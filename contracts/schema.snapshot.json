@@ -1,0 +1,42 @@
+{
+  "contract_version": "v1",
+  "json_envelope": {
+    "success": ["data", "meta.request_id"],
+    "error": ["error.code", "error.message", "error.details", "meta.request_id"]
+  },
+  "required_paths": [
+    "/api/v1/knowledge-bases",
+    "/api/v1/knowledge-bases/{kb_id}",
+    "/api/v1/knowledge-bases/{kb_id}/documents",
+    "/api/v1/documents/{document_id}",
+    "/api/v1/documents/{document_id}/content",
+    "/api/v1/documents/{document_id}/chunks",
+    "/api/v1/documents/{document_id}/assets/{asset_id}",
+    "/api/v1/documents/{document_id}/graph",
+    "/api/v1/documents/{document_id}/versions",
+    "/api/v1/documents/{document_id}/graph/rebuild",
+    "/api/v1/ingestion-jobs/{job_id}",
+    "/api/v1/ingestion-jobs/{job_id}/retry",
+    "/api/v1/conversations",
+    "/api/v1/conversations/{conversation_id}/messages",
+    "/api/v1/conversations/{conversation_id}",
+    "/api/v1/runs/{run_id}/events",
+    "/api/v1/runs/{run_id}/cancel",
+    "/api/v1/runs/{run_id}/citations/{citation_id}",
+    "/api/v1/settings",
+    "/api/v1/settings/models"
+  ],
+  "sse_events": [
+    "run.created",
+    "retrieval.started",
+    "retrieval.completed",
+    "tool.started",
+    "tool.completed",
+    "tool.failed",
+    "evidence.frozen",
+    "answer.completed",
+    "run.failed"
+  ],
+  "forbidden_terms": ["mcp", "approval", "sandbox", "skill", "shell_exec", "artifact"]
+}
+

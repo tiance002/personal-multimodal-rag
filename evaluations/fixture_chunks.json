@@ -1,0 +1,10 @@
+[
+  {"chunk_id":"m0-sample-01","knowledge_base_id":"default","document_id":"m0-doc","version_id":"m0-v1","content":"个人使用的本地知识库默认绑定 loopback，不含登录注册。"},
+  {"chunk_id":"m0-sample-02","knowledge_base_id":"default","document_id":"m0-doc","version_id":"m0-v1","content":"旧文档保留为新的 document_version，索引就绪后原子切换 active version。"},
+  {"chunk_id":"m0-sample-03","knowledge_base_id":"default","document_id":"m0-doc","version_id":"m0-v1","content":"L1 本地模型超时后保留 q0，继续确定性检索，不静默回退云端。"},
+  {"chunk_id":"m0-sample-04","knowledge_base_id":"private","document_id":"private-doc","version_id":"private-v1","content":"cloud_allowed=false 时问题、片段、图像、Embedding 和派生内容不能发送到云端。"},
+  {"chunk_id":"m0-sample-05","knowledge_base_id":"default","document_id":"m0-doc","version_id":"m0-v1","content":"回答引用必须指向真实 chunk、version、locator，可回读，未知或过期 ID 不得输出。"},
+  {"chunk_id":"m0-sample-06","knowledge_base_id":"default","document_id":"m0-doc","version_id":"m0-v1","content":"V1 Agent 不允许 shell 命令，只读知识工具闭集；MCP、沙箱、Skills 属于 V2。"},
+  {"chunk_id":"m2-sample-01","knowledge_base_id":"multimodal","document_id":"m2-doc","version_id":"m2-v1","content":"图片资料失败时原始 asset 保留，明确报告 OCR_UNAVAILABLE，不伪造文字。"},
+  {"chunk_id":"m3-sample-01","knowledge_base_id":"graph","document_id":"m3-doc","version_id":"m3-v1","content":"图谱关系必须绑定同一版本的可回读 chunk；图谱失败不影响索引。"}
+]

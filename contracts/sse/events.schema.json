@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "personal-rag-v1-sse-events",
+  "title": "Personal RAG V1 SSE event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seq", "event", "data"],
+  "properties": {
+    "seq": { "type": "integer", "minimum": 1 },
+    "event": {
+      "type": "string",
+      "enum": [
+        "run.created",
+        "retrieval.started",
+        "retrieval.completed",
+        "tool.started",
+        "tool.completed",
+        "tool.failed",
+        "evidence.frozen",
+        "answer.completed",
+        "run.failed"
+      ]
+    },
+    "data": { "type": "object" }
+  }
+}

@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir .
+
+COPY backend ./backend
+COPY alembic ./alembic
+COPY alembic.ini ./alembic.ini
+
+CMD ["python", "-m", "backend.app.workers.ingestion", "--poll-seconds", "2"]
+
