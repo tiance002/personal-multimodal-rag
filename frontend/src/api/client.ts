@@ -1,4 +1,4 @@
-import type { Conversation, DocumentItem, KnowledgeBase, Message } from "../app/state";
+import type { Conversation, DocumentItem, IngestionJob, KnowledgeBase, Message } from "../app/state";
 
 const API = "/api/v1";
 
@@ -16,12 +16,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   listKnowledgeBases: () => request<KnowledgeBase[]>("/knowledge-bases"),
+  createKnowledgeBase: (name: string) => request<KnowledgeBase>("/knowledge-bases", { method: "POST", body: JSON.stringify({ name }) }),
   listDocuments: (kbId: string) => request<DocumentItem[]>(`/knowledge-bases/${kbId}/documents`),
+  getIngestionJob: (jobId: string) => request<IngestionJob>(`/ingestion-jobs/${jobId}`),
+  retryIngestionJob: (jobId: string) => request<IngestionJob>(`/ingestion-jobs/${jobId}/retry`, { method: "POST" }),
   listConversations: () => request<Conversation[]>("/conversations"),
   createConversation: (kbId: string, documentScope: string[] = []) => request<Conversation>("/conversations", { method: "POST", body: JSON.stringify({ knowledge_base_scope: [kbId], document_scope: documentScope, title: "新对话" }) }),
   listMessages: (conversationId: string) => request<Message[]>(`/conversations/${conversationId}/messages`),
   updateConversation: (conversationId: string, patch: { knowledge_base_scope?: string[]; document_scope?: string[]; title?: string }) => request<Conversation>(`/conversations/${conversationId}`, { method: "PATCH", body: JSON.stringify(patch) }),
-  sendMessage: (conversationId: string, content: string, mode: "quick" | "smart" = "quick") => request<{ run_id: string; answer: string; citations: string[]; error_code?: string }>(`/conversations/${conversationId}/messages`, { method: "POST", body: JSON.stringify({ content, mode }) }),
+  sendMessage: (conversationId: string, content: string, mode: "quick" | "smart", knowledgeBaseScope: string[], documentScope: string[]) => request<{ run_id: string; answer: string; citations: string[]; error_code?: string }>(`/conversations/${conversationId}/messages`, { method: "POST", body: JSON.stringify({ content, mode, expected_knowledge_base_scope: knowledgeBaseScope, expected_document_scope: documentScope }) }),
   getContent: (documentId: string) => request<{ content: string; assets: unknown[] }>(`/documents/${documentId}/content`),
   getGraph: (documentId: string) => request<{ status: string; nodes: { label: string }[]; edges: { relation: string; quote: string }[] }>(`/documents/${documentId}/graph`),
   rebuildGraph: (documentId: string) => request<{ status: string }>(`/documents/${documentId}/graph/rebuild`, { method: "POST" }),

@@ -210,6 +210,34 @@
             "title": "Content",
             "type": "string"
           },
+          "expected_document_scope": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Document Scope"
+          },
+          "expected_knowledge_base_scope": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Knowledge Base Scope"
+          },
           "mode": {
             "default": "quick",
             "pattern": "^(quick|smart)$",

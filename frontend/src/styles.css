@@ -21,3 +21,9 @@
 .document-scope-toggle { flex:none; border:1px solid var(--line); background:#f8f4eb; color:var(--muted); border-radius:4px; padding:4px 6px; font-size:9px; }
 .document-scope-toggle.active { border-color:var(--moss); color:var(--moss); background:#e2eee0; }
 .library-panel { min-height:0; overflow:auto; }
+.library-actions, .create-base-controls { display:flex; align-items:center; gap:7px; }
+.create-base .field-label { margin-top:13px; }
+.create-base-controls input { flex:1; min-width:0; border:1px solid var(--line); border-radius:7px; background:#f8f4eb; color:var(--ink); padding:8px 10px; font-size:12px; }
+.create-base-controls button, .ingestion-status button { border:1px solid var(--moss); border-radius:6px; background:var(--moss-soft); color:#385c37; padding:7px 10px; font-size:11px; }
+.ingestion-status { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px; color:var(--ink); font-size:11px; }
+.ingestion-status strong { color:#a64c31; font-size:10px; }

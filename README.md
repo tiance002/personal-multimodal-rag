@@ -21,6 +21,10 @@ $env:OLLAMA_NO_CLOUD = '1'
 
 ## 本地开发
 
+本机 API 访问 Ollama 使用 `http://127.0.0.1:11434`；容器内的 `127.0.0.1` 是容器自身，Compose 通过 `COMPOSE_OLLAMA_BASE_URL`（默认 `http://host.docker.internal:11434`）访问主机 Ollama。两种模式默认 Chat 为 `qwen3.5:4b`，Embedding 为 `bge-m3:latest`。`.env.example` 中的 `OLLAMA_BASE_URL` 只供本机 API 进程使用，不会覆盖 Compose 的容器地址。
+
+Docker Compose 会读取项目根目录 `.env` 用于变量插值；下面的原生 `uvicorn` 命令**不会自动加载 `.env`**，`Settings` 只读取启动进程的环境变量。若要自定义模型或 Ollama 地址，请先在同一 PowerShell 终端设置 `$env:OLLAMA_CHAT_MODEL`、`$env:OLLAMA_EMBEDDING_MODEL`、`$env:OLLAMA_BASE_URL` 等变量；否则使用上述默认值。
+
 ```powershell
 & 'E:\Docker\DockerDesktop\resources\bin\docker.exe' compose -f deploy\compose.yml up -d db
 $env:RAG_DATABASE_URL = 'postgresql+psycopg://rag:rag@127.0.0.1:55432/rag'
@@ -34,13 +38,15 @@ $env:RAG_DATABASE_URL = 'postgresql+psycopg://rag:rag@127.0.0.1:55432/rag'
 npm --prefix frontend run dev -- --host 127.0.0.1
 ```
 
-生产式本地 Compose 会启动 API、独立 ingestion worker、前端和 PostgreSQL：
+生产式本地 Compose 会启动 API、独立 ingestion worker、前端和 PostgreSQL。需要自定义配置时先复制 `.env.example` 为 `.env`；其中 `COMPOSE_OLLAMA_BASE_URL` 是容器连接主机 Ollama 的地址：
 
 ```powershell
 & 'E:\Docker\DockerDesktop\resources\bin\docker.exe' compose -f deploy\compose.yml up -d
 ```
 
 访问 `http://127.0.0.1:4173`；API health 为 `http://127.0.0.1:8000/healthz`。Compose API 使用 `RAG_INLINE_INGESTION=false`，由 worker 轮询队列；本地开发默认 inline ingestion，便于无需常驻 worker 调试。
+
+首次打开空知识库时，在页面点击“＋ 创建”，输入名称；选中新库后导入第一份 TXT/Markdown/PDF/图片。上传仅表示文件已接收，资料台会按摄取任务显示索引进度与最终状态；一次只跟踪一份正在处理的资料，完成后可继续上传，失败且仍有可用尝试次数时可点击“重试摄取”。索引显示完成后再提问，并点击回答中的 `E1` 等引用查看原文。范围同步失败或服务端范围变化时，页面会暂停问答并提示刷新，避免按错误范围发送。
 
 ### 可选 Langfuse tracing
 

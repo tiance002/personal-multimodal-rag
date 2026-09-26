@@ -17,6 +17,16 @@ export type DocumentItem = {
   active_version_id?: string;
 };
 
+export type IngestionJob = {
+  id: string;
+  status: string;
+  stage: string;
+  progress: number;
+  attempts: number;
+  max_attempts: number;
+  error_code: string | null;
+};
+
 export type Conversation = {
   id: string;
   title: string;

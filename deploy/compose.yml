@@ -26,7 +26,9 @@ services:
       RAG_LANGFUSE_ENABLED: ${RAG_LANGFUSE_ENABLED:-false}
       RAG_LANGFUSE_CAPTURE_CONTENT: ${RAG_LANGFUSE_CAPTURE_CONTENT:-false}
       RAG_INLINE_INGESTION: "false"
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_BASE_URL: ${COMPOSE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3.5:4b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:latest}
       LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://us.cloud.langfuse.com}
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
@@ -50,7 +52,9 @@ services:
       RAG_STORAGE_ROOT: /data/storage
       RAG_CLOUD_ENABLED: "false"
       RAG_TESSDATA_DIR: /opt/tessdata
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_BASE_URL: ${COMPOSE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3.5:4b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:latest}
     volumes:
       - rag-storage:/data/storage
       - ../var/tessdata:/opt/tessdata:ro

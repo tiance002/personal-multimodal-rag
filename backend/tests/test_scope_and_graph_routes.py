@@ -82,3 +82,19 @@ def test_patch_conversation_rejects_document_from_another_knowledge_base() -> No
 
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "INVALID_DOCUMENT_SCOPE"
+
+
+def test_message_rejects_a_scope_that_changed_after_the_browser_selected_it() -> None:
+    with _client(RouteStore()) as client:
+        response = client.post(
+            "/api/v1/conversations/conversation-1/messages",
+            json={
+                "content": "question for B",
+                "mode": "quick",
+                "expected_knowledge_base_scope": ["kb-b"],
+                "expected_document_scope": [],
+            },
+        )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "CONVERSATION_SCOPE_CHANGED"

@@ -44,6 +44,8 @@ class ConversationPatch(BaseModel):
 class MessageIn(BaseModel):
     content: str = Field(min_length=1, max_length=100_000)
     mode: str = Field(default="quick", pattern="^(quick|smart)$")
+    expected_knowledge_base_scope: list[str] | None = None
+    expected_document_scope: list[str] | None = None
 
 
 def _container(request: Request) -> Container:
@@ -259,7 +261,7 @@ def retry_ingestion_job(job_id: str, request: Request, background_tasks: Backgro
     result = store.retry_job(job_id)
     if not result:
         return _not_found(request)
-    if result.get("status") == "queued":
+    if result.get("status") == "queued" and request.app.state.settings.inline_ingestion_enabled:
         background_tasks.add_task(store.process_job, job_id)
     return _ok(request, result, 202)
 
@@ -331,6 +333,13 @@ def send_message(conversation_id: str, request: Request, payload: MessageIn):
     conversation = store.get_conversation(conversation_id)
     if not conversation:
         return _not_found(request)
+    if (payload.expected_knowledge_base_scope is None) != (payload.expected_document_scope is None):
+        return _error(request, "INVALID_EXPECTED_SCOPE", "both expected scope fields are required together")
+    if payload.expected_knowledge_base_scope is not None and (
+        payload.expected_knowledge_base_scope != conversation["knowledge_base_scope"]
+        or payload.expected_document_scope != conversation["document_scope"]
+    ):
+        return _error(request, "CONVERSATION_SCOPE_CHANGED", "conversation scope changed; refresh before asking", 409)
     try:
         outcome = _answer_service(request).answer(conversation, payload.content, payload.mode)
     except Exception as exc:
