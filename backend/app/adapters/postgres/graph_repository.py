@@ -51,13 +51,25 @@ class PostgresGraphRepository(PostgresKnowledgeRepository):
             return []
         kb_names = ",".join(f":kb_{index}" for index, _ in enumerate(scope.knowledge_base_ids))
         params = {f"kb_{index}": value for index, value in enumerate(scope.knowledge_base_ids)}
+        document_clause = ""
+        if scope.document_ids:
+            document_names = ",".join(f":doc_{index}" for index, _ in enumerate(scope.document_ids))
+            params.update({f"doc_{index}": value for index, value in enumerate(scope.document_ids)})
+            document_clause = f" AND ge.document_id IN ({document_names})"
         params["name"] = f"%{entity_name.casefold()}%"
         with self.engine.connect() as conn:
             rows = conn.execute(text(f"""SELECT ge.id,ge.version_id,ge.document_id,ge.knowledge_base_id,ge.source_node_id,ge.target_node_id,ge.relation,
                 gee.chunk_id,gee.quote,gee.quote_sha256
                 FROM graph_edges ge
-                JOIN graph_edge_evidence gee ON gee.edge_id=ge.id
+                JOIN graph_edge_evidence gee ON gee.edge_id=ge.id AND gee.version_id=ge.version_id
+                JOIN documents d ON d.id=ge.document_id AND d.knowledge_base_id=ge.knowledge_base_id
+                JOIN document_versions dv ON dv.id=ge.version_id AND dv.document_id=ge.document_id
                 WHERE ge.knowledge_base_id IN ({kb_names})
+                  {document_clause}
+                  AND d.deleted_at IS NULL
+                  AND d.active_version_id = ge.version_id
+                  AND dv.index_status = 'ready'
+                  AND dv.graph_status = 'ready'
                   AND EXISTS (
                       SELECT 1 FROM graph_nodes gn
                       WHERE gn.id IN (ge.source_node_id, ge.target_node_id)

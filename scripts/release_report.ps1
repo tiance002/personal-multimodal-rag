@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $paths = @(
     'var\reports\verify-release.json','var\reports\verify-m0.json','var\reports\verify-m1.json','var\reports\verify-m2.json','var\reports\verify-m3.json','var\reports\verify-m4.json',
-    'var\reports\contract-test.json','var\reports\eval-retrieval.json','var\reports\smoke-m2.json','var\reports\smoke-m4.json','var\reports\frontend-smoke.json'
+    'var\reports\contract-test.json','var\reports\eval-retrieval.json','var\reports\eval-rag-quality.json','var\reports\smoke-quality-postgres.json','var\reports\probe-pdf-ocr.json','var\reports\smoke-m2.json','var\reports\smoke-m4.json','var\reports\smoke-m4-real.json','var\reports\smoke-langchain-ollama.json','var\reports\frontend-smoke.json','var\reports\preview-proxy-smoke.json','var\reports\compose-proxy-smoke.json','var\reports\compose-ui-smoke.json'
 )
 $checks = foreach ($path in $paths) {
     if (Test-Path -LiteralPath $path) {

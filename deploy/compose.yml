@@ -43,9 +43,11 @@ services:
       RAG_DATABASE_URL: postgresql+psycopg://rag:rag@db:5432/rag
       RAG_STORAGE_ROOT: /data/storage
       RAG_CLOUD_ENABLED: "false"
+      RAG_TESSDATA_DIR: /opt/tessdata
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
     volumes:
       - rag-storage:/data/storage
+      - ../var/tessdata:/opt/tessdata:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -57,7 +59,7 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile.frontend
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-4173}:4173"
+      - "127.0.0.1:${FRONTEND_PORT:-4173}:80"
     depends_on:
       - api
 

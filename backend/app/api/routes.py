@@ -73,7 +73,15 @@ def _media_type(file: UploadFile) -> str:
     return file.content_type or mimetypes.guess_type(file.filename or "")[0] or "application/octet-stream"
 
 
-def _submit_upload(kb_id: str, request: Request, file: UploadFile, duplicate_policy: str, background_tasks: BackgroundTasks):
+def _submit_upload(
+    kb_id: str | None,
+    request: Request,
+    file: UploadFile,
+    duplicate_policy: str,
+    background_tasks: BackgroundTasks,
+    *,
+    document_id: str | None = None,
+):
     settings = request.app.state.settings
     if not file.filename:
         return _error(request, "INVALID_FILE_NAME", "file name is required")
@@ -83,14 +91,19 @@ def _submit_upload(kb_id: str, request: Request, file: UploadFile, duplicate_pol
     try:
         store = _container(request).store
         stored = store.storage.put_stream(file.file, max_bytes=settings.max_upload_bytes)
-        receipt = store.create_upload(kb_id, normalized, _media_type(file), stored, duplicate_policy)
+        if document_id is not None:
+            receipt = store.create_version(document_id, normalized, _media_type(file), stored, duplicate_policy)
+        else:
+            if kb_id is None:
+                return _error(request, "KNOWLEDGE_BASE_NOT_FOUND", "knowledge base is required")
+            receipt = store.create_upload(kb_id, normalized, _media_type(file), stored, duplicate_policy)
         if receipt.get("job_id") and settings.inline_ingestion_enabled:
             background_tasks.add_task(store.process_job, receipt["job_id"])
         return _ok(request, receipt, 202)
     except ValueError as exc:
         return _error(request, str(exc), str(exc))
     except LookupError:
-        return _not_found(request, "knowledge base not found")
+        return _not_found(request, "document not found" if document_id is not None else "knowledge base not found")
     except Exception as exc:
         return _error(request, "UPLOAD_FAILED", type(exc).__name__, 400)
 
@@ -180,7 +193,7 @@ def upload_document_version(document_id: str, request: Request, background_tasks
     document = _container(request).store.get_document(document_id)
     if not document:
         return _not_found(request)
-    return _submit_upload(str(document["knowledge_base_id"]), request, file, duplicate_policy, background_tasks)
+    return _submit_upload(None, request, file, duplicate_policy, background_tasks, document_id=document_id)
 
 
 @router.post("/documents/{document_id}/graph/rebuild", status_code=202)
@@ -261,6 +274,8 @@ def _answer_service(request: Request) -> AnswerService:
         agent_trace_store=container.agent,
         content_reader=container.store.get_document_content,
         document_lister=container.store.list_documents,
+        document_resolver=container.store.get_document_access,
+        smart_agent=container.smart_agent,
         local_query_enabled=settings.local_query_enabled,
     )
 
@@ -305,7 +320,8 @@ def run_events(run_id: str, request: Request, last_event_id: str | None = Header
 
 @router.post("/runs/{run_id}/cancel")
 def cancel_run(run_id: str, request: Request):
-    return _ok(request, {"cancelled": True}) if _container(request).store.cancel_run(run_id) else _not_found(request)
+    container = _container(request)
+    return _ok(request, {"cancelled": True}) if container.store.cancel_run(run_id) else _not_found(request)
 
 
 @router.get("/runs/{run_id}/citations/{citation_id}")

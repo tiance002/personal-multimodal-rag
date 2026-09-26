@@ -186,7 +186,7 @@ class IngestionWorker:
                 version.id,
             )
             if not normalized.markdown_content and normalized.assets:
-                raise ParserError("OCR_UNAVAILABLE")
+                raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
             job.stage, job.progress = "indexing", 60
             version.normalized_document = normalized
             version.chunks = chunk_document(normalized)

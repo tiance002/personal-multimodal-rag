@@ -32,5 +32,5 @@ def test_pdf_and_image_keep_source_locators_and_image_failure_is_recoverable(tmp
     state = worker.process(receipt.job_id)
 
     assert state.status == "failed"
-    assert state.error_code == "OCR_UNAVAILABLE"
+    assert state.error_code == "OCR_EMPTY"
     assert storage.read(receipt.storage_key) == image_path.read_bytes()

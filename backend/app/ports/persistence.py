@@ -28,5 +28,7 @@ class RunEventStore(Protocol):
 
     def complete_run(self, run_id: str, status: str, error_code: str | None = None) -> None: ...
 
+    def is_cancelled(self, run_id: str) -> bool: ...
+
 
 __all__ = ["RunEventStore"]

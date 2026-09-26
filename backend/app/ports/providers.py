@@ -15,6 +15,7 @@ class EmbeddingResult:
     model: str
     dimensions: int
     latency_ms: float
+    profile_id: str | None = None
 
 
 @dataclass(frozen=True)

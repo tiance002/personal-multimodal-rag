@@ -22,7 +22,14 @@ class RetrievalRepository(Protocol):
     def keyword_candidates(self, scope: Scope, query: NormalizedQuery, limit: int) -> list[RankedHit]:
         """Rank chunks by deterministic term overlap, best first."""
 
-    def vector_candidates(self, scope: Scope, vector: Sequence[float], limit: int) -> list[RankedHit]:
+    def vector_candidates(
+        self,
+        scope: Scope,
+        vector: Sequence[float],
+        limit: int,
+        *,
+        profile_id: str | None = None,
+    ) -> list[RankedHit]:
         """Rank chunks by embedding similarity, best first."""
 
     def get_chunk(self, chunk_id: str) -> ChunkRecord | None:

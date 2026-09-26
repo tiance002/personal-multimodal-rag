@@ -15,6 +15,7 @@ class SourceLocator(BaseModel):
     end: int | None = Field(default=None, ge=0)
     bbox: tuple[float, float, float, float] | None = None
     quote: str | None = None
+    asset_id: str | None = None
 
 
 class DocumentSection(BaseModel):
@@ -28,6 +29,8 @@ class DocumentSection(BaseModel):
     end: int = Field(ge=0)
     page_start: int | None = Field(default=None, ge=1)
     page_end: int | None = Field(default=None, ge=1)
+    content_type: Literal["text", "image_ocr"] = "text"
+    asset_id: str | None = None
 
 
 class DocumentAsset(BaseModel):
@@ -40,6 +43,9 @@ class DocumentAsset(BaseModel):
     derived_from_asset_id: str | None = None
     page_no: int | None = Field(default=None, ge=1)
     source_locator: dict[str, object] = Field(default_factory=dict)
+    source_bytes: bytes | None = Field(default=None, exclude=True)
+    status: Literal["ready", "failed"] = "ready"
+    error_code: str | None = None
 
 
 class NormalizedDocument(BaseModel):
@@ -112,6 +118,8 @@ class ChunkRecord:
     heading_path: tuple[str, ...] = ()
     is_current: bool = True
     embedding: tuple[float, ...] | None = None
+    embedding_profile_id: str | None = None
+    content_sha256: str | None = None
 
 
 @dataclass(frozen=True)

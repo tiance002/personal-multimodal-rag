@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import json
 import hashlib
+import threading
 import uuid
+from contextlib import contextmanager
 from io import BytesIO
+from collections.abc import Iterator
 from typing import Any
 
 from sqlalchemy import Engine, text
 
 from backend.app.adapters.parsers import ParserRegistry
 from backend.app.adapters.storage import ContentAddressedStorage
-from backend.app.domain.chunking import chunk_document
+from backend.app.domain.chunking import chunk_document, profile_document
 from backend.app.domain.models import ChunkRecord, RankedHit
 from backend.app.domain.parsers import ParserError
 from backend.app.domain.scope import Scope
@@ -79,7 +82,7 @@ class PostgresKnowledgeRepository:
             kb_exists = conn.execute(text("SELECT 1 FROM knowledge_bases WHERE id=:id AND deleted_at IS NULL"), {"id": kb_id}).first()
             if not kb_exists:
                 raise LookupError("knowledge base not found")
-            existing = conn.execute(text("SELECT id,active_version_id FROM documents WHERE knowledge_base_id=:kb AND file_name=:name AND deleted_at IS NULL"), {"kb": kb_id, "name": file_name}).mappings().first()
+            existing = conn.execute(text("SELECT id,active_version_id FROM documents WHERE knowledge_base_id=:kb AND file_name=:name AND deleted_at IS NULL FOR UPDATE"), {"kb": kb_id, "name": file_name}).mappings().first()
             if existing:
                 document_id = existing["id"]
                 if duplicate_policy == "skip" and existing["active_version_id"]:
@@ -95,6 +98,191 @@ class PostgresKnowledgeRepository:
             conn.execute(text("INSERT INTO ingestion_jobs (id,version_id,job_type,status,stage) VALUES (:id,:version_id,'ingest','queued','queued')"), {"id": job_id, "version_id": version_id})
         return {"document_id": str(document_id), "version_id": str(version_id), "job_id": str(job_id), "storage_key": stored.storage_key, "sha256": stored.sha256, "size": stored.size, "status": "stored"}
 
+    def create_version(
+        self,
+        document_id: str,
+        file_name: str,
+        media_type: str,
+        stored: Any,
+        duplicate_policy: str = "new_version",
+    ) -> dict[str, Any]:
+        """Queue a new immutable version for this exact document identity."""
+        version_id = uuid.uuid4()
+        job_id = uuid.uuid4()
+        with self.engine.begin() as conn:
+            document = conn.execute(
+                text("""
+                    SELECT d.id, d.knowledge_base_id, d.active_version_id
+                    FROM documents d
+                    JOIN knowledge_bases kb ON kb.id=d.knowledge_base_id AND kb.deleted_at IS NULL
+                    WHERE d.id=:document_id AND d.deleted_at IS NULL
+                    FOR UPDATE OF d
+                """),
+                {"document_id": document_id},
+            ).mappings().first()
+            if not document:
+                raise LookupError("document not found")
+            if duplicate_policy == "skip" and document["active_version_id"]:
+                current = conn.execute(
+                    text("SELECT id,source_sha256,version_no FROM document_versions WHERE id=:id"),
+                    {"id": document["active_version_id"]},
+                ).mappings().first()
+                if current and current["source_sha256"] == stored.sha256:
+                    return {
+                        "document_id": str(document_id),
+                        "version_id": str(current["id"]),
+                        "version_no": current["version_no"],
+                        "job_id": None,
+                        "storage_key": stored.storage_key,
+                        "sha256": stored.sha256,
+                        "size": stored.size,
+                        "status": "duplicate",
+                    }
+            version_no = conn.execute(
+                text("SELECT COALESCE(MAX(version_no),0)+1 AS next_no FROM document_versions WHERE document_id=:document_id"),
+                {"document_id": document_id},
+            ).scalar_one()
+            conn.execute(
+                text("UPDATE documents SET file_name=:file_name,media_type=:media_type,original_size=:size,updated_at=clock_timestamp() WHERE id=:id"),
+                {"id": document_id, "file_name": file_name, "media_type": media_type, "size": stored.size},
+            )
+            conn.execute(
+                text("""
+                    INSERT INTO document_versions
+                        (id,document_id,version_no,source_sha256,storage_key,parser_version,index_status,graph_status)
+                    VALUES (:id,:document_id,:version_no,:sha256,:storage_key,'pending','queued','disabled')
+                """),
+                {"id": version_id, "document_id": document_id, "version_no": version_no, "sha256": stored.sha256, "storage_key": stored.storage_key},
+            )
+            conn.execute(
+                text("INSERT INTO ingestion_jobs (id,version_id,job_type,status,stage) VALUES (:id,:version_id,'ingest','queued','queued')"),
+                {"id": job_id, "version_id": version_id},
+            )
+        return {
+            "document_id": str(document_id),
+            "version_id": str(version_id),
+            "version_no": version_no,
+            "job_id": str(job_id),
+            "storage_key": stored.storage_key,
+            "sha256": stored.sha256,
+            "size": stored.size,
+            "status": "stored",
+        }
+
+    def claim_job(
+        self,
+        *,
+        worker_id: str,
+        lease_seconds: int = 60,
+        job_id: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Atomically claim one job and fence the claim with a fresh token."""
+        if not worker_id:
+            raise ValueError("worker_id is required")
+        if lease_seconds <= 0:
+            raise ValueError("lease_seconds must be positive")
+        claim_token = uuid.uuid4()
+        params: dict[str, Any] = {
+            "worker_id": worker_id,
+            "claim_token": claim_token,
+            "lease_seconds": lease_seconds,
+        }
+        target = ""
+        if job_id is not None:
+            target = " AND id=:job_id"
+            params["job_id"] = job_id
+        statement = text(f"""
+            WITH candidate AS (
+                SELECT id
+                FROM ingestion_jobs
+                WHERE attempts < max_attempts
+                  AND (
+                      status = 'queued'
+                      OR (status IN ('leased', 'running') AND lease_until IS NOT NULL AND lease_until <= clock_timestamp())
+                  ){target}
+                ORDER BY created_at
+                FOR UPDATE SKIP LOCKED
+                LIMIT 1
+            )
+            UPDATE ingestion_jobs AS job
+            SET status='running',
+                stage='processing',
+                worker_id=:worker_id,
+                claim_token=:claim_token,
+                lease_until=clock_timestamp() + (:lease_seconds * INTERVAL '1 second'),
+                attempts=job.attempts + 1,
+                error_code=NULL,
+                updated_at=clock_timestamp()
+            FROM candidate
+            WHERE job.id=candidate.id
+            RETURNING job.id, job.version_id, job.status, job.stage, job.attempts,
+                      job.worker_id, job.claim_token, job.lease_until
+        """)
+        with self.engine.begin() as conn:
+            row = conn.execute(statement, params).mappings().first()
+        if not row:
+            return None
+        result = dict(row)
+        for key in ("id", "version_id", "claim_token"):
+            if result.get(key) is not None:
+                result[key] = str(result[key])
+        return result
+
+    def renew_job(self, job_id: str, *, worker_id: str, claim_token: str, lease_seconds: int = 60) -> bool:
+        if lease_seconds <= 0:
+            raise ValueError("lease_seconds must be positive")
+        with self.engine.begin() as conn:
+            result = conn.execute(
+                text("""
+                    UPDATE ingestion_jobs
+                    SET lease_until=clock_timestamp() + (:lease_seconds * INTERVAL '1 second'), updated_at=clock_timestamp()
+                    WHERE id=:id AND status='running' AND worker_id=:worker_id
+                      AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                """),
+                {"id": job_id, "worker_id": worker_id, "claim_token": claim_token, "lease_seconds": lease_seconds},
+            )
+            return result.rowcount == 1
+
+    @contextmanager
+    def _lease_heartbeat(self, job_id: str, *, worker_id: str, claim_token: str, lease_seconds: int) -> Iterator[None]:
+        """Renew a live claim while parser or embedding work is running."""
+        stop = threading.Event()
+        interval = max(0.5, lease_seconds / 3)
+
+        def heartbeat() -> None:
+            while not stop.wait(interval):
+                if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
+                    return
+
+        thread = threading.Thread(target=heartbeat, name=f"ingestion-lease-{job_id}", daemon=True)
+        thread.start()
+        try:
+            yield
+        finally:
+            stop.set()
+            thread.join(timeout=interval + 1)
+
+    def update_job_progress(
+        self,
+        job_id: str,
+        *,
+        worker_id: str,
+        claim_token: str,
+        stage: str,
+        progress: int,
+    ) -> bool:
+        with self.engine.begin() as conn:
+            result = conn.execute(
+                text("""
+                    UPDATE ingestion_jobs
+                    SET stage=:stage, progress=:progress, updated_at=clock_timestamp()
+                    WHERE id=:id AND status='running' AND worker_id=:worker_id
+                      AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                """),
+                {"id": job_id, "worker_id": worker_id, "claim_token": claim_token, "stage": stage, "progress": progress},
+            )
+            return result.rowcount == 1
+
     def get_job(self, job_id: str) -> dict[str, Any] | None:
         with self.engine.connect() as conn:
             row = conn.execute(text("SELECT id,version_id,status,stage,attempts,max_attempts,progress,error_code,created_at,updated_at FROM ingestion_jobs WHERE id=:id"), {"id": job_id}).mappings().first()
@@ -108,6 +296,21 @@ class PostgresKnowledgeRepository:
                 WHERE d.id=:id AND d.deleted_at IS NULL"""), {"id": document_id}).mappings().first()
             return dict(row) if row else None
 
+    def get_document_access(self, document_id: str) -> dict[str, Any] | None:
+        """Resolve ownership and active-index state before a document read."""
+        with self.engine.connect() as conn:
+            row = conn.execute(
+                text("""
+                    SELECT d.id, d.knowledge_base_id, d.deleted_at, d.active_version_id,
+                           dv.version_no, dv.index_status, dv.graph_status
+                    FROM documents d
+                    LEFT JOIN document_versions dv ON dv.id=d.active_version_id
+                    WHERE d.id=:id
+                """),
+                {"id": document_id},
+            ).mappings().first()
+            return dict(row) if row else None
+
     def list_documents(self, kb_id: str) -> list[dict[str, Any]]:
         with self.engine.connect() as conn:
             rows = conn.execute(text("""SELECT d.id,d.knowledge_base_id,d.file_name,d.media_type,d.original_size,d.active_version_id,d.updated_at,
@@ -116,37 +319,93 @@ class PostgresKnowledgeRepository:
                 WHERE d.knowledge_base_id=:kb AND d.deleted_at IS NULL ORDER BY d.updated_at DESC"""), {"kb": kb_id}).mappings()
             return [dict(row) for row in rows]
 
-    def process_job(self, job_id: str) -> dict[str, Any]:
-        with self.engine.begin() as conn:
-            job = conn.execute(text("SELECT * FROM ingestion_jobs WHERE id=:id FOR UPDATE"), {"id": job_id}).mappings().first()
-            if not job:
-                raise LookupError("ingestion job not found")
-            if job["status"] in {"succeeded", "failed", "cancelled"}:
-                return dict(job)
-            if job["attempts"] >= job["max_attempts"]:
-                conn.execute(text("UPDATE ingestion_jobs SET status='failed',error_code='MAX_ATTEMPTS',updated_at=now() WHERE id=:id"), {"id": job_id})
+    def process_job(
+        self,
+        job_id: str,
+        *,
+        worker_id: str | None = None,
+        claim_token: str | None = None,
+        lease_seconds: int = 60,
+    ) -> dict[str, Any]:
+        """Process a fenced claim; direct callers first acquire their own claim."""
+        if worker_id is None or claim_token is None:
+            worker_id = worker_id or f"inline-{uuid.uuid4()}"
+            claim = self.claim_job(worker_id=worker_id, lease_seconds=lease_seconds, job_id=job_id)
+            if claim is None:
                 return self.get_job(job_id) or {}
-            conn.execute(text("UPDATE ingestion_jobs SET status='running',stage='processing',attempts=attempts+1,progress=10,updated_at=now() WHERE id=:id"), {"id": job_id})
-            version = conn.execute(text("SELECT dv.*,d.file_name,d.media_type,d.knowledge_base_id FROM document_versions dv JOIN documents d ON d.id=dv.document_id WHERE dv.id=:id"), {"id": job["version_id"]}).mappings().one()
+            claim_token = str(claim["claim_token"])
+        with self.engine.begin() as conn:
+            job = conn.execute(
+                text("""
+                    SELECT * FROM ingestion_jobs
+                    WHERE id=:id AND status='running' AND worker_id=:worker_id
+                      AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                    FOR UPDATE
+                """),
+                {"id": job_id, "worker_id": worker_id, "claim_token": claim_token},
+            ).mappings().first()
+            if not job:
+                return self.get_job(job_id) or {}
+            version = conn.execute(
+                text("SELECT dv.*,d.file_name,d.media_type,d.knowledge_base_id FROM document_versions dv JOIN documents d ON d.id=dv.document_id WHERE dv.id=:id"),
+                {"id": job["version_id"]},
+            ).mappings().one()
+        if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
+            return self.get_job(job_id) or {}
         try:
-            normalized = self.parsers.parse(self.storage.path_for(version["storage_key"]), version["media_type"], str(version["document_id"]), str(version["id"]))
-            if normalized.assets:
-                with self.engine.begin() as conn:
-                    for asset in normalized.assets:
-                        conn.execute(text("""INSERT INTO document_assets (id,version_id,document_id,knowledge_base_id,asset_type,storage_key,text_content,derived_from_asset_id,page_no,source_locator,status,error_code)
-                            VALUES (:id,:version_id,:document_id,:kb,:asset_type,:storage_key,:text_content,:derived_from,:page_no,CAST(:locator AS jsonb),:status,:error_code)"""), {
-                            "id": uuid.uuid4(), "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "asset_type": asset.asset_type, "storage_key": version["storage_key"] if asset.asset_type == "source_image" else asset.storage_key, "text_content": asset.text_content, "derived_from": asset.derived_from_asset_id, "page_no": asset.page_no, "locator": json.dumps(asset.source_locator), "status": "failed" if not normalized.markdown_content else "ready", "error_code": "OCR_UNAVAILABLE" if not normalized.markdown_content else None,
-                        })
-            if not normalized.markdown_content and normalized.assets:
-                raise ParserError("OCR_UNAVAILABLE")
-            chunks = chunk_document(normalized, max_chars=self.max_chunk_chars, overlap=self.chunk_overlap)
-            normalized_object = self.storage.put_stream(BytesIO(normalized.markdown_content.encode("utf-8"))) if normalized.markdown_content else None
-            vectors: list[list[float]] = []
-            if self.embedding_provider is not None and chunks:
-                vectors = self.embedding_provider.embed([chunk.content for chunk in chunks], timeout_seconds=60).vectors
-                if len(vectors) != len(chunks) or any(len(vector) != 1024 for vector in vectors):
-                    raise RuntimeError("EMBEDDING_DIMENSION_MISMATCH")
+            with self._lease_heartbeat(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
+                normalized = self.parsers.parse(self.storage.path_for(version["storage_key"]), version["media_type"], str(version["document_id"]), str(version["id"]))
+                asset_ids = {asset.asset_id: uuid.uuid4() for asset in normalized.assets}
+                asset_storage = {
+                    asset.asset_id: self.storage.put_stream(BytesIO(asset.source_bytes)).storage_key
+                    for asset in normalized.assets if asset.source_bytes is not None
+                }
+                if normalized.assets:
+                    with self.engine.begin() as conn:
+                        owned = conn.execute(
+                            text("""
+                                SELECT 1 FROM ingestion_jobs
+                                WHERE id=:id AND status='running' AND worker_id=:worker_id
+                                  AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                                FOR UPDATE
+                            """),
+                            {"id": job_id, "worker_id": worker_id, "claim_token": claim_token},
+                        ).first()
+                        if not owned:
+                            return self.get_job(job_id) or {}
+                        for asset in normalized.assets:
+                            conn.execute(text("""INSERT INTO document_assets (id,version_id,document_id,knowledge_base_id,asset_type,storage_key,text_content,derived_from_asset_id,page_no,source_locator,status,error_code)
+                                VALUES (:id,:version_id,:document_id,:kb,:asset_type,:storage_key,:text_content,:derived_from,:page_no,CAST(:locator AS jsonb),:status,:error_code)"""), {
+                                "id": asset_ids[asset.asset_id], "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "asset_type": asset.asset_type, "storage_key": asset_storage.get(asset.asset_id) or (version["storage_key"] if asset.asset_type == "source_image" and version["media_type"].startswith("image/") else asset.storage_key), "text_content": asset.text_content, "derived_from": asset_ids.get(asset.derived_from_asset_id), "page_no": asset.page_no, "locator": json.dumps({**asset.source_locator, **({"source_asset_id": str(asset_ids[asset.derived_from_asset_id])} if asset.derived_from_asset_id else {})}), "status": asset.status, "error_code": asset.error_code,
+                            })
+                if not normalized.markdown_content.strip() and normalized.assets:
+                    raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
+                if not normalized.markdown_content.strip():
+                    raise ParserError("EMPTY_TEXT")
+                chunking = profile_document(normalized, max_chars=self.max_chunk_chars)
+                chunks = chunk_document(normalized, max_chars=self.max_chunk_chars, overlap=self.chunk_overlap)
+                if not chunks:
+                    raise ParserError("EMPTY_TEXT")
+                normalized_object = self.storage.put_stream(BytesIO(normalized.markdown_content.encode("utf-8"))) if normalized.markdown_content else None
+                vectors: list[list[float]] = []
+                if self.embedding_provider is not None and chunks:
+                    vectors = self.embedding_provider.embed([chunk.content for chunk in chunks], timeout_seconds=60).vectors
+                    if len(vectors) != len(chunks) or any(len(vector) != 1024 for vector in vectors):
+                        raise RuntimeError("EMBEDDING_DIMENSION_MISMATCH")
+            if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
+                return self.get_job(job_id) or {}
             with self.engine.begin() as conn:
+                owned = conn.execute(
+                    text("""
+                        SELECT 1 FROM ingestion_jobs
+                        WHERE id=:id AND status='running' AND worker_id=:worker_id
+                          AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                        FOR UPDATE
+                    """),
+                    {"id": job_id, "worker_id": worker_id, "claim_token": claim_token},
+                ).first()
+                if not owned:
+                    return self.get_job(job_id) or {}
                 section_ids: dict[str, uuid.UUID] = {}
                 for section in normalized.sections:
                     section_id = uuid.uuid4()
@@ -166,25 +425,58 @@ class PostgresKnowledgeRepository:
                     section_id = section_ids.get(next((section.section_id for section in normalized.sections if section.start <= chunk.start < section.end), ""))
                     conn.execute(text("""INSERT INTO chunks (id,section_id,version_id,document_id,knowledge_base_id,chunk_index,content,content_sha256,start_pos,end_pos,heading_path,chunk_type,locator)
                         VALUES (:id,:section_id,:version_id,:document_id,:kb,:chunk_index,:content,:sha256,:start_pos,:end_pos,:heading_path,:chunk_type,:locator)"""), {
-                        "id": chunk_id, "section_id": section_id, "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "chunk_index": index, "content": chunk.content, "sha256": chunk.content_sha256, "start_pos": chunk.start, "end_pos": chunk.end, "heading_path": json.dumps(list(chunk.heading_path)), "chunk_type": chunk.chunk_type, "locator": json.dumps(chunk.source_locator.model_dump()),
+                        "id": chunk_id, "section_id": section_id, "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "chunk_index": index, "content": chunk.content, "sha256": chunk.content_sha256, "start_pos": chunk.start, "end_pos": chunk.end, "heading_path": json.dumps(list(chunk.heading_path)), "chunk_type": chunk.chunk_type, "locator": json.dumps({**chunk.source_locator.model_dump(), "asset_id": str(asset_ids[chunk.source_locator.asset_id]) if chunk.source_locator.asset_id else None}),
                     })
+                    if chunk.source_locator.asset_id:
+                        conn.execute(text("INSERT INTO chunk_assets (chunk_id,asset_id,version_id) VALUES (:chunk_id,:asset_id,:version_id)"), {
+                            "chunk_id": chunk_id, "asset_id": asset_ids[chunk.source_locator.asset_id], "version_id": version["id"],
+                        })
                     for term, frequency in term_frequencies(chunk.content).items():
                         conn.execute(text("INSERT INTO chunk_terms (chunk_id,term,term_frequency) VALUES (:chunk_id,:term,:frequency)"), {"chunk_id": chunk_id, "term": term, "frequency": frequency})
                     if profile_id is not None:
                         vector_literal = "[" + ",".join(str(value) for value in vectors[index]) + "]"
                         conn.execute(text("INSERT INTO chunk_embeddings (chunk_id,profile_id,embedding) VALUES (:chunk_id,:profile_id,CAST(:embedding AS vector))"), {"chunk_id": chunk_id, "profile_id": profile_id, "embedding": vector_literal})
-                conn.execute(text("""UPDATE document_versions SET index_status='ready',parser_version=:parser_version,normalized_content_key=:normalized_key,normalized_content_sha256=:normalized_sha,normalizer_version='text/v1',activated_at=now()
-                    WHERE id=:id"""), {"id": version["id"], "parser_version": normalized.parser_version, "normalized_key": normalized_object.storage_key if normalized_object else None, "normalized_sha": normalized_object.sha256 if normalized_object else None})
+                conn.execute(text("""UPDATE document_versions SET index_status='ready',parser_version=:parser_version,chunker_version=:chunker_version,chunk_strategy=:chunk_strategy,normalized_content_key=:normalized_key,normalized_content_sha256=:normalized_sha,normalizer_version='text/v1',activated_at=clock_timestamp()
+                    WHERE id=:id"""), {"id": version["id"], "parser_version": normalized.parser_version, "chunker_version": chunking.chunker_version, "chunk_strategy": chunking.strategy, "normalized_key": normalized_object.storage_key if normalized_object else None, "normalized_sha": normalized_object.sha256 if normalized_object else None})
                 current = conn.execute(text("SELECT active_version_id FROM documents WHERE id=:id FOR UPDATE"), {"id": version["document_id"]}).scalar()
                 current_no = conn.execute(text("SELECT version_no FROM document_versions WHERE id=:id"), {"id": current}).scalar() if current else None
                 if current_no is None or version["version_no"] >= current_no:
-                    conn.execute(text("UPDATE documents SET active_version_id=:version_id,updated_at=now() WHERE id=:id"), {"version_id": version["id"], "id": version["document_id"]})
-                conn.execute(text("UPDATE ingestion_jobs SET status='succeeded',stage='ready',progress=100,updated_at=now() WHERE id=:id"), {"id": job_id})
+                    conn.execute(text("UPDATE documents SET active_version_id=:version_id,updated_at=clock_timestamp() WHERE id=:id"), {"version_id": version["id"], "id": version["document_id"]})
+                completion = conn.execute(
+                    text("""
+                        UPDATE ingestion_jobs
+                        SET status='succeeded',stage='ready',progress=100,updated_at=clock_timestamp()
+                        WHERE id=:id AND status='running' AND worker_id=:worker_id
+                          AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                    """),
+                    {"id": job_id, "worker_id": worker_id, "claim_token": claim_token},
+                )
+                if completion.rowcount != 1:
+                    raise RuntimeError("INGESTION_CLAIM_LOST")
         except Exception as exc:
             code = str(exc) if isinstance(exc, ParserError) else type(exc).__name__
             with self.engine.begin() as conn:
-                conn.execute(text("UPDATE document_versions SET index_status='failed',error_code=:code WHERE id=:id"), {"id": version["id"], "code": code})
-                conn.execute(text("UPDATE ingestion_jobs SET status='failed',error_code=:code,updated_at=now() WHERE id=:id"), {"id": job_id, "code": code})
+                conn.execute(
+                    text("""
+                        UPDATE document_versions
+                        SET index_status='failed',error_code=:code
+                        WHERE id=:version_id AND EXISTS (
+                            SELECT 1 FROM ingestion_jobs
+                            WHERE id=:job_id AND status='running' AND worker_id=:worker_id
+                              AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                        )
+                    """),
+                    {"version_id": version["id"], "job_id": job_id, "worker_id": worker_id, "claim_token": claim_token, "code": code},
+                )
+                conn.execute(
+                    text("""
+                        UPDATE ingestion_jobs
+                        SET status='failed',error_code=:code,updated_at=clock_timestamp()
+                        WHERE id=:id AND status='running' AND worker_id=:worker_id
+                          AND claim_token=:claim_token AND lease_until > clock_timestamp()
+                    """),
+                    {"id": job_id, "worker_id": worker_id, "claim_token": claim_token, "code": code},
+                )
         return self.get_job(job_id) or {}
 
     def _scope_filter(self, scope: Scope, params: dict[str, Any], alias: str = "c") -> str:
@@ -236,23 +528,39 @@ class PostgresKnowledgeRepository:
             rows = conn.execute(statement, params).mappings()
             return [RankedHit(chunk_id=str(row["chunk_id"]), rank=index, raw_score=float(row["score"])) for index, row in enumerate(rows, start=1)]
 
-    def vector_candidates(self, scope: Scope, vector: Any, limit: int) -> list[RankedHit]:
+    def get_embedding_profile_id(self, model_name: str, dimension: int) -> str | None:
+        if not model_name or dimension <= 0:
+            return None
+        with self.engine.connect() as conn:
+            profile_id = conn.execute(
+                text("""
+                    SELECT id
+                    FROM embedding_profiles
+                    WHERE provider='ollama' AND model_name=:model_name AND dimension=:dimension
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                """),
+                {"model_name": model_name, "dimension": dimension},
+            ).scalar()
+            return str(profile_id) if profile_id is not None else None
+
+    def vector_candidates(self, scope: Scope, vector: Any, limit: int, *, profile_id: str | None = None) -> list[RankedHit]:
         """Rank candidates with the pgvector cosine-distance operator.
 
         Ordering happens inside PostgreSQL against the HNSW index created in
         migration 0009, so no embedding ever crosses the wire for ranking.
         """
         values = list(vector or ())
-        if not scope.knowledge_base_ids or not values or limit <= 0:
+        if not scope.knowledge_base_ids or not values or limit <= 0 or not profile_id:
             return []
-        params: dict[str, Any] = {"limit": limit}
+        params: dict[str, Any] = {"limit": limit, "profile_id": profile_id}
         clause = self._scope_filter(scope, params)
         params["vector"] = "[" + ",".join(str(float(value)) for value in values) + "]"
         statement = text(f"""
             SELECT c.id AS chunk_id, 1 - (ce.embedding <=> CAST(:vector AS vector)) AS score
             FROM chunks c
             {self._ACTIVE_VERSION_JOINS}
-            JOIN chunk_embeddings ce ON ce.chunk_id = c.id
+            JOIN chunk_embeddings ce ON ce.chunk_id = c.id AND ce.profile_id = :profile_id
             WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
             ORDER BY ce.embedding <=> CAST(:vector AS vector)
             LIMIT :limit
@@ -277,7 +585,7 @@ class PostgresKnowledgeRepository:
             params["limit"] = limit
             limit_clause = " LIMIT :limit"
         statement = text(f"""
-            SELECT c.id,c.knowledge_base_id,c.document_id,c.version_id,c.content,c.locator
+            SELECT c.id,c.knowledge_base_id,c.document_id,c.version_id,c.content,c.content_sha256,c.locator
             FROM chunks c
             {self._ACTIVE_VERSION_JOINS}
             WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status='ready'
@@ -285,18 +593,18 @@ class PostgresKnowledgeRepository:
         """)
         with self.engine.connect() as conn:
             rows = conn.execute(statement, params).mappings()
-            return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}) for row in rows]
+            return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, content_sha256=row["content_sha256"]) for row in rows]
 
     def get_chunk(self, chunk_id: str) -> ChunkRecord | None:
         with self.engine.connect() as conn:
-            row = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,locator FROM chunks WHERE id=:id"), {"id": chunk_id}).mappings().first()
+            row = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,content_sha256,locator FROM chunks WHERE id=:id"), {"id": chunk_id}).mappings().first()
             if not row:
                 return None
-            return ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {})
+            return ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, content_sha256=row["content_sha256"])
 
     def retry_job(self, job_id: str) -> dict[str, Any] | None:
         with self.engine.begin() as conn:
-            result = conn.execute(text("UPDATE ingestion_jobs SET status='queued',stage='queued',error_code=NULL,progress=0,updated_at=now() WHERE id=:id AND status='failed' AND attempts < max_attempts"), {"id": job_id})
+            result = conn.execute(text("UPDATE ingestion_jobs SET status='queued',stage='queued',worker_id=NULL,claim_token=NULL,lease_until=NULL,error_code=NULL,progress=0,updated_at=clock_timestamp() WHERE id=:id AND status='failed' AND attempts < max_attempts"), {"id": job_id})
             if result.rowcount == 0:
                 return self.get_job(job_id)
         return self.get_job(job_id)
@@ -415,14 +723,104 @@ class PostgresKnowledgeRepository:
             for snapshot in snapshots:
                 conn.execute(text("INSERT INTO answer_evidence (id,run_id,label,version_id,chunk_id,quote,quote_sha256,locator) VALUES (:id,:run_id,:label,:version_id,:chunk_id,:quote,:quote_sha256,CAST(:locator AS jsonb)) ON CONFLICT (run_id,label) DO NOTHING"), {"id": uuid.uuid4(), "run_id": run_id, "label": snapshot.label, "version_id": snapshot.version_id, "chunk_id": snapshot.chunk_id, "quote": snapshot.quote, "quote_sha256": snapshot.quote_sha256, "locator": json.dumps(snapshot.locator)})
 
-    def complete_run(self, run_id: str, status: str, error_code: str | None = None) -> None:
+    def finalize_answer(
+        self,
+        *,
+        run_id: str,
+        conversation_id: str | None,
+        answer: str,
+        citations: tuple[str, ...],
+        snapshots: tuple[Any, ...],
+        error_code: str | None,
+        mode: str,
+        agent_terminal: tuple[str, str | None, int] | None = None,
+    ) -> bool:
         with self.engine.begin() as conn:
-            conn.execute(text("UPDATE rag_runs SET status=:status,error_code=:error_code,completed_at=now() WHERE id=:id"), {"id": run_id, "status": status, "error_code": error_code})
+            status = conn.execute(text("SELECT status FROM rag_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()
+            if status not in {"created", "running"}:
+                return False
+            terminal_status = "completed" if error_code is None else "failed"
+            if agent_terminal is not None:
+                agent_status = conn.execute(text("SELECT status FROM agent_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()
+                if agent_status != "running":
+                    return False
+                if agent_terminal[0] != terminal_status:
+                    raise ValueError("RAG and Agent terminal statuses disagree")
+
+            def append_final_event(event_type: str, payload: dict[str, Any]) -> None:
+                seq = conn.execute(
+                    text("UPDATE rag_runs SET next_event_seq=next_event_seq+1 WHERE id=:id RETURNING next_event_seq-1"),
+                    {"id": run_id},
+                ).scalar_one()
+                conn.execute(
+                    text("INSERT INTO retrieval_events (id,run_id,seq,event_type,payload) VALUES (:id,:run_id,:seq,:event_type,CAST(:payload AS jsonb))"),
+                    {"id": uuid.uuid4(), "run_id": run_id, "seq": seq, "event_type": event_type,
+                     "payload": json.dumps(payload, ensure_ascii=False)},
+                )
+
+            append_final_event("retrieval.completed", {"count": len(citations), "error_code": error_code, "mode": mode})
+            if error_code is None:
+                for snapshot in snapshots:
+                    conn.execute(
+                        text("INSERT INTO answer_evidence (id,run_id,label,version_id,chunk_id,quote,quote_sha256,locator) VALUES (:id,:run_id,:label,:version_id,:chunk_id,:quote,:quote_sha256,CAST(:locator AS jsonb))"),
+                        {"id": uuid.uuid4(), "run_id": run_id, "label": snapshot.label,
+                         "version_id": snapshot.version_id, "chunk_id": snapshot.chunk_id,
+                         "quote": snapshot.quote, "quote_sha256": snapshot.quote_sha256,
+                         "locator": json.dumps(snapshot.locator)},
+                    )
+                if snapshots:
+                    append_final_event("evidence.frozen", {"labels": [snapshot.label for snapshot in snapshots]})
+                append_final_event("answer.completed", {"error_code": None, "citations": list(citations)})
+                if conversation_id is not None:
+                    conn.execute(
+                        text("INSERT INTO conversation_messages (id,conversation_id,role,content) VALUES (:id,:conversation_id,'assistant',:content)"),
+                        {"id": uuid.uuid4(), "conversation_id": conversation_id, "content": answer},
+                    )
+                    conn.execute(text("UPDATE conversations SET updated_at=now() WHERE id=:id"), {"id": conversation_id})
+            else:
+                append_final_event("run.failed", {"error_code": error_code, "citations": []})
+            if agent_terminal is not None:
+                conn.execute(
+                    text("UPDATE agent_runs SET status=:status,step_count=(SELECT count(*) FROM agent_steps WHERE agent_run_id=:id),cost_microunits=:cost,error_code=:error_code,completed_at=clock_timestamp() WHERE id=:id"),
+                    {"id": run_id, "status": agent_terminal[0], "error_code": agent_terminal[1], "cost": agent_terminal[2]},
+                )
+            conn.execute(
+                text("UPDATE rag_runs SET status=:status,error_code=:error_code,completed_at=clock_timestamp() WHERE id=:id"),
+                {"id": run_id, "status": terminal_status, "error_code": error_code},
+            )
+            return True
+
+    def complete_run(self, run_id: str, status: str, error_code: str | None = None) -> bool:
+        with self.engine.begin() as conn:
+            result = conn.execute(
+                text("UPDATE rag_runs SET status=:status,error_code=:error_code,completed_at=clock_timestamp() WHERE id=:id AND status IN ('created','running')"),
+                {"id": run_id, "status": status, "error_code": error_code},
+            )
+            return result.rowcount == 1
 
     def cancel_run(self, run_id: str) -> bool:
         with self.engine.begin() as conn:
-            result = conn.execute(text("UPDATE rag_runs SET status='cancelled',completed_at=now() WHERE id=:id AND status IN ('created','running')"), {"id": run_id})
-            return result.rowcount == 1
+            status = conn.execute(text("SELECT status FROM rag_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()
+            if status not in {"created", "running"}:
+                return False
+            agent_status = conn.execute(text("SELECT status FROM agent_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()
+            if agent_status not in {None, "running", "cancelled"}:
+                return False
+            conn.execute(text("UPDATE rag_runs SET status='cancelled',error_code='CANCELLED',completed_at=clock_timestamp() WHERE id=:id"), {"id": run_id})
+            if agent_status == "running":
+                conn.execute(text("UPDATE agent_runs SET status='cancelled',error_code='CANCELLED',completed_at=clock_timestamp() WHERE id=:id"), {"id": run_id})
+            seq = conn.execute(text("UPDATE rag_runs SET next_event_seq=next_event_seq+1 WHERE id=:id RETURNING next_event_seq-1"), {"id": run_id}).scalar_one()
+            conn.execute(
+                text("INSERT INTO retrieval_events (id,run_id,seq,event_type,payload) VALUES (:id,:run_id,:seq,'run.failed',CAST(:payload AS jsonb))"),
+                {"id": uuid.uuid4(), "run_id": run_id, "seq": seq,
+                 "payload": json.dumps({"error_code": "CANCELLED", "citations": []})},
+            )
+            return True
+
+    def is_cancelled(self, run_id: str) -> bool:
+        with self.engine.connect() as conn:
+            status = conn.execute(text("SELECT status FROM rag_runs WHERE id=:id"), {"id": run_id}).scalar()
+            return status == "cancelled"
 
     def get_citation(self, run_id: str, citation_id: str) -> dict[str, Any] | None:
         with self.engine.connect() as conn:

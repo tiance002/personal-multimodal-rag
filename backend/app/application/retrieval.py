@@ -87,13 +87,13 @@ class InMemoryRetrievalRepository:
             return []
         return score_keyword_hits(self.list_active_chunks(scope), query, limit)
 
-    def vector_candidates(self, scope: Scope, vector: Any, limit: int) -> list[RankedHit]:
+    def vector_candidates(self, scope: Scope, vector: Any, limit: int, *, profile_id: str | None = None) -> list[RankedHit]:
         if not scope.knowledge_base_ids:
             return []
         hits = [
             RankedHit(chunk_id=chunk.chunk_id, rank=1, raw_score=cosine_similarity(chunk.embedding or (), list(vector)))
             for chunk in self.list_active_chunks(scope)
-            if chunk.embedding is not None
+            if chunk.embedding is not None and chunk.embedding_profile_id == profile_id
         ]
         return _rank_descending(hits, limit)
 
@@ -126,7 +126,17 @@ class HybridRetriever:
         if self.embedding_provider is not None:
             try:
                 embedded = self.embedding_provider.embed([question], timeout_seconds=10)
-                rankings["vector"] = self.repository.vector_candidates(scope, embedded.vectors[0], self.candidate_k)
+                profile_id = getattr(embedded, "profile_id", None)
+                if profile_id is None:
+                    resolver = getattr(self.repository, "get_embedding_profile_id", None)
+                    if resolver is not None:
+                        profile_id = resolver(getattr(embedded, "model", ""), getattr(embedded, "dimensions", 0))
+                rankings["vector"] = self.repository.vector_candidates(
+                    scope,
+                    embedded.vectors[0],
+                    self.candidate_k,
+                    profile_id=profile_id,
+                )
             except Exception:
                 pass
 

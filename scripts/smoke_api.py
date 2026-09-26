@@ -48,8 +48,8 @@ def main() -> int:
             "citation": citation.json().get("data") if citation.status_code == 200 else citation.text,
         }
         report["status"] = "PASS" if job["status"] == "succeeded" and message_response.status_code == 201 and events.status_code == 200 and citation.status_code == 200 else "FAIL"
-        app.state.store.delete_conversation(conversation["id"])
-        app.state.store.delete_knowledge_base(kb["id"])
+        app.state.container.store.delete_conversation(conversation["id"])
+        app.state.container.store.delete_knowledge_base(kb["id"])
     report_path = Path("var/reports/smoke-api.json")
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")

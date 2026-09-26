@@ -8,12 +8,17 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
-from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
+from backend.app.bootstrap import build_container
+from backend.app.config import Settings
 
 
 def main() -> int:
     suffix = uuid.uuid4().hex[:10]
-    repository = PostgresKnowledgeRepository.from_url("postgresql+psycopg://rag:rag@127.0.0.1:55432/rag", Path(f"var/smoke-m2-storage-{suffix}"))
+    settings = Settings(
+        database_url="postgresql+psycopg://rag:rag@127.0.0.1:55432/rag",
+        storage_root=Path(f"var/smoke-m2-storage-{suffix}"),
+    )
+    repository = build_container(settings, model=None).store
     kb = repository.create_knowledge_base(f"m2-smoke-{suffix}", "temporary M2 verification")
     report: dict[str, object]
     try:
@@ -35,7 +40,7 @@ def main() -> int:
         assets = repository.list_assets(image_receipt["document_id"])
         source_preserved = bool(assets and repository.storage.read(assets[0]["storage_key"]) == image_bytes)
         report = {
-            "status": "PASS" if pdf_job.get("status") == "succeeded" and pdf_chunks and image_job.get("error_code") == "OCR_UNAVAILABLE" and source_preserved else "FAIL",
+            "status": "PASS" if pdf_job.get("status") == "succeeded" and pdf_chunks and image_job.get("error_code") in {"OCR_EMPTY", "OCR_UNAVAILABLE"} and source_preserved else "FAIL",
             "checks": {
                 "pdf_job": pdf_job,
                 "pdf_chunks": len(pdf_chunks),

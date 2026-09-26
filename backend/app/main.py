@@ -5,15 +5,15 @@ from uuid import uuid4
 from fastapi import FastAPI, Request
 
 from backend.app.api.routes import router
-from backend.app.bootstrap import build_container
+from backend.app.bootstrap import Container, build_container
 from backend.app.config import Settings
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
-    resolved = settings or Settings.from_env()
+def create_app(settings: Settings | None = None, *, container: Container | None = None) -> FastAPI:
+    resolved = settings or (container.settings if container is not None else Settings.from_env())
     app = FastAPI(title="Personal RAG", version="0.1.0")
     app.state.settings = resolved
-    app.state.container = build_container(resolved)
+    app.state.container = container or build_container(resolved)
     app.include_router(router)
 
     @app.middleware("http")

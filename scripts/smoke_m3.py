@@ -6,13 +6,18 @@ import uuid
 from pathlib import Path
 
 from backend.app.adapters.postgres.graph_repository import PostgresGraphRepository
-from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
 from backend.app.application.graph import GraphService
+from backend.app.bootstrap import build_container
+from backend.app.config import Settings
 
 
 def main() -> int:
     suffix = uuid.uuid4().hex[:10]
-    repository = PostgresKnowledgeRepository.from_url("postgresql+psycopg://rag:rag@127.0.0.1:55432/rag", Path(f"var/smoke-m3-storage-{suffix}"))
+    settings = Settings(
+        database_url="postgresql+psycopg://rag:rag@127.0.0.1:55432/rag",
+        storage_root=Path(f"var/smoke-m3-storage-{suffix}"),
+    )
+    repository = build_container(settings, model=None).store
     kb = repository.create_knowledge_base(f"m3-smoke-{suffix}", "temporary M3 verification", graph_enabled=True)
     try:
         content = "# Scope\n\n本地知识库边界。\n# Evidence\n\n引用必须可回读。"

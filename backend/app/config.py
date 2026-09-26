@@ -16,19 +16,20 @@ def _env_bool(name: str, default: bool) -> bool:
 class Settings:
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
-    local_query_enabled: bool = True
+    local_query_enabled: bool = False
     inline_ingestion_enabled: bool = True
     host: str = "127.0.0.1"
     port: int = 8000
     storage_root: Path = Path("var/storage")
     database_url: str = "postgresql+psycopg://rag:rag@127.0.0.1:55432/rag"
     ollama_base_url: str = "http://127.0.0.1:11434"
-    ollama_chat_model: str = "ornith-1.5:9b"
+    ollama_chat_model: str = "qwen3.5:4b"
     ollama_embedding_model: str = "bge-m3:latest"
     monthly_cloud_budget_microunits: int = 0
     max_upload_bytes: int = 50 * 1024 * 1024
     max_chunk_chars: int = 1200
     chunk_overlap: int = 120
+    ingestion_lease_seconds: int = 60
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -41,14 +42,17 @@ class Settings:
             raise ValueError("RAG_PORT must be between 1 and 65535")
         max_chunk_chars = int(os.getenv("RAG_MAX_CHUNK_CHARS", str(cls.max_chunk_chars)))
         chunk_overlap = int(os.getenv("RAG_CHUNK_OVERLAP", str(cls.chunk_overlap)))
+        ingestion_lease_seconds = int(os.getenv("RAG_INGESTION_LEASE_SECONDS", str(cls.ingestion_lease_seconds)))
         if max_chunk_chars <= 0:
             raise ValueError("RAG_MAX_CHUNK_CHARS must be positive")
         if not 0 <= chunk_overlap < max_chunk_chars:
             raise ValueError("RAG_CHUNK_OVERLAP must be >= 0 and < RAG_MAX_CHUNK_CHARS")
+        if ingestion_lease_seconds <= 0:
+            raise ValueError("RAG_INGESTION_LEASE_SECONDS must be positive")
         return cls(
             service_name=os.getenv("RAG_SERVICE_NAME", cls.service_name),
             cloud_enabled=_env_bool("RAG_CLOUD_ENABLED", False),
-            local_query_enabled=_env_bool("RAG_LOCAL_QUERY_ENABLED", True),
+            local_query_enabled=_env_bool("RAG_LOCAL_QUERY_ENABLED", False),
             inline_ingestion_enabled=_env_bool("RAG_INLINE_INGESTION", True),
             host=os.getenv("RAG_HOST", cls.host),
             port=port,
@@ -61,4 +65,5 @@ class Settings:
             max_upload_bytes=int(os.getenv("RAG_MAX_UPLOAD_BYTES", str(cls.max_upload_bytes))),
             max_chunk_chars=max_chunk_chars,
             chunk_overlap=chunk_overlap,
+            ingestion_lease_seconds=ingestion_lease_seconds,
         )

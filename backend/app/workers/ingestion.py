@@ -2,47 +2,42 @@ from __future__ import annotations
 
 import argparse
 import time
+import uuid
 
-from sqlalchemy import create_engine, text
-
-from backend.app.adapters.models.ollama import OllamaGateway
 from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
-from backend.app.adapters.storage import ContentAddressedStorage
+from backend.app.bootstrap import build_container
 from backend.app.config import Settings
 
 
 def build_repository(settings: Settings) -> PostgresKnowledgeRepository:
-    return PostgresKnowledgeRepository(
-        create_engine(settings.database_url, pool_pre_ping=True),
-        ContentAddressedStorage(settings.storage_root),
-        embedding_provider=OllamaGateway(
-            settings.ollama_base_url,
-            settings.ollama_chat_model,
-            settings.ollama_embedding_model,
-        ),
-    )
+    return build_container(settings).store
 
 
-def claim_job(repository: PostgresKnowledgeRepository) -> str | None:
-    with repository.engine.begin() as connection:
-        row = connection.execute(
-            text("""
-                SELECT id
-                FROM ingestion_jobs
-                WHERE status='queued' AND attempts < max_attempts
-                ORDER BY created_at
-                FOR UPDATE SKIP LOCKED
-                LIMIT 1
-            """)
-        ).mappings().first()
-        return str(row["id"]) if row else None
+def claim_job(
+    repository: PostgresKnowledgeRepository,
+    *,
+    worker_id: str | None = None,
+    lease_seconds: int = 60,
+) -> dict[str, object] | None:
+    worker_id = worker_id or f"worker-{uuid.uuid4()}"
+    return repository.claim_job(worker_id=worker_id, lease_seconds=lease_seconds)
 
 
-def run_once(repository: PostgresKnowledgeRepository) -> dict[str, object] | None:
-    job_id = claim_job(repository)
-    if job_id is None:
+def run_once(
+    repository: PostgresKnowledgeRepository,
+    *,
+    worker_id: str | None = None,
+    lease_seconds: int = 60,
+) -> dict[str, object] | None:
+    claim = claim_job(repository, worker_id=worker_id, lease_seconds=lease_seconds)
+    if claim is None:
         return None
-    return repository.process_job(job_id)
+    return repository.process_job(
+        str(claim["id"]),
+        worker_id=str(claim["worker_id"]),
+        claim_token=str(claim["claim_token"]),
+        lease_seconds=lease_seconds,
+    )
 
 
 def main() -> int:
@@ -52,8 +47,9 @@ def main() -> int:
     args = parser.parse_args()
     settings = Settings.from_env()
     repository = build_repository(settings)
+    worker_id = f"worker-{uuid.uuid4()}"
     while True:
-        result = run_once(repository)
+        result = run_once(repository, worker_id=worker_id, lease_seconds=settings.ingestion_lease_seconds)
         if result is not None:
             print({"job_id": result.get("id"), "status": result.get("status"), "stage": result.get("stage")}, flush=True)
             if args.once:
@@ -66,4 +62,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

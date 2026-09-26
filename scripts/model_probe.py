@@ -61,7 +61,7 @@ def main() -> int:
     parser.add_argument("--report", type=Path, default=Path("var/reports/m0-model-probe.json"))
     parser.add_argument("--ollama-bin", default=r"E:\ollama\ollama.exe")
     parser.add_argument("--base-url", default="http://127.0.0.1:11434")
-    parser.add_argument("--chat-model", default="ornith-1.5:9b")
+    parser.add_argument("--chat-model", default="qwen3.5:4b")
     parser.add_argument("--embedding-model", default="bge-m3:latest")
     args = parser.parse_args()
 

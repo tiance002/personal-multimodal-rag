@@ -5,3 +5,6 @@ This directory records decisions that change model routing, storage/versioning, 
 V1.0 decisions:
 
 - ADR-001 records the actual local model capabilities and the L1 fallback policy.
+- ADR-002 records budget and public contract decisions.
+- ADR-003 records the LangChain Smart Agent boundary and local tool-calling evidence.
+- ADR-004 records Qwen3.5 4B routing, deterministic evidence coverage and adaptive chunking.

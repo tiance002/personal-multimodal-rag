@@ -1,42 +1,106 @@
 # progress.md — 当前开发进度
 
-- 当前里程碑：M4.5 / V1.0 实现与发布证据已完成，等待项目负责人确认验收
-- 当前工作分支 / commit：`main`；初始基线 commit 为 `e52893ccc10b7f66e1d40b6f60e87dce952075e0`，最新提交以 `git log -1` 为准；远程为 `https://github.com/tiance002/personal-multimodal-rag.git`；无 tag
-- 当前唯一主要目标：交付个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
-- 本次任务：从空项目完成 M0→M1→M2→M3→M4→M4.5 纵切，并保存可核查报告。
-- 已完成并有证据的工作：
-  - `& .\scripts\verify-m0.ps1` → exit 0；41 tests、PostgreSQL/pgvector migration、Ollama Chat/Embedding probe、evaluation schema 均 PASS；`var/reports/verify-m0.json`。
-  - `& .\scripts\verify-m1.ps1` → exit 0；真实本地模型上传/索引/混合检索/回答/引用回读与 API/SSE PASS；`var/reports/verify-m1.json`。
-  - `& .\scripts\verify-m2.ps1` → exit 0；PDF PASS，图片明确 `OCR_UNAVAILABLE` 且源 bytes 保留；`var/reports/verify-m2.json`。
-  - `& .\scripts\verify-m3.ps1` → exit 0；图谱同版本证据、失败隔离、固定评测 Hit@5/Recall@5/MRR=1.0 PASS；`var/reports/verify-m3.json`。
-  - `& .\scripts\verify-m4.ps1` → exit 0；闭集只读工具、scope/limits/cancel、真实 API smart trace/citation smoke PASS；`var/reports/verify-m4.json`。
-  - `& .\.venv\Scripts\python.exe scripts\smoke_budget.py --database-url ...` → exit 0；PostgreSQL advisory-lock 月度预算并发、settle 和 follow-up reservation PASS；`var/reports/smoke-budget.json`。
-  - `& .\scripts\contract_test.ps1` → exit 0；OpenAPI snapshot、SSE event schema/sample、V2 forbidden-term 检查 PASS；`contracts/openapi.json`、`contracts/sse/`、`var/reports/contract-test.json`。
-  - `& .\.venv\Scripts\python.exe scripts\evaluate_retrieval.py --report var\reports\eval-retrieval.json` → exit 0；20 条 core cases，Hit@5/Recall@5/MRR 均为 1.0；`var/reports/eval-retrieval.json`。
-  - `npm --prefix frontend test` → exit 0；4 个 Playwright 用例覆盖三栏、SSE seq 去重/Last-Event-ID 重连、引用面板与冻结证据回读；发布门禁中在真实 API/Vite 服务下复跑通过。
-  - `with_server.py ... scripts\playwright_smoke.py` → exit 0；三栏、上传、选中文档、图谱绿色选中和“建立图谱”入口 PASS；`var/reports/frontend-smoke.json`、`var/reports/frontend-smoke.png`。
-  - `& .\scripts\verify-release.ps1 -Fresh` → exit 0；全量 release gate、M0–M4、预算、契约、前端、backup/isolated restore PASS；`var/reports/verify-release.json`。
-  - `& .\scripts\release_report.ps1` → exit 0；V1.0 汇总 PASS；`var/reports/v1-release-report.json`、`var/reports/v1-release-report.md`。
-  - `docker compose -f deploy\compose.yml build api worker frontend` → exit 0；后端包含 0007/0008 迁移、前端包含最新 SSE 客户端的 Compose 镜像构建 PASS。
-  - `docker compose -f deploy\compose.yml up -d api worker frontend` → exit 0；重建镜像后 API `/healthz`=200、前端首页=200，随后按约定停止应用容器。
-  - `git init -b main`、`git commit -m "chore: establish personal RAG project baseline"`、`git push -u origin main` → exit 0；GitHub 私有仓库已创建并接收 `e52893c`。
-  - 代码审查整改（`docs/reviews/2026-09-26-code-architecture-review.md` 第十三节）：修复 25 项代码问题（组合根、依赖方向、检索 SQL 下推、SSE 流式、死代码/死配置/未使用导入），并新增分层依赖门禁；`pytest backend/tests` → exit 0，`66 passed`；`scripts/contract_test.py` → exit 0（`layering_violations: []`）；`npm --prefix frontend run build` → exit 0；AST 未使用导入扫描 0 项。迁移 `0009_retrieval_perf.py` 与新增 pgvector SQL **NOT RUN**（无可用 PostgreSQL）。
-- 当前阻断（P0/P1）：无已识别 P0/P1。
-- 可控问题待负责人决定（P2/P3）：当前本机没有已验证 OCR/VLM adapter，因此图片/扫描资料显式失败而不生成伪文本；LibreOffice 缺失导致附件 DOCX 视觉渲染 BLOCKED（不影响软件运行）；`make` 不在 PATH，等价 PowerShell 门禁已执行。
-- 已批准延期及批准依据：无；以上能力限制未被擅自标记为延期通过。
-- 当前实际可执行 make targets：NOT IMPLEMENTED；未发现 Makefile，`make` 不在 PATH，未报告任何 `make` 命令通过。
-- 本次最小下一步：项目负责人复核 `var/reports/v1-release-report.md` 与 GitHub 基线，确认验收后再决定是否建立 release tag。
-- 最近一次里程碑验收：PASS（`& .\scripts\verify-release.ps1 -Fresh`，exit 0；`& .\scripts\release_report.ps1`，exit 0）。
-- 对应 ADR 与设计章节：`docs/adr/ADR-001-model-capabilities.md`；`docs/superpowers/specs/2026-09-26-personal-rag-v1-design.md`；`docs/superpowers/plans/2026-09-26-personal-rag-v1-implementation.md`。
+- 当前里程碑：M4.5 / V1.0 质量闭环与发布验证；P0/P1 与 LangChain Smart 迁移已完成代码路径
+- 当前基线：分支 `main`，用户提供基线 commit `65e5382`；本轮尚未提交、未打 tag。
+- 当前目标：个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
+- 架构：FastAPI + React/Vite + LangChain `create_agent` + 项目 RAG Core + PostgreSQL/pgvector；Quick 直接走 `RAGOrchestrator`，Smart 通过 `SmartAgentPort` 调用四个项目只读工具。
 
-## 最近工作记录
+## 本轮已完成
 
-| 日期 | 任务 | 实际命令/证据 | 结果 | 后续 |
-|---|---|---|---|---|
-| 2026-09-26 | 完成 V1.0 M0–M4.5 与完成审计闭环 | `verify-release.ps1 -Fresh`、`release_report.ps1`；41 tests、预算并发、20 条评测、OpenAPI/SSE、4 个 Playwright、backup/restore | PASS | 负责人验收/版本管理 |
-| 2026-09-26 | Compose API/worker/frontend 构建与运行 | `docker compose build api worker frontend`；healthz 200、frontend 4173 200 | PASS | 容器已按约定停止，数据库卷保留 |
-| 2026-09-26 | 最终前端镜像运行时复核 | `docker compose build frontend`、`up -d api worker frontend`；healthz 200、frontend 200 | PASS | 应用容器已停止，数据库保持健康 |
-| 2026-09-26 | 后端迁移镜像重建与 Compose 运行时复核 | `docker compose build api worker frontend`、`up -d api worker frontend`；API healthz 200、前端 200；之后 stop 应用容器 | PASS | 数据库保持健康 |
-| 2026-09-26 | 真实恢复演练 | `restore.ps1 -RestoreDatabase`；active/version、chunk、asset、graph orphan 检查均为 0 | PASS | 负责人复核 manifest |
-| 2026-09-26 | GitHub 初始化与上传 | `git init -b main`、首个 commit `e52893c`、`git push -u origin main`；`git ls-remote --heads origin main` 返回同一 SHA | PASS | 负责人复核仓库与启动说明 |
-| 2026-09-26 | 代码审查问题整改（批次一~三 + 部分批次五） | `pytest backend/tests` 66 passed；`scripts/contract_test.py` PASS（新增 layering 门禁）；`npm --prefix frontend run build` exit 0；AST 未使用导入 0、分层违规 0；清理 74+9 个残留文件/目录 | PASS（DB 相关 NOT RUN） | 批次四（上帝对象拆分）、Q-01/Q-03 格式化 |
+- P0 组合根与门禁：M1–M4/API 冒烟统一使用 `build_container`；测试通过 `create_app(..., container=...)` 注入；新增 `scripts/release_preflight.py`，无 `from_url`、旧 `app.state.store/ollama` 可执行调用。
+- 摄取一致性：原子领取、`claim_token`、后台租约心跳、过期恢复、所有权栅栏和 attempts 语义；迁移头为 `0011_doc_filename_ux`。
+- 数据边界：真实文档归属校验、图谱 KB/document/active-version/index/graph 状态 SQL 过滤、精确 embedding profile 过滤、每次 Smart 检索的证据累积与冻结。
+- 版本与空资料：指定 `document_id` 的新版本不会按文件名创建新文档；并发版本号受文档行锁与唯一索引保护；空文本、OCR 不可用和无 chunk 不会伪装成功。
+- 取消终态：RAG/Agent 取消与完成均为条件更新；取消 API 同时协调两类持久化运行；迟到模型结果不追加成功事件、证据或 assistant 消息。
+- M4 架构：加入 `langchain==1.4.2`、`langchain-ollama==1.1.0`；删除旧 `agent_runtime.py`；Smart 使用 LangChain `create_agent`、四个闭集只读工具、服务端 Scope/Run/Evidence 上下文和限制/取消检查。
+- Compose 前端：Vite `preview.proxy` 与 `deploy/nginx/nginx.conf`；前端镜像改为 Node 构建阶段 + Nginx 运行时，`/api/`、`/healthz` 同源代理并关闭 SSE buffering。
+
+## 已执行证据
+
+| 检查 | 结果 |
+|---|---|
+| `\.venv\Scripts\python.exe -m pytest -q --tb=short` | PASS，91 passed |
+| `\.venv\Scripts\python.exe -m compileall -q backend scripts` | PASS，exit 0 |
+| `\.venv\Scripts\python.exe -m alembic -c alembic.ini upgrade head` | PASS，exit 0；`0011_doc_filename_ux (head)` |
+| `scripts\verify-m1.ps1` | PASS；真实 PostgreSQL、Ollama Quick、API/SSE |
+| `scripts\verify-m2.ps1` | PASS；PDF 与 OCR_UNAVAILABLE 语义 |
+| `scripts\verify-m3.ps1` | PASS；图谱、评测与失败隔离 |
+| `scripts\verify-m4.ps1` | PASS；LangChain 导入、确定性 M4 API、证据回读 |
+| `scripts\smoke_langchain_ollama.py` | PASS；`ornith-1.5:9b` tools、JSON 参数、多轮终止 |
+| `scripts\smoke_m4.py --real-model --report var\reports\smoke-m4-real.json` | PASS；真实 Ollama Smart API，3 次只读工具调用，Agent completed，E1 回读 200 |
+| `scripts\smoke_m1.py --database-url ... --real-model --report var\reports\smoke-m1-final.json` | PASS；租约心跳后真实 PostgreSQL/pgvector 摄取、Quick 回答和 E1 回读 |
+| `npm run build`（frontend） | PASS |
+| `docker compose -f deploy\compose.yml config` | PASS |
+| Vite preview `/api/v1/knowledge-bases` HTTP 代理 | PASS，HTTP 200 |
+| `docker compose ... build frontend` | FAIL/环境阻断；Docker Hub token 网络连接失败 |
+| Playwright 浏览器级脚本 | PASS；使用已安装系统 Chrome，Vite preview `/api/v1` HTTP 200，前端 UI 冒烟通过 |
+| `verify-release.ps1` 完整发布门禁 | NOT RUN；需先恢复 Docker 镜像拉取与浏览器运行时 |
+
+## RAG 质量阶段（2026-09-26）
+
+- 默认本地 Chat 模型改为 `qwen3.5:4b`；Embedding 保持独立的 `bge-m3:latest`。Quick 先规则规划和混合检索，查询扩展默认关闭，仅在无候选且显式开启后按需运行。
+- 明确并列与成本差额问题拆为证据目标，关系问题不拆为两个答案；缺项最多一次定向补检。单个目标缺失时输出只引用已证实目标的部分回答；全部缺失时拒答。
+- Quick/Smart 都在提交前校验证据覆盖、引用标签、对象/字段/金额关系；失败不持久化助手答案或未使用的引用。Smart 搜索工具提供服务端 E 标签，真实 Qwen 连续三次引用冒烟通过。
+- Markdown 标题栈与 PDF chunk 页码已修正；新增文档画像与 `adaptive/v1` 策略切块。迁移 `0012_chunk_strategy` 记录 parser/chunker/实际策略；历史版本标注 `legacy/fixed-v1`。
+- 固定 `quality-v1` 九场景数据集保留原必需字段，并采用显式版本化 Schema；覆盖简单、并列、干扰、部分缺失、无证据、跨文档、关系与差额。相关文件见 `evaluations/quality_v1.jsonl` 和 ADR-004。
+
+| 本阶段命令 | 结果 |
+|---|---|
+| `\.venv\Scripts\python.exe scripts\model_probe.py --chat-model qwen3.5:4b --embedding-model bge-m3:latest --report var\reports\model-probe-qwen35-4b.json` | PASS；JSON 合法，BGE 1024 维 |
+| `\.venv\Scripts\python.exe scripts\smoke_langchain_ollama.py --chat-model qwen3.5:4b --report var\reports\smoke-langchain-qwen35-4b.json` | PASS；真实工具调用 |
+| `\.venv\Scripts\python.exe -m alembic upgrade head` | PASS；`0012_chunk_strategy` |
+| `\.venv\Scripts\python.exe scripts\validate_eval.py --path evaluations\quality_v1.jsonl --schema quality-v1 --report var\reports\eval-quality-schema.json` | PASS；9 行 |
+| `\.venv\Scripts\python.exe scripts\evaluate_rag_quality.py --report var\reports\eval-rag-quality.json` | PASS；9/9；确定性夹具，无 Chat 模型 |
+| `\.venv\Scripts\python.exe scripts\smoke_quality_postgres.py --database-url postgresql+psycopg://rag:rag@127.0.0.1:55432/rag --report var\reports\smoke-quality-postgres.json` | PASS；真实 PostgreSQL/BGE/Qwen；双文档完整回答 1 次 Chat，缺证据与文档范围部分回答 0 次 Chat |
+| `\.venv\Scripts\python.exe scripts\smoke_m1.py --real-model --database-url postgresql+psycopg://rag:rag@127.0.0.1:55432/rag --storage-root var\smoke-m1-qwen-storage --report var\reports\smoke-m1-qwen.json` | PASS；真实 Quick 与 E1 回读 |
+| `\.venv\Scripts\python.exe scripts\smoke_m4.py --real-model --database-url postgresql+psycopg://rag:rag@127.0.0.1:55432/rag --report var\reports\smoke-m4-qwen.json` | PASS；真实 Smart、2 次 Chat、E1 回读；连续 3 次相同冒烟通过 |
+| `\.venv\Scripts\python.exe -m pytest -q --tb=short -p no:cacheprovider` | PASS；117 passed（后续质量 Schema/标签测试的最终全量回归待重跑） |
+| `\.\scripts\contract_test.ps1 -Python (Join-Path (Get-Location) '.venv\Scripts\python.exe')` | PASS；OpenAPI/SSE 契约 |
+| `$env:PLAYWRIGHT_CHROME_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'; npm --prefix frontend test` | PASS；4 个浏览器用例 |
+| `scripts\preview_proxy_smoke.py`（通过 `with_server.py` 启动 API + Vite preview） | PASS；浏览器同源 `/api/v1` 200；`var/reports/preview-proxy-smoke.json` |
+| `scripts\playwright_smoke.py`（通过 `with_server.py` 启动 API + Vite dev） | PASS；上传、选中文档、图谱页签；`var/reports/frontend-smoke.json` |
+
+## 风险与下一步
+
+- P0/P1 代码与真实 PostgreSQL/Ollama/Chrome 浏览器关键路径已有证据；完整 Compose/Nginx 镜像构建仍因 Docker Hub 令牌连接超时而未通过。缓存的 `deploy-frontend:latest` 是旧 `vite preview` 镜像，不能冒充当前 Nginx 构建。
+- 当前 `.venv` 使用 `include-system-site-packages = true`；`pip check` 报告本机外部 `cn-mail-agent`/`langchain-openai` 与 LangChain 1.x 的冲突。项目自身声明只锁定 `langchain==1.4.2` 与 `langchain-ollama==1.1.0`，在 Docker 的干净环境应重新安装验证。
+- 扫描 PDF、PDF 内嵌图片和独立图片已接入本地 PyMuPDF/Tesseract OCR；扫描页/原图与派生文字通过资产 ID、SHA-256、页码和 `chunk_assets` 关联。空白材料报 `OCR_EMPTY`，缺少语言包报 `OCR_UNAVAILABLE`。OCR 语言包保存在不入库的 `var/tessdata/`，Compose worker 只读挂载；VLM caption 尚未实现。
+- `QualityGate` 对可确定的数值目标与关系做保守检查；任意开放式推理的语义支持检验尚未实装。九场景夹具与两文档真实冒烟不足以证明普遍的回答质量。
+- 未创建 release tag；项目负责人需复核 `var/reports/` 与本文件后决定提交、验收和 tag。
+
+## OCR 与完整门禁续验（2026-09-26）
+
+- 扫描 PDF、PDF 内嵌图片及独立图片的真实本地 OCR 已接入；原始图像 SHA-256、页码、派生 OCR 资产与 chunk 关联写入 PostgreSQL。`scripts/setup_ocr.ps1` 校验英中语言包，`verify-m2.ps1` 将其作为必需检查。
+- 完整发布门禁重新执行后，18/19 项检查退出码 0，唯一失败是 `compose_frontend_build`：Docker Hub `auth.docker.io/token` TCP 连接失败，当前 Nginx 前端镜像未能构建。不要将 Vite preview 或旧缓存镜像视为 Compose 通过。
+
+| 本轮执行命令 | 退出码与结果 |
+|---|---|
+| `& .\scripts\setup_ocr.ps1` | 0；`eng`/`chi_sim` SHA-256 匹配 |
+| `.\.venv\Scripts\python.exe scripts\probe_pdf_ocr.py --tessdata var\tessdata --report var\reports\probe-pdf-ocr.json` | 0；纯图 PDF OCR 得到 `OCR TEST 1234` |
+| `.\.venv\Scripts\python.exe -m pytest -q --tb=short -p no:cacheprovider` | 0；最终 125 passed（新增缺失 OCR 数据边界测试）；发布报告内较早的同命令为 124 passed |
+| `.\.venv\Scripts\python.exe -m compileall -q backend scripts` | 0；语法检查通过 |
+| `git diff --check` | 0；无空白错误，只有 Git CRLF 提示 |
+| `.\.venv\Scripts\python.exe -m pytest backend/tests/test_postgres_ocr_lineage.py -q --tb=short -p no:cacheprovider` | 0；真实 PostgreSQL 资产血缘/回读通过 |
+| `& .\scripts\verify-m2.ps1` | 0；OCR 数据、9 项测试、真实数据库冒烟通过 |
+| `& .\scripts\verify-m4.ps1` | 0；11 项测试、LangChain 导入、确定性 Smart API/E1 回读通过 |
+| `docker compose -f deploy\compose.yml config --quiet` | 0；Compose 配置有效 |
+| `& .\scripts\verify-release.ps1 -Fresh` | 1；18 项通过、Compose 前端镜像构建失败，详见 `var/reports/verify-release.json` |
+| `& .\scripts\release_report.ps1` | 1；`INCOMPLETE`，详见 `var/reports/v1-release-report.md` |
+
+遗留：需恢复 Docker Hub 基础镜像访问后重新构建并实际启动当前 Nginx Compose 前端，再完成浏览器同源验证。VLM caption 与更广泛的语义证据判定未实现；当前 OCR 与保守数值/关系校验不能当作所有多模态与开放式质量问题已验收。未提交、未打 tag，负责人尚未批准发布。
+
+## 当前续验诊断（2026-09-26）
+
+- 复核当前 `deploy/Dockerfile.frontend` 后确认需要的 `node:22-alpine`、`nginx:1.27-alpine` 均不在本机镜像缓存。旧 `deploy-frontend:latest` 可运行 Node 22.23.3，缓存 `nginx:alpine` 为 Nginx 1.31.6，但二者不是当前指定基底。
+- `curl.exe --silent --show-error --connect-timeout 5 --max-time 12 --output NUL --write-out 'host_http=%{http_code} remote=%{remote_ip}' https://auth.docker.io/token`：退出码 28，连接超时；同类命令请求 `https://mirror.gcr.io/v2/` 亦超时。Docker daemon 代理为 `http.docker.internal:3128`，没有 registry mirror。此轮没有改变全局网络或 Docker daemon 设置。
+- `npm --prefix frontend run build`：退出码 0，Vite 构建完成。`docker run --rm --pull=never deploy-frontend:latest sh -c 'npm ci --offline --ignore-scripts --no-audit --no-fund ...'`：退出码 0，仅为离线可行性探测。
+- 当前发布状态依然 `FAIL`，未重新运行完整门禁；是否接受一个保留官方默认基底、仅用于本机验证的 build-arg 覆盖方案，待负责人决定。未提交、未打 tag。
+
+## 取消竞态与发布门禁续验（2026-09-26）
+
+- `AnswerService` 观察到外部取消后不再重复追加 `run.failed`；取消仓储在同一事务内更新 RAG/Agent 终态并写一次取消事件。修正真实 PostgreSQL 测试清理顺序，并新增 5 轮同时取消/Smart 提交测试，检查双表终态、事件和助手消息一致。
+- `\.venv\Scripts\python.exe -m pytest backend/tests/test_cancellation_boundaries.py backend/tests/test_postgres_run_terminal_states.py -q --tb=short -p no:cacheprovider`：修正测试清理后退出码 0，8 passed。
+- `\.venv\Scripts\python.exe -m pytest -q --tb=short -p no:cacheprovider`：退出码 0，131 passed，6 warnings。
+- 发布门禁新增隔离的 Compose API/Worker/Nginx 构建、运行健康和浏览器同源检查。浏览器脚本可指定 base URL；Vite preview 参数化 UI 冒烟退出码 0，明确要求 Nginx 的负例退出码 1，防止将 Vite 冒充 Compose。
+- `& .\scripts\verify-release.ps1 -Fresh`：退出码 1；`compose_stack_build` 因 Docker Hub OAuth token 连接失败，`compose_runtime_browser` 明确 `NOT RUN`；其余执行项退出码 0，报告 `var/reports/verify-release.json`。`& .\scripts\release_report.ps1`：退出码 1，`INCOMPLETE`，Compose 浏览器报告均 `NOT RUN`。
+- 未修改系统 DNS/Docker daemon；未提交、未打 tag。当前镜像获取与真实 Compose 运行仍是发布阻断，需恢复官方基础镜像访问后重跑。

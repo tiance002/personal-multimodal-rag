@@ -8,10 +8,11 @@ import uuid
 from pathlib import Path
 
 from backend.app.adapters.models.ollama import OllamaGateway
-from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
+from backend.app.bootstrap import build_container
 from backend.app.application.citations import CitationService, InMemoryCitationStore
 from backend.app.application.rag_orchestrator import RAGOrchestrator, RagSettings
 from backend.app.application.retrieval import HybridRetriever
+from backend.app.config import Settings
 from backend.app.domain.scope import Scope
 
 
@@ -26,8 +27,14 @@ def main() -> int:
     args = parser.parse_args()
 
     suffix = uuid.uuid4().hex[:10]
-    model = OllamaGateway("http://127.0.0.1:11434", "ornith-1.5:9b", "bge-m3:latest") if args.real_model else None
-    repository = PostgresKnowledgeRepository.from_url(args.database_url, args.storage_root, embedding_provider=model)
+    settings = Settings(
+        database_url=args.database_url,
+        storage_root=args.storage_root,
+        local_query_enabled=False,
+    )
+    model = OllamaGateway(settings.ollama_base_url, settings.ollama_chat_model, settings.ollama_embedding_model) if args.real_model else None
+    container = build_container(settings, model=model)
+    repository = container.store
     kb = repository.create_knowledge_base(f"m1-smoke-{suffix}", "temporary M1 verification", cloud_allowed=False)
     scope = Scope.from_ids([kb["id"]])
     stored = repository.storage.put_stream(io.BytesIO("# 事务回滚\n\n本地知识库中的事务回滚说明。".encode("utf-8")))
@@ -52,6 +59,8 @@ def main() -> int:
         "status": "PASS" if job.get("status") == "succeeded" and chunks and result.error_code is None and citation else "FAIL",
         "database": "postgresql+pgvector",
         "real_model": bool(args.real_model),
+        "chat_model": settings.ollama_chat_model if args.real_model else None,
+        "embedding_model": settings.ollama_embedding_model if args.real_model else None,
         "checks": {
             "upload_status": receipt["status"],
             "job": {"status": job.get("status"), "stage": job.get("stage"), "progress": job.get("progress")},

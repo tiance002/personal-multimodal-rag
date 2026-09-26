@@ -6,8 +6,9 @@
 
 - Python 3.11+、Docker Desktop、PowerShell
 - PostgreSQL + pgvector：Compose 服务 `db`，默认 `127.0.0.1:55432`
-- Ollama：已实测 `ornith-1.5:9b`（Chat，可选 L1）与 `bge-m3:latest`（Embedding，1024 维）
+- Ollama：当前默认 `qwen3.5:4b`（本地 Chat/Smart）与 `bge-m3:latest`（独立 Embedding，1024 维）；本机能力见 ADR-004
 - 前端：Node/npm，React + Vite + TypeScript
+- 扫描 PDF/图片 OCR：PyMuPDF + 本地 Tesseract `eng`/`chi_sim` 语言数据。运行 `& .\scripts\setup_ocr.ps1` 下载并校验 SHA-256；数据保存在不入库的 `var/tessdata/`。Compose worker 只读挂载此目录；未安装时明确报 `OCR_UNAVAILABLE`。
 
 启动 Ollama 时使用可写模型目录，并保持云端关闭：
 
@@ -43,8 +44,7 @@ npm --prefix frontend run dev -- --host 127.0.0.1
 
 ## 主要能力
 
-- 文本/Markdown/TXT、正常 PDF 导入，图片源资产保留并带 locator。
-- 当前本机 OCR/VLM 能力未作为可用 adapter 验证；图片导入会明确返回 `OCR_UNAVAILABLE`，不伪造文本，原始 bytes 不丢失。
+- 文本/Markdown/TXT、PDF 与图片导入；扫描页和 PDF 内嵌图片先提取原图，再以本地 OCR 生成派生文字。原图 SHA-256、页码、派生资产和 chunk 关联保存，可回读；不调用云端 VLM。OCR 无法启动报 `OCR_UNAVAILABLE`，正常运行但无文字报 `OCR_EMPTY`，均不伪装索引成功。
 - 关键词 + 可选向量混合检索；L1 查询理解或回答模型失败时保留 q0，并返回可回读证据。
 - 快速检索与 bounded smart mode 共用 `RAGOrchestrator`；smart mode 只开放 `list_documents`、`search_knowledge`、`read_document`、`query_knowledge_graph` 四个只读知识工具。
 - SSE 运行事件、引用回读、文档/图谱右侧面板、三栏工作台和历史会话。

@@ -32,10 +32,20 @@ class PostgresAgentRepository:
                 "input_summary": step.input_summary, "output_summary": step.output_summary, "token_count": step.token_count, "cost": step.cost_microunits,
             })
 
-    def complete_run(self, run_id: str, status: str, error_code: str | None, cost_microunits: int = 0) -> None:
+    def complete_run(self, run_id: str, status: str, error_code: str | None, cost_microunits: int = 0) -> bool:
         with self.engine.begin() as connection:
-            connection.execute(text("UPDATE agent_runs SET status=:status,step_count=(SELECT count(*) FROM agent_steps WHERE agent_run_id=:id),cost_microunits=:cost,error_code=:error_code,completed_at=now() WHERE id=:id"), {"id": run_id, "status": status, "cost": cost_microunits, "error_code": error_code})
+            result = connection.execute(
+                text("UPDATE agent_runs SET status=:status,step_count=(SELECT count(*) FROM agent_steps WHERE agent_run_id=:id),cost_microunits=:cost,error_code=:error_code,completed_at=clock_timestamp() WHERE id=:id AND status='running'"),
+                {"id": run_id, "status": status, "cost": cost_microunits, "error_code": error_code},
+            )
+            return result.rowcount == 1
 
-    def cancel_run(self, run_id: str) -> None:
+    def cancel_run(self, run_id: str) -> bool:
         with self.engine.begin() as connection:
-            connection.execute(text("UPDATE agent_runs SET status='cancelled',completed_at=now(),error_code='CANCELLED' WHERE id=:id AND status IN ('running','completed','failed')"), {"id": run_id})
+            result = connection.execute(text("UPDATE agent_runs SET status='cancelled',completed_at=clock_timestamp(),error_code='CANCELLED' WHERE id=:id AND status='running'"), {"id": run_id})
+            return result.rowcount == 1
+
+    def is_cancelled(self, run_id: str) -> bool:
+        with self.engine.connect() as connection:
+            status = connection.execute(text("SELECT status FROM agent_runs WHERE id=:id"), {"id": run_id}).scalar()
+            return status == "cancelled"
