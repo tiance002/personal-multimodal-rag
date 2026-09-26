@@ -5,7 +5,7 @@ import uuid
 
 from sqlalchemy import Engine, text
 
-from backend.app.application.agent_runtime import AgentStep
+from backend.app.domain.agent_policy import AgentStep
 from backend.app.domain.scope import Scope
 
 

@@ -3,37 +3,37 @@ from __future__ import annotations
 import json
 import hashlib
 import uuid
-from collections import Counter
 from io import BytesIO
-from pathlib import Path
 from typing import Any
 
-from sqlalchemy import Engine, create_engine, text
+from sqlalchemy import Engine, text
 
 from backend.app.adapters.parsers import ParserRegistry
 from backend.app.adapters.storage import ContentAddressedStorage
-from backend.app.application.retrieval import ChunkRecord
 from backend.app.domain.chunking import chunk_document
-from backend.app.domain.models import NormalizedDocument
+from backend.app.domain.models import ChunkRecord, RankedHit
 from backend.app.domain.parsers import ParserError
 from backend.app.domain.scope import Scope
-from backend.app.domain.text_normalization import normalize_query
-
-
-def _str(value: Any) -> str:
-    return str(value)
+from backend.app.domain.text_normalization import NormalizedQuery, term_frequencies
 
 
 class PostgresKnowledgeRepository:
-    def __init__(self, engine: Engine, storage: ContentAddressedStorage, parsers: ParserRegistry | None = None, embedding_provider: Any | None = None) -> None:
+    def __init__(
+        self,
+        engine: Engine,
+        storage: ContentAddressedStorage,
+        parsers: ParserRegistry | None = None,
+        embedding_provider: Any | None = None,
+        *,
+        max_chunk_chars: int = 1200,
+        chunk_overlap: int = 120,
+    ) -> None:
         self.engine = engine
         self.storage = storage
         self.parsers = parsers or ParserRegistry()
         self.embedding_provider = embedding_provider
-
-    @classmethod
-    def from_url(cls, database_url: str, storage_root: str | Path, embedding_provider: Any | None = None) -> "PostgresKnowledgeRepository":
-        return cls(create_engine(database_url, pool_pre_ping=True), ContentAddressedStorage(storage_root), embedding_provider=embedding_provider)
+        self.max_chunk_chars = max_chunk_chars
+        self.chunk_overlap = chunk_overlap
 
     def create_knowledge_base(self, name: str, description: str = "", *, graph_enabled: bool = False, cloud_allowed: bool = False) -> dict[str, Any]:
         kb_id = uuid.uuid4()
@@ -139,7 +139,7 @@ class PostgresKnowledgeRepository:
                         })
             if not normalized.markdown_content and normalized.assets:
                 raise ParserError("OCR_UNAVAILABLE")
-            chunks = chunk_document(normalized)
+            chunks = chunk_document(normalized, max_chars=self.max_chunk_chars, overlap=self.chunk_overlap)
             normalized_object = self.storage.put_stream(BytesIO(normalized.markdown_content.encode("utf-8"))) if normalized.markdown_content else None
             vectors: list[list[float]] = []
             if self.embedding_provider is not None and chunks:
@@ -168,7 +168,7 @@ class PostgresKnowledgeRepository:
                         VALUES (:id,:section_id,:version_id,:document_id,:kb,:chunk_index,:content,:sha256,:start_pos,:end_pos,:heading_path,:chunk_type,:locator)"""), {
                         "id": chunk_id, "section_id": section_id, "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "chunk_index": index, "content": chunk.content, "sha256": chunk.content_sha256, "start_pos": chunk.start, "end_pos": chunk.end, "heading_path": json.dumps(list(chunk.heading_path)), "chunk_type": chunk.chunk_type, "locator": json.dumps(chunk.source_locator.model_dump()),
                     })
-                    for term, frequency in Counter(normalize_query(chunk.content).terms).items():
+                    for term, frequency in term_frequencies(chunk.content).items():
                         conn.execute(text("INSERT INTO chunk_terms (chunk_id,term,term_frequency) VALUES (:chunk_id,:term,:frequency)"), {"chunk_id": chunk_id, "term": term, "frequency": frequency})
                     if profile_id is not None:
                         vector_literal = "[" + ",".join(str(value) for value in vectors[index]) + "]"
@@ -187,34 +187,107 @@ class PostgresKnowledgeRepository:
                 conn.execute(text("UPDATE ingestion_jobs SET status='failed',error_code=:code,updated_at=now() WHERE id=:id"), {"id": job_id, "code": code})
         return self.get_job(job_id) or {}
 
-    def list_active_chunks(self, scope: Scope) -> list[ChunkRecord]:
-        if not scope.knowledge_base_ids:
-            return []
+    def _scope_filter(self, scope: Scope, params: dict[str, Any], alias: str = "c") -> str:
+        """Bind the scope predicate and return the SQL fragment.
+
+        Scope is always applied inside the candidate query so a chunk outside
+        the server-decided scope can never be ranked, let alone cited.
+        """
         kb_names = ",".join(f":kb_{index}" for index, _ in enumerate(scope.knowledge_base_ids))
-        params: dict[str, Any] = {f"kb_{index}": value for index, value in enumerate(scope.knowledge_base_ids)}
-        document_clause = ""
+        params.update({f"kb_{index}": value for index, value in enumerate(scope.knowledge_base_ids)})
+        clause = f"{alias}.knowledge_base_id IN ({kb_names})"
         if scope.document_ids:
             document_names = ",".join(f":doc_{index}" for index, _ in enumerate(scope.document_ids))
-            document_clause = f" AND c.document_id IN ({document_names})"
             params.update({f"doc_{index}": value for index, value in enumerate(scope.document_ids)})
-        query = text(f"""SELECT c.id,c.knowledge_base_id,c.document_id,c.version_id,c.content,c.locator,ce.embedding
-            FROM chunks c JOIN documents d ON d.id=c.document_id AND d.active_version_id=c.version_id
-            JOIN document_versions dv ON dv.id=c.version_id AND dv.document_id=c.document_id
-            LEFT JOIN LATERAL (SELECT embedding FROM chunk_embeddings WHERE chunk_id=c.id ORDER BY created_at DESC LIMIT 1) ce ON TRUE
-            WHERE c.knowledge_base_id IN ({kb_names}) {document_clause} AND d.deleted_at IS NULL AND dv.index_status='ready'
-            ORDER BY c.id""")
-        with self.engine.connect() as conn:
-            rows = conn.execute(query, params).mappings()
-            return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, embedding=tuple(row["embedding"]) if row["embedding"] is not None else None) for row in rows]
+            clause += f" AND {alias}.document_id IN ({document_names})"
+        return clause
 
-    def read_chunk(self, version_id: str, chunk_id: str) -> str:
-        with self.engine.connect() as conn:
-            value = conn.execute(text("SELECT content FROM chunks WHERE id=:chunk_id AND version_id=:version_id"), {"chunk_id": chunk_id, "version_id": version_id}).scalar()
-            if value is None:
-                raise LookupError("chunk not found")
-            return value
+    _ACTIVE_VERSION_JOINS = """
+        JOIN documents d ON d.id = c.document_id AND d.active_version_id = c.version_id
+        JOIN document_versions dv ON dv.id = c.version_id AND dv.document_id = c.document_id
+    """
 
-    def get(self, chunk_id: str) -> ChunkRecord | None:
+    def keyword_candidates(self, scope: Scope, query: NormalizedQuery, limit: int) -> list[RankedHit]:
+        """Rank candidates from the persisted `chunk_terms` index.
+
+        The filter, the aggregate and the `LIMIT` all run in PostgreSQL, so the
+        response is bounded by `limit` instead of by corpus size.
+        """
+        if not scope.knowledge_base_ids or not query.terms or limit <= 0:
+            return []
+        params: dict[str, Any] = {"normalized": query.normalized, "limit": limit}
+        clause = self._scope_filter(scope, params)
+        term_names = ",".join(f":t_{index}" for index, _ in enumerate(query.terms))
+        params.update({f"t_{index}": term for index, term in enumerate(query.terms)})
+        statement = text(f"""
+            SELECT c.id AS chunk_id,
+                   SUM(ct.term_frequency) + CASE
+                       WHEN :normalized <> '' AND POSITION(:normalized IN lower(c.content)) > 0 THEN 2
+                       ELSE 0 END AS score
+            FROM chunks c
+            {self._ACTIVE_VERSION_JOINS}
+            JOIN chunk_terms ct ON ct.chunk_id = c.id AND ct.term IN ({term_names})
+            WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
+            GROUP BY c.id
+            ORDER BY score DESC, c.id
+            LIMIT :limit
+        """)
+        with self.engine.connect() as conn:
+            rows = conn.execute(statement, params).mappings()
+            return [RankedHit(chunk_id=str(row["chunk_id"]), rank=index, raw_score=float(row["score"])) for index, row in enumerate(rows, start=1)]
+
+    def vector_candidates(self, scope: Scope, vector: Any, limit: int) -> list[RankedHit]:
+        """Rank candidates with the pgvector cosine-distance operator.
+
+        Ordering happens inside PostgreSQL against the HNSW index created in
+        migration 0009, so no embedding ever crosses the wire for ranking.
+        """
+        values = list(vector or ())
+        if not scope.knowledge_base_ids or not values or limit <= 0:
+            return []
+        params: dict[str, Any] = {"limit": limit}
+        clause = self._scope_filter(scope, params)
+        params["vector"] = "[" + ",".join(str(float(value)) for value in values) + "]"
+        statement = text(f"""
+            SELECT c.id AS chunk_id, 1 - (ce.embedding <=> CAST(:vector AS vector)) AS score
+            FROM chunks c
+            {self._ACTIVE_VERSION_JOINS}
+            JOIN chunk_embeddings ce ON ce.chunk_id = c.id
+            WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
+            ORDER BY ce.embedding <=> CAST(:vector AS vector)
+            LIMIT :limit
+        """)
+        with self.engine.connect() as conn:
+            rows = conn.execute(statement, params).mappings()
+            return [RankedHit(chunk_id=str(row["chunk_id"]), rank=index, raw_score=float(row["score"])) for index, row in enumerate(rows, start=1)]
+
+    def list_active_chunks(self, scope: Scope, limit: int | None = None) -> list[ChunkRecord]:
+        """Read active chunk rows in a scope.
+
+        Embeddings are deliberately not selected here: ranking resolves vectors
+        in SQL via `vector_candidates`, so pulling 1024-dimension vectors into
+        Python would be pure waste.
+        """
+        if not scope.knowledge_base_ids:
+            return []
+        params: dict[str, Any] = {}
+        clause = self._scope_filter(scope, params)
+        limit_clause = ""
+        if limit is not None:
+            params["limit"] = limit
+            limit_clause = " LIMIT :limit"
+        statement = text(f"""
+            SELECT c.id,c.knowledge_base_id,c.document_id,c.version_id,c.content,c.locator
+            FROM chunks c
+            {self._ACTIVE_VERSION_JOINS}
+            WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status='ready'
+            ORDER BY c.id{limit_clause}
+        """)
+        with self.engine.connect() as conn:
+            rows = conn.execute(statement, params).mappings()
+            return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}) for row in rows]
+
+    def get_chunk(self, chunk_id: str) -> ChunkRecord | None:
         with self.engine.connect() as conn:
             row = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,locator FROM chunks WHERE id=:id"), {"id": chunk_id}).mappings().first()
             if not row:
@@ -310,9 +383,18 @@ class PostgresKnowledgeRepository:
         return str(run_id)
 
     def append_event(self, run_id: str, event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
+        """Append one run event with a gap-free per-run sequence number.
+
+        The counter lives on `rag_runs` and is incremented with a single
+        `UPDATE ... RETURNING`, so numbering is O(1) and cannot race, unlike the
+        previous `SELECT MAX(seq)+1` which scanned every existing event.
+        """
         event_id = uuid.uuid4()
         with self.engine.begin() as conn:
-            seq = conn.execute(text("SELECT COALESCE(MAX(seq),0)+1 FROM retrieval_events WHERE run_id=:run_id"), {"run_id": run_id}).scalar_one()
+            seq = conn.execute(
+                text("UPDATE rag_runs SET next_event_seq=next_event_seq+1 WHERE id=:id RETURNING next_event_seq-1"),
+                {"id": run_id},
+            ).scalar_one()
             conn.execute(text("INSERT INTO retrieval_events (id,run_id,seq,event_type,payload) VALUES (:id,:run_id,:seq,:event_type,CAST(:payload AS jsonb))"), {"id": event_id, "run_id": run_id, "seq": seq, "event_type": event_type, "payload": json.dumps(payload, ensure_ascii=False)})
         return {"id": str(event_id), "run_id": run_id, "seq": seq, "event": event_type, "data": payload}
 
@@ -322,6 +404,8 @@ class PostgresKnowledgeRepository:
             return [{"seq": row["seq"], "event": row["event_type"], "data": row["payload"], "created_at": row["created_at"]} for row in rows]
 
     def persist_retrieval_hits(self, run_id: str, items: list[Any]) -> None:
+        if not items:
+            return
         with self.engine.begin() as conn:
             for item in items:
                 conn.execute(text("INSERT INTO retrieval_hits (id,run_id,chunk_id,rank,raw_score,fused_score,sources) VALUES (:id,:run_id,:chunk_id,:rank,:raw_score,:fused_score,CAST(:sources AS jsonb)) ON CONFLICT (run_id,chunk_id) DO UPDATE SET rank=EXCLUDED.rank,fused_score=EXCLUDED.fused_score"), {"id": uuid.uuid4(), "run_id": run_id, "chunk_id": item.chunk.chunk_id, "rank": item.hit.rank, "raw_score": item.hit.raw_score, "fused_score": item.hit.fused_score, "sources": json.dumps(list(item.hit.sources))})

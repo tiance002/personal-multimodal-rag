@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 import json
-import uuid
 from typing import Any
 
-from sqlalchemy import Engine, text
+from sqlalchemy import text
 
 from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
-from backend.app.application.graph import GraphEdgeDraft, GraphNodeDraft
-from backend.app.application.retrieval import ChunkRecord
+from backend.app.domain.graph import GraphEdgeDraft, GraphNodeDraft
+from backend.app.domain.models import ChunkRecord
 from backend.app.domain.scope import Scope
 
 
 class PostgresGraphRepository(PostgresKnowledgeRepository):
     def list_version_chunks(self, document_id: str, version_id: str) -> list[ChunkRecord]:
         with self.engine.connect() as conn:
-            rows = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,locator FROM chunks WHERE document_id=:document_id AND version_id=:version_id ORDER BY chunk_index"), {"document_id": document_id, "version_id": version_id}).mappings()
-            return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}) for row in rows]
+            rows = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,locator,heading_path FROM chunks WHERE document_id=:document_id AND version_id=:version_id ORDER BY chunk_index"), {"document_id": document_id, "version_id": version_id}).mappings()
+            return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, tuple(row["heading_path"] or ())) for row in rows]
 
     def set_graph_status(self, version_id: str, status: str) -> None:
         with self.engine.begin() as conn:
@@ -56,8 +55,13 @@ class PostgresGraphRepository(PostgresKnowledgeRepository):
         with self.engine.connect() as conn:
             rows = conn.execute(text(f"""SELECT ge.id,ge.version_id,ge.document_id,ge.knowledge_base_id,ge.source_node_id,ge.target_node_id,ge.relation,
                 gee.chunk_id,gee.quote,gee.quote_sha256
-                FROM graph_edges ge JOIN graph_nodes gn ON gn.id=ge.source_node_id OR gn.id=ge.target_node_id
+                FROM graph_edges ge
                 JOIN graph_edge_evidence gee ON gee.edge_id=ge.id
-                WHERE ge.knowledge_base_id IN ({kb_names}) AND (lower(gn.label) LIKE :name OR lower(gn.canonical_key) LIKE :name)
+                WHERE ge.knowledge_base_id IN ({kb_names})
+                  AND EXISTS (
+                      SELECT 1 FROM graph_nodes gn
+                      WHERE gn.id IN (ge.source_node_id, ge.target_node_id)
+                        AND (lower(gn.label) LIKE :name OR lower(gn.canonical_key) LIKE :name)
+                  )
                 ORDER BY ge.created_at"""), params).mappings()
             return [GraphEdgeDraft(str(row["id"]), str(row["version_id"]), str(row["document_id"]), str(row["knowledge_base_id"]), str(row["source_node_id"]), str(row["target_node_id"]), row["relation"], str(row["chunk_id"]), row["quote"], row["quote_sha256"]) for row in rows]

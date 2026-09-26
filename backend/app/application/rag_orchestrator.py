@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import re
 import uuid
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from backend.app.application.budget import BudgetDenied, BudgetGate, BudgetReservation
 from backend.app.application.citations import CitationService
 from backend.app.application.context_builder import ContextBuilder
-from backend.app.application.budget import BudgetDenied, BudgetGate, BudgetReservation
 from backend.app.application.model_policy import ModelPolicy
 from backend.app.application.quality import QualityGate
-from backend.app.application.retrieval import HybridRetriever, RetrievalResult
+from backend.app.application.retrieval import HybridRetriever, RetrievalItem
 from backend.app.domain.scope import Scope
 
 
@@ -28,8 +29,14 @@ class RagSettings:
 
 @dataclass(frozen=True)
 class Trace:
+    """Degradation and reason codes attached to one answer attempt.
+
+    A single retrieval pass runs per query, so there is no retry counter: if the
+    quality gate rejects the pass, the run fails with the gate's own reason code
+    rather than retrying with identical inputs.
+    """
+
     degradation_code: str | None = None
-    retry_count: int = 0
     reason_codes: tuple[str, ...] = ()
 
 
@@ -45,6 +52,8 @@ class AnswerResult:
 
 
 class RAGOrchestrator:
+    """Fixed quick-answer pipeline shared by quick mode and the agent runtime."""
+
     def __init__(
         self,
         retriever: HybridRetriever,
@@ -54,6 +63,7 @@ class RAGOrchestrator:
         answer_gateway: Any | None = None,
         cloud_allowed_by_kb: dict[str, bool] | None = None,
         budget_gate: BudgetGate | None = None,
+        on_retrieval: Callable[[str, Sequence[RetrievalItem]], None] | None = None,
     ) -> None:
         self.retriever = retriever
         self.citations = citation_service
@@ -61,6 +71,7 @@ class RAGOrchestrator:
         self.answer_gateway = answer_gateway
         self.cloud_allowed_by_kb = cloud_allowed_by_kb or {}
         self.budget_gate = budget_gate
+        self.on_retrieval = on_retrieval
         self.model_policy = ModelPolicy()
         self.quality_gate = QualityGate()
         self.context_builder = ContextBuilder()
@@ -69,9 +80,11 @@ class RAGOrchestrator:
         settings = settings or RagSettings()
         run_id = run_id or str(uuid.uuid4())
         reservation: BudgetReservation | None = None
+
         if settings.prefer_cloud and settings.cloud_enabled:
             if any(not self.cloud_allowed_by_kb.get(kb_id, False) for kb_id in scope.knowledge_base_ids):
-                return AnswerResult(run_id, "", (), question, Trace(reason_codes=("CLOUD_EGRESS_DISABLED",)), "CLOUD_EGRESS_DISABLED")
+                return self._failure(run_id, question, "CLOUD_EGRESS_DISABLED")
+
         query_plan, degradation = self.model_policy.build_query_plan(
             question,
             self.local_query_gateway,
@@ -79,20 +92,20 @@ class RAGOrchestrator:
             timeout_seconds=settings.local_query_timeout_seconds,
         )
         retrieval = self.retriever.retrieve(scope, question, query_plan=query_plan)
+        if self.on_retrieval is not None:
+            self.on_retrieval(run_id, retrieval.items)
+
         decision = self.quality_gate.evaluate(retrieval)
-        retry_count = 0
         if not decision.accepted:
-            retry_count = 1
-            retrieval = self.retriever.retrieve(scope, question, query_plan=query_plan)
-            decision = self.quality_gate.evaluate(retrieval)
-        if not decision.accepted:
-            reason = "NO_EVIDENCE_AFTER_RETRY"
-            return AnswerResult(run_id, "", (), query_plan, Trace(degradation, retry_count, (reason,)), reason)
+            reason = decision.reason.value if decision.reason is not None else "NO_CANDIDATES"
+            return AnswerResult(run_id, "", (), query_plan, Trace(degradation, (reason,)), reason)
+
         context, labels = self.context_builder.build(run_id, retrieval.items, self.citations)
         answer_degradation = degradation
+
         if settings.prefer_cloud and settings.cloud_enabled and self.answer_gateway is not None:
             if self.budget_gate is None:
-                return AnswerResult(run_id, "", (), query_plan, Trace(degradation, retry_count, ("BUDGET_GATE_UNAVAILABLE",)), "BUDGET_GATE_UNAVAILABLE")
+                return AnswerResult(run_id, "", (), query_plan, Trace(degradation, ("BUDGET_GATE_UNAVAILABLE",)), "BUDGET_GATE_UNAVAILABLE")
             try:
                 reservation = self.budget_gate.reserve(
                     run_id=run_id,
@@ -103,7 +116,8 @@ class RAGOrchestrator:
                 )
             except BudgetDenied as exc:
                 code = str(exc) or "MONTHLY_BUDGET_EXCEEDED"
-                return AnswerResult(run_id, "", (), query_plan, Trace(degradation, retry_count, (code,)), code)
+                return AnswerResult(run_id, "", (), query_plan, Trace(degradation, (code,)), code)
+
         if self.answer_gateway is None:
             answer = "基于检索到的证据：\n" + context
         else:
@@ -116,7 +130,12 @@ class RAGOrchestrator:
                     self.budget_gate.mark_unknown(reservation.reservation_id)
                 answer = "本地回答模型暂不可用，以下为可回读证据：\n" + context
                 answer_degradation = ";".join(code for code in (degradation, "MODEL_UNAVAILABLE") if code) or "MODEL_UNAVAILABLE"
+
         cited_labels = tuple(dict.fromkeys(re.findall(r"\bE\d+\b", answer)))
         if any(label not in labels for label in cited_labels):
-            return AnswerResult(run_id, "", tuple(labels), query_plan, Trace(answer_degradation, retry_count, ("INVALID_CITATION",)), "INVALID_CITATION")
-        return AnswerResult(run_id, answer, cited_labels or tuple(labels), query_plan, Trace(answer_degradation, retry_count), None, settings.cloud_cost_estimate_microunits if reservation is not None else 0)
+            return AnswerResult(run_id, "", tuple(labels), query_plan, Trace(answer_degradation, ("INVALID_CITATION",)), "INVALID_CITATION")
+        cost = settings.cloud_cost_estimate_microunits if reservation is not None else 0
+        return AnswerResult(run_id, answer, cited_labels or tuple(labels), query_plan, Trace(answer_degradation), None, cost)
+
+    def _failure(self, run_id: str, question: str, code: str) -> AnswerResult:
+        return AnswerResult(run_id, "", (), question, Trace(reason_codes=(code,)), code)

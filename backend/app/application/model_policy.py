@@ -1,14 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 from backend.app.domain.text_normalization import NormalizedQuery, normalize_query
-
-
-@dataclass(frozen=True)
-class QueryGatewayResult:
-    expansions: tuple[str, ...] = ()
 
 
 class ModelPolicy:

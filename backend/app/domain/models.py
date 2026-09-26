@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -88,3 +89,39 @@ class EvidenceSnapshot(BaseModel):
     quote: str = Field(min_length=1)
     quote_sha256: str
     locator: dict[str, object]
+
+
+@dataclass(frozen=True)
+class ChunkRecord:
+    """A stored chunk as read back from a retrieval repository.
+
+    A frozen dataclass rather than a pydantic model so repositories and tests can
+    construct it positionally, matching the other read-side value objects.
+
+    `embedding` is only populated by repositories that keep vectors in process
+    (the in-memory test double). The PostgreSQL repository resolves vectors in
+    SQL and therefore leaves it as None.
+    """
+
+    chunk_id: str
+    knowledge_base_id: str
+    document_id: str
+    version_id: str
+    content: str
+    locator: dict[str, object] = field(default_factory=dict)
+    heading_path: tuple[str, ...] = ()
+    is_current: bool = True
+    embedding: tuple[float, ...] | None = None
+
+
+@dataclass(frozen=True)
+class StoredObject:
+    """A content-addressed blob as written by the storage port.
+
+    Lives in domain so the storage port and its adapters can agree on the return
+    type without the application layer importing a concrete adapter.
+    """
+
+    storage_key: str
+    sha256: str
+    size: int

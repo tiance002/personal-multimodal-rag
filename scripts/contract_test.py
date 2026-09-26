@@ -1,10 +1,54 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 from pathlib import Path
 
 from backend.app.main import create_app
+
+# Declared dependency direction (see docs/superpowers/specs design, "Layering").
+# A layer may import only the layers listed for it.
+LAYER_RULES: dict[str, tuple[str, ...]] = {
+    "domain": (),
+    "ports": ("domain",),
+    "application": ("domain", "ports"),
+    "adapters": ("domain", "ports"),
+    "api": ("domain", "ports", "application"),
+}
+
+
+def _layering_violations(app_root: Path) -> list[str]:
+    """Report imports that point against the declared dependency direction.
+
+    `bootstrap.py`, `main.py` and `workers/` are composition entrypoints and are
+    intentionally exempt: they are the only places allowed to wire adapters.
+    """
+    violations: list[str] = []
+    for path in sorted(app_root.rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        parts = path.relative_to(app_root).parts
+        source_layer = parts[0] if parts and parts[0] in LAYER_RULES else None
+        if source_layer is None:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("backend.app."):
+                modules = [(node.module, node.lineno)]
+            elif isinstance(node, ast.Import):
+                modules = [(alias.name, node.lineno) for alias in node.names if alias.name.startswith("backend.app.")]
+            else:
+                continue
+            for module, lineno in modules:
+                segments = module.split(".")
+                if len(segments) < 3 or segments[2] not in LAYER_RULES or segments[2] == source_layer:
+                    continue
+                if segments[2] not in LAYER_RULES[source_layer]:
+                    violations.append(
+                        f"{path.as_posix()}:{lineno}: {source_layer} must not import {segments[2]} ({module})"
+                    )
+    return violations
 
 
 def main() -> int:
@@ -26,6 +70,7 @@ def main() -> int:
     unexpected = [path for path in actual_paths if path not in approved_paths]
     snapshot_drift = actual_paths != approved_paths
     forbidden = [term for term in snapshot.get("forbidden_terms", []) if term in json.dumps(openapi, ensure_ascii=False).lower()]
+    layering = _layering_violations(Path("backend/app"))
     event_names = sse_schema.get("properties", {}).get("event", {}).get("enum", [])
     sample_errors: list[str] = []
     for line_number, raw in enumerate(args.sse_sample.read_text(encoding="utf-8").splitlines(), start=1):
@@ -41,13 +86,16 @@ def main() -> int:
         elif event["event"] not in event_names or not isinstance(event["seq"], int) or event["seq"] < 1 or not isinstance(event["data"], dict):
             sample_errors.append(f"line {line_number}: SSE event does not match fixed schema")
     result = {
-        "status": "PASS" if not missing and not unexpected and not snapshot_drift and not forbidden and not sample_errors else "FAIL",
+        "status": "PASS"
+        if not missing and not unexpected and not snapshot_drift and not forbidden and not sample_errors and not layering
+        else "FAIL",
         "required_paths": len(required),
         "actual_paths": len(actual_paths),
         "missing_paths": missing,
         "unexpected_paths": unexpected,
         "openapi_snapshot_drift": snapshot_drift,
         "forbidden_terms": forbidden,
+        "layering_violations": layering,
         "sse_events": event_names,
         "sse_sample_errors": sample_errors,
     }

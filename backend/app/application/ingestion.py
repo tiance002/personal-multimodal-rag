@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO
 
-from backend.app.adapters.parsers import ParserRegistry
-from backend.app.adapters.storage import ContentAddressedStorage
 from backend.app.domain.chunking import chunk_document
 from backend.app.domain.models import ChunkDraft, NormalizedDocument
 from backend.app.domain.parsers import ParserError
+from backend.app.ports.ingestion import BlobStore, DocumentParser
 
 
 @dataclass
@@ -120,7 +118,12 @@ class InMemoryIngestionRepository:
 
 
 class IngestionService:
-    def __init__(self, repository: InMemoryIngestionRepository, storage: ContentAddressedStorage, parsers: ParserRegistry) -> None:
+    def __init__(
+        self,
+        repository: InMemoryIngestionRepository,
+        storage: BlobStore,
+        parsers: DocumentParser,
+    ) -> None:
         self.repository = repository
         self.storage = storage
         self.parsers = parsers
@@ -154,7 +157,12 @@ class IngestionService:
 
 
 class IngestionWorker:
-    def __init__(self, repository: InMemoryIngestionRepository, storage: ContentAddressedStorage, parsers: ParserRegistry) -> None:
+    def __init__(
+        self,
+        repository: InMemoryIngestionRepository,
+        storage: BlobStore,
+        parsers: DocumentParser,
+    ) -> None:
         self.repository = repository
         self.storage = storage
         self.parsers = parsers

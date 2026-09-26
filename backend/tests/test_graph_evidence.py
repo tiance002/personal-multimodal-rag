@@ -1,5 +1,5 @@
 from backend.app.application.graph import GraphService
-from backend.app.application.retrieval import ChunkRecord
+from backend.app.domain.models import ChunkRecord
 
 
 def test_graph_edges_require_evidence_from_the_same_version():
@@ -20,12 +20,16 @@ class GraphMemoryRepository:
     def __init__(self):
         self.chunks = []
         self.graph = None
+        self.graph_status = "disabled"
 
     def list_version_chunks(self, document_id, version_id):
         return [chunk for chunk in self.chunks if chunk.document_id == document_id and chunk.version_id == version_id]
 
     def save_graph(self, version_id, nodes, edges):
         self.graph = (version_id, nodes, edges)
+
+    def set_graph_status(self, version_id, status):
+        self.graph_status = status
 
 
 __all__ = ["GraphMemoryRepository"]

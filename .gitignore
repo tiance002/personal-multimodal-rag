@@ -7,6 +7,12 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Local runtime data, never tracked.
+#   var/reports/  authoritative verification evidence (see README.md)
+#   var/backups/  backup/restore evidence
+#   var/storage/  default RAG_STORAGE_ROOT - do NOT delete when cleaning var/
+# Everything else under var/ is per-run smoke/pytest/restore residue.
 var/
 node_modules/
 frontend/node_modules/

@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 
 from backend.app.domain.errors import EvidenceIntegrityError
-from backend.app.domain.models import EvidenceSnapshot
-from backend.app.domain.evidence import freeze_evidence
-
-from backend.app.application.retrieval import ChunkRecord
+from backend.app.domain.evidence import EvidenceResolver, freeze_evidence
+from backend.app.domain.models import ChunkRecord, EvidenceSnapshot
 
 
 @dataclass(frozen=True)
@@ -31,20 +28,26 @@ class CitationDetail:
     current_status: str
 
 
+def as_citation_chunk(chunk: CitationChunk | ChunkRecord) -> CitationChunk:
+    if isinstance(chunk, CitationChunk):
+        return chunk
+    return CitationChunk(
+        chunk.chunk_id,
+        chunk.document_id,
+        chunk.knowledge_base_id,
+        chunk.version_id,
+        chunk.content,
+        chunk.locator,
+    )
+
+
 class InMemoryCitationStore:
     def __init__(self) -> None:
         self.chunks: dict[tuple[str, str], CitationChunk] = {}
         self.current_versions: dict[str, str] = {}
 
     def add(self, chunk: CitationChunk | ChunkRecord, *, is_current: bool = True) -> None:
-        normalized = chunk if isinstance(chunk, CitationChunk) else CitationChunk(
-            chunk.chunk_id,
-            chunk.document_id,
-            chunk.knowledge_base_id,
-            chunk.version_id,
-            chunk.content,
-            chunk.locator,
-        )
+        normalized = as_citation_chunk(chunk)
         self.chunks[(normalized.version_id, normalized.chunk_id)] = normalized
         if is_current:
             self.current_versions[normalized.document_id] = normalized.version_id
@@ -57,35 +60,42 @@ class InMemoryCitationStore:
 
 
 class CitationService:
+    """Freezes answer evidence and re-reads it under hash validation.
+
+    Resolution delegates to the domain `EvidenceResolver` so the integrity rule
+    (quote hash matches, quote still readable in the frozen version) exists in
+    exactly one place.
+    """
+
     def __init__(self, store: InMemoryCitationStore) -> None:
         self.store = store
         self.snapshots: dict[tuple[str, str], EvidenceSnapshot] = {}
 
     def freeze(self, run_id: str, chunk: CitationChunk | ChunkRecord, label: str | None = None) -> CitationDetail:
-        normalized = chunk if isinstance(chunk, CitationChunk) else CitationChunk(
-            chunk.chunk_id,
-            chunk.document_id,
-            chunk.knowledge_base_id,
-            chunk.version_id,
-            chunk.content,
-            chunk.locator,
-        )
+        normalized = as_citation_chunk(chunk)
         self.store.add(normalized, is_current=False)
         label = label or f"E{sum(1 for run, _ in self.snapshots if run == run_id) + 1}"
         snapshot = freeze_evidence(label, normalized.version_id, normalized.chunk_id, normalized.content, normalized.locator)
         self.snapshots[(run_id, label)] = snapshot
-        return self._detail(run_id, label, normalized)
+        return self._detail(label, normalized)
 
     def resolve(self, run_id: str, citation_id: str) -> CitationDetail:
         snapshot = self.snapshots.get((run_id, citation_id))
         if snapshot is None or snapshot.chunk_id is None:
             raise EvidenceIntegrityError("unknown citation")
+        EvidenceResolver({citation_id: snapshot}, self._read_quote).resolve(citation_id)
         chunk = self.store.get(snapshot.version_id, snapshot.chunk_id)
-        if chunk is None or hashlib.sha256(chunk.content.encode("utf-8")).hexdigest() != snapshot.quote_sha256:
-            raise EvidenceIntegrityError("citation source changed or is unreadable")
-        return self._detail(run_id, citation_id, chunk)
+        if chunk is None:
+            raise EvidenceIntegrityError("citation source is unreadable")
+        return self._detail(citation_id, chunk)
 
-    def _detail(self, run_id: str, label: str, chunk: CitationChunk) -> CitationDetail:
+    def _read_quote(self, version_id: str, chunk_id: str | None) -> str:
+        chunk = self.store.get(version_id, chunk_id or "")
+        if chunk is None:
+            raise EvidenceIntegrityError("citation source is unreadable")
+        return chunk.content
+
+    def _detail(self, label: str, chunk: CitationChunk) -> CitationDetail:
         current = self.store.current_versions.get(chunk.document_id)
         status = "current" if current in {None, chunk.version_id} else "superseded"
         return CitationDetail(label, label, chunk.version_id, chunk.chunk_id, chunk.content, chunk.locator, status)

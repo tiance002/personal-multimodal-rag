@@ -7,8 +7,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from backend.app.application.model_policy import QueryGatewayResult
-from backend.app.ports.providers import EmbeddingResult, ProviderUnavailable
+from backend.app.ports.providers import EmbeddingResult, ProviderUnavailable, QueryGatewayResult
 
 
 class OllamaGateway:

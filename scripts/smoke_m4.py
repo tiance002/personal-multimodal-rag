@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 
 from backend.app.config import Settings
 from backend.app.main import create_app

@@ -143,6 +143,7 @@ class ImageParser:
             media_type="image/*",
             markdown_content="",
             assets=[asset],
+            source_locators=[SourceLocator(kind="image")],
             content_sha256=_sha256(path.read_bytes().hex()),
             parser_version="image/v1-no-ocr",
         )

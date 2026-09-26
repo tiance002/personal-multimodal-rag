@@ -3,16 +3,10 @@ from __future__ import annotations
 import hashlib
 import os
 import tempfile
-from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO
 
-
-@dataclass(frozen=True)
-class StoredObject:
-    storage_key: str
-    sha256: str
-    size: int
+from backend.app.domain.models import StoredObject
 
 
 class ContentAddressedStorage:

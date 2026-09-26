@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 
-from backend.app.domain.models import ChunkDraft, NormalizedDocument, SourceLocator
+from backend.app.domain.models import ChunkDraft, DocumentSection, NormalizedDocument, SourceLocator
 
 
 def _sha256(text: str) -> str:
@@ -20,11 +20,13 @@ def chunk_document(
         raise ValueError("overlap must be between 0 and max_chars")
 
     sections = document.sections or [
-        type("DefaultSection", (), {
-            "start": 0,
-            "end": len(document.markdown_content),
-            "heading_path": (),
-        })()
+        DocumentSection(
+            section_id="section-0",
+            heading="",
+            level=0,
+            start=0,
+            end=len(document.markdown_content),
+        )
     ]
     chunks: list[ChunkDraft] = []
     for section in sections:

@@ -21,7 +21,7 @@ class Settings:
     host: str = "127.0.0.1"
     port: int = 8000
     storage_root: Path = Path("var/storage")
-    database_url: str = "postgresql+psycopg://rag:rag@127.0.0.1:5432/rag"
+    database_url: str = "postgresql+psycopg://rag:rag@127.0.0.1:55432/rag"
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_chat_model: str = "ornith-1.5:9b"
     ollama_embedding_model: str = "bge-m3:latest"
@@ -39,6 +39,12 @@ class Settings:
             raise ValueError("RAG_PORT must be an integer") from exc
         if not 1 <= port <= 65535:
             raise ValueError("RAG_PORT must be between 1 and 65535")
+        max_chunk_chars = int(os.getenv("RAG_MAX_CHUNK_CHARS", str(cls.max_chunk_chars)))
+        chunk_overlap = int(os.getenv("RAG_CHUNK_OVERLAP", str(cls.chunk_overlap)))
+        if max_chunk_chars <= 0:
+            raise ValueError("RAG_MAX_CHUNK_CHARS must be positive")
+        if not 0 <= chunk_overlap < max_chunk_chars:
+            raise ValueError("RAG_CHUNK_OVERLAP must be >= 0 and < RAG_MAX_CHUNK_CHARS")
         return cls(
             service_name=os.getenv("RAG_SERVICE_NAME", cls.service_name),
             cloud_enabled=_env_bool("RAG_CLOUD_ENABLED", False),
@@ -53,6 +59,6 @@ class Settings:
             ollama_embedding_model=os.getenv("OLLAMA_EMBEDDING_MODEL", cls.ollama_embedding_model),
             monthly_cloud_budget_microunits=int(os.getenv("RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS", str(cls.monthly_cloud_budget_microunits))),
             max_upload_bytes=int(os.getenv("RAG_MAX_UPLOAD_BYTES", str(cls.max_upload_bytes))),
-            max_chunk_chars=int(os.getenv("RAG_MAX_CHUNK_CHARS", str(cls.max_chunk_chars))),
-            chunk_overlap=int(os.getenv("RAG_CHUNK_OVERLAP", str(cls.chunk_overlap))),
+            max_chunk_chars=max_chunk_chars,
+            chunk_overlap=chunk_overlap,
         )

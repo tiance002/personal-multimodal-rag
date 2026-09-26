@@ -1,4 +1,5 @@
-from backend.app.application.model_policy import ModelPolicy, QueryGatewayResult
+from backend.app.application.model_policy import ModelPolicy
+from backend.app.ports.providers import QueryGatewayResult
 
 
 class TimeoutGateway:

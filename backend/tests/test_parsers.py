@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import fitz
 from PIL import Image
 

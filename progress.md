@@ -20,6 +20,7 @@
   - `docker compose -f deploy\compose.yml build api worker frontend` → exit 0；后端包含 0007/0008 迁移、前端包含最新 SSE 客户端的 Compose 镜像构建 PASS。
   - `docker compose -f deploy\compose.yml up -d api worker frontend` → exit 0；重建镜像后 API `/healthz`=200、前端首页=200，随后按约定停止应用容器。
   - `git init -b main`、`git commit -m "chore: establish personal RAG project baseline"`、`git push -u origin main` → exit 0；GitHub 私有仓库已创建并接收 `e52893c`。
+  - 代码审查整改（`docs/reviews/2026-09-26-code-architecture-review.md` 第十三节）：修复 25 项代码问题（组合根、依赖方向、检索 SQL 下推、SSE 流式、死代码/死配置/未使用导入），并新增分层依赖门禁；`pytest backend/tests` → exit 0，`66 passed`；`scripts/contract_test.py` → exit 0（`layering_violations: []`）；`npm --prefix frontend run build` → exit 0；AST 未使用导入扫描 0 项。迁移 `0009_retrieval_perf.py` 与新增 pgvector SQL **NOT RUN**（无可用 PostgreSQL）。
 - 当前阻断（P0/P1）：无已识别 P0/P1。
 - 可控问题待负责人决定（P2/P3）：当前本机没有已验证 OCR/VLM adapter，因此图片/扫描资料显式失败而不生成伪文本；LibreOffice 缺失导致附件 DOCX 视觉渲染 BLOCKED（不影响软件运行）；`make` 不在 PATH，等价 PowerShell 门禁已执行。
 - 已批准延期及批准依据：无；以上能力限制未被擅自标记为延期通过。
@@ -38,3 +39,4 @@
 | 2026-09-26 | 后端迁移镜像重建与 Compose 运行时复核 | `docker compose build api worker frontend`、`up -d api worker frontend`；API healthz 200、前端 200；之后 stop 应用容器 | PASS | 数据库保持健康 |
 | 2026-09-26 | 真实恢复演练 | `restore.ps1 -RestoreDatabase`；active/version、chunk、asset、graph orphan 检查均为 0 | PASS | 负责人复核 manifest |
 | 2026-09-26 | GitHub 初始化与上传 | `git init -b main`、首个 commit `e52893c`、`git push -u origin main`；`git ls-remote --heads origin main` 返回同一 SHA | PASS | 负责人复核仓库与启动说明 |
+| 2026-09-26 | 代码审查问题整改（批次一~三 + 部分批次五） | `pytest backend/tests` 66 passed；`scripts/contract_test.py` PASS（新增 layering 门禁）；`npm --prefix frontend run build` exit 0；AST 未使用导入 0、分层违规 0；清理 74+9 个残留文件/目录 | PASS（DB 相关 NOT RUN） | 批次四（上帝对象拆分）、Q-01/Q-03 格式化 |
