@@ -1,7 +1,7 @@
 # progress.md — 当前开发进度
 
 - 当前里程碑：M4.5 / V1.0 实现与发布证据已完成，等待项目负责人确认验收
-- 当前工作分支 / commit：`main` / `081b3cf12542fd4c94b0220e46b3d8c69ca8f5f6`；远程为 `https://github.com/tiance002/personal-multimodal-rag.git`；无 tag
+- 当前工作分支 / commit：`main`；初始基线 commit 为 `e52893ccc10b7f66e1d40b6f60e87dce952075e0`，最新提交以 `git log -1` 为准；远程为 `https://github.com/tiance002/personal-multimodal-rag.git`；无 tag
 - 当前唯一主要目标：交付个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
 - 本次任务：从空项目完成 M0→M1→M2→M3→M4→M4.5 纵切，并保存可核查报告。
 - 已完成并有证据的工作：

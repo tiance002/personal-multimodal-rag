@@ -81,4 +81,4 @@ npm --prefix frontend run build
 & .\scripts\restore.ps1 -InputDir var\backups\backup-<timestamp> -RestoreDatabase
 ```
 
-`make` 当前不在本机 PATH，因此没有把 `make verify-*` 报告为已执行。当前项目已初始化 Git 并推送到私有仓库 [tiance002/personal-multimodal-rag](https://github.com/tiance002/personal-multimodal-rag)，初始基线 commit 为 `e52893c`，当前 HEAD 为 `081b3cf`；尚未创建 tag，也未声称项目负责人已验收，最终验收和发布 tag 仍由项目负责人确认。
+`make` 当前不在本机 PATH，因此没有把 `make verify-*` 报告为已执行。当前项目已初始化 Git 并推送到私有仓库 [tiance002/personal-multimodal-rag](https://github.com/tiance002/personal-multimodal-rag)，初始基线 commit 为 `e52893c`，最新提交可用 `git log -1` 查看；尚未创建 tag，也未声称项目负责人已验收，最终验收和发布 tag 仍由项目负责人确认。
