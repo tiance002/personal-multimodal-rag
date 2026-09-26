@@ -62,10 +62,12 @@ class PostgresGraphRepository(PostgresKnowledgeRepository):
                 gee.chunk_id,gee.quote,gee.quote_sha256
                 FROM graph_edges ge
                 JOIN graph_edge_evidence gee ON gee.edge_id=ge.id AND gee.version_id=ge.version_id
+                JOIN knowledge_bases kb ON kb.id=ge.knowledge_base_id AND kb.deleted_at IS NULL
                 JOIN documents d ON d.id=ge.document_id AND d.knowledge_base_id=ge.knowledge_base_id
                 JOIN document_versions dv ON dv.id=ge.version_id AND dv.document_id=ge.document_id
                 WHERE ge.knowledge_base_id IN ({kb_names})
                   {document_clause}
+                  AND kb.graph_enabled = TRUE
                   AND d.deleted_at IS NULL
                   AND d.active_version_id = ge.version_id
                   AND dv.index_status = 'ready'

@@ -15,5 +15,6 @@ def test_graph_query_contains_database_scope_and_readiness_guards() -> None:
         "d.active_version_id = ge.version_id",
         "dv.index_status = 'ready'",
         "dv.graph_status = 'ready'",
+        "kb.graph_enabled = TRUE",
     ):
         assert required in source

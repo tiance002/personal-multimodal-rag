@@ -15,3 +15,9 @@
 .mode-toggle button { display:flex; align-items:center; gap:5px; border:0; background:transparent; color:var(--blue); padding:6px 9px; font-size:10px; }
 .mode-toggle button.active { background:#dfeada; color:var(--moss); }
 .graph-build { margin-left:auto; border:1px solid #b8d0b4; background:#f4f0e7; color:var(--moss); border-radius:4px; padding:4px 7px; font-size:9px; }
+.scope-summary { margin-top:8px; color:var(--moss); font-size:10px; }
+.document-row { min-width:0; }
+.document-select { display:flex; align-items:center; gap:10px; flex:1; min-width:0; border:0; background:transparent; color:inherit; text-align:left; padding:0; }
+.document-scope-toggle { flex:none; border:1px solid var(--line); background:#f8f4eb; color:var(--muted); border-radius:4px; padding:4px 6px; font-size:9px; }
+.document-scope-toggle.active { border-color:var(--moss); color:var(--moss); background:#e2eee0; }
+.library-panel { min-height:0; overflow:auto; }

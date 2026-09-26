@@ -50,6 +50,7 @@ class _ToolContext:
     scope: Scope
     guard: Callable[[], None]
     record: Callable[[str, dict[str, Any], Any], None]
+    graph_enabled: bool = False
 
 
 class LangChainAgentAdapter:
@@ -76,6 +77,7 @@ class LangChainAgentAdapter:
         run_id: str,
         gateway: KnowledgeToolGateway,
         evidence: EvidenceAccumulator,
+        graph_enabled: bool = False,
         trace_store: Any | None = None,
         limits: AgentLimits | None = None,
     ) -> SmartAgentResult:
@@ -112,7 +114,7 @@ class LangChainAgentAdapter:
             if trace_store is not None:
                 trace_store.append_step(run_id, step)
 
-        context = _ToolContext(gateway, scope, guard, record)
+        context = _ToolContext(gateway, scope, guard, record, graph_enabled)
         tools = self._build_tools(context)
         self.last_tool_names = tuple(tool.name for tool in tools)
         self.last_tool_schemas = tuple(tool.args for tool in tools)
@@ -135,7 +137,7 @@ class LangChainAgentAdapter:
                 self.model,
                 tools,
                 system_prompt=(
-                    "You are a local knowledge assistant. Use only the four provided read-only tools. "
+                    "You are a local knowledge assistant. Use only the provided read-only tools. "
                     "The server has already fixed the knowledge scope; never ask for or invent scope, "
                     "version, provider, filesystem, shell, network, or cloud parameters. Search before "
                     "stating document facts. Every factual sentence in the final answer must end with a "
@@ -250,7 +252,7 @@ class LangChainAgentAdapter:
         def query_knowledge_graph(entity_name: str, depth: int = 1) -> str:
             return self._invoke_tool(context, "query_knowledge_graph", {"entity_name": entity_name, "depth": depth})
 
-        return [
+        tools = [
             StructuredTool.from_function(
                 list_documents,
                 name="list_documents",
@@ -269,13 +271,17 @@ class LangChainAgentAdapter:
                 description="Read the active ready document already authorized by the server scope.",
                 args_schema=ReadDocumentArgs,
             ),
-            StructuredTool.from_function(
-                query_knowledge_graph,
-                name="query_knowledge_graph",
-                description="Query the graph inside the server-authorized scope.",
-                args_schema=QueryKnowledgeGraphArgs,
-            ),
         ]
+        if context.graph_enabled and context.gateway.graph_query is not None:
+            tools.append(
+                StructuredTool.from_function(
+                    query_knowledge_graph,
+                    name="query_knowledge_graph",
+                    description="Query the graph inside the server-authorized scope.",
+                    args_schema=QueryKnowledgeGraphArgs,
+                )
+            )
+        return tools
 
     def _invoke_tool(self, context: _ToolContext, tool_name: str, args: dict[str, Any]) -> str:
         context.guard()

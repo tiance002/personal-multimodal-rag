@@ -62,8 +62,14 @@ try {
                     } catch { Start-Sleep -Seconds 2 }
                 }
                 if (-not $ready) { throw 'Compose Nginx/API health did not become ready' }
-                $running = @(& docker compose -p $composeProject -f deploy\compose.yml ps --status running --services)
-                foreach ($service in @('db','api','worker','frontend')) {
+                $requiredServices = @('db','api','worker','frontend')
+                $running = @()
+                for ($attempt = 0; $attempt -lt 30; $attempt++) {
+                    $running = @(& docker compose -p $composeProject -f deploy\compose.yml ps --status running --services)
+                    if (($requiredServices | Where-Object { $_ -notin $running }).Count -eq 0) { break }
+                    Start-Sleep -Seconds 1
+                }
+                foreach ($service in $requiredServices) {
                     if ($service -notin $running) { throw "Compose service '$service' is not running" }
                 }
                 & $Python scripts\preview_proxy_smoke.py --base-url 'http://127.0.0.1:14174' --expect-server nginx --report 'var\reports\compose-proxy-smoke.json'

@@ -4,6 +4,7 @@ export type KnowledgeBase = {
   id: string;
   name: string;
   description?: string;
+  graph_enabled?: boolean;
   cloud_allowed?: boolean;
 };
 
@@ -34,6 +35,7 @@ export type Message = {
 export type AppState = {
   selectedKnowledgeBaseId: string | null;
   selectedDocumentId: string | null;
+  documentScope: string[];
   viewMode: ViewMode;
   activeConversationId: string | null;
 };

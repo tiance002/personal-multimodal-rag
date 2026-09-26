@@ -63,8 +63,8 @@ LANGFUSE_SECRET_KEY=sk-lf-...
 
 - 文本/Markdown/TXT、PDF 与图片导入；扫描页和 PDF 内嵌图片先提取原图，再以本地 OCR 生成派生文字。原图 SHA-256、页码、派生资产和 chunk 关联保存，可回读；不调用云端 VLM。OCR 无法启动报 `OCR_UNAVAILABLE`，正常运行但无文字报 `OCR_EMPTY`，均不伪装索引成功。
 - 关键词 + 可选向量混合检索；L1 查询理解或回答模型失败时保留 q0，并返回可回读证据。
-- Quick 使用固定 LangChain `Runnable` Chain，Smart 使用 LangChain `create_agent`；两者共用 `KnowledgeGateway`、证据覆盖、引用冻结和答案校验。Smart 只开放 `list_documents`、`search_knowledge`、`read_document`、`query_knowledge_graph` 四个只读知识工具。
-- SSE 运行事件、引用回读、文档/图谱右侧面板、三栏工作台和历史会话。
+- Quick 使用固定 LangChain `Runnable` Chain，Smart 使用 LangChain `create_agent`；两者共用 `KnowledgeGateway`、证据覆盖、引用冻结和答案校验。Smart 默认只开放 `list_documents`、`search_knowledge`、`read_document` 三个只读知识工具；只有服务端选中的全部知识库显式启用 `graph_enabled` 时，才追加 `query_knowledge_graph`。
+- 服务端确定知识库/文档范围；切换知识库或“仅此文档”会同步当前会话的 scope，并由服务端校验文档归属。SSE 运行事件、引用回读、文档右侧面板、图谱默认关闭的三栏工作台和历史会话。
 - 云端能力默认关闭；若后续启用云端，月度预算通过 `RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS` 配置，并在实际 provider 调用前进行原子预留。
 
 ## 验证命令

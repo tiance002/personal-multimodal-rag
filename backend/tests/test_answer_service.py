@@ -49,7 +49,7 @@ def _conversation():
 
 
 class SmartAgentStub:
-    def run(self, conversation_id, question, scope, *, run_id, gateway, evidence, trace_store=None, limits=None):
+    def run(self, conversation_id, question, scope, *, run_id, gateway, evidence, graph_enabled=False, trace_store=None, limits=None):
         tool_result = gateway.invoke("search_knowledge", {"query": question}, scope)
         snapshots = evidence.freeze()
         return SmartAgentResult(

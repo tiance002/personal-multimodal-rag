@@ -68,6 +68,33 @@ def _error(request: Request, code: str, message: str, status_code: int = 400, de
     return JSONResponse({"error": {"code": code, "message": message, "details": details or {}}, "meta": _meta(request)}, status_code=status_code)
 
 
+def _validate_conversation_scope(
+    request: Request,
+    store: Any,
+    knowledge_base_scope: list[str],
+    document_scope: list[str],
+) -> JSONResponse | None:
+    if not knowledge_base_scope:
+        return _error(request, "INVALID_KNOWLEDGE_BASE_SCOPE", "at least one knowledge base is required")
+    missing_kb = [kb_id for kb_id in knowledge_base_scope if not store.get_knowledge_base(kb_id)]
+    if missing_kb:
+        return _not_found(request, "knowledge base scope contains an unknown id")
+    for document_id in document_scope:
+        document = store.get_document_access(document_id)
+        if not document or document.get("deleted_at") is not None:
+            return _error(request, "INVALID_DOCUMENT_SCOPE", "document scope contains an unknown document", 400, {"document_id": document_id})
+        document_kb_id = str(document.get("knowledge_base_id", ""))
+        if document_kb_id not in {str(kb_id) for kb_id in knowledge_base_scope}:
+            return _error(
+                request,
+                "INVALID_DOCUMENT_SCOPE",
+                "document scope must belong to the selected knowledge base scope",
+                400,
+                {"document_id": document_id, "knowledge_base_id": document_kb_id},
+            )
+    return None
+
+
 def _media_type(file: UploadFile) -> str:
     return file.content_type or mimetypes.guess_type(file.filename or "")[0] or "application/octet-stream"
 
@@ -182,8 +209,13 @@ def get_document_chunks(document_id: str, request: Request):
 @router.get("/documents/{document_id}/graph")
 def get_document_graph(document_id: str, request: Request):
     container = _container(request)
-    if not container.store.get_document(document_id):
+    document = container.store.get_document(document_id)
+    if not document:
         return _not_found(request)
+    knowledge_base_id = str(document.get("knowledge_base_id", ""))
+    knowledge_base = container.store.get_knowledge_base(knowledge_base_id)
+    if not knowledge_base or not knowledge_base.get("graph_enabled", False):
+        return _error(request, "GRAPH_DISABLED", "graph feature is disabled for this knowledge base", 409, {"knowledge_base_id": knowledge_base_id})
     return _ok(request, container.graph.get_document_graph(document_id))
 
 
@@ -203,6 +235,10 @@ def rebuild_graph(document_id: str, request: Request):
     document = container.store.get_document(document_id)
     if not document:
         return _not_found(request)
+    knowledge_base_id = str(document.get("knowledge_base_id", ""))
+    knowledge_base = container.store.get_knowledge_base(knowledge_base_id)
+    if not knowledge_base or not knowledge_base.get("graph_enabled", False):
+        return _error(request, "GRAPH_DISABLED", "graph feature is disabled for this knowledge base", 409, {"knowledge_base_id": knowledge_base_id})
     if not document.get("active_version_id"):
         return _error(request, "DOCUMENT_NOT_READY", "document has no active indexed version", 409)
     result = GraphService(container.graph).build(document_id, str(document["active_version_id"]))
@@ -231,8 +267,9 @@ def retry_ingestion_job(job_id: str, request: Request, background_tasks: Backgro
 @router.post("/conversations", status_code=201)
 def create_conversation(request: Request, payload: ConversationIn):
     store = _container(request).store
-    if any(store.get_knowledge_base(kb_id) is None for kb_id in payload.knowledge_base_scope):
-        return _not_found(request, "knowledge base scope contains an unknown id")
+    invalid_scope = _validate_conversation_scope(request, store, payload.knowledge_base_scope, payload.document_scope)
+    if invalid_scope is not None:
+        return invalid_scope
     return _ok(request, store.create_conversation(payload.knowledge_base_scope, payload.document_scope, payload.title), 201)
 
 
@@ -251,7 +288,17 @@ def list_messages(conversation_id: str, request: Request):
 
 @router.patch("/conversations/{conversation_id}")
 def update_conversation(conversation_id: str, request: Request, payload: ConversationPatch):
-    result = _container(request).store.update_conversation(conversation_id, **payload.model_dump(exclude_none=True))
+    store = _container(request).store
+    current = store.get_conversation(conversation_id)
+    if not current:
+        return _not_found(request)
+    fields = payload.model_dump(exclude_none=True)
+    knowledge_base_scope = fields.get("knowledge_base_scope", current["knowledge_base_scope"])
+    document_scope = fields.get("document_scope", current["document_scope"])
+    invalid_scope = _validate_conversation_scope(request, store, knowledge_base_scope, document_scope)
+    if invalid_scope is not None:
+        return invalid_scope
+    result = store.update_conversation(conversation_id, **fields)
     return _ok(request, result) if result else _not_found(request)
 
 

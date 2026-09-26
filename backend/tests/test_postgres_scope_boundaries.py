@@ -77,7 +77,7 @@ def test_postgres_graph_query_excludes_out_of_scope_deleted_old_and_not_ready_da
     repository = PostgresKnowledgeRepository(engine, ContentAddressedStorage(tmp_path / "storage"))
     graph_repository = PostgresGraphRepository(engine, repository.storage)
     suffix = tmp_path.name
-    knowledge_base = repository.create_knowledge_base(f"graph-scope-{suffix}")
+    knowledge_base = repository.create_knowledge_base(f"graph-scope-{suffix}", graph_enabled=True)
 
     def ingest(file_name: str, content: bytes) -> tuple[dict[str, object], dict[str, object]]:
         receipt = repository.create_upload(

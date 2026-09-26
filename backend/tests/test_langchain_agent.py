@@ -73,7 +73,7 @@ def _gateway() -> KnowledgeToolGateway:
     return KnowledgeToolGateway(retriever=HybridRetriever(repository))
 
 
-def test_langchain_adapter_uses_exactly_four_scoped_tools_and_freezes_evidence() -> None:
+def test_langchain_adapter_hides_graph_tool_by_default_and_freezes_evidence() -> None:
     model = ScriptedChatModel()
     adapter = LangChainAgentAdapter(model)
     base_gateway = _gateway()
@@ -94,9 +94,33 @@ def test_langchain_adapter_uses_exactly_four_scoped_tools_and_freezes_evidence()
     assert result.citations == ("E1",)
     assert result.model_calls == 2
     assert [snapshot.chunk_id for snapshot in result.evidence] == ["chunk-1"]
-    assert set(model.bound_names) == set(ALLOWED_READ_TOOLS)
+    assert set(model.bound_names) == set(ALLOWED_READ_TOOLS - {"query_knowledge_graph"})
     schema_keys = set().union(*(schema.keys() for schema in adapter.last_tool_schemas))
     assert not {"knowledge_base_id", "version_id", "scope", "run_id", "cloud_allowed"} & schema_keys
+
+
+def test_langchain_adapter_registers_graph_tool_only_when_scope_allows_it() -> None:
+    model = ScriptedChatModel()
+    adapter = LangChainAgentAdapter(model)
+    base_gateway = _gateway()
+    evidence = EvidenceAccumulator()
+    result = adapter.run(
+        "conversation",
+        "question",
+        Scope.from_ids(["kb"]),
+        run_id="run-graph",
+        gateway=KnowledgeToolGateway(
+            retriever=base_gateway.retriever,
+            graph_query=lambda scope, entity_name, depth: [],
+            evidence_accumulator=evidence,
+        ),
+        evidence=evidence,
+        trace_store=TraceStore(),
+        graph_enabled=True,
+    )
+
+    assert result.status == "completed"
+    assert set(model.bound_names) == set(ALLOWED_READ_TOOLS)
 
 
 def test_langchain_adapter_honors_persistent_cancellation_before_model() -> None:

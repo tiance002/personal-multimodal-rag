@@ -26,7 +26,14 @@ def main() -> int:
             browser_path = str(system_chrome) if system_chrome.is_file() else None
         browser = playwright.chromium.launch(headless=True, **({"executable_path": browser_path} if browser_path else {}))
         page = browser.new_page(viewport={"width": 1440, "height": 1000}, device_scale_factor=1)
-        response = page.request.post(f"{base_url}/api/v1/knowledge-bases", data={"name": f"ui-smoke-{suffix}", "description": "temporary UI verification"})
+        response = page.request.post(
+            f"{base_url}/api/v1/knowledge-bases",
+            data={
+                "name": f"ui-smoke-{suffix}",
+                "description": "temporary UI verification",
+                "graph_enabled": True,
+            },
+        )
         if not response.ok:
             raise RuntimeError(f"knowledge base setup failed: {response.status} {response.text()}")
         kb = response.json()["data"]

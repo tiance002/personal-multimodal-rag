@@ -12,13 +12,17 @@ Use `langchain==1.4.2` and `langchain-ollama==1.1.0`. LangChain's
 `create_agent` owns the model/tool loop and tool messages. The project exposes
 one `SmartAgentPort` and a thin `LangChainAgentAdapter`.
 
-The adapter closes four and only four read-only tools over a server-owned
-execution context:
+The adapter has a closed allowlist of at most four read-only tools over a
+server-owned execution context. The default set is three tools:
 
 - `list_documents`
 - `search_knowledge`
 - `read_document`
-- `query_knowledge_graph`
+
+`query_knowledge_graph` is added only when the server confirms that every
+knowledge base in the selected scope has explicitly enabled `graph_enabled`.
+Graph access is therefore opt-in and cannot be enabled by the model or by the
+client UI.
 
 The model does not receive knowledge-base scope, run identity, cloud policy,
 embedding profile, version authorization, filesystem or network controls.
@@ -49,8 +53,8 @@ status=PASS; provider_mode=real local Ollama; agent_status=completed;
 tool steps=list_documents,search_knowledge,read_document; citation_status=200
 ```
 
-The deterministic adapter test also verifies that the bound tool set is
-exactly the four names above, schemas contain no server-controlled fields,
+The deterministic adapter tests verify the default three-tool set and the
+explicit graph-enabled four-tool set; schemas contain no server-controlled fields,
 evidence freezes to `E1`, and persistent cancellation prevents the first model
 call.
 

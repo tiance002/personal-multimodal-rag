@@ -211,6 +211,13 @@ class AnswerService:
             self.runs.complete_run(run_id, "cancelled", "CANCELLED")
         return AnswerOutcome(run_id, "", (), "CANCELLED", cancelled_trace)
 
+    def _graph_enabled_for_scope(self, scope: Scope) -> bool:
+        """Expose graph tools only when every selected KB explicitly opts in."""
+        getter = getattr(self.runs, "get_knowledge_base", None)
+        if getter is None or not scope.knowledge_base_ids:
+            return False
+        return all(bool((getter(kb_id) or {}).get("graph_enabled", False)) for kb_id in scope.knowledge_base_ids)
+
     def _run_smart(
         self,
         conversation_id: str,
@@ -221,12 +228,13 @@ class AnswerService:
         from backend.app.application.evidence_accumulator import EvidenceAccumulator
 
         evidence = EvidenceAccumulator()
+        graph_enabled = self._graph_enabled_for_scope(scope)
         gateway = KnowledgeToolGateway(
             knowledge_gateway=self.knowledge_gateway,
             content_reader=self.content_reader,
             document_lister=self.document_lister,
             document_resolver=self.document_resolver,
-            graph_query=self.graph_query,
+            graph_query=self.graph_query if graph_enabled else None,
             evidence_accumulator=evidence,
             on_retrieval=lambda items: self.runs.persist_retrieval_hits(run_id, items),
         )
@@ -241,6 +249,7 @@ class AnswerService:
             run_id=run_id,
             gateway=gateway,
             evidence=evidence,
+            graph_enabled=graph_enabled,
             trace_store=deferred_trace,
         )
         self.runs.append_event(

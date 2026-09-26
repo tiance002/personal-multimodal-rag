@@ -107,6 +107,41 @@
 
 遗留：需恢复 Docker Hub 基础镜像访问后重新构建并实际启动当前 Nginx Compose 前端，再完成浏览器同源验证。VLM caption 与更广泛的语义证据判定未实现；当前 OCR 与保守数值/关系校验不能当作所有多模态与开放式质量问题已验收。未提交、未打 tag，负责人尚未批准发布。
 
+## V1 Goal continuation — final local delivery (2026-09-26)
+
+本节覆盖本次 Goal 的最新工作树与真实命令结果；早期“Docker Hub 构建失败”的记录属于当时环境状态，不覆盖本节最终证据。
+
+### 实际改动
+
+- 图谱默认关闭并端到端隔离：HTTP 图谱读取/重建返回结构化 `GRAPH_DISABLED`；图谱 SQL 增加非删除知识库及 `graph_enabled = TRUE` 防线；Smart 默认绑定三个只读工具，只有选中范围内全部知识库显式开启图谱时才加入 `query_knowledge_graph`；前端默认隐藏图谱入口但保留文档回读。
+- 会话 scope 由服务端校验：创建/修改会话时验证文档归属及知识库范围；前端切换知识库、历史会话恢复和“仅此文档”均同步当前会话的 `knowledge_base_scope`/`document_scope`。
+- 新增后端与前端回归测试；修正 `verify-m1.ps1` 中已删除旧测试文件的引用；真实 UI/Compose smoke 明确使用 graph-enabled 测试知识库；发布脚本等待四个 Compose 服务均进入 running。
+- README 与 ADR-003 已同步默认关闭图谱、Smart 工具和服务端 scope 契约；交付报告见 `docs/reports/v1-delivery-report.md`。
+
+### 最终命令证据
+
+| 命令 | 退出码与结果 |
+|---|---|
+| `\.venv\Scripts\python.exe -m pytest -q --tb=short -p no:cacheprovider` | 0；141 passed，6 个既有弃用警告 |
+| `\.venv\Scripts\python.exe -m compileall -q backend scripts` | 0；语法检查通过 |
+| `npm --prefix frontend run build` | 0；TypeScript/Vite 生产构建通过 |
+| `$env:PLAYWRIGHT_CHROME_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'; npm --prefix frontend test -- --reporter=line` | 0；7 个浏览器测试通过 |
+| `& .\scripts\verify-m0.ps1` | 0；M0 PASS，真实迁移/模型探针/全量后端测试 |
+| `& .\scripts\verify-m1.ps1` | 0；M1 PASS，真实 PostgreSQL/Ollama/API/SSE；27 项门禁测试 |
+| `& .\scripts\verify-m2.ps1` | 0；M2 PASS，PDF/OCR/语言包/真实冒烟 |
+| `& .\scripts\verify-m3.ps1` | 0；M3 PASS，20 条评测 Schema/检索和图谱回读 |
+| `& .\scripts\verify-m4.ps1` | 0；M4 PASS，12 项 Smart/Agent 边界测试和冒烟 |
+| `& .\scripts\contract_test.ps1` | 0；OpenAPI/SSE/分层契约 PASS |
+| `& .\scripts\verify-release.ps1 -Fresh` | 0；`V1.0_RELEASE PASS`，Compose 构建、四服务运行、Nginx 浏览器、前端、备份/恢复均 PASS |
+| `& .\scripts\release_report.ps1` | 0；`var/reports/v1-release-report.md/.json` status PASS |
+| `Makefile` / `make verify-*` | NOT IMPLEMENTED；仓库没有 Makefile，未将其写成通过 |
+
+### 当前验收状态
+
+- 代码与真实本机/Compose 证据达到本次 Goal 的 V1.0 本地交付条件；图谱为明确 opt-in，普通 ingestion/RAG 不依赖图谱。
+- 工作树仍有未提交实现变更；未创建 Git tag，项目负责人仍需审阅 `docs/reports/v1-delivery-report.md` 与 `var/reports/verify-release.json` 后决定提交、验收和 tag。
+- VLM caption、广泛开放式语义证据判断仍未实现，作为 V1 范围外/后续增强记录，不伪装为当前能力。
+
 ## 当前续验诊断（2026-09-26）
 
 - 复核当前 `deploy/Dockerfile.frontend` 后确认需要的 `node:22-alpine`、`nginx:1.27-alpine` 均不在本机镜像缓存。旧 `deploy-frontend:latest` 可运行 Node 22.23.3，缓存 `nginx:alpine` 为 Nginx 1.31.6，但二者不是当前指定基底。

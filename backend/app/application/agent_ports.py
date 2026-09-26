@@ -33,6 +33,7 @@ class SmartAgentPort(Protocol):
         run_id: str,
         gateway: KnowledgeToolGateway,
         evidence: EvidenceAccumulator,
+        graph_enabled: bool = False,
         trace_store: Any | None = None,
         limits: AgentLimits | None = None,
     ) -> SmartAgentResult: ...
