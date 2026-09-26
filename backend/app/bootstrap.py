@@ -13,13 +13,17 @@ from typing import Any
 
 from sqlalchemy import Engine, create_engine
 
+from backend.app.adapters.langfuse_tracing import LangfuseObservability
 from backend.app.adapters.models.ollama import OllamaGateway
 from backend.app.adapters.postgres.agent_repository import PostgresAgentRepository
 from backend.app.adapters.postgres.graph_repository import PostgresGraphRepository
 from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
 from backend.app.adapters.storage import ContentAddressedStorage
 from backend.app.application.budget import PostgresBudgetGate
+from backend.app.application.knowledge_gateway import KnowledgeGateway
 from backend.app.application.langchain_agent import LangChainAgentAdapter
+from backend.app.application.quick_chain import LangChainQuickChain
+from backend.app.application.retrieval import HybridRetriever
 from backend.app.config import Settings
 
 
@@ -38,7 +42,10 @@ class Container:
     agent: PostgresAgentRepository
     ollama: Any
     budget_gate: PostgresBudgetGate
+    knowledge_gateway: KnowledgeGateway
+    quick_chain: LangChainQuickChain
     smart_agent: LangChainAgentAdapter | None
+    langfuse: LangfuseObservability | None = None
 
 
 def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET) -> Container:
@@ -50,8 +57,19 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     """
     engine = create_engine(settings.database_url, pool_pre_ping=True)
     storage = ContentAddressedStorage(settings.storage_root)
+    langfuse = LangfuseObservability(
+        enabled=settings.langfuse_enabled,
+        cloud_egress_enabled=settings.cloud_enabled,
+        capture_content=settings.langfuse_capture_content,
+        base_url=settings.langfuse_base_url,
+    )
     ollama = (
-        OllamaGateway(settings.ollama_base_url, settings.ollama_chat_model, settings.ollama_embedding_model)
+        OllamaGateway(
+            settings.ollama_base_url,
+            settings.ollama_chat_model,
+            settings.ollama_embedding_model,
+            observability=langfuse,
+        )
         if model is _MODEL_UNSET
         else model
     )
@@ -78,6 +96,16 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
             )
     else:
         agent_model_value = agent_model
+    budget_gate = PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits)
+    knowledge_gateway = KnowledgeGateway(
+        HybridRetriever(store, embedding_provider=ollama),
+        observability=langfuse,
+    )
+    quick_chain = LangChainQuickChain(
+        knowledge_gateway,
+        answer_gateway=ollama,
+        budget_gate=budget_gate,
+    )
     return Container(
         settings=settings,
         engine=engine,
@@ -86,8 +114,13 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         graph=PostgresGraphRepository(engine, storage),
         agent=PostgresAgentRepository(engine),
         ollama=ollama,
-        budget_gate=PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits),
-        smart_agent=LangChainAgentAdapter(agent_model_value) if agent_model_value is not None else None,
+        budget_gate=budget_gate,
+        knowledge_gateway=knowledge_gateway,
+        quick_chain=quick_chain,
+        smart_agent=LangChainAgentAdapter(agent_model_value, observability=langfuse)
+        if agent_model_value is not None
+        else None,
+        langfuse=langfuse,
     )
 
 

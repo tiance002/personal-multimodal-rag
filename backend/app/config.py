@@ -30,6 +30,9 @@ class Settings:
     max_chunk_chars: int = 1200
     chunk_overlap: int = 120
     ingestion_lease_seconds: int = 60
+    langfuse_enabled: bool = False
+    langfuse_capture_content: bool = False
+    langfuse_base_url: str = "https://us.cloud.langfuse.com"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -62,6 +65,9 @@ class Settings:
             ollama_chat_model=os.getenv("OLLAMA_CHAT_MODEL", cls.ollama_chat_model),
             ollama_embedding_model=os.getenv("OLLAMA_EMBEDDING_MODEL", cls.ollama_embedding_model),
             monthly_cloud_budget_microunits=int(os.getenv("RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS", str(cls.monthly_cloud_budget_microunits))),
+            langfuse_enabled=_env_bool("RAG_LANGFUSE_ENABLED", False),
+            langfuse_capture_content=_env_bool("RAG_LANGFUSE_CAPTURE_CONTENT", False),
+            langfuse_base_url=os.getenv("LANGFUSE_BASE_URL", cls.langfuse_base_url).rstrip("/"),
             max_upload_bytes=int(os.getenv("RAG_MAX_UPLOAD_BYTES", str(cls.max_upload_bytes))),
             max_chunk_chars=max_chunk_chars,
             chunk_overlap=chunk_overlap,

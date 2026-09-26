@@ -19,7 +19,7 @@ V1.0 must provide a usable end-to-end local application:
 3. Preserve original bytes and immutable document versions; never silently overwrite history.
 4. Parse, normalize, chunk, index, and expose processing state with retryable failures.
 5. Search the server-selected knowledge-base/document scope using deterministic keyword retrieval plus an independently versioned embedding profile when available.
-6. Answer with the shared `RAGOrchestrator`, freezing evidence before generation and validating every citation against the stored source version and locator.
+6. Answer through `AnswerService`: Quick uses a fixed LangChain `Runnable` and Smart uses LangChain `create_agent`; both freeze evidence and validate every citation against the stored source version and locator through one shared RAG Core.
 7. Keep L0 original-query retrieval available when the optional local query model is disabled, unavailable, slow, or returns invalid structured output.
 8. Provide quick question answering and a bounded smart mode using only four internal read-only knowledge tools.
 9. Provide conversation history independently from the knowledge-base document list.
@@ -42,8 +42,8 @@ React/Vite UI
 FastAPI HTTP + SSE boundary
     |
 Application use cases
-    |-- Knowledge / Ingestion / RAGOrchestrator / Conversation
-    |-- AgentRuntime / KnowledgeToolGateway / Backup
+    |-- AnswerService / KnowledgeGateway / Ingestion / Conversation
+    |-- LangChainQuickChain / LangChainAgentAdapter / KnowledgeToolGateway / Backup
     |
 Domain and ports
     |-- NormalizedDocument / Chunk / Evidence / Citation
@@ -61,7 +61,7 @@ Runtime
     |-- persistent database and storage volumes
 ```
 
-Dependency direction is `frontend -> API -> application -> domain/ports`; infrastructure implements ports and is wired only in the composition root. Domain code does not import FastAPI, SQLAlchemy, Docker SDK, or provider clients. Ingestion and online RAG communicate through immutable document versions and indexes, not direct calls to one another. AgentRuntime calls the shared KnowledgeToolGateway and never reimplements retrieval.
+Dependency direction is `frontend -> API -> application -> domain/ports`; infrastructure implements ports and is wired only in the composition root. Domain code does not import FastAPI, SQLAlchemy, Docker SDK, or provider clients. Ingestion and online RAG communicate through immutable document versions and indexes, not direct calls to one another. Quick and Smart call the shared KnowledgeGateway; LangChain owns execution composition, not retrieval, evidence or persistence rules.
 
 ## Repository layout
 

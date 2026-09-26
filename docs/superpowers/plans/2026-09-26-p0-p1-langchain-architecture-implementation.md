@@ -4,7 +4,7 @@
 
 **Goal:** Repair the P0/P1 release-gate and data-boundary defects in the current working tree, then migrate Smart mode to LangChain `create_agent` while preserving the project-owned RAG Core, Scope, evidence, privacy, cancellation and persistence invariants.
 
-**Architecture:** FastAPI routes and workers obtain one composition-root `Container`. Quick mode calls `RAGOrchestrator`. Smart mode calls a `SmartAgentPort` implemented by a thin LangChain adapter. The adapter supplies four project-owned read-only tools and an immutable server execution context; LangChain owns the Agent loop, while RAG Core owns retrieval, scope, evidence, versions and graph rules.
+**Architecture:** FastAPI routes and workers obtain one composition-root `Container`. `AnswerService` owns the shared run/cancel/commit boundary. Quick mode calls a fixed LangChain Runnable chain; Smart mode calls a `SmartAgentPort` implemented by a thin LangChain adapter. Both modes use one `KnowledgeGateway`/RAG Core for retrieval, scope, evidence and validation; Smart additionally supplies four project-owned read-only tools and an immutable server execution context while LangChain owns only the Agent loop.
 
 **Tech Stack:** Python 3.13 virtual environment, FastAPI, PostgreSQL/pgvector, SQLAlchemy/psycopg, React/Vite, Nginx, LangChain `1.4.2`, `langchain-ollama` `1.1.0`, Ollama, pytest.
 

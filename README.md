@@ -42,11 +42,28 @@ npm --prefix frontend run dev -- --host 127.0.0.1
 
 访问 `http://127.0.0.1:4173`；API health 为 `http://127.0.0.1:8000/healthz`。Compose API 使用 `RAG_INLINE_INGESTION=false`，由 worker 轮询队列；本地开发默认 inline ingestion，便于无需常驻 worker 调试。
 
+### 可选 Langfuse tracing
+
+Langfuse 默认关闭。使用 Compose 时，从 `.env.example` 复制 `.env`（`.env` 已加入忽略列表），仅在确实允许云端外发时显式设置：
+
+```dotenv
+RAG_CLOUD_ENABLED=true
+RAG_LANGFUSE_ENABLED=true
+RAG_LANGFUSE_CAPTURE_CONTENT=false
+LANGFUSE_BASE_URL=https://us.cloud.langfuse.com
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+```
+
+也可以提供 `LANGFUSE_AUTHORIZATION`，其值为 `Basic ` 加 Base64 编码的 `pk-lf:sk-lf`。公钥/密钥仅放在本机 `.env` 或进程环境中，不要提交到 Git 或粘贴到聊天里。对于一个回答涉及的**每个**知识库，还必须把 `cloud_allowed` 显式设为 `true`，否则该回答不会创建 Langfuse trace。`RAG_CLOUD_ENABLED=true` 是全局外发许可；正文采集仍需另行打开 `RAG_LANGFUSE_CAPTURE_CONTENT=true`。正文关闭时仍会记录模型、时延、状态和可用 token 统计，但不会导出问题、文档内容、工具参数或回答正文。
+
+使用本地 `uvicorn` 启动时，需在启动 API 的进程环境中设置相同变量；Compose 自动从 `.env` 读取并只把这些变量传给 API。
+
 ## 主要能力
 
 - 文本/Markdown/TXT、PDF 与图片导入；扫描页和 PDF 内嵌图片先提取原图，再以本地 OCR 生成派生文字。原图 SHA-256、页码、派生资产和 chunk 关联保存，可回读；不调用云端 VLM。OCR 无法启动报 `OCR_UNAVAILABLE`，正常运行但无文字报 `OCR_EMPTY`，均不伪装索引成功。
 - 关键词 + 可选向量混合检索；L1 查询理解或回答模型失败时保留 q0，并返回可回读证据。
-- 快速检索与 bounded smart mode 共用 `RAGOrchestrator`；smart mode 只开放 `list_documents`、`search_knowledge`、`read_document`、`query_knowledge_graph` 四个只读知识工具。
+- Quick 使用固定 LangChain `Runnable` Chain，Smart 使用 LangChain `create_agent`；两者共用 `KnowledgeGateway`、证据覆盖、引用冻结和答案校验。Smart 只开放 `list_documents`、`search_knowledge`、`read_document`、`query_knowledge_graph` 四个只读知识工具。
 - SSE 运行事件、引用回读、文档/图谱右侧面板、三栏工作台和历史会话。
 - 云端能力默认关闭；若后续启用云端，月度预算通过 `RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS` 配置，并在实际 provider 调用前进行原子预留。
 

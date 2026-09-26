@@ -9,7 +9,7 @@
 
 ## Smart evidence and final-answer ownership
 
-Every `search_knowledge` invocation contributes only server-scoped results to a per-run evidence accumulator. The accumulator deduplicates by stable chunk/version identity, preserves the original query for tracing, and freezes the accumulated union only after the LangChain Agent stops. Final answer validation operates on that frozen union. Smart mode must not call `RAGOrchestrator.answer_query()` after an Agent search; a future project answer generator may consume frozen evidence only and may not perform retrieval.
+Every `search_knowledge` invocation contributes only server-scoped results to a per-run evidence accumulator. The accumulator deduplicates by stable chunk/version identity, preserves the original query for tracing, and freezes the accumulated union only after the LangChain Agent stops. Final answer validation operates on that frozen union. Smart mode must not start a second Quick chain after an Agent search; `AnswerService` consumes the frozen evidence through the shared `EvidenceService` and may not perform retrieval itself.
 
 The server creates an immutable execution context containing `run_id`, `Scope`, cancellation checks, evidence accumulation, limits, cloud policy, embedding profile and authorized version information. These are not model-controlled tool arguments. Model input schemas contain only the minimum business parameters needed by each read-only tool.
 

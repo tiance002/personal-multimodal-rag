@@ -22,11 +22,13 @@ execution context:
 
 The model does not receive knowledge-base scope, run identity, cloud policy,
 embedding profile, version authorization, filesystem or network controls.
-`KnowledgeToolGateway` and the RAG Core enforce those controls. Search results
-are added to a per-run `EvidenceAccumulator`, deduplicated by version/chunk
-identity, frozen after the Agent stops, and validated before citations are
-persisted. Quick mode remains a direct `RAGOrchestrator` path and never
-depends on LangChain.
+`KnowledgeToolGateway` and the shared `KnowledgeGateway`/RAG Core enforce
+those controls. Search results are added to a per-run `EvidenceAccumulator`,
+deduplicated by version/chunk identity, frozen after the Agent stops, and
+validated by the shared `EvidenceService` before citations are persisted.
+Quick mode is a fixed LangChain `Runnable` chain over the same gateway; it does
+not use `create_agent` and does not maintain a second retrieval or validation
+implementation.
 
 There is no cloud fallback when local Smart capability is unavailable. Smart
 returns a bounded local error; Quick remains available.

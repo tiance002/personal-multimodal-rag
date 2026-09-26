@@ -3,8 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from backend.app.application.retrieval import HybridRetriever
 from backend.app.application.evidence_accumulator import EvidenceAccumulator
+from backend.app.application.knowledge_gateway import KnowledgeGateway
+from backend.app.application.retrieval import HybridRetriever
 from backend.app.domain.agent_policy import ALLOWED_READ_TOOLS
 from backend.app.domain.errors import ScopeViolation
 from backend.app.domain.scope import Scope
@@ -31,19 +32,23 @@ class KnowledgeToolGateway:
         self,
         *,
         retriever: HybridRetriever | None = None,
+        knowledge_gateway: KnowledgeGateway | None = None,
         content_reader: Callable[[str], str] | None = None,
         document_lister: Callable[[str], list[dict[str, Any]]] | None = None,
         document_resolver: Callable[[str], dict[str, Any] | None] | None = None,
         graph_query: Callable[[Scope, str, int], Any] | None = None,
         evidence_accumulator: EvidenceAccumulator | None = None,
+        on_retrieval: Callable[[Any], None] | None = None,
         max_document_chars: int = 8_000,
     ) -> None:
-        self.retriever = retriever
+        self.knowledge_gateway = knowledge_gateway or (KnowledgeGateway(retriever) if retriever is not None else None)
+        self.retriever = retriever or (self.knowledge_gateway.retriever if self.knowledge_gateway is not None else None)
         self.content_reader = content_reader
         self.document_lister = document_lister
         self.document_resolver = document_resolver
         self.graph_query = graph_query
         self.evidence_accumulator = evidence_accumulator
+        self.on_retrieval = on_retrieval
         self.max_document_chars = max(1, max_document_chars)
 
     def invoke(self, tool_name: str, args: dict[str, Any], scope: Scope) -> ToolResult:
@@ -74,9 +79,11 @@ class KnowledgeToolGateway:
         return items[:limit]
 
     def _search_knowledge(self, args: dict[str, Any], scope: Scope) -> list[dict[str, Any]]:
-        if self.retriever is None:
+        if self.knowledge_gateway is None:
             return []
-        result = self.retriever.retrieve(scope, str(args.get("query", args.get("question", ""))))
+        result = self.knowledge_gateway.search(scope, str(args.get("query", args.get("question", ""))))
+        if self.on_retrieval is not None:
+            self.on_retrieval(result.items)
         if self.evidence_accumulator is not None:
             self.evidence_accumulator.add(item.chunk for item in result.items)
         return [

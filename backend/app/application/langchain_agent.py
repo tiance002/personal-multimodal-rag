@@ -3,17 +3,15 @@ from __future__ import annotations
 import re
 import time
 from collections.abc import Callable
+from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 from backend.app.application.agent_ports import SmartAgentResult
-from backend.app.application.answer_validation import AnswerValidator
 from backend.app.application.evidence_accumulator import EvidenceAccumulator
 from backend.app.application.knowledge_tools import KnowledgeToolGateway
-from backend.app.application.query_router import QueryRouter
-from backend.app.application.quality import QualityGate
 from backend.app.domain.agent_policy import ALLOWED_READ_TOOLS, AgentLimits, AgentStep, estimate_tokens
 from backend.app.domain.models import EvidenceSnapshot
 from backend.app.domain.scope import Scope
@@ -63,8 +61,9 @@ class LangChainAgentAdapter:
     external destination.
     """
 
-    def __init__(self, model: Any | None) -> None:
+    def __init__(self, model: Any | None, *, observability: Any | None = None) -> None:
         self.model = model
+        self.observability = observability
         self.last_tool_names: tuple[str, ...] = ()
         self.last_tool_schemas: tuple[dict[str, Any], ...] = ()
 
@@ -150,10 +149,43 @@ class LangChainAgentAdapter:
                     ToolCallLimitMiddleware(run_limit=limits.max_steps, exit_behavior="error"),
                 ],
             )
-            result = agent.invoke(
-                {"messages": [{"role": "user", "content": question}]},
-                config={"recursion_limit": max(25, limits.max_steps * 4 + 5)},
+            callback = self.observability.langchain_callback() if self.observability is not None else None
+            invoke_config: dict[str, Any] = {
+                "recursion_limit": max(25, limits.max_steps * 4 + 5),
+                "run_name": "smart-agent",
+            }
+            if callback is not None:
+                invoke_config["callbacks"] = [callback]
+            agent_observation = (
+                self.observability.observation(
+                    name="smart-agent-execution",
+                    as_type="agent",
+                    input={"question": question},
+                    metadata={"tool_names": list(self.last_tool_names), "model": self._model_name()},
+                )
+                if self.observability is not None
+                else nullcontext(None)
             )
+            with agent_observation as agent_span:
+                result = agent.invoke(
+                    {"messages": [{"role": "user", "content": question}]},
+                    config=invoke_config,
+                )
+                if agent_span is not None:
+                    details: dict[str, Any] = {
+                        "model_calls": model_calls,
+                        "tool_call_count": len(steps),
+                        "model": self._model_name(),
+                        "tool_names": list(self.last_tool_names),
+                    }
+                    usage = self._usage_details(result)
+                    if usage:
+                        details.update(usage)
+                    fields: dict[str, Any] = {"metadata": details}
+                    candidate_answer = self._last_answer(result)
+                    if self.observability.capture_content:
+                        fields["output"] = {"answer": candidate_answer}
+                    agent_span.update(**fields)
             guard()
             answer = self._last_answer(result)
             if not answer:
@@ -165,7 +197,11 @@ class LangChainAgentAdapter:
             cost_microunits = self._cost_microunits(result)
             if cost_microunits > limits.max_cost_microunits:
                 return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code="AGENT_COST_LIMIT", cost_microunits=cost_microunits, model_calls=model_calls))
-            coverage = QualityGate().evaluate_chunks(evidence.chunks, QueryRouter().plan(question))
+            core = gateway.knowledge_gateway
+            if core is None:
+                return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code="SMART_RETRIEVAL_UNAVAILABLE", model_calls=model_calls))
+            query_plan = core.plan(question)
+            coverage = core.evidence.evaluate_chunks(evidence.chunks, query_plan)
             if not coverage.accepted:
                 code = coverage.reason.value if coverage.reason is not None else "NO_CANDIDATES"
                 return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code=code, model_calls=model_calls))
@@ -173,7 +209,7 @@ class LangChainAgentAdapter:
             guard()
             answer, citations, error_code = self._normalize_answer(answer, snapshots)
             if error_code is None:
-                error_code = AnswerValidator().validate(answer, snapshots, QueryRouter().plan(question))
+                error_code = core.evidence.validate_answer(answer, snapshots, query_plan)
             if error_code is not None:
                 answer, citations, snapshots = "", (), ()
             else:
@@ -304,6 +340,26 @@ class LangChainAgentAdapter:
             except (TypeError, ValueError):
                 continue
         return total
+
+    def _model_name(self) -> str | None:
+        value = getattr(self.model, "model", None) or getattr(self.model, "model_name", None)
+        return str(value) if value else None
+
+    @staticmethod
+    def _usage_details(result: Any) -> dict[str, int]:
+        input_tokens = 0
+        output_tokens = 0
+        for message in result.get("messages", []) if isinstance(result, dict) else []:
+            usage = getattr(message, "usage_metadata", {}) or {}
+            metadata = getattr(message, "response_metadata", {}) or {}
+            input_tokens += int(usage.get("input_tokens") or metadata.get("prompt_eval_count") or 0)
+            output_tokens += int(usage.get("output_tokens") or metadata.get("eval_count") or 0)
+        details: dict[str, int] = {}
+        if input_tokens:
+            details["input_tokens"] = input_tokens
+        if output_tokens:
+            details["output_tokens"] = output_tokens
+        return details
 
     @staticmethod
     def _is_cancelled(trace_store: Any | None, run_id: str) -> bool:

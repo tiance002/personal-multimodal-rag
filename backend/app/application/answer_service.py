@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import Any
 
 from backend.app.application.agent_ports import SmartAgentPort
-from backend.app.application.citations import CitationService, InMemoryCitationStore
-from backend.app.application.evidence_accumulator import EvidenceAccumulator
+from backend.app.application.knowledge_gateway import KnowledgeGateway
 from backend.app.application.knowledge_tools import KnowledgeToolGateway
-from backend.app.application.rag_orchestrator import RAGOrchestrator, RagSettings
+from backend.app.application.quick_chain import LangChainQuickChain, QuickSettings
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.domain.scope import Scope
 from backend.app.ports.persistence import RunEventStore
@@ -39,19 +39,19 @@ class _DeferredAgentTraceStore:
 
 
 class AnswerService:
-    """Use case: answer one conversation message and record the whole run trace.
+    """Unified run, cancellation and final-commit boundary for both modes.
 
-    Quick mode calls `RAGOrchestrator` directly. Smart mode delegates tool
-    selection and the execution loop to the injected LangChain adapter; its
-    tools use the same RAG Core retriever and evidence boundaries.
-    The SSE event order is part of the frozen contract, so it is owned here
-    instead of by the HTTP layer.
+    Quick and Smart are execution modes over one KnowledgeGateway/RAG Core:
+    Quick uses a fixed LangChain Runnable sequence, while Smart uses the
+    LangChain Agent adapter and the same retrieval/evidence/validation services.
     """
 
     def __init__(
         self,
         *,
-        retriever: HybridRetriever,
+        knowledge_gateway: KnowledgeGateway | None = None,
+        quick_chain: LangChainQuickChain | None = None,
+        retriever: HybridRetriever | None = None,
         runs: RunEventStore,
         local_query_gateway: Any | None = None,
         answer_gateway: Any | None = None,
@@ -63,11 +63,15 @@ class AnswerService:
         document_resolver: Callable[[str], dict[str, Any] | None] | None = None,
         smart_agent: SmartAgentPort | None = None,
         local_query_enabled: bool = False,
+        observability: Any | None = None,
     ) -> None:
-        self.retriever = retriever
+        if knowledge_gateway is None:
+            if retriever is None:
+                raise ValueError("knowledge_gateway or retriever is required")
+            knowledge_gateway = KnowledgeGateway(retriever)
+        self.knowledge_gateway = knowledge_gateway
         self.runs = runs
         self.local_query_gateway = local_query_gateway
-        self.answer_gateway = answer_gateway
         self.budget_gate = budget_gate
         self.graph_query = graph_query
         self.agent_trace_store = agent_trace_store
@@ -76,6 +80,12 @@ class AnswerService:
         self.document_resolver = document_resolver
         self.smart_agent = smart_agent
         self.local_query_enabled = local_query_enabled
+        self.observability = observability
+        self.quick_chain = quick_chain or LangChainQuickChain(
+            knowledge_gateway,
+            answer_gateway=answer_gateway,
+            budget_gate=budget_gate,
+        )
 
     def answer(self, conversation: dict[str, Any], content: str, mode: str = "quick") -> AnswerOutcome:
         kb_scope = list(conversation["knowledge_base_scope"])
@@ -87,67 +97,103 @@ class AnswerService:
         self.runs.append_message(conversation_id, "user", content)
         self.runs.append_event(run_id, "retrieval.started", {"scope": kb_scope, "document_scope": document_scope})
 
-        citation_service = CitationService(InMemoryCitationStore())
         cloud_allowed_by_kb = {
             kb_id: bool((self.runs.get_knowledge_base(kb_id) or {}).get("cloud_allowed", False))
             for kb_id in kb_scope
         }
-        orchestrator = RAGOrchestrator(
-            self.retriever,
-            citation_service,
-            local_query_gateway=self.local_query_gateway,
-            answer_gateway=self.answer_gateway,
-            cloud_allowed_by_kb=cloud_allowed_by_kb,
-            budget_gate=self.budget_gate,
-            on_retrieval=self.runs.persist_retrieval_hits,
-        )
         scope = Scope.from_ids(kb_scope, document_scope)
 
         if self._is_cancelled(run_id):
             return self._cancelled_outcome(run_id, mode)
 
-        smart_evidence = ()
-        agent_terminal: tuple[str, str | None, int] | None = None
-        if mode == "smart":
-            answer, citations, error_code, trace, smart_evidence, agent_terminal = self._run_smart(conversation_id, content, scope, run_id)
-        else:
-            result = orchestrator.answer_query(content, scope, RagSettings(local_query_enabled=self.local_query_enabled), run_id=run_id)
-            answer, citations, error_code = result.answer, result.citations, result.error_code
-            trace = dict(result.trace.__dict__)
-
-        if error_code == "CANCELLED" or self._is_cancelled(run_id):
-            return self._cancelled_outcome(run_id, mode, trace)
-
-        snapshots: tuple[Any, ...] = smart_evidence
-        if not snapshots and citation_service.snapshots and error_code is None:
-            snapshots = tuple(citation_service.snapshots[(run_id, label)] for label in citations)
-
-        finalizer = getattr(self.runs, "finalize_answer", None)
-        if finalizer is not None:
-            committed = finalizer(
+        trace_context = (
+            self.observability.trace(
                 run_id=run_id,
                 conversation_id=conversation_id,
-                answer=answer,
-                citations=tuple(citations),
-                snapshots=snapshots,
-                error_code=error_code,
                 mode=mode,
-                agent_terminal=agent_terminal,
+                question=content,
+                knowledge_base_ids=kb_scope,
+                cloud_allowed_by_kb=cloud_allowed_by_kb,
             )
-            if not committed:
-                return self._cancelled_outcome(run_id, mode, trace)
-            return AnswerOutcome(run_id, answer, tuple(citations), error_code, trace)
+            if self.observability is not None
+            else nullcontext(None)
+        )
+        with trace_context as langfuse_run:
+            smart_evidence: tuple[Any, ...] = ()
+            agent_terminal: tuple[str, str | None, int] | None = None
+            if mode == "smart":
+                answer, citations, error_code, trace, smart_evidence, agent_terminal = self._run_smart(
+                    conversation_id,
+                    content,
+                    scope,
+                    run_id,
+                )
+                snapshots: tuple[Any, ...] = smart_evidence
+            else:
+                result = self.quick_chain.invoke(
+                    content,
+                    scope,
+                    settings=QuickSettings(
+                        local_query_enabled=self.local_query_enabled,
+                    ),
+                    run_id=run_id,
+                    cloud_allowed_by_kb=cloud_allowed_by_kb,
+                    local_query_gateway=self.local_query_gateway,
+                    on_retrieval=self.runs.persist_retrieval_hits,
+                )
+                answer, citations, error_code = result.answer, result.citations, result.error_code
+                trace = dict(result.trace.__dict__)
+                snapshots = result.evidence
 
-        self.runs.append_event(run_id, "retrieval.completed", {"count": len(citations), "error_code": error_code, "mode": mode})
-        if snapshots and error_code is None:
-            self.runs.persist_evidence(run_id, snapshots)
-            self.runs.append_event(run_id, "evidence.frozen", {"labels": [snapshot.label for snapshot in snapshots]})
-        self.runs.append_event(run_id, "answer.completed" if error_code is None else "run.failed", {"error_code": error_code, "citations": list(citations)})
-        if self.runs.complete_run(run_id, "completed" if error_code is None else "failed", error_code) is False:
-            return self._cancelled_outcome(run_id, mode, trace)
-        if error_code is None:
-            self.runs.append_message(conversation_id, "assistant", answer)
-        return AnswerOutcome(run_id, answer, tuple(citations), error_code, trace)
+            if error_code == "CANCELLED" or self._is_cancelled(run_id):
+                if langfuse_run is not None:
+                    langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
+                return self._cancelled_outcome(run_id, mode, trace)
+
+            finalizer = getattr(self.runs, "finalize_answer", None)
+            if finalizer is not None:
+                committed = finalizer(
+                    run_id=run_id,
+                    conversation_id=conversation_id,
+                    answer=answer,
+                    citations=tuple(citations),
+                    snapshots=snapshots,
+                    error_code=error_code,
+                    mode=mode,
+                    agent_terminal=agent_terminal,
+                )
+                if not committed:
+                    if langfuse_run is not None:
+                        langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
+                    return self._cancelled_outcome(run_id, mode, trace)
+                outcome = AnswerOutcome(run_id, answer, tuple(citations), error_code, trace)
+                if langfuse_run is not None:
+                    langfuse_run.finish(answer=answer, citations=tuple(citations), error_code=error_code, run_trace=trace)
+                return outcome
+
+            self.runs.append_event(
+                run_id,
+                "retrieval.completed",
+                {"count": len(snapshots), "error_code": error_code, "mode": mode},
+            )
+            if snapshots and error_code is None:
+                self.runs.persist_evidence(run_id, snapshots)
+                self.runs.append_event(run_id, "evidence.frozen", {"labels": [snapshot.label for snapshot in snapshots]})
+            self.runs.append_event(
+                run_id,
+                "answer.completed" if error_code is None else "run.failed",
+                {"error_code": error_code, "citations": list(citations)},
+            )
+            if self.runs.complete_run(run_id, "completed" if error_code is None else "failed", error_code) is False:
+                if langfuse_run is not None:
+                    langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
+                return self._cancelled_outcome(run_id, mode, trace)
+            if error_code is None:
+                self.runs.append_message(conversation_id, "assistant", answer)
+            outcome = AnswerOutcome(run_id, answer, tuple(citations), error_code, trace)
+            if langfuse_run is not None:
+                langfuse_run.finish(answer=answer, citations=tuple(citations), error_code=error_code, run_trace=trace)
+            return outcome
 
     def _is_cancelled(self, run_id: str) -> bool:
         checker = getattr(self.runs, "is_cancelled", None)
@@ -165,15 +211,24 @@ class AnswerService:
             self.runs.complete_run(run_id, "cancelled", "CANCELLED")
         return AnswerOutcome(run_id, "", (), "CANCELLED", cancelled_trace)
 
-    def _run_smart(self, conversation_id: str, content: str, scope: Scope, run_id: str) -> tuple[str, tuple[str, ...], str | None, dict[str, Any], tuple[Any, ...], tuple[str, str | None, int] | None]:
+    def _run_smart(
+        self,
+        conversation_id: str,
+        content: str,
+        scope: Scope,
+        run_id: str,
+    ) -> tuple[str, tuple[str, ...], str | None, dict[str, Any], tuple[Any, ...], tuple[str, str | None, int] | None]:
+        from backend.app.application.evidence_accumulator import EvidenceAccumulator
+
         evidence = EvidenceAccumulator()
         gateway = KnowledgeToolGateway(
-            retriever=self.retriever,
+            knowledge_gateway=self.knowledge_gateway,
             content_reader=self.content_reader,
             document_lister=self.document_lister,
             document_resolver=self.document_resolver,
             graph_query=self.graph_query,
             evidence_accumulator=evidence,
+            on_retrieval=lambda items: self.runs.persist_retrieval_hits(run_id, items),
         )
         self.runs.append_event(run_id, "tool.started", {"tool": "search_knowledge"})
         if self.smart_agent is None:
@@ -199,7 +254,14 @@ class AnswerService:
             "cost_microunits": agent_result.cost_microunits,
             "model_calls": agent_result.model_calls,
         }
-        return agent_result.answer, tuple(agent_result.citations), agent_result.error_code, trace, tuple(agent_result.evidence), deferred_trace.terminal if deferred_trace is not None else None
+        return (
+            agent_result.answer,
+            tuple(agent_result.citations),
+            agent_result.error_code,
+            trace,
+            tuple(agent_result.evidence),
+            deferred_trace.terminal if deferred_trace is not None else None,
+        )
 
 
 __all__ = ["AnswerOutcome", "AnswerService"]

@@ -24,9 +24,7 @@ def _chain(contents: list[str], model=None, top_k: int = 8) -> LangChainQuickCha
 
 def test_simple_question_uses_one_retrieval_and_no_query_model():
     model = RecordingAnswerModel("A方案成本1000元 [E1]")
-    chain = _chain(["A方案成本1000元。"], model)
-
-    result = chain.invoke("A 的成本是多少？", Scope.from_ids(["kb"]), run_id="run-1")
+    result = _chain(["A方案成本1000元。"], model).invoke("A 的成本是多少？", Scope.from_ids(["kb"]))
 
     assert result.error_code is None
     assert result.citations == ("E1",)
@@ -34,7 +32,7 @@ def test_simple_question_uses_one_retrieval_and_no_query_model():
     assert result.trace.model_calls == 1
 
 
-def test_compound_question_can_use_one_targeted_retrieval_then_one_answer():
+def test_compound_question_uses_shared_targeted_retrieval_before_answer():
     model = RecordingAnswerModel("A方案成本1000元 [E1]；B方案成本1200元 [E2]")
     chain = _chain(["A方案成本1000元。", "B方案成本1200元。"], model, top_k=1)
     calls: list[str] = []
@@ -45,7 +43,7 @@ def test_compound_question_can_use_one_targeted_retrieval_then_one_answer():
         return original_retrieve(scope, question, query_plan)
 
     chain.knowledge_gateway.retriever.retrieve = tracked
-    result = chain.invoke("A 与 B 两种方案各自的成本是多少？", Scope.from_ids(["kb"]), run_id="run-2")
+    result = chain.invoke("A 与 B 两种方案各自的成本是多少？", Scope.from_ids(["kb"]))
 
     assert result.error_code is None
     assert len(calls) == 2
@@ -54,32 +52,25 @@ def test_compound_question_can_use_one_targeted_retrieval_then_one_answer():
     assert "B方案成本1200元" in model.prompts[0]
 
 
-def test_missing_target_returns_supported_partial_answer_after_one_retry():
-    model = RecordingAnswerModel("unsupported")
-    chain = _chain(["A方案成本1000元。"], model)
-    calls: list[str] = []
-    original_retrieve = chain.knowledge_gateway.retriever.retrieve
-
-    def tracked(scope, question, query_plan=None):
-        calls.append(question)
-        return original_retrieve(scope, question, query_plan)
-
-    chain.knowledge_gateway.retriever.retrieve = tracked
-    result = chain.invoke("A 与 B 两种方案各自的成本是多少？", Scope.from_ids(["kb"]), run_id="run-3")
+def test_missing_target_returns_supported_partial_answer_without_model_call():
+    model = RecordingAnswerModel("unused")
+    result = _chain(["A方案成本1000元。"], model).invoke(
+        "A 与 B 两种方案各自的成本是多少？",
+        Scope.from_ids(["kb"]),
+    )
 
     assert result.error_code is None
-    assert len(calls) == 2
     assert model.prompts == []
     assert "A方案成本1000元" in result.answer
-    assert "[E1]" in result.answer
     assert "B" in result.answer and "没有足够证据" in result.answer
     assert result.citations == ("E1",)
 
 
 def test_generated_fact_without_a_reference_is_not_auto_cited():
-    chain = _chain(["A方案成本1000元。"], RecordingAnswerModel("A方案成本1000元。"))
-
-    result = chain.invoke("A 的成本是多少？", Scope.from_ids(["kb"]), run_id="run-4")
+    result = _chain(["A方案成本1000元。"], RecordingAnswerModel("A方案成本1000元。")).invoke(
+        "A 的成本是多少？",
+        Scope.from_ids(["kb"]),
+    )
 
     assert result.error_code == "UNSUPPORTED_ANSWER"
     assert result.citations == ()

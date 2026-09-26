@@ -10,7 +10,6 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from backend.app.application.answer_service import AnswerService
-from backend.app.application.retrieval import HybridRetriever
 from backend.app.bootstrap import Container
 
 router = APIRouter(prefix="/api/v1")
@@ -265,11 +264,9 @@ def _answer_service(request: Request) -> AnswerService:
     container = _container(request)
     settings = request.app.state.settings
     return AnswerService(
-        retriever=HybridRetriever(container.store, embedding_provider=container.ollama),
+        knowledge_gateway=container.knowledge_gateway,
+        quick_chain=container.quick_chain,
         runs=container.store,
-        local_query_gateway=container.ollama,
-        answer_gateway=container.ollama,
-        budget_gate=container.budget_gate,
         graph_query=container.graph.query_graph,
         agent_trace_store=container.agent,
         content_reader=container.store.get_document_content,
@@ -277,6 +274,7 @@ def _answer_service(request: Request) -> AnswerService:
         document_resolver=container.store.get_document_access,
         smart_agent=container.smart_agent,
         local_query_enabled=settings.local_query_enabled,
+        observability=container.langfuse,
     )
 
 

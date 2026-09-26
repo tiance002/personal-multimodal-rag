@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- `RAGOrchestrator` is the only quick-answer application orchestrator; do not create `QuickQAService`.
+- `LangChainQuickChain` is the fixed Quick execution component; `AnswerService` remains the only request/run boundary. Do not create a second Quick QA service.
 - L0 original query `q0` retrieval is always available; L1 local query understanding is optional and cannot block q0.
 - Server-side knowledge-base/document scope and current active-version filtering are mandatory on every read and retrieval path.
 - Original files and ready document versions are immutable; a replacement creates a new version and activates it only after indexes are ready.
@@ -238,13 +238,13 @@ Create the M1 tables in a separate Alembic revision. The repository must write c
 
 Run: `& $env:PYTHON_EXE -m pytest backend/tests/test_storage.py backend/tests/test_parsers.py backend/tests/test_ingestion_state_machine.py backend/tests/test_version_activation.py -q` and then `& $env:PYTHON_EXE -m pytest -q`. Expected: PASS, or a real PostgreSQL/PDF/OCR capability is recorded as NOT RUN/BLOCKED with its command output.
 
-### Task 4: Implement model adapters, hybrid retrieval, quality gate, and RAGOrchestrator
+### Task 4: Implement model adapters, hybrid retrieval, quality gate, and LangChainQuickChain
 
 **Files:**
 - Create: `backend/app/adapters/models/ollama.py`
 - Create: `backend/app/adapters/models/cloud.py`
 - Create: `backend/app/application/model_policy.py`
-- Create: `backend/app/application/rag_orchestrator.py`
+- Create: `backend/app/application/quick_chain.py`
 - Create: `backend/app/application/context_builder.py`
 - Create: `backend/app/application/citations.py`
 - Create: `backend/app/adapters/postgres/retrieval_repository.py`
@@ -252,26 +252,26 @@ Run: `& $env:PYTHON_EXE -m pytest backend/tests/test_storage.py backend/tests/te
 - Create: `backend/tests/test_model_policy.py`
 - Create: `backend/tests/test_hybrid_retrieval.py`
 - Create: `backend/tests/test_quality_gate.py`
-- Create: `backend/tests/test_rag_orchestrator.py`
+- Create: `backend/tests/test_quick_chain.py`
 - Create: `backend/tests/test_citation_resolution.py`
 
 **Interfaces:**
 - `ModelGateway.classify/query_expand/embed/chat` exposes typed provider calls and returns `ProviderUnavailable`, `SchemaInvalid`, or `BudgetDenied` without hiding the cause.
 - `HybridRetriever.retrieve(scope, question, policy) -> RetrievalResult` filters scope/current versions before scoring and returns keyword/vector sources.
-- `RAGOrchestrator.answer_query(question, scope, settings) -> AnswerResult` performs at most one targeted retry, freezes evidence, and validates citations.
+- `LangChainQuickChain.invoke(question, scope, settings) -> AnswerResult` performs at most one targeted retry, freezes evidence, and validates citations.
 - `CitationService.resolve(run_id, citation_id) -> CitationDetail` verifies quote hash and version-bound locator before returning content.
 
 - [ ] **Step 1: Write failing tests for L1 fallback, scope filtering, budget/egress, and citation integrity**
 
 ```python
 def test_local_query_timeout_keeps_q0_and_retrieves(retriever, timeout_gateway):
-    result = RAGOrchestrator(...).answer_query("原始问题", scope, settings=local_enabled())
+    result = LangChainQuickChain(...).invoke("原始问题", scope, settings=local_enabled())
     assert result.query_plan.q0 == "原始问题"
     assert result.trace.degradation_code == "LOCAL_QUERY_FALLBACK"
 
 
 def test_cloud_is_not_called_when_any_selected_kb_disallows_egress(cloud_gateway):
-    result = orchestrator.answer_query("secret", mixed_scope, settings=cloud_enabled())
+    result = orchestrator.invoke("secret", mixed_scope, settings=cloud_enabled())
     assert result.error_code == "CLOUD_EGRESS_DISABLED"
     assert cloud_gateway.calls == []
 
@@ -286,8 +286,8 @@ def test_old_citation_resolves_after_new_active_version(citation_service):
 
 - [ ] **Step 2: Run the focused tests and verify expected failures**
 
-Run: `& $env:PYTHON_EXE -m pytest backend/tests/test_model_policy.py backend/tests/test_hybrid_retrieval.py backend/tests/test_quality_gate.py backend/tests/test_rag_orchestrator.py backend/tests/test_citation_resolution.py -q`  
-Expected: FAIL because adapters, repositories, orchestrator, and citation service are absent.
+Run: `& $env:PYTHON_EXE -m pytest backend/tests/test_model_policy.py backend/tests/test_hybrid_retrieval.py backend/tests/test_quality_gate.py backend/tests/test_quick_chain.py backend/tests/test_citation_resolution.py -q`
+Expected: the focused retrieval, evidence and Quick Chain tests pass after the shared RAG Core is wired.
 
 - [ ] **Step 3: Implement deterministic retrieval and model policy**
 
@@ -452,7 +452,7 @@ Run: `& $env:PYTHON_EXE -m pytest backend/tests/test_conversation_scope.py backe
 
 - [ ] **Step 3: Implement M4 persistence and bounded runtime**
 
-Persist redacted step summaries, tool names, status, sequence, budget counters, and evidence references. Use the same RAGOrchestrator/retrieval service for `search_knowledge`; do not duplicate ranking logic.
+Persist redacted step summaries, tool names, status, sequence, budget counters, and evidence references. Use the same LangChainQuickChain/retrieval service for `search_knowledge`; do not duplicate ranking logic.
 
 - [ ] **Step 4: Run focused tests, full suite, and `scripts/verify-m4.ps1`**
 
@@ -580,6 +580,6 @@ Mark each phase PASS, FAIL, NOT RUN, NOT IMPLEMENTED, or BLOCKED. Do not mark V1
 
 - Spec coverage: Tasks 1–2 cover M0 and core policies; Tasks 3–4 cover ingestion and M1 RAG; Tasks 5–7 cover API/SSE, M2, and M3; Task 8 covers M4; Task 9 covers the UI; Task 10 covers M4.5 operations; Task 11 performs requirement-level audit.
 - Placeholder scan: the plan contains no unresolved placeholder markers or unowned implementation requirement. Actual provider/model/OCR values are discovered by M0 probes and written as evidence rather than guessed.
-- Interface consistency: `Scope`, `NormalizedDocument`, `HybridRetriever`, `RAGOrchestrator`, `CitationService`, `KnowledgeToolGateway`, `AgentRuntime`, `ApiClient`, and `SseClient` signatures are reused consistently across tasks.
+- Interface consistency: `Scope`, `NormalizedDocument`, `HybridRetriever`, `LangChainQuickChain`, `CitationService`, `KnowledgeToolGateway`, `AgentRuntime`, `ApiClient`, and `SseClient` signatures are reused consistently across tasks.
 - Review focus coverage: duplicate/version safety is covered by Tasks 3 and 4; cross-KB/version scope by Tasks 2, 4, 7, and 8; citation immutability by Task 4; cloud denial by Tasks 4 and 6; capability failures by Tasks 1, 3, 4, 6, and 7.
 - Environment limitation: this root is not a Git repository, `make` is not currently available, and LibreOffice is unavailable for DOCX rendering; these are reported as facts and are not converted into false PASS results.

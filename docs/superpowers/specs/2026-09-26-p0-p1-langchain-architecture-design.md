@@ -24,16 +24,17 @@ The supplied review is treated as a defect list to verify against the working tr
 ```text
 FastAPI routes
     -> AnswerService / ingestion use cases
-        -> project RAG Core (Scope, retrieval, evidence, versions, graph)
-        -> LangChainAgentPort (Smart only)
-            -> LangChain create_agent + ChatOllama
-                -> four project-owned read-only StructuredTools
+        -> QueryRouter / ModelRouter
+        -> Quick LangChain Runnable | Smart LangChain create_agent
+                -> shared KnowledgeGateway / project RAG Core
+                    -> Scope, hybrid retrieval, evidence, versions, graph
+                -> four project-owned read-only StructuredTools (Smart)
         -> PostgreSQL/pgvector, storage, Ollama
 ```
 
 `build_container(settings, overrides...)` remains the only composition root. `create_app(settings, container=...)` accepts an explicit container for tests; production still builds one container from settings. Scripts and the worker use the same root.
 
-Quick mode calls `RAGOrchestrator` directly. Smart mode calls LangChain `create_agent` through a project port. Its tools call the existing `KnowledgeToolGateway` and `HybridRetriever`; the agent must not call a second retrieval implementation. The first scoped retrieval result and evidence snapshot are reused by the final answer path.
+Quick mode calls a fixed LangChain `Runnable` chain. Smart mode calls LangChain `create_agent` through a project port. Both modes call the same `KnowledgeGateway`, `HybridRetriever`, `EvidenceService` and `AnswerValidator`; Smart tools must not call a second retrieval implementation, and its frozen evidence union is consumed by the shared final-answer validation path.
 
 ## Dependency decision
 

@@ -9,9 +9,6 @@ from pathlib import Path
 
 from backend.app.adapters.models.ollama import OllamaGateway
 from backend.app.bootstrap import build_container
-from backend.app.application.citations import CitationService, InMemoryCitationStore
-from backend.app.application.rag_orchestrator import RAGOrchestrator, RagSettings
-from backend.app.application.retrieval import HybridRetriever
 from backend.app.config import Settings
 from backend.app.domain.scope import Scope
 
@@ -41,17 +38,15 @@ def main() -> int:
     receipt = repository.create_upload(kb["id"], "smoke.md", "text/markdown", stored)
     job = repository.process_job(receipt["job_id"])
     chunks = repository.list_active_chunks(scope)
-    citation_service = CitationService(InMemoryCitationStore())
-    orchestrator = RAGOrchestrator(
-        HybridRetriever(repository, embedding_provider=model),
-        citation_service,
-        answer_gateway=model,
+    run_id = repository.create_run(None, [kb["id"]], [], "事务回滚")
+    result = container.quick_chain.invoke(
+        "事务回滚",
+        scope,
+        run_id=run_id,
         cloud_allowed_by_kb={kb["id"]: False},
     )
-    run_id = repository.create_run(None, [kb["id"]], [], "事务回滚")
-    result = orchestrator.answer_query("事务回滚", scope, RagSettings(local_query_enabled=False), run_id=run_id)
-    if citation_service.snapshots:
-        repository.persist_evidence(run_id, list(citation_service.snapshots.values()))
+    if result.evidence:
+        repository.persist_evidence(run_id, list(result.evidence))
     citation = repository.get_citation(run_id, "E1") if result.citations else None
     repository.complete_run(run_id, "completed" if result.error_code is None else "failed", result.error_code)
     repository.delete_knowledge_base(kb["id"])

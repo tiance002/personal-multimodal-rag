@@ -3,7 +3,7 @@
 - 当前里程碑：M4.5 / V1.0 质量闭环与发布验证；P0/P1 与 LangChain Smart 迁移已完成代码路径
 - 当前基线：分支 `main`，用户提供基线 commit `65e5382`；本轮尚未提交、未打 tag。
 - 当前目标：个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
-- 架构：FastAPI + React/Vite + LangChain `create_agent` + 项目 RAG Core + PostgreSQL/pgvector；Quick 直接走 `RAGOrchestrator`，Smart 通过 `SmartAgentPort` 调用四个项目只读工具。
+- 架构：FastAPI + React/Vite + LangChain Runnable/create_agent + 项目 RAG Core + PostgreSQL/pgvector；AnswerService 统一运行、取消和提交，Quick 使用固定 LangChain Runnable Chain，Smart 通过 `SmartAgentPort` 调用四个项目只读工具；两者共享 `KnowledgeGateway`、EvidenceService 和答案校验。
 
 ## 本轮已完成
 
@@ -59,6 +59,24 @@
 | `$env:PLAYWRIGHT_CHROME_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'; npm --prefix frontend test` | PASS；4 个浏览器用例 |
 | `scripts\preview_proxy_smoke.py`（通过 `with_server.py` 启动 API + Vite preview） | PASS；浏览器同源 `/api/v1` 200；`var/reports/preview-proxy-smoke.json` |
 | `scripts\playwright_smoke.py`（通过 `with_server.py` 启动 API + Vite dev） | PASS；上传、选中文档、图谱页签；`var/reports/frontend-smoke.json` |
+
+## LangChain 编排收敛（2026-09-26）
+
+- Quick 不再依赖自研 `RAGOrchestrator`；新增 `KnowledgeGateway`、`EvidenceService`、`QueryPlan`、`EvidenceBundle` 和 `AnswerResult` 共享契约，新增 `LangChainQuickChain` 以 `RunnableLambda` 固定编排规划、检索、Coverage、证据上下文、模型调用和答案校验。
+- Smart 的四个 LangChain 工具改为通过同一个 `KnowledgeGateway` 检索；`LangChainAgentAdapter` 使用同一 `EvidenceService` 的覆盖与答案验证，不再重复构造 `QueryRouter`、`QualityGate`、`AnswerValidator`。
+- `AnswerService` 现在只负责统一 run 生命周期、取消检查、证据/引用提交和最终状态；组合根一次构造 `KnowledgeGateway` 与 Quick Chain，API 不再每次请求创建检索器和旧编排器。独立 `local_query_gateway` 会显式传入 Quick Chain。
+- 预算结算异常不会再降级成成功的证据回答；确定性质量评测通过 `EvidenceResolver` 校验 quote hash 与 version/chunk 可读性。
+- `backend/app/application/rag_orchestrator.py` 已删除；相关测试和 M1/质量评测脚本已迁移到 Quick Chain。
+
+| 收敛验收命令 | 退出码与结果 |
+|---|---|
+| `.\\.venv\\Scripts\\python.exe -m pytest -q --tb=short -p no:cacheprovider` | 0；137 passed，6 warnings |
+| `.\\.venv\\Scripts\\python.exe -m compileall -q backend scripts` | 0；语法检查通过 |
+| `.\\.venv\\Scripts\\python.exe scripts\\evaluate_rag_quality.py --report var\\reports\\eval-rag-quality-langchain-quick-final.json` | 0；9/9，引用 hash/version 回读通过 |
+| `.\\.venv\\Scripts\\python.exe scripts\\contract_test.py --report var\\reports\\contract-test-langchain-convergence-final2.json` | 0；OpenAPI/SSE/分层契约 PASS |
+| `"E:/RAG quention/.venv/Scripts/python.exe" scripts/smoke_m1.py --real-model --database-url postgresql+psycopg://rag:rag@127.0.0.1:55432/rag --storage-root var/smoke-m1-storage-langchain-quick-final --report var/reports/smoke-m1-langchain-quick-final.json` | 0；真实 PostgreSQL/pgvector/Qwen Quick、E1 回读 PASS |
+| `"E:/RAG quention/.venv/Scripts/python.exe" scripts/smoke_quality_postgres.py --database-url postgresql+psycopg://rag:rag@127.0.0.1:55432/rag --report var/reports/smoke-quality-postgres-langchain-quick-final.json` | 0；复合、缺证据、文档范围部分回答 PASS |
+| `"E:/RAG quention/.venv/Scripts/python.exe" scripts/smoke_m4.py --real-model --database-url postgresql+psycopg://rag:rag@127.0.0.1:55432/rag --report var/reports/smoke-m4-langchain-convergence-final.json` | 0；真实 LangChain Smart、工具调用、Agent 终态、E1 回读 PASS |
 
 ## 风险与下一步
 

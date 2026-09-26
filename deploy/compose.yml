@@ -22,9 +22,15 @@ services:
     environment:
       RAG_DATABASE_URL: postgresql+psycopg://rag:rag@db:5432/rag
       RAG_STORAGE_ROOT: /data/storage
-      RAG_CLOUD_ENABLED: "false"
+      RAG_CLOUD_ENABLED: ${RAG_CLOUD_ENABLED:-false}
+      RAG_LANGFUSE_ENABLED: ${RAG_LANGFUSE_ENABLED:-false}
+      RAG_LANGFUSE_CAPTURE_CONTENT: ${RAG_LANGFUSE_CAPTURE_CONTENT:-false}
       RAG_INLINE_INGESTION: "false"
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://us.cloud.langfuse.com}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_AUTHORIZATION: ${LANGFUSE_AUTHORIZATION:-}
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
     volumes:

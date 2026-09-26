@@ -4,11 +4,10 @@ import argparse
 import json
 from pathlib import Path
 
-from backend.app.application.citations import CitationService, InMemoryCitationStore
-from backend.app.application.quality import QualityGate
-from backend.app.application.query_router import QueryRouter
-from backend.app.application.rag_orchestrator import RAGOrchestrator
+from backend.app.application.knowledge_gateway import KnowledgeGateway
+from backend.app.application.quick_chain import LangChainQuickChain
 from backend.app.application.retrieval import HybridRetriever, InMemoryRetrievalRepository
+from backend.app.domain.evidence import EvidenceResolver
 from backend.app.domain.models import ChunkRecord
 from backend.app.domain.scope import Scope
 from validate_eval import validate
@@ -40,30 +39,48 @@ def main() -> int:
         if not required <= case.keys():
             raise ValueError(f"dataset row lacks required fields: {sorted(required - case.keys())}")
         retrieved = []
-        citations = CitationService(InMemoryCitationStore())
-        orchestrator = RAGOrchestrator(
-            HybridRetriever(repository, top_k=5), citations,
-            on_retrieval=lambda run_id, items: retrieved.extend(items),
+        gateway = KnowledgeGateway(HybridRetriever(repository, top_k=5))
+        chain = LangChainQuickChain(gateway)
+        result = chain.invoke(
+            case["question"],
+            Scope.from_ids(case["kb_scope"]),
+            on_retrieval=lambda _run_id, items: retrieved.extend(items),
         )
-        result = orchestrator.answer_query(case["question"], Scope.from_ids(case["kb_scope"]))
-        plan = QueryRouter().plan(case["question"])
-        coverage = QualityGate().evaluate_chunks([item.chunk for item in retrieved], plan)
+        plan = gateway.plan(case["question"])
+        coverage = gateway.evidence.evaluate_chunks([item.chunk for item in retrieved], plan)
         expected = set(case["expected_chunk_ids"])
         actual = {item.chunk.chunk_id for item in retrieved}
         outcome = (
             "partial" if "PARTIAL_EVIDENCE" in result.trace.reason_codes else
             "refuse" if result.error_code is not None else "full"
         )
-        citation_readback = all(citations.resolve(result.run_id, label).chunk_id in actual for label in result.citations)
+        snapshots_by_label = {snapshot.label: snapshot for snapshot in result.evidence}
+
+        def read_chunk(version_id: str, chunk_id: str | None) -> str:
+            chunk = repository.get_chunk(chunk_id or "")
+            if chunk is None or chunk.version_id != version_id:
+                raise ValueError("citation source is unreadable")
+            return chunk.content
+
+        citation_readback = True
+        try:
+            resolver = EvidenceResolver(snapshots_by_label, read_chunk)
+            for label in result.citations:
+                snapshot = resolver.resolve(label)
+                if snapshot.chunk_id not in actual:
+                    citation_readback = False
+                    break
+        except Exception:
+            citation_readback = False
         row = {
             "scenario": case["scenario"], "question": case["question"],
             "expected_outcome": case["expected_outcome"], "outcome": outcome,
             "expected_chunk_ids": sorted(expected), "retrieved_chunk_ids": sorted(actual),
-            "expected_targets": case["expected_target_count"], "planned_targets": len(plan.targets),
-            "target_coverage": 0 if not plan.targets else (len(plan.targets) - len(coverage.missing_targets)) / len(plan.targets),
+            "expected_targets": case["expected_target_count"], "planned_targets": len(plan.evidence_plan.targets),
+            "target_coverage": 0 if not plan.evidence_plan.targets else (len(plan.evidence_plan.targets) - len(coverage.missing_targets)) / len(plan.evidence_plan.targets),
             "citation_readback": citation_readback, "model_calls": result.trace.model_calls,
             "pass": outcome == case["expected_outcome"] and expected <= actual and
-                    len(plan.targets) == case["expected_target_count"] and citation_readback and
+                    len(plan.evidence_plan.targets) == case["expected_target_count"] and citation_readback and
                     result.trace.model_calls == 0,
         }
         rows.append(row)
