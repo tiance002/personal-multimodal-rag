@@ -1,7 +1,7 @@
 # progress.md — 当前开发进度
 
 - 当前里程碑：M4.5 / V1.0 实现与发布证据已完成，等待项目负责人确认验收
-- 当前工作分支 / commit：当前根目录不是 Git 仓库；无分支、commit、tag
+- 当前工作分支 / commit：`main` / `e52893ccc10b7f66e1d40b6f60e87dce952075e0`；远程为 `https://github.com/tiance002/personal-multimodal-rag.git`；无 tag
 - 当前唯一主要目标：交付个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
 - 本次任务：从空项目完成 M0→M1→M2→M3→M4→M4.5 纵切，并保存可核查报告。
 - 已完成并有证据的工作：
@@ -19,11 +19,12 @@
   - `& .\scripts\release_report.ps1` → exit 0；V1.0 汇总 PASS；`var/reports/v1-release-report.json`、`var/reports/v1-release-report.md`。
   - `docker compose -f deploy\compose.yml build api worker frontend` → exit 0；后端包含 0007/0008 迁移、前端包含最新 SSE 客户端的 Compose 镜像构建 PASS。
   - `docker compose -f deploy\compose.yml up -d api worker frontend` → exit 0；重建镜像后 API `/healthz`=200、前端首页=200，随后按约定停止应用容器。
+  - `git init -b main`、`git commit -m "chore: establish personal RAG project baseline"`、`git push -u origin main` → exit 0；GitHub 私有仓库已创建并接收 `e52893c`。
 - 当前阻断（P0/P1）：无已识别 P0/P1。
 - 可控问题待负责人决定（P2/P3）：当前本机没有已验证 OCR/VLM adapter，因此图片/扫描资料显式失败而不生成伪文本；LibreOffice 缺失导致附件 DOCX 视觉渲染 BLOCKED（不影响软件运行）；`make` 不在 PATH，等价 PowerShell 门禁已执行。
 - 已批准延期及批准依据：无；以上能力限制未被擅自标记为延期通过。
 - 当前实际可执行 make targets：NOT IMPLEMENTED；未发现 Makefile，`make` 不在 PATH，未报告任何 `make` 命令通过。
-- 本次最小下一步：项目负责人复核 `var/reports/v1-release-report.md`，确认验收后再决定是否建立 Git 基线与 tag。
+- 本次最小下一步：项目负责人复核 `var/reports/v1-release-report.md` 与 GitHub 基线，确认验收后再决定是否建立 release tag。
 - 最近一次里程碑验收：PASS（`& .\scripts\verify-release.ps1 -Fresh`，exit 0；`& .\scripts\release_report.ps1`，exit 0）。
 - 对应 ADR 与设计章节：`docs/adr/ADR-001-model-capabilities.md`；`docs/superpowers/specs/2026-09-26-personal-rag-v1-design.md`；`docs/superpowers/plans/2026-09-26-personal-rag-v1-implementation.md`。
 
@@ -36,3 +37,4 @@
 | 2026-09-26 | 最终前端镜像运行时复核 | `docker compose build frontend`、`up -d api worker frontend`；healthz 200、frontend 200 | PASS | 应用容器已停止，数据库保持健康 |
 | 2026-09-26 | 后端迁移镜像重建与 Compose 运行时复核 | `docker compose build api worker frontend`、`up -d api worker frontend`；API healthz 200、前端 200；之后 stop 应用容器 | PASS | 数据库保持健康 |
 | 2026-09-26 | 真实恢复演练 | `restore.ps1 -RestoreDatabase`；active/version、chunk、asset、graph orphan 检查均为 0 | PASS | 负责人复核 manifest |
+| 2026-09-26 | GitHub 初始化与上传 | `git init -b main`、首个 commit `e52893c`、`git push -u origin main`；`git ls-remote --heads origin main` 返回同一 SHA | PASS | 负责人复核仓库与启动说明 |
