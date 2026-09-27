@@ -312,12 +312,61 @@ class PostgresKnowledgeRepository:
             return dict(row) if row else None
 
     def list_documents(self, kb_id: str) -> list[dict[str, Any]]:
+        """List documents with both active and latest version state.
+
+        `dv.*` describes the *active* (served) version, while `lv.*` and
+        `lj.*` describe the *newest* version and its most recent ingestion job.
+        Exposing both keeps a failed re-index from being masked by an older
+        active version that is still `ready`.
+        """
         with self.engine.connect() as conn:
-            rows = conn.execute(text("""SELECT d.id,d.knowledge_base_id,d.file_name,d.media_type,d.original_size,d.active_version_id,d.updated_at,
-                dv.version_no,dv.index_status,dv.graph_status
-                FROM documents d LEFT JOIN document_versions dv ON dv.id=d.active_version_id
+            rows = conn.execute(text("""
+                SELECT d.id,d.knowledge_base_id,d.file_name,d.media_type,d.original_size,d.active_version_id,d.updated_at,
+                       dv.version_no,dv.index_status,dv.graph_status,
+                       lv.id AS latest_version_id,lv.version_no AS latest_version_no,lv.index_status AS latest_index_status,
+                       lj.id AS latest_job_id,lj.status AS latest_job_status,lj.stage AS latest_job_stage,
+                       lj.progress AS latest_job_progress,lj.error_code AS latest_job_error_code,
+                       lj.attempts AS latest_job_attempts,lj.max_attempts AS latest_job_max_attempts
+                FROM documents d
+                LEFT JOIN document_versions dv ON dv.id=d.active_version_id
+                LEFT JOIN LATERAL (
+                    SELECT id,version_no,index_status FROM document_versions
+                    WHERE document_id=d.id ORDER BY version_no DESC LIMIT 1
+                ) lv ON true
+                LEFT JOIN LATERAL (
+                    SELECT ij.id,ij.status,ij.stage,ij.progress,ij.error_code,ij.attempts,ij.max_attempts
+                    FROM ingestion_jobs ij JOIN document_versions v ON v.id=ij.version_id
+                    WHERE v.document_id=d.id ORDER BY ij.created_at DESC LIMIT 1
+                ) lj ON true
                 WHERE d.knowledge_base_id=:kb AND d.deleted_at IS NULL ORDER BY d.updated_at DESC"""), {"kb": kb_id}).mappings()
-            return [dict(row) for row in rows]
+            return [self._document_row(row) for row in rows]
+
+    @staticmethod
+    def _document_row(row: Any) -> dict[str, Any]:
+        document = dict(row)
+        job_id = document.pop("latest_job_id", None)
+        job_status = document.pop("latest_job_status", None)
+        job_stage = document.pop("latest_job_stage", None)
+        job_progress = document.pop("latest_job_progress", None)
+        job_error = document.pop("latest_job_error_code", None)
+        job_attempts = document.pop("latest_job_attempts", None)
+        job_max_attempts = document.pop("latest_job_max_attempts", None)
+        document["latest_job"] = (
+            {
+                "id": str(job_id),
+                "status": job_status,
+                "stage": job_stage,
+                "progress": job_progress or 0,
+                "error_code": job_error,
+                "attempts": job_attempts or 0,
+                "max_attempts": job_max_attempts or 1,
+            }
+            if job_id is not None
+            else None
+        )
+        if document.get("latest_version_id") is not None:
+            document["latest_version_id"] = str(document["latest_version_id"])
+        return document
 
     def process_job(
         self,
@@ -673,16 +722,42 @@ class PostgresKnowledgeRepository:
             return result.rowcount == 1
 
     def list_messages(self, conversation_id: str) -> list[dict[str, Any]]:
-        with self.engine.connect() as conn:
-            rows = conn.execute(text("SELECT id,conversation_id,role,content,created_at FROM conversation_messages WHERE conversation_id=:id ORDER BY created_at"), {"id": conversation_id}).mappings()
-            return [dict(row) for row in rows]
+        """Return the conversation transcript with its frozen citation labels.
 
-    def append_message(self, conversation_id: str, role: str, content: str) -> dict[str, Any]:
+        Assistant rows carry `run_id`, and `citations` is read back from the
+        authoritative `answer.completed` run event so reopening a historical
+        conversation re-exposes the exact same labels for citation readback.
+        """
+        with self.engine.connect() as conn:
+            rows = conn.execute(text("""
+                SELECT m.id,m.conversation_id,m.role,m.content,m.created_at,m.run_id,
+                       COALESCE(ev.citations, '[]'::jsonb) AS citations
+                FROM conversation_messages m
+                LEFT JOIN LATERAL (
+                    SELECT e.payload->'citations' AS citations
+                    FROM retrieval_events e
+                    WHERE e.run_id=m.run_id AND e.event_type='answer.completed'
+                    ORDER BY e.seq DESC LIMIT 1
+                ) ev ON true
+                WHERE m.conversation_id=:id ORDER BY m.created_at
+            """), {"id": conversation_id}).mappings()
+            return [self._message_row(row) for row in rows]
+
+    @staticmethod
+    def _message_row(row: Any) -> dict[str, Any]:
+        message = dict(row)
+        if message.get("run_id") is not None:
+            message["run_id"] = str(message["run_id"])
+        citations = message.get("citations")
+        message["citations"] = list(citations) if isinstance(citations, list) else []
+        return message
+
+    def append_message(self, conversation_id: str, role: str, content: str, run_id: str | None = None) -> dict[str, Any]:
         message_id = uuid.uuid4()
         with self.engine.begin() as conn:
-            conn.execute(text("INSERT INTO conversation_messages (id,conversation_id,role,content) VALUES (:id,:conversation_id,:role,:content)"), {"id": message_id, "conversation_id": conversation_id, "role": role, "content": content})
+            conn.execute(text("INSERT INTO conversation_messages (id,conversation_id,role,content,run_id) VALUES (:id,:conversation_id,:role,:content,:run_id)"), {"id": message_id, "conversation_id": conversation_id, "role": role, "content": content, "run_id": run_id})
             conn.execute(text("UPDATE conversations SET updated_at=now() WHERE id=:id"), {"id": conversation_id})
-        return {"id": str(message_id), "conversation_id": conversation_id, "role": role, "content": content}
+        return {"id": str(message_id), "conversation_id": conversation_id, "role": role, "content": content, "run_id": run_id}
 
     def create_run(self, conversation_id: str | None, kb_scope: list[str], document_scope: list[str], q0: str) -> str:
         run_id = uuid.uuid4()
@@ -773,8 +848,8 @@ class PostgresKnowledgeRepository:
                 append_final_event("answer.completed", {"error_code": None, "citations": list(citations)})
                 if conversation_id is not None:
                     conn.execute(
-                        text("INSERT INTO conversation_messages (id,conversation_id,role,content) VALUES (:id,:conversation_id,'assistant',:content)"),
-                        {"id": uuid.uuid4(), "conversation_id": conversation_id, "content": answer},
+                        text("INSERT INTO conversation_messages (id,conversation_id,role,content,run_id) VALUES (:id,:conversation_id,'assistant',:content,:run_id)"),
+                        {"id": uuid.uuid4(), "conversation_id": conversation_id, "content": answer, "run_id": run_id},
                     )
                     conn.execute(text("UPDATE conversations SET updated_at=now() WHERE id=:id"), {"id": conversation_id})
             else:

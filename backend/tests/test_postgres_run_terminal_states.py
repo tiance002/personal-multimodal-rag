@@ -104,8 +104,8 @@ def test_cancelled_run_rejects_late_answer_and_success_artifacts() -> None:
         with rag.engine.begin() as connection:
             connection.execute(text("DELETE FROM agent_runs WHERE id=:id"), {"id": run_id})
             connection.execute(text("DELETE FROM retrieval_events WHERE run_id=:id"), {"id": run_id})
-            connection.execute(text("DELETE FROM rag_runs WHERE id=:id"), {"id": run_id})
             connection.execute(text("DELETE FROM conversation_messages WHERE conversation_id=:id"), {"id": conversation_id})
+            connection.execute(text("DELETE FROM rag_runs WHERE id=:id"), {"id": run_id})
             connection.execute(text("DELETE FROM conversations WHERE id=:id"), {"id": conversation_id})
 
 
@@ -140,8 +140,8 @@ def test_successful_smart_finalization_commits_both_terminal_rows_and_answer() -
         with rag.engine.begin() as connection:
             connection.execute(text("DELETE FROM agent_runs WHERE id=:id"), {"id": run_id})
             connection.execute(text("DELETE FROM retrieval_events WHERE run_id=:id"), {"id": run_id})
-            connection.execute(text("DELETE FROM rag_runs WHERE id=:id"), {"id": run_id})
             connection.execute(text("DELETE FROM conversation_messages WHERE conversation_id=:id"), {"id": conversation_id})
+            connection.execute(text("DELETE FROM rag_runs WHERE id=:id"), {"id": run_id})
             connection.execute(text("DELETE FROM conversations WHERE id=:id"), {"id": conversation_id})
 
 
@@ -197,6 +197,6 @@ def test_concurrent_cancel_and_smart_finalization_commit_one_terminal_outcome() 
             with rag.engine.begin() as connection:
                 connection.execute(text("DELETE FROM agent_runs WHERE id=:id"), {"id": run_id})
                 connection.execute(text("DELETE FROM retrieval_events WHERE run_id=:id"), {"id": run_id})
-                connection.execute(text("DELETE FROM rag_runs WHERE id=:id"), {"id": run_id})
                 connection.execute(text("DELETE FROM conversation_messages WHERE conversation_id=:id"), {"id": conversation_id})
+                connection.execute(text("DELETE FROM rag_runs WHERE id=:id"), {"id": run_id})
                 connection.execute(text("DELETE FROM conversations WHERE id=:id"), {"id": conversation_id})

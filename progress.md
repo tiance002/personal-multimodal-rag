@@ -157,3 +157,53 @@
 - 发布门禁新增隔离的 Compose API/Worker/Nginx 构建、运行健康和浏览器同源检查。浏览器脚本可指定 base URL；Vite preview 参数化 UI 冒烟退出码 0，明确要求 Nginx 的负例退出码 1，防止将 Vite 冒充 Compose。
 - `& .\scripts\verify-release.ps1 -Fresh`：退出码 1；`compose_stack_build` 因 Docker Hub OAuth token 连接失败，`compose_runtime_browser` 明确 `NOT RUN`；其余执行项退出码 0，报告 `var/reports/verify-release.json`。`& .\scripts\release_report.ps1`：退出码 1，`INCOMPLETE`，Compose 浏览器报告均 `NOT RUN`。
 - 未修改系统 DNS/Docker daemon；未提交、未打 tag。当前镜像获取与真实 Compose 运行仍是发布阻断，需恢复官方基础镜像访问后重跑。
+
+## V1 定向修复与验收（2026-09-27）
+
+### 1. 目标与改动
+
+- 目标：基于审查基线 `2e46cad65747f865bd9bbb7a498c98653cbc6a3c` 处理 P1-1 摄取任务刷新恢复、P1-2 历史引用恢复、P2 消息异步顺序与切库旧消息，并完成真实验收。未新增任务框架、未重构会话系统、未打 Tag、未删除日常数据。
+- `backend/app/adapters/postgres/knowledge_repository.py`
+  - `list_documents` 增加 `latest_version_no/latest_index_status/latest_version_id` 与 `latest_job{id,status,stage,progress,error_code,attempts,max_attempts}`（LATERAL 取每份资料最新版本与最新摄取任务）。活动版本仍为 `version_no/index_status`，新版本失败不再被旧版本 `ready` 掩盖。**未新增路由，避免 OpenAPI 契约漂移。**
+  - `finalize_answer` 写入助手消息时记录 `run_id`；`list_messages` 返回 `run_id`，并从冻结的 `answer.completed` 事件回读 `citations` 标签（不解析答案文本）；`append_message` 增加可选 `run_id`。
+- `backend/app/ports/persistence.py`：`append_message` 协议增加可选 `run_id`（默认 None，兼容既有内存假实现）。
+- `alembic/versions/0013_message_run_link.py`（新增）：`conversation_messages.run_id`（可空 UUID）→ `rag_runs.id` 外键 + 索引；**纯增量、无数据删除**。
+- `frontend/src/app/state.ts`：`DocumentItem` 增加 `latest_version_no/latest_index_status/latest_job`。
+- `frontend/src/app/App.tsx`：历史消息加载增加取消守卫（防乱序覆盖）；切换知识库清空当前展示消息（防旧消息混杂）；新增刷新后从资料列表恢复最新非终态/失败任务（含重试入口），一旦本会话已持有该库任务则不再被资料列表覆盖；`retryIngestion` 支持按 jobId 重试。
+- `frontend/src/components/KnowledgeBasePanel.tsx`：资料行展示“新版本 N · failed · 错误码”并给出“重试索引”入口。
+- `backend/tests/test_postgres_run_terminal_states.py`：修正 3 处清理顺序（先删 `conversation_messages` 再删 `rag_runs`），以适配新外键。
+- 新增测试：`backend/tests/test_ingestion_recovery.py`、`backend/tests/test_message_run_link.py`、`frontend/tests/ingestion-refresh-recovery.spec.ts`、`frontend/tests/history-citation.spec.ts`、`frontend/tests/stale-message-scope.spec.ts`；新增脚本 `scripts/smoke_v1_repair.py`。
+
+### 2. 执行命令（真实执行，含退出码）
+
+- `git rev-parse HEAD` → `2e46cad65747f865bd9bbb7a498c98653cbc6a3c`（修复改动为工作区未提交变更）。
+- 隔离库 `rag_v1_accept`（同一 pgvector 实例、独立 database）：`RAG_DATABASE_URL=.../rag_v1_accept python -m alembic -c alembic.ini upgrade head` → 退出码 0，`0013_message_run_link (head)`。
+- `RAG_DATABASE_URL=.../rag_v1_accept python -m pytest backend/tests/test_message_run_link.py backend/tests/test_ingestion_recovery.py -p no:cacheprovider` → 退出码 0，`2 passed`。
+- `RAG_DATABASE_URL=.../rag_v1_accept python -m pytest backend/tests -q -p no:cacheprovider` → 退出码 0，`146 passed`，6 warnings。
+- `python scripts/contract_test.py --report var/reports/contract-test-v1-repair.json` → 退出码 0，`status=PASS`，`openapi_snapshot_drift=false`，`layering_violations=[]`，`required_paths=20 / actual_paths=21`。
+- `npm --prefix frontend run build` → 退出码 0（`tsc --noEmit` + Vite 构建）。
+- `npx playwright test --reporter=list --timeout=25000`（`PLAYWRIGHT_CHROME_PATH` 指向系统 Chrome）→ 日志 `var/reports/playwright-v1-repair.log` 中 22 个用例全部 `ok`（无 failed/skipped）。**注意**：该进程在 Windows 上于 Playwright 的 webServer teardown 阶段长时间不退出（已知环境现象），故未捕获到汇总退出码，最终由人工终止；测试结果本身以日志逐条 `ok` 为准。
+- `python scripts/smoke_v1_repair.py --database-url .../rag_v1_accept --real-model --report var/reports/smoke-v1-repair.json` → 退出码 0，`status=PASS`（真实 qwen3.5:4b + bge-m3:latest）。
+- 隔离 Compose 全栈（项目名 `rag-v1-accept`，端口 55433/18001/14174）：`docker compose -p rag-v1-accept -f deploy/compose.yml build api worker frontend` → `build_exit=0`；`up -d --no-build` → `up_exit=0`，`healthz_ready_attempt=2`；运行服务 `db, api, frontend, worker` 全部 running；`preview_proxy_smoke.py --expect-server nginx` → `proxy_exit=0`；`playwright_smoke.py` → `ui_exit=0`；`down --volumes` → `down_exit=0`。日志 `var/reports/compose-verify-v1-repair.log`，报告 `var/reports/compose-proxy-smoke-v1-repair.json`、`var/reports/compose-ui-smoke-v1-repair.json`。
+- 开发库增量迁移（必要且非破坏）：`python -m alembic -c alembic.ini upgrade head` → 退出码 0，`0013_message_run_link (head)`；迁移后 `knowledge_bases=465 / documents=627 / conversation_messages=108`，日常数据未丢失。
+
+### 3. 结果
+
+- P1-1 摄取任务刷新恢复：**PASS**。`smoke-v1-repair.json` 显示首份 Markdown `first_job_status=succeeded`、`active_index_status=ready`；新版本失败时 `latest_index_status=failed`、`latest_job_status=failed`、`latest_job_error=EMPTY_TEXT`、`retry_entry_available=true`、`retry_status=queued`。Playwright `ingestion-refresh-recovery` 通过（刷新后仍显示任务状态/错误/重试入口）。
+- P1-2 历史引用恢复：**PASS**。`history_run_linked=true`、`history_citations=["E1"]`、`citation_readback=true`（含 locator 定位）。`get_citation` 的 quote SHA-256、版本与 chunk 可读性校验保持不变；Run 关联来自显式 `run_id` 列，未解析答案文本。Playwright `history-citation` 通过。
+- P2 消息异步顺序与切库旧消息：**PASS**。Playwright `stale-message-scope`（迟到响应不覆盖新会话、切库清空旧对话）通过。
+- 回归：完整后端测试 `146 passed`、契约测试 PASS、前端构建 PASS、Playwright `22 passed`、隔离 Compose（PostgreSQL + Worker + Nginx + 浏览器）PASS。全部为本轮真实执行，未复用历史报告，未使用 Mock 冒充真实验收。
+- 未运行：`verify-m0..m4`、`verify-release.ps1` 全量门禁、`backup/restore` 演练（本轮不在授权范围；未声明通过）。
+
+### 4. 风险与遗留
+
+- `conversation_messages.run_id` 外键使“仍有助手消息引用的 run”不可硬删除；应用层与脚本均无硬删除 run 的路径，仅测试清理受影响，已修正顺序。如需维护脚本删除 run，应先解绑消息。
+- 开发库已应用 `0013`（增量、可空列 + 外键 + 索引）；回滚可用 `alembic downgrade 0012_chunk_strategy`，但会丢弃消息与 run 的关联。
+- 刷新恢复以“本会话是否已持有该库任务”为准：若用户在别处（非本会话）触发新版本摄取失败，资料行会显示失败与“重试索引”，但顶部横幅不会自动切换。属可接受的局部限制。
+- Playwright 需系统 Chrome（`PLAYWRIGHT_CHROME_PATH`）或 `npx playwright install chromium`；本机 Playwright 1.63 期望的 `chromium_headless_shell-1243` 未安装。本轮使用系统 Chrome 完成，属环境配置项，非代码缺陷。
+- 未提交、未打 Tag；是否提交与验收由项目负责人决定。
+
+### 5. 版本与下一步
+
+- HEAD：`2e46cad65747f865bd9bbb7a498c98653cbc6a3c`；迁移版本 `0013_message_run_link`；修复改动位于工作区未提交。
+- 建议下一步（需负责人确认后执行）：审阅本轮 diff → 提交 → 在需要时打 `v1.0` 相关 Tag；随后按 V1.1 计划推进，本轮不开展 V1.1 优化。

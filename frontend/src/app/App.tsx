@@ -57,7 +57,14 @@ export default function App() {
     void api.listDocuments(state.selectedKnowledgeBaseId).then((items) => { if (!cancelled) setDocuments(items); }).catch(() => { if (!cancelled) setDocuments([]); });
     return () => { cancelled = true; };
   }, [state.selectedKnowledgeBaseId]);
-  useEffect(() => { if (!state.activeConversationId) { setMessages([]); return; } void api.listMessages(state.activeConversationId).then(setMessages).catch(() => setMessages([])); }, [state.activeConversationId]);
+  useEffect(() => {
+    if (!state.activeConversationId) { setMessages([]); return; }
+    let cancelled = false;
+    void api.listMessages(state.activeConversationId)
+      .then((items) => { if (!cancelled) setMessages(items); })
+      .catch(() => { if (!cancelled) setMessages([]); });
+    return () => { cancelled = true; };
+  }, [state.activeConversationId]);
   useEffect(() => {
     if (!ingestionJob || ingestionIssue || ["succeeded", "failed", "cancelled"].includes(ingestionJob.status)) return;
     let cancelled = false;
@@ -91,6 +98,25 @@ export default function App() {
     void api.listDocuments(ingestionJob.knowledgeBaseId).then((items) => { if (!cancelled) setDocuments(items); }).catch(() => { if (!cancelled) setNotice("任务已结束，但资料列表暂不可读"); });
     return () => { cancelled = true; };
   }, [ingestionJob?.id, ingestionJob?.status, ingestionJob?.knowledgeBaseId, state.selectedKnowledgeBaseId]);
+  // After a page refresh the in-memory job is gone. Rebuild the latest
+  // non-terminal or failed job from the document list so the task status,
+  // error and retry entry stay visible instead of silently disappearing.
+  // Once an in-session job owns this knowledge base we never override it from
+  // the (possibly stale) document list.
+  useEffect(() => {
+    const kbId = state.selectedKnowledgeBaseId;
+    if (!kbId) return;
+    if (ingestionJob && ingestionJob.knowledgeBaseId === kbId) return;
+    const recovered = documents.find((document) => document.latest_job && !["succeeded", "cancelled"].includes(document.latest_job.status));
+    const job = recovered?.latest_job;
+    if (!job) return;
+    const pending = !["succeeded", "failed", "cancelled"].includes(job.status);
+    uploadBusyRef.current = pending;
+    setUploadBusy(pending);
+    ingestionPolls.current = 0;
+    setIngestionIssue(false);
+    setIngestionJob({ id: job.id, knowledgeBaseId: kbId, status: job.status, stage: job.stage, progress: job.progress, attempts: job.attempts, max_attempts: job.max_attempts, error_code: job.error_code });
+  }, [documents, state.selectedKnowledgeBaseId, ingestionJob]);
 
   const syncScope = async (conversationId: string, patch: { knowledge_base_scope: string[]; document_scope: string[] }, successNotice: string, previous: AppState) => {
     try {
@@ -125,6 +151,9 @@ export default function App() {
     if (conversationId) { scopeSyncRef.current = true; setScopeSyncing(true); }
     setState((current) => ({ ...current, selectedKnowledgeBaseId: id, selectedDocumentId: null, documentScope: [], viewMode: "document" }));
     setCitation(null);
+    // The conversation scope now points at another knowledge base; drop the
+    // displayed transcript so answers from the previous base are not mixed in.
+    setMessages([]);
     if (!conversationId) return;
     await syncScope(conversationId, { knowledge_base_scope: [id], document_scope: [] }, "已切换知识库，会话检索范围已同步", previous);
   };
@@ -193,15 +222,18 @@ export default function App() {
       setNotice(error instanceof Error ? error.message : "上传失败");
     }
   };
-  const retryIngestion = async () => {
-    if (!ingestionJob) return;
+  const retryIngestion = async (jobId?: string) => {
+    const targetId = jobId ?? ingestionJob?.id;
+    const kbId = ingestionJob?.knowledgeBaseId ?? state.selectedKnowledgeBaseId;
+    if (!targetId || !kbId) return;
     try {
-      const next = await api.retryIngestionJob(ingestionJob.id);
+      const next = await api.retryIngestionJob(targetId);
       ingestionPolls.current = 0;
       setIngestionIssue(false);
-      uploadBusyRef.current = !["succeeded", "failed", "cancelled"].includes(next.status);
-      setUploadBusy(uploadBusyRef.current);
-      setIngestionJob({ ...next, knowledgeBaseId: ingestionJob.knowledgeBaseId });
+      const pending = !["succeeded", "failed", "cancelled"].includes(next.status);
+      uploadBusyRef.current = pending;
+      setUploadBusy(pending);
+      setIngestionJob({ ...next, knowledgeBaseId: kbId });
       setNotice(next.status === "queued" ? "重试已排队，等待摄取 Worker" : `任务状态：${next.status}`);
     } catch (error) { setNotice(error instanceof Error ? error.message : "重试失败"); }
   };
@@ -254,5 +286,5 @@ export default function App() {
   };
   const changeView = (viewMode: ViewMode) => setState((current) => ({ ...current, viewMode }));
   const openCitation = async (runId: string, citationId: string) => { try { setCitation(await api.getCitation(runId, citationId)); } catch { setNotice("引用暂时无法回读"); } };
-  return <div className="app-shell"><Sidebar conversations={conversations} activeId={state.activeConversationId} onSelect={selectConversation} onNew={() => void newConversation()} /><main className="main-column"><header className="topbar"><div className="crumb"><span className="crumb-dot" />工作台 <span>/</span> {selectedBase?.name ?? "未选择知识库"}</div><div className="topbar-actions"><span className="local-badge">本地优先</span><span className="notice">{notice}</span></div></header><div className="work-grid"><KnowledgeBasePanel bases={bases} selectedBaseId={state.selectedKnowledgeBaseId} documents={documents} selectedDocumentId={state.selectedDocumentId} documentScope={state.documentScope} scopeSyncing={scopeSyncing} questionPending={sending} uploadBusy={uploadBusy} ingestionJob={ingestionJob} ingestionIssue={ingestionIssue} onCreateBase={createBase} onSelectBase={(id) => void selectBase(id)} onSelectDocument={(id) => setState((current) => ({ ...current, selectedDocumentId: id }))} onToggleDocumentScope={(id) => void toggleDocumentScope(id)} onUpload={(file) => void upload(file)} onRetryIngestion={() => void retryIngestion()} onRefreshIngestion={() => void refreshIngestion()} /><ChatPanel messages={messages} disabled={!state.selectedKnowledgeBaseId || scopeSyncing || scopeBlocked || sending} disabledHint={scopeBlocked ? "无法确认检索范围，请刷新页面" : scopeSyncing ? "正在同步检索范围" : sending ? "正在回答，请稍候" : undefined} onSend={(content, mode) => void send(content, mode)} onCitation={(runId, citationId) => void openCitation(runId, citationId)} /></div></main><GraphPanel documentId={state.selectedDocumentId} graphEnabled={graphEnabled} viewMode={state.viewMode} onViewMode={changeView} citation={citation} /></div>;
+  return <div className="app-shell"><Sidebar conversations={conversations} activeId={state.activeConversationId} onSelect={selectConversation} onNew={() => void newConversation()} /><main className="main-column"><header className="topbar"><div className="crumb"><span className="crumb-dot" />工作台 <span>/</span> {selectedBase?.name ?? "未选择知识库"}</div><div className="topbar-actions"><span className="local-badge">本地优先</span><span className="notice">{notice}</span></div></header><div className="work-grid"><KnowledgeBasePanel bases={bases} selectedBaseId={state.selectedKnowledgeBaseId} documents={documents} selectedDocumentId={state.selectedDocumentId} documentScope={state.documentScope} scopeSyncing={scopeSyncing} questionPending={sending} uploadBusy={uploadBusy} ingestionJob={ingestionJob} ingestionIssue={ingestionIssue} onCreateBase={createBase} onSelectBase={(id) => void selectBase(id)} onSelectDocument={(id) => setState((current) => ({ ...current, selectedDocumentId: id }))} onToggleDocumentScope={(id) => void toggleDocumentScope(id)} onUpload={(file) => void upload(file)} onRetryIngestion={() => void retryIngestion()} onRetryJob={(jobId) => void retryIngestion(jobId)} onRefreshIngestion={() => void refreshIngestion()} /><ChatPanel messages={messages} disabled={!state.selectedKnowledgeBaseId || scopeSyncing || scopeBlocked || sending} disabledHint={scopeBlocked ? "无法确认检索范围，请刷新页面" : scopeSyncing ? "正在同步检索范围" : sending ? "正在回答，请稍候" : undefined} onSend={(content, mode) => void send(content, mode)} onCitation={(runId, citationId) => void openCitation(runId, citationId)} /></div></main><GraphPanel documentId={state.selectedDocumentId} graphEnabled={graphEnabled} viewMode={state.viewMode} onViewMode={changeView} citation={citation} /></div>;
 }

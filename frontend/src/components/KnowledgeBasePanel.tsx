@@ -18,10 +18,11 @@ type Props = {
   onToggleDocumentScope: (id: string) => void;
   onUpload: (file: File) => void;
   onRetryIngestion: () => void;
+  onRetryJob: (jobId: string) => void;
   onRefreshIngestion: () => void;
 };
 
-export function KnowledgeBasePanel({ bases, selectedBaseId, documents, selectedDocumentId, documentScope, scopeSyncing, questionPending, uploadBusy, ingestionJob, ingestionIssue, onCreateBase, onSelectBase, onSelectDocument, onToggleDocumentScope, onUpload, onRetryIngestion, onRefreshIngestion }: Props) {
+export function KnowledgeBasePanel({ bases, selectedBaseId, documents, selectedDocumentId, documentScope, scopeSyncing, questionPending, uploadBusy, ingestionJob, ingestionIssue, onCreateBase, onSelectBase, onSelectDocument, onToggleDocumentScope, onUpload, onRetryIngestion, onRetryJob, onRefreshIngestion }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const [creating, setCreating] = useState(false);
   const [baseName, setBaseName] = useState("");
@@ -46,6 +47,11 @@ export function KnowledgeBasePanel({ bases, selectedBaseId, documents, selectedD
     <div className="dropzone" onClick={() => { if (selectedBaseId && !uploadBusy) input.current?.click(); }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); const file = event.dataTransfer.files[0]; if (file && selectedBaseId && !uploadBusy) onUpload(file); }}><div className="drop-icon">↥</div><strong>{uploadBusy ? "等待当前资料完成" : "拖入资料"}</strong><span>PDF、Markdown、TXT、图片</span></div>
     {activeJob && <div className="ingestion-status" role="status"><span>摄取任务 · {activeJob.stage} · {activeJob.progress}% · {activeJob.status === "succeeded" ? "已完成" : activeJob.status === "failed" ? "失败" : activeJob.status === "cancelled" ? "已取消" : "进行中"}</span>{activeJob.error_code && <strong>{activeJob.error_code}</strong>}{activeJob.status === "failed" && activeJob.attempts < activeJob.max_attempts && <button type="button" onClick={onRetryIngestion}>重试摄取</button>}{ingestionIssue && <button type="button" onClick={onRefreshIngestion}>刷新状态</button>}</div>}
     <div className="document-list-head"><span>资料 {documents.length}</span><span className="muted">按最近更新</span></div>
-    <div className="document-list">{documents.length === 0 ? <div className="empty-document"><span>○</span><p>这个空间还很安静<br /><small>拖入第一份资料开始建立索引</small></p></div> : documents.map((document) => <div key={document.id} className={`document-row ${selectedDocumentId === document.id ? "selected" : ""}`}><button type="button" className="document-select" onClick={() => onSelectDocument(document.id)}><span className="file-glyph">{document.media_type?.includes("pdf") ? "PDF" : document.media_type?.includes("image") ? "IMG" : "TXT"}</span><span className="document-name"><strong>{document.file_name}</strong><small>版本 {document.version_no ?? "—"} · {document.index_status ?? "等待索引"}</small></span><span className={`index-state ${document.index_status === "ready" ? "ready" : ""}`} /></button><button type="button" disabled={scopeSyncing || questionPending} className={`document-scope-toggle ${documentScope.includes(document.id) ? "active" : ""}`} aria-pressed={documentScope.includes(document.id)} onClick={() => onToggleDocumentScope(document.id)}>{documentScope.includes(document.id) ? "取消限定" : "仅此文档"}</button></div>)}</div>
+    <div className="document-list">{documents.length === 0 ? <div className="empty-document"><span>○</span><p>这个空间还很安静<br /><small>拖入第一份资料开始建立索引</small></p></div> : documents.map((document) => {
+      const latestDiffers = document.latest_version_no !== undefined && document.latest_index_status !== undefined && document.latest_index_status !== document.index_status;
+      const job = document.latest_job;
+      const canRetry = job?.status === "failed" && job.attempts < job.max_attempts;
+      return <div key={document.id} className={`document-row ${selectedDocumentId === document.id ? "selected" : ""}`}><button type="button" className="document-select" onClick={() => onSelectDocument(document.id)}><span className="file-glyph">{document.media_type?.includes("pdf") ? "PDF" : document.media_type?.includes("image") ? "IMG" : "TXT"}</span><span className="document-name"><strong>{document.file_name}</strong><small>版本 {document.version_no ?? "—"} · {document.index_status ?? "等待索引"}</small>{latestDiffers && <small className="document-warning">新版本 {document.latest_version_no} · {document.latest_index_status}{job?.error_code ? ` · ${job.error_code}` : ""}</small>}</span><span className={`index-state ${document.index_status === "ready" && !latestDiffers ? "ready" : ""}`} /></button>{canRetry && <button type="button" className="document-retry" onClick={() => onRetryJob(job.id)}>重试索引</button>}<button type="button" disabled={scopeSyncing || questionPending} className={`document-scope-toggle ${documentScope.includes(document.id) ? "active" : ""}`} aria-pressed={documentScope.includes(document.id)} onClick={() => onToggleDocumentScope(document.id)}>{documentScope.includes(document.id) ? "取消限定" : "仅此文档"}</button></div>;
+    })}</div>
   </section>;
 }

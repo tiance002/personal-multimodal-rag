@@ -15,6 +15,9 @@ export type DocumentItem = {
   index_status?: string;
   version_no?: number;
   active_version_id?: string;
+  latest_version_no?: number;
+  latest_index_status?: string;
+  latest_job?: IngestionJob | null;
 };
 
 export type IngestionJob = {
