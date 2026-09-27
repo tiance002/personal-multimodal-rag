@@ -1,7 +1,7 @@
 # progress.md — 当前开发进度
 
 - 当前里程碑：M4.5 / V1.0 质量闭环与发布验证；P0/P1 与 LangChain Smart 迁移已完成代码路径
-- 当前基线：分支 `main`；2026-09-27 V1 最后定向修复从 `2c73215` 开始，实现提交 `00bbf53` 已推送 `origin/main`。最新执行记录见文末；历史各节保留当时状态，不代表当前验收结论。未打 release tag。
+- 当前基线：分支 `main`；2026-09-27 V1 最后定向修复从 `2c73215` 开始，实现提交 `00bbf53` 与 Compose 验证记录提交 `50a63d4` 均已推送 `origin/main`。最新执行记录见文末；历史各节保留当时状态，不代表当前验收结论。未打 release tag。
 - 当前目标：个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
 - 架构：FastAPI + React/Vite + LangChain Runnable/create_agent + 项目 RAG Core + PostgreSQL/pgvector；AnswerService 统一运行、取消和提交，Quick 使用固定 LangChain Runnable Chain，Smart 通过 `SmartAgentPort` 调用四个项目只读工具；两者共享 `KnowledgeGateway`、EvidenceService 和答案校验。
 
@@ -227,7 +227,7 @@
 | 当前源码 `docker compose ... build api worker frontend` | 退出码 1；Docker Hub `auth.docker.io/token` TCP 连接失败，无法取得基础镜像 metadata |
 | 当前源码 Compose 全栈运行及正式 `verify-release.ps1` | NOT RUN；镜像未构建。正式脚本还固定使用 55432 日常库，不可在“保留旧数据、隔离验证”条件下原样执行。此前任何 Compose PASS 都属于旧代码/旧构建，不覆盖本次结论 |
 
-结果日志位于 `var/reports/v1-final-*.txt/json`。本轮实现提交 `00bbf53` 已推送 `origin/main`，工作树在该提交后干净；本轮代码与测试回归 PASS。**完整 V1 发布门禁仍被 Compose 镜像获取阻断，不能宣称 V1 发布验收通过。** 未创建 release tag，未部署，未开展 V1.1。旧的 P2 语义质量/VLM caption 限制仍作为后续技术债。
+结果日志位于 `var/reports/v1-final-*.txt/json`。本轮实现提交 `00bbf53` 已推送 `origin/main`，代码与测试回归 PASS。Compose 镜像构建与全栈运行结果以后续“Compose 全栈续验”为准；正式 V1 发布门禁未运行，不能宣称 V1 发布验收通过。未创建 release tag，未部署，未开展 V1.1。旧的 P2 语义质量/VLM caption 限制仍作为后续技术债。
 
 ## Compose 全栈续验（2026-09-27，覆盖上一节 Compose 构建结果）
 
