@@ -1,4 +1,10 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { Button, Input, Upload } from "antd";
+import {
+  DatabaseOutlined,
+  FolderOpenOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import type { DocumentItem, IngestionJob, KnowledgeBase } from "../app/state";
 
 type Props = {
@@ -6,52 +12,419 @@ type Props = {
   selectedBaseId: string | null;
   documents: DocumentItem[];
   selectedDocumentId: string | null;
-  documentScope: string[];
-  scopeSyncing: boolean;
-  questionPending: boolean;
   uploadBusy: boolean;
   ingestionJob: (IngestionJob & { knowledgeBaseId: string }) | null;
   ingestionIssue: boolean;
   onCreateBase: (name: string) => Promise<boolean>;
-  onSelectBase: (id: string) => void;
+  onSelectBase: (id: string | null) => void;
   onSelectDocument: (id: string) => void;
-  onToggleDocumentScope: (id: string) => void;
-  onUpload: (file: File) => void;
+  onUpload: (files: File[]) => Promise<string>;
   onRetryIngestion: () => void;
   onRetryJob: (jobId: string) => void;
   onRefreshIngestion: () => void;
 };
 
-export function KnowledgeBasePanel({ bases, selectedBaseId, documents, selectedDocumentId, documentScope, scopeSyncing, questionPending, uploadBusy, ingestionJob, ingestionIssue, onCreateBase, onSelectBase, onSelectDocument, onToggleDocumentScope, onUpload, onRetryIngestion, onRetryJob, onRefreshIngestion }: Props) {
-  const input = useRef<HTMLInputElement>(null);
+type FileGroup = "全部文件" | "PDF" | "文档" | "图片" | "其他";
+const groups: FileGroup[] = ["全部文件", "PDF", "文档", "图片", "其他"];
+function formatIngestionStage(stage: string) {
+  if (stage === "queued") return "排队中";
+  if (stage === "processing") return "解析中";
+  if (stage === "indexing") return "建立索引";
+  if (stage === "ready") return "已就绪";
+  return stage;
+}
+
+function groupOf(document: DocumentItem): FileGroup {
+  const name = document.file_name.toLowerCase();
+  if (name.endsWith(".pdf")) return "PDF";
+  if (/\.(png|jpe?g|webp|gif|bmp|tiff?)$/.test(name)) return "图片";
+  if (/\.(md|txt|docx|xlsx|html?|csv)$/.test(name)) return "文档";
+  return "其他";
+}
+
+function KnowledgeBaseCard({
+  base,
+  onOpen,
+}: {
+  base: KnowledgeBase;
+  onOpen: () => void;
+}) {
+  return (
+    <button type="button" className="kb-card" onClick={onOpen}>
+      <span className="kb-card-icon">
+        <DatabaseOutlined />
+      </span>
+      <strong>{base.name}</strong>
+      <span>{base.description || "打开查看资料与分类"}</span>
+      <span className="kb-card-open">查看资料 →</span>
+    </button>
+  );
+}
+
+function FileCategoryButton({
+  group,
+  count,
+  selected,
+  onClick,
+}: {
+  group: FileGroup;
+  count: number;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={selected ? "selected" : ""}
+      onClick={onClick}
+    >
+      <span>
+        <FolderOpenOutlined /> {group}
+      </span>
+      <small>{count}</small>
+    </button>
+  );
+}
+
+function LibraryDocumentRow({
+  document,
+  selected,
+  onSelect,
+  onRetry,
+}: {
+  document: DocumentItem;
+  selected: boolean;
+  onSelect: () => void;
+  onRetry: (jobId: string) => void;
+}) {
+  const latestDiffers =
+    document.latest_version_no !== undefined &&
+    document.latest_index_status !== undefined &&
+    document.latest_index_status !== document.index_status;
+  const job = document.latest_job;
+  const canRetry = job?.status === "failed" && job.attempts < job.max_attempts;
+  return (
+    <div className={`document-row ${selected ? "selected" : ""}`}>
+      <button type="button" className="document-select" onClick={onSelect}>
+        <span className="file-glyph">
+          {groupOf(document) === "PDF"
+            ? "PDF"
+            : groupOf(document) === "图片"
+              ? "IMG"
+              : "DOC"}
+        </span>
+        <span className="document-name">
+          <strong>{document.file_name}</strong>
+          <small>
+            版本 {document.version_no ?? "—"}
+            {latestDiffers &&
+              ` · 新版本 ${document.latest_version_no} ${document.latest_index_status}`}
+          </small>
+        </span>
+      </button>
+      <span
+        className={`file-status ${document.index_status === "ready" && !latestDiffers ? "ready" : ""}`}
+      >
+        {document.index_status === "ready" && !latestDiffers
+          ? "已完成"
+          : (document.latest_index_status ??
+            document.index_status ??
+            "等待索引")}
+      </span>
+      {canRetry && (
+        <Button size="small" onClick={() => onRetry(job.id)}>
+          重试索引
+        </Button>
+      )}
+    </div>
+  );
+}
+
+export function KnowledgeBasePanel({
+  bases,
+  selectedBaseId,
+  documents,
+  selectedDocumentId,
+  uploadBusy,
+  ingestionJob,
+  ingestionIssue,
+  onCreateBase,
+  onSelectBase,
+  onSelectDocument,
+  onUpload,
+  onRetryIngestion,
+  onRetryJob,
+  onRefreshIngestion,
+}: Props) {
   const [creating, setCreating] = useState(false);
   const [baseName, setBaseName] = useState("");
   const [createPending, setCreatePending] = useState(false);
+  const [filter, setFilter] = useState<FileGroup>("全部文件");
+  const [queryDraft, setQueryDraft] = useState("");
+  const [query, setQuery] = useState("");
+  const [uploadHint, setUploadHint] = useState("");
+  const selectedBase = bases.find((base) => base.id === selectedBaseId);
+  const shownDocuments = documents.filter(
+    (document) =>
+      (filter === "全部文件" || groupOf(document) === filter) &&
+      document.file_name.toLowerCase().includes(query.toLowerCase()),
+  );
   const submitCreate = async () => {
     const name = baseName.trim();
     if (!name || createPending) return;
     setCreatePending(true);
     try {
-      if (await onCreateBase(name)) { setBaseName(""); setCreating(false); }
-    } finally { setCreatePending(false); }
+      if (await onCreateBase(name)) {
+        setBaseName("");
+        setCreating(false);
+      }
+    } finally {
+      setCreatePending(false);
+    }
   };
-  const activeJob = ingestionJob?.knowledgeBaseId === selectedBaseId ? ingestionJob : null;
+  const receiveFiles = async (files: File[]) => {
+    if (!selectedBaseId) {
+      setUploadHint("请先打开一个知识库，再上传资料");
+      return;
+    }
+    if (uploadBusy) {
+      setUploadHint("当前知识库正在接收资料，请稍候");
+      return;
+    }
+    if (!files.length) {
+      setUploadHint("未找到可上传的文件");
+      return;
+    }
+    setUploadHint(`正在接收 ${files.length} 份资料…`);
+    try {
+      setUploadHint(await onUpload(files));
+    } catch (error) {
+      setUploadHint(error instanceof Error ? error.message : "上传失败");
+    }
+  };
+  const interceptUpload = (file: File, fileList: File[]) => {
+    if (file === fileList[0]) void receiveFiles(fileList);
+    return Upload.LIST_IGNORE;
+  };
+  const activeJob =
+    ingestionJob?.knowledgeBaseId === selectedBaseId ? ingestionJob : null;
 
-  return <section className="library-panel">
-    <div className="section-kicker">资料台</div>
-    <div className="library-heading"><div><h1>知识库</h1><p>选择一个空间，保持检索边界清晰。</p></div><div className="library-actions"><button className="quiet-button" type="button" disabled={scopeSyncing || questionPending} onClick={() => setCreating((current) => !current)}>＋ 创建</button><button className="quiet-button" type="button" disabled={!selectedBaseId || uploadBusy} onClick={() => input.current?.click()}>＋ 导入</button></div><input ref={input} hidden type="file" onChange={(event) => { const file = event.target.files?.[0]; if (file) onUpload(file); event.target.value = ""; }} /></div>
-    {(creating || bases.length === 0) && <form className="create-base" onSubmit={(event) => { event.preventDefault(); void submitCreate(); }}><label className="field-label" htmlFor="new-kb-name">知识库名称</label><div className="create-base-controls"><input id="new-kb-name" value={baseName} maxLength={200} onChange={(event) => setBaseName(event.target.value)} placeholder="例如：我的资料" /><button type="submit" disabled={createPending || scopeSyncing || questionPending || !baseName.trim()}>创建知识库</button></div></form>}
-    <label className="field-label" htmlFor="kb-select">当前空间</label>
-    <select id="kb-select" className="kb-select" value={selectedBaseId ?? ""} disabled={scopeSyncing || questionPending} onChange={(event) => onSelectBase(event.target.value)}><option value="" disabled>选择知识库</option>{bases.map((base) => <option key={base.id} value={base.id}>{base.name}</option>)}</select>
-    <div className="scope-summary" aria-label="当前检索范围">{scopeSyncing ? "正在同步检索范围，暂不可提问" : questionPending ? "正在回答，暂不可切换检索范围" : `当前检索范围：${documentScope.length ? `仅 ${documents.find((document) => documentScope.includes(document.id))?.file_name ?? "选定资料"}` : "当前知识库的全部已索引资料"}`}</div>
-    <div className="dropzone" onClick={() => { if (selectedBaseId && !uploadBusy) input.current?.click(); }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); const file = event.dataTransfer.files[0]; if (file && selectedBaseId && !uploadBusy) onUpload(file); }}><div className="drop-icon">↥</div><strong>{uploadBusy ? "等待当前资料完成" : "拖入资料"}</strong><span>PDF、Markdown、TXT、图片</span></div>
-    {activeJob && <div className="ingestion-status" role="status"><span>摄取任务 · {activeJob.stage} · {activeJob.progress}% · {activeJob.status === "succeeded" ? "已完成" : activeJob.status === "failed" ? "失败" : activeJob.status === "cancelled" ? "已取消" : "进行中"}</span>{activeJob.error_code && <strong>{activeJob.error_code}</strong>}{activeJob.status === "failed" && activeJob.attempts < activeJob.max_attempts && <button type="button" onClick={onRetryIngestion}>重试摄取</button>}{ingestionIssue && <button type="button" onClick={onRefreshIngestion}>刷新状态</button>}</div>}
-    <div className="document-list-head"><span>资料 {documents.length}</span><span className="muted">按最近更新</span></div>
-    <div className="document-list">{documents.length === 0 ? <div className="empty-document"><span>○</span><p>这个空间还很安静<br /><small>拖入第一份资料开始建立索引</small></p></div> : documents.map((document) => {
-      const latestDiffers = document.latest_version_no !== undefined && document.latest_index_status !== undefined && document.latest_index_status !== document.index_status;
-      const job = document.latest_job;
-      const canRetry = job?.status === "failed" && job.attempts < job.max_attempts;
-      return <div key={document.id} className={`document-row ${selectedDocumentId === document.id ? "selected" : ""}`}><button type="button" className="document-select" onClick={() => onSelectDocument(document.id)}><span className="file-glyph">{document.media_type?.includes("pdf") ? "PDF" : document.media_type?.includes("image") ? "IMG" : "TXT"}</span><span className="document-name"><strong>{document.file_name}</strong><small>版本 {document.version_no ?? "—"} · {document.index_status ?? "等待索引"}</small>{latestDiffers && <small className="document-warning">新版本 {document.latest_version_no} · {document.latest_index_status}{job?.error_code ? ` · ${job.error_code}` : ""}</small>}</span><span className={`index-state ${document.index_status === "ready" && !latestDiffers ? "ready" : ""}`} /></button>{canRetry && <button type="button" className="document-retry" onClick={() => onRetryJob(job.id)}>重试索引</button>}<button type="button" disabled={scopeSyncing || questionPending} className={`document-scope-toggle ${documentScope.includes(document.id) ? "active" : ""}`} aria-pressed={documentScope.includes(document.id)} onClick={() => onToggleDocumentScope(document.id)}>{documentScope.includes(document.id) ? "取消限定" : "仅此文档"}</button></div>;
-    })}</div>
-  </section>;
+  return (
+    <section
+      className={`library-page ${selectedBase ? "library-page-detail" : ""}`}
+    >
+      <header className="library-page-header">
+        <div>
+          <div className="section-kicker">个人资料空间</div>
+          <h1>{selectedBase ? selectedBase.name : "知识库"}</h1>
+          <p>
+            {selectedBase
+              ? "浏览和管理已上传的资料。分类按文件类型自动整理。"
+              : "为不同主题建立独立的资料空间。"}
+          </p>
+        </div>
+        <div className="library-actions">
+          {selectedBase && (
+            <Input
+              className="library-search"
+              aria-label="搜索资料"
+              value={queryDraft}
+              prefix={<SearchOutlined />}
+              allowClear
+              onChange={(event) => {
+                const next = event.target.value;
+                setQueryDraft(next);
+                if (!next.trim()) setQuery("");
+              }}
+              onPressEnter={() => setQuery(queryDraft.trim())}
+              placeholder="搜索文件名，按回车筛选"
+            />
+          )}
+          {selectedBase && (
+            <Button
+              onClick={() => {
+                setFilter("全部文件");
+                setQueryDraft("");
+                setQuery("");
+                onSelectBase(null);
+              }}
+            >
+              返回知识库
+            </Button>
+          )}
+          <Button onClick={() => setCreating((current) => !current)}>
+            ＋ 新建知识库
+          </Button>
+          {selectedBase && (
+            <Upload
+              multiple
+              showUploadList={false}
+              accept=".pdf,.md,.markdown,.txt,.html,.htm,.docx,.xlsx,.csv,image/*"
+              disabled={uploadBusy}
+              beforeUpload={interceptUpload}
+            >
+              <Button type="primary" disabled={uploadBusy}>
+                ＋ 添加文件
+              </Button>
+            </Upload>
+          )}
+        </div>
+      </header>
+      {(creating || bases.length === 0) && (
+        <form
+          className="create-base"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submitCreate();
+          }}
+        >
+          <label htmlFor="new-kb-name">知识库名称</label>
+          <div className="create-base-controls">
+            <Input
+              id="new-kb-name"
+              value={baseName}
+              maxLength={200}
+              onChange={(event) => setBaseName(event.target.value)}
+              placeholder="例如：我的资料"
+            />
+            <Button
+              htmlType="submit"
+              type="primary"
+              disabled={createPending || !baseName.trim()}
+            >
+              创建知识库
+            </Button>
+          </div>
+        </form>
+      )}
+      {!selectedBase ? (
+        <div className="kb-overview">
+          <div className="overview-head">
+            <strong>我的知识库</strong>
+            <span>共 {bases.length} 个</span>
+          </div>
+          <div className="kb-card-grid">
+            {bases.map((base) => (
+              <KnowledgeBaseCard
+                key={base.id}
+                base={base}
+                onOpen={() => {
+                  setFilter("全部文件");
+                  setQueryDraft("");
+                  setQuery("");
+                  onSelectBase(base.id);
+                }}
+              />
+            ))}
+          </div>
+          {bases.length === 0 && (
+            <p className="empty-document">
+              创建第一个知识库后，即可上传资料并开始问答。
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="library-detail">
+          <aside className="file-categories" aria-label="资料分类">
+            <div className="category-head">
+              分类 <span>{documents.length} 个文件</span>
+            </div>
+            {groups.map((group) => {
+              const count =
+                group === "全部文件"
+                  ? documents.length
+                  : documents.filter((document) => groupOf(document) === group)
+                      .length;
+              return (
+                <FileCategoryButton
+                  key={group}
+                  group={group}
+                  count={count}
+                  selected={filter === group}
+                  onClick={() => setFilter(group)}
+                />
+              );
+            })}
+          </aside>
+          <div className="files-main">
+            <div className="files-toolbar">
+              <div>
+                <strong>{filter}</strong>
+                <span>{shownDocuments.length} 个文件</span>
+              </div>
+              {query && <span className="search-applied">匹配：{query}</span>}
+            </div>
+            <Upload.Dragger
+              className="dropzone"
+              multiple
+              showUploadList={false}
+              accept=".pdf,.md,.markdown,.txt,.html,.htm,.docx,.xlsx,.csv,image/*"
+              disabled={uploadBusy}
+              beforeUpload={interceptUpload}
+            >
+              <span className="drop-icon">↥</span>
+              <strong>
+                {uploadBusy ? "资料正在接收中" : "拖入资料，或点击选择文件"}
+              </strong>
+              <span>支持 PDF、Markdown、TXT、HTML、DOCX、XLSX、CSV、图片</span>
+            </Upload.Dragger>
+            {uploadHint && (
+              <p className="upload-hint" role="status">
+                {uploadHint}
+              </p>
+            )}
+            {activeJob && (
+              <div className="ingestion-status" role="status">
+                <span>
+                  索引任务 · {formatIngestionStage(activeJob.stage)} · {activeJob.progress}% ·{" "}
+                  {activeJob.status === "succeeded"
+                    ? "已完成"
+                    : activeJob.status === "failed"
+                      ? "失败"
+                      : "进行中"}
+                </span>
+                {activeJob.error_code && (
+                  <strong>{activeJob.error_code}</strong>
+                )}
+                {activeJob.status === "failed" &&
+                  activeJob.attempts < activeJob.max_attempts && (
+                    <button type="button" onClick={onRetryIngestion}>
+                      重试摄取
+                    </button>
+                  )}
+                {ingestionIssue && (
+                  <button type="button" onClick={onRefreshIngestion}>
+                    刷新状态
+                  </button>
+                )}
+              </div>
+            )}
+            <div className="file-table-head">
+              <span>文件名</span>
+              <span>索引状态</span>
+            </div>
+            <div className="document-list">
+              {shownDocuments.length === 0 ? (
+                <div className="empty-document">
+                  {documents.length === 0
+                    ? "还没有资料。拖入文件或点击添加文件开始。"
+                    : "此分类下没有匹配的文件。"}
+                </div>
+              ) : (
+                shownDocuments.map((document) => (
+                  <LibraryDocumentRow
+                    key={document.id}
+                    document={document}
+                    selected={selectedDocumentId === document.id}
+                    onSelect={() => onSelectDocument(document.id)}
+                    onRetry={onRetryJob}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
 }

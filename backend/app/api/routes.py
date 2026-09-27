@@ -2,13 +2,21 @@ from __future__ import annotations
 
 import json
 import mimetypes
+from pathlib import Path
 import uuid
 from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, File, Header, Request, UploadFile
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
+from starlette.background import BackgroundTask
 
+from backend.app.adapters.office_preview import (
+    OfficePreviewUnavailable,
+    cleanup_office_preview,
+    convert_office_to_pdf,
+    is_office_document,
+)
 from backend.app.application.answer_service import AnswerService
 from backend.app.bootstrap import Container
 
@@ -190,6 +198,61 @@ def get_document_content(document_id: str, request: Request):
         return _ok(request, {"document_id": document_id, "content": store.get_document_content(document_id), "assets": store.list_assets(document_id)})
     except LookupError:
         return _not_found(request)
+
+
+@router.get("/documents/{document_id}/source")
+def get_document_source(document_id: str, request: Request):
+    """Stream the immutable source bytes for the selected document version.
+
+    The normalized `/content` endpoint is intended for retrieval and text
+    inspection. The library preview needs the original bytes so PDF, HTML and
+    image files keep their pre-indexing appearance in the browser.
+    """
+    try:
+        source = _container(request).store.get_document_source(document_id)
+        return FileResponse(
+            source["path"],
+            media_type=source["media_type"],
+            filename=source["file_name"],
+            content_disposition_type="inline",
+        )
+    except (LookupError, FileNotFoundError):
+        return _not_found(request, "document source not found")
+
+
+@router.get("/documents/{document_id}/preview")
+def get_document_preview(document_id: str, request: Request):
+    """Return a browser-readable preview while keeping the source immutable.
+
+    PDF/HTML/image/text files are streamed directly. Office files are rendered
+    to a temporary PDF by the local LibreOffice process so Writer/Calc layout
+    and embedded images remain visible in the same preview surface.
+    """
+    try:
+        source = _container(request).store.get_document_source(document_id)
+        if not is_office_document(source["file_name"], source["media_type"]):
+            return FileResponse(
+                source["path"],
+                media_type=source["media_type"],
+                filename=source["file_name"],
+                content_disposition_type="inline",
+            )
+        preview = convert_office_to_pdf(
+            Path(source["path"]),
+            source["file_name"],
+            source["media_type"],
+        )
+        return FileResponse(
+            preview.path,
+            media_type="application/pdf",
+            filename=preview.file_name,
+            content_disposition_type="inline",
+            background=BackgroundTask(cleanup_office_preview, preview),
+        )
+    except (LookupError, FileNotFoundError):
+        return _not_found(request, "document preview not found")
+    except OfficePreviewUnavailable as exc:
+        return _error(request, "DOCUMENT_PREVIEW_UNAVAILABLE", str(exc), 503)
 
 
 @router.get("/documents/{document_id}/assets/{asset_id}")

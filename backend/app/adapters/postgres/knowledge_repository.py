@@ -207,6 +207,7 @@ class PostgresKnowledgeRepository:
             UPDATE ingestion_jobs AS job
             SET status='running',
                 stage='processing',
+                progress=10,
                 worker_id=:worker_id,
                 claim_token=:claim_token,
                 lease_until=clock_timestamp() + (:lease_seconds * INTERVAL '1 second'),
@@ -402,8 +403,25 @@ class PostgresKnowledgeRepository:
         if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
             return self.get_job(job_id) or {}
         try:
+            # Make the claim visible immediately.  Previously the job stayed at
+            # the database default (0%) until the terminal update, which made a
+            # healthy PDF parse look permanently stuck in the UI.
+            self.update_job_progress(
+                job_id,
+                worker_id=worker_id,
+                claim_token=claim_token,
+                stage="processing",
+                progress=10,
+            )
             with self._lease_heartbeat(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
                 normalized = self.parsers.parse(self.storage.path_for(version["storage_key"]), version["media_type"], str(version["document_id"]), str(version["id"]))
+                self.update_job_progress(
+                    job_id,
+                    worker_id=worker_id,
+                    claim_token=claim_token,
+                    stage="processing",
+                    progress=30,
+                )
                 asset_ids = {asset.asset_id: uuid.uuid4() for asset in normalized.assets}
                 asset_storage = {
                     asset.asset_id: self.storage.put_stream(BytesIO(asset.source_bytes)).storage_key
@@ -427,6 +445,13 @@ class PostgresKnowledgeRepository:
                                 VALUES (:id,:version_id,:document_id,:kb,:asset_type,:storage_key,:text_content,:derived_from,:page_no,CAST(:locator AS jsonb),:status,:error_code)"""), {
                                 "id": asset_ids[asset.asset_id], "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "asset_type": asset.asset_type, "storage_key": asset_storage.get(asset.asset_id) or (version["storage_key"] if asset.asset_type == "source_image" and version["media_type"].startswith("image/") else asset.storage_key), "text_content": asset.text_content, "derived_from": asset_ids.get(asset.derived_from_asset_id), "page_no": asset.page_no, "locator": json.dumps({**asset.source_locator, **({"source_asset_id": str(asset_ids[asset.derived_from_asset_id])} if asset.derived_from_asset_id else {})}), "status": asset.status, "error_code": asset.error_code,
                             })
+                self.update_job_progress(
+                    job_id,
+                    worker_id=worker_id,
+                    claim_token=claim_token,
+                    stage="processing",
+                    progress=40,
+                )
                 if not normalized.markdown_content.strip() and normalized.assets:
                     raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
                 if not normalized.markdown_content.strip():
@@ -435,12 +460,33 @@ class PostgresKnowledgeRepository:
                 chunks = chunk_document(normalized, max_chars=self.max_chunk_chars, overlap=self.chunk_overlap)
                 if not chunks:
                     raise ParserError("EMPTY_TEXT")
+                self.update_job_progress(
+                    job_id,
+                    worker_id=worker_id,
+                    claim_token=claim_token,
+                    stage="processing",
+                    progress=55,
+                )
                 normalized_object = self.storage.put_stream(BytesIO(normalized.markdown_content.encode("utf-8"))) if normalized.markdown_content else None
                 vectors: list[list[float]] = []
+                self.update_job_progress(
+                    job_id,
+                    worker_id=worker_id,
+                    claim_token=claim_token,
+                    stage="indexing",
+                    progress=65,
+                )
                 if self.embedding_provider is not None and chunks:
                     vectors = self.embedding_provider.embed([chunk.content for chunk in chunks], timeout_seconds=60).vectors
                     if len(vectors) != len(chunks) or any(len(vector) != 1024 for vector in vectors):
                         raise RuntimeError("EMBEDDING_DIMENSION_MISMATCH")
+                self.update_job_progress(
+                    job_id,
+                    worker_id=worker_id,
+                    claim_token=claim_token,
+                    stage="indexing",
+                    progress=80,
+                )
             if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
                 return self.get_job(job_id) or {}
             with self.engine.begin() as conn:
@@ -680,6 +726,45 @@ class PostgresKnowledgeRepository:
                 raise LookupError("document content not found")
             chunks = conn.execute(text("SELECT content FROM chunks WHERE document_id=:id AND version_id=:version_id ORDER BY chunk_index"), {"id": document_id, "version_id": row[0]}).scalars()
             return "\n".join(chunks)
+
+    def get_document_source(self, document_id: str) -> dict[str, Any]:
+        """Return the source bytes for the active version, or latest candidate.
+
+        A document without an active version can still be previewed immediately
+        after upload by falling back to its newest immutable candidate. The
+        returned path is resolved through content-addressed storage and never
+        accepts a client-provided filesystem path.
+        """
+        with self.engine.connect() as conn:
+            row = conn.execute(
+                text(
+                    """
+                    SELECT d.file_name,d.media_type,d.active_version_id,
+                           dv.storage_key,dv.version_no
+                    FROM documents d
+                    LEFT JOIN document_versions dv ON dv.id = COALESCE(
+                        d.active_version_id,
+                        (
+                            SELECT latest.id
+                            FROM document_versions latest
+                            WHERE latest.document_id=d.id
+                            ORDER BY latest.version_no DESC
+                            LIMIT 1
+                        )
+                    )
+                    WHERE d.id=:id AND d.deleted_at IS NULL
+                    """
+                ),
+                {"id": document_id},
+            ).mappings().first()
+        if not row or not row["storage_key"]:
+            raise LookupError("document source not found")
+        return {
+            "file_name": row["file_name"],
+            "media_type": row["media_type"] or "application/octet-stream",
+            "version_no": row["version_no"],
+            "path": self.storage.path_for(row["storage_key"]),
+        }
 
     def create_conversation(self, knowledge_base_scope: list[str], document_scope: list[str] | None = None, title: str = "New conversation") -> dict[str, Any]:
         conversation_id = uuid.uuid4()

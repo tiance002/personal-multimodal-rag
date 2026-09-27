@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+from html.parser import HTMLParser
 import os
 import re
 import uuid
+import zipfile
 from pathlib import Path
+from xml.etree import ElementTree
 
 import fitz
 from PIL import Image
@@ -251,13 +254,213 @@ class ImageParser:
         )
 
 
+def _text_document(
+    path: Path,
+    document_id: str,
+    version_id: str,
+    text: str,
+    media_type: str,
+    parser_version: str,
+    empty_error: str,
+    *,
+    markdown_headings: bool = False,
+) -> NormalizedDocument:
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip()
+    if not normalized:
+        raise ParserError(empty_error)
+    sections, locators = _sectioned_text(normalized, "text/markdown" if markdown_headings else "text/plain")
+    return NormalizedDocument(
+        document_id=document_id,
+        version_id=version_id,
+        title=path.stem,
+        media_type=media_type,
+        markdown_content=normalized,
+        sections=sections,
+        source_locators=locators,
+        content_sha256=_sha256(normalized),
+        parser_version=parser_version,
+    )
+
+
+class _VisibleHtmlText(HTMLParser):
+    _blocked = {"script", "style", "noscript", "template"}
+    _block_boundary = {
+        "address", "article", "aside", "blockquote", "br", "dd", "div", "dl", "dt",
+        "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav",
+        "ol", "p", "pre", "section", "table", "tbody", "td", "tfoot", "th", "thead",
+        "tr", "ul",
+    }
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+        self.blocked_depth = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        if tag in self._blocked:
+            self.blocked_depth += 1
+        elif self.blocked_depth == 0 and tag in self._block_boundary:
+            self.parts.append("\n")
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.handle_starttag(tag, attrs)
+        self.handle_endtag(tag)
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if tag in self._blocked and self.blocked_depth:
+            self.blocked_depth -= 1
+        elif self.blocked_depth == 0 and tag in self._block_boundary:
+            self.parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self.blocked_depth == 0:
+            self.parts.append(data)
+
+
+class HtmlParser:
+    def parse(self, path: Path, document_id: str, version_id: str) -> NormalizedDocument:
+        try:
+            html = path.read_text(encoding="utf-8-sig")
+        except UnicodeDecodeError:
+            html = path.read_text(encoding="cp1252", errors="replace")
+        parser = _VisibleHtmlText()
+        parser.feed(html)
+        text = "".join(parser.parts).replace("\xa0", " ")
+        text = re.sub(r"[ \t]+", " ", text)
+        text = re.sub(r"\n[ \t]+", "\n", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return _text_document(path, document_id, version_id, text, "text/html", "html/v1", "HTML_EMPTY_TEXT")
+
+
+def _local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+class DocxParser:
+    _word_text = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t"
+
+    def parse(self, path: Path, document_id: str, version_id: str) -> NormalizedDocument:
+        try:
+            with zipfile.ZipFile(path) as archive:
+                xml = archive.read("word/document.xml")
+        except (KeyError, zipfile.BadZipFile, OSError) as exc:
+            raise ParserError("DOCX_ARCHIVE_INVALID") from exc
+        try:
+            root = ElementTree.fromstring(xml)
+        except ElementTree.ParseError as exc:
+            raise ParserError("DOCX_XML_INVALID") from exc
+        paragraphs: list[str] = []
+        for paragraph in root.iter("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p"):
+            value = "".join((node.text or "") for node in paragraph.iter(self._word_text))
+            if value.strip():
+                paragraphs.append(value)
+        return _text_document(
+            path, document_id, version_id, "\n".join(paragraphs),
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "docx/v1", "DOCX_EMPTY_TEXT",
+        )
+
+
+class XlsxParser:
+    _main_ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+
+    def _shared_strings(self, archive: zipfile.ZipFile) -> list[str]:
+        try:
+            root = ElementTree.fromstring(archive.read("xl/sharedStrings.xml"))
+        except KeyError:
+            return []
+        except ElementTree.ParseError as exc:
+            raise ParserError("XLSX_XML_INVALID") from exc
+        return [
+            "".join((node.text or "") for node in item.iter() if _local_name(node.tag) == "t")
+            for item in root.iter()
+            if _local_name(item.tag) == "si"
+        ]
+
+    def _cell_value(self, cell: ElementTree.Element, shared: list[str]) -> str:
+        kind = cell.attrib.get("t")
+        value_node = next((node for node in cell if _local_name(node.tag) == "v"), None)
+        value = (value_node.text or "") if value_node is not None else ""
+        if kind == "s":
+            try:
+                return shared[int(value)]
+            except (ValueError, IndexError) as exc:
+                raise ParserError("XLSX_SHARED_STRING_INVALID") from exc
+        if kind == "b":
+            return "是" if value == "1" else "否"
+        if kind == "inlineStr":
+            return "".join((node.text or "") for node in cell.iter() if _local_name(node.tag) == "t")
+        return value
+
+    def _sheet_text(self, xml: bytes, shared: list[str]) -> str:
+        try:
+            root = ElementTree.fromstring(xml)
+        except ElementTree.ParseError as exc:
+            raise ParserError("XLSX_XML_INVALID") from exc
+        rows: list[str] = []
+        for row in (node for node in root.iter() if _local_name(node.tag) == "row"):
+            cells = [self._cell_value(cell, shared) for cell in row if _local_name(cell.tag) == "c"]
+            if any(value.strip() for value in cells):
+                rows.append("\t".join(cells).rstrip())
+        return "\n".join(rows)
+
+    def parse(self, path: Path, document_id: str, version_id: str) -> NormalizedDocument:
+        try:
+            with zipfile.ZipFile(path) as archive:
+                shared = self._shared_strings(archive)
+                sheets = sorted(
+                    (name for name in archive.namelist() if re.fullmatch(r"xl/worksheets/sheet\d+\.xml", name)),
+                    key=lambda name: int(re.search(r"sheet(\d+)", name).group(1)),
+                )
+                if not sheets:
+                    raise ParserError("XLSX_WORKSHEET_MISSING")
+                sections = [f"[工作表 {index}]\n{self._sheet_text(archive.read(name), shared)}" for index, name in enumerate(sheets, 1)]
+        except ParserError:
+            raise
+        except (zipfile.BadZipFile, OSError) as exc:
+            raise ParserError("XLSX_ARCHIVE_INVALID") from exc
+        return _text_document(
+            path, document_id, version_id, "\n\n".join(sections),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "xlsx/v1", "XLSX_EMPTY_TEXT",
+        )
+
+
+def _canonical_media_type(path: Path, media_type: str) -> str:
+    declared = (media_type or "").split(";", 1)[0].strip().lower()
+    by_suffix = {
+        ".csv": "text/csv",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".html": "text/html",
+        ".htm": "text/html",
+        ".md": "text/markdown",
+        ".pdf": "application/pdf",
+        ".txt": "text/plain",
+        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }
+    if declared in {"", "application/octet-stream", "binary/octet-stream"}:
+        return by_suffix.get(path.suffix.lower(), declared or "application/octet-stream")
+    return declared
+
+
 class ParserRegistry:
     def __init__(self, tessdata: Path | None = None) -> None:
         self.tessdata = tessdata
 
     def parse(self, path: Path, media_type: str, document_id: str, version_id: str) -> NormalizedDocument:
+        media_type = _canonical_media_type(path, media_type)
         if media_type in {"text/plain", "text/markdown"}:
             return TextParser(media_type).parse(path, document_id, version_id)
+        if media_type == "text/csv":
+            return TextParser("text/plain").parse(path, document_id, version_id)
+        if media_type in {"text/html", "application/xhtml+xml"}:
+            return HtmlParser().parse(path, document_id, version_id)
+        if media_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            return DocxParser().parse(path, document_id, version_id)
+        if media_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            return XlsxParser().parse(path, document_id, version_id)
         if media_type == "application/pdf":
             return PdfParser(tessdata=self.tessdata).parse(path, document_id, version_id)
         if media_type.startswith("image/"):
