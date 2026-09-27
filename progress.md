@@ -228,3 +228,12 @@
 | 当前源码 Compose 全栈运行及正式 `verify-release.ps1` | NOT RUN；镜像未构建。正式脚本还固定使用 55432 日常库，不可在“保留旧数据、隔离验证”条件下原样执行。此前任何 Compose PASS 都属于旧代码/旧构建，不覆盖本次结论 |
 
 结果日志位于 `var/reports/v1-final-*.txt/json`。本轮实现提交 `00bbf53` 已推送 `origin/main`，工作树在该提交后干净；本轮代码与测试回归 PASS。**完整 V1 发布门禁仍被 Compose 镜像获取阻断，不能宣称 V1 发布验收通过。** 未创建 release tag，未部署，未开展 V1.1。旧的 P2 语义质量/VLM caption 限制仍作为后续技术债。
+
+## Compose 全栈续验（2026-09-27，覆盖上一节 Compose 构建结果）
+
+- Docker Hub 访问短暂恢复后，按原始 Dockerfile 拉取 `python:3.11-slim`、`node:22-alpine`、`nginx:1.27-alpine`；`docker compose -p ragv1final0927 -f deploy/compose.yml build api worker frontend` 退出码 0。镜像内前端 `tsc --noEmit && vite build` 通过。
+- 同一 Compose 源码全栈在隔离项目运行：`POSTGRES_PORT=25436`、`API_PORT=18086`、`FRONTEND_PORT=14186`。`up -d --no-build` 退出码 0；`db, api, worker, frontend` 全部 running；迁移 `0013_message_run_link`；Nginx `/healthz` HTTP 200。项目入口 `http://127.0.0.1:14186`。
+- `preview_proxy_smoke.py --base-url http://127.0.0.1:14186 --expect-server nginx` 退出码 0；报告 `var/reports/v1-final-compose-proxy-smoke-clean.json`，确认 Nginx 1.27.5、同源 API HTTP 200。`playwright_smoke.py --base-url http://127.0.0.1:14186` 退出码 0，三栏 UI、资料上传可见、图谱页签和构建入口通过；报告 `var/reports/v1-final-compose-ui-smoke-clean.json`。
+- 容器 API 经 `host.docker.internal:11434` 能读取本机 Ollama 模型。Playwright 上传的隔离 smoke job 由 Compose Worker 实际处理为 `succeeded/ready`，attempts=1。第一次服务演练时 Ollama 按此前的“只临时启动”约束处于停止状态，job 报 `ProviderUnavailable`；临时启动 Ollama 后重试成功。验证结束 Ollama 已停止；未更改其自启设置。Compose 栈保留运行。
+- 正式 `verify-release.ps1` 仍未执行：脚本把主测试/备份恢复数据库固定到 host port 55432；`netsh interface ipv4 show excludedportrange protocol=tcp` 显示 55376–55475 为保留范围，Docker 无法绑定 55432（`ports are not available`）。为保持数据库隔离，未改 Windows 全局端口范围或脚本默认地址。尝试创建的空隔离项目 `ragv1gate0927` 已清理。
+- 本节覆盖上一节“Compose 镜像构建失败”的状态：**当前源码 Compose build/runtime/Nginx 浏览器 smoke 均 PASS**。但 V1 正式发布门禁仍为 NOT RUN，不能据此宣称整套发布门禁通过。日志：`var/reports/v1-final-compose-build-final.txt`、`v1-final-compose-up.txt`、`v1-final-compose-proxy-smoke-clean.txt`、`v1-final-compose-ui-smoke-clean.txt`。
