@@ -335,8 +335,8 @@ class PostgresKnowledgeRepository:
                 ) lv ON true
                 LEFT JOIN LATERAL (
                     SELECT ij.id,ij.status,ij.stage,ij.progress,ij.error_code,ij.attempts,ij.max_attempts
-                    FROM ingestion_jobs ij JOIN document_versions v ON v.id=ij.version_id
-                    WHERE v.document_id=d.id ORDER BY ij.created_at DESC LIMIT 1
+                    FROM ingestion_jobs ij
+                    WHERE ij.version_id=lv.id ORDER BY ij.created_at DESC, ij.id DESC LIMIT 1
                 ) lj ON true
                 WHERE d.knowledge_base_id=:kb AND d.deleted_at IS NULL ORDER BY d.updated_at DESC"""), {"kb": kb_id}).mappings()
             return [self._document_row(row) for row in rows]

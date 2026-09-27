@@ -1,7 +1,7 @@
 # progress.md — 当前开发进度
 
 - 当前里程碑：M4.5 / V1.0 质量闭环与发布验证；P0/P1 与 LangChain Smart 迁移已完成代码路径
-- 当前基线：分支 `main`，用户提供基线 commit `65e5382`；本轮尚未提交、未打 tag。
+- 当前基线：分支 `main`；2026-09-27 V1 最后定向修复从 `2c73215` 开始。最新执行记录见文末；历史各节保留当时状态，不代表当前验收结论。未打 release tag。
 - 当前目标：个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
 - 架构：FastAPI + React/Vite + LangChain Runnable/create_agent + 项目 RAG Core + PostgreSQL/pgvector；AnswerService 统一运行、取消和提交，Quick 使用固定 LangChain Runnable Chain，Smart 通过 `SmartAgentPort` 调用四个项目只读工具；两者共享 `KnowledgeGateway`、EvidenceService 和答案校验。
 
@@ -207,3 +207,24 @@
 
 - HEAD：`2e46cad65747f865bd9bbb7a498c98653cbc6a3c`；迁移版本 `0013_message_run_link`；修复改动位于工作区未提交。
 - 建议下一步（需负责人确认后执行）：审阅本轮 diff → 提交 → 在需要时打 `v1.0` 相关 Tag；随后按 V1.1 计划推进，本轮不开展 V1.1 优化。
+
+## V1 最后定向修复（2026-09-27，覆盖上节验收结论）
+
+- 基线 `2c73215`。`list_documents` 的最新摄取任务只从最新文档版本选取，并用任务 ID 稳定打破同时间排序；旧版本较晚创建的任务不会伪装成新版本任务。
+- 前端文档列表、任务、错误及上传占用按知识库归属；异步 A 库结果无法覆盖 B 库列表，A 库任务不占用 B 库导入或重试入口。历史消息加载按会话与知识库/文档范围失效；切换历史会话立即清空旧内容，新建会话后立即发送不会被迟到的空历史记录清除。
+- 真实资料摄取产生 chunk/version/locator 后冻结 E1；新仓储实例及 HTTP 历史消息、引用接口均回读同一 E1。历史 `run_id IS NULL` 的助手消息即使正文含 `[E1]` 仍返回空引用。新增 A/B 隔离、异步响应、版本任务和真实 E1 回归。原有一项测试改为尊重 `RAG_DATABASE_URL`，避免隔离库执行时错误跳过。
+- 只在新建 Compose 项目 `ragv1final0927` 的 25436 端口及其临时数据库验证；没有修改 55432 日常数据库。`0012 → 0013` 迁移往返保留临时旧消息正文、`run_id NULL` 与空引用；新鲜 Worker 数据库升级到 `0013_message_run_link`。原有数据未删除。
+
+| 本轮命令/场景 | 结果 |
+|---|---|
+| 定向后端 PostgreSQL 回归 | 退出码 0，3 passed；原版本任务案例先红后绿 |
+| 完整 `pytest backend/tests -q --tb=short -p no:cacheprovider`（隔离库） | 退出码 0，147 passed，6 warnings，无 skipped |
+| `npm --prefix frontend run build` | 退出码 0 |
+| `npm --prefix frontend test -- --reporter=line`（系统 Chrome） | 退出码 0，29 passed；A/B 与消息竞态案例先红后绿 |
+| `scripts/release_preflight.py`、`scripts/contract_test.py`、`compileall` | 均退出码 0；契约 PASS，无 OpenAPI drift |
+| 真实 PostgreSQL/pgvector + Ollama `scripts/smoke_v1_repair.py --real-model` | 退出码 0；qwen3.5:4b/bge-m3，摄取/Quick/历史 E1 回读 PASS；Ollama 临时进程已停止 |
+| 新鲜隔离库本机 Worker CLI `python -m backend.app.workers.ingestion --once` | 退出码 0；领取本次 job、`succeeded`，资料 `ready`。首次共用测试库尝试领取了旧测试排队 job 并失败，故使用独立数据库重验；两次结果均记录 |
+| 当前源码 `docker compose ... build api worker frontend` | 退出码 1；Docker Hub `auth.docker.io/token` TCP 连接失败，无法取得基础镜像 metadata |
+| 当前源码 Compose 全栈运行及正式 `verify-release.ps1` | NOT RUN；镜像未构建。正式脚本还固定使用 55432 日常库，不可在“保留旧数据、隔离验证”条件下原样执行。此前任何 Compose PASS 都属于旧代码/旧构建，不覆盖本次结论 |
+
+结果日志位于 `var/reports/v1-final-*.txt/json`。本轮代码与测试回归 PASS；**完整 V1 发布门禁仍被 Compose 镜像获取阻断，不能宣称 V1 发布验收通过。** 未创建 release tag，未部署，未开展 V1.1。旧的 P2 语义质量/VLM caption 限制仍作为后续技术债。

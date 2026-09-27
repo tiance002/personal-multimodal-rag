@@ -8,32 +8,59 @@ import { KnowledgeBasePanel } from "../components/KnowledgeBasePanel";
 import { Sidebar } from "../components/Sidebar";
 
 const initialState: AppState = { selectedKnowledgeBaseId: null, selectedDocumentId: null, documentScope: [], viewMode: "document", activeConversationId: null };
+const emptyDocuments: DocumentItem[] = [];
+type ScopedDocuments = { knowledgeBaseId: string; items: DocumentItem[] };
+type ScopedJob = IngestionJob & { knowledgeBaseId: string };
 
 export default function App() {
   const [state, setState] = useState<AppState>(initialState);
   const [bases, setBases] = useState<KnowledgeBase[]>([]);
-  const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [documentList, setDocumentList] = useState<ScopedDocuments | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [citation, setCitation] = useState<{ quote: string; current_status: string; locator: Record<string, unknown> } | null>(null);
   const [notice, setNotice] = useState("本地索引已连接");
   const scopeSyncRef = useRef(false);
   const sendPendingRef = useRef(false);
+  const messageRequestEpoch = useRef(0);
+  const previousMessageContext = useRef<{ conversationId: string | null; scopeKey: string }>({ conversationId: null, scopeKey: "" });
+  const skipHistoryLoadFor = useRef<string | null>(null);
   const [scopeSyncing, setScopeSyncing] = useState(false);
   const [scopeBlocked, setScopeBlocked] = useState(false);
   const scopeBlockedRef = useRef(false);
   const markScopeBlocked = (blocked: boolean) => { scopeBlockedRef.current = blocked; setScopeBlocked(blocked); };
   const [sending, setSending] = useState(false);
-  const [ingestionJob, setIngestionJob] = useState<(IngestionJob & { knowledgeBaseId: string }) | null>(null);
-  const [ingestionIssue, setIngestionIssue] = useState(false);
-  const ingestionPolls = useRef(0);
-  const uploadBusyRef = useRef(false);
-  const [uploadBusy, setUploadBusy] = useState(false);
+  const [ingestionJobs, setIngestionJobs] = useState<Record<string, ScopedJob>>({});
+  const [ingestionIssues, setIngestionIssues] = useState<Record<string, boolean>>({});
+  const ingestionPolls = useRef<Record<string, number>>({});
+  const uploadBusyRef = useRef<Set<string>>(new Set());
+  const [uploadBusyBases, setUploadBusyBases] = useState<Set<string>>(new Set());
   const selectedBaseIdRef = useRef<string | null>(null);
   selectedBaseIdRef.current = state.selectedKnowledgeBaseId;
 
+  const documents = documentList?.knowledgeBaseId === state.selectedKnowledgeBaseId ? documentList.items : emptyDocuments;
+  const ingestionJob = state.selectedKnowledgeBaseId ? ingestionJobs[state.selectedKnowledgeBaseId] ?? null : null;
+  const ingestionIssue = state.selectedKnowledgeBaseId ? Boolean(ingestionIssues[state.selectedKnowledgeBaseId]) : false;
+  const uploadBusy = state.selectedKnowledgeBaseId ? uploadBusyBases.has(state.selectedKnowledgeBaseId) : false;
+  const setDocumentsForBase = (kbId: string, items: DocumentItem[]) => {
+    if (selectedBaseIdRef.current === kbId) setDocumentList({ knowledgeBaseId: kbId, items });
+  };
+  const setJobForBase = (kbId: string, job: IngestionJob) => {
+    setIngestionJobs((current) => ({ ...current, [kbId]: { ...job, knowledgeBaseId: kbId } }));
+  };
+  const setUploadBusyForBase = (kbId: string, busy: boolean) => {
+    const next = new Set(uploadBusyRef.current);
+    if (busy) next.add(kbId); else next.delete(kbId);
+    uploadBusyRef.current = next;
+    setUploadBusyBases(next);
+  };
+  const setIngestionIssueForBase = (kbId: string, issue: boolean) => {
+    setIngestionIssues((current) => ({ ...current, [kbId]: issue }));
+  };
+
   const selectedBase = useMemo(() => bases.find((base) => base.id === state.selectedKnowledgeBaseId), [bases, state.selectedKnowledgeBaseId]);
   const activeConversation = useMemo(() => conversations.find((conversation) => conversation.id === state.activeConversationId), [conversations, state.activeConversationId]);
+  const messageScopeKey = JSON.stringify([state.selectedKnowledgeBaseId, [...state.documentScope].sort()]);
   const activeKnowledgeBaseScope = activeConversation?.knowledge_base_scope?.length ? activeConversation.knowledge_base_scope : (state.selectedKnowledgeBaseId ? [state.selectedKnowledgeBaseId] : []);
   const graphEnabled = activeKnowledgeBaseScope.length > 0 && activeKnowledgeBaseScope.every((id) => bases.find((base) => base.id === id)?.graph_enabled === true);
 
@@ -52,40 +79,52 @@ export default function App() {
     }).catch(() => setNotice("后端尚未启动，先检查本地服务"));
   }, []);
   useEffect(() => {
-    if (!state.selectedKnowledgeBaseId) { setDocuments([]); return; }
+    if (!state.selectedKnowledgeBaseId) { setDocumentList(null); return; }
+    const kbId = state.selectedKnowledgeBaseId;
     let cancelled = false;
-    void api.listDocuments(state.selectedKnowledgeBaseId).then((items) => { if (!cancelled) setDocuments(items); }).catch(() => { if (!cancelled) setDocuments([]); });
+    void api.listDocuments(kbId).then((items) => { if (!cancelled) setDocumentsForBase(kbId, items); }).catch(() => { if (!cancelled) setDocumentsForBase(kbId, []); });
     return () => { cancelled = true; };
   }, [state.selectedKnowledgeBaseId]);
   useEffect(() => {
-    if (!state.activeConversationId) { setMessages([]); return; }
+    const conversationId = state.activeConversationId;
+    const previous = previousMessageContext.current;
+    previousMessageContext.current = { conversationId, scopeKey: messageScopeKey };
+    const epoch = ++messageRequestEpoch.current;
+    if (!conversationId) { setMessages([]); return; }
+    if (skipHistoryLoadFor.current === conversationId) { skipHistoryLoadFor.current = null; return; }
+    // Changing scope in the same conversation clears the old transcript, but
+    // must not re-fetch that conversation's A-scope history into the B view.
+    if (previous.conversationId === conversationId && previous.scopeKey !== messageScopeKey) { setMessages([]); return; }
     let cancelled = false;
-    void api.listMessages(state.activeConversationId)
-      .then((items) => { if (!cancelled) setMessages(items); })
-      .catch(() => { if (!cancelled) setMessages([]); });
+    setMessages([]);
+    void api.listMessages(conversationId)
+      .then((items) => { if (!cancelled && messageRequestEpoch.current === epoch && !sendPendingRef.current) setMessages(items); })
+      .catch(() => { if (!cancelled && messageRequestEpoch.current === epoch && !sendPendingRef.current) setMessages([]); });
     return () => { cancelled = true; };
-  }, [state.activeConversationId]);
+  }, [state.activeConversationId, messageScopeKey]);
   useEffect(() => {
     if (!ingestionJob || ingestionIssue || ["succeeded", "failed", "cancelled"].includes(ingestionJob.status)) return;
+    const kbId = ingestionJob.knowledgeBaseId;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
     let consecutiveErrors = 0;
     const poll = async () => {
       if (cancelled) return;
-      if (++ingestionPolls.current > 240) { setIngestionIssue(true); setNotice("摄取仍未结束；已停止自动查询，可手动刷新状态"); return; }
+      ingestionPolls.current[kbId] = (ingestionPolls.current[kbId] ?? 0) + 1;
+      if (ingestionPolls.current[kbId] > 240) { setIngestionIssueForBase(kbId, true); if (selectedBaseIdRef.current === kbId) setNotice("摄取仍未结束；已停止自动查询，可手动刷新状态"); return; }
       try {
         const next = await api.getIngestionJob(ingestionJob.id);
         if (cancelled) return;
+        if (next.id !== ingestionJob.id) throw new Error("摄取任务标识不匹配");
         consecutiveErrors = 0;
-        setIngestionJob({ ...next, knowledgeBaseId: ingestionJob.knowledgeBaseId });
+        setJobForBase(kbId, next);
         if (["succeeded", "failed", "cancelled"].includes(next.status)) {
-          uploadBusyRef.current = false;
-          setUploadBusy(false);
-          setNotice(next.status === "succeeded" ? "资料解析与索引已完成" : `摄取失败：${next.error_code ?? next.status}`);
+          setUploadBusyForBase(kbId, false);
+          if (selectedBaseIdRef.current === kbId) setNotice(next.status === "succeeded" ? "资料解析与索引已完成" : `摄取失败：${next.error_code ?? next.status}`);
         } else timer = setTimeout(() => void poll(), 1500);
       } catch {
         if (cancelled) return;
-        if (++consecutiveErrors >= 3) { setIngestionIssue(true); setNotice("无法读取摄取任务状态，请手动刷新"); return; }
+        if (++consecutiveErrors >= 3) { setIngestionIssueForBase(kbId, true); if (selectedBaseIdRef.current === kbId) setNotice("无法读取摄取任务状态，请手动刷新"); return; }
         timer = setTimeout(() => void poll(), 1500);
       }
     };
@@ -95,7 +134,8 @@ export default function App() {
   useEffect(() => {
     if (!ingestionJob || !["succeeded", "failed", "cancelled"].includes(ingestionJob.status) || state.selectedKnowledgeBaseId !== ingestionJob.knowledgeBaseId) return;
     let cancelled = false;
-    void api.listDocuments(ingestionJob.knowledgeBaseId).then((items) => { if (!cancelled) setDocuments(items); }).catch(() => { if (!cancelled) setNotice("任务已结束，但资料列表暂不可读"); });
+    const kbId = ingestionJob.knowledgeBaseId;
+    void api.listDocuments(kbId).then((items) => { if (!cancelled) setDocumentsForBase(kbId, items); }).catch(() => { if (!cancelled && selectedBaseIdRef.current === kbId) setNotice("任务已结束，但资料列表暂不可读"); });
     return () => { cancelled = true; };
   }, [ingestionJob?.id, ingestionJob?.status, ingestionJob?.knowledgeBaseId, state.selectedKnowledgeBaseId]);
   // After a page refresh the in-memory job is gone. Rebuild the latest
@@ -105,18 +145,16 @@ export default function App() {
   // the (possibly stale) document list.
   useEffect(() => {
     const kbId = state.selectedKnowledgeBaseId;
-    if (!kbId) return;
-    if (ingestionJob && ingestionJob.knowledgeBaseId === kbId) return;
+    if (!kbId || documentList?.knowledgeBaseId !== kbId || ingestionJob) return;
     const recovered = documents.find((document) => document.latest_job && !["succeeded", "cancelled"].includes(document.latest_job.status));
     const job = recovered?.latest_job;
     if (!job) return;
     const pending = !["succeeded", "failed", "cancelled"].includes(job.status);
-    uploadBusyRef.current = pending;
-    setUploadBusy(pending);
-    ingestionPolls.current = 0;
-    setIngestionIssue(false);
-    setIngestionJob({ id: job.id, knowledgeBaseId: kbId, status: job.status, stage: job.stage, progress: job.progress, attempts: job.attempts, max_attempts: job.max_attempts, error_code: job.error_code });
-  }, [documents, state.selectedKnowledgeBaseId, ingestionJob]);
+    setUploadBusyForBase(kbId, pending);
+    ingestionPolls.current[kbId] = 0;
+    setIngestionIssueForBase(kbId, false);
+    setJobForBase(kbId, job);
+  }, [documents, documentList?.knowledgeBaseId, state.selectedKnowledgeBaseId, ingestionJob]);
 
   const syncScope = async (conversationId: string, patch: { knowledge_base_scope: string[]; document_scope: string[] }, successNotice: string, previous: AppState) => {
     try {
@@ -146,6 +184,7 @@ export default function App() {
 
   const selectBase = async (id: string) => {
     if (scopeSyncRef.current || sendPendingRef.current || !id || id === state.selectedKnowledgeBaseId) return;
+    messageRequestEpoch.current++;
     const conversationId = state.activeConversationId;
     const previous = state;
     if (conversationId) { scopeSyncRef.current = true; setScopeSyncing(true); }
@@ -159,8 +198,11 @@ export default function App() {
   };
   const selectConversation = (id: string) => {
     if (scopeSyncRef.current || sendPendingRef.current) return;
+    if (id === state.activeConversationId) return;
     const conversation = conversations.find((item) => item.id === id);
     if (!conversation) return;
+    messageRequestEpoch.current++;
+    setMessages([]);
     const documentScope = conversation.document_scope ?? [];
     setState((current) => ({ ...current, activeConversationId: id, selectedKnowledgeBaseId: conversation.knowledge_base_scope?.[0] ?? null, selectedDocumentId: documentScope[0] ?? null, documentScope, viewMode: "document" }));
     setCitation(null);
@@ -170,6 +212,8 @@ export default function App() {
     try {
       const conversation = await api.createConversation(state.selectedKnowledgeBaseId, state.documentScope);
       setConversations((current) => [conversation, ...current]);
+      messageRequestEpoch.current++;
+      skipHistoryLoadFor.current = conversation.id;
       setState((current) => ({ ...current, activeConversationId: conversation.id, documentScope: conversation.document_scope ?? current.documentScope }));
       setMessages([]);
     } catch (error) {
@@ -178,6 +222,9 @@ export default function App() {
   };
   const toggleDocumentScope = async (documentId: string) => {
     if (scopeSyncRef.current || sendPendingRef.current) return;
+    messageRequestEpoch.current++;
+    setMessages([]);
+    setCitation(null);
     const nextScope = state.documentScope.includes(documentId) ? [] : [documentId];
     const previous = state;
     const conversationId = state.activeConversationId;
@@ -202,57 +249,60 @@ export default function App() {
   };
   const upload = async (file: File) => {
     const kbId = state.selectedKnowledgeBaseId;
-    if (!kbId || uploadBusyRef.current) return;
-    uploadBusyRef.current = true;
-    setUploadBusy(true);
+    if (!kbId || uploadBusyRef.current.has(kbId)) return;
+    setUploadBusyForBase(kbId, true);
     setNotice(`正在接收 ${file.name}`);
     try {
       const receipt = await api.upload(kbId, file);
-      ingestionPolls.current = 0;
-      setIngestionIssue(false);
-      setIngestionJob({ id: receipt.job_id, knowledgeBaseId: kbId, status: "queued", stage: "queued", progress: 0, attempts: 0, max_attempts: 3, error_code: null });
-      setNotice("已接收，后台正在解析与索引");
+      ingestionPolls.current[kbId] = 0;
+      setIngestionIssueForBase(kbId, false);
+      setJobForBase(kbId, { id: receipt.job_id, status: "queued", stage: "queued", progress: 0, attempts: 0, max_attempts: 3, error_code: null });
+      if (selectedBaseIdRef.current === kbId) setNotice("已接收，后台正在解析与索引");
       try {
         const nextDocuments = await api.listDocuments(kbId);
-        if (selectedBaseIdRef.current === kbId) setDocuments(nextDocuments);
-      } catch { setNotice("文件已接收；资料列表暂不可读，继续查询摄取任务"); }
+        setDocumentsForBase(kbId, nextDocuments);
+      } catch { if (selectedBaseIdRef.current === kbId) setNotice("文件已接收；资料列表暂不可读，继续查询摄取任务"); }
     } catch (error) {
-      uploadBusyRef.current = false;
-      setUploadBusy(false);
-      setNotice(error instanceof Error ? error.message : "上传失败");
+      setUploadBusyForBase(kbId, false);
+      if (selectedBaseIdRef.current === kbId) setNotice(error instanceof Error ? error.message : "上传失败");
     }
   };
   const retryIngestion = async (jobId?: string) => {
+    const kbId = state.selectedKnowledgeBaseId;
     const targetId = jobId ?? ingestionJob?.id;
-    const kbId = ingestionJob?.knowledgeBaseId ?? state.selectedKnowledgeBaseId;
     if (!targetId || !kbId) return;
+    // A row retry must come from this knowledge base's scoped document list.
+    // The status-panel retry must match the selected base's own tracked job.
+    if (jobId ? !documents.some((document) => document.latest_job?.id === targetId) : ingestionJob?.knowledgeBaseId !== kbId) return;
     try {
       const next = await api.retryIngestionJob(targetId);
-      ingestionPolls.current = 0;
-      setIngestionIssue(false);
+      if (next.id !== targetId) throw new Error("摄取任务标识不匹配");
+      ingestionPolls.current[kbId] = 0;
+      setIngestionIssueForBase(kbId, false);
       const pending = !["succeeded", "failed", "cancelled"].includes(next.status);
-      uploadBusyRef.current = pending;
-      setUploadBusy(pending);
-      setIngestionJob({ ...next, knowledgeBaseId: kbId });
-      setNotice(next.status === "queued" ? "重试已排队，等待摄取 Worker" : `任务状态：${next.status}`);
-    } catch (error) { setNotice(error instanceof Error ? error.message : "重试失败"); }
+      setUploadBusyForBase(kbId, pending);
+      setJobForBase(kbId, next);
+      if (selectedBaseIdRef.current === kbId) setNotice(next.status === "queued" ? "重试已排队，等待摄取 Worker" : `任务状态：${next.status}`);
+    } catch (error) { if (selectedBaseIdRef.current === kbId) setNotice(error instanceof Error ? error.message : "重试失败"); }
   };
   const refreshIngestion = async () => {
     if (!ingestionJob) return;
-    ingestionPolls.current = 0;
-    setIngestionIssue(false);
+    const kbId = ingestionJob.knowledgeBaseId;
+    ingestionPolls.current[kbId] = 0;
+    setIngestionIssueForBase(kbId, false);
     try {
       const next = await api.getIngestionJob(ingestionJob.id);
-      uploadBusyRef.current = !["succeeded", "failed", "cancelled"].includes(next.status);
-      setUploadBusy(uploadBusyRef.current);
-      setIngestionJob({ ...next, knowledgeBaseId: ingestionJob.knowledgeBaseId });
+      if (next.id !== ingestionJob.id) throw new Error("摄取任务标识不匹配");
+      setUploadBusyForBase(kbId, !["succeeded", "failed", "cancelled"].includes(next.status));
+      setJobForBase(kbId, next);
     }
-    catch (error) { setIngestionIssue(true); setNotice(error instanceof Error ? error.message : "状态查询失败"); }
+    catch (error) { setIngestionIssueForBase(kbId, true); if (selectedBaseIdRef.current === kbId) setNotice(error instanceof Error ? error.message : "状态查询失败"); }
   };
   const send = async (content: string, mode: "quick" | "smart") => {
     const kbId = state.selectedKnowledgeBaseId;
     if (scopeSyncRef.current || sendPendingRef.current || scopeBlockedRef.current || !kbId) return;
     sendPendingRef.current = true;
+    messageRequestEpoch.current++;
     setSending(true);
     const documentScope = [...state.documentScope];
     let conversationId = state.activeConversationId;
@@ -261,6 +311,7 @@ export default function App() {
         const conversation = await api.createConversation(kbId, documentScope);
         setConversations((current) => [conversation, ...current]);
         conversationId = conversation.id;
+        skipHistoryLoadFor.current = conversation.id;
         setState((current) => ({ ...current, activeConversationId: conversation.id, documentScope: conversation.document_scope ?? current.documentScope }));
       }
       setMessages((current) => [...current, { role: "user", content }]);

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -14,7 +15,7 @@ from backend.app.main import create_app
 
 def test_version_route_keeps_the_path_document_when_filename_changes(tmp_path: Path) -> None:
     settings = Settings(
-        database_url="postgresql+psycopg://rag:rag@127.0.0.1:55432/rag",
+        database_url=os.getenv("RAG_DATABASE_URL", Settings().database_url),
         storage_root=tmp_path / "storage",
         inline_ingestion_enabled=False,
     )

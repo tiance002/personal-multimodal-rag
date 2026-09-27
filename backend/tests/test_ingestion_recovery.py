@@ -85,3 +85,28 @@ def test_a_failed_new_version_does_not_hide_behind_the_ready_active_version(tmp_
         assert after["latest_job"]["max_attempts"] >= after["latest_job"]["attempts"]
     finally:
         _purge(repository, kb_id)
+
+def test_latest_document_job_belongs_to_latest_version_even_if_an_older_job_is_newer(tmp_path: Path) -> None:
+    """A retried older version must not masquerade as the latest version's job."""
+    repository = _repository_or_skip(tmp_path)
+    suffix = uuid.uuid4().hex[:10]
+    kb_id = repository.create_knowledge_base(f"version-job-{suffix}")["id"]
+    try:
+        first = repository.create_upload(
+            kb_id, f"{suffix}.md", "text/markdown", repository.storage.put_stream(io.BytesIO(b"first version"))
+        )
+        second = repository.create_version(
+            first["document_id"], f"{suffix}.md", "text/markdown", repository.storage.put_stream(io.BytesIO(b"second version"))
+        )
+        with repository.engine.begin() as connection:
+            connection.execute(
+                text("UPDATE ingestion_jobs SET created_at=clock_timestamp()+interval '1 minute' WHERE id=:id"),
+                {"id": first["job_id"]},
+            )
+
+        document = repository.list_documents(kb_id)[0]
+        assert document["latest_version_no"] == 2
+        assert document["latest_version_id"] == second["version_id"]
+        assert document["latest_job"]["id"] == second["job_id"]
+    finally:
+        _purge(repository, kb_id)
