@@ -35,7 +35,7 @@ from eval_center.gold import evidence_from_dict
 from eval_center.isolated_index import create_isolated_database, read_index_snapshot
 from eval_center.runtime import committed_code_sha, effective_configuration, model_identities
 from eval_center.source_metrics import build_source_statistics
-from eval_center.quality import answer_statistics, duplicate_statistics
+from eval_center.quality import answer_statistics, duplicate_statistics, explicit_refusal
 from eval_center.telemetry import project_calls
 from eval_center.metrics import aggregate_metrics
 from eval_center.verification import compute_case_metrics, ExperimentInvalidError
@@ -174,7 +174,7 @@ def evaluate_case(container,kb_id,index,case,config,*,generate,tokenizer):
     refusal_codes={'NO_CANDIDATES','LOW_COVERAGE','NO_EVIDENCE_AFTER_RETRY','SEMANTIC_MISMATCH','SECTION_TRUNCATED'}
     stats['quality']=answer_statistics(answer=answer_result.answer if answer_result is not None else None,
         answer_points=case['required_answer_points'],citation_readbacks=readbacks,answerable=case['answerable'],
-        refused=answer_result.error_code in refusal_codes if answer_result is not None else None)
+        refused=explicit_refusal(answer_result.answer,error_code=answer_result.error_code) if answer_result is not None else None)
     metrics=compute_case_metrics(stats,actual)
     status=('passed' if metrics['context_recall']==1 else 'failed') if case['answerable'] else (
         'passed' if metrics['refusal_accuracy']==1 else 'failed' if generate else 'not_evaluated')

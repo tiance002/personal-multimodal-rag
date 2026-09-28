@@ -1,4 +1,14 @@
-from eval_center.quality import answer_statistics, quality_metrics, duplicate_statistics
+from eval_center.quality import answer_statistics, quality_metrics, duplicate_statistics, explicit_refusal
+
+
+def test_literal_model_abstentions_are_not_lost_without_a_business_error_code():
+    for answer in ('根据提供的资料，无法找到私人号码。','根据资料，无法回答银行卡余额。',
+                   '提供的资料中没有给出自动批准日期。','Cannot find the phone number in the evidence.'):
+        assert explicit_refusal(answer) is True
+    assert explicit_refusal('The phone number is 123456.') is False
+    assert explicit_refusal('The date is September 30.\n\nNo information about the owner.') is False
+    assert explicit_refusal(None) is None
+    assert explicit_refusal('证据不足。',error_code='LOW_COVERAGE') is True
 
 
 def test_required_alternatives_and_citation_readbacks_are_deterministic():

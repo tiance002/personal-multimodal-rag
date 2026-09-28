@@ -14,6 +14,25 @@ def _normalized(text):
     return ' '.join(unicodedata.normalize('NFKC',text).casefold().split())
 
 
+def explicit_refusal(answer, *, error_code=None):
+    """Literal refusal in the opening paragraph or a terminal evidence gate.
+
+    This measures an explicit abstention signal, not semantic correctness or
+    whether later sentences hallucinate. Those require an evaluated Judge.
+    """
+    if answer is None:
+        return None
+    gates={'NO_CANDIDATES','LOW_COVERAGE','NO_EVIDENCE_AFTER_RETRY','SEMANTIC_MISMATCH','SECTION_TRUNCATED'}
+    if error_code in gates:
+        return True
+    opening=_normalized(answer.split('\n\n',1)[0].replace('*',''))
+    phrases=('无法找到','无法回答','无法确定','无法提供','未提供','未包含','未提及',
+             '没有给出','没有提供','没有相关','资料中没有','资料不足','证据不足','不足以回答',
+             'does not contain','not provided','cannot determine','cannot find',
+             'cannot answer','insufficient evidence','no information')
+    return any(phrase in opening for phrase in phrases)
+
+
 def answer_statistics(*,answer,answer_points,citation_readbacks,answerable,refused):
     if answer is not None and not isinstance(answer,str):
         raise ValueError('answer must be text or unavailable')
