@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from backend.app.ports.providers import EmbeddingResult, ProviderUnavailable, QueryGatewayResult
+from backend.app.adapters.models.usage import call_stage, record_call
 
 
 class OllamaGateway:
@@ -33,17 +34,25 @@ class OllamaGateway:
             method="POST",
         )
         started = time.perf_counter()
+        body = None
+        status = 'error'
         try:
-            with urlopen(request, timeout=timeout_seconds) as response:
-                body = json.loads(response.read().decode("utf-8"))
-        except (HTTPError, URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
-            raise ProviderUnavailable(f"ollama request failed: {type(exc).__name__}") from exc
-        if not isinstance(body, dict):
-            raise ProviderUnavailable("ollama returned a non-object response")
-        return body, round((time.perf_counter() - started) * 1000, 1)
+            try:
+                with urlopen(request, timeout=timeout_seconds) as response:
+                    body = json.loads(response.read().decode("utf-8"))
+            except (HTTPError, URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+                raise ProviderUnavailable(f"ollama request failed: {type(exc).__name__}") from exc
+            if not isinstance(body, dict):
+                raise ProviderUnavailable("ollama returned a non-object response")
+            status = 'ok'
+            return body, round((time.perf_counter() - started) * 1000, 1)
+        finally:
+            record_call(model=payload.get('model', ''), status=status,
+                        response=body if isinstance(body, dict) else None,
+                        latency_ms=round((time.perf_counter() - started) * 1000, 1))
 
     def query_expand(self, question: str, timeout_seconds: float) -> QueryGatewayResult:
-        with self._observe(
+        with call_stage('query'), self._observe(
             "ollama-query-expansion",
             as_type="generation",
             model=self.chat_model,
@@ -83,7 +92,7 @@ class OllamaGateway:
 
     def embed(self, texts: Sequence[str], timeout_seconds: float) -> EmbeddingResult:
         input_texts = list(texts)
-        with self._observe(
+        with call_stage('embedding'), self._observe(
             "ollama-embedding",
             as_type="embedding",
             model=self.embedding_model,
@@ -109,7 +118,7 @@ class OllamaGateway:
             return EmbeddingResult(vectors=vectors, model=self.embedding_model, dimensions=dimensions, latency_ms=latency_ms)
 
     def answer(self, prompt: str, timeout_seconds: float) -> str:
-        with self._observe(
+        with call_stage('answer'), self._observe(
             "ollama-answer-generation",
             as_type="generation",
             model=self.chat_model,

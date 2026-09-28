@@ -14,6 +14,7 @@ def main() -> int:
     parser.add_argument("--dataset", type=Path, default=Path("evaluations/core.jsonl"))
     parser.add_argument("--fixture", type=Path, default=Path("evaluations/fixture_chunks.json"))
     parser.add_argument("--report", type=Path, default=Path("var/reports/eval-retrieval.json"))
+    parser.add_argument("--suite-version", default="core-v2-20-cases")
     args = parser.parse_args()
     repository = InMemoryRetrievalRepository()
     fixture = json.loads(args.fixture.read_text(encoding="utf-8"))
@@ -30,13 +31,13 @@ def main() -> int:
         ranked = [entry.chunk.chunk_id for entry in result.items]
         expected = set(item["expected_chunk_ids"])
         ranks = [rank for rank, chunk_id in enumerate(ranked, start=1) if chunk_id in expected]
-        rows.append({"question": item["question"], "ranked_chunk_ids": ranked, "expected_chunk_ids": list(expected), "hit_at_5": bool(ranks), "recall_at_5": len(ranks) / max(len(expected), 1), "mrr": 1 / ranks[0] if ranks else 0.0, "latency_ms": round((time.perf_counter() - started) * 1000, 3)})
+        rows.append({"case_id": item.get("case_id"), "question": item["question"], "ranked_chunk_ids": ranked, "expected_chunk_ids": list(expected), "hit_at_5": bool(ranks), "recall_at_5": len(ranks) / max(len(expected), 1), "mrr": 1 / ranks[0] if ranks else 0.0, "latency_ms": round((time.perf_counter() - started) * 1000, 3)})
     count = len(rows)
     report = {
         "status": "PASS" if count and all(row["hit_at_5"] for row in rows) else "FAIL",
         "mode": "deterministic_fixture",
         "dataset": str(args.dataset),
-        "dataset_version": "core-v2-20-cases",
+        "dataset_version": args.suite_version,
         "corpus": {"fixture": str(args.fixture), "chunks": len(fixture)},
         "chunker": "text/v1",
         "embedding_profile": {"provider": "none", "model": "keyword-fixture", "dimension": 0},

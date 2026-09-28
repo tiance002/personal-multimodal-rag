@@ -1,0 +1,29 @@
+{
+  "schema_version": "stable-gold-v1",
+  "dataset_version": "trust-docs-v1",
+  "sources": [
+    {
+      "document_id": "design",
+      "path": "corpus/design.md",
+      "source_version": "3334ea4f20f97b6095f8727c3e9d4e855c790c7609bcd29c4db50b96f4568809",
+      "origin": "docs/superpowers/specs/2026-09-26-personal-rag-v1-design.md",
+      "original_sha256": "6f4f07aa519ccf1bff7b99741ce629224bb5b4f12b82938bdcc759a508039dab",
+      "normalization": "UTF-8 without BOM, CRLF to LF; no content edits",
+      "license": "existing project documentation; no public redistribution asserted"
+    },
+    {
+      "document_id": "readme",
+      "path": "corpus/readme.md",
+      "source_version": "38f6f648fe52c4e8568ad86de9d9b17d926860354da17b5053731397a85da004",
+      "origin": "README.md",
+      "original_sha256": "7f2838ead3a97c9e79fcf3a57d12a4f0eef0fae27ea481b954531bd5a83a2819",
+      "normalization": "UTF-8 without BOM, CRLF to LF; no content edits",
+      "license": "existing project documentation; no public redistribution asserted"
+    }
+  ],
+  "sample_count": 33,
+  "locked_sha256": "065007665e13d20e1cfd5801ea47d5a822bc01adbc983d6c5d4a9abdb4c78a1d",
+  "coverage_threshold": 0.8,
+  "split_policy": "all acceptance questions locked; legacy fixture development corpus separate",
+  "scope": "project documentation; does not establish general-domain benchmark quality"
+}

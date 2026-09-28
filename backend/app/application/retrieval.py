@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from typing import Any
 
 from backend.app.domain.fusion import rrf_fuse
@@ -23,6 +24,12 @@ class RetrievalResult:
     items: list[RetrievalItem]
     sources: tuple[str, ...]
     reason_codes: tuple[str, ...] = ()
+    candidate_rankings: dict[str, tuple[RankedHit, ...]] = field(default_factory=dict)
+    fused_ranking: tuple[RankedHit, ...] = ()
+    effective_config: dict[str, int] = field(default_factory=dict)
+    latency_ms: float | None = None
+    degradation_flags: tuple[str, ...] = ()
+    stage_latency_ms: dict[str, float | None] = field(default_factory=dict)
 
 
 def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
@@ -110,37 +117,61 @@ class HybridRetriever:
         embedding_provider: Any | None = None,
         top_k: int = 8,
         candidate_k: int | None = None,
+        rrf_k: int = 60,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
         self.top_k = top_k
         self.candidate_k = candidate_k if candidate_k is not None else max(top_k * 4, 32)
+        self.rrf_k = rrf_k
+        self.effective_config()
+
+    def effective_config(self) -> dict[str, int]:
+        config = {'top_k': self.top_k, 'candidate_k': self.candidate_k, 'rrf_k': self.rrf_k}
+        if any(type(value) is not int or value <= 0 for value in config.values()):
+            raise ValueError('retrieval limits and RRF k must be positive integers')
+        return config
 
     def retrieve(self, scope: Scope, question: str, query_plan: NormalizedQuery | None = None) -> RetrievalResult:
+        started = time.perf_counter()
+        effective = self.effective_config()
         plan = query_plan or normalize_query(question)
+        timings={'query_processing_ms':(time.perf_counter()-started)*1000,
+                 'keyword_retrieval_ms':None,'vector_retrieval_ms':None,'embedding_ms':None,'fusion_ms':None}
         if not scope.knowledge_base_ids:
-            return RetrievalResult(query_plan=plan, items=[], sources=(), reason_codes=("NO_CANDIDATES",))
+            return RetrievalResult(query_plan=plan, items=[], sources=(), reason_codes=("NO_CANDIDATES",),
+                                   effective_config=effective, latency_ms=(time.perf_counter()-started)*1000)
+        degradation_flags: tuple[str, ...] = ()
+        keyword_started=time.perf_counter()
         rankings: dict[str, list[RankedHit]] = {
             "keyword": self.repository.keyword_candidates(scope, plan, self.candidate_k)
         }
+        timings['keyword_retrieval_ms']=(time.perf_counter()-keyword_started)*1000
         if self.embedding_provider is not None:
             try:
+                embedding_started=time.perf_counter()
                 embedded = self.embedding_provider.embed([question], timeout_seconds=10)
+                timings['embedding_ms']=(time.perf_counter()-embedding_started)*1000
                 profile_id = getattr(embedded, "profile_id", None)
                 if profile_id is None:
                     resolver = getattr(self.repository, "get_embedding_profile_id", None)
                     if resolver is not None:
                         profile_id = resolver(getattr(embedded, "model", ""), getattr(embedded, "dimensions", 0))
+                vector_started=time.perf_counter()
                 rankings["vector"] = self.repository.vector_candidates(
                     scope,
                     embedded.vectors[0],
                     self.candidate_k,
                     profile_id=profile_id,
                 )
+                timings['vector_retrieval_ms']=(time.perf_counter()-vector_started)*1000
             except Exception:
-                pass
+                degradation_flags = ('VECTOR_UNAVAILABLE',)
 
-        fused = rrf_fuse(rankings)[: self.top_k]
+        fusion_started=time.perf_counter()
+        full_fused = rrf_fuse(rankings, k=self.rrf_k)
+        timings['fusion_ms']=(time.perf_counter()-fusion_started)*1000
+        fused = full_fused[: self.top_k]
         items = [RetrievalItem(self.repository.get_chunk(hit.chunk_id), hit) for hit in fused]
         items = [item for item in items if item.chunk is not None]
         sources = tuple(sorted(rankings.keys()))
@@ -149,6 +180,10 @@ class HybridRetriever:
             items=items,
             sources=sources,
             reason_codes=() if items else ("NO_CANDIDATES",),
+            candidate_rankings={name: tuple(hits) for name, hits in rankings.items()},
+            fused_ranking=tuple(full_fused), effective_config=effective,
+            latency_ms=(time.perf_counter()-started)*1000, degradation_flags=degradation_flags,
+            stage_latency_ms=timings,
         )
 
 

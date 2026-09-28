@@ -73,7 +73,7 @@ def main() -> int:
         except Exception:
             citation_readback = False
         row = {
-            "scenario": case["scenario"], "question": case["question"],
+            "case_id": case.get("case_id"), "scenario": case["scenario"], "question": case["question"],
             "expected_outcome": case["expected_outcome"], "outcome": outcome,
             "expected_chunk_ids": sorted(expected), "retrieved_chunk_ids": sorted(actual),
             "expected_targets": case["expected_target_count"], "planned_targets": len(plan.evidence_plan.targets),

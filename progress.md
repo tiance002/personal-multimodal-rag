@@ -237,3 +237,49 @@
 - 容器 API 经 `host.docker.internal:11434` 能读取本机 Ollama 模型。Playwright 上传的隔离 smoke job 由 Compose Worker 实际处理为 `succeeded/ready`，attempts=1。第一次服务演练时 Ollama 按此前的“只临时启动”约束处于停止状态，job 报 `ProviderUnavailable`；临时启动 Ollama 后重试成功。验证结束 Ollama 已停止；未更改其自启设置。Compose 栈保留运行。
 - 正式 `verify-release.ps1` 仍未执行：脚本把主测试/备份恢复数据库固定到 host port 55432；`netsh interface ipv4 show excludedportrange protocol=tcp` 显示 55376–55475 为保留范围，Docker 无法绑定 55432（`ports are not available`）。为保持数据库隔离，未改 Windows 全局端口范围或脚本默认地址。尝试创建的空隔离项目 `ragv1gate0927` 已清理。
 - 本节覆盖上一节“Compose 镜像构建失败”的状态：**当前源码 Compose build/runtime/Nginx 浏览器 smoke 均 PASS**。但 V1 正式发布门禁仍为 NOT RUN，不能据此宣称整套发布门禁通过。日志：`var/reports/v1-final-compose-build-final.txt`、`v1-final-compose-up.txt`、`v1-final-compose-proxy-smoke-clean.txt`、`v1-final-compose-ui-smoke-clean.txt`。
+
+
+
+## ECS 评测中心定向清理与部署（2026-09-27）
+
+### 1. 目标与改动
+
+- 目标：按负责人确认的清单备份旧学习规划服务、清理精确列出的旧路径并部署本地评测中心。
+- 代码改动：完成 eval_center/ 运行模块、SQLite/只读 HTTP 服务和仪表盘；新增本地 bundle 打包、校验与部署/上传脚本；评测样本增加稳定 case_id。代码审查发现上传重复 JSON key 与校验/上传 TOCTOU 风险后，增加严格重复 key 拒绝、规范化 allowlist 快照及只读文件句柄；安装器把 /srv/rag-eval/backups 设为 root:root 0700。
+- 服务器备份：/var/backups/study-plan/cleanup-20260927T143810Z/；资产归档 100,895,884 字节，PostgreSQL custom dump 359,851 字节，均为 root:root 0600，备份目录 root:root 0700。归档和 dump 均重新校验；tar --list 与 pg_restore --exit-on-error --file=/dev/null 成功，SHA-256 与 VERIFIED 文件一致。
+- 服务器清理：移除 /opt/study-plan、/etc/study-plan、/var/lib/study-plan、/var/www/letsencrypt、旧 Nginx study-plan 站点和 7 个 study-plan-* systemd unit；Nginx 已停用。PostgreSQL 服务、study_platform 数据库及角色、OS 用户 studyplan、15 份既有 dump 和 /etc/letsencrypt 证书/续订材料均保留。
+- 部署：rag-eval.service 已启用，监听仅为 127.0.0.1:8787；仪表盘和 health API 可用，SQLite schema v1 完整，重启后仍正常。SSH 隧道本地端口验证通过并已关闭。
+- 实际传输到 ECS 的只有部署源码归档；没有上传评测报告、问题/答案、片段或其他业务结果。仓库中未保存 SSH 私钥内容或私钥路径。
+
+### 2. 执行命令与证据
+
+| 命令/检查 | 退出码 | 关键输出 |
+|---|---:|---|
+| & 'E:\RAG quention\.venv\Scripts\python.exe' -m pytest eval_center/tests backend/tests/test_quality_eval_schema.py -q | 0 | 45 passed, 6 warnings |
+| git diff --check；PowerShell parser 检查部署/上传脚本；bash -n deploy/eval_center/install.sh | 0 | 三项语法/差异检查通过；凭据材料扫描无匹配 |
+| 只读 SSH 环境复查（strict host-key，远程脚本经 stdin 传输） | 0 | Ubuntu 24.04.5；目标目录原先不存在；PostgreSQL active；旧服务/timers active；盘可用约 34 GiB；原 TLS 私钥只检查了元数据 |
+| 远程备份脚本（strict SSH，经 stdin 传输） | 0 | BACKUP_VERIFIED utc=20260927T143810Z；归档 SHA-256 1e427fc512525ba9669ae32c8f168b1c5511ea08d85e1b9e099aab3f99c9a12d；DB dump SHA-256 76cd48d52800f6a4d5fbea10cf3cbc83b5d088f80967dea6b0809b470d5a47ad |
+| 备份独立复核（重算 SHA-256、读取归档、pg_restore 校验） | 0 | BACKUP_RECHECK_PASS |
+| 远端清理脚本 | 1 | 清理操作已完成；尾部 SSH 端口断言误对整行匹配，未从 ss 提取本地地址列。修正后的完整状态复核退出码 0：CLEANUP_POSTCHECK_PASS，SSH 22 保持监听，80/443/8000 无旧监听 |
+| & '.\scripts\deploy_eval_center.ps1' -HostName '120.55.115.162' -User 'root' -Port 22 -IdentityFile '<运行时提供的私钥路径>' -Apply | 0 | rag-eval is active on 127.0.0.1:8787 |
+| 远端 health/dashboard/API、SQLite integrity/schema、systemd restart 复核 | 0 | health {"status":"ok"}；dashboard HTTP 200；API {"experiments":[]}；schema 1；integrity ok；重启后同样正常 |
+| SSH tunnel 到本机 127.0.0.1:18787 health 请求及关闭检查 | 0 | SSH_TUNNEL_PASS local_port=18787 health=ok tunnel_closed=true |
+
+备份首次尝试曾因 postgres 用户不能写入 root-only 备份目录而退出码 1；错误处理确认恢复了原服务和 timers，未开始删除。移除失败尝试生成的未验证归档后，以 root 接收 pg_dump stdout 并重新完成、复核备份。部署前后未改防火墙或云安全组。
+
+### 3. 结果
+
+- 本任务范围：本地测试与代码检查 PASS；备份 PASS；定向清理复核 PASS；ECS 部署与 loopback/隧道 smoke PASS。
+- 未运行 verify-release.ps1、全量发布门禁或实际评测结果导入，不能据此宣称 M4.5/V1.0 整体发布验收通过。
+
+### 4. 风险与遗留
+
+- 备份在同一 ECS 根盘的 /var/backups，不是异地副本；实例/磁盘整体损坏时无法依靠该份备份恢复。
+- Nginx 和旧站点已经停用；证书和续订配置保留，但旧续订 timer 停用。若要恢复旧网站，先按该归档恢复并重新检查服务配置。
+- 云安全组未查询或修改；服务只绑定 loopback，通过 SSH 隧道访问。没有公网暴露新的 8787 端口。
+- ECS 注册库保持空；实际评测结果和任何私有数据都没有传输。
+
+### 5. 版本与下一步
+
+- 工作树：codex/eval-center，基线 a0a62e8ee78be4a176b81e3f61cf5b84dd6d364b；改动未提交，无新 commit 或 tag。
+- 当前 ECS 服务部署已完成；下一最小任务是审阅改动，并在需要时单独确认要上传的已脱敏评测 bundle。

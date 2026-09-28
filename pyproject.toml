@@ -24,15 +24,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+eval = [
+  "tiktoken==0.14.0",
+]
 dev = [
   "pytest==9.1.1",
   "httpx==0.28.1",
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["backend/tests"]
+testpaths = ["backend/tests", "eval_center/tests"]
 pythonpath = ["."]
 addopts = "-ra"
 
 [tool.setuptools.packages.find]
-include = ["backend*"]
+include = ["backend*", "eval_center*"]

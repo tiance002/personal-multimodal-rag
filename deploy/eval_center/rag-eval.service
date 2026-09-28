@@ -1,0 +1,33 @@
+[Unit]
+Description=Private local-first RAG evaluation registry
+After=network.target
+
+[Service]
+Type=simple
+User=rag-eval
+Group=rag-eval
+WorkingDirectory=/srv/rag-eval/app
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+Environment=EVAL_CENTER_DB=/srv/rag-eval/experiments/registry.sqlite3
+EnvironmentFile=/srv/rag-eval/configs/runtime.env
+ExecStart=/usr/bin/python3 -m eval_center.server --host 127.0.0.1 --port 8787
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+ReadWritePaths=/srv/rag-eval/experiments
+
+[Install]
+WantedBy=multi-user.target

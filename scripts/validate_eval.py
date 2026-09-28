@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
 
 REQUIRED_FIELDS = {"question", "expected_chunk_ids", "answer_points", "kb_scope"}
+CASE_ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9._-]{0,63}\Z")
 
 
 def validate(path: Path, *, schema: str = "core-v1") -> dict[str, Any]:
@@ -14,6 +16,7 @@ def validate(path: Path, *, schema: str = "core-v1") -> dict[str, Any]:
         raise ValueError(f"unsupported evaluation schema: {schema}")
     errors: list[str] = []
     records = 0
+    seen_case_ids: set[str] = set()
     for line_number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         if not raw.strip():
             continue
@@ -26,6 +29,14 @@ def validate(path: Path, *, schema: str = "core-v1") -> dict[str, Any]:
         if not isinstance(item, dict):
             errors.append(f"line {line_number}: record must be an object")
             continue
+        if "case_id" in item:
+            case_id = item["case_id"]
+            if not isinstance(case_id, str) or not CASE_ID_PATTERN.fullmatch(case_id):
+                errors.append(f"line {line_number}: case_id must be a stable lowercase identifier")
+            elif case_id in seen_case_ids:
+                errors.append(f"line {line_number}: case_id must be unique within the dataset")
+            else:
+                seen_case_ids.add(case_id)
         missing = sorted(REQUIRED_FIELDS - item.keys())
         if missing:
             errors.append(f"line {line_number}: missing fields {missing}")

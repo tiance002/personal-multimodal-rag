@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>RAG 评测中心</title>
+  <style>
+    :root { color-scheme: light; --ink:#14251f; --muted:#61736b; --line:#dbe5df; --paper:#f3f7f4; --card:#fff; --green:#087b59; --soft:#e3f4ec; --red:#ad4438; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 "Segoe UI", "Microsoft YaHei", sans-serif; }
+    header { padding:25px clamp(18px, 4vw, 56px); background:#12382e; color:#fff; }
+    header .eyebrow { margin:0 0 5px; color:#a8d7c2; font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(23px, 3vw, 32px); font-weight:650; }
+    header p:last-child { margin:5px 0 0; color:#d0e4d9; }
+    main { max-width:1440px; margin:0 auto; padding:25px clamp(14px, 3vw, 40px) 48px; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:14px; }
+    .toolbar h2, .detail h2 { margin:0; font-size:19px; }
+    .toolbar p { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    button { border:1px solid #b9cfc3; border-radius:8px; padding:9px 14px; background:#fff; color:var(--ink); font:inherit; cursor:pointer; }
+    button.primary { border-color:var(--green); background:var(--green); color:#fff; font-weight:600; }
+    button:disabled { opacity:.48; cursor:not-allowed; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:0 8px 24px #193c2c0a; }
+    table { width:100%; border-collapse:collapse; min-width:810px; }
+    th, td { padding:12px 13px; border-bottom:1px solid var(--line); text-align:left; vertical-align:middle; }
+    th { background:#f7faf8; color:var(--muted); font-size:12px; font-weight:650; }
+    tbody tr:last-child td { border-bottom:0; }
+    td code { display:block; max-width:230px; overflow:hidden; color:#426257; font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+    .badge { display:inline-flex; align-items:center; border-radius:999px; padding:3px 9px; background:var(--soft); color:#14644b; font-size:12px; font-weight:600; }
+    .badge.fail, .badge.error { background:#fbeae7; color:var(--red); }
+    .detail, .comparison, .notice { margin-top:18px; padding:18px; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+    .detail[hidden], .comparison[hidden] { display:none; }
+    .detail-head { display:flex; justify-content:space-between; align-items:start; gap:12px; }
+    .muted { color:var(--muted); }
+    .metadata { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; margin:17px 0; }
+    .metadata div, .metric { padding:10px 12px; border-radius:8px; background:#f5f8f6; }
+    .metadata dt { color:var(--muted); font-size:12px; }
+    .metadata dd { margin:3px 0 0; overflow-wrap:anywhere; font-weight:600; }
+    .metrics { display:grid; grid-template-columns:repeat(auto-fit, minmax(125px, 1fr)); gap:9px; margin-top:9px; }
+    .metric span { display:block; color:var(--muted); font-size:12px; }
+    .metric strong { display:block; margin-top:3px; font-size:17px; }
+    .cases { margin:9px 0 0; padding-left:21px; }
+    .cases li { margin:5px 0; font-family:ui-monospace, Consolas, monospace; font-size:13px; }
+    .notice { padding:12px 15px; color:var(--muted); }
+    .notice.error { color:var(--red); }
+    .compare-grid { width:100%; border-collapse:collapse; margin-top:11px; }
+    .compare-grid th, .compare-grid td { padding:8px; border:1px solid var(--line); }
+    @media (max-width:650px) { .toolbar { align-items:flex-start; flex-direction:column; } .detail-head { flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Private · Local-first</p>
+    <h1>RAG 评测中心</h1>
+    <p>仅保存脱敏指标和实验元数据。通过 SSH 隧道访问。</p>
+  </header>
+  <main>
+    <section aria-labelledby="runs-title">
+      <div class="toolbar">
+        <div><h2 id="runs-title">实验记录</h2><p>选择 2–4 条记录，查看可比性和指标差异。</p></div>
+        <button id="compare-button" class="primary" type="button" disabled>比较所选记录</button>
+      </div>
+      <div id="message" class="notice" role="status">正在载入实验记录…</div>
+      <label><input id="diagnostic-view" type="checkbox"> 显示历史未验证记录（仅诊断，不参与正式比较）</label>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">比较</th><th scope="col">开始时间</th><th scope="col">数据集</th><th scope="col">模式</th><th scope="col">状态</th><th scope="col">样本</th><th scope="col">MRR</th><th scope="col">实验 ID</th><th scope="col">详情</th></tr></thead>
+          <tbody id="runs-body"></tbody>
+        </table>
+      </div>
+    </section>
+    <section id="comparison" class="comparison" aria-live="polite" hidden></section>
+    <section id="detail" class="detail" aria-live="polite" hidden></section>
+  </main>
+  <script>
+    (() => {
+      const selected = new Set();
+      const diagnosticView = document.getElementById('diagnostic-view');
+      const body = document.getElementById("runs-body");
+      const message = document.getElementById("message");
+      const compareButton = document.getElementById("compare-button");
+      const detailPanel = document.getElementById("detail");
+      const comparisonPanel = document.getElementById("comparison");
+      const el = (tag, text, className) => {
+        const node = document.createElement(tag);
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        if (className) node.className = className;
+        return node;
+      };
+      const safeValue = value => value === null || value === undefined ? "—" : String(value);
+      const updateCompareButton = () => { compareButton.disabled = selected.size < 2 || selected.size > 4; };
+      const showError = () => { message.textContent = "暂时无法载入数据。请确认本地隧道和评测服务可用。"; message.className = "notice error"; };
+      const loadDetail = async id => {
+        try {
+          const response = await fetch(`/api/v1/experiments/${encodeURIComponent(id)}`);
+          if (!response.ok) throw new Error("request failed");
+          const run = await response.json();
+          detailPanel.replaceChildren();
+          const head = el("div", undefined, "detail-head");
+          head.append(el("h2", "实验详情"));
+          head.append(el("code", run.experiment_id));
+          detailPanel.append(head);
+          const metadata = el("dl", undefined, "metadata");
+          [["校验状态", run.validation_status], ["Gold Set", run.gold_set_hash], ["索引版本", run.index_version], ["数据集版本", run.dataset_version], ["语料摘要", run.corpus_hash], ["评测模式", run.evaluation_mode], ["模型配置", run.model_profile], ["Embedding", run.embedding_profile], ["代码版本", run.git_sha]].forEach(([label, value]) => {
+            const cell = el("div"); cell.append(el("dt", label), el("dd", safeValue(value))); metadata.append(cell);
+          });
+          if (run.runtime) {
+            const runtime = el('pre', JSON.stringify({effective_config: run.runtime.effective_config, models: run.runtime.models, index_counts: run.runtime.index_counts}, null, 2));
+            detailPanel.append(metadata, el('h3', '实际执行配置'), runtime);
+          } else detailPanel.append(metadata);
+          detailPanel.append(el('p', '排名指标按片段计算；source_recall 与 evidence_coverage 按稳定来源证据计算。跨切分对比时，片段 Recall 的分母可能改变。', 'notice'));
+          detailPanel.append(el("h3", run.validation_status === 'verified' ? '独立校验的聚合指标' : '历史声明值（未验证）'));
+          const metrics = el("div", undefined, "metrics");
+          Object.entries(run.metrics || {}).forEach(([name, value]) => {
+            const count = (run.metric_counts || {})[name];
+            const card = el("div", undefined, "metric"); card.append(el("span", name), el("strong", safeValue(value)));
+            if (count) card.append(el('span', `有效样本 ${count.evaluated} · unavailable ${count.unavailable}`));
+            metrics.append(card);
+          });
+          detailPanel.append(metrics, el("h3", "失败或未评测用例"));
+          const failures = (run.cases || []).filter(item => item.status !== "passed");
+          if (!failures.length) detailPanel.append(el("p", "没有失败或未评测用例。", "muted"));
+          else {
+            const list = el("ul", undefined, "cases");
+            failures.forEach(item => list.append(el("li", `${item.case_id} · ${item.status} · ${item.stage || "—"} · ${item.error_code || "—"}`)));
+            detailPanel.append(list);
+          }
+          detailPanel.append(el('h3', '逐题指标与匿名统计'));
+          (run.cases || []).forEach(item => {
+            const section = el('details');
+            section.append(el('summary', `${item.case_id} · ${item.status}`), el('pre', JSON.stringify({metrics:item.metrics, statistics:item.statistics}, null, 2)));
+            detailPanel.append(section);
+          });
+          detailPanel.hidden = false;
+        } catch (_) { detailPanel.replaceChildren(el("p", "无法读取这条实验记录。", "muted")); detailPanel.hidden = false; }
+      };
+      const loadComparison = async () => {
+        const ids = Array.from(selected);
+        if (ids.length < 2 || ids.length > 4) return;
+        try {
+          const response = await fetch(`/api/v1/compare?ids=${encodeURIComponent(ids.join(","))}`);
+          if (!response.ok) throw new Error("request failed");
+          const result = await response.json();
+          comparisonPanel.replaceChildren(el("h2", "指标比较"));
+          comparisonPanel.append(el("p", result.comparable ? "所选实验具有相同的数据集、语料和评测模式。" : "所选实验条件不同；请谨慎解读数值差异。", result.comparable ? "muted" : "notice error"));
+          if (Object.keys(result.mismatches || {}).length) comparisonPanel.append(el("p", `不匹配字段：${Object.keys(result.mismatches).join("、")}`));
+          const table = el("table", undefined, "compare-grid");
+          const header = el("tr"); header.append(el("th", "指标")); ids.forEach((_, index) => header.append(el("th", `实验 ${index + 1} · 值 / Δ / Δ% / 有效样本`)));
+          const thead = el("thead"); thead.append(header); table.append(thead);
+          const rows = el("tbody");
+          Object.entries(result.metrics || {}).forEach(([name, values]) => {
+            const row = el("tr"); row.append(el("th", name));
+            values.values.forEach((value, index) => row.append(el("td", `${safeValue(value)} / ${safeValue(values.delta_from_first[index])} / ${safeValue((values.percent_change_from_first || [])[index])} / ${safeValue((values.evaluated_counts || [])[index])}`)));
+            rows.append(row);
+          });
+          table.append(rows); comparisonPanel.append(table); comparisonPanel.hidden = false;
+        } catch (_) { comparisonPanel.replaceChildren(el("p", "无法比较所选实验。", "notice error")); comparisonPanel.hidden = false; }
+      };
+      const loadRuns = async () => {
+        try {
+          const response = await fetch(`/api/v1/experiments?limit=100&offset=0&view=${diagnosticView.checked ? 'diagnostic' : 'official'}`);
+          if (!response.ok) throw new Error("request failed");
+          const result = await response.json();
+          body.replaceChildren();
+          (result.experiments || []).forEach(run => {
+            const row = el("tr");
+            const checkCell = el("td");
+            const checkbox = el("input"); checkbox.type = "checkbox"; checkbox.setAttribute("aria-label", `选择实验 ${run.experiment_id}`);
+            checkbox.disabled = run.validation_status !== 'verified';
+            checkbox.addEventListener("change", () => { checkbox.checked ? selected.add(run.experiment_id) : selected.delete(run.experiment_id); updateCompareButton(); });
+            checkCell.append(checkbox); row.append(checkCell);
+            row.append(el("td", run.started_at), el("td", run.dataset_version), el("td", run.evaluation_mode));
+            row.append(el("td", `${run.status} · ${run.validation_status}`, `badge ${run.status}`), el("td", run.sample_count), el("td", safeValue((run.metrics || {})['fused.mrr_at_k'] ?? (run.metrics || {}).mrr)));
+            const idCell = el("td"); idCell.append(el("code", run.experiment_id)); row.append(idCell);
+            const detailCell = el("td"); const button = el("button", "查看"); button.type = "button"; button.addEventListener("click", () => loadDetail(run.experiment_id)); detailCell.append(button); row.append(detailCell);
+            body.append(row);
+          });
+          message.textContent = result.experiments.length ? `共显示 ${result.experiments.length} 条记录。` : "暂无实验记录。运行本地评测并导入脱敏结果后，这里会显示实验。";
+          message.className = "notice";
+        } catch (_) { showError(); }
+      };
+      compareButton.addEventListener("click", loadComparison);
+      diagnosticView.addEventListener('change', () => { selected.clear(); updateCompareButton(); comparisonPanel.hidden=true; detailPanel.hidden=true; loadRuns(); });
+      loadRuns();
+    })();
+  </script>
+</body>
+</html>
