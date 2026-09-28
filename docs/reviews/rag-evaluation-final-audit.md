@@ -107,3 +107,7 @@ ECS code `f15aaeb374e32d7955429784b4d9dd50317608a5`；release `/srv/rag-eval/rel
 ## 6. 版本与下一步
 
 **本Goal验收核心条件满足，可开展有边界的固定语料RAG参数优化比较。** 当前真实质量未达到全题成功，结果如实partial；评测平台PASS不代表RAG产品质量或M4.5发布通过。保留隔离数据库/本地报告/模型以供重现；SSH Dashboard隧道仅本机。下一任务由项目负责人选择，本Goal不自动优化参数或打Tag。
+
+### 最后连接复查
+
+最终文档提交d1cb6c8后，本机旧SSH隧道遭Connection reset，末次本地HTTP复查退出1；直接新SSH访问ECS health退出0，实际SHA仍f15aaeb。重新以隐藏后台进程建立同一本机18788隧道，添加ServerAliveInterval30/ServerAliveCountMax3，重新请求health/official/diagnostic退出0：FINAL_LIVE_PASS，2正式/6诊断。此次是本机隧道断连，不是服务数据或部署故障；不隐去失败尝试。隧道无需公网端口或防火墙变更。
