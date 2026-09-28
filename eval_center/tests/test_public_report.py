@@ -33,6 +33,11 @@ def test_report_uses_aggregate_artifacts_and_omits_case_text(tmp_path):
         }}}},
         "cases": [{"question": "PRIVATE QUESTION", "answer": "PRIVATE ANSWER"}],
     })
+    _write(root / "runs" / "scifact" / "development" / "failed1" / "failure.json", {
+        "dataset": "scifact", "phase": "qa", "split": "development", "profile": "smoke",
+        "stage": "index_validation", "error_code": "source_coordinates_mismatch",
+        "documents": 50, "queries_completed": 0, "git_sha": "b" * 40,
+    })
 
     report = render_public_report(root)
     paths = write_public_report(root, repo)
@@ -40,6 +45,7 @@ def test_report_uses_aggregate_artifacts_and_omits_case_text(tmp_path):
     assert "0.7500" in report
     assert "LongBench Chinese" in report
     assert "NOT RUN" in report
+    assert "source_coordinates_mismatch" in report
     assert "PRIVATE QUESTION" not in report
     assert "PRIVATE ANSWER" not in report
     assert "PRIVATE QUESTION" not in (root / "reports" / "public-benchmark-optimization-report.md").read_text(encoding="utf-8")

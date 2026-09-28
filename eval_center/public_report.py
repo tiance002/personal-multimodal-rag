@@ -45,6 +45,21 @@ def _run_records(data_root: Path, dataset: str) -> list[dict[str, Any]]:
     return records
 
 
+def _failure_records(data_root: Path, dataset: str) -> list[dict[str, Any]]:
+    base = data_root / "runs" / dataset
+    if not base.exists():
+        return []
+    records = []
+    for path in base.glob("**/failure.json"):
+        try:
+            row = _read_json(path)
+        except (OSError, ValueError, TypeError):
+            continue
+        if row.get("dataset") == dataset:
+            records.append(row)
+    return sorted(records, key=lambda row: (row.get("failed_at", ""), row.get("run_id", "")))
+
+
 def _candidate(data_root: Path, dataset: str) -> dict[str, Any] | None:
     paths = list((data_root / "runs" / "candidates" / dataset).glob("*.json")) \
         if (data_root / "runs" / "candidates" / dataset).exists() else []
@@ -104,6 +119,18 @@ def _dataset_section(data_root: Path, dataset: str) -> list[str]:
     lines.append("")
 
     records = _run_records(data_root, dataset)
+    failures = _failure_records(data_root, dataset)
+    if failures:
+        lines.extend(["Failed attempts retained for diagnosis:", "",
+                      "| Phase | Split | Profile | Stage | Error | Documents | Queries attempted | Git SHA |",
+                      "|---|---|---|---|---|---:|---:|---|"])
+        for failure in failures:
+            lines.append("| {} | {} | {} | {} | `{}` | {} | {} | `{}` |".format(
+                failure.get("phase", "UNKNOWN"), failure.get("split", "UNKNOWN"),
+                failure.get("profile", "UNKNOWN"), failure.get("stage", "UNKNOWN"),
+                failure.get("error_code", "UNKNOWN"), failure.get("documents", "UNKNOWN"),
+                failure.get("queries_completed", 0), failure.get("git_sha", "UNKNOWN")))
+        lines.append("")
     if not records:
         lines.extend(["Real retrieval runs: NOT RUN", "", "Qwen QA: NOT RUN", ""])
         return lines

@@ -217,6 +217,11 @@ def _source_content(document) -> str:
     return f"# {title}\n\n{document.text}" if title else document.text
 
 
+def _expected_normalized_text(content: str) -> str:
+    """Mirror TextParser's newline normalization for the verified index binding."""
+    return content.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def run_public_retrieval(
     *,
     repository_root: Path,
@@ -322,7 +327,8 @@ def run_public_retrieval(
             file_suffix = hashlib.sha256(document.doc_id.encode("utf-8")).hexdigest()[:24]
             receipt = container.store.create_upload(kb_id, f"{file_suffix}.md", "text/markdown", stored)
             bindings[receipt["document_id"]] = {"document_id": document.doc_id,
-                                                 "source_version": hashlib.sha256(payload).hexdigest(), "text": content}
+                                                 "source_version": hashlib.sha256(payload).hexdigest(),
+                                                 "text": _expected_normalized_text(content)}
             document_external_ids.add(document.doc_id)
             if number % 250 == 0:
                 print(json.dumps({"event": "ingestion_queued", "dataset": dataset_name, "documents": number}), flush=True)
