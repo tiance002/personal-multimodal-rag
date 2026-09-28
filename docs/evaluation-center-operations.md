@@ -57,7 +57,7 @@ The deployment helper uses the current user's existing `known_hosts` file with s
   -IdentityFile <private-key-path> -Apply
 ```
 
-The installer creates `/srv/rag-eval/{app,configs,datasets,experiments,reports,logs,backups,incoming,releases}`, installs `rag-eval.service`, and checks `http://127.0.0.1:8787/healthz`. It does not change SSH, Nginx, firewall, or Aliyun security-group settings and does not remove or migrate any existing application data.
+The installer creates `/srv/rag-eval/{app,configs,datasets,experiments,reports,logs,backups,incoming,releases}`, installs `rag-eval.service`, and checks `http://127.0.0.1:8787/healthz` against the committed code SHA. It creates an online SQLite backup before the additive evaluation-registry v2 migration. Existing experiment data is preserved. It does not change SSH, Nginx, firewall, or Aliyun security-group settings.
 
 ## Tunnel and dashboard
 
@@ -101,3 +101,21 @@ ss -ltnp '( sport = :8787 )'
 Before a manual SQLite backup, stop the service so the database and WAL are quiescent, copy the database to the root-owned backup area, then start and health-check the service again. Do not copy only the main database while the service is writing. Keep backups under `/srv/rag-eval/backups/` with mode `0600`; restore only after stopping the service and preserving the current database file.
 
 No remote deployment, cleanup, firewall change, or private-data transfer is implied by this document. Those are separate owner-approved operations.
+
+## 可信评测 v2：实际 A/B 使用
+
+先提交源码并保证工作树干净。使用仓库外运行时 JSON（字段 `database_url`）提供专用本地 PostgreSQL 管理连接；禁止提交连接文件。运行器仅允许 loopback PostgreSQL 与 `rag_eval_trust_` 数据库前缀，每组新建库、不删除旧实验库。
+
+```powershell
+python -m eval_center.runner --connection-file $evalConnectionFile
+```
+
+固定 `evaluations/trust_v1` 含33个来源核查问题。运行器真实摄取、切分、Embedding、检索及8题Qwen问答，输出 `var/trust-acceptance/<run-token>/A|B/`。完整问题/答案/来源只保留本地，只有严格 v2 `bundle.json` 可上传。当前默认配置为A1200/120、B700/70、top_k5/candidate_k32/RRF60/context8000字符；从实际组件复核配置，错误声明或脏源码直接 INVALID。
+
+部署脚本要求 clean Git HEAD，带上CODE_SHA、全部服务依赖并重启。可用 `-PythonExecutable $pythonPath` 指定真实Python路径；上传脚本同样支持。部署SHA必须与实验manifest一致。`healthz.git_sha` 应匹配实际执行提交。默认Dashboard只列verified；诊断模式显示旧记录或已作废实验并禁用选择。四阶段排名与稳定来源覆盖、actual/estimated/unavailable Tokens、有效样本数量分别核对，不能用prepared上下文声称已送入模型。
+
+### 数据恢复
+
+安装器备份目录含原SQLite、service、runtime.env与previous-release。恢复前停止服务、保留当前DB及WAL。使用sqlite3 backup API把选定备份恢复到专用数据目录，恢复服务单位/配置和旧release symlink，校正rag-eval所有权及0600权限，再daemon-reload/restart并检查health SHA、实验ID/digest与integrity_check。不要在服务写入时仅覆盖主SQLite文件。恢复具体备份属于单独操作；本轮已执行当前数据备份副本的6行摘要与完整性验证，未冒称全实例灾难恢复。
+
+实际部署/真实A/B及云端篡改拒绝证据见 `docs/reviews/rag-evaluation-final-audit.md`。语义Judge默认NOT_EVALUATED，当前真实RAG质量partial，评测平台PASS不代表产品发布验收。

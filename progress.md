@@ -283,3 +283,11 @@
 
 - 工作树：codex/eval-center，基线 a0a62e8ee78be4a176b81e3f61cf5b84dd6d364b；改动未提交，无新 commit 或 tag。
 - 当前 ECS 服务部署已完成；下一最小任务是审阅改动，并在需要时单独确认要上传的已脱敏评测 bundle。
+
+## 2026-09-28 评测可信度修复与真实重新验收
+
+1. 目标与改动：当前授权Goal的P0/P1修复完成。实际执行/部署提交 f15aaeb374e32d7955429784b4d9dd50317608a5，源码前序 c4ee364。新增稳定Gold/完整排名及来源覆盖/独立ECS重算/实际usage/隔离真实runner/冻结33题/严格脱敏/版本化部署；业务改动限Ollama采集与Retriever执行元数据。最新最终报告见 docs/reviews/rag-evaluation-final-audit.md，原FAIL全文保存2026-09-27-rag-evaluation-audit-fail.md。
+2. 执行命令：完整eval_center/tests和相关业务回归157passed退出0（报告原样列出参数）；正式runner退出0，A/B各33题真实PG/BGE及8次Qwen生成；deploy/upload退出0；云端66题重算/8类篡改拒绝/同内容unchanged和冲突保护退出0；本地与云逐字段66题追踪退出0。真实浏览器正式/诊断/比较/详情数值核对，13部署源码UI摘要一致，SQLite实际恢复副本6行完整摘要一致。命令及所有尝试失败/修正详见报告。
+3. 结果：当前Goal核心评测验收PASS；RAG质量实验partial；M4.5发布/完整产品回归NOT RUN，不称负责人已验收，不创建Tag。正式A来源上下文召回.7166667，B.65；引用回读1/1，明确拒答1/1，语义Judge NOT_EVALUATED；源/排名计分单位及所有有效分母明确。
+4. 风险遗留：仅项目资料域33题、Agent来源审核（human_review NOT RUN）；当前q0查询、无真实重试，usage已测采集路径但不伪造发生调用；明确文本拒答和字面要点不能代替语义Judge；备份同盘。上述可选P2按当前Goal记录，不擅称发布或延期批准。
+5. 版本下一步：真实实验及ECS为f15aaeb（同模型digest/冻结Gold、不同真实索引）；最终提交仅文档，与运行版本明确分开。评测DB6行保留，其中2正式、2首轮拒答协议失效诊断、2原smoke未验证。正常知识库未修改、私人原文未上传、凭据不进仓库。Goal结束后不自动优化；保留隔离数据/报告及本机SSH Dashboard隧道以供复核。
