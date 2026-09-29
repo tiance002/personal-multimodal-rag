@@ -3,7 +3,11 @@ from pathlib import Path
 
 import pytest
 
-from eval_center.readonly_public_index import approved_run_directory, validate_completed_run
+from eval_center.readonly_public_index import (
+    _readonly_engine,
+    approved_run_directory,
+    validate_completed_run,
+)
 from eval_center.public_data import DATASET_VERSIONS
 from eval_center.verification import ExperimentInvalidError
 
@@ -41,3 +45,25 @@ def test_partial_or_locked_run_is_rejected(tmp_path):
     (run / "interrupted.json").write_text("{}", encoding="utf-8")
     with pytest.raises(ExperimentInvalidError, match="incomplete_public_run"):
         validate_completed_run(run, "scifact")
+
+
+def test_readonly_engine_can_apply_bounded_statement_timeout(monkeypatch):
+    captured = {}
+
+    def fake_create_engine(url, **kwargs):
+        captured["url"] = url
+        captured["kwargs"] = kwargs
+        return object()
+
+    monkeypatch.setattr("eval_center.readonly_public_index.create_engine", fake_create_engine)
+    _readonly_engine("postgresql+psycopg://user@127.0.0.1:25437/rag_eval_trust_test",
+                     statement_timeout_ms=300_000)
+    assert captured["kwargs"]["connect_args"]["options"] == (
+        "-c default_transaction_read_only=on -c statement_timeout=300000"
+    )
+
+
+def test_readonly_engine_rejects_invalid_statement_timeout():
+    with pytest.raises(ValueError, match="positive integer"):
+        _readonly_engine("postgresql+psycopg://user@127.0.0.1:25437/rag_eval_trust_test",
+                         statement_timeout_ms=0)

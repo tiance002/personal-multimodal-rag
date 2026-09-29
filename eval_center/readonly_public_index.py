@@ -73,13 +73,18 @@ def validate_completed_run(run_dir: Path, dataset: str) -> dict[str, Any]:
     return manifest
 
 
-def _readonly_engine(database_url: str) -> Engine:
+def _readonly_engine(database_url: str, *, statement_timeout_ms: int | None = None) -> Engine:
     url = guarded_database_url(database_url)
+    options = ["-c default_transaction_read_only=on"]
+    if statement_timeout_ms is not None:
+        if type(statement_timeout_ms) is not int or statement_timeout_ms <= 0:
+            raise ValueError("statement_timeout_ms must be a positive integer")
+        options.append(f"-c statement_timeout={statement_timeout_ms}")
     return create_engine(
         url,
         pool_pre_ping=True,
         connect_args={
-            "options": "-c default_transaction_read_only=on",
+            "options": " ".join(options),
             "application_name": "public-benchmark-evaluation-readonly",
         },
     )
@@ -106,6 +111,7 @@ def attach_completed_index(
     embedding_model: str,
     chunk_size: int = 1200,
     chunk_overlap: int = 120,
+    statement_timeout_ms: int | None = None,
 ) -> dict[str, Any]:
     run_dir = approved_run_directory(data_root, dataset)
     manifest = validate_completed_run(run_dir, dataset)
@@ -114,7 +120,7 @@ def attach_completed_index(
     database_name = f"rag_eval_trust_{token}_{dataset.replace('-', '_')[:10]}"
     if make_url(database_url).database != database_name:
         raise ExperimentInvalidError("database_identity_mismatch")
-    engine = _readonly_engine(database_url)
+    engine = _readonly_engine(database_url, statement_timeout_ms=statement_timeout_ms)
     _verify_readonly(engine)
     with engine.connect() as connection:
         schema_revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one_or_none()
@@ -194,6 +200,7 @@ def attach_completed_index(
         "embedding_profile_id": profile_id,
         "actual_models": actual_models,
         "index": {**snapshot, "document_ids": {document.doc_id for document in prepared.documents}},
+        "bindings": bindings,
         "database_writes": 0,
         "corpus_embeddings": 0,
         "new_indexes": 0,
