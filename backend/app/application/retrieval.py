@@ -118,12 +118,20 @@ class HybridRetriever:
         top_k: int = 8,
         candidate_k: int | None = None,
         rrf_k: int = 60,
+        enabled_sources: tuple[str, ...] = ("keyword", "vector"),
+        source_weights: dict[str, float] | None = None,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
         self.top_k = top_k
         self.candidate_k = candidate_k if candidate_k is not None else max(top_k * 4, 32)
         self.rrf_k = rrf_k
+        self.enabled_sources = tuple(enabled_sources)
+        self.source_weights = dict(source_weights or {})
+        if not self.enabled_sources or any(source not in ("keyword", "vector") for source in self.enabled_sources):
+            raise ValueError("enabled retrieval sources are invalid")
+        if any(type(weight) not in (int, float) or weight < 0 for weight in self.source_weights.values()):
+            raise ValueError("source weights are invalid")
         self.effective_config()
 
     def effective_config(self) -> dict[str, int]:
@@ -143,11 +151,11 @@ class HybridRetriever:
                                    effective_config=effective, latency_ms=(time.perf_counter()-started)*1000)
         degradation_flags: tuple[str, ...] = ()
         keyword_started=time.perf_counter()
-        rankings: dict[str, list[RankedHit]] = {
-            "keyword": self.repository.keyword_candidates(scope, plan, self.candidate_k)
-        }
-        timings['keyword_retrieval_ms']=(time.perf_counter()-keyword_started)*1000
-        if self.embedding_provider is not None:
+        rankings: dict[str, list[RankedHit]] = {}
+        if "keyword" in self.enabled_sources:
+            rankings["keyword"] = self.repository.keyword_candidates(scope, plan, self.candidate_k)
+            timings['keyword_retrieval_ms']=(time.perf_counter()-keyword_started)*1000
+        if "vector" in self.enabled_sources and self.embedding_provider is not None:
             try:
                 embedding_started=time.perf_counter()
                 embedded = self.embedding_provider.embed([question], timeout_seconds=10)
@@ -169,7 +177,7 @@ class HybridRetriever:
                 degradation_flags = ('VECTOR_UNAVAILABLE',)
 
         fusion_started=time.perf_counter()
-        full_fused = rrf_fuse(rankings, k=self.rrf_k)
+        full_fused = rrf_fuse(rankings, k=self.rrf_k, weights=self.source_weights or None)
         timings['fusion_ms']=(time.perf_counter()-fusion_started)*1000
         fused = full_fused[: self.top_k]
         items = [RetrievalItem(self.repository.get_chunk(hit.chunk_id), hit) for hit in fused]

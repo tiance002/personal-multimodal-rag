@@ -29,6 +29,8 @@ from backend.app.workers.ingestion import run_once
 from eval_center.isolated_index import create_isolated_database, read_index_snapshot
 from eval_center.metrics import aggregate_metrics, ranking_metrics
 from eval_center.public_data import PublicCase, PublicDataset, SOURCE_URLS, fold_chunk_ranking, load_public_dataset
+from eval_center.public_trace import build_stage_context_trace
+from eval_center.query_cache import RunQueryEmbeddingCache
 from eval_center.runtime import committed_code_sha, effective_configuration, model_identities
 from eval_center.verification import ExperimentInvalidError
 
@@ -132,27 +134,29 @@ def _case_row(
     tokenizer: Any | None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     chunk_to_document = {chunk_id: span.document_id for chunk_id, span in index["spans"].items()}
-    hit_by_id = {hit.chunk_id: hit for stage in result.candidate_rankings.values() for hit in stage}
-    hit_by_id.update({hit.chunk_id: hit for hit in result.fused_ranking})
     stage_chunk_ranks = _retrieval_modes(result)
     mode_documents: dict[str, list[str]] = {}
     mode_context_documents: dict[str, list[str]] = {}
     mode_metrics: dict[str, dict[str, Any]] = {}
     contexts: dict[str, dict[str, Any]] = {}
+    context_traces: dict[str, dict[str, Any]] = {}
     context_times: dict[str, float] = {}
     for mode, chunk_ids in stage_chunk_ranks.items():
         document_ranks = fold_chunk_ranking(chunk_ids, chunk_to_document)
         mode_documents[mode] = document_ranks
-        items = _items_for_rank(container.store, chunk_ids, hit_by_id, config["top_k"])
-        selected = context_builder.select(items)
-        run_id = f"public-{case.qid}-{mode}"
-        citations = CitationService(InMemoryCitationStore())
         context_started = time.perf_counter()
-        context, labels = context_builder.build(run_id, selected, citations)
+        hits = result.fused_ranking if mode == "hybrid" else result.candidate_rankings[mode]
+        stage_context, trace = build_stage_context_trace(
+            case.qid, mode, hits, index, context_builder,
+            top_k=config["top_k"], effective_config=config,
+        )
         context_times[mode] = (time.perf_counter() - context_started) * 1000
-        selected_chunk_ids = [citations.snapshots[(run_id, label)].chunk_id for label in labels]
+        selected_chunk_ids = stage_context["selected_chunk_ids"]
         context_docs = fold_chunk_ranking(selected_chunk_ids, chunk_to_document)
+        if context_docs != stage_context["selected_document_ids"]:
+            raise ExperimentInvalidError("context_source_mapping_mismatch")
         mode_context_documents[mode] = context_docs
+        context_traces[mode] = trace
         mode_metrics[mode] = {}
         for k in sorted(set((3, 5, 8, 10, 20, config["top_k"]))):
             mode_metrics[mode][f"document_metrics_at_{k}"] = ranking_metrics(document_ranks, case.qrels, k=k)
@@ -165,8 +169,7 @@ def _case_row(
             "retrieved_unjudged_documents_at_k": sum(doc_id not in judged for doc_id in document_ranks[:config["top_k"]]),
             "qrels_kind": case.qrels_kind,
         }
-        contexts[mode] = {"text": context, "selected_chunk_ids": selected_chunk_ids,
-                          "selected_document_ids": context_docs, "citation_count": len(labels)}
+        contexts[mode] = stage_context
     metric_row: dict[str, Any] = {}
     for mode, stages in mode_metrics.items():
         for metric_set, values in stages.items():
@@ -203,6 +206,7 @@ def _case_row(
         "document_rankings": mode_documents,
         "context_document_rankings": mode_context_documents,
         "context": contexts,
+        "context_trace": context_traces,
         "estimated_context_tokens": estimated_tokens,
         "metrics": metrics_by_mode,
         "timings_ms": timing,
@@ -345,13 +349,20 @@ def run_public_retrieval(
         if index["index_counts"]["documents"] != len(documents) or index["index_counts"]["embeddings"] != index["index_counts"]["chunks"]:
             raise ExperimentInvalidError("public_index_count_mismatch")
         index["document_ids"] = document_external_ids
+        embedding_profile_id = container.store.get_embedding_profile_id(container.ollama.embedding_model, 1024)
+        if embedding_profile_id is None:
+            raise ExperimentInvalidError("embedding_profile_missing")
+        query_cache = RunQueryEmbeddingCache(
+            container.ollama, model_digest=models["embedding"]["digest"],
+            profile_id=embedding_profile_id, dimensions=1024, scope_identity=kb_id,
+        )
         context_builder = ContextBuilder(context_budget_chars)
         retrievers = {}
         gateways = {}
         actual_configs = {}
         for variant in retrieval_variants:
             variant_id = variant["variant_id"]
-            retriever = RecordingRetriever(container.store, embedding_provider=container.ollama,
+            retriever = RecordingRetriever(container.store, embedding_provider=query_cache,
                 top_k=variant["top_k"], candidate_k=variant["candidate_k"], rrf_k=variant["rrf_k"])
             retrievers[variant_id] = retriever
             actual_configs[variant_id] = effective_configuration(retriever, container.store, context_builder,
@@ -417,6 +428,7 @@ def run_public_retrieval(
                 "document_rankings": detail["document_rankings"],
                 "chunk_rankings": detail["chunk_rankings"],
                 "context_document_rankings": detail["context_document_rankings"],
+                "context_trace": detail["context_trace"],
                 "metrics": detail["metrics"],
                 "timings_ms": detail["timings_ms"],
                 "estimated_context_tokens": detail["estimated_context_tokens"],
@@ -494,6 +506,7 @@ def run_public_retrieval(
             "generation_case_count": min(generation_limit, len(rows)),
             "warmup_usage": warmup_usage.to_dict() if warmup_usage is not None else "NOT_RUN",
             "warmup_error": warmup_error,
+            "query_embedding_cache": query_cache.stats(),
             "environment": {"os_family": platform.system().lower(), "python_version": platform.python_version(),
                             "architecture": platform.machine()},
             "evaluation_mode": "real_postgres_local_production_ingestion_retrieval",

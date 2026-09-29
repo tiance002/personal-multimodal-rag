@@ -48,14 +48,38 @@ def index_fingerprint(rows):
     return hashlib.sha256(('\n'.join(sorted(serialized))).encode('utf-8')).hexdigest()
 
 
-def committed_code_sha(repository:Path):
-    def git(*arguments):
-        return subprocess.run(['git','-C',str(repository),*arguments],check=True,
-                              capture_output=True,text=True).stdout.strip()
-    sha=git('rev-parse','HEAD')
-    if git('status','--porcelain','--untracked-files=all'):
+def committed_source_provenance(repository: Path) -> dict[str, str | bool]:
+    """Bind execution to a clean Git commit, its tree, and its commit patch."""
+    def git(*arguments: str) -> bytes:
+        return subprocess.run(
+            ['git', '-C', str(repository), *arguments],
+            check=True, capture_output=True,
+        ).stdout
+
+    if git('status', '--porcelain', '--untracked-files=all').strip():
         raise ExperimentInvalidError('uncommitted_execution_code')
-    return sha
+
+    commit = git('rev-parse', 'HEAD').decode('ascii').strip()
+    tree_oid = git('rev-parse', 'HEAD^{tree}').decode('ascii').strip()
+    parents = git('rev-list', '--parents', '-n', '1', commit).decode('ascii').split()
+    if len(parents) > 1:
+        patch_base = parents[1]
+        patch = git('diff', '--binary', patch_base, commit)
+    else:
+        patch_base = ''
+        patch = git('show', '--format=', '--binary', commit)
+
+    return {
+        'git_sha': commit,
+        'tree_oid': tree_oid,
+        'patch_base_sha': patch_base,
+        'patch_sha256': hashlib.sha256(patch).hexdigest(),
+        'working_tree_clean': True,
+    }
+
+
+def committed_code_sha(repository: Path) -> str:
+    return str(committed_source_provenance(repository)['git_sha'])
 
 
 def model_identities(gateway):
