@@ -11,6 +11,7 @@ from eval_center.public_m3_abc import (
     M0_DIAGNOSTIC_QIDS,
     SAMPLE_SIZES,
     SEED,
+    _check_expected_index,
     freeze_preregistration,
     select_qids,
     summarize_results,
@@ -175,3 +176,47 @@ def test_summary_keeps_dataset_metrics_and_paired_transitions_separate(tmp_path)
     assert transitions["positive_document_hits_at_5"]["total_entered"] == 1
     assert transitions["positive_document_hits_at_5"]["total_exited"] == 0
     assert summary["datasets"]["miracl-zh"]["mode_metrics"]["A-vector-only"]["judged_to_unjudged_ratio"] == 0.01
+
+
+def test_check_expected_index_accepts_one_dataset_identity():
+    attachment = {
+        "database_name": "rag_eval_trust_example_scifact",
+        "schema_revision": "0013_message_run_link",
+        "index": {
+            "index_version": "index-fingerprint",
+            "index_counts": {"documents": 1, "chunks": 2, "embeddings": 2},
+        },
+        "actual_models": {"embedding": {"name": "bge-m3:latest", "digest": "a" * 64}},
+    }
+    expected_identity = {
+        "database_name": "rag_eval_trust_example_scifact",
+        "schema_revision": "0013_message_run_link",
+        "index_version": "index-fingerprint",
+        "index_counts": {"documents": 1, "chunks": 2, "embeddings": 2},
+        "model_digests": {"embedding": {"name": "bge-m3:latest", "digest": "a" * 64}},
+    }
+
+    _check_expected_index("scifact", attachment, expected_identity)
+
+
+def test_check_expected_index_rejects_identity_mismatch():
+    attachment = {
+        "database_name": "rag_eval_trust_example_scifact",
+        "schema_revision": "0013_message_run_link",
+        "index": {
+            "index_version": "index-fingerprint",
+            "index_counts": {"documents": 1, "chunks": 2, "embeddings": 2},
+        },
+        "actual_models": {"embedding": {"name": "bge-m3:latest", "digest": "a" * 64}},
+    }
+    expected_identity = {
+        "database_name": "wrong-database",
+        "schema_revision": "0013_message_run_link",
+        "index_version": "index-fingerprint",
+        "index_counts": {"documents": 1, "chunks": 2, "embeddings": 2},
+        "model_digests": {"embedding": {"name": "bge-m3:latest", "digest": "a" * 64}},
+    }
+
+    with pytest.raises(ExperimentInvalidError) as error:
+        _check_expected_index("scifact", attachment, expected_identity)
+    assert error.value.code == "clone_index_or_model_identity_mismatch"

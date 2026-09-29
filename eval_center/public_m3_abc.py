@@ -392,7 +392,8 @@ def validate_retrieval_result(retriever: HybridRetriever, result: Any, mode: str
     return fused
 
 
-def _check_expected_index(dataset: str, attachment: dict[str, Any], expected: dict[str, Any]) -> None:
+def _check_expected_index(dataset: str, attachment: dict[str, Any],
+                          expected_identity: dict[str, Any]) -> None:
     current = {
         "database_name": attachment["database_name"],
         "schema_revision": attachment["schema_revision"],
@@ -400,7 +401,7 @@ def _check_expected_index(dataset: str, attachment: dict[str, Any], expected: di
         "index_counts": attachment["index"]["index_counts"],
         "model_digests": attachment["actual_models"],
     }
-    if current != expected[dataset]:
+    if current != expected_identity:
         raise ExperimentInvalidError("clone_index_or_model_identity_mismatch")
 
 
