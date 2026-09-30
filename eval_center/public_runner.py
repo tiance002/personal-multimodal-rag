@@ -26,6 +26,7 @@ from backend.app.config import Settings
 from backend.app.domain.scope import Scope
 from backend.app.domain.evidence import EvidenceResolver
 from backend.app.workers.ingestion import run_once
+from eval_center.query_embedding_cache import EmbeddingCacheIdentity, RunScopedQueryEmbeddingCache
 from eval_center.isolated_index import create_isolated_database, read_index_snapshot
 from eval_center.metrics import aggregate_metrics, ranking_metrics
 from eval_center.public_data import PublicCase, PublicDataset, SOURCE_URLS, fold_chunk_ranking, load_public_dataset
@@ -349,9 +350,20 @@ def run_public_retrieval(
         retrievers = {}
         gateways = {}
         actual_configs = {}
+        profile_id = container.store.get_embedding_profile_id(container.ollama.embedding_model, 1024)
+        if not profile_id:
+            raise ExperimentInvalidError("query_embedding_profile_unavailable")
+        query_embedding_cache = RunScopedQueryEmbeddingCache(
+            container.ollama,
+            EmbeddingCacheIdentity(
+                model_digest=models["embedding"]["digest"],
+                profile=profile_id,
+                dimension=1024,
+            ),
+        )
         for variant in retrieval_variants:
             variant_id = variant["variant_id"]
-            retriever = RecordingRetriever(container.store, embedding_provider=container.ollama,
+            retriever = RecordingRetriever(container.store, embedding_provider=query_embedding_cache,
                 top_k=variant["top_k"], candidate_k=variant["candidate_k"], rrf_k=variant["rrf_k"])
             retrievers[variant_id] = retriever
             actual_configs[variant_id] = effective_configuration(retriever, container.store, context_builder,
@@ -484,6 +496,7 @@ def run_public_retrieval(
             "prepared_manifest_hash": _sha256((Path(data_root) / "prepared" / "adapters" / dataset_name / "manifest.json").read_bytes()),
             "models": models,
             "embedding_dimension": 1024,
+            "query_embedding_cache": query_embedding_cache.snapshot(),
             "effective_config": actual_configs[base_variant],
             "effective_configs": actual_configs,
             "retrieval_mode_ablation": "keyword/vector rankings are the real candidate sets from one production hybrid call; hybrid uses the production fused ranking. ContextBuilder is applied independently to each stage ranking.",
