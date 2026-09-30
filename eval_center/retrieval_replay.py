@@ -204,7 +204,7 @@ def _read_database_index_metadata(connection, database: str, dataset: Developmen
         FROM chunks c JOIN chunk_embeddings ce ON ce.chunk_id=c.id
         JOIN embedding_profiles p ON p.id=ce.profile_id
         WHERE c.knowledge_base_id=CAST(:kb_id AS uuid)
-        ORDER BY p.model_name,p.id
+        ORDER BY p.model_name,profile_id
     """), {"kb_id": kb_id}).mappings()]
     if len(profile_rows) != 1:
         raise IndexReuseRejected("embedding_profile")
