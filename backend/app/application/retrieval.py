@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -26,7 +27,7 @@ class RetrievalResult:
     reason_codes: tuple[str, ...] = ()
     candidate_rankings: dict[str, tuple[RankedHit, ...]] = field(default_factory=dict)
     fused_ranking: tuple[RankedHit, ...] = ()
-    effective_config: dict[str, int] = field(default_factory=dict)
+    effective_config: dict[str, Any] = field(default_factory=dict)
     latency_ms: float | None = None
     degradation_flags: tuple[str, ...] = ()
     stage_latency_ms: dict[str, float | None] = field(default_factory=dict)
@@ -118,18 +119,24 @@ class HybridRetriever:
         top_k: int = 8,
         candidate_k: int | None = None,
         rrf_k: int = 60,
+        source_weights: Mapping[str, float] | None = None,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
         self.top_k = top_k
         self.candidate_k = candidate_k if candidate_k is not None else max(top_k * 4, 32)
         self.rrf_k = rrf_k
+        self.source_weights = dict(source_weights) if source_weights is not None else None
         self.effective_config()
 
-    def effective_config(self) -> dict[str, int]:
+    def effective_config(self) -> dict[str, Any]:
         config = {'top_k': self.top_k, 'candidate_k': self.candidate_k, 'rrf_k': self.rrf_k}
         if any(type(value) is not int or value <= 0 for value in config.values()):
             raise ValueError('retrieval limits and RRF k must be positive integers')
+        if self.source_weights is not None:
+            # Validate the opt-in configuration before making any retrieval call.
+            rrf_fuse({}, k=self.rrf_k, source_weights=self.source_weights)
+            config['source_weights'] = dict(sorted(self.source_weights.items()))
         return config
 
     def retrieve(self, scope: Scope, question: str, query_plan: NormalizedQuery | None = None) -> RetrievalResult:
@@ -169,7 +176,7 @@ class HybridRetriever:
                 degradation_flags = ('VECTOR_UNAVAILABLE',)
 
         fusion_started=time.perf_counter()
-        full_fused = rrf_fuse(rankings, k=self.rrf_k)
+        full_fused = rrf_fuse(rankings, k=self.rrf_k, source_weights=self.source_weights)
         timings['fusion_ms']=(time.perf_counter()-fusion_started)*1000
         fused = full_fused[: self.top_k]
         items = [RetrievalItem(self.repository.get_chunk(hit.chunk_id), hit) for hit in fused]
