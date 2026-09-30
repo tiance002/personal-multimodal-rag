@@ -54,6 +54,7 @@ exit $code
 - `& 'E:\RAG quention\.venv\Scripts\python.exe' -m pytest backend/tests/test_context_and_locators.py backend/tests/test_hybrid_retrieval.py -q --tb=short -p no:cacheprovider`：退出码 `0`，17 passed。
 - `& 'E:\RAG quention\.venv\Scripts\python.exe' -m pytest eval_center/tests/test_public_runner.py -q --tb=short -p no:cacheprovider`：退出码 `0`，1 passed。
 - `& 'E:\RAG quention\.venv\Scripts\python.exe' -m py_compile eval_center/public_runner.py eval_center/retrieval_replay.py eval_center/verified_index.py eval_center/query_embedding_cache.py eval_center/development_data.py scripts/validate_retrieval_round1.py`：退出码 `0`。
+- 本次离线拆分：`& 'E:\RAG quention\.venv\Scripts\python.exe' -`（Python 源从 PowerShell stdin here-string 传入）：退出码 `0`；只读取保存的 `retrieval-results.json`，汇总每个数据集的排序阶段、Context 阶段和缓存计数，不连接数据库或模型。
 
 执行中遇到并修复的预检问题：首次直接执行 `& 'E:\RAG quention\.venv\Scripts\python.exe' scripts/validate_retrieval_round1.py --preflight-only` 退出码 `1`（模块搜索路径不含仓库根），改用上面的 `python -m` 形式。随后预检曾以 `INDEX_REUSE_REJECTED:index_validation` 退出码 `2`，只读异常栈定位到 `DISTINCT` 的 `ORDER BY p.id` 列表达式不在投影中，修复后进入下一校验；再一次预检退出码 `2`，原因为 Windows CRLF 检出与 Git LF blob 的字节比较差异，修复并新增回归测试后预检通过。失败尝试没有运行查询 Embedding、写库或重建索引。
 
