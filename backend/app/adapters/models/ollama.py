@@ -140,6 +140,8 @@ class OllamaGateway:
             content = response.get("message", {}).get("content")
             if not isinstance(content, str) or not content.strip():
                 raise ProviderUnavailable("ollama answer was empty")
+            if response.get("done_reason") == "length":
+                raise ProviderUnavailable("MODEL_OUTPUT_TRUNCATED")
             answer = content.strip()
             if observation is not None:
                 fields = {"metadata": {"latency_ms": latency_ms, "answer_characters": len(answer)}}

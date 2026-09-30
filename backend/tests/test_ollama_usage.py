@@ -89,3 +89,14 @@ def test_missing_success_usage_and_judge_budget_remain_separate(model_server):
     assert business.summary()['business_total_tokens'] is None
     assert judge.summary()['judge_total_tokens'] == 12
     assert judge.summary()['business_total_tokens'] is None
+
+
+def test_length_limited_answer_is_not_returned_as_complete(model_server):
+    usage = subject()
+    gateway, responses, _ = model_server
+    responses.append((200, {'message': {'content': 'Incomplete claim'}, 'done_reason': 'length', 'prompt_eval_count': 40, 'eval_count': 512}))
+    with usage.capture_usage() as captured:
+        with pytest.raises(ProviderUnavailable, match='MODEL_OUTPUT_TRUNCATED'):
+            gateway.answer('question', 5)
+    assert captured.calls[0].finish_reason == 'length'
+    assert captured.calls[0].output_tokens == 512

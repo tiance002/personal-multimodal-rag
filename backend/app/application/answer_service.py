@@ -135,7 +135,8 @@ class AnswerService:
         with trace_context as langfuse_run:
             smart_evidence: tuple[Any, ...] = ()
             agent_terminal: tuple[str, str | None, int] | None = None
-            if mode == "smart":
+            privacy_evidence_only = self.quick_chain._privacy_configuration(execution_question)
+            if mode == "smart" and not privacy_evidence_only:
                 answer, citations, error_code, trace, smart_evidence, agent_terminal = self._run_smart(
                     conversation_id,
                     execution_question,
@@ -148,7 +149,7 @@ class AnswerService:
                     execution_question,
                     scope,
                     settings=QuickSettings(
-                        local_query_enabled=self.local_query_enabled,
+                        local_query_enabled=self.local_query_enabled and not privacy_evidence_only,
                     ),
                     run_id=run_id,
                     cloud_allowed_by_kb=cloud_allowed_by_kb,
@@ -158,6 +159,8 @@ class AnswerService:
                 answer, citations, error_code = result.answer, result.citations, result.error_code
                 trace = dict(result.trace.__dict__)
                 snapshots = result.evidence
+                if privacy_evidence_only:
+                    trace.update(requested_mode=mode, execution_mode="evidence_only")
 
             if error_code == "CANCELLED" or self._is_cancelled(run_id):
                 if langfuse_run is not None:

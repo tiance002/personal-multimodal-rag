@@ -107,6 +107,7 @@ class LangChainAgentAdapter:
             response = {
                 "prompt_eval_count": usage.get("input_tokens", metadata.get("prompt_eval_count")),
                 "eval_count": usage.get("output_tokens", metadata.get("eval_count")),
+                "done_reason": metadata.get("done_reason"),
             }
             latency = (time.perf_counter() - model_started) * 1000
             with call_stage("answer"):
@@ -159,6 +160,8 @@ class LangChainAgentAdapter:
             def check_after_model(state: Any, runtime: Any) -> None:
                 messages = state.get("messages", [])
                 record_model("ok", messages[-1] if messages else None)
+                if messages and (getattr(messages[-1], "response_metadata", {}) or {}).get("done_reason") == "length":
+                    raise _AgentAbort("MODEL_OUTPUT_TRUNCATED")
                 guard()
 
             agent = create_agent(

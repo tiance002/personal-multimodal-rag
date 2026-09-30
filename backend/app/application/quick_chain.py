@@ -166,8 +166,8 @@ class LangChainQuickChain:
             "citation_service": citation_service,
             "reservation": reservation,
             "model_calls": plan.model_calls,
-            "answer_degradation": plan.degradation_code,
-            "evidence_only": self.answer_gateway is None,
+            "answer_degradation": ";".join(code for code in (plan.degradation_code, "PRIVACY_CONFIG_EVIDENCE_ONLY" if self._privacy_configuration(question) else None) if code) or None,
+            "evidence_only": self.answer_gateway is None or self._privacy_configuration(question),
         }
 
     def _generate(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -183,8 +183,9 @@ class LangChainQuickChain:
         answer_degradation = payload.get("answer_degradation")
         evidence_only = bool(payload["evidence_only"])
 
-        if self.answer_gateway is None:
-            answer = "基于检索到的证据：\n" + bundle.context
+        if evidence_only:
+            prefix = "涉及外发与隐私配置，以下仅提供资料原文；实际运行配置需单独核查：\n" if self._privacy_configuration(question) else "基于检索到的证据：\n"
+            answer = prefix + bundle.context
         else:
             generation_started = time.perf_counter()
             metrics = current_metrics()
@@ -201,13 +202,13 @@ class LangChainQuickChain:
                     settings.answer_timeout_seconds,
                 )
                 generation_status = "ok"
-            except Exception:
+            except Exception as exc:
                 if reservation is not None:
                     self.budget_gate.mark_unknown(reservation.reservation_id)
                 answer = "本地回答模型暂不可用，以下为可回读证据：\n" + bundle.context
                 evidence_only = True
                 answer_degradation = ";".join(
-                    code for code in (answer_degradation, "MODEL_UNAVAILABLE") if code
+                    code for code in (answer_degradation, "MODEL_OUTPUT_TRUNCATED" if str(exc) == "MODEL_OUTPUT_TRUNCATED" else "MODEL_UNAVAILABLE") if code
                 ) or "MODEL_UNAVAILABLE"
             else:
                 if reservation is not None:
@@ -290,6 +291,10 @@ class LangChainQuickChain:
             cost,
             cited_snapshots,
         )
+
+    @staticmethod
+    def _privacy_configuration(question: str) -> bool:
+        return bool(re.search(r"Langfuse|RAG_CLOUD|LANGFUSE_|cloud_allowed|外发|云端(?:边界|配置|开关|权限)|正文采集", question, re.I))
 
     @staticmethod
     def _error_result(

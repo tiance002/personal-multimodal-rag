@@ -21,6 +21,7 @@ class ModelCall:
     latency_ms: float
     input_tokens: int | None
     output_tokens: int | None
+    finish_reason: str | None = None
 
 
 @dataclass
@@ -92,4 +93,5 @@ def record_call(*, model: str, status: str, response: dict[str, Any] | None, lat
         return value if type(value) is int and value >= 0 else None
     capture.calls.append(ModelCall(stage=_STAGE.get(), role=capture.role, model=model,
                                   status=status, latency_ms=latency_ms,
-                                  input_tokens=count('prompt_eval_count'), output_tokens=count('eval_count')))
+                                  input_tokens=count('prompt_eval_count'), output_tokens=count('eval_count'),
+                                  finish_reason=response.get('done_reason') if response is not None else None))
