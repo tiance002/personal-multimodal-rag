@@ -28,6 +28,8 @@ class RetrievalResult:
     candidate_rankings: dict[str, tuple[RankedHit, ...]] = field(default_factory=dict)
     fused_ranking: tuple[RankedHit, ...] = ()
     effective_config: dict[str, Any] = field(default_factory=dict)
+    context_items: tuple[RetrievalItem, ...] = ()
+    context_max_per_document: int | None = None
     latency_ms: float | None = None
     degradation_flags: tuple[str, ...] = ()
     stage_latency_ms: dict[str, float | None] = field(default_factory=dict)
@@ -120,6 +122,8 @@ class HybridRetriever:
         candidate_k: int | None = None,
         rrf_k: int = 60,
         source_weights: Mapping[str, float] | None = None,
+        context_candidate_k: int | None = None,
+        context_max_per_document: int | None = None,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
@@ -127,6 +131,8 @@ class HybridRetriever:
         self.candidate_k = candidate_k if candidate_k is not None else max(top_k * 4, 32)
         self.rrf_k = rrf_k
         self.source_weights = dict(source_weights) if source_weights is not None else None
+        self.context_candidate_k = context_candidate_k
+        self.context_max_per_document = context_max_per_document
         self.effective_config()
 
     def effective_config(self) -> dict[str, Any]:
@@ -137,6 +143,19 @@ class HybridRetriever:
             # Validate the opt-in configuration before making any retrieval call.
             rrf_fuse({}, k=self.rrf_k, source_weights=self.source_weights)
             config['source_weights'] = dict(sorted(self.source_weights.items()))
+        if self.context_candidate_k is not None:
+            context_limit = min(self.candidate_k, self.top_k * 2)
+            if (type(self.context_candidate_k) is not int or self.context_candidate_k < self.top_k
+                    or self.context_candidate_k > context_limit):
+                raise ValueError('context_candidate_k must be between top_k and min(candidate_k, 2*top_k)')
+            if (self.context_max_per_document is not None
+                    and (type(self.context_max_per_document) is not int or self.context_max_per_document <= 0)):
+                raise ValueError('context_max_per_document must be a positive integer')
+            config['context_candidate_k'] = self.context_candidate_k
+            if self.context_max_per_document is not None:
+                config['context_max_per_document'] = self.context_max_per_document
+        elif self.context_max_per_document is not None:
+            raise ValueError('context_max_per_document requires context_candidate_k')
         return config
 
     def retrieve(self, scope: Scope, question: str, query_plan: NormalizedQuery | None = None) -> RetrievalResult:
@@ -181,6 +200,14 @@ class HybridRetriever:
         fused = full_fused[: self.top_k]
         items = [RetrievalItem(self.repository.get_chunk(hit.chunk_id), hit) for hit in fused]
         items = [item for item in items if item.chunk is not None]
+        context_items: tuple[RetrievalItem, ...] = ()
+        if self.context_candidate_k is not None:
+            context_hits = full_fused[: self.context_candidate_k]
+            context_items = tuple(
+                RetrievalItem(chunk, hit)
+                for hit in context_hits
+                if (chunk := self.repository.get_chunk(hit.chunk_id)) is not None
+            )
         sources = tuple(sorted(rankings.keys()))
         return RetrievalResult(
             query_plan=plan,
@@ -189,6 +216,8 @@ class HybridRetriever:
             reason_codes=() if items else ("NO_CANDIDATES",),
             candidate_rankings={name: tuple(hits) for name, hits in rankings.items()},
             fused_ranking=tuple(full_fused), effective_config=effective,
+            context_items=context_items,
+            context_max_per_document=self.context_max_per_document,
             latency_ms=(time.perf_counter()-started)*1000, degradation_flags=degradation_flags,
             stage_latency_ms=timings,
         )

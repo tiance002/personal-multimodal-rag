@@ -105,7 +105,12 @@ class EvidenceService:
         return self.quality_gate.evaluate_chunks(list(chunks), plan.evidence_plan)
 
     def bundle(self, plan: QueryPlan, retrieval: RetrievalResult) -> EvidenceBundle:
-        selected = tuple(self.context_builder.select(retrieval.items))
+        candidates = retrieval.context_items or tuple(retrieval.items)
+        selected = tuple(self.context_builder.select(
+            candidates,
+            max_items=retrieval.effective_config.get("top_k") if retrieval.context_items else None,
+            max_per_document=retrieval.context_max_per_document,
+        ))
         selected_result = RetrievalResult(
             retrieval.query_plan,
             list(selected),
