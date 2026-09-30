@@ -13,6 +13,7 @@ from backend.app.application.retrieval import HybridRetriever
 from backend.app.domain.scope import Scope
 from backend.app.ports.persistence import RunEventStore
 from backend.app.application.run_metrics import collect_metrics, current_metrics
+from backend.app.application.follow_up import resolve_follow_up
 
 
 @dataclass(frozen=True)
@@ -112,6 +113,9 @@ class AnswerService:
             for kb_id in kb_scope
         }
         scope = Scope.from_ids(kb_scope, document_scope)
+        previous_reader = getattr(self.runs, "last_completed_question", None)
+        previous = previous_reader(conversation_id, kb_scope, document_scope) if previous_reader is not None else None
+        execution_question, follow_up_used = resolve_follow_up(content, previous)
 
         if self._is_cancelled(run_id):
             return self._cancelled_outcome(run_id, mode)
@@ -134,14 +138,14 @@ class AnswerService:
             if mode == "smart":
                 answer, citations, error_code, trace, smart_evidence, agent_terminal = self._run_smart(
                     conversation_id,
-                    content,
+                    execution_question,
                     scope,
                     run_id,
                 )
                 snapshots: tuple[Any, ...] = smart_evidence
             else:
                 result = self.quick_chain.invoke(
-                    content,
+                    execution_question,
                     scope,
                     settings=QuickSettings(
                         local_query_enabled=self.local_query_enabled,
@@ -160,6 +164,7 @@ class AnswerService:
                     langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
                 return self._cancelled_outcome(run_id, mode, trace)
 
+            trace["follow_up_context_used"] = follow_up_used
             if (metrics := current_metrics()) is not None:
                 self.runs.append_event(run_id, "run.metrics", metrics.snapshot(citations=citations, error=error_code))
             finalizer = getattr(self.runs, "finalize_answer", None)

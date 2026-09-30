@@ -837,6 +837,18 @@ class PostgresKnowledgeRepository:
         message["citations"] = list(citations) if isinstance(citations, list) else []
         return message
 
+    def last_completed_question(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> str | None:
+        """Use only a completed question in the same conversation and exact scope."""
+        with self.engine.connect() as conn:
+            return conn.execute(text("""
+                SELECT q0 FROM rag_runs
+                WHERE conversation_id=:conversation AND status='completed'
+                  AND knowledge_base_scope=CAST(:kb AS jsonb)
+                  AND document_scope=CAST(:docs AS jsonb)
+                ORDER BY created_at DESC LIMIT 1
+            """), {"conversation": conversation_id, "kb": json.dumps(kb_scope),
+                    "docs": json.dumps(document_scope)}).scalar_one_or_none()
+
     def append_message(self, conversation_id: str, role: str, content: str, run_id: str | None = None) -> dict[str, Any]:
         message_id = uuid.uuid4()
         with self.engine.begin() as conn:
