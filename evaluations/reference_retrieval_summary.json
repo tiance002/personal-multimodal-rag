@@ -1,0 +1,545 @@
+{
+  "schema_version": "v1-reference-retrieval-sanity-summary-v1",
+  "status": "COMPLETED",
+  "gate": "PASS",
+  "sample": {
+    "split": "development",
+    "qid_count_per_dataset": 8,
+    "dataset_count": 3,
+    "total_qids": 24,
+    "score_dependent_selection": false
+  },
+  "sources": {
+    "results": {
+      "path": "var/reports/reference-sanity-20260930/results.json",
+      "sha256": "fa550862bcf15d959a6be13d955c3cd2fc1dde2650b4cea356ca2c46a2fc1a35"
+    },
+    "manifest": {
+      "path": "var/reports/reference-sanity-20260930/manifest.json",
+      "sha256": "c9264d20df4fd48b8f645e0967552a96a9b8ff8e79c607aeea8c8f933ce00e72"
+    },
+    "fixture_sha256": "ca691e3c8b3eacacc75f1d560515d266e22160dc1de47b8101c89f5063615a2d",
+    "preregistration_sha256": "c9264d20df4fd48b8f645e0967552a96a9b8ff8e79c607aeea8c8f933ce00e72",
+    "source_code_git_sha": "0b68385f237e9560ef6929297d459973a4def89d",
+    "runner_command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-m",
+      "scripts.validate_reference_retrieval",
+      "--output",
+      "var\\reports\\reference-sanity-20260930"
+    ]
+  },
+  "recorded_execution": {
+    "command_display": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m scripts.validate_reference_retrieval --output var\\reports\\reference-sanity-20260930",
+    "exit_code": 0,
+    "elapsed_seconds": 155.61216580000473,
+    "elapsed_scope": "Includes full index preflight and postflight.",
+    "retrieval_calls": 48,
+    "query_embedding_calls": 24,
+    "corpus_embedding_calls": 0,
+    "database_writes": 0,
+    "llm_calls": 0,
+    "locked_calls": 0,
+    "postflight_status": "IDENTITY_UNCHANGED"
+  },
+  "profile": {
+    "id": "weknora-rank-rrf-local-v1",
+    "parameters": {
+      "candidate_k": 32,
+      "cloud_fallback_enabled": false,
+      "context_max_chars": 8000,
+      "local_answer_enabled": true,
+      "mmr_enabled": false,
+      "mode": "adaptive",
+      "query_expansion_enabled": false,
+      "query_rewrite_enabled": false,
+      "rerank_enabled": false,
+      "rrf_k": 60,
+      "source_weights": {
+        "keyword": 0.3,
+        "vector": 0.7
+      },
+      "top_k": 5
+    },
+    "arms": {
+      "Adaptive": "offline deterministic selection of the same two arms",
+      "OldHybrid": "saved original Round 1, no execution",
+      "ReferenceHybrid": "new fixed reference profile",
+      "Vector": "new vector only"
+    }
+  },
+  "gate_criteria": {
+    "adaptive_max_harm_qids_per_dataset": 0,
+    "adaptive_min_mean_recall_difference": 0,
+    "gate_fail_action": "freeze Vector default; retain opt-in Hybrid; no new runs",
+    "identity_and_context_validation_required": true
+  },
+  "adaptive_gate_evidence": {
+    "selected_reference_hybrid_qids": 1,
+    "selected_vector_qids": 23,
+    "adaptive_harm_qids_by_dataset": {
+      "scifact": 0,
+      "miracl-zh": 0,
+      "longbench-zh": 0
+    },
+    "adaptive_mean_recall_delta_by_dataset": {
+      "scifact": 0.0,
+      "miracl-zh": 0.0,
+      "longbench-zh": 0.0
+    },
+    "all_four_quality_means_equal_vector_by_dataset": {
+      "scifact": true,
+      "miracl-zh": true,
+      "longbench-zh": true
+    },
+    "interpretation": "PASS is limited to this fixed 24-QID Development sample: Adaptive adds no harm and mean Recall@5 does not decline. It does not establish broad semantic answer quality or a generally optimal route."
+  },
+  "datasets": [
+    {
+      "dataset": "scifact",
+      "split": "development",
+      "qid_count": 8,
+      "cache": {
+        "requests": 16,
+        "provider_calls": 8,
+        "provider_input_items": 8,
+        "cache_hits": 8,
+        "unique_query_keys": 8,
+        "scope": "run",
+        "storage": "memory",
+        "raw_query_retained": false
+      },
+      "adaptive_selected_arm_counts": {
+        "Vector": 7,
+        "ReferenceHybrid": 1
+      },
+      "adaptive_quality_equals_vector": true,
+      "adaptive_recall_at_5_delta_vs_vector": 0.0,
+      "arms": [
+        {
+          "arm": "Vector",
+          "provenance": "New live vector-only arm; measured in this fixed sanity run.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.625,
+          "mrr_at_5": 0.525,
+          "ndcg_at_10": 0.5900232675709843,
+          "context_recall_at_5": 0.5,
+          "rescue_vs_vector": null,
+          "harm_vs_vector": null,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1124.951925005007,
+            "p50": 178.16954999580048,
+            "p95": 5197.780535049966,
+            "p99": 7340.288987049133
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1.3415374996839091,
+            "p50": 1.2605999945662916,
+            "p95": 1.888760004658252,
+            "p99": 1.8888720055110753
+          }
+        },
+        {
+          "arm": "OldHybrid",
+          "provenance": "Historical Round 1 saved arm; metrics and timings reused, not rerun.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.5,
+          "mrr_at_5": 0.375,
+          "ndcg_at_10": 0.4077324383928644,
+          "context_recall_at_5": 0.5,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 1,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 393.9322250080295,
+            "p50": 402.16600001440383,
+            "p95": 454.89077000820544,
+            "p99": 466.5532740036724
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 0.9620874989195727,
+            "p50": 0.9224000095855445,
+            "p95": 1.2258150090929119,
+            "p99": 1.3314030307810754
+          }
+        },
+        {
+          "arm": "ReferenceHybrid",
+          "provenance": "New fixed reference hybrid profile; measured in this fixed sanity run.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.5,
+          "mrr_at_5": 0.5,
+          "ndcg_at_10": 0.5737618527477336,
+          "context_recall_at_5": 0.5,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 1,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 493.4730500099249,
+            "p50": 352.73420001612976,
+            "p95": 1131.462600032682,
+            "p99": 1417.9132400447265
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1.2363000132609159,
+            "p50": 1.2179500190541148,
+            "p95": 1.648590000695549,
+            "p99": 1.6913179837865755
+          }
+        },
+        {
+          "arm": "Adaptive",
+          "provenance": "Offline per-QID selection from the same Vector and ReferenceHybrid outputs; no retrieval call.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.625,
+          "mrr_at_5": 0.525,
+          "ndcg_at_10": 0.5900232675709843,
+          "context_recall_at_5": 0.5,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 0,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1144.3869250069838,
+            "p50": 200.51545000751503,
+            "p95": 5229.571140030745,
+            "p99": 7346.647108045288
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1.3677750030183233,
+            "p50": 1.2605999945662916,
+            "p95": 1.888760004658252,
+            "p99": 1.8888720055110753
+          }
+        }
+      ],
+      "reference_minus_vector": {
+        "document_recall_at_5": -0.125,
+        "mrr_at_5": -0.025000000000000022,
+        "ndcg_at_10": -0.01626141482325072,
+        "context_recall_at_5": 0.0
+      },
+      "postflight_index": {
+        "status": "INDEX_UNCHANGED_READ_ONLY",
+        "fingerprint": "f6c8b191834638dfa8315adc158b1875ac69c0bef5ba2baac598734976aadb93"
+      }
+    },
+    {
+      "dataset": "miracl-zh",
+      "split": "development",
+      "qid_count": 8,
+      "cache": {
+        "requests": 16,
+        "provider_calls": 8,
+        "provider_input_items": 8,
+        "cache_hits": 8,
+        "unique_query_keys": 8,
+        "scope": "run",
+        "storage": "memory",
+        "raw_query_retained": false
+      },
+      "adaptive_selected_arm_counts": {
+        "Vector": 8
+      },
+      "adaptive_quality_equals_vector": true,
+      "adaptive_recall_at_5_delta_vs_vector": 0.0,
+      "arms": [
+        {
+          "arm": "Vector",
+          "provenance": "New live vector-only arm; measured in this fixed sanity run.",
+          "qid_count": 8,
+          "document_recall_at_5": 1.0,
+          "mrr_at_5": 0.8541666666666666,
+          "ndcg_at_10": 0.8821182956677268,
+          "context_recall_at_5": 1.0,
+          "rescue_vs_vector": null,
+          "harm_vs_vector": null,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 122.86341250000987,
+            "p50": 71.46799998008646,
+            "p95": 227.0001500000944,
+            "p99": 237.4567500053672
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1.3206750008976087,
+            "p50": 1.4554499939549714,
+            "p95": 1.737930002855137,
+            "p99": 1.7419060005340725
+          }
+        },
+        {
+          "arm": "OldHybrid",
+          "provenance": "Historical Round 1 saved arm; metrics and timings reused, not rerun.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.625,
+          "mrr_at_5": 0.5,
+          "ndcg_at_10": 0.6476975370363878,
+          "context_recall_at_5": 0.625,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 3,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 138.60211250721477,
+            "p50": 144.05010000336915,
+            "p95": 203.12103500473313,
+            "p99": 203.5404470039066
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 0.8772125074756332,
+            "p50": 0.8082999847829342,
+            "p95": 1.1194000428076833,
+            "p99": 1.1574800394009799
+          }
+        },
+        {
+          "arm": "ReferenceHybrid",
+          "provenance": "New fixed reference hybrid profile; measured in this fixed sanity run.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.625,
+          "mrr_at_5": 0.5625,
+          "ndcg_at_10": 0.6885181336136883,
+          "context_recall_at_5": 0.625,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 3,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 316.748462500982,
+            "p50": 189.4204999844078,
+            "p95": 997.2942000022152,
+            "p99": 1310.9927600016815
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1.2612250138772652,
+            "p50": 1.0202999983448535,
+            "p95": 2.04855500778649,
+            "p99": 2.110911009949632
+          }
+        },
+        {
+          "arm": "Adaptive",
+          "provenance": "Offline per-QID selection from the same Vector and ReferenceHybrid outputs; no retrieval call.",
+          "qid_count": 8,
+          "document_recall_at_5": 1.0,
+          "mrr_at_5": 0.8541666666666666,
+          "ndcg_at_10": 0.8821182956677268,
+          "context_recall_at_5": 1.0,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 0,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 122.86341250000987,
+            "p50": 71.46799998008646,
+            "p95": 227.0001500000944,
+            "p99": 237.4567500053672
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 1.3206750008976087,
+            "p50": 1.4554499939549714,
+            "p95": 1.737930002855137,
+            "p99": 1.7419060005340725
+          }
+        }
+      ],
+      "reference_minus_vector": {
+        "document_recall_at_5": -0.375,
+        "mrr_at_5": -0.29166666666666663,
+        "ndcg_at_10": -0.19360016205403852,
+        "context_recall_at_5": -0.375
+      },
+      "postflight_index": {
+        "status": "INDEX_UNCHANGED_READ_ONLY",
+        "fingerprint": "629b25a5a14ea2ab960fa874c3b16e8cc77a61d0bb65e0e0847ce3c04d473c82"
+      }
+    },
+    {
+      "dataset": "longbench-zh",
+      "split": "development",
+      "qid_count": 8,
+      "cache": {
+        "requests": 16,
+        "provider_calls": 8,
+        "provider_input_items": 8,
+        "cache_hits": 8,
+        "unique_query_keys": 8,
+        "scope": "run",
+        "storage": "memory",
+        "raw_query_retained": false
+      },
+      "adaptive_selected_arm_counts": {
+        "Vector": 8
+      },
+      "adaptive_quality_equals_vector": true,
+      "adaptive_recall_at_5_delta_vs_vector": 0.0,
+      "arms": [
+        {
+          "arm": "Vector",
+          "provenance": "New live vector-only arm; measured in this fixed sanity run.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.75,
+          "mrr_at_5": 0.3958333333333333,
+          "ndcg_at_10": 0.5221022491165643,
+          "context_recall_at_5": 0.75,
+          "rescue_vs_vector": null,
+          "harm_vs_vector": null,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 140.20634999178583,
+            "p50": 169.48164999485016,
+            "p95": 212.28359498200007,
+            "p99": 217.79855899163522
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 0.8784749952610582,
+            "p50": 0.8549999911338091,
+            "p95": 1.1359100055415183,
+            "p99": 1.1570220033172518
+          }
+        },
+        {
+          "arm": "OldHybrid",
+          "provenance": "Historical Round 1 saved arm; metrics and timings reused, not rerun.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.5,
+          "mrr_at_5": 0.22916666666666666,
+          "ndcg_at_10": 0.41526125079480314,
+          "context_recall_at_5": 0.5,
+          "rescue_vs_vector": 1,
+          "harm_vs_vector": 3,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 586.2755624984857,
+            "p50": 512.7247500058729,
+            "p95": 1080.781514980481,
+            "p99": 1144.968462966499
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 0.5656875146087259,
+            "p50": 0.5560000136028975,
+            "p95": 0.6631599855609237,
+            "p99": 0.7052719802595675
+          }
+        },
+        {
+          "arm": "ReferenceHybrid",
+          "provenance": "New fixed reference hybrid profile; measured in this fixed sanity run.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.75,
+          "mrr_at_5": 0.3020833333333333,
+          "ndcg_at_10": 0.4509368188757385,
+          "context_recall_at_5": 0.625,
+          "rescue_vs_vector": 1,
+          "harm_vs_vector": 1,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 875.1171000039903,
+            "p50": 919.4292500033043,
+            "p95": 1245.8525849942814,
+            "p99": 1333.6658769840142
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 0.8319750049849972,
+            "p50": 0.6161500059533864,
+            "p95": 1.4979749830672513,
+            "p99": 1.679834982496686
+          }
+        },
+        {
+          "arm": "Adaptive",
+          "provenance": "Offline per-QID selection from the same Vector and ReferenceHybrid outputs; no retrieval call.",
+          "qid_count": 8,
+          "document_recall_at_5": 0.75,
+          "mrr_at_5": 0.3958333333333333,
+          "ndcg_at_10": 0.5221022491165643,
+          "context_recall_at_5": 0.75,
+          "rescue_vs_vector": 0,
+          "harm_vs_vector": 0,
+          "retrieval_latency_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 140.20634999178583,
+            "p50": 169.48164999485016,
+            "p95": 212.28359498200007,
+            "p99": 217.79855899163522
+          },
+          "context_building_ms": {
+            "evaluated": 8,
+            "unavailable": 0,
+            "mean": 0.8784749952610582,
+            "p50": 0.8549999911338091,
+            "p95": 1.1359100055415183,
+            "p99": 1.1570220033172518
+          }
+        }
+      ],
+      "reference_minus_vector": {
+        "document_recall_at_5": 0.0,
+        "mrr_at_5": -0.09375,
+        "ndcg_at_10": -0.07116543024082583,
+        "context_recall_at_5": -0.125
+      },
+      "postflight_index": {
+        "status": "INDEX_UNCHANGED_READ_ONLY",
+        "fingerprint": "0d41031e54185d2ebc026cdeb62a099427f35a09b0b2d2034a5ce12e4dd3c179"
+      }
+    }
+  ],
+  "cache_totals": {
+    "requests": 48,
+    "provider_calls": 24,
+    "provider_input_items": 24,
+    "cache_hits": 24,
+    "unique_query_keys": 24,
+    "scope": "run",
+    "storage": "memory",
+    "raw_query_retained": false,
+    "per_arm_attribution": "The artifact records cache counts per dataset, not per arm. Vector and ReferenceHybrid were the two live arms; OldHybrid was historical and Adaptive was offline."
+  },
+  "interpretation_limits": [
+    "Only eight Development QIDs per dataset were evaluated.",
+    "Adaptive selected ReferenceHybrid once and Vector for the other 23 QIDs; identifier routing therefore has limited coverage in this sample.",
+    "ReferenceHybrid lowered Recall@5 versus Vector on SciFact (0.625 to 0.500) and MIRACL (1.000 to 0.625). On LongBench, Recall@5 remained 0.750, while MRR@5 fell from 0.395833 to 0.302083 and Context Recall@5 from 0.750 to 0.625.",
+    "Adaptive latency is a counterfactual combination of selected same-batch arm timings and excludes actual router overhead.",
+    "Latency samples are small and mix cache/cold-warm effects; they are not a causal or general performance benchmark.",
+    "No LLM calls were made, so this does not test generated answer quality, citation quality, or general semantic support."
+  ],
+  "content_boundary": {
+    "raw_question_text_included": false,
+    "raw_answer_or_gold_text_included": false,
+    "database_credentials_included": false,
+    "per_qid_hashes_or_identifiers_included": false
+  }
+}
