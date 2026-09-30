@@ -17,6 +17,12 @@ class Settings:
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
     local_query_enabled: bool = False
+    retrieval_mode: str = "adaptive"
+    local_answer_enabled: bool = True
+    rerank_enabled: bool = False
+    mmr_enabled: bool = False
+    query_rewrite_enabled: bool = False
+    cloud_fallback_enabled: bool = False
     inline_ingestion_enabled: bool = True
     host: str = "127.0.0.1"
     port: int = 8000
@@ -56,6 +62,12 @@ class Settings:
             service_name=os.getenv("RAG_SERVICE_NAME", cls.service_name),
             cloud_enabled=_env_bool("RAG_CLOUD_ENABLED", False),
             local_query_enabled=_env_bool("RAG_LOCAL_QUERY_ENABLED", False),
+            retrieval_mode=os.getenv("RAG_RETRIEVAL_MODE", cls.retrieval_mode),
+            local_answer_enabled=_env_bool("RAG_LOCAL_ANSWER_ENABLED", True),
+            rerank_enabled=_env_bool("RAG_RERANK_ENABLED", False),
+            mmr_enabled=_env_bool("RAG_MMR_ENABLED", False),
+            query_rewrite_enabled=_env_bool("RAG_QUERY_REWRITE_ENABLED", False),
+            cloud_fallback_enabled=_env_bool("RAG_CLOUD_FALLBACK_ENABLED", False),
             inline_ingestion_enabled=_env_bool("RAG_INLINE_INGESTION", True),
             host=os.getenv("RAG_HOST", cls.host),
             port=port,

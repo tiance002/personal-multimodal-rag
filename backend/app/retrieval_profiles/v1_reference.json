@@ -1,0 +1,27 @@
+{
+  "schema_version": "retrieval-profile-v1",
+  "profile_id": "weknora-rank-rrf-local-v1",
+  "parameters": {
+    "mode": "adaptive", "candidate_k": 32, "top_k": 5, "rrf_k": 60,
+    "source_weights": {"vector": 0.7, "keyword": 0.3},
+    "context_max_chars": 8000, "rerank_enabled": false, "mmr_enabled": false,
+    "query_rewrite_enabled": false, "query_expansion_enabled": false,
+    "local_answer_enabled": true, "cloud_fallback_enabled": false
+  },
+  "parameter_sources": {
+    "mode": {"kind": "PROJECT_ADAPTATION", "reason": "Semantic vector default; deterministic exact/identifier hybrid; validate current BGE-M3 domain shift."},
+    "candidate_k": {"kind": "PROJECT_ADAPTATION", "reference_value": 30, "existing_project_value": 32, "reason": "Retain existing bounded recall depth; no grid."},
+    "top_k": {"kind": "PROJECT_ADAPTATION", "existing_project_value": 5, "reason": "Round 1 answer-context depth; bounded local context."},
+    "rrf_k": {"kind": "REFERENCE_DEFAULT", "source": "https://github.com/Tencent/WeKnora/blob/v0.8.2/internal/types/retrieval_config.go"},
+    "source_weights": {"kind": "REFERENCE_DEFAULT", "source": "https://github.com/Tencent/WeKnora/blob/v0.8.2/internal/types/retrieval_config.go", "meaning": "Sum weight/(k+1-based source rank); not raw similarity."},
+    "context_max_chars": {"kind": "EXISTING_PROJECT_VALUE", "source": "backend/app/application/context_builder.py"},
+    "rerank_enabled": {"kind": "PROJECT_ADAPTATION", "reason": "Optional port, no resident heavy model on 8 GB GPU."},
+    "mmr_enabled": {"kind": "PROJECT_ADAPTATION", "reason": "Optional port; no unvalidated MMR or embedding calls."},
+    "query_rewrite_enabled": {"kind": "PROJECT_ADAPTATION", "reason": "No general rewrite adapter; q0 remains available."},
+    "query_expansion_enabled": {"kind": "EXISTING_PROJECT_VALUE", "reason": "Existing opt-in local expansion only after empty recall."},
+    "local_answer_enabled": {"kind": "EXISTING_PROJECT_VALUE", "reason": "Existing local Ollama generation; can be disabled."},
+    "cloud_fallback_enabled": {"kind": "PROJECT_ADAPTATION", "reason": "Execution interface only; no cloud adapter or automatic policy."}
+  },
+  "thresholds": {"copied_from_reference": false, "reason": "Current term-frequency keyword scores are not BM25 or RAGFlow token-similarity scores."},
+  "reference": {"project": "Tencent/WeKnora", "tag": "v0.8.2", "equation_source": "https://github.com/Tencent/WeKnora/blob/v0.8.2/internal/application/service/knowledgebase_search_fusion.go"}
+}

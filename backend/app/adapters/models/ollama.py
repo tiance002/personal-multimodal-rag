@@ -13,6 +13,8 @@ from backend.app.adapters.models.usage import call_stage, record_call
 
 
 class OllamaGateway:
+    provider_kind = "local"
+    provider_name = "ollama"
     def __init__(
         self,
         base_url: str,
@@ -131,7 +133,7 @@ class OllamaGateway:
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
                     "think": False,
-                    "options": {"temperature": 0, "num_predict": 512},
+                    "options": {"temperature": 0, "num_predict": 512, "num_ctx": 8192},
                 },
                 timeout_seconds,
             )

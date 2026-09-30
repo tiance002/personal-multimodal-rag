@@ -70,7 +70,9 @@ def test_quick_answer_records_the_frozen_event_sequence():
     outcome = AnswerService(retriever=HybridRetriever(repository), runs=runs).answer(_conversation(), "证据")
 
     assert outcome.error_code is None
-    assert runs.event_names() == ["run.created", "retrieval.started", "retrieval.completed", "evidence.frozen", "answer.completed"]
+    assert runs.event_names() == ["run.created", "retrieval.started", "run.metrics", "retrieval.completed", "evidence.frozen", "answer.completed"]
+    assert runs.events[2][2]["query_id"] == outcome.run_id
+    assert runs.events[2][2]["selected_context_chunk_ids"] == ["c"]
     assert runs.evidence == [("run-1", ["E1"])]
     assert runs.hits == [("run-1", ["c"])]
     assert runs.completed == [("run-1", "completed", None)]
@@ -84,7 +86,7 @@ def test_no_evidence_run_fails_without_fabricating_an_answer():
 
     assert outcome.error_code == "NO_CANDIDATES"
     assert outcome.answer == ""
-    assert runs.event_names() == ["run.created", "retrieval.started", "retrieval.completed", "run.failed"]
+    assert runs.event_names() == ["run.created", "retrieval.started", "run.metrics", "retrieval.completed", "run.failed"]
     assert runs.evidence == []
     assert all(role != "assistant" for _, role, _ in runs.messages)
     assert runs.completed == [("run-1", "failed", "NO_CANDIDATES")]
@@ -120,6 +122,7 @@ def test_smart_mode_records_a_single_tool_step_through_the_smart_agent_port():
         "retrieval.started",
         "tool.started",
         "tool.completed",
+        "run.metrics",
         "retrieval.completed",
         "evidence.frozen",
         "answer.completed",

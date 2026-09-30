@@ -81,11 +81,13 @@ class KnowledgeToolGateway:
     def _search_knowledge(self, args: dict[str, Any], scope: Scope) -> list[dict[str, Any]]:
         if self.knowledge_gateway is None:
             return []
-        result = self.knowledge_gateway.search(scope, str(args.get("query", args.get("question", ""))))
+        query = str(args.get("query", args.get("question", "")))
+        plan, result = self.knowledge_gateway.retrieve_question(scope, query)
+        selected = list(self.knowledge_gateway.evidence.bundle(plan, result).selected)
         if self.on_retrieval is not None:
-            self.on_retrieval(result.items)
+            self.on_retrieval(selected)
         if self.evidence_accumulator is not None:
-            self.evidence_accumulator.add(item.chunk for item in result.items)
+            self.evidence_accumulator.add(item.chunk for item in selected)
         return [
             {
                 "chunk_id": item.chunk.chunk_id,
@@ -95,7 +97,7 @@ class KnowledgeToolGateway:
                 "quote": item.chunk.content,
                 **({"citation_label": self.evidence_accumulator.label_for(item.chunk)} if self.evidence_accumulator is not None else {}),
             }
-            for item in result.items
+            for item in selected
         ]
 
     def _read_document(self, args: dict[str, Any], scope: Scope) -> dict[str, Any]:

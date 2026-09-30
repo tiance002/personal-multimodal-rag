@@ -12,6 +12,8 @@ from pydantic import BaseModel, Field
 from backend.app.application.agent_ports import SmartAgentResult
 from backend.app.application.evidence_accumulator import EvidenceAccumulator
 from backend.app.application.knowledge_tools import KnowledgeToolGateway
+from backend.app.application.model_usage import call_stage, record_call
+from backend.app.application.run_metrics import current_metrics
 from backend.app.domain.agent_policy import ALLOWED_READ_TOOLS, AgentLimits, AgentStep, estimate_tokens
 from backend.app.domain.models import EvidenceSnapshot
 from backend.app.domain.scope import Scope
@@ -93,6 +95,27 @@ class LangChainAgentAdapter:
 
         started = time.perf_counter()
         model_calls = 0
+        model_started: float | None = None
+        usage_start = 0
+
+        def record_model(status: str, message: Any = None) -> None:
+            nonlocal model_started
+            if model_started is None:
+                return
+            usage = getattr(message, "usage_metadata", {}) or {}
+            metadata = getattr(message, "response_metadata", {}) or {}
+            response = {
+                "prompt_eval_count": usage.get("input_tokens", metadata.get("prompt_eval_count")),
+                "eval_count": usage.get("output_tokens", metadata.get("eval_count")),
+            }
+            latency = (time.perf_counter() - model_started) * 1000
+            with call_stage("answer"):
+                record_call(model=self._model_name() or "NOT_AVAILABLE", status=status,
+                            response=response, latency_ms=latency)
+            if (metrics := current_metrics()) is not None:
+                metrics.record_generation(path="LOCAL", provider="ollama", model=self._model_name() or "NOT_AVAILABLE",
+                                          usage_start=usage_start, latency_ms=latency, status=status)
+            model_started = None
         cancelled = lambda: self._is_cancelled(trace_store, run_id)
         steps: list[AgentStep] = []
 
@@ -125,12 +148,17 @@ class LangChainAgentAdapter:
 
             @before_model
             def check_before_model(state: Any, runtime: Any) -> None:
-                nonlocal model_calls
+                nonlocal model_calls, model_started, usage_start
                 guard()
                 model_calls += 1
+                model_started = time.perf_counter()
+                metrics = current_metrics()
+                usage_start = len(metrics.usage.calls) if metrics is not None else 0
 
             @after_model
             def check_after_model(state: Any, runtime: Any) -> None:
+                messages = state.get("messages", [])
+                record_model("ok", messages[-1] if messages else None)
                 guard()
 
             agent = create_agent(
@@ -232,8 +260,10 @@ class LangChainAgentAdapter:
                 ),
             )
         except _AgentAbort as exc:
+            record_model("error")
             return self._finish(trace_store, SmartAgentResult(run_id, "cancelled" if exc.code == "CANCELLED" else "failed", steps=tuple(steps), error_code=exc.code, model_calls=model_calls))
         except Exception as exc:
+            record_model("error")
             code = "AGENT_STEP_LIMIT" if type(exc).__name__ in {"ToolCallLimitExceededError", "GraphRecursionError"} else type(exc).__name__
             return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code=code, model_calls=model_calls))
 

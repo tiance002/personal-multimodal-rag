@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import uuid
+import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -13,6 +14,8 @@ from backend.app.application.citations import CitationService, InMemoryCitationS
 from backend.app.application.knowledge_gateway import AnswerResult, EvidenceBundle, KnowledgeGateway, QueryPlan, Trace
 from backend.app.application.retrieval import RetrievalItem
 from backend.app.domain.scope import Scope
+from backend.app.application.execution_routing import ExecutionRouter
+from backend.app.application.run_metrics import current_metrics
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,7 @@ class LangChainQuickChain:
         self.knowledge_gateway = knowledge_gateway
         self.answer_gateway = answer_gateway
         self.budget_gate = budget_gate
+        self.execution_router = ExecutionRouter()
         self.runnable = (
             RunnableLambda(self._prepare)
             | RunnableLambda(self._generate)
@@ -79,6 +83,14 @@ class LangChainQuickChain:
         settings: QuickSettings = payload["settings"]
         run_id = str(payload["run_id"])
         cloud_allowed_by_kb: dict[str, bool] = payload["cloud_allowed_by_kb"]
+        execution_route = self.execution_router.choose(
+            prefer_cloud=settings.prefer_cloud, cloud_enabled=settings.cloud_enabled,
+            cloud_allowed=bool(scope.knowledge_base_ids) and all(cloud_allowed_by_kb.get(kb_id, False) for kb_id in scope.knowledge_base_ids),
+            cloud_provider_available=self.answer_gateway is not None and getattr(self.answer_gateway, "provider_kind", None) != "local",
+        )
+        payload["execution_route"] = execution_route
+        if execution_route.error_code is not None:
+            return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), execution_route.error_code))
         if settings.prefer_cloud and settings.cloud_enabled:
             if any(not cloud_allowed_by_kb.get(kb_id, False) for kb_id in scope.knowledge_base_ids):
                 plan = self.knowledge_gateway.plan(question)
@@ -174,14 +186,21 @@ class LangChainQuickChain:
         if self.answer_gateway is None:
             answer = "基于检索到的证据：\n" + bundle.context
         else:
+            generation_started = time.perf_counter()
+            metrics = current_metrics()
+            usage_start = len(metrics.usage.calls) if metrics is not None else 0
+            path = payload["execution_route"].path
+            provider = getattr(self.answer_gateway, "provider_name", "NOT_AVAILABLE")
+            model = getattr(self.answer_gateway, "chat_model", "NOT_AVAILABLE")
+            generation_status = "error"
             try:
-                if not (settings.prefer_cloud and settings.cloud_enabled):
-                    model_calls += 1
+                model_calls += 1
                 answer = self.answer_gateway.answer(
                     "Answer only from the supplied evidence. Cite every factual statement with its exact "
                     f"[E#] label; say when a requested fact is missing.\nQuestion: {question}\nEvidence:\n{bundle.context}",
                     settings.answer_timeout_seconds,
                 )
+                generation_status = "ok"
             except Exception:
                 if reservation is not None:
                     self.budget_gate.mark_unknown(reservation.reservation_id)
@@ -197,6 +216,7 @@ class LangChainQuickChain:
                             reservation.reservation_id,
                             settings.cloud_cost_estimate_microunits,
                         )
+
                     except BudgetDenied as exc:
                         self.budget_gate.mark_unknown(reservation.reservation_id)
                         return self._terminal(
@@ -221,6 +241,12 @@ class LangChainQuickChain:
                                 model_calls,
                             ),
                         )
+
+            finally:
+                if metrics is not None:
+                    metrics.record_generation(path=path, provider=provider, model=model, usage_start=usage_start,
+                                              latency_ms=(time.perf_counter() - generation_started) * 1000,
+                                              status=generation_status)
 
         return {
             **payload,

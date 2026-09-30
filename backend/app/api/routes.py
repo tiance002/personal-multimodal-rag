@@ -386,6 +386,7 @@ def _answer_service(request: Request) -> AnswerService:
         document_resolver=container.store.get_document_access,
         smart_agent=container.smart_agent,
         local_query_enabled=settings.local_query_enabled,
+        local_query_gateway=container.ollama,
         observability=container.langfuse,
     )
 

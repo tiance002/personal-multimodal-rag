@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from contextlib import nullcontext
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from backend.app.application.agent_ports import SmartAgentPort
@@ -12,6 +12,7 @@ from backend.app.application.quick_chain import LangChainQuickChain, QuickSettin
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.domain.scope import Scope
 from backend.app.ports.persistence import RunEventStore
+from backend.app.application.run_metrics import collect_metrics, current_metrics
 
 
 @dataclass(frozen=True)
@@ -88,11 +89,20 @@ class AnswerService:
         )
 
     def answer(self, conversation: dict[str, Any], content: str, mode: str = "quick") -> AnswerOutcome:
+        with collect_metrics("pending") as metrics:
+            outcome = self._answer(conversation, content, mode)
+            metrics.query_id = outcome.run_id
+            row = metrics.snapshot(citations=outcome.citations, error=outcome.error_code)
+            return replace(outcome, trace={**outcome.trace, "metrics": row})
+
+    def _answer(self, conversation: dict[str, Any], content: str, mode: str = "quick") -> AnswerOutcome:
         kb_scope = list(conversation["knowledge_base_scope"])
         document_scope = list(conversation["document_scope"] or [])
         conversation_id = str(conversation["id"])
 
         run_id = self.runs.create_run(conversation_id, kb_scope, document_scope, content)
+        if (metrics := current_metrics()) is not None:
+            metrics.query_id = run_id
         self.runs.append_event(run_id, "run.created", {"run_id": run_id})
         self.runs.append_message(conversation_id, "user", content)
         self.runs.append_event(run_id, "retrieval.started", {"scope": kb_scope, "document_scope": document_scope})
@@ -150,6 +160,8 @@ class AnswerService:
                     langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
                 return self._cancelled_outcome(run_id, mode, trace)
 
+            if (metrics := current_metrics()) is not None:
+                self.runs.append_event(run_id, "run.metrics", metrics.snapshot(citations=citations, error=error_code))
             finalizer = getattr(self.runs, "finalize_answer", None)
             if finalizer is not None:
                 committed = finalizer(

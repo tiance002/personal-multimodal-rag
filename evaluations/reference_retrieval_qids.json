@@ -1,0 +1,86 @@
+{
+  "schema_version": "reference-retrieval-qids-v1",
+  "purpose": "Fixed sanity selection from the original Round 1 frozen Development QID fixture.",
+  "development_only": true,
+  "total_qid_count": 24,
+  "selection": {
+    "algorithm": "Sort each dataset's original fixture QIDs by ascending SHA-256 digest of UTF-8 string salt|dataset_key|qid; break digest ties by ascending qid; take the first 8.",
+    "salt": "v1-reference-sanity-20260930",
+    "hash_input_template": "v1-reference-sanity-20260930|{dataset_key}|{qid}",
+    "sort_order": [
+      "sha256_hex_ascending",
+      "qid_ascending_on_digest_tie"
+    ],
+    "selected_per_dataset": 8,
+    "selection_sha256_definition": "SHA-256 over UTF-8 bytes of the selected ordered QIDs joined with LF and no trailing LF."
+  },
+  "source": {
+    "original_fixture_path": "eval_center/fixtures/rag-retrieval-round1-qids.json",
+    "original_fixture_sha256": "d1d640cb658cc68c0c2304224081f0e2f1052c7587bb69bb6f4aef2fd097b499",
+    "original_fixture_selection_sha256": "babb41023732677201df7328daaf0ee93d6734060031b0dbac39485c366470ed",
+    "replay_artifact_path": "D:\\RAG-Public-Bench\\round1\\results\\2026-09-30-rag-retrieval-opt-round1\\retrieval-results.json",
+    "source_artifact_sha256": "b22ddce5112f7dfb9f9448276ea9639e1381df764e483f5fab7d1314d1565019",
+    "review_report_path": "docs/reviews/2026-09-30-rag-retrieval-optimization-round1.md",
+    "review_report_sha256": "151ff53ce56fc54f68f334766be4392b9f73f8dd2e2a49e81689c14312b166ab",
+    "replay_qid_membership_matches_fixture": true
+  },
+  "datasets": [
+    {
+      "dataset_key": "scifact",
+      "split": "development",
+      "source_fixture_qid_count": 80,
+      "selected_qid_count": 8,
+      "selection_sha256": "176346cc09debfec5fb7f7573ba636fbd4ee3ade6c2542ae0eaadacc4a82e8b3",
+      "qids": [
+        "486",
+        "469",
+        "615",
+        "392",
+        "414",
+        "933",
+        "877",
+        "1206"
+      ]
+    },
+    {
+      "dataset_key": "miracl-zh",
+      "split": "development",
+      "source_fixture_qid_count": 80,
+      "selected_qid_count": 8,
+      "selection_sha256": "b24ba053d5c1672c466a95081ea462f7b3056979b2e0ce7b2669c59867cce3a6",
+      "qids": [
+        "7634078#0",
+        "3261076#0",
+        "6097442#0",
+        "6812083#0",
+        "4791345#0",
+        "226272#0",
+        "91294#0",
+        "1545080#0"
+      ]
+    },
+    {
+      "dataset_key": "longbench-zh",
+      "split": "development",
+      "source_fixture_qid_count": 80,
+      "selected_qid_count": 8,
+      "selection_sha256": "43777ec31d87ba401a1613a662b9706198cef5e7b490b0164b7ec5fa3d1d49e2",
+      "qids": [
+        "multifieldqa_zh:00c86b6ec7a4d92a2524cf61234296271b11bce5f43dcad3",
+        "multifieldqa_zh:87121067a48cb26bef61d022077239fa38f9545060d3f7e6",
+        "multifieldqa_zh:815b1cb762d5f13120230eaf064a656a1ca14cb3e80de012",
+        "multifieldqa_zh:c464612fd58ce0dcdff5729d367548370b3f48076b14852c",
+        "multifieldqa_zh:c9d98e3c86f1a4709342c8cc8e08681c3bf2180136c81634",
+        "multifieldqa_zh:f175082600b74404f64ce00afccc4fd13335deea38f7d577",
+        "multifieldqa_zh:b95f188a44a6abc37e88a3305a0e7c245247c645e838bf49",
+        "multifieldqa_zh:792f26d086a06374cef8563d1d858ffcfcd3b5c82574555a"
+      ]
+    }
+  ],
+  "content_boundary": {
+    "contains_qid_identifiers_only": true,
+    "query_text_included": false,
+    "gold_or_answer_content_included": false,
+    "score_dependent_selection": false
+  }
+}

@@ -21,6 +21,9 @@ from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledge
 from backend.app.adapters.storage import ContentAddressedStorage
 from backend.app.application.budget import PostgresBudgetGate
 from backend.app.application.knowledge_gateway import KnowledgeGateway
+from backend.app.application.knowledge_gateway import EvidenceService
+from backend.app.application.context_builder import ContextBuilder
+from backend.app.application.retrieval_profile import reference_profile
 from backend.app.application.langchain_agent import LangChainAgentAdapter
 from backend.app.application.quick_chain import LangChainQuickChain
 from backend.app.application.retrieval import HybridRetriever
@@ -55,6 +58,11 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     unguarded lazy initialisation, which could construct two engines and two
     budget gates under concurrent first requests.
     """
+    profile = reference_profile()["parameters"]
+    unavailable = [name for name in ("rerank_enabled", "mmr_enabled", "query_rewrite_enabled", "cloud_fallback_enabled")
+                   if getattr(settings, name)]
+    if unavailable:
+        raise ValueError("optional adapters are not implemented: " + ", ".join(unavailable))
     engine = create_engine(settings.database_url, pool_pre_ping=True)
     storage = ContentAddressedStorage(settings.storage_root)
     langfuse = LangfuseObservability(
@@ -93,17 +101,21 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
                 reasoning=False,
                 seed=0,
                 num_predict=512,
+                num_ctx=8192,
             )
     else:
         agent_model_value = agent_model
     budget_gate = PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits)
     knowledge_gateway = KnowledgeGateway(
-        HybridRetriever(store, embedding_provider=ollama),
+        HybridRetriever(store, embedding_provider=ollama, mode=settings.retrieval_mode,
+                        top_k=profile["top_k"], candidate_k=profile["candidate_k"],
+                        rrf_k=profile["rrf_k"], source_weights=profile["source_weights"]),
+        evidence_service=EvidenceService(context_builder=ContextBuilder(profile["context_max_chars"])),
         observability=langfuse,
     )
     quick_chain = LangChainQuickChain(
         knowledge_gateway,
-        answer_gateway=ollama,
+        answer_gateway=ollama if settings.local_answer_enabled else None,
         budget_gate=budget_gate,
     )
     return Container(
@@ -118,7 +130,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         knowledge_gateway=knowledge_gateway,
         quick_chain=quick_chain,
         smart_agent=LangChainAgentAdapter(agent_model_value, observability=langfuse)
-        if agent_model_value is not None
+        if agent_model_value is not None and settings.local_answer_enabled
         else None,
         langfuse=langfuse,
     )

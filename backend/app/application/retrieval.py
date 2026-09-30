@@ -11,6 +11,8 @@ from backend.app.domain.models import ChunkRecord, RankedHit
 from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, normalize_query
 from backend.app.ports.retrieval import RetrievalRepository
+from backend.app.ports.ranking import CandidateRanker, CandidateDiversitySelector
+from backend.app.application.retrieval_policy import RetrievalRouter
 
 
 @dataclass(frozen=True)
@@ -33,6 +35,9 @@ class RetrievalResult:
     latency_ms: float | None = None
     degradation_flags: tuple[str, ...] = ()
     stage_latency_ms: dict[str, float | None] = field(default_factory=dict)
+    retrieval_mode: str = "hybrid"
+    route_reason: tuple[str, ...] = ()
+    embedding_cache_hit: bool | None = None
 
 
 def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
@@ -124,6 +129,9 @@ class HybridRetriever:
         source_weights: Mapping[str, float] | None = None,
         context_candidate_k: int | None = None,
         context_max_per_document: int | None = None,
+        mode: str = "hybrid",
+        ranker: CandidateRanker | None = None,
+        diversity_selector: CandidateDiversitySelector | None = None,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
@@ -133,6 +141,9 @@ class HybridRetriever:
         self.source_weights = dict(source_weights) if source_weights is not None else None
         self.context_candidate_k = context_candidate_k
         self.context_max_per_document = context_max_per_document
+        self.router = RetrievalRouter(mode)
+        self.ranker = ranker
+        self.diversity_selector = diversity_selector
         self.effective_config()
 
     def effective_config(self) -> dict[str, Any]:
@@ -156,27 +167,37 @@ class HybridRetriever:
                 config['context_max_per_document'] = self.context_max_per_document
         elif self.context_max_per_document is not None:
             raise ValueError('context_max_per_document requires context_candidate_k')
+        if self.router.mode != "hybrid":
+            config['mode'] = self.router.mode
+        if self.ranker is not None or self.diversity_selector is not None:
+            config.update(rerank_enabled=self.ranker is not None, mmr_enabled=self.diversity_selector is not None)
         return config
 
     def retrieve(self, scope: Scope, question: str, query_plan: NormalizedQuery | None = None) -> RetrievalResult:
         started = time.perf_counter()
         effective = self.effective_config()
         plan = query_plan or normalize_query(question)
+        route = self.router.route(question)
+        mode, route_reason = route.mode, route.reason
         timings={'query_processing_ms':(time.perf_counter()-started)*1000,
-                 'keyword_retrieval_ms':None,'vector_retrieval_ms':None,'embedding_ms':None,'fusion_ms':None}
+                 'keyword_retrieval_ms':0.0,'vector_retrieval_ms':0.0,'embedding_ms':0.0,'fusion_ms':0.0,
+                 'ranking_ms':0.0,'diversity_ms':0.0}
         if not scope.knowledge_base_ids:
             return RetrievalResult(query_plan=plan, items=[], sources=(), reason_codes=("NO_CANDIDATES",),
-                                   effective_config=effective, latency_ms=(time.perf_counter()-started)*1000)
+                                   effective_config=effective, latency_ms=(time.perf_counter()-started)*1000,
+                                   retrieval_mode=mode, route_reason=route_reason)
         degradation_flags: tuple[str, ...] = ()
+        embedding_cache_hit: bool | None = None
         keyword_started=time.perf_counter()
-        rankings: dict[str, list[RankedHit]] = {
-            "keyword": self.repository.keyword_candidates(scope, plan, self.candidate_k)
-        }
-        timings['keyword_retrieval_ms']=(time.perf_counter()-keyword_started)*1000
-        if self.embedding_provider is not None:
+        rankings: dict[str, list[RankedHit]] = {}
+        if mode in ("keyword", "hybrid"):
+            rankings["keyword"] = self.repository.keyword_candidates(scope, plan, self.candidate_k)
+            timings['keyword_retrieval_ms']=(time.perf_counter()-keyword_started)*1000
+        if mode in ("vector", "hybrid") and self.embedding_provider is not None:
             try:
                 embedding_started=time.perf_counter()
                 embedded = self.embedding_provider.embed([question], timeout_seconds=10)
+                embedding_cache_hit = bool(getattr(self.embedding_provider, "last_cache_hit", False))
                 timings['embedding_ms']=(time.perf_counter()-embedding_started)*1000
                 profile_id = getattr(embedded, "profile_id", None)
                 if profile_id is None:
@@ -193,10 +214,43 @@ class HybridRetriever:
                 timings['vector_retrieval_ms']=(time.perf_counter()-vector_started)*1000
             except Exception:
                 degradation_flags = ('VECTOR_UNAVAILABLE',)
+        elif mode in ("vector", "hybrid"):
+            degradation_flags = ('VECTOR_UNAVAILABLE',)
+
+        # q0 keyword fallback remains available even when the model is absent.
+        if mode == "vector" and not rankings.get("vector"):
+            keyword_started = time.perf_counter()
+            rankings["keyword"] = self.repository.keyword_candidates(scope, plan, self.candidate_k)
+            timings['keyword_retrieval_ms'] = (time.perf_counter() - keyword_started) * 1000
+            mode = "keyword"
+            route_reason += (("VECTOR_UNAVAILABLE_KEYWORD_FALLBACK" if degradation_flags else "VECTOR_EMPTY_KEYWORD_FALLBACK"),)
+        elif mode == "hybrid" and "vector" not in rankings:
+            mode = "keyword"
+            route_reason += ("VECTOR_UNAVAILABLE_KEYWORD_FALLBACK",)
 
         fusion_started=time.perf_counter()
         full_fused = rrf_fuse(rankings, k=self.rrf_k, source_weights=self.source_weights)
         timings['fusion_ms']=(time.perf_counter()-fusion_started)*1000
+        # Fusion recalls candidates; optional second stages own their ordering.
+        for adapter, method, timing_key, failure in (
+            (self.ranker, "rank", "ranking_ms", "RANKER_UNAVAILABLE"),
+            (self.diversity_selector, "select", "diversity_ms", "DIVERSITY_UNAVAILABLE"),
+        ):
+            if adapter is None:
+                continue
+            stage_started = time.perf_counter()
+            chunks = {hit.chunk_id: chunk for hit in full_fused
+                      if (chunk := self.repository.get_chunk(hit.chunk_id)) is not None}
+            try:
+                ranked = list(getattr(adapter, method)(question, tuple(full_fused), chunks))
+            except Exception:
+                degradation_flags += (failure,)
+            else:
+                ids = [hit.chunk_id for hit in ranked]
+                if len(ids) != len(set(ids)) or any(chunk_id not in chunks for chunk_id in ids):
+                    raise ValueError("ranking returned duplicate or unauthorized candidate")
+                full_fused = [hit.model_copy(update={"rank": rank}) for rank, hit in enumerate(ranked, 1)]
+            timings[timing_key] = (time.perf_counter() - stage_started) * 1000
         fused = full_fused[: self.top_k]
         items = [RetrievalItem(self.repository.get_chunk(hit.chunk_id), hit) for hit in fused]
         items = [item for item in items if item.chunk is not None]
@@ -220,6 +274,8 @@ class HybridRetriever:
             context_max_per_document=self.context_max_per_document,
             latency_ms=(time.perf_counter()-started)*1000, degradation_flags=degradation_flags,
             stage_latency_ms=timings,
+            retrieval_mode=mode, route_reason=route_reason,
+            embedding_cache_hit=embedding_cache_hit,
         )
 
 

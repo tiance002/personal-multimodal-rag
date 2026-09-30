@@ -4,6 +4,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from contextlib import nullcontext
 from typing import Any
+import time
 
 from backend.app.application.answer_validation import AnswerValidator
 from backend.app.application.citations import CitationService
@@ -15,6 +16,8 @@ from backend.app.application.retrieval import HybridRetriever, RetrievalItem, Re
 from backend.app.domain.models import EvidenceSnapshot
 from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, normalize_query
+from backend.app.application.evidence_quality import EvidenceQuality, EvidenceQualityAssessor
+from backend.app.application.run_metrics import current_metrics
 
 
 @dataclass(frozen=True)
@@ -39,6 +42,7 @@ class EvidenceBundle:
     context: str = ""
     labels: tuple[str, ...] = ()
     snapshots: tuple[EvidenceSnapshot, ...] = ()
+    quality: EvidenceQuality | None = None
 
 
 @dataclass(frozen=True)
@@ -75,6 +79,7 @@ class EvidenceService:
         self.quality_gate = quality_gate or QualityGate()
         self.context_builder = context_builder or ContextBuilder()
         self.answer_validator = answer_validator or AnswerValidator()
+        self.quality_assessor = EvidenceQualityAssessor()
 
     def plan(self, question: str) -> QueryPlan:
         return QueryPlan(question, self.query_router.plan(question), normalize_query(question))
@@ -105,6 +110,7 @@ class EvidenceService:
         return self.quality_gate.evaluate_chunks(list(chunks), plan.evidence_plan)
 
     def bundle(self, plan: QueryPlan, retrieval: RetrievalResult) -> EvidenceBundle:
+        started = time.perf_counter()
         candidates = retrieval.context_items or tuple(retrieval.items)
         selected = tuple(self.context_builder.select(
             candidates,
@@ -117,7 +123,15 @@ class EvidenceService:
             retrieval.sources,
             retrieval.reason_codes,
         )
-        return EvidenceBundle(plan, retrieval, selected, self.evaluate(selected_result, plan))
+        decision = self.evaluate(selected_result, plan)
+        supporting = None
+        if plan.evidence_plan.targets:
+            supporting = sum(any(self.quality_gate.supporting_fact(item.chunk.content, target)
+                                 for target in plan.evidence_plan.targets) for item in selected)
+        quality = self.quality_assessor.assess(retrieval, selected, supporting_chunks=supporting)
+        if (metrics := current_metrics()) is not None:
+            metrics.record_context(selected, latency_ms=(time.perf_counter() - started) * 1000, quality=quality)
+        return EvidenceBundle(plan, retrieval, selected, decision, quality=quality)
 
     def with_context(
         self,
@@ -125,7 +139,11 @@ class EvidenceService:
         run_id: str,
         citations: CitationService,
     ) -> EvidenceBundle:
+        started = time.perf_counter()
         context, labels = self.context_builder.build(run_id, bundle.selected, citations)
+        if (metrics := current_metrics()) is not None:
+            metrics.record_context(bundle.selected, latency_ms=(time.perf_counter() - started) * 1000,
+                                   rendered_chars=len(context))
         snapshots = tuple(citations.snapshots[(run_id, label)] for label in labels)
         return replace(bundle, context=context, labels=tuple(labels), snapshots=snapshots)
 
@@ -220,6 +238,8 @@ class KnowledgeGateway:
         )
         with observation as span:
             result = self.retriever.retrieve(scope, question, query_plan=query_plan)
+            if (metrics := current_metrics()) is not None:
+                metrics.record_retrieval(result)
             if span is not None:
                 span.update(
                     metadata={
