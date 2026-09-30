@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import hashlib
 import json
+import subprocess
 
 import pytest
 from sqlalchemy.engine import make_url
@@ -13,6 +14,7 @@ from sqlalchemy.dialects.postgresql.psycopg import PGDialect_psycopg
 from eval_center.verified_index import (
     IndexReuseRejected,
     read_only_database_url,
+    index_code_identity,
     validate_clone_runtime,
     validate_index_identity,
 )
@@ -234,6 +236,39 @@ def test_clone_mount_and_port_identity_is_verified():
     assert result["clone_container_id"] == "4" * 64
     assert result["database_port"] == 25437
     assert result["original_stopped"] is True
+
+
+def test_index_code_identity_uses_committed_tree_not_windows_checkout_line_endings(tmp_path):
+    repository = tmp_path / "repo"
+    repository.mkdir()
+    subprocess.run(["git", "init", "--quiet"], cwd=repository, check=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=repository, check=True)
+    subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=repository, check=True)
+    source_paths = [
+        "backend/app/domain/chunking.py",
+        "backend/app/adapters/parsers/__init__.py",
+        "backend/app/workers/ingestion.py",
+        "backend/app/adapters/postgres/knowledge_repository.py",
+        "backend/app/adapters/postgres/schema.py",
+        "backend/app/adapters/storage.py",
+        "backend/app/domain/models.py",
+    ]
+    for relative_path in source_paths:
+        path = repository / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"value = 1\n")
+    subprocess.run(["git", "add", "."], cwd=repository, check=True)
+    subprocess.run(["git", "commit", "--quiet", "-m", "baseline"], cwd=repository, check=True)
+    baseline = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=repository, check=True, capture_output=True, text=True,
+    ).stdout.strip()
+
+    for relative_path in source_paths:
+        (repository / relative_path).write_bytes(b"value = 1\r\n")
+
+    result = index_code_identity(repository, baseline)
+
+    assert result["current_index_code_sha256"] == result["baseline_index_code_sha256"]
 
 
 @pytest.mark.parametrize(

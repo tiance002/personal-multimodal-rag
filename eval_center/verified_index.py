@@ -199,8 +199,10 @@ def index_code_identity(repository_root: Path, baseline_git_sha: str) -> dict[st
                 ["git", "-C", str(repository_root), "show", f"{baseline_git_sha}:{path}"],
                 check=True, capture_output=True, timeout=15,
             ).stdout
-            current_path = repository_root / Path(path)
-            current_bytes = current_path.read_bytes()
+            current_bytes = subprocess.run(
+                ["git", "-C", str(repository_root), "show", f"HEAD:{path}"],
+                check=True, capture_output=True, timeout=15,
+            ).stdout
             baseline_rows.append((path, hashlib.sha256(baseline_bytes).hexdigest()))
             current_rows.append((path, hashlib.sha256(current_bytes).hexdigest()))
     except Exception as exc:
