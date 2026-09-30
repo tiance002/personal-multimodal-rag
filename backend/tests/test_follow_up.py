@@ -14,3 +14,8 @@ def test_referent_uses_question_only_bounded_background():
 
 def test_no_matching_completed_scope_leaves_q0_usable():
     assert resolve_follow_up("它是什么？", None) == ("它是什么？", False)
+
+
+def test_explicit_previous_turn_reference_uses_bounded_context():
+    assert resolve_follow_up("你刚才列出的最后一项是什么？", "复习间隔有哪些？")[1]
+    assert resolve_follow_up("刚才的 E1 怎样回读？", "引用怎么使用？")[1]
