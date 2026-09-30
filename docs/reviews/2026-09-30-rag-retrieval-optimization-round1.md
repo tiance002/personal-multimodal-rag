@@ -71,6 +71,18 @@ exit $code
 
 Recall@5 的逐题候选胜／负／平分别为 SciFact `14/0/66`、MIRACL `21/2/57`、LongBench `4/2/74`。所有三个分集的候选汇总指标均有提升，但这是固定、分层的 80 题样本，不能据此直接改生产默认。
 
+### 离线阶段拆分：Fusion-only / Fusion+Context
+
+保存的逐题结果同时包含融合后、Context 选择前的 `document_metrics_at_5` / `document_ndcg_at_10`，以及 Context 选择后的 `context_document_metrics_at_5`。据此可离线拆出两个阶段，无须重跑检索：Fusion-only 用排名阶段指标；Fusion+Context 用最终所选 Context 指标。
+
+| 数据集 | Fusion-only：等权 → 加权（Recall@5 / MRR@5 / nDCG@5 / nDCG@10） | Fusion+Context：等权 → 候选（Recall@5 / MRR@5 / nDCG@5） | Context 阶段变化：等权；候选（Recall@5 / MRR@5 / nDCG@5） |
+|---|---|---|---|
+| SciFact | `0.4813→0.6417 / 0.3635→0.4821 / 0.3924→0.5208 / 0.4655→0.5631` | `0.4813→0.6417 / 0.3635→0.4821 / 0.3924→0.5208` | `0/0/0；0/0/0` |
+| MIRACL 中文 | `0.4437→0.6478 / 0.3779→0.5233 / 0.3704→0.5300 / 0.4843→0.6345` | `0.4437→0.6478 / 0.3779→0.5233 / 0.3704→0.5300` | `0/0/0；0/0/0` |
+| LongBench 中文 | `0.7500→0.7750 / 0.6213→0.6363 / 0.6536→0.6709 / 0.7001→0.7120` | `0.7375→0.7625 / 0.6188→0.6331 / 0.6488→0.6656` | `-0.0125/-0.0025/-0.0048；-0.0125/-0.0031/-0.0054` |
+
+“Context 阶段变化”是在同一检索臂中比较融合排名与所选 Context，反映文档正例进入最终上下文时的保留情况。Strict 2×2 策略消融仍缺交叉臂（加权 Fusion + 旧 Context 策略、等权 Fusion + 新 Context 策略），因此无法单独估计 Context 改动的因果效应；该更严格对比标记为 `ABLATION_NOT_AVAILABLE_WITH_CURRENT_ARTIFACTS`，本轮不为此补跑。
+
 | 数据集 | Vector Top-5 有正例的 QID | Vector→等权 Hybrid 损失 | Vector→候选 Hybrid 损失 | 完整融合排名中的正例文档未进入所选 Context：基线 → 候选 | Top-5 命中在 Context 中丢失的 QID：基线 → 候选 |
 |---|---:|---:|---:|---:|---:|
 | SciFact | 59/80 | 20 | 7 | 45 → 31 | 0 → 0 |
@@ -88,7 +100,7 @@ Recall@5 的逐题候选胜／负／平分别为 SciFact `14/0/66`、MIRACL `21/
 | LongBench 中文 | 402.04 → 459.58 | 820.81 → 778.96 | 0.582 → 0.441 | 160 / 80 / 80 |
 | **总计** | — | — | — | **480 / 239 / 241** |
 
-查询缓存只存在本次运行内存，缓存键包含查询哈希、模型 digest、Embedding profile 与维数，不保留原始查询。每个 QID 的两个检索臂共用 Embedding；MIRACL 另有一个重复查询复用。因此 480 个检索臂查询请求实际触发 239 次本地 Embedding 提供方调用、输入 239 条，缓存命中 241 次。语料 Embedding、语料下载、索引构建、数据库写入、生成、Judge、云端调用均为 0。
+查询缓存只存在本次运行内存，缓存键包含查询哈希、模型 digest、Embedding profile 与维数，不保留原始查询。`requests=480` 是 240 个 QID 各两个检索臂的 Embedding 请求；`misses=239` 是实际发给本地 Embedding 提供方的 239 个唯一键。`hits=241` 可拆为每个配对第二臂共享的 240 次命中，加上 MIRACL 批次额外 1 次重复键命中（80 个 QID 对应 79 个 unique query keys）。结果未保留 query→QID/cache-key 映射，无法指出具体重复 QID。语料 Embedding、语料下载、索引构建、数据库写入、生成、Judge、云端调用均为 0。
 
 ### 固定输入、模型、索引和输出身份
 
@@ -133,6 +145,7 @@ Context 聚合 hash 按数据集、QID、检索臂排序后对每个 Context SHA
 
 - 本轮只覆盖预注册分层 Development 样本。SciFact 与 MIRACL 改善幅度较大，LongBench 较小；这不能代替完整 Development 抽样估计、Locked 测试或最终答案质量测试。
 - 候选检索平均延迟在 MIRACL 与 LongBench 高于基线，尽管 Context 构建均值更低；延迟包含共享 Embedding 缓存的冷/热次序，需在之后固定工作负载下单独分析。暂不据此调整生产默认。
+- 离线阶段拆分可用，但完整 2×2 Context 策略交叉消融缺少保存臂，状态为 `ABLATION_NOT_AVAILABLE_WITH_CURRENT_ARTIFACTS`；不追加检索运行。
 - QA Pilot 因缺少冻结 Prompt 正文保持 `NOT_RUN`。要验证最终答案、引用回读或语义支持，需要先将 Prompt 正文与生成配置纳入受版本控制的冻结输入，再单独批准运行。
 - Luna max 只读审查未发现 Critical/Important 项；其 Minor 建议是运行器尚未重新计算 fixture 的总 `selection_sha256`。本轮每个数据集的有序 QID 列表 SHA-256 与 Development 成员资格均已验证，因此该项没有改变本轮数据范围；建议后续补充聚合摘要校验。
 - 本报告与机器结果仅含公开统计和哈希。结果 JSON 未加入 Git，任何公开分享前仍应只分享此聚合报告，不传播逐题文件。
@@ -142,4 +155,4 @@ Context 聚合 hash 按数据集、QID、检索臂排序后对每个 Context SHA
 - 分支：`codex/rag-retrieval-optimization-round1-20260930`。
 - 本轮执行代码 SHA：`901b439d7e3c37def2da67fe05e181b4c9222a24`；Tree SHA：`fed248308583c5d9bf00dbbcedb22233761eb9a2`。
 - 结果状态：检索阶段 `PASS / RETRIEVAL_COMPLETE`；QA Pilot `NOT RUN`；生产默认未更改；未建 Tag、未推送 GitHub。
-- 下一步只在项目负责人提供并冻结 Prompt 正文、审核样本与 QA 计分规则后考虑 QA Pilot；本轮不扩展 QID，也不自动恢复其他实验。
+- 本轮 RAG 参数优化到此结束，后续回到 V1 产品主线。本轮不扩展 QID、不补跑缺失交叉臂，也不自动执行 QA Pilot；如需之后做 QA，须另行冻结 Prompt 正文、审核样本和计分规则。
