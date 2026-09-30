@@ -6,7 +6,7 @@ Date: 2026-09-30. Goal: mature-reference adaptation, a frozen retrieval baseline
 
 Quick Runnable and Smart knowledge tools continue to use KnowledgeGateway. The shared path is server Scope → deterministic RetrievalRouter → candidate recall → fusion → optional ranking/diversity → ContextBuilder → evidence coverage and quality signals → execution selection → answer validation and citation persistence. Scope, active version and embedding profile filtering remain inside recall queries.
 
-Semantic queries use vector recall. Explicit identifiers, quoted phrases, filenames, snake_case, internal CamelCase, acronym/code tokens or numbers use the fixed hybrid profile. Single title-cased words alone do not classify a semantic question as an identifier query. A vector failure or empty result permits bounded keyword fallback with an explicit reason. Router decisions are deterministic and do not call a model. Explicit static vector/keyword/hybrid modes remain available for troubleshooting.
+Semantic queries use vector recall. Explicit identifiers, quoted phrases, filenames, snake_case, internal CamelCase, code tokens use the fixed hybrid profile. Acronyms and numbers require an explicit lookup cue before routing to Hybrid. Single title-cased words alone do not classify a semantic question as an identifier query. A vector failure or empty result permits bounded keyword fallback with an explicit reason. Router decisions are deterministic and do not call a model. Explicit static vector/keyword/hybrid modes remain available for troubleshooting.
 
 ## Layer ownership
 
@@ -34,3 +34,9 @@ First reuse Round 1 ranks and qrels offline. Report measured ranking/observed hi
 `local_first`: local recall/routing/simple processing/local 4B; optional future cloud fallback behind egress and actual budget reservation.
 
 `cloud_heavy`: future explicit cloud query understanding/reasoning/generation baseline. It remains NOT_IMPLEMENTED/NOT_EVALUATED until a real cloud provider and fixed policy are authorized. Compare answer correctness/relevance/faithfulness/citation support, cloud call/tokens/cost, p50/p95 latency and local GPU/RAM. No quality/cost improvement is claimed from retrieval-only results.
+
+## Post-validation answer safety
+
+Privacy/egress configuration questions use the shared deterministic evidence-only path, including Smart requests. It quotes authorized source chunks, marks PRIVACY_CONFIG_EVIDENCE_ONLY, and makes no generation or expansion call. Source documentation is not proof of the current process environment. This narrow protection was added after a real answer incorrectly described optional content capture as mandatory; the original result remains preserved.
+
+Ollama done_reason=length is recorded with genuine usage and rejected as MODEL_OUTPUT_TRUNCATED. Quick falls back to readable original evidence; Smart stops without persisting an incomplete assistant answer. The generation cap remains unchanged, no hidden retry occurs. This handles observed incomplete tails without claiming that all semantic errors are solved.

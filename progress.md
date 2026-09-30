@@ -291,3 +291,12 @@
 3. 结果：当前Goal核心评测验收PASS；RAG质量实验partial；M4.5发布/完整产品回归NOT RUN，不称负责人已验收，不创建Tag。正式A来源上下文召回.7166667，B.65；引用回读1/1，明确拒答1/1，语义Judge NOT_EVALUATED；源/排名计分单位及所有有效分母明确。
 4. 风险遗留：仅项目资料域33题、Agent来源审核（human_review NOT RUN）；当前q0查询、无真实重试，usage已测采集路径但不伪造发生调用；明确文本拒答和字面要点不能代替语义Judge；备份同盘。上述可选P2按当前Goal记录，不擅称发布或延期批准。
 5. 版本下一步：真实实验及ECS为f15aaeb（同模型digest/冻结Gold、不同真实索引）；最终提交仅文档，与运行版本明确分开。评测DB6行保留，其中2正式、2首轮拒答协议失效诊断、2原smoke未验证。正常知识库未修改、私人原文未上传、凭据不进仓库。Goal结束后不自动优化；保留隔离数据/报告及本机SSH Dashboard隧道以供复核。
+
+
+## 2026-09-30 Local-first V1 收敛与真实资料验证
+
+1. 目标与改动：CURRENT_STATE审计、WeKnora/RAGFlow固定版本对照、来源标注profile、分层Recall/Fusion/可选Rank/Context、确定性Adaptive、EvidenceQuality与ExecutionRouter接口、共享真实metrics、同范围追问与隐私原文/截断护栏。详细交付见 docs/reviews/local-first-v1-final-report.md；启动见local-first-v1-runbook.md。
+2. 执行命令：一次固定24QID public sanity退出0（48 retrieval/24 query embedding/0corpus embedding/0DBwrite/0LLM）；隔离库compose/migration退出0；frontend build退出0；真实UI最终退出0（2生成）；32题真实材料runner退出0（33生成/32query embedding/0cloud），31项最终定向测试退出0；独立真实隐私guard退出0且0生成，5引用回读；命令参数和失败尝试在最终报告中明确记录。全量verify-mX/release NOT RUN。
+3. 结果：有限Retrieval Gate PASS，已冻结Vector默认+条件Hybrid，公开参数优化结束。产品真实主流程已跑通；32题30返回、2 UNSUPPORTED_ANSWER，不等于30正确；46/46引用身份回读。语义准确率/引用语义支持NOT_EVALUATED，人审NOT_RUN。输入58238/输出6068真实生成Token，p50 3.933s/p95 10.057s；GPU主机采样峰4816MiB，RAM最低可用5459.38MiB。
+4. 风险与遗留：原32结果保留错误隐私建议、2可见截断、部分遗漏/过拒答与Context覆盖失败；隐私/截断窄范围护栏新增并记录不同源码身份，不重跑评分。Gold5文档而实际6文档47Chunk，第6文档未完整预注册；scope用39Chunk映射核对；OCR未覆盖所有图像；不称发布验收，不自行批准延期。
+5. 版本与下一步：实现0b68385/56a405f，首批执行90af812e0cdb3d3124df9f39e9e78beb42da195f，安全护栏25974ce；后续脱敏报告提交独立。用户可在http://127.0.0.1:14188开始隔离V1资料使用。停止自动实验/优化/部署，不打Tag。公开原库、原卷、M3/M3.5历史产物与ECS未修改；私有资料及原始报告保留忽略的var中。

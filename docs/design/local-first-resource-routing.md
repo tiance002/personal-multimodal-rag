@@ -21,7 +21,7 @@ The model file sizes above are disk measurements. They are **not** VRAM measurem
 
 **INFERRED only — rough planning estimates:** BGE-M3 may require about 1.5–2 GiB while resident; Qwen3.5:4b may require about 4–6 GiB at an 8,192-token context with one parallel request. These estimates require a real product-run check and do not guarantee that either model, or both models together, will fit alongside KV cache, runtime overhead, other GPU users, and temporary allocations. Prefer keeping one model resident at a time.
 
-**NOT_EVALUATED:** Actual product-run residency, peak VRAM, cold-start cost, model-switch behavior, and request concurrency have not been measured. The empty `ollama ps` output only establishes that no model was resident at the observation time.
+**At the initial audit:** Actual product residency and peak memory had not been measured. See the appended serial-run measurements below; isolated per-model peak, controlled cold-start comparisons and concurrency remain NOT_EVALUATED. The empty `ollama ps` output only establishes that no model was resident at the observation time.
 
 ## PROJECT_ADAPTATION — conservative local profile
 
@@ -31,7 +31,7 @@ For a controlled project launch or request profile, use:
 |---|---:|---|
 | `OLLAMA_MAX_LOADED_MODELS` | `1` | **PROJECT_ADAPTATION.** Limit residency to one model while validating the 8 GiB budget. |
 | `OLLAMA_NUM_PARALLEL` | `1` | **PROJECT_ADAPTATION.** Keep inference serial; concurrent requests multiply context memory. |
-| Qwen Chat `options.num_ctx` | `8192` | **PROJECT_ADAPTATION.** Bound answer-generation context per request. This is not a claim that the current product request payload already sets `num_ctx`. |
+| Qwen Chat `options.num_ctx` | `8192` | **PROJECT_ADAPTATION.** Bound answer-generation context per request. The implemented Quick/Smart composition now sets num_ctx=8192; this is distinct from the model capability ceiling. |
 | Resident reranker | None | No GPU budget is reserved for a reranker in this profile. |
 
 Keep query embedding and answer generation single-flight: BGE-M3 serves embeddings and Qwen serves local generation, with one model preferred in memory at a time. Ollama's documented default keep-alive is five minutes, so sequential use may retain the first model temporarily or cause a load/unload transition under a one-model limit. Treat the resulting cold-start and switching latency as a measured product cost.
@@ -60,4 +60,12 @@ For a later controlled Quick or Smart product run, record local resource signals
 
 ### Product residency result
 
-**NOT_EVALUATED for this snapshot.** Root will append measured Quick/Smart product-run values here after a controlled run. No run ID, residency, latency, or peak-VRAM value is asserted by this document.
+### MEASURED — serial real-material run
+
+32 requests, 33 answer-generation calls (one Smart request used two calls), 32 query embedding calls, zero cloud calls, 146.209 s elapsed. Genuine answer usage: 58,238 input + 6,068 output = 64,306 tokens. Request total latency nearest-rank p50=3,932.634 ms; p95=10,056.963 ms. Cold/warm states were not deliberately randomized or stratified, so these are descriptive timings.
+
+136 host samples at roughly one-second intervals observed GPU memory peak **4,816 MiB** of 8,188 MiB. Host RAM peak **27,032.49 MiB**, minimum available **5,459.38 MiB**. These totals include other running apps/services; they are not per-model allocations or guaranteed microsecond peaks. No resource exhaustion was observed in this serial run. RAM headroom warrants caution before concurrency.
+
+After a separate zero-generation privacy guard request, read-only ollama ps showed BGE-M3 664 MB, 100% GPU, context8192; nvidia-smi showed total host GPU use755 MiB. Those two values have different accounting, not an exact BGE VRAM attribution. Qwen/BGE residency transitions were not continuously sampled per process. No global Ollama environment was changed to force the proposed one-model policy.
+
+CPU offload, concurrent load, controlled cold-start/model-switch cost and isolated model peak remain NOT_EVALUATED. No resident reranker is installed. Evidence-only fallback and explicit local failure preserve the no-automatic-cloud boundary. Private resource samples and original manifest remain under var/reports/real-materials-20260930; the sanitized aggregate is docs/reviews/real-material-verification-20260930.json.

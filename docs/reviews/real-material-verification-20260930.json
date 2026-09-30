@@ -1,0 +1,136 @@
+{
+  "schema_version": "real-material-verification-summary-v1",
+  "report_date": "2026-09-30",
+  "run": {
+    "status": "COMPLETED",
+    "case_count": 32,
+    "completed_answer_count": 30,
+    "generation_call_count": 33,
+    "cloud_call_count": 0,
+    "recorded_run_exit_code": 0,
+    "elapsed_seconds": 146.209,
+    "interpretation": "Completed-answer count describes returned outputs only and does not establish answer correctness.",
+    "run_scope_note": "The 33 generation calls belong to the 32-case run. Two separate UI generation calls and a later privacy-guard verification with zero generation calls are excluded from this run aggregation."
+  },
+  "provenance": {
+    "manifest_sha256": "a50ad5234d22f20d57162a38b5457282dbf6ad2d712fb2ada35820440eaaa9ec",
+    "manifest_git_sha": "90af812e0cdb3d3124df9f39e9e78beb42da195f",
+    "manifest_source_tree_sha": "6347a283e28f9404035eb6b1bc038df812fa9567",
+    "manifest_working_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest_case_dataset_sha256": "d0fc5f80371a0710d1618cf8a660fa8a70fb4fab96fb9b982b9e51a36804719c",
+    "results_sha256": "1c74ce53b9f1caa94857e38323291fbd903d9448ad65d996d116f4a45926a5df"
+  },
+  "token_usage": {
+    "basis": "Recorded model-call usage; answer-stage values agree with per-case input/output/total metrics. Embedding input is separated because per-case total metrics omit it.",
+    "answer_generation": {
+      "call_count": 33,
+      "input_tokens": 58238,
+      "output_tokens": 6068,
+      "total_tokens": 64306
+    },
+    "embedding": {
+      "call_count": 32,
+      "reported_input_tokens": 788,
+      "reported_output_tokens": 0
+    },
+    "combined_recorded": {
+      "input_tokens": 59026,
+      "output_tokens": 6068,
+      "total_tokens": 65094
+    }
+  },
+  "latency_ms": {
+    "basis": "Per-case total_latency_ms, nearest-rank percentile method.",
+    "sample_count": 32,
+    "p50": 3932.634,
+    "p95": 10056.963,
+    "minimum": 1719.729,
+    "maximum": 10633.275
+  },
+  "modes_and_calls": {
+    "trace_execution_mode_counts": {
+      "NOT_RECORDED": 31,
+      "smart": 1
+    },
+    "trace_mode_note": "Only one case records smart; execution mode is absent from the other 31 case traces.",
+    "retrieval_mode_counts": {
+      "hybrid": 5,
+      "vector": 27
+    },
+    "model_call_records": {
+      "total": 65,
+      "by_stage": {
+        "answer": {
+          "count": 33,
+          "status_counts": {
+            "ok": 33
+          }
+        },
+        "embedding": {
+          "count": 32,
+          "status_counts": {
+            "ok": 32
+          }
+        }
+      }
+    },
+    "recorded_cloud_calls": 0
+  },
+  "errors": {
+    "terminal_error_code_counts": {
+      "NONE": 30,
+      "UNSUPPORTED_ANSWER": 2
+    },
+    "degradation_code_counts": {
+      "NONE": 32
+    },
+    "known_output_issue_observations": {
+      "privacy_configuration_incorrect_response_count": 1,
+      "visible_output_truncation_count": 2,
+      "basis": "Coordinator-provided notes about existing outputs; this offline aggregation did not independently re-open or re-evaluate those responses.",
+      "interpretation": "These observations do not change execution counts and do not constitute a full semantic or human review."
+    }
+  },
+  "follow_up": {
+    "follow_up_context_used_counts": {
+      "False": 30,
+      "True": 2
+    },
+    "interpretation": "Trace records show contextual follow-up use for two cases; this is not a semantic correctness judgment."
+  },
+  "resource_samples": {
+    "sample_count": 136,
+    "ram_peak_used_mib": 27032.49,
+    "ram_minimum_available_mib": 5459.38,
+    "gpu_sampled_peak_used_mib": 4816
+  },
+  "citation_and_corpus_integrity": {
+    "citation_readback_pairs": 46,
+    "fully_consistent_citation_readbacks": 46,
+    "unique_recorded_chunk_ids_mapped_to_expected_single_kb": 39,
+    "cross_kb_recorded_chunk_id_occurrences": 0,
+    "citations_outside_per_case_gold_target_documents": 9,
+    "gold_target_document_count": 5,
+    "gold_target_chunk_count": 46,
+    "postflight_document_count": 6,
+    "postflight_chunk_count": 47,
+    "additional_postflight_document_in_gold_manifest": false,
+    "scope_caveat": "Effective KB/document request scope is not serialized for the 32 cases. Same-KB integrity is based on mapping every recorded retrieved, selected, and cited chunk ID to the postflight inventory. The sixth postflight document is outside the frozen five-document Gold manifest; the six-document corpus was not fully pre-registered."
+  },
+  "evaluation_status": {
+    "semantic_accuracy": "NOT_EVALUATED",
+    "semantic_citation_support": "NOT_EVALUATED",
+    "human_review": "NOT_RUN"
+  },
+  "report_generation": {
+    "method": "OFFLINE_LOCAL_JSON_AGGREGATION",
+    "evaluation_or_model_started_by_report": false,
+    "database_or_api_called_by_report": false,
+    "tests_run_by_report": false
+  },
+  "excluded_activity": {
+    "separate_ui_generation_call_count": 2,
+    "later_privacy_guard_generation_call_count": 0,
+    "included_in_32_case_run_counts": false
+  }
+}
