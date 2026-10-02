@@ -204,25 +204,29 @@
       },
       "MessageIn": {
         "properties": {
-          "content": {
-            "maxLength": 100000,
-            "minLength": 1,
-            "title": "Content",
-            "type": "string"
-          },
-          "expected_document_scope": {
+          "request_id": {
             "anyOf": [
               {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Expected Document Scope"
+            "title": "Request Id"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 100000,
+            "minLength": 1,
+            "title": "Content"
+          },
+          "mode": {
+            "type": "string",
+            "pattern": "^(quick|smart)$",
+            "title": "Mode",
+            "default": "quick"
           },
           "expected_knowledge_base_scope": {
             "anyOf": [
@@ -238,18 +242,26 @@
             ],
             "title": "Expected Knowledge Base Scope"
           },
-          "mode": {
-            "default": "quick",
-            "pattern": "^(quick|smart)$",
-            "title": "Mode",
-            "type": "string"
+          "expected_document_scope": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Document Scope"
           }
         },
+        "type": "object",
         "required": [
           "content"
         ],
-        "title": "MessageIn",
-        "type": "object"
+        "title": "MessageIn"
       },
       "ValidationError": {
         "properties": {
@@ -1321,6 +1333,97 @@
           }
         },
         "summary": "Healthz"
+      }
+    },
+    "/api/v1/documents/{document_id}/preview": {
+      "get": {
+        "summary": "Get Document Preview",
+        "description": "Return a browser-readable preview while keeping the source immutable.\n\nPDF/HTML/image/text files are streamed directly. Office files are rendered\nto a temporary PDF by the local LibreOffice process so Writer/Calc layout\nand embedded images remain visible in the same preview surface.",
+        "operationId": "get_document_preview_api_v1_documents__document_id__preview_get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original source bytes or a local PDF preview; media type follows the returned file.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Document source is unavailable"
+          },
+          "503": {
+            "description": "Local Office preview renderer is unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{document_id}/source": {
+      "get": {
+        "summary": "Get Document Source",
+        "description": "Stream the immutable source bytes for the selected document version.\n\nThe normalized `/content` endpoint is intended for retrieval and text\ninspection. The library preview needs the original bytes so PDF, HTML and\nimage files keep their pre-indexing appearance in the browser.",
+        "operationId": "get_document_source_api_v1_documents__document_id__source_get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original source bytes or a local PDF preview; media type follows the returned file.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Document source is unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

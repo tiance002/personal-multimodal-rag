@@ -2,6 +2,12 @@
 
 一个本地优先、单机多知识库、多模态资料管理与 RAG 问答工作台。原始文件按 SHA-256 内容寻址保存，文档版本不可静默覆盖；检索范围由服务端 conversation scope 决定，引用必须能回读真实 chunk/version/locator。默认 `cloud_enabled=false`，前端不保存任何 provider 凭据。
 
+学习当前固定快照，请先读[中文教学交接](docs/teaching-handoff-20261002.md)与[快照检查边界](docs/teaching-snapshot-checks-20261002.md)。
+
+## Windows 原生交付入口（待真实验收）
+
+优先复用现有Windows Python、D原生HTML/DOCX CLI、E tessdata和明确选择的DB/storage；按[Windows原生运行与备份说明](docs/windows-native-release.md)从无应用进程状态生成并审核target，先dry-run，再单独批准启动，完成UI导入→索引→一次真实问答→引用/历史回读。最终源码冻结回归和新空目标恢复/回滚演练仍必做；当前仅离线工具验证，不是release验收。下面默认库/Compose命令仅为原有开发示例，不能作为最终交付数据源，也不能干扰raglocalfirst0930既有服务。
+
 ## 运行环境
 
 - Python 3.11+、Docker Desktop、PowerShell
@@ -75,7 +81,7 @@ LANGFUSE_SECRET_KEY=sk-lf-...
 
 ## 验证命令
 
-权威报告在 `var/reports/`。已实现的门禁命令：
+权威报告在 `var/reports/`。已实现的阶段检查命令与native验收计划入口（verify-release仅生成显式计划，真实最终回归另行批准；legacy -Fresh即时拒绝）：
 
 ```powershell
 & .\scripts\verify-m0.ps1
@@ -86,7 +92,7 @@ LANGFUSE_SECRET_KEY=sk-lf-...
 & .\scripts\verify-m4.ps1
 & .\scripts\contract_test.ps1
 & .\.venv\Scripts\python.exe scripts\smoke_budget.py --database-url $env:RAG_DATABASE_URL --report var\reports\smoke-budget.json
-& .\scripts\verify-release.ps1 -Fresh
+& .\scripts\verify-release.ps1 -Python $python -TargetFile $targetFile -DatabaseName $dbName -StorageRoot $storage -OutputDir $newBackupDir -RestoreTargetFile $restoreTargetFile -RestoreDatabaseName $newDbName -RestoreStorageRoot $newStorage
 & .\scripts\release_report.ps1
 ```
 
@@ -100,8 +106,8 @@ npm --prefix frontend run build
 备份与恢复：
 
 ```powershell
-& .\scripts\backup.ps1 -OutputDir var\backups
-& .\scripts\restore.ps1 -InputDir var\backups\backup-<timestamp> -RestoreDatabase
+& .\scripts\backup.ps1 -TargetFile $targetFile -DatabaseName $dbName -StorageRoot $storage -OutputDir $newBackupDir -Python $python
+& .\scripts\restore.ps1 -TargetFile $restoreTargetFile -DatabaseName $newDbName -StorageRoot $newStorage -InputDir $backupDir -Python $python
 ```
 
 `make` 当前不在本机 PATH，因此没有把 `make verify-*` 报告为已执行。当前项目已初始化 Git 并推送到私有仓库 [tiance002/personal-multimodal-rag](https://github.com/tiance002/personal-multimodal-rag)，初始基线 commit 为 `e52893c`，最新提交可用 `git log -1` 查看；尚未创建 tag，也未声称项目负责人已验收，最终验收和发布 tag 仍由项目负责人确认。

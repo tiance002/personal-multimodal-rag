@@ -43,7 +43,18 @@ export type Message = {
   content: string;
   citations?: string[];
   run_id?: string;
+  presentation?: { kind: "clarification"; text: string; clarification_required: true };
 };
+
+// A diagnostic attached to an exact user/run, never a factual assistant message.
+export function clarificationText(message: Message | undefined): string | null {
+  const presentation = message?.presentation;
+  return message?.role === "user" && !!message.run_id &&
+    !message.citations?.length && presentation?.kind === "clarification" &&
+    presentation.clarification_required === true &&
+    typeof presentation.text === "string" && presentation.text.trim().length > 0
+    ? presentation.text : null;
+}
 
 export type AppState = {
   selectedKnowledgeBaseId: string | null;

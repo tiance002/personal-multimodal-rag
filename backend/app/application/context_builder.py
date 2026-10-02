@@ -72,6 +72,8 @@ class ContextBuilder:
         labels: list[str] = []
         for item in self.select(items):
             detail = citations.freeze(run_id, item.chunk)
+            if detail.label in labels:
+                continue
             labels.append(detail.label)
             pieces.append(f"[{detail.label}] {detail.quote}")
         return "\n\n".join(pieces), labels

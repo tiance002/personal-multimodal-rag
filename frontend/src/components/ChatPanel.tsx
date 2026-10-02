@@ -9,6 +9,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { DocumentItem, KnowledgeBase, Message } from "../app/state";
+import { clarificationText } from "../app/state";
 
 type Props = {
   messages: Message[];
@@ -204,6 +205,9 @@ export function ChatPanel({
                   </div>
                 ) : (
                   message.content
+                )}
+                {clarificationText(message) && (
+                  <p className="clarification-prompt">{clarificationText(message)}</p>
                 )}
                 {message.citations?.length ? (
                   <div className="citation-strip">

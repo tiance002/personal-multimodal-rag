@@ -9,6 +9,17 @@ class ProviderUnavailable(RuntimeError):
     """A provider could not be reached, timed out, or returned an invalid shape."""
 
 
+class ProviderRequestNotSent(ProviderUnavailable):
+    """Explicit pretransport rejection; this request incurred no provider cost."""
+
+
+class TruncatedAnswer(ProviderUnavailable):
+    """Candidate stays on the local call stack; exception text contains no data."""
+    def __init__(self, candidate: str) -> None:
+        super().__init__("MODEL_OUTPUT_TRUNCATED")
+        self.candidate = candidate
+
+
 @dataclass(frozen=True)
 class EmbeddingResult:
     vectors: list[list[float]]
@@ -37,6 +48,14 @@ class AnswerProvider(Protocol):
     def answer(self, prompt: str, timeout_seconds: float) -> str: ...
 
 
+class LocalFollowUpProvider(Protocol):
+    """One local-only structured attempt; no retry, cloud routing or evidence."""
+    provider_kind: str
+
+    def resolve_history_json(self, q0: str, history: tuple[dict[str, str], ...], *,
+                             timeout_seconds: float, max_output_tokens: int) -> str: ...
+
+
 class EmbeddingProvider(Protocol):
     def embed(self, texts: Sequence[str], timeout_seconds: float) -> EmbeddingResult: ...
 
@@ -46,6 +65,8 @@ __all__ = [
     "EmbeddingProvider",
     "EmbeddingResult",
     "LocalQueryProvider",
+    "LocalFollowUpProvider",
     "ProviderUnavailable",
+    "ProviderRequestNotSent",
     "QueryGatewayResult",
 ]

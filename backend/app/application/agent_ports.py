@@ -36,6 +36,8 @@ class SmartAgentPort(Protocol):
         graph_enabled: bool = False,
         trace_store: Any | None = None,
         limits: AgentLimits | None = None,
+        retrieval_query: str | None = None,
+        validated_follow_up: Any | None = None,
     ) -> SmartAgentResult: ...
 
 

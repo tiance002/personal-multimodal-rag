@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from backend.app.ports.session_attempts import request_identity
+from backend.app.ports.providers import ProviderRequestNotSent
+
 import re
 import uuid
 import time
@@ -14,14 +17,17 @@ from backend.app.application.citations import CitationService, InMemoryCitationS
 from backend.app.application.knowledge_gateway import AnswerResult, EvidenceBundle, KnowledgeGateway, QueryPlan, Trace
 from backend.app.application.retrieval import RetrievalItem
 from backend.app.domain.scope import Scope
-from backend.app.application.execution_routing import ExecutionRouter
+from backend.app.application.execution_routing import ExecutionRouter, ExecutionRoute
 from backend.app.application.run_metrics import current_metrics
+from backend.app.application.answer_hardening import detect_intents, generation_budget, MARKER
+from backend.app.application.follow_up import FollowUpResolution, interpretation_data
 
 
 @dataclass(frozen=True)
 class QuickSettings:
     cloud_enabled: bool = False
     prefer_cloud: bool = False
+    cloud_fallback_enabled: bool = False
     local_query_enabled: bool = False
     local_query_timeout_seconds: float = 4.0
     answer_timeout_seconds: float = 30.0
@@ -43,10 +49,12 @@ class LangChainQuickChain:
         knowledge_gateway: KnowledgeGateway,
         *,
         answer_gateway: Any | None = None,
+        cloud_answer_gateway: Any | None = None,
         budget_gate: BudgetGate | None = None,
     ) -> None:
         self.knowledge_gateway = knowledge_gateway
         self.answer_gateway = answer_gateway
+        self.cloud_answer_gateway = cloud_answer_gateway
         self.budget_gate = budget_gate
         self.execution_router = ExecutionRouter()
         self.runnable = (
@@ -65,9 +73,13 @@ class LangChainQuickChain:
         cloud_allowed_by_kb: dict[str, bool] | None = None,
         local_query_gateway: Any | None = None,
         on_retrieval: Callable[[str, Sequence[RetrievalItem]], None] | None = None,
+        retrieval_query: str | None = None,
+        validated_follow_up: FollowUpResolution | None = None,
     ) -> AnswerResult:
         payload = {
             "question": question,
+            "retrieval_query": question if retrieval_query is None else retrieval_query,
+            "validated_follow_up": validated_follow_up,
             "scope": scope,
             "settings": settings or QuickSettings(),
             "run_id": run_id or str(uuid.uuid4()),
@@ -83,15 +95,22 @@ class LangChainQuickChain:
         settings: QuickSettings = payload["settings"]
         run_id = str(payload["run_id"])
         cloud_allowed_by_kb: dict[str, bool] = payload["cloud_allowed_by_kb"]
+        cloud_gateway = self.cloud_answer_gateway or (self.answer_gateway
+            if self.answer_gateway is not None and getattr(self.answer_gateway, "provider_kind", None) != "local" else None)
         execution_route = self.execution_router.choose(
-            prefer_cloud=settings.prefer_cloud, cloud_enabled=settings.cloud_enabled,
+            prefer_cloud=settings.prefer_cloud and not self._privacy_configuration(question), cloud_enabled=settings.cloud_enabled,
             cloud_allowed=bool(scope.knowledge_base_ids) and all(cloud_allowed_by_kb.get(kb_id, False) for kb_id in scope.knowledge_base_ids),
-            cloud_provider_available=self.answer_gateway is not None and getattr(self.answer_gateway, "provider_kind", None) != "local",
+            cloud_provider_available=cloud_gateway is not None,
         )
         payload["execution_route"] = execution_route
+        payload["cloud_gateway"] = cloud_gateway
+        answer_gateway = cloud_gateway if execution_route.path == "CLOUD" else self.answer_gateway
+        payload["answer_gateway"] = answer_gateway
+        if execution_route.path != "CLOUD" and getattr(answer_gateway, "provider_kind", None) == "cloud":
+            return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), "CLOUD_EGRESS_DISABLED"))
         if execution_route.error_code is not None:
             return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), execution_route.error_code))
-        if settings.prefer_cloud and settings.cloud_enabled:
+        if execution_route.path == "CLOUD":
             if any(not cloud_allowed_by_kb.get(kb_id, False) for kb_id in scope.knowledge_base_ids):
                 plan = self.knowledge_gateway.plan(question)
                 return self._terminal(
@@ -109,7 +128,7 @@ class LangChainQuickChain:
         citation_service = CitationService(InMemoryCitationStore())
         plan, retrieval = self.knowledge_gateway.retrieve_question(
             scope,
-            question,
+            str(payload["retrieval_query"]),
             local_query_gateway=payload["local_query_gateway"],
             local_query_enabled=settings.local_query_enabled,
             local_query_timeout_seconds=settings.local_query_timeout_seconds,
@@ -142,19 +161,9 @@ class LangChainQuickChain:
             return self._terminal(payload, self._error_result(run_id, plan, "SECTION_TRUNCATED"))
 
         reservation: BudgetReservation | None = None
-        if settings.prefer_cloud and settings.cloud_enabled:
-            if self.answer_gateway is None:
-                return self._terminal(payload, self._error_result(run_id, plan, "BUDGET_GATE_UNAVAILABLE"))
-            if self.budget_gate is None:
-                return self._terminal(payload, self._error_result(run_id, plan, "BUDGET_GATE_UNAVAILABLE"))
+        if execution_route.path == "CLOUD":
             try:
-                reservation = self.budget_gate.reserve(
-                    run_id=run_id,
-                    provider=settings.cloud_provider,
-                    model_name=settings.cloud_model,
-                    capability="chat",
-                    estimate_microunits=settings.cloud_cost_estimate_microunits,
-                )
+                reservation = self._reserve_cloud(payload)
             except BudgetDenied as exc:
                 code = str(exc) or "MONTHLY_BUDGET_EXCEEDED"
                 return self._terminal(payload, self._error_result(run_id, plan, code))
@@ -167,7 +176,7 @@ class LangChainQuickChain:
             "reservation": reservation,
             "model_calls": plan.model_calls,
             "answer_degradation": ";".join(code for code in (plan.degradation_code, "PRIVACY_CONFIG_EVIDENCE_ONLY" if self._privacy_configuration(question) else None) if code) or None,
-            "evidence_only": self.answer_gateway is None or self._privacy_configuration(question),
+            "evidence_only": answer_gateway is None or self._privacy_configuration(question),
         }
 
     def _generate(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -182,6 +191,7 @@ class LangChainQuickChain:
         model_calls = int(payload["model_calls"])
         answer_degradation = payload.get("answer_degradation")
         evidence_only = bool(payload["evidence_only"])
+        answer_gateway = payload["answer_gateway"]
 
         if evidence_only:
             prefix = "涉及外发与隐私配置，以下仅提供资料原文；实际运行配置需单独核查：\n" if self._privacy_configuration(question) else "基于检索到的证据：\n"
@@ -191,22 +201,52 @@ class LangChainQuickChain:
             metrics = current_metrics()
             usage_start = len(metrics.usage.calls) if metrics is not None else 0
             path = payload["execution_route"].path
-            provider = getattr(self.answer_gateway, "provider_name", "NOT_AVAILABLE")
-            model = getattr(self.answer_gateway, "chat_model", "NOT_AVAILABLE")
+            provider = getattr(answer_gateway, "provider_name", "NOT_AVAILABLE")
+            model = getattr(answer_gateway, "chat_model", "NOT_AVAILABLE")
             generation_status = "error"
+            if metrics is not None:
+                metrics.hardening.setdefault("generation_routes", []).append({
+                    "path": path, "reason": payload["execution_route"].reason, "provider": provider,
+                    "cost_basis": "configured_reservation_estimate_not_verified_charge" if reservation else "LOCAL_COMPUTE_NOT_MEASURED",
+                    "reserved_microunits": reservation.reserved_microunits if reservation else None})
             try:
                 model_calls += 1
-                answer = self.answer_gateway.answer(
-                    "Answer only from the supplied evidence. Cite every factual statement with its exact "
-                    f"[E#] label; say when a requested fact is missing.\nQuestion: {question}\nEvidence:\n{bundle.context}",
-                    settings.answer_timeout_seconds,
+                intents = detect_intents(question)
+                budget = generation_budget(intents, len(bundle.context))
+                if metrics is not None:
+                    metrics.hardening.update({"generation_complexity": budget.complexity, "max_output_tokens": budget.max_tokens})
+                prompt = (
+                    "Answer only from the supplied evidence. "
+                    "Answer in the language of the user question by default; follow any explicit user request for a different output language instead. Do not switch answer language to match the evidence. Keep original quotations, proper names, numeric units and citation labels unchanged where necessary. "
+                    "Cite every supported factual statement with "
+                    "its exact evidence label. Allowed citation markers: "
+                    + " ".join(f"[{label}]" for label in bundle.labels)
+                    + ". Use only these markers, separately, never ranges. For each requested item, "
+                    "answer supported sub-points with citations; mark only genuinely missing sub-points "
+                    "as unknown without a citation. Be concise: cover requested points, "
+                    "omit unrelated background and do not repeat source excerpts."
+                    f"\nQuestion: {question}{intents.checklist()}"
+                    + interpretation_data(payload.get("validated_follow_up"))
+                    + f"\nEvidence:\n{bundle.context}"
                 )
+                budget_answer = getattr(answer_gateway, "answer_with_budget", None)
+                if getattr(answer_gateway, "provider_name", None) == "deepseek":
+                    product_answer = getattr(answer_gateway, "answer_with_product_scope", None)
+                    scope_args = {"run_id": run_id, "scope": payload["scope"], "question": question} if product_answer else {}
+                    answer = (product_answer or budget_answer)(prompt, settings.answer_timeout_seconds, budget.max_tokens,
+                                           cloud_authorized=path == "CLOUD",
+                                           request_id=request_identity(run_id, "quick.answer", 1), **scope_args)
+                else:
+                    answer = budget_answer(prompt, settings.answer_timeout_seconds, budget.max_tokens) if budget_answer else answer_gateway.answer(prompt, settings.answer_timeout_seconds)
                 generation_status = "ok"
             except Exception as exc:
                 if reservation is not None:
-                    self.budget_gate.mark_unknown(reservation.reservation_id)
-                answer = "本地回答模型暂不可用，以下为可回读证据：\n" + bundle.context
-                evidence_only = True
+                    if isinstance(exc, ProviderRequestNotSent):
+                        self.budget_gate.release(reservation.reservation_id)
+                    else:
+                        self.budget_gate.mark_unknown(reservation.reservation_id)
+                answer = getattr(exc, "candidate", "")
+                payload["generation_error"] = "MODEL_OUTPUT_TRUNCATED" if str(exc) == "MODEL_OUTPUT_TRUNCATED" else "MODEL_UNAVAILABLE"
                 answer_degradation = ";".join(
                     code for code in (answer_degradation, "MODEL_OUTPUT_TRUNCATED" if str(exc) == "MODEL_OUTPUT_TRUNCATED" else "MODEL_UNAVAILABLE") if code
                 ) or "MODEL_UNAVAILABLE"
@@ -249,6 +289,9 @@ class LangChainQuickChain:
                                               latency_ms=(time.perf_counter() - generation_started) * 1000,
                                               status=generation_status)
 
+            if generation_status == "error" and path == "LOCAL" and settings.cloud_fallback_enabled:
+                return self._fallback_cloud(payload, model_calls, answer_degradation)
+
         return {
             **payload,
             "answer": answer,
@@ -256,6 +299,36 @@ class LangChainQuickChain:
             "answer_degradation": answer_degradation,
             "evidence_only": evidence_only,
         }
+
+    def _reserve_cloud(self, payload: dict[str, Any]) -> BudgetReservation:
+        settings = payload["settings"]
+        if self.budget_gate is None:
+            raise BudgetDenied("BUDGET_GATE_UNAVAILABLE")
+        if settings.cloud_cost_estimate_microunits <= 0:
+            raise BudgetDenied("CLOUD_COST_ESTIMATE_REQUIRED")
+        return self.budget_gate.reserve(run_id=payload["run_id"], provider=settings.cloud_provider,
+            model_name=settings.cloud_model, capability="chat",
+            estimate_microunits=settings.cloud_cost_estimate_microunits)
+
+    def _fallback_cloud(self, payload: dict[str, Any], model_calls: int,
+                        degradation: str | None) -> dict[str, Any]:
+        settings = payload["settings"]; scope = payload["scope"]
+        route = self.execution_router.choose(prefer_cloud=True, cloud_enabled=settings.cloud_enabled,
+            cloud_allowed=bool(scope.knowledge_base_ids) and all(payload["cloud_allowed_by_kb"].get(k, False)
+                for k in scope.knowledge_base_ids), cloud_provider_available=payload["cloud_gateway"] is not None)
+        code = route.error_code or ("CLOUD_EGRESS_DISABLED" if route.path != "CLOUD" else None)
+        if code is not None:
+            return self._terminal(payload, self._error_result(payload["run_id"], payload["plan"], code, degradation, model_calls))
+        try:
+            reservation = self._reserve_cloud(payload)
+        except BudgetDenied as exc:
+            return self._terminal(payload, self._error_result(payload["run_id"], payload["plan"], str(exc), degradation, model_calls))
+        next_payload = {**payload, "answer_gateway": payload["cloud_gateway"], "reservation": reservation,
+            "execution_route": ExecutionRoute("CLOUD", "LOCAL_FAILURE_CLOUD_FALLBACK"),
+            "model_calls": model_calls, "answer_degradation": degradation}
+        next_payload.pop("generation_error", None)
+        # Exactly one local-failure fallback; CLOUD failures never recurse/retry.
+        return self._generate(next_payload)
 
     def _validate(self, payload: dict[str, Any]) -> AnswerResult:
         if "result" in payload:
@@ -267,18 +340,20 @@ class LangChainQuickChain:
         answer_degradation = payload.get("answer_degradation")
         model_calls = int(payload["model_calls"])
         evidence_only = bool(payload["evidence_only"])
-        cited_labels = tuple(dict.fromkeys(re.findall(r"\bE\d+\b", answer)))
+        reasons = ()
+        if evidence_only:
+            self.knowledge_gateway.evidence.hardening.observe_evidence_answer(answer, bundle.snapshots,
+                [item.chunk for item in bundle.selected], plan)
+        if not evidence_only:
+            finalized = self.knowledge_gateway.evidence.finalize_answer(run_id, answer, bundle.snapshots,
+                [item.chunk for item in bundle.selected], plan, payload.get("generation_error"))
+            answer = finalized.answer
+            reasons = tuple(x for x in (finalized.rejection, finalized.fallback) if x)
+            if finalized.error:
+                return self._error_result(run_id, plan, finalized.error, answer_degradation, model_calls)
+        cited_labels = tuple(dict.fromkeys(MARKER.findall(answer)))
         if any(label not in bundle.labels for label in cited_labels):
             return self._error_result(run_id, plan, "INVALID_CITATION", answer_degradation, model_calls)
-        validation_error = None
-        if not evidence_only:
-            validation_error = self.knowledge_gateway.evidence.validate_answer(
-                answer,
-                bundle.snapshots,
-                plan,
-            )
-        if validation_error is not None:
-            return self._error_result(run_id, plan, validation_error, answer_degradation, model_calls)
         cited_snapshots = tuple(snapshot for snapshot in bundle.snapshots if snapshot.label in cited_labels)
         cost = payload["settings"].cloud_cost_estimate_microunits if payload["reservation"] is not None else 0
         return AnswerResult(
@@ -286,7 +361,7 @@ class LangChainQuickChain:
             answer,
             cited_labels,
             plan,
-            Trace(answer_degradation, (), model_calls),
+            Trace(answer_degradation, reasons, model_calls),
             None,
             cost,
             cited_snapshots,

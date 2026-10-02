@@ -73,6 +73,18 @@ class CitationService:
 
     def freeze(self, run_id: str, chunk: CitationChunk | ChunkRecord, label: str | None = None) -> CitationDetail:
         normalized = as_citation_chunk(chunk)
+        for (run, old_label), old in self.snapshots.items():
+            if run != run_id:
+                continue
+            same = (old.version_id, old.chunk_id) == (normalized.version_id, normalized.chunk_id)
+            if label == old_label and not same:
+                raise EvidenceIntegrityError("citation label identity conflict")
+            if same:
+                if old.quote != normalized.content or old.locator != normalized.locator:
+                    raise EvidenceIntegrityError("citation evidence identity conflict")
+                if label is not None and label != old_label:
+                    raise EvidenceIntegrityError("citation identity already has a label")
+                return self._detail(old_label, normalized)
         self.store.add(normalized, is_current=False)
         label = label or f"E{sum(1 for run, _ in self.snapshots if run == run_id) + 1}"
         snapshot = freeze_evidence(label, normalized.version_id, normalized.chunk_id, normalized.content, normalized.locator)

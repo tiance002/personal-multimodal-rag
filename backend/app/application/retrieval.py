@@ -38,6 +38,7 @@ class RetrievalResult:
     retrieval_mode: str = "hybrid"
     route_reason: tuple[str, ...] = ()
     embedding_cache_hit: bool | None = None
+    merge_provenance: dict[str, Any] | None = None
 
 
 def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
@@ -180,12 +181,12 @@ class HybridRetriever:
         route = self.router.route(question)
         mode, route_reason = route.mode, route.reason
         timings={'query_processing_ms':(time.perf_counter()-started)*1000,
-                 'keyword_retrieval_ms':0.0,'vector_retrieval_ms':0.0,'embedding_ms':0.0,'fusion_ms':0.0,
-                 'ranking_ms':0.0,'diversity_ms':0.0}
+                 'keyword_retrieval_ms':None,'vector_retrieval_ms':None,'embedding_ms':None,'fusion_ms':None,
+                 'ranking_ms':None,'diversity_ms':None}
         if not scope.knowledge_base_ids:
             return RetrievalResult(query_plan=plan, items=[], sources=(), reason_codes=("NO_CANDIDATES",),
                                    effective_config=effective, latency_ms=(time.perf_counter()-started)*1000,
-                                   retrieval_mode=mode, route_reason=route_reason)
+                                   retrieval_mode=mode, route_reason=route_reason, stage_latency_ms=timings)
         degradation_flags: tuple[str, ...] = ()
         embedding_cache_hit: bool | None = None
         keyword_started=time.perf_counter()

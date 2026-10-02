@@ -7,6 +7,7 @@ import re
 from backend.app.application.query_router import EvidencePlan, EvidenceTarget
 from backend.app.application.retrieval import RetrievalResult
 from backend.app.domain.models import ChunkRecord
+from backend.app.application.structured_evidence import RowFact, row_facts, claim_amount, subject_period_pattern
 
 
 class QualityReason(StrEnum):
@@ -43,7 +44,7 @@ class QualityGate:
         if plan is not None and plan.targets:
             missing = tuple(
                 target for target in plan.targets
-                if not any(self.supporting_fact(chunk.content, target) for chunk in chunks)
+                if not self.supporting_chunks(chunks, target)
             )
             if missing:
                 return QualityDecision(False, QualityReason.INSUFFICIENT_EVIDENCE, missing)
@@ -51,10 +52,36 @@ class QualityGate:
 
     @staticmethod
     def supporting_fact(content: str, target: EvidenceTarget) -> str | None:
-        subject = re.escape(target.subject)
+        subject = subject_period_pattern(target)
         attribute = re.escape(target.attribute)
         pattern = re.compile(subject + r"[^。；，,！？\n]{0,8}" + attribute + r"[^。；，,！？\n]{0,20}\d", re.IGNORECASE)
         for clause in re.split(r"[。；，,！？\n]", content):
             if pattern.search(clause):
+                if target.unit is not None and not re.search(r"\d+(?:\.\d+)?\s*"+re.escape(target.unit)+r"(?![\w])",clause):
+                    continue
                 return clause.strip()
         return None
+
+    @classmethod
+    def supporting_chunks(cls, chunks, target: EvidenceTarget):
+        supported=[];signatures=set();structured=False;ambiguous_prose=False
+        for chunk in chunks:
+            if not getattr(chunk,"is_current",True):continue
+            locator=getattr(chunk,"locator",{})
+            facts=row_facts(chunk.content,locator,target,getattr(chunk,"content_sha256",None))
+            if facts:
+                structured=True
+                signatures.update((f.value,f.unit) for f in facts)
+                supported.append(chunk)
+                continue
+            # Structured evidence never falls back to matching rendered table text.
+            if locator.get("kind")=="table" or target.period is not None and "\t" in chunk.content:continue
+            fact=cls.supporting_fact(chunk.content,target)
+            if fact:
+                supported.append(chunk)
+                if target.period is not None:
+                    amount=claim_amount(fact,target)
+                    if amount is not None:signatures.add(amount)
+                    else:ambiguous_prose=True
+        if structured and (len(signatures)!=1 or ambiguous_prose):return []
+        return supported

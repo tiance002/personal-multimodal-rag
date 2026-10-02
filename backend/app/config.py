@@ -16,6 +16,9 @@ def _env_bool(name: str, default: bool) -> bool:
 class Settings:
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
+    prefer_cloud: bool = False
+    cloud_model: str = "deepseek-flash"
+    cloud_cost_estimate_microunits: int = 0
     local_query_enabled: bool = False
     retrieval_mode: str = "adaptive"
     local_answer_enabled: bool = True
@@ -61,6 +64,9 @@ class Settings:
         return cls(
             service_name=os.getenv("RAG_SERVICE_NAME", cls.service_name),
             cloud_enabled=_env_bool("RAG_CLOUD_ENABLED", False),
+            prefer_cloud=_env_bool("RAG_PREFER_CLOUD", False),
+            cloud_model=os.getenv("DEEPSEEK_MODEL", cls.cloud_model),
+            cloud_cost_estimate_microunits=int(os.getenv("RAG_CLOUD_COST_ESTIMATE_MICROUNITS", "0")),
             local_query_enabled=_env_bool("RAG_LOCAL_QUERY_ENABLED", False),
             retrieval_mode=os.getenv("RAG_RETRIEVAL_MODE", cls.retrieval_mode),
             local_answer_enabled=_env_bool("RAG_LOCAL_ANSWER_ENABLED", True),

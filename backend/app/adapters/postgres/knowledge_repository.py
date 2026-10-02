@@ -816,12 +816,27 @@ class PostgresKnowledgeRepository:
         with self.engine.connect() as conn:
             rows = conn.execute(text("""
                 SELECT m.id,m.conversation_id,m.role,m.content,m.created_at,m.run_id,
-                       COALESCE(ev.citations, '[]'::jsonb) AS citations
+                       COALESCE(ev.citations, '[]'::jsonb) AS citations,
+                       presentation.payload AS presentation
                 FROM conversation_messages m
+                JOIN conversations c ON c.id=m.conversation_id AND c.deleted_at IS NULL
+                LEFT JOIN rag_runs r ON r.id=m.run_id AND r.conversation_id=m.conversation_id
+                LEFT JOIN LATERAL (
+                    SELECT e.payload->'presentation' AS payload
+                    FROM retrieval_events e
+                    WHERE e.run_id=r.id AND e.event_type='run.metrics'
+                      AND m.role='user' AND r.status='failed'
+                      AND r.error_code='NO_CANDIDATES' AND r.completed_at IS NOT NULL
+                      AND r.knowledge_base_scope=c.knowledge_base_scope
+                      AND r.document_scope=c.document_scope
+                      AND e.payload->>'error'='NO_CANDIDATES'
+                      AND e.payload->'citations'='[]'::jsonb
+                    ORDER BY e.seq DESC LIMIT 1
+                ) presentation ON true
                 LEFT JOIN LATERAL (
                     SELECT e.payload->'citations' AS citations
                     FROM retrieval_events e
-                    WHERE e.run_id=m.run_id AND e.event_type='answer.completed'
+                    WHERE e.run_id=m.run_id AND m.role='assistant' AND e.event_type='answer.completed'
                     ORDER BY e.seq DESC LIMIT 1
                 ) ev ON true
                 WHERE m.conversation_id=:id ORDER BY m.created_at
@@ -835,19 +850,65 @@ class PostgresKnowledgeRepository:
             message["run_id"] = str(message["run_id"])
         citations = message.get("citations")
         message["citations"] = list(citations) if isinstance(citations, list) else []
+        presentation = message.pop("presentation", None)
+        if (message.get("role") == "user" and message.get("run_id")
+                and not message["citations"] and isinstance(presentation, dict)
+                and presentation.get("kind") == "clarification"
+                and presentation.get("clarification_required") is True
+                and isinstance(presentation.get("text"), str) and presentation["text"].strip()):
+            message["presentation"] = {"kind": "clarification", "text": presentation["text"],
+                                       "clarification_required": True}
         return message
 
-    def last_completed_question(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> str | None:
-        """Use only a completed question in the same conversation and exact scope."""
+    def completed_history_context(self, conversation_id: str, kb_scope: list[str],
+                                  document_scope: list[str], *, current_run_id: str,
+                                  limit: int = 3) -> dict[str, Any]:
+        from backend.app.ports.persistence import bounded_completed_history
+
         with self.engine.connect() as conn:
-            return conn.execute(text("""
-                SELECT q0 FROM rag_runs
+            current = conn.execute(text("""
+                SELECT r.created_at FROM rag_runs r
+                JOIN conversations c ON c.id=r.conversation_id AND c.deleted_at IS NULL
+                WHERE r.id=:run AND r.conversation_id=:conversation
+                  AND r.knowledge_base_scope=CAST(:kb AS jsonb)
+                  AND r.document_scope=CAST(:docs AS jsonb)
+            """), {"run": current_run_id, "conversation": conversation_id,
+                    "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope)}).mappings().first()
+            if current is None:
+                return {"turns": (), "blocked_reason": "HISTORY_UNAVAILABLE"}
+            cutoff = current["created_at"]
+            rows = list(conn.execute(text("""
+                SELECT r.id AS run_id,r.conversation_id,r.q0,r.status,r.error_code,
+                       r.knowledge_base_scope,r.document_scope,r.created_at,r.completed_at,
+                       EXISTS (SELECT 1 FROM retrieval_events e WHERE e.run_id=r.id
+                         AND e.event_type='answer.completed'
+                         AND e.payload->>'error_code' IS NULL) AS answer_completed
+                FROM rag_runs r
+                WHERE r.conversation_id=:conversation AND r.id<>:run AND r.created_at<:cutoff
+                ORDER BY r.created_at DESC,r.id DESC LIMIT 16
+            """), {"run": current_run_id, "conversation": conversation_id,
+                    "cutoff": cutoff}).mappings())
+        return bounded_completed_history(rows, conversation_id=conversation_id,
+                    kb_scope=kb_scope, document_scope=document_scope,
+                    current_run_id=current_run_id, cutoff=cutoff, limit=limit)
+
+    def last_completed_question_context(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> dict[str, str] | None:
+        """Completed q0 and provenance, in the same conversation and exact scope."""
+        with self.engine.connect() as conn:
+            row = conn.execute(text("""
+                SELECT q0, id AS run_id FROM rag_runs
                 WHERE conversation_id=:conversation AND status='completed'
                   AND knowledge_base_scope=CAST(:kb AS jsonb)
                   AND document_scope=CAST(:docs AS jsonb)
                 ORDER BY created_at DESC LIMIT 1
             """), {"conversation": conversation_id, "kb": json.dumps(kb_scope),
-                    "docs": json.dumps(document_scope)}).scalar_one_or_none()
+                    "docs": json.dumps(document_scope)}).mappings().first()
+            return {"q0": row["q0"], "run_id": str(row["run_id"])} if row is not None else None
+
+    def last_completed_question(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> str | None:
+        """Compatibility for existing callers that only need completed q0."""
+        context = self.last_completed_question_context(conversation_id, kb_scope, document_scope)
+        return context["q0"] if context else None
 
     def append_message(self, conversation_id: str, role: str, content: str, run_id: str | None = None) -> dict[str, Any]:
         message_id = uuid.uuid4()
@@ -861,6 +922,26 @@ class PostgresKnowledgeRepository:
         with self.engine.begin() as conn:
             conn.execute(text("INSERT INTO rag_runs (id,conversation_id,knowledge_base_scope,document_scope,q0,status) VALUES (:id,:conversation_id,CAST(:kb AS jsonb),CAST(:docs AS jsonb),:q0,'running')"), {"id": run_id, "conversation_id": conversation_id, "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope), "q0": q0})
         return str(run_id)
+
+    def create_run_once(self, conversation_id: str, kb_scope: list[str],
+                        document_scope: list[str], q0: str, request_id: str) -> tuple[str, bool]:
+        """Existing UUID primary key atomically claims one product request; no migration."""
+        identity = uuid.UUID(request_id)
+        with self.engine.begin() as conn:
+            inserted = conn.execute(text("""INSERT INTO rag_runs
+                (id,conversation_id,knowledge_base_scope,document_scope,q0,status)
+                VALUES (:id,:conversation_id,CAST(:kb AS jsonb),CAST(:docs AS jsonb),:q0,'running')
+                ON CONFLICT (id) DO NOTHING RETURNING id"""),
+                {"id": identity, "conversation_id": conversation_id, "kb": json.dumps(kb_scope),
+                 "docs": json.dumps(document_scope), "q0": q0}).scalar()
+            if inserted is not None:
+                return str(identity), True
+            row = conn.execute(text("""SELECT conversation_id,knowledge_base_scope,document_scope,q0
+                FROM rag_runs WHERE id=:id"""), {"id": identity}).mappings().one()
+            if (str(row["conversation_id"]) != conversation_id or row["knowledge_base_scope"] != kb_scope
+                    or row["document_scope"] != document_scope or row["q0"] != q0):
+                raise ValueError("REQUEST_ID_CONFLICT")
+            return str(identity), False
 
     def append_event(self, run_id: str, event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
         """Append one run event with a gap-free per-run sequence number.

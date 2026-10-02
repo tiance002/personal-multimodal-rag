@@ -14,9 +14,11 @@ from backend.app.application.evidence_accumulator import EvidenceAccumulator
 from backend.app.application.knowledge_tools import KnowledgeToolGateway
 from backend.app.application.model_usage import call_stage, record_call
 from backend.app.application.run_metrics import current_metrics
+from backend.app.application.answer_hardening import detect_intents, generation_budget, MARKER, normalize_marker_spacing
 from backend.app.domain.agent_policy import ALLOWED_READ_TOOLS, AgentLimits, AgentStep, estimate_tokens
 from backend.app.domain.models import EvidenceSnapshot
 from backend.app.domain.scope import Scope
+from backend.app.application.follow_up import FollowUpResolution, interpretation_data
 
 
 class SmartAgentUnavailable(RuntimeError):
@@ -53,6 +55,7 @@ class _ToolContext:
     guard: Callable[[], None]
     record: Callable[[str, dict[str, Any], Any], None]
     graph_enabled: bool = False
+    initial_query: str | None = None
 
 
 class LangChainAgentAdapter:
@@ -82,8 +85,11 @@ class LangChainAgentAdapter:
         graph_enabled: bool = False,
         trace_store: Any | None = None,
         limits: AgentLimits | None = None,
+        retrieval_query: str | None = None,
+        validated_follow_up: FollowUpResolution | None = None,
     ) -> SmartAgentResult:
         limits = limits or AgentLimits()
+        planning_question = question if retrieval_query is None else retrieval_query
         if trace_store is not None:
             trace_store.create_run(run_id, conversation_id, question, scope)
         if self._is_cancelled(trace_store, run_id):
@@ -97,6 +103,11 @@ class LangChainAgentAdapter:
         model_calls = 0
         model_started: float | None = None
         usage_start = 0
+        truncated_candidate = ""
+        intents = detect_intents(question)
+        budget = generation_budget(intents, 0)
+        if (metrics := current_metrics()) is not None:
+            metrics.hardening.update({"generation_complexity": budget.complexity, "max_output_tokens": budget.max_tokens})
 
         def record_model(status: str, message: Any = None) -> None:
             nonlocal model_started
@@ -138,7 +149,7 @@ class LangChainAgentAdapter:
             if trace_store is not None:
                 trace_store.append_step(run_id, step)
 
-        context = _ToolContext(gateway, scope, guard, record, graph_enabled)
+        context = _ToolContext(gateway, scope, guard, record, graph_enabled, retrieval_query)
         tools = self._build_tools(context)
         self.last_tool_names = tuple(tool.name for tool in tools)
         self.last_tool_schemas = tuple(tool.args for tool in tools)
@@ -158,14 +169,16 @@ class LangChainAgentAdapter:
 
             @after_model
             def check_after_model(state: Any, runtime: Any) -> None:
+                nonlocal truncated_candidate
                 messages = state.get("messages", [])
                 record_model("ok", messages[-1] if messages else None)
                 if messages and (getattr(messages[-1], "response_metadata", {}) or {}).get("done_reason") == "length":
+                    truncated_candidate = getattr(messages[-1], "content", "")
                     raise _AgentAbort("MODEL_OUTPUT_TRUNCATED")
                 guard()
 
             agent = create_agent(
-                self.model,
+                self.model.model_copy(update={"num_predict": budget.max_tokens}) if hasattr(self.model, "num_predict") else self.model,
                 tools,
                 system_prompt=(
                     "You are a local knowledge assistant. Use only the provided read-only tools. "
@@ -174,7 +187,9 @@ class LangChainAgentAdapter:
                     "stating document facts. Every factual sentence in the final answer must end with a "
                     "citation to an authorized search chunk, using its server-provided citation_label "
                     "in square brackets, for example [E1]. A read_document result alone is not a citation. "
-                    "If no searched chunk supports an answer, say 资料不足. Never invent a citation."
+                    "If no searched chunk supports an answer, say 资料不足. Never invent a citation. "
+                    "Be concise and cover requested points without unrelated background. Use separate [E1][E2] markers, never ranges."
+                    + intents.checklist()
                 ),
                 middleware=[
                     check_before_model,
@@ -201,7 +216,7 @@ class LangChainAgentAdapter:
             )
             with agent_observation as agent_span:
                 result = agent.invoke(
-                    {"messages": [{"role": "user", "content": question}]},
+                    {"messages": [{"role": "user", "content": question + interpretation_data(validated_follow_up)}]},
                     config=invoke_config,
                 )
                 if agent_span is not None:
@@ -233,16 +248,19 @@ class LangChainAgentAdapter:
             core = gateway.knowledge_gateway
             if core is None:
                 return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code="SMART_RETRIEVAL_UNAVAILABLE", model_calls=model_calls))
-            query_plan = core.plan(question)
+            query_plan = core.plan(planning_question)
             coverage = core.evidence.evaluate_chunks(evidence.chunks, query_plan)
             if not coverage.accepted:
                 code = coverage.reason.value if coverage.reason is not None else "NO_CANDIDATES"
                 return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code=code, model_calls=model_calls))
             snapshots = evidence.freeze()
             guard()
+            candidate = answer
             answer, citations, error_code = self._normalize_answer(answer, snapshots)
-            if error_code is None:
-                error_code = core.evidence.validate_answer(answer, snapshots, query_plan)
+            finalized = core.evidence.finalize_answer(run_id, answer if not error_code else candidate,
+                                                      snapshots, evidence.chunks, query_plan, error_code)
+            answer, error_code = finalized.answer, finalized.error
+            citations = tuple(dict.fromkeys(MARKER.findall(answer)))
             if error_code is not None:
                 answer, citations, snapshots = "", (), ()
             else:
@@ -264,6 +282,17 @@ class LangChainAgentAdapter:
             )
         except _AgentAbort as exc:
             record_model("error")
+            if exc.code == "MODEL_OUTPUT_TRUNCATED" and gateway.knowledge_gateway is not None and not cancelled():
+                core = gateway.knowledge_gateway
+                plan = core.plan(planning_question)
+                coverage = core.evidence.evaluate_chunks(evidence.chunks, plan)
+                snapshots = evidence.freeze()
+                finalized = core.evidence.finalize_answer(run_id, truncated_candidate, snapshots,
+                    evidence.chunks, plan, exc.code)
+                if coverage.accepted and finalized.error is None:
+                    citations = tuple(dict.fromkeys(MARKER.findall(finalized.answer)))
+                    return self._finish(trace_store, SmartAgentResult(run_id, "completed", finalized.answer,
+                        tuple(steps), citations, tuple(s for s in snapshots if s.label in citations), model_calls=model_calls))
             return self._finish(trace_store, SmartAgentResult(run_id, "cancelled" if exc.code == "CANCELLED" else "failed", steps=tuple(steps), error_code=exc.code, model_calls=model_calls))
         except Exception as exc:
             record_model("error")
@@ -276,7 +305,12 @@ class LangChainAgentAdapter:
         def list_documents(limit: int = 50) -> str:
             return self._invoke_tool(context, "list_documents", {"limit": limit})
 
+        initial_query = context.initial_query
+
         def search_knowledge(query: str) -> str:
+            nonlocal initial_query
+            if initial_query is not None:
+                query, initial_query = initial_query, None
             return self._invoke_tool(context, "search_knowledge", {"query": query})
 
         def read_document(document_id: str) -> str:
@@ -336,6 +370,7 @@ class LangChainAgentAdapter:
 
     @staticmethod
     def _normalize_answer(answer: str, snapshots: tuple[EvidenceSnapshot, ...]) -> tuple[str, tuple[str, ...], str | None]:
+        answer = normalize_marker_spacing(answer)
         if not snapshots:
             return "", (), "NO_CANDIDATES"
         by_chunk = {snapshot.chunk_id: snapshot.label for snapshot in snapshots if snapshot.chunk_id}
@@ -354,7 +389,7 @@ class LangChainAgentAdapter:
             return match.group(0)
 
         normalized = re.sub(r"\[([^\[\]]+)\]", replace_reference, answer)
-        citations = tuple(dict.fromkeys(re.findall(r"\bE\d+\b", normalized)))
+        citations = tuple(dict.fromkeys(MARKER.findall(normalized)))
         if invalid or any(label not in labels for label in citations):
             return "", (), "INVALID_CITATION"
         if not citations and not any(phrase in normalized for phrase in ("资料不足", "无法回答", "没有足够证据")):
