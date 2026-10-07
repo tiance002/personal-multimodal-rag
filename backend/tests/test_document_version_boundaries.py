@@ -86,7 +86,13 @@ def test_concurrent_versions_are_serialized_by_document_lock(tmp_path: Path) -> 
         repository.delete_knowledge_base(knowledge_base["id"])
 
 
-def test_empty_text_and_textless_pdf_never_become_ready(tmp_path: Path) -> None:
+@pytest.mark.parametrize("ocr_error", ["OCR_EMPTY", "OCR_UNAVAILABLE"])
+def test_empty_text_and_textless_pdf_never_become_ready(tmp_path: Path, monkeypatch, ocr_error: str) -> None:
+    from backend.app.adapters.parsers import PdfParser
+
+    # Explicit provider outcomes: this persistence boundary must not depend on
+    # installed OCR languages or turn either failed outcome into an active version.
+    monkeypatch.setattr(PdfParser, "_ocr", lambda self, page: ("", ocr_error))
     repository = _repository_or_skip(tmp_path)
     suffix = tmp_path.name
     knowledge_base = repository.create_knowledge_base(f"empty-{suffix}")
@@ -110,7 +116,7 @@ def test_empty_text_and_textless_pdf_never_become_ready(tmp_path: Path) -> None:
         assert empty_result["status"] == "failed"
         assert empty_result["error_code"] == "EMPTY_TEXT"
         assert pdf_result["status"] == "failed"
-        assert pdf_result["error_code"] == "OCR_EMPTY"
+        assert pdf_result["error_code"] == ocr_error
         assert (repository.get_document(empty_text["document_id"]) or {}).get("active_version_id") is None
         assert (repository.get_document(blank_pdf["document_id"]) or {}).get("active_version_id") is None
     finally:

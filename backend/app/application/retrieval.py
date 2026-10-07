@@ -38,6 +38,7 @@ class RetrievalResult:
     retrieval_mode: str = "hybrid"
     route_reason: tuple[str, ...] = ()
     embedding_cache_hit: bool | None = None
+    merge_provenance: dict[str, Any] | None = None
 
 
 def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
@@ -132,6 +133,8 @@ class HybridRetriever:
         mode: str = "hybrid",
         ranker: CandidateRanker | None = None,
         diversity_selector: CandidateDiversitySelector | None = None,
+        *,
+        context_max_items: int | None = None,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
@@ -141,6 +144,7 @@ class HybridRetriever:
         self.source_weights = dict(source_weights) if source_weights is not None else None
         self.context_candidate_k = context_candidate_k
         self.context_max_per_document = context_max_per_document
+        self.context_max_items = context_max_items
         self.router = RetrievalRouter(mode)
         self.ranker = ranker
         self.diversity_selector = diversity_selector
@@ -165,8 +169,15 @@ class HybridRetriever:
             config['context_candidate_k'] = self.context_candidate_k
             if self.context_max_per_document is not None:
                 config['context_max_per_document'] = self.context_max_per_document
+            if self.context_max_items is not None:
+                if (type(self.context_max_items) is not int or self.context_max_items <= 0
+                        or self.context_max_items > self.context_candidate_k):
+                    raise ValueError('context_max_items must be between 1 and context_candidate_k')
+                config['context_max_items'] = self.context_max_items
         elif self.context_max_per_document is not None:
             raise ValueError('context_max_per_document requires context_candidate_k')
+        elif self.context_max_items is not None:
+            raise ValueError('context_max_items requires context_candidate_k')
         if self.router.mode != "hybrid":
             config['mode'] = self.router.mode
         if self.ranker is not None or self.diversity_selector is not None:
@@ -180,12 +191,12 @@ class HybridRetriever:
         route = self.router.route(question)
         mode, route_reason = route.mode, route.reason
         timings={'query_processing_ms':(time.perf_counter()-started)*1000,
-                 'keyword_retrieval_ms':0.0,'vector_retrieval_ms':0.0,'embedding_ms':0.0,'fusion_ms':0.0,
-                 'ranking_ms':0.0,'diversity_ms':0.0}
+                 'keyword_retrieval_ms':None,'vector_retrieval_ms':None,'embedding_ms':None,'fusion_ms':None,
+                 'ranking_ms':None,'diversity_ms':None}
         if not scope.knowledge_base_ids:
             return RetrievalResult(query_plan=plan, items=[], sources=(), reason_codes=("NO_CANDIDATES",),
                                    effective_config=effective, latency_ms=(time.perf_counter()-started)*1000,
-                                   retrieval_mode=mode, route_reason=route_reason)
+                                   retrieval_mode=mode, route_reason=route_reason, stage_latency_ms=timings)
         degradation_flags: tuple[str, ...] = ()
         embedding_cache_hit: bool | None = None
         keyword_started=time.perf_counter()

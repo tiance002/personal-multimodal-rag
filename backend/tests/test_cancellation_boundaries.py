@@ -75,7 +75,7 @@ class CancelBeforeCommitStore:
     def append_event(self, run_id, event_type, payload):
         self.events.append(event_type)
 
-    def append_message(self, conversation_id, role, content):
+    def append_message(self, conversation_id, role, content, run_id=None):
         self.messages.append((role, content))
 
     def persist_retrieval_hits(self, run_id, items):
@@ -122,7 +122,7 @@ class CancelAtFinalizeStore:
     def append_event(self, run_id, event_type, payload):
         self.events.append(event_type)
 
-    def append_message(self, conversation_id, role, content):
+    def append_message(self, conversation_id, role, content, run_id=None):
         self.messages.append((role, content))
 
     def persist_retrieval_hits(self, run_id, items):

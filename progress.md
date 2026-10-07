@@ -300,3 +300,11 @@
 3. 结果：有限Retrieval Gate PASS，已冻结Vector默认+条件Hybrid，公开参数优化结束。产品真实主流程已跑通；32题30返回、2 UNSUPPORTED_ANSWER，不等于30正确；46/46引用身份回读。语义准确率/引用语义支持NOT_EVALUATED，人审NOT_RUN。输入58238/输出6068真实生成Token，p50 3.933s/p95 10.057s；GPU主机采样峰4816MiB，RAM最低可用5459.38MiB。
 4. 风险与遗留：原32结果保留错误隐私建议、2可见截断、部分遗漏/过拒答与Context覆盖失败；隐私/截断窄范围护栏新增并记录不同源码身份，不重跑评分。Gold5文档而实际6文档47Chunk，第6文档未完整预注册；scope用39Chunk映射核对；OCR未覆盖所有图像；不称发布验收，不自行批准延期。
 5. 版本与下一步：实现0b68385/56a405f，首批执行90af812e0cdb3d3124df9f39e9e78beb42da195f，安全护栏25974ce；后续脱敏报告提交独立。用户可在http://127.0.0.1:14188开始隔离V1资料使用。停止自动实验/优化/部署，不打Tag。公开原库、原卷、M3/M3.5历史产物与ECS未修改；私有资料及原始报告保留忽略的var中。
+
+## 2026-09-30 V1 Quality Hardening
+
+1. 目标与改动：共享 Validator 本地 candidate 审计与安全原文降级、bounded生成预算/length处理、零额外模型多意图清单、稳定Citation身份及occurrence映射；独立8题旧V1 Human Overlay。最终报告 docs/reviews/local-first-v1-quality-hardening-report.md。
+2. 执行命令：报告原样列出定向pytest（59passed，退出0）；最终同32题真实runner（退出0，31生成/32embedding/0cloud/52引用回读）；不可变7文件verify及168源码哈希核对（退出0）；git diff --check退出0。原首轮、重放、经用户授权的最终回归均独立保留。全量发布/Cloud/新答案人审NOT RUN。
+3. 结果：工程机制与评估协议PASS；语义完整质量门19/32=59.375%，旧62.5%不改，质量回归验收FAIL。截断0、引用身份冲突0；仍6题部分引用支持。没有Retrieval调参，32题retrieved/selected ID完全相同。
+4. 风险遗留：Context充分的8题模型失败候选、3题Retrieval先行、2题Reference范围待负责人复核。原004/009 candidate缺失仍不能证明Validator误拒；8/32Overlay仅旧答案。未自行批准退化延期，不继续无限调分。
+5. 版本下一步：分支codex/local-first-rag-v1-20260930，基底52d770e8418bb040c372bf8d9014381ed68bc160，修改未提交未合并，无Tag。停止本Goal工程与实验；下一阶段需负责人决定，不自动实现Cloud。

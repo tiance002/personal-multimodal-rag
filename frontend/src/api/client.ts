@@ -1,4 +1,4 @@
-import type { Conversation, DocumentItem, IngestionJob, KnowledgeBase, Message } from "../app/state";
+import type { Conversation, DocumentItem, IngestionJob, KnowledgeBase, Message, EvidenceHint } from "../app/state";
 
 const API = "/api/v1";
 
@@ -34,7 +34,7 @@ export const api = {
   createConversation: (kbId: string, documentScope: string[] = []) => request<Conversation>("/conversations", { method: "POST", body: JSON.stringify({ knowledge_base_scope: [kbId], document_scope: documentScope, title: "新对话" }) }),
   listMessages: (conversationId: string) => request<Message[]>(`/conversations/${conversationId}/messages`),
   updateConversation: (conversationId: string, patch: { knowledge_base_scope?: string[]; document_scope?: string[]; title?: string }) => request<Conversation>(`/conversations/${conversationId}`, { method: "PATCH", body: JSON.stringify(patch) }),
-  sendMessage: (conversationId: string, content: string, mode: "quick" | "smart", knowledgeBaseScope: string[], documentScope: string[]) => request<{ run_id: string; answer: string; citations: string[]; error_code?: string }>(`/conversations/${conversationId}/messages`, { method: "POST", body: JSON.stringify({ content, mode, expected_knowledge_base_scope: knowledgeBaseScope, expected_document_scope: documentScope }) }),
+  sendMessage: (conversationId: string, content: string, mode: "quick" | "smart", knowledgeBaseScope: string[], documentScope: string[], requestId: string = crypto.randomUUID()) => request<{ run_id: string; answer: string; citations: string[]; error_code?: string; trace?: { execution_mode?: string; clarification_required?: boolean; evidence_hint?: EvidenceHint | null } }>(`/conversations/${conversationId}/messages`, { method: "POST", body: JSON.stringify({ content, mode, request_id: requestId, expected_knowledge_base_scope: knowledgeBaseScope, expected_document_scope: documentScope }) }),
   getContent: (documentId: string) => request<{ content: string; assets: unknown[] }>(`/documents/${documentId}/content`),
   documentSourceUrl: (documentId: string) => `${API}/documents/${documentId}/source`,
   documentPreviewUrl: (documentId: string) => `${API}/documents/${documentId}/preview`,

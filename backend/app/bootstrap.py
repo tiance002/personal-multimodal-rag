@@ -9,16 +9,21 @@ module is the only place that knows which implementation satisfies which port.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from typing import Any
 
 from sqlalchemy import Engine, create_engine
 
 from backend.app.adapters.langfuse_tracing import LangfuseObservability
 from backend.app.adapters.models.ollama import OllamaGateway
+from backend.app.adapters.models.deepseek import DeepSeekGateway
+from backend.app.application.deepseek_gate_types import DEEPSEEK_GATE_TYPES
+from backend.app.application.session_attempts import SessionAttemptGate
 from backend.app.adapters.postgres.agent_repository import PostgresAgentRepository
 from backend.app.adapters.postgres.graph_repository import PostgresGraphRepository
 from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
 from backend.app.adapters.storage import ContentAddressedStorage
+from backend.app.adapters.answer_audit import LocalAnswerAudit
 from backend.app.application.budget import PostgresBudgetGate
 from backend.app.application.knowledge_gateway import KnowledgeGateway
 from backend.app.application.knowledge_gateway import EvidenceService
@@ -27,6 +32,8 @@ from backend.app.application.retrieval_profile import reference_profile
 from backend.app.application.langchain_agent import LangChainAgentAdapter
 from backend.app.application.quick_chain import LangChainQuickChain
 from backend.app.application.retrieval import HybridRetriever
+from backend.app.adapters.office_preview import OfficePreviewAdapter
+from backend.app.ports.office_preview import OfficePreviewProtocol
 from backend.app.config import Settings
 
 
@@ -49,9 +56,13 @@ class Container:
     quick_chain: LangChainQuickChain
     smart_agent: LangChainAgentAdapter | None
     langfuse: LangfuseObservability | None = None
+    office_preview: OfficePreviewProtocol | None = None
+    cloud_gateway: Any | None = None
+    follow_up_enabled: bool = False
 
 
-def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET) -> Container:
+def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET,
+                    cloud_model: Any = _MODEL_UNSET, follow_up_enabled: bool = False) -> Container:
     """Build the object graph once, eagerly, with no request-time assembly.
 
     Building eagerly (rather than lazily on first request) removes the previous
@@ -59,7 +70,10 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     budget gates under concurrent first requests.
     """
     profile = reference_profile()["parameters"]
-    unavailable = [name for name in ("rerank_enabled", "mmr_enabled", "query_rewrite_enabled", "cloud_fallback_enabled")
+    context_pool_options = ({"context_candidate_k": settings.context_pool_k,
+                             "context_max_items": settings.context_max_items}
+                            if settings.context_pool_enabled else {})
+    unavailable = [name for name in ("rerank_enabled", "mmr_enabled", "query_rewrite_enabled")
                    if getattr(settings, name)]
     if unavailable:
         raise ValueError("optional adapters are not implemented: " + ", ".join(unavailable))
@@ -109,13 +123,21 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     knowledge_gateway = KnowledgeGateway(
         HybridRetriever(store, embedding_provider=ollama, mode=settings.retrieval_mode,
                         top_k=profile["top_k"], candidate_k=profile["candidate_k"],
-                        rrf_k=profile["rrf_k"], source_weights=profile["source_weights"]),
-        evidence_service=EvidenceService(context_builder=ContextBuilder(profile["context_max_chars"])),
+                        rrf_k=profile["rrf_k"], source_weights=profile["source_weights"],
+                        **context_pool_options),
+        evidence_service=EvidenceService(context_builder=ContextBuilder(profile["context_max_chars"]),
+                                        answer_audit=LocalAnswerAudit(settings.storage_root / "answer-audit")),
         observability=langfuse,
     )
+    # Default attempt gate fails closed on the tagged validation ledger. A real
+    # authorized validation entry must inject its registered gate; never bypass it.
+    cloud_gateway = (DeepSeekGateway(api_key=os.getenv("DEEPSEEK_API_KEY", ""),
+        model=settings.cloud_model, cloud_enabled=True, attempt_gate=SessionAttemptGate(), gate_types=DEEPSEEK_GATE_TYPES)
+        if settings.cloud_enabled else None) if cloud_model is _MODEL_UNSET else cloud_model
     quick_chain = LangChainQuickChain(
         knowledge_gateway,
         answer_gateway=ollama if settings.local_answer_enabled else None,
+        cloud_answer_gateway=cloud_gateway,
         budget_gate=budget_gate,
     )
     return Container(
@@ -133,6 +155,9 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         if agent_model_value is not None and settings.local_answer_enabled
         else None,
         langfuse=langfuse,
+        office_preview=OfficePreviewAdapter(),
+        cloud_gateway=cloud_gateway,
+        follow_up_enabled=follow_up_enabled,
     )
 
 

@@ -6,11 +6,11 @@ import subprocess
 import tempfile
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
-from dataclasses import dataclass
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
 import fitz
+from backend.app.ports.office_preview import OfficePreviewUnavailable, OfficePreviewFile
 
 
 OFFICE_MEDIA_TYPES = {
@@ -21,17 +21,6 @@ OFFICE_MEDIA_TYPES = {
 }
 OFFICE_SUFFIXES = {".doc", ".docx", ".xls", ".xlsx"}
 SPREADSHEET_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-
-
-class OfficePreviewUnavailable(RuntimeError):
-    """Raised when the local office renderer cannot produce a PDF preview."""
-
-
-@dataclass(frozen=True)
-class OfficePreviewFile:
-    path: Path
-    directory: Path
-    file_name: str
 
 
 def is_office_document(file_name: str, media_type: str) -> bool:
@@ -226,3 +215,14 @@ __all__ = [
     "convert_office_to_pdf",
     "is_office_document",
 ]
+
+
+class OfficePreviewAdapter:
+    def is_office_document(self, file_name: str, media_type: str) -> bool:
+        return is_office_document(file_name, media_type)
+
+    def convert_office_to_pdf(self, source: Path, file_name: str, media_type: str) -> OfficePreviewFile:
+        return convert_office_to_pdf(source, file_name, media_type)
+
+    def cleanup_office_preview(self, preview: OfficePreviewFile) -> None:
+        cleanup_office_preview(preview)

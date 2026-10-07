@@ -11,13 +11,9 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
 
-from backend.app.adapters.office_preview import (
-    OfficePreviewUnavailable,
-    cleanup_office_preview,
-    convert_office_to_pdf,
-    is_office_document,
-)
+from backend.app.ports.office_preview import OfficePreviewUnavailable
 from backend.app.application.answer_service import AnswerService
+from backend.app.application.quick_chain import QuickSettings
 from backend.app.bootstrap import Container
 
 router = APIRouter(prefix="/api/v1")
@@ -50,6 +46,7 @@ class ConversationPatch(BaseModel):
 
 
 class MessageIn(BaseModel):
+    request_id: uuid.UUID | None = None
     content: str = Field(min_length=1, max_length=100_000)
     mode: str = Field(default="quick", pattern="^(quick|smart)$")
     expected_knowledge_base_scope: list[str] | None = None
@@ -200,7 +197,7 @@ def get_document_content(document_id: str, request: Request):
         return _not_found(request)
 
 
-@router.get("/documents/{document_id}/source")
+@router.get("/documents/{document_id}/source", response_class=FileResponse, responses={200: {"description": "Original source bytes or a local PDF preview; media type follows the returned file.", "content": {"*/*": {"schema": {"type": "string", "format": "binary"}}}}, 404: {"description": "Document source is unavailable"}})
 def get_document_source(document_id: str, request: Request):
     """Stream the immutable source bytes for the selected document version.
 
@@ -220,7 +217,7 @@ def get_document_source(document_id: str, request: Request):
         return _not_found(request, "document source not found")
 
 
-@router.get("/documents/{document_id}/preview")
+@router.get("/documents/{document_id}/preview", response_class=FileResponse, responses={200: {"description": "Original source bytes or a local PDF preview; media type follows the returned file.", "content": {"*/*": {"schema": {"type": "string", "format": "binary"}}}}, 404: {"description": "Document source is unavailable"}, 503: {"description": "Local Office preview renderer is unavailable"}})
 def get_document_preview(document_id: str, request: Request):
     """Return a browser-readable preview while keeping the source immutable.
 
@@ -230,14 +227,17 @@ def get_document_preview(document_id: str, request: Request):
     """
     try:
         source = _container(request).store.get_document_source(document_id)
-        if not is_office_document(source["file_name"], source["media_type"]):
+        office = _container(request).office_preview
+        if office is None:
+            raise OfficePreviewUnavailable("Local preview renderer is unavailable")
+        if not office.is_office_document(source["file_name"], source["media_type"]):
             return FileResponse(
                 source["path"],
                 media_type=source["media_type"],
                 filename=source["file_name"],
                 content_disposition_type="inline",
             )
-        preview = convert_office_to_pdf(
+        preview = office.convert_office_to_pdf(
             Path(source["path"]),
             source["file_name"],
             source["media_type"],
@@ -247,7 +247,7 @@ def get_document_preview(document_id: str, request: Request):
             media_type="application/pdf",
             filename=preview.file_name,
             content_disposition_type="inline",
-            background=BackgroundTask(cleanup_office_preview, preview),
+            background=BackgroundTask(office.cleanup_office_preview, preview),
         )
     except (LookupError, FileNotFoundError):
         return _not_found(request, "document preview not found")
@@ -387,7 +387,13 @@ def _answer_service(request: Request) -> AnswerService:
         smart_agent=container.smart_agent,
         local_query_enabled=settings.local_query_enabled,
         local_query_gateway=container.ollama,
+        follow_up_provider=container.ollama,
+        follow_up_enabled=container.follow_up_enabled,
         observability=container.langfuse,
+        quick_settings=QuickSettings(cloud_enabled=settings.cloud_enabled,
+            prefer_cloud=settings.prefer_cloud, cloud_fallback_enabled=settings.cloud_fallback_enabled,
+            cloud_provider="deepseek", cloud_model=settings.cloud_model,
+            cloud_cost_estimate_microunits=settings.cloud_cost_estimate_microunits),
     )
 
 
@@ -405,9 +411,12 @@ def send_message(conversation_id: str, request: Request, payload: MessageIn):
     ):
         return _error(request, "CONVERSATION_SCOPE_CHANGED", "conversation scope changed; refresh before asking", 409)
     try:
-        outcome = _answer_service(request).answer(conversation, payload.content, payload.mode)
+        outcome = _answer_service(request).answer(conversation, payload.content, payload.mode,
+            request_id=str(payload.request_id) if payload.request_id is not None else None)
     except Exception as exc:
         return _error(request, "RAG_RUN_FAILED", type(exc).__name__, 500)
+    if outcome.error_code in {"DUPLICATE_REQUEST", "REQUEST_ID_CONFLICT", "IDEMPOTENCY_UNAVAILABLE", "IDEMPOTENCY_REQUIRED"}:
+        return _error(request, outcome.error_code, "request not regenerated; use the original run or refresh", 409)
     return _ok(
         request,
         {

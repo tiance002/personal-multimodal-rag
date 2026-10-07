@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from backend.app.domain.evidence_hint import valid_hint
+
 import json
 import hashlib
 import threading
 import uuid
 from contextlib import contextmanager
 from io import BytesIO
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping, Sequence
 from typing import Any
 
 from sqlalchemy import Engine, text
@@ -18,6 +20,8 @@ from backend.app.domain.models import ChunkRecord, RankedHit
 from backend.app.domain.parsers import ParserError
 from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, term_frequencies
+from backend.app.application.context_expansion import NeighborMetadata
+from backend.app.ports.retrieval import ContextNeighborRead, ContextNeighborReason, ContextNeighborRow
 
 
 class PostgresKnowledgeRepository:
@@ -690,6 +694,253 @@ class PostgresKnowledgeRepository:
             rows = conn.execute(statement, params).mappings()
             return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, content_sha256=row["content_sha256"]) for row in rows]
 
+    _CONTEXT_BOUNDARY_FILTER = """
+        c.chunk_type='text'
+        AND c.start_pos >= section.start_pos AND c.start_pos < c.end_pos
+        AND c.end_pos <= section.end_pos
+        AND c.locator->'start' = to_jsonb(c.start_pos)
+        AND c.locator->'end' = to_jsonb(c.end_pos)
+        AND (
+            (c.locator->>'kind' IN ('text','markdown')
+             AND section.page_start IS NULL AND section.page_end IS NULL)
+            OR (c.locator->>'kind'='pdf'
+                AND section.page_start > 0 AND section.page_start=section.page_end
+                AND c.locator->'page' = to_jsonb(section.page_start))
+        )
+    """
+
+    @staticmethod
+    def _project_context_row(
+        row: Mapping[str, Any], seed: ChunkRecord, scope: Scope,
+    ) -> tuple[ContextNeighborRow | None, str | None]:
+        """Defensive projection of a scoped SQL read, not independent auth proof."""
+        required = (
+            "seed_id", "seed_index", "offset", "chunk_id", "knowledge_base_id", "document_id",
+            "version_id", "chunk_index", "content", "content_sha256", "locator", "chunk_type",
+            "active_version_id", "index_status", "document_deleted", "section_id",
+            "section_knowledge_base_id", "section_document_id", "section_version_id",
+            "section_start", "section_end", "start_pos", "end_pos",
+        )
+        if any(key not in row or row[key] is None for key in required):
+            return None, "MISSING_METADATA"
+        if any(not isinstance(row[key], (str, uuid.UUID)) or not str(row[key]).strip()
+               for key in ("seed_id", "chunk_id", "knowledge_base_id", "document_id", "version_id",
+                           "active_version_id", "section_id", "section_knowledge_base_id",
+                           "section_document_id", "section_version_id")):
+            return None, "INVALID_METADATA"
+        kb, doc, version = (str(row[key]) for key in ("knowledge_base_id", "document_id", "version_id"))
+        if (str(row["seed_id"]) != seed.chunk_id
+                or (kb, doc, version) != (seed.knowledge_base_id, seed.document_id, seed.version_id)
+                or not scope.contains(kb, doc)):
+            return None, "IDENTITY_MISMATCH"
+        if str(row["active_version_id"]) != version:
+            return None, "INACTIVE_VERSION"
+        if row["index_status"] != "ready":
+            return None, "INDEX_NOT_READY"
+        if type(row["document_deleted"]) is not bool:
+            return None, "INVALID_METADATA"
+        if row["document_deleted"]:
+            return None, "DOCUMENT_DELETED"
+        if tuple(str(row[key]) for key in (
+                "section_knowledge_base_id", "section_document_id", "section_version_id")) != (kb, doc, version):
+            return None, "SECTION_IDENTITY_MISMATCH"
+        offset, index, seed_index = row["offset"], row["chunk_index"], row["seed_index"]
+        if (any(type(value) is not int for value in (offset, index, seed_index))
+                or offset not in (-1, 0, 1) or seed_index < 0 or index < 0
+                or index != seed_index + offset):
+            return None, "NOT_ADJACENT"
+        chunk_id = str(row["chunk_id"])
+        if (offset == 0) != (chunk_id == seed.chunk_id):
+            return None, "IDENTITY_MISMATCH"
+        locator, content = row["locator"], row["content"]
+        if not isinstance(locator, dict) or not locator or not isinstance(content, str) or not content.strip():
+            return None, "INVALID_EVIDENCE"
+        kind = locator.get("kind")
+        if row["chunk_type"] != "text" or kind not in ("text", "markdown", "pdf"):
+            return None, "UNSUPPORTED_TYPE"
+        for provenance in (locator, locator.get("raw_evidence")):
+            if isinstance(provenance, dict) and (
+                provenance.get("evidence_kind") == "model_generated_caption"
+                or provenance.get("schema_version") == "local-caption/v1"
+                or provenance.get("asset_type") == "caption"
+                or provenance.get("content_type") == "image_caption"
+            ):
+                return None, "UNSUPPORTED_TYPE"
+        if (hashlib.sha256(content.encode("utf-8")).hexdigest() != row["content_sha256"]
+                or locator.get("quote", content) != content):
+            return None, "INVALID_EVIDENCE"
+        start, end, lo, hi = (row[key] for key in ("start_pos", "end_pos", "section_start", "section_end"))
+        if (any(type(value) is not int for value in (start, end, lo, hi))
+                or not 0 <= lo <= start < end <= hi
+                or type(locator.get("start")) is not int or type(locator.get("end")) is not int
+                or (start, end) != (locator["start"], locator["end"])
+                or end - start != len(content)):
+            return None, "UNRELIABLE_BOUNDARY"
+        page = None
+        if "section_page_start" not in row or "section_page_end" not in row:
+            return None, "MISSING_METADATA"
+        if kind == "pdf":
+            page = locator.get("page")
+            if (type(page) is not int or page < 1
+                    or type(row["section_page_start"]) is not int
+                    or type(row["section_page_end"]) is not int
+                    or row["section_page_start"] != page or row["section_page_end"] != page):
+                return None, "UNRELIABLE_PAGE_BOUNDARY"
+        elif (row["section_page_start"] is not None or row["section_page_end"] is not None
+              or locator.get("page") is not None):
+            return None, "UNRELIABLE_PAGE_BOUNDARY"
+        if offset == 0:
+            if (seed.is_current is not True or seed.content != content or seed.locator != locator
+                    or seed.content_sha256 != row["content_sha256"]):
+                return None, "SEED_READBACK_CHANGED"
+            chunk = seed
+        else:
+            chunk = ChunkRecord(chunk_id, kb, doc, version, content, locator,
+                                is_current=(version == str(row["active_version_id"])),
+                                content_sha256=row["content_sha256"])
+        metadata = NeighborMetadata(chunk, index, str(row["active_version_id"]), row["index_status"],
+            row["document_deleted"], row["chunk_type"], "page" if kind == "pdf" else "section",
+            str(row["section_id"]), lo, hi, page)
+        return ContextNeighborRow(seed.chunk_id, offset, metadata), None
+
+    def read_context_rows(
+        self, scope: Scope, seeds: Sequence[ChunkRecord], *, max_seeds: int = 10,
+    ) -> ContextNeighborRead:
+        """Optional, unwired read: <=10 seeds, exact -1/0/+1, <=3*N rows.
+
+        SQL is the authorization boundary. Missing/changed seed evidence or
+        unreliable sections authorize no neighbor; no historical-read fallback.
+        """
+        if type(max_seeds) is not int or not 1 <= max_seeds <= 10:
+            raise ValueError("max_seeds must be an integer between 1 and 10")
+        if len(seeds) > max_seeds:
+            raise ValueError("selected seed count exceeds explicit limit")
+        identities: set[tuple[str, str]] = set()
+        eligible_inputs: dict[int, ChunkRecord] = {}
+        reasons: list[ContextNeighborReason] = []
+        for order, seed in enumerate(seeds):
+            scope.assert_contains(seed.knowledge_base_id, seed.document_id)
+            for value in (seed.chunk_id, seed.knowledge_base_id, seed.document_id, seed.version_id):
+                if not isinstance(value, str) or str(uuid.UUID(value)) != value:
+                    raise ValueError("seed identity must be a canonical UUID string")
+            identity = (seed.version_id, seed.chunk_id)
+            if identity in identities:
+                raise ValueError("duplicate seed identity")
+            identities.add(identity)
+            if seed.is_current is not True:
+                reasons.append(ContextNeighborReason("INACTIVE_SEED_INPUT", seed.chunk_id))
+                continue
+            if (not isinstance(seed.content, str) or not seed.content.strip()
+                    or hashlib.sha256(seed.content.encode("utf-8")).hexdigest() != seed.content_sha256):
+                raise ValueError("seed evidence hash is missing or inconsistent")
+            eligible_inputs[order] = seed
+        if not eligible_inputs:
+            return ContextNeighborRead(reasons=tuple(reasons))
+        params: dict[str, Any] = {"row_limit": 3 * len(eligible_inputs)}
+        clause = self._scope_filter(scope, params)
+        values: list[str] = []
+        for order, seed in eligible_inputs.items():
+            prefix = f"seed_{order}"
+            params.update({f"{prefix}_order": order, f"{prefix}_id": seed.chunk_id,
+                           f"{prefix}_kb": seed.knowledge_base_id, f"{prefix}_doc": seed.document_id,
+                           f"{prefix}_version": seed.version_id, f"{prefix}_hash": seed.content_sha256})
+            values.append(f"(:{prefix}_order, CAST(:{prefix}_id AS uuid), CAST(:{prefix}_kb AS uuid), "
+                          f"CAST(:{prefix}_doc AS uuid), CAST(:{prefix}_version AS uuid), :{prefix}_hash)")
+        boundary = self._CONTEXT_BOUNDARY_FILTER
+        section_join = """JOIN document_sections section ON section.id = c.section_id
+            AND section.document_id = c.document_id AND section.version_id = c.version_id
+            AND section.knowledge_base_id = c.knowledge_base_id"""
+        statement = text(f"""
+            WITH requested(seed_order,seed_id,kb_id,doc_id,version_id,expected_hash) AS (
+                VALUES {','.join(values)}
+            ), eligible AS (
+                SELECT requested.seed_order, requested.seed_id, c.knowledge_base_id,
+                       c.document_id,c.version_id,c.chunk_index AS seed_index,c.section_id
+                FROM requested JOIN chunks c ON c.id=requested.seed_id
+                    AND c.knowledge_base_id=requested.kb_id AND c.document_id=requested.doc_id
+                    AND c.version_id=requested.version_id AND c.content_sha256=requested.expected_hash
+                {self._ACTIVE_VERSION_JOINS}
+                JOIN knowledge_bases kb ON kb.id=c.knowledge_base_id
+                {section_join}
+                WHERE {clause} AND d.knowledge_base_id = c.knowledge_base_id
+                    AND d.deleted_at IS NULL AND dv.index_status='ready' AND kb.deleted_at IS NULL
+                    AND {boundary}
+            )
+            SELECT eligible.seed_order,eligible.seed_id,eligible.seed_index,offsets.offset,
+                c.id AS chunk_id,c.knowledge_base_id,c.document_id,c.version_id,c.chunk_index,
+                c.content,c.content_sha256,c.locator,c.start_pos,c.end_pos,c.chunk_type,
+                d.active_version_id,dv.index_status,(d.deleted_at IS NOT NULL) AS document_deleted,
+                section.id AS section_id,section.knowledge_base_id AS section_knowledge_base_id,
+                section.document_id AS section_document_id,section.version_id AS section_version_id,
+                section.start_pos AS section_start,section.end_pos AS section_end,
+                section.page_start AS section_page_start,section.page_end AS section_page_end
+            FROM eligible CROSS JOIN (VALUES (-1), (0), (1)) AS offsets("offset")
+            JOIN chunks c ON c.knowledge_base_id=eligible.knowledge_base_id
+                AND c.document_id=eligible.document_id AND c.version_id=eligible.version_id
+                AND c.chunk_index = eligible.seed_index + offsets.offset
+                AND c.section_id = eligible.section_id
+            {self._ACTIVE_VERSION_JOINS}
+            {section_join}
+            WHERE {clause} AND d.knowledge_base_id = c.knowledge_base_id
+                AND d.deleted_at IS NULL AND dv.index_status='ready' AND {boundary}
+            ORDER BY eligible.seed_order,offsets.offset LIMIT :row_limit
+        """)
+        with self.engine.connect() as conn:
+            raw_rows = conn.execute(statement, params).mappings().all()
+        if len(raw_rows) > params["row_limit"]:
+            raise ValueError("context reader exceeded SQL row limit")
+        groups: dict[int, list[Mapping[str, Any]]] = {order: [] for order in eligible_inputs}
+        for row in raw_rows:
+            order = row.get("seed_order")
+            if type(order) is not int or order not in groups:
+                raise ValueError("context reader returned unauthorized seed group")
+            groups[order].append(row)
+        output: list[ContextNeighborRow] = []
+        for order, seed in eligible_inputs.items():
+            rows = groups[order]
+            offsets = [row.get("offset") for row in rows]
+            if any(type(offset) is not int or offset not in (-1, 0, 1) for offset in offsets):
+                reasons.append(ContextNeighborReason("NOT_ADJACENT", seed.chunk_id))
+                continue
+            if len(offsets) != len(set(offsets)):
+                reasons.append(ContextNeighborReason("AMBIGUOUS_ROWS", seed.chunk_id))
+                continue
+            seed_rows = [row for row in rows if row["offset"] == 0]
+            if not seed_rows:
+                reasons.append(ContextNeighborReason("SEED_NOT_ELIGIBLE_OR_BOUNDARY_UNKNOWN", seed.chunk_id))
+                continue
+            projected_seed, error = self._project_context_row(seed_rows[0], seed, scope)
+            if error:
+                reasons.append(ContextNeighborReason(error, seed.chunk_id, 0))
+                continue
+            assert projected_seed is not None
+            projected = [projected_seed]
+            for row in rows:
+                if row["offset"] == 0:
+                    continue
+                neighbor, error = self._project_context_row(row, seed, scope)
+                if neighbor is not None:
+                    a, b = projected_seed.metadata, neighbor.metadata
+                    if (a.section_id, a.boundary_kind, a.boundary_start, a.boundary_end, a.page) != (
+                            b.section_id, b.boundary_kind, b.boundary_start, b.boundary_end, b.page):
+                        error = "BOUNDARY_MISMATCH"
+                    elif (b.chunk_index != a.chunk_index + neighbor.offset
+                          or (neighbor.offset == -1 and not (
+                              b.chunk.locator["start"] < a.chunk.locator["start"]
+                              and b.chunk.locator["end"] < a.chunk.locator["end"]))
+                          or (neighbor.offset == 1 and not (
+                              b.chunk.locator["start"] > a.chunk.locator["start"]
+                              and b.chunk.locator["end"] > a.chunk.locator["end"]))):
+                        error = "NOT_ADJACENT"
+                if error:
+                    reasons.append(ContextNeighborReason(error, seed.chunk_id, row["offset"]))
+                elif neighbor is not None:
+                    projected.append(neighbor)
+            if len(projected) == 1:
+                reasons.append(ContextNeighborReason("NO_ELIGIBLE_NEIGHBOR", seed.chunk_id))
+            output.extend(sorted(projected, key=lambda item: item.offset))
+        return ContextNeighborRead(tuple(output), tuple(reasons))
+
     def get_chunk(self, chunk_id: str) -> ChunkRecord | None:
         with self.engine.connect() as conn:
             row = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,content_sha256,locator FROM chunks WHERE id=:id"), {"id": chunk_id}).mappings().first()
@@ -816,12 +1067,30 @@ class PostgresKnowledgeRepository:
         with self.engine.connect() as conn:
             rows = conn.execute(text("""
                 SELECT m.id,m.conversation_id,m.role,m.content,m.created_at,m.run_id,
-                       COALESCE(ev.citations, '[]'::jsonb) AS citations
+                       COALESCE(ev.citations, '[]'::jsonb) AS citations,
+                       presentation.payload AS presentation
                 FROM conversation_messages m
+                JOIN conversations c ON c.id=m.conversation_id AND c.deleted_at IS NULL
+                LEFT JOIN rag_runs r ON r.id=m.run_id AND r.conversation_id=m.conversation_id
+                LEFT JOIN LATERAL (
+                    SELECT e.payload->'presentation' AS payload
+                    FROM retrieval_events e
+                    WHERE e.run_id=r.id AND e.event_type='run.metrics'
+                      AND m.role='user' AND r.status='failed'
+                      AND r.completed_at IS NOT NULL
+                      AND r.knowledge_base_scope=c.knowledge_base_scope
+                      AND r.document_scope=c.document_scope
+                      AND ((r.error_code='NO_CANDIDATES' AND e.payload->>'error'='NO_CANDIDATES')
+                           OR (r.error_code='INSUFFICIENT_EVIDENCE' AND e.payload->>'error'='INSUFFICIENT_EVIDENCE'
+                               AND e.payload->'presentation'->>'kind'='evidence_hint'
+                               AND e.payload->'presentation'->>'reason_code'='TABLE_HEADER_UNCONFIRMED'))
+                      AND e.payload->'citations'='[]'::jsonb
+                    ORDER BY e.seq DESC LIMIT 1
+                ) presentation ON true
                 LEFT JOIN LATERAL (
                     SELECT e.payload->'citations' AS citations
                     FROM retrieval_events e
-                    WHERE e.run_id=m.run_id AND e.event_type='answer.completed'
+                    WHERE e.run_id=m.run_id AND m.role='assistant' AND e.event_type='answer.completed'
                     ORDER BY e.seq DESC LIMIT 1
                 ) ev ON true
                 WHERE m.conversation_id=:id ORDER BY m.created_at
@@ -835,19 +1104,69 @@ class PostgresKnowledgeRepository:
             message["run_id"] = str(message["run_id"])
         citations = message.get("citations")
         message["citations"] = list(citations) if isinstance(citations, list) else []
+        presentation = message.pop("presentation", None)
+        if (message.get("role") == "user" and message.get("run_id")
+                and not message["citations"] and isinstance(presentation, dict)
+                and presentation.get("kind") == "clarification"
+                and presentation.get("clarification_required") is True
+                and isinstance(presentation.get("text"), str) and presentation["text"].strip()):
+            message["presentation"] = {"kind": "clarification", "text": presentation["text"],
+                                       "clarification_required": True}
+        elif (message.get("role") == "user" and message.get("run_id")
+                and not message["citations"] and valid_hint(presentation)):
+            message["presentation"] = {key: presentation[key] for key in
+                                       ("kind", "text", "reason_code", "source_formats")}
         return message
 
-    def last_completed_question(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> str | None:
-        """Use only a completed question in the same conversation and exact scope."""
+    def completed_history_context(self, conversation_id: str, kb_scope: list[str],
+                                  document_scope: list[str], *, current_run_id: str,
+                                  limit: int = 3) -> dict[str, Any]:
+        from backend.app.ports.persistence import bounded_completed_history
+
         with self.engine.connect() as conn:
-            return conn.execute(text("""
-                SELECT q0 FROM rag_runs
+            current = conn.execute(text("""
+                SELECT r.created_at FROM rag_runs r
+                JOIN conversations c ON c.id=r.conversation_id AND c.deleted_at IS NULL
+                WHERE r.id=:run AND r.conversation_id=:conversation
+                  AND r.knowledge_base_scope=CAST(:kb AS jsonb)
+                  AND r.document_scope=CAST(:docs AS jsonb)
+            """), {"run": current_run_id, "conversation": conversation_id,
+                    "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope)}).mappings().first()
+            if current is None:
+                return {"turns": (), "blocked_reason": "HISTORY_UNAVAILABLE"}
+            cutoff = current["created_at"]
+            rows = list(conn.execute(text("""
+                SELECT r.id AS run_id,r.conversation_id,r.q0,r.status,r.error_code,
+                       r.knowledge_base_scope,r.document_scope,r.created_at,r.completed_at,
+                       EXISTS (SELECT 1 FROM retrieval_events e WHERE e.run_id=r.id
+                         AND e.event_type='answer.completed'
+                         AND e.payload->>'error_code' IS NULL) AS answer_completed
+                FROM rag_runs r
+                WHERE r.conversation_id=:conversation AND r.id<>:run AND r.created_at<:cutoff
+                ORDER BY r.created_at DESC,r.id DESC LIMIT 16
+            """), {"run": current_run_id, "conversation": conversation_id,
+                    "cutoff": cutoff}).mappings())
+        return bounded_completed_history(rows, conversation_id=conversation_id,
+                    kb_scope=kb_scope, document_scope=document_scope,
+                    current_run_id=current_run_id, cutoff=cutoff, limit=limit)
+
+    def last_completed_question_context(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> dict[str, str] | None:
+        """Completed q0 and provenance, in the same conversation and exact scope."""
+        with self.engine.connect() as conn:
+            row = conn.execute(text("""
+                SELECT q0, id AS run_id FROM rag_runs
                 WHERE conversation_id=:conversation AND status='completed'
                   AND knowledge_base_scope=CAST(:kb AS jsonb)
                   AND document_scope=CAST(:docs AS jsonb)
                 ORDER BY created_at DESC LIMIT 1
             """), {"conversation": conversation_id, "kb": json.dumps(kb_scope),
-                    "docs": json.dumps(document_scope)}).scalar_one_or_none()
+                    "docs": json.dumps(document_scope)}).mappings().first()
+            return {"q0": row["q0"], "run_id": str(row["run_id"])} if row is not None else None
+
+    def last_completed_question(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> str | None:
+        """Compatibility for existing callers that only need completed q0."""
+        context = self.last_completed_question_context(conversation_id, kb_scope, document_scope)
+        return context["q0"] if context else None
 
     def append_message(self, conversation_id: str, role: str, content: str, run_id: str | None = None) -> dict[str, Any]:
         message_id = uuid.uuid4()
@@ -861,6 +1180,26 @@ class PostgresKnowledgeRepository:
         with self.engine.begin() as conn:
             conn.execute(text("INSERT INTO rag_runs (id,conversation_id,knowledge_base_scope,document_scope,q0,status) VALUES (:id,:conversation_id,CAST(:kb AS jsonb),CAST(:docs AS jsonb),:q0,'running')"), {"id": run_id, "conversation_id": conversation_id, "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope), "q0": q0})
         return str(run_id)
+
+    def create_run_once(self, conversation_id: str, kb_scope: list[str],
+                        document_scope: list[str], q0: str, request_id: str) -> tuple[str, bool]:
+        """Existing UUID primary key atomically claims one product request; no migration."""
+        identity = uuid.UUID(request_id)
+        with self.engine.begin() as conn:
+            inserted = conn.execute(text("""INSERT INTO rag_runs
+                (id,conversation_id,knowledge_base_scope,document_scope,q0,status)
+                VALUES (:id,:conversation_id,CAST(:kb AS jsonb),CAST(:docs AS jsonb),:q0,'running')
+                ON CONFLICT (id) DO NOTHING RETURNING id"""),
+                {"id": identity, "conversation_id": conversation_id, "kb": json.dumps(kb_scope),
+                 "docs": json.dumps(document_scope), "q0": q0}).scalar()
+            if inserted is not None:
+                return str(identity), True
+            row = conn.execute(text("""SELECT conversation_id,knowledge_base_scope,document_scope,q0
+                FROM rag_runs WHERE id=:id"""), {"id": identity}).mappings().one()
+            if (str(row["conversation_id"]) != conversation_id or row["knowledge_base_scope"] != kb_scope
+                    or row["document_scope"] != document_scope or row["q0"] != q0):
+                raise ValueError("REQUEST_ID_CONFLICT")
+            return str(identity), False
 
     def append_event(self, run_id: str, event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
         """Append one run event with a gap-free per-run sequence number.

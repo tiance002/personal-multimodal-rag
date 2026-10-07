@@ -1,6 +1,32 @@
 from backend.app.application.answer_validation import AnswerValidator
-from backend.app.application.query_router import QueryRouter
+import pytest
+
+from backend.app.application.query_router import EvidencePlan, EvidenceTarget, QueryRouter
+from backend.app.application.quality import QualityGate
 from backend.app.domain.evidence import freeze_evidence
+from backend.app.domain.models import ChunkRecord
+
+
+@pytest.mark.parametrize('separator',['\u3002','\uff1b','\n'],ids=['period','semicolon','newline'])
+def test_pure_native_numbered_two_target_answer_keeps_sentence_citations(separator):
+    """SIMULATED complete native quotes; actual gate, snapshots and validator."""
+    left='\u8bbe\u5907\u7532\u957f\u5ea680\u5398\u7c73'
+    right='2. \u8bbe\u5907\u4e59\u5bbd\u5ea620\u5398\u7c73'
+    plan=EvidencePlan('SIMULATED two native numeric targets',targets=(
+        EvidenceTarget('\u8bbe\u5907\u7532','\u957f\u5ea6'),
+        EvidenceTarget('\u8bbe\u5907\u4e59','\u5bbd\u5ea6')),kind='parallel')
+    locators=[{'kind':'text','parse_status':'complete','quote':text} for text in (left,right)]
+    chunks=[ChunkRecord(f'c{i}','SIMULATED-kb',f'doc{i}','v1',text,locators[i])
+        for i,text in enumerate((left,right))]
+    assert QualityGate().evaluate_chunks(chunks,plan).accepted
+    snapshots=tuple(freeze_evidence(f'E{i+1}','v1',f'c{i}',text,locators[i])
+        for i,text in enumerate((left,right)))
+    answer=left+'[E1]'+separator+right+'[E2]'
+    validator=AnswerValidator()
+    assert validator.validate(answer,snapshots,plan) is None
+    assert validator.validate(answer.replace('20','21'),snapshots,plan)=='UNSUPPORTED_ANSWER'
+    assert validator.validate(answer.replace('[E1]','[E2]'),snapshots,plan)=='UNSUPPORTED_ANSWER'
+    assert validator.validate(answer.replace('[E2]','[E99]'),snapshots,plan)=='INVALID_CITATION'
 
 
 def _evidence():

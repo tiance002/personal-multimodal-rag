@@ -6,8 +6,10 @@ from collections.abc import Sequence
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import asdict
+from copy import deepcopy
 from typing import Any, Iterator
 
+from backend.app.application.retrieval_provenance import pass_metadata
 from backend.app.application.model_usage import ModelCall, UsageCapture, capture_usage
 
 NOT_AVAILABLE = "NOT_AVAILABLE"
@@ -20,6 +22,7 @@ class RunMetrics:
         self.usage = usage
         self.started = time.perf_counter()
         self.retrievals: list[dict[str, Any]] = []
+        self.retrieval_merges: list[dict[str, Any]] = []
         self.context_sizes: dict[str, int] = {}
         self.context_latency = 0.0
         self.rendered_context_chars: int | None = None
@@ -27,9 +30,11 @@ class RunMetrics:
         self.call_paths: dict[int, str] = {}
         self.providers: set[str] = set()
         self.cloud_called = False
+        self.hardening: dict[str, Any] = {}
 
     def record_retrieval(self, result: Any) -> None:
         self.retrievals.append({
+            "call_index": len(self.retrievals) + 1,
             "mode": result.retrieval_mode, "reason": list(result.route_reason),
             "vector_candidate_count": len(result.candidate_rankings.get("vector", ())),
             "keyword_candidate_count": len(result.candidate_rankings.get("keyword", ())),
@@ -38,7 +43,19 @@ class RunMetrics:
             "stage_latency_ms": result.stage_latency_ms,
             "embedding_cache_hit": result.embedding_cache_hit,
             "degradation_flags": list(result.degradation_flags),
+            "pass_metadata": pass_metadata(result),
         })
+
+    def record_retrieval_merge(self, provenance: dict[str, Any] | None) -> None:
+        if provenance is not None:
+            row = deepcopy(provenance)
+            recorded = self.retrievals[-2:]
+            for index, source in enumerate(row["passes"]):
+                body = {k: v for k, v in source.items() if k not in ("pass_index", "role")}
+                call = recorded[index] if len(recorded) == 2 else None
+                source["retrieval_call_index"] = (call["call_index"]
+                    if call is not None and call["pass_metadata"] == body else None)
+            self.retrieval_merges.append(row)
 
     def record_context(self, items: Sequence[Any], *, latency_ms: float = 0.0,
                        rendered_chars: int | None = None, quality: Any | None = None) -> None:
@@ -98,7 +115,9 @@ class RunMetrics:
             "retry_count": 0, "retry_count_basis": "no_application_or_provider_retries_configured",
             "model_calls": [asdict(call) | {"path": self.call_paths.get(index, "LOCAL")} for index, call in enumerate(self.usage.calls)],
             "retrieval_calls": list(self.retrievals),
+            "retrieval_merges": deepcopy(self.retrieval_merges),
             "evidence_quality": self.quality if self.quality is not None else NOT_AVAILABLE,
+            "answer_hardening": self.hardening,
         }
 
 

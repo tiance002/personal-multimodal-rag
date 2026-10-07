@@ -18,6 +18,8 @@ from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, normalize_query
 from backend.app.application.evidence_quality import EvidenceQuality, EvidenceQualityAssessor
 from backend.app.application.run_metrics import current_metrics
+from backend.app.application.retrieval_provenance import merge_provenance
+from backend.app.application.answer_hardening import HardeningPolicy, normalize_marker_spacing
 
 
 @dataclass(frozen=True)
@@ -50,6 +52,7 @@ class Trace:
     degradation_code: str | None = None
     reason_codes: tuple[str, ...] = ()
     model_calls: int = 0
+    evidence_hint: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -74,12 +77,20 @@ class EvidenceService:
         quality_gate: QualityGate | None = None,
         context_builder: ContextBuilder | None = None,
         answer_validator: AnswerValidator | None = None,
+        answer_audit: Any | None = None,
     ) -> None:
         self.query_router = query_router or QueryRouter()
         self.quality_gate = quality_gate or QualityGate()
         self.context_builder = context_builder or ContextBuilder()
         self.answer_validator = answer_validator or AnswerValidator()
         self.quality_assessor = EvidenceQualityAssessor()
+        self.hardening = HardeningPolicy(answer_audit)
+
+    def finalize_answer(self, run_id: str, answer: str, snapshots: Sequence[EvidenceSnapshot],
+                        chunks: Sequence[Any], plan: QueryPlan, error: str | None = None):
+        answer = normalize_marker_spacing(answer)
+        error = error or self.validate_answer(answer, snapshots, plan)
+        return self.hardening.finalize(run_id, answer, snapshots, chunks, plan, error)
 
     def plan(self, question: str) -> QueryPlan:
         return QueryPlan(question, self.query_router.plan(question), normalize_query(question))
@@ -111,10 +122,18 @@ class EvidenceService:
 
     def bundle(self, plan: QueryPlan, retrieval: RetrievalResult) -> EvidenceBundle:
         started = time.perf_counter()
-        candidates = retrieval.context_items or tuple(retrieval.items)
+        single_pass_pool = bool(retrieval.context_items) and retrieval.merge_provenance is None
+        candidates = retrieval.context_items if single_pass_pool else tuple(retrieval.items)
+        if retrieval.merge_provenance and any(
+            row.get("effective_config", {}).get("context_max_items") is not None
+            for row in retrieval.merge_provenance.get("passes", ())
+        ):
+            if (metrics := current_metrics()) is not None:
+                metrics.hardening["context_pool_fallback"] = "MULTI_PASS_LEGACY"
         selected = tuple(self.context_builder.select(
             candidates,
-            max_items=retrieval.effective_config.get("top_k") if retrieval.context_items else None,
+            max_items=(retrieval.effective_config.get("context_max_items", retrieval.effective_config.get("top_k"))
+                       if single_pass_pool else None),
             max_per_document=retrieval.context_max_per_document,
         ))
         selected_result = RetrievalResult(
@@ -124,10 +143,14 @@ class EvidenceService:
             retrieval.reason_codes,
         )
         decision = self.evaluate(selected_result, plan)
+        if decision.accepted and plan.evidence_plan.targets and all(t.period is not None for t in plan.evidence_plan.targets):
+            support_ids={chunk.chunk_id for target in plan.evidence_plan.targets
+                         for chunk in self.quality_gate.supporting_chunks([i.chunk for i in selected],target)}
+            selected=tuple(item for item in selected if item.chunk.chunk_id in support_ids)
         supporting = None
         if plan.evidence_plan.targets:
-            supporting = sum(any(self.quality_gate.supporting_fact(item.chunk.content, target)
-                                 for target in plan.evidence_plan.targets) for item in selected)
+            supporting = len({chunk.chunk_id for target in plan.evidence_plan.targets
+                              for chunk in self.quality_gate.supporting_chunks([i.chunk for i in selected],target)})
         quality = self.quality_assessor.assess(retrieval, selected, supporting_chunks=supporting)
         if (metrics := current_metrics()) is not None:
             metrics.record_context(selected, latency_ms=(time.perf_counter() - started) * 1000, quality=quality)
@@ -290,7 +313,9 @@ class KnowledgeGateway:
         if decision.missing_targets:
             targeted_query = " ".join(target.search_query for target in decision.missing_targets)
             targeted = self.retrieve_query(scope, targeted_query)
-            retrieval = self._merge(plan, retrieval, targeted)
+            retrieval = self._merge(plan, retrieval, targeted, max_items=2 * self.retriever.top_k)
+            if (metrics := current_metrics()) is not None:
+                metrics.record_retrieval_merge(retrieval.merge_provenance)
         return plan, retrieval
 
     def search(self, scope: Scope, question: str) -> RetrievalResult:
@@ -300,18 +325,26 @@ class KnowledgeGateway:
         return retrieval
 
     @staticmethod
-    def _merge(plan: QueryPlan, first: RetrievalResult, second: RetrievalResult) -> RetrievalResult:
-        seen = {item.chunk.chunk_id for item in first.items}
-        combined = list(first.items)
-        for item in second.items:
-            if item.chunk.chunk_id not in seen:
-                combined.append(item)
-                seen.add(item.chunk.chunk_id)
+    def _merge(plan: QueryPlan, first: RetrievalResult, second: RetrievalResult, *, max_items: int) -> RetrievalResult:
+        # One original pass plus one targeted pass, each bounded by top_k.
+        # Preserve existing stable order and never mutate either pass result.
+        if type(max_items) is not int or max_items <= 0:
+            raise ValueError("max_items must be a positive integer")
+        seen: set[str] = set()
+        combined: list[RetrievalItem] = []
+        for items in (first.items, second.items):
+            for item in items:
+                if len(combined) >= max_items:
+                    break
+                if item.chunk.chunk_id not in seen:
+                    combined.append(item)
+                    seen.add(item.chunk.chunk_id)
         return RetrievalResult(
             plan.retrieval_plan,
             combined,
             tuple(sorted(set(first.sources + second.sources))),
             tuple(sorted(set(first.reason_codes + second.reason_codes))),
+            merge_provenance=merge_provenance(first, second, combined, max_items=max_items),
         )
 
 

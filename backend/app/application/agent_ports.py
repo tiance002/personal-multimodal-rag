@@ -21,6 +21,7 @@ class SmartAgentResult:
     error_code: str | None = None
     cost_microunits: int = 0
     model_calls: int = 0
+    evidence_hint: dict[str, Any] | None = None
 
 
 class SmartAgentPort(Protocol):
@@ -36,6 +37,8 @@ class SmartAgentPort(Protocol):
         graph_enabled: bool = False,
         trace_store: Any | None = None,
         limits: AgentLimits | None = None,
+        retrieval_query: str | None = None,
+        validated_follow_up: Any | None = None,
     ) -> SmartAgentResult: ...
 
 

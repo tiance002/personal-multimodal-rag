@@ -1,0 +1,488 @@
+{
+  "origin_sha256": "8d206c0ae8a7218460ce8666e7d77d4093daf62c5682dc1413489f6abb7cffbf",
+  "historical_live_status": "LIVE_QA_FAIL_4_OF_4_POSTSTOP_VERIFICATION_PASS",
+  "cases": [
+    {
+      "format": "txt",
+      "question": "杉桥门店2026-09的营业额是多少？",
+      "run_id": "fa2e8713-1d99-4a16-820d-c0da834029d6",
+      "document_id": "25bd87ea-66d5-4fe6-b9f5-13c1d025bb03",
+      "version_id": "8106cfcf-eaaf-46ea-8640-360fc9d002fa",
+      "candidate_NOT_ACCEPTED": "杉桥门店 2026-09 的营业额为 312 千元 [E1]。",
+      "selected_source_chunk_id": "cc907415-8df5-403d-927e-4b06e9ff4173",
+      "source_quote": "杉桥门店月营业额表\nSales\n门店\t统计月份\t营业额（千元）\n杉桥门店\t2026-09\t312\n杉桥门店\t2026-10\t298",
+      "source_locator": {
+        "end": 65,
+        "bbox": null,
+        "kind": "text",
+        "page": null,
+        "cells": [],
+        "quote": "杉桥门店月营业额表\nSales\n门店\t统计月份\t营业额（千元）\n杉桥门店\t2026-09\t312\n杉桥门店\t2026-10\t298",
+        "sheet": null,
+        "start": 0,
+        "asset_id": null,
+        "raw_text": null,
+        "table_id": null,
+        "cell_range": null,
+        "table_bbox": null,
+        "header_rows": [],
+        "parse_status": "complete",
+        "raw_evidence": {},
+        "merged_ranges": [],
+        "source_format": null,
+        "parse_warnings": [],
+        "header_detection": null,
+        "conversion_lineage": {}
+      },
+      "source_sha256": "3d7aab92f2fb2099623b3fee95e463563d66daec9b297085bd96dbbf9ef1b4b6",
+      "live_result": "FAIL_UNSUPPORTED_ANSWER"
+    },
+    {
+      "format": "md",
+      "question": "杉桥门店2026-09的营业额是多少？",
+      "run_id": "d8b8c924-86a0-41f9-9058-b5ceb01b820c",
+      "document_id": "6c205f43-0d2c-477a-a808-9cdb792c807c",
+      "version_id": "1d12f541-0817-484e-a1c4-9f4ccd852ba0",
+      "candidate_NOT_ACCEPTED": "杉桥门店 2026-09 的营业额为 312 千元 [E1]。",
+      "selected_source_chunk_id": "6baefd72-dafc-49e8-9a11-0855d41885e0",
+      "source_quote": "杉桥门店月营业额表\nSales\n门店\t统计月份\t营业额（千元）\n杉桥门店\t2026-09\t312\n杉桥门店\t2026-10\t298",
+      "source_locator": {
+        "end": 65,
+        "bbox": null,
+        "kind": "markdown",
+        "page": null,
+        "cells": [],
+        "quote": "杉桥门店月营业额表\nSales\n门店\t统计月份\t营业额（千元）\n杉桥门店\t2026-09\t312\n杉桥门店\t2026-10\t298",
+        "sheet": null,
+        "start": 0,
+        "asset_id": null,
+        "raw_text": null,
+        "table_id": null,
+        "cell_range": null,
+        "table_bbox": null,
+        "header_rows": [],
+        "parse_status": "complete",
+        "raw_evidence": {},
+        "merged_ranges": [],
+        "source_format": null,
+        "parse_warnings": [],
+        "header_detection": null,
+        "conversion_lineage": {}
+      },
+      "source_sha256": "3d7aab92f2fb2099623b3fee95e463563d66daec9b297085bd96dbbf9ef1b4b6",
+      "live_result": "FAIL_UNSUPPORTED_ANSWER"
+    },
+    {
+      "format": "html",
+      "question": "杉桥门店2026-09的营业额是多少？",
+      "run_id": "23b9a3da-2cd3-47c4-8880-1f020b90997e",
+      "document_id": "b02a31eb-88d3-4903-baad-e378d0f45375",
+      "version_id": "ca4eba38-7216-4b75-976c-a2615215f1dd",
+      "candidate_NOT_ACCEPTED": "杉桥门店 2026-09 的营业额是 312 千元 [E1]。",
+      "selected_source_chunk_id": "78a5dfe3-90e0-4949-9e4b-1fae3d99e4f3",
+      "source_quote": "Document format: html; table: html-table-0; row: 2; range: R2C1:R2C3; headers: html-source-policy-v1\nCaption: Sales\nR2C1 [门店]=\"杉桥门店\"; span=1x1 | R2C2 [统计月份]=\"2026-09\"; span=1x1 | R2C3 [营业额（千元）]=\"312\"; span=1x1\n",
+      "source_locator": {
+        "end": 430,
+        "bbox": null,
+        "kind": "table",
+        "page": null,
+        "cells": [
+          {
+            "row": 1,
+            "bbox": null,
+            "value": "门店",
+            "column": 1,
+            "display": "门店",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "R1C1",
+            "raw_number": null,
+            "row_header": false,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": true,
+            "merged_anchor": null,
+            "number_format": "source_text",
+            "column_headers": [
+              "门店"
+            ],
+            "native_locator": {
+              "tr_index": 0,
+              "cell_index": 0,
+              "table_index": 0
+            },
+            "header_evidence": {
+              "tag": "th",
+              "scope": "col",
+              "policy": "leading-all-th-v1"
+            }
+          },
+          {
+            "row": 1,
+            "bbox": null,
+            "value": "统计月份",
+            "column": 2,
+            "display": "统计月份",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "R1C2",
+            "raw_number": null,
+            "row_header": false,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": true,
+            "merged_anchor": null,
+            "number_format": "source_text",
+            "column_headers": [
+              "统计月份"
+            ],
+            "native_locator": {
+              "tr_index": 0,
+              "cell_index": 1,
+              "table_index": 0
+            },
+            "header_evidence": {
+              "tag": "th",
+              "scope": "col",
+              "policy": "leading-all-th-v1"
+            }
+          },
+          {
+            "row": 1,
+            "bbox": null,
+            "value": "营业额（千元）",
+            "column": 3,
+            "display": "营业额（千元）",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "R1C3",
+            "raw_number": null,
+            "row_header": false,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": true,
+            "merged_anchor": null,
+            "number_format": "source_text",
+            "column_headers": [
+              "营业额（千元）"
+            ],
+            "native_locator": {
+              "tr_index": 0,
+              "cell_index": 2,
+              "table_index": 0
+            },
+            "header_evidence": {
+              "tag": "th",
+              "scope": "col",
+              "policy": "leading-all-th-v1"
+            }
+          },
+          {
+            "row": 2,
+            "bbox": null,
+            "value": "杉桥门店",
+            "column": 1,
+            "display": "杉桥门店",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "R2C1",
+            "raw_number": null,
+            "row_header": false,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": false,
+            "merged_anchor": null,
+            "number_format": "source_text",
+            "column_headers": [
+              "门店"
+            ],
+            "native_locator": {
+              "tr_index": 1,
+              "cell_index": 0,
+              "table_index": 0
+            },
+            "header_evidence": {
+              "tag": "td",
+              "scope": null,
+              "policy": "leading-all-th-v1"
+            }
+          },
+          {
+            "row": 2,
+            "bbox": null,
+            "value": "2026-09",
+            "column": 2,
+            "display": "2026-09",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "R2C2",
+            "raw_number": null,
+            "row_header": false,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": false,
+            "merged_anchor": null,
+            "number_format": "source_text",
+            "column_headers": [
+              "统计月份"
+            ],
+            "native_locator": {
+              "tr_index": 1,
+              "cell_index": 1,
+              "table_index": 0
+            },
+            "header_evidence": {
+              "tag": "td",
+              "scope": null,
+              "policy": "leading-all-th-v1"
+            }
+          },
+          {
+            "row": 2,
+            "bbox": null,
+            "value": "312",
+            "column": 3,
+            "display": "312",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "R2C3",
+            "raw_number": null,
+            "row_header": false,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": false,
+            "merged_anchor": null,
+            "number_format": "source_text",
+            "column_headers": [
+              "营业额（千元）"
+            ],
+            "native_locator": {
+              "tr_index": 1,
+              "cell_index": 2,
+              "table_index": 0
+            },
+            "header_evidence": {
+              "tag": "td",
+              "scope": null,
+              "policy": "leading-all-th-v1"
+            }
+          }
+        ],
+        "quote": "Document format: html; table: html-table-0; row: 2; range: R2C1:R2C3; headers: html-source-policy-v1\nCaption: Sales\nR2C1 [门店]=\"杉桥门店\"; span=1x1 | R2C2 [统计月份]=\"2026-09\"; span=1x1 | R2C3 [营业额（千元）]=\"312\"; span=1x1\n",
+        "sheet": null,
+        "start": 220,
+        "asset_id": null,
+        "raw_text": null,
+        "table_id": "html-table-0",
+        "cell_range": "R2C1:R2C3",
+        "table_bbox": null,
+        "header_rows": [
+          1
+        ],
+        "parse_status": "complete",
+        "raw_evidence": {},
+        "merged_ranges": [],
+        "source_format": "html",
+        "parse_warnings": [],
+        "header_detection": "html-source-policy-v1",
+        "conversion_lineage": {}
+      },
+      "source_sha256": "60f72b50bcf1d8f7448182f9cfba898c921eeef803626f931677d1ba12c88971",
+      "live_result": "FAIL_UNSUPPORTED_ANSWER"
+    },
+    {
+      "format": "xlsx",
+      "question": "杉桥门店2026-09的营业额是多少？",
+      "run_id": "fe95952c-cea7-483c-bf71-ffd37d52ab46",
+      "document_id": "cc599b8b-f2ab-4907-ab51-1f80a0417464",
+      "version_id": "2bc15003-2216-4e10-a258-03e6d2e2d92e",
+      "candidate_NOT_ACCEPTED": "杉桥门店 2026-09 的营业额是 312 千元 [E1]。",
+      "selected_source_chunk_id": "d5fc108e-b4d1-4d73-bae6-c5b3704a4f9c",
+      "source_quote": "Sheet: Sales; table: sheet-1; range: A2:C2\nA2 [门店]=杉桥门店; format=General | B2 [统计月份]=2026-09; format=General | C2 [营业额（千元）]=312; format=General\n",
+      "source_locator": {
+        "end": 285,
+        "bbox": null,
+        "kind": "table",
+        "page": null,
+        "cells": [
+          {
+            "row": 1,
+            "bbox": null,
+            "value": "门店",
+            "column": 1,
+            "display": "门店",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "A1",
+            "raw_number": null,
+            "row_header": null,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": null,
+            "merged_anchor": null,
+            "number_format": "General",
+            "column_headers": [
+              "门店"
+            ],
+            "native_locator": {},
+            "header_evidence": {}
+          },
+          {
+            "row": 1,
+            "bbox": null,
+            "value": "统计月份",
+            "column": 2,
+            "display": "统计月份",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "B1",
+            "raw_number": null,
+            "row_header": null,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": null,
+            "merged_anchor": null,
+            "number_format": "General",
+            "column_headers": [
+              "统计月份"
+            ],
+            "native_locator": {},
+            "header_evidence": {}
+          },
+          {
+            "row": 1,
+            "bbox": null,
+            "value": "营业额（千元）",
+            "column": 3,
+            "display": "营业额（千元）",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "C1",
+            "raw_number": null,
+            "row_header": null,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": null,
+            "merged_anchor": null,
+            "number_format": "General",
+            "column_headers": [
+              "营业额（千元）"
+            ],
+            "native_locator": {},
+            "header_evidence": {}
+          },
+          {
+            "row": 2,
+            "bbox": null,
+            "value": "杉桥门店",
+            "column": 1,
+            "display": "杉桥门店",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "A2",
+            "raw_number": null,
+            "row_header": null,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": null,
+            "merged_anchor": null,
+            "number_format": "General",
+            "column_headers": [
+              "门店"
+            ],
+            "native_locator": {},
+            "header_evidence": {}
+          },
+          {
+            "row": 2,
+            "bbox": null,
+            "value": "2026-09",
+            "column": 2,
+            "display": "2026-09",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "B2",
+            "raw_number": null,
+            "row_header": null,
+            "value_type": "text",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": null,
+            "merged_anchor": null,
+            "number_format": "General",
+            "column_headers": [
+              "统计月份"
+            ],
+            "native_locator": {},
+            "header_evidence": {}
+          },
+          {
+            "row": 2,
+            "bbox": null,
+            "value": 312,
+            "column": 3,
+            "display": "312",
+            "formula": null,
+            "row_span": 1,
+            "coordinate": "C2",
+            "raw_number": "312",
+            "row_header": null,
+            "value_type": "number",
+            "column_span": 1,
+            "cache_status": "not_applicable",
+            "cached_value": null,
+            "column_header": null,
+            "merged_anchor": null,
+            "number_format": "General",
+            "column_headers": [
+              "营业额（千元）"
+            ],
+            "native_locator": {},
+            "header_evidence": {}
+          }
+        ],
+        "quote": "Sheet: Sales; table: sheet-1; range: A2:C2\nA2 [门店]=杉桥门店; format=General | B2 [统计月份]=2026-09; format=General | C2 [营业额（千元）]=312; format=General\n",
+        "sheet": "Sales",
+        "start": 142,
+        "asset_id": null,
+        "raw_text": null,
+        "table_id": "sheet-1",
+        "cell_range": "A2:C2",
+        "table_bbox": null,
+        "header_rows": [
+          1
+        ],
+        "parse_status": "complete",
+        "raw_evidence": {},
+        "merged_ranges": [],
+        "source_format": null,
+        "parse_warnings": [],
+        "header_detection": "inferred_first_multi_text_row",
+        "conversion_lineage": {}
+      },
+      "source_sha256": "bf59918111e9ecb09ea8271f67cf73d065685b8538c1e72698b691d407b4a894",
+      "live_result": "FAIL_UNSUPPORTED_ANSWER"
+    }
+  ]
+}

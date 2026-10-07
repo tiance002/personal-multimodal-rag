@@ -6,16 +6,82 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class TableCell(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    coordinate: str
+    row: int = Field(ge=1)
+    column: int = Field(ge=1)
+    value: str | int | float | bool | None = None
+    value_type: str
+    display: str
+    number_format: str = "General"
+    raw_number: str | None = None
+    formula: str | None = None
+    cached_value: str | int | float | bool | None = None
+    cache_status: Literal["present", "missing", "not_applicable"] = "not_applicable"
+    merged_anchor: str | None = None
+    column_headers: tuple[str, ...] = ()
+    row_span: int = Field(default=1, ge=1)
+    column_span: int = Field(default=1, ge=1)
+    column_header: bool | None = None
+    row_header: bool | None = None
+    header_evidence: dict[str, object] = Field(default_factory=dict)
+    native_locator: dict[str, object] = Field(default_factory=dict)
+    bbox: tuple[float, float, float, float] | None = None
+
+
+class DocumentTable(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    table_id: str
+    sheet: str | None = None
+    cell_range: str
+    header_rows: tuple[int, ...] = ()
+    header_detection: str = "unavailable"
+    conversion_lineage: dict[str, str] = Field(default_factory=dict)
+    source_format: str | None = None
+    page: int | None = Field(default=None, ge=1)
+    bbox: tuple[float, float, float, float] | None = None
+    raw_evidence: dict[str, object] = Field(default_factory=dict)
+    caption: str | None = None
+    merged_ranges: tuple[str, ...] = ()
+    cells: list[TableCell] = Field(default_factory=list)
+    start: int = Field(ge=0)
+    end: int = Field(ge=0)
+
+
+class DocumentBlock(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    block_id: str
+    kind: Literal["text", "table"]
+    table_id: str | None = None
+    start: int = Field(ge=0)
+    end: int = Field(ge=0)
+
+
 class SourceLocator(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    kind: Literal["text", "markdown", "pdf", "image"]
+    kind: Literal["text", "markdown", "pdf", "image", "table"]
     page: int | None = Field(default=None, ge=1)
     start: int | None = Field(default=None, ge=0)
     end: int | None = Field(default=None, ge=0)
     bbox: tuple[float, float, float, float] | None = None
+    table_bbox: tuple[float, float, float, float] | None = None
+    raw_text: str | None = None
+    raw_evidence: dict[str, object] = Field(default_factory=dict)
     quote: str | None = None
     asset_id: str | None = None
+    sheet: str | None = None
+    table_id: str | None = None
+    cell_range: str | None = None
+    header_rows: tuple[int, ...] = ()
+    merged_ranges: tuple[str, ...] = ()
+    cells: tuple[TableCell, ...] = ()
+    conversion_lineage: dict[str, str] = Field(default_factory=dict)
+    source_format: str | None = None
+    header_detection: str | None = None
+    parse_status: Literal["complete", "partial"] = "complete"
+    parse_warnings: tuple[str, ...] = ()
 
 
 class DocumentSection(BaseModel):
@@ -29,7 +95,7 @@ class DocumentSection(BaseModel):
     end: int = Field(ge=0)
     page_start: int | None = Field(default=None, ge=1)
     page_end: int | None = Field(default=None, ge=1)
-    content_type: Literal["text", "image_ocr"] = "text"
+    content_type: Literal["text", "image_ocr", "image_caption", "table"] = "text"
     asset_id: str | None = None
 
 
@@ -57,10 +123,15 @@ class NormalizedDocument(BaseModel):
     media_type: str
     markdown_content: str
     sections: list[DocumentSection] = Field(default_factory=list)
+    tables: list[DocumentTable] = Field(default_factory=list)
+    blocks: list[DocumentBlock] = Field(default_factory=list)
     assets: list[DocumentAsset] = Field(default_factory=list)
     source_locators: list[SourceLocator] = Field(default_factory=list)
     content_sha256: str
     parser_version: str
+    conversion_lineage: dict[str, str] = Field(default_factory=dict)
+    parse_status: Literal["complete", "partial"] = "complete"
+    parse_warnings: tuple[str, ...] = ()
 
 
 class ChunkDraft(BaseModel):

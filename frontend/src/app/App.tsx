@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { api } from "../api/client";
+import { clarificationText, evidenceHintText, tableHeaderHint } from "./state";
 import type {
   AppState,
   Conversation,
@@ -28,6 +29,12 @@ type ScopedDocuments = { knowledgeBaseId: string; items: DocumentItem[] };
 type ScopedJob = IngestionJob & { knowledgeBaseId: string };
 
 function formatCitationLocator(locator: Record<string, unknown>) {
+  if (locator.kind === "table") {
+    const sheet = typeof locator.sheet === "string" ? locator.sheet : "";
+    const table = typeof locator.table_id === "string" ? locator.table_id : "";
+    const cells = typeof locator.cell_range === "string" ? locator.cell_range : "";
+    return [sheet ? `Sheet: ${sheet}` : table, cells ? `Cells: ${cells}` : ""].filter(Boolean).join(" · ");
+  }
   const page = typeof locator.page === "number" ? `第 ${locator.page} 页` : "";
   const start = typeof locator.start === "number" ? locator.start : null;
   const end = typeof locator.end === "number" ? locator.end : null;
@@ -71,6 +78,12 @@ export default function App() {
   const scopeSyncRef = useRef(false);
   const sendPendingRef = useRef(false);
   const messageRequestEpoch = useRef(0);
+  const citationRequestEpoch = useRef(0);
+  const citationContextRef = useRef("");
+  const closeCitation = () => {
+    citationRequestEpoch.current++;
+    setCitation(null);
+  };
   const previousMessageContext = useRef<{
     conversationId: string | null;
     scopeKey: string;
@@ -143,6 +156,11 @@ export default function App() {
     state.selectedKnowledgeBaseId,
     [...state.documentScope].sort(),
   ]);
+  citationContextRef.current = JSON.stringify([page, state.activeConversationId, messageScopeKey]);
+  useEffect(() => {
+    closeCitation();
+    return () => { citationRequestEpoch.current++; };
+  }, [page, state.activeConversationId, messageScopeKey]);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -217,8 +235,18 @@ export default function App() {
           !cancelled &&
           messageRequestEpoch.current === epoch &&
           !sendPendingRef.current
-        )
+        ) {
           setMessages(items);
+          setNotice(
+            evidenceHintText(items.at(-1))
+              ? "表格证据无法核验；可将相关表格另存为 XLSX 后上传"
+              : clarificationText(items.at(-1))
+              ? "请补充问题中的对象或上下文后再提问"
+              : items.at(-1)?.role === "user"
+                ? "暂无已保存的回复；请求状态暂无法确认。"
+                : "历史消息已加载",
+          );
+        }
       })
       .catch(() => {
         if (
@@ -418,7 +446,7 @@ export default function App() {
       documentScope: [],
       viewMode: "document",
     }));
-    setCitation(null);
+    closeCitation();
     // The conversation scope now points at another knowledge base; drop the
     // displayed transcript so answers from the previous base are not mixed in.
     setMessages([]);
@@ -447,7 +475,7 @@ export default function App() {
       documentScope,
       viewMode: "document",
     }));
-    setCitation(null);
+    closeCitation();
   };
   const newConversation = () => {
     if (scopeSyncRef.current || sendPendingRef.current) return;
@@ -459,14 +487,14 @@ export default function App() {
       documentScope: [],
     }));
     setMessages([]);
-    setCitation(null);
+    closeCitation();
     setPage("chat");
   };
   const toggleDocumentScope = async (documentId: string) => {
     if (scopeSyncRef.current || sendPendingRef.current) return;
     messageRequestEpoch.current++;
     setMessages([]);
-    setCitation(null);
+    closeCitation();
     const nextScope = state.documentScope.includes(documentId)
       ? []
       : [documentId];
@@ -629,7 +657,7 @@ export default function App() {
     )
       return;
     sendPendingRef.current = true;
-    setCitation(null);
+    closeCitation();
     messageRequestEpoch.current++;
     setSending(true);
     const documentScope = [...state.documentScope];
@@ -666,22 +694,37 @@ export default function App() {
         [kbId],
         documentScope,
       );
-      const errorText = result.error_code
+      const isClarification =
+        result.trace?.execution_mode === "clarification" &&
+        result.trace?.clarification_required === true &&
+        result.error_code === "NO_CANDIDATES" &&
+        result.answer.trim().length > 0 &&
+        result.citations.length === 0;
+      const hint = result.trace?.evidence_hint;
+      const isTableHint = result.error_code === "INSUFFICIENT_EVIDENCE" &&
+        result.citations.length === 0 && result.run_id.trim().length > 0 &&
+        tableHeaderHint(hint) && result.answer === hint.text;
+      const errorText = result.error_code && !isClarification
         ? `回答未完成：${result.error_code}`
         : result.answer;
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content: errorText,
-          citations: result.citations,
-          run_id: result.run_id,
-        },
-      ]);
+      if (isTableHint) {
+        setMessages((current) => current.map((message, index) =>
+          index === current.length - 1 && message.role === "user" && message.content === content
+            ? { ...message, run_id: result.run_id, presentation: hint } : message));
+      } else {
+        setMessages((current) => [
+          ...current,
+          { role: "assistant", content: errorText, citations: result.citations, run_id: result.run_id },
+        ]);
+      }
       setNotice(
-        result.error_code
-          ? `问答失败：${result.error_code}`
-          : "回答已完成，证据已冻结",
+        isTableHint
+          ? "表格证据无法核验；可将相关表格另存为 XLSX 后上传"
+          : isClarification
+          ? "请补充问题中的对象或上下文后再提问"
+          : result.error_code
+            ? `问答失败：${result.error_code}`
+            : "回答已完成，证据已冻结",
       );
     } catch (error) {
       if (
@@ -717,10 +760,15 @@ export default function App() {
   const changeView = (viewMode: ViewMode) =>
     setState((current) => ({ ...current, viewMode }));
   const openCitation = async (runId: string, citationId: string) => {
+    const epoch = ++citationRequestEpoch.current;
+    const context = citationContextRef.current;
     try {
-      setCitation(await api.getCitation(runId, citationId));
+      const result = await api.getCitation(runId, citationId);
+      if (epoch === citationRequestEpoch.current && context === citationContextRef.current)
+        setCitation(result);
     } catch {
-      setNotice("引用暂时无法回读");
+      if (epoch === citationRequestEpoch.current && context === citationContextRef.current)
+        setNotice("引用暂时无法回读");
     }
   };
   return (
@@ -874,7 +922,7 @@ export default function App() {
             <button
               type="button"
               className="preview-close"
-              onClick={() => setCitation(null)}
+              onClick={() => closeCitation()}
             >
               关闭引用 ×
             </button>

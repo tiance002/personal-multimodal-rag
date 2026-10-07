@@ -12,10 +12,35 @@ def _env_bool(name: str, default: bool) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_context_bool(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    normalized = raw.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"{name} must be a boolean")
+
+
+def _env_context_positive_int(name: str, default: int) -> int:
+    try:
+        value = int(os.getenv(name, str(default)))
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a positive integer") from exc
+    if value <= 0:
+        raise ValueError(f"{name} must be a positive integer")
+    return value
+
+
 @dataclass(frozen=True)
 class Settings:
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
+    prefer_cloud: bool = False
+    cloud_model: str = "deepseek-flash"
+    cloud_cost_estimate_microunits: int = 0
     local_query_enabled: bool = False
     retrieval_mode: str = "adaptive"
     local_answer_enabled: bool = True
@@ -39,6 +64,19 @@ class Settings:
     langfuse_enabled: bool = False
     langfuse_capture_content: bool = False
     langfuse_base_url: str = "https://us.cloud.langfuse.com"
+    context_pool_enabled: bool = False
+    context_pool_k: int = 10
+    context_max_items: int = 8
+
+    def __post_init__(self) -> None:
+        if type(self.context_pool_enabled) is not bool:
+            raise ValueError("context_pool_enabled must be a boolean")
+        for name in ("context_pool_k", "context_max_items"):
+            value = getattr(self, name)
+            if type(value) is not int or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
+        if self.context_max_items > self.context_pool_k:
+            raise ValueError("context_max_items must not exceed context_pool_k")
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -61,6 +99,9 @@ class Settings:
         return cls(
             service_name=os.getenv("RAG_SERVICE_NAME", cls.service_name),
             cloud_enabled=_env_bool("RAG_CLOUD_ENABLED", False),
+            prefer_cloud=_env_bool("RAG_PREFER_CLOUD", False),
+            cloud_model=os.getenv("DEEPSEEK_MODEL", cls.cloud_model),
+            cloud_cost_estimate_microunits=int(os.getenv("RAG_CLOUD_COST_ESTIMATE_MICROUNITS", "0")),
             local_query_enabled=_env_bool("RAG_LOCAL_QUERY_ENABLED", False),
             retrieval_mode=os.getenv("RAG_RETRIEVAL_MODE", cls.retrieval_mode),
             local_answer_enabled=_env_bool("RAG_LOCAL_ANSWER_ENABLED", True),
@@ -84,4 +125,7 @@ class Settings:
             max_chunk_chars=max_chunk_chars,
             chunk_overlap=chunk_overlap,
             ingestion_lease_seconds=ingestion_lease_seconds,
+            context_pool_enabled=_env_context_bool("RAG_CONTEXT_POOL_ENABLED", False),
+            context_pool_k=_env_context_positive_int("RAG_CONTEXT_POOL_K", cls.context_pool_k),
+            context_max_items=_env_context_positive_int("RAG_CONTEXT_MAX_ITEMS", cls.context_max_items),
         )

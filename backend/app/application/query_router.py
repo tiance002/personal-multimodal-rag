@@ -16,9 +16,15 @@ _COMPARISON = re.compile(
     r"(?P<attribute>[\w-]{1,30}?)差(?:额|异|距)",
     re.UNICODE,
 )
+_SINGLE_EXPLICIT = re.compile(
+    r"^\s*(?P<subject>[\w.:-]{1,30}?)\s*的\s*(?P<attribute>[\w-]{1,30}?)"
+    r"(?:[（(](?P<unit>[\w%]{1,8})[）)])?(?:是多少|为多少|多少|是什么)[？?]?\s*$",
+    re.UNICODE,
+)
+# Without 的, never split inside a contiguous ASCII model/version ID.
 _SINGLE = re.compile(
-    r"^\s*(?P<subject>[\w-]{1,30}?)\s*的?\s*(?P<attribute>[\w-]{1,30}?)"
-    r"(?:是多少|为多少|多少|是什么)[？?]?\s*$",
+    r"^\s*(?P<subject>[\w.:-]{1,30}?)(?![A-Za-z0-9_.:-])\s*的?\s*(?P<attribute>[\w-]{1,30}?)"
+    r"(?:[（(](?P<unit>[\w%]{1,8})[）)])?(?:是多少|为多少|多少|是什么)[？?]?\s*$",
     re.UNICODE,
 )
 _RELATION = re.compile(
@@ -33,10 +39,16 @@ _NUMERIC_ATTRIBUTE = re.compile(r"成本|费用|价格|金额|预算|数量|时�
 class EvidenceTarget:
     subject: str
     attribute: str
+    period: str | None = None
+    unit: str | None = None
+
+    @property
+    def literal_subject(self) -> str:
+        return self.subject + (self.period or "")
 
     @property
     def search_query(self) -> str:
-        return f"{self.subject} {self.attribute}"
+        return " ".join(p for p in (self.subject, self.period, self.attribute, self.unit) if p)
 
 
 @dataclass(frozen=True)
@@ -71,11 +83,11 @@ class QueryRouter:
                 )
         match = _PARALLEL.search(question)
         if match is None:
-            single = _SINGLE.search(question)
+            single = _SINGLE_EXPLICIT.search(question) or _SINGLE.search(question)
             if single is not None and ("多少" in question or _NUMERIC_ATTRIBUTE.search(single.group("attribute"))):
                 return EvidencePlan(
                     question,
-                    (EvidenceTarget(single.group("subject").strip(), single.group("attribute").strip()),),
+                    (self._single_target(single),),
                     "single",
                 )
             return EvidencePlan(question)
@@ -85,3 +97,13 @@ class QueryRouter:
         if not attribute or not left or not right or left == right or not ("多少" in question or _NUMERIC_ATTRIBUTE.search(attribute)):
             return EvidencePlan(question)
         return EvidencePlan(question, (EvidenceTarget(left, attribute), EvidenceTarget(right, attribute)), "parallel")
+
+
+    @staticmethod
+    def _single_target(match: re.Match[str]) -> EvidenceTarget:
+        subject=match.group("subject").strip()
+        temporal=re.fullmatch(r"(.+?)((?:19|20)\d{2}-(?:0[1-9]|1[0-2]))",subject)
+        # A contiguous ASCII model/version ID retains its original exact identity.
+        if temporal and re.search(r"[\u4e00-\u9fff]",temporal[1]):
+            return EvidenceTarget(temporal[1],match.group("attribute").strip(),temporal[2],match.groupdict().get("unit"))
+        return EvidenceTarget(subject,match.group("attribute").strip(),unit=match.groupdict().get("unit"))

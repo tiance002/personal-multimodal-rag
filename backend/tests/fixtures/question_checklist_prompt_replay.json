@@ -1,0 +1,630 @@
+{
+  "schema": "question-checklist-prompt-replay-v1",
+  "simulation": "SIMULATED",
+  "selection_basis": "historical pool5_limit5 source order; no gold selection",
+  "reference_source_sha256": "7b7468dcdde96fe17bfe35d4acdfd070b7ba299082af656d257c49716f856291",
+  "replay_source_sha256": "9e5417467630438add7c57cc462bd24d6c327b0c654a32734335de2ce075bfa2",
+  "cases": [
+    {
+      "case_id": "real-019",
+      "derived": false,
+      "question": "金融数据集结果表中 NeuralCF、DIN、DIEN、R-DIEN 的 AUC 分别是多少？最高的是哪个？",
+      "kb_scope": [
+        "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+      ],
+      "document_scope": [],
+      "sources": [
+        {
+          "label": "E1",
+          "chunk_id": "e50dae94-d885-4323-a62f-5f832e8f87f1",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "a41e9199221a09c26c571b84af30a48bfbd31175ad81c84fe4709ff3b85d190b",
+          "quote_chars": 1170,
+          "locator": {
+            "end": 25552,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 5,
+            "start": 24382,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "recommended number, and the ordinate is the accuracy or \nrecall rate. The accuracy of the algorithm will increase with \nthe increase of the value of N within a certain range, and \nthen decrease; the recall rate of the algorithm will increase \nwith the increase of the value of N. Select the point where \nthe accuracy is the peak, that is, when N=12, the \nrecommendation effect is the best. \n \nFigure 4 The relationship between the accuracy and recall of the algorithm \nThe experimental results are shown in Table III below, \nand the results can be drawn: \nTABLE III RESULT OF FINANCIAL DATASET \nMethods \nAUC \nLoss \nNeuralCF \n0.5981 \n0.6250 \nDIN \n0.6864 \n0.4229 \nDIEN \n0.7188 \n 0.4066 \nR-DIEN \n0.7316 \n0.3874 \nAs we can see from the Table III, the neural cf model \nbased on deep learning has a greater advantage over \ntraditional collaborative filtering algorithms due to its use of \nfeature crossover and the combination of MLP and GMF, \nbut it is only a hybrid crossover of features without The \nintroduction of the attention mechanism that carries the \nweight of the influence factor has led to major flaws in the \nexperimental results. The DIN algorithm carries and \n"
+        },
+        {
+          "label": "E2",
+          "chunk_id": "bce5ea25-2f46-44a5-ae4a-95966094f418",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "7da174e9179c036c655641a77636fa5c9e19383d9cb84db2d11e6b11becd2172",
+          "quote_chars": 1163,
+          "locator": {
+            "end": 5450,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 1,
+            "start": 4287,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "on \nproblem is regarded as a sequence decision-making problem. \nThrough continuous interaction with the environment, a \nseries of behaviors are selected to maximize the overall gain, \nand the attention mechanism, the combination of the \nsequence model and the recommendation system is derived. \nBased \non \nits \ntypical \ne-commerce \nadvertisement \nrecommendation scenario, Alibaba proposed a DIN (Deep \nInterest Network) model with DNN combined with Attention \nmechanism in 2017 [7]. It emphasizes that user interests are \ndiverse. It uses the correlation between candidate products \nand users' historical interaction products to obtain attention \nweights, and uses attention-based mechanisms to capture the \nrelative interest of target items. However, the user's interest \nis constantly evolving, and the user interests extracted by \nDIN are independent and unrelated, and the dynamic \nevolution of interest is not captured; and the implicit interest \nof the user is expressed through the explicit behavior of the \nuser. Accuracy cannot be guaranteed. \nIn 2019, Ali proposed DIEN (Deep Interest Envole \nNetwork) [8] to integrate a sequence model on the basis of \n"
+        },
+        {
+          "label": "E3",
+          "chunk_id": "01a98b99-a233-45e6-9b8d-afb97e0380a9",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "7b54815e32ea3950cf42b9bc411a2da28388b5f84646a6094a896545d130a788",
+          "quote_chars": 1194,
+          "locator": {
+            "end": 26626,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 5,
+            "start": 25432,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "the \nweight of the influence factor has led to major flaws in the \nexperimental results. The DIN algorithm carries and \nrecommends the target product. In this article, the \nrecommended influence factor of the advertising product is \nused as the inner product weight, and the final \nrecommendation result has been greatly improved. The \nDIEN model combines user historical behavior as a \nrecommendation consideration. By introducing the RNN \nmodel combined with time series, it fully analyzes the user’s \nhistorical behavior and interest changes. However, the RNN \nmodel algorithm is inefficient and may cause gradient \ndisappearance, etc. For the problem, a lightweight LSTM \nmodel, that is, a GRU gate loop unit, is used instead, which \nimproves the efficiency of the algorithm. The R-DIEN \nalgorithm proposed in this paper optimizes the cold start \nproblem in the recommended reordering stage, and uses \ntranformmer optimization methods on the time series model \nto further improve the accuracy of the recommendation. \nIV. CONCLUSION \nIn this article, we propose a R-DIEM model algorithm \nthat uses a cold start optimization method for new users. First \nextract \nthe \nuser \ncharacteristics, \n"
+        },
+        {
+          "label": "E4",
+          "chunk_id": "ae3e6ae6-61dd-48fe-9776-213c88a8c45c",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "8ef2d348a02ca7d2405899b939c334f536553d09c5288130052f4c02d023cabc",
+          "quote_chars": 1139,
+          "locator": {
+            "end": 17620,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 3,
+            "start": 16481,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "ame as \nthat of DIN. The second layer GRU finds a way to integrate \nthis score into the GRU (AUGRU changes the forward \npropagation process inside the GRU, specifically the update \ngate calculation method) \nD. R-DIEN Model \nThe recommendation system will eventually present a \nrecommendation list of N products to the user. After the \nrecall phase is over, a user-product rating list will be \ngenerated, which is the initial rating list. The actual \nrecommended list length N is much smaller than the initial \nrating list. The algorithm idea of this chapter is to select N \nfrom the initial rating list that are more suitable Recommend \nproducts that new users like, that is, optimize the new user \nrecommendation list by re-sorting. \nAssociating with the product through the characteristics \nof new users is the core of optimization. In this chapter, \nextracting user characteristics is the key. User characteristics \nare specifically represented in this data set as the user’s \n766\nAuthorized licensed use limited to: BEIJING UNIVERSITY OF TECHNOLOGY. Downloaded on August 30,2026 at 10:16:16 UTC from IEEE Xplore.  Restrictions apply. \n"
+        },
+        {
+          "label": "E5",
+          "chunk_id": "ef52f502-eff1-49f8-a18b-01559969ea77",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "14e45f0e34d5dbce4c849ff1f34478ff9d474520f8501dfb6e9f8027f7c34e24",
+          "quote_chars": 1170,
+          "locator": {
+            "end": 14470,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 3,
+            "start": 13300,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "al interest related to the advertisement. DIN does not \nexpress the different interests of all users by using the same \nvector, but adaptively calculates the expression vector of user \ninterests (for a given advertisement) by considering the \ncorrelation of historical behavior. The representation vector \nvaries with different advertisements. Let's take a look at the \nDIN model as follow figure 2: \n \nFigure 2 The DIN model \nCompared with the base model, a local activation unit is \nadded here, which is a feed-forward neural network. The \ninput is the user's historical behavior product and the current \ncandidate product, and the output is the correlation between \nthe two. This correlation is equivalent to The weight of each \nhistorical product, multiply this weight with the original \nhistorical behavior embedding and sum to get the user’s \ninterest expression vU(A), the calculation formula of this \nthing is as follows: \n \nC. DIEN Model \nAfter Alibaba proposed the DIN model, it did not stop \nthe \nprocess \nof \nexploring \nthe \nevolution \nof \nthe \nrecommendation model. In 2019, the Guorui boss has further \nevolved following DIN, and combined with Taobao’s e-\n"
+        }
+      ],
+      "context_sha256": "81418029f8420d2a2a5ba341f4a31ca4e51d3d633076ef88ceb1d3e8de1f4e8e",
+      "expect_appendix": true
+    },
+    {
+      "case_id": "real-022",
+      "derived": false,
+      "question": "README 区分了本机 API 与 Compose 容器连接 Ollama 的地址吗？原生 uvicorn 会自动读取 .env 吗？",
+      "kb_scope": [
+        "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+      ],
+      "document_scope": [],
+      "sources": [
+        {
+          "label": "E1",
+          "chunk_id": "44e1ad5e-0552-48f4-839c-6bac92d7dad0",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "ebe2faf4146cb6e68337b2746ca61a9c375c22b3f41409b41a4e7244d7eeccb1",
+          "quote_chars": 1199,
+          "locator": {
+            "end": 2028,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 829,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 本地开发\n\n本机 API 访问 Ollama 使用 `http://127.0.0.1:11434`；容器内的 `127.0.0.1` 是容器自身，Compose 通过 `COMPOSE_OLLAMA_BASE_URL`（默认 `http://host.docker.internal:11434`）访问主机 Ollama。两种模式默认 Chat 为 `qwen3.5:4b`，Embedding 为 `bge-m3:latest`。`.env.example` 中的 `OLLAMA_BASE_URL` 只供本机 API 进程使用，不会覆盖 Compose 的容器地址。\n\nDocker Compose 会读取项目根目录 `.env` 用于变量插值；下面的原生 `uvicorn` 命令**不会自动加载 `.env`**，`Settings` 只读取启动进程的环境变量。若要自定义模型或 Ollama 地址，请先在同一 PowerShell 终端设置 `$env:OLLAMA_CHAT_MODEL`、`$env:OLLAMA_EMBEDDING_MODEL`、`$env:OLLAMA_BASE_URL` 等变量；否则使用上述默认值。\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d db\n$env:RAG_DATABASE_URL = 'postgresql+psycopg://rag:rag@127.0.0.1:55432/rag'\n& .\\.venv\\Scripts\\python.exe -m alembic -c alembic.ini upgrade head\n& .\\.venv\\Scripts\\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000\n```\n\n另开终端启动前端：\n\n```powershell\nnpm --prefix frontend run dev -- --host 127.0.0.1\n```\n\n生产式本地 Compose 会启动 API、独立 ingestion worker、前端和 PostgreSQL。需要自定义配置时先复制 `.env.example` 为 `.env`；其中 `COMPOSE_OLLAMA_BASE_URL` 是容器连接主机 Ollama 的地址：\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d\n```\n\n"
+        },
+        {
+          "label": "E2",
+          "chunk_id": "ed7a3fc6-31ae-4fc8-b9be-427f8ff773ef",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3480b29b7ac40e73c2361647d3c204482cdc3df41eec29ad8f835b8fa0b097c9",
+          "quote_chars": 724,
+          "locator": {
+            "end": 3134,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 2410,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "### 可选 Langfuse tracing\n\nLangfuse 默认关闭。使用 Compose 时，从 `.env.example` 复制 `.env`（`.env` 已加入忽略列表），仅在确实允许云端外发时显式设置：\n\n```dotenv\nRAG_CLOUD_ENABLED=true\nRAG_LANGFUSE_ENABLED=true\nRAG_LANGFUSE_CAPTURE_CONTENT=false\nLANGFUSE_BASE_URL=https://us.cloud.langfuse.com\nLANGFUSE_PUBLIC_KEY=pk-lf-...\nLANGFUSE_SECRET_KEY=sk-lf-...\n```\n\n也可以提供 `LANGFUSE_AUTHORIZATION`，其值为 `Basic ` 加 Base64 编码的 `pk-lf:sk-lf`。公钥/密钥仅放在本机 `.env` 或进程环境中，不要提交到 Git 或粘贴到聊天里。对于一个回答涉及的**每个**知识库，还必须把 `cloud_allowed` 显式设为 `true`，否则该回答不会创建 Langfuse trace。`RAG_CLOUD_ENABLED=true` 是全局外发许可；正文采集仍需另行打开 `RAG_LANGFUSE_CAPTURE_CONTENT=true`。正文关闭时仍会记录模型、时延、状态和可用 token 统计，但不会导出问题、文档内容、工具参数或回答正文。\n\n使用本地 `uvicorn` 启动时，需在启动 API 的进程环境中设置相同变量；Compose 自动从 `.env` 读取并只把这些变量传给 API。\n\n"
+        },
+        {
+          "label": "E3",
+          "chunk_id": "9515a7b9-5322-4b9e-bf3a-d41ca7af458c",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3a54b12a314e9429afbd1db82d89084c2f8d01dc2dd2d9914ca2746a7bd0cf93",
+          "quote_chars": 606,
+          "locator": {
+            "end": 829,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 223,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 运行环境\n\n- Python 3.11+、Docker Desktop、PowerShell\n- PostgreSQL + pgvector：Compose 服务 `db`，默认 `127.0.0.1:55432`\n- Ollama：当前默认 `qwen3.5:4b`（本地 Chat/Smart）与 `bge-m3:latest`（独立 Embedding，1024 维）；本机能力见 ADR-004\n- 前端：Node/npm，React + Vite + TypeScript\n- 扫描 PDF/图片 OCR：PyMuPDF + 本地 Tesseract `eng`/`chi_sim` 语言数据。运行 `& .\\scripts\\setup_ocr.ps1` 下载并校验 SHA-256；数据保存在不入库的 `var/tessdata/`。Compose worker 只读挂载此目录；未安装时明确报 `OCR_UNAVAILABLE`。\n\n启动 Ollama 时使用可写模型目录，并保持云端关闭：\n\n```powershell\n$env:OLLAMA_MODELS = 'E:\\llm_load'\n$env:OLLAMA_HOST = '127.0.0.1:11434'\n$env:OLLAMA_NO_CLOUD = '1'\n& 'E:\\ollama\\ollama.exe' serve\n```\n\n"
+        },
+        {
+          "label": "E4",
+          "chunk_id": "a495f9da-2e55-4ff1-8ed0-20689655523e",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3f566c61d42dfff24fe3d290b7d5f71bd463ebc0b7ba24993d6b5a083e1b9ee6",
+          "quote_chars": 502,
+          "locator": {
+            "end": 2410,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 1908,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "llama 的地址：\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d\n```\n\n访问 `http://127.0.0.1:4173`；API health 为 `http://127.0.0.1:8000/healthz`。Compose API 使用 `RAG_INLINE_INGESTION=false`，由 worker 轮询队列；本地开发默认 inline ingestion，便于无需常驻 worker 调试。\n\n首次打开空知识库时，在页面点击“＋ 创建”，输入名称；选中新库后导入第一份 TXT/Markdown/PDF/图片。上传仅表示文件已接收，资料台会按摄取任务显示索引进度与最终状态；一次只跟踪一份正在处理的资料，完成后可继续上传，失败且仍有可用尝试次数时可点击“重试摄取”。索引显示完成后再提问，并点击回答中的 `E1` 等引用查看原文。范围同步失败或服务端范围变化时，页面会暂停问答并提示刷新，避免按错误范围发送。\n\n"
+        },
+        {
+          "label": "E5",
+          "chunk_id": "6a9ce0b2-8065-4b10-905a-fbc30323e5c1",
+          "document_id": "6d686ffe-7ec8-4ee4-8ca9-b7e2e451cc51",
+          "version_id": "59e15bf3-45b7-4dd2-86e8-bae99fcbd3bf",
+          "quote_sha256": "3a50f2505890f564714f17518a7ace86923203f5bd400a1ad460976e4b162fa1",
+          "quote_chars": 1147,
+          "locator": {
+            "end": 1147,
+            "bbox": null,
+            "kind": "text",
+            "page": null,
+            "start": 0,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "系统提示：\n缺少对期望输出的具体信号或假定了错误的“共享上下文” ，建议将提示分区组织（如 <background_information>、、工具指引、输出描述等），用 XML/Markdown 分隔。无论格式如何，追求的是能完整勾勒期望行为的“最小必要信息集”（“最小”并不等于“最短”）\n工具：\n职责单一、相互低重叠，接口语义清晰；\n对错误鲁棒；\n入参描述明确、无歧义，充分发挥模型擅长的表达与推理能力。 常见失败模式是“臃肿工具集”：功能边界模糊，导致“选哪个工具”这一决策本身就含混不清。如果人类工程师都说不准用哪个工具，别指望智能体做得更好。精心甄别一个“最小可行工具集（MVTS）”往往能显著提升长期交互中的稳定性与可维护性。\n示例（Few-shot）：\n始终推荐提供示例，但不建议把“所有边界条件”的罗列一股脑塞进提示。请精挑细选一组多样且典型的示例，直接画像“期望行为”。对 LLM 而言，好的示例胜过千言万语\n及时上下文：\n维护轻量化引用（文件路径、存储查询、URL 等），在运行时通过工具动态加载所需数据，引用的元数据本身也能帮助精化行为：目录层级、命名约定、时间戳等都在隐含地传达“目的与时效”。例如，tests/test_utils.py 与 src/core/test_utils.py 的语义暗示就不同\n前置加载少量“高价值”上下文以保证速度(\n项目约定说明（README、CONTRIBUTING、架构文档）——它们编码了元数据的语义，正好接上你上一轮说的\"路径/命名在传达意图\"。没有这层，agent 看到 src/core/test_utils.py 只能猜。\n入口与边界——pyproject.toml、package.json、Makefile、CI 配置。它们告诉 agent \"这个项目怎么跑、什么算合法改动\"。\n稳定不变的东西——放那些时效性弱、复用率高的内容。反过来，任何频繁变动的清单都不该预载，否则就是在制造你上一轮说的\"带错误信任预期的元数据\"\n)，然后允许智能体按需继续自主探索。边界的选择取决于任务动态性与时效要求。在工程上，可以预先放入类似“项目约定说明（如 README/指南）”的文件，同时提供 glob、grep 等原语，让智能体即时检索具体文件，从而绕开过时索引与复杂语法树的沉没成本\n这个模式的真实边界\n它并非万能，边界大致在三个维度上：\n任务动态性：探索型任务（\"帮我理解这个仓库\"）收益最大；而精确、可枚举的任务（\"改这 12 个文件的这个 API\"）反而适合直接给清单，让 agent 自己 grep 是浪费步数。\n时效要求：实时性越高，越该走向在线检索；如果任务允许几分钟延迟，轻量缓存/索引反而更省 token。\n"
+        }
+      ],
+      "context_sha256": "8d7813cd69e2762e0e1bd287f28da400d6a1bdc503f2d9404052d2ec30031afb",
+      "expect_appendix": true
+    },
+    {
+      "case_id": "real-008",
+      "derived": false,
+      "question": "这份笔记如何说明睡眠与记忆的关系？还建议睡多久？",
+      "kb_scope": [
+        "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+      ],
+      "document_scope": [],
+      "sources": [
+        {
+          "label": "E1",
+          "chunk_id": "b90d76eb-38e8-4500-8a98-29c8e4acbfc0",
+          "document_id": "1fd5a928-d3d7-4bae-aa00-fc74701f61e5",
+          "version_id": "f70ff1ab-0c35-4d24-81b7-6b3502abda26",
+          "quote_sha256": "d068cd1ee129811bf437286940fe6f07f1d593b6579a3b8de80ec880e4bed8a9",
+          "quote_chars": 1183,
+          "locator": {
+            "end": 1183,
+            "bbox": null,
+            "kind": "text",
+            "page": null,
+            "start": 0,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "主动回忆（高级）\n先看完（看时可以边看边读写）\n依照回忆边读边写/假装教别人\n连续在学习连续在学习有缺漏则回顾，后重复2），直至无缺漏\n连续在学习\n连续在学习\n分散学习（高级）\n隔一段时间复习\n间隔时间为1，7，16，35/固定间隔\n没足够多的基础知识，一开始缩短复习间隔，后逐渐加大间隔。\n精细提问（中等）\n自问问题（为什么，如何发生的）\n自我解释 （中等）\n在学习时，对自己解释学习内容与过程\n新知识与已知知识练习 \n交叉学习（中等）\n交替式学习相似但不同的技能或主题\n不能是完全不同的学科\n对压根不理解的内容，最好先分块学习，等理解差不多后在交叉学习\n记忆术（较低）\n把不好记住的东西转换为图像/故事/地点\n学习的动机\n自我参照效应\n效用价值干预\n学业自我概念\n自我效能感\n影响因素：成功体验，替代体验，言语和社会说服，情感和生理状态\n提升方法：（1）设立小目标，逐步完成；（2）自我监控\n自我决定论\n内在动机（行动既目的）——提升方法：自主性，胜任感，关系性\n外在动机（行动的目的不在于行动）\n高自主性的外在动机相近于内在动机。\n分析动机时，三个问题：是自己决定的吗，我能胜任吗，与他人和社会有什么关系吗\n内在目标（基于自身兴趣和价值）\n外在目标（对金钱，声誉，社会地位或他人认可 ）\n学习的窍门\n改变学习的地点——转换不同的学习地点，学习时想象考核的环境\n利用零碎时间学习\n果断开始\n激发好奇心——更高的动机，专注力，更好的记忆效果和长期记忆能力\n教辅应从易到难\n学好英语\n费曼技巧——在纸上写下想理解的知识，在下方空白处像教人一样解释这个知识，有所疏漏则回顾，在重复第二步\n离手机远点，消除诱因——把应用移除桌面或删除应用，把手机放在另一个房间，将手机界面设置的不好看也不好用，橡皮筋技巧\n留下放空空间\n使用抽认卡（推荐工具——Anki记忆卡）\n康奈尔笔记法——A部分写下要记忆的内容，B部分写下相关的关键点，C写下自己的总结\n不忘要事——人生不是只有学习\n睡眠的重要性\n睡眠促进记忆巩固，避免被新信息干扰，大脑主动整理和激活清醒时的记忆\n将难记忆的内容放在睡前记忆，有助于降低遗忘率\n保证优质睡眠的方法\n保持规律的睡眠\n不困不要睡觉\n尽量早睡，保持7-8小时的睡眠\n如果20分钟还没睡着可以下床做一些安静的活动，避开明亮的光线，不要使用电子设备\n下午或晚上不要喝咖啡\n不要喝太多水\n傍晚后避免强光照射\n睡前30分钟关闭电子设备\n将房间打造成安静，舒适的环境\n床上只用来睡眠\n确定一个让自己放松的睡眠习惯\n睡前不要饮酒\n定期运动并保持健康饮食\n睡前避免吃大餐\n运动的重要性（提升脑源性神经营养因子的水平）\n积极用脑和运动都能使海马体增大\n运动后记忆力更强\n每天做30分钟有氧运动\n缓解焦虑\n在纸上记下烦恼的事，写下自己能做什么，在决定要做什么，并立刻执行"
+        },
+        {
+          "label": "E2",
+          "chunk_id": "e50dae94-d885-4323-a62f-5f832e8f87f1",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "a41e9199221a09c26c571b84af30a48bfbd31175ad81c84fe4709ff3b85d190b",
+          "quote_chars": 1170,
+          "locator": {
+            "end": 25552,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 5,
+            "start": 24382,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "recommended number, and the ordinate is the accuracy or \nrecall rate. The accuracy of the algorithm will increase with \nthe increase of the value of N within a certain range, and \nthen decrease; the recall rate of the algorithm will increase \nwith the increase of the value of N. Select the point where \nthe accuracy is the peak, that is, when N=12, the \nrecommendation effect is the best. \n \nFigure 4 The relationship between the accuracy and recall of the algorithm \nThe experimental results are shown in Table III below, \nand the results can be drawn: \nTABLE III RESULT OF FINANCIAL DATASET \nMethods \nAUC \nLoss \nNeuralCF \n0.5981 \n0.6250 \nDIN \n0.6864 \n0.4229 \nDIEN \n0.7188 \n 0.4066 \nR-DIEN \n0.7316 \n0.3874 \nAs we can see from the Table III, the neural cf model \nbased on deep learning has a greater advantage over \ntraditional collaborative filtering algorithms due to its use of \nfeature crossover and the combination of MLP and GMF, \nbut it is only a hybrid crossover of features without The \nintroduction of the attention mechanism that carries the \nweight of the influence factor has led to major flaws in the \nexperimental results. The DIN algorithm carries and \n"
+        },
+        {
+          "label": "E3",
+          "chunk_id": "782050dc-c420-4ac9-acad-211a1d0697e8",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "be7964cb78b8bfb9ae6619b5c01407cdcae82572394174ab576c3447fad12ad2",
+          "quote_chars": 1003,
+          "locator": {
+            "end": 6333,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 1,
+            "start": 5330,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "ranteed. \nIn 2019, Ali proposed DIEN (Deep Interest Envole \nNetwork) [8] to integrate a sequence model on the basis of \nDIN to simulate the change process of user interest over time. \nExperience is available, the newer the user’s behavior, the \nmore it reflects the user’s interest at the time, and the greater \nthe role it plays after the speculation, while the old behavior \nplays a weaker role, indicating that the user’s interest is \nconstantly changing. Similar problems exist in e-commerce. \n764\n2022 IEEE International Conference on Electrical Engineering, Big Data and Algorithms (EEBDA)\n978-1-6654-1606-1/22/$31.00 ©2022 IEEE\nFebruary 25-27, 2022, Changchun, China\n2022 IEEE International Conference on Electrical Engineering, Big Data and Algorithms (EEBDA) | 978-1-6654-1606-1/22/$31.00 ©2022 IEEE | DOI: 10.1109/EEBDA53927.2022.9744929\nAuthorized licensed use limited to: BEIJING UNIVERSITY OF TECHNOLOGY. Downloaded on August 30,2026 at 10:16:16 UTC from IEEE Xplore.  Restrictions apply. \n"
+        },
+        {
+          "label": "E4",
+          "chunk_id": "a146e6db-f758-4d3d-b9ab-c357fd749801",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "19779fbf96922b863e459b720a09058035cd30f59d053a85150d6119d092eb35",
+          "quote_chars": 515,
+          "locator": {
+            "end": 22289,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 4,
+            "start": 21774,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "erent from score prediction, accuracy and recall are used \nto evaluate the accuracy of this type of algorithm. Suppose \nR(u) is the list obtained by the training set according to the \nuser's behavior information through the recommendation \nalgorithm, and T(u) is the recommendation list presented on \nthe test set. Then the accuracy of the recommendation \n767\nAuthorized licensed use limited to: BEIJING UNIVERSITY OF TECHNOLOGY. Downloaded on August 30,2026 at 10:16:16 UTC from IEEE Xplore.  Restrictions apply. \n"
+        },
+        {
+          "label": "E5",
+          "chunk_id": "dabf7190-3a6b-4095-ac0f-7e8a3b989af3",
+          "document_id": "c11b9f37-d4b3-4089-837d-55bdd38623cb",
+          "version_id": "980711c7-75a8-4da3-b6fa-cbea20c85aae",
+          "quote_sha256": "209a77354c01d9170dbc92d44eb347529a22fd5b122a54834f099d44970704a3",
+          "quote_chars": 1179,
+          "locator": {
+            "end": 23469,
+            "bbox": null,
+            "kind": "pdf",
+            "page": 5,
+            "start": 22290,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "algorithm is: \n \nThe recall rate is: \n \nThe value of accuracy and recall is between 0 and 1. The \ncloser the value is to 1, the higher the accuracy or recall, \nindicating that the recommendation system has a better effect, \nand vice versa. \nx \nAUC is a commonly used model evaluation index.  \nIt is defined as the area enclosed by the ROC curve and \nthe coordinate axis. Because the ROC curve is always above \nthe straight line y=x under normal conditions, the value of \nAUC ranges from 0.5 to 1. The larger the value of AUC, \nIndicates that the performance of the model is better. ROC is \na receiver operating characteristic curve. Its function is to \npredict the proportion of items users like to the total \nrecommended items. Since items that users dislike can also \nbe taken into account to reduce the impact of unbalanced \nsamples, it is widely used . ROC is obtained by calculating \nFPR (false positive rate) and TPR (true rate) through a \nconfusion matrix, and the calculation formula is shown : \n \nAccuracy score is the most important evaluation indicator \nof recommendation algorithm. Recommendation scenarios \ncan generally be divided into scoring prediction and TopN \n"
+        }
+      ],
+      "context_sha256": "b8ffff051e9755efd32c188a6b84c56435751d9a3d9050758290ea5bfe29327d",
+      "expect_appendix": false
+    },
+    {
+      "case_id": "real-030",
+      "derived": false,
+      "question": "README 和设计文档给出的本机 Qwen/BGE GPU 实测常驻显存分别是多少 MiB？",
+      "kb_scope": [
+        "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+      ],
+      "document_scope": [
+        "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+        "d283fecc-3287-4a77-805d-c687635d1ece"
+      ],
+      "sources": [
+        {
+          "label": "E1",
+          "chunk_id": "e8af461b-4dfb-4c9c-a7cf-7f8c185c5621",
+          "document_id": "d283fecc-3287-4a77-805d-c687635d1ece",
+          "version_id": "a69e2de0-fbf6-4aea-97bb-86471a1c9e9b",
+          "quote_sha256": "a161f809488c57f9f66cbf6410feed93b7abf620d0a9d76a570c9e1c5ca841b6",
+          "quote_chars": 668,
+          "locator": {
+            "end": 3001,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 2333,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## Optional features and resources\n\nLocal query expansion remains opt-in after empty recall, preserving q0 on failure. General rewrite, heavy rerank and MMR are unavailable unless a concrete adapter is added and explicitly enabled; no flag may pretend to make an absent adapter operational. Local answer generation can be disabled for cited deterministic evidence output. Cloud fallback stays disabled without an actual cloud provider.\n\nOn the 8 GB GPU, validate serial BGE-M3 and Qwen 4B stages and record cold starts. Do not make a resident reranker a V1 prerequisite. Resource settings and CPU/failure behavior are documented in `local-first-resource-routing.md`.\n\n"
+        },
+        {
+          "label": "E2",
+          "chunk_id": "ed7a3fc6-31ae-4fc8-b9be-427f8ff773ef",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3480b29b7ac40e73c2361647d3c204482cdc3df41eec29ad8f835b8fa0b097c9",
+          "quote_chars": 724,
+          "locator": {
+            "end": 3134,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 2410,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "### 可选 Langfuse tracing\n\nLangfuse 默认关闭。使用 Compose 时，从 `.env.example` 复制 `.env`（`.env` 已加入忽略列表），仅在确实允许云端外发时显式设置：\n\n```dotenv\nRAG_CLOUD_ENABLED=true\nRAG_LANGFUSE_ENABLED=true\nRAG_LANGFUSE_CAPTURE_CONTENT=false\nLANGFUSE_BASE_URL=https://us.cloud.langfuse.com\nLANGFUSE_PUBLIC_KEY=pk-lf-...\nLANGFUSE_SECRET_KEY=sk-lf-...\n```\n\n也可以提供 `LANGFUSE_AUTHORIZATION`，其值为 `Basic ` 加 Base64 编码的 `pk-lf:sk-lf`。公钥/密钥仅放在本机 `.env` 或进程环境中，不要提交到 Git 或粘贴到聊天里。对于一个回答涉及的**每个**知识库，还必须把 `cloud_allowed` 显式设为 `true`，否则该回答不会创建 Langfuse trace。`RAG_CLOUD_ENABLED=true` 是全局外发许可；正文采集仍需另行打开 `RAG_LANGFUSE_CAPTURE_CONTENT=true`。正文关闭时仍会记录模型、时延、状态和可用 token 统计，但不会导出问题、文档内容、工具参数或回答正文。\n\n使用本地 `uvicorn` 启动时，需在启动 API 的进程环境中设置相同变量；Compose 自动从 `.env` 读取并只把这些变量传给 API。\n\n"
+        },
+        {
+          "label": "E3",
+          "chunk_id": "b8c3e8f4-ea45-45d2-abd9-a68a9966c95c",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "a26a9893f219dba63398853a2ba7c8ac117e61fff879677ccd09b46e9d045154",
+          "quote_chars": 664,
+          "locator": {
+            "end": 3798,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 3134,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 主要能力\n\n- 文本/Markdown/TXT、PDF 与图片导入；扫描页和 PDF 内嵌图片先提取原图，再以本地 OCR 生成派生文字。原图 SHA-256、页码、派生资产和 chunk 关联保存，可回读；不调用云端 VLM。OCR 无法启动报 `OCR_UNAVAILABLE`，正常运行但无文字报 `OCR_EMPTY`，均不伪装索引成功。\n- 关键词 + 可选向量混合检索；L1 查询理解或回答模型失败时保留 q0，并返回可回读证据。\n- Quick 使用固定 LangChain `Runnable` Chain，Smart 使用 LangChain `create_agent`；两者共用 `KnowledgeGateway`、证据覆盖、引用冻结和答案校验。Smart 默认只开放 `list_documents`、`search_knowledge`、`read_document` 三个只读知识工具；只有服务端选中的全部知识库显式启用 `graph_enabled` 时，才追加 `query_knowledge_graph`。\n- 服务端确定知识库/文档范围；切换知识库或“仅此文档”会同步当前会话的 scope，并由服务端校验文档归属。SSE 运行事件、引用回读、文档右侧面板、图谱默认关闭的三栏工作台和历史会话。\n- 云端能力默认关闭；若后续启用云端，月度预算通过 `RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS` 配置，并在实际 provider 调用前进行原子预留。\n\n"
+        },
+        {
+          "label": "E4",
+          "chunk_id": "1a7c6db1-8573-432a-ae56-94d94fa553c4",
+          "document_id": "d283fecc-3287-4a77-805d-c687635d1ece",
+          "version_id": "a69e2de0-fbf6-4aea-97bb-86471a1c9e9b",
+          "quote_sha256": "382a7d1ff733a9395cb19be481e6ceb88911c3bead1f0a840331e9a6cdb57907",
+          "quote_chars": 553,
+          "locator": {
+            "end": 4662,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 4109,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## Future system profiles\n\n`local_first`: local recall/routing/simple processing/local 4B; optional future cloud fallback behind egress and actual budget reservation.\n\n`cloud_heavy`: future explicit cloud query understanding/reasoning/generation baseline. It remains NOT_IMPLEMENTED/NOT_EVALUATED until a real cloud provider and fixed policy are authorized. Compare answer correctness/relevance/faithfulness/citation support, cloud call/tokens/cost, p50/p95 latency and local GPU/RAM. No quality/cost improvement is claimed from retrieval-only results.\n"
+        },
+        {
+          "label": "E5",
+          "chunk_id": "9515a7b9-5322-4b9e-bf3a-d41ca7af458c",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3a54b12a314e9429afbd1db82d89084c2f8d01dc2dd2d9914ca2746a7bd0cf93",
+          "quote_chars": 606,
+          "locator": {
+            "end": 829,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 223,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 运行环境\n\n- Python 3.11+、Docker Desktop、PowerShell\n- PostgreSQL + pgvector：Compose 服务 `db`，默认 `127.0.0.1:55432`\n- Ollama：当前默认 `qwen3.5:4b`（本地 Chat/Smart）与 `bge-m3:latest`（独立 Embedding，1024 维）；本机能力见 ADR-004\n- 前端：Node/npm，React + Vite + TypeScript\n- 扫描 PDF/图片 OCR：PyMuPDF + 本地 Tesseract `eng`/`chi_sim` 语言数据。运行 `& .\\scripts\\setup_ocr.ps1` 下载并校验 SHA-256；数据保存在不入库的 `var/tessdata/`。Compose worker 只读挂载此目录；未安装时明确报 `OCR_UNAVAILABLE`。\n\n启动 Ollama 时使用可写模型目录，并保持云端关闭：\n\n```powershell\n$env:OLLAMA_MODELS = 'E:\\llm_load'\n$env:OLLAMA_HOST = '127.0.0.1:11434'\n$env:OLLAMA_NO_CLOUD = '1'\n& 'E:\\ollama\\ollama.exe' serve\n```\n\n"
+        }
+      ],
+      "context_sha256": "e2dc8be7ad2e2d027f0f72746cd6d18459018513098c78f42194dffce25a8bd7",
+      "expect_appendix": false
+    },
+    {
+      "case_id": "derived-022-no-answer",
+      "derived": true,
+      "question": "不要回答以下问题：README 区分了本机 API 与 Compose 容器连接 Ollama 的地址吗？原生 uvicorn 会自动读取 .env 吗？",
+      "kb_scope": [
+        "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+      ],
+      "document_scope": [],
+      "sources": [
+        {
+          "label": "E1",
+          "chunk_id": "44e1ad5e-0552-48f4-839c-6bac92d7dad0",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "ebe2faf4146cb6e68337b2746ca61a9c375c22b3f41409b41a4e7244d7eeccb1",
+          "quote_chars": 1199,
+          "locator": {
+            "end": 2028,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 829,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 本地开发\n\n本机 API 访问 Ollama 使用 `http://127.0.0.1:11434`；容器内的 `127.0.0.1` 是容器自身，Compose 通过 `COMPOSE_OLLAMA_BASE_URL`（默认 `http://host.docker.internal:11434`）访问主机 Ollama。两种模式默认 Chat 为 `qwen3.5:4b`，Embedding 为 `bge-m3:latest`。`.env.example` 中的 `OLLAMA_BASE_URL` 只供本机 API 进程使用，不会覆盖 Compose 的容器地址。\n\nDocker Compose 会读取项目根目录 `.env` 用于变量插值；下面的原生 `uvicorn` 命令**不会自动加载 `.env`**，`Settings` 只读取启动进程的环境变量。若要自定义模型或 Ollama 地址，请先在同一 PowerShell 终端设置 `$env:OLLAMA_CHAT_MODEL`、`$env:OLLAMA_EMBEDDING_MODEL`、`$env:OLLAMA_BASE_URL` 等变量；否则使用上述默认值。\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d db\n$env:RAG_DATABASE_URL = 'postgresql+psycopg://rag:rag@127.0.0.1:55432/rag'\n& .\\.venv\\Scripts\\python.exe -m alembic -c alembic.ini upgrade head\n& .\\.venv\\Scripts\\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000\n```\n\n另开终端启动前端：\n\n```powershell\nnpm --prefix frontend run dev -- --host 127.0.0.1\n```\n\n生产式本地 Compose 会启动 API、独立 ingestion worker、前端和 PostgreSQL。需要自定义配置时先复制 `.env.example` 为 `.env`；其中 `COMPOSE_OLLAMA_BASE_URL` 是容器连接主机 Ollama 的地址：\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d\n```\n\n"
+        },
+        {
+          "label": "E2",
+          "chunk_id": "ed7a3fc6-31ae-4fc8-b9be-427f8ff773ef",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3480b29b7ac40e73c2361647d3c204482cdc3df41eec29ad8f835b8fa0b097c9",
+          "quote_chars": 724,
+          "locator": {
+            "end": 3134,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 2410,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "### 可选 Langfuse tracing\n\nLangfuse 默认关闭。使用 Compose 时，从 `.env.example` 复制 `.env`（`.env` 已加入忽略列表），仅在确实允许云端外发时显式设置：\n\n```dotenv\nRAG_CLOUD_ENABLED=true\nRAG_LANGFUSE_ENABLED=true\nRAG_LANGFUSE_CAPTURE_CONTENT=false\nLANGFUSE_BASE_URL=https://us.cloud.langfuse.com\nLANGFUSE_PUBLIC_KEY=pk-lf-...\nLANGFUSE_SECRET_KEY=sk-lf-...\n```\n\n也可以提供 `LANGFUSE_AUTHORIZATION`，其值为 `Basic ` 加 Base64 编码的 `pk-lf:sk-lf`。公钥/密钥仅放在本机 `.env` 或进程环境中，不要提交到 Git 或粘贴到聊天里。对于一个回答涉及的**每个**知识库，还必须把 `cloud_allowed` 显式设为 `true`，否则该回答不会创建 Langfuse trace。`RAG_CLOUD_ENABLED=true` 是全局外发许可；正文采集仍需另行打开 `RAG_LANGFUSE_CAPTURE_CONTENT=true`。正文关闭时仍会记录模型、时延、状态和可用 token 统计，但不会导出问题、文档内容、工具参数或回答正文。\n\n使用本地 `uvicorn` 启动时，需在启动 API 的进程环境中设置相同变量；Compose 自动从 `.env` 读取并只把这些变量传给 API。\n\n"
+        },
+        {
+          "label": "E3",
+          "chunk_id": "9515a7b9-5322-4b9e-bf3a-d41ca7af458c",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3a54b12a314e9429afbd1db82d89084c2f8d01dc2dd2d9914ca2746a7bd0cf93",
+          "quote_chars": 606,
+          "locator": {
+            "end": 829,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 223,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 运行环境\n\n- Python 3.11+、Docker Desktop、PowerShell\n- PostgreSQL + pgvector：Compose 服务 `db`，默认 `127.0.0.1:55432`\n- Ollama：当前默认 `qwen3.5:4b`（本地 Chat/Smart）与 `bge-m3:latest`（独立 Embedding，1024 维）；本机能力见 ADR-004\n- 前端：Node/npm，React + Vite + TypeScript\n- 扫描 PDF/图片 OCR：PyMuPDF + 本地 Tesseract `eng`/`chi_sim` 语言数据。运行 `& .\\scripts\\setup_ocr.ps1` 下载并校验 SHA-256；数据保存在不入库的 `var/tessdata/`。Compose worker 只读挂载此目录；未安装时明确报 `OCR_UNAVAILABLE`。\n\n启动 Ollama 时使用可写模型目录，并保持云端关闭：\n\n```powershell\n$env:OLLAMA_MODELS = 'E:\\llm_load'\n$env:OLLAMA_HOST = '127.0.0.1:11434'\n$env:OLLAMA_NO_CLOUD = '1'\n& 'E:\\ollama\\ollama.exe' serve\n```\n\n"
+        },
+        {
+          "label": "E4",
+          "chunk_id": "a495f9da-2e55-4ff1-8ed0-20689655523e",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3f566c61d42dfff24fe3d290b7d5f71bd463ebc0b7ba24993d6b5a083e1b9ee6",
+          "quote_chars": 502,
+          "locator": {
+            "end": 2410,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 1908,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "llama 的地址：\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d\n```\n\n访问 `http://127.0.0.1:4173`；API health 为 `http://127.0.0.1:8000/healthz`。Compose API 使用 `RAG_INLINE_INGESTION=false`，由 worker 轮询队列；本地开发默认 inline ingestion，便于无需常驻 worker 调试。\n\n首次打开空知识库时，在页面点击“＋ 创建”，输入名称；选中新库后导入第一份 TXT/Markdown/PDF/图片。上传仅表示文件已接收，资料台会按摄取任务显示索引进度与最终状态；一次只跟踪一份正在处理的资料，完成后可继续上传，失败且仍有可用尝试次数时可点击“重试摄取”。索引显示完成后再提问，并点击回答中的 `E1` 等引用查看原文。范围同步失败或服务端范围变化时，页面会暂停问答并提示刷新，避免按错误范围发送。\n\n"
+        },
+        {
+          "label": "E5",
+          "chunk_id": "6a9ce0b2-8065-4b10-905a-fbc30323e5c1",
+          "document_id": "6d686ffe-7ec8-4ee4-8ca9-b7e2e451cc51",
+          "version_id": "59e15bf3-45b7-4dd2-86e8-bae99fcbd3bf",
+          "quote_sha256": "3a50f2505890f564714f17518a7ace86923203f5bd400a1ad460976e4b162fa1",
+          "quote_chars": 1147,
+          "locator": {
+            "end": 1147,
+            "bbox": null,
+            "kind": "text",
+            "page": null,
+            "start": 0,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "系统提示：\n缺少对期望输出的具体信号或假定了错误的“共享上下文” ，建议将提示分区组织（如 <background_information>、、工具指引、输出描述等），用 XML/Markdown 分隔。无论格式如何，追求的是能完整勾勒期望行为的“最小必要信息集”（“最小”并不等于“最短”）\n工具：\n职责单一、相互低重叠，接口语义清晰；\n对错误鲁棒；\n入参描述明确、无歧义，充分发挥模型擅长的表达与推理能力。 常见失败模式是“臃肿工具集”：功能边界模糊，导致“选哪个工具”这一决策本身就含混不清。如果人类工程师都说不准用哪个工具，别指望智能体做得更好。精心甄别一个“最小可行工具集（MVTS）”往往能显著提升长期交互中的稳定性与可维护性。\n示例（Few-shot）：\n始终推荐提供示例，但不建议把“所有边界条件”的罗列一股脑塞进提示。请精挑细选一组多样且典型的示例，直接画像“期望行为”。对 LLM 而言，好的示例胜过千言万语\n及时上下文：\n维护轻量化引用（文件路径、存储查询、URL 等），在运行时通过工具动态加载所需数据，引用的元数据本身也能帮助精化行为：目录层级、命名约定、时间戳等都在隐含地传达“目的与时效”。例如，tests/test_utils.py 与 src/core/test_utils.py 的语义暗示就不同\n前置加载少量“高价值”上下文以保证速度(\n项目约定说明（README、CONTRIBUTING、架构文档）——它们编码了元数据的语义，正好接上你上一轮说的\"路径/命名在传达意图\"。没有这层，agent 看到 src/core/test_utils.py 只能猜。\n入口与边界——pyproject.toml、package.json、Makefile、CI 配置。它们告诉 agent \"这个项目怎么跑、什么算合法改动\"。\n稳定不变的东西——放那些时效性弱、复用率高的内容。反过来，任何频繁变动的清单都不该预载，否则就是在制造你上一轮说的\"带错误信任预期的元数据\"\n)，然后允许智能体按需继续自主探索。边界的选择取决于任务动态性与时效要求。在工程上，可以预先放入类似“项目约定说明（如 README/指南）”的文件，同时提供 glob、grep 等原语，让智能体即时检索具体文件，从而绕开过时索引与复杂语法树的沉没成本\n这个模式的真实边界\n它并非万能，边界大致在三个维度上：\n任务动态性：探索型任务（\"帮我理解这个仓库\"）收益最大；而精确、可枚举的任务（\"改这 12 个文件的这个 API\"）反而适合直接给清单，让 agent 自己 grep 是浪费步数。\n时效要求：实时性越高，越该走向在线检索；如果任务允许几分钟延迟，轻量缓存/索引反而更省 token。\n"
+        }
+      ],
+      "context_sha256": "8d7813cd69e2762e0e1bd287f28da400d6a1bdc503f2d9404052d2ec30031afb",
+      "expect_appendix": false
+    },
+    {
+      "case_id": "derived-022-condition",
+      "derived": true,
+      "question": "仅在原文明确确认原生 uvicorn 会自动加载 .env 时回答：README 区分了本机 API 与 Compose 容器连接 Ollama 的地址吗？原生 uvicorn 会自动读取 .env 吗？",
+      "kb_scope": [
+        "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+      ],
+      "document_scope": [],
+      "sources": [
+        {
+          "label": "E1",
+          "chunk_id": "44e1ad5e-0552-48f4-839c-6bac92d7dad0",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "ebe2faf4146cb6e68337b2746ca61a9c375c22b3f41409b41a4e7244d7eeccb1",
+          "quote_chars": 1199,
+          "locator": {
+            "end": 2028,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 829,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 本地开发\n\n本机 API 访问 Ollama 使用 `http://127.0.0.1:11434`；容器内的 `127.0.0.1` 是容器自身，Compose 通过 `COMPOSE_OLLAMA_BASE_URL`（默认 `http://host.docker.internal:11434`）访问主机 Ollama。两种模式默认 Chat 为 `qwen3.5:4b`，Embedding 为 `bge-m3:latest`。`.env.example` 中的 `OLLAMA_BASE_URL` 只供本机 API 进程使用，不会覆盖 Compose 的容器地址。\n\nDocker Compose 会读取项目根目录 `.env` 用于变量插值；下面的原生 `uvicorn` 命令**不会自动加载 `.env`**，`Settings` 只读取启动进程的环境变量。若要自定义模型或 Ollama 地址，请先在同一 PowerShell 终端设置 `$env:OLLAMA_CHAT_MODEL`、`$env:OLLAMA_EMBEDDING_MODEL`、`$env:OLLAMA_BASE_URL` 等变量；否则使用上述默认值。\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d db\n$env:RAG_DATABASE_URL = 'postgresql+psycopg://rag:rag@127.0.0.1:55432/rag'\n& .\\.venv\\Scripts\\python.exe -m alembic -c alembic.ini upgrade head\n& .\\.venv\\Scripts\\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000\n```\n\n另开终端启动前端：\n\n```powershell\nnpm --prefix frontend run dev -- --host 127.0.0.1\n```\n\n生产式本地 Compose 会启动 API、独立 ingestion worker、前端和 PostgreSQL。需要自定义配置时先复制 `.env.example` 为 `.env`；其中 `COMPOSE_OLLAMA_BASE_URL` 是容器连接主机 Ollama 的地址：\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d\n```\n\n"
+        },
+        {
+          "label": "E2",
+          "chunk_id": "ed7a3fc6-31ae-4fc8-b9be-427f8ff773ef",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3480b29b7ac40e73c2361647d3c204482cdc3df41eec29ad8f835b8fa0b097c9",
+          "quote_chars": 724,
+          "locator": {
+            "end": 3134,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 2410,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "### 可选 Langfuse tracing\n\nLangfuse 默认关闭。使用 Compose 时，从 `.env.example` 复制 `.env`（`.env` 已加入忽略列表），仅在确实允许云端外发时显式设置：\n\n```dotenv\nRAG_CLOUD_ENABLED=true\nRAG_LANGFUSE_ENABLED=true\nRAG_LANGFUSE_CAPTURE_CONTENT=false\nLANGFUSE_BASE_URL=https://us.cloud.langfuse.com\nLANGFUSE_PUBLIC_KEY=pk-lf-...\nLANGFUSE_SECRET_KEY=sk-lf-...\n```\n\n也可以提供 `LANGFUSE_AUTHORIZATION`，其值为 `Basic ` 加 Base64 编码的 `pk-lf:sk-lf`。公钥/密钥仅放在本机 `.env` 或进程环境中，不要提交到 Git 或粘贴到聊天里。对于一个回答涉及的**每个**知识库，还必须把 `cloud_allowed` 显式设为 `true`，否则该回答不会创建 Langfuse trace。`RAG_CLOUD_ENABLED=true` 是全局外发许可；正文采集仍需另行打开 `RAG_LANGFUSE_CAPTURE_CONTENT=true`。正文关闭时仍会记录模型、时延、状态和可用 token 统计，但不会导出问题、文档内容、工具参数或回答正文。\n\n使用本地 `uvicorn` 启动时，需在启动 API 的进程环境中设置相同变量；Compose 自动从 `.env` 读取并只把这些变量传给 API。\n\n"
+        },
+        {
+          "label": "E3",
+          "chunk_id": "9515a7b9-5322-4b9e-bf3a-d41ca7af458c",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3a54b12a314e9429afbd1db82d89084c2f8d01dc2dd2d9914ca2746a7bd0cf93",
+          "quote_chars": 606,
+          "locator": {
+            "end": 829,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 223,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "## 运行环境\n\n- Python 3.11+、Docker Desktop、PowerShell\n- PostgreSQL + pgvector：Compose 服务 `db`，默认 `127.0.0.1:55432`\n- Ollama：当前默认 `qwen3.5:4b`（本地 Chat/Smart）与 `bge-m3:latest`（独立 Embedding，1024 维）；本机能力见 ADR-004\n- 前端：Node/npm，React + Vite + TypeScript\n- 扫描 PDF/图片 OCR：PyMuPDF + 本地 Tesseract `eng`/`chi_sim` 语言数据。运行 `& .\\scripts\\setup_ocr.ps1` 下载并校验 SHA-256；数据保存在不入库的 `var/tessdata/`。Compose worker 只读挂载此目录；未安装时明确报 `OCR_UNAVAILABLE`。\n\n启动 Ollama 时使用可写模型目录，并保持云端关闭：\n\n```powershell\n$env:OLLAMA_MODELS = 'E:\\llm_load'\n$env:OLLAMA_HOST = '127.0.0.1:11434'\n$env:OLLAMA_NO_CLOUD = '1'\n& 'E:\\ollama\\ollama.exe' serve\n```\n\n"
+        },
+        {
+          "label": "E4",
+          "chunk_id": "a495f9da-2e55-4ff1-8ed0-20689655523e",
+          "document_id": "87c2d4e7-5a24-49e4-9c0c-e8694d61d2f3",
+          "version_id": "5f93ddd1-79bc-48e2-95c0-51a76f05ae46",
+          "quote_sha256": "3f566c61d42dfff24fe3d290b7d5f71bd463ebc0b7ba24993d6b5a083e1b9ee6",
+          "quote_chars": 502,
+          "locator": {
+            "end": 2410,
+            "bbox": null,
+            "kind": "markdown",
+            "page": null,
+            "start": 1908,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "llama 的地址：\n\n```powershell\n& 'E:\\Docker\\DockerDesktop\\resources\\bin\\docker.exe' compose -f deploy\\compose.yml up -d\n```\n\n访问 `http://127.0.0.1:4173`；API health 为 `http://127.0.0.1:8000/healthz`。Compose API 使用 `RAG_INLINE_INGESTION=false`，由 worker 轮询队列；本地开发默认 inline ingestion，便于无需常驻 worker 调试。\n\n首次打开空知识库时，在页面点击“＋ 创建”，输入名称；选中新库后导入第一份 TXT/Markdown/PDF/图片。上传仅表示文件已接收，资料台会按摄取任务显示索引进度与最终状态；一次只跟踪一份正在处理的资料，完成后可继续上传，失败且仍有可用尝试次数时可点击“重试摄取”。索引显示完成后再提问，并点击回答中的 `E1` 等引用查看原文。范围同步失败或服务端范围变化时，页面会暂停问答并提示刷新，避免按错误范围发送。\n\n"
+        },
+        {
+          "label": "E5",
+          "chunk_id": "6a9ce0b2-8065-4b10-905a-fbc30323e5c1",
+          "document_id": "6d686ffe-7ec8-4ee4-8ca9-b7e2e451cc51",
+          "version_id": "59e15bf3-45b7-4dd2-86e8-bae99fcbd3bf",
+          "quote_sha256": "3a50f2505890f564714f17518a7ace86923203f5bd400a1ad460976e4b162fa1",
+          "quote_chars": 1147,
+          "locator": {
+            "end": 1147,
+            "bbox": null,
+            "kind": "text",
+            "page": null,
+            "start": 0,
+            "asset_id": null
+          },
+          "knowledge_base_id": "d78f3434-0e8f-40bf-afcb-f1c2c311ff51",
+          "content": "系统提示：\n缺少对期望输出的具体信号或假定了错误的“共享上下文” ，建议将提示分区组织（如 <background_information>、、工具指引、输出描述等），用 XML/Markdown 分隔。无论格式如何，追求的是能完整勾勒期望行为的“最小必要信息集”（“最小”并不等于“最短”）\n工具：\n职责单一、相互低重叠，接口语义清晰；\n对错误鲁棒；\n入参描述明确、无歧义，充分发挥模型擅长的表达与推理能力。 常见失败模式是“臃肿工具集”：功能边界模糊，导致“选哪个工具”这一决策本身就含混不清。如果人类工程师都说不准用哪个工具，别指望智能体做得更好。精心甄别一个“最小可行工具集（MVTS）”往往能显著提升长期交互中的稳定性与可维护性。\n示例（Few-shot）：\n始终推荐提供示例，但不建议把“所有边界条件”的罗列一股脑塞进提示。请精挑细选一组多样且典型的示例，直接画像“期望行为”。对 LLM 而言，好的示例胜过千言万语\n及时上下文：\n维护轻量化引用（文件路径、存储查询、URL 等），在运行时通过工具动态加载所需数据，引用的元数据本身也能帮助精化行为：目录层级、命名约定、时间戳等都在隐含地传达“目的与时效”。例如，tests/test_utils.py 与 src/core/test_utils.py 的语义暗示就不同\n前置加载少量“高价值”上下文以保证速度(\n项目约定说明（README、CONTRIBUTING、架构文档）——它们编码了元数据的语义，正好接上你上一轮说的\"路径/命名在传达意图\"。没有这层，agent 看到 src/core/test_utils.py 只能猜。\n入口与边界——pyproject.toml、package.json、Makefile、CI 配置。它们告诉 agent \"这个项目怎么跑、什么算合法改动\"。\n稳定不变的东西——放那些时效性弱、复用率高的内容。反过来，任何频繁变动的清单都不该预载，否则就是在制造你上一轮说的\"带错误信任预期的元数据\"\n)，然后允许智能体按需继续自主探索。边界的选择取决于任务动态性与时效要求。在工程上，可以预先放入类似“项目约定说明（如 README/指南）”的文件，同时提供 glob、grep 等原语，让智能体即时检索具体文件，从而绕开过时索引与复杂语法树的沉没成本\n这个模式的真实边界\n它并非万能，边界大致在三个维度上：\n任务动态性：探索型任务（\"帮我理解这个仓库\"）收益最大；而精确、可枚举的任务（\"改这 12 个文件的这个 API\"）反而适合直接给清单，让 agent 自己 grep 是浪费步数。\n时效要求：实时性越高，越该走向在线检索；如果任务允许几分钟延迟，轻量缓存/索引反而更省 token。\n"
+        }
+      ],
+      "context_sha256": "8d7813cd69e2762e0e1bd287f28da400d6a1bdc503f2d9404052d2ec30031afb",
+      "expect_appendix": false
+    }
+  ]
+}
