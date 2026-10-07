@@ -60,6 +60,7 @@ class Settings:
     max_upload_bytes: int = 50 * 1024 * 1024
     max_chunk_chars: int = 1200
     chunk_overlap: int = 120
+    xlsx_first_row_as_header: bool = False
     ingestion_lease_seconds: int = 60
     langfuse_enabled: bool = False
     langfuse_capture_content: bool = False
@@ -69,6 +70,8 @@ class Settings:
     context_max_items: int = 8
 
     def __post_init__(self) -> None:
+        if type(self.xlsx_first_row_as_header) is not bool:
+            raise ValueError('xlsx_first_row_as_header must be a boolean')
         if type(self.context_pool_enabled) is not bool:
             raise ValueError("context_pool_enabled must be a boolean")
         for name in ("context_pool_k", "context_max_items"):
@@ -124,6 +127,7 @@ class Settings:
             max_upload_bytes=int(os.getenv("RAG_MAX_UPLOAD_BYTES", str(cls.max_upload_bytes))),
             max_chunk_chars=max_chunk_chars,
             chunk_overlap=chunk_overlap,
+            xlsx_first_row_as_header=_env_context_bool('RAG_XLSX_FIRST_ROW_AS_HEADER', False),
             ingestion_lease_seconds=ingestion_lease_seconds,
             context_pool_enabled=_env_context_bool("RAG_CONTEXT_POOL_ENABLED", False),
             context_pool_k=_env_context_positive_int("RAG_CONTEXT_POOL_K", cls.context_pool_k),

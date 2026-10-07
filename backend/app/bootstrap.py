@@ -33,6 +33,8 @@ from backend.app.application.langchain_agent import LangChainAgentAdapter
 from backend.app.application.quick_chain import LangChainQuickChain
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.adapters.office_preview import OfficePreviewAdapter
+from backend.app.adapters.parsers import ParserRegistry
+from backend.app.application.caption import CaptionEnricher
 from backend.app.ports.office_preview import OfficePreviewProtocol
 from backend.app.config import Settings
 
@@ -62,7 +64,8 @@ class Container:
 
 
 def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET,
-                    cloud_model: Any = _MODEL_UNSET, follow_up_enabled: bool = False) -> Container:
+                    cloud_model: Any = _MODEL_UNSET, follow_up_enabled: bool = False,
+                    caption_provider=None, caption_usage_guard=None) -> Container:
     """Build the object graph once, eagerly, with no request-time assembly.
 
     Building eagerly (rather than lazily on first request) removes the previous
@@ -99,6 +102,9 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         engine,
         storage,
         embedding_provider=ollama,
+        parsers=ParserRegistry(xlsx_first_row_as_header=settings.xlsx_first_row_as_header,
+            caption_enricher=CaptionEnricher(caption_provider,usage_guard=caption_usage_guard,enabled=True)
+                if caption_provider is not None else None),
         max_chunk_chars=settings.max_chunk_chars,
         chunk_overlap=settings.chunk_overlap,
     )

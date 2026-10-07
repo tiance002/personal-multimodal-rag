@@ -24,6 +24,15 @@ class LocalCaptionEnricher:
         self.enabled = enabled
         self.clock = clock or time.monotonic
 
+    def _admission_error(self, document):
+        return None if getattr(self.provider, 'provider_kind', None) == 'local' else 'CAPTION_LOCAL_PROVIDER_REQUIRED'
+
+    def _preflight(self, document, timeout):
+        self.provider.caption_preflight(timeout)
+
+    def _call(self, document, source, timeout):
+        return self.provider.caption_image(source.source_bytes, timeout)
+
     def enrich(self, document: NormalizedDocument, *,
                should_continue: Callable[[], bool] = lambda: True) -> NormalizedDocument:
         all_sources = [asset for asset in document.assets if asset.asset_type in {"source_image", "scanned_page"}]
@@ -38,9 +47,10 @@ class LocalCaptionEnricher:
         warnings = list(document.parse_warnings)
         if len(all_sources) > 4:
             warnings.append("CAPTION_DOC_LIMIT")
-        if getattr(self.provider, "provider_kind", None) != "local":
+        admission_error = self._admission_error(document)
+        if admission_error:
             for source in sources[:4]:
-                result = self._failed(result, source, "CAPTION_LOCAL_PROVIDER_REQUIRED")
+                result = self._failed(result, source, admission_error)
             return self._partial(result, warnings)
 
         def state() -> str | None:
@@ -82,7 +92,7 @@ class LocalCaptionEnricher:
                 failure = state()
                 if failure:
                     raise ProviderUnavailable(failure)
-                self.provider.caption_preflight(min(45, 90 - (self.clock() - started)))
+                self._preflight(document, min(45, 90 - (self.clock() - started)))
                 failure = state()
                 if failure:
                     raise ProviderUnavailable(failure)
@@ -100,7 +110,7 @@ class LocalCaptionEnricher:
                 timeout = min(45, 90 - (call_started - started))
                 observed = None
                 try:
-                    observed = self.provider.caption_image(source.source_bytes, timeout)
+                    observed = self._call(document, source, timeout)
                     failure = state()
                     if failure is None and self.clock() - call_started > timeout:
                         failure = "CAPTION_TIMEOUT"
@@ -121,7 +131,7 @@ class LocalCaptionEnricher:
         if isinstance(exc, TimeoutError):
             return "CAPTION_TIMEOUT"
         # Only stable internal codes enter durable diagnostics, never arbitrary text.
-        allowed = {"CAPTION_CANCELLED", "CAPTION_TIMEOUT", "CAPTION_DEADLINE", "CAPTION_RESOURCE_BUSY",
+        allowed = {"VLM_UNAVAILABLE", "VLM_EGRESS_DENIED", "CAPTION_CANCELLED", "CAPTION_TIMEOUT", "CAPTION_DEADLINE", "CAPTION_RESOURCE_BUSY",
             "CAPTION_VISION_UNAVAILABLE", "CAPTION_LOCAL_ENDPOINT_REQUIRED", "CAPTION_LIMIT_INVALID",
             "CAPTION_RESPONSE_LIMIT", "CAPTION_RESPONSE_INVALID", "CAPTION_REQUEST_FAILED", "CAPTION_REDIRECT_DENIED",
             "CAPTION_IMAGE_BYTES_LIMIT", "CAPTION_IMAGE_PIXELS_LIMIT", "CAPTION_IMAGE_INVALID",

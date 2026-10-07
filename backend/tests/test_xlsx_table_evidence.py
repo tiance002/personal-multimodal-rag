@@ -17,7 +17,8 @@ def cells(document,sheet):return {c.coordinate:c for c in next(t for t in docume
 def test_names_sparse_coordinates_merges_and_block_roundtrip():
  d=parsed();assert [t.sheet for t in d.tables]==['Sales','Inventory']
  assert d.tables[0].cell_range=='A1:E6' and d.tables[0].merged_ranges==('A1:E1',)
- assert d.tables[0].header_rows==(1,2) and d.tables[1].header_rows==(1,)
+ assert d.tables[0].header_rows==() and d.tables[1].header_rows==()
+ assert all(t.header_detection=='column_letters' for t in d.tables)
  assert cells(d,'Sales')['B1'].merged_anchor=='A1'
  assert cells(d,'Inventory')['B2'].value is None and cells(d,'Inventory')['C2'].value==7
  assert all(cells(d,'Sales')[f'{col}5'].value is None for col in 'ABCDE')
@@ -33,12 +34,14 @@ def test_typed_formats_formula_and_cache_are_separate():
  assert c['D6'].formula=='=1/8' and c['D6'].cached_value is None and c['D6'].cache_status=='missing'
  assert 'UNKNOWN_CACHE_MISSING' in c['D6'].display
 
-@pytest.mark.parametrize('sheet,coordinate,header,expected',[('Sales','C3','Q2',20),('Sales','B4','Q1',-30.125),('Sales','D3','Rate',0.125),('Sales','E3','Date','2026-10-01T00:00:00'),('Sales','C6','Q2',60),('Sales','D6','Rate',None),('Inventory','C2','Units',7)])
+@pytest.mark.parametrize('sheet,coordinate,header,expected',[('Sales','C3','C',20),('Sales','B4','B',-30.125),('Sales','D3','D',0.125),('Sales','E3','E','2026-10-01T00:00:00'),('Sales','C6','C',60),('Sales','D6','D',None),('Inventory','C2','C',7)])
 def test_question_evidence_header_and_citation_json_chain(sheet,coordinate,header,expected):
  d=parsed();drafts=chunk_document(d)
  row=int(''.join(ch for ch in coordinate if ch.isdigit()))
  draft=next(c for c in drafts if c.source_locator.sheet==sheet and c.source_locator.cell_range.startswith('A'+str(row)+':'))
- assert draft.chunk_type=='table' and header in draft.content
+ assert draft.chunk_type=='table'
+ if expected is not None:assert header in draft.content
+ else:assert 'UNKNOWN_CACHE_MISSING' not in draft.content  # no fabricated retrieval value
  assert d.markdown_content[draft.start:draft.end]==draft.content
  persisted=json.loads(json.dumps({'content':draft.content,'locator':draft.source_locator.model_dump(mode='json')}))
  target=next(c for c in persisted['locator']['cells'] if c['coordinate']==coordinate)
@@ -47,7 +50,7 @@ def test_question_evidence_header_and_citation_json_chain(sheet,coordinate,heade
  repo=InMemoryRetrievalRepository();record=ChunkRecord('row','kb','doc','v1',persisted['content'],persisted['locator'])
  repo.add(record);repo.add(ChunkRecord('private','other','doc2','v1',record.content,record.locator))
  repo.add(ChunkRecord('old','kb','doc','v0',record.content,record.locator,is_current=False))
- result=HybridRetriever(repo).retrieve(Scope.from_ids(['kb']),header)
+ result=HybridRetriever(repo).retrieve(Scope.from_ids(['kb']),header if expected is not None else 'Total')
  assert [x.chunk.chunk_id for x in result.items]==['row']
  service=CitationService(InMemoryCitationStore());detail=service.freeze('run',result.items[0].chunk)
  reread=service.resolve('run',detail.citation_id)
@@ -127,4 +130,4 @@ def test_repeated_header_text_has_explicit_bound(tmp_path):
  from openpyxl import Workbook
  workbook=Workbook();sheet=workbook.active;sheet['A1']='Header '+('abcd'*150);sheet['B1']='Second';sheet['A2']=1;sheet['B2']=2
  path=tmp_path/'large-header.xlsx';workbook.save(path)
- with pytest.raises(ParserError,match='XLSX_TEXT_LIMIT'):XlsxParser().parse(path,'doc','v1')
+ with pytest.raises(ParserError,match='XLSX_TEXT_LIMIT'):XlsxParser(first_row_as_header=True).parse(path,'doc','v1')

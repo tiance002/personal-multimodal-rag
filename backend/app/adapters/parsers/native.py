@@ -38,7 +38,7 @@ class NativeBlock(Wire):
     table_index: int | None=Field(default=None,ge=0,lt=64)
 class NativeResult(Wire):
     schema_version: Literal[1]
-    format: Literal['html','docx']
+    format: Literal['html','docx','xls']
     source_sha256: str=Field(pattern=r'^[a-f0-9]{64}$')
     blocks: list[NativeBlock]=Field(max_length=100000)
     tables: list[NativeTable]=Field(max_length=64)
@@ -135,7 +135,7 @@ class NativeParser:
             with path.open('rb') as stream:raw=stream.read(MAX_INPUT+1)
         except OSError as exc:raise ParserError('NATIVE_SOURCE_UNREADABLE') from exc
         if len(raw)>MAX_INPUT:raise ParserError('NATIVE_INPUT_LIMIT')
-        result=validate_result(run_worker(self.python,raw,self.format,self.timeout),raw,self.format)
+        result=validate_result(run_worker(self.python,raw,getattr(self,'worker_format',self.format),self.timeout),raw,self.format)
         tables=[];blocks=[];sections=[];pieces=[];offset=0
         for b in result.blocks:
             if b.kind=='text':
@@ -158,9 +158,14 @@ class NativeParser:
                         column_header=c.column_header,row_header=c.row_header,header_evidence=evidence,native_locator=c.locator))
                 merged=tuple(f'{coordinate(c.row_start+1,c.col_start+1)}:{coordinate(c.row_end,c.col_end)}' for c in t.cells if c.row_end-c.row_start>1 or c.col_end-c.col_start>1)
                 table=DocumentTable(table_id=f'{self.format}-table-{b.table_index}',cell_range=f'R1C1:R{t.num_rows}C{t.num_cols}',
+                    sheet=t.caption if self.format=='xls' else None,
+                    row_representation='key_value' if self.format=='xls' else 'legacy',
                     header_rows=header_rows,header_detection=('html-source-policy-v1' if self.format=='html' else 'docx-declared-simple-header-v1' if all(c.header_evidence.get('policy')=='docx-declared-simple-header-v1' for c in t.cells) else 'declared-tblHeader-otherwise-UNKNOWN'),
                     source_format=self.format,caption=t.caption,merged_ranges=merged,cells=cells,start=offset,end=offset)
+                if self.format=='xls':
+                    table=table.model_copy(update={'header_detection':'explicit_first_row' if header_rows else 'column_letters'})
                 text=''.join(content for _,content in table_row_texts(table))
+                if not text:continue
                 table=table.model_copy(update={'end':offset+len(text)});tables.append(table)
                 block=DocumentBlock(block_id=f'block-{len(blocks)}',kind='table',table_id=table.table_id,start=offset,end=table.end)
             pieces.append(text);blocks.append(block);offset+=len(text)
@@ -170,6 +175,7 @@ class NativeParser:
             markdown_content=content,sections=sections,tables=tables,blocks=blocks,
             source_locators=[SourceLocator(kind='text' if b.kind=='text' else 'table',start=b.start,end=b.end,quote=content[b.start:b.end],table_id=b.table_id,source_format=self.format) for b in blocks],
             content_sha256=hashlib.sha256(content.encode()).hexdigest(),parser_version=f'{self.format}/native-v1',
+            parser_engine={'html':'beautifulsoup4/4.14.3','docx':'python-docx/1.2.0','xls':'xlrd/2.0.2'}[self.format],source_mapping_available=True,
             parse_status='partial' if result.warnings else 'complete',parse_warnings=tuple(result.warnings))
 class HtmlParser(NativeParser):
     format='html'

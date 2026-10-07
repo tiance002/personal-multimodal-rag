@@ -38,6 +38,11 @@ class XlsxParser:
     MAX_STRINGS=50000
     MAX_STYLES=10000  # XML style nodes, including nested font/fill/alignment nodes.
 
+    def __init__(self, *, first_row_as_header: bool = False):
+        if type(first_row_as_header) is not bool:
+            raise ValueError('first_row_as_header must be a boolean')
+        self.first_row_as_header = first_row_as_header
+
     def _bounds(self,area):
         try:a,b,c,d=range_boundaries(area)
         except (ValueError,TypeError) as exc:raise ParserError('XLSX_SHEET_LIMIT') from exc
@@ -201,9 +206,16 @@ class XlsxParser:
                     a,b,c,d=range_boundaries(area)
                     for row in range(b,d+1):
                         for col in range(a,c+1):anchors[(row,col)]=f'{get_column_letter(a)}{b}'
-                header=next((row for row in range(1,ws.max_row+1) if sum(isinstance(ws.cell(row,col).value,str) and ws.cell(row,col).data_type!='f' for col in range(1,ws.max_column+1))>=2),None)
-                headers=tuple(row for row in range(1,(header or 0)+1) if any(ws.cell(row,col).value is not None for col in range(1,ws.max_column+1)))
+                headers=(1,) if self.first_row_as_header and ws.max_row >= 2 else ()
                 if len(headers)>8:raise ParserError('XLSX_TEXT_LIMIT')
+                labels_by_column={};counts={}
+                for col in range(1,ws.max_column+1):
+                    anchor=anchors.get((1,col));head=ws[anchor] if anchor else ws.cell(1,col)
+                    label=str(head.value).strip() if headers and head.value is not None and head.data_type!='f' else get_column_letter(col)
+                    label=label or get_column_letter(col)
+                    if len(label)>512:raise ParserError('XLSX_TEXT_LIMIT')
+                    counts[label]=counts.get(label,0)+1
+                    labels_by_column[col]=label if counts[label]==1 else f'{label}_{counts[label]}'
                 cells=[]
                 for row in range(1,ws.max_row+1):
                     for col in range(1,ws.max_column+1):
@@ -212,12 +224,7 @@ class XlsxParser:
                         cached,cache_kind=self._value(cached_ws.cell(row,col).value if is_formula else None)
                         formula=str(cell.value) if is_formula else None
                         display=(f'FORMULA={formula}; CACHED='+('UNKNOWN_CACHE_MISSING' if cached is None else self._display(cached,cache_kind,cell.number_format))) if formula else self._display(value,kind,cell.number_format)
-                        labels=[]
-                        for h in headers:
-                            anchor=anchors.get((h,col));head=ws[anchor] if anchor else ws.cell(h,col)
-                            if head.value is not None:
-                                if len(str(head.value))>512:raise ParserError('XLSX_TEXT_LIMIT')
-                                labels.append(str(head.value))
+                        labels=[labels_by_column[col]]
                         lexical=raw.get(coordinate)
                         # Pair-load values are authoritative. A lexical candidate
                         # must agree before it is attributed to this named sheet.
@@ -227,9 +234,10 @@ class XlsxParser:
                             except ValueError:lexical=None
                         cells.append(TableCell(coordinate=coordinate,row=row,column=col,value=value,value_type=kind,display=display,number_format=cell.number_format,raw_number=lexical,formula=formula,cached_value=cached,cache_status=('missing' if cached is None else 'present') if formula else 'not_applicable',merged_anchor=anchors.get((row,col)),column_headers=tuple(labels)))
                 table_id=f'sheet-{index+1}'
-                table=DocumentTable(table_id=table_id,sheet=ws.title,cell_range=f'A1:{get_column_letter(ws.max_column)}{ws.max_row}',header_rows=headers,header_detection='inferred_first_multi_text_row',merged_ranges=merged,cells=cells,start=offset,end=offset)
+                table=DocumentTable(table_id=table_id,sheet=ws.title,cell_range=f'A1:{get_column_letter(ws.max_column)}{ws.max_row}',header_rows=headers,header_detection='explicit_first_row' if headers else 'column_letters',row_representation='key_value',merged_ranges=merged,cells=cells,start=offset,end=offset)
                 rows=table_row_texts(table);text=''.join(content for _,content in rows)
                 table=table.model_copy(update={'end':offset+len(text)})
+                if not text:continue
                 tables.append(table);pieces.append(text)
                 blocks.append(DocumentBlock(block_id=table_id,kind='table',table_id=table_id,start=offset,end=offset+len(text)))
                 sections.append(DocumentSection(section_id=table_id,heading=ws.title,heading_path=(ws.title,),level=1,start=offset,end=offset+len(text),content_type='table'))
@@ -237,7 +245,7 @@ class XlsxParser:
                 offset+=len(text)
             text=''.join(pieces)
             if not any(c.value is not None or c.formula for table in tables for c in table.cells):raise ParserError('XLSX_EMPTY_TEXT')
-            return NormalizedDocument(document_id=document_id,version_id=version_id,title=path.stem,media_type=MEDIA,markdown_content=text,sections=sections,source_locators=locators,tables=tables,blocks=blocks,content_sha256=hashlib.sha256(text.encode()).hexdigest(),parser_version='xlsx/openpyxl-3.1.5/table-v1')
+            return NormalizedDocument(document_id=document_id,version_id=version_id,title=path.stem,media_type=MEDIA,markdown_content=text,sections=sections,source_locators=locators,tables=tables,blocks=blocks,content_sha256=hashlib.sha256(text.encode()).hexdigest(),parser_version='xlsx/openpyxl-3.1.5/row-v2',parser_engine='openpyxl',source_mapping_available=True)
         except ParserError:raise
         except (zipfile.BadZipFile,OSError,ValueError,KeyError,ParseError,DefusedXmlException) as exc:raise ParserError('XLSX_ARCHIVE_INVALID') from exc
         finally:

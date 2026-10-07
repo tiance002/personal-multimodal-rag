@@ -169,7 +169,10 @@ def test_empty_and_scan_keep_failed_ocr_visible(frozen,tmp_path,mode):
     d = PdfParser(tessdata=tmp_path/'absent').parse(path,'d','v')
     assert not d.tables and not chunk_document(d)
     assert d.parse_status == 'partial' and 'PDF_TABLE_STRUCTURE_UNSUPPORTED:page=1' in d.parse_warnings
-    assert any(a.status == 'failed' and a.error_code == 'OCR_UNAVAILABLE' for a in d.assets)
+    if mode == 'scan':
+        assert any(a.status == 'failed' and a.error_code == 'OCR_UNAVAILABLE' for a in d.assets)
+    else:
+        assert not d.assets  # Fixed upstream classifier does not rasterize a genuinely blank page.
 
 
 @pytest.mark.parametrize('raw,code',[(b'not a PDF','PDF_MAGIC_MISMATCH'),(b'%PDF-1.7\ncorrupt','PDF_OPEN_FAILED')])

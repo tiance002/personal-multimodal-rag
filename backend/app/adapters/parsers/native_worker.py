@@ -179,13 +179,56 @@ def docx(raw):
             if any(c['column_header'] is None for c in cells):warnings.append('DOCX_UNMARKED_HEADERS_UNKNOWN')
     return blocks,tables,sorted(set(warnings))
 
+def xls(raw, first_row_as_header=False):
+    """xlrd does not execute macros/formulas or retrieve external links.
+
+    Cached BIFF values do not prove original formula state; mark every legacy
+    workbook partial so they cannot become strict numeric witnesses.
+    """
+    import xlrd
+    require(raw[:8]==bytes.fromhex('d0cf11e0a1b11ae1'), 'NATIVE_XLS_SIGNATURE_INVALID')
+    try:
+        workbook=xlrd.open_workbook(file_contents=raw,formatting_info=True,on_demand=True)
+    except xlrd.biffh.XLRDError as exc:
+        raise Rejected('NATIVE_PASSWORD_PROTECTED' if 'encrypted' in str(exc).lower() else 'NATIVE_XLS_CORRUPT') from exc
+    blocks=[];tables=[];grid=0
+    try:
+        require(workbook.nsheets<=32,'NATIVE_TABLE_LIMIT')
+        for sheet in workbook.sheets():
+            if not sheet.nrows or not sheet.ncols:continue
+            nr,nc=sheet.nrows,sheet.ncols;grid+=nr*nc
+            require(nr<=1000 and nc<=200 and grid<=MAX_GRID,'NATIVE_TABLE_LIMIT')
+            merged={};covered=set()
+            for r,re,c,ce in sheet.merged_cells:
+                require(0<=r<re<=nr and 0<=c<ce<=nc,'NATIVE_SPAN_INVALID')
+                merged[(r,c)]=(re,ce)
+                for rr in range(r,re):
+                    for cc in range(c,ce):
+                        require((rr,cc) not in covered,'NATIVE_MERGE_INVALID');covered.add((rr,cc))
+            origins=set(merged);cells=[]
+            for r in range(nr):
+                for c in range(nc):
+                    if (r,c) in covered and (r,c) not in origins:continue
+                    v=sheet.cell_value(r,c);kind=sheet.cell_type(r,c)
+                    if kind==xlrd.XL_CELL_ERROR:v='UNKNOWN_CELL_ERROR'
+                    text=str(v) if kind not in (xlrd.XL_CELL_EMPTY,xlrd.XL_CELL_BLANK) else ''
+                    re,ce=merged.get((r,c),(r+1,c+1))
+                    cells.append(cell(text,r,re,c,ce,True if first_row_as_header and nr>=2 and r==0 else False,None,
+                        {'formula_state':'UNKNOWN','cache_state':'UNVERIFIED'}, {'sheet':sheet.name,'row':r+1,'column':c+1}))
+            tables.append(dict(num_rows=nr,num_cols=nc,cells=cells,caption=sheet.name))
+            blocks.append({'kind':'table','table_index':len(tables)-1})
+    finally:workbook.release_resources()
+    return blocks,tables,['XLS_FORMULA_CACHE_UNVERIFIED']
+
+
 def main():
-    require(len(sys.argv)==2 and sys.argv[1] in {'html','docx'},'NATIVE_FORMAT_INVALID')
+    require(len(sys.argv)==2 and sys.argv[1] in {'html','docx','xls','xls-header'},'NATIVE_FORMAT_INVALID')
     raw=sys.stdin.buffer.read(MAX_INPUT+1);require(len(raw)<=MAX_INPUT,'NATIVE_INPUT_LIMIT')
-    blocks,tables,warnings=(html(raw) if sys.argv[1]=='html' else docx(raw))
+    selected=sys.argv[1]
+    blocks,tables,warnings=(html(raw) if selected=='html' else docx(raw) if selected=='docx' else xls(raw,selected=='xls-header'))
     validate_tables(tables)
     require(sum(len(b.get('text','')) for b in blocks)<=MAX_TEXT,'NATIVE_TEXT_LIMIT')
-    payload={'schema_version':1,'format':sys.argv[1],'source_sha256':hashlib.sha256(raw).hexdigest(),'blocks':blocks,'tables':tables,'warnings':warnings}
+    payload={'schema_version':1,'format':'xls' if selected.startswith('xls') else selected,'source_sha256':hashlib.sha256(raw).hexdigest(),'blocks':blocks,'tables':tables,'warnings':warnings}
     encoded=json.dumps(payload,ensure_ascii=False,separators=(',',':')).encode('utf-8')
     require(len(encoded)<=MAX_OUTPUT,'NATIVE_OUTPUT_LIMIT')
     sys.stdout.buffer.write(encoded)

@@ -65,7 +65,7 @@ def _table_rows(content: str, locator: dict[str,Any],target: EvidenceTarget) -> 
     source=locator.get('source_format');policy=locator.get('header_detection')
     docx=source=='docx' and policy=='docx-declared-simple-header-v1'
     native=source=='html' and policy=='html-source-policy-v1' or docx
-    sheet=source is None and policy=='inferred_first_multi_text_row' and isinstance(locator.get('sheet'),str)
+    sheet=source is None and policy in {'inferred_first_multi_text_row','explicit_first_row'} and isinstance(locator.get('sheet'),str)
     if not (native or sheet):return []
     header_rows=locator.get('header_rows')
     if not isinstance(header_rows,(list,tuple)) or len(header_rows)!=1:return []
@@ -135,8 +135,17 @@ def _table_rows(content: str, locator: dict[str,Any],target: EvidenceTarget) -> 
         remainder=content[len(prefix):] if content.startswith(prefix) else ''
         if remainder!=body and not (remainder.startswith('Caption: ') and len(remainder.splitlines())==2 and remainder.split('\n',1)[1]==body):return []
     else:
-        prefix=f"Sheet: {locator['sheet']}; table: {table}; range: {cell_range}\n"
-        if content!=prefix+body:return []
+        if policy=='explicit_first_row':
+            from backend.app.domain.models import DocumentTable,TableCell
+            from backend.app.domain.table_evidence import key_value_row
+            try:
+                original=[TableCell.model_validate(c) for c in cells]
+            except (ValueError,TypeError):return []
+            source_table=DocumentTable(table_id=table,sheet=locator['sheet'],cell_range=cell_range,cells=original,start=0,end=len(content))
+            if content!=key_value_row(source_table,[c for c in original if c.row==row]):return []
+        else:
+            prefix=f"Sheet: {locator['sheet']}; table: {table}; range: {cell_range}\n"
+            if content!=prefix+body:return []
     return [RowFact(value,unit,row,table,data[amount]['coordinate'])]
 
 

@@ -59,6 +59,28 @@ class LocalCaptionProvider(Protocol):
     def caption_image(self, image_bytes: bytes, timeout_seconds: float) -> CaptionResult: ...
 
 
+class CaptionProvider(Protocol):
+    """Model-neutral VLM port. Preflight must not perform paid generation."""
+    provider_kind: str
+
+    def caption_preflight(self, timeout_seconds: float) -> None: ...
+
+    def caption_image(self, image_bytes: bytes, timeout_seconds: float) -> CaptionResult: ...
+
+
+class CaptionUsageGuard(Protocol):
+    """Trusted cloud boundary: global/KB egress, reserve budget, settle usage.
+
+    Unknown usage must retain a conservative reservation, never count as free.
+    This port does not authorize unregistered providers or supply credentials.
+    """
+    def allowed(self, document_id: str, version_id: str) -> bool: ...
+
+    def reserve(self, document_id: str, version_id: str) -> str: ...
+
+    def settle(self, reservation: str, usage_actual: dict | None) -> None: ...
+
+
 class LocalQueryProvider(Protocol):
     """Optional L1 query understanding. Failure must never block baseline RAG."""
 

@@ -470,6 +470,14 @@ class PostgresKnowledgeRepository:
                     progress=55,
                 )
                 normalized_object = self.storage.put_stream(BytesIO(normalized.markdown_content.encode("utf-8"))) if normalized.markdown_content else None
+                processing_manifest = self.storage.put_stream(BytesIO(json.dumps({
+                    'schema_version': 1, 'document_id': normalized.document_id, 'version_id': normalized.version_id,
+                    'parser_engine': normalized.parser_engine, 'parser_version': normalized.parser_version,
+                    'parse_status': normalized.parse_status, 'warnings': normalized.parse_warnings,
+                    'source_mapping_available': normalized.source_mapping_available,
+                    'conversion_lineage': normalized.conversion_lineage,
+                    'table_row_proofs': [p.model_dump(mode='json') for p in normalized.table_row_proofs],
+                }, ensure_ascii=False).encode('utf-8')))
                 vectors: list[list[float]] = []
                 self.update_job_progress(
                     job_id,
@@ -533,8 +541,8 @@ class PostgresKnowledgeRepository:
                     if profile_id is not None:
                         vector_literal = "[" + ",".join(str(value) for value in vectors[index]) + "]"
                         conn.execute(text("INSERT INTO chunk_embeddings (chunk_id,profile_id,embedding) VALUES (:chunk_id,:profile_id,CAST(:embedding AS vector))"), {"chunk_id": chunk_id, "profile_id": profile_id, "embedding": vector_literal})
-                conn.execute(text("""UPDATE document_versions SET index_status='ready',parser_version=:parser_version,chunker_version=:chunker_version,chunk_strategy=:chunk_strategy,normalized_content_key=:normalized_key,normalized_content_sha256=:normalized_sha,normalizer_version='text/v1',activated_at=clock_timestamp()
-                    WHERE id=:id"""), {"id": version["id"], "parser_version": normalized.parser_version, "chunker_version": chunking.chunker_version, "chunk_strategy": chunking.strategy, "normalized_key": normalized_object.storage_key if normalized_object else None, "normalized_sha": normalized_object.sha256 if normalized_object else None})
+                conn.execute(text("""UPDATE document_versions SET index_status='ready',parser_version=:parser_version,chunker_version=:chunker_version,chunk_strategy=:chunk_strategy,normalized_content_key=:normalized_key,normalized_content_sha256=:normalized_sha,processing_manifest_key=:manifest_key,processing_manifest_sha256=:manifest_sha,normalizer_version='text/v1',activated_at=clock_timestamp()
+                    WHERE id=:id"""), {"id": version["id"], "parser_version": normalized.parser_version, "chunker_version": chunking.chunker_version, "chunk_strategy": chunking.strategy, "normalized_key": normalized_object.storage_key if normalized_object else None, "normalized_sha": normalized_object.sha256 if normalized_object else None, 'manifest_key':processing_manifest.storage_key,'manifest_sha':processing_manifest.sha256})
                 current = conn.execute(text("SELECT active_version_id FROM documents WHERE id=:id FOR UPDATE"), {"id": version["document_id"]}).scalar()
                 current_no = conn.execute(text("SELECT version_no FROM document_versions WHERE id=:id"), {"id": current}).scalar() if current else None
                 if current_no is None or version["version_no"] >= current_no:

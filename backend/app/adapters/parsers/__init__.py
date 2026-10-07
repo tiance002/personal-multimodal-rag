@@ -3,14 +3,15 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+import sys
 import uuid
 from pathlib import Path
 
 import fitz
 from PIL import Image
 
-from backend.app.domain.models import DocumentAsset, DocumentBlock, DocumentSection, NormalizedDocument, SourceLocator
-from backend.app.domain.table_evidence import table_row_texts
+from backend.app.domain.models import DocumentAsset, DocumentBlock, DocumentSection, NormalizedDocument, SourceLocator, TableRowProof
+from backend.app.domain.table_evidence import table_row_texts, table_row_cells, table_row_range
 from backend.app.adapters.parsers.pdf_tables import page_tables
 from backend.app.domain.parsers import OCRUnavailable, ParserError
 
@@ -145,14 +146,35 @@ class PdfParser:
             if pdf.needs_pass:
                 raise ParserError("PDF_PASSWORD_REQUIRED")
             for page_number, page in enumerate(pdf, start=1):
-                raw_text = page.get_text("text")
-                pieces, table_evidence, table_warnings = page_tables(page,page_number,raw_text)
+                try:
+                    raw_text = page.get_text("text")
+                except Exception:
+                    warnings.append(f"PARTIAL_PARSE:page={page_number}:text")
+                    raw_text = ''
+                try:
+                    image_area = sum(abs((i['bbox'][2]-i['bbox'][0])*(i['bbox'][3]-i['bbox'][1])) for i in page.get_image_info())
+                    ratio = image_area / page.rect.get_area() if page.rect.get_area() > 0 else 0
+                except Exception:
+                    warnings.append(f"PARTIAL_PARSE:page={page_number}:classification")
+                    ratio = 0
+                scanned = classify_pdf_page(ratio, len(raw_text.strip())) == 'scanned'
+                try:
+                    pieces, table_evidence, table_warnings = (
+                        ([(raw_text,None)],{'table_status':'unsupported','table_candidates':[]},
+                         [f'PDF_TABLE_STRUCTURE_UNSUPPORTED:page={page_number}'])
+                        if scanned else page_tables(page,page_number,raw_text))
+                except Exception:
+                    pieces, table_evidence, table_warnings = [(raw_text,None)],{},[f"PARTIAL_PARSE:page={page_number}:layout"]
                 warnings.extend(table_warnings)
                 text = raw_text
                 source_id: str | None = None
                 embedded_images: list[tuple[str, bytes, str]] = []
-                if not raw_text.strip():
-                    raster = page.get_pixmap(matrix=fitz.Matrix(2, 2)).tobytes("png")
+                if scanned:
+                    try:
+                        raster = page.get_pixmap(matrix=fitz.Matrix(2, 2)).tobytes("png")
+                    except Exception:
+                        warnings.append(f"PARTIAL_PARSE:page={page_number}:render")
+                        continue
                     source_id = str(uuid.uuid4())
                     assets.append(DocumentAsset(
                         asset_id=source_id, asset_type="scanned_page", page_no=page_number,
@@ -162,7 +184,10 @@ class PdfParser:
                                         **({"coordinate_basis":"pdf-points-top-left-unrotated"}
                                            if self.collect_caption_geometry else {})},
                     ))
-                    text, error = self._ocr(page)
+                    try:
+                        text, error = self._ocr(page)
+                    except Exception:
+                        text, error = '', 'OCR_UNAVAILABLE'
                     pieces = [(text,None)]
                     if error:
                         warnings.append(f"{error}:page={page_number}")
@@ -174,11 +199,27 @@ class PdfParser:
                         status="failed" if error else "ready", error_code=error,
                     ))
                 else:
-                    for image in page.get_images(full=True):
+                    try:
+                        page_images = page.get_images(full=True)
+                    except Exception:
+                        warnings.append(f"PARTIAL_PARSE:page={page_number}:embedded-images")
+                        page_images = []
+                    for image in page_images:
                         xref = image[0]
-                        extracted = pdf.extract_image(xref)
-                        image_bytes = extracted["image"]
-                        regions = page.get_image_rects(xref) if self.collect_caption_geometry else [None]
+                        try:
+                            extracted = pdf.extract_image(xref)
+                            image_bytes = extracted['image']
+                            extension = extracted['ext']
+                            if not isinstance(image_bytes, bytes) or not image_bytes or not isinstance(extension, str):
+                                raise ValueError('embedded image unavailable')
+                        except Exception:
+                            warnings.append(f"PARTIAL_PARSE:page={page_number}:embedded-image")
+                            continue
+                        try:
+                            regions = page.get_image_rects(xref) if self.collect_caption_geometry else [None]
+                        except Exception:
+                            warnings.append(f"PARTIAL_PARSE:page={page_number}:image-geometry")
+                            regions = [None]
                         for region in regions or [None]:
                             image_id = str(uuid.uuid4())
                             geometry = ({"bbox": tuple(region) if region is not None else None,
@@ -192,7 +233,7 @@ class PdfParser:
                                     "table_structure_status":"unsupported", "semantic_status":"NOT_RUN", **geometry},
                             ))
                             warnings.append(f"PDF_IMAGE_TABLE_SEMANTICS_UNSUPPORTED:page={page_number}")
-                            embedded_images.append((image_id, image_bytes, extracted["ext"]))
+                            embedded_images.append((image_id, image_bytes, extension))
                 start = cursor
                 for piece, table in pieces:
                     append(piece,page_number,table=table,asset_id=source_id)
@@ -225,7 +266,8 @@ class PdfParser:
             document_id=document_id,version_id=version_id,title=path.stem,media_type="application/pdf",
             markdown_content=content,sections=sections,tables=tables,blocks=blocks,assets=assets,
             source_locators=locators,content_sha256=_sha256(content),
-            parser_version=f"pdf/v3-native-table-pymupdf-{fitz.VersionBind}",
+            parser_version=f"pdf/v4-weknora-page-router-pymupdf-{fitz.VersionBind}",
+            parser_engine="pymupdf/weknora-page-router-v1",source_mapping_available=True,
             parse_status=status,parse_warnings=tuple(warnings),
         )
 
@@ -246,12 +288,16 @@ class ImageParser:
         source_id = str(uuid.uuid4())
         asset = DocumentAsset(
             asset_id=source_id, asset_type="source_image",
+            source_bytes=raw,
             source_locator={"sha256": hashlib.sha256(raw).hexdigest(),
                 **({"bbox": (0, 0, *image_size), "coordinate_basis": "image-pixels-top-left"}
                    if self.collect_caption_geometry else {})},
         )
-        with fitz.open(stream=raw, filetype=path.suffix.lstrip(".")) as image_document:
-            content, error = self.pdf_parser._ocr(image_document[0])
+        try:
+            with fitz.open(stream=raw, filetype=path.suffix.lstrip(".")) as image_document:
+                content, error = self.pdf_parser._ocr(image_document[0])
+        except Exception:
+            content, error = '', 'OCR_UNAVAILABLE'
         derived = DocumentAsset(
             asset_id=str(uuid.uuid4()), asset_type="ocr_text", text_content=content or None,
             derived_from_asset_id=source_id, status="failed" if error else "ready", error_code=error,
@@ -272,6 +318,9 @@ class ImageParser:
             source_locators=[SourceLocator(kind="image", start=0, end=len(content), quote=content, asset_id=source_id)],
             content_sha256=_sha256(content),
             parser_version="image/v2-ocr",
+            parser_engine="pymupdf/tesseract",source_mapping_available=True,
+            parse_status="partial" if error else "complete",
+            parse_warnings=(error,) if error else (),
         )
 
 
@@ -310,6 +359,16 @@ from backend.app.adapters.parsers.doc import DocParser
 
 # XLSX uses the mature, bounded inert workbook adapter.
 from backend.app.adapters.parsers.xlsx import XlsxParser
+from backend.app.adapters.parsers.xls import XlsParser
+
+
+def classify_pdf_page(image_area_ratio: float, text_len: int) -> str:
+    """Fixed WeKnora v0.8.2 _classify_page defaults, in the same order."""
+    if image_area_ratio >= 0.5:
+        return 'scanned'
+    if text_len < 10 and image_area_ratio >= 0.1:
+        return 'scanned'
+    return 'text'
 
 
 def _canonical_media_type(path: Path, media_type: str) -> str:
@@ -324,6 +383,7 @@ def _canonical_media_type(path: Path, media_type: str) -> str:
         ".pdf": "application/pdf",
         ".txt": "text/plain",
         ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".xls": "application/vnd.ms-excel",
     }
     if declared in {"", "application/octet-stream", "binary/octet-stream"}:
         return by_suffix.get(path.suffix.lower(), declared or "application/octet-stream")
@@ -332,31 +392,50 @@ def _canonical_media_type(path: Path, media_type: str) -> str:
 
 class ParserRegistry:
     def __init__(self, tessdata: Path | None = None, *, native_python: Path | None = None,
-                 doc_converter=None, collect_caption_geometry: bool = False) -> None:
+                 doc_converter=None, collect_caption_geometry: bool = False,
+                 xlsx_first_row_as_header: bool = False, caption_enricher=None) -> None:
         self.tessdata = tessdata
-        self.native_python = native_python
+        self.native_python = Path(native_python or os.getenv('RAG_NATIVE_TABLE_PYTHON') or sys.executable)
         self.doc_converter = doc_converter
-        self.collect_caption_geometry = collect_caption_geometry
+        self.collect_caption_geometry = collect_caption_geometry or caption_enricher is not None
+        self.caption_enricher = caption_enricher
+        self.parsers = {
+            'text/plain': TextParser('text/plain'),
+            'text/markdown': TextParser('text/markdown'),
+            'text/csv': TextParser('text/plain'),
+            'application/msword': DocParser(python=self.native_python, converter=doc_converter),
+            'text/html': HtmlParser(python=self.native_python),
+            'application/xhtml+xml': HtmlParser(python=self.native_python),
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': DocxParser(python=self.native_python),
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': XlsxParser(first_row_as_header=xlsx_first_row_as_header),
+            'application/vnd.ms-excel': XlsParser(python=self.native_python, first_row_as_header=xlsx_first_row_as_header),
+            'application/pdf': PdfParser(tessdata=tessdata, collect_caption_geometry=self.collect_caption_geometry),
+            'image/*': ImageParser(tessdata=tessdata, collect_caption_geometry=self.collect_caption_geometry),
+        }
 
     def parse(self, path: Path, media_type: str, document_id: str, version_id: str) -> NormalizedDocument:
         media_type = _canonical_media_type(path, media_type)
-        if media_type in {"text/plain", "text/markdown"}:
-            return TextParser(media_type).parse(path, document_id, version_id)
-        if media_type == "application/msword":
-            return DocParser(python=self.native_python, converter=self.doc_converter).parse(path, document_id, version_id)
-        if media_type == "text/csv":
-            return TextParser("text/plain").parse(path, document_id, version_id)
-        if media_type in {"text/html", "application/xhtml+xml"}:
-            return HtmlParser(python=self.native_python).parse(path, document_id, version_id)
-        if media_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            return DocxParser(python=self.native_python).parse(path, document_id, version_id)
-        if media_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            return XlsxParser().parse(path, document_id, version_id)
-        if media_type == "application/pdf":
-            return PdfParser(tessdata=self.tessdata, collect_caption_geometry=self.collect_caption_geometry).parse(path, document_id, version_id)
-        if media_type.startswith("image/"):
-            return ImageParser(tessdata=self.tessdata, collect_caption_geometry=self.collect_caption_geometry).parse(path, document_id, version_id)
-        raise ParserError("UNSUPPORTED_MEDIA_TYPE")
+        parser = self.parsers.get('image/*' if media_type.startswith('image/') else media_type)
+        if parser is None:
+            raise ParserError('UNSUPPORTED_MEDIA_TYPE')
+        document = parser.parse(path, document_id, version_id)
+        proofs = []
+        source_sha256 = hashlib.sha256(path.read_bytes()).hexdigest() if document.tables else None
+        for table in document.tables:
+            for row, cells in table_row_cells(table):
+                origins = {c.coordinate for c in cells}
+                proofs.append(TableRowProof(document_id=document_id,version_id=version_id,
+                    source_sha256=source_sha256,table_id=table.table_id,
+                    row=row,cell_range=table_row_range(table,row,cells),header_rows=table.header_rows,
+                    header_policy=table.header_detection,cells=tuple(c for c in table.cells
+                        if c.coordinate in origins or c.row in table.header_rows),parse_status=document.parse_status,
+                    conversion_lineage=table.conversion_lineage))
+        document = document.model_copy(update={'table_row_proofs': proofs,
+            'parser_engine': document.parser_engine if document.parser_engine != 'legacy' else type(parser).__name__,
+            'source_mapping_available': bool(document.source_locators)})
+        if self.caption_enricher is not None:
+            document = self.caption_enricher.enrich(document)
+        return document
 
 
 __all__ = ["OCRUnavailable", "ParserError", "ParserRegistry"]

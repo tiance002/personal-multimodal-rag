@@ -37,6 +37,7 @@ class DocumentTable(BaseModel):
     cell_range: str
     header_rows: tuple[int, ...] = ()
     header_detection: str = "unavailable"
+    row_representation: Literal["legacy", "key_value"] = "legacy"
     conversion_lineage: dict[str, str] = Field(default_factory=dict)
     source_format: str | None = None
     page: int | None = Field(default=None, ge=1)
@@ -114,6 +115,27 @@ class DocumentAsset(BaseModel):
     error_code: str | None = None
 
 
+class TableRowProof(BaseModel):
+    """Immutable parser proof, independent of where-only source locators.
+
+    Existing citation consumers retain their legacy JSON projection until their
+    own migration; this object also survives in the version processing manifest.
+    """
+    model_config = ConfigDict(frozen=True)
+    schema_version: Literal[1] = 1
+    document_id: str
+    version_id: str
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    table_id: str
+    row: int = Field(ge=1)
+    cell_range: str
+    header_rows: tuple[int, ...] = ()
+    header_policy: str
+    cells: tuple[TableCell, ...]
+    parse_status: Literal["complete", "partial"]
+    conversion_lineage: dict[str, str] = Field(default_factory=dict)
+
+
 class NormalizedDocument(BaseModel):
     model_config = ConfigDict(frozen=True)
 
@@ -129,6 +151,9 @@ class NormalizedDocument(BaseModel):
     source_locators: list[SourceLocator] = Field(default_factory=list)
     content_sha256: str
     parser_version: str
+    parser_engine: str = "legacy"
+    source_mapping_available: bool = False
+    table_row_proofs: list[TableRowProof] = Field(default_factory=list)
     conversion_lineage: dict[str, str] = Field(default_factory=dict)
     parse_status: Literal["complete", "partial"] = "complete"
     parse_warnings: tuple[str, ...] = ()
