@@ -8,7 +8,7 @@ import threading
 import uuid
 from contextlib import contextmanager
 from io import BytesIO
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from typing import Any
 
 from sqlalchemy import Engine, text
@@ -21,6 +21,9 @@ from backend.app.domain.parsers import ParserError
 from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, term_frequencies
 from backend.app.application.context_expansion import NeighborMetadata
+from backend.app.ports.ingestion import parse_version_source
+from backend.app.domain.version_source import VersionSource
+from backend.app.domain.errors import FinalAnswerCommitError
 from backend.app.ports.retrieval import ContextNeighborRead, ContextNeighborReason, ContextNeighborRow
 
 
@@ -94,11 +97,10 @@ class PostgresKnowledgeRepository:
                     if current and current["source_sha256"] == stored.sha256:
                         return {"document_id": str(document_id), "version_id": str(current["id"]), "job_id": None, "storage_key": stored.storage_key, "sha256": stored.sha256, "size": stored.size, "status": "duplicate"}
                 version_no = conn.execute(text("SELECT COALESCE(MAX(version_no),0)+1 AS next_no FROM document_versions WHERE document_id=:id"), {"id": document_id}).scalar_one()
-                conn.execute(text("UPDATE documents SET media_type=:media_type, original_size=:size, updated_at=now() WHERE id=:id"), {"id": document_id, "media_type": media_type, "size": stored.size})
             else:
                 version_no = 1
                 conn.execute(text("INSERT INTO documents (id,knowledge_base_id,file_name,media_type,original_size) VALUES (:id,:kb,:name,:media_type,:size)"), {"id": document_id, "kb": kb_id, "name": file_name, "media_type": media_type, "size": stored.size})
-            conn.execute(text("INSERT INTO document_versions (id,document_id,version_no,source_sha256,storage_key,parser_version,index_status,graph_status) VALUES (:id,:document_id,:version_no,:sha256,:storage_key,'pending','queued','disabled')"), {"id": version_id, "document_id": document_id, "version_no": version_no, "sha256": stored.sha256, "storage_key": stored.storage_key})
+            conn.execute(text("INSERT INTO document_versions (id,document_id,version_no,source_sha256,storage_key,file_name,media_type,original_size,parser_version,index_status,graph_status) VALUES (:id,:document_id,:version_no,:sha256,:storage_key,:file_name,:media_type,:size,'pending','queued','disabled')"), {"id": version_id, "document_id": document_id, "version_no": version_no, "sha256": stored.sha256, "storage_key": stored.storage_key, "file_name": file_name, "media_type": media_type, "size": stored.size})
             conn.execute(text("INSERT INTO ingestion_jobs (id,version_id,job_type,status,stage) VALUES (:id,:version_id,'ingest','queued','queued')"), {"id": job_id, "version_id": version_id})
         return {"document_id": str(document_id), "version_id": str(version_id), "job_id": str(job_id), "storage_key": stored.storage_key, "sha256": stored.sha256, "size": stored.size, "status": "stored"}
 
@@ -147,16 +149,12 @@ class PostgresKnowledgeRepository:
                 {"document_id": document_id},
             ).scalar_one()
             conn.execute(
-                text("UPDATE documents SET file_name=:file_name,media_type=:media_type,original_size=:size,updated_at=clock_timestamp() WHERE id=:id"),
-                {"id": document_id, "file_name": file_name, "media_type": media_type, "size": stored.size},
-            )
-            conn.execute(
                 text("""
                     INSERT INTO document_versions
-                        (id,document_id,version_no,source_sha256,storage_key,parser_version,index_status,graph_status)
-                    VALUES (:id,:document_id,:version_no,:sha256,:storage_key,'pending','queued','disabled')
+                        (id,document_id,version_no,source_sha256,storage_key,file_name,media_type,original_size,parser_version,index_status,graph_status)
+                    VALUES (:id,:document_id,:version_no,:sha256,:storage_key,:file_name,:media_type,:size,'pending','queued','disabled')
                 """),
-                {"id": version_id, "document_id": document_id, "version_no": version_no, "sha256": stored.sha256, "storage_key": stored.storage_key},
+                {"id": version_id, "document_id": document_id, "version_no": version_no, "sha256": stored.sha256, "storage_key": stored.storage_key, "file_name": file_name, "media_type": media_type, "size": stored.size},
             )
             conn.execute(
                 text("INSERT INTO ingestion_jobs (id,version_id,job_type,status,stage) VALUES (:id,:version_id,'ingest','queued','queued')"),
@@ -401,7 +399,7 @@ class PostgresKnowledgeRepository:
             if not job:
                 return self.get_job(job_id) or {}
             version = conn.execute(
-                text("SELECT dv.*,d.file_name,d.media_type,d.knowledge_base_id FROM document_versions dv JOIN documents d ON d.id=dv.document_id WHERE dv.id=:id"),
+                text("SELECT dv.*,d.knowledge_base_id FROM document_versions dv JOIN documents d ON d.id=dv.document_id WHERE dv.id=:id"),
                 {"id": job["version_id"]},
             ).mappings().one()
         if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
@@ -418,7 +416,7 @@ class PostgresKnowledgeRepository:
                 progress=10,
             )
             with self._lease_heartbeat(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
-                normalized = self.parsers.parse(self.storage.path_for(version["storage_key"]), version["media_type"], str(version["document_id"]), str(version["id"]))
+                normalized = parse_version_source(self.parsers, self.storage, VersionSource.from_row(version))
                 self.update_job_progress(
                     job_id,
                     worker_id=worker_id,
@@ -540,7 +538,7 @@ class PostgresKnowledgeRepository:
                 current = conn.execute(text("SELECT active_version_id FROM documents WHERE id=:id FOR UPDATE"), {"id": version["document_id"]}).scalar()
                 current_no = conn.execute(text("SELECT version_no FROM document_versions WHERE id=:id"), {"id": current}).scalar() if current else None
                 if current_no is None or version["version_no"] >= current_no:
-                    conn.execute(text("UPDATE documents SET active_version_id=:version_id,updated_at=clock_timestamp() WHERE id=:id"), {"version_id": version["id"], "id": version["document_id"]})
+                    conn.execute(text("UPDATE documents SET active_version_id=:version_id,file_name=:file_name,media_type=:media_type,original_size=:size,updated_at=clock_timestamp() WHERE id=:id"), {"version_id": version["id"], "id": version["document_id"], "file_name": version["file_name"], "media_type": version["media_type"], "size": version["original_size"]})
                 completion = conn.execute(
                     text("""
                         UPDATE ingestion_jobs
@@ -990,8 +988,8 @@ class PostgresKnowledgeRepository:
             row = conn.execute(
                 text(
                     """
-                    SELECT d.file_name,d.media_type,d.active_version_id,
-                           dv.storage_key,dv.version_no
+                    SELECT dv.file_name,dv.media_type,d.active_version_id,
+                           dv.id AS version_id,dv.storage_key,dv.version_no
                     FROM documents d
                     LEFT JOIN document_versions dv ON dv.id = COALESCE(
                         d.active_version_id,
@@ -1011,8 +1009,12 @@ class PostgresKnowledgeRepository:
         if not row or not row["storage_key"]:
             raise LookupError("document source not found")
         return {
-            "file_name": row["file_name"],
-            "media_type": row["media_type"] or "application/octet-stream",
+            # Legacy NULL metadata is explicitly unknown. A generic attachment
+            # keeps bytes available without guessing an Office/PDF interpretation.
+            "file_name": row["file_name"] if row["file_name"] and row["media_type"] else f"{row['version_id']}.bin",
+            "media_type": row["media_type"] if row["file_name"] and row["media_type"] else "application/octet-stream",
+            "version_id": str(row["version_id"]),
+            "metadata_status": "known" if row["file_name"] and row["media_type"] else "legacy_unknown",
             "version_no": row["version_no"],
             "path": self.storage.path_for(row["storage_key"]),
         }
@@ -1245,11 +1247,27 @@ class PostgresKnowledgeRepository:
         error_code: str | None,
         mode: str,
         agent_terminal: tuple[str, str | None, int] | None = None,
+        commit_check: Callable[[], str | None] | None = None,
     ) -> bool:
         with self.engine.begin() as conn:
             status = conn.execute(text("SELECT status FROM rag_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()
             if status not in {"created", "running"}:
                 return False
+            if error_code is None:
+                # The application owns the one policy. Require it even for
+                # internal/offline callers, then rerun under the terminal lock.
+                if commit_check is None:
+                    raise FinalAnswerCommitError("FINAL_COMMIT_CHECK_REQUIRED")
+                error = commit_check()
+                if error:
+                    raise FinalAnswerCommitError(error)
+                # FK existence alone cannot prove chunk/version identity or a
+                # readable quote. Check inside the same cancellation-locked TX.
+                for snapshot in snapshots:
+                    content = conn.execute(text("SELECT content FROM chunks WHERE id=:chunk_id AND version_id=:version_id"),
+                        {"chunk_id": snapshot.chunk_id, "version_id": snapshot.version_id}).scalar()
+                    if content is None or snapshot.quote not in content:
+                        raise FinalAnswerCommitError("INVALID_EVIDENCE_SNAPSHOT")
             terminal_status = "completed" if error_code is None else "failed"
             if agent_terminal is not None:
                 agent_status = conn.execute(text("SELECT status FROM agent_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()

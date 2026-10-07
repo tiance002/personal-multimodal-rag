@@ -103,6 +103,9 @@ def main() -> int:
             snapshots=tuple(result.evidence),
             error_code=result.error_code,
             mode="quick",
+            commit_check=lambda: container.knowledge_gateway.evidence.commit_check.check(
+                result.answer, result.evidence, result.query_plan.evidence_plan,
+                answer_type=result.answer_type, finish_reason=result.finish_reason, citations=result.citations),
         )
         messages = repository.list_messages(conversation_id)
         assistant = next((message for message in messages if message["role"] == "assistant"), None)

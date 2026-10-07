@@ -173,7 +173,8 @@ class LangChainAgentAdapter:
                 nonlocal truncated_candidate
                 messages = state.get("messages", [])
                 record_model("ok", messages[-1] if messages else None)
-                if messages and (getattr(messages[-1], "response_metadata", {}) or {}).get("done_reason") == "length":
+                metadata = (getattr(messages[-1], "response_metadata", {}) or {}) if messages else {}
+                if metadata.get("done_reason") == "length" or metadata.get("finish_reason") == "length":
                     truncated_candidate = getattr(messages[-1], "content", "")
                     raise _AgentAbort("MODEL_OUTPUT_TRUNCATED")
                 guard()

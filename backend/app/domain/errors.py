@@ -10,3 +10,9 @@ class ScopeViolation(DomainError):
 
 class EvidenceIntegrityError(DomainError):
     code = "EVIDENCE_INVALID"
+
+
+class FinalAnswerCommitError(DomainError):
+    """A success transaction was rolled back before writing answer artifacts."""
+
+    code = "FINAL_ANSWER_COMMIT_INVALID"

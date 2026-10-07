@@ -206,6 +206,7 @@ class HardeningPolicy:
                 'citation_occurrences': citation_occurrences(answer, snapshots, chunks), 'continuation_calls': 0})
 
     def finalize(self, run_id: str, candidate: str, snapshots: Any, chunks: Any, plan: Any, error: str | None) -> FinalizedAnswer:
+        from backend.app.application.final_answer_commit import FinalAnswerCommitCheck
         intent_plan = detect_intents(plan.question)
         coverage = intent_coverage(candidate, intent_plan)
         labels = {s.label for s in snapshots}
@@ -231,12 +232,20 @@ class HardeningPolicy:
                 audit_status = 'SAVED_LOCAL' if self.audit and self.audit.save(record) else 'AUDIT_UNAVAILABLE'
             except (OSError, ValueError):
                 audit_status = 'AUDIT_WRITE_FAILED'
-            answer = evidence_fallback(plan.question, snapshots, plan) if audit_status == 'SAVED_LOCAL' else ''
+            answer = (evidence_fallback(plan.question, snapshots, plan)
+                      if audit_status == 'SAVED_LOCAL' and error != 'MODEL_OUTPUT_TRUNCATED' else '')
             fallback = 'EVIDENCE_ONLY_FALLBACK' if answer else None
             # Never release the rejected candidate. No inference or new call.
-            error = None if answer else error
+            if answer:
+                error = FinalAnswerCommitCheck().check(answer, snapshots, plan.evidence_plan, answer_type='fallback')
+                if error:
+                    answer = ''
+            # No fallback (including a truncated generation) retains its error.
         else:
             answer, fallback = candidate, None
+            error = FinalAnswerCommitCheck().check(answer, snapshots, plan.evidence_plan)
+            if error:
+                answer = ''
         rows = citation_occurrences(answer, snapshots, chunks)
         if (metrics := current_metrics()) is not None:
             metrics.hardening.update({'version': VERSION, 'route_reason': intent_plan.route_reason,

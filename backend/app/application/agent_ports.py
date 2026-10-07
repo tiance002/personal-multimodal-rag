@@ -22,6 +22,7 @@ class SmartAgentResult:
     cost_microunits: int = 0
     model_calls: int = 0
     evidence_hint: dict[str, Any] | None = None
+    finish_reason: str | None = None
 
 
 class SmartAgentPort(Protocol):

@@ -13,6 +13,8 @@ from backend.app.adapters.postgres.agent_repository import PostgresAgentReposito
 from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
 from backend.app.config import Settings
 from backend.app.domain.scope import Scope
+from backend.app.application.final_answer_commit import FinalAnswerCommitCheck
+from backend.app.application.query_router import EvidencePlan
 
 
 def _repositories_or_skip() -> tuple[PostgresKnowledgeRepository, PostgresAgentRepository]:
@@ -125,6 +127,7 @@ def test_successful_smart_finalization_commits_both_terminal_rows_and_answer() -
             error_code=None,
             mode="smart",
             agent_terminal=("completed", None, 7),
+            commit_check=lambda: FinalAnswerCommitCheck().check("supported answer", (), EvidencePlan("original question"), citations=()),
         )
         assert committed is True
         with rag.engine.connect() as connection:
@@ -169,6 +172,7 @@ def test_concurrent_cancel_and_smart_finalization_commit_one_terminal_outcome() 
                 error_code=None,
                 mode="smart",
                 agent_terminal=("completed", None, 0),
+                commit_check=lambda: FinalAnswerCommitCheck().check("supported answer", (), EvidencePlan("original question"), citations=()),
             )
 
         try:

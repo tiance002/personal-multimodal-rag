@@ -29,7 +29,7 @@ def test_failed_candidate_does_not_replace_active_version(tmp_path):
     worker.process(first.job_id)
     active_before = repository.active_version(first.document_id).id
 
-    failed = service.submit_upload("kb-1", "notes.txt", "application/octet-stream", io.BytesIO(b"broken"))
+    failed = service.submit_upload("kb-1", "notes.txt", "application/x-unsupported", io.BytesIO(b"broken"))
     failed_state = worker.process(failed.job_id)
 
     assert failed_state.status == "failed"

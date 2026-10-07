@@ -15,6 +15,8 @@ from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledge
 from backend.app.adapters.storage import ContentAddressedStorage
 from backend.app.config import Settings
 from backend.app.domain.evidence import freeze_evidence
+from backend.app.application.final_answer_commit import FinalAnswerCommitCheck
+from backend.app.application.query_router import EvidencePlan
 from backend.app.main import create_app
 
 
@@ -89,6 +91,8 @@ def test_reopened_conversation_reads_real_frozen_e1_and_leaves_legacy_null_run_u
             snapshots=(snapshot,),
             error_code=None,
             mode="quick",
+            commit_check=lambda: FinalAnswerCommitCheck().check(
+                "AX-731 costs 1000 units [E1].", (snapshot,), EvidencePlan("what is the cost?"), citations=("E1",)),
         ) is True
 
         # Recreate the read-side adapter as a page refresh would do.

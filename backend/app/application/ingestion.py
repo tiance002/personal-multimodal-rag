@@ -8,7 +8,8 @@ from typing import BinaryIO
 from backend.app.domain.chunking import chunk_document
 from backend.app.domain.models import ChunkDraft, NormalizedDocument
 from backend.app.domain.parsers import ParserError
-from backend.app.ports.ingestion import BlobStore, DocumentParser
+from backend.app.domain.version_source import VersionSource
+from backend.app.ports.ingestion import BlobStore, DocumentParser, parse_version_source
 
 
 @dataclass
@@ -31,6 +32,7 @@ class VersionRecord:
     media_type: str
     source_sha256: str
     storage_key: str
+    original_size: int | None = None
     index_status: str = "queued"
     error_code: str | None = None
     normalized_document: NormalizedDocument | None = None
@@ -80,15 +82,18 @@ class InMemoryIngestionRepository:
         self.documents[document.id] = document
         return document
 
-    def create_version(self, document: DocumentRecord, source_sha256: str, storage_key: str) -> VersionRecord:
+    def create_version(self, document: DocumentRecord, source_sha256: str, storage_key: str,
+                       *, file_name: str | None = None, media_type: str | None = None,
+                       original_size: int | None = None) -> VersionRecord:
         version = VersionRecord(
             id=str(uuid.uuid4()),
             document_id=document.id,
             version_no=len(document.version_ids) + 1,
-            file_name=document.file_name,
-            media_type=document.media_type,
+            file_name=file_name if file_name is not None else document.file_name,
+            media_type=media_type if media_type is not None else document.media_type,
             source_sha256=source_sha256,
             storage_key=storage_key,
+            original_size=original_size,
         )
         document.version_ids.append(version.id)
         self.versions[version.id] = version
@@ -109,10 +114,12 @@ class InMemoryIngestionRepository:
         document = self.documents[version.document_id]
         if document.active_version_id is None:
             document.active_version_id = version.id
+            document.file_name, document.media_type = version.file_name, version.media_type
             return True
         active = self.versions[document.active_version_id]
         if version.version_no >= active.version_no:
             document.active_version_id = version.id
+            document.file_name, document.media_type = version.file_name, version.media_type
             return True
         return False
 
@@ -145,13 +152,13 @@ class IngestionService:
         document = self.repository.find_document(knowledge_base_id, normalized_name)
         if document is None:
             document = self.repository.create_document(knowledge_base_id, normalized_name, media_type)
-        else:
-            document.media_type = media_type
         if duplicate_policy == "skip" and document.active_version_id:
             active = self.repository.active_version(document.id)
             if active.source_sha256 == stored.sha256:
                 return UploadReceipt(document.id, active.id, "", stored.storage_key, stored.sha256, stored.size, status="duplicate")
-        version = self.repository.create_version(document, stored.sha256, stored.storage_key)
+        version = self.repository.create_version(document, stored.sha256, stored.storage_key,
+                                                 file_name=normalized_name, media_type=media_type,
+                                                 original_size=stored.size)
         job = self.repository.create_job(version.id)
         return UploadReceipt(document.id, version.id, job.id, stored.storage_key, stored.sha256, stored.size)
 
@@ -178,13 +185,9 @@ class IngestionWorker:
         job.status, job.stage, job.progress = "running", "processing", 10
         version = self.repository.versions[job.version_id]
         try:
-            document = self.repository.documents[version.document_id]
-            normalized = self.parsers.parse(
-                self.storage.path_for(version.storage_key),
-                version.media_type,
-                document.id,
-                version.id,
-            )
+            normalized = parse_version_source(self.parsers, self.storage, VersionSource(
+                version.id, version.document_id, version.version_no, version.source_sha256,
+                version.storage_key, version.file_name, version.media_type, version.original_size))
             if not normalized.markdown_content and normalized.assets:
                 raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
             job.stage, job.progress = "indexing", 60

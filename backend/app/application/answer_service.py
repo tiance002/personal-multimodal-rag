@@ -14,6 +14,7 @@ from backend.app.application.knowledge_tools import KnowledgeToolGateway
 from backend.app.application.quick_chain import LangChainQuickChain, QuickSettings
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.domain.scope import Scope
+from backend.app.domain.errors import FinalAnswerCommitError
 from backend.app.ports.persistence import RunEventStore
 from backend.app.application.run_metrics import collect_metrics, current_metrics
 from backend.app.application.follow_up import resolve_question, clarification, validate_resolution_response, bounded_method_reference
@@ -220,6 +221,8 @@ class AnswerService:
             smart_evidence: tuple[Any, ...] = ()
             agent_terminal: tuple[str, str | None, int] | None = None
             privacy_evidence_only = self.quick_chain._privacy_configuration(content)
+            answer_type, finish_reason = "generated", None
+            commit_plan = self.knowledge_gateway.plan(execution_question).evidence_plan
             if resolution.clarification_required:
                 # Existing insufficient-evidence terminal path, with a non-factual
                 # clarification. Do not let retrieval similarity pick the object.
@@ -252,6 +255,8 @@ class AnswerService:
                 answer, citations, error_code = result.answer, result.citations, result.error_code
                 trace = dict(result.trace.__dict__)
                 snapshots = result.evidence
+                answer_type, finish_reason = result.answer_type, result.finish_reason
+                commit_plan = result.query_plan.evidence_plan
                 if privacy_evidence_only:
                     trace.update(requested_mode=mode, execution_mode="evidence_only")
 
@@ -262,6 +267,16 @@ class AnswerService:
                 if langfuse_run is not None:
                     langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
                 return self._cancelled_outcome(run_id, mode, trace)
+
+            if error_code is None:
+                error_code = self.knowledge_gateway.evidence.commit_check.check(
+                    answer, snapshots, commit_plan, answer_type=answer_type,
+                    finish_reason=finish_reason or trace.get("finish_reason"), citations=citations)
+                trace["final_commit_check"] = "PASS" if error_code is None else error_code
+                if error_code:
+                    answer, citations, snapshots = "", (), ()
+                    if agent_terminal is not None:
+                        agent_terminal = ("failed", error_code, agent_terminal[2])
 
             trace["follow_up_context_used"] = follow_up_used
             if (metrics := current_metrics()) is not None:
@@ -282,7 +297,7 @@ class AnswerService:
                 self.runs.append_event(run_id, "run.metrics", metadata)
             finalizer = getattr(self.runs, "finalize_answer", None)
             if finalizer is not None:
-                committed = finalizer(
+                commit_args = dict(
                     run_id=run_id,
                     conversation_id=conversation_id,
                     answer=answer,
@@ -291,7 +306,23 @@ class AnswerService:
                     error_code=error_code,
                     mode=mode,
                     agent_terminal=agent_terminal,
+                    commit_check=lambda: self.knowledge_gateway.evidence.commit_check.check(
+                        answer, snapshots, commit_plan, answer_type=answer_type,
+                        finish_reason=finish_reason or trace.get("finish_reason"), citations=citations),
                 )
+                try:
+                    committed = finalizer(**commit_args)
+                except FinalAnswerCommitError as exc:
+                    # The success TX rolled back. Commit only a failed terminal;
+                    # cancellation can still win the second terminal lock.
+                    error_code = str(exc)
+                    answer, citations, snapshots = "", (), ()
+                    trace["final_commit_check"] = error_code
+                    if agent_terminal is not None:
+                        agent_terminal = ("failed", error_code, agent_terminal[2])
+                    commit_args.update(answer="", citations=(), snapshots=(), error_code=error_code,
+                                       agent_terminal=agent_terminal, commit_check=None)
+                    committed = finalizer(**commit_args)
                 if not committed:
                     if langfuse_run is not None:
                         langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
@@ -477,6 +508,7 @@ class AnswerService:
             "steps": [step.__dict__ for step in agent_result.steps],
             "cost_microunits": agent_result.cost_microunits,
             "model_calls": agent_result.model_calls,
+            "finish_reason": getattr(agent_result, "finish_reason", None),
         }
         hint = getattr(agent_result, "evidence_hint", None)
         if (agent_result.status == "failed" and agent_result.error_code == "INSUFFICIENT_EVIDENCE"

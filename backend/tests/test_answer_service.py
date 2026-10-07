@@ -55,7 +55,7 @@ class SmartAgentStub:
         return SmartAgentResult(
             run_id,
             "completed",
-            "基于证据 E1 的智能回答。",
+            "基于证据的智能回答 [E1]。",
             (AgentStep(1, "search_knowledge", "completed", "question_redacted", f"items={len(tool_result.data['items'])}"),),
             ("E1",),
             snapshots,

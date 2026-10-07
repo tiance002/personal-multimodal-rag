@@ -365,6 +365,11 @@ class LangChainQuickChain:
         if any(label not in bundle.labels for label in cited_labels):
             return self._error_result(run_id, plan, "INVALID_CITATION", answer_degradation, model_calls)
         cited_snapshots = tuple(snapshot for snapshot in bundle.snapshots if snapshot.label in cited_labels)
+        answer_type = "source_excerpt" if evidence_only else "fallback" if "EVIDENCE_ONLY_FALLBACK" in reasons else "generated"
+        error = self.knowledge_gateway.evidence.commit_check.check(
+            answer, cited_snapshots, plan.evidence_plan, answer_type=answer_type, citations=cited_labels)
+        if error:
+            return self._error_result(run_id, plan, error, answer_degradation, model_calls)
         cost = payload["settings"].cloud_cost_estimate_microunits if payload["reservation"] is not None else 0
         return AnswerResult(
             run_id,
@@ -375,6 +380,7 @@ class LangChainQuickChain:
             None,
             cost,
             cited_snapshots,
+            answer_type,
         )
 
     @staticmethod

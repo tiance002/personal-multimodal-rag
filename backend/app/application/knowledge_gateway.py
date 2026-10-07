@@ -20,6 +20,7 @@ from backend.app.application.evidence_quality import EvidenceQuality, EvidenceQu
 from backend.app.application.run_metrics import current_metrics
 from backend.app.application.retrieval_provenance import merge_provenance
 from backend.app.application.answer_hardening import HardeningPolicy, normalize_marker_spacing
+from backend.app.application.final_answer_commit import AnswerType, FinalAnswerCommitCheck
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,8 @@ class AnswerResult:
     error_code: str | None = None
     cost_microunits: int = 0
     evidence: tuple[EvidenceSnapshot, ...] = ()
+    answer_type: AnswerType = "generated"
+    finish_reason: str | None = None
 
 
 class EvidenceService:
@@ -85,6 +88,7 @@ class EvidenceService:
         self.answer_validator = answer_validator or AnswerValidator()
         self.quality_assessor = EvidenceQualityAssessor()
         self.hardening = HardeningPolicy(answer_audit)
+        self.commit_check = FinalAnswerCommitCheck()
 
     def finalize_answer(self, run_id: str, answer: str, snapshots: Sequence[EvidenceSnapshot],
                         chunks: Sequence[Any], plan: QueryPlan, error: str | None = None):
@@ -216,13 +220,18 @@ class EvidenceService:
         if plan.evidence_plan.kind == "comparison":
             lines.append("因此无法计算差额。")
         snapshots = tuple(citations.snapshots[(run_id, label)] for label in labels_by_chunk.values())
+        answer = "\n".join(lines)
+        error = self.commit_check.check(answer, snapshots, plan.evidence_plan, answer_type="partial",
+                                       citations=tuple(labels_by_chunk.values()))
         return AnswerResult(
             run_id=run_id,
-            answer="\n".join(lines),
-            citations=tuple(labels_by_chunk.values()),
+            answer=answer if error is None else "",
+            citations=tuple(labels_by_chunk.values()) if error is None else (),
             query_plan=plan,
             trace=Trace(plan.degradation_code, ("PARTIAL_EVIDENCE",), plan.model_calls),
-            evidence=snapshots,
+            evidence=snapshots if error is None else (),
+            error_code=error,
+            answer_type="partial",
         )
 
 

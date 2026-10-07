@@ -251,9 +251,9 @@ def test_smart_length_candidate_audited_without_extra_call(tmp_path):
     model = LengthModel(final_answer='partial private content')
     result = LangChainAgentAdapter(model).run('conv', '缓存有什么作用？', Scope.from_ids(['kb']), run_id='run',
         gateway=KnowledgeToolGateway(knowledge_gateway=core, evidence_accumulator=accumulated), evidence=accumulated)
-    assert result.error_code is None
+    assert result.error_code == 'MODEL_OUTPUT_TRUNCATED'
     assert result.model_calls == 2
     assert 'partial private content' not in result.answer
-    assert '缓存用于减少重复读取' in result.answer
+    assert result.answer == '' and result.citations == ()
     record = json.loads(next(tmp_path.glob('*.json')).read_text(encoding='utf-8'))
     assert record['validator_reason'] == 'MODEL_OUTPUT_TRUNCATED'
