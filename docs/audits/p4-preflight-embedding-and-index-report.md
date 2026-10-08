@@ -1,5 +1,128 @@
 # P4-Preflight — Embedding 输入完整性与 P3 真实索引验证
 
+## P4_PRE-R4 当前结果（2026-10-08；下方历史报告保留）
+
+**P4_PRE_PASS — 有界合成输入的工程链路检查通过，等待 Owner 复核。**
+本轮入场/测试基线 `92b660bd3690b51e67350a62120a9f911df58344`，分支
+`codex/local-first-rag-v1-20260930`。独立本地提交 SHA 见本轮 commit-receipt.json；
+此 PASS 不表示任意长度服务端不截断、P7 质量达标或已获发布批准。
+执行方式 MANUALLY_SUPERVISED_TRIAL；实际 serving model/effort UNKNOWN，未派发 Worker。
+没有进入正式 P4。入场四项已知 Secret 修改保留并纳入本轮验收。
+
+### 实际改动及输入证据
+
+- `.gitignore`、`.dockerignore` 排除根 `.env.local`；`scripts/with_clean_slate.py`
+  只将两个白名单 Provider Key 装入当前项目子进程，不更改 Windows 环境。
+  DB、Storage、外发开关不能被该文件覆盖；`models.json` 仍只存变量名。
+  `test_clean_slate_secret_config.py` 用 SIMULATED Key 验证日志、错误和 Git/Docker 排除。
+- 新增 `backend/app/adapters/models/bge_tokenizer.py`，固定 BAAI/bge-m3 提交
+  `5617a9f61b028005a4858fdac845db406aefb181` 的完整 tokenizer.json；
+  17,098,108 字节、SHA-256
+  `21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08`，
+  与官方 HF revision API 的 LFS SHA/大小一致。无需权重或额外 tokenizer 文件。
+  `pyproject.toml` 固定 `tokenizers==0.23.2`，已安装/import，实际 Python 3.13.0。
+- 依 Owner 最新要求，tokenizer 和下载的上游元数据均从 C 盘移至
+  `D:\RAG-ModelAssets\bge-m3\5617a9f61b028005a4858fdac845db406aefb181`。
+  转移前后 SHA 相同；测试从 D 盘直接读取，C 盘下载副本已移除。
+  hf-verified-metadata.json 是有效来源记录；hf-revision-metadata.json 的 null
+  是旧失败尝试，不作为来源证据。config 下载 EOF 记录保留，不以之替代自包含 tokenizer。
+- `EmbeddingAdmission.from_bge_m3_file` 是明确的有界准入，默认构造继续关闭。
+  完整 ContextHeader + 原文、XLM-R `<s>`/`</s>` 均精确计数；关闭 tokenizer
+  truncation/padding，原文不改写。官方 8192 上限，客户端上限 7680，预留
+  512（6.25%）作为本地保守余量；该余量不是实测供应商漂移上界。
+  非匹配哈希、未知计数器、超限、缺 Key/权限/预算在传输前拒绝。
+  `non_truncating_verified` 对此路径仍为 False，供应商内部行为 UNKNOWN。
+  真实短输入计数一致是有限证据，不能证明供应商任意输入均不截断。
+
+来源：[官方 tokenizer 固定文件](https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/tokenizer.json)、
+[固定版本 metadata](https://huggingface.co/api/models/BAAI/bge-m3/revision/5617a9f61b028005a4858fdac845db406aefb181?blobs=true)、
+[SiliconFlow Embedding 合同](https://api-docs.siliconflow.cn/docs/api/embeddings-post)、
+[官方价格页](https://siliconflow.cn/pricing)。本轮核对标准 BAAI/bge-m3 免费，未使用 Pro 型号。
+这些公开页面不等于账户结算凭证。
+
+### 真实 SQL / 模型 / 清理
+
+`scripts/verify_p4_cloud_embedding.py` 是显式 opt-in 的一次性合成入口。
+先检查固定 Clean-slate 身份（库名、OID 21278、cluster 7691227493754040358、
+端口 25438、0017_embedding_profile_identity、Storage 和 P3 identity），
+24 表入场均 0、无其他客户端。真实 worker `run_once`、租约/heartbeat、Parser、
+P3 prepare_document、Repository 写入和 pgvector cosine SQL 均执行，没有用 Fake 向量。
+唯一临时允许角色为 embedding，其他角色关闭；产品全局开关保持 false。
+先实际验证 adapter 禁用和 KB.cloud_allowed=false 均 0 请求、失败版本不激活，
+再以短 embedding 探针确认账户模型可用，未访问其他带认证 API。
+
+| 阶段 | 真实请求 | 本地/供应商 Token | 模型 HTTP 延迟 |
+|---|---:|---:|---:|
+| 短文本账户/模型探针 | 1 | 12 / 12 | 3577.82 ms |
+| 合成文档摄取 | 1 | 1704 / 1704 | 3681.73 ms |
+| Query Embedding | 1 | 12 / 12 | 1427.55 ms |
+| 合计 | **3 / 10** | **1728 / 20000；供应商 1728** | 无自动重试 |
+
+三次响应均成功；供应商 completion_tokens=0。DeepSeek/Chat/Rerank/Vision 请求均 0。
+实际结算 **UNKNOWN**，未声称已核实零费用。
+
+合成 Markdown 有中文标题层级、多段长正文、短表格行及独立短节。
+1 Parent、8 Child、8 个真实 1024 维 Embedding；7 Child 关联同版本 Parent，
+独立短 Child 合法 NULL parent_id。Parent 无向量、无关键词项。
+8 个 Child 的真实 pgvector 命中集合精确一致；错误 Profile 和另一 KB 查询为空。
+当前 Version 成功激活；index_identity、Provider/model/revision/fingerprint、
+完整 source/normalized SHA、所有块 offset/quote/content SHA 均检查。
+两条 Profile 为真实索引身份和独立的错误输入语义隔离反例，清理前均记录完整六列和 ID。
+worker 总耗时 4027.07 ms，pgvector 查询 4.88 ms；无峰值资源或质量指标推断。
+
+模型调用经真实 PostgresBudgetGate / BudgetUsageGuard：公开免费模型使用每请求
+正数最小占用 1、此受控实例预算 10 个既有 micro-unit；这是审计占用，不是人民币
+实扣估计或产品月度预算变更。10 请求、20000 Token 的独立上限在 adapter 和
+发送前持久化 receipt 共同保留；live-attempt.lock 不允许重启入口获得新额度。
+
+本次允许为真实 worker 可见性提交专属合成 KB/Document/Version 等，随后按登记
+ID、名称、完整 Profile 身份及 FK 顺序精确清理，非测试业务对象删除 0。
+最终 23 张业务表仍 0；model_calls **3** 条真实调用记录以 unknown 保留，各占用 1，
+不因清理合成数据而重置费用占用。清理 PASS；两条 Profile、两份上传/KB 和全部
+Child/Parent/terms 已清理。历史库没有连接或读写，旧库前后计数 NOT RUN；
+未将此表述为独立排除外部消费者写入。公开数据集未读写。测试 CAS 在仓库 ignored
+var/reports/p4-pre-r4/synthetic-storage，未改变配置的 D 盘业务 Storage。
+
+### 实际验证及失败保留
+
+| 命令/轮次 | 退出码 | 实际结果 |
+|---|---:|---|
+| `python -B var/reports/p4-pre-r4/run_checks.py admission-first` | 1 | 88 PASS / 3 FAIL；边界生成器尾部空格额外产生 Token |
+| `python -B var/reports/p4-pre-r4/run_checks.py targeted-final` | 0 | **213 PASS / 0 FAIL / 0 SKIP**；REAL tokenizer，模型/传输 SIMULATED |
+| `python -B var/reports/p4-pre-r4/run_checks.py postgres-final` | 0 | 31 PASS；REAL PG，模型 SIMULATED |
+| `python -B var/reports/p4-pre-r4/run_checks.py postgres-final2` | 1 | 31 PASS / 1 FAIL；入口模拟演练的合成短节未成为独立一级节 |
+| `python -B var/reports/p4-pre-r4/run_checks.py postgres-final3` | 0 | **32 PASS / 0 FAIL / 0 SKIP / 2 DESELECTED**；REAL PG / SIMULATED HTTP |
+| `python -B scripts/verify_p4_cloud_embedding.py --tokenizer <D盘固定文件>` | 2 | 未给显式 opt-in，拒绝外发；非测试失败 |
+| 同一入口加 `--allow-real-siliconflow` | 0 | **REAL SiliconFlow / PG PASS**；3 请求、精确清理 PASS |
+| `python -B scripts/with_clean_slate.py --mode check`（前后） | 0 | REAL PG 只读身份检查 PASS；输出 model_calls=0 指此次检查调用数，不是表行数 |
+| `git diff --check`；提交前默认 `git diff --cached --check` | 见 git-checks.json | 实际退出码与 diff 单独存档 |
+
+所有 Python 命令真实可执行文件为项目 `.venv/Scripts/python.exe`，完整命令、
+JUnit、日志及对应全源码 SHA 快照见本轮证据。未实现的命令不得报告通过。
+第一轮失败只修正合成边界生成方式；第二轮只调整 synthetic_source 的标题层级。
+均未放宽数值/引用断言、P2 原生 table proof 或 P3 参数/算法；所有原失败 XML 保留。
+新增 PG 401/403/429、数量/维度错误、NaN/Inf 七反例均验证失败版本不激活、
+无向量残留、仅一次请求且无 Ollama fallback。超限真实 tokenizer 反例在传输前拒绝，
+没有向供应商发送超限内容。
+
+2 项 DESELECTED 是未改动的 R3 已提交并发 Profile 用例；它们会写固定的 R3 证据路径，
+本轮复用原同哈希代码的真实成功/精确清理证据，不覆盖旧轮次、不算本轮 PASS。
+其余真实并发事务回滚用例仍实际执行。原四项 Caption 历史目录对照保持 NOT RUN。
+无无关广泛回归；原 29 项历史失败及因果对照原文件保留并附 hash，不声称本轮重跑全绿。
+历史 Migration 0001–0017、P3 算法、Repository、frozen PDF 等保护哈希与入场相同；
+gold.json 仍 18157 字节、SHA-256 d44ff365b77800fab83b4604b26a53f9152fa8d810851e52f8cf93aae8836f79。
+
+**依赖升级影响未独立验证**。UNKNOWN 云模型 revision 的漂移、供应商内部任意输入
+截断行为、账户实际结算和普遍检索质量仍未证明。P4_PRE_PASS 仅适用于本轮有界工程链路。
+完整证据同步到 `D:\RAG-CleanSlate\cs0_20261008t072656z_352f705b\reports\p4-pre-r4`，
+索引为 docs/audits/p4-pre-r4-evidence.json；final-manifest.json、git-checks.json、
+full.diff、commit-receipt.json 分别记录源码/资产 SHA、范围检查、实际差异和独立提交回执。
+本轮允许本地独立 commit，不 Push、Merge、Tag；完成后停止，等待复核。
+
+---
+
+## 以下为历史阶段报告（当时状态及限制，不作为本轮结果）
+
 **状态：`P4_PRE_PARTIAL`**
 **基线：** `a41952f8dbbcaa568ed57974f7d896b0d64b5ac2` (`codex/local-first-rag-v1-20260930`)
 **当前范围：** P4 开发前验证；未实现 Rerank、Parent 回捞、Merge 或 Router。

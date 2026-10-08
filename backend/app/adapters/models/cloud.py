@@ -48,8 +48,10 @@ def _usage(response):
 class EmbeddingAdmission:
     """Verified model tokenizer contract, deliberately absent by default.
 
-    Counter counts special tokens and MUST disable tokenizer truncation. Its
-    identity and provider non-truncation evidence require independent review.
+    Counter counts special tokens and MUST disable tokenizer truncation. The
+    pinned BGE path implements R4's explicitly bounded client policy while
+    retaining UNKNOWN provider-internal non-truncation. Other counters still
+    require their independently reviewed contract.
     Tests inject an explicitly SIMULATED counter, never a character estimate.
     Batch/request caps are local limits, not claims about supplier capacity.
     """
@@ -65,12 +67,30 @@ class EmbeddingAdmission:
     def count(self, texts):
         if not texts or len(texts) > self.max_batch_items or any(not isinstance(t, str) or not t.strip() for t in texts):
             raise ProviderRequestNotSent("EMBEDDING_INPUT_INVALID")
-        if self.counter is None or self.tokenizer_identity == "UNKNOWN" or not self.non_truncating_verified:
+        from backend.app.adapters.models.bge_tokenizer import PinnedBgeM3Tokenizer
+        bounded = (type(self.counter) is PinnedBgeM3Tokenizer
+                   and self.tokenizer_identity == self.counter.identity)
+        if (self.counter is None or self.tokenizer_identity == "UNKNOWN"
+                or (not self.non_truncating_verified and not bounded)):
             raise ProviderRequestNotSent("EMBEDDING_CAPACITY_GUARANTEE_UNKNOWN")
         counts = [self.counter(t) for t in texts]
-        if any(type(n) is not int or not 0 < n <= 8192 for n in counts):
+        limit = self.counter.max_input_tokens if bounded else 8192
+        if any(type(n) is not int or not 0 < n <= limit for n in counts):
             raise ProviderRequestNotSent("EMBEDDING_TOKEN_LIMIT_EXCEEDED")
         return sum(counts)
+
+    @classmethod
+    def from_bge_m3_file(cls, path):
+        """Owner-authorized bounded inputs; never claim provider proof.
+
+        Default construction stays closed. Only a hash-verified official
+        tokenizer admits this narrower client limit with explicit UNKNOWN
+        supplier behavior, as permitted by P4_PRE-R4.
+        """
+        from backend.app.adapters.models.bge_tokenizer import PinnedBgeM3Tokenizer
+        counter = PinnedBgeM3Tokenizer(path)
+        return cls(counter, tokenizer_identity=counter.identity,
+                   non_truncating_verified=False)
 
 
 class CloudAdapter:

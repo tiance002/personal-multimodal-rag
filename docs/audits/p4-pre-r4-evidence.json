@@ -1,0 +1,169 @@
+{
+  "task": "P4_PRE-R4",
+  "status": "P4_PRE_PASS",
+  "baseline_head": "92b660bd3690b51e67350a62120a9f911df58344",
+  "execution": "MANUALLY_SUPERVISED_TRIAL",
+  "actual_model_effort": "UNKNOWN",
+  "local_evidence": "C:\\Users\\22088\\.codex\\worktrees\\rag-retrieval-opt-round1\\RAG quention\\var\\reports\\p4-pre-r4",
+  "external_evidence": "D:/RAG-CleanSlate/cs0_20261008t072656z_352f705b/reports/p4-pre-r4",
+  "asset_directory": "D:\\RAG-ModelAssets\\bge-m3\\5617a9f61b028005a4858fdac845db406aefb181",
+  "tokenizer": {
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "sha256": "21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08",
+    "bytes": 17098108,
+    "source": "https://huggingface.co/BAAI/bge-m3/resolve/5617a9f61b028005a4858fdac845db406aefb181/tokenizer.json",
+    "runtime": "tokenizers==0.23.2",
+    "client_limit": 7680,
+    "official_limit": 8192,
+    "provider_non_truncation": "UNKNOWN"
+  },
+  "verification": {
+    "offline_passed": 213,
+    "real_pg_simulated_http_passed": 32,
+    "pg_deselected": 2,
+    "live_requests": 3,
+    "local_planned_tokens": 1728,
+    "provider_reported_tokens": 1728,
+    "parent_count": 1,
+    "child_count": 8,
+    "embedding_count": 8,
+    "profiles_before_cleanup": 2,
+    "cleanup": "PASS",
+    "retained_real_model_call_audit": 3,
+    "actual_settlement": "UNKNOWN"
+  },
+  "historical_29": {
+    "rerun": false,
+    "source": "var\\reports\\p4-pre-r3-fix\\failure-baseline-comparison.json",
+    "sha256": "be68625e0541d8a374529796baf2450a33e99c933c597f916aee38a0edd50f84"
+  },
+  "caption_historical_comparisons": "4 NOT RUN",
+  "dependency_upgrade_impact": "未独立验证",
+  "failure_records": [
+    "admission-first.xml",
+    "postgres-final2.xml"
+  ],
+  "simulated_receipts": "All receipts below postgres-*-temp/rehearsal are REAL_SQL_SIMULATED_HTTP; ONLY top-level live-receipt.json is REAL_SILICONFLOW",
+  "artifacts": {
+    "admission-first-command.json": {
+      "sha256": "6a30da185956e555ad5afde0afd63719968760cbf4973b78b618629d66f2e383",
+      "bytes": 855
+    },
+    "admission-first-source-snapshot.json": {
+      "sha256": "f22dc8e924eaa03867b4317af9c7f95a048de1283c2abad597855d7a9c3f7967",
+      "bytes": 57302
+    },
+    "admission-first.log": {
+      "sha256": "c9b238a7d62730aa24b8c5579a20080a484924fcc52b7daeb150d0e327b3ee65",
+      "bytes": 4082
+    },
+    "admission-first.xml": {
+      "sha256": "90098befb53d2da3b4b37f26fe3cc95c6f6358da2b59dc76226710cf43c50c6f",
+      "bytes": 17688
+    },
+    "database-before.json": {
+      "sha256": "4195083179b587eb07dc5db6e7a13eb969b42f4c10d80eb92fa087e2ccdc3324",
+      "bytes": 8094
+    },
+    "entry-baseline.json": {
+      "sha256": "1544ff7d2d31365f3f69684af4205e84fa24b2fd2b9a9001afbb0e0ca99a61a9",
+      "bytes": 4841
+    },
+    "entry-denied-command.json": {
+      "sha256": "7d09b1b0ebf98aa4485b96349dc34aacf6720beccbf4dac42fe8de970f1b6da8",
+      "bytes": 283
+    },
+    "entry-denied.log": {
+      "sha256": "21f00749599d12aefce003309d185f2d99e87614c0f5f5c22dc86a22ea00fa96",
+      "bytes": 92
+    },
+    "historical-failure-baseline-comparison.json": {
+      "sha256": "be68625e0541d8a374529796baf2450a33e99c933c597f916aee38a0edd50f84",
+      "bytes": 60743
+    },
+    "live-command.json": {
+      "sha256": "7b30f79209be3d6d5423e0f1c125eff2efa9a37d54f35ae28c58638e22345ec2",
+      "bytes": 299
+    },
+    "live-receipt.json": {
+      "sha256": "98770b119a01bcef1166f0ccbed6b1595871fffcff4a8d10c6fd896725a66ce9",
+      "bytes": 10531
+    },
+    "live.log": {
+      "sha256": "59a795c07517a6bf0ae0f3c77406849682a2d5c5af27c8972dbd825b3a25a76b",
+      "bytes": 10595
+    },
+    "postgres-final-command.json": {
+      "sha256": "d92b568498bbdaf53085153e8142f80822c34551e33f35768f25b123d33e2a99",
+      "bytes": 901
+    },
+    "postgres-final-source-snapshot.json": {
+      "sha256": "26fa661b1e4e7aad5a6b13f84babe12682d99b0996c937bfc1f57f0966123995",
+      "bytes": 57302
+    },
+    "postgres-final.log": {
+      "sha256": "e41f4c492dbef0d6d826c8e345187efe4422696540af95ed4cb3523ba313723d",
+      "bytes": 941
+    },
+    "postgres-final.xml": {
+      "sha256": "275ec055623eddc3ac429ec99aceae1918921f554e4905eb739539209459a83b",
+      "bytes": 4860
+    },
+    "postgres-final2-command.json": {
+      "sha256": "94bf90bccc5df67d1740126ed1a06eba709cad40f0464381616927fe661ba2cd",
+      "bytes": 903
+    },
+    "postgres-final2-source-snapshot.json": {
+      "sha256": "be1899822738a03443a06e530422ccd7604c4508c1f27d2fadfceb1ec1a4a250",
+      "bytes": 57413
+    },
+    "postgres-final2.log": {
+      "sha256": "53e83b52738458d1c5d1f99c6720edd56d2cc3f9e256a8b2749bfb9994eb877e",
+      "bytes": 1849
+    },
+    "postgres-final2.xml": {
+      "sha256": "6e757ae611771f48f3afdbb95e975ab96c3ffc2626b1f52c853a828e00b36ec7",
+      "bytes": 6028
+    },
+    "postgres-final3-command.json": {
+      "sha256": "c15917e740e09ab1598394db3de76411068e79d7118f7156da86f8b061730e82",
+      "bytes": 903
+    },
+    "postgres-final3-source-snapshot.json": {
+      "sha256": "053b330e094572d6698e2eedbbfd785d33a1d1a57f6584f18be958d2245ee591",
+      "bytes": 57413
+    },
+    "postgres-final3.log": {
+      "sha256": "e54d72b6ea7aa1c8ba73a4c3b9dd66fe8156ceb416e2877f4849365785a02cc0",
+      "bytes": 941
+    },
+    "postgres-final3.xml": {
+      "sha256": "4ed6c9efe7d62553d6a208c1659aba8b2786c1e62bb694941115824cac87e29c",
+      "bytes": 4995
+    },
+    "SIMULATED-rehearsal-final-receipt.json": {
+      "sha256": "90fd96e0389e3c60cac6780f1cf5a0214c99be3ca5d62e7f85f6e6da6ca41c97",
+      "bytes": 10233
+    },
+    "SIMULATED-rehearsal-first-receipt.json": {
+      "sha256": "0f3063e5ca1a5a4a0788b4e269a8050fc69c4c7e6dfa2df702ee32dfb0011865",
+      "bytes": 6956
+    },
+    "targeted-final-command.json": {
+      "sha256": "b0281fdd6c9d766d3452d7a14565898f872a19fdccaabbc0f075148844a358a5",
+      "bytes": 1358
+    },
+    "targeted-final-source-snapshot.json": {
+      "sha256": "26fa661b1e4e7aad5a6b13f84babe12682d99b0996c937bfc1f57f0966123995",
+      "bytes": 57302
+    },
+    "targeted-final.log": {
+      "sha256": "13ef9edd442b38154325003e225385a09192ede056309b331f9a67adc3d09b36",
+      "bytes": 1090
+    },
+    "targeted-final.xml": {
+      "sha256": "df88a9805050a1d26a4407bb1a27240cff65132032e26a13c26f4320bd4af6f4",
+      "bytes": 64763
+    }
+  }
+}

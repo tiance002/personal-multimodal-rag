@@ -2,7 +2,8 @@
 
 No credentials are stored in the profile or printed. Connection construction
 reuses the project's public local-development default; PGPASSWORD, if supplied
-privately by the operator, overrides that default in memory. No .env is loaded.
+privately by the operator, overrides that default in memory. The only project
+file loaded is .env.local, and only for the two whitelisted provider keys.
 """
 from __future__ import annotations
 
@@ -20,6 +21,46 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from backend.app.config import Settings
 from backend.app.domain.adaptive_chunking import ChunkingConfig
+
+PROJECT_SECRET_KEYS = frozenset({'SILICONFLOW_API_KEY', 'DEEPSEEK_API_KEY'})
+
+
+def _read_project_secrets(path: Path) -> dict[str, str]:
+    """Read only approved provider credentials from this project's .env.local.
+
+    No interpolation, logging, or error messages contain input values. Other
+    variables in the file are ignored and cannot alter runtime security config.
+    """
+    secrets: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding='utf-8-sig').splitlines()
+    except FileNotFoundError:
+        return secrets
+    except (OSError, UnicodeError):
+        raise ValueError('PROJECT_SECRET_FILE_UNREADABLE') from None
+    try:
+        for raw in lines:
+            line = raw.strip()
+            if not line or line.startswith('#'):
+                continue
+            if line.startswith('export '):
+                line = line[7:].strip()
+            name, separator, value = line.partition('=')
+            name, value = name.strip(), value.strip()
+            if name not in PROJECT_SECRET_KEYS:
+                continue
+            if not separator or name in secrets:
+                raise ValueError('PROJECT_SECRET_FILE_INVALID')
+            if value.startswith(('"', "'")):
+                if len(value) < 2 or value[-1] != value[0]:
+                    raise ValueError('PROJECT_SECRET_FILE_INVALID')
+                value = value[1:-1]
+            else:
+                value = value.split(' #', 1)[0].rstrip()
+            secrets[name] = value
+    except UnicodeError:
+        raise ValueError('PROJECT_SECRET_FILE_INVALID') from None
+    return secrets
 
 
 def resolve_environment(profile: dict, inherited: dict[str, str]) -> dict[str, str]:
@@ -47,6 +88,9 @@ def resolve_environment(profile: dict, inherited: dict[str, str]) -> dict[str, s
         RAG_LOCAL_ANSWER_ENABLED='false', RAG_QUERY_REWRITE_ENABLED='false',
         RAG_RERANK_ENABLED='false', RAG_MMR_ENABLED='false', RAG_INLINE_INGESTION='false',
         RAG_MAX_CHUNK_CHARS='512', RAG_CHUNK_OVERLAP='80')
+    # The only project-file values copied into a child process are these two
+    # credentials. The file cannot change DB, Storage, or any allow/deny flag.
+    env.update(_read_project_secrets(ROOT / '.env.local'))
     return env
 
 
