@@ -14,12 +14,14 @@ from backend.app.ports.retrieval import RetrievalRepository
 from backend.app.ports.ranking import CandidateRanker, CandidateDiversitySelector
 from backend.app.ports.model_access import model_access
 from backend.app.application.retrieval_policy import RetrievalRouter
+from backend.app.application.retrieval_merge import ContextPassage, merge_passages, SHORT_CONTEXT
 
 
 @dataclass(frozen=True)
 class RetrievalItem:
     chunk: ChunkRecord
     hit: RankedHit
+    context_passage: ContextPassage | None = None
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,7 @@ class RetrievalResult:
     route_reason: tuple[str, ...] = ()
     embedding_cache_hit: bool | None = None
     merge_provenance: dict[str, Any] | None = None
+    retrieval_stats: dict[str, Any] = field(default_factory=dict)
 
 
 def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
@@ -94,7 +97,7 @@ class InMemoryRetrievalRepository:
         chunks = [
             chunk
             for chunk in self.records.values()
-            if chunk.is_current and scope.contains(chunk.knowledge_base_id, chunk.document_id)
+            if chunk.is_current and chunk.chunk_role == 'child' and scope.contains(chunk.knowledge_base_id, chunk.document_id)
         ]
         chunks.sort(key=lambda chunk: chunk.chunk_id)
         return chunks[:limit] if limit is not None else chunks
@@ -116,6 +119,15 @@ class InMemoryRetrievalRepository:
 
     def get_chunk(self, chunk_id: str) -> ChunkRecord | None:
         return self.records.get(chunk_id)
+
+    def get_retrieval_chunks(self, scope: Scope, chunk_ids) -> dict[str, ChunkRecord]:
+        return {c.chunk_id: c for c in self.list_active_chunks(scope) if c.chunk_id in chunk_ids}
+
+    def read_parent_contexts(self, scope: Scope, seeds) -> dict[str, ChunkRecord]:
+        from backend.app.application.retrieval_merge import valid_context
+        return {seed.chunk_id: parent for seed in seeds
+                if (parent := self.records.get(seed.parent_id)) is not None
+                and valid_context(seed, parent, scope, parent=True)}
 
 
 class HybridRetriever:
@@ -251,37 +263,79 @@ class HybridRetriever:
         fusion_started=time.perf_counter()
         full_fused = rrf_fuse(rankings, k=self.rrf_k, source_weights=self.source_weights)
         timings['fusion_ms']=(time.perf_counter()-fusion_started)*1000
+        # Revalidate active Scope before any cloud input, never use historical
+        # citation readback as production authorization.
+        reader = getattr(self.repository, 'get_retrieval_chunks', None)
+        chunks = (reader(scope, [h.chunk_id for h in full_fused]) if reader else
+                  {h.chunk_id: self.repository.get_chunk(h.chunk_id) for h in full_fused})
+        chunks = {key: c for key, c in chunks.items() if c is not None and c.chunk_id == key
+                  and c.is_current is True and c.chunk_role == 'child'
+                  and scope.contains(c.knowledge_base_id, c.document_id)}
+        full_fused = [h for h in full_fused if h.chunk_id in chunks]
         # Fusion recalls candidates; optional second stages own their ordering.
         for adapter, method, timing_key, failure in (
             (self.ranker, "rank", "ranking_ms", "RANKER_UNAVAILABLE"),
             (self.diversity_selector, "select", "diversity_ms", "DIVERSITY_UNAVAILABLE"),
         ):
-            if adapter is None:
+            if adapter is None or not full_fused:
                 continue
             stage_started = time.perf_counter()
-            chunks = {hit.chunk_id: chunk for hit in full_fused
-                      if (chunk := self.repository.get_chunk(hit.chunk_id)) is not None}
             try:
-                ranked = list(getattr(adapter, method)(question, tuple(full_fused), chunks))
+                allowed = True
+                if getattr(adapter, 'provider_kind', None) == 'cloud':
+                    checker = getattr(self.repository, 'embedding_scope_allowed', None)
+                    allowed = checker is not None and checker(scope) is True
+                with model_access('rerank', allowed=allowed):
+                    ranked = list(getattr(adapter, method)(question, tuple(full_fused), chunks))
+                ids = [hit.chunk_id for hit in ranked]
+                if (len(ids) != len(full_fused) or len(ids) != len(set(ids))
+                        or set(ids) != {h.chunk_id for h in full_fused}):
+                    raise ValueError('ranking returned incomplete or unauthorized candidates')
+                originals = {h.chunk_id: h for h in full_fused}
+                # Only order is accepted from a ranker, never its replacement
+                # scores, source channels or arbitrary candidate metadata.
+                full_fused = [originals[key].model_copy(update={'rank': rank})
+                              for rank, key in enumerate(ids, 1)]
             except Exception:
                 degradation_flags += (failure,)
-            else:
-                ids = [hit.chunk_id for hit in ranked]
-                if len(ids) != len(set(ids)) or any(chunk_id not in chunks for chunk_id in ids):
-                    raise ValueError("ranking returned duplicate or unauthorized candidate")
-                full_fused = [hit.model_copy(update={"rank": rank}) for rank, hit in enumerate(ranked, 1)]
             timings[timing_key] = (time.perf_counter() - stage_started) * 1000
-        fused = full_fused[: self.top_k]
-        items = [RetrievalItem(self.repository.get_chunk(hit.chunk_id), hit) for hit in fused]
-        items = [item for item in items if item.chunk is not None]
+        if self.ranker is not None:
+            effective['rerank_status'] = ('FUSION_FALLBACK' if 'RANKER_UNAVAILABLE' in degradation_flags else
+                                         'RERANKED' if full_fused else 'EMPTY_SKIP')
+            effective['rerank_circuit_open'] = bool(getattr(self.ranker, 'circuit_open', False))
+        merge_started = time.perf_counter()
+        candidates = [(chunks[h.chunk_id], h) for h in full_fused]
+        parents, neighbors = {}, {}
+        try:
+            parent_reader = getattr(self.repository, 'read_parent_contexts', None)
+            if parent_reader:
+                parents = parent_reader(scope, [c for c, _ in candidates])
+        except Exception:
+            degradation_flags += ('PARENT_CONTEXT_UNAVAILABLE',)
+        try:
+            neighbor_reader = getattr(self.repository, 'read_context_rows', None)
+            short = [c for c, _ in candidates if c.chunk_id not in parents and len(c.content) < SHORT_CONTEXT
+                     and c.chunk_type == 'text' and c.content_sha256][:10]
+            if neighbor_reader and short:
+                for row in neighbor_reader(scope, short, max_seeds=10).rows:
+                    if row.offset:
+                        neighbors.setdefault(row.seed_id, []).append((row.offset, row.metadata.chunk))
+        except Exception:
+            degradation_flags += ('NEIGHBOR_CONTEXT_UNAVAILABLE',)
+        groups = merge_passages(scope, candidates, parents, neighbors)
+        timings['merge_ms'] = (time.perf_counter() - merge_started) * 1000
+
+        def materialize(selected_groups):
+            return [RetrievalItem(c, h, passage if (passage.parent_ids or passage.neighbor_ids
+                        or len(passage.unit_ids) > 1) else None)
+                    for passage, units in selected_groups for c, h in units]
+
+        # Top-K counts merged contexts; every retained original citation unit
+        # stays available to coverage, validation and snapshot freezing.
+        items = materialize(groups[:self.top_k])
         context_items: tuple[RetrievalItem, ...] = ()
         if self.context_candidate_k is not None:
-            context_hits = full_fused[: self.context_candidate_k]
-            context_items = tuple(
-                RetrievalItem(chunk, hit)
-                for hit in context_hits
-                if (chunk := self.repository.get_chunk(hit.chunk_id)) is not None
-            )
+            context_items = tuple(materialize(groups[:self.context_candidate_k]))
         sources = tuple(sorted(rankings.keys()))
         return RetrievalResult(
             query_plan=plan,
@@ -296,6 +350,14 @@ class HybridRetriever:
             stage_latency_ms=timings,
             retrieval_mode=mode, route_reason=route_reason,
             embedding_cache_hit=embedding_cache_hit,
+            retrieval_stats=dict(candidate_count=len(full_fused), merged_count=len(groups),
+                final_context_count=min(len(groups), self.top_k), final_evidence_count=len(items),
+                document_count=len({i.chunk.document_id for i in items}),
+                parent_count=len({p for i in items if i.context_passage for p in i.context_passage.parent_ids}),
+                cross_document=len({i.chunk.document_id for i in items}) > 1,
+                contains_table=any(i.chunk.locator.get('table_id') is not None for i in items),
+                contains_image_caption_or_ocr=any(i.chunk.chunk_type in {'caption','image_caption','ocr','image_ocr'} for i in items),
+                answer_correctness='UNKNOWN'),
         )
 
 

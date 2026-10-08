@@ -82,7 +82,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     context_pool_options = ({"context_candidate_k": settings.context_pool_k,
                              "context_max_items": settings.context_max_items}
                             if settings.context_pool_enabled else {})
-    unavailable = [name for name in ("rerank_enabled", "mmr_enabled", "query_rewrite_enabled")
+    unavailable = [name for name in ("mmr_enabled", "query_rewrite_enabled")
                    if getattr(settings, name)]
     if unavailable:
         raise ValueError("optional adapters are not implemented: " + ", ".join(unavailable))
@@ -156,6 +156,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         HybridRetriever(store, embedding_provider=embedding_provider, mode=settings.retrieval_mode,
                         top_k=profile["top_k"], candidate_k=profile["candidate_k"],
                         rrf_k=profile["rrf_k"], source_weights=profile["source_weights"],
+                        ranker=provider_factory.build('rerank') if settings.rerank_enabled else None,
                         **context_pool_options),
         evidence_service=EvidenceService(context_builder=ContextBuilder(profile["context_max_chars"]),
                                         answer_audit=LocalAnswerAudit(settings.storage_root / "answer-audit")),

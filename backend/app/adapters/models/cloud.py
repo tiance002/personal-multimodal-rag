@@ -45,6 +45,20 @@ def _usage(response):
             for key, value in raw.items() if key in {"prompt_tokens", "completion_tokens", "total_tokens"}}
 
 
+def _rerank_usage(response):
+    observed = _usage(response)
+    if observed:
+        return observed
+    meta = response.get('meta')
+    tokens = meta.get('tokens') if isinstance(meta, dict) else None
+    if not isinstance(tokens, dict):
+        return None
+    counts = [tokens.get('input_tokens'), tokens.get('output_tokens')]
+    counts = [n if type(n) is int and n >= 0 else None for n in counts]
+    return dict(prompt_tokens=counts[0], completion_tokens=counts[1],
+                total_tokens=sum(counts) if all(n is not None for n in counts) else None)
+
+
 class EmbeddingAdmission:
     """Verified model tokenizer contract, deliberately absent by default.
 
@@ -120,7 +134,7 @@ class CloudAdapter:
         if type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds) or not 0 < timeout_seconds <= 120:
             raise ProviderRequestNotSent("MODEL_TIMEOUT_INVALID")
 
-    def _request(self, path, payload, timeout, validate, planned_tokens=None):
+    def _request(self, path, payload, timeout, validate, planned_tokens=None, *, usage_parser=_usage):
         self.preflight(timeout)
         # ModelSpec validates exact base URL, provider, model and key-env pair.
         request = Request(self.spec.base_url + path, method="POST", headers={
@@ -149,7 +163,7 @@ class CloudAdapter:
             if reported is not None and reported != self.spec.model_id:
                 raise ProviderUnavailable("MODEL_RESPONSE_IDENTITY_MISMATCH")
             value = validate(response)
-            observed_usage = _usage(response)
+            observed_usage = usage_parser(response)
             status = "ok"
             return value, observed_usage, (time.perf_counter()-started)*1000
         except HTTPError as exc:
@@ -263,9 +277,12 @@ class SiliconFlowRerank(CloudAdapter):
             raise ValueError("RERANK_CAPABILITY_REQUIRED")
         super().__init__(spec, **kwargs)
         self.last_result = None
+        self.circuit_open = False
 
     def rank(self, question, hits, chunks):
         self.last_result = None
+        if self.circuit_open:
+            raise ProviderRequestNotSent('RERANK_CIRCUIT_OPEN')
         hits = tuple(hits)
         if not question or not hits or len({h.chunk_id for h in hits}) != len(hits) or any(h.chunk_id not in chunks for h in hits):
             raise ProviderRequestNotSent("RERANK_INPUT_INVALID")
@@ -288,8 +305,18 @@ class SiliconFlowRerank(CloudAdapter):
                 scores.append(float(score))
             return tuple(result), tuple(scores)
 
-        result, usage, latency = self._request("/rerank", dict(model=self.spec.model_id, query=question,
-            documents=documents, top_n=len(hits), return_documents=False), 30, validate)
+        try:
+            result, usage, latency = self._request("/rerank", dict(model=self.spec.model_id, query=question,
+                documents=documents, top_n=len(hits), return_documents=False), 30, validate,
+                usage_parser=_rerank_usage)
+        except ProviderRequestNotSent:
+            # A local permission/credential/budget denial sent nothing and must
+            # not poison unrelated authorized KB requests on this instance.
+            raise
+        except ProviderUnavailable:
+            # No automatic retry/probe after an uncertain or rejected send.
+            self.circuit_open = True
+            raise
         self.last_result = RerankResult(result[0], result[1], latency, usage)
         return self.last_result.hits
 

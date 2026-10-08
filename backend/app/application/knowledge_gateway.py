@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, replace, field
 from contextlib import nullcontext
 from typing import Any
 import time
@@ -46,6 +46,7 @@ class EvidenceBundle:
     labels: tuple[str, ...] = ()
     snapshots: tuple[EvidenceSnapshot, ...] = ()
     quality: EvidenceQuality | None = None
+    evidence_stats: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -172,7 +173,14 @@ class EvidenceService:
             metrics.record_context(bundle.selected, latency_ms=(time.perf_counter() - started) * 1000,
                                    rendered_chars=len(context))
         snapshots = tuple(citations.snapshots[(run_id, label)] for label in labels)
-        return replace(bundle, context=context, labels=tuple(labels), snapshots=snapshots)
+        return replace(bundle, context=context, labels=tuple(labels), snapshots=snapshots,
+            evidence_stats=dict(final_evidence_count=len(snapshots), context_chars=len(context),
+                document_count=len({i.chunk.document_id for i in bundle.selected}),
+                parent_count=len({p for i in bundle.selected if i.context_passage
+                                  for p in i.context_passage.parent_ids}),
+                coverage_status='SUFFICIENT' if bundle.decision.accepted else 'INSUFFICIENT',
+                conflict=bundle.quality.signals.conflicting_evidence if bundle.quality else None,
+                answer_correctness='UNKNOWN'))
 
     def validate_answer(
         self,

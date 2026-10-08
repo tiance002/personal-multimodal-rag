@@ -223,6 +223,11 @@ class ChunkRecord:
     embedding: tuple[float, ...] | None = None
     embedding_profile_id: str | None = None
     content_sha256: str | None = None
+    parent_id: str | None = None
+    chunk_role: str = "child"
+    chunk_index: int | None = None
+    chunk_type: str = "text"
+    index_identity: str | None = None
 
 
 @dataclass(frozen=True)

@@ -111,8 +111,10 @@ class CaptureEngine:
 
 
 def repository(rows):
+    from backend.app.domain.adaptive_chunking import ChunkingConfig
     repo = object.__new__(actual_repository_class())
     repo.engine = CaptureEngine(rows)
+    repo.chunking_config = ChunkingConfig()
     return repo
 
 

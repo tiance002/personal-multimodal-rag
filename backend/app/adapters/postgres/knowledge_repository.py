@@ -804,6 +804,53 @@ class PostgresKnowledgeRepository:
             rows = conn.execute(statement, params).mappings()
             return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, content_sha256=row["content_sha256"]) for row in rows]
 
+    @staticmethod
+    def _retrieval_chunk(row) -> ChunkRecord:
+        return ChunkRecord(str(row['id']), str(row['knowledge_base_id']), str(row['document_id']),
+            str(row['version_id']), row['content'], row['locator'] or {},
+            content_sha256=row['content_sha256'], parent_id=str(row['parent_id']) if row['parent_id'] else None,
+            chunk_role=row['chunk_role'], chunk_index=row['chunk_index'], chunk_type=row['chunk_type'],
+            index_identity=row['index_identity'])
+
+    def get_retrieval_chunks(self, scope: Scope, chunk_ids: Sequence[str]) -> dict[str, ChunkRecord]:
+        """Scoped current child read; historical get_chunk stays unchanged."""
+        if not chunk_ids or not scope.knowledge_base_ids:
+            return {}
+        params = {'ids': list(chunk_ids), 'index_identity': self.chunking_config.identity}
+        clause = self._scope_filter(scope, params)
+        with self.engine.connect() as conn:
+            rows = conn.execute(text(f"""
+                SELECT c.* FROM chunks c {self._ACTIVE_VERSION_JOINS}
+                JOIN knowledge_bases kb ON kb.id=c.knowledge_base_id
+                WHERE {clause} AND c.id=ANY(CAST(:ids AS uuid[]))
+                    AND d.knowledge_base_id=c.knowledge_base_id AND d.deleted_at IS NULL
+                    AND kb.deleted_at IS NULL AND dv.index_status='ready'
+                    AND c.chunk_role='child' AND c.index_identity=:index_identity
+                    AND dv.index_identity=:index_identity
+            """), params).mappings()
+            return {str(row['id']): self._retrieval_chunk(row) for row in rows}
+
+    def read_parent_contexts(self, scope: Scope, seeds: Sequence[ChunkRecord]) -> dict[str, ChunkRecord]:
+        """Parent lookup constrained by both original child and active Scope."""
+        if not seeds or not scope.knowledge_base_ids:
+            return {}
+        params = {'ids': [c.chunk_id for c in seeds], 'index_identity': self.chunking_config.identity}
+        clause = self._scope_filter(scope, params)
+        with self.engine.connect() as conn:
+            rows = conn.execute(text(f"""
+                SELECT c.id AS seed_id,p.* FROM chunks c {self._ACTIVE_VERSION_JOINS}
+                JOIN knowledge_bases kb ON kb.id=c.knowledge_base_id
+                JOIN chunks p ON p.id=c.parent_id AND p.version_id=c.version_id
+                    AND p.document_id=c.document_id AND p.knowledge_base_id=c.knowledge_base_id
+                    AND p.chunk_role='parent' AND p.index_identity=:index_identity
+                WHERE {clause} AND c.id=ANY(CAST(:ids AS uuid[]))
+                    AND d.knowledge_base_id=c.knowledge_base_id AND d.deleted_at IS NULL
+                    AND kb.deleted_at IS NULL AND dv.index_status='ready'
+                    AND c.chunk_role='child' AND c.index_identity=:index_identity
+                    AND dv.index_identity=:index_identity
+            """), params).mappings()
+            return {str(row['seed_id']): self._retrieval_chunk(row) for row in rows}
+
     _CONTEXT_BOUNDARY_FILTER = """
         c.chunk_type='text'
         AND c.start_pos >= section.start_pos AND c.start_pos < c.end_pos
@@ -907,7 +954,8 @@ class PostgresKnowledgeRepository:
         else:
             chunk = ChunkRecord(chunk_id, kb, doc, version, content, locator,
                                 is_current=(version == str(row["active_version_id"])),
-                                content_sha256=row["content_sha256"])
+                                content_sha256=row["content_sha256"], chunk_index=index,
+                                index_identity=row.get('index_identity', seed.index_identity))
         metadata = NeighborMetadata(chunk, index, str(row["active_version_id"]), row["index_status"],
             row["document_deleted"], row["chunk_type"], "page" if kind == "pdf" else "section",
             str(row["section_id"]), lo, hi, page)
@@ -916,7 +964,7 @@ class PostgresKnowledgeRepository:
     def read_context_rows(
         self, scope: Scope, seeds: Sequence[ChunkRecord], *, max_seeds: int = 10,
     ) -> ContextNeighborRead:
-        """Optional, unwired read: <=10 seeds, exact -1/0/+1, <=3*N rows.
+        """Bounded P4 context read: <=10 seeds, exact -1/0/+1, <=3*N rows.
 
         SQL is the authorization boundary. Missing/changed seed evidence or
         unreliable sections authorize no neighbor; no historical-read fallback.
@@ -946,7 +994,8 @@ class PostgresKnowledgeRepository:
             eligible_inputs[order] = seed
         if not eligible_inputs:
             return ContextNeighborRead(reasons=tuple(reasons))
-        params: dict[str, Any] = {"row_limit": 3 * len(eligible_inputs)}
+        params: dict[str, Any] = {"row_limit": 3 * len(eligible_inputs),
+                                  "index_identity": self.chunking_config.identity}
         clause = self._scope_filter(scope, params)
         values: list[str] = []
         for order, seed in eligible_inputs.items():
@@ -974,11 +1023,12 @@ class PostgresKnowledgeRepository:
                 {section_join}
                 WHERE {clause} AND d.knowledge_base_id = c.knowledge_base_id
                     AND d.deleted_at IS NULL AND dv.index_status='ready' AND kb.deleted_at IS NULL
-                    AND {boundary}
+                    AND c.chunk_role='child' AND c.index_identity=:index_identity
+                    AND dv.index_identity=:index_identity AND {boundary}
             )
             SELECT eligible.seed_order,eligible.seed_id,eligible.seed_index,offsets.offset,
                 c.id AS chunk_id,c.knowledge_base_id,c.document_id,c.version_id,c.chunk_index,
-                c.content,c.content_sha256,c.locator,c.start_pos,c.end_pos,c.chunk_type,
+                c.content,c.content_sha256,c.locator,c.start_pos,c.end_pos,c.chunk_type,c.index_identity,
                 d.active_version_id,dv.index_status,(d.deleted_at IS NOT NULL) AS document_deleted,
                 section.id AS section_id,section.knowledge_base_id AS section_knowledge_base_id,
                 section.document_id AS section_document_id,section.version_id AS section_version_id,
@@ -992,7 +1042,9 @@ class PostgresKnowledgeRepository:
             {self._ACTIVE_VERSION_JOINS}
             {section_join}
             WHERE {clause} AND d.knowledge_base_id = c.knowledge_base_id
-                AND d.deleted_at IS NULL AND dv.index_status='ready' AND {boundary}
+                AND d.deleted_at IS NULL AND dv.index_status='ready'
+                AND c.chunk_role='child' AND c.index_identity=:index_identity
+                AND dv.index_identity=:index_identity AND {boundary}
             ORDER BY eligible.seed_order,offsets.offset LIMIT :row_limit
         """)
         with self.engine.connect() as conn:

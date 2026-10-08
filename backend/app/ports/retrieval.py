@@ -42,6 +42,12 @@ class RetrievalRepository(Protocol):
     def list_active_chunks(self, scope: Scope, limit: int | None = None) -> list[ChunkRecord]:
         """Read active chunks in a scope; `limit` bounds the scan when given."""
 
+    def get_retrieval_chunks(self, scope: Scope, chunk_ids: Sequence[str]) -> dict[str, ChunkRecord]:
+        """Revalidate recalled child IDs under current Scope/index identity."""
+
+    def read_parent_contexts(self, scope: Scope, seeds: Sequence[ChunkRecord]) -> dict[str, ChunkRecord]:
+        """Map seed IDs to same-KB/document/version active parents, context only."""
+
 
 @dataclass(frozen=True)
 class ContextNeighborRow:
@@ -75,7 +81,8 @@ class ContextNeighborReader(Protocol):
     Both seeds and neighbors must be queried under server Scope, current
     version, ready/nondeleted state and fully proved section/page boundaries.
     At most ten selected seeds and three rows per seed (including offset 0).
-    Unavailable/ambiguous boundaries admit no neighbor. No caller is wired yet.
+    Unavailable/ambiguous boundaries admit no neighbor. P4 admits only whole
+    short-context neighbors; these rows never become direct retrieval hits.
     """
 
     def read_context_rows(

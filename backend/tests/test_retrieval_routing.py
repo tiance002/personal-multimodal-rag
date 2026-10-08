@@ -65,8 +65,9 @@ def test_ranker_cannot_inject_a_chunk_outside_recall():
     class UntrustedRanker:
         def rank(self, question, hits, chunks):
             return [RankedHit(chunk_id="other-kb", rank=1)]
-    with pytest.raises(ValueError, match="unauthorized"):
-        HybridRetriever(repository(), Embedding(), ranker=UntrustedRanker()).retrieve(Scope.from_ids(["kb"]), "注意力")
+    result = HybridRetriever(repository(), Embedding(), ranker=UntrustedRanker()).retrieve(Scope.from_ids(["kb"]), "注意力")
+    assert result.items and 'RANKER_UNAVAILABLE' in result.degradation_flags
+    assert all(item.chunk.chunk_id != 'other-kb' for item in result.items)
 
 
 def test_evidence_quality_does_not_invent_conflict_or_correctness():

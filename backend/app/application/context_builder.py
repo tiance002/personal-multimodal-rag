@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 
 from backend.app.application.citations import CitationService
 from backend.app.application.retrieval import RetrievalItem
@@ -9,6 +10,22 @@ from backend.app.application.retrieval import RetrievalItem
 class ContextBuilder:
     def __init__(self, max_chars: int = 8000) -> None:
         self.max_chars = max_chars
+
+    @staticmethod
+    def _pieces(items, labels=None):
+        """Auxiliary context has no E label; only original units are citable."""
+        pieces, contexts = [], set()
+        for index, item in enumerate(items):
+            passage = item.context_passage
+            if passage is not None and passage.key not in contexts:
+                contexts.add(passage.key)
+                pieces.append('[辅助上下文，不是引用证据]\n' + passage.content)
+            label = labels[index] if labels is not None else f'E{index + 1}'
+            pieces.append(f'[{label}] {item.chunk.content}')
+        return pieces
+
+    def _length(self, items):
+        return len('\n\n'.join(self._pieces(items)))
 
     def select(
         self,
@@ -23,14 +40,7 @@ class ContextBuilder:
             raise ValueError("max_per_document must be a positive integer")
 
         def fits(selected: list[tuple[int, RetrievalItem]], item: RetrievalItem) -> bool:
-            next_label = f"E{len(selected) + 1}"
-            piece_length = len(f"[{next_label}] {item.chunk.content}")
-            separator = 2 if selected else 0
-            used = sum(
-                len(f"[E{index + 1}] {selected_item.chunk.content}") + (2 if index else 0)
-                for index, (_, selected_item) in enumerate(selected)
-            )
-            return used + separator + piece_length <= self.max_chars
+            return self._length([value for _, value in selected] + [item]) <= self.max_chars
 
         selected: list[tuple[int, RetrievalItem]] = []
         deferred: list[tuple[int, RetrievalItem]] = []
@@ -43,7 +53,13 @@ class ContextBuilder:
                 deferred.append((index, item))
                 continue
             if not fits(selected, item):
-                continue
+                # A whole parent can exceed the general context hard limit.
+                # Retain the original whole child instead of slicing evidence.
+                if item.context_passage is None:
+                    continue
+                item = replace(item, context_passage=None)
+                if not fits(selected, item):
+                    continue
             selected.append((index, item))
             per_document[document_id] = per_document.get(document_id, 0) + 1
 
@@ -60,20 +76,26 @@ class ContextBuilder:
         # Recheck after restoring original ranking order, since citation labels
         # are assigned in that final stable order.
         while output:
-            used = sum(len(f"[E{index + 1}] {item.chunk.content}") + (2 if index else 0)
-                       for index, item in enumerate(output))
+            used = self._length(output)
             if used <= self.max_chars:
                 break
             output.pop()
         return output
 
     def build(self, run_id: str, items: Sequence[RetrievalItem], citations: CitationService) -> tuple[str, list[str]]:
-        pieces: list[str] = []
+        selected: list[RetrievalItem] = []
         labels: list[str] = []
         for item in self.select(items):
             detail = citations.freeze(run_id, item.chunk)
             if detail.label in labels:
                 continue
             labels.append(detail.label)
-            pieces.append(f"[{detail.label}] {detail.quote}")
-        return "\n\n".join(pieces), labels
+            selected.append(item)
+        context = '\n\n'.join(self._pieces(selected, labels))
+        # Actual labels may already exist in a Smart run; never truncate a quote.
+        if len(context) > self.max_chars:
+            selected = [replace(item, context_passage=None) for item in selected]
+            context = '\n\n'.join(self._pieces(selected, labels))
+        if len(context) > self.max_chars:
+            raise ValueError('CONTEXT_HARD_LIMIT_EXCEEDED')
+        return context, labels
