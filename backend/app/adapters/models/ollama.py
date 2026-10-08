@@ -5,6 +5,7 @@ import base64
 import hashlib
 import io
 import ipaddress
+import math
 import time
 from contextlib import nullcontext
 from collections.abc import Sequence
@@ -42,6 +43,17 @@ def validate_caption_image(image_bytes: bytes) -> str:
     except Exception as exc:
         raise ProviderUnavailable("CAPTION_IMAGE_INVALID") from exc
     return hashlib.sha256(image_bytes).hexdigest()
+
+
+def _valid_embedding_value(value: Any) -> bool:
+    if type(value) not in (int, float):
+        return False
+    try:
+        number = float(value)
+    except OverflowError:
+        return False
+    # PostgreSQL/pgvector stores vector elements as float4 values.
+    return math.isfinite(number) and abs(number) <= 3.4028234663852886e38
 
 
 class OllamaGateway:
@@ -283,15 +295,25 @@ class OllamaGateway:
         ) as observation:
             response, latency_ms = self._post(
                 "/api/embed",
-                {"model": self.embedding_model, "input": input_texts},
+                {"model": self.embedding_model, "input": input_texts, "truncate": False},
                 timeout_seconds,
             )
             vectors = response.get("embeddings")
             if not isinstance(vectors, list) or not all(isinstance(vector, list) for vector in vectors):
                 raise ProviderUnavailable("ollama embedding response schema invalid")
+            if len(vectors) != len(input_texts):
+                raise ProviderUnavailable("ollama embedding count mismatch")
             dimensions = len(vectors[0]) if vectors else 0
             if dimensions != 1024:
                 raise ProviderUnavailable(f"embedding dimension mismatch: {dimensions}")
+            if any(len(vector) != dimensions for vector in vectors):
+                raise ProviderUnavailable("embedding dimension mismatch")
+            if any(
+                not _valid_embedding_value(value)
+                for vector in vectors
+                for value in vector
+            ):
+                raise ProviderUnavailable("ollama embedding vector values invalid")
             if observation is not None:
                 observation.update(
                     output={"input_count": len(input_texts), "dimensions": dimensions},

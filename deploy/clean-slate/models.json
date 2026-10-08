@@ -1,0 +1,71 @@
+{
+  "models": [
+    {
+      "model_key": "chat_cheap_default",
+      "role": "chat_cheap",
+      "provider": "siliconflow",
+      "model_id": "XingChenAGI/Xing4.0-29B",
+      "api_key_env": "SILICONFLOW_API_KEY",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "dimension": null,
+      "enabled": true,
+      "resolved_revision": "UNKNOWN",
+      "input_semantics_version": "context-header-child/v1"
+    },
+    {
+      "model_key": "chat_expensive_default",
+      "role": "chat_expensive",
+      "provider": "deepseek",
+      "model_id": "deepseek-flash",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "base_url": "https://api.deepseek.com",
+      "dimension": null,
+      "enabled": true,
+      "resolved_revision": "UNKNOWN",
+      "input_semantics_version": "context-header-child/v1"
+    },
+    {
+      "model_key": "embedding_default",
+      "role": "embedding",
+      "provider": "siliconflow",
+      "model_id": "BAAI/bge-m3",
+      "api_key_env": "SILICONFLOW_API_KEY",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "dimension": 1024,
+      "enabled": true,
+      "resolved_revision": "UNKNOWN",
+      "input_semantics_version": "context-header-child/v1"
+    },
+    {
+      "model_key": "rerank_default",
+      "role": "rerank",
+      "provider": "siliconflow",
+      "model_id": "BAAI/bge-reranker-v2-m3",
+      "api_key_env": "SILICONFLOW_API_KEY",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "dimension": null,
+      "enabled": true,
+      "resolved_revision": "UNKNOWN",
+      "input_semantics_version": "context-header-child/v1"
+    },
+    {
+      "model_key": "vision_default",
+      "role": "vision",
+      "provider": "deepseek",
+      "model_id": "deepseek-flash",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "base_url": "https://api.deepseek.com",
+      "dimension": null,
+      "enabled": true,
+      "resolved_revision": "UNKNOWN",
+      "input_semantics_version": "context-header-child/v1"
+    }
+  ],
+  "defaults": {
+    "chat_cheap": "chat_cheap_default",
+    "chat_expensive": "chat_expensive_default",
+    "embedding": "embedding_default",
+    "rerank": "rerank_default",
+    "vision": "vision_default"
+  }
+}

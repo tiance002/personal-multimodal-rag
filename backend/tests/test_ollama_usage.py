@@ -100,3 +100,61 @@ def test_length_limited_answer_is_not_returned_as_complete(model_server):
             gateway.answer('question', 5)
     assert captured.calls[0].finish_reason == 'length'
     assert captured.calls[0].output_tokens == 512
+
+
+def test_embedding_disables_truncation_and_preserves_exact_context_header_input(model_server):
+    gateway, responses, requests = model_server
+    source = '二级标题\n\n原始表格行：项目A｜数量3｜状态正常'
+    header = '产品手册 > 安全检查'
+    embedding_content = f'{header}\n\n{source}'
+    responses.append((200, {'embeddings': [[0.25] * 1024, [0.5] * 1024]}))
+
+    result = gateway.embed(['短文本', embedding_content], 5)
+
+    assert requests == [{
+        'model': 'bge-test',
+        'input': ['短文本', embedding_content],
+        'truncate': False,
+    }]
+    assert result.model == 'bge-test'
+    assert result.dimensions == 1024
+    assert result.vectors == [[0.25] * 1024, [0.5] * 1024]
+
+
+@pytest.mark.parametrize(('input_texts', 'vectors', 'error'), [
+    (['原始输入'], [], 'count mismatch'),
+    (['原始输入'], [[0.0] * 1024, [0.0] * 1024], 'count mismatch'),
+    (['原始输入'], [[0.0] * 1023], 'dimension mismatch'),
+    (['原始输入', '第二条'], [[0.0] * 1024, [0.0] * 1023], 'dimension mismatch'),
+    (['原始输入'], [[float('nan')] * 1024], 'vector values invalid'),
+    (['原始输入'], [[float('inf')] * 1024], 'vector values invalid'),
+    (['原始输入'], [[1e100] * 1024], 'vector values invalid'),
+    (['原始输入'], [[10 ** 1000] * 1024], 'vector values invalid'),
+    (['原始输入'], [[True] * 1024], 'vector values invalid'),
+    (['原始输入'], [['0.25'] * 1024], 'vector values invalid'),
+])
+def test_embedding_rejects_incomplete_or_invalid_vector_results(model_server, input_texts, vectors, error):
+    gateway, responses, requests = model_server
+    responses.append((200, {'embeddings': vectors}))
+
+    with pytest.raises(ProviderUnavailable, match=error):
+        gateway.embed(input_texts, 5)
+
+    assert len(requests) == 1
+    assert requests[0]['input'] == input_texts
+    assert requests[0]['truncate'] is False
+
+
+def test_embedding_provider_rejection_is_not_retried_with_shortened_input(model_server):
+    gateway, responses, requests = model_server
+    long_atomic_input = '表格原子行｜字段A=' + ('完整原文值' * 300)
+    responses.append((400, {'error': 'context length exceeded'}))
+
+    with pytest.raises(ProviderUnavailable, match='ollama request failed'):
+        gateway.embed([long_atomic_input], 5)
+
+    assert requests == [{
+        'model': 'bge-test',
+        'input': [long_atomic_input],
+        'truncate': False,
+    }]

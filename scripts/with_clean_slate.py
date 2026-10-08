@@ -26,7 +26,8 @@ def resolve_environment(profile: dict, inherited: dict[str, str]) -> dict[str, s
     db = profile['database']
     storage = Path(profile['storage_root']).resolve()
     if (db['host'] != '127.0.0.1' or db['port'] != 25438 or db['user'] != 'rag'
-            or not db['name'].startswith('rag_clean_dev_') or not db['name'].replace('_', '').isalnum()):
+            or db['name'] != 'rag_clean_dev_20261008t072656z_352f705b'
+            or db['oid'] != 21278 or db['system_identifier'] != '7691227493754040358'):
         raise ValueError('CLEAN_SLATE_DATABASE_IDENTITY_INVALID')
     if (not storage.is_relative_to(Path(r'D:\RAG-CleanSlate').resolve())
             or storage.is_relative_to(Path(profile['public_benchmark_root']).resolve())

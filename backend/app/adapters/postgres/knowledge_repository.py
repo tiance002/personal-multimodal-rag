@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from backend.app.domain.embedding_identity import EmbeddingIdentity, effective_identity
+from backend.app.ports.model_access import model_access
+
 from backend.app.domain.evidence_hint import valid_hint
 
 import json
@@ -17,7 +20,7 @@ from sqlalchemy import Engine, text
 from backend.app.adapters.parsers import ParserRegistry
 from backend.app.adapters.storage import ContentAddressedStorage
 from backend.app.domain.adaptive_chunking import (
-    CHUNKER_VERSION, ChunkingConfig, embedding_fingerprint, prepare_document,
+    CHUNKER_VERSION, ChunkingConfig, prepare_document,
 )
 from backend.app.domain.models import ChunkRecord, RankedHit
 from backend.app.domain.parsers import ParserError
@@ -502,7 +505,14 @@ class PostgresKnowledgeRepository:
                     progress=65,
                 )
                 if self.embedding_provider is not None and chunks:
-                    vectors = self.embedding_provider.embed([chunk.embedding_content for chunk in chunks], timeout_seconds=60).vectors
+                    allowed = True
+                    if getattr(self.embedding_provider, "provider_kind", None) == "cloud":
+                        kb = self.get_knowledge_base(str(version["knowledge_base_id"]))
+                        allowed = kb is not None and kb.get("cloud_allowed") is True
+                    with model_access("embedding", allowed=allowed):
+                        embedded = self.embedding_provider.embed([chunk.embedding_content for chunk in chunks], timeout_seconds=60)
+                    self.validate_embedding_result(embedded)
+                    vectors = embedded.vectors
                     if len(vectors) != len(chunks) or any(len(vector) != 1024 for vector in vectors):
                         raise RuntimeError("EMBEDDING_DIMENSION_MISMATCH")
                 self.update_job_progress(
@@ -536,12 +546,7 @@ class PostgresKnowledgeRepository:
                     })
                 profile_id = None
                 if vectors:
-                    model = getattr(self.embedding_provider, "embedding_model", "bge-m3:latest")
-                    fingerprint = embedding_fingerprint(model, 1024, self.chunking_config)
-                    profile_id = conn.execute(text("SELECT id FROM embedding_profiles WHERE provider='ollama' AND model_name=:model AND dimension=1024 AND fingerprint=:fingerprint LIMIT 1"), {"model": model, "fingerprint": fingerprint}).scalar()
-                    if profile_id is None:
-                        profile_id = uuid.uuid4()
-                        conn.execute(text("INSERT INTO embedding_profiles (id,provider,model_name,model_revision,dimension,distance,fingerprint) VALUES (:id,'ollama',:model,:revision,1024,'cosine',:fingerprint)"), {"id": profile_id, "model": model, "revision": "local/" + self.chunking_config.identity, "fingerprint": fingerprint})
+                    profile_id = self._get_or_create_embedding_profile(conn, self.embedding_identity())
                 parent_ids = [uuid.uuid4() for _ in prepared.parents]
                 for index, chunk in enumerate(prepared.parents + chunks):
                     is_parent = index < len(prepared.parents)
@@ -659,19 +664,80 @@ class PostgresKnowledgeRepository:
             rows = conn.execute(statement, params).mappings()
             return [RankedHit(chunk_id=str(row["chunk_id"]), rank=index, raw_score=float(row["score"])) for index, row in enumerate(rows, start=1)]
 
+    def embedding_identity(self):
+        return effective_identity(self.embedding_provider, self.chunking_config.identity)
+
+    @staticmethod
+    def _get_or_create_embedding_profile(conn, identity):
+        """Atomic six-column identity; a conflict never mutates the existing row.
+
+        READ COMMITTED gives the subsequent SELECT a fresh snapshot after the
+        unique-index wait. Other isolation modes are rejected before INSERT;
+        unexpected constraints/transaction errors propagate without retries.
+        """
+        if not isinstance(identity, EmbeddingIdentity):
+            raise ValueError("EMBEDDING_PROFILE_IDENTITY_INVALID")
+        fields = (identity.provider, identity.model_id,
+                  identity.resolved_revision_or_unknown, identity.distance_metric,
+                  identity.chunking_index_identity, identity.embedding_input_semantics_version)
+        if (any(not isinstance(value, str) or not value.strip() for value in fields)
+                or type(identity.dimension) is not int or identity.dimension <= 0
+                or identity.distance_metric != "cosine"):
+            raise ValueError("EMBEDDING_PROFILE_IDENTITY_INVALID")
+        if conn.get_isolation_level() != "READ COMMITTED":
+            raise RuntimeError("EMBEDDING_PROFILE_REQUIRES_READ_COMMITTED")
+        params = dict(id=uuid.uuid4(), provider=identity.provider, model=identity.model_id,
+                      revision=identity.resolved_revision_or_unknown, dimension=identity.dimension,
+                      distance=identity.distance_metric, fingerprint=identity.fingerprint)
+        profile_id = conn.execute(text("""
+            INSERT INTO embedding_profiles
+                (id,provider,model_name,model_revision,dimension,distance,fingerprint)
+            VALUES (:id,:provider,:model,:revision,:dimension,:distance,:fingerprint)
+            ON CONFLICT (provider,model_name,model_revision,dimension,distance,fingerprint)
+            DO NOTHING RETURNING id
+        """), params).scalar()
+        if profile_id is None:
+            profile_id = conn.execute(text("""
+                SELECT id FROM embedding_profiles
+                WHERE provider=:provider AND model_name=:model AND model_revision=:revision
+                  AND dimension=:dimension AND distance=:distance AND fingerprint=:fingerprint
+            """), params).scalar_one_or_none()
+        if profile_id is None:
+            raise RuntimeError("EMBEDDING_PROFILE_CONFLICT_NOT_VISIBLE")
+        return profile_id
+
+    def validate_embedding_result(self, result):
+        identity = self.embedding_identity()
+        # Legacy injected offline providers without model metadata retain their
+        # old test contract. Concrete adapters must match the effective identity.
+        if hasattr(self.embedding_provider, "embedding_model") and (result.model != identity.model_id or result.dimensions != identity.dimension):
+            raise RuntimeError("EMBEDDING_IDENTITY_MISMATCH")
+        fingerprint = getattr(result, "identity_fingerprint", None)
+        if (fingerprint is not None and fingerprint != identity.fingerprint) or (
+                getattr(self.embedding_provider, "provider_kind", None) == "cloud" and fingerprint is None):
+            raise RuntimeError("EMBEDDING_FINGERPRINT_MISMATCH")
+
+    def embedding_scope_allowed(self, scope: Scope) -> bool:
+        return bool(scope.knowledge_base_ids) and all(
+            (self.get_knowledge_base(kb_id) or {}).get("cloud_allowed") is True
+            for kb_id in scope.knowledge_base_ids)
+
     def get_embedding_profile_id(self, model_name: str, dimension: int) -> str | None:
-        if not model_name or dimension <= 0:
+        identity = self.embedding_identity()
+        if not model_name or model_name != identity.model_id or dimension != identity.dimension:
             return None
         with self.engine.connect() as conn:
             profile_id = conn.execute(
                 text("""
                     SELECT id
                     FROM embedding_profiles
-                    WHERE provider='ollama' AND model_name=:model_name AND dimension=:dimension AND fingerprint=:fingerprint
+                    WHERE provider=:provider AND model_name=:model_name AND model_revision=:revision
+                      AND dimension=:dimension AND distance=:distance AND fingerprint=:fingerprint
                     ORDER BY created_at DESC
                     LIMIT 1
                 """),
-                {"model_name": model_name, "dimension": dimension, "fingerprint": embedding_fingerprint(model_name, dimension, self.chunking_config)},
+                {"provider": identity.provider, "model_name": model_name, "revision": identity.resolved_revision_or_unknown,
+                 "dimension": dimension, "distance": identity.distance_metric, "fingerprint": identity.fingerprint},
             ).scalar()
             return str(profile_id) if profile_id is not None else None
 
@@ -684,9 +750,13 @@ class PostgresKnowledgeRepository:
         values = list(vector or ())
         if not scope.knowledge_base_ids or not values or limit <= 0 or not profile_id:
             return []
-        model = getattr(self.embedding_provider, "embedding_model", "bge-m3:latest")
+        identity = self.embedding_identity()
+        if len(values) != identity.dimension:
+            return []
         params: dict[str, Any] = {"limit": limit, "profile_id": profile_id, "index_identity": self.chunking_config.identity,
-                                "fingerprint": embedding_fingerprint(model, len(values), self.chunking_config)}
+                                "provider": identity.provider, "model": identity.model_id,
+                                "revision": identity.resolved_revision_or_unknown, "distance": identity.distance_metric,
+                                "fingerprint": identity.fingerprint}
         clause = self._scope_filter(scope, params)
         params["vector"] = "[" + ",".join(str(float(value)) for value in values) + "]"
         statement = text(f"""
@@ -695,11 +765,14 @@ class PostgresKnowledgeRepository:
             {self._ACTIVE_VERSION_JOINS}
             JOIN chunk_embeddings ce ON ce.chunk_id = c.id AND ce.profile_id = :profile_id
             JOIN embedding_profiles ep ON ep.id=ce.profile_id AND ep.fingerprint=:fingerprint
+                AND ep.provider=:provider AND ep.model_name=:model AND ep.model_revision=:revision
+                AND ep.dimension=:dimension AND ep.distance=:distance
             WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
               AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
             ORDER BY ce.embedding <=> CAST(:vector AS vector)
             LIMIT :limit
         """)
+        params["dimension"] = identity.dimension
         with self.engine.connect() as conn:
             rows = conn.execute(statement, params).mappings()
             return [RankedHit(chunk_id=str(row["chunk_id"]), rank=index, raw_score=float(row["score"])) for index, row in enumerate(rows, start=1)]

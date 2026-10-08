@@ -60,10 +60,12 @@ def test_postgres_vector_candidates_require_the_exact_profile(tmp_path: Path) ->
         repository_a.process_job(first["job_id"])
         repository_b.process_job(second["job_id"])
         profile_a = repository_a.get_embedding_profile_id("profile-a-model", 1024)
-        profile_b = repository_a.get_embedding_profile_id("profile-b-model", 1024)
+        assert repository_a.get_embedding_profile_id("profile-b-model", 1024) is None
+        profile_b = repository_b.get_embedding_profile_id("profile-b-model", 1024)
 
         hits_a = repository_a.vector_candidates(Scope.from_ids([knowledge_base["id"]]), [1.0] + [0.0] * 1023, 10, profile_id=profile_a)
-        hits_b = repository_a.vector_candidates(Scope.from_ids([knowledge_base["id"]]), [1.0] + [0.0] * 1023, 10, profile_id=profile_b)
+        assert repository_a.vector_candidates(Scope.from_ids([knowledge_base["id"]]), [1.0] + [0.0] * 1023, 10, profile_id=profile_b) == []
+        hits_b = repository_b.vector_candidates(Scope.from_ids([knowledge_base["id"]]), [1.0] + [0.0] * 1023, 10, profile_id=profile_b)
 
         assert profile_a and profile_b and profile_a != profile_b
         assert [hit.chunk_id for hit in hits_a] == [str(repository_a.list_chunks(first["document_id"])[0]["id"])]

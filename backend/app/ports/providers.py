@@ -27,6 +27,8 @@ class EmbeddingResult:
     dimensions: int
     latency_ms: float
     profile_id: str | None = None
+    identity_fingerprint: str | None = None
+    usage_actual: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -49,6 +51,23 @@ class CaptionResult:
     usage_actual: dict[str, int | None]
     latency_ms: float
     prompt_version: str = "local-figure-caption/v1"
+    preprocessing: str = "validated-original-bytes/v1"
+
+
+@dataclass(frozen=True)
+class ChatResult:
+    text: str
+    model_requested: str
+    model_reported: str
+    finish_reason: str
+    usage_actual: dict | None
+    latency_ms: float
+
+
+class ChatProvider(Protocol):
+    """Structured extension of AnswerProvider; generic calls cannot grant egress."""
+    def generate(self, messages: Sequence[dict], *, timeout_seconds: float, max_tokens: int = 512) -> ChatResult: ...
+    def answer(self, prompt: str, timeout_seconds: float) -> str: ...
 
 
 class LocalCaptionProvider(Protocol):

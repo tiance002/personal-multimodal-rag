@@ -2,8 +2,18 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from typing import Protocol
+from dataclasses import dataclass
 
 from backend.app.domain.models import ChunkRecord, RankedHit
+
+
+@dataclass(frozen=True)
+class RerankResult:
+    """Scores correspond to hits; original RankedHit provenance stays intact."""
+    hits: tuple[RankedHit, ...]
+    relevance_scores: tuple[float, ...]
+    latency_ms: float
+    usage_actual: dict | None
 
 
 class CandidateRanker(Protocol):

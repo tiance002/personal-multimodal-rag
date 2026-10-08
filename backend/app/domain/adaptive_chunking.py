@@ -58,7 +58,10 @@ class ChunkingConfig:
 
 
 def embedding_fingerprint(model: str, dimension: int, config: ChunkingConfig) -> str:
-    return hashlib.sha256(json.dumps(["ollama", model, dimension, config.identity]).encode()).hexdigest()
+    # Compatibility helper for the optional local provider. Identity now also
+    # covers unknown revision, distance and full header/child input semantics.
+    from backend.app.domain.embedding_identity import EmbeddingIdentity
+    return EmbeddingIdentity("ollama", model, "UNKNOWN", dimension, "cosine", config.identity).fingerprint
 
 
 def protected_spans(text):

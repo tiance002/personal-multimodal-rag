@@ -170,6 +170,7 @@ class LocalCaptionEnricher:
             "input_image_sha256": observed.input_image_sha256, "model_requested": observed.model_requested,
             "model_reported": observed.model_reported, "model_digest": observed.model_digest or "UNKNOWN",
             "prompt_version": observed.prompt_version, "usage_actual": observed.usage_actual,
+            "preprocessing": observed.preprocessing,
             "latency_ms": observed.latency_ms, "page": source.page_no,
             "bbox": source.source_locator.get("bbox"), "coordinate_basis": source.source_locator.get("coordinate_basis")}
         content = CAPTION_EVIDENCE_PREFIX + observed.text

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -38,6 +39,12 @@ def _env_context_positive_int(name: str, default: int) -> int:
 class Settings:
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
+    model_registry_json: str | None = None
+    embedding_backend: str = "siliconflow"
+    embedding_egress_enabled: bool = False
+    chat_egress_enabled: bool = False
+    rerank_egress_enabled: bool = False
+    vision_egress_enabled: bool = False
     prefer_cloud: bool = False
     cloud_model: str = "deepseek-flash"
     cloud_cost_estimate_microunits: int = 0
@@ -70,6 +77,12 @@ class Settings:
     context_max_items: int = 8
 
     def __post_init__(self) -> None:
+        if self.embedding_backend not in {"siliconflow", "ollama"}:
+            raise ValueError("EMBEDDING_BACKEND_UNSUPPORTED")
+        self.model_registry()
+        for name in ("embedding_egress_enabled", "chat_egress_enabled", "rerank_egress_enabled", "vision_egress_enabled"):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError("MODEL_EGRESS_FLAG_INVALID")
         if type(self.xlsx_first_row_as_header) is not bool:
             raise ValueError('xlsx_first_row_as_header must be a boolean')
         if type(self.context_pool_enabled) is not bool:
@@ -100,6 +113,12 @@ class Settings:
         if ingestion_lease_seconds <= 0:
             raise ValueError("RAG_INGESTION_LEASE_SECONDS must be positive")
         return cls(
+            model_registry_json=os.getenv("RAG_MODEL_REGISTRY_JSON"),
+            embedding_backend=os.getenv("RAG_EMBEDDING_BACKEND", cls.embedding_backend),
+            embedding_egress_enabled=_env_context_bool("RAG_EMBEDDING_EGRESS_ENABLED", False),
+            chat_egress_enabled=_env_context_bool("RAG_CHAT_EGRESS_ENABLED", False),
+            rerank_egress_enabled=_env_context_bool("RAG_RERANK_EGRESS_ENABLED", False),
+            vision_egress_enabled=_env_context_bool("RAG_VISION_EGRESS_ENABLED", False),
             service_name=os.getenv("RAG_SERVICE_NAME", cls.service_name),
             cloud_enabled=_env_bool("RAG_CLOUD_ENABLED", False),
             prefer_cloud=_env_bool("RAG_PREFER_CLOUD", False),
@@ -133,3 +152,8 @@ class Settings:
             context_pool_k=_env_context_positive_int("RAG_CONTEXT_POOL_K", cls.context_pool_k),
             context_max_items=_env_context_positive_int("RAG_CONTEXT_MAX_ITEMS", cls.context_max_items),
         )
+
+    def model_registry(self):
+        from backend.app.domain.model_registry import ModelRegistry
+        return (ModelRegistry.from_dict(json.loads(self.model_registry_json))
+                if self.model_registry_json is not None else ModelRegistry.frozen_defaults())

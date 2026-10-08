@@ -261,7 +261,8 @@ class Embeddings:
     def __init__(self): self.inputs = []
     def embed(self, texts, **kwargs):
         self.inputs.extend(texts)
-        return SimpleNamespace(vectors=[[float(i)] * 1024 for i in range(len(texts))])
+        return SimpleNamespace(vectors=[[float(i)] * 1024 for i in range(len(texts))],
+                               model=self.embedding_model, dimensions=1024)
 
 
 def production_job(tmp_path, monkeypatch, *, ready=False):
@@ -275,7 +276,11 @@ def production_job(tmp_path, monkeypatch, *, ready=False):
         if sql.startswith("SELECT * FROM ingestion_jobs"): return {"version_id": "v1"}
         if sql.startswith("SELECT dv.*"): return version
         if sql.startswith("SELECT 1 FROM ingestion_jobs"): return (1,)
+        if sql.startswith("INSERT INTO embedding_profiles"): return params["id"]
     engine = SQLRecorder(handler)
+    # SIMULATED connection protocol only; independent real-connection races
+    # are covered by test_clean_slate_model_profiles, not this recorder.
+    engine.get_isolation_level = lambda: "READ COMMITTED"
     model = Embeddings()
     repo = PostgresKnowledgeRepository(engine, storage, embedding_provider=model)
     monkeypatch.setattr(repo, "renew_job", lambda *a, **kw: True)
@@ -308,8 +313,12 @@ def test_production_persists_source_context_and_child_only_indexes(tmp_path, mon
     assert indexed == {p["id"] for p in children} == {p["chunk_id"] for p in vectors}
     assert not indexed.intersection(parents)
     profile = next(p for sql,p in engine.calls if sql.startswith("INSERT INTO embedding_profiles"))
+    profile_sql = next(sql for sql,_ in engine.calls if sql.startswith("INSERT INTO embedding_profiles"))
+    assert "ON CONFLICT (provider,model_name,model_revision,dimension,distance,fingerprint) DO NOTHING RETURNING id" in profile_sql
     assert profile["fingerprint"] == adaptive.embedding_fingerprint(model.embedding_model, 1024, repo.chunking_config)
-    assert profile["revision"] == "local/" + repo.chunking_config.identity
+    # R3 records provider revision honestly; the P3 index identity remains in
+    # the fingerprint and chunk/version columns, rather than posing as revision.
+    assert profile["revision"] == "UNKNOWN"
     update = next(p for sql,p in engine.calls if "index_status='ready'" in sql)
     manifest = json.loads(repo.storage.path_for(update["manifest_key"]).read_text(encoding="utf-8"))
     assert manifest["chunking_diagnostics"] and manifest["index_identity"] == update["index_identity"]

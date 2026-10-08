@@ -17,6 +17,8 @@ from sqlalchemy import Engine, create_engine
 from backend.app.adapters.langfuse_tracing import LangfuseObservability
 from backend.app.adapters.models.ollama import OllamaGateway
 from backend.app.adapters.models.deepseek import DeepSeekGateway
+from backend.app.adapters.models.factory import ProviderFactory
+from backend.app.domain.adaptive_chunking import ChunkingConfig
 from backend.app.application.deepseek_gate_types import DEEPSEEK_GATE_TYPES
 from backend.app.application.session_attempts import SessionAttemptGate
 from backend.app.adapters.postgres.agent_repository import PostgresAgentRepository
@@ -25,6 +27,7 @@ from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledge
 from backend.app.adapters.storage import ContentAddressedStorage
 from backend.app.adapters.answer_audit import LocalAnswerAudit
 from backend.app.application.budget import PostgresBudgetGate
+from backend.app.application.provider_usage import BudgetUsageGuard
 from backend.app.application.knowledge_gateway import KnowledgeGateway
 from backend.app.application.knowledge_gateway import EvidenceService
 from backend.app.application.context_builder import ContextBuilder
@@ -61,11 +64,14 @@ class Container:
     office_preview: OfficePreviewProtocol | None = None
     cloud_gateway: Any | None = None
     follow_up_enabled: bool = False
+    provider_factory: ProviderFactory | None = None
 
 
 def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET,
                     cloud_model: Any = _MODEL_UNSET, follow_up_enabled: bool = False,
-                    caption_provider=None, caption_usage_guard=None) -> Container:
+                    caption_provider=None, caption_usage_guard=None,
+                    embedding_provider=_MODEL_UNSET, model_usage_guards=None,
+                    embedding_admission=None) -> Container:
     """Build the object graph once, eagerly, with no request-time assembly.
 
     Building eagerly (rather than lazily on first request) removes the previous
@@ -80,7 +86,23 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
                    if getattr(settings, name)]
     if unavailable:
         raise ValueError("optional adapters are not implemented: " + ", ".join(unavailable))
+    enabled_roles = {"embedding"} if settings.embedding_egress_enabled else set()
+    if settings.cloud_enabled:
+        if settings.chat_egress_enabled:
+            enabled_roles.update({"chat_cheap", "chat_expensive"})
+        if settings.rerank_egress_enabled:
+            enabled_roles.add("rerank")
+        if settings.vision_egress_enabled:
+            enabled_roles.add("vision")
+    provider_factory = ProviderFactory(settings.model_registry(), enabled_roles=enabled_roles,
+        usage_guards=model_usage_guards, embedding_admission=embedding_admission,
+        chunking_config=ChunkingConfig(general_size=settings.max_chunk_chars, general_overlap=settings.chunk_overlap))
     engine = create_engine(settings.database_url, pool_pre_ping=True)
+    budget_gate = PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits)
+    if settings.cloud_cost_estimate_microunits > 0:
+        for role in enabled_roles:
+            provider_factory.usage_guards.setdefault(role, BudgetUsageGuard(budget_gate,
+                provider_factory.registry.select(role), settings.cloud_cost_estimate_microunits))
     storage = ContentAddressedStorage(settings.storage_root)
     langfuse = LangfuseObservability(
         enabled=settings.langfuse_enabled,
@@ -98,10 +120,15 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         if model is _MODEL_UNSET
         else model
     )
+    if embedding_provider is _MODEL_UNSET:
+        # Preserve explicit legacy test injection; normal production selection
+        # is independent of local Chat / Query Expansion.
+        embedding_provider = (model if model is not _MODEL_UNSET else
+            ollama if settings.embedding_backend == "ollama" else provider_factory.build("embedding"))
     store = PostgresKnowledgeRepository(
         engine,
         storage,
-        embedding_provider=ollama,
+        embedding_provider=embedding_provider,
         parsers=ParserRegistry(xlsx_first_row_as_header=settings.xlsx_first_row_as_header,
             caption_enricher=CaptionEnricher(caption_provider,usage_guard=caption_usage_guard,enabled=True)
                 if caption_provider is not None else None),
@@ -125,9 +152,8 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
             )
     else:
         agent_model_value = agent_model
-    budget_gate = PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits)
     knowledge_gateway = KnowledgeGateway(
-        HybridRetriever(store, embedding_provider=ollama, mode=settings.retrieval_mode,
+        HybridRetriever(store, embedding_provider=embedding_provider, mode=settings.retrieval_mode,
                         top_k=profile["top_k"], candidate_k=profile["candidate_k"],
                         rrf_k=profile["rrf_k"], source_weights=profile["source_weights"],
                         **context_pool_options),
@@ -139,7 +165,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     # authorized validation entry must inject its registered gate; never bypass it.
     cloud_gateway = (DeepSeekGateway(api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         model=settings.cloud_model, cloud_enabled=True, attempt_gate=SessionAttemptGate(), gate_types=DEEPSEEK_GATE_TYPES)
-        if settings.cloud_enabled else None) if cloud_model is _MODEL_UNSET else cloud_model
+        if settings.cloud_enabled and settings.chat_egress_enabled else None) if cloud_model is _MODEL_UNSET else cloud_model
     quick_chain = LangChainQuickChain(
         knowledge_gateway,
         answer_gateway=ollama if settings.local_answer_enabled else None,
@@ -164,6 +190,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         office_preview=OfficePreviewAdapter(),
         cloud_gateway=cloud_gateway,
         follow_up_enabled=follow_up_enabled,
+        provider_factory=provider_factory,
     )
 
 

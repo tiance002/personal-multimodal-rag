@@ -12,6 +12,7 @@ from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, normalize_query
 from backend.app.ports.retrieval import RetrievalRepository
 from backend.app.ports.ranking import CandidateRanker, CandidateDiversitySelector
+from backend.app.ports.model_access import model_access
 from backend.app.application.retrieval_policy import RetrievalRouter
 
 
@@ -207,7 +208,15 @@ class HybridRetriever:
         if mode in ("vector", "hybrid") and self.embedding_provider is not None:
             try:
                 embedding_started=time.perf_counter()
-                embedded = self.embedding_provider.embed([question], timeout_seconds=10)
+                allowed = True
+                if getattr(self.embedding_provider, "provider_kind", None) == "cloud":
+                    checker = getattr(self.repository, "embedding_scope_allowed", None)
+                    allowed = checker is not None and checker(scope) is True
+                with model_access("embedding", allowed=allowed):
+                    embedded = self.embedding_provider.embed([question], timeout_seconds=10)
+                validator = getattr(self.repository, "validate_embedding_result", None)
+                if validator is not None:
+                    validator(embedded)
                 embedding_cache_hit = bool(getattr(self.embedding_provider, "last_cache_hit", False))
                 timings['embedding_ms']=(time.perf_counter()-embedding_started)*1000
                 profile_id = getattr(embedded, "profile_id", None)

@@ -22,6 +22,10 @@ class ModelCall:
     input_tokens: int | None
     output_tokens: int | None
     finish_reason: str | None = None
+    provider: str | None = None
+    model_key: str | None = None
+    capability: str | None = None
+    settlement: str | None = None
 
 
 @dataclass
@@ -95,3 +99,16 @@ def record_call(*, model: str, status: str, response: dict[str, Any] | None, lat
                                   status=status, latency_ms=latency_ms,
                                   input_tokens=count('prompt_eval_count'), output_tokens=count('eval_count'),
                                   finish_reason=response.get('done_reason') if response is not None else None))
+
+
+def record_provider_call(*, model_key: str, capability: str, provider: str, model: str,
+                         status: str, usage: dict | None, latency_ms: float) -> None:
+    """Capture supplier-returned tokens separately from monetary settlement."""
+    capture = _CAPTURE.get()
+    if capture is None:
+        return
+    usage = usage or {}
+    stage = 'answer' if capability.startswith('chat_') else capability
+    capture.calls.append(ModelCall(stage, capture.role, model, status, latency_ms,
+        usage.get('prompt_tokens'), usage.get('completion_tokens'), provider=provider,
+        model_key=model_key, capability=capability, settlement='UNKNOWN'))
