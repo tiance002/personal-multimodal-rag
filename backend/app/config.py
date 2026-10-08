@@ -58,8 +58,8 @@ class Settings:
     ollama_embedding_model: str = "bge-m3:latest"
     monthly_cloud_budget_microunits: int = 0
     max_upload_bytes: int = 50 * 1024 * 1024
-    max_chunk_chars: int = 1200
-    chunk_overlap: int = 120
+    max_chunk_chars: int = 512
+    chunk_overlap: int = 80
     xlsx_first_row_as_header: bool = False
     ingestion_lease_seconds: int = 60
     langfuse_enabled: bool = False

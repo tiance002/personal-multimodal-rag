@@ -14,7 +14,7 @@ from backend.app.domain.scope import Scope
 class PostgresGraphRepository(PostgresKnowledgeRepository):
     def list_version_chunks(self, document_id: str, version_id: str) -> list[ChunkRecord]:
         with self.engine.connect() as conn:
-            rows = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,locator,heading_path FROM chunks WHERE document_id=:document_id AND version_id=:version_id ORDER BY chunk_index"), {"document_id": document_id, "version_id": version_id}).mappings()
+            rows = conn.execute(text("SELECT id,knowledge_base_id,document_id,version_id,content,locator,heading_path FROM chunks WHERE document_id=:document_id AND version_id=:version_id AND chunk_role='child' ORDER BY chunk_index"), {"document_id": document_id, "version_id": version_id}).mappings()
             return [ChunkRecord(str(row["id"]), str(row["knowledge_base_id"]), str(row["document_id"]), str(row["version_id"]), row["content"], row["locator"] or {}, tuple(row["heading_path"] or ())) for row in rows]
 
     def set_graph_status(self, version_id: str, status: str) -> None:

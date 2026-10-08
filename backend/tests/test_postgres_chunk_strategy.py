@@ -31,8 +31,8 @@ def test_postgres_records_actual_parser_chunker_and_strategy(tmp_path):
         assert job["status"] == "succeeded"
         assert dict(row) == {
             "parser_version": "text/v1",
-            "chunker_version": "adaptive/v1",
-            "chunk_strategy": "heading_recursive",
+            "chunker_version": "weknora-adaptive-parent-child/v1",
+            "chunk_strategy": "legacy",  # Two headings do not meet the fixed auto threshold of three.
         }
     finally:
         repository.delete_knowledge_base(kb["id"])

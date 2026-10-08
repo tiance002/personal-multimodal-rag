@@ -7,6 +7,7 @@ import hashlib
 import threading
 import uuid
 from contextlib import contextmanager
+from dataclasses import asdict
 from io import BytesIO
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from typing import Any
@@ -15,7 +16,9 @@ from sqlalchemy import Engine, text
 
 from backend.app.adapters.parsers import ParserRegistry
 from backend.app.adapters.storage import ContentAddressedStorage
-from backend.app.domain.chunking import chunk_document, profile_document
+from backend.app.domain.adaptive_chunking import (
+    CHUNKER_VERSION, ChunkingConfig, embedding_fingerprint, prepare_document,
+)
 from backend.app.domain.models import ChunkRecord, RankedHit
 from backend.app.domain.parsers import ParserError
 from backend.app.domain.scope import Scope
@@ -35,8 +38,8 @@ class PostgresKnowledgeRepository:
         parsers: ParserRegistry | None = None,
         embedding_provider: Any | None = None,
         *,
-        max_chunk_chars: int = 1200,
-        chunk_overlap: int = 120,
+        max_chunk_chars: int = 512,
+        chunk_overlap: int = 80,
     ) -> None:
         self.engine = engine
         self.storage = storage
@@ -44,6 +47,7 @@ class PostgresKnowledgeRepository:
         self.embedding_provider = embedding_provider
         self.max_chunk_chars = max_chunk_chars
         self.chunk_overlap = chunk_overlap
+        self.chunking_config = ChunkingConfig(general_size=max_chunk_chars, general_overlap=chunk_overlap)
 
     def create_knowledge_base(self, name: str, description: str = "", *, graph_enabled: bool = False, cloud_allowed: bool = False) -> dict[str, Any]:
         kb_id = uuid.uuid4()
@@ -404,6 +408,14 @@ class PostgresKnowledgeRepository:
             ).mappings().one()
         if not self.renew_job(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
             return self.get_job(job_id) or {}
+        # A reindex must create a new version, never mutate indexed history.
+        if version.get("index_status") == "ready":
+            with self.engine.begin() as conn:
+                conn.execute(text("""UPDATE ingestion_jobs SET status='failed',error_code='REINDEX_REQUIRES_NEW_VERSION'
+                    WHERE id=:id AND status='running' AND worker_id=:worker_id
+                    AND claim_token=:claim_token AND lease_until > clock_timestamp()"""),
+                    {"id": job_id, "worker_id": worker_id, "claim_token": claim_token})
+            return self.get_job(job_id) or {}
         try:
             # Make the claim visible immediately.  Previously the job stayed at
             # the database default (0%) until the terminal update, which made a
@@ -458,8 +470,8 @@ class PostgresKnowledgeRepository:
                     raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
                 if not normalized.markdown_content.strip():
                     raise ParserError("EMPTY_TEXT")
-                chunking = profile_document(normalized, max_chars=self.max_chunk_chars)
-                chunks = chunk_document(normalized, max_chars=self.max_chunk_chars, overlap=self.chunk_overlap)
+                prepared = prepare_document(normalized, self.chunking_config)
+                chunks = prepared.children
                 if not chunks:
                     raise ParserError("EMPTY_TEXT")
                 self.update_job_progress(
@@ -477,6 +489,9 @@ class PostgresKnowledgeRepository:
                     'source_mapping_available': normalized.source_mapping_available,
                     'conversion_lineage': normalized.conversion_lineage,
                     'table_row_proofs': [p.model_dump(mode='json') for p in normalized.table_row_proofs],
+                    'chunker_version': CHUNKER_VERSION, 'index_identity': self.chunking_config.identity,
+                    'chunking_config': asdict(self.chunking_config),
+                    'chunking_diagnostics': prepared.diagnostics,
                 }, ensure_ascii=False).encode('utf-8')))
                 vectors: list[list[float]] = []
                 self.update_job_progress(
@@ -487,7 +502,7 @@ class PostgresKnowledgeRepository:
                     progress=65,
                 )
                 if self.embedding_provider is not None and chunks:
-                    vectors = self.embedding_provider.embed([chunk.content for chunk in chunks], timeout_seconds=60).vectors
+                    vectors = self.embedding_provider.embed([chunk.embedding_content for chunk in chunks], timeout_seconds=60).vectors
                     if len(vectors) != len(chunks) or any(len(vector) != 1024 for vector in vectors):
                         raise RuntimeError("EMBEDDING_DIMENSION_MISMATCH")
                 self.update_job_progress(
@@ -521,28 +536,38 @@ class PostgresKnowledgeRepository:
                     })
                 profile_id = None
                 if vectors:
-                    profile_id = conn.execute(text("SELECT id FROM embedding_profiles WHERE provider='ollama' AND model_name=:model AND dimension=1024 LIMIT 1"), {"model": getattr(self.embedding_provider, "embedding_model", "bge-m3:latest")}).scalar()
+                    model = getattr(self.embedding_provider, "embedding_model", "bge-m3:latest")
+                    fingerprint = embedding_fingerprint(model, 1024, self.chunking_config)
+                    profile_id = conn.execute(text("SELECT id FROM embedding_profiles WHERE provider='ollama' AND model_name=:model AND dimension=1024 AND fingerprint=:fingerprint LIMIT 1"), {"model": model, "fingerprint": fingerprint}).scalar()
                     if profile_id is None:
                         profile_id = uuid.uuid4()
-                        conn.execute(text("INSERT INTO embedding_profiles (id,provider,model_name,model_revision,dimension,distance,fingerprint) VALUES (:id,'ollama',:model,'local',1024,'cosine','ollama-local-1024')"), {"id": profile_id, "model": getattr(self.embedding_provider, "embedding_model", "bge-m3:latest")})
-                for index, chunk in enumerate(chunks):
-                    chunk_id = uuid.uuid4()
+                        conn.execute(text("INSERT INTO embedding_profiles (id,provider,model_name,model_revision,dimension,distance,fingerprint) VALUES (:id,'ollama',:model,:revision,1024,'cosine',:fingerprint)"), {"id": profile_id, "model": model, "revision": "local/" + self.chunking_config.identity, "fingerprint": fingerprint})
+                parent_ids = [uuid.uuid4() for _ in prepared.parents]
+                for index, chunk in enumerate(prepared.parents + chunks):
+                    is_parent = index < len(prepared.parents)
+                    child_index = index - len(prepared.parents)
+                    chunk_id = parent_ids[index] if is_parent else uuid.uuid4()
+                    parent_id = parent_ids[chunk.parent_index] if chunk.parent_index is not None else None
                     section_id = section_ids.get(next((section.section_id for section in normalized.sections if section.start <= chunk.start < section.end), ""))
-                    conn.execute(text("""INSERT INTO chunks (id,section_id,version_id,document_id,knowledge_base_id,chunk_index,content,content_sha256,start_pos,end_pos,heading_path,chunk_type,locator)
-                        VALUES (:id,:section_id,:version_id,:document_id,:kb,:chunk_index,:content,:sha256,:start_pos,:end_pos,:heading_path,:chunk_type,:locator)"""), {
-                        "id": chunk_id, "section_id": section_id, "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "chunk_index": index, "content": chunk.content, "sha256": chunk.content_sha256, "start_pos": chunk.start, "end_pos": chunk.end, "heading_path": json.dumps(list(chunk.heading_path)), "chunk_type": chunk.chunk_type, "locator": json.dumps({**chunk.source_locator.model_dump(), "asset_id": str(asset_ids[chunk.source_locator.asset_id]) if chunk.source_locator.asset_id else None}),
+                    conn.execute(text("""INSERT INTO chunks (id,section_id,version_id,document_id,knowledge_base_id,chunk_index,content,content_sha256,start_pos,end_pos,heading_path,chunk_type,locator,context_header,parent_id,chunk_role,index_identity)
+                        VALUES (:id,:section_id,:version_id,:document_id,:kb,:chunk_index,:content,:sha256,:start_pos,:end_pos,:heading_path,:chunk_type,:locator,:context_header,:parent_id,:chunk_role,:index_identity)"""), {
+                        "id": chunk_id, "section_id": section_id, "version_id": version["id"], "document_id": version["document_id"], "kb": version["knowledge_base_id"], "chunk_index": len(chunks) + chunk.chunk_index if is_parent else chunk.chunk_index, "content": chunk.content, "sha256": chunk.content_sha256, "start_pos": chunk.start, "end_pos": chunk.end, "heading_path": json.dumps(list(chunk.heading_path)), "chunk_type": chunk.chunk_type, "locator": json.dumps({**chunk.source_locator.model_dump(), "asset_id": str(asset_ids[chunk.source_locator.asset_id]) if chunk.source_locator.asset_id else None}),
+                        "context_header": chunk.context_header, "parent_id": parent_id,
+                        "chunk_role": "parent" if is_parent else "child", "index_identity": self.chunking_config.identity,
                     })
                     if chunk.source_locator.asset_id:
                         conn.execute(text("INSERT INTO chunk_assets (chunk_id,asset_id,version_id) VALUES (:chunk_id,:asset_id,:version_id)"), {
                             "chunk_id": chunk_id, "asset_id": asset_ids[chunk.source_locator.asset_id], "version_id": version["id"],
                         })
+                    if is_parent:
+                        continue
                     for term, frequency in term_frequencies(chunk.content).items():
                         conn.execute(text("INSERT INTO chunk_terms (chunk_id,term,term_frequency) VALUES (:chunk_id,:term,:frequency)"), {"chunk_id": chunk_id, "term": term, "frequency": frequency})
                     if profile_id is not None:
-                        vector_literal = "[" + ",".join(str(value) for value in vectors[index]) + "]"
+                        vector_literal = "[" + ",".join(str(value) for value in vectors[child_index]) + "]"
                         conn.execute(text("INSERT INTO chunk_embeddings (chunk_id,profile_id,embedding) VALUES (:chunk_id,:profile_id,CAST(:embedding AS vector))"), {"chunk_id": chunk_id, "profile_id": profile_id, "embedding": vector_literal})
-                conn.execute(text("""UPDATE document_versions SET index_status='ready',parser_version=:parser_version,chunker_version=:chunker_version,chunk_strategy=:chunk_strategy,normalized_content_key=:normalized_key,normalized_content_sha256=:normalized_sha,processing_manifest_key=:manifest_key,processing_manifest_sha256=:manifest_sha,normalizer_version='text/v1',activated_at=clock_timestamp()
-                    WHERE id=:id"""), {"id": version["id"], "parser_version": normalized.parser_version, "chunker_version": chunking.chunker_version, "chunk_strategy": chunking.strategy, "normalized_key": normalized_object.storage_key if normalized_object else None, "normalized_sha": normalized_object.sha256 if normalized_object else None, 'manifest_key':processing_manifest.storage_key,'manifest_sha':processing_manifest.sha256})
+                conn.execute(text("""UPDATE document_versions SET index_status='ready',parser_version=:parser_version,chunker_version=:chunker_version,chunk_strategy=:chunk_strategy,index_identity=:index_identity,normalized_content_key=:normalized_key,normalized_content_sha256=:normalized_sha,processing_manifest_key=:manifest_key,processing_manifest_sha256=:manifest_sha,normalizer_version='text/v1',activated_at=clock_timestamp()
+                    WHERE id=:id"""), {"id": version["id"], "parser_version": normalized.parser_version, "chunker_version": CHUNKER_VERSION, "chunk_strategy": ",".join(sorted({d["selected"] for d in prepared.diagnostics})) or "native_atomic", "index_identity": self.chunking_config.identity, "normalized_key": normalized_object.storage_key if normalized_object else None, "normalized_sha": normalized_object.sha256 if normalized_object else None, 'manifest_key':processing_manifest.storage_key,'manifest_sha':processing_manifest.sha256})
                 current = conn.execute(text("SELECT active_version_id FROM documents WHERE id=:id FOR UPDATE"), {"id": version["document_id"]}).scalar()
                 current_no = conn.execute(text("SELECT version_no FROM document_versions WHERE id=:id"), {"id": current}).scalar() if current else None
                 if current_no is None or version["version_no"] >= current_no:
@@ -612,7 +637,7 @@ class PostgresKnowledgeRepository:
         """
         if not scope.knowledge_base_ids or not query.terms or limit <= 0:
             return []
-        params: dict[str, Any] = {"normalized": query.normalized, "limit": limit}
+        params: dict[str, Any] = {"normalized": query.normalized, "limit": limit, "index_identity": self.chunking_config.identity}
         clause = self._scope_filter(scope, params)
         term_names = ",".join(f":t_{index}" for index, _ in enumerate(query.terms))
         params.update({f"t_{index}": term for index, term in enumerate(query.terms)})
@@ -625,6 +650,7 @@ class PostgresKnowledgeRepository:
             {self._ACTIVE_VERSION_JOINS}
             JOIN chunk_terms ct ON ct.chunk_id = c.id AND ct.term IN ({term_names})
             WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
+              AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
             GROUP BY c.id
             ORDER BY score DESC, c.id
             LIMIT :limit
@@ -641,11 +667,11 @@ class PostgresKnowledgeRepository:
                 text("""
                     SELECT id
                     FROM embedding_profiles
-                    WHERE provider='ollama' AND model_name=:model_name AND dimension=:dimension
+                    WHERE provider='ollama' AND model_name=:model_name AND dimension=:dimension AND fingerprint=:fingerprint
                     ORDER BY created_at DESC
                     LIMIT 1
                 """),
-                {"model_name": model_name, "dimension": dimension},
+                {"model_name": model_name, "dimension": dimension, "fingerprint": embedding_fingerprint(model_name, dimension, self.chunking_config)},
             ).scalar()
             return str(profile_id) if profile_id is not None else None
 
@@ -658,7 +684,9 @@ class PostgresKnowledgeRepository:
         values = list(vector or ())
         if not scope.knowledge_base_ids or not values or limit <= 0 or not profile_id:
             return []
-        params: dict[str, Any] = {"limit": limit, "profile_id": profile_id}
+        model = getattr(self.embedding_provider, "embedding_model", "bge-m3:latest")
+        params: dict[str, Any] = {"limit": limit, "profile_id": profile_id, "index_identity": self.chunking_config.identity,
+                                "fingerprint": embedding_fingerprint(model, len(values), self.chunking_config)}
         clause = self._scope_filter(scope, params)
         params["vector"] = "[" + ",".join(str(float(value)) for value in values) + "]"
         statement = text(f"""
@@ -666,7 +694,9 @@ class PostgresKnowledgeRepository:
             FROM chunks c
             {self._ACTIVE_VERSION_JOINS}
             JOIN chunk_embeddings ce ON ce.chunk_id = c.id AND ce.profile_id = :profile_id
+            JOIN embedding_profiles ep ON ep.id=ce.profile_id AND ep.fingerprint=:fingerprint
             WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
+              AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
             ORDER BY ce.embedding <=> CAST(:vector AS vector)
             LIMIT :limit
         """)
@@ -683,7 +713,7 @@ class PostgresKnowledgeRepository:
         """
         if not scope.knowledge_base_ids:
             return []
-        params: dict[str, Any] = {}
+        params: dict[str, Any] = {"index_identity": self.chunking_config.identity}
         clause = self._scope_filter(scope, params)
         limit_clause = ""
         if limit is not None:
@@ -694,6 +724,7 @@ class PostgresKnowledgeRepository:
             FROM chunks c
             {self._ACTIVE_VERSION_JOINS}
             WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status='ready'
+              AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
             ORDER BY c.id{limit_clause}
         """)
         with self.engine.connect() as conn:
@@ -963,7 +994,7 @@ class PostgresKnowledgeRepository:
 
     def list_chunks(self, document_id: str) -> list[dict[str, Any]]:
         with self.engine.connect() as conn:
-            rows = conn.execute(text("SELECT id,version_id,chunk_index,content,content_sha256,locator,heading_path,chunk_type FROM chunks WHERE document_id=:id ORDER BY version_id,chunk_index"), {"id": document_id}).mappings()
+            rows = conn.execute(text("SELECT id,version_id,chunk_index,content,content_sha256,locator,heading_path,chunk_type FROM chunks WHERE document_id=:id AND chunk_role='child' ORDER BY version_id,chunk_index"), {"id": document_id}).mappings()
             return [dict(row) for row in rows]
 
     def list_assets(self, document_id: str) -> list[dict[str, Any]]:
@@ -981,7 +1012,7 @@ class PostgresKnowledgeRepository:
             row = conn.execute(text("SELECT active_version_id FROM documents WHERE id=:id AND deleted_at IS NULL"), {"id": document_id}).first()
             if not row or row[0] is None:
                 raise LookupError("document content not found")
-            chunks = conn.execute(text("SELECT content FROM chunks WHERE document_id=:id AND version_id=:version_id ORDER BY chunk_index"), {"id": document_id, "version_id": row[0]}).scalars()
+            chunks = conn.execute(text("SELECT content FROM chunks WHERE document_id=:id AND version_id=:version_id AND chunk_role='child' ORDER BY chunk_index"), {"id": document_id, "version_id": row[0]}).scalars()
             return "\n".join(chunks)
 
     def get_document_source(self, document_id: str) -> dict[str, Any]:

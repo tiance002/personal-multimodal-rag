@@ -170,6 +170,13 @@ class ChunkDraft(BaseModel):
     chunk_type: Literal["text", "parent_text", "image_ocr", "image_caption", "table"] = "text"
     content_sha256: str
     source_locator: SourceLocator
+    context_header: str = ""
+    parent_index: int | None = Field(default=None, ge=0)
+
+    @property
+    def embedding_content(self) -> str:
+        body = self.content.strip()
+        return f"{self.context_header}\n\n{body}" if self.context_header else body
 
 
 class RankedHit(BaseModel):

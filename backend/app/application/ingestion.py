@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import BinaryIO
 
-from backend.app.domain.chunking import chunk_document
+from backend.app.domain.adaptive_chunking import prepare_document
 from backend.app.domain.models import ChunkDraft, NormalizedDocument
 from backend.app.domain.parsers import ParserError
 from backend.app.domain.version_source import VersionSource
@@ -37,6 +37,8 @@ class VersionRecord:
     error_code: str | None = None
     normalized_document: NormalizedDocument | None = None
     chunks: list[ChunkDraft] = field(default_factory=list)
+    parents: list[ChunkDraft] = field(default_factory=list)
+    index_identity: str | None = None
 
 
 @dataclass
@@ -192,7 +194,10 @@ class IngestionWorker:
                 raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
             job.stage, job.progress = "indexing", 60
             version.normalized_document = normalized
-            version.chunks = chunk_document(normalized)
+            prepared = prepare_document(normalized)
+            version.chunks = prepared.children
+            version.parents = prepared.parents
+            version.index_identity = prepared.config.identity
             version.index_status = "ready"
             self.repository.activate_if_current(version)
             job.status, job.stage, job.progress = "succeeded", "ready", 100
