@@ -1,0 +1,33 @@
+{
+  "task": "P2-PDF-OFFLINE-CLOSURE",
+  "fixture_kind": "SIMULATED synthetic PDF; real PDF decoding",
+  "source_round": "D:\\RAG-M5-PDF-TABLE-01-rev1attempt1",
+  "source_documentation": "docs/pdf-native-tables.md",
+  "source_preparation": "harness/prepare.py",
+  "files": [
+    {
+      "name": "tables.pdf",
+      "sha256": "327630979b4097b3f78732d46aea86888c78ffae4298fdad3c6519e86afad08f",
+      "bytes": 273256,
+      "source": "D:\\RAG-M5-PDF-TABLE-01-rev1attempt1\\fixture\\tables.pdf",
+      "source_manifest_sha256": "4b8c0aed8d7012e5bc712b9d598f893d14859b53dd9515412d9429988bd42d04",
+      "original_poc_matches": true
+    },
+    {
+      "name": "gold.json",
+      "sha256": "d44ff365b77800fab83b4604b26a53f9152fa8d810851e52f8cf93aae8836f79",
+      "bytes": 18157,
+      "source": "D:\\RAG-M5-PDF-TABLE-01-rev1attempt1\\fixture\\gold.json",
+      "source_manifest_sha256": "4b8c0aed8d7012e5bc712b9d598f893d14859b53dd9515412d9429988bd42d04",
+      "original_poc_matches": true
+    },
+    {
+      "name": "scan_table.png",
+      "sha256": "1a02f380dd87cd422e8ed0f58773b2d3578a8ee30165b19784416824a3ed67f2",
+      "bytes": 5348,
+      "source": "D:\\RAG-M5-PDF-TABLE-01-rev1attempt1\\fixture\\scan_table.png",
+      "source_manifest_sha256": "4b8c0aed8d7012e5bc712b9d598f893d14859b53dd9515412d9429988bd42d04",
+      "original_poc_matches": true
+    }
+  ]
+}

@@ -20,9 +20,9 @@ from backend.app.domain.scope import Scope
 @pytest.fixture
 def frozen():
     root = os.getenv('RAG_PDF_TEST_FIXTURES')
-    if not root:
-        pytest.skip('explicit frozen SIMULATED PDF fixture directory required')
-    return Path(root)
+    # Verified historical synthetic gold is now committed with provenance.
+    # Keep the explicit override for old harnesses; no environment is required.
+    return Path(root) if root else Path(__file__).parent / 'fixtures/p2_pdf_closure'
 
 
 def chain(document, row, query, tag):
