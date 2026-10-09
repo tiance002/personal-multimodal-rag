@@ -34,16 +34,31 @@ export function parseStreamEvents(text: string, afterSeq = 0): StreamEvent[] {
  * buffering the whole response, and a dropped stream is resumed with
  * `Last-Event-ID` so already-seen `seq` values are not replayed.
  */
-export async function readRunEvents(runId: string, onEvent: (event: StreamEvent) => void): Promise<void> {
+export async function readRunEvents(runId: string, conversationId: string, onEvent: (event: StreamEvent) => void,
+                                    options: { signal?: AbortSignal } = {}): Promise<void> {
   let lastSeq = 0;
+  const startupDeadline = Date.now() + 10_000;
   for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (options.signal?.aborted) return;
     let response: Response;
     try {
       response = await fetch(
-        `/api/v1/runs/${runId}/events`,
-        lastSeq ? { headers: { "Last-Event-ID": String(lastSeq) } } : undefined,
+        `/api/v1/runs/${runId}/events?conversation_id=${encodeURIComponent(conversationId)}`,
+        { signal: options.signal, ...(lastSeq ? { headers: { "Last-Event-ID": String(lastSeq) } } : {}) },
       );
     } catch {
+      continue;
+    }
+    // The synchronous POST may not have committed its claim yet. Wait only
+    // for this known scoped identity; never create/replay a generation request.
+    if (response.status === 404 && lastSeq === 0 && Date.now() < startupDeadline) {
+      await new Promise<void>((resolve) => {
+        const finish = () => { clearTimeout(timer); options.signal?.removeEventListener('abort', finish); resolve(); };
+        const timer = setTimeout(finish, 250);
+        options.signal?.addEventListener('abort', finish, { once: true });
+        if (options.signal?.aborted) finish();
+      });
+      attempt -= 1;
       continue;
     }
     if (!response.ok || !response.body) return;
@@ -53,7 +68,7 @@ export async function readRunEvents(runId: string, onEvent: (event: StreamEvent)
     let buffer = "";
     let terminal = false;
     try {
-      while (!terminal) {
+      while (!terminal && !options.signal?.aborted) {
         const chunk = await reader.read();
         if (chunk.done) break;
         if (chunk.value) buffer += decoder.decode(chunk.value, { stream: true });
@@ -70,6 +85,9 @@ export async function readRunEvents(runId: string, onEvent: (event: StreamEvent)
           }
         }
       }
+    } catch {
+      // A dropped body reader is resumable just like an early EOF. Preserve
+      // the scoped Run and last valid sequence; never restart generation.
     } finally {
       await reader.cancel().catch(() => undefined);
     }

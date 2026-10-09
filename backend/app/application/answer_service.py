@@ -21,6 +21,8 @@ from backend.app.application.follow_up import resolve_question, clarification, v
 from backend.app.ports.model_usage import ModelCall, call_stage
 from backend.app.ports.providers import ProviderRequestNotSent
 from backend.app.application.table_header_hint import valid_hint
+from backend.app.application.run_lifecycle import current_execution
+from backend.app.ports.run_lifecycle import LifecycleDenied
 
 
 @dataclass(frozen=True)
@@ -76,6 +78,8 @@ class AnswerService:
         follow_up_provider: Any | None = None,
         observability: Any | None = None,
         quick_settings: QuickSettings | None = None,
+        lifecycle: Any | None = None,
+        memory_service: Any | None = None,
     ) -> None:
         if knowledge_gateway is None:
             if retriever is None:
@@ -98,6 +102,8 @@ class AnswerService:
         self.follow_up_provider = follow_up_provider
         self.observability = observability
         self.quick_settings = quick_settings or QuickSettings()
+        self.lifecycle = lifecycle
+        self.memory_service = memory_service
         self.quick_chain = quick_chain or LangChainQuickChain(
             knowledge_gateway,
             answer_gateway=answer_gateway,
@@ -107,7 +113,27 @@ class AnswerService:
     def answer(self, conversation: dict[str, Any], content: str, mode: str = "quick",
                *, request_id: str | None = None) -> AnswerOutcome:
         with collect_metrics("pending") as metrics:
-            outcome = self._answer(conversation, content, mode, request_id=request_id)
+            if self.lifecycle is None:
+                outcome = self._answer(conversation, content, mode, request_id=request_id)
+            else:
+                import uuid
+                identity = request_id or str(uuid.uuid4())
+                try:
+                    claim = self.lifecycle.repository.claim_run(str(conversation['id']),
+                        list(conversation['knowledge_base_scope']),list(conversation['document_scope'] or []),content,mode,identity)
+                    if not claim.created:
+                        saved = self.lifecycle.repository.read_run(claim.run_id,str(conversation['id']),
+                            list(conversation['knowledge_base_scope']),list(conversation['document_scope'] or []))
+                        if claim.state in {'COMPLETED','FAILED','CANCELLED'}:
+                            self.lifecycle.cleanup_terminal(claim.run_id)
+                            outcome = AnswerOutcome(claim.run_id,saved['answer'],saved['citations'],saved['error_code'],{'replayed':True})
+                        else:
+                            outcome = AnswerOutcome(claim.run_id,'',(),'RUN_'+claim.state,{'replayed':True})
+                    else:
+                        with self.lifecycle.executing(claim,str(conversation['id'])):
+                            outcome = self._answer(conversation, content, mode, request_id=identity)
+                except LifecycleDenied as exc:
+                    outcome = AnswerOutcome(identity,'',(),str(exc),{})
             metrics.query_id = outcome.run_id
             row = metrics.snapshot(citations=outcome.citations, error=outcome.error_code)
             return replace(outcome, trace={**outcome.trace, "metrics": row})
@@ -118,10 +144,16 @@ class AnswerService:
         document_scope = list(conversation["document_scope"] or [])
         conversation_id = str(conversation["id"])
 
+        policy = self.quick_settings.router_policy or getattr(self.quick_chain, "router_policy", None)
         if request_id is None and self.quick_settings.cloud_enabled and (
+                (policy is not None and policy.mode != "OFF") or
                 self.quick_settings.prefer_cloud or self.quick_settings.cloud_fallback_enabled):
             return AnswerOutcome("", "", (), "IDEMPOTENCY_REQUIRED", {})
-        if request_id is not None:
+        context = current_execution.get()
+        if context is not None:
+            self.lifecycle.assert_current()
+            run_id = context[0].run_id
+        elif request_id is not None:
             claim = getattr(self.runs, "create_run_once", None)
             if claim is None:
                 return AnswerOutcome(request_id, "", (), "IDEMPOTENCY_UNAVAILABLE", {})
@@ -250,6 +282,8 @@ class AnswerService:
                     cloud_allowed_by_kb=cloud_allowed_by_kb,
                     local_query_gateway=self.local_query_gateway,
                     on_retrieval=self.runs.persist_retrieval_hits,
+                    is_cancelled=lambda: self._is_cancelled(run_id),
+                    **({'conversation_id': conversation_id} if getattr(self.quick_chain, 'context_manager', None) is not None else {}),
                     **resolution_args,
                 )
                 answer, citations, error_code = result.answer, result.citations, result.error_code
@@ -328,6 +362,13 @@ class AnswerService:
                         langfuse_run.finish(answer="", citations=(), error_code="CANCELLED", run_trace=trace)
                     return self._cancelled_outcome(run_id, mode, trace)
                 outcome = AnswerOutcome(run_id, answer, tuple(citations), error_code, trace)
+                if error_code is None and self.memory_service is not None:
+                    try:
+                        trace['memory_extraction_job'] = self.memory_service.after_completed(conversation_id,scope)
+                    except Exception:
+                        # The answer was authoritatively committed; scheduling
+                        # failure must not relabel or regenerate that answer.
+                        trace['memory_schedule_error'] = 'MEMORY_SCHEDULE_FAILED'
                 if langfuse_run is not None:
                     langfuse_run.finish(answer=answer, citations=tuple(citations), error_code=error_code, run_trace=trace)
                 return outcome

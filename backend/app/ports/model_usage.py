@@ -38,7 +38,7 @@ class UsageCapture:
 
     def summary(self) -> dict[str, Any]:
         result: dict[str, Any] = {}
-        for stage in ('query', 'answer', 'embedding'):
+        for stage in ('query', 'answer', 'embedding', 'context_compaction', 'memory_extraction'):
             calls = [call for call in self.calls if call.stage == stage]
             row = {'call_count': len(calls), 'error_count': sum(call.status != 'ok' for call in calls),
                    'availability': 'not_run' if not calls else 'actual',
@@ -52,7 +52,7 @@ class UsageCapture:
                 elif calls:
                     row['availability'] = 'unavailable'
             result[stage] = row
-        chat_calls = [call for call in self.calls if call.stage in ('query', 'answer')]
+        chat_calls = [call for call in self.calls if call.stage in ('query', 'answer', 'context_compaction', 'memory_extraction')]
         totals = [None if call.input_tokens is None or call.output_tokens is None
                   else call.input_tokens+call.output_tokens for call in chat_calls]
         total = sum(totals) if totals and all(value is not None for value in totals) else None
@@ -79,7 +79,7 @@ def capture_usage(*, role: str = 'business') -> Iterator[UsageCapture]:
 
 @contextmanager
 def call_stage(stage: str) -> Iterator[None]:
-    if stage not in ('query', 'answer', 'embedding'):
+    if stage not in ('query', 'answer', 'embedding', 'context_compaction', 'memory_extraction'):
         raise ValueError('invalid model call stage')
     token = _STAGE.set(stage)
     try:

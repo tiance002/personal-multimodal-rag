@@ -51,6 +51,21 @@ class PostgresKnowledgeRepository:
         self.max_chunk_chars = max_chunk_chars
         self.chunk_overlap = chunk_overlap
         self.chunking_config = ChunkingConfig(general_size=max_chunk_chars, general_overlap=chunk_overlap)
+        # Wired by the composition root. Invoked only after the PG transaction
+        # exits successfully; cache failure cannot alter committed facts.
+        self.event_sink = None
+
+    def _publish_committed_events(self, run_id, events):
+        if self.event_sink is None:
+            return
+        try:
+            with self.engine.connect() as conn:
+                session=conn.execute(text('SELECT conversation_id FROM rag_runs WHERE id=:id'),dict(id=run_id)).scalar()
+            if session is not None:
+                for event in events:
+                    self.event_sink(str(session),str(run_id),event)
+        except Exception:
+            pass
 
     def create_knowledge_base(self, name: str, description: str = "", *, graph_enabled: bool = False, cloud_allowed: bool = False) -> dict[str, Any]:
         kb_id = uuid.uuid4()
@@ -1286,22 +1301,26 @@ class PostgresKnowledgeRepository:
 
     def completed_history_context(self, conversation_id: str, kb_scope: list[str],
                                   document_scope: list[str], *, current_run_id: str,
-                                  limit: int = 3) -> dict[str, Any]:
+                                  limit: int = 3, purpose: str = 'follow_up') -> dict[str, Any]:
         from backend.app.ports.persistence import bounded_completed_history
+        if purpose not in {'follow_up','context'} or type(limit) is not int or limit < 1:
+            raise ValueError('HISTORY_REQUEST_INVALID')
 
         with self.engine.connect() as conn:
             current = conn.execute(text("""
-                SELECT r.created_at FROM rag_runs r
+                SELECT r.created_at,r.knowledge_base_scope,r.document_scope FROM rag_runs r
                 JOIN conversations c ON c.id=r.conversation_id AND c.deleted_at IS NULL
                 WHERE r.id=:run AND r.conversation_id=:conversation
-                  AND r.knowledge_base_scope=CAST(:kb AS jsonb)
-                  AND r.document_scope=CAST(:docs AS jsonb)
+                  AND ((:context_mode AND r.knowledge_base_scope @> CAST(:kb AS jsonb) AND r.knowledge_base_scope <@ CAST(:kb AS jsonb)
+                         AND r.document_scope @> CAST(:docs AS jsonb) AND r.document_scope <@ CAST(:docs AS jsonb))
+                       OR (NOT :context_mode AND r.knowledge_base_scope=CAST(:kb AS jsonb) AND r.document_scope=CAST(:docs AS jsonb)))
+                  AND c.knowledge_base_scope=r.knowledge_base_scope AND c.document_scope=r.document_scope
             """), {"run": current_run_id, "conversation": conversation_id,
-                    "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope)}).mappings().first()
+                    "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope), "context_mode": purpose == 'context'}).mappings().first()
             if current is None:
                 return {"turns": (), "blocked_reason": "HISTORY_UNAVAILABLE"}
             cutoff = current["created_at"]
-            rows = list(conn.execute(text("""
+            query = """
                 SELECT r.id AS run_id,r.conversation_id,r.q0,r.status,r.error_code,
                        r.knowledge_base_scope,r.document_scope,r.created_at,r.completed_at,
                        EXISTS (SELECT 1 FROM retrieval_events e WHERE e.run_id=r.id
@@ -1310,11 +1329,49 @@ class PostgresKnowledgeRepository:
                 FROM rag_runs r
                 WHERE r.conversation_id=:conversation AND r.id<>:run AND r.created_at<:cutoff
                 ORDER BY r.created_at DESC,r.id DESC LIMIT 16
-            """), {"run": current_run_id, "conversation": conversation_id,
+            """
+            scan_limit = min(2048, max(16, limit*4)) if purpose == 'context' else 16
+            # Only server-derived integer constants change the context branch;
+            # the existing follow-up SQL and its sixteen-row barrier are intact.
+            if purpose == 'context': query = query.replace('LIMIT 16', 'LIMIT ' + str(scan_limit))
+            rows = list(conn.execute(text(query), {"run": current_run_id, "conversation": conversation_id,
                     "cutoff": cutoff}).mappings())
+            if purpose == 'context':
+                from backend.app.ports.context_budget import identity, protocol_messages
+                enriched = []
+                for record in rows:
+                    row = dict(record)
+                    messages = conn.execute(text('SELECT role,content FROM conversation_messages WHERE run_id=:run AND conversation_id=:conversation'),
+                        {'run': row['run_id'], 'conversation': conversation_id}).mappings().all()
+                    row['message_count'] = len(messages)
+                    row['user_content'] = next((m['content'] for m in messages if m['role'] == 'user'), None)
+                    row['answer'] = next((m['content'] for m in messages if m['role'] == 'assistant'), None)
+                    payload = conn.execute(text("SELECT payload FROM retrieval_events WHERE run_id=:run AND event_type='answer.completed' ORDER BY seq DESC LIMIT 1"),
+                        {'run': row['run_id']}).scalar()
+                    row['citations'] = payload.get('citations') if isinstance(payload, dict) else None
+                    proofs = conn.execute(text('''SELECT ae.label,ae.version_id,ae.chunk_id,ae.quote,ae.quote_sha256,ae.locator,c.content
+                        FROM answer_evidence ae JOIN chunks c ON c.id=ae.chunk_id AND c.version_id=ae.version_id
+                        WHERE ae.run_id=:run'''), {'run': row['run_id']}).mappings().all()
+                    by_label = {p['label']: p for p in proofs}
+                    labels = row['citations']
+                    row['citation_valid'] = (isinstance(labels, list) and all(isinstance(x, str) for x in labels)
+                        and len(set(labels)) == len(labels) and all(label in by_label
+                            and hashlib.sha256(by_label[label]['quote'].encode()).hexdigest() == by_label[label]['quote_sha256']
+                            and by_label[label]['quote'] in by_label[label]['content'] for label in labels))
+                    ordered_proofs = [by_label[label] for label in labels] if row['citation_valid'] else proofs
+                    row['evidence'] = [{k: str(p[k]) if k in {'version_id','chunk_id'} else p[k]
+                        for k in ('label','version_id','chunk_id','quote','quote_sha256','locator')} for p in ordered_proofs]
+                    protocol = conn.execute(text('SELECT messages,sha256 FROM context_run_protocol WHERE run_id=:run'), {'run': row['run_id']}).mappings().first()
+                    row['protocol'] = []
+                    if protocol:
+                        if identity(protocol['messages']) != protocol['sha256']:
+                            raise ValueError('CONTEXT_PROTOCOL_INTEGRITY_INVALID')
+                        row['protocol'] = protocol_messages(protocol['messages'])
+                    enriched.append(row)
+                rows = enriched
         return bounded_completed_history(rows, conversation_id=conversation_id,
                     kb_scope=kb_scope, document_scope=document_scope,
-                    current_run_id=current_run_id, cutoff=cutoff, limit=limit)
+                    current_run_id=current_run_id, cutoff=cutoff, limit=limit, purpose=purpose)
 
     def last_completed_question_context(self, conversation_id: str, kb_scope: list[str], document_scope: list[str]) -> dict[str, str] | None:
         """Completed q0 and provenance, in the same conversation and exact scope."""
@@ -1381,12 +1438,19 @@ class PostgresKnowledgeRepository:
                 {"id": run_id},
             ).scalar_one()
             conn.execute(text("INSERT INTO retrieval_events (id,run_id,seq,event_type,payload) VALUES (:id,:run_id,:seq,:event_type,CAST(:payload AS jsonb))"), {"id": event_id, "run_id": run_id, "seq": seq, "event_type": event_type, "payload": json.dumps(payload, ensure_ascii=False)})
-        return {"id": str(event_id), "run_id": run_id, "seq": seq, "event": event_type, "data": payload}
+        event={"id": str(event_id), "run_id": run_id, "seq": seq, "event": event_type, "data": payload}
+        self._publish_committed_events(run_id,[event])
+        return event
 
     def list_events(self, run_id: str, after_seq: int = 0) -> list[dict[str, Any]]:
         with self.engine.connect() as conn:
             rows = conn.execute(text("SELECT seq,event_type,payload,created_at FROM retrieval_events WHERE run_id=:run_id AND seq>:after ORDER BY seq"), {"run_id": run_id, "after": after_seq}).mappings()
             return [{"seq": row["seq"], "event": row["event_type"], "data": row["payload"], "created_at": row["created_at"]} for row in rows]
+
+    def read_committed_run(self, run_id, session, kbs, docs):
+        # Read-only recovery also works when Redis coordination is unconfigured.
+        from backend.app.adapters.postgres.run_lifecycle import PostgresRunLifecycle
+        return PostgresRunLifecycle(self.engine).read_run(run_id,session,kbs,docs)
 
     def persist_retrieval_hits(self, run_id: str, items: list[Any]) -> None:
         if not items:
@@ -1413,10 +1477,16 @@ class PostgresKnowledgeRepository:
         agent_terminal: tuple[str, str | None, int] | None = None,
         commit_check: Callable[[], str | None] | None = None,
     ) -> bool:
+        committed_events=[]
         with self.engine.begin() as conn:
             status = conn.execute(text("SELECT status FROM rag_runs WHERE id=:id FOR UPDATE"), {"id": run_id}).scalar()
             if status not in {"created", "running"}:
                 return False
+            from backend.app.adapters.postgres.run_lifecycle import check_fence
+            # Deploy migration before wiring lifecycle; unmanaged legacy runs
+            # continue to use the same final validator and cancellation lock.
+            if getattr(conn,'dialect',None) is not None and conn.dialect.has_table(conn,'rag_run_leases'):
+                check_fence(conn,run_id)
             if error_code is None:
                 # The application owns the one policy. Require it even for
                 # internal/offline callers, then rerun under the terminal lock.
@@ -1450,6 +1520,7 @@ class PostgresKnowledgeRepository:
                     {"id": uuid.uuid4(), "run_id": run_id, "seq": seq, "event_type": event_type,
                      "payload": json.dumps(payload, ensure_ascii=False)},
                 )
+                committed_events.append(dict(seq=seq,event=event_type,data=payload))
 
             append_final_event("retrieval.completed", {"count": len(citations), "error_code": error_code, "mode": mode})
             if error_code is None:
@@ -1481,7 +1552,8 @@ class PostgresKnowledgeRepository:
                 text("UPDATE rag_runs SET status=:status,error_code=:error_code,completed_at=clock_timestamp() WHERE id=:id"),
                 {"id": run_id, "status": terminal_status, "error_code": error_code},
             )
-            return True
+        self._publish_committed_events(run_id,committed_events)
+        return True
 
     def complete_run(self, run_id: str, status: str, error_code: str | None = None) -> bool:
         with self.engine.begin() as conn:
@@ -1508,7 +1580,8 @@ class PostgresKnowledgeRepository:
                 {"id": uuid.uuid4(), "run_id": run_id, "seq": seq,
                  "payload": json.dumps({"error_code": "CANCELLED", "citations": []})},
             )
-            return True
+        self._publish_committed_events(run_id,[dict(seq=seq,event='run.failed',data={'error_code':'CANCELLED','citations':[]})])
+        return True
 
     def is_cancelled(self, run_id: str) -> bool:
         with self.engine.connect() as conn:

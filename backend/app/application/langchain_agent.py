@@ -68,9 +68,11 @@ class LangChainAgentAdapter:
     external destination.
     """
 
-    def __init__(self, model: Any | None, *, observability: Any | None = None) -> None:
+    def __init__(self, model: Any | None, *, observability: Any | None = None,
+                 context_manager: Any | None = None, context_role: str = 'local_chat') -> None:
         self.model = model
         self.observability = observability
+        self.context_manager, self.context_role = context_manager, context_role
         self.last_tool_names: tuple[str, ...] = ()
         self.last_tool_schemas: tuple[dict[str, Any], ...] = ()
 
@@ -160,13 +162,30 @@ class LangChainAgentAdapter:
             from langchain.agents.middleware import ToolCallLimitMiddleware, after_model, before_model
 
             @before_model
-            def check_before_model(state: Any, runtime: Any) -> None:
+            def check_before_model(state: Any, runtime: Any) -> dict | None:
                 nonlocal model_calls, model_started, usage_start
                 guard()
+                update = None
+                if self.context_manager is not None:
+                    from backend.app.application.context_window import protocol_messages
+                    from langchain_core.messages import RemoveMessage
+                    from langgraph.graph.message import REMOVE_ALL_MESSAGES
+                    before = protocol_messages(state['messages'])
+                    if self.context_manager.store is not None:
+                        last_user = max((i for i,m in enumerate(before) if m['role']=='user'), default=-1)
+                        # A completed tool round is journaled before compaction.
+                        # Authoritative replay still requires successful RAG commit.
+                        self.context_manager.store.save_protocol(run_id, before[last_user+1:])
+                    after = self.context_manager.fit_live(before, conversation=conversation_id, scope=scope,
+                        run=run_id, role=self.context_role, system=system_prompt, tools=tool_protocol,
+                        output_tokens=budget.max_tokens)
+                    if after != before:
+                        update = {'messages': [RemoveMessage(id=REMOVE_ALL_MESSAGES), *after]}
                 model_calls += 1
                 model_started = time.perf_counter()
                 metrics = current_metrics()
                 usage_start = len(metrics.usage.calls) if metrics is not None else 0
+                return update
 
             @after_model
             def check_after_model(state: Any, runtime: Any) -> None:
@@ -179,10 +198,7 @@ class LangChainAgentAdapter:
                     raise _AgentAbort("MODEL_OUTPUT_TRUNCATED")
                 guard()
 
-            agent = create_agent(
-                self.model.model_copy(update={"num_predict": budget.max_tokens}) if hasattr(self.model, "num_predict") else self.model,
-                tools,
-                system_prompt=(
+            system_prompt = (
                     "You are a local knowledge assistant. Use only the provided read-only tools. "
                     "The server has already fixed the knowledge scope; never ask for or invent scope, "
                     "version, provider, filesystem, shell, network, or cloud parameters. Search before "
@@ -195,7 +211,18 @@ class LangChainAgentAdapter:
                     "不要写成 [依据：E1] 等带说明的格式，也不要把引用另起一段。"
                     "保留问题与来源中的实体、日期或月份、数字和单位的原文写法，不改写这些格式。"
                     + intents.checklist()
-                ),
+                )
+            from langchain_core.utils.function_calling import convert_to_openai_tool
+            tool_protocol = [convert_to_openai_tool(tool) for tool in tools]
+            initial_messages = [{'role': 'user', 'content': question + interpretation_data(validated_follow_up)}]
+            if self.context_manager is not None:
+                initial_messages = self.context_manager.smart_messages(conversation=conversation_id,
+                    scope=scope, run=run_id, role=self.context_role, system=system_prompt,
+                    current=initial_messages, tools=tool_protocol, output_tokens=budget.max_tokens)
+            agent = create_agent(
+                self.model.model_copy(update={"num_predict": budget.max_tokens}) if hasattr(self.model, "num_predict") else self.model,
+                tools,
+                system_prompt=system_prompt,
                 middleware=[
                     check_before_model,
                     check_after_model,
@@ -221,7 +248,7 @@ class LangChainAgentAdapter:
             )
             with agent_observation as agent_span:
                 result = agent.invoke(
-                    {"messages": [{"role": "user", "content": question + interpretation_data(validated_follow_up)}]},
+                    {"messages": initial_messages},
                     config=invoke_config,
                 )
                 if agent_span is not None:
@@ -275,6 +302,13 @@ class LangChainAgentAdapter:
             else:
                 snapshots = tuple(snapshot for snapshot in snapshots if snapshot.label in citations)
             status = "completed" if error_code is None else "failed"
+            if status == 'completed' and self.context_manager is not None and self.context_manager.store is not None:
+                from backend.app.application.context_window import protocol_messages
+                # Keep only this turn's actual tool/reasoning protocol, excluding
+                # old history and the final candidate (canonical answer is PG).
+                wire = protocol_messages(result['messages'])
+                last_user = max((i for i,m in enumerate(wire) if m['role']=='user'), default=-1)
+                self.context_manager.store.save_protocol(run_id, wire[last_user+1:-1])
             return self._finish(
                 trace_store,
                 SmartAgentResult(
@@ -305,7 +339,8 @@ class LangChainAgentAdapter:
             return self._finish(trace_store, SmartAgentResult(run_id, "cancelled" if exc.code == "CANCELLED" else "failed", steps=tuple(steps), error_code=exc.code, model_calls=model_calls))
         except Exception as exc:
             record_model("error")
-            code = "AGENT_STEP_LIMIT" if type(exc).__name__ in {"ToolCallLimitExceededError", "GraphRecursionError"} else type(exc).__name__
+            from backend.app.application.context_window import ContextDenied
+            code = str(exc) if isinstance(exc, ContextDenied) else "AGENT_STEP_LIMIT" if type(exc).__name__ in {"ToolCallLimitExceededError", "GraphRecursionError"} else type(exc).__name__
             return self._finish(trace_store, SmartAgentResult(run_id, "failed", steps=tuple(steps), error_code=code, model_calls=model_calls))
 
     def _build_tools(self, context: _ToolContext) -> list[Any]:

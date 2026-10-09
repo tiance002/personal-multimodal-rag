@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
-import { api } from "../api/client";
+import { api, sendMessageWithEvents } from "../api/client";
 import { clarificationText, evidenceHintText, tableHeaderHint } from "./state";
 import type {
   AppState,
@@ -15,6 +15,7 @@ import { ChatPanel } from "../components/ChatPanel";
 import { DocumentPreviewModal } from "../components/DocumentPreviewModal";
 import { KnowledgeBasePanel } from "../components/KnowledgeBasePanel";
 import { Sidebar } from "../components/Sidebar";
+import { MemoryPanel } from "../components/MemoryPanel";
 import { useResizablePanelWidth } from "../components/useResizablePanelWidth";
 
 const initialState: AppState = {
@@ -687,12 +688,21 @@ export default function App() {
       setNotice(
         mode === "smart" ? "智能推理正在读取当前知识库" : "正在检索当前知识库",
       );
-      const result = await api.sendMessage(
+      const streamEpoch = messageRequestEpoch.current;
+      const result = await sendMessageWithEvents(
         conversationId,
         content,
         mode,
         [kbId],
         documentScope,
+        (event) => {
+          if (messageRequestEpoch.current !== streamEpoch) return;
+          // Stage notices only. Candidate text never enters the transcript.
+          if (event.event === 'retrieval.started') setNotice('正在检索当前知识库');
+          if (event.event === 'evidence.frozen') setNotice('证据已冻结，正在完成回答');
+          if (event.event === 'answer.completed') setNotice('回答已完成，证据已冻结');
+          if (event.event === 'run.failed') setNotice('回答未完成，正在读取运行状态');
+        },
       );
       const isClarification =
         result.trace?.execution_mode === "clarification" &&
@@ -887,6 +897,7 @@ export default function App() {
           ) : (
             <section className="settings-page">
               <h1>系统设置</h1>
+              <MemoryPanel kbId={state.selectedKnowledgeBaseId} />
               <p>调整本机工作台的显示方式。</p>
               <label className="setting-row">
                 <span>

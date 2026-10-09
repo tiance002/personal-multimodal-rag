@@ -20,7 +20,7 @@ from backend.app.application.reviewed_immutable_batch import (
 )
 from backend.app.application.session_attempts import CANONICAL_LEDGER
 from backend.app.application.reviewed_grant60 import (
-    read_v2, require_current, trusted_for_product,
+    _has_owner, read_v2, require_current, trusted_for_product,
 )
 from backend.app.application.usd_pricing import input_upper_bound
 from backend.app.domain.scope import Scope
@@ -147,6 +147,59 @@ class ReviewedProductRequestGate(ReviewedImmutableBatchGate):
             return super()._require_attempt_authorization(data)
         require_current(grant)
 
+    def _task_entry(self, data):
+        try:
+            return super()._task_entry(data)
+        except AttemptDenied as error:
+            # Only the locked registry-validation path may close this distinct
+            # pre-owner failure. Other admission denials keep their contracts.
+            if error.args == ('REVIEWED_REGISTRY_CHANGED',) and self._grant() is None:
+                self._close_idle_manifest_rejection(data)
+            raise
+
+    def _close_idle_manifest_rejection(self, data):
+        """Close only a bound legacy registry's manifest mismatch, under its lock."""
+        self._frozen()  # Canonical path and immutable source/policy identity.
+        self._validate_v1_data(data)
+        self._require_attempt_authorization(data)
+        self._used(data)  # Validate ledger policy/history without settling usage.
+        if (data.get('calls_allowed_in_this_task') is not True
+                or data['reserved_attempts'] or 'grant60' in data):
+            return
+        tasks = data.get('reviewed_immutable_tasks')
+        task = tasks.get(self.product_spec.scope_id) if isinstance(tasks, dict) else None
+        if (not isinstance(task, dict) or task.get('policy') != self._trusted_policy()
+                or task.get('policy_sha256') != self._policy_digest()
+                or not isinstance(task.get('batches'), dict)
+                or set(task['batches']) != {self.batch_id}):
+            return
+        entry = task['batches'][self.batch_id]
+        if (not isinstance(entry, dict) or entry.get('sha256') != self.batch_spec.sha256
+                or entry.get('enabled') is not False
+                or entry.get('manifest') == _manifest(self.product_spec)
+                or any(row.get('request_id') == self.case['request_id']
+                       for row in data['attempts'])):
+            return  # Consumed IDs retain the separate R2 cleanup path.
+        scopes = []
+        for registered in tasks.values():
+            if not isinstance(registered, dict) or not isinstance(registered.get('batches'), dict):
+                return
+            scopes.extend(registered['batches'].values())
+        static = data.get('static_pair_scopes', {})
+        if not isinstance(static, dict):
+            return
+        scopes.extend(static.values())
+        if any(not isinstance(scope, dict) or type(scope.get('enabled')) is not bool
+               for scope in scopes):
+            return  # Ambiguous owner state is not evidence of an idle ledger.
+        if _has_owner(data):
+            return
+        data['calls_allowed_in_this_task'] = False
+        try:
+            self._write(data)
+        except (OSError, ValueError, TypeError):
+            raise AttemptDenied('PRODUCT_MANIFEST_CLOSURE_UNAVAILABLE') from None
+
     def _require_attempt_capacity(self, data):
         grant = self._grant()
         if grant is None:
@@ -209,7 +262,19 @@ class ReviewedProductRequestGate(ReviewedImmutableBatchGate):
 
     def _close_execution(self, data, comparison_id, owner):
         if self._grant() is None:
-            return super()._close_execution(data, comparison_id, owner)
+            super()._close_execution(data, comparison_id, owner)
+            # A consumed request can fail before this activation acquires an
+            # owner. Close only an idle re-enabled task, under the caller's
+            # ledger lock; preserve other owners and all historical usage.
+            if (comparison_id == self.product_spec.scope_id
+                    and data.get('calls_allowed_in_this_task') is True
+                    and not data['reserved_attempts']
+                    and any(row.get('request_id') == self.case['request_id']
+                            for row in data['attempts'])
+                    and not _has_owner(data)):
+                data['calls_allowed_in_this_task'] = False
+                self._write(data)
+            return
         epoch = data['grant60']
         entry = data.get('reviewed_immutable_tasks', {}).get(comparison_id, {}).get('batches', {}).get(self.batch_id)
         if (not isinstance(entry, dict) or entry.get('execution_owner') != owner

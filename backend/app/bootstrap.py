@@ -34,6 +34,7 @@ from backend.app.application.context_builder import ContextBuilder
 from backend.app.application.retrieval_profile import reference_profile
 from backend.app.application.langchain_agent import LangChainAgentAdapter
 from backend.app.application.quick_chain import LangChainQuickChain
+from backend.app.application.rule_router_v1 import RouterPolicy, GenerationRole
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.adapters.office_preview import OfficePreviewAdapter
 from backend.app.adapters.parsers import ParserRegistry
@@ -65,6 +66,8 @@ class Container:
     cloud_gateway: Any | None = None
     follow_up_enabled: bool = False
     provider_factory: ProviderFactory | None = None
+    lifecycle: Any | None = None
+    memory_service: Any | None = None
 
 
 def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET,
@@ -167,12 +170,47 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     cloud_gateway = (DeepSeekGateway(api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         model=settings.cloud_model, cloud_enabled=True, attempt_gate=SessionAttemptGate(), gate_types=DEEPSEEK_GATE_TYPES)
         if settings.cloud_enabled and settings.chat_egress_enabled else None) if cloud_model is _MODEL_UNSET else cloud_model
+    from backend.app.application.context_window import ContextManager, ModelWindow
+    from backend.app.adapters.postgres.context_checkpoint import PostgresContextStore
+    registry = settings.model_registry()
+    context_windows = {role: ModelWindow(registry.select(role).provider, registry.select(role).model_id)
+                       for role in ('chat_cheap', 'chat_expensive')}
+    context_windows['local_chat'] = ModelWindow('ollama', settings.ollama_chat_model)
+    if cloud_gateway is not None:
+        context_windows['cloud_chat'] = ModelWindow(getattr(cloud_gateway, 'provider_name', 'UNKNOWN'),
+                                                  getattr(cloud_gateway, 'chat_model', 'UNKNOWN'))
+    context_manager = ContextManager(store, PostgresContextStore(engine), context_windows)
+    memory_service = None
+    if settings.memory_local_principal is not None:
+        if settings.host not in {'127.0.0.1','localhost','::1'}:
+            raise ValueError('MEMORY_LOCAL_BIND_REQUIRED')
+        from backend.app.adapters.postgres.memory import PostgresMemoryRepository
+        from backend.app.application.memory import MemoryService, MemoryRetriever
+        memory_repo = PostgresMemoryRepository(engine, settings.memory_local_principal)
+        memory_service = MemoryService(memory_repo, memory_repo.principal)
+        context_manager.memory_retriever = MemoryRetriever(memory_repo, memory_repo.principal)
     quick_chain = LangChainQuickChain(
         knowledge_gateway,
         answer_gateway=ollama if settings.local_answer_enabled else None,
         cloud_answer_gateway=cloud_gateway,
         budget_gate=budget_gate,
+        context_manager=context_manager,
+        router_policy=RouterPolicy(mode="DYNAMIC" if settings.rule_router_enabled else "OFF",
+            quality_escalation=settings.rule_router_quality_escalation,
+            abstention_escalation=settings.rule_router_abstention_escalation,
+            provider_fallback=settings.rule_router_provider_fallback),
+        generation_roles={
+            "chat_cheap": GenerationRole("chat_cheap", provider_factory.build("chat_cheap")),
+            "chat_expensive": GenerationRole("chat_expensive", cloud_gateway,
+                usage_guard=provider_factory.usage_guards.get("chat_expensive")),
+        } if settings.rule_router_enabled else None,
     )
+    from backend.app.application.run_lifecycle import RunLifecycle
+    from backend.app.adapters.postgres.run_lifecycle import PostgresRunLifecycle
+    from backend.app.adapters.redis_stream import RedisStreamManager
+    lifecycle = (RunLifecycle(PostgresRunLifecycle(engine,lease_seconds=settings.live_run_ttl_seconds),
+        RedisStreamManager.from_url(settings.redis_url,live_ttl=settings.live_run_ttl_seconds,event_ttl=settings.stream_event_ttl_seconds),store)
+        if settings.redis_url else None)
     return Container(
         settings=settings,
         engine=engine,
@@ -184,7 +222,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         budget_gate=budget_gate,
         knowledge_gateway=knowledge_gateway,
         quick_chain=quick_chain,
-        smart_agent=LangChainAgentAdapter(agent_model_value, observability=langfuse)
+        smart_agent=LangChainAgentAdapter(agent_model_value, observability=langfuse, context_manager=context_manager)
         if agent_model_value is not None and settings.local_answer_enabled
         else None,
         langfuse=langfuse,
@@ -192,6 +230,8 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         cloud_gateway=cloud_gateway,
         follow_up_enabled=follow_up_enabled,
         provider_factory=provider_factory,
+        lifecycle=lifecycle,
+        memory_service=memory_service,
     )
 
 

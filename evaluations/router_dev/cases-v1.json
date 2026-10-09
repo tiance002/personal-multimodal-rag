@@ -1,0 +1,1194 @@
+{
+  "schema_version": "router-dev/v1",
+  "execution_kind": "SIMULATED",
+  "cases": [
+    {
+      "id": "router-dev-01",
+      "q0": "列出甲方解除条款原文",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 列出甲方解除条款原文\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "17cd53517b66a95252a3b03df6990822aadd48a69392e982c8bd0379016819bd",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "3263e83cb22575e354e08668e21bbd16192e373d5c2865d056c97e0982b61efb",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-02",
+      "q0": "根据合同甲方能否解除",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 根据合同甲方能否解除\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "f61c7135975d049abffac62ced00a02df7bfa6ea1cb8cefa783d2d07021e462b",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "e0be00dab5341bf7144e78de52733bdb75bf100a251b0cf4a5fe16ce746d16de",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-03",
+      "q0": "列出‘能否解除协议’的相关条款，不需要判断",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 列出‘能否解除协议’的相关条款，不需要判断\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "a19d618bf9af94a36a179c3d562628dbde0cc8bdabaaee9d96090872157493a8",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "e54bfb5bab4115bc3149903d0cc0d14b57716640005d5891c308dbf801a325e5",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-04",
+      "q0": "摘录原因",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 摘录原因\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "970a5d8fe422b0802910a0eebe189c51d855c2e586ce75a9de8dbb83e4d11620",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "6a9ca794a0119e97f7f505a0488c2ebeeed057df565315dd4c25be3ebdceac6c",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-05",
+      "q0": "推断原因",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 推断原因\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "f907a26324b1f1225c8819de871bd4d9f577e1bb1321eaaebbb2fd6029164788",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "874812e366ce14450615288af00735ee56412f649ad2109531d8d4a1d162db63",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-06",
+      "q0": "翻译这段文本",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 翻译这段文本\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "976bc4657bfe1d2047bbd4ad4d8ba1952f1b9b0369ddf18f54518e96e1ecb397",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "c30166ac9f07552b11e179f5008daaf898410061ea15c5536470079b1266063d",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-07",
+      "q0": "总结报告",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 总结报告\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "5708bd03c74e850ef248afb2b87a97c55e57328cefefce53c63e9ccde78b1929",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "34179a5f837fd090c05a63e4750ba0983b4b816ac81cfc33313bf442dc80d2e3",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-08",
+      "q0": "比较两个版本",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 比较两个版本\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "e81978b2ea641d9548f9b42f9b34ee07f7c329fc74fa210f7cbb72c8f2ae40c3",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "3568427452067d9c2611f6c8abfc98d57331e7890ef7b635d256de8efbf9b6b1",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-09",
+      "q0": "调和两个版本冲突",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 调和两个版本冲突\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "466927619cc32e8022cc0a218338659364cb0b23ffdc192b27311f97c093243f",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "9b599f7e787e205848c77d13c89b6f8d54b5db9bf70d3ec35c417044d5f0a26e",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-10",
+      "q0": "制定应急计划",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 制定应急计划\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "0175c21950e07a3de557f0974344efe5302cd1af10b9adbee0175178b33543bb",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "a1d7e5761af9dad7752bc3d41986541e5587ddbab22f215b2ce46b100d08acb7",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-11",
+      "q0": "你好",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 你好\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "958256bc2e0489fb31d38d11c3095ba371901a157054ce4c6b1aa59e3d05a054",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "7374c7d16abe9d328e016f4abc72cc8141ed6a0f4ad528c61b04535b70afb722",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-12",
+      "q0": "先计算两个增量，再用结果算占比",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 先计算两个增量，再用结果算占比\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "62deace986b092364bfb296e8c4bbcb21f5d1f2061d518487ec202770366a04f",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "03f839915b7f3887614394742a42bc5895cd56d5f452017bc0e4012c895d2f32",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-13",
+      "q0": "若金额≤5000，且负责人已批准，且安全审批通过，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若金额≤5000，且负责人已批准，且安全审批通过，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "a2af2f751bec327e3b690a6b962e4ed3e24cca689bf59e6e6c38c54e4800c7fd",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "783593e1b18d9bcfc95deb94132d6f46975a6e35dce605864a32caeff01001c6",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-14",
+      "q0": "若金额≤5000，且负责人已批准，且安全审批通过，能否报销；除非紧急情况豁免上述条件",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若金额≤5000，且负责人已批准，且安全审批通过，能否报销；除非紧急情况豁免上述条件\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "5cd76e9186da53bad717342b3d59da35bef9a11160e5030bed7817b2a0a03d11",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "82a520c8cc9c5d0fb0069303ea43953e38233767f2d7281b59a73b6a25232527",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-15",
+      "q0": "若金额不超过5000，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若金额不超过5000，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "ab4284e7c6f3c1b611ee72245e79d431e19112128ccc85a5cbcdbdd3a8445754",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "cdf377eb25ca19ee24320f0e77cfb3a5b7ebe18aa59f5106898a842460ea8d24",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-16",
+      "q0": "若金额≤5000，或负责人已批准，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若金额≤5000，或负责人已批准，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "d632652423f49a244a8ec4cf1c1f43e919647c92026fb318e534524d168aa453",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "bbb284d2e90fb99ccbfb62ac1fd5c81e2bd8c21cd23a482c165617514a87505f",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-17",
+      "q0": "若金额≤5000，且负责人已批准，或安全审批通过，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若金额≤5000，且负责人已批准，或安全审批通过，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "0f2d37bfae856f7ab819be71bfe0acd73dd8d192e695d962a81cea52b44d0035",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "29990ef6b496ae0cc38698e081a0dbdd0166315f894c32d0aa43cac34deea63d",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-18",
+      "q0": "若（金钱≤5000或负责人已批准）且安全审批通过，能否报销；紧急例外豁免上述条件",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若（金钱≤5000或负责人已批准）且安全审批通过，能否报销；紧急例外豁免上述条件\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "d9847f23a727c751dd5e897dd400418d0e5c39fc8ed4b65f97e35c83a805f286",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "55d90ef1db1618950c3b9f41c9154eb4d10db55b4975812a16f1f18cdddfeac4",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-19",
+      "q0": "能否报销，除非紧急情况",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 能否报销，除非紧急情况\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "6d5c5ab47d1d37901b5baf763df205f9c38b708a8c7de7e1275f13da8eda03b4",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "cd7882bea54a953940922177f728fc4d793f2e595795edc5dff0871eabf74240",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-20",
+      "q0": "计算(440-200)/(1300-1000)",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 计算(440-200)/(1300-1000)\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "f231928422a017af37a00f66d13f52bbfbf9682e1181f341e56768addcce69d0",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "08687bb2cb97009a6bc9e97cae38c817017e773c201209a4826a0bbd8e46e939",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-21",
+      "q0": "计算((8-2)/3)+4",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 计算((8-2)/3)+4\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "36268c34c5f9e846ec344f167bfa795875d57e06b18a809df2ecca30f9ae9a1d",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "311e55eb4d634bc7336cccca264025811302d0cc1ad079771b651318f0f6a123",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-22",
+      "q0": "先阅读再摘录",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 先阅读再摘录\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "be037873a6a59ab7fba5da859d7c065661aab98ff58d5d2115077035f96acd97",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "a0b7b9f1627c4952483287bb6683ac2fed830362c3659a06fb4fe360ca089256",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-23",
+      "q0": "先计算两个差额，最终输出一个比例",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 先计算两个差额，最终输出一个比例\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "0e54263376a5cde9d5655922530737ff1cf83b08b10c1ec18f6b9b81e0e2a36d",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "c8863b6cb8fea32889dc23a143157334092cad31011ec8d40104d035f2cfeadf",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-24",
+      "q0": "分别输出三个城市两个指标",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 分别输出三个城市两个指标\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "7d582902425ffab875ee2d7ceb63330ce953cffff66bb03532a93ff42b3d8f79",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "8c8e7aee1dc066416764f230f8d22f786bc711cedc9d8e534c5106f33227d068",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-25",
+      "q0": "输出七项结果",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 输出七项结果\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "84b88c77cff3ab01b9650e35fd26603f97ab1af0c64ba39754192a799c997f4e",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "b683b7b850d15237bb895cab7be38cfc4ae1960d4398d4e968c60f2a956c63f8",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-26",
+      "q0": "输出两项指标",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 输出两项指标\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "f4bd0d4e44ba5d709ce7b2248ab2d8f0c1a13959cff6248ff49323ff876d70e5",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "9e4e9b8d6840f2818ca6087deb76dca3443a2cd80c55f84f0b9d19436a9a545d",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-27",
+      "q0": "摘录条款并比较差异",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 摘录条款并比较差异\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "709f356200a6683396a2388f72065f0d954ceee413a6786d2d5f1368e4672dbf",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "9180ff6782513c32562010a08ebbf05d3fe1cb8b930a0d74f10af04886d8f726",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-28",
+      "q0": "无条件，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 无条件，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "63c2a0b697b6280121a3ed476844e20af6db83903c07cc1ab038e55877983956",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "08b6a8d2f2c54d145e6ecf84881b64374acd8010df97dd11cd2dbd00d55a6cb8",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-29",
+      "q0": "若金额≤5000，且金额≤5000，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若金额≤5000，且金额≤5000，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "abd41bdcf0a9b99d5764dbb7f752b5c3ca8f63a4849ea873c90edf69a9212850",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "c0588d93baad6ff6db7fc4a0104d221ceecad4117793e84f982a21fdaf9e5d0f",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-30",
+      "q0": "列出三个城市三个年份",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 列出三个城市三个年份\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "73c54fb2effc0c23d5b33b90f1536344988b2b9c736bbc181444635dc0befa92",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "a3bab6223b5900a373005c74c5a9cb4c12b9b8e2e4b281fb26b60742c5f0ec1b",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-31",
+      "q0": "摘录‘证据不足’的原文",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 摘录‘证据不足’的原文\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "2009b3803e036b6a8bd00a616200a04a2599f4c3cbce7250a373d2da3bd0eda1",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "b1af9966d23df6ef2387609f72d7721719d18899149966bad61ce98a716079e9",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-32",
+      "q0": "不要推断，列出原文",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 不要推断，列出原文\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "86a5ff08981dd25de58a418bcfc044c48b9879b04f0baba620c0ae69e7c07aa6",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "b66051f25ddec8b75438585c755fbb8d85235f6fb5c7315a747ba9a7a748fb7a",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-33",
+      "q0": "若审批0为真，且审批1为真，且审批2为真，且审批3为真，且审批4为真，能否报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 若审批0为真，且审批1为真，且审批2为真，且审批3为真，且审批4为真，能否报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "e8017cb8af002321f85bc5034b65f0290fe0e5664526d0f05931ebb17437848b",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "02a737d3e3961d68aa3e9336db675f6fe343cd86608b4b0860f0b7a95742bfdf",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-34",
+      "q0": "如果审批通过，是否可以报销",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 如果审批通过，是否可以报销\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "fe6e35daf4cd73ae3ef3bdd98e5b192a27f15be7d8b2c9b2b0c8aa6649414e98",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "a01c03f37352df68ee462bf667f15352acd4990e6d353c4986d39d2c03f9eb68",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-35",
+      "q0": "筛选条件：金额≤5000，且负责人已批准，计算总和",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 筛选条件：金额≤5000，且负责人已批准，计算总和\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "1928ca79d25abbcf6e0f37c771a47accb797603d6f60d53b83d09661106edbec",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "fa74629c5cf87510e9ecfef0b45952e34f698f06f9e08207054018434be064e3",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    },
+    {
+      "id": "router-dev-36",
+      "q0": "根据合同甲方能否解除，输出七项结果",
+      "context": "SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "template_version": "simulated-replay-prompt/v1",
+      "max_tokens": 512,
+      "annotation_status": "DEVELOPER_DIAGNOSTIC_NOT_OWNER_REVIEWED",
+      "prompt": "Answer only from supplied evidence. Allowed labels: [E1].\nQuestion: 根据合同甲方能否解除，输出七项结果\nEvidence: [E1] SIMULATED development evidence. 金额上限5000，审批规则仅供离线诊断。",
+      "responses": {
+        "chat_cheap": {
+          "identity": "4fefc1acf314c03d09dd4d6125a0b3009011b3125e262739aefa50f35ae0641b",
+          "execution_kind": "SIMULATED",
+          "answer": "无效文本 [E99]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 12,
+          "bill_cost": null
+        },
+        "chat_expensive": {
+          "identity": "b5f49f8c80e9f80be3f246c6dca21f4bd4309e5ac410c950abee87c07ffda3e0",
+          "execution_kind": "SIMULATED",
+          "answer": "SIMULATED development evidence [E1]",
+          "tokens": {
+            "input": 11,
+            "output": 7
+          },
+          "latency_ms": 32,
+          "bill_cost": null
+        }
+      }
+    }
+  ]
+}

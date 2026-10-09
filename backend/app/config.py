@@ -37,6 +37,7 @@ def _env_context_positive_int(name: str, default: int) -> int:
 
 @dataclass(frozen=True)
 class Settings:
+    memory_local_principal: str | None = None
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
     model_registry_json: str | None = None
@@ -55,6 +56,13 @@ class Settings:
     mmr_enabled: bool = False
     query_rewrite_enabled: bool = False
     cloud_fallback_enabled: bool = False
+    rule_router_enabled: bool = False
+    rule_router_quality_escalation: bool = True
+    rule_router_abstention_escalation: bool = False
+    rule_router_provider_fallback: bool = False
+    redis_url: str | None = None
+    live_run_ttl_seconds: int = 60
+    stream_event_ttl_seconds: int = 86400
     inline_ingestion_enabled: bool = True
     host: str = "127.0.0.1"
     port: int = 8000
@@ -77,8 +85,13 @@ class Settings:
     context_max_items: int = 8
 
     def __post_init__(self) -> None:
+        if type(self.live_run_ttl_seconds) is not int or self.live_run_ttl_seconds < 3 or type(self.stream_event_ttl_seconds) is not int or self.stream_event_ttl_seconds < 1:
+            raise ValueError('STREAM_TTL_INVALID')
         if self.embedding_backend not in {"siliconflow", "ollama"}:
             raise ValueError("EMBEDDING_BACKEND_UNSUPPORTED")
+        for name in ("rule_router_enabled", "rule_router_quality_escalation", "rule_router_abstention_escalation", "rule_router_provider_fallback"):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError("RULE_ROUTER_FLAG_INVALID")
         self.model_registry()
         for name in ("embedding_egress_enabled", "chat_egress_enabled", "rerank_egress_enabled", "vision_egress_enabled"):
             if type(getattr(self, name)) is not bool:
@@ -113,6 +126,7 @@ class Settings:
         if ingestion_lease_seconds <= 0:
             raise ValueError("RAG_INGESTION_LEASE_SECONDS must be positive")
         return cls(
+            memory_local_principal=os.getenv('RAG_MEMORY_LOCAL_PRINCIPAL') or None,
             model_registry_json=os.getenv("RAG_MODEL_REGISTRY_JSON"),
             embedding_backend=os.getenv("RAG_EMBEDDING_BACKEND", cls.embedding_backend),
             embedding_egress_enabled=_env_context_bool("RAG_EMBEDDING_EGRESS_ENABLED", False),
@@ -131,6 +145,13 @@ class Settings:
             mmr_enabled=_env_bool("RAG_MMR_ENABLED", False),
             query_rewrite_enabled=_env_bool("RAG_QUERY_REWRITE_ENABLED", False),
             cloud_fallback_enabled=_env_bool("RAG_CLOUD_FALLBACK_ENABLED", False),
+            rule_router_enabled=_env_context_bool("RAG_RULE_ROUTER_ENABLED", False),
+            redis_url=os.getenv('RAG_REDIS_URL') or None,
+            live_run_ttl_seconds=_env_context_positive_int('RAG_LIVE_RUN_TTL_SECONDS',60),
+            stream_event_ttl_seconds=_env_context_positive_int('RAG_STREAM_EVENT_TTL_SECONDS',86400),
+            rule_router_quality_escalation=_env_context_bool("RAG_RULE_ROUTER_QUALITY_ESCALATION", True),
+            rule_router_abstention_escalation=_env_context_bool("RAG_RULE_ROUTER_ABSTENTION_ESCALATION", False),
+            rule_router_provider_fallback=_env_context_bool("RAG_RULE_ROUTER_PROVIDER_FALLBACK", False),
             inline_ingestion_enabled=_env_bool("RAG_INLINE_INGESTION", True),
             host=os.getenv("RAG_HOST", cls.host),
             port=port,

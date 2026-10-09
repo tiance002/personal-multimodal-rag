@@ -77,7 +77,7 @@ def env(tmp_path,monkeypatch):
     old_gates=[]
     for b in old_policy.batches:
         index=old_policy.batches.index(b)+1
-        old_manifest=Path(r'D:\codex_workspace\2026-10-01\task-16\planning-cloud12-rev2')/f'batch-{index:02}-manifest.draft.json'
+        old_manifest=Path(r'C:\codex-test-fixtures\reviewed-task')/f'batch-{index:02}-manifest.draft.json'
         first=batch.ReviewedImmutableBatchGate(p,task_policy=old_policy,batch_id=b.batch_id,scope_path=old_manifest,case_id=b.case_identities[0][0])
         first.register_disabled_scope()
         for cid,rid in b.case_identities:
@@ -282,3 +282,156 @@ def test_default_local_and_cloud_disabled_use_zero_additional_paid_attempts(env,
     c.cloud_enabled=True
     with pytest.raises(ProviderRequestNotSent):invoke(e,c,cloud_authorized=False)
     assert not requests and read(e.p)['consumed_attempts']==23
+
+
+# P5-R2.1: SIMULATED ledger and transport; original tests remain byte-identical.
+def _r21_tamper(e):
+    data = read(e.p)
+    data['reviewed_immutable_tasks'][TASK]['batches'][TASK]['manifest']['cases'][0]['prompt_sha256'] = '0'*64
+    data['calls_allowed_in_this_task'] = True
+    write(e.p, data)
+    return read(e.p)
+
+
+def test_r21_manifest_rejection_stage_is_before_owner(env, monkeypatch):
+    e = env
+    before = _r21_tamper(e)
+    events = []
+    check = e.g._validate_manifest
+    def observed(manifest, spec):
+        entry = read(e.p)['reviewed_immutable_tasks'][TASK]['batches'][TASK]
+        events.append({'stage':'manifest_validation', 'enabled':entry['enabled'],
+                       'owner':entry.get('execution_owner')})
+        return check(manifest, spec)
+    monkeypatch.setattr(e.g, '_validate_manifest', observed)
+    with pytest.raises(AttemptDenied, match='^REVIEWED_REGISTRY_CHANGED$'):
+        with e.g.execution_scope():
+            pytest.fail('tampered manifest entered execution')
+    assert events == [{'stage':'manifest_validation', 'enabled':False, 'owner':None}]
+    assert read(e.p) == {**before, 'calls_allowed_in_this_task':False}
+    write(e.p.parent/'SIMULATED-r21-path.json', {'events':events, 'request_consumed':False})
+
+
+@pytest.mark.parametrize('kind', ['prompt', 'missing', 'null', 'foreign_scope'])
+def test_r21_unconsumed_integrity_rejection_closes_only_global_flag(env, monkeypatch, kind):
+    e = env
+    sent = transport(monkeypatch)
+    data = _r21_tamper(e)
+    entry = data['reviewed_immutable_tasks'][TASK]['batches'][TASK]
+    if kind == 'missing': entry.pop('manifest')
+    if kind == 'null': entry['manifest'] = None
+    if kind == 'foreign_scope': entry['manifest']['parent_comparison_id'] = 'SIMULATED-foreign'
+    # Unrelated historical UNKNOWN remains occupied and is not settled/refunded.
+    data['attempts'][0]['status'] = 'unknown'
+    data['attempts'][0]['validation_tokens']['state'] = 'unknown'
+    write(e.p, data)
+    before = read(e.p)
+    used = e.g._used(before)
+    with pytest.raises(AttemptDenied, match='^REVIEWED_REGISTRY_CHANGED$'):
+        with e.g.execution_scope(): pytest.fail('manifest was trusted')
+    assert read(e.p) == {**before, 'calls_allowed_in_this_task':False}
+    assert e.g._used(read(e.p)) == used and not sent
+
+
+@pytest.mark.parametrize('failure', ['write', 'replace'])
+def test_r21_manifest_closure_persistence_failure_is_explicit(env, monkeypatch, failure):
+    e = env
+    _r21_tamper(e)
+    before = e.p.read_bytes()
+    if failure == 'write':
+        monkeypatch.setattr(e.g, '_write', lambda data: (_ for _ in ()).throw(OSError('SIMULATED private exception text')))
+    else:
+        monkeypatch.setattr(os, 'replace', lambda *a: (_ for _ in ()).throw(OSError('SIMULATED private exception text')))
+    with pytest.raises(AttemptDenied, match='^PRODUCT_MANIFEST_CLOSURE_UNAVAILABLE$'):
+        with e.g.execution_scope(): pytest.fail('failed closure entered body')
+    assert e.p.read_bytes() == before
+    assert not list(e.p.parent.glob('*.tmp'))
+
+
+def _r21_other_gate(e, monkeypatch):
+    other_spec = dataclasses.replace(e.spec, scope_id=TASK+'-R21-OTHER',
+        run_id=str(uuid.uuid5(uuid.NAMESPACE_URL, 'SIMULATED-R21-other-run')))
+    specs = {TASK:e.spec, other_spec.scope_id:other_spec}
+    monkeypatch.setattr(e.m, '_TRUSTED_PRODUCT_REQUESTS', MappingProxyType(specs))
+    monkeypatch.setattr(e.m, '_PRODUCT_SPEC_DIGESTS', MappingProxyType(
+        {k:e.m._digest(dataclasses.asdict(v)) for k,v in specs.items()}))
+    gate = e.m.ReviewedProductRequestGate(e.p, scope_id=other_spec.scope_id)
+    gate.register_disabled_scope()
+    return gate
+
+
+@pytest.mark.parametrize('pending', [False, True])
+def test_r21_manifest_denial_preserves_legitimate_other_owner(env, monkeypatch, pending):
+    e = env
+    other = _r21_other_gate(e, monkeypatch)
+    enable(e.p)
+    with other.execution_scope():
+        if pending:
+            attempt = other.reserve(request_id=other.case['request_id'])
+        _r21_tamper(e)
+        before = e.p.read_bytes()
+        def reject(_):
+            with pytest.raises(AttemptDenied, match='^REVIEWED_REGISTRY_CHANGED$'):
+                with e.g.execution_scope(): pytest.fail('tampered manifest entered')
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            list(pool.map(reject, range(8)))
+        assert e.p.read_bytes() == before
+        assert read(e.p)['calls_allowed_in_this_task'] is True
+        if pending: other.finish(attempt, 'unknown')
+    assert read(e.p)['calls_allowed_in_this_task'] is False
+
+
+@pytest.mark.parametrize('kind', ['static_owner', 'stale_owner', 'reserved_without_owner'])
+def test_r21_manifest_denial_preserves_nonidle_scope(env, kind):
+    e = env
+    data = _r21_tamper(e)
+    if kind == 'static_owner':
+        data['static_pair_scopes'] = {'SIMULATED-other':{'enabled':True, 'execution_owner':'SIMULATED-owner'}}
+    elif kind == 'stale_owner':
+        data['reviewed_immutable_tasks'][TASK]['batches'][TASK]['execution_owner'] = 'SIMULATED-other-owner'
+    else:
+        data['attempts'][0]['status'] = 'reserved'
+        data['attempts'][0]['validation_tokens']['state'] = 'reserved'
+        data['reserved_attempts'] = 1
+    write(e.p, data)
+    before = e.p.read_bytes()
+    with pytest.raises(AttemptDenied, match='^REVIEWED_REGISTRY_CHANGED$'):
+        with e.g.execution_scope(): pytest.fail('nonidle tampered scope entered')
+    assert e.p.read_bytes() == before
+
+
+@pytest.mark.parametrize('kind', ['policy_digest', 'scope_hash', 'ledger_policy', 'provider', 'foreign_ledger', 'owner_shape'])
+def test_r21_untrusted_binding_never_receives_manifest_cleanup(env, kind):
+    e = env
+    data = _r21_tamper(e)
+    entry = data['reviewed_immutable_tasks'][TASK]
+    if kind == 'policy_digest': entry['policy_sha256'] = '0'*64
+    if kind == 'scope_hash': entry['batches'][TASK]['sha256'] = '0'*64
+    if kind == 'ledger_policy': data['validation_policy']['scope'] = 'SIMULATED-foreign'
+    if kind == 'provider': data['provider'] = 'SIMULATED-foreign'
+    if kind == 'owner_shape': data['static_pair_scopes'] = {'SIMULATED-other':{}}
+    write(e.p, data)
+    path = e.p
+    if kind == 'foreign_ledger':
+        path = e.p.parent/'SIMULATED-foreign-ledger.json'
+        write(path, data)
+        e.g.path = path
+    before = path.read_bytes()
+    with pytest.raises(AttemptDenied):
+        with e.g.execution_scope(): pytest.fail('untrusted binding entered')
+    assert path.read_bytes() == before
+
+
+def test_r21_other_scope_manifest_cannot_close_current_owner(env, monkeypatch):
+    e = env
+    other = _r21_other_gate(e, monkeypatch)
+    data = read(e.p)
+    data['reviewed_immutable_tasks'][other.product_spec.scope_id]['batches'][other.batch_id]['manifest'] = None
+    write(e.p, data)
+    enable(e.p)
+    with e.g.execution_scope():
+        before = e.p.read_bytes()
+        with pytest.raises(AttemptDenied, match='^REVIEWED_REGISTRY_CHANGED$'):
+            with other.execution_scope(): pytest.fail('other tampered scope entered')
+        assert e.p.read_bytes() == before
+    assert read(e.p)['calls_allowed_in_this_task'] is False

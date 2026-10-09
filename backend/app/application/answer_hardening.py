@@ -196,6 +196,18 @@ class HardeningPolicy:
     def __init__(self, audit: Any = None) -> None:
         self.audit = audit
 
+    def check_candidate(self, candidate: str, snapshots: Any, plan: Any, error: str | None) -> str | None:
+        """Side-effect-free original-candidate check before audit/fallback/commit."""
+        from backend.app.application.final_answer_commit import FinalAnswerCommitCheck
+        if not isinstance(candidate, str) or not candidate.strip():
+            return error or 'MODEL_EMPTY'
+        labels = {s.label for s in snapshots}
+        if set(MARKER.findall(candidate)) - labels or any(m[1] not in labels for m in ANY_MARKER.finditer(candidate)):
+            return 'INVALID_CITATION'
+        if not error and obvious_contradiction(candidate, snapshots):
+            return 'SELF_CONTRADICTION'
+        return error or FinalAnswerCommitCheck().check(candidate, snapshots, plan.evidence_plan)
+
     def observe_evidence_answer(self, answer: str, snapshots: Any, chunks: Any, plan: Any) -> None:
         if (metrics := current_metrics()) is not None:
             intents = detect_intents(plan.question)

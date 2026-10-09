@@ -31,6 +31,7 @@ class RunMetrics:
         self.providers: set[str] = set()
         self.cloud_called = False
         self.hardening: dict[str, Any] = {}
+        self.rule_router: dict[str, Any] | None = None
 
     def record_retrieval(self, result: Any) -> None:
         self.retrievals.append({
@@ -118,6 +119,7 @@ class RunMetrics:
             "retrieval_merges": deepcopy(self.retrieval_merges),
             "evidence_quality": self.quality if self.quality is not None else NOT_AVAILABLE,
             "answer_hardening": self.hardening,
+            "rule_router": deepcopy(self.rule_router),
         }
 
 

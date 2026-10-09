@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import asyncio
+import time
 import mimetypes
 from pathlib import Path
 import uuid
@@ -379,6 +381,8 @@ def _answer_service(request: Request) -> AnswerService:
         knowledge_gateway=container.knowledge_gateway,
         quick_chain=container.quick_chain,
         runs=container.store,
+        lifecycle=getattr(container,'lifecycle',None),
+        memory_service=getattr(container,'memory_service',None),
         graph_query=container.graph.query_graph,
         agent_trace_store=container.agent,
         content_reader=container.store.get_document_content,
@@ -431,16 +435,43 @@ def send_message(conversation_id: str, request: Request, payload: MessageIn):
 
 
 @router.get("/runs/{run_id}/events")
-def run_events(run_id: str, request: Request, last_event_id: str | None = Header(default=None, alias="Last-Event-ID")):
-    store = _container(request).store
-    after = int(last_event_id or 0)
-    events = store.list_events(run_id, after)
-    if not events:
-        return _not_found(request, "run or events not found")
+async def run_events(run_id: str, conversation_id: str, request: Request, last_event_id: str | None = Header(default=None, alias="Last-Event-ID")):
+    container = _container(request)
+    store, lifecycle = container.store, getattr(container,'lifecycle',None)
+    try:
+        uuid.UUID(run_id); uuid.UUID(conversation_id)
+        after = int(last_event_id or 0)
+        if after < 0 or after > 2**53-1:
+            raise ValueError()
+    except ValueError:
+        return _error(request,'INVALID_STREAM_POSITION','invalid stream identity or position',400)
+    conversation = store.get_conversation(conversation_id)
+    read_run=lifecycle.repository.read_run if lifecycle else getattr(store,'read_committed_run',None)
+    if conversation is None or read_run is None:
+        return _not_found(request,'scoped stream unavailable')
+    kbs, docs = conversation['knowledge_base_scope'], conversation['document_scope'] or []
+    try:
+        await asyncio.to_thread(read_run,run_id,conversation_id,kbs,docs)
+    except Exception:
+        return _not_found(request,'scoped stream unavailable')
 
-    def stream():
-        for event in events:
-            yield f"id: {event['seq']}\nevent: {event['event']}\ndata: {json.dumps(event['data'], ensure_ascii=False)}\n\n"
+    async def stream():
+        from backend.app.application.run_lifecycle import read_committed_events
+        position, started = after, time.monotonic()
+        while time.monotonic()-started < 30 and not await request.is_disconnected():
+            try:
+                events, saved = await asyncio.to_thread(read_committed_events,read_run,
+                    lifecycle.streams if lifecycle else None,store,run_id,conversation_id,kbs,docs,position)
+            except Exception:
+                return
+            for event in events:
+                if event['seq'] > position:
+                    position = event['seq']
+                    yield f"id: {position}\nevent: {event['event']}\ndata: {json.dumps(event['data'], ensure_ascii=False)}\n\n"
+            if saved['status'] in {'completed','failed','cancelled'}:
+                return
+            yield ': waiting\n\n'
+            await asyncio.sleep(0.25)
 
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
@@ -492,3 +523,80 @@ def patch_settings(request: Request, payload: dict[str, Any]):
         request.app.state.settings = settings.__class__(**{**settings.__dict__, **payload})
         _container(request).budget_gate.monthly_budget_microunits = request.app.state.settings.monthly_cloud_budget_microunits
     return get_settings(request)
+
+
+class MemoryScopeIn(BaseModel):
+    model_config = {'extra':'forbid'}
+    knowledge_base_scope: list[str] = Field(min_length=1,max_length=64)
+    document_scope: list[str] = Field(default_factory=list,max_length=64)
+
+class MemoryItemIn(MemoryScopeIn):
+    kind: str = Field(pattern='^(profile|preference|fact|task|interest)$')
+    fact_key: str = Field(min_length=1,max_length=120)
+    content: str = Field(min_length=1,max_length=300)
+
+class MemorySettingsIn(BaseModel):
+    model_config = {'extra':'forbid','strict':True}
+    read_enabled: bool
+    write_mode: str = Field(pattern='^(explicit_only|auto)$')
+
+def _memory(request, action, status_code=200):
+    """Single local principal, bound by server composition; no user ID input.
+
+    This is not authentication for a network/multi-user deployment. Such a
+    deployment must supply a reviewed principal boundary before enabling memory.
+    """
+    from urllib.parse import urlparse
+    from backend.app.ports.memory import MemoryDenied
+    service=getattr(_container(request),'memory_service',None)
+    if service is None:return _error(request,'MEMORY_PRINCIPAL_REQUIRED','local memory is not configured',403)
+    if request.client is None or request.client.host not in {'127.0.0.1','::1'} or request.url.hostname not in {'127.0.0.1','localhost','::1'}:
+        return _error(request,'MEMORY_LOCAL_ACCESS_REQUIRED','memory requires the local owner boundary',403)
+    origin=request.headers.get('origin')
+    if origin and urlparse(origin).netloc!=request.url.netloc:
+        return _error(request,'MEMORY_ORIGIN_DENIED','memory requires same-origin access',403)
+    try:return _ok(request,action(service),status_code=status_code)
+    except MemoryDenied as exc:return _error(request,str(exc),'memory request denied',409)
+    except Exception:return _error(request,'MEMORY_STORAGE_UNAVAILABLE','memory storage is unavailable',503)
+
+def _memory_scope(request,payload):
+    from backend.app.domain.scope import Scope
+    error=_validate_conversation_scope(request,_container(request).store,payload.knowledge_base_scope,payload.document_scope)
+    return error or Scope.from_ids(payload.knowledge_base_scope,payload.document_scope)
+
+@router.get('/memory/settings')
+def memory_settings(request: Request):
+    return _memory(request,lambda s:s.repository.settings(s.principal))
+
+@router.patch('/memory/settings')
+def memory_patch_settings(request: Request,payload: MemorySettingsIn):
+    return _memory(request,lambda s:s.repository.settings(s.principal,payload.model_dump()))
+
+@router.post('/memory/list')
+def memory_list(request: Request,payload: MemoryScopeIn):
+    scope=_memory_scope(request,payload)
+    if isinstance(scope,JSONResponse):return scope
+    return _memory(request,lambda s:s.repository.list_items(s.principal,scope))
+
+@router.post('/memory/items',status_code=201)
+def memory_save(request: Request,payload: MemoryItemIn):
+    scope=_memory_scope(request,payload)
+    if isinstance(scope,JSONResponse):return scope
+    return _memory(request,lambda s:{'id':s.repository.save(s.principal,scope,payload.kind,payload.fact_key,payload.content,source_request_id=_meta(request)['request_id'])},status_code=201)
+
+@router.patch('/memory/items/{item_id}')
+def memory_edit(item_id: uuid.UUID,request: Request,payload: MemoryItemIn):
+    scope=_memory_scope(request,payload)
+    if isinstance(scope,JSONResponse):return scope
+    return _memory(request,lambda s:{'id':s.repository.save(s.principal,scope,payload.kind,payload.fact_key,payload.content,target=str(item_id),source_request_id=_meta(request)['request_id'])})
+
+@router.post('/memory/items/{item_id}/{operation}')
+def memory_transition(item_id: uuid.UUID,operation: str,request: Request,payload: MemoryScopeIn):
+    scope=_memory_scope(request,payload)
+    if isinstance(scope,JSONResponse):return scope
+    from backend.app.ports.memory import MemoryDenied
+    def action(s):
+        if operation not in {'confirm','reject','delete'}:raise MemoryDenied('MEMORY_TRANSITION_INVALID')
+        s.repository.transition(s.principal,scope,str(item_id),{'confirm':'active','reject':'rejected','delete':'deleted'}[operation])
+        return {'status':operation}
+    return _memory(request,action)

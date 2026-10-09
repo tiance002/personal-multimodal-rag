@@ -113,3 +113,164 @@ def test_foreign_receipt_cannot_replace_bound_pending_evidence(env,monkeypatch,f
     monkeypatch.setattr(e.m.ProductReceiptFileSink,'persist',lambda self,**kw:persist(**kw))
     with e.g.execution_scope():invoke(e,c)
     assert before_after==[True] and read(c.receipt_sink.path)['state']=='receipt_persisted'
+
+
+# P5-R2: SIMULATED canonical ledger / transport, original assertions above intact.
+from backend.app.ports.session_attempts import AttemptDenied
+from concurrent.futures import ThreadPoolExecutor
+from types import MappingProxyType
+import uuid
+
+
+def _r2_first_attempt(e, monkeypatch, outcome):
+    sent = transport(monkeypatch, reason='length' if outcome == 'truncated' else 'stop',
+                     error=TimeoutError('SIMULATED timeout') if outcome == 'unknown' else None)
+    c = durable(e)
+    enable(e.p)
+    with e.g.execution_scope():
+        if outcome == 'ok':
+            assert invoke(e, c) == '顾遥 [E1]'
+        else:
+            with pytest.raises(ProviderUnavailable):
+                invoke(e, c)
+    return sent, c
+
+
+@pytest.mark.parametrize('outcome', ['ok', 'unknown', 'truncated'])
+def test_r2_idle_consumed_rejection_changes_only_enable_flag(env, monkeypatch, outcome):
+    e = env
+    sent, c = _r2_first_attempt(e, monkeypatch, outcome)
+    receipt = c.receipt_sink.path.read_bytes()
+    enable(e.p)
+    before = read(e.p)
+    used = e.g._used(before)
+    with pytest.raises(AttemptDenied):
+        with e.make().execution_scope():
+            pytest.fail('consumed identity entered an execution scope')
+    after = read(e.p)
+    assert after == {**before, 'calls_allowed_in_this_task': False}
+    assert after['consumed_attempts'] == 24 and after['reserved_attempts'] == 0
+    assert e.g._used(after) == used and c.receipt_sink.path.read_bytes() == receipt
+    assert after['attempts'][:23] == e.baseline['attempts'] and len(sent) == 1
+    if outcome != 'ok':
+        assert after['attempts'][-1]['validation_tokens']['state'] == 'unknown'
+
+
+@pytest.mark.parametrize('outcome', ['ok', 'unknown'])
+def test_r2_concurrent_rejection_preserves_other_active_owner(env, monkeypatch, outcome):
+    e = env
+    sent = transport(monkeypatch, error=TimeoutError('SIMULATED') if outcome == 'unknown' else None)
+    c = durable(e)
+    enable(e.p)
+    with e.g.execution_scope():
+        if outcome == 'ok':
+            invoke(e, c)
+        else:
+            with pytest.raises(ProviderUnavailable):
+                invoke(e, c)
+        before = e.p.read_bytes()
+        owner = read(e.p)['reviewed_immutable_tasks'][TASK]['batches'][TASK]['execution_owner']
+        def denied(_):
+            with pytest.raises(AttemptDenied):
+                with e.make().execution_scope():
+                    pytest.fail('concurrent duplicate activated')
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            list(pool.map(denied, range(8)))
+        assert e.p.read_bytes() == before
+        assert read(e.p)['calls_allowed_in_this_task'] is True
+        assert read(e.p)['reviewed_immutable_tasks'][TASK]['batches'][TASK]['execution_owner'] == owner
+    assert read(e.p)['calls_allowed_in_this_task'] is False and len(sent) == 1
+
+
+def test_r2_consumed_rejection_preserves_distinct_valid_scope(env, monkeypatch):
+    e = env
+    sent, c = _r2_first_attempt(e, monkeypatch, 'unknown')
+    other_spec = dataclasses.replace(e.spec, scope_id=TASK+'-OTHER',
+        run_id=str(uuid.uuid5(uuid.NAMESPACE_URL, 'SIMULATED-R2-other-run')))
+    specs = {TASK: e.spec, other_spec.scope_id: other_spec}
+    monkeypatch.setattr(e.m, '_TRUSTED_PRODUCT_REQUESTS', MappingProxyType(specs))
+    monkeypatch.setattr(e.m, '_PRODUCT_SPEC_DIGESTS', MappingProxyType(
+        {key:e.m._digest(dataclasses.asdict(value)) for key,value in specs.items()}))
+    other = e.m.ReviewedProductRequestGate(e.p, scope_id=other_spec.scope_id)
+    other.register_disabled_scope()
+    enable(e.p)
+    with other.execution_scope():
+        attempt = other.reserve(request_id=request_identity(other_spec.run_id, 'quick.answer', 1))
+        before = e.p.read_bytes()
+        def reject(_):
+            with pytest.raises(AttemptDenied):
+                with e.make().execution_scope():
+                    pytest.fail('consumed scope activated beside another owner')
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            list(pool.map(reject, range(8)))
+        assert e.p.read_bytes() == before
+        assert read(e.p)['calls_allowed_in_this_task'] is True
+        other.finish(attempt, 'unknown')  # synthetic reservation, no provider request
+    assert len(sent) == 1 and read(e.p)['calls_allowed_in_this_task'] is False
+    assert read(e.p)['attempts'][-2]['validation_tokens']['state'] == 'unknown'
+    assert c.receipt_sink.path.exists()
+
+
+def test_r2_concurrent_idle_duplicates_never_reserve_or_send(env, monkeypatch):
+    e = env
+    sent, c = _r2_first_attempt(e, monkeypatch, 'unknown')
+    enable(e.p)
+    before = read(e.p)
+    def deny(_):
+        with pytest.raises(AttemptDenied):
+            with e.make().execution_scope():
+                pytest.fail('consumed identity unexpectedly activated')
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(deny, range(8)))
+    assert read(e.p) == {**before, 'calls_allowed_in_this_task': False}
+    assert len(sent) == 1
+
+
+def test_r2_activation_write_failure_closes_acquired_owner_without_usage(env, monkeypatch):
+    e = env
+    enable(e.p)
+    before = read(e.p)
+    original = e.g._write
+    writes = []
+    def fail_activation(data):
+        entry = data['reviewed_immutable_tasks'][TASK]['batches'][TASK]
+        writes.append(entry['enabled'])
+        if entry['enabled']:
+            raise OSError('SIMULATED activation persistence failure')
+        return original(data)
+    monkeypatch.setattr(e.g, '_write', fail_activation)
+    with pytest.raises(AttemptDenied, match='^SESSION_LEDGER_UNAVAILABLE$'):
+        with e.g.execution_scope():
+            pytest.fail('activation persistence failure entered body')
+    assert writes == [True, False]
+    assert read(e.p) == {**before, 'calls_allowed_in_this_task': False}
+
+
+@pytest.mark.parametrize('error', [RuntimeError('SIMULATED'), KeyboardInterrupt('SIMULATED')])
+def test_r2_owned_scope_exception_closes_without_reservation(env, error):
+    e = env
+    enable(e.p)
+    before = read(e.p)
+    with pytest.raises(type(error)):
+        with e.g.execution_scope():
+            raise error
+    assert read(e.p) == {**before, 'calls_allowed_in_this_task': False}
+
+
+def test_r2_rejection_cleanup_write_failure_preserves_unknown_and_receipt(env, monkeypatch):
+    e = env
+    sent, c = _r2_first_attempt(e, monkeypatch, 'unknown')
+    enable(e.p)
+    before = e.p.read_bytes()
+    receipt = c.receipt_sink.path.read_bytes()
+    used = e.g._used(read(e.p))
+    gate = e.make()
+    def fail_write(data):
+        raise OSError('SIMULATED close persistence failure')
+    monkeypatch.setattr(gate, '_write', fail_write)
+    with pytest.raises(AttemptDenied, match='^SESSION_LEDGER_UNAVAILABLE$'):
+        with gate.execution_scope():
+            pytest.fail('consumed request entered after closure write failure')
+    assert e.p.read_bytes() == before and c.receipt_sink.path.read_bytes() == receipt
+    assert e.g._used(read(e.p)) == used and len(sent) == 1
+    assert read(e.p)['attempts'][-1]['validation_tokens']['state'] == 'unknown'

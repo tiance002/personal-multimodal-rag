@@ -18,7 +18,7 @@ class RunEventStore(Protocol):
 
     def completed_history_context(self, conversation_id: str, kb_scope: list[str],
                                   document_scope: list[str], *, current_run_id: str,
-                                  limit: int = 3) -> dict[str, Any]: ...
+                                  limit: int = 3, purpose: str = 'follow_up') -> dict[str, Any]: ...
 
     def create_run(self, conversation_id: str | None, kb_scope: list[str], document_scope: list[str], q0: str) -> str: ...
 
@@ -37,19 +37,24 @@ class RunEventStore(Protocol):
 
 def bounded_completed_history(rows: Sequence[Any], *, conversation_id: str,
                               kb_scope: list[str], document_scope: list[str],
-                              current_run_id: str, cutoff: Any, limit: int = 3) -> dict[str, Any]:
+                              current_run_id: str, cutoff: Any, limit: int = 3,
+                              purpose: str = 'follow_up') -> dict[str, Any]:
     """Pure snapshot selection contract. Never extracts assistant content.
 
     Precise scope arrays retain existing persistence semantics. No-run scope
     switches cannot be detected without a stored epoch; this adds no schema.
     """
-    limit = min(3, max(0, limit))
+    if purpose not in {'follow_up', 'context'}:
+        raise ValueError('HISTORY_PURPOSE_INVALID')
+    limit = min(512 if purpose == 'context' else 3, max(0, limit))
     eligible, blocked, omitted = [], None, 0
     candidates = [row for row in rows if str(row["conversation_id"]) == conversation_id
                   and str(row["run_id"]) != current_run_id and row["created_at"] < cutoff]
     candidates.sort(key=lambda row: (row["created_at"], str(row["run_id"])), reverse=True)
-    for row in candidates[:16]:
-        if row["knowledge_base_scope"] != kb_scope or row["document_scope"] != document_scope:
+    for row in candidates[:2048 if purpose == 'context' else 16]:
+        kb_match = (set(row['knowledge_base_scope']) == set(kb_scope) if purpose == 'context' else row['knowledge_base_scope'] == kb_scope)
+        docs_match = (set(row['document_scope']) == set(document_scope) if purpose == 'context' else row['document_scope'] == document_scope)
+        if not kb_match or not docs_match:
             blocked = "SCOPE_HISTORY_BARRIER"
             break
         # A later terminal state cannot erase the pending barrier at cutoff.
@@ -62,13 +67,25 @@ def bounded_completed_history(rows: Sequence[Any], *, conversation_id: str,
                 or row.get("answer_completed") is not True):
             continue
         q0 = row["q0"]
-        if not isinstance(q0, str) or not q0.strip() or len(q0) > 512:
+        if not isinstance(q0, str) or not q0.strip() or (purpose == 'follow_up' and len(q0) > 512):
             omitted += 1
             continue
-        eligible.append({"run_id": str(row["run_id"]), "q0": q0})
+        if purpose == 'context':
+            if (row.get('user_content') != q0 or not isinstance(row.get('answer'), str)
+                    or not row['answer'].strip() or row.get('message_count') != 2
+                    or not isinstance(row.get('citations'), list) or not row.get('citation_valid')):
+                omitted += 1
+                continue
+            eligible.append({'run_id': str(row['run_id']), 'q0': q0, 'answer': row['answer'],
+                'citations': row['citations'], 'evidence': row.get('evidence', []),
+                'protocol': row.get('protocol', []), 'created_at': str(row['created_at']),
+                'completed_at': str(row['completed_at'])})
+        else:
+            eligible.append({"run_id": str(row["run_id"]), "q0": q0})
         if len(eligible) >= limit:
             break
-    turns = tuple({"turn_id": f"H{i}", **item} for i, item in enumerate(reversed(eligible), 1))
+    turns = tuple(item if purpose == 'context' else {"turn_id": f"H{i}", **item}
+                  for i, item in enumerate(reversed(eligible), 1))
     return {"turns": turns, "blocked_reason": blocked, "omitted_count": omitted,
             "knowledge_base_scope": list(kb_scope), "document_scope": list(document_scope),
             "snapshot_at": str(cutoff)}
