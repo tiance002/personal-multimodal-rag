@@ -80,7 +80,7 @@ def test_pg_pipeline_scope_profile_parent_context_citations(isolated_database,mo
             {'id':id,'profile':profile,'v':'['+','.join(['1']*1024)+']'})
     ranker=SiliconFlowRerank(ModelRegistry.frozen_defaults().select('rerank'),enabled=True,
         usage_guard=SimulatedGuard(),transport=lambda request,timeout: dict(results=[
-            {'index':i,'relevance_score':1.-i/100.} for i in reversed(range(len(json.loads(request.data)['documents'])))]))
+            {'index':i,'relevance_score':1.-i/100.,'document':{'text':json.loads(request.data)['documents'][i]}} for i in reversed(range(len(json.loads(request.data)['documents'])))]))
     result=HybridRetriever(repo,adapter,mode=mode,ranker=ranker,top_k=1).retrieve(Scope.from_ids([kb['id']]),'Synthetic cost')
     assert result.items and not result.degradation_flags
     assert all(i.chunk.chunk_id in children for i in result.items)

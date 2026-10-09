@@ -198,7 +198,8 @@ def test_chat_contract_and_truncation(registry, guard, role, finish):
 def test_rerank_mapping_retains_original_hits(registry, guard, bad):
     hits = [RankedHit(chunk_id="a", rank=1, raw_score=3, sources=("vector",)), RankedHit(chunk_id="b", rank=2)]
     chunks = {key: ChunkRecord(key, "kb", "doc", "v", key+" content", {}) for key in ("a", "b")}
-    rows = [dict(index=1, relevance_score=.9), dict(index=0, relevance_score=.1)]
+    rows = [dict(index=1, relevance_score=.9, document={"text": chunks["b"].content}),
+            dict(index=0, relevance_score=.1, document={"text": chunks["a"].content})]
     if bad == "duplicate": rows[1]["index"] = 1
     if bad == "range": rows[0]["index"] = 2
     if bad == "score": rows[0]["relevance_score"] = float("nan")

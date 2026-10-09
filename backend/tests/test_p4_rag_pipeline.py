@@ -208,7 +208,7 @@ def test_provider_meta_tokens_are_observed_not_billing_settlement(monkeypatch):
     monkeypatch.setenv('SILICONFLOW_API_KEY','SIMULATED-P4-META')
     guard=SimulatedGuard()
     adapter=SiliconFlowRerank(ModelRegistry.frozen_defaults().select('rerank'),enabled=True,
-        usage_guard=guard,transport=lambda *args:dict(results=[dict(index=0,relevance_score=.8)],
+        usage_guard=guard,transport=lambda *args:dict(results=[dict(index=0,relevance_score=.8,document={"text":chunk("c").content})],
             meta=dict(tokens=dict(input_tokens=15,output_tokens=2),billed_units=dict(search_units=1))))
     c=chunk('c')
     with model_access('rerank',allowed=True):adapter.rank('synthetic',[RankedHit(chunk_id='c',rank=1)],{'c':c})
@@ -223,7 +223,7 @@ def test_authorized_transport_counts_bytes_before_uncertain_send_without_secret_
     record={'attempts':[]}; saved=[]; sent=[]
     def send(request,timeout):sent.append(1);return {'SIMULATED':True}
     transport=AuthorizedTransport(record,lambda:saved.append(len(record['attempts'])),send,{'synthetic'})
-    payload=json.dumps(dict(model='BAAI/bge-reranker-v2-m3',query='Synthetic cost',documents=['synthetic'])).encode()
+    payload=json.dumps(dict(model='BAAI/bge-reranker-v2-m3',query='Synthetic cost',documents=['synthetic'],return_documents=True)).encode()
     request=Request('https://api.siliconflow.cn/v1/rerank',data=payload,
         headers={'Authorization':'Bearer SIMULATED-P4-SECRET'})
     for _ in range(3):transport(request,30)
@@ -234,7 +234,7 @@ def test_authorized_transport_counts_bytes_before_uncertain_send_without_secret_
     big='x'*20000
     transport=AuthorizedTransport({'attempts':[]},lambda:None,send,{big})
     oversized=Request(request.full_url,data=json.dumps(dict(model='BAAI/bge-reranker-v2-m3',
-        query='Synthetic cost',documents=[big])).encode())
+        query='Synthetic cost',documents=[big],return_documents=True)).encode())
     with pytest.raises(ProviderRequestNotSent,match='CAP_EXCEEDED'):transport(oversized,30)
     assert len(sent)==3
 
@@ -246,15 +246,29 @@ def test_authorized_transport_does_not_retry_network_exception():
     def fail(*args):calls.append(1);raise TimeoutError('SIMULATED')
     transport=AuthorizedTransport(record,lambda:None,fail,{'synthetic'})
     request=Request('https://api.siliconflow.cn/v1/rerank',data=json.dumps(dict(
-        model='BAAI/bge-reranker-v2-m3',query='Synthetic cost',documents=['synthetic'])).encode())
+        model='BAAI/bge-reranker-v2-m3',query='Synthetic cost',documents=['synthetic'],return_documents=True)).encode())
     with pytest.raises(TimeoutError):transport(request,30)
     assert len(calls)==len(record['attempts'])==1
+
+
+@pytest.mark.parametrize('echo', [None, False, 1])
+def test_authorized_transport_requires_explicit_true_without_send(echo):
+    from urllib.request import Request
+    from scripts.verify_p4_rag import AuthorizedTransport
+    record, saves, sends = {'attempts': []}, [], []
+    transport = AuthorizedTransport(record, lambda: saves.append(True),
+                                    lambda *a: sends.append(True), {'synthetic'})
+    payload = dict(model='BAAI/bge-reranker-v2-m3', query='Synthetic cost', documents=['synthetic'])
+    if echo is not None: payload['return_documents'] = echo
+    with pytest.raises(ProviderRequestNotSent, match='ALLOWLIST_DENIED'):
+        transport(Request('https://api.siliconflow.cn/v1/rerank', data=json.dumps(payload).encode()), 30)
+    assert not record['attempts'] and not saves and not sends
 
 
 def test_local_egress_denial_does_not_open_provider_failure_circuit(monkeypatch):
     monkeypatch.setenv('SILICONFLOW_API_KEY','SIMULATED-P4-DENIAL')
     adapter=SiliconFlowRerank(ModelRegistry.frozen_defaults().select('rerank'),enabled=True,
-        usage_guard=SimulatedGuard(),transport=lambda *args:dict(results=[dict(index=0,relevance_score=.8)]))
+        usage_guard=SimulatedGuard(),transport=lambda *args:dict(results=[dict(index=0,relevance_score=.8,document={"text":chunk("c").content})]))
     c=chunk('c');hits=[RankedHit(chunk_id='c',rank=1)]
     with model_access('rerank',allowed=False):
         with pytest.raises(ProviderRequestNotSent):adapter.rank('synthetic',hits,{'c':c})
