@@ -4,19 +4,27 @@ from contextvars import ContextVar
 from typing import Protocol
 
 _SCOPE = ContextVar("model_egress_scope", default=frozenset())
+_REQUEST_SCOPE = ContextVar('model_request_scope',default=None)
 
 
 @contextmanager
-def model_access(role: str, *, allowed: bool):
+def model_access(role: str, *, allowed: bool, scope=None):
     token = _SCOPE.set(frozenset({role}) if allowed is True else frozenset())
+    scope_token = _REQUEST_SCOPE.set((role,scope) if allowed is True else None)
     try:
         yield
     finally:
         _SCOPE.reset(token)
+        _REQUEST_SCOPE.reset(scope_token)
 
 
 def scope_allows(role):
     return role in _SCOPE.get()
+
+
+def request_scope(role):
+    context = _REQUEST_SCOPE.get()
+    return context[1] if context is not None and context[0] == role else None
 
 
 class ModelUsageGuard(Protocol):

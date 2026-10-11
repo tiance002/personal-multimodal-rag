@@ -27,7 +27,8 @@ class ContextManager:
         if data.get('blocked_reason') == 'HISTORY_UNAVAILABLE': return []
         return list(data.get('turns', ()))
 
-    def quick_prompt(self, prompt, *, conversation, scope, run, roles, output_tokens, query=None):
+    def quick_prompt(self, prompt, *, conversation, scope, run, roles, output_tokens, query=None,
+                     allow_global_memory=True):
         if not roles: raise ContextDenied('MODEL_CONTEXT_CAPACITY_UNKNOWN')
         # Fail closed before touching newly migrated history storage when model
         # admission is UNKNOWN; no business migration is implied by this stage.
@@ -52,7 +53,8 @@ class ContextManager:
         result = assemble(selected)
         if self.memory_retriever:
             result = self.memory_retriever.quick_context(result, scope=scope,
-                windows=[self.window(r) for r in roles], output_tokens=output_tokens, query=query)
+                windows=[self.window(r) for r in roles], output_tokens=output_tokens, query=query,
+                allow_global_memory=allow_global_memory)
         return result
 
     def smart_messages(self, *, conversation, scope, run, role, system, current, tools, output_tokens):

@@ -30,6 +30,7 @@ class BudgetGate(Protocol):
         capability: str,
         estimate_microunits: int,
         month: date | None = None,
+        zero_price_authority: object | None = None,
     ) -> BudgetReservation: ...
 
     def settle(self, reservation_id: str, actual_microunits: int) -> None: ...
@@ -43,9 +44,16 @@ def _month(value: date | None) -> date:
     return value or datetime.now(timezone.utc).date().replace(day=1)
 
 
-def _validate_estimate(value: int) -> int:
-    if value <= 0:
+def _validate_estimate(value: int, *, zero_price_authority=None, **identity) -> int:
+    if type(value) is not int or value < 0:
         raise ValueError("budget estimate must be positive")
+    if value == 0:
+        from backend.app.ports.xing_zero_reservation import XingCalibrationZeroReservation, SiliconFlowZeroReservation
+        if type(zero_price_authority) not in (XingCalibrationZeroReservation,SiliconFlowZeroReservation):
+            raise ValueError('XING_ZERO_CALIBRATION_AUTHORITY_REQUIRED')
+        zero_price_authority.validate(**identity)
+    elif zero_price_authority is not None:
+        raise ValueError('XING_ZERO_CALIBRATION_ESTIMATE_MISMATCH')
     return int(value)
 
 
@@ -79,8 +87,10 @@ class InMemoryBudgetGate:
         capability: str,
         estimate_microunits: int,
         month: date | None = None,
+        zero_price_authority: object | None = None,
     ) -> BudgetReservation:
-        estimate = _validate_estimate(estimate_microunits)
+        estimate = _validate_estimate(estimate_microunits, zero_price_authority=zero_price_authority,
+            run_id=run_id, provider=provider, model_name=model_name, capability=capability)
         budget_month = _month(month)
         with self._lock:
             if self._used(budget_month) + estimate > self.monthly_budget_microunits:
@@ -89,7 +99,7 @@ class InMemoryBudgetGate:
             self.reservations[reservation_id] = {
                 "month": budget_month,
                 "reserved_microunits": estimate,
-                "settled_microunits": 0,
+                "settled_microunits": None if zero_price_authority is not None else 0,
                 "state": "reserved",
                 "run_id": run_id,
                 "provider": provider,
@@ -142,8 +152,10 @@ class PostgresBudgetGate:
         capability: str,
         estimate_microunits: int,
         month: date | None = None,
+        zero_price_authority: object | None = None,
     ) -> BudgetReservation:
-        estimate = _validate_estimate(estimate_microunits)
+        estimate = _validate_estimate(estimate_microunits, zero_price_authority=zero_price_authority,
+            run_id=run_id, provider=provider, model_name=model_name, capability=capability)
         budget_month = _month(month)
         reservation_id = uuid.uuid4()
         with self.engine.begin() as connection:

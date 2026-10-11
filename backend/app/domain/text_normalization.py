@@ -9,7 +9,13 @@ from pydantic import BaseModel, ConfigDict
 
 
 _CJK_RUN = re.compile(r"[\u3400-\u9fff]+")
-_TOKEN = re.compile(r"[\w]+|>=|<=|==|!=|[><=]", re.UNICODE)
+# Separate script runs in mixed words (A方案成本1000元). Pure CJK still
+# produces the existing full-run + bigram stream; ASCII identifiers stay whole.
+MIXED_PART_PATTERN = '[\u3400-\u9fff]+|[^\\W\u3400-\u9fff]+'
+CJK_PATTERN = '[\u3400-\u9fff]'
+NON_CJK_WORD_PATTERN = '[^\\W\u3400-\u9fff]'
+PURE_CJK_PATTERN = '^[\u3400-\u9fff]+$'
+_TOKEN = re.compile(MIXED_PART_PATTERN + r"|>=|<=|==|!=|[><=]", re.UNICODE)
 
 
 class NormalizedQuery(BaseModel):

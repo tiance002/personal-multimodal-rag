@@ -1,0 +1,364 @@
+{
+  "schema": "rag-v6-ecs-first-round-execution-plan/v1",
+  "revision": 1,
+  "task": "RAG-V6-ECS-RESUME rev1 attempt1",
+  "evidence_cutoff_utc": "2026-10-10T15:42:22Z",
+  "plan_only": true,
+  "result": "PLAN_READY_FOR_PARENT_REVIEW_REAL_CLOSURE_BLOCKED",
+  "enforcement": "MANUALLY_SUPERVISED_TRIAL",
+  "head": "befd5478a680ffa779a1e8ede736260d9bac1060",
+  "actual_actions_this_plan": {
+    "SSH": 0,
+    "external_API": 0,
+    "DB": 0,
+    "model": 0,
+    "tests": 0,
+    "production_edits": 0
+  },
+  "allowed_writes": [
+    "docs/evaluation/ECS_FIRST_ROUND_EXECUTION_PLAN.md",
+    "docs/evaluation/ECS_FIRST_ROUND_EXECUTION_PLAN.json"
+  ],
+  "single_owners": {
+    "decision_and_acceptance": "parent coordinator",
+    "two_stage_source_writer": "01a1267d",
+    "ECS_deployment_data_budget_sender": "ECS operator",
+    "local_DB": "Owner separate task; excluded"
+  },
+  "time_policy": {
+    "automatic_local_switch_16UTC": "CANCELLED_BY_OWNER",
+    "old_SETUP_lease": {
+      "id": "v6-r6-first-paired-setup1",
+      "start": "2026-10-10T15:22:50.915188Z",
+      "end": "2026-10-10T16:00:00Z",
+      "reuse": false
+    },
+    "formal_BATCH_T0": "NOT_STARTED_AT_EVIDENCE_CUTOFF",
+    "T0_rule": "atomically persist immediately before first formal bulk operation, including ingestion/indexing; not first Chat",
+    "batch_cap_seconds": 18000,
+    "first_round": {
+      "questions": 40,
+      "arms": 3,
+      "cells": 120,
+      "Omni_parsing_pages": 24,
+      "official_Omni_QA": 0
+    },
+    "subsequent_round_cap_seconds": 3600,
+    "existing_profile_limits": {
+      "owner_lease_small_minutes": 40,
+      "owner_lease_40q_24page_minutes": 60,
+      "dispatch_minutes": 30
+    },
+    "automatic_tuning_after_first_round": false
+  },
+  "accounting": {
+    "authority": "ECS epoch1 SINGLE_WRITER; local fenced",
+    "DS_total_input_output_cap": 1000000,
+    "historical_DS_tokens": 65569,
+    "historical_DS_attempts": 53,
+    "UNKNOWN_refund": false,
+    "second_writer": false,
+    "SF_unknown_rows_last_verified": 14,
+    "SF_reserved_microunits_last_verified": 10,
+    "actual_charge": "UNKNOWN"
+  },
+  "inputs": {
+    "raw_counts": {
+      "scifact": 200,
+      "miracl-zh": 400,
+      "longbench-zh": 48
+    },
+    "prepared_counts": {
+      "hotpotqa": 73,
+      "omnidocbench": 24,
+      "mmlongbench-doc": 3
+    },
+    "total_original_units": 748,
+    "separate_prepared_artifact_records": 470,
+    "raw_input_kind": "original_sources",
+    "prepared_input_kind": "prepared_input",
+    "loader_sha256": "336cc1c384d752b6d884b727eef05d073b0ae56a3b8d919c5634adc4d7c88b98",
+    "Gold_in_model_inputs": false,
+    "whole_corpus_reader_is_whole_index_proof": false
+  },
+  "evaluation_lines": {
+    "A": "fixed-QID same evidence/Context route fairness; answer/citation/usage/latency; does not establish retrieval quality",
+    "B": "independent dataset Gold parsing/retrieval/context/answer diagnostics with explicit applicability/denominators",
+    "questions_without_answer_gold": 16,
+    "maximum_official_answer_gold_QIDs": 24,
+    "Hotpot_supporting_facts": "needs sentence-level source mapper; official joint NOT_EVALUATED",
+    "MML_page_scoring": "UNKNOWN convention must not score; current scorer has no applicable implemented MML page metric branch",
+    "MML_official_GPT_judge": "NOT_RUN",
+    "Omni": "24 page parsing PROJECT diagnostics; no official QA; no postmodel QA invention",
+    "LLM_judge_added": false
+  },
+  "embedding_policy": {
+    "batch_size": "min(32, actual admission.max_batch_items), further constrained by actual per-item/total token capacity",
+    "dimension": 1024,
+    "initial_model_concurrency": 1,
+    "batch_identity": "version:job:number:total + exact item/chunk/wire/profile/plan hashes",
+    "unknown_replay": false
+  },
+  "critical_path": [
+    "G0 frozen two-stage patch and necessary counterexamples → fresh finite lease/profile and existing authority/DB/stream status → fixed raw/prepared SETUP inputs and plans",
+    "G1 real raw+prepared ingestion/READY → query/rerank when required → sealed wire → fair scored three arms/citation → trace readback → safe SSH disconnect/recovery without duplicate sends",
+    "G2 coordinate semantic review → atomic T0/5h →748 bulk units with independent existing-READY reuse → full index manifest →40Q×3 plus24 page parsing scores → trace/aggregate/checkpoint/results"
+  ],
+  "parallel_allowed": [
+    "sole two-stage author code",
+    "read-only source/Gold/pool mapping",
+    "disjoint score protocol investigation",
+    "teaching document"
+  ],
+  "parallel_forbidden": [
+    "second authority/budget writer",
+    "concurrent local provider calls",
+    "multiple model dispatchers",
+    "same job/index publication/CAS mapping writes",
+    "concurrent same-file author changes"
+  ],
+  "minimal_fix_packages": {
+    "P1": "normal two-stage preparation only; writer01a1267d",
+    "P2": "operator normal ingestion/job/source-map/exact batch plans and frozen component entry",
+    "P3": "necessary source/page applicability and Omni prediction export + numeric Scores mapping",
+    "P4": "finite detached wrapper and real checkpoint recovery proof"
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "name": "环境/身份/authority",
+      "status": "已验证（历史快照）；新lease/新修复包实现未验证",
+      "requires": [],
+      "normal_calls": [
+        "build_container",
+        "V6LedgerAuthority.from_manifest/revalidate",
+        "V6OwnerActivityGate",
+        "require_read_only_connection"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "新两阶段包冻结、依赖inventory、新lease/profile和当前身份核验",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 2,
+      "name": "六包安全加载/Gold隔离",
+      "status": "已验证暂存和6样本；正式全包消费未验证",
+      "requires": [
+        1
+      ],
+      "normal_calls": [
+        "package_loader.load_original_source",
+        "package_loader.load_prepared_input",
+        "normal_package_job_binding.load_package_input"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "loader正式调度接线；同一输入/Gold分离引用",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 3,
+      "name": "formal document/version/job/解析",
+      "status": "raw3job已验证；prepared正式消费实现未验证",
+      "requires": [
+        1,
+        2
+      ],
+      "normal_calls": [
+        "ContentAddressedStorage.put_stream",
+        "PostgresKnowledgeRepository.create_upload/claim_job/renew_job/process_job",
+        "VersionSource.from_row",
+        "validate_prepared_input",
+        "normal_package_job_binding.bind_package_job/process_bound_package_job"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "source→UUID映射落盘、raw+prepared各1真实job消费、duplicate/恢复规则",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 4,
+      "name": "Embedding批次/预算/native claims",
+      "status": "3真实index发送已验证；六包batch接线缺失",
+      "requires": [
+        3
+      ],
+      "normal_calls": [
+        "PostgresKnowledgeRepository._embed_index_chunks/_planned_index_chunk_ids",
+        "SiliconFlowEmbedding.embed",
+        "ProviderBatchPlan",
+        "FreeModelRequestContext",
+        "SiliconFlowFreeBinding",
+        "BudgetUsageGuard",
+        "PostgresBudgetGate.reserve"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "精确逐项SHA/wire/batch/native plans、有限lease、原结果读回；UNKNOWN不重放",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 5,
+      "name": "child索引/READY/indexmanifest",
+      "status": "3READY已验证；整包索引发布实现未验证",
+      "requires": [
+        4
+      ],
+      "normal_calls": [
+        "PostgresKnowledgeRepository.process_job/keyword_candidates/vector_candidates",
+        "validate_index_identity"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "实际候选池scope、child/vector/terms计数和独立expected/actual manifest",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 6,
+      "name": "query/hybrid/RRF/rerank/parent/context",
+      "status": "算法已实现；真实共享链未验证；共享rerank计划缺失",
+      "requires": [
+        5
+      ],
+      "normal_calls": [
+        "KnowledgeGateway.retrieve_question",
+        "HybridRetriever.retrieve",
+        "rrf_fuse",
+        "PostgresKnowledgeRepository.read_parent_contexts",
+        "merge_passages",
+        "EvidenceService.bundle/with_context"
+      ],
+      "owner": "ECS operator；共享rerank合同仅指定唯一源码writer",
+      "minimum_gap": "source mapper/观测、独立rerank许可/native合同；降级明确",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 7,
+      "name": "两阶段实际wire admission",
+      "status": "修复中；未验证",
+      "requires": [
+        1,
+        5,
+        6
+      ],
+      "normal_calls": [
+        "normal_setup_entry.run_normal_prepared_setup",
+        "build_normal_paired_runtime",
+        "run_public_paired_cohort",
+        "SiliconFlowFreePermit.planned_call",
+        "CloudAdapter._request"
+      ],
+      "owner": "01a1267d 唯一源码writer；ECS operator消费",
+      "minimum_gap": "合法任务→native检索receipt→Context冻结→normal renderer→immutable exactwire permit→发送guard",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 8,
+      "name": "公平三臂/引用/validation",
+      "status": "实现未验证；真实完整三臂NOT_RUN",
+      "requires": [
+        7
+      ],
+      "normal_calls": [
+        "run_public_paired_generation_case/invoke_paired_generation_arm",
+        "LangChainQuickChain",
+        "GenerationRole",
+        "EvidenceService.validate_answer",
+        "_readback_citations",
+        "NormalPairedProductBridge"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "SETUP真实三臂和native/product终态；同hash/同Context；无自动回放",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 9,
+      "name": "A/B评分/40Q+24页",
+      "status": "scorer已实现；来源映射/Omni输出消费缺失或未验证",
+      "requires": [
+        2,
+        3,
+        6,
+        8
+      ],
+      "normal_calls": [
+        "prepare_full_cohort",
+        "score_answer",
+        "score_retrieval_annotations",
+        "page_input_contract/selected_page_gold/score_page_parsing"
+      ],
+      "owner": "ECS operator；评分窄作者由父指定且文件独占",
+      "minimum_gap": "冻结40Q引用、句子/页来源适用性、Omni prediction导出；A与B独立分母",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 10,
+      "name": "Trace/flush/readback/程序Scores",
+      "status": "接口存在/CONFIGURED历史证据；真实回读NOT_RUN",
+      "requires": [
+        8,
+        9
+      ],
+      "normal_calls": [
+        "public_langfuse.write_and_readback_public_event",
+        "replay_public_paired_telemetry"
+      ],
+      "owner": "ECS operator；必要allowlist仅指定评分writer",
+      "minimum_gap": "live客户端/限时I/O/稳定ID回读；如需retrieval/page则补已算指标映射",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    },
+    {
+      "id": 11,
+      "name": "脱离SSH/checkpoint恢复/落盘",
+      "status": "native接口已实现；后台wrapper和真实恢复证据缺失",
+      "requires": [
+        1,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10
+      ],
+      "normal_calls": [
+        "existing finite systemd/private Redis facilities",
+        "normal lifecycle/SQLite registry",
+        "native result CAS/read_result",
+        "run_public_paired_cohort"
+      ],
+      "owner": "ECS operator",
+      "minimum_gap": "冻结后台入口；SETUP断线/安全恢复且成功调用数不增；T0/5h持久化",
+      "input_output_persistence_recovery_acceptance": "specified in corresponding numbered Markdown node; verify against exact source before executing"
+    }
+  ],
+  "evidence": {
+    "E1": "var/reports/v6-ecs-resume-r1/native-status-release-prepare-r6-1.json",
+    "E2": "var/reports/v6-ecs-resume-r1/six-data-completion-packet-r3-1.json",
+    "E3": [
+      "var/reports/v6-ecs-resume-r1/package-binding-linux-r6-2.json",
+      "var/reports/v6-ecs-resume-r1/operator-link-increment-r3-1/offline-package-binding-r6-2/report.json"
+    ],
+    "E4": [
+      "var/reports/v6-ecs-resume-r1/first-normal-index-r3-1-repair1.json",
+      "var/reports/v6-ecs-resume-r1/index-current-inspection-r6-1-repair1.json"
+    ],
+    "E5": [
+      "var/reports/v6-ecs-resume-r1/freeze-existing-index-r6-1-repair1.json",
+      "var/reports/v6-ecs-resume-r1/runtime-data-view-r6-1.json"
+    ],
+    "E6": [
+      "var/reports/v6-ecs-resume-r1/operator-link-increment-r3-1/wire-stage-assessment-r6-2.md",
+      "var/reports/v6-ecs-resume-r1/operator-link-increment-r3-1/answer-wire-preparation-constraint-r6.json"
+    ],
+    "E7": "var/reports/v6-ecs-resume-r1/paired-profiles-r6-1-repair1.json"
+  },
+  "completion": "real SETUP raw+prepared+scored3arms+safe recovery; complete or explicitly partial748/120cells/24pages counts; independent A/B scores; real trace flush/readback; immutable identities/history/UNKNOWN; parent/Owner semantic review. No executor acceptance/tag.",
+  "latest_redis_authorization": {
+    "source": "Latest Owner authorization relayed by parent coordinator",
+    "rebuild_new_finite_private_redis_lease": true,
+    "preserve_existing_private_socket_permissions_resource_budget_controls": true,
+    "reuse_or_mutate_expired_lease": false,
+    "irreversible_ECS_delete_requires_current_exact_object_confirmation": true,
+    "prefer_recoverable_old_copy_new_isolated_directory": true,
+    "local_data_deletion": false,
+    "delete_budget_ledger_UNKNOWN_failure_evidence_other_project_services": false,
+    "triggers_SSH_DB_models_this_plan": false
+  }
+}

@@ -26,6 +26,7 @@ from backend.app.application.question_checklist import explicit_question_checkli
 from backend.app.application.table_header_hint import header_hint, REASON as TABLE_HEADER_REASON
 from backend.app.application.rule_router_v1 import RouterPolicy, GenerationEnvelope, GenerationRole, GenerationSettlementFailure, decide, digest, escalation_reason
 from backend.app.ports.providers import TruncatedAnswer
+from backend.app.ports.provider_send_claims import ProviderSendClaims
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,12 @@ class QuickSettings:
     cloud_model: str = "configured"
     explicit_question_checklist_enabled: bool = False
     router_policy: RouterPolicy | None = None
+    answer_output_token_cap: int | None = None
+
+    def __post_init__(self):
+        if self.answer_output_token_cap is not None and (
+                type(self.answer_output_token_cap) is not int or self.answer_output_token_cap != 512):
+            raise ValueError('QUICK_OUTPUT_CAP_INVALID')
 
 
 class LangChainQuickChain:
@@ -62,6 +69,7 @@ class LangChainQuickChain:
         generation_roles: dict[str, GenerationRole] | None = None,
         input_token_estimator: Callable[[str], tuple[int, str]] | None = None,
         context_manager: Any | None = None,
+        query_understand: Any | None = None,
     ) -> None:
         self.knowledge_gateway = knowledge_gateway
         self.answer_gateway = answer_gateway
@@ -72,6 +80,7 @@ class LangChainQuickChain:
         self.generation_roles = dict(generation_roles or {})
         self.input_token_estimator = input_token_estimator
         self.context_manager = context_manager
+        self.query_understand = query_understand
         self.runnable = (
             RunnableLambda(self._prepare)
             | RunnableLambda(self._generate)
@@ -92,6 +101,7 @@ class LangChainQuickChain:
         validated_follow_up: FollowUpResolution | None = None,
         is_cancelled: Callable[[], bool] | None = None,
         conversation_id: str | None = None,
+        query_understanding: Any | None = None,
     ) -> AnswerResult:
         payload = {
             "question": question,
@@ -106,8 +116,57 @@ class LangChainQuickChain:
             "is_cancelled": is_cancelled or (lambda: False),
             "caller_run_id": run_id is not None,
             "conversation_id": conversation_id,
+            "query_understanding": query_understanding,
         }
         return self.runnable.invoke(payload)
+
+    def validate_generation_policy(self, policy: RouterPolicy) -> None:
+        """Read-only evaluation admission; request-local gates still decide sends."""
+        if type(policy) is not RouterPolicy:
+            raise ProviderRequestNotSent('ROUTER_POLICY_INVALID')
+        if policy.mode == 'OFF':
+            return
+        required = (('chat_cheap',) if policy.mode == 'CHEAP_ONLY' else
+                    ('chat_expensive',) if policy.mode == 'EXPENSIVE_ONLY' else
+                    ('chat_cheap', 'chat_expensive'))
+        for name in required:
+            role = self.generation_roles.get(name)
+            denial = 'OFFLINE_ROUTER_MODE_ONLY' if policy.mode.endswith('ONLY') else 'P5_BLOCKED_REAL_AUTHORIZATION_AND_CAPACITY'
+            if type(role) is not GenerationRole:
+                raise ProviderRequestNotSent(denial)
+            if role.role != name:
+                raise ProviderRequestNotSent('ROUTER_ROLE_BINDING_MISMATCH')
+            try:
+                role.check()
+            except ProviderRequestNotSent:
+                raise ProviderRequestNotSent(denial) from None
+            if role.execution_kind == 'SIMULATED':
+                continue
+            if (role.execution_kind != 'REAL' or str(policy.threshold) != '0.35'
+                    or any((policy.quality_escalation, policy.abstention_escalation,
+                            policy.provider_fallback, policy.truncated_escalation))):
+                raise ProviderRequestNotSent(denial)
+            if name == 'chat_cheap':
+                binding = role.xing_binding
+                if (binding is None or 'answer' not in binding.grant.allowed_purposes
+                        or type(binding.grant.scope) is not Scope
+                        or not binding.grant.scope.knowledge_base_ids
+                        or not isinstance(getattr(binding.authorized_transport, 'send_claim_callback', None), ProviderSendClaims)):
+                    raise ProviderRequestNotSent(denial)
+                from datetime import datetime
+                if datetime.fromisoformat(binding.grant.deadline_utc.replace('Z', '+00:00')) != datetime.fromisoformat(
+                        '2026-10-10T04:25:44+00:00'):
+                    raise ProviderRequestNotSent(denial)
+                binding.authorized_transport.check_scope(scope=binding.grant.scope,
+                    purpose='answer', timeout_seconds=1)
+            elif (role.v6_binding is None or role.v6_binding.server_scope is None
+                    or not isinstance(getattr(role.gateway, 'send_claim_callback', None), ProviderSendClaims)):
+                raise ProviderRequestNotSent(denial)
+            else:
+                from datetime import datetime, timezone
+                deadline = datetime.fromisoformat(role.v6_binding.grant.deadline_utc.replace('Z', '+00:00'))
+                if deadline <= datetime.now(timezone.utc):
+                    raise ProviderRequestNotSent(denial)
 
     def _prepare(self, payload: dict[str, Any]) -> dict[str, Any]:
         question = str(payload["question"])
@@ -124,8 +183,10 @@ class LangChainQuickChain:
                 return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), "IDEMPOTENCY_REQUIRED"))
             if not settings.cloud_enabled or not scope.knowledge_base_ids or not all(cloud_allowed_by_kb.get(k, False) for k in scope.knowledge_base_ids):
                 return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), "CLOUD_EGRESS_DISABLED"))
-            if policy.mode.endswith("ONLY") and not all(r.simulated for r in self.generation_roles.values()):
-                return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), "OFFLINE_ROUTER_MODE_ONLY"))
+            try:
+                self.validate_generation_policy(policy)
+            except ProviderRequestNotSent as exc:
+                return self._terminal(payload, self._error_result(run_id, self.knowledge_gateway.plan(question), str(exc)))
             from backend.app.application.run_lifecycle import current_execution, RunLifecycle
             try:
                 RunLifecycle.assert_current()
@@ -170,6 +231,7 @@ class LangChainQuickChain:
             local_query_gateway=payload["local_query_gateway"],
             local_query_enabled=settings.local_query_enabled,
             local_query_timeout_seconds=settings.local_query_timeout_seconds,
+            understanding=payload.get('query_understanding'),
         )
         observer = payload.get("on_retrieval")
         if observer is not None:
@@ -253,26 +315,9 @@ class LangChainQuickChain:
                     "cost_basis": "configured_reservation_estimate_not_verified_charge" if reservation else "LOCAL_COMPUTE_NOT_MEASURED",
                     "reserved_microunits": reservation.reserved_microunits if reservation else None})
             try:
-                intents = detect_intents(question)
-                budget = generation_budget(intents, len(bundle.context))
+                prompt, budget = self.render_answer_prompt(question, bundle, settings, payload.get("validated_follow_up"))
                 if metrics is not None:
                     metrics.hardening.update({"generation_complexity": budget.complexity, "max_output_tokens": budget.max_tokens})
-                prompt = (
-                    "Answer only from the supplied evidence. "
-                    "Answer in the language of the user question by default; follow any explicit user request for a different output language instead. Do not switch answer language to match the evidence. Keep original quotations, proper names, numeric units and citation labels unchanged where necessary. "
-                    "Cite every supported factual statement with "
-                    "its exact evidence label. Allowed citation markers: "
-                    + " ".join(f"[{label}]" for label in bundle.labels)
-                    + ". Use only these markers, separately, never ranges. For each requested item, "
-                    "answer supported sub-points with citations; mark only genuinely missing sub-points "
-                    "as unknown without a citation. Be concise: cover requested points, "
-                    "omit unrelated background and do not repeat source excerpts."
-                    f"\nQuestion: {question}{intents.checklist()}"
-                    + (explicit_question_checklist(question, len(intents.intents))
-                       if settings.explicit_question_checklist_enabled else "")
-                    + interpretation_data(payload.get("validated_follow_up"))
-                    + f"\nEvidence:\n{bundle.context}"
-                )
                 if self.context_manager is not None:
                     if payload.get('conversation_id') is None:
                         raise ProviderRequestNotSent('CONTEXT_CONVERSATION_REQUIRED')
@@ -284,7 +329,8 @@ class LangChainQuickChain:
                             if (window.provider, window.model) != (binding.provider, binding.model):
                                 raise ContextDenied('MODEL_CONTEXT_IDENTITY_MISMATCH')
                     prompt = self.context_manager.quick_prompt(prompt, conversation=payload['conversation_id'],
-                        scope=payload['scope'], run=run_id, roles=roles, output_tokens=budget.max_tokens, query=question)
+                        scope=payload['scope'], run=run_id, roles=roles, output_tokens=budget.max_tokens,
+                        query=question, allow_global_memory=payload['execution_route'].path != "CLOUD")
                 if payload.get("router_enabled"):
                     return self._generate_router(payload, prompt, budget.max_tokens)
                 if self.context_manager is not None and self.context_manager.memory_retriever is not None:
@@ -364,12 +410,35 @@ class LangChainQuickChain:
             "evidence_only": evidence_only,
         }
 
-    def _generate_router(self, payload: dict[str, Any], prompt: str, max_tokens: int) -> dict[str, Any]:
-        """Same fixed Quick chain, at most two generation attempts, one finalizer."""
-        settings = payload["settings"]
+    @staticmethod
+    def render_answer_prompt(question, bundle, settings, validated_follow_up=None):
+        """Pure normal evidence prompt renderer; grants no provider capability."""
+        intents = detect_intents(question)
+        budget = generation_budget(intents, len(bundle.context))
+        if settings.answer_output_token_cap is not None:
+            budget = replace(budget, max_tokens=min(budget.max_tokens, settings.answer_output_token_cap))
+        prompt = (
+            "Answer only from the supplied evidence. "
+            "Answer in the language of the user question by default; follow any explicit user request for a different output language instead. Do not switch answer language to match the evidence. Keep original quotations, proper names, numeric units and citation labels unchanged where necessary. "
+            "Cite every supported factual statement with "
+            "its exact evidence label. Allowed citation markers: "
+            + " ".join(f"[{label}]" for label in bundle.labels)
+            + ". Use only these markers, separately, never ranges. For each requested item, "
+            "answer supported sub-points with citations; mark only genuinely missing sub-points "
+            "as unknown without a citation. Be concise: cover requested points, "
+            "omit unrelated background and do not repeat source excerpts."
+            f"\nQuestion: {question}{intents.checklist()}"
+            + (explicit_question_checklist(question, len(intents.intents))
+               if settings.explicit_question_checklist_enabled else "")
+            + interpretation_data(validated_follow_up)
+            + f"\nEvidence:\n{bundle.context}"
+        )
+        return prompt, budget
+
+    def render_generation_envelope(self, payload, prompt, max_tokens):
+        """Render the immutable envelope without invoking a generation role."""
         bundle = payload["bundle"]
-        policy = payload["router_policy"]
-        run_id = payload["run_id"]
+        settings = payload["settings"]
         resolution = payload.get("validated_follow_up")
         trusted_query = (resolution.question if resolution and resolution.used and resolution.query_original == payload["question"]
                          else payload["question"])
@@ -384,7 +453,17 @@ class LangChainQuickChain:
         envelope = GenerationEnvelope(payload["question"], trusted_query, prompt, digest(bundle.context), tuple(bundle.labels),
             tuple((s.version_id, s.chunk_id, s.quote_sha256, digest(json.dumps(s.locator, sort_keys=True))) for s in bundle.snapshots),
             max_tokens, settings.answer_timeout_seconds, estimated_input_tokens=estimated_tokens)
-        decision = decide(trusted_query, prompt, policy, estimated_tokens=estimated_tokens, estimator=estimator)
+        return envelope, trusted_query, estimated_tokens, estimator
+
+    def _generate_router(self, payload: dict[str, Any], prompt: str, max_tokens: int) -> dict[str, Any]:
+        """Same fixed Quick chain, at most two generation attempts, one finalizer."""
+        settings = payload["settings"]
+        bundle = payload["bundle"]
+        policy = payload["router_policy"]
+        run_id = payload["run_id"]
+        envelope, trusted_query, estimated_tokens, estimator = self.render_generation_envelope(payload, prompt, max_tokens)
+        decision = decide(trusted_query, prompt, policy, estimated_tokens=estimated_tokens, estimator=estimator,
+            understanding=payload.get('query_understanding'))
         metrics = current_metrics()
         row = decision.public(policy) | {"context_hash": envelope.context_hash, "prompt_hash": digest(prompt),
             "envelope_identity": envelope.identity, "selected_source_ids": [s.chunk_id for s in bundle.snapshots],
@@ -392,6 +471,11 @@ class LangChainQuickChain:
             "attempts": [], "escalation_reason": None, "provider_failure_reason": None,
             "net_saving": "NOT_AVAILABLE", "total_latency_ms": None}
         row["legacy_cost_field_basis"] = "COMPATIBILITY_FIELD_NOT_BILLING"
+        if payload.get('query_understanding') is not None:
+            u=payload['query_understanding']
+            row['query_understand']={'intent':u.intent,'task_count':len(u.tasks),'task_status':u.task_status,
+                'q0_hash':digest(u.q0),'rewrite_hash':digest(u.rewrite_query),'history_run_ids':list(u.history_run_ids),
+                'scoring_basis':'MAX_PER_FEATURE_Q0_AND_VALIDATED_REWRITE_NO_TASK_RECOUNT'}
         if metrics is not None:
             metrics.rule_router = row
         started = time.perf_counter()
@@ -475,7 +559,7 @@ class LangChainQuickChain:
                         status="truncated" if generation_status == "TRUNCATED" else "error" if provider_failed else "ok")
             usages = metrics.usage.calls[usage_start:] if metrics is not None else []
             attempt = {"attempt_id": attempt_id, "role": role, "provider": binding.provider,
-                "model": binding.model, "execution_kind": "SIMULATED" if binding.simulated else "BLOCKED_REAL",
+                "model": binding.model, "execution_kind": binding.execution_kind,
                 "envelope_identity": envelope.identity, "latency_ms": elapsed, "error_class": error_class,
                 "finish_reason": finish_reason, "generation_status": generation_status,
                 "send_status": send_status, "settlement_operation": settlement_operation,

@@ -17,6 +17,39 @@ CANONICAL_LEDGER = Path(r'E:\codex_workspace\2026-10-01\task-2\deepseek-call-led
 class SessionAttemptGate:
     def __init__(self, ledger_path: Path = CANONICAL_LEDGER):
         self.path = Path(ledger_path)
+        self.expected_authority_marker = None
+
+    def _check_authority_marker(self):
+        """A durable sidecar retires the source even after process restart.
+
+        Legacy paths are unchanged when no marker exists. A migrated REAL gate
+        additionally pins the ACTIVE marker hash/epoch through its manifest.
+        No marker is created, repaired or removed by a normal request.
+        """
+        marker_path=Path(str(self.path)+'.authority.json')
+        try:
+            if not marker_path.exists():
+                if self.expected_authority_marker is not None:raise ValueError()
+                return
+            raw=marker_path.read_bytes();marker=json.loads(raw)
+            if (type(marker) is not dict or type(marker.get('schema_version')) is not int or marker['schema_version']!=1
+                    or type(marker.get('epoch')) is not int or marker['epoch']<=0
+                    or not isinstance(marker.get('authority_id'),str) or not marker['authority_id']
+                    or marker.get('status') not in ('FENCED','ACTIVE_SINGLE_WRITER')
+                    or marker.get('ledger_path')!=str(self.path.resolve())):
+                raise ValueError()
+            if marker['status']=='FENCED':raise AttemptDenied('LEDGER_AUTHORITY_FENCED')
+            if self.expected_authority_marker is not None:
+                import hashlib
+                if (hashlib.sha256(raw).hexdigest(),marker['authority_id'],marker['epoch'])!=self.expected_authority_marker:
+                    raise ValueError()
+        except AttemptDenied:raise
+        except (OSError,ValueError,TypeError,KeyError):
+            raise AttemptDenied('LEDGER_AUTHORITY_MARKER_INVALID') from None
+
+    def check_authority_active(self):
+        """Read-only guard for the normal coordinator/lease entry, all providers."""
+        self._check_authority_marker()
 
     @contextmanager
     def _locked(self):
@@ -24,6 +57,7 @@ class SessionAttemptGate:
         lock = None
         acquired = False
         try:
+            self._check_authority_marker()
             if not self.path.is_file():
                 raise AttemptDenied('SESSION_LEDGER_UNAVAILABLE')
             lock = open(str(self.path) + '.lock', 'a+b')
@@ -46,6 +80,7 @@ class SessionAttemptGate:
                     if time.monotonic() >= deadline:
                         raise AttemptDenied('SESSION_LEDGER_LOCK_UNAVAILABLE') from None
                     time.sleep(0.01)
+            self._check_authority_marker()
             yield
         except AttemptDenied:
             raise
@@ -64,6 +99,7 @@ class SessionAttemptGate:
                 lock.close()
 
     def _read(self):
+        self._check_authority_marker()
         try:
             data = json.loads(self.path.read_text(encoding='utf-8-sig'))
         except (OSError, ValueError, TypeError):
@@ -102,16 +138,25 @@ class SessionAttemptGate:
         self._write_bytes(json.dumps(data, ensure_ascii=False, indent=2).encode('utf-8'))
 
     def _write_bytes(self, raw):
+        self._check_authority_marker()
         temp = self.path.with_name(self.path.name + '.' + uuid.uuid4().hex + '.tmp')
         try:
             with temp.open('xb') as target:
                 target.write(raw)
                 target.flush()
                 os.fsync(target.fileno())
+            self._check_authority_marker()
             os.replace(temp, self.path)
+            self._fsync_parent()
         finally:
             if temp.exists():
                 temp.unlink()
+
+    def _fsync_parent(self):
+        if os.name == 'nt':return  # Windows keeps its supported file-fsync/replace path.
+        fd=os.open(str(self.path.parent),os.O_RDONLY|getattr(os,'O_DIRECTORY',0))
+        try:os.fsync(fd)
+        finally:os.close(fd)
 
     def _require_attempt_capacity(self, data):
         if data['consumed_attempts'] >= data['authorized_limit']:

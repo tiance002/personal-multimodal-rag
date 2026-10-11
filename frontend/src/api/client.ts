@@ -2,8 +2,8 @@ import type { Conversation, DocumentItem, IngestionJob, KnowledgeBase, Message, 
 import { readRunEvents, type StreamEvent } from "./sse";
 
 const API = "/api/v1";
-export type MemoryItem = { id: string; kind: string; fact_key: string; content: string; status: string; origin: string; version: number; sources: unknown[] };
-type MemoryScope = { knowledge_base_scope: string[]; document_scope: string[] };
+export type MemoryItem = { id: string; scope_type: 'GLOBAL' | 'SCOPED'; kind: string; fact_key: string; content: string; status: string; origin: string; version: number; sources: unknown[] };
+type MemoryScope = { scope_type?: 'GLOBAL' | 'SCOPED'; knowledge_base_scope: string[]; document_scope: string[] };
 type AnswerResponse = { run_id: string; answer: string; citations: string[]; error_code?: string; trace?: { execution_mode?: string; clarification_required?: boolean; evidence_hint?: EvidenceHint | null } };
 
 type Envelope<T> = { data: T; meta: { request_id: string } };
@@ -29,8 +29,8 @@ async function responseBody(response: Response): Promise<unknown> {
 }
 
 export const api = {
-  memorySettings: () => request<{read_enabled: boolean; write_mode: string}>("/memory/settings"),
-  memoryUpdateSettings: (value: {read_enabled: boolean; write_mode: string}) => request("/memory/settings", {method: "PATCH", body: JSON.stringify(value)}),
+  memorySettings: () => request<{read_enabled: boolean; write_mode: string; automatic_extraction: string}>("/memory/settings"),
+  memoryUpdateSettings: (value: {read_enabled: boolean; write_mode: string}) => request("/memory/settings", {method: "PATCH", body: JSON.stringify({read_enabled: value.read_enabled, write_mode: value.write_mode})}),
   memoryList: (scope: MemoryScope) => request<MemoryItem[]>("/memory/list", {method: "POST", body: JSON.stringify(scope)}),
   memorySave: (value: MemoryScope & {kind: string; fact_key: string; content: string}, id: string | null = null) => request(id ? `/memory/items/${id}` : "/memory/items", {method: id ? "PATCH" : "POST", body: JSON.stringify(value)}),
   memoryTransition: (id: string, operation: string, scope: MemoryScope) => request(`/memory/items/${id}/${operation}`, {method: "POST", body: JSON.stringify(scope)}),

@@ -262,10 +262,10 @@ class KnowledgeGateway:
     def plan(self, question: str) -> QueryPlan:
         return self.evidence.plan(question)
 
-    def retrieve(self, scope: Scope, plan: QueryPlan) -> RetrievalResult:
-        return self.retrieve_query(scope, plan.question, query_plan=plan.retrieval_plan)
+    def retrieve(self, scope: Scope, plan: QueryPlan, *, allow_expansion: bool = True) -> RetrievalResult:
+        return self.retrieve_query(scope, plan.question, query_plan=plan.retrieval_plan,allow_expansion=allow_expansion)
 
-    def retrieve_query(self, scope: Scope, question: str, *, query_plan: Any = None) -> RetrievalResult:
+    def retrieve_query(self, scope: Scope, question: str, *, query_plan: Any = None, allow_expansion: bool = True) -> RetrievalResult:
         observation = (
             self.observability.observation(
                 name="knowledge-retrieval",
@@ -277,7 +277,9 @@ class KnowledgeGateway:
             else nullcontext(None)
         )
         with observation as span:
-            result = self.retriever.retrieve(scope, question, query_plan=query_plan)
+            result = (self.retriever.retrieve(scope,question,query_plan=query_plan,allow_expansion=False)
+                      if isinstance(self.retriever,HybridRetriever) and not allow_expansion else
+                      self.retriever.retrieve(scope, question, query_plan=query_plan))
             if (metrics := current_metrics()) is not None:
                 metrics.record_retrieval(result)
             if span is not None:
@@ -305,10 +307,18 @@ class KnowledgeGateway:
         local_query_gateway: Any | None = None,
         local_query_enabled: bool = False,
         local_query_timeout_seconds: float = 4.0,
+        understanding: Any = None,
     ) -> tuple[QueryPlan, RetrievalResult]:
         plan = self.plan(question)
-        retrieval = self.retrieve(scope, plan)
-        if not retrieval.items and local_query_enabled and local_query_gateway is not None:
+        if understanding is not None and isinstance(self.retriever, HybridRetriever):
+            # C already validated rewrite/tasks/history provenance; q0 stays in
+            # the interpretation object and is not replaced by projections.
+            retrieval = self.retriever.retrieve(scope,question,query_plan=plan.retrieval_plan,understanding=understanding)
+            if (metrics := current_metrics()) is not None:metrics.record_retrieval(retrieval)
+        else:
+            retrieval = self.retrieve(scope, plan)
+        if (not retrieval.items and local_query_enabled and local_query_gateway is not None
+                and not retrieval.retrieval_stats.get('query_expansion',{}).get('queries')):
             expanded, degradation = self.model_policy.build_query_plan(
                 question,
                 local_query_gateway,
@@ -322,14 +332,20 @@ class KnowledgeGateway:
                     degradation_code=degradation,
                     model_calls=1,
                 )
-                retrieval = self.retrieve(scope, plan)
+                # No deterministic query was dispatched; this legacy explicit
+                # model stage is the sole recovery attempt, not a new loop.
+                retrieval = self.retrieve(scope, plan,allow_expansion=False)
             else:
                 plan = replace(plan, degradation_code=degradation, model_calls=1)
 
         decision = self.evidence.evaluate(retrieval, plan)
         if decision.missing_targets:
             targeted_query = " ".join(target.search_query for target in decision.missing_targets)
-            targeted = self.retrieve_query(scope, targeted_query)
+            if isinstance(self.retriever, HybridRetriever):
+                targeted = self.retriever.retrieve(scope,targeted_query,allow_expansion=False)
+                if (metrics := current_metrics()) is not None:metrics.record_retrieval(targeted)
+            else:
+                targeted = self.retrieve_query(scope,targeted_query)
             retrieval = self._merge(plan, retrieval, targeted, max_items=2 * self.retriever.top_k)
             if (metrics := current_metrics()) is not None:
                 metrics.record_retrieval_merge(retrieval.merge_provenance)

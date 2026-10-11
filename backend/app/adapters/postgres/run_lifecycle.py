@@ -4,7 +4,9 @@ import json
 import uuid
 from sqlalchemy import text
 
-from backend.app.ports.run_lifecycle import execution_owner, LifecycleDenied, RunClaim
+from backend.app.ports.run_lifecycle import (
+    execution_owner, LifecycleDenied, RunClaim, current_attempt, checked_retrieval_completion,
+)
 
 
 def request_hash(session, kbs, docs, content, mode):
@@ -98,6 +100,45 @@ class PostgresRunLifecycle:
             if count != 1:
                 raise LifecycleDenied('ATTEMPT_BUDGET_LINK_DENIED')
 
+    def link_token_budget(self, receipt):
+        from backend.app.ports.v6_token_budget import V6TokenBudgetReceipt
+        if (type(receipt) is not V6TokenBudgetReceipt or receipt.status != 'reserved'
+                or receipt.token_state != 'reserved'):
+            raise LifecycleDenied('ATTEMPT_TOKEN_RECEIPT_INVALID')
+        with self.engine.begin() as conn:
+            conn.execute(text("""SELECT id FROM rag_runs WHERE id=:id AND conversation_id=:session
+                AND status='running' AND knowledge_base_scope=CAST(:kbs AS jsonb)
+                AND document_scope=CAST(:docs AS jsonb) FOR UPDATE"""),
+                dict(id=receipt.run_id, session=receipt.session_id,
+                    kbs=json.dumps(receipt.knowledge_base_ids), docs=json.dumps(receipt.document_ids))).one()
+            check_fence(conn, receipt.run_id, receipt.owner)
+            count = conn.execute(text("""UPDATE rag_model_attempts SET diagnostics=diagnostics ||
+                jsonb_build_object('canonical_token_budget', CAST(:receipt AS jsonb))
+                WHERE id=:attempt AND run_id=:id AND owner=:owner AND state='IN_PROGRESS'
+                AND role='chat_expensive' AND provider='deepseek' AND model='deepseek-flash'
+                AND envelope_hash=:envelope AND NOT (diagnostics ? 'canonical_token_budget')"""),
+                dict(id=receipt.run_id, owner=receipt.owner, attempt=receipt.product_attempt_id,
+                    envelope=receipt.envelope_sha256, receipt=json.dumps(receipt.diagnostics()))).rowcount
+            if count != 1:
+                raise LifecycleDenied('ATTEMPT_TOKEN_BUDGET_LINK_DENIED')
+
+    def assert_token_budget_current(self, receipt):
+        from backend.app.ports.v6_token_budget import V6TokenBudgetReceipt
+        if type(receipt) is not V6TokenBudgetReceipt or receipt.status != 'reserved' or receipt.token_state != 'reserved':
+            raise LifecycleDenied('ATTEMPT_TOKEN_RECEIPT_INVALID')
+        with self.engine.begin() as conn:
+            conn.execute(text('SELECT id FROM rag_runs WHERE id=:id AND conversation_id=:session AND status=\'running\' FOR UPDATE'),
+                dict(id=receipt.run_id, session=receipt.session_id)).one()
+            check_fence(conn, receipt.run_id, receipt.owner)
+            valid = conn.execute(text("""SELECT 1 FROM rag_model_attempts WHERE id=:attempt AND run_id=:id
+                AND owner=:owner AND state='IN_PROGRESS' AND role='chat_expensive' AND provider='deepseek'
+                AND model='deepseek-flash' AND envelope_hash=:envelope
+                AND diagnostics #>> '{canonical_token_budget,native_token_attempt_id}' = :native"""),
+                dict(id=receipt.run_id, owner=receipt.owner, attempt=receipt.product_attempt_id,
+                    envelope=receipt.envelope_sha256, native=receipt.native_token_attempt_id)).scalar()
+            if valid != 1:
+                raise LifecycleDenied('ATTEMPT_TOKEN_BUDGET_FENCE_DENIED')
+
     def finish_run(self, run_id, owner, *, not_sent=False):
         with self.engine.begin() as conn:
             row = conn.execute(text('SELECT status FROM rag_runs WHERE id=:id FOR UPDATE'),dict(id=run_id)).scalar_one()
@@ -117,6 +158,64 @@ class PostgresRunLifecycle:
             conn.execute(text("UPDATE rag_run_leases SET state=:state WHERE run_id=:id AND owner=:owner AND state='IN_PROGRESS'"),dict(id=run_id,owner=owner,state=state))
             conn.execute(text("UPDATE rag_model_attempts SET state='UNKNOWN' WHERE run_id=:id AND owner=:owner AND state='IN_PROGRESS'"),dict(id=run_id,owner=owner))
             return state
+
+    def finalize_retrieval(self, *, run_id, owner, session, kbs, docs, content, mode,
+                           completed_qids, native_receipts_sha256) -> bool:
+        payload = checked_retrieval_completion(completed_qids, native_receipts_sha256)
+        from backend.app.application.run_lifecycle import RunLifecycle
+
+        def current():
+            claim, lifecycle, _, active_session = RunLifecycle.assert_current()
+            if (type(claim) is not RunClaim or type(lifecycle) is not RunLifecycle
+                    or lifecycle.repository is not self or not claim.created or claim.state != 'IN_PROGRESS'
+                    or (claim.run_id, claim.owner, active_session) != (run_id, owner, session)
+                    or execution_owner.get() != (run_id, owner) or current_attempt.get() is not None):
+                raise LifecycleDenied('RETRIEVAL_COMPLETION_CONTEXT_INVALID')
+
+        current()
+        with self.engine.begin() as conn:
+            row = conn.execute(text('''SELECT conversation_id,knowledge_base_scope,document_scope,q0,status
+                FROM rag_runs WHERE id=:id FOR UPDATE'''), dict(id=run_id)).mappings().first()
+            if (row is None or row['status'] != 'running' or str(row['conversation_id']) != session
+                    or row['knowledge_base_scope'] != kbs or row['document_scope'] != docs or row['q0'] != content):
+                raise LifecycleDenied('RETRIEVAL_COMPLETION_RUN_DENIED')
+            check_fence(conn, run_id, owner)
+            identity = conn.execute(text('SELECT request_hash FROM rag_run_leases WHERE run_id=:id AND owner=:owner'),
+                dict(id=run_id, owner=owner)).scalar()
+            if mode not in ('quick', 'smart') or identity != request_hash(session, kbs, docs, content, mode):
+                raise LifecycleDenied('RETRIEVAL_COMPLETION_REQUEST_MISMATCH')
+            conversation = conn.execute(text('''SELECT knowledge_base_scope,document_scope,deleted_at
+                FROM conversations WHERE id=:session FOR SHARE'''), dict(session=session)).mappings().first()
+            if (conversation is None or conversation['deleted_at'] is not None
+                    or conversation['knowledge_base_scope'] != kbs or conversation['document_scope'] != docs):
+                raise LifecycleDenied('RUN_SCOPE_MISMATCH')
+            prohibited = conn.execute(text('''SELECT EXISTS(SELECT 1 FROM rag_model_attempts WHERE run_id=:id)
+                OR EXISTS(SELECT 1 FROM agent_runs WHERE id=:id)
+                OR EXISTS(SELECT 1 FROM conversation_messages WHERE run_id=:id AND role='assistant')
+                OR EXISTS(SELECT 1 FROM answer_evidence WHERE run_id=:id)
+                OR EXISTS(SELECT 1 FROM retrieval_events WHERE run_id=:id
+                    AND (event_type='answer.completed' OR payload->>'terminal_kind'='retrieval_only'))'''),
+                dict(id=run_id)).scalar_one()
+            if prohibited is not False:
+                raise LifecycleDenied('RETRIEVAL_COMPLETION_NOT_RETRIEVAL_ONLY')
+            current()
+            payload.update(run_id=run_id, owner=owner, session_id=session,
+                knowledge_base_ids=kbs, document_ids=docs, mode=mode)
+            seq = conn.execute(text('''UPDATE rag_runs SET status='completed',error_code=NULL,
+                completed_at=clock_timestamp(),next_event_seq=next_event_seq+1
+                WHERE id=:id AND status='running' RETURNING next_event_seq-1'''), dict(id=run_id)).scalar()
+            if seq is None:
+                raise LifecycleDenied('RETRIEVAL_COMPLETION_COMMIT_DENIED')
+            conn.execute(text("""INSERT INTO retrieval_events(id,run_id,seq,event_type,payload)
+                VALUES (:event,:id,:seq,'retrieval.completed',CAST(:payload AS jsonb))"""),
+                dict(event=str(uuid.uuid4()), id=run_id, seq=seq, payload=json.dumps(payload)))
+            count = conn.execute(text("""UPDATE rag_run_leases SET state='COMPLETED'
+                WHERE run_id=:id AND owner=:owner AND state='IN_PROGRESS' AND lease_until>clock_timestamp()"""),
+                dict(id=run_id, owner=owner)).rowcount
+            if count != 1:
+                raise LifecycleDenied('RETRIEVAL_COMPLETION_LEASE_LOST')
+            current()
+        return True
 
     def cleanup_identity(self, run_id):
         with self.engine.connect() as conn:
@@ -157,16 +256,43 @@ class PostgresRunLifecycle:
                 raise LifecycleDenied('RUN_SCOPE_MISMATCH')
             answer = conn.execute(text("SELECT content FROM conversation_messages WHERE run_id=:id AND role='assistant' ORDER BY created_at LIMIT 1"),dict(id=run_id)).scalar()
             labels=[]
+            retrieval=None
             if row['status']=='completed':
                 payload=conn.execute(text("SELECT payload FROM retrieval_events WHERE run_id=:id AND event_type='answer.completed' ORDER BY seq DESC LIMIT 1"),dict(id=run_id)).scalar()
-                labels=payload.get('citations') if isinstance(payload,dict) else None
-                if not isinstance(labels,list) or any(not isinstance(label,str) for label in labels) or len(set(labels))!=len(labels):
-                    raise LifecycleDenied('RUN_CITATION_INTEGRITY_ERROR')
-                evidence=conn.execute(text('''SELECT ae.label,ae.quote,ae.quote_sha256,c.content FROM answer_evidence ae
-                    JOIN chunks c ON c.id=ae.chunk_id AND c.version_id=ae.version_id WHERE ae.run_id=:id'''),dict(id=run_id)).mappings().all()
-                by_label={e['label']:e for e in evidence}
-                for label in labels:
-                    e=by_label.get(label)
-                    if e is None or hashlib.sha256(e['quote'].encode('utf8')).hexdigest()!=e['quote_sha256'] or e['quote'] not in e['content']:
+                if payload is None:
+                    retrieval=conn.execute(text("""SELECT payload FROM retrieval_events WHERE run_id=:id
+                        AND event_type='retrieval.completed' AND payload->>'terminal_kind'='retrieval_only'
+                        ORDER BY seq DESC LIMIT 1"""),dict(id=run_id)).scalar()
+                    if type(retrieval) is not dict:
                         raise LifecycleDenied('RUN_CITATION_INTEGRITY_ERROR')
-            return dict(run_id=str(row['id']),status=row['status'],error_code=row['error_code'],answer=answer or '',citations=tuple(labels))
+                    try:
+                        if type(retrieval.get('completed_qids')) is not list: raise ValueError()
+                        base=checked_retrieval_completion(tuple(retrieval['completed_qids']),retrieval['native_receipts_sha256'])
+                        lease=conn.execute(text('SELECT owner,request_hash,state FROM rag_run_leases WHERE run_id=:id'),dict(id=run_id)).mappings().first()
+                        if (answer is not None or any(retrieval.get(key)!=value for key,value in base.items())
+                                or type(retrieval.get('count')) is not int or retrieval.get('run_id')!=str(row['id'])
+                                or retrieval.get('session_id')!=session or retrieval.get('knowledge_base_ids')!=kbs
+                                or retrieval.get('document_ids')!=docs or lease is None or lease['state']!='COMPLETED'
+                                or retrieval.get('owner')!=str(lease['owner']) or retrieval.get('mode') not in ('quick','smart')
+                                or lease['request_hash']!=request_hash(session,kbs,docs,row['q0'],retrieval['mode'])):
+                            raise ValueError()
+                        mixed=conn.execute(text('''SELECT EXISTS(SELECT 1 FROM answer_evidence WHERE run_id=:id)
+                            OR EXISTS(SELECT 1 FROM rag_model_attempts WHERE run_id=:id)
+                            OR EXISTS(SELECT 1 FROM agent_runs WHERE id=:id)'''),dict(id=run_id)).scalar_one()
+                        if mixed is not False: raise ValueError()
+                    except (KeyError,TypeError,ValueError,LifecycleDenied):
+                        raise LifecycleDenied('RUN_RETRIEVAL_INTEGRITY_ERROR') from None
+                else:
+                    labels=payload.get('citations') if isinstance(payload,dict) else None
+                    if not isinstance(labels,list) or any(not isinstance(label,str) for label in labels) or len(set(labels))!=len(labels):
+                        raise LifecycleDenied('RUN_CITATION_INTEGRITY_ERROR')
+                    evidence=conn.execute(text('''SELECT ae.label,ae.quote,ae.quote_sha256,c.content FROM answer_evidence ae
+                        JOIN chunks c ON c.id=ae.chunk_id AND c.version_id=ae.version_id WHERE ae.run_id=:id'''),dict(id=run_id)).mappings().all()
+                    by_label={e['label']:e for e in evidence}
+                    for label in labels:
+                        e=by_label.get(label)
+                        if e is None or hashlib.sha256(e['quote'].encode('utf8')).hexdigest()!=e['quote_sha256'] or e['quote'] not in e['content']:
+                            raise LifecycleDenied('RUN_CITATION_INTEGRITY_ERROR')
+            result=dict(run_id=str(row['id']),status=row['status'],error_code=row['error_code'],answer=answer or '',citations=tuple(labels))
+            if retrieval is not None: result['retrieval']=retrieval
+            return result

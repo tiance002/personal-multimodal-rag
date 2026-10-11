@@ -15,6 +15,7 @@ from backend.app.ports.ranking import CandidateRanker, CandidateDiversitySelecto
 from backend.app.ports.model_access import model_access
 from backend.app.application.retrieval_policy import RetrievalRouter
 from backend.app.application.retrieval_merge import ContextPassage, merge_passages, SHORT_CONTEXT
+from backend.app.domain.bm25 import score_bm25
 
 
 @dataclass(frozen=True)
@@ -51,7 +52,7 @@ def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
 
 
 def score_keyword_hits(chunks: list[ChunkRecord], query: NormalizedQuery, limit: int) -> list[RankedHit]:
-    """Deterministic keyword scoring shared by in-process repositories.
+    """Frozen legacy TF scorer retained only for baseline comparisons.
 
     Mirrors the PostgreSQL `chunk_terms` ranking so both repositories order
     candidates the same way: summed term occurrences, plus a bonus when the
@@ -105,7 +106,7 @@ class InMemoryRetrievalRepository:
     def keyword_candidates(self, scope: Scope, query: NormalizedQuery, limit: int) -> list[RankedHit]:
         if not scope.knowledge_base_ids or not query.terms:
             return []
-        return score_keyword_hits(self.list_active_chunks(scope), query, limit)
+        return score_bm25(self.list_active_chunks(scope), query, limit)
 
     def vector_candidates(self, scope: Scope, vector: Any, limit: int, *, profile_id: str | None = None) -> list[RankedHit]:
         if not scope.knowledge_base_ids:
@@ -148,6 +149,7 @@ class HybridRetriever:
         diversity_selector: CandidateDiversitySelector | None = None,
         *,
         context_max_items: int | None = None,
+        query_expansion_enabled: bool = True,
     ) -> None:
         self.repository = repository
         self.embedding_provider = embedding_provider
@@ -158,6 +160,7 @@ class HybridRetriever:
         self.context_candidate_k = context_candidate_k
         self.context_max_per_document = context_max_per_document
         self.context_max_items = context_max_items
+        self.query_expansion_enabled = query_expansion_enabled
         self.router = RetrievalRouter(mode)
         self.ranker = ranker
         self.diversity_selector = diversity_selector
@@ -197,7 +200,8 @@ class HybridRetriever:
             config.update(rerank_enabled=self.ranker is not None, mmr_enabled=self.diversity_selector is not None)
         return config
 
-    def retrieve(self, scope: Scope, question: str, query_plan: NormalizedQuery | None = None) -> RetrievalResult:
+    def retrieve(self, scope: Scope, question: str, query_plan: NormalizedQuery | None = None, *,
+                 understanding: Any = None, allow_expansion: bool = True) -> RetrievalResult:
         started = time.perf_counter()
         effective = self.effective_config()
         plan = query_plan or normalize_query(question)
@@ -224,7 +228,7 @@ class HybridRetriever:
                 if getattr(self.embedding_provider, "provider_kind", None) == "cloud":
                     checker = getattr(self.repository, "embedding_scope_allowed", None)
                     allowed = checker is not None and checker(scope) is True
-                with model_access("embedding", allowed=allowed):
+                with model_access("embedding", allowed=allowed, scope=scope):
                     embedded = self.embedding_provider.embed([question], timeout_seconds=10)
                 validator = getattr(self.repository, "validate_embedding_result", None)
                 if validator is not None:
@@ -260,6 +264,59 @@ class HybridRetriever:
             mode = "keyword"
             route_reason += ("VECTOR_UNAVAILABLE_KEYWORD_FALLBACK",)
 
+        # Lexical recovery occurs before one global fusion/rerank. Dense still
+        # uses the original validated expression once, not each projection.
+        from backend.app.application.query_expansion import risk_signals, variants, fingerprint
+        read = getattr(self.repository, 'get_retrieval_chunks', None)
+        first_ids = list(dict.fromkeys(h.chunk_id for hits in rankings.values() for h in hits))
+        first_chunks = (read(scope,first_ids) if read else {key:self.repository.get_chunk(key) for key in first_ids})
+        first_chunks = {key:c for key,c in first_chunks.items() if c and c.chunk_id==key and c.is_current
+                        and c.chunk_role=='child' and scope.contains(c.knowledge_base_id,c.document_id)}
+        keyword_requested='keyword' in rankings
+        before = risk_signals(question,list(first_chunks.values()),rankings.get('keyword',()),understanding,keyword_requested=keyword_requested)
+        # A semantic vector route deliberately omits lexical voting. Lexical
+        # mismatch alone does not prove a gap in semantic paraphrase evidence.
+        # Explicit unsupported targets/tasks still permit bounded recovery.
+        trigger_reasons=(before['reasons'] if keyword_requested else [reason for reason in before['reasons']
+            if reason in {'EMPTY_CANDIDATES','EVIDENCE_TARGET_UNCOVERED','EXPLICIT_TASK_UNCOVERED'}])
+        expansion = dict(enabled=self.query_expansion_enabled and allow_expansion,triggered=False,
+            before=before,after=before,trigger_reasons=trigger_reasons,queries=[],model_calls=0,cost_microunits=0,cost_basis='DETERMINISTIC_NO_MODEL',
+            initial_candidate_rankings={k:[h.model_dump(mode='json') for h in v] for k,v in rankings.items()},
+            q0_sha256=fingerprint(understanding.q0 if understanding is not None else plan.q0),
+            rewrite_sha256=fingerprint(question),status='NOT_NEEDED',latency_ms=0.0)
+        if expansion['enabled'] and trigger_reasons:
+            stage=time.perf_counter();expansion['triggered']=True
+            initial_rankings=dict(rankings);initial_mode=mode;initial_reason=route_reason
+            local={'original':rankings.get('keyword',[])}
+            for i,(projection,projected_plan) in enumerate(variants(question,understanding),1):
+                row=dict(source=projection.source,query_sha256=fingerprint(projection.text),
+                         terms_sha256=fingerprint('\0'.join(projected_plan.terms)),candidates=[],status='FAILED')
+                try:
+                    hits=self.repository.keyword_candidates(scope,projected_plan,self.candidate_k)
+                    local[f'projection_{i}']=hits
+                    row.update(status='RETRIEVED',candidates=[h.model_dump(mode='json') for h in hits])
+                except Exception:
+                    row['reason']='EXPANSION_RETRIEVAL_UNAVAILABLE'
+                    degradation_flags+=('EXPANSION_RETRIEVAL_UNAVAILABLE',)
+                expansion['queries'].append(row)
+            if len(local)>1 and all(r['status']=='RETRIEVED' for r in expansion['queries']):
+                merged=rrf_fuse(local,k=self.rrf_k)
+                rankings['keyword']=[h.model_copy(update={'rank':i,'raw_score':h.fused_score}) for i,h in enumerate(merged[:self.candidate_k],1)]
+                if mode=='vector':mode='hybrid';route_reason+=('LOW_RECALL_LEXICAL_RECOVERY',)
+            ids=list(dict.fromkeys(h.chunk_id for hits in rankings.values() for h in hits))
+            try:
+                after_chunks=(read(scope,ids) if read else {key:self.repository.get_chunk(key) for key in ids})
+                after_chunks=[c for key,c in after_chunks.items() if c and c.chunk_id==key and c.is_current
+                              and c.chunk_role=='child' and scope.contains(c.knowledge_base_id,c.document_id)]
+                expansion['after']=risk_signals(question,after_chunks,rankings.get('keyword',()),understanding,keyword_requested='keyword' in rankings)
+            except Exception:
+                rankings=initial_rankings;mode=initial_mode;route_reason=initial_reason
+                expansion['validation_failure']='EXPANSION_READBACK_UNAVAILABLE'
+                degradation_flags+=('EXPANSION_READBACK_UNAVAILABLE',)
+            expansion['status']='DEGRADED_KEEP_INITIAL' if any(r['status']=='FAILED' for r in expansion['queries']) else 'COMPLETED' if expansion['queries'] else 'NO_SAFE_VARIANT'
+            if expansion.get('validation_failure'):expansion['status']='DEGRADED_KEEP_INITIAL'
+            expansion['latency_ms']=(time.perf_counter()-stage)*1000
+        timings['query_expansion_ms']=expansion['latency_ms']
         fusion_started=time.perf_counter()
         full_fused = rrf_fuse(rankings, k=self.rrf_k, source_weights=self.source_weights)
         timings['fusion_ms']=(time.perf_counter()-fusion_started)*1000
@@ -272,6 +329,7 @@ class HybridRetriever:
                   and c.is_current is True and c.chunk_role == 'child'
                   and scope.contains(c.knowledge_base_id, c.document_id)}
         full_fused = [h for h in full_fused if h.chunk_id in chunks]
+        fused_before_rank = [h.model_dump(mode='json') for h in full_fused]
         # Fusion recalls candidates; optional second stages own their ordering.
         for adapter, method, timing_key, failure in (
             (self.ranker, "rank", "ranking_ms", "RANKER_UNAVAILABLE"),
@@ -285,7 +343,7 @@ class HybridRetriever:
                 if getattr(adapter, 'provider_kind', None) == 'cloud':
                     checker = getattr(self.repository, 'embedding_scope_allowed', None)
                     allowed = checker is not None and checker(scope) is True
-                with model_access('rerank', allowed=allowed):
+                with model_access('rerank', allowed=allowed, scope=scope):
                     ranked = list(getattr(adapter, method)(question, tuple(full_fused), chunks))
                 ids = [hit.chunk_id for hit in ranked]
                 if (len(ids) != len(full_fused) or len(ids) != len(set(ids))
@@ -351,6 +409,8 @@ class HybridRetriever:
             retrieval_mode=mode, route_reason=route_reason,
             embedding_cache_hit=embedding_cache_hit,
             retrieval_stats=dict(candidate_count=len(full_fused), merged_count=len(groups),
+                query_expansion=expansion,keyword_scoring='BM25/k1=1.2/b=0.75/mixed-script-compatible/v2',
+                fused_before_rank=fused_before_rank,
                 final_context_count=min(len(groups), self.top_k), final_evidence_count=len(items),
                 document_count=len({i.chunk.document_id for i in items}),
                 parent_count=len({p for i in items if i.context_passage for p in i.context_passage.parent_ids}),

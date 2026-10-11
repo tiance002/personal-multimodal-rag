@@ -53,6 +53,7 @@ class PublicCase:
     answers: tuple[str, ...] = ()
     paired_source_doc_id: str | None = None
     qrels_kind: str = "official_document_qrels"
+    evaluation_metadata: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

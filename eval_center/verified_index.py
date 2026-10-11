@@ -5,7 +5,8 @@ import hashlib
 import json
 import re
 import subprocess
-from pathlib import Path
+from dataclasses import dataclass, asdict
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from sqlalchemy import text
@@ -35,6 +36,96 @@ _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 _GIT_SHA = re.compile(r"[0-9a-f]{40}\Z")
 
 
+@dataclass(frozen=True)
+class ECSReadOnlyDatabaseProfile:
+    """Explicit owner evidence for the independent ECS DB; no inferred IDs."""
+    port: int
+    system_identifier: str
+    database_oid: int
+    schema_revision: str
+    container_id: str | None
+    volume_name: str | None
+    evidence_sha256: str
+    database: str = 'rag_p7_r1'
+    container_name: str | None = 'rag-eval'
+    host: str = '127.0.0.1'
+    profile_id: str = 'OWNER_V6_ECS_INDEPENDENT'
+    deployment_kind: str = 'DOCKER_CONTAINER'
+    data_directory: str | None = None
+    service_name: str | None = None
+    postgres_executable: str | None = None
+
+    def validate(self):
+        if (type(self) is not ECSReadOnlyDatabaseProfile
+                or self.profile_id != 'OWNER_V6_ECS_INDEPENDENT'
+                or self.database != 'rag_p7_r1'
+                or self.host != '127.0.0.1' or type(self.port) is not int
+                or not 1 <= self.port <= 65535
+                or type(self.system_identifier) is not str
+                or not re.fullmatch(r'[1-9][0-9]{0,19}', self.system_identifier)
+                or int(self.system_identifier) >= 2**64
+                or type(self.database_oid) is not int or not 0 < self.database_oid < 2**32
+                or type(self.schema_revision) is not str or not self.schema_revision
+                or not _SHA256.fullmatch(str(self.evidence_sha256))):
+            raise IndexReuseRejected('ecs_database_profile')
+        if self.deployment_kind == 'DOCKER_CONTAINER':
+            if (self.container_name != 'rag-eval' or not _SHA256.fullmatch(str(self.container_id))
+                    or type(self.volume_name) is not str or not self.volume_name
+                    or any(value is not None for value in (self.data_directory,self.service_name,self.postgres_executable))):
+                raise IndexReuseRejected('ecs_container_identity')
+        elif self.deployment_kind == 'HOST_NATIVE_POSTGRESQL':
+            if (any(value is not None for value in (self.container_id,self.container_name,self.volume_name))
+                    or not _absolute_postgres_path(self.data_directory)
+                    or not _absolute_postgres_path(self.postgres_executable)
+                    or PurePosixPath(self.postgres_executable).name != 'postgres'
+                    or type(self.service_name) is not str
+                    or not re.fullmatch(r'postgresql@[A-Za-z0-9_.-]+\.service',self.service_name)):
+                raise IndexReuseRejected('ecs_host_instance_identity')
+        else:
+            raise IndexReuseRejected('deployment_kind')
+
+    @classmethod
+    def from_host_metadata_receipt(cls, evidence_path: Path, *, expected_sha256: str):
+        """Load the exact approved external receipt; creates no Scope/index/ready flag."""
+        try:
+            raw=Path(evidence_path).read_bytes()
+            if not _SHA256.fullmatch(expected_sha256) or hashlib.sha256(raw).hexdigest()!=expected_sha256:
+                raise ValueError('metadata_hash')
+            receipt=json.loads(raw)
+            observed=json.loads(receipt['stdout'])
+            service=observed['native_postgres_service'];process=observed['native_postgres_process']
+            service_state=dict(line.split('=',1) for line in service['stdout'].splitlines())
+            service_name=service['command'][2]
+            if (receipt['exit_code']!=0 or observed['exit_code']!=0
+                    or observed['deployment_kind']!='HOST_NATIVE_POSTGRESQL'
+                    or any(observed[field] is not None for field in ('container_id','container_name','volume_name'))
+                    or observed['docker_identity_status']!='NOT_APPLICABLE_HOST_NATIVE_POSTGRESQL'
+                    or service['exit_code']!=0 or service['command'][:2]!=['systemctl','show']
+                    or service_state['ActiveState']!='active' or int(service_state['MainPID'])<=0
+                    or process['pid']!=int(service_state['MainPID'])
+                    or not any(line.split(':',2)[-1].endswith('/'+service_name)
+                               for line in process['cgroup'].splitlines())
+                    or any(observed[field]!=0 for field in ('model_calls','ledger_operations','database_writes'))):
+                raise ValueError('metadata_instance')
+            meta=observed['target_database_metadata']
+            if meta['transaction_read_only']!='on':raise ValueError('metadata_transaction')
+            profile=cls(port=meta['port'],system_identifier=meta['system_identifier'],
+                database_oid=meta['database_oid'],schema_revision=meta['schema_revision'],
+                container_id=None,container_name=None,volume_name=None,evidence_sha256=expected_sha256,
+                database=meta['database'],deployment_kind='HOST_NATIVE_POSTGRESQL',
+                data_directory=meta['data_directory'],service_name=service_name,
+                postgres_executable=process['executable'])
+            profile.validate()
+            return profile
+        except (OSError,AttributeError,IndexError,KeyError,TypeError,ValueError) as exc:
+            raise IndexReuseRejected('ecs_metadata_evidence') from exc
+
+
+def _absolute_postgres_path(value):
+    return (type(value) is str and bool(value) and PurePosixPath(value).is_absolute()
+            and '..' not in PurePosixPath(value).parts)
+
+
 class IndexReuseRejected(RuntimeError):
     """The prebuilt index cannot be proven identical and read-only."""
 
@@ -44,16 +135,21 @@ class IndexReuseRejected(RuntimeError):
         super().__init__(f"INDEX_REUSE_REJECTED:{field}")
 
 
-def read_only_database_url(admin_url: str | URL, database: str) -> str:
+def read_only_database_url(admin_url: str | URL, database: str, *,
+                           database_profile: ECSReadOnlyDatabaseProfile | None = None) -> str:
     """Derive a URL pinned to the validated clone loopback port and read-only txns."""
     try:
         url = make_url(admin_url)
     except Exception as exc:
         raise IndexReuseRejected("database_url") from exc
+    if database_profile is not None:
+        database_profile.validate()
+    port = database_profile.port if database_profile is not None else CLONE_PORT
     if (url.get_backend_name() != "postgresql" or url.host != "127.0.0.1"
-            or url.port != CLONE_PORT or url.database != "postgres"):
+            or url.port != port or url.database != "postgres"):
         raise IndexReuseRejected("clone_endpoint")
-    if database not in ALLOWED_DATABASES:
+    if (database != database_profile.database if database_profile is not None
+            else database not in ALLOWED_DATABASES):
         raise IndexReuseRejected("database")
     # Never forward driver parameters from the supplied DSN: psycopg query
     # values such as host/hostaddr/port/dbname can override the validated URL.
@@ -64,7 +160,12 @@ def read_only_database_url(admin_url: str | URL, database: str) -> str:
     return url.set(database=database, query=query).render_as_string(hide_password=False)
 
 
-def require_read_only_connection(connection: Any, expected_database: str) -> None:
+def require_read_only_connection(connection: Any, expected_database: str, *,
+                                 database_profile: ECSReadOnlyDatabaseProfile | None = None) -> None:
+    if database_profile is not None:
+        database_profile.validate()
+        if expected_database != database_profile.database:
+            raise IndexReuseRejected('database')
     row = connection.execute(text(
         "SELECT current_database(), current_setting('transaction_read_only')"
     )).one()
@@ -72,10 +173,38 @@ def require_read_only_connection(connection: Any, expected_database: str) -> Non
         raise IndexReuseRejected("connected_database")
     if str(row[1]).lower() not in {"on", "true", "1"}:
         raise IndexReuseRejected("database_read_only")
+    if database_profile is not None:
+        host_native=database_profile.deployment_kind=='HOST_NATIVE_POSTGRESQL'
+        fields=('system_identifier','database_oid','schema_revision')
+        extra_sql=''
+        if host_native:
+            fields+=('data_directory','port')
+            extra_sql=", current_setting('data_directory'), current_setting('port')::integer"
+        observed = connection.execute(text(
+            "SELECT (pg_control_system()).system_identifier::text, "
+            "(SELECT oid FROM pg_database WHERE datname=current_database()), "
+            "(SELECT version_num FROM alembic_version)"+extra_sql
+        )).one()
+        if len(observed)!=len(fields):raise IndexReuseRejected('connected_instance_fields')
+        for field, value in zip(fields, observed):
+            if value != getattr(database_profile, field):
+                raise IndexReuseRejected(field)
 
 
-def validate_index_identity(expected: dict[str, Any], actual: dict[str, Any]) -> dict[str, Any]:
-    for field in REQUIRED_INDEX_IDENTITY_FIELDS:
+def validate_index_identity(expected: dict[str, Any], actual: dict[str, Any], *,
+                            database_profile: ECSReadOnlyDatabaseProfile | None = None,
+                            scope=None) -> dict[str, Any]:
+    fields = REQUIRED_INDEX_IDENTITY_FIELDS
+    if database_profile is not None:
+        database_profile.validate()
+        fields += ('system_identifier', 'database_oid', 'scope')
+        if database_profile.deployment_kind=='HOST_NATIVE_POSTGRESQL':
+            docker_fields=('container_id','container_name','volume_name')
+            if any(expected.get(f) is not None or actual.get(f) is not None for f in docker_fields):
+                raise IndexReuseRejected('docker_identity_not_applicable')
+            fields=tuple(f for f in fields if f not in docker_fields)
+            fields+=('deployment_kind','data_directory','service_name','postgres_executable')
+    for field in fields:
         if field not in expected or expected[field] is None or field not in actual or actual[field] is None:
             raise IndexReuseRejected(field)
         if expected[field] != actual[field]:
@@ -86,8 +215,22 @@ def validate_index_identity(expected: dict[str, Any], actual: dict[str, Any]) ->
         raise IndexReuseRejected("ready_state")
     if expected["database_read_only"] is not True or actual["database_read_only"] is not True:
         raise IndexReuseRejected("database_read_only")
-    if expected["port"] != CLONE_PORT or actual["port"] != CLONE_PORT:
-        raise IndexReuseRejected("port")
+    if database_profile is None:
+        if expected["port"] != CLONE_PORT or actual["port"] != CLONE_PORT:
+            raise IndexReuseRejected("port")
+    else:
+        profile_fields=('database','port','system_identifier','database_oid','schema_revision')
+        profile_fields+=(('deployment_kind','data_directory','service_name','postgres_executable')
+            if database_profile.deployment_kind=='HOST_NATIVE_POSTGRESQL'
+            else ('container_id','container_name','volume_name'))
+        for field in profile_fields:
+            if expected[field] != getattr(database_profile, field):
+                raise IndexReuseRejected(field)
+        from backend.app.domain.scope import Scope
+        if (type(scope) is not Scope or not scope.knowledge_base_ids
+                or actual['scope'] != {'kb': sorted(scope.knowledge_base_ids),
+                                       'documents': sorted(scope.document_ids)}):
+            raise IndexReuseRejected('scope')
     for field in ("run_manifest_sha256", "corpus_sha256", "development_cases_sha256",
                   "prepared_manifest_sha256", "embedding_digest", "index_fingerprint",
                   "source_binding_sha256", "index_code_sha256"):
@@ -100,12 +243,14 @@ def validate_index_identity(expected: dict[str, Any], actual: dict[str, Any]) ->
             or any(type(value) is not int or value <= 0 for value in counts.values())
             or counts["chunks"] != counts["embeddings"]):
         raise IndexReuseRejected("index_counts")
-    serialized = json.dumps(expected, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+    identity = expected if database_profile is None else {
+        'index': expected, 'database_profile': asdict(database_profile)}
+    serialized = json.dumps(identity, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
                             allow_nan=False).encode("utf-8")
     return {
         "status": "VERIFIED_READ_ONLY_REUSE",
         "identity_sha256": hashlib.sha256(serialized).hexdigest(),
-        "verified_fields": sorted(REQUIRED_INDEX_IDENTITY_FIELDS),
+        "verified_fields": sorted(fields),
     }
 
 
@@ -216,6 +361,7 @@ def index_code_identity(repository_root: Path, baseline_git_sha: str) -> dict[st
 
 
 __all__ = [
+    "ECSReadOnlyDatabaseProfile",
     "ALLOWED_DATABASES", "CLONE_CONTAINER_NAME", "CLONE_PORT", "CLONE_VOLUME_NAME",
     "IndexReuseRejected", "ORIGINAL_CONTAINER_NAME", "REQUIRED_INDEX_IDENTITY_FIELDS",
     "index_code_identity", "inspect_known_containers", "read_only_database_url",

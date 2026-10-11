@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Local single-principal memory",
-    "version": "memory/v1"
+    "version": "memory/v2-global-scoped"
   },
   "paths": {
     "/api/v1/memory/settings": {
@@ -250,13 +250,18 @@
       },
       "MemoryItemIn": {
         "properties": {
+          "scope_type": {
+            "type": "string",
+            "pattern": "^(GLOBAL|SCOPED)$",
+            "title": "Scope Type",
+            "default": "SCOPED"
+          },
           "knowledge_base_scope": {
             "items": {
               "type": "string"
             },
             "type": "array",
             "maxItems": 64,
-            "minItems": 1,
             "title": "Knowledge Base Scope"
           },
           "document_scope": {
@@ -288,7 +293,6 @@
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "knowledge_base_scope",
           "kind",
           "fact_key",
           "content"
@@ -297,13 +301,18 @@
       },
       "MemoryScopeIn": {
         "properties": {
+          "scope_type": {
+            "type": "string",
+            "pattern": "^(GLOBAL|SCOPED)$",
+            "title": "Scope Type",
+            "default": "SCOPED"
+          },
           "knowledge_base_scope": {
             "items": {
               "type": "string"
             },
             "type": "array",
             "maxItems": 64,
-            "minItems": 1,
             "title": "Knowledge Base Scope"
           },
           "document_scope": {
@@ -317,9 +326,6 @@
         },
         "additionalProperties": false,
         "type": "object",
-        "required": [
-          "knowledge_base_scope"
-        ],
         "title": "MemoryScopeIn"
       },
       "MemorySettingsIn": {
@@ -332,14 +338,15 @@
             "type": "string",
             "pattern": "^(explicit_only|auto)$",
             "title": "Write Mode"
+          },
+          "retrieval_mode": {
+            "type": "string",
+            "pattern": "^(lexical|semantic|hybrid)$",
+            "title": "Retrieval Mode"
           }
         },
         "additionalProperties": false,
         "type": "object",
-        "required": [
-          "read_enabled",
-          "write_mode"
-        ],
         "title": "MemorySettingsIn"
       },
       "ValidationError": {

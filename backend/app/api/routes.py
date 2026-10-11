@@ -383,6 +383,7 @@ def _answer_service(request: Request) -> AnswerService:
         runs=container.store,
         lifecycle=getattr(container,'lifecycle',None),
         memory_service=getattr(container,'memory_service',None),
+        query_understand=getattr(container,'query_understand',None),
         graph_query=container.graph.query_graph,
         agent_trace_store=container.agent,
         content_reader=container.store.get_document_content,
@@ -527,7 +528,8 @@ def patch_settings(request: Request, payload: dict[str, Any]):
 
 class MemoryScopeIn(BaseModel):
     model_config = {'extra':'forbid'}
-    knowledge_base_scope: list[str] = Field(min_length=1,max_length=64)
+    scope_type: str = Field(default='SCOPED',pattern='^(GLOBAL|SCOPED)$')
+    knowledge_base_scope: list[str] = Field(default_factory=list,max_length=64)
     document_scope: list[str] = Field(default_factory=list,max_length=64)
 
 class MemoryItemIn(MemoryScopeIn):
@@ -537,8 +539,9 @@ class MemoryItemIn(MemoryScopeIn):
 
 class MemorySettingsIn(BaseModel):
     model_config = {'extra':'forbid','strict':True}
-    read_enabled: bool
-    write_mode: str = Field(pattern='^(explicit_only|auto)$')
+    read_enabled: bool | None = None
+    write_mode: str | None = Field(default=None,pattern='^(explicit_only|auto)$')
+    retrieval_mode: str | None = Field(default=None,pattern='^(lexical|semantic|hybrid)$')
 
 def _memory(request, action, status_code=200):
     """Single local principal, bound by server composition; no user ID input.
@@ -561,34 +564,40 @@ def _memory(request, action, status_code=200):
 
 def _memory_scope(request,payload):
     from backend.app.domain.scope import Scope
+    if payload.scope_type=='GLOBAL':
+        if payload.knowledge_base_scope or payload.document_scope:
+            return _error(request,'MEMORY_GLOBAL_SCOPE_MUST_BE_EXPLICIT','global memory has no KB/document binding',409)
+        return Scope.from_ids([])
+    if not payload.knowledge_base_scope:
+        return _error(request,'MEMORY_SCOPE_REQUIRED','scoped memory requires knowledge bases',409)
     error=_validate_conversation_scope(request,_container(request).store,payload.knowledge_base_scope,payload.document_scope)
     return error or Scope.from_ids(payload.knowledge_base_scope,payload.document_scope)
 
 @router.get('/memory/settings')
 def memory_settings(request: Request):
-    return _memory(request,lambda s:s.repository.settings(s.principal))
+    return _memory(request,lambda s:s.settings())
 
 @router.patch('/memory/settings')
 def memory_patch_settings(request: Request,payload: MemorySettingsIn):
-    return _memory(request,lambda s:s.repository.settings(s.principal,payload.model_dump()))
+    return _memory(request,lambda s:s.settings(payload.model_dump(exclude_none=True)))
 
 @router.post('/memory/list')
 def memory_list(request: Request,payload: MemoryScopeIn):
     scope=_memory_scope(request,payload)
     if isinstance(scope,JSONResponse):return scope
-    return _memory(request,lambda s:s.repository.list_items(s.principal,scope))
+    return _memory(request,lambda s:s.repository.list_items(s.principal,scope,scope_type=payload.scope_type))
 
 @router.post('/memory/items',status_code=201)
 def memory_save(request: Request,payload: MemoryItemIn):
     scope=_memory_scope(request,payload)
     if isinstance(scope,JSONResponse):return scope
-    return _memory(request,lambda s:{'id':s.repository.save(s.principal,scope,payload.kind,payload.fact_key,payload.content,source_request_id=_meta(request)['request_id'])},status_code=201)
+    return _memory(request,lambda s:{'id':s.repository.save(s.principal,scope,payload.kind,payload.fact_key,payload.content,source_request_id=_meta(request)['request_id'],scope_type=payload.scope_type)},status_code=201)
 
 @router.patch('/memory/items/{item_id}')
 def memory_edit(item_id: uuid.UUID,request: Request,payload: MemoryItemIn):
     scope=_memory_scope(request,payload)
     if isinstance(scope,JSONResponse):return scope
-    return _memory(request,lambda s:{'id':s.repository.save(s.principal,scope,payload.kind,payload.fact_key,payload.content,target=str(item_id),source_request_id=_meta(request)['request_id'])})
+    return _memory(request,lambda s:{'id':s.repository.save(s.principal,scope,payload.kind,payload.fact_key,payload.content,target=str(item_id),source_request_id=_meta(request)['request_id'],scope_type=payload.scope_type)})
 
 @router.post('/memory/items/{item_id}/{operation}')
 def memory_transition(item_id: uuid.UUID,operation: str,request: Request,payload: MemoryScopeIn):
@@ -597,6 +606,6 @@ def memory_transition(item_id: uuid.UUID,operation: str,request: Request,payload
     from backend.app.ports.memory import MemoryDenied
     def action(s):
         if operation not in {'confirm','reject','delete'}:raise MemoryDenied('MEMORY_TRANSITION_INVALID')
-        s.repository.transition(s.principal,scope,str(item_id),{'confirm':'active','reject':'rejected','delete':'deleted'}[operation])
+        s.repository.transition(s.principal,scope,str(item_id),{'confirm':'active','reject':'rejected','delete':'deleted'}[operation],scope_type=payload.scope_type)
         return {'status':operation}
     return _memory(request,action)

@@ -5,14 +5,11 @@ import argparse
 import json
 import os
 import shutil
-from datetime import datetime, timezone
+import hashlib
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import make_url
+from types import SimpleNamespace
 
-from backend.app.adapters.models.ollama import OllamaGateway
-from backend.app.config import Settings
-from eval_center.isolated_index import guarded_database_url
 from eval_center.public_data import DATASET_VERSIONS, DEFAULT_DATA_ROOT, load_public_dataset, prepare_public_datasets
 from eval_center.runtime import committed_code_sha, model_identities
 from eval_center.verification import ExperimentInvalidError
@@ -20,7 +17,7 @@ from eval_center.verification import ExperimentInvalidError
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Reproducible public-dataset RAG benchmark workflow")
-    parser.add_argument("--phase", choices=("preflight", "fetch", "prepare", "baseline", "optimize", "qa", "validate", "sync", "report"), required=True)
+    parser.add_argument("--phase", choices=("preflight", "fetch", "prepare", "baseline", "optimize", "qa", "validate", "sync", "report", "paired-preflight", "paired-simulate", "paired-run", "paired-prepare-special"), required=True)
     parser.add_argument("--dataset", choices=("scifact", "miracl-zh", "longbench-zh"), default="scifact")
     parser.add_argument("--profile", choices=("smoke", "standard"), default="smoke")
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
@@ -33,10 +30,31 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--candidate-k", type=int, default=32)
     parser.add_argument("--rrf-k", type=int, default=60)
     parser.add_argument("--context-budget-chars", type=int, default=8000)
+    parser.add_argument("--cohort-file", type=Path,
+                        default=Path("var/reports/v6-first-evaluation-20261010/cohort_dev24.jsonl"))
+    parser.add_argument("--source-manifest", type=Path,
+                        default=Path("var/reports/v6-first-evaluation-20261010/source_manifest.json"))
+    parser.add_argument("--run-id")
+    parser.add_argument("--state-path", type=Path)
+    parser.add_argument("--index-manifest", type=Path)
+    parser.add_argument("--runtime-entry", type=Path,
+                        help="Explicit owner-reviewed local composition module; no automatic settings/key lookup")
+    parser.add_argument("--runtime-entry-sha256", help="Required SHA256 of the reviewed composition module")
+    parser.add_argument('--paired-time-profile',choices=('legacy-dev24','owner-small','owner-40q-24page',
+        'owner-lease-small','owner-lease-40q-24page'),default='legacy-dev24')
+    parser.add_argument('--paired-lease-id',help='New explicit execution lease identity; never renew an existing Run')
+    parser.add_argument('--paired-lease-not-before-utc',help='UTC start from the reviewed native activity lease')
+    parser.add_argument('--paired-lease-deadline-utc',help='Finite UTC native execution lease deadline, not an Owner total-task cutoff')
+    parser.add_argument('--special-freeze',type=Path)
+    parser.add_argument('--special-freeze-sha256')
+    parser.add_argument('--special-data-root',type=Path)
+    parser.add_argument('--special-output',type=Path)
     return parser
 
 
 def _admin_url() -> str:
+    from sqlalchemy.engine import make_url
+    from eval_center.isolated_index import guarded_database_url
     value = os.environ.get("RAG_PUBLIC_BENCH_ADMIN_DATABASE_URL")
     if not value:
         raise ExperimentInvalidError("missing_local_admin_database_url")
@@ -78,7 +96,10 @@ def _preflight(args) -> dict:
     if args.dry_run:
         result.update(status="PREFLIGHT_DRY_RUN", models="NOT_CHECKED", postgres="NOT_CHECKED")
         return result
+    from backend.app.adapters.models.ollama import OllamaGateway
+    from backend.app.config import Settings
     settings = Settings.from_env()
+    from sqlalchemy import create_engine, text
     result["models"] = model_identities(OllamaGateway(settings.ollama_base_url, settings.ollama_chat_model,
                                                        settings.ollama_embedding_model))
     admin_url = _admin_url()
@@ -96,7 +117,130 @@ def _preflight(args) -> dict:
     return result
 
 
-def _run(args) -> dict:
+def _paired_time_profile(args, composition=None):
+    from eval_center.public_paired_reporting import time_profile
+    profile=time_profile(args.paired_time_profile,
+        lease_id=getattr(args,'paired_lease_id',None),
+        lease_not_before_utc=getattr(args,'paired_lease_not_before_utc',None),
+        lease_deadline_utc=getattr(args,'paired_lease_deadline_utc',None))
+    if composition is not None:
+        from eval_center.public_runner import bind_native_paired_time_profile
+        profile=bind_native_paired_time_profile(profile,composition)
+    return profile
+
+
+def _load_runtime_composition(args, state_path):
+    """Load only an explicitly selected, hash-frozen operator composition.
+
+    The operator module defines compose_public_paired_runtime and must
+    construct inputs, never dispatch providers.
+    This is an evaluation CLI composition root, not a product Agent tool.
+    """
+    from eval_center.public_runner import PairedRuntimeAssemblyBlocked
+    profile=_paired_time_profile(args)
+    error=profile.availability_error(datetime.now(timezone.utc))
+    if error:raise PairedRuntimeAssemblyBlocked([error])
+    path = getattr(args, "runtime_entry", None)
+    expected = getattr(args, "runtime_entry_sha256", None)
+    if path is None or not Path(path).is_file():
+        raise PairedRuntimeAssemblyBlocked(["reviewed_runtime_entry_missing"])
+    data = Path(path).read_bytes()
+    if not isinstance(expected, str) or hashlib.sha256(data).hexdigest() != expected:
+        raise PairedRuntimeAssemblyBlocked(["reviewed_runtime_entry_hash_mismatch"])
+    # Execute the exact verified bytes once, with no path reopen TOCTOU.
+    namespace = {"__name__": "_owner_public_paired_composition", "__file__": str(Path(path).resolve())}
+    exec(compile(data, str(path), "exec"), namespace)
+    name = "compose_public_paired_runtime"
+    factory = namespace.get(name)
+    if not callable(factory):
+        raise PairedRuntimeAssemblyBlocked([name + "_missing"])
+    composition = factory(state_path=Path(state_path), index_manifest_path=args.index_manifest)
+    from dataclasses import replace
+    from eval_center.public_runner import PairedRuntimeComposition
+    if type(composition) is not PairedRuntimeComposition:
+        raise PairedRuntimeAssemblyBlocked(["typed_runtime_composition"])
+    return replace(composition, entry_sha256=expected)
+
+
+def _paired_phase(args, *, runtime=None, composition=None, simulate=False) -> dict:
+    """Both CLI phases use the same admitted cohort runtime and scheduler."""
+    from eval_center.public_runner import run_public_paired_cohort, build_normal_paired_runtime, PairedRuntimeAssemblyBlocked
+    if simulate and runtime is not None and getattr(runtime, "execution_kind", None) != "SIMULATED":
+        raise ExperimentInvalidError("paired_simulate_requires_simulated_runtime")
+    state_path = args.state_path or Path("var/reports/v6-cohort-runtime-r1/cli-default/run_ledger.sqlite3")
+    if getattr(args, "runtime_entry", None) is not None:
+        if simulate or runtime is not None or composition is not None:
+            raise ExperimentInvalidError("paired_runtime_entry_conflict")
+        try:
+            composition = _load_runtime_composition(args, state_path)
+        except PairedRuntimeAssemblyBlocked as exc:
+            return {"status": "BLOCKED_ZERO_SEND", "missing": exc.missing,
+                    "provider_calls": 0, "send_attempts": 0, "quickchain_invocations": 0,
+                    "database_queries": 0, "assembly": "NOT_STARTED"}
+    if composition is not None and (runtime is not None or simulate):
+        raise ExperimentInvalidError("paired_runtime_composition_conflict")
+    if simulate and runtime is None:
+        from eval_center.paired_simulation import build_simulated_runtime
+        from eval_center.paired_state import load_frozen_cohort
+        names=tuple(dict.fromkeys(row['dataset'] for row in load_frozen_cohort(args.cohort_file)))
+        runtime_factory = lambda path: build_simulated_runtime(state_path=path, run_id=args.run_id,dataset_names=names)
+    elif composition is not None:
+        runtime_factory = lambda path: build_normal_paired_runtime(composition,
+            source_manifest_path=args.source_manifest, index_manifest_path=args.index_manifest,
+            cohort_path=args.cohort_file, run_id=args.run_id,
+            time_profile=_paired_time_profile(args,composition))
+    else:
+        runtime_factory = lambda path: runtime
+    try:
+        return run_public_paired_cohort(
+            cohort_path=args.cohort_file, source_path=args.source_manifest,
+            data_root=args.data_root, state_path=state_path, run_id=args.run_id,
+            runtime_factory=runtime_factory, index_manifest_path=args.index_manifest,
+            top_k=args.top_k,
+            time_profile=_paired_time_profile(args,composition),
+        )
+    except PairedRuntimeAssemblyBlocked as exc:
+        return {"status": "BLOCKED_ZERO_SEND", "missing": exc.missing,
+                "provider_calls": 0, "send_attempts": 0, "quickchain_invocations": 0,
+                "database_queries": "UNKNOWN_READONLY_PREFLIGHT", "assembly": "PREFLIGHT_REJECTED"}
+
+
+def _paired_simulate(args, *, runtime=None) -> dict:
+    return _paired_phase(args, runtime=runtime, simulate=True)
+
+
+def _paired_run(args, *, runtime=None, composition=None) -> dict:
+    # Owner composition injects a fully wired PairedRuntime. Missing injection
+    # is refused without Settings/key reads, engine creation or provider calls.
+    return _paired_phase(args, runtime=runtime, composition=composition)
+
+
+def _run(args, *, runtime=None, composition=None) -> dict:
+    if args.phase=='paired-prepare-special':
+        from eval_center.special_public_data import prepare_full_cohort
+        if args.special_freeze is None or args.special_freeze_sha256 is None or args.special_output is None:
+            raise ExperimentInvalidError('explicit_special_freeze_hash_and_output_required')
+        return prepare_full_cohort(base_cohort_path=args.cohort_file,base_source_path=args.source_manifest,
+            freeze_path=args.special_freeze,freeze_sha256=args.special_freeze_sha256,
+            output_dir=args.special_output,asset_root=args.special_data_root)
+    if args.phase == "paired-simulate":
+        return _paired_simulate(args, runtime=runtime)
+    if args.phase == "paired-run":
+        return _paired_run(args, runtime=runtime, composition=composition)
+    if args.phase == "paired-preflight":
+        from eval_center.paired_state import load_frozen_cohort, sha256_file
+        cases = load_frozen_cohort(args.cohort_file)
+        source_manifest = json.loads(args.source_manifest.read_text(encoding="utf-8"))
+        if source_manifest.get("status") != "FROZEN_FOR_PREPARATION":
+            raise ExperimentInvalidError("paired_source_manifest_not_frozen")
+        counts = {name: sum(case["dataset"] == name for case in cases)
+                  for name in ("scifact", "miracl-zh", "longbench-zh")}
+        return {"status": "OFFLINE_PAIRED_COHORT_VERIFIED",
+                "dispatch": "NOT_RUN", "database": "NOT_TOUCHED",
+                "provider_calls": 0, "langfuse": "NOT_TOUCHED",
+                "cohort_rows": len(cases), "dataset_counts": counts,
+                "cohort_sha256": sha256_file(args.cohort_file),
+                "source_manifest_sha256": sha256_file(args.source_manifest)}
     if args.phase == "preflight":
         return _preflight(args)
     if args.dry_run:
@@ -271,10 +415,10 @@ def _run(args) -> dict:
     raise ExperimentInvalidError("unknown_public_benchmark_phase")
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, runtime=None, composition=None) -> int:
     args = _parser().parse_args(argv)
     try:
-        result = _run(args)
+        result = _run(args, runtime=runtime, composition=composition)
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, allow_nan=False))
         return 0
     except Exception as exc:

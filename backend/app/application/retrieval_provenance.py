@@ -26,6 +26,7 @@ def pass_metadata(result: Any) -> dict[str, Any]:
         'retrieval_mode': result.retrieval_mode, 'route_reason': list(result.route_reason),
         'latency_ms': result.latency_ms, 'stage_latency_ms': deepcopy(result.stage_latency_ms),
         'degradation_flags': list(result.degradation_flags), 'embedding_cache_hit': result.embedding_cache_hit,
+        'retrieval_stats':deepcopy(result.retrieval_stats),
         'metadata_availability': {
             'configuration': 'PRESENT' if config else 'NOT_AVAILABLE',
             'candidate_rankings': 'PRESENT' if result.candidate_rankings else 'NOT_AVAILABLE',

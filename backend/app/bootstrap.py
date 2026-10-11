@@ -34,7 +34,9 @@ from backend.app.application.context_builder import ContextBuilder
 from backend.app.application.retrieval_profile import reference_profile
 from backend.app.application.langchain_agent import LangChainAgentAdapter
 from backend.app.application.quick_chain import LangChainQuickChain
-from backend.app.application.rule_router_v1 import RouterPolicy, GenerationRole
+from backend.app.application.rule_router_v1 import (
+    RouterPolicy, GenerationRole, V6GenerationBinding, V6XingGenerationBinding,
+)
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.adapters.office_preview import OfficePreviewAdapter
 from backend.app.adapters.parsers import ParserRegistry
@@ -68,13 +70,15 @@ class Container:
     provider_factory: ProviderFactory | None = None
     lifecycle: Any | None = None
     memory_service: Any | None = None
+    query_understand: Any | None = None
 
 
 def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET,
                     cloud_model: Any = _MODEL_UNSET, follow_up_enabled: bool = False,
                     caption_provider=None, caption_usage_guard=None,
                     embedding_provider=_MODEL_UNSET, model_usage_guards=None,
-                    embedding_admission=None) -> Container:
+                    embedding_admission=None, v6_generation_binding=None, v6_xing_binding=None,
+                    v6_free_model_bindings=None) -> Container:
     """Build the object graph once, eagerly, with no request-time assembly.
 
     Building eagerly (rather than lazily on first request) removes the previous
@@ -82,6 +86,8 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     budget gates under concurrent first requests.
     """
     profile = reference_profile()["parameters"]
+    if v6_xing_binding is not None and type(v6_xing_binding) is not V6XingGenerationBinding:
+        raise ValueError('XING_BINDING_INVALID')
     context_pool_options = ({"context_candidate_k": settings.context_pool_k,
                              "context_max_items": settings.context_max_items}
                             if settings.context_pool_enabled else {})
@@ -99,14 +105,30 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
             enabled_roles.add("vision")
     provider_factory = ProviderFactory(settings.model_registry(), enabled_roles=enabled_roles,
         usage_guards=model_usage_guards, embedding_admission=embedding_admission,
-        chunking_config=ChunkingConfig(general_size=settings.max_chunk_chars, general_overlap=settings.chunk_overlap))
+        chunking_config=ChunkingConfig(general_size=settings.max_chunk_chars, general_overlap=settings.chunk_overlap),
+        free_model_bindings=v6_free_model_bindings)
     engine = create_engine(settings.database_url, pool_pre_ping=True)
     budget_gate = PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits)
     if settings.cloud_cost_estimate_microunits > 0:
         for role in enabled_roles:
             provider_factory.usage_guards.setdefault(role, BudgetUsageGuard(budget_gate,
                 provider_factory.registry.select(role), settings.cloud_cost_estimate_microunits))
+    elif settings.cloud_cost_estimate_microunits == 0:
+        # An ordinary zero setting grants nothing. Only the explicit Owner
+        # frozen plan supplies a typed zero authority at each actual request.
+        permits = {role:binding.permit for role,binding in provider_factory.free_model_bindings.items()}
+        if v6_xing_binding is not None:
+            permit = getattr(v6_xing_binding.authorized_transport,'free_model_permit',None)
+            if permit is not None: permits['chat_cheap'] = permit
+        for role,permit in permits.items():
+            if role in enabled_roles:
+                provider_factory.usage_guards.setdefault(role,BudgetUsageGuard(budget_gate,
+                    provider_factory.registry.select(role),0,zero_price_permit=permit))
     storage = ContentAddressedStorage(settings.storage_root)
+    if provider_factory.free_model_bindings:
+        from dataclasses import replace
+        provider_factory.free_model_bindings = {role:replace(binding,result_storage=storage)
+            if binding.result_storage is None else binding for role,binding in provider_factory.free_model_bindings.items()}
     langfuse = LangfuseObservability(
         enabled=settings.langfuse_enabled,
         cloud_egress_enabled=settings.cloud_enabled,
@@ -123,7 +145,11 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         if model is _MODEL_UNSET
         else model
     )
-    if embedding_provider is _MODEL_UNSET:
+    if 'embedding' in provider_factory.free_model_bindings:
+        if embedding_provider is not _MODEL_UNSET:
+            raise ValueError('SF_FREE_EMBEDDING_PROVIDER_OVERRIDE_DENIED')
+        embedding_provider = provider_factory.build('embedding')
+    elif embedding_provider is _MODEL_UNSET:
         # Preserve explicit legacy test injection; normal production selection
         # is independent of local Chat / Query Expansion.
         embedding_provider = (model if model is not _MODEL_UNSET else
@@ -170,6 +196,16 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     cloud_gateway = (DeepSeekGateway(api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         model=settings.cloud_model, cloud_enabled=True, attempt_gate=SessionAttemptGate(), gate_types=DEEPSEEK_GATE_TYPES)
         if settings.cloud_enabled and settings.chat_egress_enabled else None) if cloud_model is _MODEL_UNSET else cloud_model
+    if v6_generation_binding is not None:
+        if type(v6_generation_binding) is not V6GenerationBinding or cloud_model is not _MODEL_UNSET:
+            raise ValueError('V6_GENERATION_BINDING_INVALID')
+        cloud_gateway = provider_factory.build_v6_gateway(
+            activity_gate=v6_generation_binding.activity_gate, gate_types=DEEPSEEK_GATE_TYPES,
+            api_key=os.getenv('DEEPSEEK_API_KEY', ''),
+            send_claim_callback=v6_generation_binding.send_claim_callback)
+        if v6_generation_binding.token_budget_binding is not None:
+            provider_factory.usage_guards['chat_expensive'] = provider_factory.build_v6_token_usage_guard(
+                cloud_gateway, v6_generation_binding.token_budget_binding)
     from backend.app.application.context_window import ContextManager, ModelWindow
     from backend.app.adapters.postgres.context_checkpoint import PostgresContextStore
     registry = settings.model_registry()
@@ -180,6 +216,11 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         context_windows['cloud_chat'] = ModelWindow(getattr(cloud_gateway, 'provider_name', 'UNKNOWN'),
                                                   getattr(cloud_gateway, 'chat_model', 'UNKNOWN'))
     context_manager = ContextManager(store, PostgresContextStore(engine), context_windows)
+    from backend.app.application.query_understand import QueryUnderstandService
+    from backend.app.adapters.postgres.query_understand import PostgresQueryAttemptStore
+    # Shared zero-call production path; no real Query Understand provider grant.
+    query_understand = QueryUnderstandService(context_manager,
+        attempt_store=PostgresQueryAttemptStore(engine),budget_gate=budget_gate)
     memory_service = None
     if settings.memory_local_principal is not None:
         if settings.host not in {'127.0.0.1','localhost','::1'}:
@@ -188,21 +229,24 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         from backend.app.application.memory import MemoryService, MemoryRetriever
         memory_repo = PostgresMemoryRepository(engine, settings.memory_local_principal)
         memory_service = MemoryService(memory_repo, memory_repo.principal)
-        context_manager.memory_retriever = MemoryRetriever(memory_repo, memory_repo.principal)
+        context_manager.memory_retriever = MemoryRetriever(memory_repo, memory_repo.principal,
+            embedding_provider=embedding_provider)
     quick_chain = LangChainQuickChain(
         knowledge_gateway,
         answer_gateway=ollama if settings.local_answer_enabled else None,
         cloud_answer_gateway=cloud_gateway,
         budget_gate=budget_gate,
         context_manager=context_manager,
+        query_understand=query_understand,
         router_policy=RouterPolicy(mode="DYNAMIC" if settings.rule_router_enabled else "OFF",
             quality_escalation=settings.rule_router_quality_escalation,
             abstention_escalation=settings.rule_router_abstention_escalation,
             provider_fallback=settings.rule_router_provider_fallback),
         generation_roles={
-            "chat_cheap": GenerationRole("chat_cheap", provider_factory.build("chat_cheap")),
+            "chat_cheap": GenerationRole("chat_cheap", provider_factory.build("chat_cheap", xing_binding=v6_xing_binding),
+                xing_binding=v6_xing_binding),
             "chat_expensive": GenerationRole("chat_expensive", cloud_gateway,
-                usage_guard=provider_factory.usage_guards.get("chat_expensive")),
+                usage_guard=provider_factory.usage_guards.get("chat_expensive"), v6_binding=v6_generation_binding),
         } if settings.rule_router_enabled else None,
     )
     from backend.app.application.run_lifecycle import RunLifecycle
@@ -232,6 +276,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         provider_factory=provider_factory,
         lifecycle=lifecycle,
         memory_service=memory_service,
+        query_understand=query_understand,
     )
 
 

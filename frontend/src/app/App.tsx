@@ -897,7 +897,7 @@ export default function App() {
           ) : (
             <section className="settings-page">
               <h1>系统设置</h1>
-              <MemoryPanel kbId={state.selectedKnowledgeBaseId} />
+              <MemoryPanel kbId={state.selectedKnowledgeBaseId} documentScope={state.documentScope} />
               <p>调整本机工作台的显示方式。</p>
               <label className="setting-row">
                 <span>

@@ -2,7 +2,8 @@
 import uuid
 import json
 from sqlalchemy import text
-from backend.app.ports.memory import MemoryDenied, subject_id, scope_value, item_value, identity
+from backend.app.ports.memory import (MemoryDenied, subject_id, scope_value, item_value, identity,
+                                     memory_scope, memory_scope_hash, GLOBAL_KINDS)
 
 class PostgresMemoryRepository:
     def __init__(self,engine,principal):
@@ -17,36 +18,100 @@ class PostgresMemoryRepository:
         with self.engine.begin() as c:
             row=self._subject(c,principal)
             if patch is not None:
-                if set(patch)-{'read_enabled','write_mode'} or ('read_enabled' in patch and type(patch['read_enabled']) is not bool) or patch.get('write_mode','explicit_only') not in {'auto','explicit_only'}:
+                from backend.app.ports.memory import MEMORY_RETRIEVAL_MODES
+                if (set(patch)-{'read_enabled','write_mode','retrieval_mode'}
+                    or ('read_enabled' in patch and type(patch['read_enabled']) is not bool)
+                    or patch.get('write_mode','explicit_only') not in {'auto','explicit_only'}
+                    or patch.get('retrieval_mode',row.get('retrieval_mode','lexical')) not in MEMORY_RETRIEVAL_MODES):
                     raise MemoryDenied('MEMORY_SETTING_INVALID')
-                c.execute(text('UPDATE memory_subjects SET read_enabled=:enabled,write_mode=:mode WHERE id=:id'),
-                    dict(id=self.principal,enabled=patch.get('read_enabled',row['read_enabled']),mode=patch.get('write_mode',row['write_mode'])))
+                c.execute(text('UPDATE memory_subjects SET read_enabled=:enabled,write_mode=:mode,retrieval_mode=:retrieval WHERE id=:id'),
+                    dict(id=self.principal,enabled=patch.get('read_enabled',row['read_enabled']),mode=patch.get('write_mode',row['write_mode']),
+                         retrieval=patch.get('retrieval_mode',row.get('retrieval_mode','lexical'))))
                 row=c.execute(text('SELECT * FROM memory_subjects WHERE id=:id'),dict(id=self.principal)).mappings().one()
             return dict(row)
 
-    def _rows(self,c,scope):
-        data=scope_value(scope)
-        return list(c.execute(text('SELECT * FROM long_term_memory_items WHERE subject_id=:subject AND scope_hash=:scope ORDER BY created_at,id'),
-            dict(subject=self.principal,scope=identity(data))).mappings())
+    def vector_rows(self, principal, rows, *, provider, model, dimensions, profile_fingerprint, input_version):
+        if subject_id(principal)!=self.principal:
+            raise MemoryDenied('MEMORY_PRINCIPAL_DENIED')
+        ids=[str(r['id']) for r in rows]
+        if not ids:return {}
+        with self.engine.begin() as c:
+            self._subject(c,principal)
+            found=c.execute(text('''SELECT item_id,item_version,content_hash,vector FROM memory_item_vectors
+                WHERE item_id=ANY(CAST(:ids AS uuid[])) AND provider=:provider AND model=:model AND dimensions=:dimensions
+                  AND profile_fingerprint=:fingerprint AND input_version=:input_version'''),
+                dict(ids=ids,provider=provider,model=model,dimensions=dimensions,
+                     fingerprint=profile_fingerprint,input_version=input_version)).mappings()
+            return {str(r['item_id']):(r['item_version'],r['content_hash'],r['vector']) for r in found}
 
-    def list_items(self,principal,scope,*,active_only=False):
+    def upsert_vector(self, principal, row, *, provider, model, dimensions, profile_fingerprint, input_version, vector):
+        if subject_id(principal)!=self.principal:
+            raise MemoryDenied('MEMORY_PRINCIPAL_DENIED')
+        with self.engine.begin() as c:
+            self._subject(c,principal)
+            live=c.execute(text('''SELECT 1 FROM long_term_memory_items WHERE id=:id AND subject_id=:subject
+                AND version=:version AND content_hash=:hash AND status='active' '''),
+                dict(id=row['id'],subject=self.principal,version=row['version'],hash=row['content_hash'])).first()
+            if live is None:return False
+            c.execute(text('''INSERT INTO memory_item_vectors(item_id,profile_fingerprint,input_version,item_version,content_hash,provider,model,dimensions,vector)
+                VALUES (:id,:fingerprint,:input_version,:version,:hash,:provider,:model,:dimensions,CAST(:vector AS jsonb))
+                ON CONFLICT(item_id,profile_fingerprint) DO UPDATE SET input_version=EXCLUDED.input_version,
+                item_version=EXCLUDED.item_version,content_hash=EXCLUDED.content_hash,
+                provider=EXCLUDED.provider,model=EXCLUDED.model,dimensions=EXCLUDED.dimensions,vector=EXCLUDED.vector,updated_at=now()'''),
+                dict(id=row['id'],version=row['version'],hash=row['content_hash'],provider=provider,model=model,
+                     dimensions=dimensions,fingerprint=profile_fingerprint,input_version=input_version,
+                     vector=json.dumps(vector,separators=(',',':'))))
+            return True
+
+    def memory_embedding_scope_allowed(self, scope):
+        """Cloud memory embeddings require every current KB in the server scope to allow egress."""
+        ids=sorted(scope.knowledge_base_ids)
+        if not ids:return False
+        with self.engine.connect() as c:
+            rows=list(c.execute(text('''SELECT id,cloud_allowed,deleted_at FROM knowledge_bases
+                WHERE id=ANY(CAST(:ids AS uuid[]))'''),dict(ids=ids)).mappings())
+        return len(rows)==len(ids) and all(r['cloud_allowed'] is True and r['deleted_at'] is None for r in rows)
+
+    def _rows(self,c,scope,scope_type='SCOPED'):
+        key=memory_scope_hash(scope,scope_type)
+        return list(c.execute(text('SELECT * FROM long_term_memory_items WHERE subject_id=:subject AND scope_type=:type AND scope_hash=:scope ORDER BY created_at,id'),
+            dict(subject=self.principal,type=scope_type,scope=key)).mappings())
+
+    def _validated(self,c,scope,scope_type,active_only):
+        out=[]
+        for r in self._rows(c,scope,scope_type):
+            if active_only and r['status']!='active':continue
+            if (r['scope']!=memory_scope(scope,scope_type)
+                or r['scope_hash'].strip()!=memory_scope_hash(scope,scope_type)
+                or item_value(r['kind'],r['fact_key'],r['content'])['content_hash']!=r['content_hash'].strip()
+                or scope_type=='GLOBAL' and (r['origin']!='explicit' or r['kind'] not in GLOBAL_KINDS)):
+                raise MemoryDenied('MEMORY_INTEGRITY_INVALID')
+            row=dict(r);row['id']=str(row['id']);row['replaces_id']=str(row['replaces_id']) if row['replaces_id'] else None
+            row['sources']=[dict(s) for s in c.execute(text('SELECT run_id,message_id,source,created_at FROM memory_sources WHERE item_id=:id ORDER BY created_at,id'),dict(id=r['id'])).mappings()]
+            out.append(row)
+        return out
+
+    def list_items(self,principal,scope,*,active_only=False,scope_type='SCOPED'):
         with self.engine.begin() as c:
             subject=self._subject(c,principal)
             if active_only and not subject['read_enabled']: return []
-            rows=self._rows(c,scope)
-            out=[]
-            for r in rows:
-                if active_only and r['status']!='active':continue
-                # Do not serve a corrupt hash/scope even if an index matches.
-                if r['scope']!=scope_value(scope) or item_value(r['kind'],r['fact_key'],r['content'])['content_hash']!=r['content_hash'].strip():
-                    raise MemoryDenied('MEMORY_INTEGRITY_INVALID')
-                row=dict(r);row['id']=str(row['id']);row['replaces_id']=str(row['replaces_id']) if row['replaces_id'] else None
-                row['sources']=[dict(s) for s in c.execute(text('SELECT run_id,message_id,source,created_at FROM memory_sources WHERE item_id=:id ORDER BY created_at,id'),dict(id=r['id'])).mappings()]
-                out.append(row)
-            return out
+            return self._validated(c,scope,scope_type,active_only)
 
-    def _write(self,c,scope,value,origin,sources,target=None):
-        rows=self._rows(c,scope);same=[r for r in rows if r['fact_key']==value['fact_key']]
+    def recall_items(self,principal,scope):
+        from backend.app.domain.scope import Scope
+        # One subject lock/read boundary for the whole union. Retrieval scope
+        # still requires authorized KBs; Global grants no knowledge access.
+        scope_value(scope)
+        with self.engine.begin() as c:
+            subject=self._subject(c,principal)
+            if not subject['read_enabled']:return []
+            return self._validated(c,Scope.from_ids([]),'GLOBAL',True)+self._validated(c,scope,'SCOPED',True)
+
+    def _write(self,c,scope,value,origin,sources,target=None,scope_type='SCOPED'):
+        data=memory_scope(scope,scope_type);key=memory_scope_hash(scope,scope_type)
+        if scope_type=='GLOBAL' and (origin!='explicit' or value['kind'] not in GLOBAL_KINDS):
+            raise MemoryDenied('MEMORY_GLOBAL_KIND_OR_ORIGIN_DENIED')
+        rows=self._rows(c,scope,scope_type);same=[r for r in rows if r['fact_key']==value['fact_key']]
         if origin=='extracted' and any(r['status'] in {'rejected','deleted'} for r in same): return None
         duplicate=next((r for r in reversed(same) if r['content_hash'].strip()==value['content_hash'] and r['status'] in {'active','pending'}),None)
         if target:
@@ -56,7 +121,7 @@ class PostgresMemoryRepository:
         if duplicate:
             item=str(duplicate['id'])
             if origin=='explicit' and duplicate['status']=='pending':
-                c.execute(text("UPDATE long_term_memory_items SET status='superseded',updated_at=now() WHERE subject_id=:subject AND scope_hash=:scope AND fact_key=:key AND status='active'"),dict(subject=self.principal,scope=identity(scope_value(scope)),key=value['fact_key']))
+                c.execute(text("UPDATE long_term_memory_items SET status='superseded',updated_at=now() WHERE subject_id=:subject AND scope_type=:type AND scope_hash=:scope AND fact_key=:key AND status='active'"),dict(subject=self.principal,type=scope_type,scope=key,key=value['fact_key']))
                 c.execute(text("UPDATE long_term_memory_items SET status='active',updated_at=now() WHERE id=:id"),dict(id=item))
         else:
             counts=c.execute(text("SELECT count(*) AS total,count(*) FILTER(WHERE status IN ('active','pending')) AS live FROM long_term_memory_items WHERE subject_id=:subject"),dict(subject=self.principal)).mappings().one()
@@ -66,11 +131,11 @@ class PostgresMemoryRepository:
             active=next((r for r in reversed(same) if r['status']=='active'),None)
             previous=next((r for r in reversed(same) if str(r['id'])==target),None) if target else active
             if origin=='explicit':
-                c.execute(text("UPDATE long_term_memory_items SET status='superseded',updated_at=now() WHERE subject_id=:subject AND scope_hash=:scope AND fact_key=:key AND status IN ('active','pending')"),dict(subject=self.principal,scope=identity(scope_value(scope)),key=value['fact_key']))
+                c.execute(text("UPDATE long_term_memory_items SET status='superseded',updated_at=now() WHERE subject_id=:subject AND scope_type=:type AND scope_hash=:scope AND fact_key=:key AND status IN ('active','pending')"),dict(subject=self.principal,type=scope_type,scope=key,key=value['fact_key']))
             item=str(uuid.uuid4())
-            c.execute(text('''INSERT INTO long_term_memory_items(id,subject_id,scope,scope_hash,kind,fact_key,content,content_hash,origin,status,version,replaces_id)
-                VALUES (:id,:subject,CAST(:scope AS jsonb),:scope_hash,:kind,:fact_key,:content,:content_hash,:origin,:status,:version,:previous)'''),
-                dict(**value,id=item,subject=self.principal,scope=json.dumps(scope_value(scope)),scope_hash=identity(scope_value(scope)),origin=origin,
+            c.execute(text('''INSERT INTO long_term_memory_items(id,subject_id,scope_type,scope,scope_hash,kind,fact_key,content,content_hash,origin,status,version,replaces_id)
+                VALUES (:id,:subject,:type,CAST(:scope AS jsonb),:scope_hash,:kind,:fact_key,:content,:content_hash,:origin,:status,:version,:previous)'''),
+                dict(**value,id=item,subject=self.principal,type=scope_type,scope=json.dumps(data),scope_hash=key,origin=origin,
                     status='active' if origin=='explicit' else 'pending',version=max([r['version'] for r in same],default=0)+1,previous=str(previous['id']) if previous else None))
         for source in sources:
             c.execute(text('''INSERT INTO memory_sources(id,item_id,run_id,message_id,source,source_hash)
@@ -78,7 +143,7 @@ class PostgresMemoryRepository:
                 dict(id=str(uuid.uuid4()),item=item,run=source.get('run_id'),message=source.get('message_id'),source=json.dumps(source),hash=identity(source)))
         return item
 
-    def save(self,principal,scope,kind,key,content,*,target=None,source_request_id=None):
+    def save(self,principal,scope,kind,key,content,*,target=None,source_request_id=None,scope_type='SCOPED'):
         value=item_value(kind,key,content)
         source={'type':'explicit_owner_action','content_hash':value['content_hash']}
         if source_request_id is not None:
@@ -86,19 +151,19 @@ class PostgresMemoryRepository:
             except (ValueError,TypeError):raise MemoryDenied('MEMORY_SOURCE_REQUEST_INVALID') from None
         with self.engine.begin() as c:
             self._subject(c,principal)
-            item=self._write(c,scope,value,'explicit',[source],target)
+            item=self._write(c,scope,value,'explicit',[source],target,scope_type)
         return item
 
-    def transition(self,principal,scope,item,status):
+    def transition(self,principal,scope,item,status,*,scope_type='SCOPED'):
         if status not in {'active','rejected','deleted'}:raise MemoryDenied('MEMORY_TRANSITION_INVALID')
         with self.engine.begin() as c:
-            self._subject(c,principal);rows=self._rows(c,scope)
+            self._subject(c,principal);rows=self._rows(c,scope,scope_type)
             row=next((r for r in rows if str(r['id'])==item),None)
             if row is None:raise MemoryDenied('MEMORY_ITEM_NOT_FOUND')
             if status=='active' and row['status']!='pending':raise MemoryDenied('MEMORY_CONFIRM_DENIED')
             if status=='rejected' and row['status']!='pending':raise MemoryDenied('MEMORY_REJECT_DENIED')
             if status=='active':
-                c.execute(text("UPDATE long_term_memory_items SET status='superseded',updated_at=now() WHERE subject_id=:subject AND scope_hash=:scope AND fact_key=:key AND status='active'"),dict(subject=self.principal,scope=row['scope_hash'],key=row['fact_key']))
+                c.execute(text("UPDATE long_term_memory_items SET status='superseded',updated_at=now() WHERE subject_id=:subject AND scope_type=:type AND scope_hash=:scope AND fact_key=:key AND status='active'"),dict(subject=self.principal,type=scope_type,scope=row['scope_hash'],key=row['fact_key']))
             c.execute(text('UPDATE long_term_memory_items SET status=:state,updated_at=now() WHERE id=:id'),dict(id=item,state=status))
 
     def schedule(self,principal,scope,conversation,provider,model):
@@ -107,6 +172,8 @@ class PostgresMemoryRepository:
         A source remains consumed for UNKNOWN/failure; no new ID can replay it.
         Scope changes never authorize historical messages from another scope.
         """
+        if any(not isinstance(v,str) or not v.strip() or v=='UNKNOWN' for v in (provider,model)):
+            raise MemoryDenied('MEMORY_EXTRACTION_MODEL_NOT_CONFIGURED')
         data=scope_value(scope);scope_hash=identity(data)
         with self.engine.begin() as c:
             subject=self._subject(c,principal)

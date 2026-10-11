@@ -80,6 +80,7 @@ class AnswerService:
         quick_settings: QuickSettings | None = None,
         lifecycle: Any | None = None,
         memory_service: Any | None = None,
+        query_understand: Any | None = None,
     ) -> None:
         if knowledge_gateway is None:
             if retriever is None:
@@ -104,6 +105,7 @@ class AnswerService:
         self.quick_settings = quick_settings or QuickSettings()
         self.lifecycle = lifecycle
         self.memory_service = memory_service
+        self.query_understand = query_understand or getattr(quick_chain,'query_understand',None)
         self.quick_chain = quick_chain or LangChainQuickChain(
             knowledge_gateway,
             answer_gateway=answer_gateway,
@@ -178,41 +180,56 @@ class AnswerService:
         scope = Scope.from_ids(kb_scope, document_scope)
         if self._is_cancelled(run_id):
             return self._cancelled_outcome(run_id, mode)
-        # Prefer provenance-aware history; legacy stores still provide completed q0.
-        context_reader = getattr(self.runs, "last_completed_question_context", None) if not self.follow_up_enabled else None
-        source_run_id = "UNKNOWN"
-        if context_reader is not None:
-            previous_context = context_reader(conversation_id, kb_scope, document_scope)
-            previous = previous_context["q0"] if previous_context else None
-            if previous_context and previous_context.get("run_id") is not None:
-                source_run_id = str(previous_context["run_id"])
+        understanding = None
+        if self.query_understand is not None:
+            from backend.app.ports.query_understand import QueryUnderstandDenied
+            try:
+                understanding = self.query_understand.understand(content,conversation=conversation_id,
+                    scope=scope,run=run_id,cloud_allowed_by_kb=cloud_allowed_by_kb)
+            except QueryUnderstandDenied as exc:
+                from backend.app.ports.query_understand import QueryUnderstanding
+                understanding = QueryUnderstanding(content,True,content,'unknown',(),reason=str(exc),task_status='INCOMPLETE')
+            resolution = understanding.resolution()
+            source_run_id = resolution.source_run_ids[0] if len(resolution.source_run_ids)==1 else 'UNKNOWN'
+            resolver_trace = {'resolver_enabled':True,'resolver_status':understanding.reason,
+                'resolver_call_count':int(understanding.model_status in {'SIMULATED_COMPLETED','RESPONSE_RECEIVED','UNKNOWN'}),
+                'history_count':len(understanding.history_run_ids),'query_understand':understanding.public()}
         else:
-            previous_reader = getattr(self.runs, "last_completed_question", None) if not self.follow_up_enabled else None
-            previous = previous_reader(conversation_id, kb_scope, document_scope) if previous_reader is not None else None
-        resolution = resolve_question(content, previous)
-        resolver_trace = {"resolver_enabled": self.follow_up_enabled, "resolver_status": "disabled",
-                          "resolver_call_count": 0, "history_count": 0}
-        if not self.follow_up_enabled and resolution.clarification_required:
-            # Restore the existing bounded follow-up capability without enabling
-            # the general model resolver or putting historical questions in q0.
-            reader = getattr(self.runs, "completed_history_context", None)
-            if reader is not None:
-                try:
-                    context = reader(conversation_id, kb_scope, document_scope, current_run_id=run_id, limit=1)
-                    turns = context.get("turns", ())
-                    if (len(turns) == 1 and context.get("knowledge_base_scope") == kb_scope
-                            and context.get("document_scope") == document_scope and turns[0].get("turn_id") == "H1"):
-                        bounded = bounded_method_reference(content, turns[0].get("q0"), turns[0].get("run_id"))
-                        if bounded is not None:
-                            resolution = bounded
-                            source_run_id = bounded.source_run_ids[0]
-                            resolver_trace.update(resolver_status="bounded_method_reference", history_count=1)
-                except (ValueError, TypeError, KeyError, AttributeError):
-                    # Unavailable/malformed history never prevents safe clarification.
-                    pass
-        if self.follow_up_enabled:
-            resolution, resolver_trace = self._resolve_history(content, conversation_id, kb_scope, document_scope, run_id)
-            source_run_id = resolution.source_run_ids[0] if len(resolution.source_run_ids) == 1 else "UNKNOWN"
+            # Prefer provenance-aware history; legacy stores still provide completed q0.
+            context_reader = getattr(self.runs, "last_completed_question_context", None) if not self.follow_up_enabled else None
+            source_run_id = "UNKNOWN"
+            if context_reader is not None:
+                previous_context = context_reader(conversation_id, kb_scope, document_scope)
+                previous = previous_context["q0"] if previous_context else None
+                if previous_context and previous_context.get("run_id") is not None:
+                    source_run_id = str(previous_context["run_id"])
+            else:
+                previous_reader = getattr(self.runs, "last_completed_question", None) if not self.follow_up_enabled else None
+                previous = previous_reader(conversation_id, kb_scope, document_scope) if previous_reader is not None else None
+            resolution = resolve_question(content, previous)
+            resolver_trace = {"resolver_enabled": self.follow_up_enabled, "resolver_status": "disabled",
+                              "resolver_call_count": 0, "history_count": 0}
+            if not self.follow_up_enabled and resolution.clarification_required:
+                # Restore the existing bounded follow-up capability without enabling
+                # the general model resolver or putting historical questions in q0.
+                reader = getattr(self.runs, "completed_history_context", None)
+                if reader is not None:
+                    try:
+                        context = reader(conversation_id, kb_scope, document_scope, current_run_id=run_id, limit=1)
+                        turns = context.get("turns", ())
+                        if (len(turns) == 1 and context.get("knowledge_base_scope") == kb_scope
+                                and context.get("document_scope") == document_scope and turns[0].get("turn_id") == "H1"):
+                            bounded = bounded_method_reference(content, turns[0].get("q0"), turns[0].get("run_id"))
+                            if bounded is not None:
+                                resolution = bounded
+                                source_run_id = bounded.source_run_ids[0]
+                                resolver_trace.update(resolver_status="bounded_method_reference", history_count=1)
+                    except (ValueError, TypeError, KeyError, AttributeError):
+                        # Unavailable/malformed history never prevents safe clarification.
+                        pass
+            if self.follow_up_enabled:
+                resolution, resolver_trace = self._resolve_history(content, conversation_id, kb_scope, document_scope, run_id)
+                source_run_id = resolution.source_run_ids[0] if len(resolution.source_run_ids) == 1 else "UNKNOWN"
         execution_question = resolution.question if resolution.used else content
         follow_up_used = bool(resolution.source_run_ids)
         resolution_args = ({"retrieval_query": execution_question, "validated_follow_up": resolution}
@@ -225,7 +242,7 @@ class AnswerService:
             "resolution_scope": {"knowledge_base_ids": kb_scope, "document_ids": document_scope},
             "follow_up_context_used": follow_up_used,
             "history_resolution_performed": bool(resolver_trace["resolver_call_count"]),
-            "automatic_ambiguity_resolution": ("LOCAL_RESOLVER_SEMANTICS_NOT_VERIFIED" if resolver_trace["resolver_call_count"] else "BOUNDED_METHOD_REFERENCE" if resolution.reason == "BOUNDED_METHOD_REFERENCE" else "NOT_PERFORMED"),
+            "automatic_ambiguity_resolution": ("LOCAL_RESOLVER_SEMANTICS_NOT_VERIFIED" if resolver_trace["resolver_call_count"] else "BOUNDED_METHOD_REFERENCE" if resolution.reason == "BOUNDED_METHOD_REFERENCE" else "SOURCE_VALIDATED_QUERY_UNDERSTAND" if understanding is not None and resolution.used else "NOT_PERFORMED"),
             "clarification_required": resolution.clarification_required,
             "resolver_decision": resolution.decision,
             "source_completed_run_ids": list(resolution.source_run_ids),
@@ -269,6 +286,7 @@ class AnswerService:
                     scope,
                     run_id,
                     **resolution_args,
+                    query_understanding=understanding,
                 )
                 snapshots: tuple[Any, ...] = smart_evidence
             else:
@@ -284,6 +302,7 @@ class AnswerService:
                     on_retrieval=self.runs.persist_retrieval_hits,
                     is_cancelled=lambda: self._is_cancelled(run_id),
                     **({'conversation_id': conversation_id} if getattr(self.quick_chain, 'context_manager', None) is not None else {}),
+                    **({'query_understanding':understanding} if understanding is not None else {}),
                     **resolution_args,
                 )
                 answer, citations, error_code = result.answer, result.citations, result.error_code
@@ -509,6 +528,7 @@ class AnswerService:
         run_id: str,
         *, retrieval_query: str | None = None,
         validated_follow_up: Any | None = None,
+        query_understanding: Any | None = None,
     ) -> tuple[str, tuple[str, ...], str | None, dict[str, Any], tuple[Any, ...], tuple[str, str | None, int] | None]:
         from backend.app.application.evidence_accumulator import EvidenceAccumulator
 
@@ -517,6 +537,8 @@ class AnswerService:
         gateway = KnowledgeToolGateway(
             knowledge_gateway=self.knowledge_gateway,
             content_reader=self.content_reader,
+            document_view_reader=getattr(self.runs,'read_document_view',None),
+            query_understanding=query_understanding,
             document_lister=self.document_lister,
             document_resolver=self.document_resolver,
             graph_query=self.graph_query if graph_enabled else None,

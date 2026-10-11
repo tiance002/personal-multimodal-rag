@@ -7,6 +7,20 @@ from backend.app.ports.context_budget import canonical, identity, history_data, 
 class MemoryDenied(ContextDenied): pass
 
 KINDS={'profile','preference','fact','task','interest'}
+GLOBAL_KINDS={'profile','preference','interest'}
+MEMORY_RETRIEVAL_MODES={'lexical','semantic','hybrid'}
+
+def memory_scope(scope,scope_type='SCOPED'):
+    if scope_type=='GLOBAL':
+        if scope.knowledge_base_ids or scope.document_ids:raise MemoryDenied('MEMORY_GLOBAL_SCOPE_MUST_BE_EXPLICIT')
+        return {}
+    if scope_type!='SCOPED':raise MemoryDenied('MEMORY_SCOPE_TYPE_INVALID')
+    return scope_value(scope)
+
+def memory_scope_hash(scope,scope_type='SCOPED'):
+    value=memory_scope(scope,scope_type)
+    # Preserve every 0020 Scoped identity; Global uses an explicit type tag.
+    return identity({'scope_type':'GLOBAL'}) if scope_type=='GLOBAL' else identity(value)
 def subject_id(value):
     try: return str(uuid.UUID(value))
     except (ValueError,TypeError,AttributeError): raise MemoryDenied('MEMORY_PRINCIPAL_REQUIRED') from None

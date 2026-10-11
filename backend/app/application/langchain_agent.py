@@ -42,6 +42,8 @@ class SearchKnowledgeArgs(BaseModel):
 
 class ReadDocumentArgs(BaseModel):
     document_id: str = Field(min_length=1, max_length=200)
+    offset: int = Field(default=0, ge=0, strict=True)
+    length: int = Field(default=8000, ge=1, le=8000, strict=True)
 
 
 class QueryKnowledgeGraphArgs(BaseModel):
@@ -152,6 +154,11 @@ class LangChainAgentAdapter:
             if trace_store is not None:
                 trace_store.append_step(run_id, step)
 
+        gateway.bind_read_run(run_id)
+        if self.context_manager is not None:
+            from backend.app.ports.context_budget import canonical
+            gateway.bind_read_token_counter(lambda result:self.context_manager.window(self.context_role).count(
+                [{'role':'tool','tool_call_id':'document_read','content':canonical(result)}]))
         context = _ToolContext(gateway, scope, guard, record, graph_enabled, retrieval_query)
         tools = self._build_tools(context)
         self.last_tool_names = tuple(tool.name for tool in tools)
@@ -357,8 +364,9 @@ class LangChainAgentAdapter:
                 query, initial_query = initial_query, None
             return self._invoke_tool(context, "search_knowledge", {"query": query})
 
-        def read_document(document_id: str) -> str:
-            return self._invoke_tool(context, "read_document", {"document_id": document_id})
+        def read_document(document_id: str, offset: int = 0, length: int = 8000) -> str:
+            return self._invoke_tool(context, "read_document", {"document_id": document_id,
+                "offset":offset,"length":length})
 
         def query_knowledge_graph(entity_name: str, depth: int = 1) -> str:
             return self._invoke_tool(context, "query_knowledge_graph", {"entity_name": entity_name, "depth": depth})
@@ -379,7 +387,7 @@ class LangChainAgentAdapter:
             StructuredTool.from_function(
                 read_document,
                 name="read_document",
-                description="Read the active ready document already authorized by the server scope.",
+                description="Read bounded document context, not citation evidence. Character offsets address child-order reading text. Continue with next_offset; the server binds the active version across this Run. Never reread a range. Search original Child evidence for final citations.",
                 args_schema=ReadDocumentArgs,
             ),
         ]

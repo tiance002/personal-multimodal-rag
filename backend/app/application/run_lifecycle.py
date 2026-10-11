@@ -8,12 +8,16 @@ def read_committed_events(read_run, streams, store, run_id, session, kbs, docs, 
     saved=read_run(run_id,session,kbs,docs)
     events=store.list_events(run_id,after_seq)
     terminal={'completed','failed','cancelled'}
+    def retrieval_terminal(event):
+        return (event['event']=='retrieval.completed' and isinstance(event.get('data'),dict)
+                and event['data'].get('terminal_kind')=='retrieval_only')
     # A final TX can commit between the status read and the event read. Re-read
     # before publishing its terminal event, so reconnect gets committed text.
-    if saved['status'] not in terminal and any(e['event'] in {'answer.completed','run.failed'} for e in events):
+    if saved['status'] not in terminal and any(e['event'] in {'answer.completed','run.failed'} or retrieval_terminal(e) for e in events):
         saved=read_run(run_id,session,kbs,docs)
     events=[e for e in events if (e['event']!='answer.completed' or saved['status']=='completed')
-            and (e['event']!='run.failed' or saved['status'] in {'failed','cancelled'})]
+            and (e['event']!='run.failed' or saved['status'] in {'failed','cancelled'})
+            and (not retrieval_terminal(e) or saved['status']=='completed')]
     if streams is not None:
         try:
             cached=streams.get_events(session,run_id,after_seq)

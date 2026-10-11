@@ -29,7 +29,7 @@ from backend.app.domain.models import ChunkRecord
 from backend.tests.test_p5_router_generation import make_chain, GOOD
 
 ROOT = Path(__file__).resolve().parents[2]
-URL = 'postgresql+psycopg://p55a:SIMULATED_TEST_ONLY@127.0.0.1:52352/p55a_lifecycle_test'
+URL = 'postgresql+psycopg://p55a:SIMULATED_TEST_ONLY@127.0.0.1:55729/p55a_lifecycle_test'
 REDIS = 'redis://127.0.0.1:52355/0'
 
 
@@ -39,10 +39,22 @@ def connect():
     engine = create_engine(URL)
     with engine.connect() as c:
         assert c.execute(text('SELECT current_database(),oid,(SELECT system_identifier FROM pg_control_system()) FROM pg_database WHERE datname=current_database()')).one() == ('p55a_lifecycle_test',16384,7694635764170571814)
-        expected = ('0020_long_term_memory' if os.getenv('P55B2_ISOLATED_AUTHORIZED') == 'p55b-memory-r1' else
-                    '0019_context_checkpoints' if os.getenv('P55B_ISOLATED_AUTHORIZED') == 'p55b-context-r1' else '0018_run_attempt_lifecycle')
-        assert c.execute(text('SELECT version_num FROM alembic_version')).scalar_one()==expected
+        _require_isolated_revision(c.execute(text('SELECT version_num FROM alembic_version')).scalar_one())
     return engine
+
+
+def _expected_isolated_revision():
+    if os.getenv('P55E_ISOLATED_AUTHORIZED') == 'p55e-memory-vector-r1':
+        return '0022_memory_vector_index'
+    return ('0021_global_scoped_memory' if os.getenv('P55B21_ISOLATED_AUTHORIZED') == 'p55b21-global-scoped-r1' else
+            '0020_long_term_memory' if os.getenv('P55B2_ISOLATED_AUTHORIZED') == 'p55b-memory-r1' else
+            '0019_context_checkpoints' if os.getenv('P55B_ISOLATED_AUTHORIZED') == 'p55b-context-r1' else '0018_run_attempt_lifecycle')
+
+
+def _require_isolated_revision(actual):
+    expected = _expected_isolated_revision()
+    if actual != expected:
+        raise AssertionError(f'ISOLATED_REVISION_MISMATCH expected={expected} actual={actual}')
 
 
 @pytest.fixture

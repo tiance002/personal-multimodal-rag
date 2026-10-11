@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import uuid
+from io import BytesIO
 from pathlib import Path
 
 import fitz
@@ -107,10 +108,90 @@ class PdfParser:
             return "", "OCR_UNAVAILABLE"
         return text, None if text else "OCR_EMPTY"
 
+    def _embedded_image_occurrences(self, pdf, page, source_sha256, *, warnings):
+        """One real placement per image block, including its own soft mask.
+
+        get_image_rects matches base-pixel digests and cross-matches different
+        masked images with identical bases. It is not a placement identity.
+        Masked visible images use the original rendered region; fully transparent
+        objects stay blank rather than borrowing text from underlying page layers.
+        """
+        def pixels(data, mode):
+            if not data:
+                return None
+            with Image.open(BytesIO(data)) as image:
+                decoded = image.convert(mode)
+                return decoded.size, hashlib.sha256(decoded.tobytes()).hexdigest()
+
+        references = {}
+        for image in page.get_images(full=True):
+            xref = 'UNKNOWN'
+            try:
+                xref = image[0]
+                extracted = pdf.extract_image(xref)
+                mask = pdf.extract_image(extracted['smask'])['image'] if extracted.get('smask') else None
+                key = (pixels(extracted['image'], 'RGB'), pixels(mask, 'L'))
+                references.setdefault(key, set()).add(xref)
+            except Exception as exc:
+                warnings.append(f'PARTIAL_PARSE:page={page.number + 1}:embedded-image:resource:'
+                                f'xref={xref}:error={type(exc).__name__}')
+        for block in page.get_text('dict', flags=fitz.TEXT_PRESERVE_IMAGES)['blocks']:
+            placement_index = 'UNKNOWN'
+            try:
+                placement_index = block.get('number', 'UNKNOWN')
+                if block['type'] != 1:
+                    continue
+                base, mask = block['image'], block.get('mask')
+                key = (pixels(base, 'RGB'), pixels(mask, 'L'))
+                candidates = sorted(references.get(key, ()))
+                bbox = fitz.Rect(block['bbox'])
+                if bbox.is_empty or bbox.is_infinite:
+                    raise ValueError('invalid image placement')
+                image_bytes, extension = base, block['ext']
+                mode = 'unmasked_object'
+                if mask:
+                    with Image.open(BytesIO(mask)) as alpha:
+                        transparent = alpha.convert('L').getextrema() == (0, 0)
+                    if transparent:
+                        # A rendered page crop could contain unrelated text behind
+                        # this invisible object. Preserve only the object's emptiness.
+                        blank = Image.new('RGB', (max(1, round(bbox.width * 2)),
+                                                 max(1, round(bbox.height * 2))), 'white')
+                        output = BytesIO()
+                        blank.save(output, format='PNG')
+                        image_bytes = output.getvalue()
+                        mode = 'fully_transparent_object_on_white'
+                    else:
+                        clip = bbox * page.rotation_matrix
+                        image_bytes = page.get_pixmap(matrix=fitz.Matrix(2, 2),
+                                                     clip=clip, alpha=False).tobytes('png')
+                        mode = 'masked_placement_page_render'
+                    extension = 'png'
+                locator = {
+                    'page': page.number + 1, 'xref': candidates[0] if len(candidates) == 1 else None,
+                    'xref_candidates': candidates, 'placement_index': block['number'],
+                    'placement_bbox': tuple(bbox), 'placement_transform': tuple(block['transform']),
+                    'source_sha256': source_sha256, 'base_image_sha256': hashlib.sha256(base).hexdigest(),
+                    'soft_mask_sha256': hashlib.sha256(mask).hexdigest() if mask else None,
+                    'base_pixel_sha256': key[0][1], 'soft_mask_pixel_sha256': key[1][1] if key[1] else None,
+                    'extraction_version': 'pdf-embedded-mask-placement/v1', 'extraction_mode': mode,
+                    'render_matrix': (2, 2) if mask else None, 'page_rotation': page.rotation,
+                    'sha256': hashlib.sha256(image_bytes).hexdigest(),
+                    'table_structure_status': 'unsupported', 'semantic_status': 'NOT_RUN',
+                    **({'bbox': tuple(bbox), 'coordinate_basis': 'pdf-points-top-left-unrotated'}
+                       if self.collect_caption_geometry else {}),
+                }
+            except Exception as exc:
+                warnings.append(f'PARTIAL_PARSE:page={page.number + 1}:embedded-image:placement:'
+                                f'index={placement_index}:error={type(exc).__name__}')
+                continue
+            yield image_bytes, extension, locator
+
     def parse(self, path: Path, document_id: str, version_id: str) -> NormalizedDocument:
         raw = path.read_bytes()
         if not raw.startswith(b"%PDF"):
             raise ParserError("PDF_MAGIC_MISMATCH")
+        source_sha256 = hashlib.sha256(raw).hexdigest()
         pages: list[str] = []
         locators: list[SourceLocator] = []
         sections: list[DocumentSection] = []
@@ -168,7 +249,7 @@ class PdfParser:
                 warnings.extend(table_warnings)
                 text = raw_text
                 source_id: str | None = None
-                embedded_images: list[tuple[str, bytes, str]] = []
+                embedded_images: list[tuple[str, bytes, str, dict]] = []
                 if scanned:
                     try:
                         raster = page.get_pixmap(matrix=fitz.Matrix(2, 2)).tobytes("png")
@@ -200,47 +281,24 @@ class PdfParser:
                     ))
                 else:
                     try:
-                        page_images = page.get_images(full=True)
-                    except Exception:
-                        warnings.append(f"PARTIAL_PARSE:page={page_number}:embedded-images")
-                        page_images = []
-                    for image in page_images:
-                        xref = image[0]
-                        try:
-                            extracted = pdf.extract_image(xref)
-                            image_bytes = extracted['image']
-                            extension = extracted['ext']
-                            if not isinstance(image_bytes, bytes) or not image_bytes or not isinstance(extension, str):
-                                raise ValueError('embedded image unavailable')
-                        except Exception:
-                            warnings.append(f"PARTIAL_PARSE:page={page_number}:embedded-image")
-                            continue
-                        try:
-                            regions = page.get_image_rects(xref) if self.collect_caption_geometry else [None]
-                        except Exception:
-                            warnings.append(f"PARTIAL_PARSE:page={page_number}:image-geometry")
-                            regions = [None]
-                        for region in regions or [None]:
+                        occurrences = self._embedded_image_occurrences(pdf, page, source_sha256, warnings=warnings)
+                        for image_bytes, extension, locator in occurrences:
                             image_id = str(uuid.uuid4())
-                            geometry = ({"bbox": tuple(region) if region is not None else None,
-                                "coordinate_basis": "pdf-points-top-left-unrotated" if region is not None else "UNKNOWN"}
-                                if self.collect_caption_geometry else {})
                             assets.append(DocumentAsset(
                                 asset_id=image_id, asset_type="source_image", page_no=page_number,
-                                source_bytes=image_bytes,
-                                source_locator={"page": page_number, "xref": xref,
-                                    "sha256": hashlib.sha256(image_bytes).hexdigest(),
-                                    "table_structure_status":"unsupported", "semantic_status":"NOT_RUN", **geometry},
+                                source_bytes=image_bytes, source_locator=locator,
                             ))
                             warnings.append(f"PDF_IMAGE_TABLE_SEMANTICS_UNSUPPORTED:page={page_number}")
-                            embedded_images.append((image_id, image_bytes, extension))
+                            embedded_images.append((image_id, image_bytes, extension, locator))
+                    except Exception:
+                        warnings.append(f"PARTIAL_PARSE:page={page_number}:embedded-images")
                 start = cursor
                 for piece, table in pieces:
                     append(piece,page_number,table=table,asset_id=source_id)
                 locators.append(SourceLocator(kind="pdf",page=page_number,start=start,end=cursor,
                     quote="".join(pages)[start:cursor],raw_text=raw_text,raw_evidence=table_evidence,
                     asset_id=source_id))
-                for image_id, image_bytes, extension in embedded_images:
+                for image_id, image_bytes, extension, image_locator in embedded_images:
                     try:
                         with fitz.open(stream=image_bytes, filetype=extension) as image_document:
                             image_text, error = self._ocr(image_document[0])
@@ -251,14 +309,15 @@ class PdfParser:
                     assets.append(DocumentAsset(
                         asset_id=str(uuid.uuid4()), asset_type="ocr_text", page_no=page_number,
                         text_content=image_text or None, derived_from_asset_id=image_id,
-                        source_locator={"page": page_number, "source_asset_id": image_id},
+                        source_locator={**image_locator, "source_asset_id": image_id},
                         status="failed" if error else "ready", error_code=error,
                     ))
                     if image_text:
                         image_start = cursor
                         append("\n"+image_text,page_number,asset_id=image_id)
                         locators.append(SourceLocator(kind="pdf",page=page_number,start=image_start,end=cursor,
-                            quote="\n"+image_text,asset_id=image_id))
+                            quote="\n"+image_text,asset_id=image_id,bbox=image_locator.get('bbox'),
+                            raw_evidence=image_locator))
         content = "".join(pages)
         status = "partial" if warnings else "complete"
         locators = [l.model_copy(update={"parse_status":status,"parse_warnings":tuple(warnings)}) for l in locators]
@@ -266,7 +325,7 @@ class PdfParser:
             document_id=document_id,version_id=version_id,title=path.stem,media_type="application/pdf",
             markdown_content=content,sections=sections,tables=tables,blocks=blocks,assets=assets,
             source_locators=locators,content_sha256=_sha256(content),
-            parser_version=f"pdf/v4-weknora-page-router-pymupdf-{fitz.VersionBind}",
+            parser_version=f"pdf/v5-image-mask-placement-pymupdf-{fitz.VersionBind}",
             parser_engine="pymupdf/weknora-page-router-v1",source_mapping_available=True,
             parse_status=status,parse_warnings=tuple(warnings),
         )
@@ -293,9 +352,12 @@ class ImageParser:
                 **({"bbox": (0, 0, *image_size), "coordinate_basis": "image-pixels-top-left"}
                    if self.collect_caption_geometry else {})},
         )
+        from backend.app.adapters.parsers.image_ocr_layout import structured_image_ocr
+        layout = None
         try:
             with fitz.open(stream=raw, filetype=path.suffix.lstrip(".")) as image_document:
-                content, error = self.pdf_parser._ocr(image_document[0])
+                content, error, layout = structured_image_ocr(image_document[0],
+                    tessdata=self.pdf_parser.tessdata, image_size=image_size)
         except Exception:
             content, error = '', 'OCR_UNAVAILABLE'
         derived = DocumentAsset(
@@ -315,9 +377,11 @@ class ImageParser:
             markdown_content=content,
             sections=sections,
             assets=[asset, derived],
-            source_locators=[SourceLocator(kind="image", start=0, end=len(content), quote=content, asset_id=source_id)],
+            source_locators=[SourceLocator(kind="image", start=0, end=len(content), quote=content, asset_id=source_id,
+                raw_evidence={"source_sha256":hashlib.sha256(raw).hexdigest(),
+                              **({"ocr_layout":layout} if layout is not None else {})})],
             content_sha256=_sha256(content),
-            parser_version="image/v2-ocr",
+            parser_version="image/v3-ocr-layout",
             parser_engine="pymupdf/tesseract",source_mapping_available=True,
             parse_status="partial" if error else "complete",
             parse_warnings=(error,) if error else (),

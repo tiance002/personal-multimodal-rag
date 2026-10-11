@@ -24,7 +24,7 @@ class RetrievalRepository(Protocol):
     """
 
     def keyword_candidates(self, scope: Scope, query: NormalizedQuery, limit: int) -> list[RankedHit]:
-        """Rank chunks by deterministic term overlap, best first."""
+        """Rank child chunks by scope/index-bound BM25, best first."""
 
     def vector_candidates(
         self,

@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 from backend.app.domain.models import NormalizedDocument, StoredObject
 from backend.app.domain.parsers import ParserError
 from backend.app.domain.version_source import VersionSource
+from backend.app.ports.prepared_ingestion import PreparedIngestionInput, validate_prepared_input
 
 
 @runtime_checkable

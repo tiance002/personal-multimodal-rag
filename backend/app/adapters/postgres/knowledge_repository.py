@@ -27,7 +27,7 @@ from backend.app.domain.parsers import ParserError
 from backend.app.domain.scope import Scope
 from backend.app.domain.text_normalization import NormalizedQuery, term_frequencies
 from backend.app.application.context_expansion import NeighborMetadata
-from backend.app.ports.ingestion import parse_version_source
+from backend.app.ports.ingestion import PreparedIngestionInput, parse_version_source, validate_prepared_input
 from backend.app.domain.version_source import VersionSource
 from backend.app.domain.errors import FinalAnswerCommitError
 from backend.app.ports.retrieval import ContextNeighborRead, ContextNeighborReason, ContextNeighborRow
@@ -400,6 +400,7 @@ class PostgresKnowledgeRepository:
         worker_id: str | None = None,
         claim_token: str | None = None,
         lease_seconds: int = 60,
+        prepared_input: PreparedIngestionInput | None = None,
     ) -> dict[str, Any]:
         """Process a fenced claim; direct callers first acquire their own claim."""
         if worker_id is None or claim_token is None:
@@ -446,7 +447,12 @@ class PostgresKnowledgeRepository:
                 progress=10,
             )
             with self._lease_heartbeat(job_id, worker_id=worker_id, claim_token=claim_token, lease_seconds=lease_seconds):
-                normalized = parse_version_source(self.parsers, self.storage, VersionSource.from_row(version))
+                source = VersionSource.from_row(version)
+                reused = None
+                if prepared_input is None:
+                    normalized = parse_version_source(self.parsers, self.storage, source)
+                else:
+                    normalized, reused = validate_prepared_input(prepared_input, self.storage, source, self.chunking_config)
                 self.update_job_progress(
                     job_id,
                     worker_id=worker_id,
@@ -488,7 +494,7 @@ class PostgresKnowledgeRepository:
                     raise ParserError(next((asset.error_code for asset in normalized.assets if asset.error_code), "OCR_EMPTY"))
                 if not normalized.markdown_content.strip():
                     raise ParserError("EMPTY_TEXT")
-                prepared = prepare_document(normalized, self.chunking_config)
+                prepared = reused if reused is not None else prepare_document(normalized, self.chunking_config)
                 chunks = prepared.children
                 if not chunks:
                     raise ParserError("EMPTY_TEXT")
@@ -510,8 +516,17 @@ class PostgresKnowledgeRepository:
                     'chunker_version': CHUNKER_VERSION, 'index_identity': self.chunking_config.identity,
                     'chunking_config': asdict(self.chunking_config),
                     'chunking_diagnostics': prepared.diagnostics,
+                    **({'prepared_input': {
+                        'schema': 'pinned-source-parse/v1', 'source_sha256': prepared_input.source_sha256,
+                        'normalized_artifact_sha256': prepared_input.normalized_sha256,
+                        'chunk_artifact_sha256': prepared_input.chunks_sha256,
+                        'asset_manifest_sha256': prepared_input.assets_sha256,
+                        'producer_modules': dict(prepared_input.module_hashes),
+                        'producer_libraries': dict(prepared_input.library_versions),
+                    }} if prepared_input is not None else {}),
                 }, ensure_ascii=False).encode('utf-8')))
                 vectors: list[list[float]] = []
+                planned_child_ids = ()
                 self.update_job_progress(
                     job_id,
                     worker_id=worker_id,
@@ -524,12 +539,11 @@ class PostgresKnowledgeRepository:
                     if getattr(self.embedding_provider, "provider_kind", None) == "cloud":
                         kb = self.get_knowledge_base(str(version["knowledge_base_id"]))
                         allowed = kb is not None and kb.get("cloud_allowed") is True
-                    with model_access("embedding", allowed=allowed):
-                        embedded = self.embedding_provider.embed([chunk.embedding_content for chunk in chunks], timeout_seconds=60)
-                    self.validate_embedding_result(embedded)
-                    vectors = embedded.vectors
-                    if len(vectors) != len(chunks) or any(len(vector) != 1024 for vector in vectors):
-                        raise RuntimeError("EMBEDDING_DIMENSION_MISMATCH")
+                    with model_access("embedding", allowed=allowed,
+                            scope=Scope.from_ids([str(version['knowledge_base_id'])],[str(version['document_id'])])):
+                        planned_child_ids = self._planned_index_chunk_ids(chunks,job_id=job_id,version_id=str(version['id']))
+                        vectors = self._embed_index_chunks(chunks,job_id=job_id,worker_id=worker_id,
+                            claim_token=claim_token,lease_seconds=lease_seconds,version_id=str(version['id']),chunk_ids=planned_child_ids)
                 self.update_job_progress(
                     job_id,
                     worker_id=worker_id,
@@ -566,7 +580,7 @@ class PostgresKnowledgeRepository:
                 for index, chunk in enumerate(prepared.parents + chunks):
                     is_parent = index < len(prepared.parents)
                     child_index = index - len(prepared.parents)
-                    chunk_id = parent_ids[index] if is_parent else uuid.uuid4()
+                    chunk_id = parent_ids[index] if is_parent else (uuid.UUID(planned_child_ids[child_index]) if planned_child_ids else uuid.uuid4())
                     parent_id = parent_ids[chunk.parent_index] if chunk.parent_index is not None else None
                     section_id = section_ids.get(next((section.section_id for section in normalized.sections if section.start <= chunk.start < section.end), ""))
                     conn.execute(text("""INSERT INTO chunks (id,section_id,version_id,document_id,knowledge_base_id,chunk_index,content,content_sha256,start_pos,end_pos,heading_path,chunk_type,locator,context_header,parent_id,chunk_role,index_identity)
@@ -650,34 +664,132 @@ class PostgresKnowledgeRepository:
     """
 
     def keyword_candidates(self, scope: Scope, query: NormalizedQuery, limit: int) -> list[RankedHit]:
-        """Rank candidates from the persisted `chunk_terms` index.
+        """BM25 over scope/current-version/child/index-bound chunk_terms.
 
         The filter, the aggregate and the `LIMIT` all run in PostgreSQL, so the
         response is bounded by `limit` instead of by corpus size.
         """
         if not scope.knowledge_base_ids or not query.terms or limit <= 0:
             return []
-        params: dict[str, Any] = {"normalized": query.normalized, "limit": limit, "index_identity": self.chunking_config.identity}
+        from backend.app.domain.bm25 import K1, B
+        from backend.app.domain.text_normalization import MIXED_PART_PATTERN, CJK_PATTERN, NON_CJK_WORD_PATTERN, PURE_CJK_PATTERN
+        params: dict[str, Any] = {"limit": limit, "index_identity": self.chunking_config.identity, "k1":K1, "b":B,
+            "mixed_parts":MIXED_PART_PATTERN,"cjk":CJK_PATTERN,"non_cjk":NON_CJK_WORD_PATTERN,"pure_cjk":PURE_CJK_PATTERN}
         clause = self._scope_filter(scope, params)
         term_names = ",".join(f":t_{index}" for index, _ in enumerate(query.terms))
         params.update({f"t_{index}": term for index, term in enumerate(query.terms)})
         statement = text(f"""
-            SELECT c.id AS chunk_id,
-                   SUM(ct.term_frequency) + CASE
-                       WHEN :normalized <> '' AND POSITION(:normalized IN lower(c.content)) > 0 THEN 2
-                       ELSE 0 END AS score
-            FROM chunks c
-            {self._ACTIVE_VERSION_JOINS}
-            JOIN chunk_terms ct ON ct.chunk_id = c.id AND ct.term IN ({term_names})
-            WHERE {clause} AND d.deleted_at IS NULL AND dv.index_status = 'ready'
-              AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
-            GROUP BY c.id
-            ORDER BY score DESC, c.id
+            WITH eligible AS MATERIALIZED (
+                SELECT c.id FROM chunks c
+                {self._ACTIVE_VERSION_JOINS}
+                JOIN knowledge_bases kb ON kb.id=c.knowledge_base_id AND kb.deleted_at IS NULL
+                WHERE {clause} AND d.knowledge_base_id=c.knowledge_base_id AND d.deleted_at IS NULL AND dv.index_status='ready'
+                  AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
+            ), physical AS MATERIALIZED (
+                SELECT ct.* FROM chunk_terms ct JOIN eligible e ON e.id=ct.chunk_id
+            ), parts AS (
+                -- Only legacy mixed words need projection. Pure CJK already
+                -- stores its bigrams; expanding those again would double TF.
+                SELECT chunk_id,term_frequency,(regexp_matches(term,:mixed_parts,'g'))[1] AS term,true AS expand
+                FROM physical WHERE term ~ :cjk AND term ~ :non_cjk
+                UNION ALL
+                SELECT chunk_id,term_frequency,term,false AS expand
+                FROM physical WHERE NOT (term ~ :cjk AND term ~ :non_cjk)
+            ), canonical AS MATERIALIZED (
+                SELECT chunk_id,term,SUM(term_frequency)::float8 AS tf FROM (
+                    SELECT chunk_id,term,term_frequency FROM parts
+                    UNION ALL
+                    SELECT chunk_id,substring(term FROM i FOR 2),term_frequency
+                    FROM parts CROSS JOIN LATERAL generate_series(1,char_length(term)-1) i
+                    WHERE expand AND term ~ :pure_cjk AND char_length(term)>2
+                ) stream GROUP BY chunk_id,term
+            ), lengths AS (
+                SELECT e.id, COALESCE(SUM(ct.tf),0)::float8 AS dl
+                FROM eligible e LEFT JOIN canonical ct ON ct.chunk_id=e.id GROUP BY e.id
+            ), corpus AS (
+                SELECT COUNT(*)::float8 AS n, AVG(dl) AS avgdl FROM lengths
+            ), matching AS (
+                SELECT ct.chunk_id,ct.term,ct.tf
+                FROM canonical ct
+                WHERE ct.term IN ({term_names})
+            ), frequencies AS (
+                SELECT term,COUNT(*)::float8 AS df FROM matching GROUP BY term
+            )
+            SELECT m.chunk_id, SUM(LN(1 + (s.n-f.df+0.5)/(f.df+0.5)) *
+                m.tf * (:k1+1) / (m.tf+:k1*(1-:b+:b*l.dl/NULLIF(s.avgdl,0)))) AS score
+            FROM matching m JOIN lengths l ON l.id=m.chunk_id
+            JOIN frequencies f ON f.term=m.term CROSS JOIN corpus s
+            GROUP BY m.chunk_id
+            ORDER BY score DESC, m.chunk_id
             LIMIT :limit
         """)
         with self.engine.connect() as conn:
             rows = conn.execute(statement, params).mappings()
             return [RankedHit(chunk_id=str(row["chunk_id"]), rank=index, raw_score=float(row["score"])) for index, row in enumerate(rows, start=1)]
+
+    def _planned_index_chunk_ids(self,chunks,*,job_id,version_id):
+        """Bind new persisted child IDs to the explicit frozen indexing plan."""
+        binding=getattr(self.embedding_provider,'free_binding',None)
+        if binding is None: return ()
+        from backend.app.ports.xing_zero_reservation import current_free_request
+        from backend.app.ports.providers import ProviderRequestNotSent
+        batch_size=min(32,self.embedding_provider.admission.max_batch_items)
+        batches=(len(chunks)+batch_size-1)//batch_size
+        ids=[]
+        for number,start in enumerate(range(0,len(chunks),batch_size)):
+            try:
+                context=current_free_request('index_embedding',batch_id=f'{version_id}:{job_id}:{number}:{batches}')
+            except ValueError:
+                raise ProviderRequestNotSent('SF_FREE_EXPLICIT_REQUEST_CONTEXT_REQUIRED') from None
+            call=next(c for c in binding.permit.calls if c.request_id==context.request_id)
+            texts=[c.embedding_content for c in chunks[start:start+batch_size]]
+            if context.batch_plan is None and binding.permit.execution_kind=='SIMULATED' and not call.chunk_ids:
+                return ()
+            if (context.batch_plan is None or call.document_version_ids!=(str(version_id),)*len(texts)
+                    or call.input_sha256!=tuple(hashlib.sha256(t.encode()).hexdigest() for t in texts)
+                    or len(call.chunk_ids)!=len(texts)):
+                raise RuntimeError('INDEXING_FROZEN_CHUNK_IDENTITY_MISMATCH')
+            for chunk_id in call.chunk_ids:
+                if str(uuid.UUID(chunk_id))!=chunk_id: raise RuntimeError('INDEXING_FROZEN_CHUNK_IDENTITY_MISMATCH')
+            ids.extend(call.chunk_ids)
+        if len(ids)!=len(chunks) or len(set(ids))!=len(ids):
+            raise RuntimeError('INDEXING_FROZEN_CHUNK_IDENTITY_MISMATCH')
+        return tuple(ids)
+
+    def _embed_index_chunks(self,chunks,*,job_id,worker_id,claim_token,lease_seconds,version_id,chunk_ids=None):
+        """One provider instance, stable version/job batches, no partial commit.
+
+        Reclaimed jobs preserve batch identities, so durable UNKNOWN claims
+        cannot be silently retransmitted. Existing fencing also protects the
+        final indexing transaction.
+        """
+        cloud = getattr(self.embedding_provider,'provider_kind',None) == 'cloud'
+        admission = getattr(self.embedding_provider,'admission',None)
+        batch_size = min(32,getattr(admission,'max_batch_items',32)) if cloud else len(chunks)
+        if type(batch_size) is not int or batch_size <= 0:
+            raise RuntimeError('EMBEDDING_BATCH_POLICY_INVALID')
+        batches = (len(chunks)+batch_size-1)//batch_size
+        if chunk_ids is None:
+            chunk_ids=self._planned_index_chunk_ids(chunks,job_id=job_id,version_id=version_id)
+        vectors = []
+        def owned():
+            return self.renew_job(job_id,worker_id=worker_id,claim_token=claim_token,lease_seconds=lease_seconds) is True
+        for number,start in enumerate(range(0,len(chunks),batch_size)):
+            if not owned(): raise RuntimeError('INGESTION_LEASE_LOST')
+            inputs = [c.embedding_content for c in chunks[start:start+batch_size]]
+            kwargs = {}
+            if getattr(self.embedding_provider,'free_binding',None) is not None:
+                kwargs = dict(purpose='index_embedding',batch_id=f'{version_id}:{job_id}:{number}:{batches}',lease_check=owned,
+                    document_version_ids=(str(version_id),)*len(inputs) if chunk_ids else (),
+                    chunk_ids=tuple(chunk_ids[start:start+batch_size]))
+            result = self.embedding_provider.embed(inputs,timeout_seconds=60,**kwargs)
+            self.validate_embedding_result(result)
+            if len(result.vectors)!=len(inputs) or any(len(v)!=1024 for v in result.vectors):
+                raise RuntimeError('EMBEDDING_DIMENSION_MISMATCH')
+            if not owned(): raise RuntimeError('INGESTION_LEASE_LOST')
+            vectors.extend(result.vectors)
+        if len(vectors)!=len(chunks): raise RuntimeError('EMBEDDING_DIMENSION_MISMATCH')
+        return vectors
 
     def embedding_identity(self):
         return effective_identity(self.embedding_provider, self.chunking_config.identity)
@@ -1146,6 +1258,36 @@ class PostgresKnowledgeRepository:
         with self.engine.connect() as conn:
             row = conn.execute(text("SELECT id,version_id,asset_type,storage_key,text_content,derived_from_asset_id,page_no,source_locator,status,error_code FROM document_assets WHERE document_id=:document_id AND id=:asset_id"), {"document_id": document_id, "asset_id": asset_id}).mappings().first()
             return dict(row) if row else None
+
+    def read_document_view(self, scope: Scope, document_id: str, version_id: str) -> dict[str, Any]:
+        """Single SQL snapshot binds reading to current Scope/version/index.
+
+        Offsets address the stable child-order reading projection (not source
+        coordinates). Atomic table/caption/OCR spans must not be partial pages.
+        This read-side projection grants no EvidenceSnapshot/Citation rights.
+        """
+        if not scope.knowledge_base_ids:return None
+        params={'document':document_id,'version':version_id,'index_identity':self.chunking_config.identity}
+        clause=self._scope_filter(scope,params)
+        with self.engine.connect() as conn:
+            rows=list(conn.execute(text(f"""
+                SELECT c.content,c.chunk_type,c.locator FROM chunks c
+                {self._ACTIVE_VERSION_JOINS}
+                JOIN knowledge_bases kb ON kb.id=c.knowledge_base_id AND kb.deleted_at IS NULL
+                WHERE {clause} AND c.document_id=:document AND c.version_id=:version
+                  AND d.deleted_at IS NULL AND dv.index_status='ready'
+                  AND c.chunk_role='child' AND c.index_identity=:index_identity AND dv.index_identity=:index_identity
+                ORDER BY c.chunk_index,c.id
+            """),params).mappings())
+        if not rows:raise LookupError('DOCUMENT_READING_IDENTITY_UNAVAILABLE')
+        parts=[];spans=[];offset=0
+        for row in rows:
+            if parts:offset+=1
+            content=row['content'];parts.append(content)
+            if row['chunk_type'] in {'table','table_row','caption','image_caption','ocr','image_ocr'} or row['locator'].get('kind') in {'table','image'}:
+                spans.append((offset,offset+len(content)))
+            offset+=len(content)
+        return {'version_id':version_id,'content':'\n'.join(parts),'protected_spans':spans}
 
     def get_document_content(self, document_id: str) -> str:
         with self.engine.connect() as conn:
