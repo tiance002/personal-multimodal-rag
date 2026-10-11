@@ -1,0 +1,394 @@
+{
+  "schema_version": "public-benchmark-closeout-audit-v1",
+  "generated_at": "2026-09-28T20:00:56.3982265+08:00",
+  "evaluation_worktree": "C:\\Users\\22088\\.codex\\worktrees\\eval-center\\RAG quention",
+  "branch": "codex/eval-center",
+  "evaluation_git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+  "elapsed_total": "PT6H25M48S",
+  "experiment_status": {
+    "completed_identity_runs": 10,
+    "completed_runs_independently_validated": 10,
+    "locked_runs_completed_once": 3,
+    "interrupted_runs": 1,
+    "formal_aggregate_eligible_partial_run": false,
+    "not_run": "Remaining chunk/context/dedup grid; SciFact and MIRACL QA/Judge; full 320-query LongBench QA; other unexecuted locked variants"
+  },
+  "artifact_validation": {
+    "source_files_sha256_verified": "12/12",
+    "duplicate_qids": 0,
+    "run_rows_equal_sample_count_and_unique_qids": true,
+    "manifest_cases_metrics_report_present_for_all_10_completed_runs": true,
+    "locked_manifest_checks_passed": "3/3",
+    "run_identities": [
+      {
+        "dataset": "scifact",
+        "phase": "baseline",
+        "profile": "smoke",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 12,
+        "generation_case_count": 0,
+        "experiment_id": "670080e5-51cc-40a7-a818-04f86dd7dfa3",
+        "dataset_hash": "8608aa67e02a307745506d92316ebd0d1b2079226a576446c2bb5943e064f59f",
+        "config_hash": "3bdc4e63a7a6b00af0ec2a64f4c937575ec22800c9a52f96238e1c010c2d0592",
+        "index_hash": "78b44827d0747db84539642318b3af0e0ca2fe1676217b90c82c8277cf757629",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "42e4464f6caaebcb10952079a9cf859f4e943356",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\scifact\\development\\20260928T055230Z-9c2a2cba55"
+      },
+      {
+        "dataset": "scifact",
+        "phase": "optimize",
+        "profile": "standard",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 809,
+        "generation_case_count": 0,
+        "experiment_id": "34ce5e54-1c59-4be4-9e46-e65692d02aa4",
+        "dataset_hash": "8608aa67e02a307745506d92316ebd0d1b2079226a576446c2bb5943e064f59f",
+        "config_hash": "404c2a1abe5ec40c9f797b6df0292171e604420caecaffa3e4e68da32cf1e223",
+        "index_hash": "f6c8b191834638dfa8315adc158b1875ac69c0bef5ba2baac598734976aadb93",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\scifact\\development\\20260928T060742Z-6f0c61007b"
+      },
+      {
+        "dataset": "scifact",
+        "phase": "validate",
+        "profile": "standard",
+        "split": "locked_holdout",
+        "status": "COMPLETED",
+        "sample_count": 300,
+        "generation_case_count": 0,
+        "experiment_id": "6d50fc0a-42c1-4d5d-a37b-c53db8c8923f",
+        "dataset_hash": "8608aa67e02a307745506d92316ebd0d1b2079226a576446c2bb5943e064f59f",
+        "config_hash": "33f92e99cb52c9d8f2cecec9a4aa647aacf497a8911a7e92a4597be0e8a4d60d",
+        "index_hash": "f6c8b191834638dfa8315adc158b1875ac69c0bef5ba2baac598734976aadb93",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\scifact\\locked_holdout\\20260928T083231Z-efc760238e"
+      },
+      {
+        "dataset": "miracl-zh",
+        "phase": "baseline",
+        "profile": "smoke",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 9,
+        "generation_case_count": 0,
+        "experiment_id": "047aff43-8f1e-4027-9232-035fcdd94cb5",
+        "dataset_hash": "105dde269ea99ddee8ad0ebf8649631e88c3710be9ad2b54b4ced59e4a17ad29",
+        "config_hash": "3bdc4e63a7a6b00af0ec2a64f4c937575ec22800c9a52f96238e1c010c2d0592",
+        "index_hash": "491f3e1873aad774492be30d53f33f1f25b26be62a56fda8532033c928a9eaeb",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "42e4464f6caaebcb10952079a9cf859f4e943356",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\miracl-zh\\development\\20260928T055342Z-5ded8a5306"
+      },
+      {
+        "dataset": "miracl-zh",
+        "phase": "optimize",
+        "profile": "standard",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 328,
+        "generation_case_count": 0,
+        "experiment_id": "c13b3d0a-8e9c-4663-a583-c9b806adc4d2",
+        "dataset_hash": "105dde269ea99ddee8ad0ebf8649631e88c3710be9ad2b54b4ced59e4a17ad29",
+        "config_hash": "404c2a1abe5ec40c9f797b6df0292171e604420caecaffa3e4e68da32cf1e223",
+        "index_hash": "629b25a5a14ea2ab960fa874c3b16e8cc77a61d0bb65e0e0847ce3c04d473c82",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\miracl-zh\\development\\20260928T071014Z-cffac0cd6a"
+      },
+      {
+        "dataset": "miracl-zh",
+        "phase": "validate",
+        "profile": "standard",
+        "split": "locked_holdout",
+        "status": "COMPLETED",
+        "sample_count": 99,
+        "generation_case_count": 0,
+        "experiment_id": "ba03bc45-e713-470c-a197-4911c45b6e36",
+        "dataset_hash": "105dde269ea99ddee8ad0ebf8649631e88c3710be9ad2b54b4ced59e4a17ad29",
+        "config_hash": "886d82e90f67bdffafa99785955151fa3eec7030ec93dcdd5bb951950dde0ff6",
+        "index_hash": "629b25a5a14ea2ab960fa874c3b16e8cc77a61d0bb65e0e0847ce3c04d473c82",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\miracl-zh\\locked_holdout\\20260928T090914Z-7586bc13ce"
+      },
+      {
+        "dataset": "longbench-zh",
+        "phase": "qa",
+        "profile": "smoke",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 12,
+        "generation_case_count": 4,
+        "experiment_id": "e70b9b8a-470d-414e-806c-867070afdcbd",
+        "dataset_hash": "d5f18bf83d652664d6778d1fab2eba0c1d6ef7781cc4c106e96217eca1cac0c1",
+        "config_hash": "3bdc4e63a7a6b00af0ec2a64f4c937575ec22800c9a52f96238e1c010c2d0592",
+        "index_hash": "f2a5a0fb11bdf9a91cdbfda07bc5f82c5f8d5c01bc8a62b016a9eab85aa695ea",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\longbench-zh\\development\\20260928T060258Z-8721f3bc72"
+      },
+      {
+        "dataset": "longbench-zh",
+        "phase": "optimize",
+        "profile": "standard",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 320,
+        "generation_case_count": 0,
+        "experiment_id": "29a52f74-e547-4172-8a09-d695a285632e",
+        "dataset_hash": "d5f18bf83d652664d6778d1fab2eba0c1d6ef7781cc4c106e96217eca1cac0c1",
+        "config_hash": "404c2a1abe5ec40c9f797b6df0292171e604420caecaffa3e4e68da32cf1e223",
+        "index_hash": "0d41031e54185d2ebc026cdeb62a099427f35a09b0b2d2034a5ce12e4dd3c179",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\longbench-zh\\development\\20260928T074111Z-442ee43dd3"
+      },
+      {
+        "dataset": "longbench-zh",
+        "phase": "qa",
+        "profile": "smoke",
+        "split": "development",
+        "status": "COMPLETED",
+        "sample_count": 12,
+        "generation_case_count": 4,
+        "experiment_id": "0e988d63-865d-4173-8b15-5dff07b038ad",
+        "dataset_hash": "d5f18bf83d652664d6778d1fab2eba0c1d6ef7781cc4c106e96217eca1cac0c1",
+        "config_hash": "072c9d929aea4fb9e5d16423e46f4e9ce196da90711d51d845bbbdd475cdfd21",
+        "index_hash": "f2a5a0fb11bdf9a91cdbfda07bc5f82c5f8d5c01bc8a62b016a9eab85aa695ea",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\longbench-zh\\development\\20260928T082622Z-f83949b20b"
+      },
+      {
+        "dataset": "longbench-zh",
+        "phase": "validate",
+        "profile": "standard",
+        "split": "locked_holdout",
+        "status": "COMPLETED",
+        "sample_count": 80,
+        "generation_case_count": 0,
+        "experiment_id": "79c99278-391d-4596-ab7d-a19c6d9b4fe5",
+        "dataset_hash": "d5f18bf83d652664d6778d1fab2eba0c1d6ef7781cc4c106e96217eca1cac0c1",
+        "config_hash": "c98b34c11068d8bd6ddeac3396044dd6670a19bfdb5763bc27206b7980578268",
+        "index_hash": "0d41031e54185d2ebc026cdeb62a099427f35a09b0b2d2034a5ce12e4dd3c179",
+        "model_digests": {
+          "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+          "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+        },
+        "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+        "run_dir": "D:\\RAG-Public-Bench\\runs\\longbench-zh\\locked_holdout\\20260928T093926Z-3cda58550a"
+      }
+    ]
+  },
+  "selected_locked_identities": [
+    {
+      "dataset": "scifact",
+      "phase": "validate",
+      "profile": "standard",
+      "split": "locked_holdout",
+      "status": "COMPLETED",
+      "sample_count": 300,
+      "generation_case_count": 0,
+      "experiment_id": "6d50fc0a-42c1-4d5d-a37b-c53db8c8923f",
+      "dataset_hash": "8608aa67e02a307745506d92316ebd0d1b2079226a576446c2bb5943e064f59f",
+      "config_hash": "33f92e99cb52c9d8f2cecec9a4aa647aacf497a8911a7e92a4597be0e8a4d60d",
+      "index_hash": "f6c8b191834638dfa8315adc158b1875ac69c0bef5ba2baac598734976aadb93",
+      "model_digests": {
+        "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+        "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+      },
+      "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+      "run_dir": "D:\\RAG-Public-Bench\\runs\\scifact\\locked_holdout\\20260928T083231Z-efc760238e"
+    },
+    {
+      "dataset": "miracl-zh",
+      "phase": "validate",
+      "profile": "standard",
+      "split": "locked_holdout",
+      "status": "COMPLETED",
+      "sample_count": 99,
+      "generation_case_count": 0,
+      "experiment_id": "ba03bc45-e713-470c-a197-4911c45b6e36",
+      "dataset_hash": "105dde269ea99ddee8ad0ebf8649631e88c3710be9ad2b54b4ced59e4a17ad29",
+      "config_hash": "886d82e90f67bdffafa99785955151fa3eec7030ec93dcdd5bb951950dde0ff6",
+      "index_hash": "629b25a5a14ea2ab960fa874c3b16e8cc77a61d0bb65e0e0847ce3c04d473c82",
+      "model_digests": {
+        "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+        "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+      },
+      "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+      "run_dir": "D:\\RAG-Public-Bench\\runs\\miracl-zh\\locked_holdout\\20260928T090914Z-7586bc13ce"
+    },
+    {
+      "dataset": "longbench-zh",
+      "phase": "validate",
+      "profile": "standard",
+      "split": "locked_holdout",
+      "status": "COMPLETED",
+      "sample_count": 80,
+      "generation_case_count": 0,
+      "experiment_id": "79c99278-391d-4596-ab7d-a19c6d9b4fe5",
+      "dataset_hash": "d5f18bf83d652664d6778d1fab2eba0c1d6ef7781cc4c106e96217eca1cac0c1",
+      "config_hash": "c98b34c11068d8bd6ddeac3396044dd6670a19bfdb5763bc27206b7980578268",
+      "index_hash": "0d41031e54185d2ebc026cdeb62a099427f35a09b0b2d2034a5ce12e4dd3c179",
+      "model_digests": {
+        "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+        "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+      },
+      "git_sha": "241d2c7ebdc4911e92a18bdc1e48307d85c87503",
+      "run_dir": "D:\\RAG-Public-Bench\\runs\\longbench-zh\\locked_holdout\\20260928T093926Z-3cda58550a"
+    }
+  ],
+  "candidate_records": [
+    {
+      "path": "D:\\RAG-Public-Bench\\runs\\candidates\\scifact\\34ce5e54-1c59-4be4-9e46-e65692d02aa4.json",
+      "sha256": "62B277C8C12349062842F0CF725A321EB0C152014C6E784FF367928B75EB3B00",
+      "candidate_status": null,
+      "selected_variant": null
+    },
+    {
+      "path": "D:\\RAG-Public-Bench\\runs\\candidates\\miracl-zh\\c13b3d0a-8e9c-4663-a583-c9b806adc4d2.json",
+      "sha256": "AE548F3F53BD107E2A0CD987D3579EBE4C4EE5663D0E324233DD1D8F612845BE",
+      "candidate_status": null,
+      "selected_variant": null
+    },
+    {
+      "path": "D:\\RAG-Public-Bench\\runs\\candidates\\longbench-zh\\29a52f74-e547-4172-8a09-d695a285632e.json",
+      "sha256": "7DA7859B31C4676D314EED3910747F5588DC9D11C5D9AAC135CF71A03BD23421",
+      "candidate_status": null,
+      "selected_variant": null
+    }
+  ],
+  "lock_records": [
+    {
+      "path": "D:\\RAG-Public-Bench\\runs\\locks\\scifact-locked-holdout.json",
+      "sha256": "169264C3A737A790CFA8F7D7DDE74C996AB94F73794725619B5E25C2D5F79729",
+      "status": "completed",
+      "run_id": "efc760238e",
+      "run_manifest_sha256": "690ee03a5d1bab494fdb43a885a70d14d5e9e91c1bc8e6a16bd218587e0616b7",
+      "query_set_sha256": null
+    },
+    {
+      "path": "D:\\RAG-Public-Bench\\runs\\locks\\miracl-zh-locked-holdout.json",
+      "sha256": "7690025AE30DEDEAA30DF5C1FB9EB4C2FB582BF94BC61638600F3621D69ABC03",
+      "status": "completed",
+      "run_id": "7586bc13ce",
+      "run_manifest_sha256": "44a0858c57aeb180dc6e49874b451de99dd3f1358e961c75bb6c4a5d41392cd0",
+      "query_set_sha256": null
+    },
+    {
+      "path": "D:\\RAG-Public-Bench\\runs\\locks\\longbench-zh-locked-holdout.json",
+      "sha256": "2CCF86EB222FCD4C40A689283002D45017E57AE8EE4B59361B33BB618E3D29DD",
+      "status": "completed",
+      "run_id": "3cda58550a",
+      "run_manifest_sha256": "c532e592a415736d9a27bfdf7f6caf7ed4ab30d89cd79705866909e0dfd181d4",
+      "query_set_sha256": null
+    }
+  ],
+  "interrupted_run": {
+    "status": "INTERRUPTED",
+    "aggregation_eligible": false,
+    "run_dir": "D:\\RAG-Public-Bench\\runs\\scifact\\development\\20260928T102515Z-8505c397eb",
+    "interrupted_json_sha256": "2979AAF07DA2144F4FEFB3EFB104B81D0E536D40BDAFAC51028F3B571F37319A",
+    "succeeded_ingestion_jobs": 1530,
+    "queued_ingestion_jobs": 3652,
+    "expired_leases": 1,
+    "chunks": 8256,
+    "embeddings": 8256,
+    "full_manifest_metrics_cases": false,
+    "index_hash": "NOT_AVAILABLE_PARTIAL_INDEX_NOT_SNAPSHOTTED",
+    "elapsed": "PT20M5.4S"
+  },
+  "model_digests": {
+    "chat": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+    "embedding": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab"
+  },
+  "report_generation": {
+    "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m eval_center.public_benchmark_cli --phase report --data-root 'D:\\RAG-Public-Bench'",
+    "exit_code": 0,
+    "outputs": [
+      "D:\\RAG-Public-Bench\\reports\\public-benchmark-optimization-report.md",
+      "C:\\Users\\22088\\.codex\\worktrees\\eval-center\\RAG quention\\docs\\reviews\\public-benchmark-optimization-report.md"
+    ]
+  },
+  "report_and_identity_hashes": [
+    {
+      "path": "D:\\RAG-Public-Bench\\reports\\public-benchmark-optimization-report.md",
+      "sha256": "A02FD1D45090EE1573EF4884F1440F78707D970F0D01B8A11C2F766428870B57",
+      "bytes": 12615,
+      "modified_utc": "2026-09-28T11:55:05.2773629Z"
+    },
+    {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\eval-center\\RAG quention\\docs\\reviews\\public-benchmark-optimization-report.md",
+      "sha256": "A02FD1D45090EE1573EF4884F1440F78707D970F0D01B8A11C2F766428870B57",
+      "bytes": 12615,
+      "modified_utc": "2026-09-28T11:55:05.2773629Z"
+    },
+    {
+      "path": "D:\\RAG-Public-Bench\\reports\\public-benchmark-case-analysis-20260928.md",
+      "sha256": "9A2D103EEB93DF2F75D6182D9610678EECC42686F452A4451EFFB1F5C15E0272",
+      "bytes": 29072,
+      "modified_utc": "2026-09-28T12:00:15.9889578Z"
+    },
+    {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\eval-center\\RAG quention\\docs\\reviews\\public-benchmark-case-analysis-20260928.md",
+      "sha256": "9A2D103EEB93DF2F75D6182D9610678EECC42686F452A4451EFFB1F5C15E0272",
+      "bytes": 29072,
+      "modified_utc": "2026-09-28T12:00:15.9889578Z"
+    },
+    {
+      "path": "D:\\RAG-Public-Bench\\reports\\completed-experiment-identities-20260928.json",
+      "sha256": "48CA41EAD8263EF172DE3973883852942E5A6C20BDE216B910B2E6438C96B356",
+      "bytes": 16276,
+      "modified_utc": "2026-09-28T10:45:21.2807657Z"
+    }
+  ],
+  "process_state": {
+    "benchmark_runner_processes_found": 0,
+    "ollama_loaded_models": 0,
+    "docker_database_container": "left running",
+    "database_service_modified": false,
+    "new_experiment_or_model_task_started_during_closeout": false,
+    "downloads_or_index_builds_started": false,
+    "cache_or_dataset_deletion_performed": false,
+    "remote_sync_or_deployment_performed": false
+  },
+  "next_recovery": {
+    "safe_resume_command": null,
+    "reason": "Existing runner has no partial DB resume path; its prior command starts ingestion/chunking/embedding again. A future recovery requires explicit approval and a verified clone/snapshot or purpose-built resume path.",
+    "non_resume_command": "scripts/run_public_benchmark.ps1 -Phase baseline -Dataset scifact -Profile standard -Split development -ChunkSize 400 -ChunkOverlap 40 -TopK 5 -CandidateK 32 -RrfK 30 -ContextBudgetChars 8000",
+    "executed": false
+  }
+}
