@@ -1,5 +1,15 @@
 # progress.md — 当前开发进度
 
+## 2026-10-11 主线整合与仓库清理（功能未验收）
+
+- `main` 已快进包含当前项目提交 `2e19b75`，并合并公开评测报告分支与 M4 前 25 题 Qwen 报告分支；合并提交分别为 `7056e73`、`41885a2`。
+- `.gitattributes` 冲突已人工合并：保留 PDF closure fixture 的 `-text -diff` 规则，并添加 M4 报告与结果文件的 LF 规则。
+- 已删除三个已并入 `main` 的本地分支引用：`codex/eval-center`、`codex/rag-retrieval-optimization-round1-20260930`、`codex/local-first-rag-v1-20260930`。GitHub 远端分支清理待本轮推送确认。
+- M3 评测/检索实验分支、M1/M2 评测实现分支和 `snapshot/teaching-20261002` 保留：仍有主线未包含的代码或历史证据。
+- 三个 C 盘链接 worktree 的只读 Git 状态检查返回访问拒绝；未删除其目录、分支或修改 ACL。
+- 两组完全相同文件仍保留：`backend/app/adapters/models/usage.py` 与 `backend/app/application/model_usage.py` 分属不同依赖层且各有调用点；冻结语料 `evaluations/trust_v1/corpus/design.md` 与设计原文相同，`sources.json` 仍以原文为来源。
+- `git diff --check origin/main...HEAD` 检出历史审计/设计/冻结评测文件中的行尾空白与 EOF 空行；为保留历史证据及冻结语料，未改写这些文件。测试、模型请求和数据库操作均未运行。
+
 - 当前里程碑：M4.5 / V1.0 质量闭环与发布验证；P0/P1 与 LangChain Smart 迁移已完成代码路径
 - 当前基线：分支 `main`；2026-09-27 V1 最后定向修复从 `2c73215` 开始，实现提交 `00bbf53` 与 Compose 验证记录提交 `50a63d4` 均已推送 `origin/main`。最新执行记录见文末；历史各节保留当时状态，不代表当前验收结论。未打 release tag。
 - 当前目标：个人、本地、多知识库、多模态 RAG 知识库问答 Agent V1.0。
