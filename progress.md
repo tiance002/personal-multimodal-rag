@@ -4,7 +4,7 @@
 
 - `main` 已快进包含当前项目提交 `2e19b75`，并合并公开评测报告分支与 M4 前 25 题 Qwen 报告分支；合并提交分别为 `7056e73`、`41885a2`。
 - `.gitattributes` 冲突已人工合并：保留 PDF closure fixture 的 `-text -diff` 规则，并添加 M4 报告与结果文件的 LF 规则。
-- 已删除三个已并入 `main` 的本地分支引用：`codex/eval-center`、`codex/rag-retrieval-optimization-round1-20260930`、`codex/local-first-rag-v1-20260930`。GitHub 远端分支清理待本轮推送确认。
+- 已删除三个已并入 `main` 的本地分支引用：`codex/eval-center`、`codex/rag-retrieval-optimization-round1-20260930`、`codex/local-first-rag-v1-20260930`。GitHub `main` 已同步；已删除远端 `codex/local-first-rag-v1-20260930` 与 `codex/m4-qwen-paired-first25-20260929`。
 - M3 评测/检索实验分支、M1/M2 评测实现分支和 `snapshot/teaching-20261002` 保留：仍有主线未包含的代码或历史证据。
 - 三个 C 盘链接 worktree 的只读 Git 状态检查返回访问拒绝；未删除其目录、分支或修改 ACL。
 - 两组完全相同文件仍保留：`backend/app/adapters/models/usage.py` 与 `backend/app/application/model_usage.py` 分属不同依赖层且各有调用点；冻结语料 `evaluations/trust_v1/corpus/design.md` 与设计原文相同，`sources.json` 仍以原文为来源。
