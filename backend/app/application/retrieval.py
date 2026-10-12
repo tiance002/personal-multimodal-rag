@@ -56,9 +56,9 @@ def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
 def score_keyword_hits(chunks: list[ChunkRecord], query: NormalizedQuery, limit: int) -> list[RankedHit]:
     """Frozen legacy TF scorer retained only for baseline comparisons.
 
-    Mirrors the PostgreSQL `chunk_terms` ranking so both repositories order
-    candidates the same way: summed term occurrences, plus a bonus when the
-    whole normalised query appears verbatim.
+    Reproduces the historical TF comparison, not current PostgreSQL BM25:
+    summed term occurrences plus a verbatim-query bonus. Keep this exported
+    helper for frozen comparisons; production keyword retrieval uses BM25.
     """
     hits: list[RankedHit] = []
     for chunk in chunks:

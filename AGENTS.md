@@ -68,49 +68,10 @@
 **“通过”的证据标准：命令是什么？退出码是什么？关键输出在哪里？** 不得用看似完成的文字代替真实运行。
 
 
-## Dynamic task execution contract (DYNAMIC-ROUTE-01 rev1)
+## 历史单次任务授权与协作记录
 
-This is the single project source for common execution constraints. Model routing
-and task responsibility are separate: FAST=gpt-6-luna/max;
-NORMAL=gpt-6.1-sol/medium; HARD=gpt-6.1-sol/xhigh. These are requested routes,
-not proof of serving identity. The parent/user assigns the route and responsibility
-in each id/revision/attempt contract. Workers never switch models or recursively
-dispatch; only the coordinating parent may dispatch. Do not install custom agents
-or change config.toml under this contract. Preserve disable_response_storage and
-existing auth/provider/billing/privacy/approval/sandbox settings.
-
-Every packet must name exact allowed read/write paths. The current implementation
-may write only this AGENTS.md appendix and preparation/evidence files under
-E:\codex_workspace\2026-10-01\task-2\dynamic-route-01. Read-only audit workers
-have no writable project targets; return their Evidence Packet to the parent.
-Do not scan outside their enumerated files, read .env/auth.json/token or sensitive
-sessions/private corpora, follow rejected paths, or use network/model APIs unless
-separately authorized. RAG code/data/indexes, services, credentials and the global
-DeepSeek ledger are outside all task write scopes. Preserve7 calls/855 tokens,
-entry disabled; no reset/restore or further DeepSeek/Langfuse request.
-
-At most3 substantive executions including the coordinating parent, with one
-assigned writer. The parent tracks active tasks and confirms cancellation before
-replacing them. A cancelled worker must stop new commands/writes and deliver
-existing evidence. Reuse task identity to prevent duplicate execution. Initial
-attempt plus at most1 evidence-driven repair; thereafter hand off or BLOCKED.
-Missing permissions, environment failures or missing evidence do not justify a
-stronger model. HARD requires an explicit complexity-based assignment.
-
-Evidence Packet: task id/revision/attempt, responsibility, requested model/effort,
-observable actual model/effort and exact source/limits (UNKNOWN if unavailable),
-HEAD plus dirty-snapshot identity, commands/exit codes/actual check counts,
-artifact hashes, failures and carried handoff evidence, available usage and elapsed
-time. Separate requested, configured, app-server-confirmed settings and upstream
-actual identity. Model self-report and disk config are not route proof. Never
-invent token/cost/timing or call UNKNOWN/PASS evidence interchangeable.
-
-Executors may recommend CHECKS_PASSED, BLOCKED or NEEDS_OWNER_REVIEW, never grant
-ACCEPTED, milestone approval, publication or deployment. The parent/user evaluates
-semantic results from raw questions/reference/context/answers. Existing automatic
-checks or executor judgments cannot replace independent evaluation. Simulation
-fixtures must say SIMULATED explicitly and retain their original evidence.
-
-These instructions are not an OS/tool hard boundary. Unless cancellation, single
-writer, concurrency, no-recursion and duplicate prevention are verified by control
-plane/tool enforcement, report MANUALLY_SUPERVISED_TRIAL, not fully automatic.
+DYNAMIC-ROUTE-01 的固定路径、旧次数和试点执行合同已原文归档到
+[对应历史任务](docs/history/dynamic-route-01-execution-contract-20261001.md)，不作为当前常驻服务授权。
+保留通用边界：明确读写范围、协调单一写入者、不得递归派发或覆盖其他会话修改；
+请求路由不是实际模型身份的证明；旧评测 grant、失败证据和 UNKNOWN 账本不得重置或伪造。
+新服务调用仍必须符合本文件隐私、Scope、费用与证据规则及有效负责人授权。
