@@ -1,6 +1,6 @@
 """Do not label a sent-but-unproven cap test as an unsent free request."""
 from backend.app.ports.providers import ProviderRequestNotSent, ProviderUnavailable
-from scripts.probe_ordinary_output import failure_state, prior_allows_continuation, ACKNOWLEDGED_UNKNOWN, FOLLOWUP_UNKNOWN
+from scripts.probe_ordinary_output import failure_state, prior_allows_continuation, ACKNOWLEDGED_UNKNOWN, FOLLOWUP_UNKNOWN, REPAIRED_TRANSPORT_UNKNOWN
 
 
 def test_proof_denial_after_response_is_sent_not_proven():
@@ -34,3 +34,10 @@ def test_new_stop_requires_separate_exact_owner_acknowledgment():
     assert not prior_allows_continuation(latest, True)
     assert prior_allows_continuation(latest, True, True)
     assert not prior_allows_continuation({'state': 'UNKNOWN', 'run_id': 'another-new-unknown'}, True, True)
+
+
+def test_post_repair_stop_still_needs_new_decision_and_cannot_ack_future_calls():
+    latest = {'state': 'UNKNOWN', 'run_id': REPAIRED_TRANSPORT_UNKNOWN}
+    assert not prior_allows_continuation(latest, True, True)
+    assert prior_allows_continuation(latest, True, True, True)
+    assert not prior_allows_continuation({'state': 'UNKNOWN', 'run_id': 'future-unknown'}, True, True, True)

@@ -30,6 +30,7 @@ KB = 'd78f3434-0e8f-40bf-afcb-f1c2c311ff51'
 DOC = '1fd5a928-d3d7-4bae-aa00-fc74701f61e5'
 ACKNOWLEDGED_UNKNOWN = '046c3327-5dd9-4d44-a6e6-876897da41ab'
 FOLLOWUP_UNKNOWN = '72917fff-bd37-4607-b3db-7c7e402d3fbf'
+REPAIRED_TRANSPORT_UNKNOWN = '33a016bc-41d1-4340-a072-5dd50b594af1'
 OWNER_BATCH_ROOT = Path('/data/storage/weknora-probes-20261012')
 PROMPT = SYNTHETIC_OUTPUT_PROBE
 
@@ -50,14 +51,16 @@ def save(path, value):
     temp.replace(path)
 
 
-def prior_allows_continuation(row, acknowledged_unknown=False, acknowledge_followup=False):
+def prior_allows_continuation(row, acknowledged_unknown=False, acknowledge_followup=False,
+                             acknowledge_repaired_transport=False):
     if row['state'] in {'VERIFIED', 'NOT_SENT'}:
         return True
     if row['state'] == 'NOT_PROVEN':
         return row.get('provider_diagnostic', {}).get('token_settlement') == 'settled'
     return bool(row['state'] == 'UNKNOWN' and (
         acknowledged_unknown and row.get('run_id') == ACKNOWLEDGED_UNKNOWN or
-        acknowledge_followup and row.get('run_id') == FOLLOWUP_UNKNOWN))
+        acknowledge_followup and row.get('run_id') == FOLLOWUP_UNKNOWN or
+        acknowledge_repaired_transport and row.get('run_id') == REPAIRED_TRANSPORT_UNKNOWN))
 
 
 def main():
@@ -69,13 +72,16 @@ def main():
     # Explicit operator opt-in only after a fresh owner decision. This does not
     # release/retry either acknowledged identity or increase the seven-call cap.
     parser.add_argument('--acknowledge-followup-unknown', choices=[FOLLOWUP_UNKNOWN])
-    parser.add_argument('--new-probe-label', choices=['owner-followup-1'])
+    parser.add_argument('--acknowledge-repaired-transport-unknown', choices=[REPAIRED_TRANSPORT_UNKNOWN])
+    parser.add_argument('--new-probe-label', choices=['owner-followup-1', 'owner-followup-2'])
     args = parser.parse_args()
     if args.root.resolve() != OWNER_BATCH_ROOT:
         raise RuntimeError('OWNER_BATCH_ROOT_REQUIRED')
     if args.new_probe_label and (not args.acknowledge_followup_unknown or
             (args.role, args.cap) != ('chat_expensive', 4096)):
         raise RuntimeError('FRESH_FOLLOWUP_PROBE_REQUIRED')
+    if args.new_probe_label == 'owner-followup-2' and not args.acknowledge_repaired_transport_unknown:
+        raise RuntimeError('FRESH_POST_REPAIR_OWNER_DECISION_REQUIRED')
     args.root.mkdir(parents=True, exist_ok=True)
     suffix = '-' + args.new_probe_label if args.new_probe_label else ''
     receipt = args.root / f'probe-v{OUTPUT_PROBE_PROMPT_VERSION}-{args.role}-{args.cap}{suffix}.json'
@@ -83,7 +89,8 @@ def main():
         raise RuntimeError('EXISTING_PROBE_RECEIPT_NO_RESEND')
     prior = [json.loads(p.read_text()) for p in args.root.glob('probe-*.json')]
     limit = 7 if args.acknowledge_unknown else 6
-    if len(prior) >= limit or any(not prior_allows_continuation(p, args.acknowledge_unknown, args.acknowledge_followup_unknown)
+    if len(prior) >= limit or any(not prior_allows_continuation(p, args.acknowledge_unknown,
+            args.acknowledge_followup_unknown, args.acknowledge_repaired_transport_unknown)
                                  for p in prior):
         raise RuntimeError('PROBE_BATCH_STOP_REQUIRED')
     c = build_container(apply_config(Settings.from_env()))

@@ -87,10 +87,16 @@ class _ObservedHTTPSConnection(http.client.HTTPSConnection):
             try:
                 super().connect()
             except (OSError, URLError) as error:
-                self.close()
                 # Only this direct connect-stage EOF proves no HTTP bytes.
                 # No certificate, response/read, or possibly-sent retry.
-                if ordinal==1 and isinstance(error,ssl.SSLEOFError):continue
+                if ordinal==1 and isinstance(error,ssl.SSLEOFError):
+                    # connect() can run inside send() for an in-flight HTTP
+                    # request. HTTPConnection.close() would reset that request
+                    # to Idle, so retire only the failed pre-HTTP socket here.
+                    if self.sock is not None:self.sock.close()
+                    self.sock=None
+                    continue
+                self.close()
                 raise _ConnectionNotSent(error,ordinal) from None
             try:
                 if self.before_send is not None:self.before_send()

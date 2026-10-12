@@ -1,5 +1,6 @@
 """OFFLINE/SIMULATED sockets: certificate/hostname guards and no-send proof."""
 import http.client
+import io
 import ssl
 from types import SimpleNamespace
 
@@ -44,6 +45,69 @@ def test_only_pre_http_eof_reconnects_once_and_rechecks_fence(monkeypatch):
     connection.connect()
     assert events[:5]==['fence','connect','fence','connect','fence']
     assert 0<events[5][1]<=10
+
+
+class MemoryHTTPSocket:
+    """In-memory HTTP bytes only; no DNS, TLS, network or credential access."""
+    def __init__(self, writes):
+        self.writes, self.closed = writes, False
+    def settimeout(self, timeout):
+        assert 0 < timeout <= 10
+    def sendall(self, data):
+        self.writes.append(bytes(data))
+    def makefile(self, *args, **kwargs):
+        return io.BytesIO(b'HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\n{}')
+    def close(self):
+        self.closed = True
+
+
+def test_eof_reconnect_preserves_inflight_http_request_and_reads_response(monkeypatch):
+    attempts, writes, fences = [], [], []
+    failed_socket = MemoryHTTPSocket([])
+    successful_socket = MemoryHTTPSocket(writes)
+    def connect(connection):
+        attempts.append(1)
+        if len(attempts) == 1:
+            connection.sock = failed_socket
+            raise ssl.SSLEOFError(8, 'SIMULATED_PRE_HTTP_EOF')
+        connection.sock = successful_socket
+    monkeypatch.setattr(http.client.HTTPSConnection, 'connect', connect)
+    connection = cloud._ObservedHTTPSConnection('example.invalid', timeout=10,
+        before_send=lambda: fences.append(1))
+    connection.request('POST', '/chat/completions', body=b'{}',
+                       headers={'Content-Type': 'application/json'})
+    assert len(attempts) == 2 and len(fences) == 3
+    assert failed_socket.closed and not failed_socket.writes
+    assert sum(data.startswith(b'POST ') for data in writes) == 1
+    assert b''.join(writes).endswith(b'\r\n\r\n{}')
+    response = connection.getresponse()
+    assert response.status == 200 and response.read() == b'{}'
+    connection.close()
+
+
+@pytest.mark.parametrize('failure', ['terminal_eof', 'certificate', 'revocation'])
+def test_complete_http_request_connect_failures_send_zero_http_bytes(monkeypatch, failure):
+    attempts, writes, fences = [], [], []
+    failed_socket = MemoryHTTPSocket(writes)
+    def connect(connection):
+        attempts.append(1)
+        connection.sock = failed_socket
+        if failure == 'certificate':
+            raise ssl.SSLCertVerificationError(1, 'SIMULATED')
+        raise ssl.SSLEOFError(8, 'SIMULATED')
+    def fence():
+        fences.append(1)
+        if failure == 'revocation' and len(fences) == 2:
+            raise ProviderRequestNotSent('MODEL_PRETRANSPORT_FENCE_DENIED')
+    monkeypatch.setattr(http.client.HTTPSConnection, 'connect', connect)
+    connection = cloud._ObservedHTTPSConnection('example.invalid', timeout=10, before_send=fence)
+    with pytest.raises(ProviderRequestNotSent) as caught:
+        connection.request('POST', '/chat/completions', body=b'{}')
+    assert not writes and failed_socket.closed
+    assert len(attempts) == (2 if failure == 'terminal_eof' else 1)
+    if failure != 'revocation':
+        assert type(caught.value) is cloud._ConnectionNotSent
+    connection.close()
 
 
 def test_certificate_failure_has_one_attempt(monkeypatch):
@@ -122,7 +186,10 @@ def test_only_trusted_connection_failure_releases_current_reservation(monkeypatc
 def test_late_tls_error_stays_unknown_not_not_sent(monkeypatch):
     monkeypatch.setenv('SILICONFLOW_API_KEY','SIMULATED_KEY')
     guard=SimulatedGuard()
-    def late_failure(request,timeout):raise ssl.SSLEOFError(8,'PRIVATE_AFTER_WRITE')
+    attempts=[]
+    def late_failure(request,timeout):
+        attempts.append(1)
+        raise ssl.SSLEOFError(8,'PRIVATE_AFTER_WRITE')
     adapter=cloud.SiliconFlowEmbedding(ModelRegistry.frozen_defaults().select('embedding'),
         enabled=True,usage_guard=guard,transport=late_failure,chunking_index_identity=ChunkingConfig().identity,
         admission=cloud.EmbeddingAdmission(lambda text:3,tokenizer_identity='SIMULATED',non_truncating_verified=True))
@@ -130,6 +197,7 @@ def test_late_tls_error_stays_unknown_not_not_sent(monkeypatch):
         with pytest.raises(ProviderUnavailable):adapter.embed(['PUBLIC'],5)
     assert guard.settlements==[('1',None,True)]
     assert adapter.receipts[-1]['settlement']=='UNKNOWN'
+    assert len(attempts)==1
 
 
 @pytest.mark.parametrize('value',[0,-1,121,True,30.5])
