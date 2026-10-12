@@ -48,3 +48,4 @@ Baseline: b4aa3ec5ff82497fdf9f9f00cdacf75e3128edd3. Code only; no business data/
 | `frontend/tests/scope-sync.spec.ts` | Focused offline/browser fixture or regression; SIMULATED provider/PG authority; actual local tokenizer tests identified separately. |
 | `frontend/tests/stale-message-scope.spec.ts` | Focused offline/browser fixture or regression; SIMULATED provider/PG authority; actual local tokenizer tests identified separately. |
 | `frontend/tests/table-header-hint.spec.ts` | Focused offline/browser fixture or regression; SIMULATED provider/PG authority; actual local tokenizer tests identified separately. |
+| `progress.md` | Current Goal handoff and approval boundary; no runtime behavior. |

@@ -1,6 +1,6 @@
 # G0-G4 verification report
 
-Baseline main b4aa3ec5ff82497fdf9f9f00cdacf75e3128edd3. G1 local commit: e90ecebca3f3346ff0e08ca49a8eca4147064b57. Runtime source/image/config/DB identity are NOT VERIFIED in this batch.
+Baseline main b4aa3ec5ff82497fdf9f9f00cdacf75e3128edd3. G1 local commit: e90ecebca3f3346ff0e08ca49a8eca4147064b57. G2/G3 local commit: 4d01144. Runtime source/image/config/DB identity are NOT VERIFIED in this batch.
 
 ## Gates
 
@@ -44,4 +44,3 @@ Root initialmistyped test_run_lifecycle.py path: pytestexit1 filemissing/no test
 Originalq0 is the user's studyquestion; preserved KB d78f3434-0e8f-40bf-afcb-f1c2c311ff51,doc1fd5a928-d3d7-4bae-aa00-fc74701f61e5. HistoricalRun d1eee158-93d3-4bac-b78a-5aab154d4221/oldfailure56f2e64b-fdda-4387-81c2-57a854b54ff4 retained. NewRunID NONE,providerusageNONE,citationHTTPevidenceNOT RUN. Oldresult is not newimplementation acceptance.
 
 Before approved realverification: restoreDocker, check actualUI/API/Workerimage digest/configrevision/DBhead and exactScope/remainingledger; obtain currentprovideroutputproof through authorized boundedprobes. No old V6grant, quotareset, KBconsentchange, DBschema/data mutation, push/tag/release. Goal remains awaiting this gate; OFFLINE_PASS is not E2E_PASS.
-
