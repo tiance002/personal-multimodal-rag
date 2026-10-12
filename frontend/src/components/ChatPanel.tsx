@@ -8,11 +8,14 @@ import {
 } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { DocumentItem, KnowledgeBase, Message } from "../app/state";
+import type { DocumentItem, KnowledgeBase, Message, RunTimeline } from "../app/state";
 import { clarificationText, evidenceHintText, runDiagnosticText } from "../app/state";
+import { RunProgress } from "./RunProgress";
 
 type Props = {
   messages: Message[];
+  runTimelines: Record<string, RunTimeline>;
+  onCancelWait: () => void;
   bases: KnowledgeBase[];
   documents: DocumentItem[];
   selectedBaseId: string | null;
@@ -61,6 +64,8 @@ function ScopeOption({
 
 export function ChatPanel({
   messages,
+  runTimelines,
+  onCancelWait,
   bases,
   documents,
   selectedBaseId,
@@ -227,6 +232,13 @@ export function ChatPanel({
                 ) : null}
               </div>
             </article>
+            {message.role === "user" && message.run_id && runTimelines[message.run_id] && (
+              <RunProgress timeline={runTimelines[message.run_id]} onCancel={onCancelWait} />
+            )}
+            {message.role === "assistant" && message.run_id &&
+              !messages.some(row => row.role === "user" && row.run_id === message.run_id) && runTimelines[message.run_id] && (
+              <RunProgress timeline={runTimelines[message.run_id]} />
+            )}
             {diagnostic && (
               <article className="message assistant diagnostic" data-run-id={message.run_id}>
                 <div className="message-role">索引台</div>

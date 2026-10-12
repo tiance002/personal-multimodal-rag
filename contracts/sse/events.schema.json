@@ -4,13 +4,21 @@
   "title": "Personal RAG V1 SSE event",
   "type": "object",
   "additionalProperties": false,
-  "required": ["seq", "event", "data"],
+  "required": [
+    "seq",
+    "event",
+    "data"
+  ],
   "properties": {
-    "seq": { "type": "integer", "minimum": 1 },
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
     "event": {
       "type": "string",
       "enum": [
         "run.created",
+        "run.progress",
         "retrieval.started",
         "retrieval.completed",
         "tool.started",
@@ -21,6 +29,96 @@
         "run.failed"
       ]
     },
-    "data": { "type": "object" }
-  }
+    "data": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "const": "run.progress"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "schema_version",
+              "stage",
+              "status"
+            ],
+            "properties": {
+              "schema_version": {
+                "const": "run-progress/v1"
+              },
+              "stage": {
+                "enum": [
+                  "run",
+                  "understand",
+                  "retrieval",
+                  "evidence",
+                  "generation",
+                  "validation"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "started",
+                  "completed",
+                  "failed",
+                  "truncated"
+                ]
+              },
+              "attempt_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+              },
+              "role": {
+                "enum": [
+                  "cheap",
+                  "expensive"
+                ]
+              },
+              "candidate_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "selected_evidence_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "duration_ms": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "reason_code": {
+                "enum": [
+                  "CANCELLED",
+                  "CLOUD_EGRESS_DISABLED",
+                  "INSUFFICIENT_EVIDENCE",
+                  "MODEL_NOT_READY",
+                  "MODEL_OUTPUT_TRUNCATED",
+                  "MODEL_REQUEST_NOT_SENT",
+                  "MODEL_UNAVAILABLE",
+                  "MONTHLY_BUDGET_EXCEEDED",
+                  "NO_CANDIDATES",
+                  "OUTPUT_CAPACITY_UNSUPPORTED",
+                  "OUTPUT_CAPACITY_UNVERIFIED",
+                  "RUN_LEASE_LOST",
+                  "SECTION_TRUNCATED",
+                  "STAGE_FAILED",
+                  "UNSUPPORTED_ANSWER"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

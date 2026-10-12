@@ -41,7 +41,7 @@ class RecordingRunStore:
         self.completed.append((run_id, status, error_code))
 
     def event_names(self) -> list[str]:
-        return [event for _, event, _ in self.events]
+        return [event for _, event, _ in self.events if event != "run.progress"]
 
 
 def _conversation():
@@ -71,8 +71,8 @@ def test_quick_answer_records_the_frozen_event_sequence():
 
     assert outcome.error_code is None
     assert runs.event_names() == ["run.created", "retrieval.started", "run.metrics", "retrieval.completed", "evidence.frozen", "answer.completed"]
-    assert runs.events[2][2]["query_id"] == outcome.run_id
-    assert runs.events[2][2]["selected_context_chunk_ids"] == ["c"]
+    assert next(data for _, event, data in runs.events if event == "run.metrics")["query_id"] == outcome.run_id
+    assert next(data for _, event, data in runs.events if event == "run.metrics")["selected_context_chunk_ids"] == ["c"]
     assert runs.evidence == [("run-1", ["E1"])]
     assert runs.hits == [("run-1", ["c"])]
     assert runs.completed == [("run-1", "completed", None)]

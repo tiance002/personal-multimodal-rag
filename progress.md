@@ -334,3 +334,12 @@
 3. 结果：有限公开样本真实问答/引用/恢复有既有PASS证据；G4原hello新诊断仍MODEL_UNAVAILABLE：BGE与Xing成功、Xing输出未过Validator后DeepSeek升级TLS层异常。旧失败原因UNKNOWN，不反推；不关闭证书校验、自动重试、切模型或释放UNKNOWN。全任务未验收，Goal active。
 4. 风险与遗留：DeepSeek当前真实生成需受控复核；新未知模型能力适配/Rerank实际调用未启用；31历史分层违规不为此次全仓重构。没有负责人延期批准、发布验收或Tag。
 5. 版本与下一步：main基底d13951af，准备故障修复提交，再独立历史AGENTS附录归档/冗余说明提交；证据与checkpoint保持忽略。不得删除源/Gold/迁移/旧引用/失败/UNKNOWN记录。MANUALLY_SUPERVISED_TRIAL。
+
+
+## 2026-10-12 WeKnora ordinary output / progress / SSE Goal
+
+1. Goal and changes: fixed WeKnora3e8b0bfc source mapping; independent ordinary output policy/counters, immutable attempts, safe committed progress, assistant-side timeline and scoped long-request recovery. G1 local commit e90eceb; G2/G3 source and handoff staged separately. Existing retrieval/router score, final validator/PG transaction, ledger/UNKNOWN and historical grants unchanged.
+2. Commands/evidence: docs/audits/weknora-ordinary-output-progress/TEST_REPORT.md and G1_NOTES/UI_NOTES list actual commands/exits. Root289offline tests passed, later14readiness/progress and41final-commit tests passed; related75browser tests plus final16passed; TypeScript/Vitebuild exit0. Globalcontract exit1,31baseline layering violations/0new; OpenAPI/SSE checks pass.
+3. Result: OFFLINE_PASS for scoped implementation. Runtime identity BLOCKED: DockerDesktop engine absent,14188/8000unreachable. Real output probes, neworiginal-question replay/currentcitationHTTP, service replacement and businessDB operations NOT RUN. Not E2E_PASS or owner acceptance.
+4. Risks: real1024 output unknown and refusedbeforetransport;2048/4096 notenabled. No silent512fallback. Existing grants/quotas/consent/UNKNOWN notmodified. G5cleanup NOT RUN pending functional validation. No push/tag/release.
+5. Next minimum task: ownerapproved runtime restoration/identity check and bounded hosted output probes, then3distinct authorized ordinary questions with actual stages/usage/citation readback. Keep sameGoal checkpoint var/codex-goals/weknora-ordinary-20261012.json; do not rerun alloffline tests if their scopedinputs remainunchanged.

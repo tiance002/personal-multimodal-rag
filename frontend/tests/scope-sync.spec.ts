@@ -87,7 +87,7 @@ test("a delayed knowledge-base PATCH blocks sending until the server scope chang
   await page.route("**/api/v1/conversations/conv-1/messages", (route) => {
     if (route.request().method() === "POST") {
       sentScopes.push(serverScope);
-      return route.fulfill({ json: { data: { run_id: "", answer: "回答", citations: [] }, meta: { request_id: "r" } } });
+      return route.fulfill({ json: { data: { run_id: route.request().postDataJSON().request_id, answer: "回答", citations: [] }, meta: { request_id: "r" } } });
     }
     return route.fulfill({ json: { data: [], meta: { request_id: "r" } } });
   });
@@ -251,7 +251,7 @@ test("an in-flight question cannot be moved to another knowledge base", async ({
     if (route.request().method() === "GET") return route.fulfill({ json: { data: [], meta: { request_id: "r" } } });
     await answerGate;
     sentScope = serverScope;
-    return route.fulfill({ status: 201, json: { data: { run_id: "", answer: "回答", citations: [] }, meta: { request_id: "r" } } });
+    return route.fulfill({ status: 201, json: { data: { run_id: route.request().postDataJSON().request_id, answer: "回答", citations: [] }, meta: { request_id: "r" } } });
   });
   await page.route("**/api/v1/conversations/conv-1", (route) => {
     serverScope = "kb-b";
@@ -284,7 +284,7 @@ test("conversation creation in flight keeps the selected knowledge base fixed", 
   await page.route("**/api/v1/conversations/conv-1/messages", (route) => {
     if (route.request().method() === "POST") {
       expectedScope = (route.request().postDataJSON() as { expected_knowledge_base_scope: string[] }).expected_knowledge_base_scope;
-      return route.fulfill({ status: 201, json: { data: { run_id: "", answer: "A", citations: [] }, meta: { request_id: "r" } } });
+      return route.fulfill({ status: 201, json: { data: { run_id: route.request().postDataJSON().request_id, answer: "A", citations: [] }, meta: { request_id: "r" } } });
     }
     return route.fulfill({ json: { data: [], meta: { request_id: "r" } } });
   });
@@ -322,4 +322,7 @@ test("a server scope conflict reselects the actual knowledge base and blocks ano
   await page.getByRole("button", { name: "发送问题" }).click();
   await expectBase(page, "B");
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
+});
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/v1/**", route => route.fulfill({ status: 404, json: { error: { code: "OFFLINE_ONLY" } } }));
 });

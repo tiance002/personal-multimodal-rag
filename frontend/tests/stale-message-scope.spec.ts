@@ -121,7 +121,7 @@ test("a new conversation draft creates on send without an empty history reload",
   await page.route("**/api/v1/knowledge-bases/kb-a/documents", (route) => route.fulfill({ json: { data: [], meta: { request_id: "r" } } }));
   await page.route("**/api/v1/conversations/conv-old/messages", (route) => route.fulfill({ json: { data: [], meta: { request_id: "r" } } }));
   await page.route("**/api/v1/conversations/conv-new/messages", async (route) => {
-    if (route.request().method() === "POST") return route.fulfill({ status: 201, json: { data: { run_id: "", answer: "新会话回答", citations: [] }, meta: { request_id: "r" } } });
+    if (route.request().method() === "POST") return route.fulfill({ status: 201, json: { data: { run_id: route.request().postDataJSON().request_id, answer: "新会话回答", citations: [] }, meta: { request_id: "r" } } });
     historyReads++;
     await newGate;
     return route.fulfill({ json: { data: [], meta: { request_id: "r" } } });
@@ -152,7 +152,7 @@ test("implicit conversation creation skips history reload and retains its answer
     : route.fulfill({ json: { data: [], meta: { request_id: "r" } } }));
   await page.route("**/api/v1/knowledge-bases/kb-a/documents", (route) => route.fulfill({ json: { data: [], meta: { request_id: "r" } } }));
   await page.route("**/api/v1/conversations/conv-first/messages", async (route) => {
-    if (route.request().method() === "POST") return route.fulfill({ status: 201, json: { data: { run_id: "", answer: "首次回答", citations: [] }, meta: { request_id: "r" } } });
+    if (route.request().method() === "POST") return route.fulfill({ status: 201, json: { data: { run_id: route.request().postDataJSON().request_id, answer: "首次回答", citations: [] }, meta: { request_id: "r" } } });
     historyReads++;
     await newGate;
     return route.fulfill({ json: { data: [], meta: { request_id: "r" } } });

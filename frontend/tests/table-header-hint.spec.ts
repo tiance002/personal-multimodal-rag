@@ -38,7 +38,7 @@ async function base(page: Page, response: any, history: any[] = [], mode: "quick
     { id: "other", title: "其他会话", knowledge_base_scope: ["other-kb"], document_scope: [] },
   ], meta: {} } }));
   await page.route("**/api/v1/conversations/conv/messages", route => {
-    if (route.request().method() === "POST") { expect(route.request().postDataJSON().mode).toBe(mode); posts++; return route.fulfill({ status: 201, json: { data: response, meta: {} } }); }
+    if (route.request().method() === "POST") { expect(route.request().postDataJSON().mode).toBe(mode); posts++; return route.fulfill({ status: 201, json: { data: { ...response, run_id: route.request().postDataJSON().request_id }, meta: {} } }); }
     return route.fulfill({ json: { data: history, meta: {} } });
   });
   await page.route("**/api/v1/conversations/other/messages", route => route.fulfill({ json: { data: [{ role: "assistant", content: "其他会话的历史" }], meta: {} } }));

@@ -23,6 +23,7 @@ from backend.app.ports.providers import ProviderRequestNotSent
 from backend.app.application.table_header_hint import valid_hint
 from backend.app.application.run_lifecycle import current_execution
 from backend.app.ports.run_lifecycle import LifecycleDenied
+from backend.app.application.run_progress import RunProgress
 
 
 @dataclass(frozen=True)
@@ -170,6 +171,8 @@ class AnswerService:
         if (metrics := current_metrics()) is not None:
             metrics.query_id = run_id
         self.runs.append_event(run_id, "run.created", {"run_id": run_id})
+        progress = RunProgress(self.runs, run_id)
+        progress.emit("run", "started")
         self.runs.append_message(conversation_id, "user", content, run_id=run_id)
         self.runs.append_event(run_id, "retrieval.started", {"scope": kb_scope, "document_scope": document_scope})
 
@@ -180,6 +183,7 @@ class AnswerService:
         scope = Scope.from_ids(kb_scope, document_scope)
         if self._is_cancelled(run_id):
             return self._cancelled_outcome(run_id, mode)
+        progress.emit("understand", "started")
         understanding = None
         if self.query_understand is not None:
             from backend.app.ports.query_understand import QueryUnderstandDenied
@@ -230,6 +234,7 @@ class AnswerService:
             if self.follow_up_enabled:
                 resolution, resolver_trace = self._resolve_history(content, conversation_id, kb_scope, document_scope, run_id)
                 source_run_id = resolution.source_run_ids[0] if len(resolution.source_run_ids) == 1 else "UNKNOWN"
+        progress.emit("understand", "completed")
         execution_question = resolution.question if resolution.used else content
         follow_up_used = bool(resolution.source_run_ids)
         resolution_args = ({"retrieval_query": execution_question, "validated_follow_up": resolution}
@@ -300,6 +305,7 @@ class AnswerService:
                     cloud_allowed_by_kb=cloud_allowed_by_kb,
                     local_query_gateway=self.local_query_gateway,
                     on_retrieval=self.runs.persist_retrieval_hits,
+                    on_progress=progress.emit,
                     is_cancelled=lambda: self._is_cancelled(run_id),
                     **({'conversation_id': conversation_id} if getattr(self.quick_chain, 'context_manager', None) is not None else {}),
                     **({'query_understanding':understanding} if understanding is not None else {}),
@@ -322,9 +328,11 @@ class AnswerService:
                 return self._cancelled_outcome(run_id, mode, trace)
 
             if error_code is None:
+                progress.emit("validation", "started")
                 error_code = self.knowledge_gateway.evidence.commit_check.check(
                     answer, snapshots, commit_plan, answer_type=answer_type,
                     finish_reason=finish_reason or trace.get("finish_reason"), citations=citations)
+                progress.emit("validation", "completed" if error_code is None else "failed", reason_code=error_code)
                 trace["final_commit_check"] = "PASS" if error_code is None else error_code
                 if error_code:
                     answer, citations, snapshots = "", (), ()

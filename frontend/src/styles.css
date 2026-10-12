@@ -1662,3 +1662,19 @@ p {
   font-size: 12px;
   font-weight: 550;
 }
+/* Real Run state stays beside the assistant answer, outside message content. */
+.run-progress { margin: 8px 0 18px; max-width: 670px; padding: 10px 14px; border-left: 2px solid #d4e6dc; background: #f7faf8; border-radius: 0 8px 8px 0; color: #51645a; font-size: 13px; }
+.run-progress-header { display: flex; align-items: center; gap: 12px; }
+.run-progress-header > button:first-child { display: flex; align-items: center; gap: 8px; flex: 1; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; padding: 2px 0; }
+.run-progress-toggle { margin-left: auto; color: #6c8275; font-size: 12px; }
+.run-progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #73a48b; flex-shrink: 0; }
+.run-progress.pending .run-progress-dot { background: #09b873; }
+.run-progress.failed .run-progress-dot { background: #b9764c; }
+.run-progress-cancel { border: 0; background: transparent; color: #748177; font-size: 12px; cursor: pointer; }
+.run-progress-stages { list-style: none; padding: 4px 0 0 14px; margin: 4px 0 0; border-left: 1px solid #dce7df; }
+.run-progress-stages li { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.run-stage-status { color: #88948c; margin-left: auto; font-size: 12px; }
+.stage-started .run-stage-status { color: #078956; }
+.stage-failed .run-stage-status, .stage-truncated .run-stage-status { color: #a96f47; }
+.run-progress-stages small { flex-basis: 100%; color: #7e8b82; font-size: 12px; }
+.run-progress button:focus-visible { outline: 2px solid #09b873; outline-offset: 3px; border-radius: 3px; }

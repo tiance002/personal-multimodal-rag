@@ -36,7 +36,7 @@ async function base(page: Page, response: Record<string, unknown>, history: unkn
     { id: "conv-a", title: "Replay A", knowledge_base_scope: ["kb-a"], document_scope: [] },
     { id: "conv-b", title: "Replay B", knowledge_base_scope: ["kb-b"], document_scope: [] },
   ], meta: {} } }));
-  await page.route("**/api/v1/conversations/conv-a/messages", route => route.fulfill({ status: route.request().method() === "POST" ? status : 200, json: route.request().method() === "POST" ? (status < 400 ? { data: response, meta: {} } : response) : { data: history, meta: {} } }));
+  await page.route("**/api/v1/conversations/conv-a/messages", route => route.fulfill({ status: route.request().method() === "POST" ? status : 200, json: route.request().method() === "POST" ? (status < 400 ? { data: { ...response, run_id: route.request().postDataJSON().request_id }, meta: {} } : response) : { data: history, meta: {} } }));
   await page.route("**/api/v1/conversations/conv-b/messages", route => route.fulfill({ json: { data: [{ role: "assistant", content: "Other conversation" }], meta: {} } }));
   await page.goto("/");
   await page.getByRole("button", { name: "Replay A", exact: true }).click();
@@ -111,7 +111,7 @@ test("a pending replay cannot be duplicated or switched into another conversatio
   await base(page, clarify);
   await page.route("**/api/v1/conversations/conv-a/messages", async route => {
     if (route.request().method() !== "POST") return route.fulfill({ json: { data: [], meta: {} } });
-    posts++; await gate; await route.fulfill({ status: 201, json: { data: clarify, meta: {} } });
+    posts++; await gate; await route.fulfill({ status: 201, json: { data: { ...clarify, run_id: route.request().postDataJSON().request_id }, meta: {} } });
   });
   await send(page); await expect.poll(() => posts).toBe(1);
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
@@ -136,7 +136,7 @@ test("running refresh remains neutral and never implies an incomplete question",
     if (route.request().method() !== "POST") return route.fulfill({ json: { data: history, meta: {} } });
     posts++; running = true; history.push({ role: "user", content: "Running question" });
     await gate; running = false;
-    await route.fulfill({ status: 201, json: { data: clarify, meta: {} } }).catch(() => undefined);
+    await route.fulfill({ status: 201, json: { data: { ...clarify, run_id: route.request().postDataJSON().request_id }, meta: {} } }).catch(() => undefined);
   });
   try {
     await send(page); await expect.poll(() => posts).toBe(1);

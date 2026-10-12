@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { api, sendMessageWithEvents, retrievalFailureText } from "../api/client";
-import { clarificationText, evidenceHintText, runDiagnosticText, tableHeaderHint, validRunDiagnostic, validClarificationPresentation } from "./state";
+import { readRunEvents } from "../api/sse";
+import { applyRunEvent, finishRunTimeline, clarificationText, evidenceHintText, runDiagnosticText, tableHeaderHint, validRunDiagnostic, validClarificationPresentation } from "./state";
 import type {
   AppState,
   Conversation,
@@ -9,6 +10,7 @@ import type {
   IngestionJob,
   KnowledgeBase,
   Message,
+  RunTimeline,
   ViewMode,
 } from "./state";
 import { ChatPanel } from "../components/ChatPanel";
@@ -65,6 +67,14 @@ export default function App() {
   );
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [runTimelines, setRunTimelines] = useState<Record<string, RunTimeline>>({});
+  const activeWait = useRef<AbortController | null>(null);
+  useEffect(() => () => { activeWait.current?.abort(); }, []);
+  const cancelWait = () => {
+    activeWait.current?.abort();
+    setRunTimelines(current => Object.fromEntries(Object.entries(current).map(([id, row]) =>
+      [id, row.status === "pending" ? finishRunTimeline(row, "cancelled") : row])));
+  };
   const [citation, setCitation] = useState<{
     quote: string;
     current_status: string;
@@ -224,13 +234,18 @@ export default function App() {
       conversationId,
       scopeKey: messageScopeKey,
     };
+    if (skipHistoryLoadFor.current === conversationId) {
+      skipHistoryLoadFor.current = null;
+      return;
+    }
+    activeWait.current?.abort();
+    activeWait.current = null;
+    sendPendingRef.current = false;
+    setSending(false);
+    setRunTimelines({});
     const epoch = ++messageRequestEpoch.current;
     if (!conversationId) {
       setMessages([]);
-      return;
-    }
-    if (skipHistoryLoadFor.current === conversationId) {
-      skipHistoryLoadFor.current = null;
       return;
     }
     // Changing scope in the same conversation clears the old transcript, but
@@ -243,9 +258,11 @@ export default function App() {
       return;
     }
     let cancelled = false;
+    const historyController = new AbortController();
+    activeWait.current = historyController;
     setMessages([]);
     void api
-      .listMessages(conversationId)
+      .listMessages(conversationId, historyController.signal)
       .then((items) => {
         if (
           !cancelled &&
@@ -253,6 +270,31 @@ export default function App() {
           !sendPendingRef.current
         ) {
           setMessages(items);
+          const runIds = [...new Set(items.flatMap(row => row.run_id ? [row.run_id] : []))];
+          for (const runId of runIds) {
+            setRunTimelines(current => ({ ...current, [runId]: { runId, lastSeq: 0, status: "pending", stages: [] } }));
+            void readRunEvents(runId, conversationId, event => {
+              if (cancelled || messageRequestEpoch.current !== epoch || sendPendingRef.current) return;
+              setRunTimelines(current => current[runId] ? { ...current, [runId]: applyRunEvent(current[runId], event) } : current);
+              // User-only history may belong to a Run still executing at refresh.
+              // Reload committed messages after terminal; never synthesize tokens.
+              if ((event.event === "answer.completed" || event.event === "run.failed") &&
+                  !items.some(row => row.run_id === runId && (row.role === "assistant" || row.presentation))) {
+                void api.listMessages(conversationId, historyController.signal).then(saved => {
+                  if (!cancelled && !historyController.signal.aborted && messageRequestEpoch.current === epoch && !sendPendingRef.current) setMessages(saved);
+                }).catch(() => undefined);
+              }
+            }, { signal: historyController.signal, startupWaitMs: 0 }).then(() => {
+              if (cancelled || messageRequestEpoch.current !== epoch || sendPendingRef.current) return;
+              setRunTimelines(current => {
+                const row = current[runId];
+                if (!row || row.status !== "pending") return current;
+                const saved = items.find(item => item.run_id === runId && item.role === "assistant");
+                const diagnostic = items.find(item => item.run_id === runId && item.role === "user" && item.presentation);
+                return { ...current, [runId]: finishRunTimeline(row, saved ? "completed" : diagnostic ? "failed" : "unknown") };
+              });
+            });
+          }
           setNotice(
             runDiagnosticText(items.at(-1))
               ? "回答未完成"
@@ -276,6 +318,8 @@ export default function App() {
       });
     return () => {
       cancelled = true;
+      historyController.abort();
+      if (activeWait.current === historyController) activeWait.current = null;
     };
   }, [state.activeConversationId, messageScopeKey]);
   useEffect(() => {
@@ -674,15 +718,21 @@ export default function App() {
       !kbId
     )
       return;
+    activeWait.current?.abort();
     sendPendingRef.current = true;
     closeCitation();
     messageRequestEpoch.current++;
     setSending(true);
     const documentScope = [...state.documentScope];
+    let streamEpoch = messageRequestEpoch.current;
+    const controller = new AbortController();
+    activeWait.current = controller;
+    let activeRunId: string | undefined;
     let conversationId = state.activeConversationId;
     try {
       if (!conversationId) {
         const conversation = await api.createConversation(kbId, documentScope);
+        if (controller.signal.aborted || messageRequestEpoch.current !== streamEpoch) return;
         const titled = { ...conversation, title: content.slice(0, 36) };
         setConversations((current) => [titled, ...current]);
         conversationId = conversation.id;
@@ -705,7 +755,7 @@ export default function App() {
       setNotice(
         mode === "smart" ? "智能推理正在读取当前知识库" : "正在检索当前知识库",
       );
-      const streamEpoch = messageRequestEpoch.current;
+      streamEpoch = messageRequestEpoch.current;
       const result = await sendMessageWithEvents(
         conversationId,
         content,
@@ -714,13 +764,24 @@ export default function App() {
         documentScope,
         (event) => {
           if (messageRequestEpoch.current !== streamEpoch) return;
+          if (activeRunId) setRunTimelines(current => current[activeRunId!] ?
+            { ...current, [activeRunId!]: applyRunEvent(current[activeRunId!], event) } : current);
           // Stage notices only. Candidate text never enters the transcript.
           if (event.event === 'retrieval.started') setNotice('正在检索当前知识库');
           if (event.event === 'evidence.frozen') setNotice('证据已冻结，正在完成回答');
           if (event.event === 'answer.completed') setNotice('回答已完成，证据已冻结');
           if (event.event === 'run.failed') setNotice('回答未完成，正在读取运行状态');
         },
+        { signal: controller.signal, onRun: runId => {
+          activeRunId = runId;
+          setRunTimelines(current => ({ ...current, [runId]: { runId, lastSeq: 0, status: "pending", stages: [] } }));
+          setMessages(current => current.map((row, index) => index === current.length - 1 && row.role === "user"
+            ? { ...row, run_id: runId } : row));
+        } },
       );
+      if (controller.signal.aborted || messageRequestEpoch.current !== streamEpoch) return;
+      if (activeRunId) setRunTimelines(current => current[activeRunId!] ? { ...current,
+        [activeRunId!]: finishRunTimeline(current[activeRunId!], result.error_code ? "failed" : "completed") } : current);
       const isClarification =
         result.trace?.execution_mode === "clarification" &&
         result.trace?.clarification_required === true &&
@@ -767,6 +828,9 @@ export default function App() {
             : "回答已完成，证据已冻结",
       );
     } catch (error) {
+      if (messageRequestEpoch.current !== streamEpoch) return;
+      if (activeRunId) setRunTimelines(current => current[activeRunId!] ? { ...current,
+        [activeRunId!]: finishRunTimeline(current[activeRunId!], controller.signal.aborted ? "cancelled" : "unknown") } : current);
       if (
         error instanceof Error &&
         error.message.includes("CONVERSATION_SCOPE_CHANGED") &&
@@ -793,8 +857,11 @@ export default function App() {
         }
       } else setNotice(error instanceof Error ? error.message : "问答失败");
     } finally {
-      sendPendingRef.current = false;
-      setSending(false);
+      if (activeWait.current === controller) {
+        activeWait.current = null;
+        sendPendingRef.current = false;
+        setSending(false);
+      }
     }
   };
   const changeView = (viewMode: ViewMode) =>
@@ -858,6 +925,8 @@ export default function App() {
             <div className="chat-page">
               <ChatPanel
                 messages={messages}
+                runTimelines={runTimelines}
+                onCancelWait={cancelWait}
                 bases={bases}
                 documents={documents}
                 selectedBaseId={state.selectedKnowledgeBaseId}

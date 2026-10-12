@@ -1,6 +1,6 @@
 import type { Conversation, DocumentItem, IngestionJob, KnowledgeBase, Message, EvidenceHint } from "../app/state";
 import { clarificationText, tableHeaderHint, validRunDiagnostic } from "../app/state";
-import { readRunEvents, type StreamEvent } from "./sse";
+import { readRunEvents, type StreamEvent, type RunEventOptions } from "./sse";
 
 const API = "/api/v1";
 export type MemoryItem = { id: string; scope_type: 'GLOBAL' | 'SCOPED'; kind: string; fact_key: string; content: string; status: string; origin: string; version: number; sources: unknown[] };
@@ -27,6 +27,10 @@ export function retrievalFailureText(result: AnswerResponse): string | null {
 
 type Envelope<T> = { data: T; meta: { request_id: string } };
 
+class ApiRequestError extends Error {
+  constructor(message: string, readonly status: number) { super(message); }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API}${path}`, {
     ...init,
@@ -35,9 +39,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const body = (await response.json()) as Envelope<T> | { error?: { code?: string; message?: string }; detail?: { type?: string; loc?: unknown[] }[] };
   if (response.status === 422 && "detail" in body && Array.isArray(body.detail) &&
       body.detail.some(row => row.type === "string_too_long" && row.loc?.join(".") === "body.content")) {
-    throw new Error("INPUT_LIMIT：问题最多允许 4096 个字符，请缩短或分次提问");
+    throw new ApiRequestError("INPUT_LIMIT：问题最多允许 4096 个字符，请缩短或分次提问", response.status);
   }
-  if (!response.ok) throw new Error("error" in body ? `${body.error?.code ?? "REQUEST_FAILED"}: ${body.error?.message ?? "请求失败"}` : "请求失败");
+  if (!response.ok) throw new ApiRequestError("error" in body ? `${body.error?.code ?? "REQUEST_FAILED"}: ${body.error?.message ?? "请求失败"}` : "请求失败", response.status);
   return (body as Envelope<T>).data;
 }
 
@@ -72,9 +76,9 @@ export const api = {
   retryIngestionJob: (jobId: string) => request<IngestionJob>(`/ingestion-jobs/${jobId}/retry`, { method: "POST" }),
   listConversations: () => request<Conversation[]>("/conversations"),
   createConversation: (kbId: string, documentScope: string[] = []) => request<Conversation>("/conversations", { method: "POST", body: JSON.stringify({ knowledge_base_scope: [kbId], document_scope: documentScope, title: "新对话" }) }),
-  listMessages: (conversationId: string) => request<Message[]>(`/conversations/${conversationId}/messages`),
+  listMessages: (conversationId: string, signal?: AbortSignal) => request<Message[]>(`/conversations/${conversationId}/messages`, { signal }),
   updateConversation: (conversationId: string, patch: { knowledge_base_scope?: string[]; document_scope?: string[]; title?: string }) => request<Conversation>(`/conversations/${conversationId}`, { method: "PATCH", body: JSON.stringify(patch) }),
-  sendMessage: (conversationId: string, content: string, mode: "quick" | "smart", knowledgeBaseScope: string[], documentScope: string[], requestId: string = crypto.randomUUID()) => request<AnswerResponse>(`/conversations/${conversationId}/messages`, { method: "POST", body: JSON.stringify({ content, mode, request_id: requestId, expected_knowledge_base_scope: knowledgeBaseScope, expected_document_scope: documentScope }) }),
+  sendMessage: (conversationId: string, content: string, mode: "quick" | "smart", knowledgeBaseScope: string[], documentScope: string[], requestId: string = crypto.randomUUID(), signal?: AbortSignal) => request<AnswerResponse>(`/conversations/${conversationId}/messages`, { method: "POST", signal, body: JSON.stringify({ content, mode, request_id: requestId, expected_knowledge_base_scope: knowledgeBaseScope, expected_document_scope: documentScope }) }),
   getContent: (documentId: string) => request<{ content: string; assets: unknown[] }>(`/documents/${documentId}/content`),
   documentSourceUrl: (documentId: string) => `${API}/documents/${documentId}/source`,
   documentPreviewUrl: (documentId: string) => `${API}/documents/${documentId}/preview`,
@@ -91,59 +95,89 @@ export const api = {
   },
 };
 
-/** One POST, concurrent scoped GET recovery; only committed terminal text. */
+/** One POST races a terminal from the same server-scoped committed GET. */
 export async function sendMessageWithEvents(conversationId: string, content: string, mode: "quick" | "smart",
-  knowledgeBaseScope: string[], documentScope: string[], onEvent: (event: StreamEvent) => void): Promise<AnswerResponse> {
+  knowledgeBaseScope: string[], documentScope: string[], onEvent: (event: StreamEvent) => void,
+  options: RunEventOptions & { onRun?: (runId: string) => void } = {}): Promise<AnswerResponse> {
   const identity = crypto.randomUUID();
   const controller = new AbortController();
-  let recovered: AnswerResponse | undefined;
-  const post = api.sendMessage(conversationId, content, mode, knowledgeBaseScope, documentScope, identity);
-  const stream = readRunEvents(identity, conversationId, (event) => {
-    if ((event.event === 'answer.completed' || event.event === 'run.failed') &&
-        typeof event.data.answer === 'string' && Array.isArray(event.data.citations) &&
-        event.data.citations.every((label: unknown) => typeof label === 'string')) {
-      recovered = { run_id: identity, answer: event.data.answer, citations: event.data.citations as string[],
-        error_code: typeof event.data.error_code === 'string' ? event.data.error_code : undefined };
-    }
-    onEvent(event);
-  }, { signal: controller.signal });
-  try {
-    return await post;
-  } catch (error) {
-    // A server-confirmed scope rejection precedes Run creation. Resync the
-    // authoritative scope immediately instead of waiting for a nonexistent Run.
-    if (error instanceof Error && error.message.includes("CONVERSATION_SCOPE_CHANGED")) {
-      controller.abort();
-      throw error;
-    }
-    // A lost POST response is not evidence of a failed/unsent model request.
-    await stream;
-    if (recovered) {
-      // Recover presentation from scoped committed history, never candidate SSE
-      // text, an error-code guess, or another POST that could regenerate.
-      if (recovered.error_code && recovered.citations.length === 0) {
-        try {
-          const history = await api.listMessages(conversationId);
-          const message = history.find(row => row.role === "user" && row.run_id === identity);
-          const clarification = clarificationText(message);
-          if (message?.run_id === identity && validRunDiagnostic(message.presentation)) {
-            recovered = { ...recovered, presentation: message.presentation };
-          }
-          if (recovered.error_code === "NO_CANDIDATES" && clarification) {
-            recovered = { ...recovered, answer: clarification,
-              presentation: message?.presentation as import("../app/state").ClarificationPresentation,
-              trace: { execution_mode: "clarification", clarification_required: true } };
-          } else if (recovered.error_code === "INSUFFICIENT_EVIDENCE" && tableHeaderHint(message?.presentation)) {
-            recovered = { ...recovered, answer: message.presentation.text,
-              trace: { evidence_hint: message.presentation } };
-          }
-        } catch { /* Unavailable authority retains the explicit unknown result. */ }
+  let finished = false;
+  const abort = () => controller.abort();
+  options.signal?.addEventListener("abort", abort, { once: true });
+  if (options.signal?.aborted) abort();
+  const waitMs = Math.max(210_000, options.waitTimeoutMs ?? 240_000);
+  const timer = setTimeout(abort, waitMs);
+  let rejectAbort: (reason: unknown) => void = () => {};
+  const aborted = new Promise<never>((_, reject) => { rejectAbort = reject; });
+  const onAbort = () => rejectAbort(new Error(options.signal?.aborted
+    ? "CANCELLED：已停止等待此请求" : "RUN_STATUS_UNKNOWN：等待运行状态超时，请刷新当前会话；未重新生成"));
+  controller.signal.addEventListener("abort", onAbort, { once: true });
+  if (controller.signal.aborted) onAbort();
+  options.onRun?.(identity);
+  let terminal: StreamEvent | undefined;
+  let postError: unknown;
+  // Catch rejection immediately, including a late rejection after GET won.
+  const post = api.sendMessage(conversationId, content, mode, knowledgeBaseScope, documentScope, identity, controller.signal)
+    .then(result => {
+      if (result?.run_id !== identity || typeof result.answer !== "string" || !Array.isArray(result.citations) ||
+          !result.citations.every(label => typeof label === "string")) {
+        throw new Error("RUN_STATUS_UNKNOWN：回复的运行标识不匹配，等待当前运行的已提交结果");
       }
-      return recovered;
+      return result;
+    })
+    .catch(error => {
+      postError = error;
+      if (error instanceof ApiRequestError && error.status >= 400 && error.status < 500) throw error;
+      return new Promise<AnswerResponse>(() => {});
+    });
+  const stream = readRunEvents(identity, conversationId, event => {
+    if (finished || controller.signal.aborted) return;
+    if ((event.event === "answer.completed" || event.event === "run.failed") &&
+        typeof event.data.answer === "string" && Array.isArray(event.data.citations) &&
+        event.data.citations.every(label => typeof label === "string")) terminal = event;
+    onEvent(event);
+  }, { ...options, signal: controller.signal });
+  const recovery = stream.then(async (): Promise<AnswerResponse> => {
+    if (!terminal) throw postError ?? new Error("RUN_STATUS_UNKNOWN：暂无已确认的回复，请刷新当前会话；未重新生成");
+    const saved = terminal.data;
+    let recovered: AnswerResponse = { run_id: identity, answer: saved.answer as string, citations: saved.citations as string[],
+      error_code: typeof saved.error_code === "string" ? saved.error_code : undefined };
+    // GET /events has already checked Run/conversation/current KB/document scope
+    // against committed PostgreSQL state. History must still select this exact
+    // Run; no candidate token or guessed diagnostic can become an answer.
+    try {
+      const history = await api.listMessages(conversationId, controller.signal);
+      if (!recovered.error_code) {
+        const answer = history.find(row => row.role === "assistant" && row.run_id === identity &&
+          row.content === recovered.answer && JSON.stringify(row.citations ?? []) === JSON.stringify(recovered.citations));
+        if (!answer) throw new Error("RUN_STATUS_UNKNOWN：已结束的运行尚无匹配的已保存回复，请刷新当前会话");
+      } else if (recovered.citations.length === 0) {
+        const message = history.find(row => row.role === "user" && row.run_id === identity);
+        const clarification = clarificationText(message);
+        if (validRunDiagnostic(message?.presentation)) recovered = { ...recovered, presentation: message.presentation };
+        if (recovered.error_code === "NO_CANDIDATES" && clarification) {
+          recovered = { ...recovered, answer: clarification,
+            presentation: message?.presentation as import("../app/state").ClarificationPresentation,
+            trace: { execution_mode: "clarification", clarification_required: true } };
+        } else if (recovered.error_code === "INSUFFICIENT_EVIDENCE" && tableHeaderHint(message?.presentation)) {
+          recovered = { ...recovered, answer: message.presentation.text, trace: { evidence_hint: message.presentation } };
+        }
+      }
+    } catch (error) {
+      if (!recovered.error_code || controller.signal.aborted) throw error;
+      // A failed Run can keep its explicit error, never fabricate presentation.
     }
-    throw error;
+    return recovered;
+  });
+  try {
+    return await Promise.race([post, recovery, aborted]);
   } finally {
+    finished = true;
+    clearTimeout(timer);
+    options.signal?.removeEventListener("abort", abort);
+    controller.signal.removeEventListener("abort", onAbort);
     controller.abort();
-    await stream;
+    // Do not await an uncooperative POST/body reader after authoritative finish.
+    void stream.catch(() => undefined);
   }
 }
