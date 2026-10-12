@@ -65,3 +65,16 @@ Earlier source reads named nonexistent frontend App.tsx/ordinary-recovery.spec.t
 Candidate image/native Linux verification and actual deployment evidence are added below when executed. Source-level/offline repair PASS is not real DeepSeek capacity or RAG success. No three-question replay, current factual answer/citation readback/reload, or G5 cleanup has run.
 
 Under the owner-approved stop condition, a fresh decision is required for the single remaining seventh DeepSeek4096 probe on the repaired candidate, followed only after known valid capacity evidence by the original scoped three-question fenced replay. This would not enlarge7/3/75000. All three UNKNOWN remain included. Any new UNKNOWN halts again. No Push/Tag/release or owner acceptance is claimed. **未实现的命令不得报告通过。**
+
+## Candidate image / native Linux evidence
+
+Source repair commit `47f3445` built as `personal-rag:weknora-tls-state-20261012`, with OCI revision label set to the actual full commit SHA. `docker build -f deploy/Dockerfile.api -t personal-rag:weknora-tls-state-20261012 --label "org.opencontainers.image.revision=$($taskSourceSha.Trim())" .` (taskSourceSha was actual `git rev-parse HEAD`): **exit0**. Image config `sha256:0859d4c8319fc1a48132eefbb3ca0c2ab614cb6547fdb1acbbdac9bed3e900c4`, manifest list `sha256:cfd161ba200916708eb4d0f33a9d0d7b46b829bb8cf84fc3d2cbbfd339f05668`.
+
+```powershell
+$taskSmokePath = (Resolve-Path -LiteralPath scripts/smoke_ordinary_deepseek_tls.py).Path
+docker run --rm --network none --mount "type=bind,source=$taskSmokePath,target=/tmp/smoke_ordinary_deepseek_tls.py,readonly" -e PYTHONPATH=/app personal-rag:weknora-tls-state-20261012 python /tmp/smoke_ordinary_deepseek_tls.py
+```
+
+**exit0 / PASS**, actual candidate Python3.11.16; check kind OFFLINE_ACTUAL_HTTP_STATE_MACHINE_SIMULATED_SOCKETS. Four cases PASS with same counts as above. provider_calls0, network_calls0, database_calls0. The actual repaired cloud module was imported from the candidate image; no private env file or DB volume was mounted, networking was disabled and the image migration CMD was replaced with the explicit Python command.
+
+Candidate **built and natively tested, NOT DEPLOYED**. Live API/Worker remain on image5de88de8... and original source5ec3b65..., old proofacfa33...; there was no live service swap after the latest UNKNOWN. Native passing sockets do not prove a live provider response. Deployment, final capacity probe and original/short/long webpage recovery/citation verification still require the fresh decision described above.
