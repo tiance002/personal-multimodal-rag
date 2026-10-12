@@ -53,6 +53,13 @@ def test_duration_unit_cannot_borrow_from_uncited_evidence():
     assert FinalAnswerCommitCheck().check('复习间隔为1、7、16、35天 [E1]',sources,EvidencePlan('学习'))=='UNSUPPORTED_ANSWER'
 
 
+def test_legal_duration_lists_from_two_cited_sources_remain_valid():
+    sources = snapshots(prose('保持7-8小时睡眠。'),
+                        replace(prose('运动20-30分钟。'), chunk_id='another'))
+    answer = '保持7-8小时睡眠 [E1]；运动20-30分钟 [E2]'
+    assert FinalAnswerCommitCheck().check(answer, sources, EvidencePlan('学习')) is None
+
+
 def test_partial_structured_answer_checks_covered_row_without_inventing_missing_target():
     plan = EvidencePlan("two targets", targets=(EvidenceTarget("松林门店", "收入", "2025-02"),
                                                EvidenceTarget("柏林门店", "收入", "2025-02")), kind="parallel")

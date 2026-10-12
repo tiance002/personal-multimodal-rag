@@ -21,7 +21,8 @@ def policy(limit=100):
         'deepseek', 'deepseek-flash', ('chat_expensive', 'vision'), limit, 1, 1)
 
 
-def test_normal_truncated_answer_settles_received_usage_without_accepting_answer(ledger,monkeypatch):
+@pytest.mark.parametrize('output,text', [(512, 'incomplete candidate'), (1024, 'incomplete candidate'), (1024, '')])
+def test_normal_truncated_answer_settles_received_usage_without_accepting_answer(ledger,monkeypatch,output,text):
     from backend.app.adapters.models.cloud import CloudChat
     from backend.app.ports.service_policy import ServiceModelBinding
     from backend.app.ports.providers import TruncatedAnswer
@@ -38,8 +39,8 @@ def test_normal_truncated_answer_settles_received_usage_without_accepting_answer
     class Transport:
         execution_kind='SIMULATED'
         def __call__(self,request,timeout):
-            return dict(model=spec.model_id,choices=[dict(finish_reason='length',message={'content':'incomplete candidate'})],
-                        usage={'prompt_tokens':2,'completion_tokens':512,'total_tokens':514})
+            return dict(model=spec.model_id,choices=[dict(finish_reason='length',message={'content':text})],
+                        usage={'prompt_tokens':2,'completion_tokens':output,'total_tokens':output+2})
     adapter=CloudChat(spec,enabled=True,usage_guard=guard,transport=Transport(),
         service_binding=ServiceModelBinding(p,Capacity(),guard))
     scope=Scope.from_ids(['SIMULATED-kb'])
@@ -54,12 +55,12 @@ def test_normal_truncated_answer_settles_received_usage_without_accepting_answer
     try:
         with model_access('chat_cheap',allowed=True,scope=scope),pytest.raises(TruncatedAnswer):
             adapter.generate_with_service_scope([{'role':'user','content':'PUBLIC'}],timeout_seconds=1,
-                max_tokens=512,scope=scope,request_id='SIMULATED-truncation')
+                max_tokens=output,scope=scope,request_id='SIMULATED-truncation')
     finally:
         current_attempt.reset(attempt_token);execution_owner.reset(owner_token);current_execution.reset(context_token)
     with ledger.engine.connect() as c:
         row=c.execute(select(calls)).mappings().one()
-    assert row['state']=='settled' and row['actual_input']==2 and row['actual_output']==512
+    assert row['state']=='settled' and row['actual_input']==2 and row['actual_output']==output
 
 
 @pytest.fixture

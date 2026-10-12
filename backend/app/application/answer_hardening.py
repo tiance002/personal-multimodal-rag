@@ -77,6 +77,22 @@ def generation_budget(intents: IntentPlan, context_chars: int) -> GenerationBudg
     return GenerationBudget('SIMPLE', 512)
 
 
+
+def ordinary_generation_budget(intents: IntentPlan) -> GenerationBudget:
+    """Answer length policy only; never changes retrieval or routing scores."""
+    question = ' '.join(intents.intents)
+    if re.search(r'详细|详尽|全面|深入|长篇|对比|比较|逐步|分步骤|逐项|完整步骤|代码|\b(?:detailed|comprehensive|in.depth|compare|comparison|step.by.step|code)\b', question, re.I):
+        return GenerationBudget('LONG', 4096)
+    if re.search(r'简短|简洁|简要|一句话|\b(?:brief|briefly|concise|short)\b', question, re.I):
+        return GenerationBudget('SHORT', 1024)
+    if len(intents.intents) >= 3:
+        return GenerationBudget('LONG', 4096)
+    if len(intents.intents) >= 2:
+        return GenerationBudget('STANDARD', 2048)
+    if re.search(r'解释|说明|原理|原因|为什么|如何|怎么|总结|\b(?:explain|why|how|summari[sz]e)\b', question, re.I):
+        return GenerationBudget('STANDARD', 2048)
+    return GenerationBudget('SHORT', 1024)
+
 def topic_anchors(intent: str) -> list[str]:
     text = re.sub(r'^(?:请|分别|解释|说明|介绍|根据资料|资料中|文档中|资料所说的|文档所说的)\s*', '', intent)
     text = re.split(r'什么|如何|怎么|哪些|多少|是否|为何|为什么|怎样|有何', text)[0]

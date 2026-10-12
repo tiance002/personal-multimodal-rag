@@ -26,6 +26,28 @@ def test_selected_models_share_deepseek_cap_and_exclude_pro():
     assert policies['embedding'].zero_quote and policies['chat_cheap'].zero_quote
 
 
+def test_ordinary_output_readiness_is_explicit_without_endpoint_probe(monkeypatch):
+    from types import SimpleNamespace as NS
+    from backend.app.adapters.models.runtime_readiness import configuration_readiness
+    monkeypatch.setenv('SILICONFLOW_API_KEY', 'SIMULATED-NOT-A-KEY')
+    monkeypatch.setenv('DEEPSEEK_API_KEY', 'SIMULATED-NOT-A-KEY')
+    output = dict(local_reviewed_caps=[512, 1024], endpoint_output_evidence='UNKNOWN',
+                  hosted_recipe_equivalence='UNKNOWN')
+    factory = NS(registry=ModelRegistry.frozen_defaults(), enabled_roles={'chat_cheap', 'chat_expensive'},
+                 service_bindings={role: NS(capacity=NS(output_readiness=output))
+                                   for role in ('chat_cheap', 'chat_expensive')})
+    container = NS(settings=Settings(service_model_policy_json=policy_json(), rule_router_enabled=True,
+                                     redis_url='redis://127.0.0.1:1'),
+                   store=NS(embedding_provider=None), quick_chain=NS(context_manager=None),
+                   provider_factory=factory, service_capacity_errors={})
+    result = configuration_readiness(container)
+    for role in ('chat_cheap', 'chat_expensive'):
+        assert result['roles'][role]['status'] == 'NOT_READY'
+        assert result['roles'][role]['ordinary_output'] == output
+        assert 'OUTPUT_CAPACITY_UNVERIFIED' in result['roles'][role]['reasons']
+    assert result['runtime_verified'] is False
+
+
 @pytest.mark.parametrize('change', ['pro', 'duplicate_role', 'zero_unquoted', 'bool_version'])
 def test_malformed_or_mismatched_policy_fails_closed(change):
     raw = json.loads(policy_json())

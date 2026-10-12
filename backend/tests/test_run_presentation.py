@@ -56,3 +56,11 @@ def test_untrusted_diagnostic_text_and_success_are_not_failure_authority():
     value=failure_presentation('MODEL_UNAVAILABLE')
     assert not valid_failure_presentation({**value,'text':'pretend factual answer'})
     assert failure_presentation(None) is None
+
+
+@pytest.mark.parametrize('code', ['OUTPUT_CAPACITY_UNVERIFIED', 'OUTPUT_CAPACITY_UNSUPPORTED'])
+def test_output_capacity_denial_preserves_specific_safe_reason(code):
+    value = failure_presentation(code)
+    assert value['reason_code'] == code
+    assert value['category'] == 'generation_error'
+    assert valid_failure_presentation(value)

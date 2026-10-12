@@ -20,7 +20,7 @@ from backend.app.application.retrieval import RetrievalItem
 from backend.app.domain.scope import Scope
 from backend.app.application.execution_routing import ExecutionRouter, ExecutionRoute
 from backend.app.application.run_metrics import current_metrics
-from backend.app.application.answer_hardening import detect_intents, generation_budget, MARKER, normalize_marker_spacing
+from backend.app.application.answer_hardening import detect_intents, generation_budget, ordinary_generation_budget, MARKER, normalize_marker_spacing
 from backend.app.application.follow_up import FollowUpResolution, interpretation_data
 from backend.app.application.question_checklist import explicit_question_checklist
 from backend.app.application.table_header_hint import header_hint, REASON as TABLE_HEADER_REASON
@@ -44,8 +44,13 @@ class QuickSettings:
     router_policy: RouterPolicy | None = None
     answer_output_token_cap: int | None = None
     concise_budgeted_answer: bool = False
+    ordinary_output_budget: bool = False
 
     def __post_init__(self):
+        if type(self.ordinary_output_budget) is not bool:
+            raise ValueError("QUICK_ORDINARY_POLICY_INVALID")
+        if self.ordinary_output_budget and self.answer_output_token_cap is not None:
+            raise ValueError("QUICK_OUTPUT_CAP_CONFLICT")
         if type(self.concise_budgeted_answer) is not bool:
             raise ValueError('QUICK_CONCISE_POLICY_INVALID')
         if self.answer_output_token_cap is not None and (
@@ -99,6 +104,7 @@ class LangChainQuickChain:
         run_id: str | None = None,
         cloud_allowed_by_kb: dict[str, bool] | None = None,
         local_query_gateway: Any | None = None,
+        on_progress: Callable[..., None] | None = None,
         on_retrieval: Callable[[str, Sequence[RetrievalItem]], None] | None = None,
         retrieval_query: str | None = None,
         validated_follow_up: FollowUpResolution | None = None,
@@ -116,6 +122,7 @@ class LangChainQuickChain:
             "cloud_allowed_by_kb": cloud_allowed_by_kb or {},
             "local_query_gateway": local_query_gateway if local_query_gateway is not None else self.answer_gateway,
             "on_retrieval": on_retrieval,
+            "on_progress": on_progress,
             "is_cancelled": is_cancelled or (lambda: False),
             "caller_run_id": run_id is not None,
             "conversation_id": conversation_id,
@@ -175,6 +182,17 @@ class LangChainQuickChain:
                 if deadline <= datetime.now(timezone.utc):
                     raise ProviderRequestNotSent(denial)
 
+    @staticmethod
+    def _progress(payload, stage, status, **fields):
+        if 'role' in fields:
+            fields['role'] = fields['role'].removeprefix('chat_')
+        callback = payload.get('on_progress')
+        if callback is not None:
+            try:
+                callback(stage, status, **fields)
+            except Exception:
+                pass  # Observability cannot alter the answer transaction.
+
     def _prepare(self, payload: dict[str, Any]) -> dict[str, Any]:
         question = str(payload["question"])
         scope: Scope = payload["scope"]
@@ -232,14 +250,20 @@ class LangChainQuickChain:
                 )
 
         citation_service = CitationService(InMemoryCitationStore())
-        plan, retrieval = self.knowledge_gateway.retrieve_question(
-            scope,
-            str(payload["retrieval_query"]),
-            local_query_gateway=payload["local_query_gateway"],
-            local_query_enabled=settings.local_query_enabled,
-            local_query_timeout_seconds=settings.local_query_timeout_seconds,
-            understanding=payload.get('query_understanding'),
-        )
+        self._progress(payload, "retrieval", "started")
+        try:
+            plan, retrieval = self.knowledge_gateway.retrieve_question(
+                scope,
+                str(payload["retrieval_query"]),
+                local_query_gateway=payload["local_query_gateway"],
+                local_query_enabled=settings.local_query_enabled,
+                local_query_timeout_seconds=settings.local_query_timeout_seconds,
+                understanding=payload.get('query_understanding'),
+            )
+        except Exception:
+            self._progress(payload, "retrieval", "failed")
+            raise
+        self._progress(payload, "retrieval", "completed", candidate_count=len(retrieval.items))
         observer = payload.get("on_retrieval")
         if observer is not None:
             observer(run_id, retrieval.items)
@@ -269,6 +293,7 @@ class LangChainQuickChain:
             return self._terminal(payload, self._error_result(run_id, plan, reason))
 
         bundle = self.knowledge_gateway.evidence.with_context(bundle, run_id, citation_service)
+        self._progress(payload, "evidence", "completed", selected_evidence_count=len(bundle.labels))
         if not bundle.labels:
             return self._terminal(payload, self._error_result(run_id, plan, "SECTION_TRUNCATED"))
 
@@ -421,7 +446,8 @@ class LangChainQuickChain:
     def render_answer_prompt(question, bundle, settings, validated_follow_up=None):
         """Pure normal evidence prompt renderer; grants no provider capability."""
         intents = detect_intents(question)
-        budget = generation_budget(intents, len(bundle.context))
+        budget = (ordinary_generation_budget(intents) if settings.ordinary_output_budget
+                  else generation_budget(intents, len(bundle.context)))
         if settings.answer_output_token_cap is not None:
             budget = replace(budget, max_tokens=min(budget.max_tokens, settings.answer_output_token_cap))
         prompt = (
@@ -439,7 +465,10 @@ class LangChainQuickChain:
                "For a broad advice question, give the three most relevant actionable suggestions, not a catalogue of all evidence. "
                "Prefer short source-supported wording. Omit introductions, long headings and conclusions. "
                "Retain every explicitly requested sub-question and attach citations to each factual point."
-               if settings.concise_budgeted_answer else "")
+               if settings.concise_budgeted_answer and not settings.ordinary_output_budget else "")
+            + (f"\nOutput budget is {budget.max_tokens} tokens including citations. Answer length tier: {budget.complexity}. "
+               "Cover every requested point with its evidence; keep the answer complete within this budget."
+               if settings.ordinary_output_budget else "")
             + f"\nQuestion: {question}{intents.checklist()}"
             + (explicit_question_checklist(question, len(intents.intents))
                if settings.explicit_question_checklist_enabled else "")
@@ -448,7 +477,7 @@ class LangChainQuickChain:
             + ("\nEnd of evidence. Give only the complete concise answer. "
                "Do not add units to numbers whose cited source does not state those units; "
                "leave such values unitless or omit unrequested numeric examples."
-               if settings.concise_budgeted_answer else "")
+               if settings.concise_budgeted_answer and not settings.ordinary_output_budget else "")
         )
         return prompt, budget
 
@@ -498,10 +527,13 @@ class LangChainQuickChain:
         started = time.perf_counter()
         role, answer, error = decision.role, "", None
         calls = int(payload["model_calls"])
+        base_envelope = envelope
         for ordinal in (1, 2):
             if payload["is_cancelled"]():
                 return self._terminal(payload, self._error_result(run_id, payload["plan"], "CANCELLED", model_calls=calls))
             attempt_id = request_identity(run_id, "quick.router." + role, ordinal)
+            envelope = (replace(base_envelope, attempt_id=attempt_id)
+                        if settings.ordinary_output_budget else base_envelope)
             binding = self.generation_roles.get(role)
             if binding is None:
                 return self._terminal(payload, self._error_result(run_id, payload["plan"], "P5_GENERATION_ROLE_UNAVAILABLE", model_calls=calls))
@@ -537,33 +569,42 @@ class LangChainQuickChain:
             try:
                 token = current_attempt.set(attempt_id)
                 try:
+                    self._progress(payload, "generation", "started", role=role, attempt_id=attempt_id)
                     answer = binding.invoke(envelope, request_id=attempt_id, run_id=run_id, scope=payload["scope"])
                 finally:
                     current_attempt.reset(token)
+                self._progress(payload, "generation", "completed", role=role, attempt_id=attempt_id)
                 generation_status, send_status = "COMPLETED", "RESPONSE_RECEIVED"
                 finish_reason, settlement_operation = "stop", "COMPLETED"
+                self._progress(payload, "validation", "started", role=role, attempt_id=attempt_id)
                 candidate = normalize_marker_spacing(answer)
                 error = self.knowledge_gateway.evidence.hardening.check_candidate(candidate, bundle.snapshots, payload["plan"],
                     self.knowledge_gateway.evidence.validate_answer(candidate, bundle.snapshots, payload["plan"]))
                 validation = error or "PASS"
+                self._progress(payload, "validation", "failed" if error else "completed", role=role, attempt_id=attempt_id)
             except ProviderRequestNotSent as exc:
                 code = str(exc)
-                safe_codes = {"P5_BLOCKED_REAL_AUTHORIZATION_AND_CAPACITY", "ROUTER_MODEL_IDENTITY_MISMATCH", "MODEL_USAGE_GUARD_REQUIRED", "DEEPSEEK_GATED_ROLE_REQUIRED", "MODEL_BUDGET_DENIED"}
+                self._progress(payload, "generation", "failed", role=role, attempt_id=attempt_id)
+                safe_codes = {"OUTPUT_CAPACITY_UNVERIFIED", "OUTPUT_CAPACITY_UNSUPPORTED", "P5_BLOCKED_REAL_AUTHORIZATION_AND_CAPACITY", "ROUTER_MODEL_IDENTITY_MISMATCH", "MODEL_USAGE_GUARD_REQUIRED", "DEEPSEEK_GATED_ROLE_REQUIRED", "MODEL_BUDGET_DENIED"}
                 not_sent, error, error_class = True, code if code in safe_codes else "MODEL_REQUEST_NOT_SENT", "ProviderRequestNotSent"
                 generation_status, send_status, settlement_operation = "NOT_SENT", "NOT_SENT", "NOT_REQUIRED_OR_RELEASED"
             except TruncatedAnswer as exc:
+                self._progress(payload, "generation", "truncated", role=role, attempt_id=attempt_id)
                 answer, error, error_class = exc.candidate, "MODEL_OUTPUT_TRUNCATED", "TruncatedAnswer"
                 generation_status, send_status = "TRUNCATED", "RESPONSE_RECEIVED"
                 finish_reason, settlement_operation = "length", "COMPLETED"
             except GenerationSettlementFailure as exc:
+                self._progress(payload, "generation", "failed", role=role, attempt_id=attempt_id)
                 not_sent = exc.not_sent
                 provider_failed, error, error_class = True, "MODEL_UNAVAILABLE", "SettlementFailure"
                 send_status = "NOT_SENT" if not_sent else "UNKNOWN"
                 settlement_operation, primary_outcome = "FAILED", exc.primary_outcome
             except Exception as exc:
                 if generation_status == "COMPLETED":
+                    self._progress(payload, "validation", "failed", role=role, attempt_id=attempt_id)
                     error, error_class, validation = "CANDIDATE_VALIDATION_INTERNAL_ERROR", "CandidateValidationFailure", "VALIDATION_ERROR"
                 else:
+                    self._progress(payload, "generation", "failed", role=role, attempt_id=attempt_id)
                     provider_failed, error, error_class = True, "MODEL_UNAVAILABLE", "ProviderFailure"
                     if isinstance(exc, ProviderUnavailable) and str(exc) == "MODEL_USAGE_SETTLEMENT_FAILED":
                         settlement_operation = "FAILED"

@@ -25,17 +25,17 @@ class ServiceCapacity:
             self.window_tokens = 8192
         elif kind == 'xing_text':
             from backend.app.adapters.models.siliconflow_xing_capacity import (
-                SiliconFlowXingCapacityCounter, RENDERER_IDENTITY, OFFICIAL_CONTEXT_WINDOW,
+                SiliconFlowXingCapacityCounter, OrdinarySiliconFlowXingCapacityCounter, RENDERER_IDENTITY, OFFICIAL_CONTEXT_WINDOW,
             )
-            if (provider, model) != ('siliconflow', 'XingChenAGI/Xing4.0-29B') or type(counter) is not SiliconFlowXingCapacityCounter:
+            if (provider, model) != ('siliconflow', 'XingChenAGI/Xing4.0-29B') or type(counter) not in (SiliconFlowXingCapacityCounter, OrdinarySiliconFlowXingCapacityCounter):
                 raise ValueError('SERVICE_CAPACITY_IDENTITY_INVALID')
             self.execution_kind, self.source, self.window_tokens = 'REAL', counter.identity, OFFICIAL_CONTEXT_WINDOW
         elif kind == 'deepseek_text':
             from backend.app.adapters.models.v6_text_capacity import (
-                DeepseekV41TextCapacityCounter, DeepseekV41RecipeRenderer,
+                DeepseekV41TextCapacityCounter, OrdinaryDeepseekV41TextCapacityCounter, DeepseekV41RecipeRenderer,
                 DEEPSEEK_RENDERER_IDENTITY, DEEPSEEK_CONTEXT_WINDOW,
             )
-            if ((provider, model) != ('deepseek', 'deepseek-flash') or type(counter) is not DeepseekV41TextCapacityCounter
+            if ((provider, model) != ('deepseek', 'deepseek-flash') or type(counter) not in (DeepseekV41TextCapacityCounter, OrdinaryDeepseekV41TextCapacityCounter)
                     or type(counter.renderer) is not DeepseekV41RecipeRenderer):
                 raise ValueError('SERVICE_CAPACITY_IDENTITY_INVALID')
             self.execution_kind, self.source, self.window_tokens = 'REAL', DEEPSEEK_RENDERER_IDENTITY, DEEPSEEK_CONTEXT_WINDOW
@@ -50,7 +50,26 @@ class ServiceCapacity:
         if self.execution_kind == 'UNKNOWN' or not self.source or self.source == 'UNKNOWN':
             raise ValueError('SERVICE_CAPACITY_SOURCE_UNKNOWN')
 
+    @property
+    def output_readiness(self):
+        return {'local_reviewed_caps': list(getattr(self.counter, 'reviewed_output_caps', (512,))),
+                'endpoint_output_evidence': getattr(self.counter, 'endpoint_output_evidence', 'UNKNOWN'),
+                'hosted_recipe_equivalence': 'UNKNOWN'}
+
+    def assert_output_capacity(self, output_tokens, *, execution_kind):
+        self._check_local_output(output_tokens)
+        if output_tokens > 512 and execution_kind != 'SIMULATED':
+            raise ProviderRequestNotSent('OUTPUT_CAPACITY_UNVERIFIED')
+
+    def _check_local_output(self, output_tokens):
+        if not hasattr(self.counter, 'reviewed_output_caps'):
+            return
+        if type(output_tokens) is not int or output_tokens not in self.counter.reviewed_output_caps:
+            code = 'OUTPUT_CAPACITY_UNVERIFIED' if type(output_tokens) is int and output_tokens in (2048, 4096) else 'OUTPUT_CAPACITY_UNSUPPORTED'
+            raise ProviderRequestNotSent(code)
+
     def render_chat(self, messages, output_tokens):
+        self._check_local_output(output_tokens)
         if self.kind == 'xing_text':
             return dict(model=self.model, messages=list(messages), max_tokens=output_tokens,
                         stream=False, enable_thinking=False)
@@ -86,7 +105,7 @@ class ServiceCapacity:
             raise ContextDenied('MODEL_CONTEXT_PROTOCOL_UNSUPPORTED')
         # DeepSeek's audited recipe has an exact 512 output contract; Xing's
         # input framing is independent of the reserved output length.
-        output = 512 if self.kind == 'deepseek_text' else 1
+        output = 1024 if hasattr(self.counter, 'reviewed_output_caps') else (512 if self.kind == 'deepseek_text' else 1)
         body = self.render_chat(envelope['messages'], output)
         try:
             return self.measure(body, json.dumps(body).encode())[0]

@@ -25,7 +25,11 @@ MESSAGES = {
     'input_limit': '当前输入或上下文超过模型容量，请检查输入和所选模型的容量配置。',
     'failed': '问答未完成，请检查运行状态后再试。',
 }
-REASON_MESSAGES = {'MODEL_OUTPUT_TRUNCATED': '本次回答达到输出长度上限，未保存为完整答案。可以重试或将问题拆成几部分。'}
+REASON_MESSAGES = {
+    'MODEL_OUTPUT_TRUNCATED': '本次回答达到输出长度上限，未保存为完整答案。可以重试或将问题拆成几部分。',
+    'OUTPUT_CAPACITY_UNVERIFIED': '所选模型的回答输出容量尚未验证，本次未发送生成请求。',
+    'OUTPUT_CAPACITY_UNSUPPORTED': '所选模型不支持本次回答所需的输出长度，本次未发送生成请求。',
+}
 
 
 def failure_presentation(error_code, metrics=None):
@@ -53,7 +57,8 @@ def failure_presentation(error_code, metrics=None):
                     category, reason = 'evidence_unavailable', 'EVIDENCE_READBACK_OR_SELECTION_FAILED'
     elif error_code in {'MODEL_CONTEXT_WINDOW_EXCEEDED','INPUT_LIMIT','QUERY_INPUT_LIMIT','EMBEDDING_TOKEN_LIMIT_EXCEEDED'}:
         category, reason = 'input_limit', error_code
-    elif error_code in {'MODEL_UNAVAILABLE','MODEL_OUTPUT_TRUNCATED','MODEL_CONTEXT_CAPACITY_UNKNOWN'}:
+    elif error_code in {'MODEL_UNAVAILABLE','MODEL_OUTPUT_TRUNCATED','MODEL_CONTEXT_CAPACITY_UNKNOWN',
+                        'OUTPUT_CAPACITY_UNVERIFIED','OUTPUT_CAPACITY_UNSUPPORTED'}:
         category, reason = 'generation_error', error_code
     elif error_code in {'INSUFFICIENT_EVIDENCE','UNSUPPORTED_ANSWER','INVALID_CITATION','NO_EVIDENCE'}:
         category, reason = 'evidence_unavailable', error_code
@@ -71,4 +76,5 @@ def valid_failure_presentation(value):
         and value['reason_code'] in (PUBLIC_PROVIDER_REASONS | {
             'RUN_FAILED','CLOUD_EGRESS_DISABLED','RETRIEVAL_DIAGNOSTIC_MISSING','RETRIEVAL_UNAVAILABLE','NO_CANDIDATES',
             'EVIDENCE_READBACK_OR_SELECTION_FAILED','MODEL_CONTEXT_WINDOW_EXCEEDED','INPUT_LIMIT','QUERY_INPUT_LIMIT',
-            'MODEL_UNAVAILABLE','MODEL_OUTPUT_TRUNCATED','INSUFFICIENT_EVIDENCE','UNSUPPORTED_ANSWER','INVALID_CITATION','NO_EVIDENCE'}))
+            'MODEL_UNAVAILABLE','MODEL_OUTPUT_TRUNCATED','OUTPUT_CAPACITY_UNVERIFIED','OUTPUT_CAPACITY_UNSUPPORTED',
+            'INSUFFICIENT_EVIDENCE','UNSUPPORTED_ANSWER','INVALID_CITATION','NO_EVIDENCE'}))

@@ -105,14 +105,18 @@ class GenerationEnvelope:
     timeout_seconds: float
     template_version: str = "quick-evidence-prompt/v1"
     estimated_input_tokens: int | None = None
+    attempt_id: str | None = None
 
     @property
     def identity(self) -> str:
-        return digest(json.dumps({"q0_hash": digest(self.q0), "resolved_hash": digest(self.resolved_query),
+        data = {"q0_hash": digest(self.q0), "resolved_hash": digest(self.resolved_query),
             "prompt_hash": digest(self.prompt), "context_hash": self.context_hash, "labels": self.labels,
             "snapshot_identities": self.snapshot_identities, "max_tokens": self.max_tokens,
             "timeout_seconds": self.timeout_seconds, "template_version": self.template_version,
-            "estimated_input_tokens": self.estimated_input_tokens}, sort_keys=True))
+            "estimated_input_tokens": self.estimated_input_tokens}
+        if self.attempt_id is not None:
+            data["attempt_id"] = self.attempt_id
+        return digest(json.dumps(data, sort_keys=True))
 
 
 @dataclass(frozen=True)

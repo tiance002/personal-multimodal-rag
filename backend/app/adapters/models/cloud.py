@@ -1696,10 +1696,10 @@ class CloudChat(CloudAdapter):
         choice = response["choices"][0]
         message, finish = choice["message"], choice["finish_reason"]
         text = message.get("content")
+        if finish == "length":
+            raise TruncatedAnswer(text if isinstance(text, str) else "")
         if message.get("refusal") or not isinstance(text, str) or not text.strip():
             raise ProviderUnavailable("CHAT_REFUSED_OR_INVALID")
-        if finish == "length":
-            raise TruncatedAnswer(text)
         if finish != "stop":
             raise ProviderUnavailable("CHAT_FINISH_INVALID")
         return text, response.get("model", "UNKNOWN")
@@ -1724,6 +1724,11 @@ class CloudChat(CloudAdapter):
     def generate_with_service_scope(self, messages, *, timeout_seconds, max_tokens, scope, request_id):
         if self.service_binding is None or scope != request_scope(self.spec.role):
             raise ProviderRequestNotSent('SERVICE_SERVER_SCOPE_REQUIRED')
+        capacity_check = getattr(self.service_binding.capacity, 'assert_output_capacity', None)
+        if capacity_check is not None:
+            capacity_check(max_tokens, execution_kind=getattr(self.transport, 'execution_kind', 'REAL'))
+        elif max_tokens > 512 and getattr(self.transport, 'execution_kind', 'REAL') != 'SIMULATED':
+            raise ProviderRequestNotSent('OUTPUT_CAPACITY_UNVERIFIED')
         payload = self.service_binding.capacity.render_chat(messages, max_tokens)
         observed, usage, latency = self._request('/chat/completions', payload, timeout_seconds,
             self._validate, service_request_id=request_id)

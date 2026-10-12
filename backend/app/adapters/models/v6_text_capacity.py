@@ -383,3 +383,20 @@ def _canonical(value: Any) -> bytes:
 
 def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+class OrdinaryDeepseekV41TextCapacityCounter(DeepseekV41TextCapacityCounter):
+    """Ordinary local framing only; no V6 production profile or grant issuance."""
+    endpoint_output_evidence = 'UNKNOWN'
+    reviewed_output_caps = (512, 1024)
+
+    def __init__(self, renderer=None):
+        super().__init__(renderer)
+
+    @staticmethod
+    def _validate_body(model, body):
+        output = body.get('max_tokens') if isinstance(body, Mapping) else None
+        if type(output) is not int or output not in (512, 1024):
+            code = 'OUTPUT_CAPACITY_UNVERIFIED' if type(output) is int and output in (2048, 4096) else 'OUTPUT_CAPACITY_UNSUPPORTED'
+            raise CapacityCounterUnavailable(code)
+        DeepseekV41TextCapacityCounter._validate_body(model, {**body, 'max_tokens': 512})

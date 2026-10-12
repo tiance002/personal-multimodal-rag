@@ -102,9 +102,18 @@ provider availability, account balance, KB consent or index compatibility.
                 reasons.append('SERVICE_RUN_LIFECYCLE_REQUIRED')
             if role in ('chat_cheap', 'chat_expensive') and not settings.rule_router_enabled:
                 reasons.append('SERVICE_ROUTER_REQUIRED')
+            output_readiness = None
+            if binding is not None and role in ('chat_cheap', 'chat_expensive'):
+                capacity = getattr(binding, 'capacity', None)
+                if capacity is not None and hasattr(capacity, 'output_readiness'):
+                    output_readiness = capacity.output_readiness
+                    if output_readiness['endpoint_output_evidence'] == 'UNKNOWN':
+                        reasons.append('OUTPUT_CAPACITY_UNVERIFIED')
             roles[role] = dict(provider=spec.provider, model=spec.model_id,
                 status='NOT_READY' if reasons else 'READY_CONFIG', reasons=reasons,
                 capacity_status='LOCAL_BOUND_VERIFIED' if binding else 'UNKNOWN', hosted_equivalence='UNKNOWN')
+            if output_readiness is not None:
+                roles[role]['ordinary_output'] = output_readiness
         if settings.rule_router_enabled:
             roles['chat'] = dict(roles['chat_cheap'])
             roles['chat']['reasons'] = sorted(set(roles['chat_cheap']['reasons'] + roles['chat_expensive']['reasons']))

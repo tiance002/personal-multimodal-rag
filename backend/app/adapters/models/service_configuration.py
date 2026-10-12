@@ -45,9 +45,9 @@ def configured_service_capacity(spec, settings, embedding_admission):
         elif (spec.provider, spec.model_id) == ('siliconflow', 'XingChenAGI/Xing4.0-29B'):
             if settings.xing_capacity_resources is None:
                 return None, 'XING_CAPACITY_RESOURCES_MISSING'
-            from backend.app.adapters.models.siliconflow_xing_capacity import SiliconFlowXingCapacityCounter
+            from backend.app.adapters.models.siliconflow_xing_capacity import OrdinarySiliconFlowXingCapacityCounter
             capacity = ServiceCapacity(spec.provider, spec.model_id,
-                SiliconFlowXingCapacityCounter(settings.xing_capacity_resources, ordinary_service=True), kind='xing_text')
+                OrdinarySiliconFlowXingCapacityCounter(settings.xing_capacity_resources), kind='xing_text')
         elif spec.role == 'vision':
             if settings.deepseek_tokenizer_path is None:
                 return None, 'DEEPSEEK_TOKENIZER_MISSING'
@@ -57,10 +57,10 @@ def configured_service_capacity(spec, settings, embedding_admission):
         elif (spec.provider, spec.model_id) == ('deepseek', 'deepseek-flash'):
             if settings.deepseek_tokenizer_path is None:
                 return None, 'DEEPSEEK_TOKENIZER_MISSING'
-            from backend.app.adapters.models.v6_text_capacity import DeepseekV41RecipeRenderer, DeepseekV41TextCapacityCounter
+            from backend.app.adapters.models.v6_text_capacity import DeepseekV41RecipeRenderer, OrdinaryDeepseekV41TextCapacityCounter
             from backend.app.adapters.models.service_deepseek_capacity import verified_recipe
             verified_recipe(settings.deepseek_tokenizer_path)
-            counter = DeepseekV41TextCapacityCounter(DeepseekV41RecipeRenderer(settings.deepseek_tokenizer_path))
+            counter = OrdinaryDeepseekV41TextCapacityCounter(DeepseekV41RecipeRenderer(settings.deepseek_tokenizer_path))
             capacity = ServiceCapacity(spec.provider, spec.model_id, counter, kind='deepseek_text')
         else:
             return None, 'SERVICE_CAPACITY_PROTOCOL_UNSUPPORTED'

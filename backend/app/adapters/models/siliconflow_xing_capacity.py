@@ -425,3 +425,22 @@ class SiliconFlowXingCapacityCounter:
         return self.measure(SILICONFLOW_PROVIDER, envelope["model"], body,
                             scope=self.production_profile.grant.scope_id if self.production_profile is not None
                             else "LOCAL_MODEL_WINDOW_PRECOUNT").reservation_bound
+
+
+class OrdinarySiliconFlowXingCapacityCounter(SiliconFlowXingCapacityCounter):
+    """Local ordinary protocol proof, separate from frozen grants and profiles."""
+    endpoint_output_evidence = 'UNKNOWN'
+    reviewed_output_caps = (512, 1024)
+
+    def __init__(self, resource_directory):
+        super().__init__(resource_directory, ordinary_service=True)
+        self.local_input_token_cap = OFFICIAL_CONTEXT_WINDOW - 1024
+        self.identity += ';ordinary-output/v1;endpoint-output=UNKNOWN'
+
+    def _validate_body(self, model, body):
+        output = body.get('max_tokens') if type(body) is dict else None
+        if type(output) is not int or output not in self.reviewed_output_caps:
+            code = 'OUTPUT_CAPACITY_UNVERIFIED' if type(output) is int and output in (2048, 4096) else 'OUTPUT_CAPACITY_UNSUPPORTED'
+            raise XingCapacityUnavailable(code)
+        # Reuse the complete frozen protocol validation without widening it.
+        super()._validate_body(model, {**body, 'max_tokens': 512})
