@@ -130,9 +130,11 @@ def test_expanded_pool_obeys_server_document_kb_and_current_version_scope():
     assert all(item.chunk.version_id == "version" for item in result.context_items)
 
 
-@pytest.mark.parametrize("suffix_length,first_fits", [(7990, True), (7991, False)])
+@pytest.mark.parametrize("suffix_length,first_fits", [(7989, True), (7990, False)])
 def test_8000_character_boundary_includes_frozen_label(suffix_length, first_fits):
-    repo = repository(["alpha" + "x" * suffix_length, "alpha short"])
+    # BM25 matches a complete term. Concatenating alphaxxx never matched alpha
+    # after the earlier TF migration, so it did not exercise the context bound.
+    repo = repository(["alpha " + "x" * suffix_length, "alpha short"])
     result = expanded(repo).retrieve(SCOPE, "alpha")
     service = EvidenceService()
     bundle = service.bundle(service.plan("alpha"), result)
@@ -143,7 +145,7 @@ def test_8000_character_boundary_includes_frozen_label(suffix_length, first_fits
 
 
 def test_label_separator_budget_excludes_second_complete_chunk():
-    repo = repository(["alpha" + "x" * 3990, "alpha" + "y" * 3990])
+    repo = repository(["alpha " + "x" * 3989, "alpha " + "y" * 3989])
     service = EvidenceService()
     result = expanded(repo).retrieve(SCOPE, "alpha")
     bundle = service.bundle(service.plan("alpha"), result)

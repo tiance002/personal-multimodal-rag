@@ -34,6 +34,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+service = [
+  "sentencepiece==0.2.1",
+  "Jinja2==3.1.6",
+  "MarkupSafe==3.0.3",
+  "deepseek-recipe==0.1.1; sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
 eval = [
   "tiktoken==0.14.0",
 ]

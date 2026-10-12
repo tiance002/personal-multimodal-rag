@@ -18,6 +18,7 @@ export type DocumentItem = {
   latest_version_no?: number;
   latest_index_status?: string;
   latest_job?: IngestionJob | null;
+  index_compatibility?: { schema_version: "index-compatibility-v1"; status: "COMPATIBLE" | "INCOMPATIBLE" | "NOT_INDEXED"; reason_code: string | null };
 };
 
 export type IngestionJob = {
@@ -60,8 +61,26 @@ export type Message = {
   content: string;
   citations?: string[];
   run_id?: string;
-  presentation?: { kind: "clarification"; text: string; clarification_required: true } | EvidenceHint;
+  presentation?: { kind: "clarification"; text: string; clarification_required: true } | EvidenceHint | RunDiagnostic;
 };
+
+export type RunDiagnostic = { schema_version: "run-presentation-v1"; kind: "run_diagnostic";
+  category: "permission_required" | "retrieval_error" | "no_match" | "evidence_unavailable" | "generation_error" | "input_limit" | "failed";
+  reason_code: string; text: string };
+
+export function validRunDiagnostic(value: unknown): value is RunDiagnostic {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Partial<RunDiagnostic>;
+  return row.schema_version === "run-presentation-v1" && row.kind === "run_diagnostic" &&
+    typeof row.category === "string" && ["permission_required", "retrieval_error", "no_match", "evidence_unavailable", "generation_error", "input_limit", "failed"].includes(row.category) &&
+    typeof row.reason_code === "string" && /^[A-Z_]{1,80}$/.test(row.reason_code) &&
+    typeof row.text === "string" && row.text.trim().length > 0 && row.text.length <= 300;
+}
+
+export function runDiagnosticText(message: Message): string | null {
+  return message.role === "user" && message.run_id && !message.citations?.length && validRunDiagnostic(message.presentation)
+    ? message.presentation.text : null;
+}
 
 // A diagnostic attached to an exact user/run, never a factual assistant message.
 export function clarificationText(message: Message | undefined): string | null {

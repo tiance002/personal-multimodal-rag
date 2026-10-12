@@ -48,6 +48,26 @@ from backend.app.config import Settings
 _MODEL_UNSET = object()
 
 
+def read_model_configuration(settings):
+    from backend.app.adapters.models.user_settings import public_config
+    return public_config(settings)
+
+
+def save_model_configuration(settings, payload):
+    """Assemble first, then atomically persist. Never probes a provider."""
+    from backend.app.adapters.models.user_settings import LOCK, prepare_config, apply_config, write_config
+    with LOCK:
+        saved = prepare_config(settings, payload)
+        configured = apply_config(settings, saved)
+        candidate = build_container(configured)
+        try:
+            write_config(settings, saved)
+        except Exception:
+            candidate.engine.dispose()
+            raise
+        return configured, candidate
+
+
 @dataclass(frozen=True)
 class Container:
     """Fully wired object graph for one application instance."""
@@ -71,6 +91,12 @@ class Container:
     lifecycle: Any | None = None
     memory_service: Any | None = None
     query_understand: Any | None = None
+    embedding_admission_error: str | None = None
+    service_capacity_errors: dict[str, str] | None = None
+
+    def model_readiness(self):
+        from backend.app.adapters.models.runtime_readiness import configuration_readiness
+        return configuration_readiness(self)
 
 
 def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_model: Any = _MODEL_UNSET,
@@ -96,6 +122,14 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     if unavailable:
         raise ValueError("optional adapters are not implemented: " + ", ".join(unavailable))
     enabled_roles = {"embedding"} if settings.embedding_egress_enabled else set()
+    if settings.service_model_policy_json is not None and not settings.cloud_enabled:
+        enabled_roles.clear()
+    admission_error = None
+    if (embedding_admission is None and not v6_free_model_bindings
+            and settings.embedding_backend == "siliconflow"):
+        from backend.app.adapters.models.runtime_readiness import configured_embedding_admission
+        embedding_admission, admission_error = configured_embedding_admission(
+            settings.model_registry().select("embedding"), settings.embedding_tokenizer_path)
     if settings.cloud_enabled:
         if settings.chat_egress_enabled:
             enabled_roles.update({"chat_cheap", "chat_expensive"})
@@ -107,10 +141,38 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         usage_guards=model_usage_guards, embedding_admission=embedding_admission,
         chunking_config=ChunkingConfig(general_size=settings.max_chunk_chars, general_overlap=settings.chunk_overlap),
         free_model_bindings=v6_free_model_bindings)
+    provider_factory.api_keys = dict(settings.model_api_keys)
     engine = create_engine(settings.database_url, pool_pre_ping=True)
     budget_gate = PostgresBudgetGate(engine, settings.monthly_cloud_budget_microunits)
+    service_capacity_errors = {}
+    if settings.service_model_policy_json is not None:
+        if any((v6_generation_binding, v6_xing_binding, v6_free_model_bindings)):
+            raise ValueError('SERVICE_EVALUATION_POLICY_CONFLICT')
+        from backend.app.adapters.models.service_configuration import configured_service_policies, configured_service_capacity
+        from backend.app.adapters.postgres.service_usage import PostgresServiceTokenLedger
+        from backend.app.application.service_usage import ServiceUsageGuard
+        from backend.app.ports.service_policy import ServiceModelBinding
+        service_policies = configured_service_policies(settings, provider_factory.registry)
+        ledger = PostgresServiceTokenLedger(engine)
+        for role, policy in service_policies.items():
+            spec = provider_factory.registry.select(role)
+            capacity, reason = configured_service_capacity(spec, settings, embedding_admission)
+            if reason is not None:
+                service_capacity_errors[role] = reason
+                # An explicit normal policy cannot fall back to legacy quota.
+                continue
+            guard = ServiceUsageGuard(budget_gate, ledger, spec, policy)
+            provider_factory.service_bindings[role] = ServiceModelBinding(policy, capacity, guard)
+            provider_factory.usage_guards[role] = guard
+        # Explicit service mode grants only roles with a complete normal binding.
+        # Missing policies/resources cannot reuse injected or legacy cost guards.
+        provider_factory.enabled_roles = frozenset(enabled_roles & provider_factory.service_bindings.keys())
+        provider_factory.usage_guards = {role: binding.usage_guard
+            for role, binding in provider_factory.service_bindings.items()}
     if settings.cloud_cost_estimate_microunits > 0:
         for role in enabled_roles:
+            if settings.service_model_policy_json is not None:
+                continue
             provider_factory.usage_guards.setdefault(role, BudgetUsageGuard(budget_gate,
                 provider_factory.registry.select(role), settings.cloud_cost_estimate_microunits))
     elif settings.cloud_cost_estimate_microunits == 0:
@@ -154,15 +216,23 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         # is independent of local Chat / Query Expansion.
         embedding_provider = (model if model is not _MODEL_UNSET else
             ollama if settings.embedding_backend == "ollama" else provider_factory.build("embedding"))
+    service_caption_enricher = None
+    if 'vision' in provider_factory.service_bindings and 'vision' in provider_factory.enabled_roles:
+        if caption_provider is not None:
+            raise ValueError('SERVICE_VISION_PROVIDER_OVERRIDE_DENIED')
+        from backend.app.application.service_caption import ServiceCaptionEnricher
+        service_caption_enricher = ServiceCaptionEnricher(provider_factory.build('vision'))
     store = PostgresKnowledgeRepository(
         engine,
         storage,
         embedding_provider=embedding_provider,
         parsers=ParserRegistry(xlsx_first_row_as_header=settings.xlsx_first_row_as_header,
+            collect_caption_geometry=service_caption_enricher is not None,
             caption_enricher=CaptionEnricher(caption_provider,usage_guard=caption_usage_guard,enabled=True)
                 if caption_provider is not None else None),
         max_chunk_chars=settings.max_chunk_chars,
         chunk_overlap=settings.chunk_overlap,
+        service_caption_enricher=service_caption_enricher,
     )
     if agent_model is _MODEL_UNSET:
         if model is None:
@@ -196,6 +266,8 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     cloud_gateway = (DeepSeekGateway(api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         model=settings.cloud_model, cloud_enabled=True, attempt_gate=SessionAttemptGate(), gate_types=DEEPSEEK_GATE_TYPES)
         if settings.cloud_enabled and settings.chat_egress_enabled else None) if cloud_model is _MODEL_UNSET else cloud_model
+    if settings.service_model_policy_json is not None and cloud_model is _MODEL_UNSET:
+        cloud_gateway = provider_factory.build('chat_expensive') if 'chat_expensive' in provider_factory.service_bindings else None
     if v6_generation_binding is not None:
         if type(v6_generation_binding) is not V6GenerationBinding or cloud_model is not _MODEL_UNSET:
             raise ValueError('V6_GENERATION_BINDING_INVALID')
@@ -211,10 +283,15 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
     registry = settings.model_registry()
     context_windows = {role: ModelWindow(registry.select(role).provider, registry.select(role).model_id)
                        for role in ('chat_cheap', 'chat_expensive')}
+    for role in ('chat_cheap', 'chat_expensive'):
+        binding = provider_factory.service_bindings.get(role)
+        if binding is not None:
+            context_windows[role] = binding.capacity.model_window()
     context_windows['local_chat'] = ModelWindow('ollama', settings.ollama_chat_model)
     if cloud_gateway is not None:
-        context_windows['cloud_chat'] = ModelWindow(getattr(cloud_gateway, 'provider_name', 'UNKNOWN'),
-                                                  getattr(cloud_gateway, 'chat_model', 'UNKNOWN'))
+        context_windows['cloud_chat'] = (context_windows['chat_expensive']
+            if 'chat_expensive' in provider_factory.service_bindings else
+            ModelWindow(getattr(cloud_gateway, 'provider_name', 'UNKNOWN'), getattr(cloud_gateway, 'chat_model', 'UNKNOWN')))
     context_manager = ContextManager(store, PostgresContextStore(engine), context_windows)
     from backend.app.application.query_understand import QueryUnderstandService
     from backend.app.adapters.postgres.query_understand import PostgresQueryAttemptStore
@@ -244,9 +321,10 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
             provider_fallback=settings.rule_router_provider_fallback),
         generation_roles={
             "chat_cheap": GenerationRole("chat_cheap", provider_factory.build("chat_cheap", xing_binding=v6_xing_binding),
-                xing_binding=v6_xing_binding),
+                xing_binding=v6_xing_binding, service_binding=provider_factory.service_bindings.get('chat_cheap')),
             "chat_expensive": GenerationRole("chat_expensive", cloud_gateway,
-                usage_guard=provider_factory.usage_guards.get("chat_expensive"), v6_binding=v6_generation_binding),
+                usage_guard=provider_factory.usage_guards.get("chat_expensive"), v6_binding=v6_generation_binding,
+                service_binding=provider_factory.service_bindings.get('chat_expensive')),
         } if settings.rule_router_enabled else None,
     )
     from backend.app.application.run_lifecycle import RunLifecycle
@@ -256,6 +334,8 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         RedisStreamManager.from_url(settings.redis_url,live_ttl=settings.live_run_ttl_seconds,event_ttl=settings.stream_event_ttl_seconds),store)
         if settings.redis_url else None)
     return Container(
+        embedding_admission_error=admission_error,
+        service_capacity_errors=service_capacity_errors,
         settings=settings,
         engine=engine,
         storage=storage,

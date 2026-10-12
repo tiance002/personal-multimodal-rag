@@ -49,7 +49,8 @@ def _validate_estimate(value: int, *, zero_price_authority=None, **identity) -> 
         raise ValueError("budget estimate must be positive")
     if value == 0:
         from backend.app.ports.xing_zero_reservation import XingCalibrationZeroReservation, SiliconFlowZeroReservation
-        if type(zero_price_authority) not in (XingCalibrationZeroReservation,SiliconFlowZeroReservation):
+        from backend.app.ports.service_policy import ServiceZeroReservation
+        if type(zero_price_authority) not in (XingCalibrationZeroReservation,SiliconFlowZeroReservation,ServiceZeroReservation):
             raise ValueError('XING_ZERO_CALIBRATION_AUTHORITY_REQUIRED')
         zero_price_authority.validate(**identity)
     elif zero_price_authority is not None:

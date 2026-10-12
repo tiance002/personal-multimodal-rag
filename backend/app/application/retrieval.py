@@ -13,6 +13,7 @@ from backend.app.domain.text_normalization import NormalizedQuery, normalize_que
 from backend.app.ports.retrieval import RetrievalRepository
 from backend.app.ports.ranking import CandidateRanker, CandidateDiversitySelector
 from backend.app.ports.model_access import model_access
+from backend.app.ports.providers import ProviderRequestNotSent, public_provider_reason
 from backend.app.application.retrieval_policy import RetrievalRouter
 from backend.app.application.retrieval_merge import ContextPassage, merge_passages, SHORT_CONTEXT
 from backend.app.domain.bm25 import score_bm25
@@ -44,6 +45,7 @@ class RetrievalResult:
     embedding_cache_hit: bool | None = None
     merge_provenance: dict[str, Any] | None = None
     retrieval_stats: dict[str, Any] = field(default_factory=dict)
+    diagnostic: dict[str, Any] = field(default_factory=dict)
 
 
 def _rank_descending(hits: list[RankedHit], limit: int) -> list[RankedHit]:
@@ -215,13 +217,25 @@ class HybridRetriever:
                                    effective_config=effective, latency_ms=(time.perf_counter()-started)*1000,
                                    retrieval_mode=mode, route_reason=route_reason, stage_latency_ms=timings)
         degradation_flags: tuple[str, ...] = ()
+        channels = {name: {"status": "NOT_SELECTED", "count": None, "reason": None}
+                    for name in ("keyword", "vector")}
+
+        def keyword_candidates():
+            try:
+                hits = self.repository.keyword_candidates(scope, plan, self.candidate_k)
+                channels["keyword"] = {"status": "OK" if hits else "EMPTY", "count": len(hits), "reason": None}
+                return hits
+            except Exception:
+                channels["keyword"] = {"status": "FAILED", "count": None, "reason": "KEYWORD_RETRIEVAL_FAILED"}
+                return []
         embedding_cache_hit: bool | None = None
         keyword_started=time.perf_counter()
         rankings: dict[str, list[RankedHit]] = {}
         if mode in ("keyword", "hybrid"):
-            rankings["keyword"] = self.repository.keyword_candidates(scope, plan, self.candidate_k)
+            rankings["keyword"] = keyword_candidates()
             timings['keyword_retrieval_ms']=(time.perf_counter()-keyword_started)*1000
         if mode in ("vector", "hybrid") and self.embedding_provider is not None:
+            vector_stage = "embedding"
             try:
                 embedding_started=time.perf_counter()
                 allowed = True
@@ -230,17 +244,22 @@ class HybridRetriever:
                     allowed = checker is not None and checker(scope) is True
                 with model_access("embedding", allowed=allowed, scope=scope):
                     embedded = self.embedding_provider.embed([question], timeout_seconds=10)
+                vector_stage = "embedding_identity"
                 validator = getattr(self.repository, "validate_embedding_result", None)
                 if validator is not None:
                     validator(embedded)
                 embedding_cache_hit = bool(getattr(self.embedding_provider, "last_cache_hit", False))
                 timings['embedding_ms']=(time.perf_counter()-embedding_started)*1000
                 profile_id = getattr(embedded, "profile_id", None)
+                vector_stage = "embedding_profile"
                 if profile_id is None:
                     resolver = getattr(self.repository, "get_embedding_profile_id", None)
                     if resolver is not None:
                         profile_id = resolver(getattr(embedded, "model", ""), getattr(embedded, "dimensions", 0))
+                        if profile_id is None:
+                            raise ProviderRequestNotSent("EMBEDDING_PROFILE_UNAVAILABLE")
                 vector_started=time.perf_counter()
+                vector_stage = "vector_query"
                 rankings["vector"] = self.repository.vector_candidates(
                     scope,
                     embedded.vectors[0],
@@ -248,15 +267,24 @@ class HybridRetriever:
                     profile_id=profile_id,
                 )
                 timings['vector_retrieval_ms']=(time.perf_counter()-vector_started)*1000
-            except Exception:
+                hits = rankings["vector"]
+                channels["vector"] = {"status": "OK" if hits else "EMPTY", "count": len(hits), "reason": None}
+            except Exception as exc:
+                # No raw exception/SQL/provider payload is public. A missing
+                # profile follows an actual embedding call, so it is FAILED.
+                not_sent = isinstance(exc, ProviderRequestNotSent) and vector_stage == "embedding"
+                channels["vector"] = {"status": "NOT_SENT" if not_sent else "FAILED", "count": None,
+                                      "stage": vector_stage,
+                                      "reason": public_provider_reason(exc, "VECTOR_RETRIEVAL_FAILED")}
                 degradation_flags = ('VECTOR_UNAVAILABLE',)
         elif mode in ("vector", "hybrid"):
             degradation_flags = ('VECTOR_UNAVAILABLE',)
+            channels["vector"] = {"status": "NOT_SENT", "count": None, "reason": "EMBEDDING_PROVIDER_MISSING"}
 
         # q0 keyword fallback remains available even when the model is absent.
         if mode == "vector" and not rankings.get("vector"):
             keyword_started = time.perf_counter()
-            rankings["keyword"] = self.repository.keyword_candidates(scope, plan, self.candidate_k)
+            rankings["keyword"] = keyword_candidates()
             timings['keyword_retrieval_ms'] = (time.perf_counter() - keyword_started) * 1000
             mode = "keyword"
             route_reason += (("VECTOR_UNAVAILABLE_KEYWORD_FALLBACK" if degradation_flags else "VECTOR_EMPTY_KEYWORD_FALLBACK"),)
@@ -408,6 +436,7 @@ class HybridRetriever:
             stage_latency_ms=timings,
             retrieval_mode=mode, route_reason=route_reason,
             embedding_cache_hit=embedding_cache_hit,
+            diagnostic={"schema_version": "retrieval-diagnostic-v1", "channels": channels},
             retrieval_stats=dict(candidate_count=len(full_fused), merged_count=len(groups),
                 query_expansion=expansion,keyword_scoring='BM25/k1=1.2/b=0.75/mixed-script-compatible/v2',
                 fused_before_rank=fused_before_rank,

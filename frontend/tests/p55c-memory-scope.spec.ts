@@ -6,7 +6,7 @@ test('memory uses conversation documents; late old scope cannot replace new rows
   {id:'conv-b',title:'会话B',knowledge_base_scope:['kb'],document_scope:['B']}];
  let held=false;let release:(()=>void)|undefined;
  const gate=new Promise<void>(r=>{release=r;});
- await page.route('**/api/**',async route=>{
+ await page.route('**/api/v1/**',async route=>{
   const req=route.request(),url=new URL(req.url()),p=url.pathname;
   let data:any=[];const body=req.method()==='GET'?{}:req.postDataJSON();
   if(p.endsWith('/knowledge-bases'))data=[{id:'kb',name:'知识库',graph_enabled:false}];

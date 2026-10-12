@@ -44,6 +44,7 @@ class RunMetrics:
             "stage_latency_ms": result.stage_latency_ms,
             "embedding_cache_hit": result.embedding_cache_hit,
             "degradation_flags": list(result.degradation_flags),
+            "diagnostic": getattr(result, "diagnostic", {}),
             "pass_metadata": pass_metadata(result),
         })
 
@@ -120,6 +121,8 @@ class RunMetrics:
             "evidence_quality": self.quality if self.quality is not None else NOT_AVAILABLE,
             "answer_hardening": self.hardening,
             "rule_router": deepcopy(self.rule_router),
+            "retrieval_diagnostics": [row["diagnostic"] for row in self.retrievals],
+            "provider_diagnostics": deepcopy(self.usage.provider_diagnostics),
         }
 
 

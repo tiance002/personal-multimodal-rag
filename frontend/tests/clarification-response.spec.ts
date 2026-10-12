@@ -3,6 +3,24 @@ import { expect, test, type Page } from "@playwright/test";
 const prompt = "请明确对象并重述完整问题；本次上下文解析不可用或指代不明确，未检索或生成事实答案。";
 const clarify = { run_id: "clarify-run", answer: prompt, citations: [], error_code: "NO_CANDIDATES", trace: { execution_mode: "clarification", clarification_required: true } };
 
+test("versioned generation failure stays on the same user/run after refresh", async ({ page }) => {
+  const diagnostic = { schema_version: "run-presentation-v1", kind: "run_diagnostic", category: "generation_error",
+    reason_code: "MODEL_UNAVAILABLE", text: "答案模型未能完成请求，请稍后重试或检查模型服务。" };
+  const history: unknown[] = [];
+  let posts = 0;
+  page.on("request", request => { if (request.method() === "POST" && request.url().includes("/messages")) posts++; });
+  await base(page, { run_id: "failed-run", answer: "", citations: [], error_code: "MODEL_UNAVAILABLE", presentation: diagnostic }, history);
+  await send(page);
+  await expect(page.locator(".clarification-prompt")).toHaveText(diagnostic.text);
+  await expect(page.locator("article.assistant")).toHaveCount(0);
+  history.push({ role: "user", content: "它的下一次巡检日期是什么时候？", run_id: "failed-run", citations: [], presentation: diagnostic });
+  await page.reload();
+  await page.getByRole("button", { name: "Replay A", exact: true }).click();
+  await expect(page.locator(".clarification-prompt")).toHaveText(diagnostic.text);
+  await expect(page.locator("article.assistant")).toHaveCount(0);
+  expect(posts).toBe(1);
+});
+
 async function base(page: Page, response: Record<string, unknown>, history: unknown[] = [], status = 201) {
   // Every API request is fulfilled locally; there is no backend/model fallback.
   await page.route("**/api/v1/**", route => route.fulfill({ status: 404, json: { error: { code: "UNEXPECTED_MOCK_ROUTE" } } }));
@@ -48,7 +66,9 @@ for (const [label, response, code] of [
 ] as const) {
   test(`${label} remains an ordinary error`, async ({ page }) => {
     await base(page, response); await send(page);
-    await expect(page.getByText(`回答未完成：${code}`, { exact: true })).toBeVisible();
+    await expect(page.getByText(code === "NO_CANDIDATES"
+      ? "检索未完成：运行记录缺少阶段诊断，请检查模型与索引状态"
+      : `回答未完成：${code}`, { exact: true })).toBeVisible();
     await expect(page.getByRole("status")).toHaveText(`问答失败：${code}`);
     await expect(page.getByText(prompt, { exact: true })).toHaveCount(0);
   });
@@ -56,7 +76,15 @@ for (const [label, response, code] of [
 
 test("a duplicate API rejection is shown without inventing another assistant reply", async ({ page }) => {
   await base(page, { error: { code: "DUPLICATE_REQUEST", message: "request not regenerated" } }, [], 409); await send(page);
-  await expect(page.getByRole("status")).toContainText("DUPLICATE_REQUEST");
+  // Unknown Run startup is polled for at most ten seconds before recovery ends.
+  await expect(page.getByRole("status")).toContainText("DUPLICATE_REQUEST", { timeout: 12_000 });
+  await expect(page.locator(".message.assistant")).toHaveCount(0);
+});
+
+test("an input length rejection is explicit and never a clarification", async ({ page }) => {
+  await base(page, { detail: [{ type: "string_too_long", loc: ["body", "content"] }] }, [], 422);
+  await send(page);
+  await expect(page.getByRole("status")).toContainText("INPUT_LIMIT", { timeout: 12_000 });
   await expect(page.locator(".message.assistant")).toHaveCount(0);
 });
 

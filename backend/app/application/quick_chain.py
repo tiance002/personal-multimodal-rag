@@ -140,6 +140,10 @@ class LangChainQuickChain:
                 role.check()
             except ProviderRequestNotSent:
                 raise ProviderRequestNotSent(denial) from None
+            if role.service_binding is not None:
+                # Ordinary service has its own durable scope/capacity/budget
+                # admission; frozen evaluation grant checks apply below only.
+                continue
             if role.execution_kind == 'SIMULATED':
                 continue
             if (role.execution_kind != 'REAL' or str(policy.threshold) != '0.35'

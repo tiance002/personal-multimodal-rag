@@ -4,20 +4,30 @@ from backend.app.adapters.models.cloud import (
 )
 from backend.app.domain.adaptive_chunking import ChunkingConfig
 from backend.app.adapters.models.deepseek import DeepSeekGateway
+from backend.app.ports.service_policy import ServiceModelBinding
 
 
 class ProviderFactory:
     def __init__(self, registry, *, enabled_roles=(), usage_guards=None, embedding_admission=None,
-                 chunking_config=None,free_model_bindings=None):
+                 chunking_config=None,free_model_bindings=None, service_bindings=None):
         self.registry = registry
         self.enabled_roles = frozenset(enabled_roles)
         if not self.enabled_roles <= set(registry.defaults):
             raise ValueError("EGRESS_ROLE_UNSUPPORTED")
         self.usage_guards = dict(usage_guards or {})
+        self.api_keys = {}
         self.embedding_admission = embedding_admission
         self.chunking_config = chunking_config or ChunkingConfig()
         from backend.app.ports.xing_zero_reservation import SiliconFlowFreeBinding
         self.free_model_bindings = dict(free_model_bindings or {})
+        self.service_bindings = dict(service_bindings or {})
+        for role, binding in self.service_bindings.items():
+            if type(binding) is not ServiceModelBinding or role in self.free_model_bindings:
+                raise ValueError('SERVICE_MODEL_BINDING_INVALID')
+            binding.validate(registry.select(role))
+            if role in self.usage_guards and self.usage_guards[role] is not binding.usage_guard:
+                raise ValueError('SERVICE_USAGE_GUARD_MISMATCH')
+            self.usage_guards[role] = binding.usage_guard
         for role,binding in self.free_model_bindings.items():
             if type(binding) is not SiliconFlowFreeBinding or role not in ('embedding','rerank'):
                 raise ValueError('SF_FREE_BINDING_INVALID')
@@ -26,6 +36,14 @@ class ProviderFactory:
     def build(self, role, key=None, *, xing_binding=None):
         spec = self.registry.select(role, key)
         kwargs = dict(enabled=role in self.enabled_roles, usage_guard=self.usage_guards.get(role))
+        if role in self.api_keys:
+            kwargs['api_key'] = self.api_keys[role]
+        service_binding = self.service_bindings.get(role)
+        if service_binding is not None:
+            service_binding.validate(spec)
+            if xing_binding is not None:
+                raise ValueError('SERVICE_EVALUATION_POLICY_CONFLICT')
+            kwargs.update(service_binding=service_binding, usage_guard=service_binding.usage_guard)
         free_binding = self.free_model_bindings.get(role)
         if free_binding is not None:
             kwargs.update(free_binding=free_binding,transport=free_binding.authorized_transport,

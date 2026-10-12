@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -37,11 +37,17 @@ def _env_context_positive_int(name: str, default: int) -> int:
 
 @dataclass(frozen=True)
 class Settings:
+    model_api_keys: dict[str, str] = field(default_factory=dict, repr=False, compare=False)
+    model_configuration_revision: str = 'environment'
     memory_local_principal: str | None = None
     service_name: str = "personal-rag"
     cloud_enabled: bool = False
     model_registry_json: str | None = None
     embedding_backend: str = "siliconflow"
+    embedding_tokenizer_path: Path | None = None
+    service_model_policy_json: str | None = None
+    xing_capacity_resources: Path | None = None
+    deepseek_tokenizer_path: Path | None = None
     embedding_egress_enabled: bool = False
     chat_egress_enabled: bool = False
     rerank_egress_enabled: bool = False
@@ -127,8 +133,13 @@ class Settings:
             raise ValueError("RAG_INGESTION_LEASE_SECONDS must be positive")
         return cls(
             memory_local_principal=os.getenv('RAG_MEMORY_LOCAL_PRINCIPAL') or None,
-            model_registry_json=os.getenv("RAG_MODEL_REGISTRY_JSON"),
+            model_registry_json=os.getenv("RAG_MODEL_REGISTRY_JSON") or None,
             embedding_backend=os.getenv("RAG_EMBEDDING_BACKEND", cls.embedding_backend),
+            embedding_tokenizer_path=(Path(os.environ["RAG_EMBEDDING_TOKENIZER_PATH"])
+                                      if os.getenv("RAG_EMBEDDING_TOKENIZER_PATH") else None),
+            service_model_policy_json=os.getenv('RAG_SERVICE_MODEL_POLICY_JSON') or None,
+            xing_capacity_resources=Path(os.environ['RAG_XING_CAPACITY_RESOURCES']) if os.getenv('RAG_XING_CAPACITY_RESOURCES') else None,
+            deepseek_tokenizer_path=Path(os.environ['RAG_DEEPSEEK_TOKENIZER_PATH']) if os.getenv('RAG_DEEPSEEK_TOKENIZER_PATH') else None,
             embedding_egress_enabled=_env_context_bool("RAG_EMBEDDING_EGRESS_ENABLED", False),
             chat_egress_enabled=_env_context_bool("RAG_CHAT_EGRESS_ENABLED", False),
             rerank_egress_enabled=_env_context_bool("RAG_RERANK_EGRESS_ENABLED", False),

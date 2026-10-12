@@ -24,11 +24,19 @@ class ModelSpec:
     enabled: bool = True
     resolved_revision: str = "UNKNOWN"
     input_semantics_version: str = "context-header-child/v1"
+    user_configured: bool = False
 
     def __post_init__(self):
-        if self.role not in CAPABILITIES.get((self.provider, self.model_id), set()):
+        if self.user_configured:
+            from urllib.parse import urlsplit
+            url = urlsplit(self.base_url)
+            if (self.role not in {'embedding', 'rerank', 'chat_cheap', 'chat_expensive', 'vision'}
+                    or not self.provider or not self.model_id or url.scheme != 'https'
+                    or not url.hostname or url.username or url.password or url.query or url.fragment):
+                raise ValueError('MODEL_REGISTRATION_INVALID')
+        elif self.role not in CAPABILITIES.get((self.provider, self.model_id), set()):
             raise ValueError("MODEL_CAPABILITY_UNSUPPORTED")
-        if self.base_url != ENDPOINTS[self.provider] or self.api_key_env != KEY_ENVS[self.provider]:
+        if not self.user_configured and (self.base_url != ENDPOINTS[self.provider] or self.api_key_env != KEY_ENVS[self.provider]):
             raise ValueError("MODEL_ENDPOINT_OR_KEY_ENV_UNTRUSTED")
         if not self.model_key or type(self.enabled) is not bool:
             raise ValueError("MODEL_REGISTRATION_INVALID")

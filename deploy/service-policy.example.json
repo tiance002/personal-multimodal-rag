@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "policies": [
+    {
+      "policy_id": "owner-20261011-bge-m3-normal-v1",
+      "authorization_reference": "Owner 2026-10-11: ordinary BAAI/bge-m3 unlimited calls; Pro prohibited",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "roles": ["embedding"],
+      "token_limit": null,
+      "input_microunits_per_million": 0,
+      "output_microunits_per_million": 0,
+      "zero_quote": true
+    },
+    {
+      "policy_id": "owner-20261011-xing-normal-v1",
+      "authorization_reference": "Owner 2026-10-11: Xing free quote and unlimited calls",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "roles": ["chat_cheap"],
+      "token_limit": null,
+      "input_microunits_per_million": 0,
+      "output_microunits_per_million": 0,
+      "zero_quote": true
+    },
+    {
+      "policy_id": "owner-20261011-deepseek-normal-v1",
+      "authorization_reference": "Owner 2026-10-11: new normal service cumulative input+output limit 1000000; USD peak quote from https://api-docs.deepseek.com/quick_start/pricing/ verified 2026-10-11; existing evaluation ledgers unchanged",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "roles": ["chat_expensive", "vision"],
+      "token_limit": 1000000,
+      "input_microunits_per_million": 300000,
+      "output_microunits_per_million": 1200000,
+      "zero_quote": false
+    }
+  ]
+}

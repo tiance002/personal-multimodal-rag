@@ -13,12 +13,16 @@ os.environ['P55A_ISOLATED_AUTHORIZED']='p5-redis-lifecycle-r1'
 sys.dont_write_bytecode=True
 if sys.platform=='win32':
     v=sys.getwindowsversion();platform._uname_cache=platform.uname_result('Windows','',str(v.major),f'{v.major}.{v.minor}.{v.build}','UNKNOWN')
-target=json.loads((ROOT/'var/reports/p5-redis-lifecycle-r1/isolated-target.json').read_text())
-assert (target['database'],target['pg_port'],target['redis_port'],target['system_identifier'])==('p55a_lifecycle_test',52352,52355,'7694635764170571814')
+from backend.tests.isolated_target import isolated_target, database_url
+target=isolated_target()
+allowed_ports={target['pg_port'],target['redis_port']}
+if target.get('verified_revision')=='0022_memory_vector_index':
+    os.environ['P55E_ISOLATED_AUTHORIZED']='p55e-memory-vector-r1'
+# Identity is validated above; actual DB OID/system ID/revision are rechecked below.
 blocked=dict(network=0,secret=0,subprocess=0,database=0,stdlib_socketpair=0)
 def guard(event,args):
     if event=='socket.getaddrinfo':
-        if args[0]!='127.0.0.1' or int(args[1]) not in {52352,52355}:blocked['network']+=1;raise RuntimeError('ISOLATED_NETWORK_BLOCKED')
+        if args[0]!='127.0.0.1' or int(args[1]) not in allowed_ports:blocked['network']+=1;raise RuntimeError('ISOLATED_NETWORK_BLOCKED')
     if event in {'socket.connect','socket.sendto'}:
         address=args[1]
         # Windows asyncio's documented socketpair fallback connects exactly
@@ -32,7 +36,7 @@ def guard(event,args):
                     blocked['stdlib_socketpair']+=1
                     return
             frame=frame.f_back
-        if not isinstance(address,tuple) or address[0]!='127.0.0.1' or address[1] not in {52352,52355}:blocked['network']+=1;raise RuntimeError('ISOLATED_NETWORK_BLOCKED')
+        if not isinstance(address,tuple) or address[0]!='127.0.0.1' or address[1] not in allowed_ports:blocked['network']+=1;raise RuntimeError('ISOLATED_NETWORK_BLOCKED')
     if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):
         path=os.fsdecode(args[0]).replace('\\','/').lower();name=path.rsplit('/',1)[-1]
         if name.startswith('.env') or name in {'auth.json','token'} or path=='e:/codex_workspace/2026-10-01/task-2/deepseek-call-ledger.json':blocked['secret']+=1;raise RuntimeError('ISOLATED_SECRET_BLOCKED')
@@ -47,7 +51,7 @@ from psycopg.conninfo import conninfo_to_dict
 original=psycopg.Connection.connect.__func__
 def safe_connect(cls,conninfo='',**kw):
     opts=conninfo_to_dict(conninfo,**{k:v for k,v in kw.items() if k in {'host','port','dbname','user','password'}})
-    if (opts.get('host'),str(opts.get('port')),opts.get('dbname'),opts.get('user'))!=('127.0.0.1','52352','p55a_lifecycle_test','p55a'):
+    if (opts.get('host'),str(opts.get('port')),opts.get('dbname'),opts.get('user'))!=('127.0.0.1',str(target['pg_port']),'p55a_lifecycle_test','p55a'):
         blocked['database']+=1;raise RuntimeError('ISOLATED_DATABASE_BLOCKED')
     return original(cls,conninfo,**kw)
 psycopg.Connection.connect=classmethod(safe_connect);psycopg.connect=psycopg.Connection.connect
@@ -57,7 +61,7 @@ label=sys.argv[1]
 if not label.replace('-','').isalnum():raise ValueError('ATTEMPT_LABEL_INVALID')
 out=ROOT/'var/reports/p55b-context-r1'/label;out.mkdir(exist_ok=False)
 from sqlalchemy import create_engine
-url='postgresql+psycopg://p55a:SIMULATED_TEST_ONLY@127.0.0.1:52352/p55a_lifecycle_test'
+url=database_url(target)
 engine=create_engine(url)
 def snapshot():return {str(p.relative_to(ROOT)).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest() for d in ('backend/app','backend/tests','scripts','alembic/versions') for p in (ROOT/d).rglob('*.py')}
 before=snapshot();(out/'source-before.json').write_text(json.dumps(before,indent=2))
@@ -65,7 +69,7 @@ with engine.begin() as c:
     db=c.execute(text('SELECT current_database(),oid,(SELECT system_identifier FROM pg_control_system()) FROM pg_database WHERE datname=current_database()')).one()
     assert db==('p55a_lifecycle_test',16384,7694635764170571814)
     revision=c.execute(text('SELECT version_num FROM alembic_version')).scalar_one()
-    assert revision in {'0018_run_attempt_lifecycle','0019_context_checkpoints'}
+    assert revision in {'0018_run_attempt_lifecycle','0019_context_checkpoints','0022_memory_vector_index'}
     old_chat_constraint=c.execute(text("SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname='attempt_role_ordinal_ck'")).scalar_one()
     schema_before={'identity':list(db),'revision':revision,'chat_constraint':old_chat_constraint}
     if revision=='0018_run_attempt_lifecycle':

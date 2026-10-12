@@ -1,0 +1,146 @@
+{
+  "schema_version": "local-root-cause-v1",
+  "date": "2026-10-11",
+  "head": "d13951afbd4de4432d231a5921c8657daedab853",
+  "scope": {
+    "knowledge_base_ids": [
+      "d78f3434-0e8f-40bf-afcb-f1c2c311ff51"
+    ],
+    "document_ids": [],
+    "cloud_allowed": false
+  },
+  "runs": [
+    {
+      "q0": "hello",
+      "run_id": "d04fed31-22d1-4285-8e1f-9fb97cfdb965",
+      "state": "failed",
+      "error": "NO_CANDIDATES",
+      "stored_hits": 0,
+      "vector_status": "UNKNOWN"
+    },
+    {
+      "q0": "你好",
+      "run_id": "eb3b6fc5-b743-4274-991e-281657de3da1",
+      "state": "failed",
+      "error": "NO_CANDIDATES",
+      "stored_hits": 0,
+      "vector_status": "UNKNOWN"
+    }
+  ],
+  "observed_local": {
+    "active_versions": 6,
+    "ready_versions": 6,
+    "chunks": 47,
+    "chunks_with_terms": 47,
+    "chunks_with_vectors": 47,
+    "current_child_identity_matches": "UNKNOWN",
+    "migration": "0013_message_run_link",
+    "original_stage_reason": "UNKNOWN",
+    "storage_objects_restored": 11,
+    "source_preview_http_200": 12
+  },
+  "conclusions": [
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "Actual API storage lacked the scoped source/normalized objects",
+      "result": "RESTORED",
+      "evidence": "var/reports/no-candidates-20261011/storage-restore.json"
+    },
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "Actual API is an older Ollama assembly and connection refused at observation time",
+      "original_run_vector_reason": "UNKNOWN"
+    },
+    {
+      "classification": "PROVEN_CODE_PATH",
+      "issue": "Vector failures and missing profiles can collapse into NO_CANDIDATES",
+      "patch": "versioned safe retrieval diagnostics"
+    },
+    {
+      "classification": "PROVEN_CODE_PATH",
+      "issue": "Ordinary source assembly lacks verified Chat capacity and normal service policy",
+      "status": "PATCHED_AND_CONFIGURATION_VERIFIED"
+    },
+    {
+      "classification": "CONDITIONAL_RISK",
+      "issue": "Migrated legacy index identities would be excluded by current index predicates",
+      "action": "Verified later; six new immutable versions, original identity unchanged"
+    },
+    {
+      "classification": "NOT_REPRODUCED",
+      "issue": "Single historical root cause for original vector channel",
+      "reason": "Original runtime did not persist stage diagnostics"
+    },
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "Normal cloud upload-answer-citation-history closure",
+      "status": "REPRODUCED_LATER_SEPARATE_EVIDENCE"
+    },
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "All six original active versions gained legacy/v1 on migration; original 47 children excluded by current p3 predicates",
+      "action": "Six immutable new versions through ordinary API/Worker succeeded; no historical identity updates",
+      "evidence": "var\\reports\\no-candidates-20261011\\scoped-new-versions-real.json"
+    },
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "Original Scope replay after new versions reached 32 vector candidates but frozen Xing 4096/8192 local limits blocked generation",
+      "action": "Separate ordinary pinned-window limits, preserve frozen evaluation limits; 91 related offline checks",
+      "evidence": "var\\reports\\no-candidates-20261011\\original-question-replay-real.json"
+    },
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "Public fixture real upload, indexing, generation, validation, committed history and citation; real browser one POST and reload",
+      "result": "CHECKS_PASSED",
+      "evidence": "var\\reports\\no-candidates-20261011\\normal-web-real.json"
+    },
+    {
+      "classification": "OBSERVED_LOCAL",
+      "issue": "Original hello/你好 second replay: vector OK (32), generation ProviderFailure / MODEL_UNAVAILABLE / zero citations",
+      "original_provider_failure_detail": "UNKNOWN; near 30s timeout is inference, not a stored transport code",
+      "action": "Keep two unknown token reservations; no silent provider fallback",
+      "evidence": "var\\reports\\no-candidates-20261011\\original-question-replay-real-r2.json"
+    }
+  ],
+  "model_policy": {
+    "embedding": "BAAI/bge-m3",
+    "prohibited_embedding": "Pro/BAAI/bge-m3",
+    "cheap": "XingChenAGI/Xing4.0-29B",
+    "expensive": "deepseek-flash",
+    "vision": "deepseek-flash",
+    "deepseek_total_input_output_limit": 1000000,
+    "service_policy_implemented": true
+  },
+  "provider_calls_in_repair": "REAL_CALLS_OCCURRED; see independent normal-service ledger; UNKNOWN retained",
+  "acceptance": "NOT_ACCEPTED",
+  "current_runtime": {
+    "migration": "0023_service_token_policy",
+    "entry": "http://127.0.0.1:14188/",
+    "cloud_allowed": true,
+    "authorization": "Owner current KB task-only",
+    "api_worker_shared_identity": "p3:391208cb6fb98bbcd68552703cfa80d158973c46902eb9f321a1c1f02d88c041",
+    "snapshot": "var/reports/no-candidates-20261011/current-runtime-20261012.json"
+  },
+  "resume_20261012": {
+    "classification": "OBSERVED_LOCAL",
+    "goal_status": "ACTIVE_NOT_ACCEPTED",
+    "model_configuration_revision": "bcd271c7-e820-45d4-9910-039384d268cd",
+    "api_worker_save_restart": "CHECKS_PASSED",
+    "historical_versions_chunks_hashes": "7 versions / 47 chunks unchanged; 12 source/preview HTTP200",
+    "failed_candidate": "TEXT_UTF8_DECODE_FAILED; old active unchanged; zero providers",
+    "privacy": "CLOUD_EGRESS_DISABLED before retrieval; permission_required POST/GET/UI; zero providers",
+    "original_hello_diagnostic": {
+      "run_id": "c1f82e19-bc8f-4aa4-8307-4f025610c8e4",
+      "scope_unchanged": true,
+      "vector_candidates": 32,
+      "bge": "SUCCEEDED",
+      "xing": "SUCCEEDED_BUT_UNSUPPORTED_ANSWER",
+      "deepseek": "TLS SSLError classification; physical phase UNKNOWN",
+      "terminal": "MODEL_UNAVAILABLE",
+      "citations": 0
+    },
+    "tls_without_credentials": "DEFAULT/TLSv1.2 succeeded for both providers; zero model calls; does not prove generation repaired",
+    "contract": "OpenAPI/SSE checks pass; 31 baseline import violations, zero introduced pairs",
+    "historical_regression": "79 real isolated PG/Redis SIMULATED models; 116 offline; 89 BM25/context; 40 browser SIMULATED API"
+  }
+}

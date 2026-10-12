@@ -29,8 +29,10 @@ from backend.app.domain.models import ChunkRecord
 from backend.tests.test_p5_router_generation import make_chain, GOOD
 
 ROOT = Path(__file__).resolve().parents[2]
-URL = 'postgresql+psycopg://p55a:SIMULATED_TEST_ONLY@127.0.0.1:55729/p55a_lifecycle_test'
-REDIS = 'redis://127.0.0.1:52355/0'
+from backend.tests.isolated_target import isolated_target, database_url
+_target = isolated_target()
+URL = database_url(_target)
+REDIS = f"redis://127.0.0.1:{_target['redis_port']}/0"
 
 
 def connect():

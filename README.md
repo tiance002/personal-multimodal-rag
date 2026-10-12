@@ -1,6 +1,8 @@
 # Personal Multimodal RAG Knowledge Agent V1.0
 
-一个本地优先、单机多知识库、多模态资料管理与 RAG 问答工作台。原始文件按 SHA-256 内容寻址保存，文档版本不可静默覆盖；检索范围由服务端 conversation scope 决定，引用必须能回读真实 chunk/version/locator。默认 `cloud_enabled=false`，前端不保存任何 provider 凭据。
+一个本地优先、单机多知识库、多模态资料管理与 RAG 问答工作台。原始文件按 SHA-256 内容寻址保存，文档版本不可静默覆盖；检索范围由服务端 conversation scope 决定，引用必须能回读真实 chunk/version/locator。新知识库默认禁止云端外发；模型密钥由本机服务保存，不写入浏览器持久存储。
+
+当前普通服务入口与唯一现行配置说明见 [RUNNING.md](docs/RUNNING.md)。页面“系统设置”配置五个模型角色；当前选用普通 SiliconFlow BGE-M3、Xing cheap、DeepSeek expensive/VLM。下面 Windows 原生交付和 Ollama 命令是此前阶段的独立示例，不能代表当前实际容器的模型、端口或授权。任务进度与尚未完成项见 [限定修复报告](docs/audits/no-candidates-20261011/MINIMAL_FIX_REPORT.md)。
 
 开发状态、测试入口与产物保护见[文档索引](docs/README.md)。
 

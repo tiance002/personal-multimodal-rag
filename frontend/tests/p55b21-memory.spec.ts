@@ -3,7 +3,7 @@ import { test,expect } from '@playwright/test';
 test('explicit Global choice, Scoped default, late responses, edit/source/delete',async({page},testInfo)=>{
  const rows:Record<string,any[]>={SCOPED:[],GLOBAL:[]};const sent:any[]=[];
  let held=false;let release:(()=>void)|undefined;const gate=new Promise<void>(r=>{release=r;});
- await page.route('**/api/**',async route=>{
+ await page.route('**/api/v1/**',async route=>{
   const req=route.request(),p=new URL(req.url()).pathname,b=req.method()==='GET'?{}:req.postDataJSON();let data:any=[];
   if(p.endsWith('/knowledge-bases'))data=[{id:'kb',name:'KB',graph_enabled:false}];
   else if(p.endsWith('/conversations'))data=[{id:'conv',title:'会话A',knowledge_base_scope:['kb'],document_scope:['A']}];

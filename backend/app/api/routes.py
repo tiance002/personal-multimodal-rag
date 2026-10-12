@@ -49,10 +49,27 @@ class ConversationPatch(BaseModel):
 
 class MessageIn(BaseModel):
     request_id: uuid.UUID | None = None
-    content: str = Field(min_length=1, max_length=100_000)
+    content: str = Field(min_length=1, max_length=4096)
     mode: str = Field(default="quick", pattern="^(quick|smart)$")
     expected_knowledge_base_scope: list[str] | None = None
     expected_document_scope: list[str] | None = None
+
+
+def model_configuration_input_schema():
+    # Runtime validation uses fixed public errors and never echoes secret input.
+    return {'type': 'object', 'additionalProperties': False, 'required': ['revision', 'roles'],
+            'properties': {
+                'revision': {'type': 'string'},
+                'roles': {'type': 'array', 'minItems': 5, 'maxItems': 5,
+                    'items': {'type': 'object', 'additionalProperties': False,
+                        'required': ['role', 'provider', 'model', 'base_url'],
+                        'properties': {
+                            'role': {'type': 'string', 'enum': ['embedding', 'rerank', 'chat_cheap', 'chat_expensive', 'vision']},
+                            'provider': {'type': 'string', 'minLength': 1, 'maxLength': 500},
+                            'model': {'type': 'string', 'minLength': 1, 'maxLength': 500},
+                            'base_url': {'type': 'string', 'minLength': 1, 'maxLength': 500},
+                            'api_key': {'type': 'string', 'maxLength': 4096, 'writeOnly': True,
+                                        'description': 'Leave blank to retain the same destination credential.'}}}}}}
 
 
 def _container(request: Request) -> Container:
@@ -398,7 +415,8 @@ def _answer_service(request: Request) -> AnswerService:
         quick_settings=QuickSettings(cloud_enabled=settings.cloud_enabled,
             prefer_cloud=settings.prefer_cloud, cloud_fallback_enabled=settings.cloud_fallback_enabled,
             cloud_provider="deepseek", cloud_model=settings.cloud_model,
-            cloud_cost_estimate_microunits=settings.cloud_cost_estimate_microunits),
+            cloud_cost_estimate_microunits=settings.cloud_cost_estimate_microunits,
+            answer_output_token_cap=512 if settings.service_model_policy_json is not None else None),
     )
 
 
@@ -422,6 +440,10 @@ def send_message(conversation_id: str, request: Request, payload: MessageIn):
         return _error(request, "RAG_RUN_FAILED", type(exc).__name__, 500)
     if outcome.error_code in {"DUPLICATE_REQUEST", "REQUEST_ID_CONFLICT", "IDEMPOTENCY_UNAVAILABLE", "IDEMPOTENCY_REQUIRED"}:
         return _error(request, outcome.error_code, "request not regenerated; use the original run or refresh", 409)
+    from backend.app.ports.run_presentation import failure_presentation
+    legacy_hint = (outcome.trace.get('execution_mode') == 'clarification'
+                   and outcome.trace.get('clarification_required') is True) or outcome.trace.get('evidence_hint')
+    presentation = None if legacy_hint else failure_presentation(outcome.error_code, outcome.trace.get('metrics'))
     return _ok(
         request,
         {
@@ -430,6 +452,7 @@ def send_message(conversation_id: str, request: Request, payload: MessageIn):
             "citations": list(outcome.citations),
             "error_code": outcome.error_code,
             "trace": outcome.trace,
+            "presentation": presentation,
         },
         201,
     )
@@ -500,8 +523,11 @@ def get_settings(request: Request):
 
 @router.get("/settings/models")
 def get_models(request: Request):
-    settings = request.app.state.settings
-    return _ok(request, {"chat": settings.ollama_chat_model, "embedding": settings.ollama_embedding_model, "provider": "ollama"})
+    data = _container(request).model_readiness()
+    # Retain the old keys while reporting their actual assembled identities.
+    return _ok(request, {"chat": data["roles"]["chat"]["model"],
+                         "embedding": data["roles"]["embedding"]["model"],
+                         "provider": data["roles"]["embedding"]["provider"], **data})
 
 
 @router.patch("/settings")
@@ -524,6 +550,34 @@ def patch_settings(request: Request, payload: dict[str, Any]):
         request.app.state.settings = settings.__class__(**{**settings.__dict__, **payload})
         _container(request).budget_gate.monthly_budget_microunits = request.app.state.settings.monthly_cloud_budget_microunits
     return get_settings(request)
+
+
+@router.get('/settings/model-configuration')
+def get_model_configuration(request: Request):
+    from backend.app.bootstrap import read_model_configuration
+    return _ok(request, read_model_configuration(request.app.state.base_settings))
+
+
+@router.put('/settings/model-configuration', openapi_extra={
+    'requestBody': {'content': {'application/json': {'schema': model_configuration_input_schema()}}}})
+def put_model_configuration(request: Request, payload: dict[str, Any]):
+    from backend.app.bootstrap import save_model_configuration
+    # Serialize persistence AND the in-process swap to avoid applying an older
+    # revision after a concurrent save. Worker consumes the same atomic file.
+    with request.app.state.model_configuration_lock:
+        try:
+            configured, candidate = save_model_configuration(request.app.state.base_settings, payload)
+        except ValueError as exc:
+            code = 'MODEL_SETTINGS_CONFLICT' if str(exc) == 'MODEL_SETTINGS_CONFLICT' else 'MODEL_SETTINGS_INVALID'
+            return _error(request, code, '模型配置未保存，请检查模型名称、提供商和 HTTPS 接口网址',
+                          409 if code.endswith('CONFLICT') else 400)
+        except Exception:
+            return _error(request, 'MODEL_SETTINGS_SAVE_FAILED', '模型配置未保存，请检查本地服务与存储权限', 503)
+        request.app.state.settings = configured
+        previous = request.app.state.container
+        request.app.state.container = candidate
+        previous.engine.dispose()
+    return get_model_configuration(request)
 
 
 class MemoryScopeIn(BaseModel):

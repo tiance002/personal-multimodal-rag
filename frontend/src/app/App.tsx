@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
-import { api, sendMessageWithEvents } from "../api/client";
-import { clarificationText, evidenceHintText, tableHeaderHint } from "./state";
+import { api, sendMessageWithEvents, retrievalFailureText } from "../api/client";
+import { clarificationText, evidenceHintText, tableHeaderHint, validRunDiagnostic } from "./state";
 import type {
   AppState,
   Conversation,
@@ -16,6 +16,7 @@ import { DocumentPreviewModal } from "../components/DocumentPreviewModal";
 import { KnowledgeBasePanel } from "../components/KnowledgeBasePanel";
 import { Sidebar } from "../components/Sidebar";
 import { MemoryPanel } from "../components/MemoryPanel";
+import { ModelSettingsPanel } from "../components/ModelSettingsPanel";
 import { useResizablePanelWidth } from "../components/useResizablePanelWidth";
 
 const initialState: AppState = {
@@ -75,7 +76,21 @@ export default function App() {
       initialWidth: 460,
       minWidth: 420,
     });
-  const [notice, setNotice] = useState("本地索引已连接");
+  const [notice, setNotice] = useState("正在读取运行状态");
+  const [modelBadge, setModelBadge] = useState("模型状态未知");
+  const [cloudConsentPending, setCloudConsentPending] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void api.models().then(models => {
+      if (cancelled) return;
+      const embedding = models.roles?.embedding;
+      const chat = models.roles?.chat;
+      setModelBadge(embedding && chat
+        ? `Embedding ${embedding.provider} · Chat ${chat.provider}${models.status === "NOT_READY" ? " · 未就绪" : ""}`
+        : `${models.provider} · 能力未核验`);
+    }).catch(() => { if (!cancelled) setModelBadge("模型状态未知"); });
+    return () => { cancelled = true; };
+  }, []);
   const scopeSyncRef = useRef(false);
   const sendPendingRef = useRef(false);
   const messageRequestEpoch = useRef(0);
@@ -715,9 +730,15 @@ export default function App() {
         result.citations.length === 0 && result.run_id.trim().length > 0 &&
         tableHeaderHint(hint) && result.answer === hint.text;
       const errorText = result.error_code && !isClarification
-        ? `回答未完成：${result.error_code}`
+        ? retrievalFailureText(result) ?? `回答未完成：${result.error_code}`
         : result.answer;
-      if (isTableHint) {
+      const diagnostic = result.error_code && result.citations.length === 0 && result.run_id.trim() &&
+        validRunDiagnostic(result.presentation) ? result.presentation : null;
+      if (diagnostic) {
+        setMessages((current) => current.map((message, index) =>
+          index === current.length - 1 && message.role === "user" && message.content === content
+            ? { ...message, run_id: result.run_id, presentation: diagnostic } : message));
+      } else if (isTableHint) {
         setMessages((current) => current.map((message, index) =>
           index === current.length - 1 && message.role === "user" && message.content === content
             ? { ...message, run_id: result.run_id, presentation: hint } : message));
@@ -728,7 +749,7 @@ export default function App() {
         ]);
       }
       setNotice(
-        isTableHint
+        diagnostic ? diagnostic.text : isTableHint
           ? "表格证据无法核验；可将相关表格另存为 XLSX 后上传"
           : isClarification
           ? "请补充问题中的对象或上下文后再提问"
@@ -818,7 +839,7 @@ export default function App() {
               )}
             </div>
             <div className="topbar-actions">
-              <span className="local-badge">本地模式</span>
+              <span className="local-badge">{modelBadge}</span>
               <span className="notice" role="status">
                 {notice}
               </span>
@@ -897,6 +918,29 @@ export default function App() {
           ) : (
             <section className="settings-page">
               <h1>系统设置</h1>
+              <ModelSettingsPanel onSaved={() => {
+                void api.models().then(models => setModelBadge(models.status === "NOT_READY" ? "模型配置待完成" : "模型已配置"));
+              }} />
+              <label className="setting-row">
+                <span>
+                  <strong>允许当前知识库外发 · {selectedBase?.name ?? "请先选择知识库"}</strong>
+                  <small>允许向已配置的云模型发送本库问题、资料片段及图像；关闭后禁止外发。</small>
+                </span>
+                <Switch checked={selectedBase?.cloud_allowed === true}
+                  disabled={!selectedBase || cloudConsentPending}
+                  onChange={async allowed => {
+                    if (!selectedBase) return;
+                    const id = selectedBase.id;
+                    setCloudConsentPending(true);
+                    try {
+                      const updated = await api.setKnowledgeBaseCloudAllowed(id, allowed);
+                      setBases(current => current.map(base => base.id === id ? updated : base));
+                      setNotice(allowed ? "当前知识库已允许外发" : "当前知识库已关闭外发");
+                    } catch (error) {
+                      setNotice(error instanceof Error ? error.message : "外发设置更新失败");
+                    } finally { setCloudConsentPending(false); }
+                  }} />
+              </label>
               <MemoryPanel kbId={state.selectedKnowledgeBaseId} documentScope={state.documentScope} />
               <p>调整本机工作台的显示方式。</p>
               <label className="setting-row">

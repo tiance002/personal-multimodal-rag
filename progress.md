@@ -318,3 +318,19 @@
 3. 结果：工程机制与评估协议PASS；语义完整质量门19/32=59.375%，旧62.5%不改，质量回归验收FAIL。截断0、引用身份冲突0；仍6题部分引用支持。没有Retrieval调参，32题retrieved/selected ID完全相同。
 4. 风险遗留：Context充分的8题模型失败候选、3题Retrieval先行、2题Reference范围待负责人复核。原004/009 candidate缺失仍不能证明Validator误拒；8/32Overlay仅旧答案。未自行批准退化延期，不继续无限调分。
 5. 版本下一步：分支codex/local-first-rag-v1-20260930，基底52d770e8418bb040c372bf8d9014381ed68bc160，修改未提交未合并，无Tag。停止本Goal工程与实验；下一阶段需负责人决定，不自动实现Cloud。
+
+## 2026-10-11 NO_CANDIDATES 任务暂停交接
+
+1. 目标与改动：负责人要求暂停执行；当前修复、真实服务和UI改动保留，不撤销、不提交、不打Tag。五角色模型配置表单、本机密钥安全保存接口、资料完整名称显示已实现。完整任务G4/G5尚未完成。
+2. 执行命令：本轮模型配置定向pytest退出0、102 passed；Playwright退出0、12 passed（SIMULATED API）；真实网页只读脚本退出0（5角色/9名称/0模型调用/0变更请求）；Docker构建与部署退出0。完整命令、失败尝试、报告位置与证据界限见 docs/audits/no-candidates-20261011/PAUSE_HANDOFF.md。
+3. 结果：局部检查PASS，真实服务/公开样本闭环有既有证据；全任务验收NOT RUN。新模型配置真实保存与Worker同步、新API的OpenAPI快照、隐私/版本保护和受影响历史回归尚未完成；未知模型适配及Rerank不可称已支持。
+4. 风险与遗留：原hello/你好候选已恢复但生成仍MODEL_UNAVAILABLE，原因UNKNOWN；两笔UNKNOWN预留保持。旧回归65隔离setup错误和2边界失败需归属核查。没有自行批准延期。
+5. 版本与下一步：main HEAD d13951afbd4de4432d231a5921c8657daedab853，工作树未提交。网页14188、API/Worker/Redis/DB保持运行。续做入口 PAUSE_HANDOFF.md 和忽略目录 var/codex-goals/no-candidates-20261011.json；须负责人明确恢复后执行。MANUALLY_SUPERVISED_TRIAL。
+
+## 2026-10-12 恢复 Goal：配置、保护与验收续做
+
+1. 目标与改动：按PAUSE_HANDOFF恢复原完整任务。五角色配置真实保存/API Worker同步与重启恢复验证通过；权限失败DTO、固定provider诊断、历史测试fixture漂移修复；来源/旧版本与失败新版本保护验证通过。当前入口说明改为docs/RUNNING.md，历史运行快照保留。
+2. 执行命令：MINIMAL_FIX_REPORT.md列原样命令/退出码/报告；真实专用PG/Redis79 passed（模型SIMULATED），离线116 passed，BM25/context89 passed，浏览器40 passed（API SIMULATED），装配/窗口96 passed。真实版本保护12回读/0调用；配置保存重启0调用；失败历史两轮0变更。整体contract退出1，31基线import违规/0新增；OpenAPI/SSE各项无漂移。不存在或未运行发布命令不能称通过。
+3. 结果：有限公开样本真实问答/引用/恢复有既有PASS证据；G4原hello新诊断仍MODEL_UNAVAILABLE：BGE与Xing成功、Xing输出未过Validator后DeepSeek升级TLS层异常。旧失败原因UNKNOWN，不反推；不关闭证书校验、自动重试、切模型或释放UNKNOWN。全任务未验收，Goal active。
+4. 风险与遗留：DeepSeek当前真实生成需受控复核；新未知模型能力适配/Rerank实际调用未启用；31历史分层违规不为此次全仓重构。没有负责人延期批准、发布验收或Tag。
+5. 版本与下一步：main基底d13951af，准备故障修复提交，再独立历史AGENTS附录归档/冗余说明提交；证据与checkpoint保持忽略。不得删除源/Gold/迁移/旧引用/失败/UNKNOWN记录。MANUALLY_SUPERVISED_TRIAL。

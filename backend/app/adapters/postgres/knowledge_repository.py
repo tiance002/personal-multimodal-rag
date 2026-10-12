@@ -43,11 +43,13 @@ class PostgresKnowledgeRepository:
         *,
         max_chunk_chars: int = 512,
         chunk_overlap: int = 80,
+        service_caption_enricher=None,
     ) -> None:
         self.engine = engine
         self.storage = storage
         self.parsers = parsers or ParserRegistry()
         self.embedding_provider = embedding_provider
+        self.service_caption_enricher = service_caption_enricher
         self.max_chunk_chars = max_chunk_chars
         self.chunk_overlap = chunk_overlap
         self.chunking_config = ChunkingConfig(general_size=max_chunk_chars, general_overlap=chunk_overlap)
@@ -316,10 +318,10 @@ class PostgresKnowledgeRepository:
     def get_document(self, document_id: str) -> dict[str, Any] | None:
         with self.engine.connect() as conn:
             row = conn.execute(text("""SELECT d.id,d.knowledge_base_id,d.file_name,d.media_type,d.original_size,d.active_version_id,d.created_at,d.updated_at,
-                dv.version_no,dv.index_status,dv.graph_status,dv.source_sha256
+                dv.version_no,dv.index_status,dv.graph_status,dv.source_sha256,dv.index_identity
                 FROM documents d LEFT JOIN document_versions dv ON dv.id=d.active_version_id
                 WHERE d.id=:id AND d.deleted_at IS NULL"""), {"id": document_id}).mappings().first()
-            return dict(row) if row else None
+            return self._index_compatibility(dict(row)) if row else None
 
     def get_document_access(self, document_id: str) -> dict[str, Any] | None:
         """Resolve ownership and active-index state before a document read."""
@@ -347,7 +349,7 @@ class PostgresKnowledgeRepository:
         with self.engine.connect() as conn:
             rows = conn.execute(text("""
                 SELECT d.id,d.knowledge_base_id,d.file_name,d.media_type,d.original_size,d.active_version_id,d.updated_at,
-                       dv.version_no,dv.index_status,dv.graph_status,
+                       dv.version_no,dv.index_status,dv.graph_status,dv.index_identity,
                        lv.id AS latest_version_id,lv.version_no AS latest_version_no,lv.index_status AS latest_index_status,
                        lj.id AS latest_job_id,lj.status AS latest_job_status,lj.stage AS latest_job_stage,
                        lj.progress AS latest_job_progress,lj.error_code AS latest_job_error_code,
@@ -364,7 +366,16 @@ class PostgresKnowledgeRepository:
                     WHERE ij.version_id=lv.id ORDER BY ij.created_at DESC, ij.id DESC LIMIT 1
                 ) lj ON true
                 WHERE d.knowledge_base_id=:kb AND d.deleted_at IS NULL ORDER BY d.updated_at DESC"""), {"kb": kb_id}).mappings()
-            return [self._document_row(row) for row in rows]
+            return [self._index_compatibility(self._document_row(row)) for row in rows]
+
+    def _index_compatibility(self, document: dict[str, Any]) -> dict[str, Any]:
+        active_identity = document.get('index_identity')
+        status = ('NOT_INDEXED' if document.get('index_status') != 'ready' else
+                  'COMPATIBLE' if active_identity == self.chunking_config.identity else 'INCOMPATIBLE')
+        document['index_compatibility'] = dict(schema_version='index-compatibility-v1',
+            status=status, active_identity=active_identity, required_identity=self.chunking_config.identity,
+            reason_code='INDEX_IDENTITY_INCOMPATIBLE' if status == 'INCOMPATIBLE' else None)
+        return document
 
     @staticmethod
     def _document_row(row: Any) -> dict[str, Any]:
@@ -453,6 +464,13 @@ class PostgresKnowledgeRepository:
                     normalized = parse_version_source(self.parsers, self.storage, source)
                 else:
                     normalized, reused = validate_prepared_input(prepared_input, self.storage, source, self.chunking_config)
+                if self.service_caption_enricher is not None and prepared_input is None:
+                    normalized = self.service_caption_enricher.enrich_for_ingestion(normalized,
+                        scope=Scope.from_ids([str(version['knowledge_base_id'])], [str(version['document_id'])]),
+                        job_id=job_id,
+                        permission_check=lambda: (self.get_knowledge_base(str(version['knowledge_base_id'])) or {}).get('cloud_allowed') is True,
+                        lease_check=lambda: self.renew_job(job_id, worker_id=worker_id,
+                            claim_token=claim_token, lease_seconds=lease_seconds))
                 self.update_job_progress(
                     job_id,
                     worker_id=worker_id,
@@ -618,7 +636,9 @@ class PostgresKnowledgeRepository:
                 if completion.rowcount != 1:
                     raise RuntimeError("INGESTION_CLAIM_LOST")
         except Exception as exc:
-            code = str(exc) if isinstance(exc, ParserError) else type(exc).__name__
+            from backend.app.ports.providers import ProviderUnavailable, public_provider_reason
+            code = (str(exc) if isinstance(exc, ParserError) else
+                    public_provider_reason(exc) if isinstance(exc, ProviderUnavailable) else type(exc).__name__)
             with self.engine.begin() as conn:
                 conn.execute(
                     text("""
@@ -778,7 +798,8 @@ class PostgresKnowledgeRepository:
             if not owned(): raise RuntimeError('INGESTION_LEASE_LOST')
             inputs = [c.embedding_content for c in chunks[start:start+batch_size]]
             kwargs = {}
-            if getattr(self.embedding_provider,'free_binding',None) is not None:
+            if (getattr(self.embedding_provider,'free_binding',None) is not None
+                    or getattr(self.embedding_provider,'service_binding',None) is not None):
                 kwargs = dict(purpose='index_embedding',batch_id=f'{version_id}:{job_id}:{number}:{batches}',lease_check=owned,
                     document_version_ids=(str(version_id),)*len(inputs) if chunk_ids else (),
                     chunk_ids=tuple(chunk_ids[start:start+batch_size]))
@@ -1391,10 +1412,22 @@ class PostgresKnowledgeRepository:
             rows = conn.execute(text("""
                 SELECT m.id,m.conversation_id,m.role,m.content,m.created_at,m.run_id,
                        COALESCE(ev.citations, '[]'::jsonb) AS citations,
-                       presentation.payload AS presentation
+                       presentation.payload AS presentation,
+                       failure.error_code AS run_error_code,failure.metrics AS run_metrics
                 FROM conversation_messages m
                 JOIN conversations c ON c.id=m.conversation_id AND c.deleted_at IS NULL
                 LEFT JOIN rag_runs r ON r.id=m.run_id AND r.conversation_id=m.conversation_id
+                LEFT JOIN LATERAL (
+                    SELECT r.error_code AS error_code, (
+                        SELECT e.payload FROM retrieval_events e
+                        WHERE e.run_id=r.id AND e.event_type='run.metrics'
+                          AND e.payload->>'error'=r.error_code
+                        ORDER BY e.seq DESC LIMIT 1
+                    ) AS metrics
+                    WHERE m.role='user' AND r.status='failed' AND r.completed_at IS NOT NULL
+                      AND r.knowledge_base_scope=c.knowledge_base_scope
+                      AND r.document_scope=c.document_scope
+                ) failure ON true
                 LEFT JOIN LATERAL (
                     SELECT e.payload->'presentation' AS payload
                     FROM retrieval_events e
@@ -1428,6 +1461,7 @@ class PostgresKnowledgeRepository:
         citations = message.get("citations")
         message["citations"] = list(citations) if isinstance(citations, list) else []
         presentation = message.pop("presentation", None)
+        run_error_code, run_metrics = message.pop('run_error_code', None), message.pop('run_metrics', None)
         if (message.get("role") == "user" and message.get("run_id")
                 and not message["citations"] and isinstance(presentation, dict)
                 and presentation.get("kind") == "clarification"
@@ -1439,6 +1473,11 @@ class PostgresKnowledgeRepository:
                 and not message["citations"] and valid_hint(presentation)):
             message["presentation"] = {key: presentation[key] for key in
                                        ("kind", "text", "reason_code", "source_formats")}
+        elif message.get('role') == 'user' and message.get('run_id') and not message['citations']:
+            from backend.app.ports.run_presentation import failure_presentation
+            diagnostic = failure_presentation(run_error_code, run_metrics)
+            if diagnostic is not None:
+                message['presentation'] = diagnostic
         return message
 
     def completed_history_context(self, conversation_id: str, kb_scope: list[str],

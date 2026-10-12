@@ -215,7 +215,16 @@ class SiliconFlowXingCapacityCounter:
 
     identity = RENDERER_IDENTITY
 
-    def __init__(self, resource_directory: str | Path, *, production_profile=None):
+    def __init__(self, resource_directory: str | Path, *, production_profile=None, ordinary_service=False):
+        if type(ordinary_service) is not bool or (ordinary_service and production_profile is not None):
+            raise XingCapacityUnavailable('XING_CAPACITY_PROFILE_UNVERIFIED')
+        # Frozen evaluation keeps its small local limits. Ordinary service uses
+        # the hash-verified upstream window, with the same exact rendering and
+        # normalized-byte proof; this does not assert hosted equivalence.
+        self.local_input_token_cap = OFFICIAL_CONTEXT_WINDOW - LOCAL_OUTPUT_TOKEN_CAP if ordinary_service else LOCAL_INPUT_TOKEN_CAP
+        self.local_content_utf8_cap = OFFICIAL_CONTEXT_WINDOW if ordinary_service else LOCAL_CONTENT_UTF8_CAP
+        self.local_wire_byte_cap = 6 * OFFICIAL_CONTEXT_WINDOW + LOCAL_WIRE_BYTE_CAP if ordinary_service else LOCAL_WIRE_BYTE_CAP
+        self.identity = RENDERER_IDENTITY + (';ordinary-window/v1' if ordinary_service else '')
         if production_profile is not None:
             if type(production_profile) is not XingCapacityProfile:
                 raise XingCapacityUnavailable('XING_CAPACITY_PROFILE_UNVERIFIED')
@@ -305,7 +314,7 @@ class SiliconFlowXingCapacityCounter:
             if any(s in message["content"] for s in self._special_ids):
                 # Do not reinterpret user text as control/reasoning/tool markers.
                 raise XingCapacityUnavailable("XING_SPECIAL_TOKEN_LITERAL_UNSUPPORTED")
-        if content_bytes > LOCAL_CONTENT_UTF8_CAP:
+        if content_bytes > self.local_content_utf8_cap:
             raise XingCapacityUnavailable("XING_CONTENT_LOCAL_CAP_EXCEEDED")
 
     def _count_rendered(self, rendered: str, thinking: bool) -> LocalProfileCount:
@@ -360,7 +369,7 @@ class SiliconFlowXingCapacityCounter:
             if body.get('enable_thinking') is not False:
                 raise XingCapacityUnavailable('XING_THINKING_FIELD_UNSUPPORTED')
         serialized = serialize_xing_body(body)
-        if len(serialized) > LOCAL_WIRE_BYTE_CAP:
+        if len(serialized) > self.local_wire_byte_cap:
             raise XingCapacityUnavailable("XING_WIRE_LOCAL_CAP_EXCEEDED")
         if wire_bytes is not None and (type(wire_bytes) is not bytes or wire_bytes != serialized):
             raise XingCapacityUnavailable("XING_WIRE_SERIALIZATION_MISMATCH")
@@ -375,7 +384,7 @@ class SiliconFlowXingCapacityCounter:
         except Exception:
             raise XingCapacityUnavailable("XING_TEMPLATE_OR_TOKENIZATION_FAILED") from None
         bound = max(p.conservative_prompt_bound for p in profiles)
-        if bound > LOCAL_INPUT_TOKEN_CAP:
+        if bound > self.local_input_token_cap:
             raise XingCapacityUnavailable("XING_INPUT_LOCAL_CAP_EXCEEDED")
         if bound + frozen_body["max_tokens"] > OFFICIAL_CONTEXT_WINDOW:
             raise XingCapacityUnavailable("XING_LOCAL_CONTEXT_WINDOW_EXCEEDED")
@@ -396,6 +405,7 @@ class SiliconFlowXingCapacityCounter:
             output_reservation=frozen_body["max_tokens"], selected_local_thinking=selected_thinking,
             profiles=profiles, wire_bytes=serialized,capacity_profile=self.production_profile,
             counter=self if self.production_profile is not None else None,
+            renderer_identity=self.identity, local_input_token_cap=self.local_input_token_cap,
         )
         if self.production_profile is not None:self._issued[id(estimate)]=estimate
         return estimate

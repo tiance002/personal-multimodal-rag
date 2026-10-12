@@ -66,6 +66,20 @@ def embedding(registry, guard, response=None, **kwargs):
     return adapter, calls
 
 
+def test_transport_failure_metrics_keep_fixed_reason_not_exception_text(registry, guard):
+    from backend.app.application.run_metrics import collect_metrics
+    adapter, calls=embedding(registry, guard, TimeoutError('PRIVATE_PROMPT_AND_SECRET'))
+    with collect_metrics('SIMULATED') as metrics:
+        with model_access('embedding',allowed=True,scope=Scope.from_ids(['kb'])):
+            with pytest.raises(ProviderUnavailable):
+                adapter.embed(['SIMULATED_PUBLIC_TEXT'],timeout_seconds=5)
+        result=metrics.snapshot(citations=[],error='NO_CANDIDATES')
+    assert len(calls)==1
+    assert result['provider_diagnostics']==[dict(schema_version='provider-diagnostic/v1',
+        call_index=0,stage='transport',reason_code='REQUEST_TIMEOUT')]
+    assert 'PRIVATE_PROMPT_AND_SECRET' not in json.dumps(result)
+
+
 def test_frozen_roles_and_independent_instances(registry):
     factory = ProviderFactory(registry)
     assert [(registry.select(r).provider, registry.select(r).model_id) for r in registry.defaults] == [

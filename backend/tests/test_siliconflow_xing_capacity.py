@@ -181,6 +181,25 @@ def test_real_input_and_content_caps_reject_without_truncation(counter):
     assert measure(counter, body(output=LOCAL_OUTPUT_TOKEN_CAP)).output_reservation == 512
 
 
+def test_ordinary_window_does_not_extend_frozen_evaluation_caps(assets, counter):
+    ordinary = SiliconFlowXingCapacityCounter(assets, ordinary_service=True)
+    payload = body('公开容量验证。' * 1500, disabled=True, output=512)
+    original = serialize_xing_body(payload)
+    with pytest.raises(XingCapacityUnavailable, match='XING_CONTENT_LOCAL_CAP_EXCEEDED'):
+        measure(counter, payload)
+    result = measure(ordinary, payload)
+    assert result.fits_local_policy and not result.production_ready
+    assert result.reservation_bound > LOCAL_INPUT_TOKEN_CAP
+    assert result.local_total_reservation_bound <= OFFICIAL_CONTEXT_WINDOW
+    assert result.hosted_revision == 'UNKNOWN'
+    assert serialize_xing_body(payload) == original
+    # The exact complete framing still counts against input/output reservation.
+    with pytest.raises(XingCapacityUnavailable, match='XING_INPUT_LOCAL_CAP_EXCEEDED'):
+        measure(ordinary, body('a' * (OFFICIAL_CONTEXT_WINDOW - LOCAL_OUTPUT_TOKEN_CAP), disabled=True))
+    with pytest.raises(XingCapacityUnavailable, match='XING_OUTPUT_LOCAL_CAP_EXCEEDED'):
+        measure(ordinary, body(output=513))
+
+
 @pytest.mark.parametrize("messages", [[], (), [{"role": "tool", "content": "x"}],
     [{"role": "user", "content": [dict(type="text", text="x")]}],
     [{"role": "user", "content": "x", "reasoning_content": "hidden"}],

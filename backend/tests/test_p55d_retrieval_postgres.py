@@ -14,14 +14,16 @@ from backend.app.domain.bm25 import score_bm25,bm25_score
 from backend.app.application.retrieval import HybridRetriever
 from backend.app.application.knowledge_tools import KnowledgeToolGateway,ToolDenied
 from backend.tests.test_p55d_retrieval import corpus,FROZEN,legacy_term_frequencies,legacy_query
+from backend.tests.isolated_target import isolated_target, database_url
+from backend.tests.test_p55a_lifecycle_integration import _require_isolated_revision
 
 @pytest.fixture
 def pg(tmp_path,request):
     assert os.environ.get('P55B21_ISOLATED_AUTHORIZED')=='p55b21-global-scoped-r1','GUARDED_ISOLATED_RUNNER_REQUIRED'
-    engine=create_engine('postgresql+psycopg://p55a:SIMULATED_TEST_ONLY@127.0.0.1:55729/p55a_lifecycle_test',connect_args={'connect_timeout':5})
+    engine=create_engine(database_url(isolated_target()),connect_args={'connect_timeout':5})
     with engine.connect() as c:
         assert c.execute(text('SELECT current_database(),oid,(SELECT system_identifier FROM pg_control_system()) FROM pg_database WHERE datname=current_database()')).one()==('p55a_lifecycle_test',16384,7694635764170571814)
-        assert c.execute(text('SELECT version_num FROM alembic_version')).scalar_one()=='0021_global_scoped_memory'
+        _require_isolated_revision(c.execute(text('SELECT version_num FROM alembic_version')).scalar_one())
         # Actual trusted public schema, including authoritative citation tables.
         tables=c.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")).scalars().all()
         quote=engine.dialect.identifier_preparer.quote

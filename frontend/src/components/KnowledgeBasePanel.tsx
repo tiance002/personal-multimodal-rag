@@ -102,6 +102,7 @@ function LibraryDocumentRow({
     document.latest_index_status !== undefined &&
     document.latest_index_status !== document.index_status;
   const job = document.latest_job;
+  const incompatible = document.index_compatibility?.status === "INCOMPATIBLE";
   const canRetry = job?.status === "failed" && job.attempts < job.max_attempts;
   return (
     <div className={`document-row ${selected ? "selected" : ""}`}>
@@ -123,9 +124,10 @@ function LibraryDocumentRow({
         </span>
       </button>
       <span
-        className={`file-status ${document.index_status === "ready" && !latestDiffers ? "ready" : ""}`}
+        className={`file-status ${document.index_status === "ready" && !latestDiffers && !incompatible ? "ready" : ""}`}
+        title={incompatible ? "原文仍可预览；重新上传同名文件可建立兼容的新索引版本" : undefined}
       >
-        {document.index_status === "ready" && !latestDiffers
+        {incompatible ? "索引需更新" : document.index_status === "ready" && !latestDiffers
           ? "已完成"
           : (document.latest_index_status ??
             document.index_status ??

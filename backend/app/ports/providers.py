@@ -13,6 +13,22 @@ class ProviderRequestNotSent(ProviderUnavailable):
     """Explicit pretransport rejection; this request incurred no provider cost."""
 
 
+PUBLIC_PROVIDER_REASONS = frozenset({
+    "MODEL_ROLE_EGRESS_DENIED", "MODEL_USAGE_GUARD_REQUIRED", "MODEL_CREDENTIAL_MISSING",
+    "MODEL_BUDGET_DENIED", "MODEL_REQUEST_BUDGET_EXCEEDED", "MODEL_TIMEOUT_INVALID",
+    "EMBEDDING_CAPACITY_GUARANTEE_UNKNOWN", "EMBEDDING_TOKEN_LIMIT_EXCEEDED",
+    "EMBEDDING_INPUT_INVALID", "MODEL_RESPONSE_IDENTITY_MISMATCH", "MODEL_RESPONSE_INVALID",
+    "EMBEDDING_PROFILE_UNAVAILABLE", "EMBEDDING_DIMENSION_MISMATCH",
+    "MODEL_CONTEXT_CAPACITY_UNKNOWN", "MODEL_INPUT_LIMIT_UNKNOWN",
+})
+
+
+def public_provider_reason(error, fallback="MODEL_PROVIDER_FAILED"):
+    """Only fixed codes from typed provider failures can cross the API boundary."""
+    code = str(error) if isinstance(error, ProviderUnavailable) else None
+    return code if code in PUBLIC_PROVIDER_REASONS else fallback
+
+
 class TruncatedAnswer(ProviderUnavailable):
     """Candidate stays on the local call stack; exception text contains no data."""
     def __init__(self, candidate: str) -> None:

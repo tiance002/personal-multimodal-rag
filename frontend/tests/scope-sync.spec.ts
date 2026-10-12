@@ -1,4 +1,21 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+// These tests use mocked API responses (SIMULATED); the selectors exercise the
+// current scope popover and preserve the server-authoritative scope assertions.
+async function selectBase(page: Page, name: string) {
+  await page.getByRole("button", { name: "选择知识库和文件" }).click();
+  await page.locator(".scope-options").getByRole("button").filter({ has: page.getByText(name, { exact: true }) }).click();
+}
+async function expectBase(page: Page, name: string) {
+  await expect(page.locator(".composer-scope")).toHaveText(name);
+}
+async function expectBaseDisabled(page: Page, disabled: boolean) {
+  await page.getByRole("button", { name: "选择知识库和文件" }).click();
+  const option = page.locator(".scope-options").getByRole("button").filter({ has: page.getByText("B", { exact: true }) });
+  if (disabled) await expect(option).toBeDisabled();
+  else await expect(option).toBeEnabled();
+  await page.getByRole("button", { name: "选择知识库和文件" }).click();
+}
 
 test("switching knowledge bases patches the active conversation scope", async ({ page }) => {
   let patchBody: Record<string, unknown> | null = null;
@@ -23,7 +40,8 @@ test("switching knowledge bases patches the active conversation scope", async ({
   });
 
   await page.goto("/");
-  await page.locator("#kb-select").selectOption("kb-b");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
+  await selectBase(page, "B");
   await expect.poll(() => patchBody).toEqual({ knowledge_base_scope: ["kb-b"], document_scope: [] });
 });
 
@@ -47,9 +65,10 @@ test("marking a document as the retrieval scope patches the active conversation"
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await expect(page.getByRole("button", { name: "会话", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "仅此文档" })).toBeVisible();
-  await page.getByRole("button", { name: "仅此文档" }).click();
+  await page.getByRole("button", { name: "选择知识库和文件" }).click();
+  await page.locator(".scope-options").getByRole("button").filter({ has: page.getByText("guide.md", { exact: true }) }).click();
   await expect.poll(() => patchBody).toEqual({ knowledge_base_scope: ["kb-a"], document_scope: ["doc-1"] });
 });
 
@@ -79,8 +98,9 @@ test("a delayed knowledge-base PATCH blocks sending until the server scope chang
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("新库里的内容是什么？");
-  await page.locator("#kb-select").selectOption("kb-b");
+  await selectBase(page, "B");
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
   expect(sentScopes).toEqual([]);
   releasePatch?.();
@@ -118,13 +138,15 @@ test("a delayed document-scope PATCH blocks sending and failure resyncs the actu
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("只问这份资料");
-  await page.getByRole("button", { name: "仅此文档" }).click();
+  await page.getByRole("button", { name: "选择知识库和文件" }).click();
+  await page.locator(".scope-options").getByRole("button").filter({ has: page.getByText("guide.md", { exact: true }) }).click();
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
   expect(sends).toBe(0);
   releasePatch?.();
   await expect.poll(() => reads).toBe(2);
-  await expect(page.getByRole("button", { name: "取消限定" })).toBeVisible();
+  await expect(page.locator(".composer-scope")).toHaveText("仅 guide.md");
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
 });
 
@@ -142,9 +164,10 @@ test("a failed knowledge-base PATCH restores the server's old scope but keeps qu
   await page.route("**/api/v1/conversations/conv-1", (route) => route.fulfill({ status: 500, json: { error: { code: "PATCH_FAILED", message: "未写入" }, meta: { request_id: "r" } } }));
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("当前库是哪一个？");
-  await page.locator("#kb-select").selectOption("kb-b");
-  await expect(page.locator("#kb-select")).toHaveValue("kb-a");
+  await selectBase(page, "B");
+  await expectBase(page, "A");
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
 });
 
@@ -171,8 +194,9 @@ test("an unreadable server scope fails closed after PATCH failure", async ({ pag
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("不能泄露的问题");
-  await page.locator("#kb-select").selectOption("kb-b");
+  await selectBase(page, "B");
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
   await expect(page.getByText("无法确认服务端检索范围，请刷新页面后再提问")).toBeVisible();
   expect(sends).toBe(0);
@@ -202,10 +226,11 @@ test("a failed PATCH that commits after resync keeps questions blocked", async (
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("仍然可能写入的问题");
-  await page.locator("#kb-select").selectOption("kb-b");
+  await selectBase(page, "B");
   await expect.poll(() => readsAfterFailure).toBeGreaterThan(0);
-  await expect(page.locator("#kb-select")).toHaveValue("kb-a");
+  await expectBase(page, "A");
   await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
   expect(sends).toBe(0);
 });
@@ -234,11 +259,12 @@ test("an in-flight question cannot be moved to another knowledge base", async ({
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("只问 A");
   await page.getByRole("button", { name: "发送问题" }).click();
-  await expect(page.locator("#kb-select")).toBeDisabled();
+  await expectBaseDisabled(page, true);
   releaseAnswer?.();
-  await expect(page.locator("#kb-select")).toBeEnabled();
+  await expectBaseDisabled(page, false);
   expect(sentScope).toBe("kb-a");
 });
 
@@ -264,13 +290,13 @@ test("conversation creation in flight keeps the selected knowledge base fixed", 
   });
 
   await page.goto("/");
-  await expect(page.locator("#kb-select")).toHaveValue("kb-a");
+  await expectBase(page, "A");
   await page.getByLabel("输入问题").fill("A 的问题");
   await page.getByRole("button", { name: "发送问题" }).click();
-  await expect(page.locator("#kb-select")).toBeDisabled();
+  await expectBaseDisabled(page, true);
   releaseCreate?.();
   await expect.poll(() => expectedScope).toEqual(["kb-a"]);
-  await expect(page.locator("#kb-select")).toHaveValue("kb-a");
+  await expectBase(page, "A");
 });
 
 test("a server scope conflict reselects the actual knowledge base and blocks another send", async ({ page }) => {
@@ -291,8 +317,9 @@ test("a server scope conflict reselects the actual knowledge base and blocks ano
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "会话", exact: true }).click();
   await page.getByLabel("输入问题").fill("只问 A");
   await page.getByRole("button", { name: "发送问题" }).click();
-  await expect(page.locator("#kb-select")).toHaveValue("kb-b");
-  await expect(page.getByLabel("输入问题")).toBeDisabled();
+  await expectBase(page, "B");
+  await expect(page.getByRole("button", { name: "发送问题" })).toBeDisabled();
 });

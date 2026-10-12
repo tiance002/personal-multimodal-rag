@@ -13,6 +13,7 @@ import ssl
 import threading
 import time
 import re
+import uuid
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -24,7 +25,8 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 from backend.app.domain.embedding_identity import EmbeddingIdentity
 from backend.app.domain.model_registry import ModelSpec
 from backend.app.domain.scope import Scope
-from backend.app.ports.model_access import scope_allows
+from backend.app.ports.model_access import scope_allows, request_scope
+from backend.app.ports.service_policy import ServiceModelBinding
 from backend.app.ports.model_usage import record_provider_call
 from backend.app.ports.provider_send_claims import ProviderSendClaims, claim_matches
 from backend.app.ports.ranking import RerankResult
@@ -1181,14 +1183,25 @@ class CloudAdapter:
     provider_kind = "cloud"
 
     def __init__(self, spec: ModelSpec, *, enabled=False, usage_guard=None, transport=None,
-                 max_requests=10, max_planned_tokens=20000, request_window=None):
+                 max_requests=10, max_planned_tokens=20000, request_window=None, service_binding=None, api_key=None):
         if type(max_requests) is not int or not 1 <= max_requests <= 10:
             raise ValueError("PROVIDER_REQUEST_CAP_INVALID")
         if type(max_planned_tokens) is not int or not 1 <= max_planned_tokens <= 20000:
             raise ValueError("PROVIDER_TOKEN_CAP_INVALID")
         self.spec, self.enabled, self.usage_guard = spec, enabled, usage_guard
+        self._api_key = api_key
         self.provider_name = spec.provider
         self.transport = transport or _send
+        self.service_binding = service_binding
+        if service_binding is not None:
+            if (type(service_binding) is not ServiceModelBinding or request_window is not None
+                    or service_binding.usage_guard is not usage_guard):
+                raise ValueError('SERVICE_MODEL_BINDING_INVALID')
+            service_binding.validate(spec)
+            observed = 'REAL' if self.transport is _send else getattr(self.transport, 'execution_kind', 'UNKNOWN')
+            if observed == 'REAL' and service_binding.capacity.execution_kind != 'REAL':
+                raise ValueError('SERVICE_CAPACITY_SOURCE_UNVERIFIED')
+            self.execution_kind = observed
         self.max_requests, self.max_planned_tokens = max_requests, max_planned_tokens
         if request_window is not None:
             if type(request_window) not in (V6XingRequestWindow,SiliconFlowFreePermit):
@@ -1205,7 +1218,7 @@ class CloudAdapter:
             raise ProviderRequestNotSent("MODEL_ROLE_EGRESS_DENIED")
         if self.usage_guard is None:
             raise ProviderRequestNotSent("MODEL_USAGE_GUARD_REQUIRED")
-        if not os.environ.get(self.spec.api_key_env, "").strip():
+        if not self.credential_present():
             raise ProviderRequestNotSent("MODEL_CREDENTIAL_MISSING")
         if type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds) or not 0 < timeout_seconds <= 120:
             raise ProviderRequestNotSent("MODEL_TIMEOUT_INVALID")
@@ -1213,11 +1226,18 @@ class CloudAdapter:
     def _prepare_request(self,path,payload):
         # ModelSpec validates exact base URL, provider, model and key-env pair.
         return Request(self.spec.base_url + path, method="POST", headers={
-            "Authorization": "Bearer " + os.environ[self.spec.api_key_env],
+            "Authorization": "Bearer " + self._credential(),
             "Content-Type": "application/json"}, data=json.dumps(payload).encode())
 
+    def _credential(self):
+        return self._api_key if self._api_key is not None else os.environ.get(self.spec.api_key_env, '')
+
+    def credential_present(self):
+        return bool(self._credential().strip())
+
     def _request(self, path, payload, timeout, validate, planned_tokens=None, *, usage_parser=_usage,
-                 response_diagnostics=False, expected_results=None, request_policy=None,prepared_request=None):
+                 response_diagnostics=False, expected_results=None, request_policy=None,prepared_request=None,
+                 service_request_id=None, service_lease_check=None):
         self.preflight(timeout)
         request = prepared_request or self._prepare_request(path,payload)
         if (request.full_url != self.spec.base_url+path or request.get_method() != 'POST'
@@ -1227,6 +1247,16 @@ class CloudAdapter:
             raise ProviderRequestNotSent("MODEL_REQUEST_TOO_LARGE")
         if request_policy is not None:
             request_policy.validate_request(request, timeout)
+        service = self.service_binding
+        if service is not None:
+            if request_policy is not None:
+                raise ProviderRequestNotSent('SERVICE_EVALUATION_POLICY_CONFLICT')
+            service.validate(self.spec)
+            scope = request_scope(self.spec.role)
+            input_bound, output_bound = service.capacity.measure(payload, request.data)
+            planned_tokens = input_bound + output_bound
+            if not service_request_id:
+                raise ProviderRequestNotSent('SERVICE_REQUEST_ID_REQUIRED')
         planned_call = None
         with self._lock:
             limit = self.max_requests
@@ -1237,18 +1267,23 @@ class CloudAdapter:
                     raise ProviderRequestNotSent('V6_XING_WINDOW_ALREADY_CONSUMED')
                 limit = len(self.request_window.calls)
                 token_limit = self.request_window.planned_token_cap
-            if self.requests >= limit or (planned_tokens is not None
-                    and self.planned_tokens + planned_tokens > token_limit):
+            if service is None and (self.requests >= limit or (planned_tokens is not None
+                    and self.planned_tokens + planned_tokens > token_limit)):
                 raise ProviderRequestNotSent("MODEL_REQUEST_BUDGET_EXCEEDED")
             try:
-                reserve_kwargs = {}
-                from backend.app.application.provider_usage import BudgetUsageGuard
-                if type(self.usage_guard) is BudgetUsageGuard and self.usage_guard.estimate_microunits == 0:
-                    if type(request_policy) not in (_XingRequestPolicy,_FreeModelRequestPolicy):
-                        raise ProviderRequestNotSent('XING_ZERO_CALIBRATION_ONLY')
-                    reserve_kwargs['zero_price_authority'] = request_policy.zero_price_authority(request, timeout)
-                reservation = self.usage_guard.reserve(model_key=self.spec.model_key,
-                    role=self.spec.role, model_id=self.spec.model_id, planned_tokens=planned_tokens, **reserve_kwargs)
+                if service is not None:
+                    reservation = self.usage_guard.reserve_prepared(request_id=service_request_id,
+                        scope=scope, wire_sha256=hashlib.sha256(request.data).hexdigest(),
+                        input_tokens=input_bound, output_tokens=output_bound)
+                else:
+                    reserve_kwargs = {}
+                    from backend.app.application.provider_usage import BudgetUsageGuard
+                    if type(self.usage_guard) is BudgetUsageGuard and self.usage_guard.estimate_microunits == 0:
+                        if type(request_policy) not in (_XingRequestPolicy,_FreeModelRequestPolicy):
+                            raise ProviderRequestNotSent('XING_ZERO_CALIBRATION_ONLY')
+                        reserve_kwargs['zero_price_authority'] = request_policy.zero_price_authority(request, timeout)
+                    reservation = self.usage_guard.reserve(model_key=self.spec.model_key,
+                        role=self.spec.role, model_id=self.spec.model_id, planned_tokens=planned_tokens, **reserve_kwargs)
             except Exception:
                 raise ProviderRequestNotSent("MODEL_BUDGET_DENIED") from None
             self.requests += 1
@@ -1260,6 +1295,15 @@ class CloudAdapter:
         safe_response_diagnostics = None
         stage, error_code, sent = 'transport', 'NONE', True
         try:
+            if service is not None:
+                # Repeat the exact-wire and current execution fences after the
+                # durable reservation and immediately before transport.
+                self.preflight(timeout)
+                if service.capacity.measure(payload, request.data) != (input_bound, output_bound):
+                    raise ProviderRequestNotSent('MODEL_FINAL_WIRE_MISMATCH')
+                if service_lease_check is not None and service_lease_check() is not True:
+                    raise ProviderRequestNotSent('INGESTION_LEASE_LOST')
+                self.usage_guard.check_before_send(reservation)
             if request_policy is not None:
                 request_policy.validate_request(request, timeout)
                 request_policy.claim_dispatch(request, timeout, reservation)
@@ -1339,6 +1383,10 @@ class CloudAdapter:
                 latency_ms=(time.perf_counter()-started)*1000, planned_tokens=planned_tokens,
                 usage_actual=observed_usage, settlement='UNKNOWN',
                 diagnostic_schema='provider-diagnostic/v1', diagnostic_stage=stage, error_code=error_code)
+            if service is not None:
+                receipt.update(service_policy_id=service.policy.policy_id,
+                    capacity_source=service.capacity.source, capacity_status='LOCAL_BOUND_VERIFIED',
+                    hosted_equivalence='UNKNOWN', service_request_id=service_request_id)
             if response_diagnostics:
                 receipt['response_diagnostics'] = (safe_response_diagnostics or
                     _response_diagnostics(expected_results=expected_results))
@@ -1346,7 +1394,9 @@ class CloudAdapter:
                 receipt.update(request_policy.receipt_fields())
             settlement_failed = False
             try:
-                self.usage_guard.settle(reservation, observed_usage, sent=sent)
+                token_settlement = self.usage_guard.settle(reservation, observed_usage, sent=sent)
+                if service is not None:
+                    receipt['token_settlement'] = token_settlement
                 if not sent:
                     receipt['settlement'] = 'NOT_SENT'
             except Exception:
@@ -1369,6 +1419,7 @@ class CloudAdapter:
                 record_provider_call(model_key=self.spec.model_key, capability=self.spec.role,
                     provider=self.spec.provider, model=self.spec.model_id, status=receipt['status'],
                     usage=observed_usage, latency_ms=receipt['latency_ms'],
+                    diagnostic_stage=receipt['diagnostic_stage'], error_code=receipt['error_code'],
                     **({'stage': request_policy.usage_stage} if request_policy is not None else {}))
             except Exception:
                 if self.spec.role == 'rerank':
@@ -1384,7 +1435,7 @@ class CloudAdapter:
 
 class SiliconFlowEmbedding(CloudAdapter):
     def __init__(self, spec, *, chunking_index_identity, admission=None, free_binding=None, **kwargs):
-        if spec.role != "embedding" or spec.provider != "siliconflow":
+        if spec.role != "embedding" or (spec.provider != "siliconflow" and not spec.user_configured):
             raise ValueError("EMBEDDING_CAPABILITY_REQUIRED")
         super().__init__(spec, **kwargs)
         self.embedding_model, self.embedding_dimension = spec.model_id, spec.dimension
@@ -1447,7 +1498,9 @@ class SiliconFlowEmbedding(CloudAdapter):
 
         payload = {"model":self.spec.model_id,"input":inputs,"encoding_format":"float"}
         if self.free_binding is None:
-            vectors,usage,latency = self._request('/embeddings',payload,timeout_seconds,validate,planned)
+            normal = ({'service_request_id': batch_id or str(uuid.uuid4()), 'service_lease_check': lease_check}
+                      if self.service_binding is not None else {})
+            vectors,usage,latency = self._request('/embeddings',payload,timeout_seconds,validate,planned,**normal)
         else:
             self._check_free_binding()
             try: context = current_free_request(purpose,batch_id=batch_id)
@@ -1481,6 +1534,9 @@ class CloudChat(CloudAdapter):
                     or self.transport is not xing_admission.transport):
                 raise ValueError('XING_BINDING_INVALID')
         self.xing_admission, self.xing_binding = xing_admission, xing_binding
+        self.chat_model = spec.model_id
+        if self.service_binding is not None and xing_binding is not None:
+            raise ValueError('SERVICE_EVALUATION_POLICY_CONFLICT')
         if xing_admission is not None:
             self.execution_kind = xing_admission.grant.execution_kind
 
@@ -1543,6 +1599,8 @@ class CloudChat(CloudAdapter):
         return text, response.get("model", "UNKNOWN")
 
     def generate(self, messages, *, timeout_seconds, max_tokens=512):
+        if self.service_binding is not None:
+            raise ProviderRequestNotSent('SERVICE_EXPLICIT_SCOPE_REQUIRED')
         if self.xing_admission is not None:
             raise ProviderRequestNotSent('XING_EXPLICIT_SCOPE_REQUIRED')
         if self.spec.provider == 'siliconflow' and self.transport is _send:
@@ -1557,13 +1615,21 @@ class CloudChat(CloudAdapter):
         observed, usage, latency = self._request("/chat/completions", payload, timeout_seconds, self._validate)
         return ChatResult(observed[0], self.spec.model_id, observed[1], "stop", usage, latency)
 
+    def generate_with_service_scope(self, messages, *, timeout_seconds, max_tokens, scope, request_id):
+        if self.service_binding is None or scope != request_scope(self.spec.role):
+            raise ProviderRequestNotSent('SERVICE_SERVER_SCOPE_REQUIRED')
+        payload = self.service_binding.capacity.render_chat(messages, max_tokens)
+        observed, usage, latency = self._request('/chat/completions', payload, timeout_seconds,
+            self._validate, service_request_id=request_id)
+        return ChatResult(observed[0], self.spec.model_id, observed[1], 'stop', usage, latency)
+
     def answer(self, prompt, timeout_seconds):
         return self.generate([{"role": "user", "content": prompt}], timeout_seconds=timeout_seconds).text
 
 
 class SiliconFlowRerank(CloudAdapter):
     def __init__(self, spec, *, free_binding=None, **kwargs):
-        if spec.role != "rerank" or spec.provider != "siliconflow":
+        if spec.role != "rerank" or (spec.provider != "siliconflow" and not spec.user_configured):
             raise ValueError("RERANK_CAPABILITY_REQUIRED")
         super().__init__(spec, **kwargs)
         self.last_result = None
@@ -1678,14 +1744,16 @@ class SiliconFlowRerank(CloudAdapter):
 
 class DeepSeekVision(CloudAdapter):
     def __init__(self, spec, **kwargs):
-        if spec.role != "vision" or spec.provider != "deepseek":
+        if spec.role != "vision" or (spec.provider != "deepseek" and not spec.user_configured):
             raise ValueError("VISION_CAPABILITY_REQUIRED")
         super().__init__(spec, **kwargs)
 
     def caption_preflight(self, timeout_seconds):
         self.preflight(timeout_seconds)
 
-    def caption_image(self, image_bytes, timeout_seconds):
+    def caption_image(self, image_bytes, timeout_seconds, *, request_id=None, lease_check=None):
+        if self.service_binding is not None and (not request_id or not callable(lease_check)):
+            raise ProviderRequestNotSent('SERVICE_VISION_JOB_SCOPE_REQUIRED')
         digest = validate_caption_image(image_bytes)
         # Actual bytes validated above, never forward caller-supplied URLs/MIME.
         from PIL import Image
@@ -1699,6 +1767,8 @@ class DeepSeekVision(CloudAdapter):
                 {"type": "text", "text": "Describe this figure briefly. Do not infer precise table values."},
                 {"type": "image_url", "image_url": {"url": "data:" + mime + ";base64," +
                     base64.b64encode(image_bytes).decode(), "detail": "original"}}]}])
-        observed, usage, latency = self._request("/chat/completions", payload, timeout_seconds, CloudChat._validate)
+        normal = ({'service_request_id': request_id, 'service_lease_check': lease_check}
+                  if self.service_binding is not None else {})
+        observed, usage, latency = self._request("/chat/completions", payload, timeout_seconds, CloudChat._validate, **normal)
         return CaptionResult(observed[0], self.spec.model_id, observed[1], None, digest,
             "stop", usage, latency, prompt_version="deepseek-figure-caption/v1")

@@ -11,6 +11,7 @@ from backend.app.ports.providers import ProviderRequestNotSent, ProviderUnavaila
 from backend.app.ports.model_access import model_access
 from backend.app.ports.model_usage import call_stage
 from backend.app.domain.scope import Scope
+from backend.app.ports.service_policy import ServiceModelBinding
 from backend.app.application.validation_usd_budget import (
     OWNER_V6_TOKEN_GRANT, OWNER_V6_TOKEN_GRANT_R2, OWNER_V6_TOKEN_GRANT_R3, OwnerActivityTokenGrant, V6OwnerActivityGate,
 )
@@ -144,6 +145,7 @@ class GenerationRole:
     simulated_input_limit: int | None = None
     v6_binding: V6GenerationBinding | None = None
     xing_binding: V6XingGenerationBinding | None = None
+    service_binding: ServiceModelBinding | None = None
 
     @property
     def provider(self) -> str | None:
@@ -158,6 +160,10 @@ class GenerationRole:
     def execution_kind(self) -> str:
         """Observed gateway/typed transport identity, never a policy/bool label."""
         observed = getattr(self.gateway, 'execution_kind', 'UNKNOWN')
+        if self.service_binding is not None:
+            return observed if (type(self.service_binding) is ServiceModelBinding
+                and getattr(self.gateway, 'service_binding', None) is self.service_binding
+                and observed in ('REAL', 'SIMULATED')) else 'UNKNOWN'
         if self.xing_binding is not None:
             if type(self.xing_binding) is not V6XingGenerationBinding:
                 return 'UNKNOWN'
@@ -172,6 +178,18 @@ class GenerationRole:
         return 'SIMULATED' if self.simulated and observed == 'SIMULATED' else 'UNKNOWN'
 
     def check(self) -> None:
+        if self.service_binding is not None:
+            if (type(self.service_binding) is not ServiceModelBinding or self.v6_binding is not None
+                    or self.xing_binding is not None or self.simulated
+                    or getattr(self.gateway, 'service_binding', None) is not self.service_binding
+                    or self.role != getattr(getattr(self.gateway, 'spec', None), 'role', None)
+                    or self.execution_kind not in ('REAL', 'SIMULATED')):
+                raise ProviderRequestNotSent('SERVICE_MODEL_BINDING_INVALID')
+            try:
+                self.service_binding.validate(self.gateway.spec)
+            except ValueError:
+                raise ProviderRequestNotSent('SERVICE_MODEL_BINDING_INVALID') from None
+            return
         expected = MODELS.get(self.role)
         actual = (self.provider, self.model)
         if expected is None or actual != expected:
@@ -221,6 +239,15 @@ class GenerationRole:
 
     def invoke(self, envelope: GenerationEnvelope, *, request_id: str, run_id: str, scope):
         self.check()
+        if self.service_binding is not None:
+            with call_stage('answer'), model_access(self.role, allowed=True, scope=scope):
+                result = self.gateway.generate_with_service_scope([{'role': 'user', 'content': envelope.prompt}],
+                    timeout_seconds=envelope.timeout_seconds, max_tokens=envelope.max_tokens,
+                    scope=scope, request_id=request_id)
+            if (result.model_requested != self.model or result.model_reported != self.model
+                    or result.finish_reason != 'stop'):
+                raise ProviderUnavailable('ROUTER_MODEL_RESPONSE_MISMATCH')
+            return result.text
         prepared = None
         if self.v6_binding is not None:
             binding = self.v6_binding

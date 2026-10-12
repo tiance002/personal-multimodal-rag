@@ -202,31 +202,149 @@
         "title": "KnowledgeBasePatch",
         "type": "object"
       },
-      "MessageIn": {
+      "MemoryItemIn": {
+        "additionalProperties": false,
         "properties": {
-          "request_id": {
+          "content": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "document_scope": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Document Scope",
+            "type": "array"
+          },
+          "fact_key": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Fact Key",
+            "type": "string"
+          },
+          "kind": {
+            "pattern": "^(profile|preference|fact|task|interest)$",
+            "title": "Kind",
+            "type": "string"
+          },
+          "knowledge_base_scope": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Knowledge Base Scope",
+            "type": "array"
+          },
+          "scope_type": {
+            "default": "SCOPED",
+            "pattern": "^(GLOBAL|SCOPED)$",
+            "title": "Scope Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "fact_key",
+          "content"
+        ],
+        "title": "MemoryItemIn",
+        "type": "object"
+      },
+      "MemoryScopeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "document_scope": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Document Scope",
+            "type": "array"
+          },
+          "knowledge_base_scope": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Knowledge Base Scope",
+            "type": "array"
+          },
+          "scope_type": {
+            "default": "SCOPED",
+            "pattern": "^(GLOBAL|SCOPED)$",
+            "title": "Scope Type",
+            "type": "string"
+          }
+        },
+        "title": "MemoryScopeIn",
+        "type": "object"
+      },
+      "MemorySettingsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "read_enabled": {
             "anyOf": [
               {
-                "type": "string",
-                "format": "uuid"
+                "type": "boolean"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Request Id"
+            "title": "Read Enabled"
           },
+          "retrieval_mode": {
+            "anyOf": [
+              {
+                "pattern": "^(lexical|semantic|hybrid)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieval Mode"
+          },
+          "write_mode": {
+            "anyOf": [
+              {
+                "pattern": "^(explicit_only|auto)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Write Mode"
+          }
+        },
+        "title": "MemorySettingsIn",
+        "type": "object"
+      },
+      "MessageIn": {
+        "properties": {
           "content": {
-            "type": "string",
-            "maxLength": 100000,
+            "maxLength": 4096,
             "minLength": 1,
-            "title": "Content"
+            "title": "Content",
+            "type": "string"
           },
-          "mode": {
-            "type": "string",
-            "pattern": "^(quick|smart)$",
-            "title": "Mode",
-            "default": "quick"
+          "expected_document_scope": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Document Scope"
           },
           "expected_knowledge_base_scope": {
             "anyOf": [
@@ -242,26 +360,30 @@
             ],
             "title": "Expected Knowledge Base Scope"
           },
-          "expected_document_scope": {
+          "mode": {
+            "default": "quick",
+            "pattern": "^(quick|smart)$",
+            "title": "Mode",
+            "type": "string"
+          },
+          "request_id": {
             "anyOf": [
               {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
+                "format": "uuid",
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Expected Document Scope"
+            "title": "Request Id"
           }
         },
-        "type": "object",
         "required": [
           "content"
         ],
-        "title": "MessageIn"
+        "title": "MessageIn",
+        "type": "object"
       },
       "ValidationError": {
         "properties": {
@@ -756,6 +878,97 @@
         "summary": "Rebuild Graph"
       }
     },
+    "/api/v1/documents/{document_id}/preview": {
+      "get": {
+        "description": "Return a browser-readable preview while keeping the source immutable.\n\nPDF/HTML/image/text files are streamed directly. Office files are rendered\nto a temporary PDF by the local LibreOffice process so Writer/Calc layout\nand embedded images remain visible in the same preview surface.",
+        "operationId": "get_document_preview_api_v1_documents__document_id__preview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Original source bytes or a local PDF preview; media type follows the returned file."
+          },
+          "404": {
+            "description": "Document source is unavailable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "description": "Local Office preview renderer is unavailable"
+          }
+        },
+        "summary": "Get Document Preview"
+      }
+    },
+    "/api/v1/documents/{document_id}/source": {
+      "get": {
+        "description": "Stream the immutable source bytes for the selected document version.\n\nThe normalized `/content` endpoint is intended for retrieval and text\ninspection. The library preview needs the original bytes so PDF, HTML and\nimage files keep their pre-indexing appearance in the browser.",
+        "operationId": "get_document_source_api_v1_documents__document_id__source_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Original source bytes or a local PDF preview; media type follows the returned file."
+          },
+          "404": {
+            "description": "Document source is unavailable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Document Source"
+      }
+    },
     "/api/v1/documents/{document_id}/versions": {
       "post": {
         "operationId": "upload_document_version_api_v1_documents__document_id__versions_post",
@@ -1111,6 +1324,233 @@
         "summary": "Upload Document"
       }
     },
+    "/api/v1/memory/items": {
+      "post": {
+        "operationId": "memory_save_api_v1_memory_items_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemoryItemIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Memory Save"
+      }
+    },
+    "/api/v1/memory/items/{item_id}": {
+      "patch": {
+        "operationId": "memory_edit_api_v1_memory_items__item_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemoryItemIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Memory Edit"
+      }
+    },
+    "/api/v1/memory/items/{item_id}/{operation}": {
+      "post": {
+        "operationId": "memory_transition_api_v1_memory_items__item_id___operation__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "operation",
+            "required": true,
+            "schema": {
+              "title": "Operation",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemoryScopeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Memory Transition"
+      }
+    },
+    "/api/v1/memory/list": {
+      "post": {
+        "operationId": "memory_list_api_v1_memory_list_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemoryScopeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Memory List"
+      }
+    },
+    "/api/v1/memory/settings": {
+      "get": {
+        "operationId": "memory_settings_api_v1_memory_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Memory Settings"
+      },
+      "patch": {
+        "operationId": "memory_patch_settings_api_v1_memory_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemorySettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Memory Patch Settings"
+      }
+    },
     "/api/v1/runs/{run_id}/cancel": {
       "post": {
         "operationId": "cancel_run_api_v1_runs__run_id__cancel_post",
@@ -1208,6 +1648,15 @@
             }
           },
           {
+            "in": "query",
+            "name": "conversation_id",
+            "required": true,
+            "schema": {
+              "title": "Conversation Id",
+              "type": "string"
+            }
+          },
+          {
             "in": "header",
             "name": "Last-Event-ID",
             "required": false,
@@ -1299,6 +1748,115 @@
         "summary": "Patch Settings"
       }
     },
+    "/api/v1/settings/model-configuration": {
+      "get": {
+        "operationId": "get_model_configuration_api_v1_settings_model_configuration_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Model Configuration"
+      },
+      "put": {
+        "operationId": "put_model_configuration_api_v1_settings_model_configuration_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "revision": {
+                    "type": "string"
+                  },
+                  "roles": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "api_key": {
+                          "description": "Leave blank to retain the same destination credential.",
+                          "maxLength": 4096,
+                          "type": "string",
+                          "writeOnly": true
+                        },
+                        "base_url": {
+                          "maxLength": 500,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "model": {
+                          "maxLength": 500,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "maxLength": 500,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "embedding",
+                            "rerank",
+                            "chat_cheap",
+                            "chat_expensive",
+                            "vision"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "role",
+                        "provider",
+                        "model",
+                        "base_url"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 5,
+                    "minItems": 5,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "revision",
+                  "roles"
+                ],
+                "title": "Payload",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Model Configuration"
+      }
+    },
     "/api/v1/settings/models": {
       "get": {
         "operationId": "get_models_api_v1_settings_models_get",
@@ -1335,95 +1893,20 @@
         "summary": "Healthz"
       }
     },
-    "/api/v1/documents/{document_id}/preview": {
+    "/readyz": {
       "get": {
-        "summary": "Get Document Preview",
-        "description": "Return a browser-readable preview while keeping the source immutable.\n\nPDF/HTML/image/text files are streamed directly. Office files are rendered\nto a temporary PDF by the local LibreOffice process so Writer/Calc layout\nand embedded images remain visible in the same preview surface.",
-        "operationId": "get_document_preview_api_v1_documents__document_id__preview_get",
-        "parameters": [
-          {
-            "name": "document_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Document Id"
-            }
-          }
-        ],
+        "operationId": "readyz_readyz_get",
         "responses": {
           "200": {
-            "description": "Original source bytes or a local PDF preview; media type follows the returned file.",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Document source is unavailable"
-          },
-          "503": {
-            "description": "Local Office preview renderer is unavailable"
-          },
-          "422": {
-            "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": {}
               }
-            }
+            },
+            "description": "Successful Response"
           }
-        }
-      }
-    },
-    "/api/v1/documents/{document_id}/source": {
-      "get": {
-        "summary": "Get Document Source",
-        "description": "Stream the immutable source bytes for the selected document version.\n\nThe normalized `/content` endpoint is intended for retrieval and text\ninspection. The library preview needs the original bytes so PDF, HTML and\nimage files keep their pre-indexing appearance in the browser.",
-        "operationId": "get_document_source_api_v1_documents__document_id__source_get",
-        "parameters": [
-          {
-            "name": "document_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Document Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Original source bytes or a local PDF preview; media type follows the returned file.",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Document source is unavailable"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
+        },
+        "summary": "Readyz"
       }
     }
   }

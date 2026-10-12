@@ -12,6 +12,10 @@ from backend.app.config import Settings
 
 def create_app(settings: Settings | None = None, *, container: Container | None = None) -> FastAPI:
     resolved = settings or (container.settings if container is not None else Settings.from_env())
+    base_settings = resolved
+    if container is None:
+        from backend.app.adapters.models.user_settings import apply_config
+        resolved = apply_config(resolved)
     resolved_container = container or build_container(resolved)
 
     @asynccontextmanager
@@ -23,6 +27,9 @@ def create_app(settings: Settings | None = None, *, container: Container | None 
 
     app = FastAPI(title="Personal RAG", version="0.1.0", lifespan=lifespan)
     app.state.settings = resolved
+    app.state.base_settings = base_settings
+    from threading import RLock
+    app.state.model_configuration_lock = RLock()
     app.state.container = resolved_container
     app.include_router(router)
 
@@ -42,6 +49,13 @@ def create_app(settings: Settings | None = None, *, container: Container | None 
             },
             "meta": {"request_id": getattr(request.state, "request_id", str(uuid4()))},
         }
+
+    @app.get("/readyz")
+    def readyz(request: Request):
+        from fastapi.responses import JSONResponse
+        data = request.app.state.container.model_readiness()
+        return JSONResponse({"data": data, "meta": {"request_id": request.state.request_id}},
+                            status_code=200 if data["status"] == "READY_CONFIG" else 503)
 
     return app
 

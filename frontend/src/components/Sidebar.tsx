@@ -128,7 +128,7 @@ export function Sidebar({
       </div>
       <div className="sidebar-footer">
         <span className="status-pip" />
-        本地模式 · 云端关闭
+        按当前知识库范围检索
       </div>
     </aside>
   );

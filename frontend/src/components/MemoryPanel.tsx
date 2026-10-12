@@ -10,6 +10,7 @@ export function MemoryPanel({ kbId, documentScope }: { kbId: string | null; docu
   const [editing, setEditing] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [available, setAvailable] = useState(false);
   const epoch = useRef(0);
   const [scopeType, setScopeType] = useState<'GLOBAL' | 'SCOPED'>('SCOPED');
   const scopeKey = JSON.stringify({ scopeType, documents: [...documentScope].sort() });
@@ -19,8 +20,12 @@ export function MemoryPanel({ kbId, documentScope }: { kbId: string | null; docu
   useEffect(() => {
     const version = ++epoch.current;
     setItems([]); setEditing(null); setContent(""); setKey(""); setBusy(false);
-    void Promise.all([api.memorySettings(), canManage ? api.memoryList(scope) : Promise.resolve([])])
-      .then(([config, rows]) => { if (epoch.current === version) { setSettings(config); setItems(rows); setNotice(""); } })
+    void api.memorySettings()
+      .then(async config => {
+        if (epoch.current !== version) return;
+        const rows = canManage ? await api.memoryList(scope) : [];
+        if (epoch.current === version) { setAvailable(true); setSettings(config); setItems(rows); setNotice(""); }
+      })
       .catch((e: Error) => { if (epoch.current === version) setNotice(e.message); });
     return () => { ++epoch.current; };
   }, [kbId, scopeKey]);
@@ -35,6 +40,7 @@ export function MemoryPanel({ kbId, documentScope }: { kbId: string | null; docu
     } catch (e) { if (version === epoch.current) setNotice((e as Error).message); }
     finally { if (version === epoch.current) setBusy(false); }
   }
+  if (!available || notice.includes("MEMORY_PRINCIPAL_REQUIRED")) return null;
   return <section aria-label="长期记忆管理">
     <h2>长期记忆</h2>
     <label>记忆范围 <select value={scopeType} onChange={(e) => { setScopeType(e.target.value as 'GLOBAL' | 'SCOPED'); setKind('preference'); }}>

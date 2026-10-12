@@ -9,7 +9,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { DocumentItem, KnowledgeBase, Message } from "../app/state";
-import { clarificationText, evidenceHintText } from "../app/state";
+import { clarificationText, evidenceHintText, runDiagnosticText } from "../app/state";
 
 type Props = {
   messages: Message[];
@@ -49,11 +49,12 @@ function ScopeOption({
       type="button"
       disabled={disabled}
       className={selected ? "selected" : ""}
+      title={label}
       onClick={onClick}
     >
       {kind === "base" ? <DatabaseOutlined /> : <FileTextOutlined />}
-      <span>{label}</span>
-      {selected && <span>✓</span>}
+      <span className="scope-option-label">{label}</span>
+      {selected && <span className="scope-option-check">✓</span>}
     </button>
   );
 }
@@ -128,7 +129,7 @@ export function ChatPanel({
                 kind="document"
                 label={document.file_name}
                 selected={documentScope.includes(document.id)}
-                disabled={scopeBusy || document.index_status !== "ready"}
+                disabled={scopeBusy || document.index_status !== "ready" || document.index_compatibility?.status === "INCOMPATIBLE"}
                 onClick={() => {
                   if (!documentScope.includes(document.id))
                     onToggleDocumentScope(document.id);
@@ -211,6 +212,9 @@ export function ChatPanel({
                 )}
                 {evidenceHintText(message) && (
                   <p className="clarification-prompt">{evidenceHintText(message)}</p>
+                )}
+                {runDiagnosticText(message) && (
+                  <p className="clarification-prompt">{runDiagnosticText(message)}</p>
                 )}
                 {message.citations?.length ? (
                   <div className="citation-strip">

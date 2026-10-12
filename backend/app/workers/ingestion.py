@@ -45,10 +45,25 @@ def main() -> int:
     parser.add_argument("--once", action="store_true", help="process at most one queued job")
     parser.add_argument("--poll-seconds", type=float, default=2.0)
     args = parser.parse_args()
-    settings = Settings.from_env()
+    from backend.app.adapters.models.user_settings import apply_config, read_config
+    base_settings = Settings.from_env()
+    saved = read_config(base_settings)
+    settings = apply_config(base_settings, saved)
+    revision = saved['revision'] if saved else 'environment'
     repository = build_repository(settings)
+    print({'event': 'model_configuration.loaded', 'revision': revision,
+           'index_identity': repository.chunking_config.identity}, flush=True)
     worker_id = f"worker-{uuid.uuid4()}"
     while True:
+        saved = read_config(base_settings)
+        next_revision = saved['revision'] if saved else 'environment'
+        if next_revision != revision:
+            next_settings = apply_config(base_settings, saved)
+            next_repository = build_repository(next_settings)
+            repository.engine.dispose()
+            settings, repository, revision = next_settings, next_repository, next_revision
+            print({'event': 'model_configuration.loaded', 'revision': revision,
+                   'index_identity': repository.chunking_config.identity}, flush=True)
         result = run_once(repository, worker_id=worker_id, lease_seconds=settings.ingestion_lease_seconds)
         if result is not None:
             print({"job_id": result.get("id"), "status": result.get("status"), "stage": result.get("stage")}, flush=True)
