@@ -13,6 +13,41 @@ from backend.app.application.answer_hardening import generation_budget,detect_in
 
 QUESTION='What is A cost? What evidence supports A cost?'
 
+
+@pytest.mark.parametrize('concise',[False,True])
+def test_explicit_normal_concise_prompt_retains_question_citations_and_cap(monkeypatch,concise):
+    chain,_,wires,_=make_chain(monkeypatch,policy=RouterPolicy(mode='CHEAP_ONLY'))
+    chain.invoke(QUESTION,Scope.from_ids(['kb']),run_id='SIMULATED-concise',
+        settings=QuickSettings(cloud_enabled=True,answer_output_token_cap=512,concise_budgeted_answer=concise),
+        cloud_allowed_by_kb={'kb':True})
+    assert len(wires)==1 and wires[0]['max_tokens']==512
+    prompt=wires[0]['messages'][0]['content']
+    assert QUESTION in prompt and '[E1]' in prompt
+    assert ('Output budget is 512 tokens' in prompt)==concise
+
+
+@pytest.mark.parametrize('enabled',[False,True])
+def test_truncated_escalation_is_explicit_and_never_publishes_partial(monkeypatch,enabled):
+    from backend.app.ports.providers import TruncatedAnswer
+    from backend.tests.test_p5_router_generation import invoke
+    chain,gate,cheap,exp=make_chain(monkeypatch,cheap=TruncatedAnswer('partial unaccepted'),
+        policy=RouterPolicy(mode='DYNAMIC',truncated_escalation=enabled))
+    result,metrics=invoke(chain)
+    assert len(cheap)==1 and len(exp.calls)==int(enabled)
+    assert 'partial unaccepted' not in result.answer
+    assert result.error_code==(None if enabled else 'MODEL_OUTPUT_TRUNCATED')
+    assert len(metrics['rule_router']['attempts'])==(2 if enabled else 1)
+
+
+def test_cancel_after_truncation_prevents_second_provider(monkeypatch):
+    from backend.app.ports.providers import TruncatedAnswer
+    from backend.tests.test_p5_router_generation import invoke
+    cancelled={'value':False}
+    chain,_,cheap,exp=make_chain(monkeypatch,cheap=TruncatedAnswer('partial'),
+        after_cheap=lambda:cancelled.update(value=True),policy=RouterPolicy(mode='DYNAMIC',truncated_escalation=True))
+    result,_=invoke(chain,cancel=lambda:cancelled['value'])
+    assert result.error_code=='CANCELLED' and len(cheap)==1 and not exp.calls
+
 @pytest.mark.parametrize('mode',['CHEAP_ONLY','DYNAMIC','EXPENSIVE_ONLY'])
 @pytest.mark.parametrize('cap',[None,512])
 def test_uniform_cap_896_plan_reaches_normal_generation_and_same_envelope(monkeypatch,mode,cap):

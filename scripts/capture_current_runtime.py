@@ -22,11 +22,13 @@ def main():
     parser.add_argument('--after-input-route',action='store_true')
     parser.add_argument('--final-input-route',action='store_true')
     parser.add_argument('--core-final',action='store_true')
+    parser.add_argument('--study-fix',action='store_true')
     options=parser.parse_args()
     destination=OUT.with_name('current-runtime-after-tls-20261012.json') if options.after_tls_fix else OUT
     if options.after_input_route: destination=OUT.with_name('current-runtime-after-input-route-20261012.json')
     if options.final_input_route: destination=OUT.with_name('current-runtime-final-input-route-20261012.json')
     if options.core_final: destination=OUT.with_name('current-runtime-core-final-20261012.json')
+    if options.study_fix: destination=OUT.with_name('current-runtime-study-fix-20261012.json')
     data=dict(head=run(['git','rev-parse','HEAD']),branch=run(['git','branch','--show-current']),
               dirty=True,entry='http://127.0.0.1:14188',provider_calls=0,containers={})
     for role in ('api','worker','db','redis'):
@@ -35,7 +37,7 @@ def main():
         identity,image,status=raw.split()
         item=dict(name=name,id=identity,image_id=image,status=status)
         if role in ('api','worker'):
-            script="import sys,json,hashlib;from pathlib import Path;print(json.dumps(dict(python=sys.version.split()[0],executable=sys.executable,files={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [Path('/app/backend/app/main.py'),Path('/app/backend/app/bootstrap.py'),Path('/app/backend/app/workers/ingestion.py'),Path('/app/backend/app/adapters/models/cloud.py'),Path('/app/backend/app/ports/model_usage.py'),Path('/app/backend/app/application/answer_service.py'),Path('/app/backend/app/adapters/postgres/knowledge_repository.py')]})))"
+            script="import sys,json,hashlib;from pathlib import Path;print(json.dumps(dict(python=sys.version.split()[0],executable=sys.executable,files={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [Path('/app/backend/app/main.py'),Path('/app/backend/app/bootstrap.py'),Path('/app/backend/app/workers/ingestion.py'),Path('/app/backend/app/adapters/models/cloud.py'),Path('/app/backend/app/ports/model_usage.py'),Path('/app/backend/app/application/answer_service.py'),Path('/app/backend/app/adapters/postgres/knowledge_repository.py'),Path('/app/backend/app/application/quick_chain.py'),Path('/app/backend/app/application/final_answer_commit.py')]})))"
             item['runtime']=json.loads(run(['docker','exec',name,'python','-c',script]))
             for filename,digest in item['runtime']['files'].items():
                 assert hashlib.sha256((ROOT/filename.removeprefix('/app/')).read_bytes()).hexdigest()==digest

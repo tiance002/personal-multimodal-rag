@@ -29,6 +29,42 @@ def test_connect_eof_before_http_is_typed_not_sent(monkeypatch):
     assert caught.value.stage=='connection_setup'
     assert caught.value.code=='TLS_EOF_BEFORE_REQUEST'
     assert not sends and 'SIMULATED_PRIVATE_ERROR' not in str(caught.value)
+    assert caught.value.attempts==2
+
+
+def test_only_pre_http_eof_reconnects_once_and_rechecks_fence(monkeypatch):
+    events=[]
+    def connect(self):
+        events.append('connect')
+        if events.count('connect')==1:raise ssl.SSLEOFError(8,'SIMULATED')
+        self.sock=SimpleNamespace(settimeout=lambda timeout:events.append(('timeout',timeout)),close=lambda:None)
+    monkeypatch.setattr(http.client.HTTPSConnection,'connect',connect)
+    connection=cloud._ObservedHTTPSConnection('example.invalid',timeout=10,
+        before_send=lambda:events.append('fence'))
+    connection.connect()
+    assert events[:5]==['fence','connect','fence','connect','fence']
+    assert 0<events[5][1]<=10
+
+
+def test_certificate_failure_has_one_attempt(monkeypatch):
+    attempts=[]
+    def connect(self):
+        attempts.append(1);raise ssl.SSLCertVerificationError(1,'SIMULATED')
+    monkeypatch.setattr(http.client.HTTPSConnection,'connect',connect)
+    with pytest.raises(ProviderRequestNotSent):cloud._ObservedHTTPSConnection('example.invalid').connect()
+    assert len(attempts)==1
+
+
+def test_fence_revoked_before_reconnect_never_connects_again(monkeypatch):
+    attempts=[];checks=[]
+    def connect(self):attempts.append(1);raise ssl.SSLEOFError(8,'SIMULATED')
+    def fence():
+        checks.append(1)
+        if len(checks)==2:raise ProviderRequestNotSent('MODEL_PRETRANSPORT_FENCE_DENIED')
+    monkeypatch.setattr(http.client.HTTPSConnection,'connect',connect)
+    with pytest.raises(ProviderRequestNotSent,match='FENCE_DENIED'):
+        cloud._ObservedHTTPSConnection('example.invalid',before_send=fence).connect()
+    assert len(attempts)==1
 
 
 def test_normal_context_keeps_certificate_checks_and_legacy_default(monkeypatch):

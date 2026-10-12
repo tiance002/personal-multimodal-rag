@@ -62,6 +62,7 @@ def test_global_egress_and_missing_resources_cannot_fall_back(tmp_path, monkeypa
     container = build_container(settings, embedding_admission=admission)
     try:
         factory = container.provider_factory
+        assert container.quick_chain.router_policy.truncated_escalation is True
         assert factory.enabled_roles == (frozenset({'embedding'}) if cloud_enabled else frozenset())
         assert set(factory.usage_guards) == {'embedding'}
         assert container.quick_chain.cloud_answer_gateway is None

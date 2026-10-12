@@ -417,7 +417,8 @@ def _answer_service(request: Request) -> AnswerService:
             prefer_cloud=settings.prefer_cloud, cloud_fallback_enabled=settings.cloud_fallback_enabled,
             cloud_provider="deepseek", cloud_model=settings.cloud_model,
             cloud_cost_estimate_microunits=settings.cloud_cost_estimate_microunits,
-            answer_output_token_cap=512 if settings.service_model_policy_json is not None else None),
+            answer_output_token_cap=512 if settings.service_model_policy_json is not None else None,
+            concise_budgeted_answer=settings.service_model_policy_json is not None),
     )
 
 

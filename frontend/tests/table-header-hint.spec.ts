@@ -62,8 +62,10 @@ for (const mode of ["quick", "smart"] as const) for (const format of ["pdf", "do
     const posts = await base(page, data.response, history, mode); await send(page);
     await expect(page.getByText(data.response.answer, { exact: true })).toBeVisible();
     await expect(page.getByRole("status")).toContainText("XLSX");
-    await expect(page.locator(".message.assistant")).toHaveCount(0);
+    await expect(page.locator(".message.assistant:not(.diagnostic)")).toHaveCount(0);
     await expect(page.locator(".citation-pill")).toHaveCount(0);
+    await expect(page.locator(".message.assistant.diagnostic")).toHaveCount(1);
+    await expect(page.locator(".message.user .clarification-prompt")).toHaveCount(0);
     expect(posts()).toBe(1);
     history.push(...data.history);
     await page.reload(); await page.getByRole("button", { name: "表格提示测试", exact: true }).click();
@@ -87,7 +89,10 @@ for (const [name, patch] of [
   for (const mode of ["quick", "smart"] as const) test(`${mode} ${name} does not show an XLSX recommendation`, async ({ page }) => {
     const response = { ...payload("pdf").response, ...patch };
     await base(page, response, [], mode); await send(page);
-    await expect(page.getByText(`回答未完成：${response.error_code}`, { exact: true })).toBeVisible();
+    const error = response.error_code === "NO_CANDIDATES"
+      ? "检索未完成：运行记录缺少阶段诊断，请检查模型与索引状态"
+      : `回答未完成：${response.error_code}`;
+    await expect(page.locator(".message.assistant .markdown-content")).toHaveText(error);
     await expect(page.getByText(response.answer, { exact: true })).toHaveCount(0);
     await expect(page.getByRole("status")).not.toContainText("XLSX");
   });

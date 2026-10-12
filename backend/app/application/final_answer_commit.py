@@ -8,6 +8,7 @@ from collections.abc import Sequence
 import hashlib
 import json
 import re
+from decimal import Decimal
 from typing import Literal
 
 from backend.app.application.answer_hardening import ANY_MARKER, MARKER
@@ -25,6 +26,31 @@ EXCERPT_PREFIXES = (
     "基于检索到的证据：\n",
     "涉及外发与隐私配置，以下仅提供资料原文；实际运行配置需单独核查：\n",
 )
+
+# A list/range of bare values cannot acquire a duration unit in generation.
+# This is a narrow literal witness check, not general semantic entailment.
+_NUMBER = r'\d+(?:\.\d+)?'
+_DURATION_LIST = re.compile(r'(?<!\d)('+_NUMBER+r'(?:\s*[,，、/\-–—~～至到]\s*'+_NUMBER+r')+)\s*(小时|分钟|秒|天)')
+_DURATION_VALUE = re.compile(r'(?<!\d)('+_NUMBER+r')\s*(小时|分钟|秒|天)')
+
+
+def unsupported_duration_list(answer, by_label):
+    for line in answer.splitlines():
+        claims=list(_DURATION_LIST.finditer(line))
+        if not claims:continue
+        sources=[by_label[label].quote for label in MARKER.findall(line) if label in by_label]
+        for claim in claims:
+            numbers=tuple(Decimal(n) for n in re.findall(_NUMBER,claim[1]))
+            unit=claim[2]
+            supported=False
+            for source in sources:
+                lists={(tuple(Decimal(n) for n in re.findall(_NUMBER,m[1])),m[2])
+                       for m in _DURATION_LIST.finditer(source)}
+                values={(Decimal(m[1]),m[2]) for m in _DURATION_VALUE.finditer(source)}
+                if (numbers,unit) in lists or all((n,unit) in values for n in numbers):
+                    supported=True;break
+            if not supported:return True
+    return False
 
 
 class FinalAnswerCommitCheck:
@@ -74,6 +100,8 @@ class FinalAnswerCommitCheck:
             return None
 
         caption_cited = any(QualityGate.is_model_caption(by_label[label].locator) for label in labels)
+        if unsupported_duration_list(answer, by_label):
+            return 'UNSUPPORTED_ANSWER'
         clauses = (_numeric_safe_split(answer, _ANSWER_FACT_SEPARATORS) if caption_cited
                    else _ANSWER_FACT_SEPARATORS.split(answer))
         if caption_cited:

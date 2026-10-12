@@ -105,7 +105,7 @@ def record_call(*, model: str, status: str, response: dict[str, Any] | None, lat
 def record_provider_call(*, model_key: str, capability: str, provider: str, model: str,
                          status: str, usage: dict | None, latency_ms: float,
                          stage: str | None = None, diagnostic_stage: str | None = None,
-                         error_code: str | None = None) -> None:
+                         error_code: str | None = None, connection_setup_attempts: int | None = None) -> None:
     """Capture supplier-returned tokens separately from monetary settlement."""
     if stage is not None and (type(stage) is not str or stage not in (
             'query', 'answer', 'embedding', 'context_compaction', 'memory_extraction', 'query_understand')):
@@ -131,3 +131,5 @@ def record_provider_call(*, model_key: str, capability: str, provider: str, mode
             call_index=len(capture.calls)-1,
             stage=diagnostic_stage if diagnostic_stage in stages else 'UNKNOWN',
             reason_code=error_code if error_code in reasons else 'UNKNOWN'))
+        if type(connection_setup_attempts) is int and connection_setup_attempts in (1,2):
+            capture.provider_diagnostics[-1]['connection_setup_attempts']=connection_setup_attempts

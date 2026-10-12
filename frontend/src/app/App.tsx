@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { api, sendMessageWithEvents, retrievalFailureText } from "../api/client";
-import { clarificationText, evidenceHintText, tableHeaderHint, validRunDiagnostic, validClarificationPresentation } from "./state";
+import { clarificationText, evidenceHintText, runDiagnosticText, tableHeaderHint, validRunDiagnostic, validClarificationPresentation } from "./state";
 import type {
   AppState,
   Conversation,
@@ -254,7 +254,9 @@ export default function App() {
         ) {
           setMessages(items);
           setNotice(
-            evidenceHintText(items.at(-1))
+            runDiagnosticText(items.at(-1))
+              ? "回答未完成"
+              : evidenceHintText(items.at(-1))
               ? "表格证据无法核验；可将相关表格另存为 XLSX 后上传"
               : clarificationText(items.at(-1))
               ? "请补充问题中的对象或上下文后再提问"
@@ -756,7 +758,7 @@ export default function App() {
         ]);
       }
       setNotice(
-        diagnostic ? diagnostic.text : isTableHint
+        diagnostic ? "回答未完成" : isTableHint
           ? "表格证据无法核验；可将相关表格另存为 XLSX 后上传"
           : isClarification
           ? "请补充问题中的对象或上下文后再提问"

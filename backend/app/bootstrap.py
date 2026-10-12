@@ -317,6 +317,7 @@ def build_container(settings: Settings, *, model: Any = _MODEL_UNSET, agent_mode
         query_understand=query_understand,
         router_policy=RouterPolicy(mode="DYNAMIC" if settings.rule_router_enabled else "OFF",
             quality_escalation=settings.rule_router_quality_escalation,
+            truncated_escalation=settings.service_model_policy_json is not None,
             abstention_escalation=settings.rule_router_abstention_escalation,
             provider_fallback=settings.rule_router_provider_fallback),
         generation_roles={

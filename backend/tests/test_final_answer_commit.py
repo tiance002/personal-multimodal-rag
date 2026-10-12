@@ -35,6 +35,24 @@ def test_b7_normal_exact_numeric_candidate_passes():
     assert check("松林门店2025-02的收入为1230元 [E1]") is None
 
 
+@pytest.mark.parametrize('source,answer,expected',[
+    ('复习间隔为1，7，16，35。','复习间隔为1、7、16、35天 [E1]','UNSUPPORTED_ANSWER'),
+    ('复习间隔为1，7，16，35。','复习间隔数值为1、7、16、35 [E1]',None),
+    ('复习间隔为1、7、16、35天。','复习间隔为1、7、16、35天 [E1]',None),
+    ('第1天、第7天、第16天、第35天复习。','复习间隔为1、7、16、35天 [E1]',None),
+    ('保持7-8小时睡眠。','保持7-8小时睡眠 [E1]',None),
+    ('保持7–8小时睡眠。','保持7-8小时睡眠 [E1]',None),
+])
+def test_duration_list_requires_explicit_cited_units(source,answer,expected):
+    sources=frozen(prose(source))
+    assert FinalAnswerCommitCheck().check(answer,sources,EvidencePlan('如何学习'))==expected
+
+
+def test_duration_unit_cannot_borrow_from_uncited_evidence():
+    sources=snapshots(prose('复习间隔为1，7，16，35。'),replace(prose('复习间隔为1、7、16、35天。'),chunk_id='another'))
+    assert FinalAnswerCommitCheck().check('复习间隔为1、7、16、35天 [E1]',sources,EvidencePlan('学习'))=='UNSUPPORTED_ANSWER'
+
+
 def test_partial_structured_answer_checks_covered_row_without_inventing_missing_target():
     plan = EvidencePlan("two targets", targets=(EvidenceTarget("松林门店", "收入", "2025-02"),
                                                EvidenceTarget("柏林门店", "收入", "2025-02")), kind="parallel")

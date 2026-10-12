@@ -43,8 +43,11 @@ class QuickSettings:
     explicit_question_checklist_enabled: bool = False
     router_policy: RouterPolicy | None = None
     answer_output_token_cap: int | None = None
+    concise_budgeted_answer: bool = False
 
     def __post_init__(self):
+        if type(self.concise_budgeted_answer) is not bool:
+            raise ValueError('QUICK_CONCISE_POLICY_INVALID')
         if self.answer_output_token_cap is not None and (
                 type(self.answer_output_token_cap) is not int or self.answer_output_token_cap != 512):
             raise ValueError('QUICK_OUTPUT_CAP_INVALID')
@@ -431,11 +434,21 @@ class LangChainQuickChain:
             "answer supported sub-points with citations; mark only genuinely missing sub-points "
             "as unknown without a citation. Be concise: cover requested points, "
             "omit unrelated background and do not repeat source excerpts."
-            f"\nQuestion: {question}{intents.checklist()}"
+            + (f"\nOutput budget is {budget.max_tokens} tokens including citations. "
+               "Write a complete compact answer within this limit, aiming for at most 180 Chinese characters or 100 English words. "
+               "For a broad advice question, give the three most relevant actionable suggestions, not a catalogue of all evidence. "
+               "Prefer short source-supported wording. Omit introductions, long headings and conclusions. "
+               "Retain every explicitly requested sub-question and attach citations to each factual point."
+               if settings.concise_budgeted_answer else "")
+            + f"\nQuestion: {question}{intents.checklist()}"
             + (explicit_question_checklist(question, len(intents.intents))
                if settings.explicit_question_checklist_enabled else "")
             + interpretation_data(validated_follow_up)
             + f"\nEvidence:\n{bundle.context}"
+            + ("\nEnd of evidence. Give only the complete concise answer. "
+               "Do not add units to numbers whose cited source does not state those units; "
+               "leave such values unitless or omit unrequested numeric examples."
+               if settings.concise_budgeted_answer else "")
         )
         return prompt, budget
 

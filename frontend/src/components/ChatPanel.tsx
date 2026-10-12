@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Button, Popover, Select, Upload } from "antd";
 import {
   DatabaseOutlined,
@@ -189,9 +189,11 @@ export function ChatPanel({
             </div>
           </div>
         ) : (
-          messages.map((message, index) => (
+          messages.map((message, index) => {
+            const diagnostic = runDiagnosticText(message) ?? clarificationText(message) ?? evidenceHintText(message);
+            return (
+            <Fragment key={message.id ?? index}>
             <article
-              key={message.id ?? index}
               className={`message ${message.role}`}
             >
               <div className="message-role">
@@ -206,15 +208,6 @@ export function ChatPanel({
                   </div>
                 ) : (
                   message.content
-                )}
-                {clarificationText(message) && (
-                  <p className="clarification-prompt">{clarificationText(message)}</p>
-                )}
-                {evidenceHintText(message) && (
-                  <p className="clarification-prompt">{evidenceHintText(message)}</p>
-                )}
-                {runDiagnosticText(message) && (
-                  <p className="clarification-prompt">{runDiagnosticText(message)}</p>
                 )}
                 {message.citations?.length ? (
                   <div className="citation-strip">
@@ -234,7 +227,17 @@ export function ChatPanel({
                 ) : null}
               </div>
             </article>
-          ))
+            {diagnostic && (
+              <article className="message assistant diagnostic" data-run-id={message.run_id}>
+                <div className="message-role">索引台</div>
+                <div className="message-body">
+                  <p className="clarification-prompt">{diagnostic}</p>
+                </div>
+              </article>
+            )}
+            </Fragment>
+            );
+          })
         )}
       </div>
       <div className="composer-wrap">

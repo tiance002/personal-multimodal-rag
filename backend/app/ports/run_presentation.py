@@ -25,6 +25,7 @@ MESSAGES = {
     'input_limit': '当前输入或上下文超过模型容量，请检查输入和所选模型的容量配置。',
     'failed': '问答未完成，请检查运行状态后再试。',
 }
+REASON_MESSAGES = {'MODEL_OUTPUT_TRUNCATED': '本次回答达到输出长度上限，未保存为完整答案。可以重试或将问题拆成几部分。'}
 
 
 def failure_presentation(error_code, metrics=None):
@@ -57,13 +58,15 @@ def failure_presentation(error_code, metrics=None):
     elif error_code in {'INSUFFICIENT_EVIDENCE','UNSUPPORTED_ANSWER','INVALID_CITATION','NO_EVIDENCE'}:
         category, reason = 'evidence_unavailable', error_code
     return dict(schema_version=VERSION, kind='run_diagnostic', category=category,
-        reason_code=reason, text=MESSAGES[category])
+        reason_code=reason, text=REASON_MESSAGES.get(reason, MESSAGES[category]))
 
 
 def valid_failure_presentation(value):
     return (isinstance(value, dict) and set(value) == {'schema_version','kind','category','reason_code','text'}
         and value.get('schema_version') == VERSION and value.get('kind') == 'run_diagnostic'
-        and value.get('category') in MESSAGES and value.get('text') == MESSAGES[value['category']]
+        and value.get('category') in MESSAGES and isinstance(value.get('text'),str)
+        and isinstance(value.get('reason_code'),str)
+        and value['text'] in {MESSAGES[value['category']], REASON_MESSAGES.get(value.get('reason_code'))}
         and isinstance(value.get('reason_code'), str)
         and value['reason_code'] in (PUBLIC_PROVIDER_REASONS | {
             'RUN_FAILED','CLOUD_EGRESS_DISABLED','RETRIEVAL_DIAGNOSTIC_MISSING','RETRIEVAL_UNAVAILABLE','NO_CANDIDATES',

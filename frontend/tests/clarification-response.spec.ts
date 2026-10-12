@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 const prompt = "请明确对象并重述完整问题；本次上下文解析不可用或指代不明确，未检索或生成事实答案。";
 const clarify = { run_id: "clarify-run", answer: prompt, citations: [], error_code: "NO_CANDIDATES", trace: { execution_mode: "clarification", clarification_required: true } };
 
-test("versioned generation failure stays on the same user/run after refresh", async ({ page }) => {
+test("versioned generation failure renders on agent side for the same run after refresh", async ({ page }) => {
   const diagnostic = { schema_version: "run-presentation-v1", kind: "run_diagnostic", category: "generation_error",
     reason_code: "MODEL_UNAVAILABLE", text: "答案模型未能完成请求，请稍后重试或检查模型服务。" };
   const history: unknown[] = [];
@@ -12,12 +12,18 @@ test("versioned generation failure stays on the same user/run after refresh", as
   await base(page, { run_id: "failed-run", answer: "", citations: [], error_code: "MODEL_UNAVAILABLE", presentation: diagnostic }, history);
   await send(page);
   await expect(page.locator(".clarification-prompt")).toHaveText(diagnostic.text);
-  await expect(page.locator("article.assistant")).toHaveCount(0);
+  await expect(page.locator("article.assistant.diagnostic")).toHaveCount(1);
+  await expect(page.locator("article.user .message-body")).toHaveText("它的下一次巡检日期是什么时候？");
+  await expect(page.getByRole("status")).toHaveText("回答未完成");
+  await expect(page.locator("article.assistant:not(.diagnostic)")).toHaveCount(0);
   history.push({ role: "user", content: "它的下一次巡检日期是什么时候？", run_id: "failed-run", citations: [], presentation: diagnostic });
   await page.reload();
   await page.getByRole("button", { name: "Replay A", exact: true }).click();
   await expect(page.locator(".clarification-prompt")).toHaveText(diagnostic.text);
-  await expect(page.locator("article.assistant")).toHaveCount(0);
+  await expect(page.locator("article.assistant.diagnostic")).toHaveCount(1);
+  await expect(page.locator("article.user .message-body")).toHaveText("它的下一次巡检日期是什么时候？");
+  await expect(page.getByRole("status")).toHaveText("回答未完成");
+  await expect(page.locator("article.assistant:not(.diagnostic)")).toHaveCount(0);
   expect(posts).toBe(1);
 });
 
@@ -78,14 +84,14 @@ test("a duplicate API rejection is shown without inventing another assistant rep
   await base(page, { error: { code: "DUPLICATE_REQUEST", message: "request not regenerated" } }, [], 409); await send(page);
   // Unknown Run startup is polled for at most ten seconds before recovery ends.
   await expect(page.getByRole("status")).toContainText("DUPLICATE_REQUEST", { timeout: 12_000 });
-  await expect(page.locator(".message.assistant")).toHaveCount(0);
+  await expect(page.locator(".message.assistant:not(.diagnostic)")).toHaveCount(0);
 });
 
 test("an input length rejection is explicit and never a clarification", async ({ page }) => {
   await base(page, { detail: [{ type: "string_too_long", loc: ["body", "content"] }] }, [], 422);
   await send(page);
   await expect(page.getByRole("status")).toContainText("INPUT_LIMIT", { timeout: 12_000 });
-  await expect(page.locator(".message.assistant")).toHaveCount(0);
+  await expect(page.locator(".message.assistant:not(.diagnostic)")).toHaveCount(0);
 });
 
 test("refresh of a user-only history uses a generic unsaved-reply hint, not a reconstructed clarification", async ({ page }) => {
@@ -165,7 +171,7 @@ test("persisted terminal clarification restores the exact prompt after refresh w
   await base(page, clarify, history);
   await expect(page.getByText(prompt, { exact: true })).toBeVisible();
   await expect(page.getByRole("status")).toHaveText("请补充问题中的对象或上下文后再提问");
-  await expect(page.locator(".message.assistant")).toHaveCount(0);
+  await expect(page.locator(".message.assistant:not(.diagnostic)")).toHaveCount(0);
   await expect(page.locator(".citation-pill")).toHaveCount(0);
   await page.reload(); await page.getByRole("button", { name: "Replay A", exact: true }).click();
   await expect(page.getByText(prompt, { exact: true })).toBeVisible();

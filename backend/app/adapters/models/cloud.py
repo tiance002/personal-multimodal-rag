@@ -1,6 +1,7 @@
 """Four cloud capabilities over existing ports, with independent admission/usage.
 
-No retries, URL discovery, redirects, proxies, fallback models or content logs.
+No HTTP request retries, URL discovery, redirects, proxies or content logs.
+Ordinary DeepSeek may re-establish one failed pre-HTTP TLS EOF connection.
 Adapters stay denied without a trusted scope AND a role-specific usage guard.
 """
 import base64
@@ -58,44 +59,75 @@ class _DiagnosticFailure(ProviderUnavailable):
 
 class _ConnectionNotSent(ProviderRequestNotSent):
     """Trusted direct connection failed before the first HTTP byte was sent."""
-    def __init__(self, error):
+    def __init__(self, error, attempts=1):
         super().__init__('MODEL_CONNECTION_NOT_SENT')
         self.stage = 'connection_setup'
         self.code = ('TLS_EOF_BEFORE_REQUEST' if isinstance(error, ssl.SSLEOFError)
                      else _transport_error_code(error))
+        self.attempts = attempts
 
 
 class _ObservedHTTPSConnection(http.client.HTTPSConnection):
+    def __init__(self,*args,before_send=None,observe_attempt=None,**kwargs):
+        kwargs.setdefault('timeout',30)
+        super().__init__(*args,**kwargs)
+        self.before_send,self.observe_attempt=before_send,observe_attempt
+
     def connect(self):
         # The ordinary opener forbids proxies. A CONNECT tunnel would itself
         # transmit HTTP bytes, so it cannot use this no-request proof.
         if self._tunnel_host is not None:
             raise ProviderRequestNotSent('MODEL_PROXY_DISABLED')
-        try:
-            super().connect()
-        except (OSError, URLError) as error:
-            self.close()
-            raise _ConnectionNotSent(error) from None
+        deadline=time.monotonic()+self.timeout
+        for ordinal in (1,2):
+            if self.before_send is not None:self.before_send()
+            if self.observe_attempt is not None:self.observe_attempt(ordinal)
+            self.timeout=deadline-time.monotonic()
+            if self.timeout<=0:raise _ConnectionNotSent(TimeoutError(),ordinal)
+            try:
+                super().connect()
+            except (OSError, URLError) as error:
+                self.close()
+                # Only this direct connect-stage EOF proves no HTTP bytes.
+                # No certificate, response/read, or possibly-sent retry.
+                if ordinal==1 and isinstance(error,ssl.SSLEOFError):continue
+                raise _ConnectionNotSent(error,ordinal) from None
+            try:
+                if self.before_send is not None:self.before_send()
+                remaining=deadline-time.monotonic()
+                if remaining<=0:raise _ConnectionNotSent(TimeoutError(),ordinal)
+                if self.sock is not None:self.sock.settimeout(remaining)
+                return
+            except Exception:
+                self.close();raise
 
 
 class _ObservedHTTPSHandler(HTTPSHandler):
+    def __init__(self,*args,before_send=None,observe_attempt=None,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.before_send,self.observe_attempt=before_send,observe_attempt
+
     def https_open(self, request):
         # Python 3.12+ moved hostname checking entirely into SSLContext.
         legacy = ({'check_hostname': self._check_hostname}
                   if hasattr(self, '_check_hostname') else {})
-        return self.do_open(_ObservedHTTPSConnection, request,
+        def connection(*args,**kwargs):
+            return _ObservedHTTPSConnection(*args,before_send=self.before_send,
+                observe_attempt=self.observe_attempt,**kwargs)
+        return self.do_open(connection, request,
                             context=self._context, **legacy)
 
 
 class _ReceivedResponse:
     """Decoded response plus safe transport metadata; never contains raw bytes."""
-    __slots__ = ('payload', 'http_status_code', 'response_bytes', 'content_type')
+    __slots__ = ('payload', 'http_status_code', 'response_bytes', 'content_type', 'connection_setup_attempts')
 
-    def __init__(self, payload, http_status_code, response_bytes, content_type=None):
+    def __init__(self, payload, http_status_code, response_bytes, content_type=None, connection_setup_attempts=None):
         self.payload = payload
         self.http_status_code = http_status_code
         self.response_bytes = response_bytes
         self.content_type = content_type
+        self.connection_setup_attempts=connection_setup_attempts
 
 
 def _safe_content_type(value):
@@ -173,14 +205,16 @@ def _transport_error_code(error):
     return 'TRANSPORT_FAILED'
 
 
-def _send(request, timeout, *, ordinary_deepseek=False):
+def _send(request, timeout, *, ordinary_deepseek=False, before_send=None):
     handlers = [_NoRedirect(), ProxyHandler({})]
+    setup={}
     if ordinary_deepseek:
         # Same CA/hostname verification and TLS version policy as the default.
         # The observed local route closes connections advertising HTTP/1.1 ALPN;
         # omitting optional ALPN retains ordinary HTTPS/HTTP1.1 interoperability.
         # Frozen evaluation transports retain their original default context.
-        handlers.append(_ObservedHTTPSHandler(context=ssl.create_default_context()))
+        handlers.append(_ObservedHTTPSHandler(context=ssl.create_default_context(),before_send=before_send,
+            observe_attempt=lambda ordinal:setup.update(attempts=ordinal)))
     with build_opener(*handlers).open(request, timeout=timeout) as response:
         status = response.getcode()
         if type(status) is not int or not 100 <= status <= 599:
@@ -196,7 +230,7 @@ def _send(request, timeout, *, ordinary_deepseek=False):
     except (json.JSONDecodeError, UnicodeDecodeError):
         raise _DiagnosticFailure('MODEL_REQUEST_FAILED', 'response_decode', 'JSON_RESPONSE_INVALID',
             _response_diagnostics(http_status_code=status, response_bytes=len(raw), content_type=content_type)) from None
-    return _ReceivedResponse(payload, status, len(raw), content_type)
+    return _ReceivedResponse(payload, status, len(raw), content_type, setup.get('attempts'))
 
 
 def _usage(response):
@@ -1331,6 +1365,7 @@ class CloudAdapter:
                 self._window_consumed.add(planned_call.request_id)
         started = time.perf_counter()
         response, status, observed_usage = None, "error", None
+        connection_setup_attempts = None
         safe_response_diagnostics = None
         stage, error_code, sent = 'transport', 'NONE', True
         try:
@@ -1349,10 +1384,29 @@ class CloudAdapter:
                 if planned_call is not None:
                     self.request_window.validate_claim(planned_call, request_policy.provider_claim)
                     request_policy.validate_request(request, timeout)
-            response = (_send(request, timeout, ordinary_deepseek=True)
+            def connection_admission():
+                try:
+                    if not scope_allows(self.spec.role) or request_scope(self.spec.role)!=scope:
+                        raise ValueError('MODEL_ROLE_EGRESS_DENIED')
+                    self.usage_guard.check_before_send(reservation)
+                    from backend.app.ports.run_lifecycle import current_execution
+                    context=current_execution.get()
+                    if context is not None:
+                        claim,lifecycle,lost,_=context
+                        store=getattr(lifecycle,'event_store',None)
+                        if store is not None and (store.is_cancelled(claim.run_id)
+                            or not all(bool((store.get_knowledge_base(k) or {}).get('cloud_allowed',False)) for k in scope.knowledge_base_ids)):
+                            raise ValueError('RUN_OR_EGRESS_REVOKED')
+                        lifecycle.repository.renew(claim.run_id,claim.owner)
+                    if service_lease_check is not None and service_lease_check() is not True:
+                        raise ValueError('INGESTION_LEASE_LOST')
+                except Exception:
+                    raise ProviderRequestNotSent('MODEL_PRETRANSPORT_FENCE_DENIED') from None
+            response = (_send(request, timeout, ordinary_deepseek=True,before_send=connection_admission)
                         if service is not None and self.transport is _send and self.spec.provider == 'deepseek'
                         else self.transport(request, timeout))
             if isinstance(response, _ReceivedResponse):
+                connection_setup_attempts=response.connection_setup_attempts
                 safe_response_diagnostics = _response_diagnostics(response.payload, received=True,
                     http_status_code=response.http_status_code, response_bytes=response.response_bytes,
                     content_type=response.content_type,
@@ -1413,6 +1467,7 @@ class CloudAdapter:
             stage, error_code, status, sent = 'admission', 'REQUEST_NOT_SENT', 'not_sent', False
             if type(error) is _ConnectionNotSent:
                 stage, error_code = error.stage, error.code
+                connection_setup_attempts=error.attempts
             raise
         except TruncatedAnswer:
             status = "truncated"
@@ -1435,6 +1490,8 @@ class CloudAdapter:
                 receipt.update(service_policy_id=service.policy.policy_id,
                     capacity_source=service.capacity.source, capacity_status='LOCAL_BOUND_VERIFIED',
                     hosted_equivalence='UNKNOWN', service_request_id=service_request_id)
+            if connection_setup_attempts is not None:
+                receipt['connection_setup_attempts']=connection_setup_attempts
             if response_diagnostics:
                 receipt['response_diagnostics'] = (safe_response_diagnostics or
                     _response_diagnostics(expected_results=expected_results))
@@ -1468,6 +1525,7 @@ class CloudAdapter:
                     provider=self.spec.provider, model=self.spec.model_id, status=receipt['status'],
                     usage=observed_usage, latency_ms=receipt['latency_ms'],
                     diagnostic_stage=receipt['diagnostic_stage'], error_code=receipt['error_code'],
+                    connection_setup_attempts=connection_setup_attempts,
                     **({'stage': request_policy.usage_stage} if request_policy is not None else {}))
             except Exception:
                 if self.spec.role == 'rerank':

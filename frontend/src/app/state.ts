@@ -87,8 +87,8 @@ export function validRunDiagnostic(value: unknown): value is RunDiagnostic {
     typeof row.text === "string" && row.text.trim().length > 0 && row.text.length <= 300;
 }
 
-export function runDiagnosticText(message: Message): string | null {
-  return message.role === "user" && message.run_id && !message.citations?.length && validRunDiagnostic(message.presentation)
+export function runDiagnosticText(message: Message | undefined): string | null {
+  return message?.role === "user" && message.run_id && !message.citations?.length && validRunDiagnostic(message.presentation)
     ? message.presentation.text : null;
 }
 
