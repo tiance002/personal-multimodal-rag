@@ -11,11 +11,11 @@ REPORT = Path(__file__).resolve().parents[1] / 'var/reports/no-candidates-202610
 QUESTION = '北辰测试项目的负责人是谁，验收日期是什么时候？'
 
 
-def call(path, body=None):
+def call(path, body=None, *, timeout=45):
     request = urllib.request.Request(BASE + path,
         data=json.dumps(body).encode() if body is not None else None,
         headers={'Content-Type': 'application/json'})
-    with urllib.request.urlopen(request, timeout=45) as response:
+    with urllib.request.urlopen(request, timeout=timeout) as response:
         return json.load(response)['data']
 
 

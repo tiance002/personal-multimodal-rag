@@ -1461,14 +1461,11 @@ class PostgresKnowledgeRepository:
         citations = message.get("citations")
         message["citations"] = list(citations) if isinstance(citations, list) else []
         presentation = message.pop("presentation", None)
+        from backend.app.ports.run_presentation import clarification_presentation, valid_clarification_presentation
         run_error_code, run_metrics = message.pop('run_error_code', None), message.pop('run_metrics', None)
         if (message.get("role") == "user" and message.get("run_id")
-                and not message["citations"] and isinstance(presentation, dict)
-                and presentation.get("kind") == "clarification"
-                and presentation.get("clarification_required") is True
-                and isinstance(presentation.get("text"), str) and presentation["text"].strip()):
-            message["presentation"] = {"kind": "clarification", "text": presentation["text"],
-                                       "clarification_required": True}
+                and not message["citations"] and valid_clarification_presentation(presentation)):
+            message["presentation"] = clarification_presentation(presentation['text'])
         elif (message.get("role") == "user" and message.get("run_id")
                 and not message["citations"] and valid_hint(presentation)):
             message["presentation"] = {key: presentation[key] for key in
@@ -1504,11 +1501,17 @@ class PostgresKnowledgeRepository:
             query = """
                 SELECT r.id AS run_id,r.conversation_id,r.q0,r.status,r.error_code,
                        r.knowledge_base_scope,r.document_scope,r.created_at,r.completed_at,
+                       EXISTS (SELECT 1 FROM retrieval_events ce WHERE ce.run_id=r.id
+                         AND ce.event_type='run.metrics' AND ce.payload->>'execution_mode'='chat') AS is_chat,
                        EXISTS (SELECT 1 FROM retrieval_events e WHERE e.run_id=r.id
                          AND e.event_type='answer.completed'
                          AND e.payload->>'error_code' IS NULL) AS answer_completed
                 FROM rag_runs r
                 WHERE r.conversation_id=:conversation AND r.id<>:run AND r.created_at<:cutoff
+                  AND NOT EXISTS (SELECT 1 FROM retrieval_events ce WHERE ce.run_id=r.id
+                    AND ce.event_type='run.metrics' AND ce.payload->>'execution_mode'='chat'
+                    AND r.status='completed' AND r.completed_at<:cutoff
+                    AND r.knowledge_base_scope=CAST(:kb AS jsonb) AND r.document_scope=CAST(:docs AS jsonb))
                 ORDER BY r.created_at DESC,r.id DESC LIMIT 16
             """
             scan_limit = min(2048, max(16, limit*4)) if purpose == 'context' else 16
@@ -1516,7 +1519,7 @@ class PostgresKnowledgeRepository:
             # the existing follow-up SQL and its sixteen-row barrier are intact.
             if purpose == 'context': query = query.replace('LIMIT 16', 'LIMIT ' + str(scan_limit))
             rows = list(conn.execute(text(query), {"run": current_run_id, "conversation": conversation_id,
-                    "cutoff": cutoff}).mappings())
+                    "cutoff": cutoff, "kb": json.dumps(kb_scope), "docs": json.dumps(document_scope)}).mappings())
             if purpose == 'context':
                 from backend.app.ports.context_budget import identity, protocol_messages
                 enriched = []
@@ -1560,6 +1563,8 @@ class PostgresKnowledgeRepository:
             row = conn.execute(text("""
                 SELECT q0, id AS run_id FROM rag_runs
                 WHERE conversation_id=:conversation AND status='completed'
+                  AND NOT EXISTS (SELECT 1 FROM retrieval_events ce WHERE ce.run_id=rag_runs.id
+                    AND ce.event_type='run.metrics' AND ce.payload->>'execution_mode'='chat')
                   AND knowledge_base_scope=CAST(:kb AS jsonb)
                   AND document_scope=CAST(:docs AS jsonb)
                 ORDER BY created_at DESC LIMIT 1

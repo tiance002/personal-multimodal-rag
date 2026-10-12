@@ -413,6 +413,7 @@ def _answer_service(request: Request) -> AnswerService:
         follow_up_enabled=container.follow_up_enabled,
         observability=container.langfuse,
         quick_settings=QuickSettings(cloud_enabled=settings.cloud_enabled,
+            answer_timeout_seconds=settings.service_chat_timeout_seconds if settings.service_model_policy_json is not None else 30.0,
             prefer_cloud=settings.prefer_cloud, cloud_fallback_enabled=settings.cloud_fallback_enabled,
             cloud_provider="deepseek", cloud_model=settings.cloud_model,
             cloud_cost_estimate_microunits=settings.cloud_cost_estimate_microunits,
@@ -440,10 +441,14 @@ def send_message(conversation_id: str, request: Request, payload: MessageIn):
         return _error(request, "RAG_RUN_FAILED", type(exc).__name__, 500)
     if outcome.error_code in {"DUPLICATE_REQUEST", "REQUEST_ID_CONFLICT", "IDEMPOTENCY_UNAVAILABLE", "IDEMPOTENCY_REQUIRED"}:
         return _error(request, outcome.error_code, "request not regenerated; use the original run or refresh", 409)
-    from backend.app.ports.run_presentation import failure_presentation
+    from backend.app.ports.run_presentation import failure_presentation, clarification_presentation
     legacy_hint = (outcome.trace.get('execution_mode') == 'clarification'
                    and outcome.trace.get('clarification_required') is True) or outcome.trace.get('evidence_hint')
     presentation = None if legacy_hint else failure_presentation(outcome.error_code, outcome.trace.get('metrics'))
+    if (outcome.trace.get('execution_mode')=='clarification'
+            and outcome.trace.get('clarification_required') is True
+            and outcome.error_code=='NO_CANDIDATES' and not outcome.citations):
+        presentation=clarification_presentation(outcome.answer)
     return _ok(
         request,
         {

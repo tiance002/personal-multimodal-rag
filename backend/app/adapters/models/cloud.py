@@ -14,13 +14,14 @@ import threading
 import time
 import re
 import uuid
+import http.client
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 
 from backend.app.domain.embedding_identity import EmbeddingIdentity
 from backend.app.domain.model_registry import ModelSpec
@@ -53,6 +54,37 @@ class _DiagnosticFailure(ProviderUnavailable):
         super().__init__(public_code)
         self.public_code, self.stage, self.code = public_code, stage, code
         self.response_diagnostics = response_diagnostics
+
+
+class _ConnectionNotSent(ProviderRequestNotSent):
+    """Trusted direct connection failed before the first HTTP byte was sent."""
+    def __init__(self, error):
+        super().__init__('MODEL_CONNECTION_NOT_SENT')
+        self.stage = 'connection_setup'
+        self.code = ('TLS_EOF_BEFORE_REQUEST' if isinstance(error, ssl.SSLEOFError)
+                     else _transport_error_code(error))
+
+
+class _ObservedHTTPSConnection(http.client.HTTPSConnection):
+    def connect(self):
+        # The ordinary opener forbids proxies. A CONNECT tunnel would itself
+        # transmit HTTP bytes, so it cannot use this no-request proof.
+        if self._tunnel_host is not None:
+            raise ProviderRequestNotSent('MODEL_PROXY_DISABLED')
+        try:
+            super().connect()
+        except (OSError, URLError) as error:
+            self.close()
+            raise _ConnectionNotSent(error) from None
+
+
+class _ObservedHTTPSHandler(HTTPSHandler):
+    def https_open(self, request):
+        # Python 3.12+ moved hostname checking entirely into SSLContext.
+        legacy = ({'check_hostname': self._check_hostname}
+                  if hasattr(self, '_check_hostname') else {})
+        return self.do_open(_ObservedHTTPSConnection, request,
+                            context=self._context, **legacy)
 
 
 class _ReceivedResponse:
@@ -141,8 +173,15 @@ def _transport_error_code(error):
     return 'TRANSPORT_FAILED'
 
 
-def _send(request, timeout):
-    with build_opener(_NoRedirect(), ProxyHandler({})).open(request, timeout=timeout) as response:
+def _send(request, timeout, *, ordinary_deepseek=False):
+    handlers = [_NoRedirect(), ProxyHandler({})]
+    if ordinary_deepseek:
+        # Same CA/hostname verification and TLS version policy as the default.
+        # The observed local route closes connections advertising HTTP/1.1 ALPN;
+        # omitting optional ALPN retains ordinary HTTPS/HTTP1.1 interoperability.
+        # Frozen evaluation transports retain their original default context.
+        handlers.append(_ObservedHTTPSHandler(context=ssl.create_default_context()))
+    with build_opener(*handlers).open(request, timeout=timeout) as response:
         status = response.getcode()
         if type(status) is not int or not 100 <= status <= 599:
             status = None
@@ -1310,7 +1349,9 @@ class CloudAdapter:
                 if planned_call is not None:
                     self.request_window.validate_claim(planned_call, request_policy.provider_claim)
                     request_policy.validate_request(request, timeout)
-            response = self.transport(request, timeout)
+            response = (_send(request, timeout, ordinary_deepseek=True)
+                        if service is not None and self.transport is _send and self.spec.provider == 'deepseek'
+                        else self.transport(request, timeout))
             if isinstance(response, _ReceivedResponse):
                 safe_response_diagnostics = _response_diagnostics(response.payload, received=True,
                     http_status_code=response.http_status_code, response_bytes=response.response_bytes,
@@ -1328,6 +1369,11 @@ class CloudAdapter:
             if reported is not None and reported != self.spec.model_id:
                 raise _DiagnosticFailure('MODEL_RESPONSE_IDENTITY_MISMATCH', stage, 'MODEL_IDENTITY_MISMATCH',
                     safe_response_diagnostics)
+            # A rejected/truncated answer is still a received, billed response.
+            # Preserve valid usage for normal service after exact model identity
+            # confirmation. Frozen evaluation parse/settlement order is unchanged.
+            if service is not None and reported == self.spec.model_id:
+                observed_usage = usage_parser(response)
             value = validate(response)
             stage = 'usage_parse'
             observed_usage = usage_parser(response)
@@ -1361,10 +1407,12 @@ class CloudAdapter:
                 safe_response_diagnostics = _merge_response_diagnostics(
                     safe_response_diagnostics, exc.response_diagnostics, expected_results)
             raise ProviderUnavailable(exc.public_code) from None
-        except ProviderRequestNotSent:
+        except ProviderRequestNotSent as error:
             # A trusted transport may reject its local allowlist before I/O.
             # Release only explicitly proven not-sent reservations.
             stage, error_code, status, sent = 'admission', 'REQUEST_NOT_SENT', 'not_sent', False
+            if type(error) is _ConnectionNotSent:
+                stage, error_code = error.stage, error.code
             raise
         except TruncatedAnswer:
             status = "truncated"

@@ -67,18 +67,26 @@ class PostgresRunLifecycle:
             check_fence(conn,run_id,owner)
             conn.execute(text("UPDATE rag_run_leases SET lease_until=clock_timestamp()+:seconds * interval '1 second' WHERE run_id=:id"),dict(id=run_id,seconds=self.lease_seconds))
 
-    def claim_attempt(self, *, run_id, owner, attempt_id, role, ordinal, envelope_hash, provider, model):
+    def claim_attempt(self, *, run_id, owner, attempt_id, role, ordinal, envelope_hash, provider, model, purpose=None):
         if role not in {'chat_cheap','chat_expensive'} or type(ordinal) is not int or ordinal not in {1,2} or (ordinal==2 and role!='chat_expensive'):
             raise LifecycleDenied('ATTEMPT_IDENTITY_INVALID')
         from backend.app.ports.session_attempts import request_identity
-        if attempt_id != request_identity(run_id,'quick.router.'+role,ordinal):
+        prefix = 'quick.router.' + role
+        if purpose is not None:
+            if purpose != 'input.route' or role != 'chat_cheap' or ordinal != 1:
+                raise LifecycleDenied('ATTEMPT_IDENTITY_INVALID')
+            prefix = purpose
+        if attempt_id != request_identity(run_id,prefix,ordinal):
             raise LifecycleDenied('ATTEMPT_IDENTITY_INVALID')
         with self.engine.begin() as conn:
             conn.execute(text('SELECT id FROM rag_runs WHERE id=:id FOR UPDATE'),dict(id=run_id)).one()
             check_fence(conn,run_id,owner)
-            row = conn.execute(text('''INSERT INTO rag_model_attempts(id,run_id,owner,role,ordinal,envelope_hash,provider,model,state)
+            insert = '''INSERT INTO rag_model_attempts(id,run_id,owner,role,ordinal,envelope_hash,provider,model,state)
                 VALUES (:attempt,:id,:owner,:role,:ordinal,:hash,:provider,:model,'IN_PROGRESS')
-                ON CONFLICT DO NOTHING RETURNING id'''),dict(attempt=attempt_id,id=run_id,owner=owner,role=role,ordinal=ordinal,hash=envelope_hash,provider=provider,model=model)).scalar()
+                ON CONFLICT DO NOTHING RETURNING id'''
+            if purpose is not None:
+                insert = insert.replace('model,state)', 'model,state,purpose)').replace("'IN_PROGRESS')", "'IN_PROGRESS',:purpose)")
+            row = conn.execute(text(insert),dict(attempt=attempt_id,id=run_id,owner=owner,role=role,ordinal=ordinal,hash=envelope_hash,provider=provider,model=model,purpose=purpose or 'rag')).scalar()
             if row is None:
                 raise LifecycleDenied('DUPLICATE_ATTEMPT')
 

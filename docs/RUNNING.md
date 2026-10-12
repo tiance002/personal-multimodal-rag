@@ -1,6 +1,8 @@
 # 当前普通服务运行说明
 
-更新日期：2026-10-12。负责人已恢复 Goal。普通 API/Worker 已部署，公开小样本真实上传、问答、引用及网页历史刷新已验证；完整任务仍未验收。当前状态见 [修复报告](audits/no-candidates-20261011/MINIMAL_FIX_REPORT.md)，[暂停交接](audits/no-candidates-20261011/PAUSE_HANDOFF.md)保留历史暂停记录。历史阶段报告和评测窗口不构成当前运行授权。
+更新日期：2026-10-12。普通 API/Worker 已部署，公开小样本入库及真实资料在整库/单文档范围的问答、引用和网页刷新已验证。限定任务工程收尾见 [修复报告](audits/no-candidates-20261011/MINIMAL_FIX_REPORT.md) 最新节；不代表负责人发布验收。[暂停交接](audits/no-candidates-20261011/PAUSE_HANDOFF.md)保留历史记录。历史评测窗口不构成当前运行授权。
+
+负责人暂放闲聊/资料问题分流及对应记忆方案，普通入口未启用该草稿。草稿与实验回执保留在本机忽略目录 `var/handoffs/input-routing-paused-20261012`。已执行的0024迁移和历史调用不删除；已有聊天实验记录不进入资料问答上下文。没有独立多轮闲聊记忆，不把草稿作为本任务交付。
 
 网页“系统设置”提供 Embedding、Rerank、Chat cheap/expansive、VLM 的提供商、模型名称、HTTPS 接口网址和 API Key 配置。保存到本机共享存储 `private/model-settings.json`，不回传密钥。API 保存后切换配置，Worker 完成当前 Job 后加载；更换模型不覆盖旧索引和额度。2026-10-12已实际验证同一模型配置的保存、API/Worker同步及重启保留，0模型调用。未知模型可以保存，系统容量、协议和用量适配未完成时明确不可用；当前 Rerank 尚未启用。
 

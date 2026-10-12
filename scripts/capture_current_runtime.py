@@ -2,6 +2,7 @@
 import hashlib
 import json
 import subprocess
+import argparse
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -16,6 +17,16 @@ def run(argv):
 
 
 def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--after-tls-fix',action='store_true')
+    parser.add_argument('--after-input-route',action='store_true')
+    parser.add_argument('--final-input-route',action='store_true')
+    parser.add_argument('--core-final',action='store_true')
+    options=parser.parse_args()
+    destination=OUT.with_name('current-runtime-after-tls-20261012.json') if options.after_tls_fix else OUT
+    if options.after_input_route: destination=OUT.with_name('current-runtime-after-input-route-20261012.json')
+    if options.final_input_route: destination=OUT.with_name('current-runtime-final-input-route-20261012.json')
+    if options.core_final: destination=OUT.with_name('current-runtime-core-final-20261012.json')
     data=dict(head=run(['git','rev-parse','HEAD']),branch=run(['git','branch','--show-current']),
               dirty=True,entry='http://127.0.0.1:14188',provider_calls=0,containers={})
     for role in ('api','worker','db','redis'):
@@ -24,7 +35,7 @@ def main():
         identity,image,status=raw.split()
         item=dict(name=name,id=identity,image_id=image,status=status)
         if role in ('api','worker'):
-            script="import sys,json,hashlib;from pathlib import Path;print(json.dumps(dict(python=sys.version.split()[0],executable=sys.executable,files={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [Path('/app/backend/app/main.py'),Path('/app/backend/app/bootstrap.py'),Path('/app/backend/app/workers/ingestion.py')]})))"
+            script="import sys,json,hashlib;from pathlib import Path;print(json.dumps(dict(python=sys.version.split()[0],executable=sys.executable,files={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [Path('/app/backend/app/main.py'),Path('/app/backend/app/bootstrap.py'),Path('/app/backend/app/workers/ingestion.py'),Path('/app/backend/app/adapters/models/cloud.py'),Path('/app/backend/app/ports/model_usage.py'),Path('/app/backend/app/application/answer_service.py'),Path('/app/backend/app/adapters/postgres/knowledge_repository.py')]})))"
             item['runtime']=json.loads(run(['docker','exec',name,'python','-c',script]))
             for filename,digest in item['runtime']['files'].items():
                 assert hashlib.sha256((ROOT/filename.removeprefix('/app/')).read_bytes()).hexdigest()==digest
@@ -38,7 +49,7 @@ def main():
     assert all('api_key' not in row for row in data['model_configuration']['roles'])
     data['normal_ledger']=json.loads(run(['docker','exec','raglocalfirst0930-db-1','psql','-U','rag','-d','rag','-XAt','-c',
         "SELECT coalesce(json_agg(t),'[]') FROM (SELECT role,state,count(*) AS requests,sum(actual_input) AS actual_input,sum(actual_output) AS actual_output,sum(input_reserved+output_reserved) AS token_reserved FROM service_token_reservations WHERE policy_id IN ('owner-20261011-bge-m3-normal-v1','owner-20261011-xing-normal-v1','owner-20261011-deepseek-normal-v1') GROUP BY role,state ORDER BY role,state) t"]))
-    OUT.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    destination.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(dict(status='IDENTITY_CAPTURED',migration=data['migration'],api_worker_same_image=True,
                          config_revision=data['model_configuration']['revision'],provider_calls=0)))
 

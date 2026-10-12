@@ -120,9 +120,9 @@ def record_provider_call(*, model_key: str, capability: str, provider: str, mode
         usage.get('prompt_tokens'), usage.get('completion_tokens'), provider=provider,
         model_key=model_key, capability=capability, settlement='UNKNOWN'))
     if diagnostic_stage is not None:
-        stages={'admission','transport','http_response','response_decode','response_validation',
+        stages={'admission','connection_setup','transport','http_response','response_decode','response_validation',
                 'usage_parse','usage_settlement','rerank_validation','complete'}
-        reasons={'NONE','DNS_FAILED','TLS_CERTIFICATE_FAILED','TLS_HANDSHAKE_FAILED','REQUEST_TIMEOUT',
+        reasons={'NONE','DNS_FAILED','TLS_CERTIFICATE_FAILED','TLS_HANDSHAKE_FAILED','TLS_EOF_BEFORE_REQUEST','REQUEST_TIMEOUT',
                  'NETWORK_CONNECTION_FAILED','TRANSPORT_FAILED','HTTP_401','HTTP_403','HTTP_404','HTTP_429',
                  'HTTP_5XX','HTTP_OTHER','JSON_RESPONSE_INVALID','RESPONSE_STRUCTURE_INVALID',
                  'MODEL_IDENTITY_MISMATCH','REQUEST_NOT_SENT','RESPONSE_TRUNCATED','PROVIDER_UNAVAILABLE',

@@ -72,3 +72,9 @@ Xing/BGE-M3 无次数限制；DeepSeek 新授权累计输入+输出上限 1,000,
 负责人指定 `.env.local` 供启动程序加载；隔离容器仅输出密钥存在性：SiliconFlow=true、DeepSeek=true。
 这不代表密钥/网络/供应商额度已验证。未查看或输出密钥文件内容。
 已保存实际业务 DB 备份，隔离恢复/0013至0023迁移及六进程额度检查通过；业务迁移仍 NOT RUN。
+
+## 2026-10-12 最终普通入口（以上保留故障时点）
+
+正式入口仍为 http://127.0.0.1:14188/，API8000，原DB容器、数据库及storage卷保持原身份。API/Worker同镜像、实际代码hash与当前工作树核验，配置revision `bcd271c7-e820-45d4-9910-039384d268cd`。已执行迁移为0024_input_route_attempts；新备份SHA `f6c0f39163c4d6ff8fc8c7cf818e5fe2ab87ff6757fdb0d314344bdb709a781e`，隔离恢复迁移保护旧资料、指针、调用和Token状态。当前源码不装配闲聊入口；草稿在忽略目录保存。
+
+身份回执：`var/reports/no-candidates-20261011/current-runtime-core-final-20261012.json`。此回执在提交前捕获，HEAD是26159e3且dirty=true；记录真实时点，不伪造为提交后运行身份。静态readyz仍为CONFIGURATION_ONLY；真实可用性证据来自独立网页回执，不从readyz推断。

@@ -21,6 +21,47 @@ def policy(limit=100):
         'deepseek', 'deepseek-flash', ('chat_expensive', 'vision'), limit, 1, 1)
 
 
+def test_normal_truncated_answer_settles_received_usage_without_accepting_answer(ledger,monkeypatch):
+    from backend.app.adapters.models.cloud import CloudChat
+    from backend.app.ports.service_policy import ServiceModelBinding
+    from backend.app.ports.providers import TruncatedAnswer
+    monkeypatch.setenv('SILICONFLOW_API_KEY','SIMULATED_KEY')
+    spec=ModelRegistry.frozen_defaults().select('chat_cheap')
+    p=ServiceModelPolicy('SIMULATED-truncated','SIMULATED free quote',spec.provider,spec.model_id,
+        ('chat_cheap',),None,0,0,zero_quote=True)
+    guard=ServiceUsageGuard(InMemoryBudgetGate(0),ledger,spec,p)
+    class Capacity:
+        provider=spec.provider;model=spec.model_id;execution_kind='SIMULATED';source='SIMULATED'
+        def render_chat(self,messages,output):
+            return dict(model=self.model,messages=messages,max_tokens=output,stream=False,enable_thinking=False)
+        def measure(self,payload,wire):return 10,payload['max_tokens']
+    class Transport:
+        execution_kind='SIMULATED'
+        def __call__(self,request,timeout):
+            return dict(model=spec.model_id,choices=[dict(finish_reason='length',message={'content':'incomplete candidate'})],
+                        usage={'prompt_tokens':2,'completion_tokens':512,'total_tokens':514})
+    adapter=CloudChat(spec,enabled=True,usage_guard=guard,transport=Transport(),
+        service_binding=ServiceModelBinding(p,Capacity(),guard))
+    scope=Scope.from_ids(['SIMULATED-kb'])
+    from backend.app.ports.run_lifecycle import current_execution,current_attempt,execution_owner,RunClaim
+    from threading import Event
+    from types import SimpleNamespace
+    claim=RunClaim('SIMULATED-run','SIMULATED-owner',True,'IN_PROGRESS')
+    lifecycle=SimpleNamespace(repository=SimpleNamespace(link_budget=lambda *a:None))
+    context_token=current_execution.set((claim,lifecycle,Event(),'SIMULATED-session'))
+    owner_token=execution_owner.set((claim.run_id,claim.owner))
+    attempt_token=current_attempt.set('SIMULATED-attempt')
+    try:
+        with model_access('chat_cheap',allowed=True,scope=scope),pytest.raises(TruncatedAnswer):
+            adapter.generate_with_service_scope([{'role':'user','content':'PUBLIC'}],timeout_seconds=1,
+                max_tokens=512,scope=scope,request_id='SIMULATED-truncation')
+    finally:
+        current_attempt.reset(attempt_token);execution_owner.reset(owner_token);current_execution.reset(context_token)
+    with ledger.engine.connect() as c:
+        row=c.execute(select(calls)).mappings().one()
+    assert row['state']=='settled' and row['actual_input']==2 and row['actual_output']==512
+
+
 @pytest.fixture
 def ledger(tmp_path):
     engine = create_engine('sqlite:///' + str(tmp_path / 'quota.db'))

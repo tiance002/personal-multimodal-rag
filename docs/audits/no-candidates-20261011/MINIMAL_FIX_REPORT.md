@@ -242,3 +242,38 @@ HEAD 不变，未提交、未打 Tag、未获得负责人验收。Goal 保持 ac
 - 先提交本任务故障修复，再单独归档历史AGENTS附录/整理冗余说明。不得删除迁移、原文、Gold、旧引用、失败或UNKNOWN记录。整体Goal保持active，不自称负责人已验收或打Tag。
 
 最新装配/窗口回归：`$env:XING_TEST_ASSETS = 'E:\RAG quention\var\model-assets\xing4.0\baae3c3e813cad5f888f1f485cfff659c89076c5'; & '.venv/Scripts/python.exe' -m pytest -p no:cacheprovider backend/tests/test_siliconflow_xing_capacity.py backend/tests/test_runtime_readiness.py backend/tests/test_service_configuration.py backend/tests/test_service_caption.py backend/tests/test_bootstrap.py -q`：退出0，96 passed / 7 warnings，final-assembly-window-20261012-r2.txt。首轮未设置既有夹具必需的XING_TEST_ASSETS而26 passed/70 setup errors，保留为FAIL；设置已核验资源目录后重跑，不改测试guard、不下载或调用模型。
+
+## 2026-10-12 原任务最终收尾（取代上述未完成时点）
+
+### 1. 目标与改动
+
+原G0–G5限定修复完成工程收尾：普通模型装配/容量/持久预算、许可、原文恢复、不可变索引升级、诊断、引用与恢复均有对应证据。负责人明确原问候是模型可用性检查，允许用真实资料问题验RAG；不把问候作为事实题，也不改写旧Run/失败/UNKNOWN。闲聊分流和两套短期记忆方案已按最新指令暂放，草稿保存在忽略目录，当前普通AnswerService不装配分流。既有实验记录/已执行迁移保留，资料历史排除聊天和失败，范围/未完成屏障仍有效。
+
+本次额外窄修复：普通DeepSeek显式严格SSLContext与connect阶段NOT_SENT证明；仅普通服务的内部90秒生成超时（合法范围1–120）；普通收到且模型身份吻合的截断响应保留usage而不接受答案；澄清presentation统一run-presentation-v1，POST/GET/SSE/刷新沿用同一已提交user/run，兼容旧DTO且不创建助手事实。
+
+### 2. 执行命令与证据
+
+报告目录均为`var/reports/no-candidates-20261011`，原失败日志与首轮证据保留。
+
+- `$env:RAG_NATIVE_TEST_PYTHON='E:\RAG quention\.venv\Scripts\python.exe'; .venv/Scripts/python.exe -m pytest backend/tests/test_run_metrics.py backend/tests/test_bounded_history.py backend/tests/test_p55c_query_understand.py backend/tests/test_run_presentation.py backend/tests/test_product_gap_contract.py backend/tests/test_service_usage.py backend/tests/test_ordinary_deepseek_tls.py -q -p no:cacheprovider`：0，165 passed / 5 warnings；`core-final-affected-20261012.txt`，OFFLINE/SIMULATED。
+- `.venv/Scripts/python.exe -m pytest backend/tests/test_bounded_history.py -q -p no:cacheprovider`：0，67 passed；`historical-chat-guard-core-20261012.txt`，包含新增四类历史聊天/失败/范围/未完成屏障检查；与165有重叠，不相加。
+- frontend中 `npx playwright test tests/clarification-response.spec.ts tests/sse.spec.ts --reporter=line`：0，26 passed；`canonical-clarification-browser-20261012.txt`，真实浏览器/SIMULATED API。`npx tsc --noEmit`：0。
+- `.venv/Scripts/python.exe scripts/verify_service_migration_restore.py --input-route --current-backup --history-check`：最终0；`migration-input-route-history-20261012-r3.json/.txt`。真实隔离PG、当前备份0023→0024，8文档/16版本/273片段/113Run及来源/内容/active hash不变，旧attempt/Token状态hash不变；三attempt共存、三duplicate拒绝、三历史读取器均排除聊天/失败，0模型。早期历史探针用旧镜像缺openpyxl而失败，切到已安装service依赖的实际镜像后通过；FAIL保留。
+- `docker build -f deploy/Dockerfile.api -t personal-rag:no-candidates-20261011 .` 和 `& ./scripts/deploy_no_candidates_service.ps1 -Deploy`：各0；`api-image-build-core-final-20261012-r2.txt` / `deploy-core-final-20261012-r2.txt`。备份hash和隔离迁移证明为部署前门，原DB卷不重建。
+- `.venv/Scripts/python.exe scripts/smoke_material_answer_web.py --kb-wide --core-only`：0；`material-answer-core-web-real-20261012.json/.txt`。真实普通网页、原KB、document_scope=[]，run `f3dd7ba1-5566-4de9-8bc1-d28e83636f4f`；1 POST、0入口分类调用；基于已存在真实资料的明确问题，最终引用200且刷新同文/同标签。单文档版本和整库版本的先前真实问答证据分别为`material-answer-web-real-20261012.json` / `material-answer-kb-wide-web-real-20261012.json`，与最终入口证据分开。
+- `.venv/Scripts/python.exe scripts/capture_current_runtime.py --core-final`：0；`current-runtime-core-final-20261012.json`，实际API/Worker同镜像、模块hash匹配、迁移0024、同配置revision，0模型。
+- `.venv/Scripts/python.exe scripts/contract_test.py --report var/reports/no-candidates-20261011/contracts-input-route-20261012.json`：1；31既有import违规，normalized22文件/导入对与既有报告完全相同，0新增；无OpenAPI路径/快照漂移，固定SSE样本无错。整体结果仍FAIL，不能标PASS。
+
+### 3. 结果
+
+限定修复/真实资料闭环：PASS；负责人正式验收：NOT RUN。G4各安全与历史项的前序证据继续有效，上述是最后受影响验证及真实普通入口验证。未实现的命令不得报告通过。全量verify-mX/release、六完整评测、所有新答案全面人审均NOT RUN；不把限定正确的一题推广成全面准确率。
+
+### 4. 风险与遗留
+
+外部网络仍可能失败：最新曾有DeepSeek connect EOF，可证明NOT_SENT并仅释放本次预留；已发送未知请求继续占额度。没有自动重试、关闭证书检查或改写旧UNKNOWN。SF一次90秒超时也保留UNKNOWN。实际账单、远端模型与本地token recipe等价性仍UNKNOWN。Rerank/未知自定义模型的能力适配不称已启用。
+
+原问候不是有资料证据的事实问题；当前普通入口不交付聊天能力，相关方案负责人暂放，不自称已完成。草稿位于`var/handoffs/input-routing-paused-20261012/final-draft`，含逐文件hash；正式代码只保留已应用历史所需的兼容/过滤护栏。未批准任何未修P0/P1延期，未声称发布。
+
+### 5. 版本与下一步
+
+前序修复35e34b0；独立归档26159e3；本轮追加原任务兼容修复单独提交。运行回执捕获时HEAD/dirty反映真实时点；不反写历史回执。无push、无Tag。后续闲聊/资料问题与短期记忆设计由负责人提供方案后再做，不把它扩张为本文件收尾前置条件。

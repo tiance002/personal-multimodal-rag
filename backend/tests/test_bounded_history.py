@@ -41,6 +41,15 @@ def snapshot(rows):
               current_run_id="current", cutoff=STAMP, limit=3)
 
 
+@pytest.mark.parametrize('state,kbs,expected',[('completed',['kb'],['rag']),
+    ('failed',['kb'],['rag']),('running',['kb'],[]),('completed',['other'],[])])
+def test_historical_chat_is_not_rag_context_and_cannot_erase_barriers(state,kbs,expected):
+    valid=row('rag','资料问题',age=3)
+    archived=row('chat','历史聊天',age=2,status=state,kb=kbs)
+    archived['is_chat']=True
+    assert [turn['run_id'] for turn in snapshot([valid,archived])['turns']]==expected
+
+
 def history(q0="M27是什么设备？"):
     return ({"turn_id": "H1", "run_id": "run-1", "q0": q0},)
 

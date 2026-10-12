@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { api, sendMessageWithEvents, retrievalFailureText } from "../api/client";
-import { clarificationText, evidenceHintText, tableHeaderHint, validRunDiagnostic } from "./state";
+import { clarificationText, evidenceHintText, tableHeaderHint, validRunDiagnostic, validClarificationPresentation } from "./state";
 import type {
   AppState,
   Conversation,
@@ -738,6 +738,13 @@ export default function App() {
         setMessages((current) => current.map((message, index) =>
           index === current.length - 1 && message.role === "user" && message.content === content
             ? { ...message, run_id: result.run_id, presentation: diagnostic } : message));
+      } else if (isClarification) {
+        const presentation = validClarificationPresentation(result.presentation) && result.presentation.text === result.answer
+          ? result.presentation : {schema_version: "run-presentation-v1" as const,kind: "clarification" as const,
+              text:result.answer,clarification_required:true as const};
+        setMessages(current => current.map((message,index) =>
+          index === current.length-1 && message.role === "user" && message.content === content
+            ? {...message,run_id:result.run_id,presentation} : message));
       } else if (isTableHint) {
         setMessages((current) => current.map((message, index) =>
           index === current.length - 1 && message.role === "user" && message.content === content

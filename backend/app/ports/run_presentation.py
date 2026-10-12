@@ -2,6 +2,20 @@
 from backend.app.ports.providers import PUBLIC_PROVIDER_REASONS
 
 VERSION = 'run-presentation-v1'
+
+
+def clarification_presentation(text):
+    if not isinstance(text,str) or not text.strip() or len(text)>300:
+        return None
+    return dict(schema_version=VERSION,kind='clarification',text=text,clarification_required=True)
+
+
+def valid_clarification_presentation(value):
+    return (isinstance(value,dict) and value.get('kind')=='clarification'
+        and value.get('clarification_required') is True
+        and value.get('schema_version',VERSION)==VERSION
+        and set(value)<= {'schema_version','kind','text','clarification_required'}
+        and clarification_presentation(value.get('text')) is not None)
 MESSAGES = {
     'permission_required': '云端处理尚未获许可，请检查系统设置中的知识库外发许可与模型配置。',
     'retrieval_error': '检索能力不可用，请检查模型配置、知识库外发许可和索引状态。',

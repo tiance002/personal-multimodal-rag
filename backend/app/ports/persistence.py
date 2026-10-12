@@ -66,6 +66,10 @@ def bounded_completed_history(rows: Sequence[Any], *, conversation_id: str,
                 or row.get("completed_at") is None or row["completed_at"] > cutoff
                 or row.get("answer_completed") is not True):
             continue
+        # Preserve scope/pending barriers before skipping completed chat. A chat
+        # from another scope must not reconnect older unrelated RAG context.
+        if row.get('is_chat') is True:
+            continue
         q0 = row["q0"]
         if not isinstance(q0, str) or not q0.strip() or (purpose == 'follow_up' and len(q0) > 512):
             omitted += 1

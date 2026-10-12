@@ -55,7 +55,14 @@ if (!$Deploy) { Write-Output 'PREPARED_ONLY; business migration NOT RUN'; exit 0
 $taskDbId = & docker inspect raglocalfirst0930-db-1 --format '{{.Id}}'
 if ($LASTEXITCODE -ne 0 -or !$taskDbId.StartsWith('5c9a6eacb994')) { throw 'ACTUAL_DB_IDENTITY_CHANGED' }
 $taskCurrentRevision = & docker exec raglocalfirst0930-db-1 psql -U rag -d rag -XAt -v ON_ERROR_STOP=1 -c 'SELECT version_num FROM alembic_version;'
-if ($LASTEXITCODE -ne 0 -or $taskCurrentRevision.Trim() -notin @('0013_message_run_link', '0023_service_token_policy')) { throw 'BUSINESS_REVISION_CHANGED_RECHECK_REQUIRED' }
+if ($LASTEXITCODE -ne 0 -or $taskCurrentRevision.Trim() -notin @('0013_message_run_link', '0023_service_token_policy', '0024_input_route_attempts')) { throw 'BUSINESS_REVISION_CHANGED_RECHECK_REQUIRED' }
+if (Test-Path -LiteralPath 'alembic/versions/0024_input_route_attempts.py') {
+    $taskRouteProof = Get-Content -LiteralPath (Join-Path $taskReports 'migration-input-route-isolated-20261012.json') -Raw | ConvertFrom-Json
+    if ($taskRouteProof.status -ne 'CHECKS_PASSED' -or $taskRouteProof.input_route_check.provider_calls -ne 0) { throw 'INPUT_ROUTE_MIGRATION_PROOF_REQUIRED' }
+    $taskRouteBackup = Get-Content -LiteralPath (Join-Path $taskReports 'business-db-before-0024.json') -Raw | ConvertFrom-Json
+    $taskRouteHash = (Get-FileHash -LiteralPath (Join-Path $taskReports 'business-db-before-0024.dump') -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($taskRouteHash -ne $taskRouteBackup.sha256) { throw 'INPUT_ROUTE_BACKUP_HASH_MISMATCH' }
+}
 & docker @taskCompose up -d --no-build --no-deps redis *> (Join-Path $taskReports 'redis-start.txt')
 if ($LASTEXITCODE -ne 0) { throw 'REDIS_START_FAILED' }
 $taskRedisReady = $false

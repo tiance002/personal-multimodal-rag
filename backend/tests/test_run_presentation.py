@@ -11,6 +11,18 @@ def test_egress_gate_before_retrieval_is_permission_required():
 from backend.app.adapters.postgres.knowledge_repository import PostgresKnowledgeRepository
 
 
+def test_clarification_post_and_history_share_versioned_dto_with_legacy_read():
+    from backend.app.ports.run_presentation import clarification_presentation,valid_clarification_presentation
+    dto=clarification_presentation('请提出具体问题。')
+    assert dto['schema_version']=='run-presentation-v1'
+    legacy={k:v for k,v in dto.items() if k!='schema_version'}
+    assert valid_clarification_presentation(legacy)
+    for source in (dto,legacy):
+        row=PostgresKnowledgeRepository._message_row(dict(role='user',run_id='run',citations=[],presentation=source))
+        assert row['presentation']==dto
+    assert not valid_clarification_presentation({**dto,'schema_version':'unknown'})
+
+
 def metrics(status, reason=None):
     return {'retrieval_diagnostics':[{'schema_version':'retrieval-diagnostic-v1','channels':{
         'keyword':{'status':'NOT_SELECTED','count':None,'reason':None},

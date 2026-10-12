@@ -6,7 +6,7 @@ const API = "/api/v1";
 export type MemoryItem = { id: string; scope_type: 'GLOBAL' | 'SCOPED'; kind: string; fact_key: string; content: string; status: string; origin: string; version: number; sources: unknown[] };
 type MemoryScope = { scope_type?: 'GLOBAL' | 'SCOPED'; knowledge_base_scope: string[]; document_scope: string[] };
 type RetrievalChannel = { status: string; count: number | null; reason: string | null };
-type AnswerResponse = { run_id: string; answer: string; citations: string[]; error_code?: string; presentation?: import("../app/state").RunDiagnostic | null; trace?: { execution_mode?: string; clarification_required?: boolean; evidence_hint?: EvidenceHint | null; metrics?: { retrieval_diagnostics?: { schema_version: string; channels: Record<string, RetrievalChannel> }[] } } };
+type AnswerResponse = { run_id: string; answer: string; citations: string[]; error_code?: string; presentation?: import("../app/state").RunDiagnostic | import("../app/state").ClarificationPresentation | null; trace?: { execution_mode?: string; clarification_required?: boolean; evidence_hint?: EvidenceHint | null; metrics?: { retrieval_diagnostics?: { schema_version: string; channels: Record<string, RetrievalChannel> }[] } } };
 export type ModelReadiness = { provider: string; status?: string; check_kind?: string; roles?: Record<string, { provider: string; model: string; status: string; reasons: string[] }> };
 
 export function retrievalFailureText(result: AnswerResponse): string | null {
@@ -131,6 +131,7 @@ export async function sendMessageWithEvents(conversationId: string, content: str
           }
           if (recovered.error_code === "NO_CANDIDATES" && clarification) {
             recovered = { ...recovered, answer: clarification,
+              presentation: message?.presentation as import("../app/state").ClarificationPresentation,
               trace: { execution_mode: "clarification", clarification_required: true } };
           } else if (recovered.error_code === "INSUFFICIENT_EVIDENCE" && tableHeaderHint(message?.presentation)) {
             recovered = { ...recovered, answer: message.presentation.text,

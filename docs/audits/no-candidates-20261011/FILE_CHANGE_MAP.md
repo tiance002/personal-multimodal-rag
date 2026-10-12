@@ -2,6 +2,8 @@
 
 范围：本任务修复工作树，基底 d13951af；非全仓重构。AGENTS历史附录在后续独立提交归档。
 
+2026-10-12收尾补充：cloud.py / providers.py / model_usage.py / test_ordinary_deepseek_tls.py处理已观察TLS阶段与NOT_SENT证明，并保留真实收到的普通请求usage；config.py / routes.py / compose.yml为普通服务增加内部有界90秒生成超时，不改冻结评测30秒。run_presentation.py / AnswerService / PG repository / frontend三文件及对应测试统一版本化澄清DTO。0024迁移、PG lifecycle、persistence和bounded-history检查只保留已产生记录兼容和安全历史过滤；普通入口没有新闲聊分流。三个真实material/restore验证脚本和身份/deploy脚本对应G4/G5证据。闲聊源文件、测试及ADR草稿已转入忽略目录，不作为正式修改。
+
 | 文件 | 对应需求 / 原因 |
 | --- | --- |
 | `.dockerignore` | F1/F6/F8 shared verified runtime dependencies/config; secrets and corpus excluded from image context |

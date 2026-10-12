@@ -340,8 +340,8 @@ class AnswerService:
                         and isinstance(answer, str) and answer.strip()):
                     # Presentation only: the read side also requires committed failed
                     # status and matching current scope. Never an assistant fact.
-                    metadata["presentation"] = {"kind": "clarification", "text": answer,
-                                                "clarification_required": True}
+                    from backend.app.ports.run_presentation import clarification_presentation
+                    metadata["presentation"] = clarification_presentation(answer)
                 hint = trace.get("evidence_hint")
                 if (error_code == "INSUFFICIENT_EVIDENCE" and not citations and not snapshots
                         and valid_hint(hint) and answer == hint["text"]):

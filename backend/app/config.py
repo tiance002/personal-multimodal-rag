@@ -46,6 +46,7 @@ class Settings:
     embedding_backend: str = "siliconflow"
     embedding_tokenizer_path: Path | None = None
     service_model_policy_json: str | None = None
+    service_chat_timeout_seconds: int = 90
     xing_capacity_resources: Path | None = None
     deepseek_tokenizer_path: Path | None = None
     embedding_egress_enabled: bool = False
@@ -91,6 +92,8 @@ class Settings:
     context_max_items: int = 8
 
     def __post_init__(self) -> None:
+        if type(self.service_chat_timeout_seconds) is not int or not 1 <= self.service_chat_timeout_seconds <= 120:
+            raise ValueError('SERVICE_CHAT_TIMEOUT_INVALID')
         if type(self.live_run_ttl_seconds) is not int or self.live_run_ttl_seconds < 3 or type(self.stream_event_ttl_seconds) is not int or self.stream_event_ttl_seconds < 1:
             raise ValueError('STREAM_TTL_INVALID')
         if self.embedding_backend not in {"siliconflow", "ollama"}:
@@ -138,6 +141,7 @@ class Settings:
             embedding_tokenizer_path=(Path(os.environ["RAG_EMBEDDING_TOKENIZER_PATH"])
                                       if os.getenv("RAG_EMBEDDING_TOKENIZER_PATH") else None),
             service_model_policy_json=os.getenv('RAG_SERVICE_MODEL_POLICY_JSON') or None,
+            service_chat_timeout_seconds=_env_context_positive_int('RAG_SERVICE_CHAT_TIMEOUT_SECONDS',90),
             xing_capacity_resources=Path(os.environ['RAG_XING_CAPACITY_RESOURCES']) if os.getenv('RAG_XING_CAPACITY_RESOURCES') else None,
             deepseek_tokenizer_path=Path(os.environ['RAG_DEEPSEEK_TOKENIZER_PATH']) if os.getenv('RAG_DEEPSEEK_TOKENIZER_PATH') else None,
             embedding_egress_enabled=_env_context_bool("RAG_EMBEDDING_EGRESS_ENABLED", False),

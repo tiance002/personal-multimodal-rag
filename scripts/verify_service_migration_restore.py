@@ -31,6 +31,9 @@ SNAPSHOT = """SELECT json_build_object(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--quota-check', action='store_true')
+    parser.add_argument('--input-route', action='store_true')
+    parser.add_argument('--current-backup', action='store_true')
+    parser.add_argument('--history-check', action='store_true')
     options = parser.parse_args()
     receipts = []
     report = dict(schema_version=1, check_kind='ISOLATED_REAL_POSTGRES_BACKUP_RESTORE_MIGRATION',
@@ -40,6 +43,8 @@ def main():
         result = subprocess.run(args, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         receipts.append(dict(command=args, exit_code=result.returncode))
         if check and result.returncode:
+            if options.history_check:
+                (REPORTS/'migration-input-route-history-error-20261012-r3.txt').write_bytes(result.stderr)
             raise RuntimeError('ISOLATED_COMMAND_FAILED:' + args[0])
         return result
     def snapshot():
@@ -48,6 +53,11 @@ def main():
     try:
         backup = REPORTS / 'business-db-before-0023.dump'
         metadata = json.loads((REPORTS / 'business-db-backup.json').read_text(encoding='utf-8'))
+        if options.current_backup:
+            assert options.input_route
+            backup = REPORTS / 'business-db-before-0024.dump'
+            current = json.loads((REPORTS / 'business-db-before-0024.json').read_text(encoding='utf-8'))
+            metadata = {'backup_sha256': current['sha256']}
         raw = backup.read_bytes()
         assert hashlib.sha256(raw).hexdigest() == metadata['backup_sha256']
         report['backup_sha256'] = metadata['backup_sha256']
@@ -66,7 +76,10 @@ def main():
         run(['docker', 'exec', '-i', CONTAINER, 'pg_restore', '-U', 'postgres', '-d', 'rag_restore',
             '--no-owner', '--no-acl', '--exit-on-error'], data=raw)
         before = snapshot()
-        assert before['revision'] == '0013_message_run_link'
+        assert before['revision'] == ('0023_service_token_policy' if options.current_backup else '0013_message_run_link')
+        ledger_sql = "SELECT json_build_object('attempts',(SELECT md5(coalesce(string_agg(id || ':' || state || ':' || diagnostics::text,',' ORDER BY id),'')) FROM rag_model_attempts),'tokens',(SELECT md5(coalesce(string_agg(id::text || ':' || state || ':' || input_reserved::text || ':' || output_reserved::text,',' ORDER BY id),'')) FROM service_token_reservations))"
+        if options.current_backup:
+            ledger_before = run(['docker','exec',CONTAINER,'psql','-U','postgres','-d','rag_restore','-XAt','-c',ledger_sql]).stdout
         # Existing local image supplies the dependency runtime; mounted code
         # supplies the current migrations. No application server is started.
         run(['docker', 'run', '--pull=never', '--rm', '--network', NETWORK,
@@ -75,8 +88,11 @@ def main():
             '-e', 'RAG_DATABASE_URL=postgresql+psycopg://postgres@' + CONTAINER + ':5432/rag_restore',
             '--entrypoint', 'python', 'raglocalfirst0930-api', '-m', 'alembic', '-c', 'alembic.ini', 'upgrade', 'head'])
         after = snapshot()
-        assert after['revision'] == '0023_service_token_policy'
+        assert after['revision'] == ('0024_input_route_attempts' if options.input_route else '0023_service_token_policy')
         assert {k:v for k,v in before.items() if k != 'revision'} == {k:v for k,v in after.items() if k != 'revision'}
+        if options.current_backup:
+            assert ledger_before == run(['docker','exec',CONTAINER,'psql','-U','postgres','-d','rag_restore','-XAt','-c',ledger_sql]).stdout
+            report['old_attempts_and_token_states_unchanged'] = True
         if options.quota_check:
             result = run(['docker', 'run', '--pull=never', '--rm', '--network', NETWORK,
                 '--mount', f'type=bind,source={ROOT / "backend"},target=/app/backend,readonly',
@@ -86,6 +102,14 @@ def main():
                 '/app/scripts/smoke_service_quota_postgres.py'])
             report['quota_check'] = json.loads(result.stdout)
             assert snapshot() == after
+        if options.input_route:
+            result = run(['docker', 'run', '--pull=never', '--rm', '--network', NETWORK,
+                '--mount', f'type=bind,source={ROOT / "backend"},target=/app/backend,readonly',
+                '--mount', f'type=bind,source={ROOT / "scripts"},target=/app/scripts,readonly',
+                '-e', 'RAG_DATABASE_URL=postgresql+psycopg://postgres@' + CONTAINER + ':5432/rag_restore',
+                '-e', 'PYTHONPATH=/app', '--entrypoint', 'python', 'personal-rag:no-candidates-20261011',
+                '/app/scripts/smoke_input_route_postgres.py'])
+            report['input_route_check'] = json.loads(result.stdout)
         report.update(status='CHECKS_PASSED', before=before, after=after,
             original_content_source_and_activation_unchanged=True)
     except Exception as error:
@@ -101,6 +125,11 @@ def main():
             assert info['Labels'].get('codex.task') == LABEL.split('=',1)[1]
             run(['docker', 'network', 'rm', NETWORK])
         filename = 'migration-quota-isolated.json' if options.quota_check else 'migration-restore-isolated.json'
+        if options.input_route: filename = 'migration-input-route-isolated-20261012.json'
+        if options.current_backup: filename = 'migration-input-route-current-backup-20261012.json'
+        if options.history_check:
+            assert options.input_route and options.current_backup
+            filename = 'migration-input-route-history-20261012-r3.json'
         (REPORTS / filename).write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
         print(json.dumps({k:v for k,v in report.items() if k != 'commands'}))
 

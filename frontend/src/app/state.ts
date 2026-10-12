@@ -61,8 +61,18 @@ export type Message = {
   content: string;
   citations?: string[];
   run_id?: string;
-  presentation?: { kind: "clarification"; text: string; clarification_required: true } | EvidenceHint | RunDiagnostic;
+  presentation?: ClarificationPresentation | EvidenceHint | RunDiagnostic;
 };
+
+export type ClarificationPresentation = { schema_version?: "run-presentation-v1"; kind: "clarification"; text: string; clarification_required: true };
+
+export function validClarificationPresentation(value: unknown): value is ClarificationPresentation {
+  if (!value || typeof value !== "object") return false;
+  const row=value as Partial<ClarificationPresentation>;
+  return row.kind==="clarification" && row.clarification_required===true &&
+    (row.schema_version===undefined || row.schema_version==="run-presentation-v1") &&
+    typeof row.text==="string" && row.text.trim().length>0 && row.text.length<=300;
+}
 
 export type RunDiagnostic = { schema_version: "run-presentation-v1"; kind: "run_diagnostic";
   category: "permission_required" | "retrieval_error" | "no_match" | "evidence_unavailable" | "generation_error" | "input_limit" | "failed";
@@ -86,9 +96,7 @@ export function runDiagnosticText(message: Message): string | null {
 export function clarificationText(message: Message | undefined): string | null {
   const presentation = message?.presentation;
   return message?.role === "user" && !!message.run_id &&
-    !message.citations?.length && presentation?.kind === "clarification" &&
-    presentation.clarification_required === true &&
-    typeof presentation.text === "string" && presentation.text.trim().length > 0
+    !message.citations?.length && validClarificationPresentation(presentation)
     ? presentation.text : null;
 }
 
