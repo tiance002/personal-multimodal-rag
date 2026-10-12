@@ -107,7 +107,7 @@ provider availability, account balance, KB consent or index compatibility.
                 capacity = getattr(binding, 'capacity', None)
                 if capacity is not None and hasattr(capacity, 'output_readiness'):
                     output_readiness = capacity.output_readiness
-                    if output_readiness['endpoint_output_evidence'] == 'UNKNOWN':
+                    if not {1024, 2048, 4096}.issubset(output_readiness.get('supported_output_caps', [])):
                         reasons.append('OUTPUT_CAPACITY_UNVERIFIED')
             roles[role] = dict(provider=spec.provider, model=spec.model_id,
                 status='NOT_READY' if reasons else 'READY_CONFIG', reasons=reasons,

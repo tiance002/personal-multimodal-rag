@@ -1,0 +1,29 @@
+"""Do not label a sent-but-unproven cap test as an unsent free request."""
+from backend.app.ports.providers import ProviderRequestNotSent, ProviderUnavailable
+from scripts.probe_ordinary_output import failure_state, prior_allows_continuation, ACKNOWLEDGED_UNKNOWN
+
+
+def test_proof_denial_after_response_is_sent_not_proven():
+    assert failure_state(ProviderRequestNotSent('OUTPUT_CAPABILITY_EVIDENCE_INVALID'),
+                         {'usage': {'completion_tokens': 1}}, {'token_settlement': 'settled'}) == 'NOT_PROVEN'
+
+
+def test_observed_response_with_failed_settlement_still_remains_unknown():
+    assert failure_state(ProviderUnavailable('MODEL_USAGE_SETTLEMENT_FAILED'),
+                         {'usage': {'completion_tokens': 1}}, {'token_settlement': 'unknown'}) == 'UNKNOWN'
+
+
+def test_uncertain_transport_remains_unknown():
+    assert failure_state(ProviderUnavailable('MODEL_REQUEST_FAILED'), None) == 'UNKNOWN'
+
+
+def test_explicit_pretransport_denial_is_not_sent():
+    assert failure_state(ProviderRequestNotSent('MODEL_CREDENTIAL_MISSING'), None) == 'NOT_SENT'
+
+
+def test_only_settled_known_failure_can_continue_without_unknown_approval():
+    assert prior_allows_continuation({'state': 'NOT_PROVEN', 'provider_diagnostic': {'token_settlement': 'settled'}})
+    assert not prior_allows_continuation({'state': 'NOT_PROVEN'})
+    assert not prior_allows_continuation({'state': 'UNKNOWN', 'run_id': 'new-run'}, True)
+    assert prior_allows_continuation({'state': 'UNKNOWN', 'run_id': ACKNOWLEDGED_UNKNOWN}, True)
+    assert not prior_allows_continuation({'state': 'UNKNOWN', 'run_id': ACKNOWLEDGED_UNKNOWN})

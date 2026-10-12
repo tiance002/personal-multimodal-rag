@@ -15,6 +15,7 @@ from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 
 import pytest
+from backend.app.ports.providers import ProviderRequestNotSent
 
 from backend.app.adapters.models import siliconflow_xing_capacity as module
 from backend.app.adapters.models.siliconflow_xing_capacity import (
@@ -48,6 +49,47 @@ def body(text="hello", *, messages=None, disabled=False, output=32):
 
 def measure(counter, payload):
     return counter.measure("siliconflow", SILICONFLOW_XING_MODEL, payload, scope="PUBLIC_SYNTHETIC")
+
+
+@pytest.mark.parametrize('output', [1024, 2048, 4096])
+def test_ordinary_reviewed_output_caps_use_real_complete_local_framing(assets, counter, output):
+    ordinary = module.OrdinarySiliconFlowXingCapacityCounter(assets)
+    payload = body('Public fixture: 比较 cafe and emoji 🧪.', disabled=True, output=output)
+    result = measure(ordinary, payload)
+    expected = measure(counter, {**payload, 'max_tokens': 512})
+    assert result.output_reservation == output
+    assert result.reservation_bound == expected.reservation_bound
+    assert result.wire_request_sha256 == hashlib.sha256(serialize_xing_body(payload)).hexdigest()
+    assert result.local_input_token_cap == OFFICIAL_CONTEXT_WINDOW - 4096
+    assert 'local-caps=512,1024,2048,4096' in result.renderer_identity
+    assert result.reservation_bound + result.output_reservation <= OFFICIAL_CONTEXT_WINDOW
+    with pytest.raises(XingCapacityUnavailable):
+        measure(counter, payload)
+
+
+def test_ordinary_service_requires_exact_pinned_cap_receipt(assets):
+    from backend.app.adapters.models.service_capacity import ServiceCapacity
+    from backend.app.ports.output_capability import OutputCapabilityEvidence, PROTOCOLS, SYNTHETIC_OUTPUT_PROBE
+    capacity = ServiceCapacity('siliconflow', SILICONFLOW_XING_MODEL,
+        module.OrdinarySiliconFlowXingCapacityCounter(assets), kind='xing_text')
+    for output in (1024, 2048, 4096):
+        with pytest.raises(ProviderRequestNotSent, match='OUTPUT_CAPACITY_UNVERIFIED'):
+            capacity.assert_output_capacity(output, execution_kind='REAL')
+    payload = capacity.render_chat([dict(role='user', content=SYNTHETIC_OUTPUT_PROBE)], 2048)
+    response = dict(model=SILICONFLOW_XING_MODEL, usage=dict(prompt_tokens=10, completion_tokens=2048, total_tokens=2058),
+                    choices=[dict(finish_reason='length', message=dict(role='assistant', content=' '.join(['capacity'] * 2048)))])
+    protocol, endpoint = PROTOCOLS[('siliconflow', SILICONFLOW_XING_MODEL)]
+    capacity.bind_output_evidence(OutputCapabilityEvidence('siliconflow', SILICONFLOW_XING_MODEL,
+        protocol, endpoint, 2048, json.dumps(payload), json.dumps(response), 'simulated-run', 'simulated-attempt'))
+    capacity.assert_output_capacity(2048, execution_kind='REAL')
+    capacity.assert_output_capacity(1024, execution_kind='REAL')
+    with pytest.raises(ProviderRequestNotSent, match='OUTPUT_CAPACITY_UNVERIFIED'):
+        capacity.assert_output_capacity(4096, execution_kind='REAL')
+    assert capacity.output_readiness['verified_output_caps'] == [2048]
+    assert capacity.output_readiness['observed_output_caps'] == [2048]
+    assert capacity.output_readiness['supported_output_caps'] == [512, 1024, 2048]
+    assert capacity.output_readiness['inferred_lower_output_caps'] == [1024]
+    assert capacity.output_readiness['hosted_recipe_equivalence'] == 'UNKNOWN'
 
 
 def reference(assets, rendered):

@@ -66,13 +66,23 @@ def test_local_1024_measurement_matches_wire_and_reservation_and_preserves_froze
 
 @pytest.mark.parametrize('output', [2048, 4096])
 def test_unproved_higher_tiers_fail_without_silent_clamping(output):
-    with pytest.raises(CapacityCounterUnavailable, match='OUTPUT_CAPACITY_UNVERIFIED'):
-        OrdinaryDeepseekV41TextCapacityCounter(SimulatedRenderer()).measure('deepseek','deepseek-flash',body(output),scope='SIMULATED')
+    counter = OrdinaryDeepseekV41TextCapacityCounter(SimulatedRenderer())
+    measured = counter.measure('deepseek','deepseek-flash',body(output),scope='SIMULATED')
+    assert measured.output_reservation == output
+    with pytest.raises(ProviderRequestNotSent, match='OUTPUT_CAPACITY_UNVERIFIED'):
+        simulated_capacity(counter).assert_output_capacity(output, execution_kind='REAL')
+
+
+def simulated_capacity(counter):
+    capacity = object.__new__(ServiceCapacity)
+    capacity.counter = counter
+    capacity.provider, capacity.model, capacity.kind = 'deepseek', 'deepseek-flash', 'deepseek_text'
+    capacity._output_evidence = ()
+    return capacity
 
 
 def test_real_output_capacity_fails_closed_before_provider_send():
-    capacity = object.__new__(ServiceCapacity)
-    capacity.counter = OrdinaryDeepseekV41TextCapacityCounter(SimulatedRenderer())
+    capacity = simulated_capacity(OrdinaryDeepseekV41TextCapacityCounter(SimulatedRenderer()))
     capacity.assert_output_capacity(1024, execution_kind='SIMULATED')
     with pytest.raises(ProviderRequestNotSent, match='OUTPUT_CAPACITY_UNVERIFIED'):
         capacity.assert_output_capacity(1024, execution_kind='REAL')
@@ -135,4 +145,6 @@ def test_real_local_xing_1024_wire_measurement_is_not_endpoint_proof(monkeypatch
     assert capacity.model_window().check(messages,1024)['output_reserve'] == 1024
     assert capacity.output_readiness['endpoint_output_evidence'] == 'UNKNOWN'
     with pytest.raises(ProviderRequestNotSent, match='OUTPUT_CAPACITY_UNVERIFIED'):
-        capacity.render_chat(messages,4096)
+        capacity.assert_output_capacity(4096, execution_kind='REAL')
+    payload4096 = capacity.render_chat(messages,4096)
+    assert capacity.measure(payload4096, json.dumps(payload4096).encode())[1] == 4096

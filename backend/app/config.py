@@ -46,6 +46,8 @@ class Settings:
     embedding_backend: str = "siliconflow"
     embedding_tokenizer_path: Path | None = None
     service_model_policy_json: str | None = None
+    output_capability_file: Path | None = None
+    output_capability_sha256: str | None = None
     service_chat_timeout_seconds: int = 90
     xing_capacity_resources: Path | None = None
     deepseek_tokenizer_path: Path | None = None
@@ -141,6 +143,8 @@ class Settings:
             embedding_tokenizer_path=(Path(os.environ["RAG_EMBEDDING_TOKENIZER_PATH"])
                                       if os.getenv("RAG_EMBEDDING_TOKENIZER_PATH") else None),
             service_model_policy_json=os.getenv('RAG_SERVICE_MODEL_POLICY_JSON') or None,
+            output_capability_file=Path(os.environ['RAG_OUTPUT_CAPABILITY_FILE']) if os.getenv('RAG_OUTPUT_CAPABILITY_FILE') else None,
+            output_capability_sha256=os.getenv('RAG_OUTPUT_CAPABILITY_SHA256') or None,
             service_chat_timeout_seconds=_env_context_positive_int('RAG_SERVICE_CHAT_TIMEOUT_SECONDS',90),
             xing_capacity_resources=Path(os.environ['RAG_XING_CAPACITY_RESOURCES']) if os.getenv('RAG_XING_CAPACITY_RESOURCES') else None,
             deepseek_tokenizer_path=Path(os.environ['RAG_DEEPSEEK_TOKENIZER_PATH']) if os.getenv('RAG_DEEPSEEK_TOKENIZER_PATH') else None,

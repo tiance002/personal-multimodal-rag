@@ -388,15 +388,16 @@ def _sha256(value: bytes) -> str:
 class OrdinaryDeepseekV41TextCapacityCounter(DeepseekV41TextCapacityCounter):
     """Ordinary local framing only; no V6 production profile or grant issuance."""
     endpoint_output_evidence = 'UNKNOWN'
-    reviewed_output_caps = (512, 1024)
+    reviewed_output_caps = (512, 1024, 2048, 4096)
 
     def __init__(self, renderer=None):
         super().__init__(renderer)
+        self.renderer_identity += ';ordinary-output/v2;local-caps=512,1024,2048,4096'
 
     @staticmethod
     def _validate_body(model, body):
         output = body.get('max_tokens') if isinstance(body, Mapping) else None
-        if type(output) is not int or output not in (512, 1024):
+        if type(output) is not int or output not in OrdinaryDeepseekV41TextCapacityCounter.reviewed_output_caps:
             code = 'OUTPUT_CAPACITY_UNVERIFIED' if type(output) is int and output in (2048, 4096) else 'OUTPUT_CAPACITY_UNSUPPORTED'
             raise CapacityCounterUnavailable(code)
         DeepseekV41TextCapacityCounter._validate_body(model, {**body, 'max_tokens': 512})

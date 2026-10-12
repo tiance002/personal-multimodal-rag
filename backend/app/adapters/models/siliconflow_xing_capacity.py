@@ -430,12 +430,12 @@ class SiliconFlowXingCapacityCounter:
 class OrdinarySiliconFlowXingCapacityCounter(SiliconFlowXingCapacityCounter):
     """Local ordinary protocol proof, separate from frozen grants and profiles."""
     endpoint_output_evidence = 'UNKNOWN'
-    reviewed_output_caps = (512, 1024)
+    reviewed_output_caps = (512, 1024, 2048, 4096)
 
     def __init__(self, resource_directory):
         super().__init__(resource_directory, ordinary_service=True)
-        self.local_input_token_cap = OFFICIAL_CONTEXT_WINDOW - 1024
-        self.identity += ';ordinary-output/v1;endpoint-output=UNKNOWN'
+        self.local_input_token_cap = OFFICIAL_CONTEXT_WINDOW - max(self.reviewed_output_caps)
+        self.identity += ';ordinary-output/v2;local-caps=512,1024,2048,4096'
 
     def _validate_body(self, model, body):
         output = body.get('max_tokens') if type(body) is dict else None

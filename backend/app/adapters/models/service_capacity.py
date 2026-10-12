@@ -14,6 +14,7 @@ from backend.app.ports.providers import ProviderRequestNotSent
 class ServiceCapacity:
     def __init__(self, provider, model, counter, *, kind):
         self.provider, self.model, self.counter, self.kind = provider, model, counter, kind
+        self._output_evidence = ()
         if kind == 'embedding':
             from backend.app.adapters.models.cloud import EmbeddingAdmission, SimulatedEmbeddingCounter
             from backend.app.adapters.models.bge_tokenizer import PinnedBgeM3Tokenizer
@@ -38,7 +39,7 @@ class ServiceCapacity:
             if ((provider, model) != ('deepseek', 'deepseek-flash') or type(counter) not in (DeepseekV41TextCapacityCounter, OrdinaryDeepseekV41TextCapacityCounter)
                     or type(counter.renderer) is not DeepseekV41RecipeRenderer):
                 raise ValueError('SERVICE_CAPACITY_IDENTITY_INVALID')
-            self.execution_kind, self.source, self.window_tokens = 'REAL', DEEPSEEK_RENDERER_IDENTITY, DEEPSEEK_CONTEXT_WINDOW
+            self.execution_kind, self.source, self.window_tokens = 'REAL', counter.renderer_identity, DEEPSEEK_CONTEXT_WINDOW
         elif kind == 'deepseek_vision':
             from backend.app.adapters.models.service_deepseek_capacity import DeepseekV41VisionCapacityCounter
             from backend.app.adapters.models.v6_text_capacity import DEEPSEEK_CONTEXT_WINDOW
@@ -52,14 +53,53 @@ class ServiceCapacity:
 
     @property
     def output_readiness(self):
+        observed = sorted(r.output_tokens for r in self._output_evidence)
+        supported = self.supported_output_caps
         return {'local_reviewed_caps': list(getattr(self.counter, 'reviewed_output_caps', (512,))),
-                'endpoint_output_evidence': getattr(self.counter, 'endpoint_output_evidence', 'UNKNOWN'),
+                'endpoint_output_evidence': 'PINNED_SYNTHETIC_PROVIDER_RECEIPT' if self._output_evidence else 'UNKNOWN',
+                'verified_output_caps': observed,
+                'observed_output_caps': observed,
+                'supported_output_caps': supported,
+                'inferred_lower_output_caps': [cap for cap in supported if cap > 512 and cap not in observed],
+                'lower_cap_inference_basis': [r.lower_cap_inference_basis for r in self._output_evidence],
+                'proof_identities': [r.identity for r in self._output_evidence],
                 'hosted_recipe_equivalence': 'UNKNOWN'}
+
+    @property
+    def supported_output_caps(self):
+        return sorted({512} | {cap for r in self._output_evidence for cap in r.supported_output_caps})
+
+    @property
+    def output_protocol(self):
+        from backend.app.ports.output_capability import PROTOCOLS
+        return PROTOCOLS.get((self.provider, self.model), (None,))[0]
+
+    def bind_output_evidence(self, evidence):
+        from backend.app.ports.output_capability import OutputCapabilityEvidence
+        if (type(evidence) is not OutputCapabilityEvidence or
+                not hasattr(self.counter, 'reviewed_output_caps') or
+                (evidence.provider, evidence.model, evidence.protocol) !=
+                (self.provider, self.model, self.output_protocol)):
+            raise ProviderRequestNotSent('OUTPUT_CAPABILITY_EVIDENCE_INVALID')
+        self._check_local_output(evidence.output_tokens)
+        body = json.loads(evidence.request_wire)
+        input_bound, output_bound = self.measure(body, evidence.request_wire.encode())
+        usage = json.loads(evidence.response_wire)['usage']
+        if usage['prompt_tokens'] > input_bound or usage['completion_tokens'] > output_bound:
+            raise ProviderRequestNotSent('OUTPUT_CAPABILITY_USAGE_BOUND_EXCEEDED')
+        if any(r.output_tokens == evidence.output_tokens for r in self._output_evidence):
+            raise ProviderRequestNotSent('OUTPUT_CAPABILITY_EVIDENCE_DUPLICATE')
+        self._output_evidence += (evidence,)
 
     def assert_output_capacity(self, output_tokens, *, execution_kind):
         self._check_local_output(output_tokens)
         if output_tokens > 512 and execution_kind != 'SIMULATED':
-            raise ProviderRequestNotSent('OUTPUT_CAPACITY_UNVERIFIED')
+            from backend.app.ports.output_capability import consume_output_probe
+            # Probe admission is exact and single-use even if a cap is proven.
+            if consume_output_probe(self.provider, self.model, self.output_protocol, output_tokens):
+                return
+            if output_tokens not in self.supported_output_caps:
+                raise ProviderRequestNotSent('OUTPUT_CAPACITY_UNVERIFIED')
 
     def _check_local_output(self, output_tokens):
         if not hasattr(self.counter, 'reviewed_output_caps'):
@@ -70,6 +110,8 @@ class ServiceCapacity:
 
     def render_chat(self, messages, output_tokens):
         self._check_local_output(output_tokens)
+        from backend.app.ports.output_capability import check_output_probe_payload
+        check_output_probe_payload(self.provider, self.model, self.output_protocol, output_tokens, list(messages))
         if self.kind == 'xing_text':
             return dict(model=self.model, messages=list(messages), max_tokens=output_tokens,
                         stream=False, enable_thinking=False)
@@ -103,9 +145,9 @@ class ServiceCapacity:
         if (type(envelope) is not dict or set(envelope) != {'model', 'messages', 'tools'}
                 or envelope['model'] != self.model or envelope['tools'] != []):
             raise ContextDenied('MODEL_CONTEXT_PROTOCOL_UNSUPPORTED')
-        # DeepSeek's audited recipe has an exact 512 output contract; Xing's
-        # input framing is independent of the reserved output length.
-        output = 1024 if hasattr(self.counter, 'reviewed_output_caps') else (512 if self.kind == 'deepseek_text' else 1)
+        # Reserve the largest locally reviewed ordinary cap during pre-count;
+        # ModelWindow.check adds the actual selected output reserve separately.
+        output = max(self.counter.reviewed_output_caps) if hasattr(self.counter, 'reviewed_output_caps') else (512 if self.kind == 'deepseek_text' else 1)
         body = self.render_chat(envelope['messages'], output)
         try:
             return self.measure(body, json.dumps(body).encode())[0]

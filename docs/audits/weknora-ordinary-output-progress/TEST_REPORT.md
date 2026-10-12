@@ -44,3 +44,8 @@ Root initialmistyped test_run_lifecycle.py path: pytestexit1 filemissing/no test
 Originalq0 is the user's studyquestion; preserved KB d78f3434-0e8f-40bf-afcb-f1c2c311ff51,doc1fd5a928-d3d7-4bae-aa00-fc74701f61e5. HistoricalRun d1eee158-93d3-4bac-b78a-5aab154d4221/oldfailure56f2e64b-fdda-4387-81c2-57a854b54ff4 retained. NewRunID NONE,providerusageNONE,citationHTTPevidenceNOT RUN. Oldresult is not newimplementation acceptance.
 
 Before approved realverification: restoreDocker, check actualUI/API/Workerimage digest/configrevision/DBhead and exactScope/remainingledger; obtain currentprovideroutputproof through authorized boundedprobes. No old V6grant, quotareset, KBconsentchange, DBschema/data mutation, push/tag/release. Goal remains awaiting this gate; OFFLINE_PASS is not E2E_PASS.
+
+
+## Current continuation status (2026-10-12)
+
+The earlier Docker/runtime BLOCKED section is historical. See [CONTINUATION_REPORT.md](CONTINUATION_REPORT.md) for the current per-file changes, real Run identities, immutable image/config/schema, commands and results. Four probes: UNKNOWN1063 retained; known STOP176 NOT_PROVEN; Xing2048 reached/settled2176; DeepSeekUNKNOWN4804 retained. Batch stopped under owner condition; 0/3 webpage questions, successful current citations/reload NOT RUN. Readyz503 is intentional for unverified tiers. G5 NOT RUN. Full Goal is not accepted.

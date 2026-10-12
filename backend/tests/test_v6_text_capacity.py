@@ -1,6 +1,7 @@
 """Offline tests for the V6 text-only capacity handoff contract."""
 import hashlib
 import json
+import os
 
 import pytest
 
@@ -59,6 +60,33 @@ def request(messages=None, **overrides):
 def estimate(body=None, renderer=None, *, scope=V6_SCOPE):
     return DeepseekV41TextCapacityCounter(renderer or FakePinnedRenderer()).measure(
         "deepseek", DEEPSEEK_MODEL, request() if body is None else body, scope=scope)
+
+
+@pytest.mark.parametrize('cap', [1024, 2048, 4096])
+def test_ordinary_caps_preserve_frozen_base_and_complete_framing(cap):
+    from backend.app.adapters.models.v6_text_capacity import OrdinaryDeepseekV41TextCapacityCounter
+    renderer = FakePinnedRenderer()
+    counter = OrdinaryDeepseekV41TextCapacityCounter(renderer)
+    result = counter.measure('deepseek', DEEPSEEK_MODEL, request(max_tokens=cap), scope='PUBLIC_SYNTHETIC')
+    assert result.output_reservation == cap
+    assert result.reservation_bound == len(renderer.rendered[0].encode())
+    assert 'ordinary-output/v2;local-caps=512,1024,2048,4096' in result.renderer_identity
+    with pytest.raises(CapacityCounterUnavailable):
+        estimate(request(max_tokens=cap))
+
+
+@pytest.mark.parametrize('cap', [1024, 2048, 4096])
+@pytest.mark.skipif(not os.getenv('DEEPSEEK_TEST_TOKENIZER'), reason='real Linux recipe requires pinned tokenizer path')
+def test_ordinary_real_pinned_recipe_counts_each_output_cap(cap):
+    from backend.app.adapters.models.v6_text_capacity import OrdinaryDeepseekV41TextCapacityCounter
+    renderer = DeepseekV41RecipeRenderer(os.environ['DEEPSEEK_TEST_TOKENIZER'])
+    counter = OrdinaryDeepseekV41TextCapacityCounter(renderer)
+    body = request(max_tokens=cap)
+    result = counter.measure('deepseek', DEEPSEEK_MODEL, body, scope='PUBLIC_SYNTHETIC')
+    assert renderer.last_token_count > 0
+    assert result.reservation_bound >= renderer.last_token_count
+    assert result.output_reservation == cap and result.fits_context_window
+    assert result.wire_request_sha256 == hashlib.sha256(json.dumps(body).encode()).hexdigest()
 
 
 def test_full_rendered_unicode_uses_byte_bound_and_exact_cloud_wire_hash():

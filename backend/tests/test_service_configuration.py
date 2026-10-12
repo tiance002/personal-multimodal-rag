@@ -48,6 +48,30 @@ def test_ordinary_output_readiness_is_explicit_without_endpoint_probe(monkeypatc
     assert result['runtime_verified'] is False
 
 
+@pytest.mark.parametrize('ceiling,supported,status', [
+    (2048, [512, 1024, 2048], 'NOT_READY'),
+    (4096, [512, 1024, 2048, 4096], 'READY_CONFIG'),
+])
+def test_ordinary_readiness_distinguishes_observed_caps_from_supported_lower_caps(monkeypatch, ceiling, supported, status):
+    from types import SimpleNamespace as NS
+    from backend.app.adapters.models.runtime_readiness import configuration_readiness
+    monkeypatch.setenv('SILICONFLOW_API_KEY', 'SIMULATED-NOT-A-KEY')
+    monkeypatch.setenv('DEEPSEEK_API_KEY', 'SIMULATED-NOT-A-KEY')
+    output = dict(verified_output_caps=[ceiling], observed_output_caps=[ceiling],
+                  supported_output_caps=supported, endpoint_output_evidence='SIMULATED_RECEIPT')
+    factory = NS(registry=ModelRegistry.frozen_defaults(), enabled_roles={'chat_cheap', 'chat_expensive'},
+                 service_bindings={role: NS(capacity=NS(output_readiness=output))
+                                   for role in ('chat_cheap', 'chat_expensive')})
+    container = NS(settings=Settings(service_model_policy_json=policy_json(), rule_router_enabled=True,
+                                    redis_url='redis://127.0.0.1:1'), store=NS(embedding_provider=None),
+                   quick_chain=NS(context_manager=None), provider_factory=factory, service_capacity_errors={})
+    result = configuration_readiness(container)
+    for role in ('chat_cheap', 'chat_expensive'):
+        assert result['roles'][role]['status'] == status
+        assert result['roles'][role]['ordinary_output']['verified_output_caps'] == [ceiling]
+        assert ('OUTPUT_CAPACITY_UNVERIFIED' in result['roles'][role]['reasons']) == (ceiling < 4096)
+
+
 @pytest.mark.parametrize('change', ['pro', 'duplicate_role', 'zero_unquoted', 'bool_version'])
 def test_malformed_or_mismatched_policy_fails_closed(change):
     raw = json.loads(policy_json())
@@ -103,10 +127,14 @@ def test_settings_load_service_paths_and_policy_without_reading_secrets(tmp_path
     monkeypatch.setenv('RAG_SERVICE_MODEL_POLICY_JSON', policy_json())
     monkeypatch.setenv('RAG_XING_CAPACITY_RESOURCES', str(tmp_path / 'xing'))
     monkeypatch.setenv('RAG_DEEPSEEK_TOKENIZER_PATH', str(tmp_path / 'deepseek.json'))
+    monkeypatch.setenv('RAG_OUTPUT_CAPABILITY_FILE', str(tmp_path / 'output-capability.json'))
+    monkeypatch.setenv('RAG_OUTPUT_CAPABILITY_SHA256', 'a' * 64)
     settings = Settings.from_env()
     assert settings.xing_capacity_resources == tmp_path / 'xing'
     assert settings.deepseek_tokenizer_path == tmp_path / 'deepseek.json'
     assert settings.service_model_policy_json == policy_json()
+    assert settings.output_capability_file == tmp_path / 'output-capability.json'
+    assert settings.output_capability_sha256 == 'a' * 64
 
 
 def test_compose_empty_optional_registry_keeps_frozen_role_defaults(monkeypatch):

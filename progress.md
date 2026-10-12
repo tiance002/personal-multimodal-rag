@@ -343,3 +343,8 @@
 3. Result: OFFLINE_PASS for scoped implementation. Runtime identity BLOCKED: DockerDesktop engine absent,14188/8000unreachable. Real output probes, neworiginal-question replay/currentcitationHTTP, service replacement and businessDB operations NOT RUN. Not E2E_PASS or owner acceptance.
 4. Risks: real1024 output unknown and refusedbeforetransport;2048/4096 notenabled. No silent512fallback. Existing grants/quotas/consent/UNKNOWN notmodified. G5cleanup NOT RUN pending functional validation. No push/tag/release.
 5. Next minimum task: ownerapproved runtime restoration/identity check and bounded hosted output probes, then3distinct authorized ordinary questions with actual stages/usage/citation readback. Keep sameGoal checkpoint var/codex-goals/weknora-ordinary-20261012.json; do not rerun alloffline tests if their scopedinputs remainunchanged.
+
+
+## 2026-10-12 WeKnora continuation checkpoint
+
+Current report: [CONTINUATION_REPORT.md](docs/audits/weknora-ordinary-output-progress/CONTINUATION_REPORT.md). Ordinary output/progress/SSE offline work retained; version3 public capacity proof and internal SHA-pinned deployment added. Actual Xing2048 PASS, lower1024 support explicitly inferred, higher4096 unverified. Latest DeepSeek Run72917fff-bd37-4607-b3db-7c7e402d3fbf TRANSPORT_FAILED/UNKNOWN4804 causes immediate owner-required generation stop. PriorUNKNOWN1063 remains occupied; totalUNKNOWN5867. 4/7 probes, 0/3 webpage questions. API/Worker image5de88de8..., originalDB0024/config revision unchanged; readyz503 NOT_READY. No current factual answer/citation/reload proof, no G5 cleanup, no Push/Tag/release. Goal remains incomplete; owner decision needed before new model calls. No old Run resend or quota/ledger reset.

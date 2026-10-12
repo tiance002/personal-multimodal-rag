@@ -66,6 +66,15 @@ def configured_service_capacity(spec, settings, embedding_admission):
             return None, 'SERVICE_CAPACITY_PROTOCOL_UNSUPPORTED'
         if spec.role not in {'embedding', 'vision'}:
             capacity.count_window({'model': spec.model_id, 'messages': [{'role': 'user', 'content': 'configuration probe'}], 'tools': []})
+            proof_path = settings.output_capability_file
+            proof_hash = settings.output_capability_sha256
+            if proof_path is not None or proof_hash is not None:
+                from backend.app.ports.output_capability import load_output_capabilities
+                for evidence in load_output_capabilities(proof_path, proof_hash):
+                    if (evidence.provider, evidence.model) == (spec.provider, spec.model_id):
+                        if evidence.endpoint != spec.base_url.rstrip('/') + '/chat/completions':
+                            raise ValueError('OUTPUT_CAPABILITY_ENDPOINT_MISMATCH')
+                        capacity.bind_output_evidence(evidence)
         return capacity, None
     except Exception:
         return None, 'SERVICE_CAPACITY_RESOURCES_UNVERIFIED'
