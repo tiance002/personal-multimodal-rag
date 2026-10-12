@@ -80,3 +80,5 @@ Linux actual zero-provider smoke was executed as `docker exec -e PYTHONPATH=/app
 Do not retry either UNKNOWN identity, release their occupancy, rotate policy IDs, reset counters, alter route thresholds, suppress validation or broaden Scope to pass. Resume requires an explicit owner decision authorizing new calls after the latest UNKNOWN plus investigation of actual transport. Before the three webpage calls, enforce the remaining task aggregate Token fence across their embedding and generation requests while retaining the existing authoritative ledger and policies. No webpage requests have been dispatched under an unimplemented task fence.
 
 Original question remains `我应该怎么学习`. No new factual answer or citation readback exists; historical answers/citations are not relabelled as current evidence. No milestone acceptance or owner-approved P1 deferral is claimed. **未实现的命令不得报告通过。**
+
+Subsequent read-only transport observations and the implemented/offline-tested G4 aggregate task fence are recorded in [TASK_FENCE_NOTES.md](TASK_FENCE_NOTES.md). Its real activation remains NOT RUN; current generation stop remains in force.

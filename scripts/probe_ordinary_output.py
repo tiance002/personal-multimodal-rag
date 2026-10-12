@@ -29,6 +29,7 @@ SESSION = '313909f3-34d9-4f26-8778-3d5bd27f2c60'
 KB = 'd78f3434-0e8f-40bf-afcb-f1c2c311ff51'
 DOC = '1fd5a928-d3d7-4bae-aa00-fc74701f61e5'
 ACKNOWLEDGED_UNKNOWN = '046c3327-5dd9-4d44-a6e6-876897da41ab'
+FOLLOWUP_UNKNOWN = '72917fff-bd37-4607-b3db-7c7e402d3fbf'
 OWNER_BATCH_ROOT = Path('/data/storage/weknora-probes-20261012')
 PROMPT = SYNTHETIC_OUTPUT_PROBE
 
@@ -49,13 +50,14 @@ def save(path, value):
     temp.replace(path)
 
 
-def prior_allows_continuation(row, acknowledged_unknown=False):
+def prior_allows_continuation(row, acknowledged_unknown=False, acknowledge_followup=False):
     if row['state'] in {'VERIFIED', 'NOT_SENT'}:
         return True
     if row['state'] == 'NOT_PROVEN':
         return row.get('provider_diagnostic', {}).get('token_settlement') == 'settled'
-    return bool(acknowledged_unknown and row.get('run_id') == ACKNOWLEDGED_UNKNOWN
-                and row['state'] == 'UNKNOWN')
+    return bool(row['state'] == 'UNKNOWN' and (
+        acknowledged_unknown and row.get('run_id') == ACKNOWLEDGED_UNKNOWN or
+        acknowledge_followup and row.get('run_id') == FOLLOWUP_UNKNOWN))
 
 
 def main():
@@ -64,16 +66,24 @@ def main():
     parser.add_argument('--cap', type=int, choices=[1024, 2048, 4096], required=True)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--acknowledge-unknown', choices=[ACKNOWLEDGED_UNKNOWN])
+    # Explicit operator opt-in only after a fresh owner decision. This does not
+    # release/retry either acknowledged identity or increase the seven-call cap.
+    parser.add_argument('--acknowledge-followup-unknown', choices=[FOLLOWUP_UNKNOWN])
+    parser.add_argument('--new-probe-label', choices=['owner-followup-1'])
     args = parser.parse_args()
     if args.root.resolve() != OWNER_BATCH_ROOT:
         raise RuntimeError('OWNER_BATCH_ROOT_REQUIRED')
+    if args.new_probe_label and (not args.acknowledge_followup_unknown or
+            (args.role, args.cap) != ('chat_expensive', 4096)):
+        raise RuntimeError('FRESH_FOLLOWUP_PROBE_REQUIRED')
     args.root.mkdir(parents=True, exist_ok=True)
-    receipt = args.root / f'probe-v{OUTPUT_PROBE_PROMPT_VERSION}-{args.role}-{args.cap}.json'
+    suffix = '-' + args.new_probe_label if args.new_probe_label else ''
+    receipt = args.root / f'probe-v{OUTPUT_PROBE_PROMPT_VERSION}-{args.role}-{args.cap}{suffix}.json'
     if receipt.exists():
         raise RuntimeError('EXISTING_PROBE_RECEIPT_NO_RESEND')
     prior = [json.loads(p.read_text()) for p in args.root.glob('probe-*.json')]
     limit = 7 if args.acknowledge_unknown else 6
-    if len(prior) >= limit or any(not prior_allows_continuation(p, args.acknowledge_unknown)
+    if len(prior) >= limit or any(not prior_allows_continuation(p, args.acknowledge_unknown, args.acknowledge_followup_unknown)
                                  for p in prior):
         raise RuntimeError('PROBE_BATCH_STOP_REQUIRED')
     c = build_container(apply_config(Settings.from_env()))
