@@ -13,7 +13,7 @@ export class PortApiError extends Error {
   constructor(message: string, readonly status = 0, readonly code = "REQUEST_FAILED") { super(message); }
 }
 
-async function jsonRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function jsonRequest<T>(path: string, init: RequestInit = {}, allowEmpty = false): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API}${path}`, {
@@ -31,6 +31,7 @@ async function jsonRequest<T>(path: string, init: RequestInit = {}): Promise<T> 
     const detail = body as { error?: { code?: string; message?: string } };
     throw new PortApiError(detail.error?.message ?? `API 请求失败 (${response.status})`, response.status, detail.error?.code ?? "REQUEST_FAILED");
   }
+  if (allowEmpty && (body as { success?: boolean })?.success === true) return undefined as T;
   const envelope = body as PortEnvelope<T>;
   if (!envelope || !("data" in envelope)) throw new PortApiError("API 返回缺少 data 字段", response.status, "API_CONTRACT_INVALID");
   return envelope.data;
@@ -69,6 +70,12 @@ export const portApi = {
       role, provider, model, base_url, ...(api_key?.trim() ? { api_key } : {}),
     })) }),
   }),
+  memorySettings: () => jsonRequest<{ workspace_enabled: boolean; user_enabled: boolean; effective: boolean; write_mode: string; max_items: number; item_count: number }>("/memory/settings"),
+  memoryItems: (offset = 0) => jsonRequest<MemoryItem[]>(`/memory/items?limit=50&offset=${offset}`),
+  forgetMemory: async (id: string) => {
+    await assertPortRuntime();
+    await jsonRequest<void>(`/memory/items/${encodeURIComponent(id)}`, { method: "DELETE" }, true);
+  },
   sessions: () => jsonRequest<SessionRow[]>("/sessions"),
   createSession: (kbIds: string[], documentIds: string[], title = "新对话") => mutate<SessionRow>("/sessions", {
     method: "POST", body: JSON.stringify({ knowledge_base_scope: kbIds, document_scope: documentIds, title }),
@@ -80,3 +87,5 @@ export const portApi = {
 export function apiBaseForStream(path: string): string {
   return `${API}${path}`;
 }
+
+export type MemoryItem = { id: string; kind: string; content: string; topic: string; status: string; origin: string };
