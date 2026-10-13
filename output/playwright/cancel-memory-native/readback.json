@@ -1,0 +1,571 @@
+{
+  "observations": [
+    {
+      "kind": "actual_stop",
+      "metricsAfterStop": {
+        "kind": "PUBLIC_ISOLATED_MOCK_PROVIDER_FIXTURE",
+        "wire_calls": 9,
+        "answer_stream_calls": 1,
+        "real_provider_calls": 0,
+        "database_system_identifier": "7696088403504697382",
+        "redis_run_id": "c7d5aaff50b2743adea96a426718c5df3483c80f"
+      },
+      "session": "02db6352-897d-40df-bc16-dbd4a1437889",
+      "assistant": {
+        "id": "67c11b8c-5b46-4ef1-9780-fb83726cac4c",
+        "request_id": "84f7a07a-47b9-41e5-96cf-ea7d58abf1cc",
+        "role": "assistant",
+        "content": "",
+        "created_at": "2026-10-13T15:54:02.688851+00:00",
+        "knowledge_references": [],
+        "is_completed": false,
+        "turn_status": "error",
+        "turn_error_code": "MODEL_CALL_CANCELLED",
+        "knowledge_base_scope": [
+          "6f193f92-fdfc-4478-8d24-133beacb102e"
+        ],
+        "document_scope": []
+      },
+      "snapshot": "- complementary:\n  - text: W\n  - strong: WeKnora\n  - text: Python adapter\n  - navigation \"主导航\":\n    - button \"问答\"\n    - button \"资料库\"\n    - button \"模型设置\"\n    - button \"长期记忆\"\n  - button \"＋ 新对话\"\n  - text: 历史会话\n  - button \"What protocol do blue widgets use? extract sourc 1 个知识库 ·\":\n    - strong: What protocol do blue widgets use? extract sourc\n    - text: 1 个知识库 ·\n  - text: 本地知识工作台\n- main:\n  - text: 问答台 / Browser cancellation fixture\n  - status: 已请求停止原始生成，等待保存终止状态\n  - strong: 检索范围\n  - text: 会话使用已保存的知识库范围；新范围请新建会话 1 个知识库 · 0 个资料 知识库\n  - checkbox \"Browser cancellation fixture 1 份资料 · 允许外发\" [checked] [disabled]\n  - strong: Browser cancellation fixture\n  - text: 1 份资料 · 允许外发 资料文件\n  - checkbox \"browser-cancel-source.txt completed\" [disabled]\n  - strong: browser-cancel-source.txt\n  - text: completed\n  - article:\n    - text: 你\n    - paragraph: What protocol do blue widgets use? extract source\n  - article:\n    - text: 运行提示\n    - group: 实际执行事件 · 20\n    - text: 运行发生错误\n    - paragraph: 已停止生成；原始运行已保存取消状态。\n  - text: 快速问答\n  - button \"智能推理 暂不可用\" [disabled]\n  - text: 一次提问只发一次 POST；中断后只 GET 续读\n  - textbox \"询问当前资料…\"\n  - text: Enter 发送 · Shift+Enter 换行\n  - button \"发送 ↗\" [disabled]"
+    },
+    {
+      "kind": "actual_delete_restore",
+      "beforeMemory": [
+        {
+          "id": "a80ec509-a090-429f-81bb-721ced9f56bd",
+          "tenant_id": 64,
+          "subject_id": "fixture-owner:ad6cb8ba-5dd4-45ca-b8c4-a7eadaf28854",
+          "kind": "fact",
+          "content": "This is a recoverable synthetic browser memory.",
+          "topic": "Browser fixture memory",
+          "importance": 3,
+          "status": "active",
+          "origin": "manual",
+          "valid_from": "2026-10-13T15:50:35.367636+00:00",
+          "expires_at": null,
+          "source_session_id": "",
+          "source_message_id": "",
+          "normalized_key": "browserfixturememory",
+          "inferred": false,
+          "replaces_id": "",
+          "superseded_by": "",
+          "last_used_at": null,
+          "operation_id": ""
+        }
+      ],
+      "receipt": {
+        "success": true,
+        "restored_id": "a80ec509-a090-429f-81bb-721ced9f56bd",
+        "backup_sha256": "2cf722c080d5b1e9a82addc587ede9ae84cce04f5ebab44af82434395ff5466c",
+        "tombstone_preserved": true
+      },
+      "restored": [
+        {
+          "id": "a80ec509-a090-429f-81bb-721ced9f56bd",
+          "tenant_id": 64,
+          "subject_id": "fixture-owner:ad6cb8ba-5dd4-45ca-b8c4-a7eadaf28854",
+          "kind": "fact",
+          "content": "This is a recoverable synthetic browser memory.",
+          "topic": "Browser fixture memory",
+          "importance": 3,
+          "status": "active",
+          "origin": "manual",
+          "valid_from": "2026-10-13T15:50:35.367636+00:00",
+          "expires_at": null,
+          "source_session_id": "",
+          "source_message_id": "",
+          "normalized_key": "browserfixturememory",
+          "inferred": false,
+          "replaces_id": "",
+          "superseded_by": "",
+          "last_used_at": null,
+          "operation_id": ""
+        }
+      ],
+      "metricsBeforeDelete": {
+        "kind": "PUBLIC_ISOLATED_MOCK_PROVIDER_FIXTURE",
+        "wire_calls": 9,
+        "answer_stream_calls": 1,
+        "real_provider_calls": 0,
+        "database_system_identifier": "7696088403504697382",
+        "redis_run_id": "c7d5aaff50b2743adea96a426718c5df3483c80f"
+      },
+      "metricsAfterDelete": {
+        "kind": "PUBLIC_ISOLATED_MOCK_PROVIDER_FIXTURE",
+        "wire_calls": 9,
+        "answer_stream_calls": 1,
+        "real_provider_calls": 0,
+        "database_system_identifier": "7696088403504697382",
+        "redis_run_id": "c7d5aaff50b2743adea96a426718c5df3483c80f"
+      }
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/main.tsx?t=1791906751302"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/@react-refresh"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react-dom_client.js?v=00f403df"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/app/App.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/rolldown-runtime-DC62tzP2.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/client-B6T5C89C.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/antd.js?v=ced344e6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/api/client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/api/sse.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/app/state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/ChatPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/DocumentPreviewModal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/KnowledgeBasePanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/Sidebar.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/MemoryPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/ModelSettingsPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/useResizablePanelWidth.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react-dom.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/@ant-design_icons.js?v=a712be80"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react-markdown.js?v=e79c21e2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/remark-gfm.js?v=b0c92b88"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/RunProgress.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/GraphPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/lib-WQhLkSWE.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react_jsx-runtime.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/ZoomOutOutlined-6vNXTx7n.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/WeKnoraPythonApp.tsx?t=1791906751302"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/api.ts?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/sse.ts?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/KnowledgeBaseConsent.tsx?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/MemoryPanel.tsx?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/styles.css?t=1791903540026"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/knowledge-bases"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/sessions"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/settings/model-configuration"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/knowledge-bases"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/sessions"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/settings/model-configuration"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/knowledge-bases/6f193f92-fdfc-4478-8d24-133beacb102e/documents"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:56426/api/v1/sessions"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:56426/api/v1/sessions/02db6352-897d-40df-bc16-dbd4a1437889/messages"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:56426/api/v1/sessions/02db6352-897d-40df-bc16-dbd4a1437889/stop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/sessions"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/main.tsx?t=1791906751302"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/@react-refresh"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react-dom_client.js?v=00f403df"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/app/App.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/rolldown-runtime-DC62tzP2.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/client-B6T5C89C.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react-dom.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/antd.js?v=ced344e6"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/api/client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/api/sse.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/app/state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/ChatPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/DocumentPreviewModal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/KnowledgeBasePanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/Sidebar.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/MemoryPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/ModelSettingsPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/useResizablePanelWidth.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/ZoomOutOutlined-6vNXTx7n.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/@ant-design_icons.js?v=a712be80"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react-markdown.js?v=e79c21e2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/remark-gfm.js?v=b0c92b88"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/RunProgress.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/react_jsx-runtime.js?v=f0d3112a"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/node_modules/.vite/deps/lib-WQhLkSWE.js?v=2415cd04"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/components/GraphPanel.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/WeKnoraPythonApp.tsx?t=1791906751302"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/api.ts?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/sse.ts?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/KnowledgeBaseConsent.tsx?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/MemoryPanel.tsx?t=1791906340623"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/src/weknora_port/styles.css?t=1791903540026"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/knowledge-bases"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/sessions"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/settings/model-configuration"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/knowledge-bases"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/sessions"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/settings/model-configuration"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/sessions/02db6352-897d-40df-bc16-dbd4a1437889/messages"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/knowledge-bases/6f193f92-fdfc-4478-8d24-133beacb102e/documents"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/settings"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/items?limit=50&offset=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/settings"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/items?limit=50&offset=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/runtime"
+    },
+    {
+      "method": "DELETE",
+      "url": "http://127.0.0.1:56426/api/v1/memory/items/a80ec509-a090-429f-81bb-721ced9f56bd"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/settings"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/items?limit=50&offset=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/settings"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:56426/api/v1/memory/items?limit=50&offset=0"
+    }
+  ],
+  "generationPosts": [
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:56426/api/v1/sessions/02db6352-897d-40df-bc16-dbd4a1437889/messages"
+    }
+  ],
+  "stops": [
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:56426/api/v1/sessions/02db6352-897d-40df-bc16-dbd4a1437889/stop"
+    }
+  ],
+  "deletes": [
+    {
+      "method": "DELETE",
+      "url": "http://127.0.0.1:56426/api/v1/memory/items/a80ec509-a090-429f-81bb-721ced9f56bd"
+    }
+  ]
+}

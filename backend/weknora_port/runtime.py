@@ -393,6 +393,15 @@ class ApplicationRuntime:
             bindings, self.store, self.turns, lifecycle=LeasedLifecycle(self, turn),
             estimator=self.estimator, on_progress=progress)
 
+    async def stop_session(self,principal,session_id,message_id):
+        self._owner(principal)
+        turn=await self.ordinary.validate_run(session_id,message_id,principal)
+        rows=await self.list_messages(principal,session_id)
+        message=next((row for row in rows if row['id']==turn.assistant_message_id),None)
+        if message and message['is_completed']:
+            return {'success':True,'message':'Message already completed'}
+        return await self.ordinary.request_stop(session_id,message_id,principal)
+
     async def accept_turn(self, request, trusted_principal):
         return await self.ordinary.accept_turn(request, trusted_principal)
 

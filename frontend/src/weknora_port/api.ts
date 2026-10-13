@@ -76,6 +76,10 @@ export const portApi = {
     await assertPortRuntime();
     await jsonRequest<void>(`/memory/items/${encodeURIComponent(id)}`, { method: "DELETE" }, true);
   },
+  stopSession: async (sessionId: string, messageId: string) => {
+    await assertPortRuntime();
+    await jsonRequest<void>(`/sessions/${encodeURIComponent(sessionId)}/stop`, { method: "POST", body: JSON.stringify({ message_id: messageId }) }, true);
+  },
   sessions: () => jsonRequest<SessionRow[]>("/sessions"),
   createSession: (kbIds: string[], documentIds: string[], title = "新对话") => mutate<SessionRow>("/sessions", {
     method: "POST", body: JSON.stringify({ knowledge_base_scope: kbIds, document_scope: documentIds, title }),

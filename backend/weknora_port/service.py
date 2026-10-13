@@ -192,6 +192,29 @@ class RuntimeService:
         except Exception:
             pass
 
+    async def request_stop(self, session_id, message_id, principal):
+        turn=await self.validate_run(session_id,message_id,principal)
+        events,_=await self.store.get_events(session_id,message_id,0)
+        if any(event.type=='complete' for event in events):
+            return {'success':True,'message':'Message already completed'}
+        import uuid
+        await self.store.append_event(session_id,message_id,StreamEvent('stop-'+str(uuid.uuid4()),'stop',done=True,
+            data={'session_id':session_id,'message_id':message_id,'reason':'user_requested'}))
+        return {'success':True,'message':'Generation stopped'}
+
+    async def _watch_stop(self,turn):
+        # Fixed source helpers.go:startStopWatcher: shared stream,300ms,2h;
+        # request disconnect never owns this cancellation mechanism.
+        if turn.context.cancelled is None:return
+        deadline=asyncio.get_running_loop().time()+7200;offset=0
+        while asyncio.get_running_loop().time()<deadline:
+            await asyncio.sleep(.3)
+            try:events,offset=await self.store.get_events(turn.session_id,turn.assistant_message_id,offset)
+            except Exception:continue
+            for event in events:
+                if event.type=='stop':turn.context.cancelled.set();return
+                if event.type=='complete' or event.type=='error' and event.done:return
+
     async def run_turn(self, turn):
         self._validate(turn)
         if turn.replay_only:
@@ -200,6 +223,7 @@ class RuntimeService:
         if key in self._active:
             return None
         self._active.add(key)
+        stop_watch=asyncio.create_task(self._watch_stop(turn),name='stop-watch:'+turn.run_id)
         async def progress(stage,status,**fields):
             await self._progress(turn,stage,status,**fields)
         try:

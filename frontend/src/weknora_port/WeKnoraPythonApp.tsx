@@ -159,7 +159,7 @@ export function WeKnoraPythonApp() {
     try {
       const history = await portApi.messages(session.id);
       setMessages(history.map(row => ({ id: row.id, role: row.role === "user" ? "user" : "assistant", content: row.content,
-        status: row.role === "user" || row.is_completed ? "completed" : row.turn_status === "error" ? "failed" : "unknown",
+        status: row.role === "user" || row.is_completed ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.turn_status === "error" ? "failed" : "unknown",
         error: row.turn_status === "error",
       })));
       setNotice("已读取保存的会话历史；实时阶段仅显示当前连接收到的事件");
@@ -336,6 +336,15 @@ export function WeKnoraPythonApp() {
     catch (error) { setSourceError(`引用暂不可回读：${errorText(error)}`); }
   };
 
+  const stopGeneration = async () => {
+    const identity = activeIdentity.current;
+    if (!identity) { setNotice("正在确认原始运行，请稍后停止"); return; }
+    try {
+      await portApi.stopSession(identity.sessionId, identity.assistantMessageId);
+      setNotice("已请求停止原始生成，等待保存终止状态");
+    } catch (failure) { setNotice(`停止失败：${errorText(failure)}`); }
+  };
+
   const stopReading = () => {
     activeAbort.current?.abort();
     setNotice("已停止读取当前 SSE；服务端运行不变，可继续读取同一 assistant message");
@@ -385,6 +394,8 @@ export function WeKnoraPythonApp() {
               <div className="wp-message-content"><MessageContent content={message.content} onCitation={id => void openSource(id)} /></div>
               {message.status === "running" && <span className="wp-running"><i />正在接收同一运行的回答</span>}
               {message.status === "interrupted" && <div className="wp-run-actions"><span>已断开读取，服务端运行未被重发</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>继续读取原回答</button>}</div>}
+              {message.status === "cancelled" && <p className="wp-run-actions">已停止生成；原始运行已保存取消状态。</p>}
+              {message.status === "failed" && <p className="wp-run-actions">生成失败；原始运行的错误已保存。</p>}
               {message.status === "unknown" && <div className="wp-run-actions"><span>尚未收到 complete，结果状态待确认；没有重新生成。</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>GET 续读原回答</button>}</div>}
               {message.role === "assistant" && message.status === "completed" && <small className="wp-complete">回答已由服务端完成并保存</small>}
             </>}
@@ -392,7 +403,7 @@ export function WeKnoraPythonApp() {
         </div>
         <div className="wp-composer-wrap">
           <div className="wp-mode-row"><span className="wp-mode-active">快速问答</span><button className="wp-mode-disabled" disabled title="Python 适配器尚未接入智能推理执行">智能推理 <small>暂不可用</small></button><span className="wp-composer-hint">一次提问只发一次 POST；中断后只 GET 续读</span></div>
-          <form className="wp-composer" onSubmit={event => void submit(event)}><textarea value={query} onChange={event => setQuery(event.target.value)} placeholder={selectedBases.length ? "询问当前资料…" : "先从上方选择知识库"} disabled={busy || Boolean(runtimeError)} rows={3} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} /><div className="wp-composer-actions">{busy ? <button type="button" className="wp-stop" onClick={stopReading}>停止读取</button> : <span>Enter 发送 · Shift+Enter 换行</span>}<button type="submit" disabled={!canSubmit}>发送 ↗</button></div></form>
+          <form className="wp-composer" onSubmit={event => void submit(event)}><textarea value={query} onChange={event => setQuery(event.target.value)} placeholder={selectedBases.length ? "询问当前资料…" : "先从上方选择知识库"} disabled={busy || Boolean(runtimeError)} rows={3} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} /><div className="wp-composer-actions">{busy ? <><button type="button" className="wp-stop" onClick={() => void stopGeneration()}>停止生成</button><button type="button" onClick={stopReading}>停止读取</button></> : <span>Enter 发送 · Shift+Enter 换行</span>}<button type="submit" disabled={!canSubmit}>发送 ↗</button></div></form>
         </div>
       </section>}
 

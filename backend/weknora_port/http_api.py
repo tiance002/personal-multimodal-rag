@@ -63,6 +63,10 @@ class MessageCreate(ApiModel):
     document_scope: list[str] = Field(default_factory=list)
 
 
+class StopSessionRequest(ApiModel):
+    message_id: str = Field(min_length=1,max_length=36)
+
+
 class ModelRoleWrite(ApiModel):
     role: str
     provider: str = Field(max_length=200)
@@ -320,6 +324,10 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.exception_handler(MemoryScopeError)
     async def memory_scope_error(request: Request, exc: MemoryScopeError):
         return _error_response('MEMORY_SCOPE_UNAVAILABLE',403,_request_id(request))
+
+    @app.post('/api/v1/sessions/{session_id}/stop')
+    async def stop_session(session_id: str,body: StopSessionRequest,request: Request):
+        return JSONResponse(await runtime.stop_session(await principal(request),session_id,body.message_id))
 
     @app.get('/api/v1/memory/settings')
     async def memory_settings(request: Request):

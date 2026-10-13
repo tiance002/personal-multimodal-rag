@@ -27,9 +27,46 @@ text=text.replace('create_app(runtime, resolve_principal=lambda _request: princi
     "create_app(runtime, resolve_principal=lambda _request: principal,allowed_origins=('http://127.0.0.1:56426',))")
 text=text.replace("allowed_origins=('http://127.0.0.1:56425',)",
     "allowed_origins=('http://127.0.0.1:56425','http://127.0.0.1:56426')")
+if '--ui-scenarios' in sys.argv:
+    assert reuse is None, 'UI_DELETE_REQUIRES_FRESH_SYNTHETIC_OWNER'
+    text=text.replace('def handler(request):','async def handler(request):')
+    text=text.replace('wire.append(', 'wire.append(',1)
+    text=text.replace("    if body.get('stream'):","    if body.get('stream'):\n        await asyncio.sleep(15)",1)
 work=ROOT/'var/weknora-port/browser-fixture' ;work.mkdir(parents=True,exist_ok=True)
 stop=work/('stop-'+str(uuid.uuid4()))
 extra='''
+    ui_backup=None
+    if UI_SCENARIOS:
+        import hashlib
+        from dataclasses import asdict
+        from backend.weknora_port.conversation.types import MemoryContext,MemoryItem,MemoryScope
+        context=MemoryContext(principal.tenant_id,principal.subject_id)
+        async with leases.lease() as guard:
+            await guard.connection.execute('UPDATE tenants SET memory_config=%s::jsonb WHERE id=%s',
+                (json.dumps({'enabled':True,'write_mode':'explicit_only'}),principal.tenant_id))
+        item=await runtime.memory_manager.remember(context,MemoryItem(str(uuid.uuid4()),principal.tenant_id,
+            principal.subject_id,'fact','This is a recoverable synthetic browser memory.',topic='Browser fixture memory',origin='manual'))
+        async with leases.lease() as guard:
+            record=await (await guard.connection.execute('SELECT * FROM memory_items WHERE tenant_id=%s AND subject_id=%s AND id=%s',
+                (principal.tenant_id,principal.subject_id,item.id))).fetchone()
+        ui_backup={'kind':'NEW_SYNTHETIC_MEMORY_RECOVERY_ONLY','item':record,'tenant':principal.tenant_id,'subject':principal.subject_id}
+        backup_path=WORK/('ui-memory-backup-'+str(principal.tenant_id)+'.json')
+        assert not backup_path.exists()
+        backup_path.write_text(json.dumps(ui_backup,default=str,indent=2),encoding='utf-8')
+        backup_hash=hashlib.sha256(backup_path.read_bytes()).hexdigest()
+        @app.post('/_fixture/restore-memory')
+        async def restore_memory():
+            assert hashlib.sha256(backup_path.read_bytes()).hexdigest()==backup_hash
+            assert ui_backup['item']['tenant_id']==principal.tenant_id and ui_backup['item']['subject_id']==principal.subject_id
+            async with leases.lease() as guard:
+                count=(await (await guard.connection.execute('SELECT count(*) AS n FROM memory_items WHERE id=%s',(item.id,))).fetchone())['n']
+                assert count==0
+                await guard.connection.execute('INSERT INTO memory_items SELECT * FROM jsonb_populate_record(NULL::memory_items,%s::jsonb)',
+                    (json.dumps(ui_backup['item'],default=str),))
+                await guard.connection.execute("UPDATE memory_subjects SET block_text='',cache_revision=cache_revision+1 WHERE tenant_id=%s AND subject_id=%s",
+                    (principal.tenant_id,principal.subject_id))
+            await runtime.memory_manager._rebuild(MemoryScope(principal.tenant_id,principal.subject_id))
+            return {'success':True,'restored_id':item.id,'backup_sha256':backup_hash,'tombstone_preserved':True}
     @app.post('/_fixture/fail-next-cheap')
     async def fail_next_cheap():
         nonlocal fail_cheap
@@ -49,6 +86,7 @@ extra='''
         ready={'kind':'PUBLIC_ISOLATED_MOCK_PROVIDER_FIXTURE','url':'http://127.0.0.1:56425',
                'stop_file':STOP,'system_identifier':EXPECTED,'redis_run_id':REDIS_RUN_ID,
                'source_text':SOURCE,'provider_calls_real':0,
+               'ui_memory_backup':str(backup_path) if UI_SCENARIOS else None,'ui_memory_id':item.id if UI_SCENARIOS else None,
                'principal_tenant':principal.tenant_id,'principal_subject':principal.subject_id,'storage_root':str(root),'redis_prefix':prefix}
         (WORK/'ready.json').write_text(json.dumps(ready,indent=2),encoding='utf-8')
         print(json.dumps(ready),flush=True)
@@ -58,7 +96,7 @@ extra='''
         await task
         await redis.aclose()
 '''
-namespace=dict(fixture.__dict__);namespace.update(dsn=fixture.approved_dsn(),STOP=str(stop),WORK=work,REUSE=reuse,REUSE_STORAGE=reuse_storage,REUSE_PREFIX=reuse_prefix)
+namespace=dict(fixture.__dict__);namespace.update(dsn=fixture.approved_dsn(),STOP=str(stop),WORK=work,REUSE=reuse,REUSE_STORAGE=reuse_storage,REUSE_PREFIX=reuse_prefix,UI_SCENARIOS='--ui-scenarios' in sys.argv)
 program='async def browser_fixture():\n'+ '\n'.join('    '+line for line in text.splitlines())+extra
 (work/'generated_runtime.py').write_text(program,encoding='utf-8')
 exec(compile(program,str(work/'generated_runtime.py'),'exec'),namespace)

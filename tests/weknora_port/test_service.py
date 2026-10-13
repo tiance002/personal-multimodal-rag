@@ -25,7 +25,7 @@ class DurableRepository:
             if existing.request!=request:raise ProviderError('TURN_PAYLOAD_CONFLICT')
             return replace(existing,is_new=False,replay_only=True)
         turn=AcceptedTurn(request.request_id,request.session_id,'user','assistant',
-            CallContext(request.request_id,TrustedScope('owner',('kb',)),session_id=request.session_id),
+            CallContext(request.request_id,TrustedScope('owner',('kb',)),cancelled=asyncio.Event(),session_id=request.session_id),
             MemoryContext(1,'owner'),request,True,False)
         self.turns[request.request_id]=turn;self.trace.append('ACCEPT');return turn
     async def validate_run(self,session,message,principal):
@@ -250,4 +250,26 @@ def test_memory_lineage_reaches_query_pipeline_and_both_chat_attempts_without_ex
         assert seen[0].required_origin_kbs==('kb-private',)
         assert accepted.context.required_origin_kbs==()
         assert c.calls[0][2].required_origin_kbs==e.calls[0][2].required_origin_kbs==('kb-private',)
+    run(scenario())
+
+
+def test_shared_stop_marker_cancels_original_run_without_generation_retry_or_reader():
+    async def scenario():
+        release=asyncio.Event();service,repo,retrieval,co,c,e,store,commit,counts=runtime(blocked=release)
+        accepted=await service.accept_turn(REQ,'owner')
+        while counts['pipeline']==0:await asyncio.sleep(.001)
+        reply=await service.request_stop('session','assistant','owner')
+        assert reply['success']
+        for _ in range(60):
+            if accepted.context.cancelled.is_set():break
+            await asyncio.sleep(.01)
+        assert accepted.context.cancelled.is_set()
+        release.set();await service.drain_background()
+        assert not c.calls and not e.calls and counts['generation']==0
+        assert repo.failures==[('assistant','MODEL_CALL_CANCELLED')]
+        assert store.events[-1].type=='complete' and store.events[-1].data['status']=='cancelled'
+        before=len(store.events)
+        assert (await service.request_stop('session','assistant','owner'))['message']=='Message already completed'
+        assert len(store.events)==before
+        with pytest.raises(ProviderError,match='SCOPE_DENIED'):await service.request_stop('session','assistant','foreign')
     run(scenario())
