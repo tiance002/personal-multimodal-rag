@@ -91,7 +91,9 @@ def test_thinking_tool_incremental_string_and_reasoning_metadata():
         packet({},finish="tool_calls"),b"data:[DONE]\n"])
     events,_=collect(body)
     assert "".join(e.content for e in events if e.response_type=="thinking")=="hello\nworld"
-    assert events[-1].data=={"reasoning_metadata":{"reasoning_details":[{"opaque":1}]}}
+    assert events[-1].data["reasoning_metadata"] == {"reasoning_details":[{"opaque":1}]}
+    assert events[-1].data["model_requested"] == "m"
+    assert events[-1].data["model_reported"] is None
 
 
 def test_clean_eof_is_upstream_end_not_an_invented_failure_or_stop():

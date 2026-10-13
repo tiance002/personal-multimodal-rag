@@ -125,6 +125,9 @@ class ProviderModel:
     async def chat_stream(self, messages, options, context):
         options = self._options(options, context)
         assembler = StreamAssembler()
+        model_reported = None
+        def identity_event(event):
+            return replace(event, data={**(event.data or {}), "model_requested": self.config.model, "model_reported": model_reported})
         try:
             async with call_lifetime(context, DEFAULT_STREAM_TIMEOUT) as lifetime:
                 for retry in (False, True):
@@ -144,6 +147,8 @@ class ProviderModel:
                                 if env.get("usage") is not None:
                                     assembler.usage = normalize_usage(env["usage"], self.config.chat.prompt_cache_accounting)
                                     handle.usage = assembler.usage
+                                if isinstance(env.get("model"), str) and env["model"]:
+                                    model_reported = env["model"]
                                 assert_response_identity(env, self.config)
                                 choices = env.get("choices", [])
                                 if not isinstance(choices, list):
@@ -164,7 +169,7 @@ class ProviderModel:
                             handle.observed(assembler.usage or normalize_usage(None, self.config.chat.prompt_cache_accounting))
                         # Emit final only after durable gate finish has succeeded.
                         for event in assembler.end():
-                            yield event
+                            yield identity_event(event)
                         return
                     except ProviderError as error:
                         if not retry and getattr(error, "multimodal_unsupported", False):
@@ -175,7 +180,7 @@ class ProviderModel:
             raise
         except ProviderError as error:
             for event in assembler.fail(error):
-                yield event
+                yield identity_event(event)
 
     async def embed(self, texts, context, *, kind="document"):
         s = self.config.embedding
