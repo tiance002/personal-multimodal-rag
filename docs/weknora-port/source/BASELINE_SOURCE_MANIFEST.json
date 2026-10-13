@@ -1,0 +1,398 @@
+{
+  "schema_version": "weknora-port-baseline/v1",
+  "worktree_head": "55372f7bae8e30a8150d16e0eb12262a038cbea2",
+  "branch": "codex/weknora-python-port",
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "sources": [
+    {
+      "path": "config/config.yaml",
+      "blob": "06811ba23dcb25042fcfdf7e4720d2eba21fcdb3",
+      "sha256": "1a4c3db756f038ab0aac7b9056a5ac18cb98e511b5344159983782621155619b",
+      "bytes": 6661,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/types/retrieval_config.go",
+      "blob": "fe5ab23b465dab812d50068fcfa0f6c487a45877",
+      "sha256": "a372e96e12b6cb31bc286e8fef7982811dadfdc4615a2c5f1381f68c0fee6093",
+      "bytes": 4357,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/types/model.go",
+      "blob": "69fb38b86b59a04f2032bd927dff0c9f2ba0e67c",
+      "sha256": "350c2d927f7fe9184cb386172e52597d8108aa85dbd18f145931d4791d35ba9b",
+      "bytes": 15640,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/session_knowledge_qa.go",
+      "blob": "2c468c5bc2b7666f67955b16db6a615a5c5c0b88",
+      "sha256": "bfc76618b54725ff85f6f3fba194c0e93b5ef9bab50c2d067e2fc54443228dc3",
+      "bytes": 49736,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/openaicompletions/request.go",
+      "blob": "a949891f5e8f854a0eb659a9df67a731f7c5d234",
+      "sha256": "d8b7a7ee3d90add90e1208394bda9d7a46cf5c95aba36cbe692392a4477d7711",
+      "bytes": 12976,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/openaicompletions/client.go",
+      "blob": "062e46fda28097545c0a1924b09350be0c39c01a",
+      "sha256": "072a7902a56875ee4a71d5bff7875c29e424dffa621cf32f92a47110c17f87c2",
+      "bytes": 12007,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/transport.go",
+      "blob": "603a01714d02fb13c4a772cee5b4d105eb242d3a",
+      "sha256": "acb62d082622bec9ba549f83b17f9b1d2cf4f3f58786f2d38ef70bbdc18f9c74",
+      "bytes": 2445,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/usage.go",
+      "blob": "8abb31f4c734947ac7966a07af4cbef483dd3292",
+      "sha256": "0723a7fd21b789cf6a76b09aefc53ac70e437623d576ee5a611e5197ead2c245",
+      "bytes": 3013,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/sse.go",
+      "blob": "909edf3b6819aecd500191f12307b773cd1b19cf",
+      "sha256": "5ffd4f6bd2cd1636f18c827b594d243800ab147a06d1c4906f004351cc7155d1",
+      "bytes": 1510,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/stream_assembler.go",
+      "blob": "1874426d900b34ceb4b70ebd1e8b841811abbc8d",
+      "sha256": "4ced22fd4e5850ca63297bd65a696fa367e799c110996995862c6a263fd841f4",
+      "bytes": 13400,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/api/options.go",
+      "blob": "7124839ddc1049332ab4f153be17d939b876fe73",
+      "sha256": "6a7ee64411adb92d486aa7422ac525aa7f7b3ab76be7341327c750bfb6d859c4",
+      "bytes": 5370,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/providers/siliconflow.go",
+      "blob": "4d036f5df819500bd2d2c9927d9b4abbc61a2c98",
+      "sha256": "f1d0fffee192fad8ba0bdb716ba5ee4ebbe1617ed02108b905ae0fb46397d320",
+      "bytes": 4325,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/models/providers/deepseek.go",
+      "blob": "4db3f986209883f019dc9f66bcb3b3d88054dcd0",
+      "sha256": "73d58a843be68614bdff352437afe0471825e03651ff1b3ac2f1fd6f14756319",
+      "bytes": 5158,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/infrastructure/chunker/strategy.go",
+      "blob": "4766462a7d116a90dad02d30c55530e843c60f81",
+      "sha256": "9fd4b53627e0bcf16875366a6c117260d6964c9bd45cf32c284608bdd87049c1",
+      "bytes": 13183,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/infrastructure/chunker/splitter.go",
+      "blob": "69ff38e43e98b37699df1a8a81e01cf4dee4da80",
+      "sha256": "a0f271f655a97885c78e0d0a0b0953b250d686769014470c4d1158949485d1aa",
+      "bytes": 28615,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/knowledge_process.go",
+      "blob": "9cf4ad1b73f3241c1b03f42e319cc29508697a2b",
+      "sha256": "66756daeb35e39d7d043c9600bee9baff17ef0ac02c02704beaa508356f901fe",
+      "bytes": 173197,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/knowledge_process_config.go",
+      "blob": "b50fa815ca79899f185e16546c35e2d290b6cf56",
+      "sha256": "43e71a9f21d850c4cafdd5070fc6008d12198c92ca502107e53c20b4bca26130",
+      "bytes": 9968,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/retriever/keywords_vector_hybrid_indexer.go",
+      "blob": "efb6d58246bfc9a75a27806d8a072b1816b8a79a",
+      "sha256": "fff4812ee21249022e9e8e81120ac01a2e32f2d037c0b0cc45cef543906a7ef6",
+      "bytes": 13564,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/repository/retriever/postgres/repository.go",
+      "blob": "f89b94632dad4a15b7c8aac237cb4d6d718fe055",
+      "sha256": "ebc97eb3a671d5602dbb52ae01db8e6283424c5e9ae267537ed81e415fe320c3",
+      "bytes": 26857,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/knowledgebase_search_fusion.go",
+      "blob": "b88702981c07090b41e05c5ce297138f10248a0a",
+      "sha256": "6d292f7580571e8c2bb99e28913fef8dd2c203b16282782084061b2b7580092e",
+      "bytes": 6567,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/modelcontext/citations.go",
+      "blob": "98e690981f20140bf0d5f0182bd391c769022dd7",
+      "sha256": "91252854633b8263e40fc953cb0efb0893ac19059af67a7ea267ba1a8ced4483",
+      "bytes": 11166,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/stream/redis_manager.go",
+      "blob": "4e0191ac4a7479b439046df744f0983a26c0d5e7",
+      "sha256": "8bec19fc081d84af23ffc0b22cd7db44ee0772f8db4cf0c156c67848c8b58031",
+      "bytes": 16362,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/handler/session/stream.go",
+      "blob": "734d618316f1cd71fd5fecb0a89cbf324ff5fdf3",
+      "sha256": "351540755ae3149822ff2f60e7b9da7a979278b26fd2bc9206792b6ad3609b29",
+      "bytes": 15731,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "frontend/src/composables/useChatStreamHandler.ts",
+      "blob": "aa36f31688d47bdad06c46c538fd5698dee86073",
+      "sha256": "33c2db69c9ebb0c515ba285bef4f198917f217f8cd350e28525e452a6f835bd8",
+      "bytes": 51775,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "frontend/src/views/chat/components/RagPipelineProgress.vue",
+      "blob": "d703ad6a1e9f2ea77ce71967e5e1f0777c9f414a",
+      "sha256": "1e51cf2c3b3e05727847ff8010f345f32204e107a62dccb0938e324f984ebe32",
+      "bytes": 25743,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "LICENSE",
+      "blob": "14d7c9f96b125cd6c4bd18084a5cd0f8c2c29361",
+      "sha256": "889cfdf724aa5cdf542c5e14c3e3edbea9a71f07aa78faaa4f2d331d8f516a95",
+      "bytes": 161682,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "blob": "0084b16948ec0e2596320e37d5820a8c45e53b6b",
+      "sha256": "2ff10072ea5ad0cf50b30088e03d9de1b394f70db48b23ec126a97a0e427044f",
+      "bytes": 4773,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/query_understand.go",
+      "blob": "c8c29777229f2d4af90b89b136d628db4b2e894a",
+      "sha256": "4b30c67f6b59bcd74c6cba4bca1c6a5ea0a6327e7a04fa8fd587870864b86e63",
+      "bytes": 17547,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/search.go",
+      "blob": "a3b2423cea4f47306877bca2280ed8111b82d0a5",
+      "sha256": "27c8632259b99b300357407408462b16043d898aeadda29d6d642c69dccb9e34",
+      "bytes": 21004,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/search_parallel.go",
+      "blob": "fb8ba98200d3b37b90de50fda3235711b84de53a",
+      "sha256": "bf3e13e66e80a11a007a3115cf89e07c64b12ebc429bda8424aa8e36e610ef9d",
+      "bytes": 5838,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/query_expansion.go",
+      "blob": "3324a9853e11a94c393ac4d682380c1c8aa02782",
+      "sha256": "ac11dccb1fa378ecdb1b71a75bf43b4649191f82f6ad41afb7bc4317124470bf",
+      "bytes": 7792,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/rerank.go",
+      "blob": "659a0c6590b3d7bac0c71597a9ee4169b9b332df",
+      "sha256": "fe89172323f4368b31de950a7fd8ac1a4abbd7cf4833e4feff6b73a4758b16e0",
+      "bytes": 24080,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/merge.go",
+      "blob": "21263c8a1ec4b0332ab95bc18c44b3c4abafc459",
+      "sha256": "6e9d7c4ed6d7c37f700a7f3a031d04a89c6242b829f26b46c55efdbaed1c0bfe",
+      "bytes": 15380,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/merge_expand.go",
+      "blob": "e459e96c5874361a49f9081fb606810f2ead6741",
+      "sha256": "dbaba0f90d210b9d69031774ecee74890f6156774ccad8fd58c57beb69250512",
+      "bytes": 7826,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/merge_history.go",
+      "blob": "33d81b00a3a1db4416338299aea4fc206035e9a4",
+      "sha256": "78ee2fa8029feaccb1e6633dad4bdeed2dd880cf95d495ecc381ecdf5e19b9fb",
+      "bytes": 2628,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/filter_top_k.go",
+      "blob": "6af579960922a81877f4114a234d3a7828f3741f",
+      "sha256": "6247b843499705862c95c3e193e745796044fee86f5607b854c8a1b7175b2cb4",
+      "bytes": 3259,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/into_chat_message.go",
+      "blob": "e8f923ce10642ca806eef59d129bce6833e1ea61",
+      "sha256": "fb63f0b6707adb15e5748ce9f493a84183e27731c7adbe86966990b9b87bdd3b",
+      "bytes": 11173,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/load_history.go",
+      "blob": "a9a6dd0a68dc22c2129eb7bad047defdd12cbecc",
+      "sha256": "de40f7d3ce830548ce68105c4fd9c65c276cf0e307645ffa19faca00a47afefe",
+      "bytes": 2096,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/memory_recall.go",
+      "blob": "79bc2107574ec4dcf654797d28497e8c6fff5c30",
+      "sha256": "0c36a4d357cdf2242c223046960f8ed4bede323c45d28d950f036e157e03419e",
+      "bytes": 3263,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/chat_completion_stream.go",
+      "blob": "0f19dfafa81702c5b5d76d217f4942d750496c34",
+      "sha256": "e1deb514b4c875c8b112d676094f98c8949c8ee85a4a392396af43869ce18591",
+      "bytes": 9161,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/progress.go",
+      "blob": "e5425c8280cc5b3bd18b6c303782df04a5a28096",
+      "sha256": "b887d3aca04263f85f813977997ba327a7070031ae6eee68fb1df10c1b0802cf",
+      "bytes": 9020,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/chat_pipeline/references.go",
+      "blob": "234149f2d1d60943f367c7bc4f83a2884ae6511c",
+      "sha256": "f516dfb66391ddc873c8d55a5a50c53a7ce154798b1da031ebe4f071a0e1c49d",
+      "bytes": 4850,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/service.go",
+      "blob": "472fe07eb887dfc4e8c5eec9c4034948ed07c607",
+      "sha256": "c87552d696fc4d877309bf21baec40eea91ea146dbfadcab94c5005704ff6947",
+      "bytes": 46624,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/extract.go",
+      "blob": "df7d2c1eb143f34108adc57aa5c672981cec217f",
+      "sha256": "af44808881c3f0a53880c772416af962160a51c7f03c01b51de3abb908585780",
+      "bytes": 43693,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/search.go",
+      "blob": "6e61c5f4ba662bc5e7e2738cf97499b52a613655",
+      "sha256": "eaf7940dd0a70d59807eb13a3148dededf39266623a4f07772ce111c62d76e02",
+      "bytes": 5588,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/vector.go",
+      "blob": "ad7038fe485fa3db80d425e892aeae10f7cb20ec",
+      "sha256": "2697f71d4ae10222e46b7aaa81a49fbd20d0bb538a8ace4a5a8ba0013f1c402a",
+      "bytes": 10909,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/consolidate.go",
+      "blob": "93fae776dabe8832901cf327fef2d210fba0439d",
+      "sha256": "4a1ca8e8cdca09fc78bf19690bc8be898dd58d2557b799b43b5bf4f3d4e8817a",
+      "bytes": 18769,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/scope.go",
+      "blob": "3d655d7afca898cf4aa5e83bc5de2d4a58358363",
+      "sha256": "2ba562b2ce3e8e31462996fd4d2624c3f9494411c2ba389fdcb4857be355dd3c",
+      "bytes": 1675,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "internal/application/service/memory/lexical.go",
+      "blob": "e0d52c32dfb1bcf6e2b3f020884a59068587ebcc",
+      "sha256": "fd242ffac25c11c5db0aa34bef686d0de20a895a58e84239b0fe1674992176a1",
+      "bytes": 6526,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "docreader/parser/pdf_parser.py",
+      "blob": "4a54196521bdef3afbd6fa507fe90ade15204dd3",
+      "sha256": "5b48c524ad280026cdd81033880ddc96958e8fe269edc55c09c6f466efde1496",
+      "bytes": 60605,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "docreader/parser/image_parser.py",
+      "blob": "dfbf1d590a2d6fe516dbffd4b8de0ef361189a4c",
+      "sha256": "8ad7ce35602107aa9f3e7068e944bbf9d06e12a2dbb88167602225e28b826bee",
+      "bytes": 912,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "docreader/parser/excel_parser.py",
+      "blob": "e302a7fcff213983df74405549cce941e0420ae4",
+      "sha256": "40cc7d46e4b46451c6cfc829595010148488de66e3b2a03b87c128f603c86e95",
+      "bytes": 9756,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "docreader/parser/docx_parser.py",
+      "blob": "f9820069fe341b41ea5b53b9412352e808e7d5d9",
+      "sha256": "dc4c1937e55b6da71258ef36f28258857f2da37436730b80bc674fece229aa04",
+      "bytes": 59781,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "docreader/parser/registry.py",
+      "blob": "330c0211adece83a010819aaa0d26d269cc312d8",
+      "sha256": "b5911f8c5565b2c717cb3d29fc3cdc600f584e3c83269e9271b28a30725eabe2",
+      "bytes": 7913,
+      "status": "BLOB_VERIFIED"
+    },
+    {
+      "path": "docreader/parser/base_parser.py",
+      "blob": "b868c1e747ca03034db6dc1bfa616c61ff649b63",
+      "sha256": "69fc3ce9a2331d697401ccf3cbe1defe51a6fff62d6d8eb026ed3811d261a998",
+      "bytes": 1810,
+      "status": "BLOB_VERIFIED"
+    }
+  ],
+  "missing_requested_sources": [],
+  "task_zip_sha256": "ca4006e99b7b0cc3e9e31c9ca22ddd50b4239ff9ca13e0d471e3f6d462e49939",
+  "provider_calls": 0,
+  "old_db_writes": 0,
+  "runtime_identity": "NOT_VERIFIED_DOCKER_UNAVAILABLE"
+}

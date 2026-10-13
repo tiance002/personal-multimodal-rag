@@ -1,0 +1,35 @@
+{
+  "schema_version": "weknora-source-cases/v1",
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "yaml_observed": {
+    "max_rounds": "5",
+    "keyword_threshold": "0.3",
+    "embedding_top_k": "30",
+    "vector_threshold": "0.2",
+    "rerank_threshold": "0.3",
+    "rerank_top_k": "30",
+    "enable_rewrite": "true",
+    "enable_query_expansion": "true",
+    "enable_rerank": "true",
+    "max_completion_tokens": "1024"
+  },
+  "retrieval_type_fallbacks": {
+    "embedding_top_k": 50,
+    "vector_threshold": 0.15,
+    "keyword_threshold": 0.3,
+    "rerank_top_k": 10,
+    "rerank_threshold_nil": 0.2,
+    "rerank_threshold_non_nil_zero": 0,
+    "rrf_k": 60,
+    "rrf_weights": [
+      0.7,
+      0.3
+    ]
+  },
+  "transport_fallback_seconds": {
+    "chat": 300,
+    "stream": 600,
+    "existing_deadline": "PRESERVED"
+  },
+  "status": "SOURCE_EXPECTATIONS_ONLY_NOT_BEHAVIORALLY_VERIFIED"
+}

@@ -1,0 +1,972 @@
+{
+  "baseline": "55372f7bae8e30a8150d16e0eb12262a038cbea2",
+  "execution": "LOCAL_PURE_FUNCTION",
+  "cases": [
+    {
+      "question": "缓存是什么？",
+      "mode": "CHEAP_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "CHEAP_ONLY",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "缓存是什么？",
+      "mode": "EXPENSIVE_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "EXPENSIVE_ONLY",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "缓存是什么？",
+      "mode": "DYNAMIC",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      }
+    },
+    {
+      "question": "列出三个步骤",
+      "mode": "CHEAP_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "CHEAP_ONLY",
+        "task_labels": [
+          "extract"
+        ],
+        "task_anchors": [
+          {
+            "task": "extract",
+            "sha256": "37774a07ef39925a1629d7c396d1dc37e072e97ff353d773d69e690343c1a005"
+          }
+        ],
+        "T": {
+          "value": 0.02,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.02",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "列出三个步骤",
+      "mode": "EXPENSIVE_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "EXPENSIVE_ONLY",
+        "task_labels": [
+          "extract"
+        ],
+        "task_anchors": [
+          {
+            "task": "extract",
+            "sha256": "37774a07ef39925a1629d7c396d1dc37e072e97ff353d773d69e690343c1a005"
+          }
+        ],
+        "T": {
+          "value": 0.02,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.02",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "列出三个步骤",
+      "mode": "DYNAMIC",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "extract"
+        ],
+        "task_anchors": [
+          {
+            "task": "extract",
+            "sha256": "37774a07ef39925a1629d7c396d1dc37e072e97ff353d773d69e690343c1a005"
+          }
+        ],
+        "T": {
+          "value": 0.02,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.02",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      }
+    },
+    {
+      "question": "比较两个方案的差异",
+      "mode": "CHEAP_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "CHEAP_ONLY",
+        "task_labels": [
+          "compare"
+        ],
+        "task_anchors": [
+          {
+            "task": "compare",
+            "sha256": "fb8791a7645ec8e37e1ef43ed43fc6f9aa596a1ee5aefe4e085f3799c054e6cd"
+          },
+          {
+            "task": "compare",
+            "sha256": "9032c3c2b7e690089b404cc67909a9f101449b0d489b0731bd4bd39c8c13a920"
+          }
+        ],
+        "T": {
+          "value": 0.09,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.09",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "比较两个方案的差异",
+      "mode": "EXPENSIVE_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "EXPENSIVE_ONLY",
+        "task_labels": [
+          "compare"
+        ],
+        "task_anchors": [
+          {
+            "task": "compare",
+            "sha256": "fb8791a7645ec8e37e1ef43ed43fc6f9aa596a1ee5aefe4e085f3799c054e6cd"
+          },
+          {
+            "task": "compare",
+            "sha256": "9032c3c2b7e690089b404cc67909a9f101449b0d489b0731bd4bd39c8c13a920"
+          }
+        ],
+        "T": {
+          "value": 0.09,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.09",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "比较两个方案的差异",
+      "mode": "DYNAMIC",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "compare"
+        ],
+        "task_anchors": [
+          {
+            "task": "compare",
+            "sha256": "fb8791a7645ec8e37e1ef43ed43fc6f9aa596a1ee5aefe4e085f3799c054e6cd"
+          },
+          {
+            "task": "compare",
+            "sha256": "9032c3c2b7e690089b404cc67909a9f101449b0d489b0731bd4bd39c8c13a920"
+          }
+        ],
+        "T": {
+          "value": 0.09,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.09",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      }
+    },
+    {
+      "question": "若金额≤100且审批通过是否可以报销？",
+      "mode": "CHEAP_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "CHEAP_ONLY",
+        "task_labels": [
+          "apply_rule"
+        ],
+        "task_anchors": [
+          {
+            "task": "apply_rule",
+            "sha256": "768da8b98032817de2171c9b5218ffeb85185d6f3700e509e901f3255591d7c4"
+          }
+        ],
+        "T": {
+          "value": 0.16,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.07,
+          "status": "OBSERVED"
+        },
+        "J": {
+          "value": 0.03,
+          "status": "OBSERVED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": 2,
+        "condition_count_basis": "OBSERVED",
+        "logic": "AND",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.26",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "若金额≤100且审批通过是否可以报销？",
+      "mode": "EXPENSIVE_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "EXPENSIVE_ONLY",
+        "task_labels": [
+          "apply_rule"
+        ],
+        "task_anchors": [
+          {
+            "task": "apply_rule",
+            "sha256": "768da8b98032817de2171c9b5218ffeb85185d6f3700e509e901f3255591d7c4"
+          }
+        ],
+        "T": {
+          "value": 0.16,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.07,
+          "status": "OBSERVED"
+        },
+        "J": {
+          "value": 0.03,
+          "status": "OBSERVED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": 2,
+        "condition_count_basis": "OBSERVED",
+        "logic": "AND",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.26",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "若金额≤100且审批通过是否可以报销？",
+      "mode": "DYNAMIC",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "apply_rule"
+        ],
+        "task_anchors": [
+          {
+            "task": "apply_rule",
+            "sha256": "768da8b98032817de2171c9b5218ffeb85185d6f3700e509e901f3255591d7c4"
+          }
+        ],
+        "T": {
+          "value": 0.16,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.07,
+          "status": "OBSERVED"
+        },
+        "J": {
+          "value": 0.03,
+          "status": "OBSERVED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": 2,
+        "condition_count_basis": "OBSERVED",
+        "logic": "AND",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.26",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      }
+    },
+    {
+      "question": "总结后比较，最后制定计划",
+      "mode": "CHEAP_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "CHEAP_ONLY",
+        "task_labels": [
+          "summarize",
+          "compare",
+          "infer_plan"
+        ],
+        "task_anchors": [
+          {
+            "task": "summarize",
+            "sha256": "04830193b408eeb17c18cfb88440e68061423af6e0c2944c79e4c4cfc6a0f0dc"
+          },
+          {
+            "task": "compare",
+            "sha256": "fb8791a7645ec8e37e1ef43ed43fc6f9aa596a1ee5aefe4e085f3799c054e6cd"
+          },
+          {
+            "task": "infer_plan",
+            "sha256": "0a394f451f0045780636fd27b8fad0208d139bb00d9456b9dde93493751a45ce"
+          }
+        ],
+        "T": {
+          "value": 0.18,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.18",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "总结后比较，最后制定计划",
+      "mode": "EXPENSIVE_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "EXPENSIVE_ONLY",
+        "task_labels": [
+          "summarize",
+          "compare",
+          "infer_plan"
+        ],
+        "task_anchors": [
+          {
+            "task": "summarize",
+            "sha256": "04830193b408eeb17c18cfb88440e68061423af6e0c2944c79e4c4cfc6a0f0dc"
+          },
+          {
+            "task": "compare",
+            "sha256": "fb8791a7645ec8e37e1ef43ed43fc6f9aa596a1ee5aefe4e085f3799c054e6cd"
+          },
+          {
+            "task": "infer_plan",
+            "sha256": "0a394f451f0045780636fd27b8fad0208d139bb00d9456b9dde93493751a45ce"
+          }
+        ],
+        "T": {
+          "value": 0.18,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.18",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "总结后比较，最后制定计划",
+      "mode": "DYNAMIC",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "summarize",
+          "compare",
+          "infer_plan"
+        ],
+        "task_anchors": [
+          {
+            "task": "summarize",
+            "sha256": "04830193b408eeb17c18cfb88440e68061423af6e0c2944c79e4c4cfc6a0f0dc"
+          },
+          {
+            "task": "compare",
+            "sha256": "fb8791a7645ec8e37e1ef43ed43fc6f9aa596a1ee5aefe4e085f3799c054e6cd"
+          },
+          {
+            "task": "infer_plan",
+            "sha256": "0a394f451f0045780636fd27b8fad0208d139bb00d9456b9dde93493751a45ce"
+          }
+        ],
+        "T": {
+          "value": 0.18,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.18",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      }
+    },
+    {
+      "question": "解释文档内容",
+      "mode": "CHEAP_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "CHEAP_ONLY",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "解释文档内容",
+      "mode": "EXPENSIVE_ONLY",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "EXPENSIVE_ONLY",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "OFFLINE_ARM"
+      }
+    },
+    {
+      "question": "解释文档内容",
+      "mode": "DYNAMIC",
+      "decision": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "UNKNOWN"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": null,
+        "estimator": "UNKNOWN",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      }
+    }
+  ]
+}
