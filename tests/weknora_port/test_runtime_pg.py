@@ -1,0 +1,353 @@
+"""Actual loopback FastAPI + PG/Redis + source RAG/P5 + uniform mock wire.
+
+Synthetic vectors, model responses, profile postprocessor and price grants are
+explicit fixtures. No hosted provider request and no private/old data used.
+"""
+import asyncio, json, uuid, socket
+from pathlib import Path
+from datetime import datetime, timezone, timedelta
+import httpx, pytest, uvicorn
+from redis.asyncio import Redis
+from dataclasses import replace
+
+from tests.weknora_port.test_memory_storage_pg import approved_dsn, actual_pg_run, connection, EXPECTED, PROHIBITED
+from backend.weknora_port.storage.connections import IsolatedConnectionFactory
+from backend.weknora_port.storage.postgres import IsolationPolicy
+from backend.weknora_port.storage.local_principal import LocalPrincipalStore
+from backend.weknora_port.storage.configuration_migrate import apply_configuration_schema
+from backend.weknora_port.storage.generation_migrate import apply_generation_schema
+from backend.weknora_port.storage.send_gate_migrate import apply_send_gate_schema
+from backend.weknora_port.storage.turns_migrate import apply_turn_schema
+from backend.weknora_port.storage.models_migrate import apply_model_schema
+from backend.weknora_port.storage.send_gate import SendAuthorization, ContentOrigin, MonthlyAuthority, ReservationEstimate, ActualCost
+from backend.weknora_port.models.provider import ProviderModel
+from backend.weknora_port.models.transport import AsyncHTTPTransport
+from backend.weknora_port.models.transport import resolve_endpoint
+from backend.weknora_port.models.types import CallContext, TrustedScope
+from backend.weknora_port.model_registry import NeutralModelRegistry
+from backend.weknora_port.streaming.manager import RedisListStreamStore
+from backend.weknora_port.crypto import SecretCipher
+from backend.weknora_port.runtime import ApplicationRuntime, ConversationSettings, LeasedSendGate
+from backend.weknora_port.generation import RouterPolicy
+from backend.weknora_port.documents import DocumentLifecycleService, KnowledgeBaseSettings
+from backend.weknora_port.http_api import create_app
+
+
+REDIS_RUN_ID = "c7d5aaff50b2743adea96a426718c5df3483c80f"
+SOURCE = "The source handbook says blue widgets use protocol W-17. Keep the widgets dry."
+
+
+class FixtureCosts:
+    def __init__(self):
+        now = datetime.now(timezone.utc).date().replace(day=1)
+        self.authority = MonthlyAuthority(
+            "resume-http-fixture-" + str(uuid.uuid4()), now, 1000000, 0,
+            "KNOWN", "synthetic-new-empty-account", "synthetic-mock-wire-only")
+    async def monthly(self, call): return self.authority
+    async def estimate(self, call):
+        return ReservationEstimate(100, 100000, "SYNTHETIC-NOT-BILLING", "fixture-conservative-bound")
+    async def actual(self, call, usage, source):
+        return ActualCost(10, "SYNTHETIC-NOT-BILLING")
+
+
+class FixturePermissions:
+    def __init__(self, leases, principal):
+        self.leases, self.principal = leases, principal
+        self.calls = []
+    async def resolve(self, call):
+        self.calls.append(call)
+        assert call.context.scope.owner_id == self.principal.subject_id
+        kbs = call.context.scope.knowledge_base_ids
+        async with self.leases.lease() as guard:
+            rows = await (await guard.connection.execute(
+                "SELECT id,cloud_allowed FROM knowledge_bases WHERE tenant_id=%s "
+                "AND id=ANY(%s) AND deleted_at IS NULL",
+                (self.principal.tenant_id, list(kbs)))).fetchall()
+        readable = frozenset(row["id"] for row in rows)
+        allowed = frozenset(row["id"] for row in rows if row["cloud_allowed"])
+        # This closed public fixture knows all question/evidence/history inputs
+        # originate solely from these fixture KBs. It is not a production resolver.
+        origins = tuple(ContentOrigin(kind, call.wire_sha256, kbs, True)
+                        for kind in ("question", "evidence", "history", "memory"))
+        return SendAuthorization(
+            call.context.request_id, self.principal.subject_id, call.provider,
+            call.model, call.model_id, call.endpoint, call.capability, call.wire_sha256,
+            origins, readable, allowed, "SYNTHETIC-MOCK-WIRE-ONLY", True, True, True,
+            100000, 4096, datetime.now(timezone.utc) + timedelta(minutes=5))
+
+
+def stream_response(model, text, finish):
+    rows = [
+        {"model": model, "choices": [{"delta": {"content": text}, "finish_reason": None}]},
+        {"model": model, "choices": [{"delta": {}, "finish_reason": finish}],
+         "usage": {"prompt_tokens": 100, "completion_tokens": 10, "total_tokens": 110}},
+    ]
+    return httpx.Response(200, headers={"content-type": "text/event-stream"},
+        content="".join("data: " + json.dumps(row) + "\n\n" for row in rows) + "data: [DONE]\n\n")
+
+
+def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout_no_upgrade(monkeypatch):
+    dsn = approved_dsn()
+    import backend.weknora_port.documents as doc_module
+    original_safe_code = doc_module._safe_error_code
+    def fixture_diagnostic(exc, fallback):
+        import traceback
+        print("PUBLIC_SYNTHETIC_DIAGNOSTIC", type(exc).__name__, str(exc),
+              [(row.filename, row.lineno, row.name) for row in traceback.extract_tb(exc.__traceback__)[-3:]])
+        return original_safe_code(exc, fallback)
+    monkeypatch.setattr(doc_module, "_safe_error_code", fixture_diagnostic)
+    from backend.weknora_port.service import RuntimeService
+    original_run_code = RuntimeService._safe_code
+    def runtime_fixture_diagnostic(exc):
+        import traceback
+        print("PUBLIC_SYNTHETIC_RUNTIME_DIAGNOSTIC", type(exc).__name__, str(exc),
+              [(row.filename, row.lineno, row.name) for row in traceback.extract_tb(exc.__traceback__)[-4:]])
+        return original_run_code(exc)
+    monkeypatch.setattr(RuntimeService, "_safe_code", staticmethod(runtime_fixture_diagnostic))
+    from backend.weknora_port.runtime import LeasedKnowledgeRepository
+    original_repository_method = LeasedKnowledgeRepository.__getattr__
+    def repository_fixture_diagnostic(self, name):
+        invoke = original_repository_method(self, name)
+        async def observed(*args, **kwargs):
+            try:
+                return await invoke(*args, **kwargs)
+            except Exception as exc:
+                import traceback
+                print("PUBLIC_SYNTHETIC_RETRIEVAL_DIAGNOSTIC", name, type(exc).__name__, str(exc),
+                      [(row.filename, row.lineno, row.name) for row in traceback.extract_tb(exc.__traceback__)[-4:]])
+                raise
+        return observed
+    monkeypatch.setattr(LeasedKnowledgeRepository, "__getattr__", repository_fixture_diagnostic)
+
+    async def scenario():
+        async def acquire():
+            conn, _ = await connection(dsn)
+            return conn
+        async def release(conn): await conn.close()
+        leases = IsolatedConnectionFactory(acquire, release, IsolationPolicy(EXPECTED, PROHIBITED))
+        async with leases.lease() as guard:
+            for apply in (apply_configuration_schema, apply_generation_schema,
+                          apply_send_gate_schema, apply_turn_schema, apply_model_schema):
+                await apply(guard)
+        principal = await LocalPrincipalStore(leases).bootstrap()
+        redis = Redis.from_url("redis://127.0.0.1:56424/0", decode_responses=True)
+        assert (await redis.info("server"))["run_id"] == REDIS_RUN_ID
+        prefix = "weknora-resume:20261013:" + str(uuid.uuid4())
+        store = RedisListStreamStore(redis, prefix=prefix)
+        wire = []
+        fail_cheap = False
+
+        def handler(request):
+            nonlocal fail_cheap
+            assert request.url.host == "fixture.invalid"
+            body = json.loads(request.content)
+            wire.append({"path": request.url.path, "body": body})
+            if request.url.path.endswith("/embeddings"):
+                values = body["input"]
+                return httpx.Response(200, json={"model": body["model"],
+                    "data": [{"index": i, "embedding": [.1, .2, .3]} for i, _ in enumerate(values)],
+                    "usage": {"prompt_tokens": 10, "total_tokens": 10}})
+            if request.url.path.endswith("/rerank"):
+                return httpx.Response(200, json={"results": [
+                    {"index": i, "relevance_score": .9} for i, _ in enumerate(body["documents"])]})
+            if body.get("stream"):
+                if "Xing" in body["model"]:
+                    if fail_cheap:
+                        raise httpx.ReadTimeout("synthetic fixture timeout", request=request)
+                    return stream_response(body["model"], "CHEAP_REJECTED_DRAFT", "length")
+                return stream_response(body["model"], "Blue widgets use W-17. <ref id=\"c1\"/>", "stop")
+            return httpx.Response(200, json={"model": body["model"],
+                "choices": [{"message": {"content": json.dumps(
+                    {"rewrite_query": "blue widgets protocol", "intent": "kb_search", "image_description": ""})},
+                    "finish_reason": "stop"}],
+                "usage": {"prompt_tokens": 20, "completion_tokens": 10, "total_tokens": 30}})
+
+        def model_factory(config, key, gate):
+            endpoints = [resolve_endpoint(config, suffix) for suffix in
+                         ("/chat/completions", "/embeddings", "/rerank")]
+            transport = AsyncHTTPTransport(
+                allowed_endpoints=endpoints, gate=gate, credential=lambda _: key,
+                http_transport=httpx.MockTransport(handler))
+            return ProviderModel(config, transport)
+
+        box = {}
+        async def settings(who):
+            runtime = box["runtime"]
+            async with leases.lease() as guard:
+                snapshot = await runtime._snapshot(guard)
+            return KnowledgeBaseSettings(
+                snapshot.model_id("embedding"), snapshot.model_id("cheap"), snapshot.model_id("rerank"),
+                {"chunk_size": 128, "chunk_overlap": 0},
+                {"vector_enabled": True, "keyword_enabled": True, "wiki_enabled": False, "graph_enabled": False}, {"enable_multimodal": False})
+
+        async def embedder_for_kb(who, kb):
+            runtime = box["runtime"]
+            context = CallContext(str(uuid.uuid4()), TrustedScope(who.subject_id, (kb["id"],)))
+            gate = LeasedSendGate(runtime)
+            registry = NeutralModelRegistry(
+                runtime.models, lambda config, key: model_factory(config, key, gate),
+                owner_id=who.subject_id, catalogue=runtime.catalogue)
+            class Embedder:
+                async def batch_embed_with_pool(self, texts, *, attempt):
+                    model = await registry.embedding(kb["embedding_model_id"], context)
+                    try:
+                        return (await model.embed(texts, context.child("upload-embed-" + str(attempt)))).vectors
+                    finally:
+                        await registry.close()
+            return Embedder()
+
+        async def profile_fixture(who, kb, document, ingest, chunks):
+            assert who == principal and ingest.parsed.content == SOURCE and chunks
+            # Only the profile worker is synthetic; actual parser/chunks/index/ready
+            # writes and all query/generation mechanism execute below.
+            return True
+
+        root = Path("E:/RAG-Tests/runtime-source-" + str(uuid.uuid4()))
+        documents = DocumentLifecycleService(
+            leases, root, principal=principal, resolve_kb_settings=settings,
+            embedder_for_kb=embedder_for_kb, post_processor=profile_fixture)
+        costs = FixtureCosts()
+        permissions = FixturePermissions(leases, principal)
+        runtime = ApplicationRuntime(
+            leases, principal, store, documents, model_factory=model_factory,
+            cipher=SecretCipher(b"s" * 32), policy=RouterPolicy(mode="DYNAMIC"),
+            permissions=permissions, costs=costs)
+        box["runtime"] = runtime
+        roles = [
+            ("embedding", "siliconflow", "BAAI/bge-m3"),
+            ("rerank", "siliconflow", "BAAI/bge-reranker-v2-m3"),
+            ("cheap", "siliconflow", "XingChenAGI/Xing4.0-29B"),
+            ("expensive", "deepseek", "deepseek-flash"),
+            ("vlm", "siliconflow", "Qwen/Qwen2.5-VL-72B-Instruct"),
+        ]
+        current = await runtime.read_model_configuration(principal)
+        await runtime.update_model_configuration(principal, current["revision"], [
+            {"role": role, "provider": provider, "model": name,
+             "base_url": "https://fixture.invalid/v1", "api_key": "SYNTHETIC-NOT-A-KEY"}
+            for role, provider, name in roles])
+        app = create_app(runtime, resolve_principal=lambda request: principal,
+                         allowed_origins=("http://127.0.0.1:56425",))
+        with socket.socket() as check:
+            assert check.connect_ex(("127.0.0.1", 56425)) != 0, "fixture port already occupied"
+        server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=56425,
+                                              log_level="error", access_log=False))
+        task = asyncio.create_task(server.serve())
+        try:
+            for _ in range(200):
+                if server.started: break
+                if task.done(): await task
+                await asyncio.sleep(.01)
+            assert server.started
+            async with httpx.AsyncClient(base_url="http://127.0.0.1:56425",
+                    headers={"Origin": "http://127.0.0.1:56425"}, timeout=20) as client:
+                assert (await client.get("/api/v1/runtime")).status_code == 200
+                created = await client.post("/api/v1/knowledge-bases", json={"name": "HTTP public synthetic source"})
+                assert created.status_code == 200, created.text
+                kb = created.json()["data"]["id"]
+                enabled = await client.patch(f"/api/v1/knowledge-bases/{kb}/external-processing",
+                                             json={"cloud_allowed": True})
+                assert enabled.status_code == 200, enabled.text
+                uploaded = await client.post(f"/api/v1/knowledge-bases/{kb}/documents",
+                                              files={"file": ("source.txt", SOURCE, "text/plain")})
+                assert uploaded.status_code == 200, uploaded.text
+                document = uploaded.json()["data"]
+                assert document["status"] == "completed", document.get("error_code")
+                # Verify the finalizer JOIN refuses both foreign tenants and
+                # wrong KBs, using disabled physical embeddings as witnesses.
+                foreign_kb, foreign_doc, foreign_source = [str(uuid.uuid4()) for _ in range(3)]
+                sibling_kb, sibling_doc, sibling_source = [str(uuid.uuid4()) for _ in range(3)]
+                async with leases.lease() as guard:
+                    foreign_tenant = (await (await guard.connection.execute(
+                        "INSERT INTO tenants(name,business) VALUES(%s,%s) RETURNING id",
+                        ("foreign isolated fixture", "isolated-test"))).fetchone())["id"]
+                    for tenant, kid, did, eid in (
+                            (foreign_tenant, foreign_kb, foreign_doc, foreign_source),
+                            (principal.tenant_id, sibling_kb, sibling_doc, sibling_source)):
+                        await guard.connection.execute(
+                            "INSERT INTO knowledge_bases(id,tenant_id,name,embedding_model_id,summary_model_id,rerank_model_id) "
+                            "VALUES(%s,%s,'scope witness','','','')", (kid, tenant))
+                        await guard.connection.execute(
+                            "INSERT INTO knowledges(id,tenant_id,knowledge_base_id,type,title,source,parse_status) "
+                            "VALUES(%s,%s,%s,'text','scope witness','fixture','processing')", (did, tenant, kid))
+                        await guard.connection.execute(
+                            "INSERT INTO embeddings(source_id,source_type,knowledge_id,knowledge_base_id,dimension,is_enabled) "
+                            "VALUES(%s,0,%s,%s,3,FALSE)", (eid, did, kid))
+                from backend.weknora_port.documents import DocumentLifecycleError
+                with pytest.raises(DocumentLifecycleError):
+                    await documents._finalize(principal, foreign_kb, foreign_doc,
+                                              "scope-fixture", {}, enabled=True)
+                with pytest.raises(DocumentLifecycleError):
+                    await documents._finalize(principal, kb, sibling_doc,
+                                              "scope-fixture", {}, enabled=True)
+                async with leases.lease() as guard:
+                    untouched = await (await guard.connection.execute(
+                        "SELECT source_id,is_enabled FROM embeddings WHERE source_id=ANY(%s) ORDER BY source_id",
+                        ([foreign_source, sibling_source],))).fetchall()
+                assert len(untouched) == 2 and all(not row["is_enabled"] for row in untouched)
+                wrong_scope = await client.post("/api/v1/sessions",
+                    json={"knowledge_base_scope": [foreign_kb], "document_scope": []})
+                assert wrong_scope.status_code == 403, wrong_scope.text
+                session = await client.post("/api/v1/sessions",
+                    json={"title": "integration", "knowledge_base_scope": [kb], "document_scope": [document["id"]]})
+                assert session.status_code == 200, session.text
+                sid = session.json()["data"]["id"]
+                request = {"content": "What protocol do blue widgets use?", "request_id": str(uuid.uuid4()),
+                           "knowledge_base_scope": [kb], "document_scope": [document["id"]]}
+                answer = await client.post(f"/api/v1/sessions/{sid}/messages", json=request)
+                assert answer.status_code == 200, answer.text
+                await runtime.drain_background()
+                assert "CHEAP_REJECTED_DRAFT" not in answer.text
+                assert "Blue widgets use W-17." in answer.text, answer.text
+                frames = [json.loads(line[6:]) for line in answer.text.splitlines()
+                          if line.startswith("data: ")]
+                assert frames[-1]["response_type"] == "complete"
+                assert sum(frame["response_type"] == "complete" for frame in frames) == 1
+                messages = (await client.get(f"/api/v1/sessions/{sid}/messages")).json()["data"]
+                assistant = next(row for row in messages if row["role"] == "assistant")
+                assert assistant["is_completed"] and assistant["knowledge_references"]
+                ref = assistant["knowledge_references"][0]
+                readback = await client.get("/api/v1/chunks/" + ref["id"])
+                assert readback.status_code == 200 and SOURCE in readback.text
+                count = len(wire)
+                replay = await client.post(f"/api/v1/sessions/{sid}/messages", json=request)
+                assert replay.status_code == 200 and len(wire) == count
+                restored = await client.get(f"/api/v1/sessions/continue-stream/{sid}",
+                                              params={"message_id": assistant["id"]})
+                assert restored.status_code == 200 and "Blue widgets use W-17." in restored.text
+                assert len(wire) == count
+                fail_cheap = True
+                timeout_request = {**request, "request_id": str(uuid.uuid4())}
+                failure = await client.post(f"/api/v1/sessions/{sid}/messages", json=timeout_request)
+                assert failure.status_code == 200 and "MODEL_CALL_TIMEOUT" in failure.text
+                await runtime.drain_background()
+                async with leases.lease() as guard:
+                    attempts = await (await guard.connection.execute(
+                        "SELECT a.role,a.status,a.error_code,a.usage FROM generation_attempts a "
+                        "JOIN generation_runs r ON r.run_id=a.run_id AND r.tenant_id=a.tenant_id "
+                        "AND r.subject_id=a.subject_id WHERE a.tenant_id=%s AND a.subject_id=%s "
+                        "AND r.session_id=%s ORDER BY a.started_at,a.ordinal",
+                        (principal.tenant_id, principal.subject_id, sid))).fetchall()
+                    ledger = await (await guard.connection.execute(
+                        "SELECT capability,state,usage FROM send_calls WHERE account_id=%s ORDER BY created_at",
+                        (costs.authority.account_id,))).fetchall()
+                assert [row["role"] for row in attempts] == ["cheap", "expensive", "cheap"]
+                assert attempts[-1]["error_code"] == "MODEL_CALL_TIMEOUT"
+                assert ledger[-1]["state"] == "unknown" and ledger[-1]["usage"]["status"] == "UNKNOWN"
+                evidence = {"kind": "ACTUAL_LOOPBACK_HTTP_PG_REDIS_MOCK_PROVIDER",
+                    "system_identifier": EXPECTED, "redis_run_id": REDIS_RUN_ID, "redis_prefix": prefix,
+                    "knowledge_base": kb, "document": document["id"], "session": sid,
+                    "assistant": assistant["id"], "client_request_id": request["request_id"],
+                    "server_run_id": assistant["request_id"], "attempts": attempts, "ledger": ledger,
+                    "mock_wire_count": len(wire), "real_provider_calls": 0,
+                    "assertions": "PASS", "cross_tenant_and_wrong_kb_index_activation": untouched,
+                    "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "MOCK_NOT_SOURCE_PARITY",
+                    "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
+                output = Path("docs/weknora-port/evidence/RESUME_HTTP_CHAIN_20261013.json")
+                output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
+        finally:
+            server.should_exit = True
+            await task
+            await redis.aclose()
+
+    actual_pg_run(scenario())
+

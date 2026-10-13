@@ -12,7 +12,7 @@ Actual lifecycle defect: documents.py supplied a synchronous int tenant resolver
 
 Final targeted command, PYTHONPATH=E:/RAG-Worktrees/weknora-python-port-20261013/var/weknora-port/runtime-deps, explicit new56423 WEKNORA_PORT_TEST_DSN:
 E:/RAG quention/.venv/Scripts/python.exe -B -m pytest --noconftest -q tests/weknora_port/test_documents.py tests/weknora_port/test_documents_pg.py tests/weknora_port/test_model_store_pg.py tests/weknora_port/test_turn_storage_pg.py tests/weknora_port/test_send_gate_pg.py tests/weknora_port/test_memory_storage_pg.py tests/weknora_port/test_generation_storage.py -p no:cacheprovider --basetemp=E:/RAG-Tests/w13a --tb=short
-Exit0:41passed4.35s. There are7document doubles,21generation storage doubles and13actual PG cases (one generation case +12 explicit pg modules). Check collection if counts change; not all41are real DB tests.
+Exit0:41passed4.35s. There are3document doubles,25generation storage doubles and13actual PG cases (one generation case +12 explicit pg modules). Check collection if counts change; not all41are real DB tests.
 
 Earlier attempts retained as FAIL:34pass/3cryptography dependency failures/1missing temp parent; after dependency install3modelpass/1constructor failure; next omitted KB image config failure; next DOCUMENT_PROCESSING_FAILED; async resolver fix39pass/2Windows long-path failures; short root then41pass. No assertion lowered and no provider call.
 

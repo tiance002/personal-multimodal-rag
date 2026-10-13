@@ -1,5 +1,9 @@
 # Authoritative E-worktree resume — 2026-10-13
 
+## Current stable entry checkpoint
+
+Native loopback HTTP + fresh PG56423/Redis56424 + source parser/index/P3/P5/SQL final/SSE/reference path tested:24passed, including cross-tenant/wrong-KB physical index activation denials and foreign-KB HTTP403.497associated checks and57fixed-source oracle comparisons passed; React build exit0. See FIRST_ENTRY_CHECKPOINT_20261013.md and evidence/RESUME_HTTP_CHAIN_20261013.json. Supplier/profile/price/vectors are explicit mocks. Full Go engine parity, production profile worker, actual estimator, memory automation, real React/cancel/cursor, P7/P8 remain open. No phase-wide P6 acceptance, real provider or cutover PASS. Next independent stage must not mutate reviewed entry code without a new scoped checkpoint.
+
 Implementation now occurs in E:/RAG-Worktrees/weknora-python-port-20261013, branch codex/weknora-python-port-resume-20261013. Base f33706d; stable candidate checkpoint082c2d5. 65 files imported only after before/content/after hashes matched, with origin manifest in evidence/RESUME_IMPORT_20261013.json. Original worktrees not edited. Latest owner policy supersedes imported timeout-on claims: timeout does not upgrade. Scoped133offline tests passed/1PG skipped; see P5_LATEST_POLICY_20261013.md. Full runtime binding and P7 remain pending. Imported phase evidence below is historical and is reused only for unchanged inputs.
 
 # WeKnora Python + P5 Goal status

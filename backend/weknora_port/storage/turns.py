@@ -71,7 +71,7 @@ class PostgresTurnRepository:
         request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs)
         context=CallContext(row['run_id'],TrustedScope(self.principal.subject_id,kbs,docs),cancelled=asyncio.Event(),session_id=row['session_id'])
         return AcceptedTurn(row['run_id'],row['session_id'],row['user_message_id'],row['assistant_message_id'],context,
-                            MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new)
+                            MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new,row['client_request_id'])
 
     async def accept(self,request: OrdinaryTurnRequest,principal: LocalPrincipal):
         self._owner(principal)

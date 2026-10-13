@@ -1,3 +1,20 @@
+# Current bounded parity matrix — E resume
+
+Fixed upstream3e8b0bfc. Authoritative checkpoint: FIRST_ENTRY_CHECKPOINT_20261013.md. Imported P0 table below is historical scope, not present completion.
+
+| Domain | Python/source mapping | Current evidence / gap |
+|---|---|---|
+| Entry | http_api→runtime.ApplicationRuntime→storage.turns→service.RuntimeService | Actual nativeHTTP/PG/Redis path PASS, client nonce/server Run relation and scope checked; full Go orchestration paired corpus NOT RUN. |
+| Models | source ModelParameters→storage.models→model_registry.SourceCatalogue→neutral ProviderModel |54same-input request-source fixtures with neutral stubs + crypto vector verified; full SDK/production native credential binding parity not claimed. |
+| Index | knowledge_process/chunker→documents→storage.chunks/indexing→ParadeDB embeddings | Actual uploaded text/chunks/index/ready/reference and tenant/KB negatives; mock profile worker, synthetic3D vectors; complete ingestion/profile parity pending. |
+| RAG/config | query_understand/search/rerank/merge_history/filter_top_k/into_chat_message→retrieval modules | Actual entry executes core, session settings override startup; type fallback stays in existing hybrid. Full Go corpus/tokenizer comparison pending. |
+| P5 | original six-feature max(q0,rewrite)/threshold0.35→generation + durable lifecycle |d9c5cbc timeoutOFF override authoritative; length/empty/invalidhandle one upgrade tests; actual truncation2attempts and timeout1UNKNOWN. Actual estimator pending. |
+| History/memory | common.go raw query+separate refs→conversation/storage.memory→service/runtime | Actual history reads/rendered sink and source references preserved; auto extraction/vector/maintenance complete entry pending. |
+| SSE/citations | source Redis/ContinueStream/source registry→streaming/references/http_api | Actual quoteGET/replay/no-extra-send/terminal once; baseline/Expensive streaming currently overbuffered, timed parity needs repair; real React/cancel/cursor pending. |
+| Evaluation/cutover | existing six public adapters→new full-chain paired bridge | P7 not implemented; P8prep pending; real providers/cutover AWAITING_OWNER_APPROVAL. |
+
+## Imported P0 matrix (historical)
+
 # Fixed source → Python behavior matrix
 
 Upstream `3e8b0bfc80b845b2d4b2ed683994748741450a97`. This table records scope, not completed implementations. A verified Git blob is not behavioral parity. Stage reports must replace PENDING with observed inputs, branches, outputs and tests before declaring parity.

@@ -44,6 +44,7 @@ class AcceptedTurn:
     request: OrdinaryTurnRequest = field(repr=False)
     is_new: bool = False
     replay_only: bool = True
+    client_request_id: str = ''
 
 @dataclass(frozen=True)
 class MemoryBundle:
@@ -208,7 +209,7 @@ class RuntimeService:
             await progress('history','started')
             rounds=tuple(await self.history_service.load(turn.memory_context,turn.session_id,state.max_rounds))
             history=tuple(History(h.query,h.answer) for h in rounds)
-            state.history=list(history)
+            state.history=list(rounds)
             await progress('history','completed')
             check_context(turn.context)
             await progress('memory','started')

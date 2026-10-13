@@ -442,8 +442,10 @@ class DocumentLifecycleService:
             async with retriever.connection.transaction():
                 if enabled:
                     await retriever.connection.execute(
-                        "UPDATE embeddings SET is_enabled=TRUE WHERE tenant_id=%s AND knowledge_base_id=%s "
-                        "AND knowledge_id=%s AND is_enabled=FALSE",
+                        "UPDATE embeddings SET is_enabled=TRUE FROM knowledges k "
+                        "WHERE embeddings.knowledge_id=k.id AND embeddings.knowledge_base_id=k.knowledge_base_id "
+                        "AND k.tenant_id=%s AND k.knowledge_base_id=%s AND k.id=%s "
+                        "AND k.deleted_at IS NULL AND embeddings.is_enabled=FALSE",
                         (principal.tenant_id, knowledge_base_id, document_id))
                 cursor = await retriever.connection.execute(
                     "UPDATE knowledges SET parse_status='completed',error_message='',metadata=%s::jsonb,"

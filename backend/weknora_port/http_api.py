@@ -21,6 +21,8 @@ from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool
 
 from .streaming.events import StreamEvent, to_sse
+from .models.types import ProviderError
+from .documents import DocumentLifecycleError
 
 
 _CODE = re.compile(r"^[A-Z][A-Z0-9_]{0,79}$")
@@ -95,14 +97,7 @@ class AcceptedTurn:
         return self.run_id
 
 
-@dataclass(frozen=True)
-class OrdinaryTurnRequest:
-    session_id: str
-    content: str
-    request_id: str
-    mode: str
-    knowledge_base_scope: tuple[str, ...]
-    document_scope: tuple[str, ...]
+from .service import OrdinaryTurnRequest
 
 
 class RuntimeService(Protocol):
@@ -202,7 +197,7 @@ async def _response_stream(runtime: RuntimeService, principal: Any,
         if event.type in ("answer", "thinking", "reflection") and "event_id" not in event.data:
             event = StreamEvent(event.event_id, event.type, event.content, event.done,
                                 event.timestamp, {**event.data, "event_id": event.event_id}, event.usage)
-        yield to_sse(event, accepted.request_id)
+        yield to_sse(event, accepted.run_id)
 
 
 def _normalize_origin(value: str) -> str | None:
@@ -275,6 +270,23 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.exception_handler(RuntimeContractError)
     async def contract_error(request: Request, exc: RuntimeContractError):
         return _error_response(_safe_code(exc, "RUNTIME_CONTRACT_INVALID"), 502, _request_id(request))
+
+    @app.exception_handler(ProviderError)
+    async def provider_application_error(request: Request, exc: ProviderError):
+        code = _safe_code(exc, "REQUEST_FAILED")
+        denied = {"TRUSTED_PRINCIPAL_REQUIRED", "TURN_OWNER_MISMATCH",
+                  "TURN_KB_SCOPE_DENIED", "TURN_DOCUMENT_SCOPE_DENIED",
+                  "TURN_RAW_SCOPE_EXPANSION_DENIED", "KNOWLEDGE_OWNER_MISMATCH"}
+        conflicts = {"TURN_REQUEST_PAYLOAD_CONFLICT", "TURN_FAILURE_CONFLICT",
+                     "TURN_ALREADY_FAILED"}
+        status = 403 if code in denied else 409 if code in conflicts else 422
+        return _error_response(code, status, _request_id(request))
+
+    @app.exception_handler(DocumentLifecycleError)
+    async def document_application_error(request: Request, exc: DocumentLifecycleError):
+        code = _safe_code(exc, "DOCUMENT_REQUEST_FAILED")
+        status = 404 if code.endswith("_NOT_FOUND") else 403 if code.endswith("_SCOPE_DENIED") else 422
+        return _error_response(code, status, _request_id(request))
 
     @app.exception_handler(Exception)
     async def runtime_error(request: Request, exc: Exception):
@@ -358,7 +370,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         turn_request = OrdinaryTurnRequest(session_id, body.content, body.request_id, body.mode,
                                            tuple(body.knowledge_base_scope), tuple(body.document_scope))
         accepted = await runtime.accept_turn(turn_request, who)
-        if accepted.session_id != session_id or accepted.run_id != body.request_id:
+        if accepted.session_id != session_id or (getattr(accepted, 'client_request_id', '') or accepted.run_id) != body.request_id:
             raise RuntimeContractError("TURN_IDENTITY_MISMATCH")
         return StreamingResponse(_response_stream(runtime, who, accepted), media_type="text/event-stream",
                                  headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

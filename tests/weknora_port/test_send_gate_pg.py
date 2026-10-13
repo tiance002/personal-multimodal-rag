@@ -13,7 +13,7 @@ from backend.weknora_port.storage.send_gate_migrate import apply_send_gate_schem
 
 
 def save_evidence(case,value):
-    path=Path(__file__).resolve().parents[2]/'docs/weknora-port/P1_SEND_GATE_EVIDENCE.json'
+    path=Path(__file__).resolve().parents[2]/'docs/weknora-port/evidence/RESUME_P1_SEND_GATE_EVIDENCE.json'
     saved=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'kind':'actual-isolated-pg-synthetic-send-gate','model_calls':0,'http_sends':0,'old_database_writes':0,'cases':{}}
     saved['cases'][case]=value
     path.write_text(json.dumps(saved,ensure_ascii=False,indent=2,default=str)+'\n',encoding='utf-8')

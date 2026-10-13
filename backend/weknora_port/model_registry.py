@@ -37,8 +37,17 @@ class SourceCatalogue:
     """Resolve source protocol/capacity metadata, with no role-specific HTTP path."""
     def resolve(self, role: ConfiguredRole, model_id: str) -> ModelConfig:
         from .models.catalog import resolve_model_config
+        parameters = dict(role.parameters)
+        # Stored source ModelParameters includes identity and encrypted-secret
+        # slots. They are supplied separately by the trusted immutable role.
+        for name, expected in (('provider', role.provider), ('base_url', role.base_url),
+                               ('api_key', role.api_key)):
+            if name in parameters and parameters[name] != expected:
+                raise ProviderError('MODEL_PARAMETER_IDENTITY_CONFLICT')
+            parameters.pop(name, None)
+        parameters.pop('app_secret', None)
         return resolve_model_config(role.provider,role.model,base_url=role.base_url,
-            model_id=model_id,model_type=MODEL_TYPES[role.role],internal_overrides=dict(role.parameters))
+            model_id=model_id,model_type=MODEL_TYPES[role.role],internal_overrides=parameters)
 
     def validate(self, role: ConfiguredRole) -> None:
         if role.role not in ROLES or not all((role.provider,role.model,role.base_url)):
