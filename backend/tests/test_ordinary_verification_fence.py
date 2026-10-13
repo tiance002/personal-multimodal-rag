@@ -33,9 +33,9 @@ class FenceTests(unittest.TestCase):
         self.probe = self.root / 'probe-fixture.json'
         self.probe.write_text(json.dumps(dict(state='UNKNOWN', run_id='old-unknown',
                                              input_reserved=39, output_reserved=1024)))
-        self.runs = [str(uuid.uuid4()) for _ in range(5)]
+        self.runs = [str(uuid.uuid4()) for _ in range(6)]
         self.grant = self.root / 'grant.json'
-        self.value = dict(schema_version=2, owner_authorization='OFFLINE_SIMULATED_OWNER_DECISION',
+        self.value = dict(schema_version=3, owner_authorization='OFFLINE_SIMULATED_OWNER_DECISION',
                           run_ids=self.runs, probe_snapshot={self.probe.name: hashlib.sha256(self.probe.read_bytes()).hexdigest()},
                           acknowledged_unknown_runs=['old-unknown'])
         self.journal = self.root / 'journal.json'
