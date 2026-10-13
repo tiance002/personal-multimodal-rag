@@ -1,0 +1,52 @@
+"""Local text proxy for P5 L, never provider actual usage or a billing authority.
+
+Tokenizer: tiktoken 0.14.0 cl100k_base; pattern/special IDs from
+its tiktoken_ext/openai_public.py. Asset SHA pinned by that same package.
+Only caller-supplied local bytes are read. No downloads/cache writes here.
+Unsupported images/tools or absent/invalid asset keep L UNKNOWN.
+"""
+from __future__ import annotations
+import base64, hashlib, json
+from pathlib import Path
+from .types import TokenEstimate
+
+ASSET_SHA256 = '223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7'
+PATTERN = r"""'(?i:[sdmt]|ll|ve|re)|[^\r\n\p{L}\p{N}]?+\p{L}++|\p{N}{1,3}+| ?[^\s\p{L}\p{N}]++[\r\n]*+|\s++$|\s*[\r\n]|\s+(?!\S)|\s"""
+BASIS = 'LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/' + ASSET_SHA256
+
+class LocalTextTokenEstimator:
+    def __init__(self, asset_path=None):
+        self.encoding = None
+        if asset_path is None:
+            return
+        try:
+            import tiktoken
+            from importlib.metadata import version
+            if version('tiktoken') != '0.14.0':
+                return
+            raw = Path(asset_path).read_bytes()
+            if hashlib.sha256(raw).hexdigest() != ASSET_SHA256:
+                return
+            ranks = {base64.b64decode(token, validate=True): int(rank)
+                     for token, rank in (line.split() for line in raw.splitlines() if line)}
+            self.encoding = tiktoken.Encoding(name='cl100k_base',pat_str=PATTERN,
+                mergeable_ranks=ranks, special_tokens={'<|endoftext|>':100257,
+                    '<|fim_prefix|>':100258,'<|fim_middle|>':100259,
+                    '<|fim_suffix|>':100260,'<|endofprompt|>':100276})
+        except (OSError, ValueError, ImportError):
+            self.encoding = None
+
+    def estimate(self, messages, options):
+        if self.encoding is None or getattr(options,'tools',None):
+            return TokenEstimate()
+        rows=[]
+        for message in messages:
+            if message.images or message.multi_content or message.tool_calls or message.tool_call_id:
+                return TokenEstimate()
+            rows.append({'role':message.role,'content':message.content,'name':message.name,
+                         'reasoning_content':message.reasoning_content})
+        if not rows:
+            return TokenEstimate()
+        payload=json.dumps(rows,ensure_ascii=False,sort_keys=True,separators=(',',':'))
+        # Encode literal special-token text as ordinary text, not model control tokens.
+        return TokenEstimate(len(self.encoding.encode(payload,disallowed_special=())),BASIS)

@@ -14,6 +14,7 @@ from .models.types import ProviderError, ChatOptions, CallContext, TrustedScope
 from .model_registry import SourceCatalogue, NeutralModelRegistry, role_snapshot
 from .generation import GenerationCoordinator, RouterPolicy
 from .generation.types import RoleBinding
+from .generation.estimator import LocalTextTokenEstimator
 from .retrieval.pipeline import PipelineState, RetrievalPipeline
 from .retrieval.search import SearchTarget
 from .service import RuntimeService, TurnConfiguration, OrdinaryMemoryLoader
@@ -176,13 +177,14 @@ class ApplicationRuntime:
     """
     def __init__(self, leases, principal, store, documents, *, model_factory,
                  cipher: SecretCipher, conversation=None, policy=None,
-                 estimator=None, permissions=None, costs=None, catalogue=None):
+                 estimator=None, tokenizer_asset=None, permissions=None, costs=None, catalogue=None):
         self.leases, self.principal = leases, principal
         self.store, self.documents = store, documents
         self.cipher, self.catalogue = cipher, catalogue or SourceCatalogue()
         self.model_factory, self.permissions, self.costs = model_factory, permissions, costs
         self.conversation = conversation or ConversationSettings()
-        self.policy, self.estimator = policy or RouterPolicy(), estimator
+        self.policy = policy or RouterPolicy()
+        self.estimator = estimator if estimator is not None else LocalTextTokenEstimator(tokenizer_asset)
         self.models = PostgresModelStore(leases, principal, self.catalogue, cipher=cipher)
         self.turns = PostgresTurnRepository(leases, principal)
         self.memory_repository = LeasedMemoryRepository(leases, principal)

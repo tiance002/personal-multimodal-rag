@@ -70,6 +70,7 @@ async def scenario_complete():
     rendered=''.join(m.content for m in e.calls[0][0])
     assert 'real source source evidence' in rendered and 'historic question' in rendered and 'memory prompt' in rendered
     assert store.events[0].type=='agent_query' and store.events[0].event_id=='run'
+    assert store.events[0].data['request_id']==accepted.run_id
     assert sum(ev.type=='agent_query' for ev in store.events)==1
     assert store.trace[-2:]==['COMMIT','complete'] and len(commit.calls)==1
     progress=[ev.data for ev in store.events if ev.type=='progress']

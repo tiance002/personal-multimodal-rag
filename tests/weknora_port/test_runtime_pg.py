@@ -211,6 +211,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
         runtime = ApplicationRuntime(
             leases, principal, store, documents, model_factory=model_factory,
             cipher=SecretCipher(b"s" * 32), policy=RouterPolicy(mode="DYNAMIC"),
+            tokenizer_asset="D:/RAG-Tokenizer-Assets/cl100k_base.tiktoken",
             permissions=permissions, costs=costs)
         box["runtime"] = runtime
         roles = [

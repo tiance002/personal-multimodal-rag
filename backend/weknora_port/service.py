@@ -131,7 +131,7 @@ class RuntimeService:
         if turn.is_new:
             try:
                 await self.store.append_event(turn.session_id,turn.assistant_message_id,
-                    StreamEvent(turn.run_id,'agent_query',data={'query':request.content,'session_id':turn.session_id,'assistant_message_id':turn.assistant_message_id}))
+                    StreamEvent(turn.run_id,'agent_query',data={'request_id':turn.run_id,'query':request.content,'session_id':turn.session_id,'assistant_message_id':turn.assistant_message_id}))
             except Exception as exc:
                 await self.publish_error(turn,exc)
                 return turn
