@@ -137,11 +137,10 @@ class PostgresGenerationLifecycle:
                 if first["role"] != "cheap" or first["status"] not in _TERMINAL or record.role != "expensive" or record.upgrade_reason is None:
                     raise GenerationError("GENERATION_ATTEMPT_UPGRADE_DENIED")
                 observed = set(_object(first["objective"]))
-                allowed = ((record.upgrade_reason == "MODEL_CALL_TIMEOUT" and first["status"] == "FAILED" and first["error_code"] == "MODEL_CALL_TIMEOUT") or
-                           (first["status"] in ("COMPLETED", "TRUNCATED") and
+                allowed = (first["status"] in ("COMPLETED", "TRUNCATED") and
                             ((record.upgrade_reason == "TRUNCATION" and "TRUNCATED" in observed) or
                              (record.upgrade_reason == "MODEL_EMPTY" and "EMPTY" in observed) or
-                             (record.upgrade_reason == "INVALID_HANDLES" and "INVALID_HANDLES" in observed))))
+                             (record.upgrade_reason == "INVALID_HANDLES" and "INVALID_HANDLES" in observed)))
                 if not allowed or (first["prompt_sha256"],first["context_sha256"]) != (record.prompt_sha256,record.context_sha256):
                     raise GenerationError("GENERATION_ATTEMPT_UPGRADE_DENIED")
             columns = ("attempt_id","run_id","tenant_id","subject_id","ordinal","role","provider","model_requested","endpoint","envelope_sha256","prompt_sha256","context_sha256","upgrade_reason","usage")

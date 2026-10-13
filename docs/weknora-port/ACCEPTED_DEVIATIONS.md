@@ -1,3 +1,7 @@
+# Current resume authority — 2026-10-13
+
+Latest owner delegation explicitly makes task 02/03 authoritative: provider_fallback=false, including explicit Cheap model timeouts. P5-TIMEOUT below is retained as an imported historical authorization claim; it is superseded in this independent E branch and is not an active deviation. Neither coordinator nor persistent lifecycle permits timeout upgrade. Old C worktree and historical evidence remain unchanged.
+
 # Authorized deviations from fixed WeKnora
 
 This list is exhaustive for current business-algorithm differences. Framework differences require observable-equivalence evidence, not a third RAG strategy.

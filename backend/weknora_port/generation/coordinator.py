@@ -193,9 +193,9 @@ class GenerationCoordinator:
             record, candidate, error = await self._attempt(request, prepared, context, role, ordinal, reason)
             attempts.append(record)
             check_context(context)
-            upgrade = ordinal == 1 and role == 'cheap' and (request.policy.mode == 'DYNAMIC') and (isinstance(error, ModelCallTimeout) or (error is None and bool(record.objective)))
+            upgrade = ordinal == 1 and role == 'cheap' and (request.policy.mode == 'DYNAMIC') and error is None and bool(record.objective)
             if upgrade:
-                reason = 'MODEL_CALL_TIMEOUT' if isinstance(error, ModelCallTimeout) else 'TRUNCATION' if 'TRUNCATED' in record.objective else 'MODEL_EMPTY' if 'EMPTY' in record.objective else 'INVALID_HANDLES'
+                reason = 'TRUNCATION' if 'TRUNCATED' in record.objective else 'MODEL_EMPTY' if 'EMPTY' in record.objective else 'INVALID_HANDLES'
                 role = 'expensive'
                 continue
             if error is not None:

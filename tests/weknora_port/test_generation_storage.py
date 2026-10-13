@@ -161,7 +161,7 @@ def test_out_of_order_third_or_forged_attempts_cannot_insert(bad):
 
 
 @pytest.mark.parametrize('first,reason,allowed',[
-    (replace(record(),status='FAILED',error_code='MODEL_CALL_TIMEOUT'),'MODEL_CALL_TIMEOUT',True),
+    (replace(record(),status='FAILED',error_code='MODEL_CALL_TIMEOUT'),'MODEL_CALL_TIMEOUT',False),
     (replace(record(),status='COMPLETED',objective=('EMPTY',)),'MODEL_EMPTY',True),
     (replace(record(),status='TRUNCATED',objective=('TRUNCATED',)),'TRUNCATION',True),
     (replace(record(),status='COMPLETED',objective=('INVALID_HANDLES',),invalid_handle_count=1),'INVALID_HANDLES',True),
@@ -269,10 +269,10 @@ def test_actual_isolated_pg_claim_two_attempts_unknown_and_no_duplicate_dispatch
             attempt_context=replace(context,request_id=first.attempt_id)
             await lifecycle.begin_attempt(first,attempt_context)
             with pytest.raises(GenerationReplay):await lifecycle.begin_attempt(first,attempt_context)
-            first_done=replace(first,status='FAILED',error_code='MODEL_CALL_TIMEOUT')
+            first_done=replace(first,status='TRUNCATED',finish_reason='length',objective=('TRUNCATED',))
             await lifecycle.finish_attempt(first_done,attempt_context)
             await lifecycle.finish_attempt(first_done,attempt_context)
-            second=AttemptRecord(run_id+'/answer/2/expensive',2,'expensive','fixture-provider','fixture-expensive','https://fixture.invalid/api',SHA,SHA,SHA,upgrade_reason='MODEL_CALL_TIMEOUT')
+            second=AttemptRecord(run_id+'/answer/2/expensive',2,'expensive','fixture-provider','fixture-expensive','https://fixture.invalid/api',SHA,SHA,SHA,upgrade_reason='TRUNCATION')
             second_context=replace(context,request_id=second.attempt_id)
             await lifecycle.begin_attempt(second,second_context)
             second_done=replace(second,status='COMPLETED',finish_reason='stop',usage=TokenUsage(prompt_tokens=12))

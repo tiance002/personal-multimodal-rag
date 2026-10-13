@@ -38,25 +38,15 @@ async def execute(handler,*,reported=True,usage=True):
     try:return await coordinator.run(request(),CTX),gate,lifecycle,store
     finally:await transport.aclose()
 
-def test_real_transport_read_timeout_upgrades_once_and_unknown_cost_is_retained():
+def test_transport_read_timeout_does_not_upgrade_with_default_fallback_off():
     async def exercise():
         bodies=[]
         def handler(req):
             body=json.loads(req.content);bodies.append(body)
-            if body['model']=='XingChenAGI/Xing4.0-29B':raise httpx.ReadTimeout('synthetic private message',request=req)
-            return frames(body['model'],'selected answer <ref id="c1"/>')
-        result,gate,lifecycle,store=await execute(handler)
-        assert len(bodies)==len(gate.calls)==len(gate.finishes)==2
-        assert result.upgraded and result.attempts[0].error_code=='MODEL_CALL_TIMEOUT'
-        assert result.attempts[0].usage.status=='UNKNOWN' and result.attempts[0].cost_status=='UNKNOWN'
-        assert result.attempts[1].model_reported=='deepseek-flash'
-        assert result.usage.status=='UNKNOWN' and result.usage.total_tokens is None
-        assert bodies[0]['messages']==bodies[1]['messages']
-        assert all(sum(key in body for key in ('max_tokens','max_completion_tokens'))==1 for body in bodies)
-        assert all(body.get('max_tokens',body.get('max_completion_tokens'))==1024 for body in bodies)
-        assert [c.context.request_id for c in gate.calls]==['run/answer/1/cheap','run/answer/2/expensive']
-        assert gate.finishes[0][1]!='COMPLETED' and gate.finishes[0][2].status=='UNKNOWN'
-        assert 'synthetic private message' not in repr(result)
+            raise httpx.ReadTimeout('synthetic private message',request=req)
+        with pytest.raises(ProviderError,match='MODEL_CALL_TIMEOUT'):
+            await execute(handler)
+        assert len(bodies)==1 and bodies[0]['model']=='XingChenAGI/Xing4.0-29B'
     asyncio.run(exercise())
 
 @pytest.mark.parametrize('reported,usage',[(False,False),(True,True)])

@@ -1,3 +1,7 @@
+# Authoritative E-worktree resume — 2026-10-13
+
+Implementation now occurs in E:/RAG-Worktrees/weknora-python-port-20261013, branch codex/weknora-python-port-resume-20261013. Base f33706d; stable candidate checkpoint082c2d5. 65 files imported only after before/content/after hashes matched, with origin manifest in evidence/RESUME_IMPORT_20261013.json. Original worktrees not edited. Latest owner policy supersedes imported timeout-on claims: timeout does not upgrade. Scoped133offline tests passed/1PG skipped; see P5_LATEST_POLICY_20261013.md. Full runtime binding and P7 remain pending. Imported phase evidence below is historical and is reused only for unchanged inputs.
+
 # WeKnora Python + P5 Goal status
 
 Full Goal active. Fixed upstream3e8b0bfc, clean starting main55372f7, isolated branch `codex/weknora-python-port`.

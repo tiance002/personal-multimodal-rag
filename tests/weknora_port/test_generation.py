@@ -83,8 +83,6 @@ def test_fixed_only_modes_do_not_upgrade(mode,calls):
     ([event('cheap partial',done=True,finish='length',final=True)],'TRUNCATION'),
     ([event('',done=True,finish='stop',final=True)],'MODEL_EMPTY'),
     ([event('cheap answer <ref id="c999"/>',done=True,finish='stop',final=True)],'INVALID_HANDLES'),
-    ([ModelCallTimeout(sent=True)],'MODEL_CALL_TIMEOUT'),
-    ([event('MODEL_CALL_TIMEOUT',kind='error',data={'error_code':'MODEL_CALL_TIMEOUT','error_class':'ModelCallTimeout'},final=True)],'MODEL_CALL_TIMEOUT'),
 ])
 def test_approved_upgrade_exactly_two_distinct_attempts(outputs,reason):
     co,c,e,store,commit,life=setup(outputs)
@@ -98,7 +96,7 @@ def test_approved_upgrade_exactly_two_distinct_attempts(outputs,reason):
     assert len(life.started)==len(life.finished)==2 and len(commit.calls)==1
     assert store.trace[-2:]==['COMMIT','complete']
 
-@pytest.mark.parametrize('failure',[ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+@pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
 def test_non_model_timeout_and_other_errors_never_upgrade(failure):
     co,c,e,store,commit,life=setup([event('discarded draft'),failure])
     with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
@@ -261,3 +259,17 @@ def test_configurable_binding_still_checks_actual_configuration_identity():
     with pytest.raises(GenerationError,match='GENERATION_MODEL_IDENTITY_MISMATCH'):
         run(co.run(request(),CTX))
     assert not c.calls and not e.calls
+
+@pytest.mark.parametrize('output', [
+    ModelCallTimeout(sent=True),
+    event('MODEL_CALL_TIMEOUT',kind='error',data={'error_code':'MODEL_CALL_TIMEOUT','error_class':'ModelCallTimeout'},final=True),
+])
+def test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade(output):
+    co,c,e,store,commit,life=setup([event('discarded draft'),output])
+    with pytest.raises(ModelCallTimeout):
+        run(co.run(request(),CTX))
+    assert len(c.calls)==1 and not e.calls and not commit.calls and not store.events
+    assert len(life.started)==len(life.finished)==1
+    record=life.finished[0][0]
+    assert record.error_code=='MODEL_CALL_TIMEOUT'
+    assert record.usage.status==record.cost_status=='UNKNOWN'
