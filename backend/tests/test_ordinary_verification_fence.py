@@ -33,11 +33,11 @@ class FenceTests(unittest.TestCase):
         self.probe = self.root / 'probe-fixture.json'
         self.probe.write_text(json.dumps(dict(state='UNKNOWN', run_id='old-unknown',
                                              input_reserved=39, output_reserved=1024)))
-        self.runs = [str(uuid.uuid4()) for _ in range(6)]
+        self.runs = [str(uuid.uuid4()) for _ in range(7)]
         self.grant = self.root / 'grant.json'
-        self.value = dict(schema_version=3, owner_authorization='OFFLINE_SIMULATED_OWNER_DECISION',
+        self.value = dict(schema_version=4, owner_authorization='OFFLINE_SIMULATED_OWNER_DECISION',
                           run_ids=self.runs, probe_snapshot={self.probe.name: hashlib.sha256(self.probe.read_bytes()).hexdigest()},
-                          acknowledged_unknown_runs=['old-unknown'])
+                          acknowledged_unknown_runs=['old-unknown'], acknowledged_unknown_web_requests=[])
         self.journal = self.root / 'journal.json'
         self.write_grant()
         self.fence = TaskFence(self.grant, self.sha, self.journal, batch_root=self.root)
@@ -118,6 +118,38 @@ class FenceTests(unittest.TestCase):
             fence.admit(run_id=self.runs[4], request_id='fixture.extension', role='embedding',
                 policy_id=POLICIES['embedding'], scope=Scope.from_ids([KB], [DOC]),
                 input_tokens=TOKEN_LIMIT-1063-14048+1, output_tokens=0)
+
+    def test_explicit_ack_keeps_old_unknown_bound_and_stops_next_unknown(self):
+        from scripts.ordinary_verification_fence import check_unknown_stop
+        from sqlalchemy import create_engine, text
+        engine = create_engine('sqlite://')
+        self.addCleanup(engine.dispose)
+        self.admit(request_id='fixture.old-web-unknown', input_tokens=17526, output_tokens=4096)
+        entries = self.fence.read_journal()['entries']
+        self.value['acknowledged_unknown_web_requests'] = ['fixture.old-web-unknown']
+        self.write_grant()
+        self.journal.write_text(json.dumps(dict(grant_sha256=self.sha, entries=entries)))
+        fence = TaskFence(self.grant, self.sha, self.journal, batch_root=self.root)
+        with engine.begin() as connection:
+            connection.execute(text('CREATE TABLE service_token_reservations(request_id TEXT,policy_id TEXT,state TEXT)'))
+            connection.execute(text("INSERT INTO service_token_reservations VALUES (:id,:policy,'unknown')"),
+                               {'id':'fixture.old-web-unknown','policy':POLICIES['embedding']})
+        container = SimpleNamespace(engine=engine)
+        check_unknown_stop(container,fence)
+        self.assertEqual(sum(r['tokens'] for r in fence.read_journal()['entries']),21622)
+        fence.admit(run_id=self.runs[-1], request_id='fixture.next-web-unknown', role='embedding',
+            policy_id=POLICIES['embedding'],scope=Scope.from_ids([KB],[DOC]),input_tokens=42,output_tokens=0)
+        with engine.begin() as connection:
+            connection.execute(text("INSERT INTO service_token_reservations VALUES (:id,:policy,'unknown')"),
+                               {'id':'fixture.next-web-unknown','policy':POLICIES['embedding']})
+        with self.assertRaisesRegex(ValueError,'UNKNOWN_STOP_REQUIRED'):
+            check_unknown_stop(container,fence)
+
+    def test_ack_cannot_name_an_unadmitted_request(self):
+        self.value['acknowledged_unknown_web_requests'] = ['not-an-admission']
+        self.write_grant()
+        with self.assertRaisesRegex(ValueError,'UNKNOWN_ACK_NOT_IN_CARRIED_JOURNAL'):
+            TaskFence(self.grant,self.sha,self.journal,batch_root=self.root)
 
     def test_native_cross_process_serialization(self):
         context = multiprocessing.get_context('spawn')

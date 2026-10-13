@@ -4,7 +4,7 @@ Mount this script read-only and use its app factory only after fresh owner
 authorization. Normal production startup does not import or activate it.
 Every admitted request consumes its full bound permanently in the task journal,
 including unsent failures. This deliberately overcounts the owner-approved
-250,000 Token limit; the prior journal is carried forward without releasing it.
+350,000 Token limit; the prior journal is carried forward without releasing it.
 """
 from contextlib import contextmanager
 import hashlib
@@ -18,7 +18,7 @@ SESSION = '313909f3-34d9-4f26-8778-3d5bd27f2c60'
 KB = 'd78f3434-0e8f-40bf-afcb-f1c2c311ff51'
 DOC = '1fd5a928-d3d7-4bae-aa00-fc74701f61e5'
 BATCH = Path('/data/storage/weknora-probes-20261012')
-TOKEN_LIMIT = 250000
+TOKEN_LIMIT = 350000
 POLICIES = {'embedding': 'owner-20261011-bge-m3-normal-v1',
             'chat_cheap': 'owner-20261011-xing-normal-v1',
             'chat_expensive': 'owner-20261011-deepseek-normal-v1'}
@@ -42,22 +42,28 @@ class TaskFence:
             raise ValueError('OWNER_GRANT_HASH_MISMATCH')
         grant = json.loads(raw)
         if (set(grant) != {'schema_version', 'owner_authorization', 'run_ids',
-                           'probe_snapshot', 'acknowledged_unknown_runs'}
-                or type(grant['schema_version']) is not int or grant['schema_version'] != 3
+                           'probe_snapshot', 'acknowledged_unknown_runs', 'acknowledged_unknown_web_requests'}
+                or type(grant['schema_version']) is not int or grant['schema_version'] != 4
                 or not isinstance(grant['owner_authorization'], str) or not grant['owner_authorization'].strip()
                 or grant['owner_authorization'].startswith('PENDING')
-                or type(grant['run_ids']) is not list or len(grant['run_ids']) != 6
-                or len(set(grant['run_ids'])) != 6
+                or type(grant['run_ids']) is not list or len(grant['run_ids']) != 7
+                or len(set(grant['run_ids'])) != 7
                 or any(str(uuid.UUID(v)) != v for v in grant['run_ids'])
                 or not isinstance(grant['probe_snapshot'], dict)
                 or not 1 <= len(grant['probe_snapshot']) <= 7
-                or type(grant['acknowledged_unknown_runs']) is not list):
+                or type(grant['acknowledged_unknown_runs']) is not list
+                or type(grant['acknowledged_unknown_web_requests']) is not list
+                or len(set(grant['acknowledged_unknown_web_requests'])) != len(grant['acknowledged_unknown_web_requests'])
+                or any(not isinstance(v, str) or not re.fullmatch(r'[A-Za-z0-9_.:-]{1,200}', v)
+                       for v in grant['acknowledged_unknown_web_requests'])):
             raise ValueError('OWNER_GRANT_INVALID')
         self.grant, self.grant_hash = grant, grant_sha256
         self.batch_root, self.journal = batch_root, journal_path
         self.seed = self.check_snapshot()
         # Missing journal is a failure, not permission to reset occupancy.
-        self.read_journal()
+        journal = self.read_journal()
+        if set(grant['acknowledged_unknown_web_requests']) - {r['request_id'] for r in journal['entries']}:
+            raise ValueError('UNKNOWN_ACK_NOT_IN_CARRIED_JOURNAL')
 
     def check_snapshot(self):
         rows = []
@@ -136,11 +142,12 @@ def check_unknown_stop(container, fence):
     request_ids = [r['request_id'] for r in fence.read_journal()['entries']]
     if request_ids:
         from sqlalchemy import text, bindparam
-        query = text("SELECT COUNT(*) FROM service_token_reservations "
+        query = text("SELECT request_id FROM service_token_reservations "
             "WHERE state='unknown' AND request_id IN :requests AND policy_id IN :policies")
         query = query.bindparams(bindparam('requests', expanding=True), bindparam('policies', expanding=True))
         with container.engine.connect() as connection:
-            if connection.execute(query, dict(requests=request_ids, policies=list(POLICIES.values()))).scalar_one():
+            unknown = set(connection.execute(query, dict(requests=request_ids, policies=list(POLICIES.values()))).scalars())
+            if unknown - set(fence.grant['acknowledged_unknown_web_requests']):
                 raise ValueError('OWNER_TASK_UNKNOWN_STOP_REQUIRED')
 
 
@@ -191,8 +198,8 @@ def allowed_mutation(method, path, run_ids):
 
 def create_app():
     """Explicit alternate test startup; no installation into the normal service."""
-    fence = TaskFence(BATCH / 'web-owner-grant-v3.json', os.environ['RAG_OWNER_VERIFICATION_GRANT_SHA256'],
-                      BATCH / 'web-task-admissions-v3.json')
+    fence = TaskFence(BATCH / 'web-owner-grant-v4.json', os.environ['RAG_OWNER_VERIFICATION_GRANT_SHA256'],
+                      BATCH / 'web-task-admissions-v4.json')
     from backend.app.main import app
     from fastapi.responses import JSONResponse
     install_fence(app.state.container, fence)
