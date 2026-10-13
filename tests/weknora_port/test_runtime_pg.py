@@ -23,7 +23,7 @@ from backend.weknora_port.storage.send_gate import SendAuthorization, ContentOri
 from backend.weknora_port.models.provider import ProviderModel
 from backend.weknora_port.models.transport import AsyncHTTPTransport
 from backend.weknora_port.models.transport import resolve_endpoint
-from backend.weknora_port.models.types import CallContext, TrustedScope
+from backend.weknora_port.models.types import CallContext, TrustedScope, ProviderError
 from backend.weknora_port.model_registry import NeutralModelRegistry
 from backend.weknora_port.streaming.manager import RedisListStreamStore
 from backend.weknora_port.crypto import SecretCipher
@@ -130,7 +130,15 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
             for apply in (apply_configuration_schema, apply_generation_schema,
                           apply_send_gate_schema, apply_turn_schema, apply_model_schema, apply_document_profile_schema):
                 await apply(guard)
-        principal = await LocalPrincipalStore(leases).bootstrap()
+        persistent_principal = await LocalPrincipalStore(leases).bootstrap()
+        # Each integration fixture has its own public synthetic owner namespace;
+        # preserve persistent bootstrap and all previous failed/UNKNOWN rows.
+        from backend.weknora_port.storage.history import LocalPrincipal
+        async with leases.lease() as fixture_guard:
+            fixture_tenant=(await (await fixture_guard.connection.execute(
+                'INSERT INTO tenants(name,business) VALUES(%s,%s) RETURNING id',
+                ('resume-public-fixture-'+str(uuid.uuid4()),'isolated-test'))).fetchall())[0]['id']
+        principal=LocalPrincipal(fixture_tenant,'fixture-owner:'+str(uuid.uuid4()))
         redis = Redis.from_url("redis://127.0.0.1:56424/0", decode_responses=True)
         assert (await redis.info("server"))["run_id"] == REDIS_RUN_ID
         prefix = "weknora-resume:20261013:" + str(uuid.uuid4())
@@ -151,6 +159,14 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
             if request.url.path.endswith("/rerank"):
                 return httpx.Response(200, json={"results": [
                     {"index": i, "relevance_score": .9} for i, _ in enumerate(body["documents"])]})
+            if body.get('messages',[{}])[0].get('content','').startswith('You maintain a small set of long-term notes'):
+                assert body['model']=='XingChenAGI/Xing4.0-29B'
+                assert 'I use blue widgets' in body['messages'][1]['content']
+                return httpx.Response(200,json={'model':body['model'],'choices':[{'message':{
+                    'content':json.dumps({'memories':[{'action':'add','kind':'fact','topic':'Widget usage',
+                        'content':'User uses blue widgets.','importance':4,'source':3,'inferred':False}],
+                        'topics':[]})},'finish_reason':'stop'}],
+                    'usage':{'prompt_tokens':20,'completion_tokens':10,'total_tokens':30}})
             if body.get("stream"):
                 if "Xing" in body["model"]:
                     if fail_cheap:
@@ -350,6 +366,60 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                 assert [row["role"] for row in attempts] == ["cheap", "expensive", "cheap"]
                 assert attempts[-1]["error_code"] == "MODEL_CALL_TIMEOUT"
                 assert ledger[-1]["state"] == "unknown" and ledger[-1]["usage"]["status"] == "UNKNOWN"
+                # Enable source automatic memory only for this new public fixture tenant.
+                async with leases.lease() as memory_guard:
+                    roles_ids=dict((await runtime._snapshot(memory_guard)).model_ids)
+                    await memory_guard.connection.execute('UPDATE tenants SET memory_config=%s::jsonb WHERE id=%s',
+                        (json.dumps({'enabled':True,'write_mode':'auto','extract_delay_seconds':5,
+                         'extract_min_interval_seconds':1,'embedding_model_id':roles_ids['embedding'],
+                         'extract_model_id':roles_ids['cheap']}),principal.tenant_id))
+                fail_cheap=False
+                memory_request={**request,'request_id':str(uuid.uuid4()),'content':'I use blue widgets. extract source'}
+                memory_turn=await client.post(f'/api/v1/sessions/{sid}/messages',json=memory_request)
+                assert memory_turn.status_code==200 and 'MODEL_CALL_TIMEOUT' not in memory_turn.text
+                await runtime.drain_background()
+                assert not runtime.memory_hook_errors
+                from backend.weknora_port.conversation.types import MemoryContext
+                memory_context=MemoryContext(principal.tenant_id,principal.subject_id)
+                recall=await runtime.memory.recall(memory_context,'blue widgets')
+                print('PUBLIC_SYNTHETIC_MEMORY_DIAGNOSTIC', {'dead':await redis.lrange(runtime.memory_enqueuer.keys[3],0,-1),
+                    'memory_wire_calls':sum('You maintain a small set of long-term notes' in json.dumps(w.get('body')) for w in wire)})
+                assert 'User uses blue widgets.' in recall.prompt
+                async with leases.lease() as memory_guard:
+                    saved_memories=await (await memory_guard.connection.execute(
+                        'SELECT id,source_session_id,source_message_id FROM memory_items WHERE tenant_id=%s '
+                        'AND subject_id=%s AND status=%s',(principal.tenant_id,principal.subject_id,'active'))).fetchall()
+                assert len(saved_memories)==1 and saved_memories[0]['source_session_id']==sid
+                listing=await client.get('/api/v1/memory/items',params={'status':'active'})
+                assert listing.status_code==200 and listing.json()['total']==1
+                assert listing.json()['data'][0]['id']==saved_memories[0]['id']
+                settings_reply=await client.get('/api/v1/memory/settings')
+                assert settings_reply.status_code==200 and settings_reply.json()['data']['effective'] is True
+                # Derived memory retains KB external-processing consent and tenant owner.
+                from backend.weknora_port.conversation.maintenance_types import ModelRequest
+                from backend.weknora_port.conversation.types import MemoryScope
+                scope=MemoryScope(principal.tenant_id,principal.subject_id)
+                await runtime.update_knowledge_base_consent(principal,kb,False)
+                before_denied=len(wire)
+                with pytest.raises(ProviderError,match='MODEL_ORIGIN_KB_EGRESS_DENIED'):
+                    await runtime.memory_models.complete(ModelRequest(scope,roles_ids['cheap'],'public system','public memory','{}',100))
+                assert len(wire)==before_denied
+                with pytest.raises(ProviderError,match='MEMORY_OWNER_MISMATCH'):
+                    await runtime.memory_models.complete(ModelRequest(MemoryScope(principal.tenant_id,'other-subject'),roles_ids['cheap'],'system','memory','{}',100))
+                assert len(wire)==before_denied
+                await runtime.update_knowledge_base_consent(principal,kb,True)
+                denied_delete=await client.delete('/api/v1/memory/items/'+str(uuid.uuid4()))
+                assert denied_delete.status_code==404
+                removed=await client.delete('/api/v1/memory/items/'+saved_memories[0]['id'])
+                assert removed.status_code==200
+                await runtime.memory.drain_background()
+                after_forget=await runtime.memory.recall(memory_context,'blue widgets')
+                assert 'User uses blue widgets.' not in after_forget.prompt
+                async with leases.lease() as memory_guard:
+                    residual=await (await memory_guard.connection.execute('SELECT count(*) AS n FROM memory_item_embeddings '
+                        'WHERE tenant_id=%s AND subject_id=%s AND item_id=%s',
+                        (principal.tenant_id,principal.subject_id,saved_memories[0]['id']))).fetchall()
+                assert residual[0]['n']==0
                 evidence = {"kind": "ACTUAL_LOOPBACK_HTTP_PG_REDIS_MOCK_PROVIDER",
                     "system_identifier": EXPECTED, "redis_run_id": REDIS_RUN_ID, "redis_prefix": prefix,
                     "knowledge_base": kb, "document": document["id"], "session": sid,
@@ -358,8 +428,10 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     "mock_wire_count": len(wire), "real_provider_calls": 0,
                     "assertions": "PASS", "cross_tenant_and_wrong_kb_index_activation": untouched,
                     "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "SOURCE_TEXT_ADAPTER_WITH_MOCK_PROVIDER_GO_ORACLE_NOT_RUN",
+                    "automatic_memory": {"queued_actual_redis": True,"actual_pg_saved": saved_memories,
+                        "recalled_before_forget": True,"absent_after_forget": True,"embedding_residual": residual[0]["n"],"private_origin_denies_wire":True,"foreign_subject_denies_wire":True,"delete_http":removed.status_code},
                     "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
-                output = Path("docs/weknora-port/evidence/RESUME_PROFILE_HTTP_CHAIN_20261013.json")
+                output = Path("docs/weknora-port/evidence/RESUME_MEMORY_HTTP_CHAIN_20261013.json")
                 output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
         finally:
             server.should_exit = True

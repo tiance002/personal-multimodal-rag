@@ -1,3 +1,7 @@
+## Current resume checkpoints — 2026-10-13
+
+After frozen review commit45ce807: 6d8bc26 incremental generation116passed; 1a045b9 local BPE proxy/SSE identity106passed; bb4e956 source text document profile (Go8 limited outputs; final3passed); automatic memory checkpoint adds actual Redis/PG/HTTP extraction/recall/forget/private-origin denial. See respective *_CHECKPOINT_20261013.md and raw stdout/exit/JUnit. Full stage source-parity, React actual closure, P7 full chain, real-provider/cutover remain NOT RUN/pending. Historical status below is retained, not current acceptance.
+
 # Authoritative E-worktree resume — 2026-10-13
 
 ## Current stable entry checkpoint

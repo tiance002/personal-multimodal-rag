@@ -7,7 +7,7 @@ and optional permission/cost authorities. Missing authorities deny sends.
 from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from typing import Any, Mapping
-import inspect, json, uuid, hashlib
+import inspect, json, uuid, hashlib, asyncio
 
 from .crypto import SecretCipher
 from .models.types import ProviderError, ChatOptions, CallContext, TrustedScope
@@ -160,7 +160,13 @@ class BoundOrdinaryService(RuntimeService):
 
     async def run_turn(self, turn):
         try:
-            return await super().run_turn(turn)
+            result = await super().run_turn(turn)
+            if result is not None:
+                try:
+                    await self.application.record_turn_memory(turn,result)
+                except Exception as exc:
+                    self.application.memory_hook_errors.append(type(exc).__name__)
+            return result
         finally:
             state = self.application._runs.pop(turn.run_id, None)
             if state is not None:
@@ -177,7 +183,7 @@ class ApplicationRuntime:
     """
     def __init__(self, leases, principal, store, documents, *, model_factory,
                  cipher: SecretCipher, conversation=None, policy=None,
-                 estimator=None, tokenizer_asset=None, permissions=None, costs=None, catalogue=None):
+                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None):
         self.leases, self.principal = leases, principal
         self.store, self.documents = store, documents
         self.cipher, self.catalogue = cipher, catalogue or SourceCatalogue()
@@ -188,7 +194,31 @@ class ApplicationRuntime:
         self.models = PostgresModelStore(leases, principal, self.catalogue, cipher=cipher)
         self.turns = PostgresTurnRepository(leases, principal)
         self.memory_repository = LeasedMemoryRepository(leases, principal)
-        self.memory = MemoryService(self.memory_repository)
+        from .memory_runtime import RuntimeMemoryModels
+        from .conversation.management import MemoryManager
+        from .conversation.maintenance import MemoryMaintenance, embeddable_text
+        from .conversation.extraction import ExtractionWorker
+        from .conversation.topics import TopicService
+        from .storage.memory_queue import RedisMemoryExtractionQueue
+        self.memory_models = RuntimeMemoryModels(self)
+        self.memory = MemoryService(self.memory_repository, self.memory_models)
+        async def after_memory_write(scope, cfg, item):
+            if cfg.embedding_model_id:
+                vector=tuple(await asyncio.wait_for(self.memory_models.embed_query(
+                    scope,cfg.embedding_model_id,embeddable_text(item)),10))
+                if vector:
+                    await self.memory_repository.upsert_item_embedding(scope,item,cfg.embedding_model_id,vector)
+        self.memory_manager = MemoryManager(self.memory_repository,self.memory,after_write=after_memory_write)
+        self.memory_maintenance = MemoryMaintenance(self.memory_repository,self.memory_manager,self.memory_models)
+        self.memory_topics = TopicService(self.memory_repository,self.memory_manager,self.memory_models)
+        client=getattr(store,'client',None)
+        if memory_enqueuer is None and callable(getattr(client,'eval',None)) and callable(getattr(client,'pipeline',None)):
+            memory_enqueuer=RedisMemoryExtractionQueue(client,store.prefix+':memory',principal)
+        self.memory_enqueuer=memory_enqueuer
+        self.memory_worker=ExtractionWorker(self.memory_repository,self.memory_manager,self.memory_models,
+            memory_enqueuer,self.memory_topics,self.memory_maintenance)
+        if isinstance(memory_enqueuer,RedisMemoryExtractionQueue):memory_enqueuer.worker=self.memory_worker
+        self.memory_hook_errors=[]
         self.history = OrdinaryHistoryService(self.memory_repository)
         self._runs = {}
         if documents.post_processor is None:
@@ -366,8 +396,52 @@ class ApplicationRuntime:
         self._owner(principal)
         return self.ordinary.replay(accepted, principal)
 
+    async def record_turn_memory(self,turn,result):
+        from .conversation.turns import record_turn_memory
+        from .conversation.types import DocumentAffinity
+        data=self._runs[turn.run_id]
+        references=tuple(DocumentAffinity(r['knowledge_id'],r.get('knowledge_title',''),1,r['knowledge_base_id'])
+            for r in result.references if r.get('knowledge_id') and
+            r.get('knowledge_base_id') in turn.context.scope.knowledge_base_ids)
+        await record_turn_memory(self.memory_worker,turn.memory_context,turn.session_id,
+            turn.assistant_message_id,turn.request.content,turn.user_message_id,data['chat_id'],references)
+
+    async def memory_settings(self,principal):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_manager.settings(MemoryContext(principal.tenant_id,principal.subject_id))
+
+    async def list_memory(self,principal,status='',limit=50,offset=0):
+        self._owner(principal)
+        from .conversation.types import MemoryScope
+        scope=MemoryScope(principal.tenant_id,principal.subject_id)
+        items=await self.memory_repository.list_items(scope,status,limit,offset)
+        rows=await self._rows("SELECT count(*) AS n FROM memory_items WHERE tenant_id=%s AND subject_id=%s "
+            "AND (%s='' OR status=%s)",(principal.tenant_id,principal.subject_id,status,status))
+        return items,rows[0]['n']
+
+    async def consolidate_memory(self,principal):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_maintenance.review(MemoryContext(principal.tenant_id,principal.subject_id),force=True)
+
+    async def forget_memory(self,principal,item_id):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        await self.memory_manager.delete(MemoryContext(principal.tenant_id,principal.subject_id),item_id)
+
+    async def start_background_workers(self):
+        start=getattr(self.memory_enqueuer,'start',None)
+        if callable(start):await start()
+
+    async def stop_background_workers(self):
+        stop=getattr(self.memory_enqueuer,'stop',None)
+        if callable(stop):await stop()
+
     async def drain_background(self):
         await self.ordinary.drain_background()
+        drain=getattr(self.memory_enqueuer,'drain',None)
+        if callable(drain):await drain()
         await self.memory.drain_background()
 
     async def list_knowledge_bases(self, principal):

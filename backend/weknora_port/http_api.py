@@ -225,7 +225,16 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     """
     if runtime is None or resolve_principal is None:
         raise TypeError("RUNTIME_AND_PRINCIPAL_RESOLVER_REQUIRED")
-    app = FastAPI(title="WeKnora Python Port", version="v1")
+    from contextlib import asynccontextmanager
+    @asynccontextmanager
+    async def lifespan(app):
+        start=getattr(runtime,'start_background_workers',None)
+        if callable(start):await start()
+        try:yield
+        finally:
+            stop=getattr(runtime,'stop_background_workers',None)
+            if callable(stop):await stop()
+    app = FastAPI(title="WeKnora Python Port", version="v1", lifespan=lifespan)
     app.state.runtime_service = runtime
     app.state.resolve_principal = resolve_principal
     normalized_allowed = frozenset(origin for raw in allowed_origins if (origin := _normalize_origin(raw)))
@@ -276,7 +285,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         code = _safe_code(exc, "REQUEST_FAILED")
         denied = {"TRUSTED_PRINCIPAL_REQUIRED", "TURN_OWNER_MISMATCH",
                   "TURN_KB_SCOPE_DENIED", "TURN_DOCUMENT_SCOPE_DENIED",
-                  "TURN_RAW_SCOPE_EXPANSION_DENIED", "KNOWLEDGE_OWNER_MISMATCH"}
+                  "TURN_RAW_SCOPE_EXPANSION_DENIED", "KNOWLEDGE_OWNER_MISMATCH", "MEMORY_OWNER_MISMATCH"}
         conflicts = {"TURN_REQUEST_PAYLOAD_CONFLICT", "TURN_FAILURE_CONFLICT",
                      "TURN_ALREADY_FAILED"}
         status = 403 if code in denied else 409 if code in conflicts else 422
@@ -297,6 +306,45 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
 
     def json_data(request: Request, data: Any) -> JSONResponse:
         return JSONResponse(content={"data": data, "meta": {"request_id": _request_id(request)}})
+
+    from dataclasses import asdict
+    from fastapi.encoders import jsonable_encoder
+    from .conversation.management import MemoryWriteError
+    from .conversation.types import MemoryScopeError
+
+    @app.exception_handler(MemoryWriteError)
+    async def memory_write_error(request: Request, exc: MemoryWriteError):
+        code=_safe_code(exc,'MEMORY_WRITE_FAILED')
+        return _error_response(code,404 if str(exc)=='MEMORY_ITEM_NOT_FOUND' else 422,_request_id(request))
+
+    @app.exception_handler(MemoryScopeError)
+    async def memory_scope_error(request: Request, exc: MemoryScopeError):
+        return _error_response('MEMORY_SCOPE_UNAVAILABLE',403,_request_id(request))
+
+    @app.get('/api/v1/memory/settings')
+    async def memory_settings(request: Request):
+        return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.memory_settings(await principal(request)))})
+
+    @app.get('/api/v1/memory/items')
+    async def memory_items(request: Request,status: str='',limit: str='50',offset: str='0'):
+        if status not in ('','active','superseded','archived','pending'):
+            raise HTTPException(400,'MEMORY_STATUS_INVALID')
+        try:page_limit=int(limit)
+        except ValueError:page_limit=50
+        if page_limit<=0 or page_limit>200:page_limit=50
+        try:page_offset=max(0,int(offset))
+        except ValueError:page_offset=0
+        items,total=await runtime.list_memory(await principal(request),status,page_limit,page_offset)
+        return JSONResponse({'success':True,'data':jsonable_encoder(items),'total':total})
+
+    @app.delete('/api/v1/memory/items/{item_id}')
+    async def delete_memory(item_id: str,request: Request):
+        await runtime.forget_memory(await principal(request),item_id)
+        return JSONResponse({'success':True})
+
+    @app.post('/api/v1/memory/consolidate')
+    async def consolidate_memory(request: Request):
+        return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.consolidate_memory(await principal(request)))})
 
     @app.get("/api/v1/runtime")
     async def runtime_endpoint(request: Request):
