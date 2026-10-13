@@ -261,6 +261,7 @@ def test_missing_or_failed_credentials_are_safe_not_sent_failures():
         for credential in (None,lambda provider:(_ for _ in ()).throw(RuntimeError("PRIVATE_SECRET"))):
             sent=[]
             model,transport,gate=setup(lambda req:sent.append(req) or httpx.Response(200,json={}))
+            model.config=replace(model.config,requires_auth=True)
             transport.credential=credential
             try:
                 with pytest.raises(ProviderError) as error:

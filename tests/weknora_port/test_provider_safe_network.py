@@ -292,16 +292,16 @@ def test_cidr_admin_whitelist_source_semantics_and_error_cache():
     asyncio.run(run())
 
 
-def test_proxy_deployment_limitation_fails_closed_and_no_proxy_direct_case_works():
+def test_proxy_configured_path_is_protocol_enabled_and_no_proxy_bypasses():
     async def run():
-        dialer=Dialer()
+        raw=RecordedStream([b"HTTP/1.1 200 Connection Established\r\n\r\n",http_packet()])
+        dialer=Dialer([raw])
         safe=SafeHTTPTransport(policy=SSRFPolicy(resolver=Resolver(("8.8.8.8",))),network_backend=dialer,
             proxy_environment={"https":"http://proxy.example:8080"})
         client=httpx.AsyncClient(transport=safe,timeout=None)
         try:
-            with pytest.raises(ProviderError,match="PROVIDER_PROXY_PARITY_UNIMPLEMENTED"):
-                await client.post("https://api.fixture.example/v1")
-            assert dialer.calls==[]
+            assert (await client.post("https://api.fixture.example/v1")).status_code==200
+            assert dialer.calls==[("8.8.8.8",8080,30)]
             assert environment_proxy("https://api.fixture.example",{"https":"proxy","no":".fixture.example"}) is None
         finally:
             await client.aclose()

@@ -226,11 +226,34 @@ def build_chat_body(config: ModelConfig, messages: Sequence[Message], options: C
 
 def build_embedding_body(config, texts, kind):
     s = config.embedding
+    dimensions=config.dimensions if config.supports_dimension_override else 0
+    if config.embedding_api == "dashscope-embeddings":
+        body={"model":config.model,"input":{"contents":[{"text":text} for text in texts]}}
+        if s.dimensions_field and dimensions>0: body["parameters"]={s.dimensions_field:dimensions}
+        for key,value in s.extra_body.items(): body.setdefault(key,deepcopy(value))
+        return body
+    if config.embedding_api == "ark-embeddings":
+        body={"model":config.model,"input":[{"type":"text","text":text} for text in texts]}
+        if s.send_encoding_format: body["encoding_format"]="float"
+        if s.dimensions_field and dimensions>0: body[s.dimensions_field]=dimensions
+        for key,value in s.extra_body.items(): body.setdefault(key,deepcopy(value))
+        return body
+    if config.embedding_api == "google-embeddings":
+        requests=[]
+        for text in texts:
+            request={"model":"models/"+config.model.removeprefix("models/"),"content":{"parts":[{"text":text}]}}
+            options={}
+            if s.input_type_field: options[s.input_type_field]=s.input_type_values.get(kind,kind)
+            if s.dimensions_field and dimensions>0: options[s.dimensions_field]=dimensions
+            if options: request["embedContentConfig"]=options
+            requests.append(request)
+        return {**deepcopy(s.extra_body),"requests":requests}
+    if config.embedding_api != "openai-embeddings": raise ProviderError("MODEL_PROTOCOL_UNSUPPORTED")
     body = {"model": config.model, "input": list(texts)}
     if s.send_encoding_format:
         body["encoding_format"] = "float"
-    if s.dimensions_field and config.dimensions > 0:
-        body[s.dimensions_field] = config.dimensions
+    if s.dimensions_field and dimensions > 0:
+        body[s.dimensions_field] = dimensions
     if s.input_type_field:
         body[s.input_type_field] = s.input_type_values.get(kind, kind)
     if s.truncate_field:
@@ -244,6 +267,20 @@ def build_embedding_body(config, texts, kind):
 
 def build_rerank_body(config, query, documents):
     s = config.reranking
+    if config.rerank_api=="nim-rerank":
+        body={"model":config.model,"query":{"text":query},"passages":[{"text":text} for text in documents]}
+        if s.truncate: body["truncate"]=s.truncate
+        return {**deepcopy(s.extra_body),**body}
+    if config.rerank_api=="dashscope-rerank":
+        return {**deepcopy(s.extra_body),"model":config.model,"input":{"query":query,"documents":list(documents)},
+                "parameters":{"return_documents":s.send_return_documents,"top_n":len(documents)}}
+    if config.rerank_api=="tencent-lkeap":
+        return {"Model":config.model.strip() or "lke-reranker-base","Query":query,"Docs":list(documents)}
+    if config.rerank_api=="volcengine-knowledge":
+        instruction=config.extra_config.get("instruction","").strip() or "Whether the document answers the query or matches the content retrieval intent"
+        return {"datas":[{"query":query,"content":text} for text in documents],
+                "rerank_model":config.model.strip() or "doubao-seed-rerank","rerank_instruction":instruction}
+    if config.rerank_api != "cohere-rerank": raise ProviderError("MODEL_PROTOCOL_UNSUPPORTED")
     body = {"model": config.model, "query": query, "documents": list(documents)}
     if s.send_top_n and documents:
         body["top_n"] = len(documents)

@@ -8,6 +8,7 @@ from typing import Any, Mapping, Protocol
 
 from .history import LocalPrincipal
 from .postgres import PostgresRetriever
+from ..crypto import SecretCipher
 
 ROLES = ('embedding', 'rerank', 'cheap', 'expensive', 'vlm')
 
@@ -36,23 +37,25 @@ class ModelCatalogue(Protocol):
 
 
 class PostgresModelRoleStore:
-    def __init__(self, guard: PostgresRetriever, principal: LocalPrincipal, catalogue: ModelCatalogue):
+    def __init__(self, guard: PostgresRetriever, principal: LocalPrincipal, catalogue: ModelCatalogue, *, cipher: SecretCipher | None = None):
         self.guard, self.principal, self.catalogue = guard, principal, catalogue
+        self.cipher = cipher or SecretCipher(None)
 
     async def _rows(self, query, args=()):
         self.guard.require_verified()
         return await (await self.guard.connection.execute(query,args)).fetchall()
 
-    async def read(self) -> tuple[int, tuple[ConfiguredRole, ...]]:
+    async def read(self, *, strict_secrets=True) -> tuple[int, tuple[ConfiguredRole, ...]]:
         rows = await self._rows('SELECT revision,roles FROM port_model_configuration WHERE tenant_id=%s AND subject_id=%s',
                                (self.principal.tenant_id,self.principal.subject_id))
         if not rows:
             return 0, tuple(ConfiguredRole(role,'','','') for role in ROLES)
         values = rows[0]['roles']
-        return rows[0]['revision'], tuple(ConfiguredRole(**values[role]) for role in ROLES)
+        return rows[0]['revision'], tuple(ConfiguredRole(**{**values[role],
+            'api_key':self.cipher.decrypt(values[role]['api_key'],strict=strict_secrets)}) for role in ROLES)
 
     async def read_public(self):
-        revision,roles = await self.read()
+        revision,roles = await self.read(strict_secrets=False)
         return {'revision':revision,'roles':[role.public() for role in roles]}
 
     async def update(self, revision: int, roles: list[dict[str, Any]]):
@@ -90,9 +93,10 @@ class PostgresModelRoleStore:
                     self.catalogue.validate(role)
                 prepared[role.role] = {'role':role.role,'provider':role.provider,'model':role.model,
                     'base_url':role.base_url,'api_key':role.api_key,'parameters':dict(role.parameters)}
+            stored = {name:{**value,'api_key':self.cipher.encrypt(value['api_key'])} for name,value in prepared.items()}
             await self.guard.connection.execute('INSERT INTO port_model_configuration(tenant_id,subject_id,revision,roles) '
                 'VALUES(%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,subject_id) DO UPDATE '
                 'SET revision=EXCLUDED.revision,roles=EXCLUDED.roles,updated_at=now()',
                 (self.principal.tenant_id,self.principal.subject_id,current_revision+1,
-                 json.dumps(prepared,ensure_ascii=False,allow_nan=False)))
+                 json.dumps(stored,ensure_ascii=False,allow_nan=False)))
         return {'revision':current_revision+1,'roles':[ConfiguredRole(**prepared[role]).public() for role in ROLES]}

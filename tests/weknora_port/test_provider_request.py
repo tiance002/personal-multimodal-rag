@@ -172,6 +172,6 @@ def test_batch_limits_reject_oversize_instead_of_truncating():
 def test_model_capacity_validation_has_no_output_probe_dependency():
     c = config(max_output_tokens=8192)
     model = ProviderModel(c,None)
-    assert model.build_request_body(CONVERSATION,ChatOptions(max_tokens=4096))["max_completion_tokens"] == 4096
+    assert model.build_request_body(CONVERSATION,ChatOptions(max_tokens=4096))["max_tokens"] == 4096
     with pytest.raises(ProviderError,match="MODEL_OUTPUT_LIMIT_EXCEEDED"):
         model.build_request_body(CONVERSATION,ChatOptions(max_tokens=8193))

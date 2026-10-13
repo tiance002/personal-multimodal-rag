@@ -55,11 +55,24 @@ class PipelineState(SearchState):
 
 class RetrievalPipeline:
 
-    def __init__(self, repository, registry, *, segmenter=None, embedding_resolver=None, web_search=None, entity_search=None, history_loader=None, caption_sink=None, persist_sink=None):
+    def __init__(self, repository, registry, *, segmenter=None, embedding_resolver=None, web_search=None, entity_search=None, history_loader=None, caption_sink=None, persist_sink=None, on_progress=None):
         self.repository, self.registry = (repository, registry)
         self.segmenter, self.embedding_resolver = (segmenter or default_segmenter(), embedding_resolver)
         self.web_search, self.entity_search = (web_search, entity_search)
         self.history_loader, self.caption_sink, self.persist_sink = (history_loader, caption_sink, persist_sink)
+        self.on_progress = on_progress
+
+    async def _progress(self, stage, status, **fields):
+        if self.on_progress is None:
+            return
+        try:
+            value = self.on_progress(stage, status, **fields)
+            if hasattr(value, "__await__"):
+                await value
+        except Exception as error:
+            from ..models.types import CallCancelled, RunDeadlineExceeded
+            if isinstance(error, (CallCancelled, RunDeadlineExceeded)):
+                raise
 
     async def run(self, state, context):
         import asyncio
@@ -71,14 +84,25 @@ class RetrievalPipeline:
             if context.deadline is not None and context.deadline <= asyncio.get_running_loop().time():
                 raise RunDeadlineExceeded()
         check_context()
+        await self._progress("understand", "started")
         await understand_query(state, context, self.registry, history_loader=self.history_loader, caption_sink=self.caption_sink)
+        await self._progress("understand", "completed")
         check_context()
         state.needs_retrieval = needs_retrieval(state.intent, state.web_search_enabled)
+        await self._progress("retrieval", "started")
         await search(state, context, self.repository, embedding_resolver=self.embedding_resolver, web_search=self.web_search, entity_search=self.entity_search, segmenter=self.segmenter)
+        await self._progress("retrieval", "completed", candidate_count=sum(r is not None for r in state.search_results))
         check_context()
+        await self._progress("rerank", "started")
         await rerank(state, context, self.registry, self.segmenter)
+        await self._progress("rerank", "completed", candidate_count=sum(r is not None for r in state.rerank_results))
         check_context()
+        await self._progress("merge", "started")
         await merge(state, context, self.repository, self.segmenter)
+        await self._progress("merge", "completed", candidate_count=sum(r is not None for r in state.merge_results))
         check_context()
         filter_top_k(state)
-        return await into_chat_message(state, context, persist_sink=self.persist_sink)
+        await self._progress("context", "started")
+        result = await into_chat_message(state, context, persist_sink=self.persist_sink)
+        await self._progress("context", "completed", selected_evidence_count=len(result.result_ids))
+        return result

@@ -9,9 +9,11 @@ from collections.abc import Mapping, Sequence
 from .types import (Message, ChatOptions, ChatResponse, TokenUsage, ProviderError,
                     EmbeddingResponse, RerankResponse, RerankResult, CallCancelled)
 from .request import build_chat_body, build_embedding_body, build_rerank_body, split_batches, strip_images
-from .transport import call_lifetime, DEFAULT_CHAT_TIMEOUT, DEFAULT_STREAM_TIMEOUT
+from .transport import call_lifetime, DEFAULT_CHAT_TIMEOUT, DEFAULT_STREAM_TIMEOUT, env_duration
 from .usage import normalize_usage, accumulate_usage
 from .stream import StreamAssembler, sse_events, decode_tool_calls
+from .native_request import build_native_body
+from .native_response import parse_native_response, NativeStreamState, native_usage
 
 
 def decode_json(raw):
@@ -61,6 +63,26 @@ def split_think_tags(content):
     return trimmed[index+len("</think>"):].strip(), trimmed[len("<think>"):index].strip()
 
 
+def normalize_rerank_response(response,documents):
+    """Source rerank/protocol.go:Rerank, normalizeScore service adapter.
+
+    Protocol clients return raw scores. This one boundary fills omitted text,
+    rejects invalid indices and stably sorts once after logit conversion.
+    """
+    results=[]
+    for item in response.results:
+        if type(item.index) is not int or not 0<=item.index<len(documents):
+            raise ProviderError("PROVIDER_RERANK_INVALID",sent=True)
+        score=item.score
+        if response.score_scale=="logit":
+            if score>=0: score=1/(1+math.exp(-score))
+            else:
+                exp=math.exp(score);score=exp/(1+exp)
+        results.append(replace(item,score=score,text=item.text or documents[item.index]))
+    results.sort(key=lambda item:item.score,reverse=True)
+    return RerankResponse(tuple(results),response.usage,"probability")
+
+
 def parse_chat_response(env, config):
     assert_response_identity(env, config)
     choices = env.get("choices")
@@ -87,8 +109,22 @@ class ProviderModel:
         return options
 
     def build_request_body(self, messages, options=None, *, stream=False):
-        body = build_chat_body(self.config, messages, options, stream=stream, image_resolver=self.image_resolver)
-        budget = body.get("max_tokens", body.get("max_completion_tokens", 0))
+        if self.config.provider=="weknoracloud" and self.config.model_type=="VLLM":
+            # Specialized source VLM wire; ordinary cloud chat flattens images.
+            from .request import convert_messages
+            config=replace(self.config,chat=replace(self.config.chat,supports_multi_content=True))
+            converted=convert_messages(config,messages,self.image_resolver)
+            for message in converted:
+                if isinstance(message.get("content"),list):
+                    for part in message["content"]:
+                        if part.get("image_url"): part["image_url"].pop("detail",None)
+            body={"model":self.config.model,"messages":converted,"stream":False,
+                  "max_tokens":options.completion_budget() if options and options.completion_budget()>0 else 5000,
+                  "temperature":options.temperature if options and options.temperature>0 else float(.1)}
+        else:
+            builder=build_chat_body if self.config.api == "openai-completions" else build_native_body
+            body = builder(self.config, messages, options, stream=stream, image_resolver=self.image_resolver)
+        budget = body.get("max_tokens", body.get("max_completion_tokens", body.get("max_output_tokens", (body.get("generationConfig") or {}).get("maxOutputTokens",0))))
         if type(budget) is not int or budget < 0:
             raise ProviderError("MODEL_OUTPUT_BUDGET_INVALID")
         if self.config.max_output_tokens > 0 and budget > self.config.max_output_tokens:
@@ -97,7 +133,8 @@ class ProviderModel:
 
     def _affinity(self, options, context):
         return ((options.prompt_cache_key if options and options.prompt_cache_key else context.session_id)[:64]
-                if self.config.chat.prompt_cache_key else "")
+                if (self.config.chat.prompt_cache_key if self.config.api=="openai-completions" else
+                    self.config.protocol_settings.get(self.config.api,{}).get("prompt_cache_key")) else "")
 
     async def chat(self, messages: Sequence[Message], options: ChatOptions | None, context, *, _capability="chat"):
         options = self._options(options, context)
@@ -108,21 +145,54 @@ class ProviderModel:
                 try:
                     async with self.transport.open(self.config, "/chat/completions", body, call_context,
                             capability=_capability, affinity=self._affinity(options, context), lifetime=lifetime) as handle:
-                        env = decode_json(await handle.response.aread())
-                        usage = normalize_usage(env.get("usage"), self.config.chat.prompt_cache_accounting)
-                        handle.observed(usage)
-                        return parse_chat_response(env, self.config)
+                        if self.config.api=="anthropic-messages" and "text/event-stream" in handle.response.headers.get("content-type","").lower():
+                            assembler=StreamAssembler();state=NativeStreamState(self.config,assembler)
+                            content,reasoning=[],[]
+                            async for done,raw in sse_events(handle.response):
+                                if done: break
+                                if raw:
+                                    for event in state.process(decode_json(raw)):
+                                        if event.response_type=="answer": content.append(event.content)
+                                        elif event.response_type=="thinking": reasoning.append(event.content)
+                                    if state.complete: break
+                            state.finish()
+                            response=ChatResponse("".join(content),"".join(reasoning),assembler.last_finish_reason,
+                                assembler.ordered_calls(),assembler.usage or normalize_usage(None,True),state.metadata,
+                                reasoning_signature=state.metadata.get("reasoning_signature",""))
+                        else:
+                            env = decode_json(await handle.response.aread())
+                            # Retain real counters even when response identity fails.
+                            handle.usage=(normalize_usage(env.get("usage"),self.config.chat.prompt_cache_accounting)
+                                if self.config.api=="openai-completions" else native_usage(self.config,
+                                    env.get("usageMetadata") if self.config.api=="google-generative-ai" else env.get("usage")))
+                            assert_response_identity(env,self.config)
+                            response=parse_chat_response(env, self.config) if self.config.api=="openai-completions" else parse_native_response(env,self.config)
+                        handle.observed(response.usage)
+                        return response
                 except ProviderError as error:
                     if not retry and getattr(error, "multimodal_unsupported", False):
                         continue
                     raise
 
     async def vision(self, messages, options, context):
-        if not self.config.supports_vision:
+        if not self.config.supports_vision and self.config.model_type != "VLLM":
             raise ProviderError("MODEL_VISION_UNSUPPORTED")
+        deadline=asyncio.get_running_loop().time()+env_duration("VLM_HTTP_TIMEOUT_SECONDS",180)
+        if context.deadline is None or context.deadline>deadline:
+            context=replace(context,deadline=deadline,deadline_kind="provider")
+        if options is None:
+            import struct
+            temp=float(struct.unpack("f",struct.pack("f",.1))[0])
+            try: temp=float(self.config.extra_config.get("temperature",temp))
+            except ValueError: pass
+            options=ChatOptions(max_tokens=5000,temperature=temp)
         return await self.chat(messages, options, context, _capability="vision")
 
     async def chat_stream(self, messages, options, context):
+        if self.config.api != "openai-completions":
+            async for event in self._native_stream(messages,options,context):
+                yield event
+            return
         options = self._options(options, context)
         assembler = StreamAssembler()
         model_reported = None
@@ -182,6 +252,44 @@ class ProviderModel:
             for event in assembler.fail(error):
                 yield identity_event(event)
 
+    async def _native_stream(self,messages,options,context):
+        options=self._options(options,context)
+        assembler=StreamAssembler();state=NativeStreamState(self.config,assembler)
+        reported=None
+        def identity(event):
+            data={**(event.data or {}),"model_requested":self.config.model,"model_reported":reported}
+            if event.is_final and state.metadata: data["reasoning_metadata"]=state.metadata
+            return replace(event,data=data)
+        try:
+            async with call_lifetime(context,DEFAULT_STREAM_TIMEOUT) as lifetime:
+                for retry in (False,True):
+                    body=self.build_request_body(strip_images(messages) if retry else messages,options,stream=True)
+                    ctx=context.child("image-fallback") if retry else context
+                    try:
+                        async with self.transport.open(self.config,"",body,ctx,capability="chat",stream=True,
+                                affinity=self._affinity(options,context),lifetime=lifetime) as handle:
+                            async for done,raw in sse_events(handle.response):
+                                if done: break
+                                if not raw: continue
+                                env=decode_json(raw)
+                                events=state.process(env)
+                                handle.usage=assembler.usage or normalize_usage(None)
+                                assert_response_identity(env,self.config)
+                                if env.get("model"): reported=env["model"]
+                                for event in events: yield event
+                                if state.complete: break
+                            for event in state.finish(): yield event
+                            handle.observed(assembler.usage or normalize_usage(None))
+                        for event in assembler.end(): yield identity(event)
+                        return
+                    except ProviderError as error:
+                        if not retry and getattr(error,"multimodal_unsupported",False): continue
+                        raise
+        except CallCancelled:
+            raise
+        except ProviderError as error:
+            for event in assembler.fail(error): yield identity(event)
+
     async def embed(self, texts, context, *, kind="document"):
         s = self.config.embedding
         batches = split_batches(tuple(texts), max_items=s.max_batch_size, max_item_chars=s.max_input_chars)
@@ -195,7 +303,17 @@ class ProviderModel:
                     usage = normalize_usage(env.get("usage"))
                     handle.observed(usage)
                     assert_response_identity(env, self.config)
-                    rows = env.get("data")
+                    if self.config.embedding_api == "dashscope-embeddings":
+                        if env.get("code"): raise ProviderError("PROVIDER_API_ERROR",sent=True)
+                        rows=(env.get("output") or {}).get("embeddings")
+                    elif self.config.embedding_api == "ark-embeddings":
+                        if len(batch)!=1: raise ProviderError("MODEL_EMBEDDING_BATCH_INVALID")
+                        rows=[{"index":0,"embedding":(env.get("data") or {}).get("embedding")}]
+                    elif self.config.embedding_api == "google-embeddings":
+                        raw=env.get("embeddings")
+                        rows=[{"index":i,"embedding":r.get("values")} for i,r in enumerate(raw)] if isinstance(raw,list) and all(isinstance(r,dict) for r in raw) else None
+                    else:
+                        rows = env.get("data")
                     if not isinstance(rows, list):
                         raise ProviderError("PROVIDER_EMBEDDING_INVALID", sent=True)
                     out, seen = [None]*len(batch), set()
@@ -233,7 +351,21 @@ class ProviderModel:
                     usage = normalize_usage(env.get("usage"))
                     handle.observed(usage)
                     assert_response_identity(env, self.config)
-                    rows = env.get("results", [])
+                    protocol=self.config.rerank_api
+                    if protocol=="dashscope-rerank":
+                        if env.get("code"): raise ProviderError("PROVIDER_API_ERROR",sent=True)
+                        rows=(env.get("output") or {}).get("results",[])
+                    elif protocol=="nim-rerank":
+                        raw=env.get("rankings",[])
+                        rows=[{"index":r.get("index",0),"relevance_score":r.get("logit",0),"document":batch[r.get("index",0)] if type(r.get("index",0)) is int and 0<=r.get("index",0)<len(batch) else ""} for r in raw] if isinstance(raw,list) and all(isinstance(r,dict) for r in raw) else None
+                    elif protocol in ("tencent-lkeap","volcengine-knowledge"):
+                        data=env.get("Response") if protocol=="tencent-lkeap" else env.get("data")
+                        if not isinstance(data,dict) or data.get("Error") or env.get("code",0): raise ProviderError("PROVIDER_API_ERROR",sent=True)
+                        scores=data.get("ScoreList") if protocol=="tencent-lkeap" else data.get("scores")
+                        if not isinstance(scores,list) or len(scores)!=len(batch): raise ProviderError("PROVIDER_RERANK_INVALID",sent=True)
+                        rows=[{"index":i,"relevance_score":score or 0,"document":batch[i]} for i,score in enumerate(scores)]
+                    else:
+                        rows = env.get("results", [])
                     if not isinstance(rows, list):
                         raise ProviderError("PROVIDER_RERANK_INVALID", sent=True)
                     for row in rows:

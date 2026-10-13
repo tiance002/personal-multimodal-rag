@@ -88,6 +88,7 @@ class Message:
     reasoning_metadata: Mapping[str, Any] = field(default_factory=dict, repr=False)
     kind: str = ""  # internal history fields never go on the wire
     turn_id: str = ""
+    reasoning_signature: str = field(default="", repr=False)
 
 
 @dataclass(frozen=True)
@@ -184,6 +185,9 @@ class RerankSettings:
     accepts_truncate_prompt_tokens: bool = False
     truncate_prompt_tokens: int = 0
     extra_body: Mapping[str, Any] = field(default_factory=dict)
+    truncate: str = ""
+    max_concurrency: int = 0
+    unsupported_reason: str = ""
 
 
 @dataclass(frozen=True)
@@ -205,6 +209,15 @@ class ModelConfig:
     query: Mapping[str, str] = field(default_factory=dict)
     custom_headers: Mapping[str, str] = field(default_factory=dict, repr=False)
     requires_auth: bool = True
+    api: str = "openai-completions"
+    embedding_api: str = "openai-embeddings"
+    rerank_api: str = "cohere-rerank"
+    auth_style: str = "bearer"
+    protocol_settings: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    extra_config: Mapping[str, str] = field(default_factory=dict, repr=False)
+    cataloged: bool = False
+    model_type: str = "KnowledgeQA"
+    supports_dimension_override: bool = False
 
     def __post_init__(self):
         if not self.provider or not self.model or not self.model_id:
@@ -238,6 +251,7 @@ class ChatResponse:
     usage: TokenUsage = field(default_factory=TokenUsage)
     reasoning_metadata: Mapping[str, Any] = field(default_factory=dict, repr=False)
     model: str = ""  # missing response identity stays missing, never inferred
+    reasoning_signature: str = field(default="", repr=False)
 
     @property
     def truncated(self) -> bool:

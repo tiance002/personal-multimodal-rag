@@ -46,3 +46,10 @@ If POST stream transport ends before `complete`, the client reconnects only with
 ## Errors and unavailable scope
 
 An HTTP or runtime-identity error is rendered in an assistant error bubble for chat and an inline error for settings/library. The `smart` option remains visible but the UI shows “暂不可用” and disables its submit path until the API advertises support. A failed `GET /chunks/{chunk_id}` displays an inline unavailable-source state; it does not fabricate a citation target.
+
+
+## Knowledge base external processing consent
+
+`PATCH /api/v1/knowledge-bases/{knowledge_base_id}/external-processing` accepts only `{"cloud_allowed": true|false}`. StrictBool rejects string/numeric/null coercion and the DTO rejects extra owner/scope fields. The injected runtime authorizes the trusted principal and current KB before changing its stored consent. All PATCH writes use the existing same-Origin guard, including missing/null/cross-Origin denial. The response is the current KnowledgeBase row (id/name/cloud_allowed/document_count).
+
+The library UI shows the current selected KB's persisted permission and an explicit privacy switch. Enabling permits questions, retrieved passages and images to be processed by configured cloud models; disabling prohibits their external processing. The switch updates only after a successful save, and failure leaves the prior displayed value with an inline error. Saving permission does not run model probes or approve real model calls for this Goal. Default new-KB consent stays false.

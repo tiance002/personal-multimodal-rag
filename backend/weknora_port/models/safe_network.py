@@ -14,8 +14,7 @@ import socket
 import ssl
 import time
 from collections.abc import Mapping
-from urllib.parse import urlsplit, urljoin
-from urllib.request import getproxies_environment, proxy_bypass_environment
+from urllib.parse import urlsplit, urljoin, unquote
 
 import httpcore
 import httpx
@@ -236,7 +235,7 @@ class SafeNetworkBackend(httpcore.AsyncNetworkBackend):
 
 
 def _mapped_core_error(error):
-    pairs = ((httpcore.ConnectTimeout,httpx.ConnectTimeout),(httpcore.ReadTimeout,httpx.ReadTimeout),
+    pairs = ((httpcore.ProxyError,httpx.ProxyError),(httpcore.ConnectTimeout,httpx.ConnectTimeout),(httpcore.ReadTimeout,httpx.ReadTimeout),
         (httpcore.WriteTimeout,httpx.WriteTimeout),(httpcore.PoolTimeout,httpx.PoolTimeout),
         (httpcore.ConnectError,httpx.ConnectError),(httpcore.ReadError,httpx.ReadError),
         (httpcore.WriteError,httpx.WriteError),(httpcore.LocalProtocolError,httpx.LocalProtocolError),
@@ -261,19 +260,189 @@ class CoreResponseStream(httpx.AsyncByteStream):
 
 
 def environment_proxy(url, environment=None):
-    proxies = getproxies_environment() if environment is None else dict(environment)
+    """Pinned Go httpproxy semantics: uppercase first, no ALL_PROXY fallback."""
+    env = os.environ if environment is None else environment
+    def value(name, legacy):
+        return env.get(name) or env.get(name.lower()) or env.get(legacy) or ""
     parts = urlsplit(url)
-    if proxy_bypass_environment(parts.netloc,proxies):
+    host, port = parts.hostname.lower(), parts.port or (443 if parts.scheme == "https" else 80)
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        ip = None
+    if host == "localhost" or ip is not None and ip.is_loopback:
         return None
-    return proxies.get(parts.scheme)
+    for entry in value("NO_PROXY", "no").split(","):
+        entry = entry.strip().lower()
+        if entry == "*":
+            return None
+        if not entry:
+            continue
+        try:
+            network = ipaddress.ip_network(entry, strict=False)
+        except ValueError:
+            pass
+        else:
+            if ip is not None and ip in network:
+                return None
+            continue
+        entry_port = None
+        if entry.startswith("[") or entry.count(":") == 1:
+            try:
+                parsed = urlsplit("//"+entry)
+                entry_port = parsed.port
+                if entry_port:
+                    entry = parsed.hostname
+            except ValueError:
+                continue
+        if entry_port and entry_port != port:
+            continue
+        if entry.startswith("*."):
+            entry = entry[1:]
+        if entry.startswith("."):
+            matched = host.endswith(entry)
+        else:
+            matched = host == entry or host.endswith("."+entry)
+        if matched:
+            return None
+    raw = value("HTTPS_PROXY" if parts.scheme == "https" else "HTTP_PROXY", parts.scheme)
+    if raw and parts.scheme == "http" and env.get("REQUEST_METHOD"):
+        raise ProviderError("PROVIDER_PROXY_CGI_BLOCKED")
+    return raw or None
+
+
+def _proxy_parts(raw):
+    try:
+        parts = urlsplit(raw if "://" in raw else "http://"+raw)
+        port = parts.port or {"http":80,"https":443,"socks5":1080,"socks5h":1080}.get(parts.scheme)
+        if not parts.hostname or not port or parts.scheme not in ("http","https","socks5","socks5h"):
+            raise ValueError()
+        if parts.path not in ("", "/") or parts.query or parts.fragment:
+            raise ValueError()
+        auth = (unquote(parts.username or "").encode(),unquote(parts.password or "").encode()) if parts.username is not None else None
+        return parts, port, auth
+    except (ValueError, UnicodeError):
+        raise ProviderError("PROVIDER_PROXY_CONFIGURATION_INVALID") from None
+
+
+class ProxyStream(CheckedStream):
+    """TLS host transitions are declared before any proxy socket is created."""
+    def __init__(self, stream, tls_hosts):
+        super().__init__(stream, tls_hosts[0] if tls_hosts else "")
+        self.tls_hosts = tuple(tls_hosts)
+        self.connect_pending = False
+        self.connect_header = bytearray()
+    async def start_tls(self,ssl_context,server_hostname=None,timeout=None):
+        upgraded = await super().start_tls(ssl_context,server_hostname,timeout)
+        return ProxyStream(upgraded, self.tls_hosts[1:])
+    async def write(self,buffer,timeout=None):
+        if buffer.startswith(b"CONNECT "):
+            self.connect_pending = True
+        await self.stream.write(buffer,timeout)
+    async def read(self,max_bytes,timeout=None):
+        data = await self.stream.read(max_bytes, 60 if timeout is None and self.connect_pending else timeout)
+        if self.connect_pending:
+            self.connect_header.extend(data)
+            if b"\r\n" in self.connect_header:
+                line = bytes(self.connect_header).split(b"\r\n",1)[0].split(b" ",2)
+                if len(line) < 2 or line[1] != b"200":
+                    await self.stream.aclose()
+                    raise httpcore.ProxyError("provider proxy tunnel rejected")
+                self.connect_pending = False
+                self.connect_header.clear()
+        return data
+
+
+class ProxyNetworkBackend(SafeNetworkBackend):
+    """Source IsSystemProxy exemption only for the exact configured socket.
+
+    Target URL checks are always retained. Proxy DNS answers are pinned to
+    numeric addresses, including explicitly configured localhost proxies.
+    """
+    def __init__(self, policy, parts, port, target, *, backend=None, auth=None):
+        super().__init__(policy,backend=backend)
+        self.parts,self.proxy_port,self.target,self.auth = parts,port,target,auth
+    async def _proxy_tcp(self,timeout,local_address,socket_options):
+        try:
+            answers = (str(ipaddress.ip_address(self.parts.hostname)),)
+        except ValueError:
+            try:
+                answers = await self.policy.resolver(self.parts.hostname)
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                raise ProviderError("PROVIDER_PROXY_DNS_FAILED") from None
+        try:
+            addresses = tuple(str(ipaddress.ip_address(a)) for a in answers)
+        except ValueError:
+            raise ProviderError("PROVIDER_PROXY_DNS_INVALID") from None
+        if not addresses:
+            raise ProviderError("PROVIDER_PROXY_DNS_EMPTY")
+        last = None
+        for ip in addresses:
+            try:
+                return await self.backend.connect_tcp(ip,self.proxy_port,30 if timeout is None else min(timeout,30),local_address,socket_options)
+            except (httpcore.ConnectError,httpcore.ConnectTimeout) as error:
+                last=error
+        raise last
+    async def connect_tcp(self,host,port,timeout=None,local_address=None,socket_options=None):
+        socks = self.parts.scheme in ("socks5","socks5h")
+        if not socks and (host != self.parts.hostname or port != self.proxy_port):
+            raise ProviderError("PROVIDER_PROXY_SINK_MISMATCH")
+        stream = await self._proxy_tcp(timeout,local_address,socket_options)
+        tls_hosts = ([self.parts.hostname] if self.parts.scheme == "https" else []) + ([self.target] if self.target else [])
+        try:
+            if socks:
+                await self._socks(stream,host,port,timeout)
+            return ProxyStream(stream,tls_hosts)
+        except BaseException:
+            await stream.aclose()
+            raise
+    async def _socks(self,stream,host,port,timeout):
+        async def read(size):
+            result=b""
+            while len(result)<size:
+                packet=await stream.read(size-len(result),timeout)
+                if not packet:
+                    raise httpcore.ProxyError("provider proxy negotiation failed")
+                result+=packet
+            return result
+        methods=b"\x00\x02" if self.auth else b"\x00"
+        await stream.write(b"\x05"+bytes([len(methods)])+methods,timeout)
+        response=await read(2)
+        if response[0]!=5 or response[1] not in methods:
+            raise httpcore.ProxyError("provider proxy negotiation failed")
+        if response[1]==2:
+            user,password=self.auth
+            if not 0<len(user)<256 or not 0<len(password)<256:
+                raise ProviderError("PROVIDER_PROXY_CONFIGURATION_INVALID")
+            await stream.write(b"\x01"+bytes([len(user)])+user+bytes([len(password)])+password,timeout)
+            if await read(2)!=b"\x01\x00":
+                raise httpcore.ProxyError("provider proxy authentication failed")
+        try:
+            ip=ipaddress.ip_address(host)
+        except ValueError:
+            name=host.encode("idna")
+            if len(name)>255:
+                raise ProviderError("PROVIDER_PROXY_CONFIGURATION_INVALID")
+            address=b"\x03"+bytes([len(name)])+name
+        else:
+            address=bytes([1 if ip.version==4 else 4])+ip.packed
+        await stream.write(b"\x05\x01\x00"+address+port.to_bytes(2,"big"),timeout)
+        response=await read(4)
+        if response[:3]!=b"\x05\x00\x00" or response[3] not in (1,3,4):
+            raise httpcore.ProxyError("provider proxy destination rejected")
+        length={1:4,4:16}.get(response[3])
+        if length is None:
+            length=(await read(1))[0]
+        await read(length+2)
 
 
 class SafeHTTPTransport(httpx.AsyncBaseTransport):
     """Public httpcore pool API adapter; no HTTPX private-attribute mutation.
 
-    Proxy deployments remain explicitly blocked: a remote CONNECT destination
-    cannot use our local validated IP sink without additional verified proxy
-    semantics. Direct connections are safe and usable with an application gate.
+    Every destination URL is validated before proxy resolution; every direct
+    and proxy connection uses a declared numeric sink and verified TLS hosts.
     """
     def __init__(self, *, policy=None, network_backend=None, proxy_environment=None):
         if httpx.__version__!="0.28.1" or httpcore.__version__!="1.0.9":
@@ -286,13 +455,24 @@ class SafeHTTPTransport(httpx.AsyncBaseTransport):
 
     async def _request(self,request):
         await self.policy.validate_url(str(request.url))
-        if environment_proxy(str(request.url),self.proxy_environment):
-            raise ProviderError("PROVIDER_PROXY_PARITY_UNIMPLEMENTED")
-        key=(request.url.raw_scheme,request.url.raw_host,request.url.port)
+        proxy = environment_proxy(str(request.url),self.proxy_environment)
+        key=(request.url.raw_scheme,request.url.raw_host,request.url.port,proxy)
         if key not in self.pools:
-            self.pools[key]=httpcore.AsyncConnectionPool(ssl_context=self.ssl_context,
-                max_connections=None,max_keepalive_connections=5,keepalive_expiry=90,
-                http1=True,http2=False,retries=0,network_backend=self.backend)
+            kwargs=dict(ssl_context=self.ssl_context,max_connections=None,max_keepalive_connections=5,
+                        keepalive_expiry=90,http1=True,http2=False,retries=0)
+            if proxy:
+                parts,port,auth=_proxy_parts(proxy)
+                backend=ProxyNetworkBackend(self.policy,parts,port,request.url.host if request.url.scheme=="https" else "",
+                    backend=self.backend.backend,auth=auth)
+                if parts.scheme in ("socks5","socks5h"):
+                    self.pools[key]=httpcore.AsyncConnectionPool(network_backend=backend,**kwargs)
+                else:
+                    self.pools[key]=httpcore.AsyncHTTPProxy(proxy_url=httpcore.URL(scheme=parts.scheme.encode(),
+                        host=parts.hostname.encode("idna"),port=port),proxy_auth=auth,
+                        proxy_ssl_context=self.ssl_context if parts.scheme=="https" else None,
+                        network_backend=backend,**kwargs)
+            else:
+                self.pools[key]=httpcore.AsyncConnectionPool(network_backend=self.backend,**kwargs)
         req=httpcore.Request(request.method,httpcore.URL(scheme=request.url.raw_scheme,
             host=request.url.raw_host,port=request.url.port,target=request.url.raw_path),
             headers=request.headers.raw,content=request.stream,extensions=request.extensions)

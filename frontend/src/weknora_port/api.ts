@@ -53,6 +53,9 @@ export const portApi = {
   runtime: assertPortRuntime,
   knowledgeBases: () => jsonRequest<KnowledgeBase[]>("/knowledge-bases"),
   createKnowledgeBase: (name: string) => mutate<KnowledgeBase>("/knowledge-bases", { method: "POST", body: JSON.stringify({ name }) }),
+  updateKnowledgeBaseConsent: (kbId: string, cloudAllowed: boolean) => mutate<KnowledgeBase>(`/knowledge-bases/${encodeURIComponent(kbId)}/external-processing`, {
+    method: "PATCH", body: JSON.stringify({ cloud_allowed: cloudAllowed }),
+  }),
   documents: (kbId: string) => jsonRequest<DocumentRow[]>(`/knowledge-bases/${encodeURIComponent(kbId)}/documents`),
   upload: async (kbId: string, file: File) => {
     const form = new FormData();

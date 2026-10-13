@@ -101,6 +101,50 @@ def resolve_endpoint(config, path: str) -> str:
     return target
 
 
+def configured_endpoint(config, capability="chat", *, stream=False):
+    """Exact source protocol URL; calculation never reads a key or sends HTTP."""
+    from dataclasses import replace
+    base = config.base_url.rstrip("/")
+    if capability in ("chat", "vision"):
+        if config.api == "anthropic-messages":
+            path = urlsplit(base).path.rstrip("/")
+            return resolve_endpoint(config, "/messages" if path.endswith(("/v1","/v1beta")) else "/v1/messages") if not path.endswith("/messages") else resolve_endpoint(replace(config,endpoint_url=config.endpoint_url or base), "")
+        if config.api == "google-generative-ai":
+            endpoint = config.endpoint_url
+            if not endpoint:
+                prefix = config.protocol_settings.get(config.api,{}).get("api_version_prefix", "/v1beta")
+                if urlsplit(base).path in ("", "/") and prefix:
+                    base += "/"+prefix.strip("/")
+                endpoint = base + "/models/" + config.model + (":streamGenerateContent" if stream else ":generateContent")
+            elif stream and endpoint.endswith(":generateContent"):
+                endpoint = endpoint[:-len(":generateContent")]+":streamGenerateContent"
+            query = {**config.query, **({"alt":"sse"} if stream else {})}
+            return resolve_endpoint(replace(config,endpoint_url=endpoint,query=query), "")
+        return resolve_endpoint(config, {"openai-responses":"/responses", "ollama":"/api/chat"}.get(config.api,"/chat/completions"))
+    if capability == "embedding":
+        if config.embedding_api == "google-embeddings":
+            endpoint = config.endpoint_url or base.removesuffix("/openai")+"/models/"+config.model.removeprefix("models/")+":batchEmbedContents"
+            return resolve_endpoint(replace(config,endpoint_url=endpoint), "")
+        return resolve_endpoint(config, config.embedding.path or "/embeddings")
+    if capability == "rerank":
+        if config.rerank_api == "tencent-lkeap":
+            return "https://lkeap.tencentcloudapi.com/"
+        if config.rerank_api == "volcengine-knowledge":
+            parts=urlsplit(base)
+            return parts.scheme+"://"+parts.netloc+"/api/knowledge/service/rerank"
+        return resolve_endpoint(config, config.reranking.path or "/rerank")
+    raise ProviderError("MODEL_CAPABILITY_UNSUPPORTED")
+
+
+def endpoint_urls(config):
+    """Closed endpoint set for this model's configured source capability."""
+    capability = {"Embedding":"embedding", "Rerank":"rerank"}.get(config.model_type,"chat")
+    urls = [configured_endpoint(config,capability)]
+    if capability == "chat":
+        urls.append(configured_endpoint(config,capability,stream=True))
+    return tuple(dict.fromkeys(urls))
+
+
 def validate_endpoint(url: str, allowed: frozenset[str]):
     parts = urlsplit(url)
     if (url not in allowed or parts.scheme not in ("http", "https") or not parts.hostname or
@@ -144,7 +188,7 @@ class AsyncHTTPTransport:
 
     @asynccontextmanager
     async def open(self, config, path, body, context, *, capability, stream=False, affinity="", lifetime=None):
-        url = resolve_endpoint(config, path)
+        url = configured_endpoint(config, capability, stream=stream)
         validate_endpoint(url, self.allowed_endpoints)
         if not (self._mock_transport or self._safe_transport):
             raise ProviderError("PROVIDER_SAFE_DIAL_UNIMPLEMENTED")
@@ -157,7 +201,8 @@ class AsyncHTTPTransport:
             raise ProviderError("MODEL_REQUEST_SERIALIZATION_INVALID") from None
         call = PreparedCall(context, config.provider, config.model, config.model_id, capability,
             url, hashlib.sha256(wire).hexdigest(), len(wire),
-            body.get("max_tokens", body.get("max_completion_tokens")))
+            body.get("max_tokens", body.get("max_completion_tokens", body.get("max_output_tokens",
+                (body.get("generationConfig") or {}).get("maxOutputTokens")))))
         if context.cancelled is not None and context.cancelled.is_set():
             raise CallCancelled()
         try:
@@ -186,10 +231,34 @@ class AsyncHTTPTransport:
                     raise ValueError()
             except Exception:
                 raise ProviderError("MODEL_CREDENTIAL_UNAVAILABLE") from None
-            if config.requires_auth and not key:
+            if config.requires_auth and config.auth_style != "signed" and not key:
                 raise ProviderError("MODEL_CREDENTIAL_REQUIRED")
-            if key:
+            if capability == "rerank" and config.rerank_api in ("tencent-lkeap","volcengine-knowledge"):
+                from .signing import tencent_lkeap_headers,volcengine_headers
+                secret=config.extra_config.get("app_secret","").strip() or config.extra_config.get("secret_key","")
+                if config.rerank_api=="tencent-lkeap":
+                    headers.update(tencent_lkeap_headers(key,secret,wire,region=config.extra_config.get("region","") or "ap-guangzhou"))
+                else:
+                    headers.update(volcengine_headers(key,secret,wire,url,headers,region=config.extra_config.get("region","") or "cn-beijing"))
+            elif config.auth_style == "signed":
+                from .signing import weknora_cloud_headers
+                headers.update(weknora_cloud_headers(config.extra_config.get("app_id",""),config.extra_config.get("app_secret","") or key,wire))
+            elif key and config.auth_style in ("api-key","x-api-key","x-goog-api-key"):
+                headers[config.auth_style]=key
+            elif key and config.auth_style != "none":
                 headers["Authorization"] = "Bearer " + key
+            if capability in ("chat","vision") and config.api == "anthropic-messages":
+                settings=config.protocol_settings.get(config.api,{})
+                headers["anthropic-version"]=settings.get("version") or "2023-06-01"
+                betas=[]
+                values=list(settings.get("beta_headers",[]))
+                if body.get("thinking",{}).get("type")=="enabled" and body.get("tools"):
+                    values.append(settings.get("interleaved_thinking_beta", ""))
+                values.append(headers.get("anthropic-beta", ""))
+                for value in values:
+                    for beta in value.split(","):
+                        if beta.strip() and beta.strip() not in betas: betas.append(beta.strip())
+                if betas: headers["anthropic-beta"]=",".join(betas)
             if stream:
                 headers["Accept"] = "text/event-stream"
             if affinity:

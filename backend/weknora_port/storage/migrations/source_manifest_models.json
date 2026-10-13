@@ -1,0 +1,17 @@
+{
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "generated_sha256": "e3d22edc4a5d53415835be33ea2620d955248c038747b62ad8db5e5477427691",
+  "source_blocks": [
+    {
+      "path": "migrations/paradedb/00-init-db.sql",
+      "start_line": 33,
+      "end_line": 52,
+      "sha256": "8e92dc40e9d93c9163a804e6edbeb19a0d7a12af638f75ce1bd655b021cd404f"
+    }
+  ],
+  "source_semantics": [
+    "internal/types/model.go::ModelParameters.Value/Scan",
+    "internal/application/repository/model.go::GetByID/Create/Update"
+  ],
+  "adaptation": "Strict runtime decrypt, sole-owner isolation and immutable identity pins; no catalog deletion"
+}
