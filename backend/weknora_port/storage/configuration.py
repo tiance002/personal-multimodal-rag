@@ -86,7 +86,8 @@ class PostgresModelRoleStore:
                 name = value.get('model','').strip()
                 parameters = old.parameters if (provider,name) == (old.provider,old.model) else {}
                 role = ConfiguredRole(value['role'], provider,name,endpoint,key,parameters)
-                self.catalogue.validate(role)
+                if role.provider or role.model or role.base_url or role.api_key:
+                    self.catalogue.validate(role)
                 prepared[role.role] = {'role':role.role,'provider':role.provider,'model':role.model,
                     'base_url':role.base_url,'api_key':role.api_key,'parameters':dict(role.parameters)}
             await self.guard.connection.execute('INSERT INTO port_model_configuration(tenant_id,subject_id,revision,roles) '

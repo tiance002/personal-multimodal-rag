@@ -519,15 +519,15 @@ class PostgresMemoryRepository:
         return StoredMessage(row["id"], row.get("request_id") or "", row["session_id"], row["tenant_id"], row["subject_id"], row["role"], row.get("content") or "", row["created_at"], row.get("rendered_content") or "", tuple(decode_json(row.get("image_captions"), [])), attachments, tuple(decode_json(row.get("knowledge_references"), [])))
 
     async def recent_messages(self, scope, session_id, limit):
-        rows = await self._rows("SELECT * FROM (SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s ORDER BY created_at DESC,id DESC LIMIT %s) recent ORDER BY created_at ASC,id ASC", (*self._scope(scope), session_id, limit))
+        rows = await self._rows("SELECT * FROM (SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s AND deleted_at IS NULL ORDER BY created_at DESC,id DESC LIMIT %s) recent ORDER BY created_at ASC,id ASC", (*self._scope(scope), session_id, limit))
         return tuple(map(self._message, rows))
 
     async def messages_after_cursor(self, scope, session_id, cursor, limit):
-        rows = await self._rows("SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s AND (%s::timestamptz IS NULL OR created_at>%s OR (created_at=%s AND id>%s)) ORDER BY created_at ASC,id ASC LIMIT %s", (*self._scope(scope), session_id, cursor.at, cursor.at, cursor.at, cursor.id, limit))
+        rows = await self._rows("SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s AND deleted_at IS NULL AND (%s::timestamptz IS NULL OR created_at>%s OR (created_at=%s AND id>%s)) ORDER BY created_at ASC,id ASC LIMIT %s", (*self._scope(scope), session_id, cursor.at, cursor.at, cursor.at, cursor.id, limit))
         return tuple(map(self._message, rows))
 
     async def messages_before_time(self, scope, session_id, at, limit):
-        rows = await self._rows("SELECT * FROM(SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s AND created_at<%s ORDER BY created_at DESC,id DESC LIMIT %s) previous ORDER BY created_at ASC,id ASC", (*self._scope(scope), session_id, at, limit))
+        rows = await self._rows("SELECT * FROM(SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s AND deleted_at IS NULL AND created_at<%s ORDER BY created_at DESC,id DESC LIMIT %s) previous ORDER BY created_at ASC,id ASC", (*self._scope(scope), session_id, at, limit))
         return tuple(map(self._message, rows))
 
 

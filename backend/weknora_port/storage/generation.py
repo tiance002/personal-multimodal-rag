@@ -57,9 +57,9 @@ class PostgresGenerationLifecycle:
     async def _locked_message(self, context):
         tenant, owner, session, message = self._context(context)
         async with self.connection.transaction():
-            row = await self._one("SELECT id FROM sessions WHERE id=%s AND tenant_id=%s AND subject_id=%s FOR UPDATE", (session, tenant, owner))
+            row = await self._one("SELECT id FROM sessions WHERE id=%s AND tenant_id=%s AND subject_id=%s AND deleted_at IS NULL FOR UPDATE", (session, tenant, owner))
             if row is None: raise GenerationError("GENERATION_STORAGE_SCOPE_DENIED")
-            row = await self._one("SELECT id,role,is_completed FROM messages WHERE id=%s AND tenant_id=%s AND subject_id=%s AND session_id=%s FOR UPDATE", (message, tenant, owner, session))
+            row = await self._one("SELECT id,role,is_completed FROM messages WHERE id=%s AND tenant_id=%s AND subject_id=%s AND session_id=%s AND deleted_at IS NULL FOR UPDATE", (message, tenant, owner, session))
             if row is None or row["role"] != "assistant": raise GenerationError("GENERATION_STORAGE_MESSAGE_DENIED")
             yield row
 
