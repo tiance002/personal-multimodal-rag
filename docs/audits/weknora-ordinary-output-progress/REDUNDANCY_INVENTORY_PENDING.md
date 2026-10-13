@@ -1,0 +1,14 @@
+# G5 inventory — no cleanup performed
+
+Status: NOT RUN for source cleanup; read-only investigation complete. The Goal requires functional acceptance before a separate cleanup commit. Current long sample remains FAIL, so the following is a future inventory, not an approved deferral or completed cleanup.
+
+| Candidate | Actual caller / purpose | Decision and minimal future scope |
+|---|---|---|
+| Ordinary512 constants | `quick_chain.py:render_answer_prompt` branches ordinary generation budgets separately; `routes.py` enables ordinary. Ordinary counter body512 substitutions reuse frozen body validation; `service_capacity.py` requires proof above512. | KEEP: no current ordinary forced512 cap was found; deleting frozen compatibility or proof guards would remove valid semantics. |
+| Quick stage notices | `App.tsx:submitMessage` writes four legacy event notices in addition to RunProgress; `notice` also serves upload, Scope, clarification, table hints and final application results. | Possible cleanup only for Quick stage notices; retain Smart compatibility and other application notices. `sending`, `activeWait` and request epoch are request fences, not redundant stage state. |
+| In-memory receipts | `CloudAdapter._request` appends diagnostics to `receipts`; ordinary service reuse can grow the list. `probe_ordinary_output.py` reads the last receipt; frozen verification scripts use list JSON, truthiness, `[0]` and length. Authoritative `service_usage.py` reserves/settles persistent rows, not this list. | Minimal future change: bound only ordinary service diagnostic list, truncate in place while retaining latest records and list API. Preserve frozen/eval buffers, DeepSeekGateway, request counters, persistent ledger and UNKNOWN. |
+| Failure wording | Versioned `run_presentation.py` supplies current diagnostics. `api/client.ts:retrievalFailureText` and `App.tsx` still cover missing/legacy presentation; `sse.spec.ts` tests this compatibility. | KEEP: historical fallback has callers. Do not invent a shared mapping or unrelated frontend/backend refactor. |
+
+Future necessary tests only: ordinary receipt overflow keeps latest failed/UNKNOWN diagnostics and all reserve/settle operations; frozen list remains untrimmed; affected service/provider tests. If Quick notices are changed, run targeted RunProgress/SSE and clarification/table-hint checks plus TypeScript/build. All cleanup-specific tests are NOT RUN. Existing G3 nineteen-test evidence does not stand in for future cleanup checks.
+
+Do not delete raw sources, Gold, versions, migrations, events, historical grant/Run identities, owner decisions, failed records or UNKNOWN. After full functional acceptance, create an independent cleanup commit and `REDUNDANCY_CHANGES.md` recording actual edits, KEEP reasons, call paths, real commands/exits and rollback. No cleanup source files were modified for this inventory.

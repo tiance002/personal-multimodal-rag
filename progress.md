@@ -365,3 +365,12 @@ See [TLS_STATE_REPAIR.md](docs/audits/weknora-ordinary-output-progress/TLS_STATE
 3. Results: seven probes finished; observed Xing2048/4096 and DeepSeek4096, lower caps inferred. Original UNSUPPORTED_ANSWER, short MODEL_BUDGET_DENIED upgrade NOT_SENT, long NOT RUN. No current answer/citation success; G5 NOT RUN.
 4. Risk: old UNKNOWN10671 retained, no new Token UNKNOWN. Full task bounds63958/75000; actual known+old UNKNOWN31858. Candidate unit guard has not been deployed; task fence remains active and blocks other mutations.
 5. Next: explicit owner decision needed for new candidate replacement, two additional fresh original/short Runs plus existing unsent long Run, and higher conservative task ceiling; no old Run resend, Push, Tag, release or unilateral deferral. Goal incomplete.
+
+
+## 2026-10-13 WeKnora latest actual long stop
+
+1. Goal and changes: unit instruction repairce3398a and G3 history-interruption/default300s repair0219046 complete; runtime API/worker sourcece3398a imagea94a1696, ordinary timeout120 and V4 task-only fence350000/7webIDs active. Original DB/config/storage preserved. Detailed current report LIVE_ACCEPTANCE_20261013.md.
+2. Commands: original171ca042 and shortcc79fb74 real browser collectors exit0/functionPASS with8citationHTTP200/PGScope/version/quote-hash readback and UI click/reload/SSE22events cursor recovery. G3 RED exit1 then19SIM tests/build/diff-check exit0. V4 nativeLinux14tests exit0. Latestlong9043e892 collector exit0/functionFAIL; taskreadback exit1 intentionally NEW_UNKNOWN_STOP.
+3. Results: original2048/short1024 PASS; long4096 FAIL, both90s and120s REQUEST_TIMEOUT. All7probes preserved,7webattempts consumed; actual known43321 plusUNKNOWN53915=97236, fullconservative189408/350000. No costly calls afterlatestunknown.
+4. Risk: provider service-side causeUNKNOWN, no response/usage to infer; neither budget increase nor120s wait provedlong availability. Unknown occupancy retained. G5 sourcecleanup NOT RUN; only REDUNDANCY_INVENTORY_PENDING.md prepared. No unilateraldeferral/acceptance.
+5. Next: owner/model-service decision required forlong path under unchanged scoring/roles; no blindlongresend, no unapproved model/timeout substitution, no Push/Tag/release.
