@@ -8,6 +8,7 @@ from backend.weknora_port.storage.postgres import (
     DatabaseIdentity, IsolationPolicy, PostgresRetriever, RetrieveParams,
     keyword_statement, vector_statement,
 )
+from backend.weknora_port.storage.indexing import IndexInfo, IndexBoundaryDenied
 
 
 def test_keyword_scope_and_engine_are_parameterized():
@@ -83,4 +84,23 @@ def test_verify_then_guc_fallback_after_rollback_only():
         conn.fail = "permission denied"
         with pytest.raises(RuntimeError, match="permission denied"):
             await repo.vectors(RetrieveParams(("kb",), embedding=(1.0,)))
+    asyncio.run(exercise())
+
+
+def test_index_write_requires_verified_identity_and_trusted_kb():
+    async def exercise():
+        conn = FakeConnection()
+        repo = PostgresRetriever(conn,IsolationPolicy("new",frozenset({"old"})),
+                                 writable_knowledge_base_ids=frozenset({"kb"}))
+        row = IndexInfo("s",1,"c","d","kb","text\x00\ud800\ufffd")
+        with pytest.raises(PermissionError): await repo.batch_save([row],{"s":[.5]})
+        await repo.verify_identity()
+        forbidden = IndexInfo("s",1,"c","d","other","text")
+        with pytest.raises(IndexBoundaryDenied): await repo.batch_save([forbidden],{})
+        assert not any("INSERT" in query for query,_ in conn.calls)
+        await repo.batch_save([row],{"s":[.5]})
+        sql,params = conn.calls[-1]
+        assert sql.endswith("ON CONFLICT DO NOTHING")
+        assert params[6] == "text\ufffd" and params[7:9] == [1,"[0.5]"]
+        assert sql.count("%s") == len(params)
     asyncio.run(exercise())

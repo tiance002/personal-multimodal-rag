@@ -10,6 +10,8 @@ import math
 from dataclasses import dataclass
 from typing import Any, Mapping, Protocol, Sequence
 
+from .indexing import IndexInfo, IndexBoundaryDenied
+
 
 class Cursor(Protocol):
     async def fetchall(self) -> list[Mapping[str, Any]]: ...
@@ -109,8 +111,10 @@ def vector_statement(params: RetrieveParams) -> Statement:
 
 
 class PostgresRetriever:
-    def __init__(self, connection: Connection, isolation: IsolationPolicy):
+    def __init__(self, connection: Connection, isolation: IsolationPolicy, *,
+                 writable_knowledge_base_ids: frozenset[str] = frozenset()):
         self.connection, self.isolation = connection, isolation
+        self.writable_knowledge_base_ids = writable_knowledge_base_ids
         self._verified = False
 
     async def verify_identity(self) -> DatabaseIdentity:
@@ -135,6 +139,35 @@ class PostgresRetriever:
         self.require_verified()
         stmt = keyword_statement(params)
         return await (await self.connection.execute(stmt.sql, stmt.params)).fetchall()
+
+    async def batch_save(self, rows: Sequence[IndexInfo],
+                         embeddings: Mapping[str, Sequence[float]]) -> None:
+        self.require_verified()
+        if not rows:
+            return
+        # Write permission comes from the server's trusted KB resolver, never
+        # from row metadata or a client-provided scope.
+        if any(row.knowledge_base_id not in self.writable_knowledge_base_ids for row in rows):
+            raise IndexBoundaryDenied("KNOWLEDGE_BASE_WRITE_SCOPE_DENIED")
+        values: list[Any] = []
+        for row in rows:
+            vector = embeddings.get(row.source_id, ())
+            if any(not math.isfinite(value) for value in vector):
+                raise ValueError("INVALID_EMBEDDING")
+            vector_text = "[" + ",".join(str(float(value)) for value in vector) + "]"
+            # CleanInvalidUTF8 strips invalid scalars and NUL; valid U+FFFD is
+            # retained, as in the Go rune decoder.
+            content = row.content.encode("utf-8", errors="ignore").decode("utf-8").replace("\x00", "")
+            values.extend((row.source_id,row.source_type,row.chunk_id,row.knowledge_id,
+                           row.knowledge_base_id,row.tag_id,content,len(vector),
+                           vector_text if vector else None,row.is_enabled))
+        columns = "source_id,source_type,chunk_id,knowledge_id,knowledge_base_id,tag_id,content,dimension,embedding,is_enabled"
+        placeholder = "(%s,%s,%s,%s,%s,%s,%s,%s,%s::halfvec,%s)"
+        sql = f"INSERT INTO embeddings ({columns}) VALUES " + ",".join([placeholder] * len(rows))
+        # Fixed source BatchSave uses OnConflict{DoNothing:true}; no silent
+        # replacement of an already indexed source identity.
+        async with self.connection.transaction():
+            await self.connection.execute(sql + " ON CONFLICT DO NOTHING", values)
 
     async def vectors(self, params: RetrieveParams) -> list[Mapping[str, Any]]:
         self.require_verified()
