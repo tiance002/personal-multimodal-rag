@@ -268,7 +268,7 @@ class DocumentLifecycleService:
                 (document_id, principal.tenant_id, knowledge_base_id, Path(name).stem, name,
                  kb.get("embedding_model_id") or None, name, extension.lstrip("."), len(data),
                  str(original_path), digest, json.dumps(metadata, ensure_ascii=False),
-                 json.dumps({"local_subject_id": principal.subject_id, "source_version": source_version})),
+                 json.dumps({})),
                 writable_knowledge_base_ids=frozenset({knowledge_base_id}))
         except Exception:
             original_path.unlink(missing_ok=True)

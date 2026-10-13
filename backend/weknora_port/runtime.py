@@ -191,10 +191,24 @@ class ApplicationRuntime:
         self.memory = MemoryService(self.memory_repository)
         self.history = OrdinaryHistoryService(self.memory_repository)
         self._runs = {}
+        if documents.post_processor is None:
+            from .document_profile import SourceDocumentPostprocessor
+            documents.post_processor = SourceDocumentPostprocessor(self)
         self.ordinary = BoundOrdinaryService(
             self, self.turns, store, self.history, OrdinaryMemoryLoader(self.memory),
             configuration=self._configuration, pipeline_factory=self._pipeline,
             generation_factory=self._generation)
+
+    def registry_for_context(self):
+        gate = LeasedSendGate(self)
+        async def factory(config, key):
+            model = self.model_factory(config, key, gate)
+            model = await model if inspect.isawaitable(model) else model
+            if getattr(getattr(model, "transport", None), "gate", None) is not gate:
+                raise ProviderError("RUNTIME_DURABLE_GATE_REQUIRED")
+            return model
+        return NeutralModelRegistry(self.models, factory, owner_id=self.principal.subject_id,
+                                    catalogue=self.catalogue)
 
     def _owner(self, principal):
         if principal != self.principal:

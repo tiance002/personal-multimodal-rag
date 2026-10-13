@@ -27,6 +27,7 @@ from backend.weknora_port.models.types import CallContext, TrustedScope
 from backend.weknora_port.model_registry import NeutralModelRegistry
 from backend.weknora_port.streaming.manager import RedisListStreamStore
 from backend.weknora_port.crypto import SecretCipher
+from backend.weknora_port.storage.document_profile_migrate import apply_document_profile_schema
 from backend.weknora_port.runtime import ApplicationRuntime, ConversationSettings, LeasedSendGate
 from backend.weknora_port.generation import RouterPolicy
 from backend.weknora_port.documents import DocumentLifecycleService, KnowledgeBaseSettings
@@ -127,7 +128,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
         leases = IsolatedConnectionFactory(acquire, release, IsolationPolicy(EXPECTED, PROHIBITED))
         async with leases.lease() as guard:
             for apply in (apply_configuration_schema, apply_generation_schema,
-                          apply_send_gate_schema, apply_turn_schema, apply_model_schema):
+                          apply_send_gate_schema, apply_turn_schema, apply_model_schema, apply_document_profile_schema):
                 await apply(guard)
         principal = await LocalPrincipalStore(leases).bootstrap()
         redis = Redis.from_url("redis://127.0.0.1:56424/0", decode_responses=True)
@@ -156,6 +157,14 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                         raise httpx.ReadTimeout("synthetic fixture timeout", request=request)
                     return stream_response(body["model"], "CHEAP_REJECTED_DRAFT", "length")
                 return stream_response(body["model"], "Blue widgets use W-17. <ref id=\"c1\"/>", "stop")
+            if 'precise document profiling expert' in body.get('messages',[{}])[0].get('content',''):
+                assert 'source_version' not in body['messages'][1]['content']
+                assert 'local_subject_id' not in body['messages'][1]['content']
+                return httpx.Response(200,json={'model':body['model'],
+                    'choices':[{'message':{'content':json.dumps({'summary':SOURCE,
+                        'gist':'Blue widget protocol','topics':['widgets','protocol'],'doc_type':'handbook',
+                        'typical_question':'Which protocol do blue widgets use?'})},'finish_reason':'stop'}],
+                    'usage':{'prompt_tokens':20,'completion_tokens':10,'total_tokens':30}})
             return httpx.Response(200, json={"model": body["model"],
                 "choices": [{"message": {"content": json.dumps(
                     {"rewrite_query": "blue widgets protocol", "intent": "kb_search", "image_description": ""})},
@@ -196,16 +205,10 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                         await registry.close()
             return Embedder()
 
-        async def profile_fixture(who, kb, document, ingest, chunks):
-            assert who == principal and ingest.parsed.content == SOURCE and chunks
-            # Only the profile worker is synthetic; actual parser/chunks/index/ready
-            # writes and all query/generation mechanism execute below.
-            return True
-
         root = Path("E:/RAG-Tests/runtime-source-" + str(uuid.uuid4()))
         documents = DocumentLifecycleService(
             leases, root, principal=principal, resolve_kb_settings=settings,
-            embedder_for_kb=embedder_for_kb, post_processor=profile_fixture)
+            embedder_for_kb=embedder_for_kb)
         costs = FixtureCosts()
         permissions = FixturePermissions(leases, principal)
         runtime = ApplicationRuntime(
@@ -253,6 +256,19 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                 assert uploaded.status_code == 200, uploaded.text
                 document = uploaded.json()["data"]
                 assert document["status"] == "completed", document.get("error_code")
+                async with leases.lease() as profile_guard:
+                    profile_rows=await (await profile_guard.connection.execute(
+                        'SELECT description,profile,summary_status,custom_metadata FROM knowledges WHERE id=%s',
+                        (document['id'],))).fetchall()
+                    assert profile_rows[0]['description']==SOURCE
+                    assert profile_rows[0]['profile']['gist']=='Blue widget protocol'
+                    assert profile_rows[0]['summary_status']=='completed' and profile_rows[0]['custom_metadata']=={}
+                    summary_rows=await (await profile_guard.connection.execute(
+                        'SELECT c.id,c.parent_chunk_id,e.source_type,e.is_enabled FROM chunks c JOIN embeddings e '
+                        'ON e.chunk_id=c.id WHERE c.knowledge_id=%s AND c.chunk_type=%s',
+                        (document['id'],'summary'))).fetchall()
+                    assert len(summary_rows)==1 and summary_rows[0]['parent_chunk_id']
+                    assert summary_rows[0]['source_type']==0 and summary_rows[0]['is_enabled']
                 # Verify the finalizer JOIN refuses both foreign tenants and
                 # wrong KBs, using disabled physical embeddings as witnesses.
                 foreign_kb, foreign_doc, foreign_source = [str(uuid.uuid4()) for _ in range(3)]
@@ -341,9 +357,9 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     "server_run_id": assistant["request_id"], "attempts": attempts, "ledger": ledger,
                     "mock_wire_count": len(wire), "real_provider_calls": 0,
                     "assertions": "PASS", "cross_tenant_and_wrong_kb_index_activation": untouched,
-                    "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "MOCK_NOT_SOURCE_PARITY",
+                    "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "SOURCE_TEXT_ADAPTER_WITH_MOCK_PROVIDER_GO_ORACLE_NOT_RUN",
                     "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
-                output = Path("docs/weknora-port/evidence/RESUME_HTTP_CHAIN_20261013.json")
+                output = Path("docs/weknora-port/evidence/RESUME_PROFILE_HTTP_CHAIN_20261013.json")
                 output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
         finally:
             server.should_exit = True
