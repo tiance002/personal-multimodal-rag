@@ -44,6 +44,8 @@ def generate(upstream: Path) -> None:
                "CREATE INDEX IF NOT EXISTS idx_embeddings_is_enabled ON embeddings(is_enabled);",
                "CREATE INDEX IF NOT EXISTS idx_embeddings_tag_id ON embeddings(tag_id);",
                "ALTER TABLE chunks ADD COLUMN IF NOT EXISTS metadata JSON;",
+               "ALTER TABLE knowledge_bases ADD COLUMN IF NOT EXISTS type VARCHAR(32) NOT NULL DEFAULT 'document';",
+               "ALTER TABLE knowledge_bases ADD COLUMN IF NOT EXISTS indexing_strategy JSONB;",
                revisions]
     output = ROOT / "backend/weknora_port/storage/migrations/001_retrieval.sql"
     output.parent.mkdir(parents=True,exist_ok=True)
@@ -52,7 +54,8 @@ def generate(upstream: Path) -> None:
     manifest = {"upstream":PIN, "sources":{path:git("rev-parse",f"{PIN}:{path}").decode().strip()
                for path in (base_path,revision_path,
                "migrations/versioned/000002_embeddings.up.sql",
-               "migrations/versioned/000007_embeddings_tag_id.up.sql", "internal/types/chunk.go")},
+               "migrations/versioned/000007_embeddings_tag_id.up.sql", "internal/types/chunk.go",
+               "migrations/versioned/000001_agent.up.sql", "migrations/versioned/000037_wiki_and_indexing.up.sql")},
                "generated_sha256":hashlib.sha256(output.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
                "execution":"GENERATION_ONLY", "database_writes":0}
     (output.parent / "source_manifest.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")

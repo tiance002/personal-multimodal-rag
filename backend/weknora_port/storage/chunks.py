@@ -84,7 +84,7 @@ def prepare_chunks(scope: DocumentScope, parsed: Sequence[ParsedChunk], *,
         for row in rows:
             parent_id = parent_ids.get(row.parent_source_id or "", "") if kind == "text" else ""
             current.append(StoredChunk(ids[row.source_id],scope,row.content,row.seq,row.start,row.end,
-                kind,row.content,row.context_header,parent_id,metadata={**row.metadata,
+                kind,"",row.context_header,parent_id,metadata={**row.metadata,
                 "source_version":scope.source_version,"parsed_source_id":row.source_id}))
         # Parent rows always link sequentially; children only do so outside
         # parent-child mode, including otherwise-standalone children in that mode.

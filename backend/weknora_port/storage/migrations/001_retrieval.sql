@@ -115,6 +115,10 @@ CREATE INDEX IF NOT EXISTS idx_embeddings_tag_id ON embeddings(tag_id);
 
 ALTER TABLE chunks ADD COLUMN IF NOT EXISTS metadata JSON;
 
+ALTER TABLE knowledge_bases ADD COLUMN IF NOT EXISTS type VARCHAR(32) NOT NULL DEFAULT 'document';
+
+ALTER TABLE knowledge_bases ADD COLUMN IF NOT EXISTS indexing_strategy JSONB;
+
 -- Migration 000078: editable chunks, revision history, and custom document metadata.
 ALTER TABLE chunks ADD COLUMN IF NOT EXISTS source_content TEXT NOT NULL DEFAULT '';
 ALTER TABLE chunks ADD COLUMN IF NOT EXISTS content_revision INT NOT NULL DEFAULT 0;

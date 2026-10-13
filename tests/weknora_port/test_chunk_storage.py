@@ -32,7 +32,9 @@ def test_parent_rows_not_indexed_child_evidence_not_replaced_with_embedding_head
     assert all(not row.pre_chunk_id and not row.next_chunk_id for row in child_rows)
     assert [row.source_id for row in plan.indexed]==["child1","child2","child3"]
     assert plan.indexed[0].content=="Document title\n# Section\n\nchild literal"
-    assert child_rows[0].content==child_rows[0].source_content==" child literal "
+    assert child_rows[0].content==" child literal "
+    # Fixed CreateChunks backfills immutable parser output only on first edit.
+    assert child_rows[0].source_content==""
 
 
 def test_standalone_chunks_link_and_empty_children_are_skipped():
