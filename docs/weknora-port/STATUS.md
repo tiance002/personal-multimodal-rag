@@ -1,3 +1,5 @@
+P7 current frozen original source bridge verifies73/3/24 assets (exit0), QA/full-chain NOT RUN. P8 pre-cutover boundary plan prepared, no cutover/cleanup. See P7_ORIGINAL_ASSET_BRIDGE_20261013.md and P8_PRE_CUTOVER_PLAN_20261013.md.
+
 Current resume checkpoints 2026-10-13: ed2caa7 native React stream/replay/source/history, 354f51c native memory read UI; current mandatory ordinary memory origins checkpoint in MEMORY_ORIGIN_CHECKPOINT_20261013.md (49offline +1actualHTTP/PG/Redis, exit0). Later progress supersedes the pending wording in historical entries below; full stage/source equivalence is still not claimed. Browser DELETE NOT RUN, real suppliers/cutover NOT RUN, Agent/sandbox excluded by owner. See source gaps in current checkpoint reports rather than inferring stage PASS from historical counts.
 
 ## Current resume checkpoints — 2026-10-13
