@@ -12,7 +12,13 @@ from backend.app.ports.providers import ProviderRequestNotSent
 
 
 class ServiceCapacity:
+    streaming = False
     def __init__(self, provider, model, counter, *, kind):
+        from backend.app.adapters.models.ordinary_stream_capacity import OrdinaryStreamCapacityCounter
+        self.streaming = type(counter) is OrdinaryStreamCapacityCounter
+        checked_counter = counter.base if self.streaming else counter
+        if self.streaming and (kind not in {'xing_text', 'deepseek_text'} or counter.kind != kind):
+            raise ValueError('SERVICE_STREAM_PROTOCOL_INVALID')
         self.provider, self.model, self.counter, self.kind = provider, model, counter, kind
         self._output_evidence = ()
         if kind == 'embedding':
@@ -28,7 +34,7 @@ class ServiceCapacity:
             from backend.app.adapters.models.siliconflow_xing_capacity import (
                 SiliconFlowXingCapacityCounter, OrdinarySiliconFlowXingCapacityCounter, RENDERER_IDENTITY, OFFICIAL_CONTEXT_WINDOW,
             )
-            if (provider, model) != ('siliconflow', 'XingChenAGI/Xing4.0-29B') or type(counter) not in (SiliconFlowXingCapacityCounter, OrdinarySiliconFlowXingCapacityCounter):
+            if (provider, model) != ('siliconflow', 'XingChenAGI/Xing4.0-29B') or type(checked_counter) not in (SiliconFlowXingCapacityCounter, OrdinarySiliconFlowXingCapacityCounter):
                 raise ValueError('SERVICE_CAPACITY_IDENTITY_INVALID')
             self.execution_kind, self.source, self.window_tokens = 'REAL', counter.identity, OFFICIAL_CONTEXT_WINDOW
         elif kind == 'deepseek_text':
@@ -36,10 +42,10 @@ class ServiceCapacity:
                 DeepseekV41TextCapacityCounter, OrdinaryDeepseekV41TextCapacityCounter, DeepseekV41RecipeRenderer,
                 DEEPSEEK_RENDERER_IDENTITY, DEEPSEEK_CONTEXT_WINDOW,
             )
-            if ((provider, model) != ('deepseek', 'deepseek-flash') or type(counter) not in (DeepseekV41TextCapacityCounter, OrdinaryDeepseekV41TextCapacityCounter)
-                    or type(counter.renderer) is not DeepseekV41RecipeRenderer):
+            if ((provider, model) != ('deepseek', 'deepseek-flash') or type(checked_counter) not in (DeepseekV41TextCapacityCounter, OrdinaryDeepseekV41TextCapacityCounter)
+                    or type(checked_counter.renderer) is not DeepseekV41RecipeRenderer):
                 raise ValueError('SERVICE_CAPACITY_IDENTITY_INVALID')
-            self.execution_kind, self.source, self.window_tokens = 'REAL', counter.renderer_identity, DEEPSEEK_CONTEXT_WINDOW
+            self.execution_kind, self.source, self.window_tokens = 'REAL', (counter.identity if self.streaming else counter.renderer_identity), DEEPSEEK_CONTEXT_WINDOW
         elif kind == 'deepseek_vision':
             from backend.app.adapters.models.service_deepseek_capacity import DeepseekV41VisionCapacityCounter
             from backend.app.adapters.models.v6_text_capacity import DEEPSEEK_CONTEXT_WINDOW
@@ -56,6 +62,7 @@ class ServiceCapacity:
         observed = sorted(r.output_tokens for r in self._output_evidence)
         supported = self.supported_output_caps
         return {'local_reviewed_caps': list(getattr(self.counter, 'reviewed_output_caps', (512,))),
+                'delivery_protocol': 'INTERNAL_SSE_AGGREGATION_V4' if self.streaming else 'NONSTREAM_JSON_V3',
                 'endpoint_output_evidence': 'PINNED_SYNTHETIC_PROVIDER_RECEIPT' if self._output_evidence else 'UNKNOWN',
                 'verified_output_caps': observed,
                 'observed_output_caps': observed,
@@ -67,12 +74,12 @@ class ServiceCapacity:
 
     @property
     def supported_output_caps(self):
-        return sorted({512} | {cap for r in self._output_evidence for cap in r.supported_output_caps})
+        return sorted((set() if self.streaming else {512}) | {cap for r in self._output_evidence for cap in r.supported_output_caps})
 
     @property
     def output_protocol(self):
-        from backend.app.ports.output_capability import PROTOCOLS
-        return PROTOCOLS.get((self.provider, self.model), (None,))[0]
+        from backend.app.ports.output_capability import PROTOCOLS, STREAM_PROTOCOLS
+        return (STREAM_PROTOCOLS if self.streaming else PROTOCOLS).get((self.provider, self.model), (None,))[0]
 
     def bind_output_evidence(self, evidence):
         from backend.app.ports.output_capability import OutputCapabilityEvidence
@@ -84,7 +91,7 @@ class ServiceCapacity:
         self._check_local_output(evidence.output_tokens)
         body = json.loads(evidence.request_wire)
         input_bound, output_bound = self.measure(body, evidence.request_wire.encode())
-        usage = json.loads(evidence.response_wire)['usage']
+        usage = evidence.response['usage']
         if usage['prompt_tokens'] > input_bound or usage['completion_tokens'] > output_bound:
             raise ProviderRequestNotSent('OUTPUT_CAPABILITY_USAGE_BOUND_EXCEEDED')
         if any(r.output_tokens == evidence.output_tokens for r in self._output_evidence):
@@ -93,7 +100,7 @@ class ServiceCapacity:
 
     def assert_output_capacity(self, output_tokens, *, execution_kind):
         self._check_local_output(output_tokens)
-        if output_tokens > 512 and execution_kind != 'SIMULATED':
+        if (output_tokens > 512 or self.streaming) and execution_kind != 'SIMULATED':
             from backend.app.ports.output_capability import consume_output_probe
             # Probe admission is exact and single-use even if a cap is proven.
             if consume_output_probe(self.provider, self.model, self.output_protocol, output_tokens):
@@ -114,16 +121,18 @@ class ServiceCapacity:
         check_output_probe_payload(self.provider, self.model, self.output_protocol, output_tokens, list(messages))
         if self.kind == 'xing_text':
             return dict(model=self.model, messages=list(messages), max_tokens=output_tokens,
-                        stream=False, enable_thinking=False)
+                        stream=self.streaming, enable_thinking=False)
         if self.kind == 'deepseek_text':
             # Preserve the exact order/protocol accepted by the pinned renderer.
             return dict(model=self.model, messages=list(messages), thinking={'type': 'disabled'},
-                        max_tokens=output_tokens, temperature=0, stream=False)
+                        max_tokens=output_tokens, temperature=0, stream=self.streaming)
         raise ProviderRequestNotSent('SERVICE_CHAT_PROTOCOL_UNSUPPORTED')
 
     def measure(self, payload, wire_bytes):
         if type(wire_bytes) is not bytes or json.dumps(payload).encode() != wire_bytes:
             raise ProviderRequestNotSent('MODEL_FINAL_WIRE_MISMATCH')
+        if self.streaming:
+            return self.counter.measure(self.provider, self.model, payload, wire_bytes)
         if self.kind == 'deepseek_vision':
             return self.counter.measure(payload, wire_bytes)
         if self.kind == 'embedding':

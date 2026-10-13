@@ -65,6 +65,10 @@ def configured_service_capacity(spec, settings, embedding_admission):
         else:
             return None, 'SERVICE_CAPACITY_PROTOCOL_UNSUPPORTED'
         if spec.role not in {'embedding', 'vision'}:
+            if getattr(settings, 'ordinary_chat_stream_enabled', False):
+                from backend.app.adapters.models.ordinary_stream_capacity import OrdinaryStreamCapacityCounter
+                capacity = ServiceCapacity(spec.provider, spec.model_id,
+                    OrdinaryStreamCapacityCounter(capacity.counter, capacity.kind), kind=capacity.kind)
             capacity.count_window({'model': spec.model_id, 'messages': [{'role': 'user', 'content': 'configuration probe'}], 'tools': []})
             proof_path = settings.output_capability_file
             proof_hash = settings.output_capability_sha256

@@ -49,6 +49,7 @@ class Settings:
     output_capability_file: Path | None = None
     output_capability_sha256: str | None = None
     service_chat_timeout_seconds: int = 90
+    ordinary_chat_stream_enabled: bool = False
     xing_capacity_resources: Path | None = None
     deepseek_tokenizer_path: Path | None = None
     embedding_egress_enabled: bool = False
@@ -94,6 +95,8 @@ class Settings:
     context_max_items: int = 8
 
     def __post_init__(self) -> None:
+        if type(self.ordinary_chat_stream_enabled) is not bool:
+            raise ValueError('ORDINARY_STREAM_SETTING_INVALID')
         if type(self.service_chat_timeout_seconds) is not int or not 1 <= self.service_chat_timeout_seconds <= 120:
             raise ValueError('SERVICE_CHAT_TIMEOUT_INVALID')
         if type(self.live_run_ttl_seconds) is not int or self.live_run_ttl_seconds < 3 or type(self.stream_event_ttl_seconds) is not int or self.stream_event_ttl_seconds < 1:
@@ -146,6 +149,7 @@ class Settings:
             output_capability_file=Path(os.environ['RAG_OUTPUT_CAPABILITY_FILE']) if os.getenv('RAG_OUTPUT_CAPABILITY_FILE') else None,
             output_capability_sha256=os.getenv('RAG_OUTPUT_CAPABILITY_SHA256') or None,
             service_chat_timeout_seconds=_env_context_positive_int('RAG_SERVICE_CHAT_TIMEOUT_SECONDS',90),
+            ordinary_chat_stream_enabled=_env_context_bool('RAG_ORDINARY_CHAT_STREAM_ENABLED',False),
             xing_capacity_resources=Path(os.environ['RAG_XING_CAPACITY_RESOURCES']) if os.getenv('RAG_XING_CAPACITY_RESOURCES') else None,
             deepseek_tokenizer_path=Path(os.environ['RAG_DEEPSEEK_TOKENIZER_PATH']) if os.getenv('RAG_DEEPSEEK_TOKENIZER_PATH') else None,
             embedding_egress_enabled=_env_context_bool("RAG_EMBEDDING_EGRESS_ENABLED", False),

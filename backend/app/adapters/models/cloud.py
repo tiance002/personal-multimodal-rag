@@ -136,6 +136,15 @@ class _ReceivedResponse:
         self.connection_setup_attempts=connection_setup_attempts
 
 
+class _ReceivedStreamResponse(_ReceivedResponse):
+    """Private ordinary aggregate; raw SSE is never included in diagnostics."""
+    __slots__ = ('stream_wire',)
+
+    def __init__(self, payload, status, content_type, stream_wire, attempts=None):
+        super().__init__(payload, status, len(stream_wire), content_type, attempts)
+        self.stream_wire = stream_wire
+
+
 def _safe_content_type(value):
     if value is None: return None
     if not isinstance(value, str): return 'other'
@@ -237,6 +246,60 @@ def _send(request, timeout, *, ordinary_deepseek=False, before_send=None):
         raise _DiagnosticFailure('MODEL_REQUEST_FAILED', 'response_decode', 'JSON_RESPONSE_INVALID',
             _response_diagnostics(http_status_code=status, response_bytes=len(raw), content_type=content_type)) from None
     return _ReceivedResponse(payload, status, len(raw), content_type, setup.get('attempts'))
+
+
+def _send_ordinary_stream(request, timeout, *, before_send, expected_model, ordinary_deepseek=False):
+    """One ordinary HTTP request; internal SSE only, absolute bounded wait.
+
+    Frozen _send is unchanged. Partial content never becomes a ChatResult.
+    Revocation after dispatch is a sent failure, never a refundable NotSent.
+    """
+    from backend.app.ports.ordinary_chat_stream import ChatStreamAccumulator
+    deadline = time.monotonic() + timeout
+    before_send()
+    handlers = [_NoRedirect(), ProxyHandler({})]
+    setup = {}
+    if ordinary_deepseek:
+        handlers.append(_ObservedHTTPSHandler(context=ssl.create_default_context(), before_send=before_send,
+            observe_attempt=lambda ordinal: setup.update(attempts=ordinal)))
+    accumulator = ChatStreamAccumulator(expected_model)
+    with build_opener(*handlers).open(request, timeout=timeout) as response:
+        status = response.getcode()
+        raw_type = response.headers.get('Content-Type')
+        content_type = raw_type.split(';', 1)[0].strip().lower() if type(raw_type) is str and len(raw_type) <= 128 else None
+        if status != 200 or content_type != 'text/event-stream':
+            raise _DiagnosticFailure('MODEL_RESPONSE_INVALID', 'response_decode', 'STREAM_CONTENT_TYPE_INVALID')
+        # CPython's HTTPS urllib response exposes its live TLS socket here.
+        # Refuse an unsupported transport rather than silently losing deadline.
+        sock = getattr(getattr(getattr(response, 'fp', None), 'raw', None), '_sock', None)
+        if sock is None or not callable(getattr(sock, 'settimeout', None)) or not callable(getattr(response, 'read1', None)):
+            raise _DiagnosticFailure('MODEL_REQUEST_FAILED', 'transport', 'STREAM_DEADLINE_UNSUPPORTED')
+        while not accumulator.complete:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError()
+            try:
+                before_send()  # existing current scope/lease/cancel/budget checks
+            except Exception:
+                raise _DiagnosticFailure('MODEL_REQUEST_FAILED', 'transport', 'STREAM_FENCE_REVOKED') from None
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError()
+            sock.settimeout(remaining)
+            raw = response.read1(8192)
+            if time.monotonic() >= deadline:
+                raise TimeoutError()
+            if not raw:
+                break
+            try:
+                accumulator.feed(raw)
+            except ValueError:
+                raise _DiagnosticFailure('MODEL_RESPONSE_INVALID', 'response_decode', 'STREAM_RESPONSE_INVALID') from None
+        try:
+            payload = accumulator.finish()
+        except ValueError:
+            raise _DiagnosticFailure('MODEL_RESPONSE_INVALID', 'response_decode', 'STREAM_RESPONSE_INCOMPLETE') from None
+    return _ReceivedStreamResponse(payload, status, content_type, accumulator.raw_wire, setup.get('attempts'))
 
 
 def _usage(response):
@@ -1408,9 +1471,17 @@ class CloudAdapter:
                         raise ValueError('INGESTION_LEASE_LOST')
                 except Exception:
                     raise ProviderRequestNotSent('MODEL_PRETRANSPORT_FENCE_DENIED') from None
-            response = (_send(request, timeout, ordinary_deepseek=True,before_send=connection_admission)
-                        if service is not None and self.transport is _send and self.spec.provider == 'deepseek'
-                        else self.transport(request, timeout))
+            if service is not None and getattr(service.capacity, 'streaming', False) and self.transport is _send:
+                response = _send_ordinary_stream(request, timeout, before_send=connection_admission,
+                    expected_model=self.spec.model_id, ordinary_deepseek=self.spec.provider == 'deepseek')
+            else:
+                response = (_send(request, timeout, ordinary_deepseek=True,before_send=connection_admission)
+                            if service is not None and self.transport is _send and self.spec.provider == 'deepseek'
+                            else self.transport(request, timeout))
+            if isinstance(response, _ReceivedStreamResponse):
+                from backend.app.ports.output_capability import capture_stream_probe_wire
+                capture_stream_probe_wire(self.spec.provider, self.spec.model_id, service.capacity.output_protocol,
+                    output_bound, response.stream_wire)
             if isinstance(response, _ReceivedResponse):
                 connection_setup_attempts=response.connection_setup_attempts
                 safe_response_diagnostics = _response_diagnostics(response.payload, received=True,

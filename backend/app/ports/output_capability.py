@@ -32,6 +32,11 @@ PROTOCOLS = {
     ('deepseek', 'deepseek-flash'): ('deepseek-text-thinking-disabled-output-reach/v3', 'https://api.deepseek.com/chat/completions'),
     ('siliconflow', 'XingChenAGI/Xing4.0-29B'): ('siliconflow-xing-text-thinking-disabled-output-reach/v3', 'https://api.siliconflow.cn/v1/chat/completions'),
 }
+STREAM_PROTOCOLS = {
+    ('deepseek', 'deepseek-flash'): ('deepseek-text-thinking-disabled-stream-output-reach/v4', 'https://api.deepseek.com/chat/completions'),
+    ('siliconflow', 'XingChenAGI/Xing4.0-29B'): ('siliconflow-xing-text-thinking-disabled-stream-output-reach/v4', 'https://api.siliconflow.cn/v1/chat/completions'),
+}
+STREAM_RESPONSE_PARSER_IDENTITY = 'ordinary-chat-sse/v1'
 VENDOR_OUTPUT_CONTRACTS = {
     'deepseek': 'https://api-docs.deepseek.com/api/create-chat-completion/',
     'siliconflow': 'https://docs.siliconflow.cn/docs/api/chat-completions-post',
@@ -61,16 +66,17 @@ class OutputCapabilityEvidence:
     attempt_id: str
 
     def __post_init__(self):
-        _require(PROTOCOLS.get((self.provider, self.model)) == (self.protocol, self.endpoint))
+        _require((self.protocol, self.endpoint) in
+                 (PROTOCOLS.get((self.provider, self.model)), STREAM_PROTOCOLS.get((self.provider, self.model))))
         _require(type(self.output_tokens) is int and self.output_tokens in OUTPUT_CAPS)
         _require(all(type(v) is str and v.strip() for v in
                      (self.request_wire, self.response_wire, self.run_id, self.attempt_id)))
         try:
-            body, response = json.loads(self.request_wire), json.loads(self.response_wire)
+            body, response = json.loads(self.request_wire), self.response
         except (ValueError, TypeError):
             raise ProviderRequestNotSent('OUTPUT_CAPABILITY_EVIDENCE_INVALID') from None
         expected = dict(model=self.model, messages=[dict(role='user', content=SYNTHETIC_OUTPUT_PROBE)],
-                        max_tokens=self.output_tokens, stream=False)
+                        max_tokens=self.output_tokens, stream=self.streaming)
         if self.provider == 'deepseek':
             expected.update(thinking={'type': 'disabled'}, temperature=0)
         else:
@@ -93,8 +99,22 @@ class OutputCapabilityEvidence:
                  and not message.get('reasoning_content'))
 
     @property
+    def streaming(self):
+        return STREAM_PROTOCOLS.get((self.provider, self.model), (None,))[0] == self.protocol
+
+    @property
+    def response(self):
+        if not self.streaming:
+            return json.loads(self.response_wire)
+        from backend.app.ports.ordinary_chat_stream import ChatStreamAccumulator
+        accumulator = ChatStreamAccumulator(self.model)
+        accumulator.feed(self.response_wire.encode('utf-8'))
+        return accumulator.finish()
+
+    @property
     def identity(self):
-        return f'{self.protocol};cap={self.output_tokens};request={_hash(self.request_wire.encode())};response={_hash(self.response_wire.encode())}'
+        parser = f';parser={STREAM_RESPONSE_PARSER_IDENTITY}' if self.streaming else ''
+        return f'{self.protocol};cap={self.output_tokens};request={_hash(self.request_wire.encode())};response={_hash(self.response_wire.encode())}' + parser
 
     @property
     def supported_output_caps(self):
@@ -117,9 +137,10 @@ def load_output_capabilities(path, expected_sha256):
         _require(_hash(raw) == expected_sha256)
         data = json.loads(raw)
         _require(type(data) is dict and set(data) == {'schema_version', 'receipts'}
-                 and type(data['schema_version']) is int and data['schema_version'] == 3
+                 and type(data['schema_version']) is int and data['schema_version'] in (3, 4)
                  and type(data['receipts']) is list and bool(data['receipts']))
         receipts = tuple(OutputCapabilityEvidence(**row) for row in data['receipts'])
+        _require(all(r.streaming == (data['schema_version'] == 4) for r in receipts))
         keys = [(r.provider, r.model, r.protocol, r.output_tokens) for r in receipts]
         _require(len(set(keys)) == len(keys))
         _require(len({r.attempt_id for r in receipts}) == len(receipts))
@@ -137,6 +158,7 @@ class _ProbeAdmission:
     run_id: str
     attempt_id: str
     consumed: bool = False
+    response_wire: str | None = None
 
 
 _probe = ContextVar('ordinary_synthetic_output_probe', default=None)
@@ -164,6 +186,13 @@ def consume_output_probe(provider, model, protocol, output_tokens):
     return True
 
 
+def capture_stream_probe_wire(provider, model, protocol, output_tokens, wire):
+    """Only the exact public synthetic probe may retain raw generated SSE."""
+    admission = _matching_probe(provider, model, protocol, output_tokens)
+    if admission is not None and admission.consumed:
+        admission.response_wire = wire.decode('utf-8', errors='strict')
+
+
 def check_output_probe_payload(provider, model, protocol, output_tokens, messages):
     admission = _matching_probe(provider, model, protocol, output_tokens)
     if admission is not None and (not admission.consumed or messages !=
@@ -178,13 +207,14 @@ def output_probe_admission(*, provider, model, protocol, output_tokens, run_id, 
 The caller durably claims its bounded owner grant before entering. This context
 only unlocks one exact output-cap check; it grants no scope, budget or transport.
 """
-    _require(PROTOCOLS.get((provider, model), (None,))[0] == protocol
+    _require(protocol in (PROTOCOLS.get((provider, model), (None,))[0],
+                          STREAM_PROTOCOLS.get((provider, model), (None,))[0])
              and type(output_tokens) is int and output_tokens in (1024, 2048, 4096)
              and all(type(v) is str and v for v in (run_id, attempt_id)) and _probe.get() is None)
     admission = _ProbeAdmission(provider, model, protocol, output_tokens, run_id, attempt_id)
     token = _probe.set(admission)
     try:
         _require(_matching_probe(provider, model, protocol, output_tokens) is admission)
-        yield
+        yield admission
     finally:
         _probe.reset(token)
