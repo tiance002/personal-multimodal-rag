@@ -40,7 +40,7 @@ class History:
         self.calls.append((context,session,max_rounds));return (SimpleNamespace(query='historic question',answer='historic answer'),)
 class Memory:
     def __init__(self):self.calls=[]
-    async def load(self,context,query):self.calls.append((context,query));return MemoryBundle('background','memory prompt')
+    async def load(self,context,query):self.calls.append((context,query));return MemoryBundle('background','memory prompt',('kb',))
 
 def runtime(*,error=None,configuration=None,repo=None,blocked=None):
     co,c,e,store,commit,life=setup([event('partial',done=True,finish='length',final=True)])
@@ -218,4 +218,36 @@ def test_failure_without_persistence_receipt_cannot_publish_terminal():
         await service.accept_turn(REQ,'owner');await service.drain_background()
         assert not any(ev.type in ('error','complete') for ev in store.events)
         assert list(service.background_errors.values())==['TURN_FAILURE_COMMIT_UNVERIFIED']
+    run(scenario())
+
+
+def test_memory_unknown_lineage_fails_before_pipeline_and_chat():
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        async def unknown(context,query):return MemoryBundle('private derived text','')
+        service.memory_loader.load=unknown
+        await service.accept_turn(REQ,'owner');await service.drain_background()
+        assert repo.failures==[('assistant','MODEL_MEMORY_ORIGIN_UNKNOWN')]
+        assert counts=={'pipeline':0,'generation':0} and not c.calls and not e.calls
+    run(scenario())
+
+
+def test_memory_lineage_reaches_query_pipeline_and_both_chat_attempts_without_expanding_retrieval():
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        async def known(context,query):return MemoryBundle('derived private background','memory',('kb-private',))
+        service.memory_loader.load=known
+        original=service.pipeline_factory;seen=[]
+        async def factory(turn,progress):
+            pipeline=await original(turn,progress);actual=pipeline.run
+            async def capture(state,context):
+                seen.append(context);return await actual(state,context)
+            pipeline.run=capture;return pipeline
+        service.pipeline_factory=factory
+        accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
+        assert not repo.failures and len(seen)==1
+        assert seen[0].scope.knowledge_base_ids==('kb',)
+        assert seen[0].required_origin_kbs==('kb-private',)
+        assert accepted.context.required_origin_kbs==()
+        assert c.calls[0][2].required_origin_kbs==e.calls[0][2].required_origin_kbs==('kb-private',)
     run(scenario())

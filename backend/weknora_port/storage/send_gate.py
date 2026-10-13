@@ -132,6 +132,10 @@ class P1SendGate:
             elif not origin.knowledge_base_ids:
                 raise ProviderError("MODEL_INPUT_PROVENANCE_UNKNOWN")
             origin_kbs.update(origin.knowledge_base_ids)
+        required = call.context.required_origin_kbs
+        if not isinstance(required, tuple) or not all(isinstance(k, str) and k for k in required):
+            raise ProviderError("MODEL_INPUT_PROVENANCE_UNKNOWN")
+        origin_kbs.update(required)
         checked_kbs=origin_kbs|set(call.context.scope.knowledge_base_ids)
         if not checked_kbs.issubset(grant.readable_origin_kbs): raise ProviderError("MODEL_ORIGIN_KB_ACCESS_DENIED")
         if not checked_kbs.issubset(grant.cloud_allowed_origin_kbs): raise ProviderError("MODEL_ORIGIN_KB_EGRESS_DENIED")

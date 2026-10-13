@@ -6,7 +6,7 @@ from .conversation.maintenance_types import ModelResponse
 class RuntimeMemoryModels:
     def __init__(self,application):self.app=application
 
-    async def context(self,scope,identity):
+    async def origin_knowledge_bases(self,scope):
         app=self.app
         if (scope.tenant_id,scope.subject_id)!=(app.principal.tenant_id,app.principal.subject_id):
             raise ProviderError('MEMORY_OWNER_MISMATCH')
@@ -18,6 +18,10 @@ class RuntimeMemoryModels:
             "FROM sessions WHERE tenant_id=%s AND subject_id=%s",
             (scope.tenant_id,scope.subject_id))
         knowledge_bases=tuple(sorted({row['kb'] for row in rows if row.get('kb')}))
+        return knowledge_bases
+
+    async def context(self,scope,identity):
+        knowledge_bases = await self.origin_knowledge_bases(scope)
         return CallContext('memory/'+identity,TrustedScope(scope.subject_id,knowledge_bases))
 
     async def workspace_chat_model(self,scope):

@@ -6,7 +6,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Protocol
 from .conversation.types import MemoryContext, resolve_scope
 from .generation import GenerationRequest, GenerationReplay, Evidence, History, ValidatedRewrite
@@ -50,6 +50,7 @@ class AcceptedTurn:
 class MemoryBundle:
     background: str = field(default='',repr=False)
     prompt: str = field(default='',repr=False)
+    origin_kbs: tuple[str, ...] | None = None
 
 @dataclass
 class TurnConfiguration:
@@ -58,8 +59,9 @@ class TurnConfiguration:
 
 class OrdinaryMemoryLoader:
     """Use existing P4 reads and the exact QUERY_UNDERSTAND background wrapper."""
-    def __init__(self, memory_service):
+    def __init__(self, memory_service, origin_resolver=None):
         self.memory_service = memory_service
+        self.origin_resolver = origin_resolver
 
     async def load(self, context, query):
         recall = await self.memory_service.recall(context, query)
@@ -74,7 +76,10 @@ class OrdinaryMemoryLoader:
             if value.documents:
                 background += '\n常查资料：' + '、'.join(value.documents)
             background += '\n</asker_background>'
-        return MemoryBundle(background, recall.prompt)
+        origins = None
+        if (background or recall.prompt) and self.origin_resolver is not None:
+            origins = tuple(await self.origin_resolver(resolve_scope(context)))
+        return MemoryBundle(background, recall.prompt, origins)
 
 class TurnRepository(Protocol):
     async def accept(self, request: OrdinaryTurnRequest, principal: Any) -> AcceptedTurn:
@@ -216,11 +221,16 @@ class RuntimeService:
             memory=await self.memory_loader.load(turn.memory_context,turn.request.content)
             if not isinstance(memory,MemoryBundle):
                 raise ProviderError('MEMORY_BUNDLE_REQUIRED')
+            model_context = turn.context
+            if memory.background or memory.prompt:
+                if not isinstance(memory.origin_kbs, tuple) or not memory.origin_kbs or not all(isinstance(k, str) and k for k in memory.origin_kbs):
+                    raise ProviderError('MODEL_MEMORY_ORIGIN_UNKNOWN')
+                model_context = replace(turn.context, required_origin_kbs=tuple(sorted(set(turn.context.required_origin_kbs) | set(memory.origin_kbs))))
             state.memory_background=memory.background
             await progress('memory','completed')
             check_context(turn.context)
             pipeline=await _resolve(self.pipeline_factory(turn,progress))
-            finalized=await pipeline.run(state,turn.context)
+            finalized=await pipeline.run(state,model_context)
             check_context(turn.context)
             evidence=tuple(Evidence.from_result(r) for r in state.merge_results if r is not None)
             # Existing query-understand validation supplies the rewrite; P5
@@ -236,7 +246,7 @@ class RuntimeService:
             request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
                 evidence=evidence,history=history,memory_prompt=memory.prompt,understanding=understanding,**options)
             coordinator=await _resolve(self.generation_factory(turn,progress))
-            return await coordinator.run(request,turn.context)
+            return await coordinator.run(request,model_context)
         except GenerationReplay:
             return None  # source persistent lifecycle: attach, never resend
         except (Exception,asyncio.CancelledError) as exc:

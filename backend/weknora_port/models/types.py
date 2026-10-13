@@ -48,6 +48,8 @@ class CallContext:
     cancelled: asyncio.Event | None = field(default=None, repr=False, compare=False)
     session_id: str = ""
     deadline_kind: str = "model"  # run deadlines must never trigger model upgrade
+    # Additional server-resolved derived-content sources; never retrieval scope.
+    required_origin_kbs: tuple[str, ...] = ()
 
     def child(self, suffix: str) -> CallContext:
         return replace(self, request_id=f"{self.request_id}/{suffix}")

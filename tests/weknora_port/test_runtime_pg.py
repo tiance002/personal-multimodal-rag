@@ -58,7 +58,7 @@ class FixturePermissions:
     async def resolve(self, call):
         self.calls.append(call)
         assert call.context.scope.owner_id == self.principal.subject_id
-        kbs = call.context.scope.knowledge_base_ids
+        kbs = tuple(sorted(set(call.context.scope.knowledge_base_ids) | set(call.context.required_origin_kbs)))
         async with self.leases.lease() as guard:
             rows = await (await guard.connection.execute(
                 "SELECT id,cloud_allowed FROM knowledge_bases WHERE tenant_id=%s "
@@ -395,6 +395,30 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                 assert listing.json()['data'][0]['id']==saved_memories[0]['id']
                 settings_reply=await client.get('/api/v1/memory/settings')
                 assert settings_reply.status_code==200 and settings_reply.json()['data']['effective'] is True
+                # Ordinary public-KB turn must also gate whole-subject memory origins.
+                private_reply=await client.post('/api/v1/knowledge-bases',json={'name':'synthetic-private-memory-origin'})
+                assert private_reply.status_code==200
+                private_kb=private_reply.json()['data']['id']
+                private_session=await client.post('/api/v1/sessions',json={'title':'synthetic-memory-origin',
+                    'knowledge_base_scope':[private_kb],'document_scope':[]})
+                assert private_session.status_code==200
+                before_memory_origin=len(wire)
+                origin_request={**request,'request_id':str(uuid.uuid4()),'content':'What about my blue widgets? extract source'}
+                origin_reply=await client.post(f'/api/v1/sessions/{sid}/messages',json=origin_request)
+                await runtime.drain_background()
+                assert origin_reply.status_code==200 and '"error_code":"ORDINARY_CHAIN_FAILED"' in origin_reply.text,origin_reply.text
+                assert len(wire)==before_memory_origin
+                denied_calls=[call for call in permissions.calls if private_kb in call.context.required_origin_kbs]
+                assert denied_calls and all(call.context.scope.knowledge_base_ids==(kb,) for call in denied_calls)
+                denied_authorization=await permissions.resolve(denied_calls[-1])
+                assert private_kb in denied_authorization.readable_origin_kbs and private_kb not in denied_authorization.cloud_allowed_origin_kbs
+                from backend.weknora_port.storage.send_gate import P1SendGate
+                with pytest.raises(ProviderError,match='MODEL_ORIGIN_KB_EGRESS_DENIED'):
+                    P1SendGate.__new__(P1SendGate)._permission(denied_calls[-1],denied_authorization)
+                memory_origin_result={'private_origin':private_kb,'retrieval_kb':kb,'wire_before':before_memory_origin,
+                    'wire_after':len(wire),'mandatory_origins':denied_calls[-1].context.required_origin_kbs,
+                    'gate_error':'MODEL_ORIGIN_KB_EGRESS_DENIED','http_error':'ORDINARY_CHAIN_FAILED',
+                    'retrieval_scope_unchanged':True}
                 # Derived memory retains KB external-processing consent and tenant owner.
                 from backend.weknora_port.conversation.maintenance_types import ModelRequest
                 from backend.weknora_port.conversation.types import MemoryScope
@@ -428,10 +452,11 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     "mock_wire_count": len(wire), "real_provider_calls": 0,
                     "assertions": "PASS", "cross_tenant_and_wrong_kb_index_activation": untouched,
                     "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "SOURCE_TEXT_ADAPTER_WITH_MOCK_PROVIDER_GO_ORACLE_NOT_RUN",
+                    "ordinary_memory_origin_gate":memory_origin_result,
                     "automatic_memory": {"queued_actual_redis": True,"actual_pg_saved": saved_memories,
                         "recalled_before_forget": True,"absent_after_forget": True,"embedding_residual": residual[0]["n"],"private_origin_denies_wire":True,"foreign_subject_denies_wire":True,"delete_http":removed.status_code},
                     "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
-                output = Path("docs/weknora-port/evidence/RESUME_MEMORY_HTTP_CHAIN_20261013.json")
+                output = Path("docs/weknora-port/evidence/RESUME_MEMORY_ORIGIN_HTTP_CHAIN_20261013.json")
                 output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
         finally:
             server.should_exit = True

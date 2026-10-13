@@ -225,7 +225,7 @@ class ApplicationRuntime:
             from .document_profile import SourceDocumentPostprocessor
             documents.post_processor = SourceDocumentPostprocessor(self)
         self.ordinary = BoundOrdinaryService(
-            self, self.turns, store, self.history, OrdinaryMemoryLoader(self.memory),
+            self, self.turns, store, self.history, OrdinaryMemoryLoader(self.memory, self.memory_models.origin_knowledge_bases),
             configuration=self._configuration, pipeline_factory=self._pipeline,
             generation_factory=self._generation)
 

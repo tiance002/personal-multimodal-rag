@@ -177,3 +177,20 @@ def test_manifest_hash_and_no_legacy_runtime_import_or_free_unknown_defaults():
     code=(root/'send_gate.py').read_text(encoding='utf-8')
     assert 'from backend.app' not in code and 'import backend.app' not in code
     assert 'actual_microunits BIGINT CHECK' in sql and 'carry_in_source' in sql
+
+
+@pytest.mark.parametrize('readable,cloud,code',[
+    ({'kb'},{'kb'},'MODEL_ORIGIN_KB_ACCESS_DENIED'),
+    ({'kb','private'},{'kb'},'MODEL_ORIGIN_KB_EGRESS_DENIED')])
+def test_mandatory_derived_origins_cannot_be_omitted_by_resolver(readable,cloud,code):
+    prepared=call();prepared=replace(prepared,context=replace(prepared.context,required_origin_kbs=('private',)))
+    gate=P1SendGate.__new__(P1SendGate)
+    authorization=grant(prepared,readable_origin_kbs=frozenset(readable),cloud_allowed_origin_kbs=frozenset(cloud))
+    with pytest.raises(ProviderError,match=code):gate._permission(prepared,authorization)
+    assert prepared.context.scope.knowledge_base_ids==('kb',)
+
+def test_mandatory_derived_origins_recorded_only_with_explicit_permission():
+    prepared=call();prepared=replace(prepared,context=replace(prepared.context,required_origin_kbs=('private',)))
+    gate=P1SendGate.__new__(P1SendGate)
+    authorization=grant(prepared,readable_origin_kbs=frozenset({'kb','private'}),cloud_allowed_origin_kbs=frozenset({'kb','private'}))
+    assert gate._permission(prepared,authorization)==('kb','private')

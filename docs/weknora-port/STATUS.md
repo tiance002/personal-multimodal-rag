@@ -1,3 +1,5 @@
+Current resume checkpoints 2026-10-13: ed2caa7 native React stream/replay/source/history, 354f51c native memory read UI; current mandatory ordinary memory origins checkpoint in MEMORY_ORIGIN_CHECKPOINT_20261013.md (49offline +1actualHTTP/PG/Redis, exit0). Later progress supersedes the pending wording in historical entries below; full stage/source equivalence is still not claimed. Browser DELETE NOT RUN, real suppliers/cutover NOT RUN, Agent/sandbox excluded by owner. See source gaps in current checkpoint reports rather than inferring stage PASS from historical counts.
+
 ## Current resume checkpoints — 2026-10-13
 
 After frozen review commit45ce807: 6d8bc26 incremental generation116passed; 1a045b9 local BPE proxy/SSE identity106passed; bb4e956 source text document profile (Go8 limited outputs; final3passed); automatic memory checkpoint adds actual Redis/PG/HTTP extraction/recall/forget/private-origin denial. See respective *_CHECKPOINT_20261013.md and raw stdout/exit/JUnit. Full stage source-parity, React actual closure, P7 full chain, real-provider/cutover remain NOT RUN/pending. Historical status below is retained, not current acceptance.
