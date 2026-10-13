@@ -12,11 +12,11 @@ import re
 import uuid
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Awaitable, Callable, Mapping, Protocol, Sequence
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit,quote
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse,Response
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool
 
@@ -305,7 +305,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         return await _resolved_principal(resolve_principal, request)
 
     def json_data(request: Request, data: Any) -> JSONResponse:
-        return JSONResponse(content={"data": data, "meta": {"request_id": _request_id(request)}})
+        return JSONResponse(content={"data": jsonable_encoder(data), "meta": {"request_id": _request_id(request)}})
 
     from dataclasses import asdict
     from fastapi.encoders import jsonable_encoder
@@ -378,6 +378,13 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         result = await runtime.upload_document(who, knowledge_base_id, file.filename or "upload",
                                                file.content_type or "application/octet-stream", file)
         return json_data(request, result)
+
+    @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/source')
+    async def original_document(knowledge_base_id: str,document_id: str,request: Request):
+        source=await runtime.read_document(await principal(request),knowledge_base_id,document_id)
+        return Response(source.content,media_type=source.media_type,headers={
+            'Content-Disposition':"attachment; filename*=UTF-8''"+quote(source.filename,safe=''),
+            'X-Content-Type-Options':'nosniff'})
 
     @app.get("/api/v1/settings/model-configuration")
     async def read_model_configuration(request: Request):

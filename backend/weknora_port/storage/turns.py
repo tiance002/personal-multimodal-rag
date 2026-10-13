@@ -104,7 +104,7 @@ class PostgresTurnRepository:
                 row=dict(tenant_id=principal.tenant_id,subject_id=principal.subject_id,session_id=request.session_id,client_request_id=request.request_id,run_id=run_id,user_message_id=user_id,assistant_message_id=assistant_id,q0=snapshot.q0,knowledge_base_scope=snapshot.knowledge_base_ids,document_scope=snapshot.document_ids,payload_sha256=payload)
                 if new:
                     for id,role,content in ((user_id,'user',snapshot.q0),(assistant_id,'assistant','')):
-                        await conn.execute('INSERT INTO messages(id,request_id,session_id,tenant_id,subject_id,role,content,knowledge_base_scope,document_scope) VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb)',(id,run_id,request.session_id,*self._owner(principal),role,content,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids)))
+                        await conn.execute('INSERT INTO messages(id,request_id,session_id,tenant_id,subject_id,role,content,knowledge_base_scope,document_scope,is_completed,created_at) VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,clock_timestamp())',(id,run_id,request.session_id,*self._owner(principal),role,content,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids),role=='user'))
                 await conn.execute('INSERT INTO port_turns(tenant_id,subject_id,session_id,client_request_id,run_id,user_message_id,assistant_message_id,q0,payload_sha256,knowledge_base_scope,document_scope) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb)',(*self._owner(principal),request.session_id,request.request_id,run_id,user_id,assistant_id,snapshot.q0,payload,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids)))
                 return self._accepted(row,new=new)
 

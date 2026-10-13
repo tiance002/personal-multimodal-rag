@@ -85,7 +85,7 @@ class MemoryConnection:
             doc_id, tenant, kb_id = params
             row = self.docs.get(doc_id)
             return Cursor([row] if row and row["tenant_id"] == tenant and row["knowledge_base_id"] == kb_id else [])
-        if query.startswith("SELECT file_name,file_type,file_path FROM knowledges"):
+        if query.startswith("SELECT file_name,file_type,file_path,file_hash,file_size FROM knowledges"):
             doc_id, tenant, kb_id = params
             row = self.docs.get(doc_id)
             return Cursor([row] if row and row["tenant_id"] == tenant and row["knowledge_base_id"] == kb_id else [])
@@ -226,6 +226,9 @@ def test_text_and_markdown_uploads_persist_immutable_source_chunks_and_complete_
         assert len(raw_paths) == 2 and len(set(raw_paths)) == 2
         assert all(path.is_file() for path in raw_paths)
         assert any(event[0] == "batch_save" for event in factory.connection.events)
+        raw_paths[0].write_bytes(b'mutated synthetic fixture')
+        with pytest.raises(documents.DocumentLifecycleError,match='DOCUMENT_SOURCE_HASH_MISMATCH'):
+            await service.read_document(PRINCIPAL,kb['id'],text['id'])
 
     asyncio.run(exercise())
 

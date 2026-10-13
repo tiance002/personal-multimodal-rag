@@ -46,7 +46,7 @@ class Leases:
         finally:guard._verified=False
 
 def stored(q0='private question'):
-    return dict(session_id='session',q0=q0,run_id='run',user_message_id='user',assistant_message_id='assistant',knowledge_base_scope=['kb'],document_scope=[],payload_sha256='',status='pending',error_code='')
+    return dict(session_id='session',q0=q0,client_request_id='client',run_id='run',user_message_id='user',assistant_message_id='assistant',knowledge_base_scope=['kb'],document_scope=[],payload_sha256='',status='pending',error_code='')
 
 def test_new_admission_writes_both_messages_and_claim_atomically_before_model():
     async def run():

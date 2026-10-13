@@ -304,7 +304,7 @@ class ApplicationRuntime:
         async with self.leases.lease() as guard:
             await self.turns._session(guard, session_id, principal)
             return await (await guard.connection.execute(
-                "SELECT id,request_id,role,content,knowledge_references,is_completed,turn_status,"
+                "SELECT id,request_id,role,content,created_at,knowledge_references,is_completed,turn_status,"
                 "turn_error_code,knowledge_base_scope,document_scope FROM messages WHERE "
                 "tenant_id=%s AND subject_id=%s AND session_id=%s AND deleted_at IS NULL "
                 "ORDER BY created_at,id", (principal.tenant_id, principal.subject_id, session_id))).fetchall()
@@ -461,6 +461,10 @@ class ApplicationRuntime:
         return await self.documents.upload_document(
             principal, knowledge_base_id, filename, content_type, source)
 
+    async def read_document(self,principal,knowledge_base_id,document_id):
+        self._owner(principal)
+        return await self.documents.read_document(principal,knowledge_base_id,document_id)
+
     async def read_source_chunk(self, principal, chunk_id):
         self._owner(principal)
         return await self.documents.read_source_chunk(principal, chunk_id)
@@ -473,5 +477,8 @@ class ApplicationRuntime:
                 "UPDATE knowledge_bases SET cloud_allowed=%s,updated_at=now() "
                 "WHERE tenant_id=%s AND id=%s AND deleted_at IS NULL",
                 (cloud_allowed, principal.tenant_id, knowledge_base_id))
-        return {"id": knowledge_base_id, "cloud_allowed": cloud_allowed}
+        rows=await self.documents.list_knowledge_bases(principal)
+        row=next((row for row in rows if row['id']==knowledge_base_id),None)
+        if row is None:raise ProviderError('KNOWLEDGE_BASE_NOT_FOUND')
+        return row
 

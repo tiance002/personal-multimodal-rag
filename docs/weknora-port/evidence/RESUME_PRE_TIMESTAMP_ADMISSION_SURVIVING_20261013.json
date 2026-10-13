@@ -1,0 +1,94 @@
+{
+  "kind": "actual-isolated-pg-synthetic-records",
+  "system_identifier": "7696038373595934758",
+  "database": "weknora_python_port_20261013",
+  "model_calls": 0,
+  "old_database_writes": 0,
+  "cases": {
+    "concurrent_restart": {
+      "migration_sha256": "ff212d6db2cd21a8823019d47aae4b34aad3b6a2b6df7f39ed3286c7ccf7bf3d",
+      "tenant_id": 1,
+      "session_id": "00726026-597c-47f5-944e-120df21ead5c",
+      "client_request_id": "9f78412e-1281-4a2a-8ebb-d93c59721a3d",
+      "run_id": "a3dd1e40-1bbf-4010-a367-946b79539ca6",
+      "messages": [
+        {
+          "id": "98b1f386-8173-4af0-a2af-c972af18ba97",
+          "role": "assistant",
+          "request_id": "a3dd1e40-1bbf-4010-a367-946b79539ca6"
+        },
+        {
+          "id": "19690b39-6ad7-448a-a383-5da4c5552d2a",
+          "role": "user",
+          "request_id": "a3dd1e40-1bbf-4010-a367-946b79539ca6"
+        }
+      ],
+      "concurrent_new_count": 1,
+      "restart_replay_only": true,
+      "changed_payload_denied": true
+    },
+    "scope_deletion": {
+      "session_id": "f7d3dfa7-a1db-4f71-894c-018fc090e8f4",
+      "other_session_id": "5ab0d8ba-6b09-4ea1-be53-38cd2d8c8178",
+      "client_request_id": "24363bd2-47c0-4788-8bcf-ac5abe130dd8",
+      "run_ids": [
+        "4f301786-9a10-49e3-b54a-dcc5553fdeee",
+        "060d1140-2958-4e01-bdb5-853b4b025336"
+      ],
+      "scope_expansion_denied": true,
+      "changed_session_scope_denied": true,
+      "deleted_document_denied": true,
+      "deleted_session_denied": true,
+      "long_client_id_denied": true
+    },
+    "failure_final": {
+      "session_id": "f1c86cff-b1c4-4d70-a5d9-11e8fa258a90",
+      "failed_run_id": "f3e2c1e9-02d6-4a75-a0ce-1191ca82c558",
+      "successful_run_id": "c1e7b6b8-6d73-41df-9c01-fd7d2bf0c87c",
+      "messages": [
+        {
+          "id": "1c938996-bc93-4264-aef3-7ff8d27c646e",
+          "role": "assistant",
+          "content": "fixture committed answer",
+          "is_completed": true,
+          "turn_status": "pending",
+          "turn_error_code": ""
+        },
+        {
+          "id": "2f0cef76-f220-4391-bf96-686917701df7",
+          "role": "assistant",
+          "content": "",
+          "is_completed": false,
+          "turn_status": "error",
+          "turn_error_code": "MODEL_USAGE_UNKNOWN"
+        },
+        {
+          "id": "e10198c0-f738-4c25-b645-b99445f2c256",
+          "role": "user",
+          "content": "fixture failure question",
+          "is_completed": false,
+          "turn_status": "pending",
+          "turn_error_code": ""
+        },
+        {
+          "id": "fe9953f9-44a4-41f8-aa27-e02a52cfde86",
+          "role": "user",
+          "content": "fixture final question",
+          "is_completed": false,
+          "turn_status": "pending",
+          "turn_error_code": ""
+        }
+      ],
+      "late_failure_receipt": false,
+      "late_final_after_failure_denied": true,
+      "budget_ledger_operations": 0
+    }
+  },
+  "execution": {
+    "command": "& E:\\RAG quention\\.venv\\Scripts\\python.exe -m pytest --noconftest tests/weknora_port/test_turn_storage.py tests/weknora_port/test_turn_storage_pg.py -q --tb=short",
+    "exit_code": 0,
+    "output": "13 passed in 1.25s",
+    "sql_double_cases": 10,
+    "actual_pg_cases": 3
+  }
+}

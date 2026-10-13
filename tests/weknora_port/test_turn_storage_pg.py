@@ -28,7 +28,7 @@ def factory(dsn):
 
 
 def save(name, value):
-    path = Path(__file__).resolve().parents[2] / 'docs/weknora-port/evidence/RESUME_P5_TURN_ADMISSION_EVIDENCE.json'
+    path = Path(__file__).resolve().parents[2] / 'docs/weknora-port/evidence/RESUME_NATIVE_TURN_TIMESTAMP_READBACK_20261013.json'
     content = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {
         'kind': 'actual-isolated-pg-synthetic-records', 'system_identifier': EXPECTED,
         'database': 'weknora_python_port_20261013', 'model_calls': 0, 'old_database_writes': 0, 'cases': {}}
@@ -74,6 +74,9 @@ def test_actual_pg_bootstrap_restart_and_concurrent_durable_admission():
                 await repo.accept(OrdinaryTurnRequest(session, 'changed synthetic question', request.request_id), principal)
             rows = await (await conn.execute("SELECT id,role,request_id FROM messages WHERE session_id=%s ORDER BY role", (session,))).fetchall()
             assert len(rows) == 2 and {r['role'] for r in rows} == {'user', 'assistant'}
+            ordered=await (await conn.execute('SELECT role,created_at FROM messages WHERE session_id=%s ORDER BY created_at,id',(session,))).fetchall()
+            assert [row['role'] for row in ordered]==['user','assistant']
+            assert ordered[0]['created_at']<ordered[1]['created_at']
             save('concurrent_restart', {'migration_sha256': digest, 'tenant_id': principal.tenant_id, 'session_id': session,
                 'client_request_id': request.request_id, 'run_id': replay.run_id, 'messages': rows,
                 'concurrent_new_count': 1, 'restart_replay_only': True, 'changed_payload_denied': True})

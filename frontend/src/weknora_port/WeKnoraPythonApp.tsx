@@ -16,7 +16,7 @@ type ChatLine = {
   content: string;
   segments?: Segment[];
   progress?: TimelineEvent[];
-  status?: "running" | "completed" | "interrupted" | "failed" | "unknown";
+  status?: "running" | "completed" | "interrupted" | "failed" | "cancelled" | "unknown";
   error?: boolean;
   identity?: PortRunIdentity;
 };
@@ -157,7 +157,10 @@ export function WeKnoraPythonApp() {
     setNotice("正在读取会话历史");
     try {
       const history = await portApi.messages(session.id);
-      setMessages(history.map(row => ({ id: row.id, role: row.role === "user" ? "user" : "assistant", content: row.content })));
+      setMessages(history.map(row => ({ id: row.id, role: row.role === "user" ? "user" : "assistant", content: row.content,
+        status: row.role === "user" || row.is_completed ? "completed" : row.turn_status === "error" ? "failed" : "unknown",
+        error: row.turn_status === "error",
+      })));
       setNotice("已读取保存的会话历史；实时阶段仅显示当前连接收到的事件");
     } catch (error) { setMessages([assistantBubble(`历史读取失败：${errorText(error)}`)]); }
   };
@@ -203,6 +206,12 @@ export function WeKnoraPythonApp() {
         return { ...previous, segments, content: answerFromSegments(segments), progress, status: "running" };
       }
       if (event.response_type === "complete") {
+        if (event.data.status === "cancelled") {
+          return { ...previous, progress, status: "cancelled" };
+        }
+        if (event.data.status === "failed" || previous.error) {
+          return { ...previous, progress, status: "failed", error: true };
+        }
         const finalContent = typeof event.data.final_content === "string" ? event.data.final_content : answerFromSegments(previous.segments);
         return { ...previous, content: finalContent, progress, status: "completed" };
       }
@@ -230,11 +239,11 @@ export function WeKnoraPythonApp() {
         onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], status: "running" })),
         onMessage: event => applyEvent(line.id, event),
       });
-      if (controller.signal.aborted) updateMessage(line.id, previous => previous.status === "completed" ? previous : { ...previous, status: "interrupted" });
-      else updateMessage(line.id, previous => previous.status === "completed" ? previous : { ...previous, status: "unknown" });
+      if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
+      else updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
       await refreshSessions();
     } catch (error) {
-      if (controller.signal.aborted) updateMessage(line.id, previous => previous.status === "completed" ? previous : { ...previous, status: "interrupted" });
+      if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
       else updateMessage(line.id, previous => ({ ...previous, status: "unknown", error: true,
         content: previous.content || errorText(error),
         progress: [...(previous.progress ?? []), { type: "error", text: errorText(error) }] }));
@@ -281,7 +290,7 @@ export function WeKnoraPythonApp() {
         onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], status: "running" })),
         onMessage: event => applyEvent(line.id, event),
       });
-      if (!controller.signal.aborted) updateMessage(line.id, previous => previous.status === "completed" ? previous : { ...previous, status: "unknown" });
+      if (!controller.signal.aborted) updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
     } catch (error) {
       updateMessage(line.id, previous => ({ ...previous, status: controller.signal.aborted ? "interrupted" : "unknown", error: true,
         content: previous.content || errorText(error),
@@ -294,6 +303,7 @@ export function WeKnoraPythonApp() {
     try {
       const row = await portApi.upload(uploadKbId, file);
       setDocuments(current => [...current.filter(item => item.id !== row.id), row]);
+      setBases(await portApi.knowledgeBases());
       setNotice(`已提交资料：${row.filename} · ${row.status}`);
     } catch (error) { setNotice(`上传失败：${errorText(error)}`); }
   };
@@ -374,7 +384,7 @@ export function WeKnoraPythonApp() {
               {message.status === "running" && <span className="wp-running"><i />正在接收同一运行的回答</span>}
               {message.status === "interrupted" && <div className="wp-run-actions"><span>已断开读取，服务端运行未被重发</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>继续读取原回答</button>}</div>}
               {message.status === "unknown" && <div className="wp-run-actions"><span>尚未收到 complete，结果状态待确认；没有重新生成。</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>GET 续读原回答</button>}</div>}
-              {message.status === "completed" && <small className="wp-complete">回答已由服务端完成并保存</small>}
+              {message.role === "assistant" && message.status === "completed" && <small className="wp-complete">回答已由服务端完成并保存</small>}
             </>}
           </article>)}
         </div>

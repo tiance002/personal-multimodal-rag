@@ -186,11 +186,11 @@ class DocumentLifecycleService:
     async def list_knowledge_bases(self, principal: LocalPrincipal) -> list[dict[str, Any]]:
         self._authorize(principal)
         rows = await self._rows(
-            "SELECT kb.id,kb.name,(SELECT count(*) FROM knowledges k WHERE k.tenant_id=kb.tenant_id "
+            "SELECT kb.id,kb.name,kb.cloud_allowed,(SELECT count(*) FROM knowledges k WHERE k.tenant_id=kb.tenant_id "
             "AND k.knowledge_base_id=kb.id AND k.deleted_at IS NULL) AS document_count "
             "FROM knowledge_bases kb WHERE kb.tenant_id=%s AND kb.deleted_at IS NULL ORDER BY kb.created_at,kb.id",
             (principal.tenant_id,))
-        return [{"id": row["id"], "name": row["name"], "cloud_allowed": False,
+        return [{"id": row["id"], "name": row["name"], "cloud_allowed": bool(row.get("cloud_allowed",False)),
                  "document_count": row["document_count"]} for row in rows]
 
     async def create_knowledge_base(self, principal: LocalPrincipal, name: str) -> dict[str, Any]:
@@ -476,7 +476,7 @@ class DocumentLifecycleService:
                             document_id: str) -> DocumentBytes:
         await self._kb(principal, knowledge_base_id)
         rows = await self._rows(
-            "SELECT file_name,file_type,file_path FROM knowledges WHERE id=%s AND tenant_id=%s "
+            "SELECT file_name,file_type,file_path,file_hash,file_size FROM knowledges WHERE id=%s AND tenant_id=%s "
             "AND knowledge_base_id=%s AND deleted_at IS NULL",
             (document_id, principal.tenant_id, knowledge_base_id))
         if not rows:
@@ -486,8 +486,15 @@ class DocumentLifecycleService:
         if not path.is_file():
             raise LookupError("DOCUMENT_SOURCE_UNAVAILABLE")
         extension = "." + (row.get("file_type") or "").lower().lstrip(".")
+        if path.stat().st_size>self.max_upload_bytes:
+            raise DocumentLifecycleError('DOCUMENT_SOURCE_SIZE_MISMATCH')
+        raw=path.read_bytes()
+        if not row.get('file_hash') or hashlib.sha256(raw).hexdigest()!=row['file_hash']:
+            raise DocumentLifecycleError('DOCUMENT_SOURCE_HASH_MISMATCH')
+        if row.get('file_size') is not None and len(raw)!=row['file_size']:
+            raise DocumentLifecycleError('DOCUMENT_SOURCE_SIZE_MISMATCH')
         return DocumentBytes(row.get("file_name") or path.name,
-                             _SUPPORTED_MEDIA.get(extension, "application/octet-stream"), path.read_bytes())
+                             _SUPPORTED_MEDIA.get(extension, "application/octet-stream"),raw)
 
     async def read_source_chunk(self, principal: LocalPrincipal, chunk_id: str) -> dict[str, Any]:
         self._authorize(principal)

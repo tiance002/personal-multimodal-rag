@@ -1,0 +1,52 @@
+{
+  "kind": "ACTUAL_NATIVE_REACT_FINAL_READBACK",
+  "post_count_this_browser": 2,
+  "get_resume_count_this_browser": 1,
+  "timestamp_order": {
+    "run_id": "27175b18-3533-4aa1-a6d6-b12a0505016b",
+    "client_request_id": "c093cc2e-80e1-4791-b6c4-7d4da15d11b7",
+    "q0": "extract source timestamp fix",
+    "status": "completed",
+    "error_code": "",
+    "user_at": "2026-10-13 14:05:03.260608+00:00",
+    "assistant_at": "2026-10-13 14:05:03.262933+00:00",
+    "user_complete": false,
+    "assistant_complete": true
+  },
+  "timeout": {
+    "run_id": "b15fe647-39a4-4cb6-8002-f5911ac857cc",
+    "client_request_id": "99879b63-fc8a-4118-a9ec-560f8509bd8a",
+    "q0": "extract source timeout",
+    "status": "error",
+    "error_code": "MODEL_CALL_TIMEOUT",
+    "user_at": "2026-10-13 14:34:06.988921+00:00",
+    "assistant_at": "2026-10-13 14:34:06.990921+00:00",
+    "user_complete": true,
+    "assistant_complete": false
+  },
+  "timeout_attempts": [
+    {
+      "role": "cheap",
+      "status": "FAILED",
+      "error_code": "MODEL_CALL_TIMEOUT"
+    }
+  ],
+  "timeout_unknown_retained": [
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unreported",
+        "total_tokens": null,
+        "cached_tokens": 0,
+        "prompt_tokens": null,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    }
+  ],
+  "real_provider_calls": 0
+}

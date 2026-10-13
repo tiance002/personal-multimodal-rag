@@ -14,7 +14,7 @@ export function KnowledgeBaseConsent({ base, disabled, onUpdated }: {
     try {
       const updated = await portApi.updateKnowledgeBaseConsent(base.id, cloudAllowed);
       if (updated.id !== base.id || typeof updated.cloud_allowed !== "boolean") throw new Error("知识库许可响应无效");
-      onUpdated(updated);
+      onUpdated({ ...base, ...updated });
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "外发许可保存失败");
     } finally { setSaving(false); }

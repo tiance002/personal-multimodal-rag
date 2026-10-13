@@ -1,3 +1,5 @@
+> Current owner scope, 2026-10-13: do not implement/port product code sandbox or tool-calling Agent. Existing Smart UI/API direction remains explicitly unavailable; provider tool-call protocol support does not imply an Agent loop. This supersedes any broad future Agent-port assumption below.
+
 # Current resume authority — 2026-10-13
 
 Latest owner delegation explicitly makes task 02/03 authoritative: provider_fallback=false, including explicit Cheap model timeouts. P5-TIMEOUT below is retained as an imported historical authorization claim; it is superseded in this independent E branch and is not an active deviation. Neither coordinator nor persistent lifecycle permits timeout upgrade. Old C worktree and historical evidence remain unchanged.
