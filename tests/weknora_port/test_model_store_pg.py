@@ -23,7 +23,7 @@ ROLE = ConfiguredRole('embedding', 'fixture', 'synthetic-embedding', 'https://fi
 
 
 def save(name, value):
-    path = Path(__file__).resolve().parents[2] / 'docs/weknora-port/P1_MODEL_STORE_EVIDENCE.json'
+    path = Path(__file__).resolve().parents[2] / 'docs/weknora-port/evidence/RESUME_P1_MODEL_STORE_EVIDENCE.json'
     content = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {
         'kind': 'actual-isolated-pg-real-aes-synthetic-records', 'system_identifier': '7696038373595934758',
         'database': 'weknora_python_port_20261013', 'model_calls': 0, 'old_database_writes': 0, 'cases': {}}

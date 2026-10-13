@@ -11,8 +11,8 @@ from backend.weknora_port.storage.history import LocalPrincipal
 from backend.weknora_port.storage.postgres import IsolationPolicy
 
 
-EXPECTED_SYSTEM_ID = "7696038373595934758"
-PROHIBITED_SYSTEM_IDS = frozenset({"7691227493754040358", "7689510505384681511"})
+EXPECTED_SYSTEM_ID = "7696088403504697382"
+PROHIBITED_SYSTEM_IDS = frozenset({"7691227493754040358", "7689510505384681511", "7696038373595934758"})
 
 
 def test_actual_pg_document_upload_chunk_source_read_and_cleanup(tmp_path):
@@ -40,6 +40,7 @@ def test_actual_pg_document_upload_chunk_source_read_and_cleanup(tmp_path):
                 embedding_model_id="fixture-no-provider",
                 summary_model_id="fixture-no-provider",
                 rerank_model_id="fixture-no-provider",
+                image_processing_config={"enable_multimodal": False},
                 chunking_config={"chunk_size": 128, "chunk_overlap": 0},
                 indexing_strategy={"vector_enabled": False, "keyword_enabled": False,
                                    "wiki_enabled": False, "graph_enabled": False})
@@ -56,14 +57,14 @@ def test_actual_pg_document_upload_chunk_source_read_and_cleanup(tmp_path):
             finally:
                 await conn.close()
             principal = LocalPrincipal(tenant_id, subject)
-            service = DocumentLifecycleService(factory, tmp_path, principal,
-                                                settings, post_processor=postprocess)
+            service = DocumentLifecycleService(factory, tmp_path, principal=principal,
+                                                resolve_kb_settings=settings, post_processor=postprocess)
             kb = await service.create_knowledge_base(principal, "document lifecycle fixture")
             knowledge_base_id = kb["id"]
             uploaded = await service.upload_document(principal, knowledge_base_id, "source.txt",
                 "text/plain", b"actual isolated source paragraph")
             document_id = uploaded["id"]
-            assert uploaded["status"] == "completed"
+            assert uploaded["status"] == "completed", uploaded
             listed = await service.list_documents(principal, knowledge_base_id)
             assert [row["id"] for row in listed] == [document_id]
             raw = await service.read_document(principal, knowledge_base_id, document_id)

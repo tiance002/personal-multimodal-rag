@@ -1,0 +1,57 @@
+{
+  "kind": "actual-isolated-pg-real-aes-synthetic-records",
+  "system_identifier": "7696038373595934758",
+  "database": "weknora_python_port_20261013",
+  "model_calls": 0,
+  "old_database_writes": 0,
+  "cases": {
+    "old_pin": {
+      "migration_sha256": "e3d22edc4a5d53415835be33ea2620d955248c038747b62ad8db5e5477427691",
+      "tenant_id": 22,
+      "knowledge_base_id": "846f4eab-5657-4c68-85c5-130d1bbfce38",
+      "pinned_model_id": "mdl8abd92ff3d5006f3be6394d8d60a103ab0993bfaaffa18106968aaa5f1ece",
+      "new_model_id": "mdlab5a5c40d39560d367df141623ffa6ec81ee5a406b442eaa34de0ed30317c",
+      "retained_row_count": 2,
+      "stored_secrets_encrypted": true,
+      "credential_update_preserved_id": true,
+      "public": {
+        "id": "mdl8abd92ff3d5006f3be6394d8d60a103ab0993bfaaffa18106968aaa5f1ece",
+        "role": "embedding",
+        "provider": "fixture",
+        "model": "synthetic-embedding",
+        "base_url": "https://fixture.invalid/v1",
+        "key_configured": true
+      },
+      "physical_keys": [
+        "9f799b95f3607d71ade3c42fdf162263581705dc00ee7e669e5f6037ff5da74e",
+        "640574804d001147ec3c7ebf43575ca319454a7fb1d9e1eb58c146c50442777d"
+      ]
+    },
+    "concurrent_physical": {
+      "tenant_id": 23,
+      "concurrent_same_id": "mdl1681619010234bde263023c9c8f1c4fadd71015ea6654ef1db8ea0ef0626a",
+      "concurrent_row_count": 1,
+      "cheap_id": "mdlae189b289c0db164ffc6874c5677a99d330801632b1429f39131f6e9a5e94",
+      "expensive_id": "mdlf16e9bd29e1d06e9afa45e3085c0c694abee728a455d8e28ecce74396dd6d",
+      "same_physical_key": "5198e8af52859e3ac16c7f3a0bc040932e335030c173cc14f5bfe324cf3b8733"
+    },
+    "strict_scope": {
+      "tenant_id": 24,
+      "model_id": "mdl306f6c0f02ce2b2a37585ddedc7762666cd5a48398b45dd70ca417aaf465f",
+      "wrong_key_denied": true,
+      "foreign_owner_denied": true,
+      "public_available_without_decrypt": true,
+      "original_key_readback_ok": true
+    }
+  },
+  "execution": {
+    "command": "& '.\\var\\weknora-port\\p2-venv\\Scripts\\python.exe' -m pytest --noconftest tests/weknora_port/test_model_store.py tests/weknora_port/test_model_store_pg.py -q --tb=short",
+    "exit_code": 0,
+    "output": "12 passed in 1.06s",
+    "sql_double_cases": 9,
+    "actual_pg_cases": 3,
+    "cryptography_version": "46.0.3",
+    "psycopg_version": "3.2.10",
+    "package_changes": 0
+  }
+}

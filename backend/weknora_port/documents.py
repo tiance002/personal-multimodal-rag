@@ -386,7 +386,7 @@ class DocumentLifecycleService:
         return any(row.chunk_type == "text" for row in plan.persisted)
 
     @staticmethod
-    def _resolve_tenant(owner: str, principal: LocalPrincipal) -> int:
+    async def _resolve_tenant(owner: str, principal: LocalPrincipal) -> int:
         if owner != principal.subject_id:
             raise PermissionError("DOCUMENT_OWNER_SCOPE_MISMATCH")
         return principal.tenant_id

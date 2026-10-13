@@ -18,15 +18,15 @@ from backend.weknora_port.storage.memory import PostgresExtractionEnqueuer, Post
 from backend.weknora_port.storage.postgres import IsolationPolicy, PostgresRetriever
 from backend.weknora_port.conversation.maintenance_types import ExtractionPayload, ExtractionSession, MessageCursor
 
-EXPECTED = '7696038373595934758'
-PROHIBITED = frozenset({'7691227493754040358','7689510505384681511'})
+EXPECTED = '7696088403504697382'
+PROHIBITED = frozenset({'7691227493754040358','7689510505384681511','7696038373595934758'})
 
 
 def approved_dsn():
     value = os.environ.get('WEKNORA_PORT_TEST_DSN')
     if not value: pytest.skip('Explicit isolated PostgreSQL DSN not supplied')
     parsed = urlsplit(value)
-    if parsed.hostname != '127.0.0.1' or parsed.port != 56413 or parsed.path != '/weknora_python_port_20261013':
+    if parsed.hostname != '127.0.0.1' or parsed.port != 56423 or parsed.path != '/weknora_python_port_20261013':
         pytest.fail('DSN is not the approved isolated target')
     return value
 
@@ -48,7 +48,7 @@ async def connection(dsn):
 
 
 def save_pg_evidence(name, value):
-    path=Path(__file__).resolve().parents[2]/'docs/weknora-port/P5_GENERATION_STORAGE_EVIDENCE.json'
+    path=Path(__file__).resolve().parents[2]/'docs/weknora-port/evidence/RESUME_P5_GENERATION_STORAGE_EVIDENCE.json'
     content=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'kind':'actual-isolated-pg-synthetic-records','model_calls':0,'budget_calls':0,'cases':{}}
     content['cases'][name]=value
     path.write_text(json.dumps(content,ensure_ascii=False,indent=2,default=str)+'\n',encoding='utf-8')
