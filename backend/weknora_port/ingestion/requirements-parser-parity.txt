@@ -1,0 +1,11 @@
+# Direct parser/test pins from the fixed upstream docreader/uv.lock. pandas and
+# numpy are present for direct Excel-parser oracle tests; the Python port's own
+# XLSX path uses openpyxl and does not import pandas.
+# Windows amd64 wheel hashes from that lock:
+pypdfium2==5.8.0 \
+    --hash=sha256:55592af0bddd2d62bed18e0053c546c9b72041430c5115e54870f7f6163125b0
+markitdown[docx]==0.1.3 \
+    --hash=sha256:08d9a25770979d78f60dcc0afcb868de6799608e4db65342b2e03304fb091251
+pandas==2.3.3
+numpy==2.3.4
+python-pptx==1.0.2

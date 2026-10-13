@@ -34,6 +34,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+weknora-port = [
+  "httpx==0.28.1",
+  "httpcore==1.0.9",
+  "pypdfium2==5.8.0",
+  "markitdown[docx,pptx,xlsx]==0.1.3",
+  "python-pptx==1.0.2",
+  "pandas==2.3.3",
+  "numpy==2.3.4",
+]
 service = [
   "sentencepiece==0.2.1",
   "Jinja2==3.1.6",
@@ -55,3 +64,10 @@ addopts = "-ra"
 
 [tool.setuptools.packages.find]
 include = ["backend*", "eval_center*"]
+
+[tool.setuptools.package-data]
+"backend.weknora_port.storage" = ["migrations/*.sql", "migrations/*.json"]
+"backend.weknora_port.retrieval" = ["tokenizer_assets/*", "NOTICE"]
+"backend.weknora_port.ingestion" = ["NOTICE", "*.txt", "LICENSE*"]
+"backend.weknora_port.models" = ["NOTICE"]
+"backend.weknora_port.conversation" = ["NOTICE"]
