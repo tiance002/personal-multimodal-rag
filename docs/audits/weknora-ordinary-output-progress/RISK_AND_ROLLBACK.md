@@ -10,3 +10,8 @@
 - Pure code rollback: review and revert the new local implementation commits individually; do not reset --hard or clean untracked data. No schema change, so no DB downgrade or reindex needed. Leave all historical runs, migrations, citations, ledger entries and failed receipts intact. If later deployed, retain old image digest/config and restart only explicitly approved API/Worker targets; check shared configuration and current DB head before any action.
 - G5 redundant cleanup NOT RUN. Functional real-world acceptance is pending; do not remove frozen adapters, history, ledger guards or compatibility contracts.
 - No push, merge, tag or publish performed. No owner acceptance claimed.
+
+
+## Current live checkpoint
+
+Historical results above are retained. Current seven-probe/two-question outcomes, actual running identity, local unit-prompt repair and pending limits are in [LIVE_ACCEPTANCE_20261013.md](LIVE_ACCEPTANCE_20261013.md). Full Goal remains incomplete; G4 current samples FAIL/FAIL/NOT RUN and G5 NOT RUN.

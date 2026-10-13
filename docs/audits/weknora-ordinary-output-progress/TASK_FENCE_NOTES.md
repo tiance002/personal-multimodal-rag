@@ -63,3 +63,8 @@ Source search attempted a nonexistent `generation_budget.py` and `budget_gate.py
 Task fence **PASS offline/native Linux**, real activation **NOT RUN**. Real G4 question/answer/citation/reload **NOT RUN**. Existing actual Xing2048 capacity PASS remains valid; Xing4096 and ordinary DeepSeek still unverified. Overall `/readyz` remains503, Goal not accepted. No G5 cleanup, Push, Tag or release.
 
 Fresh owner decision is required by the previously approved “another UNKNOWN means immediate stop” condition. It must authorize the two fresh probes, temporary task-only API entrypoint for the three original-scope webpage replays, and continued inclusion of both UNKNOWN reservations in the unchanged75000Token aggregate. Any new UNKNOWN must halt again. **未实现的命令不得报告通过。**
+
+
+## Current live checkpoint
+
+Historical results above are retained. Current seven-probe/two-question outcomes, actual running identity, local unit-prompt repair and pending limits are in [LIVE_ACCEPTANCE_20261013.md](LIVE_ACCEPTANCE_20261013.md). Full Goal remains incomplete; G4 current samples FAIL/FAIL/NOT RUN and G5 NOT RUN.

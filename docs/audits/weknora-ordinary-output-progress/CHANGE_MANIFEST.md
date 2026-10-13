@@ -49,3 +49,8 @@ Baseline: b4aa3ec5ff82497fdf9f9f00cdacf75e3128edd3. Code only; no business data/
 | `frontend/tests/stale-message-scope.spec.ts` | Focused offline/browser fixture or regression; SIMULATED provider/PG authority; actual local tokenizer tests identified separately. |
 | `frontend/tests/table-header-hint.spec.ts` | Focused offline/browser fixture or regression; SIMULATED provider/PG authority; actual local tokenizer tests identified separately. |
 | `progress.md` | Current Goal handoff and approval boundary; no runtime behavior. |
+
+
+## Current live checkpoint
+
+Historical results above are retained. Current seven-probe/two-question outcomes, actual running identity, local unit-prompt repair and pending limits are in [LIVE_ACCEPTANCE_20261013.md](LIVE_ACCEPTANCE_20261013.md). Full Goal remains incomplete; G4 current samples FAIL/FAIL/NOT RUN and G5 NOT RUN.

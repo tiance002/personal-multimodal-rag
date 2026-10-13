@@ -82,3 +82,8 @@ Do not retry either UNKNOWN identity, release their occupancy, rotate policy IDs
 Original question remains `我应该怎么学习`. No new factual answer or citation readback exists; historical answers/citations are not relabelled as current evidence. No milestone acceptance or owner-approved P1 deferral is claimed. **未实现的命令不得报告通过。**
 
 Subsequent read-only transport observations and the implemented/offline-tested G4 aggregate task fence are recorded in [TASK_FENCE_NOTES.md](TASK_FENCE_NOTES.md). Its real activation remains NOT RUN; current generation stop remains in force.
+
+
+## Current live checkpoint
+
+Historical results above are retained. Current seven-probe/two-question outcomes, actual running identity, local unit-prompt repair and pending limits are in [LIVE_ACCEPTANCE_20261013.md](LIVE_ACCEPTANCE_20261013.md). Full Goal remains incomplete; G4 current samples FAIL/FAIL/NOT RUN and G5 NOT RUN.

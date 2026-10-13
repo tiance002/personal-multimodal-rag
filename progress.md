@@ -356,3 +356,12 @@ See [TASK_FENCE_NOTES.md](docs/audits/weknora-ordinary-output-progress/TASK_FENC
 ### Authorized follow-up probes and ordinary TLS repair
 
 See [TLS_STATE_REPAIR.md](docs/audits/weknora-ordinary-output-progress/TLS_STATE_REPAIR.md). Owner authorized2freshprobes+temporaryfenced3questions. Xing4096 Run8b61ffc6 verified/settled4224; DeepSeek33a016bc UNKNOWN4804 triggered immediate stop. Total6/7probes,0/3questions; PG readback known+UNKNOWN17247, UNKNOWN10671 retained. No current factual answers/citations. Full HTTP memory reproduction found firstTLS-EOF close resets Request-sent toIdle, causing ResponseNotReady after secondconnection sends the one request. Minimal socket-only retry cleanup implemented, terminalfailures remaintypedNotSent, max2connect/1HTTP withguardchecks retained. Red testexit1 thenTLS18passed exit0; service/provider86passed exit0; stop7passed exit0; standardlibsmoke4casesPASS. HistoricalUNKNOWN cause not asserted; none released/reclassified. NewXing4k proof bound only inpreview, notliveconfiguration. Lastseventhprobe and3webquestions require a fresh owner decision after latestUNKNOWN. No G5,Push,Tag,release or acceptance.
+
+
+## 2026-10-13 WeKnora actual replay and unit prompt repair
+
+1. Goal and changes: latest owner approval used seventh DeepSeek4096 probe successfully. Source repair ce3398a restores numeric-unit witness instruction for ordinary answers only; validators/router/ledger remain unchanged. Current report docs/audits/weknora-ordinary-output-progress/LIVE_ACCEPTANCE_20261013.md supersedes stale summaries without erasing them.
+2. Commands: original/short native webpage collectors each exit0 but functional FAIL; targeted70 pytest passed exit0; candidate Docker build exit0. Actual runtime remains TLS image47f3445, READY_CONFIG, same DB0024/config/volumes.
+3. Results: seven probes finished; observed Xing2048/4096 and DeepSeek4096, lower caps inferred. Original UNSUPPORTED_ANSWER, short MODEL_BUDGET_DENIED upgrade NOT_SENT, long NOT RUN. No current answer/citation success; G5 NOT RUN.
+4. Risk: old UNKNOWN10671 retained, no new Token UNKNOWN. Full task bounds63958/75000; actual known+old UNKNOWN31858. Candidate unit guard has not been deployed; task fence remains active and blocks other mutations.
+5. Next: explicit owner decision needed for new candidate replacement, two additional fresh original/short Runs plus existing unsent long Run, and higher conservative task ceiling; no old Run resend, Push, Tag, release or unilateral deferral. Goal incomplete.

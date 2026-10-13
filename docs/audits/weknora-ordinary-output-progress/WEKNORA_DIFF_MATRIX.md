@@ -18,3 +18,8 @@ Git status -sb and rev-parse HEAD exit0. docker ps --format '{{.Names}} {{.Image
 Original-question scope: KB d78f3434-0e8f-40bf-afcb-f1c2c311ff51; document1fd5a928-d3d7-4bae-aa00-fc74701f61e5. Historical successful Run d1eee158-93d3-4bac-b78a-5aab154d4221; historical failed Run56f2e64b-fdda-4387-81c2-57a854b54ff4. They are not new-budget/progress validation. Existing preview/name/diagnostic fixes are retained without repeating that task.
 
 License: WeKnora main project MIT plus independently licensed third-party components. Only interfaces/behavior ideas adapted; no substantive upstream Go/Vue code copied into runtime, no vendor dependency.
+
+
+## Current live checkpoint
+
+Historical results above are retained. Current seven-probe/two-question outcomes, actual running identity, local unit-prompt repair and pending limits are in [LIVE_ACCEPTANCE_20261013.md](LIVE_ACCEPTANCE_20261013.md). Full Goal remains incomplete; G4 current samples FAIL/FAIL/NOT RUN and G5 NOT RUN.

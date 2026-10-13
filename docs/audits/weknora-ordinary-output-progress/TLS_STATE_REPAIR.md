@@ -78,3 +78,8 @@ docker run --rm --network none --mount "type=bind,source=$taskSmokePath,target=/
 **exit0 / PASS**, actual candidate Python3.11.16; check kind OFFLINE_ACTUAL_HTTP_STATE_MACHINE_SIMULATED_SOCKETS. Four cases PASS with same counts as above. provider_calls0, network_calls0, database_calls0. The actual repaired cloud module was imported from the candidate image; no private env file or DB volume was mounted, networking was disabled and the image migration CMD was replaced with the explicit Python command.
 
 Candidate **built and natively tested, NOT DEPLOYED**. Live API/Worker remain on image5de88de8... and original source5ec3b65..., old proofacfa33...; there was no live service swap after the latest UNKNOWN. Native passing sockets do not prove a live provider response. Deployment, final capacity probe and original/short/long webpage recovery/citation verification still require the fresh decision described above.
+
+
+## Current live checkpoint
+
+Historical results above are retained. Current seven-probe/two-question outcomes, actual running identity, local unit-prompt repair and pending limits are in [LIVE_ACCEPTANCE_20261013.md](LIVE_ACCEPTANCE_20261013.md). Full Goal remains incomplete; G4 current samples FAIL/FAIL/NOT RUN and G5 NOT RUN.
