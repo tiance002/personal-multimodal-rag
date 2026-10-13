@@ -1,0 +1,45 @@
+{
+  "schema": "weknora-public-source-inventory-v1",
+  "datasets": [
+    {
+      "dataset": "scifact",
+      "dataset_version": "beir-scifact-5f7d1de60b170fc8027bb7898e2efca1",
+      "status": "SOURCE_ASSETS_VERIFIED",
+      "rag_execution": "NOT_RUN",
+      "gold_boundary": "unchanged existing adapter; qrels/answers never corpus"
+    },
+    {
+      "dataset": "miracl-zh",
+      "dataset_version": "MIRACL-ZH-CANDIDATE-POOL-SHARD0-SEED20260928-V1",
+      "status": "SOURCE_ASSETS_VERIFIED",
+      "rag_execution": "NOT_RUN",
+      "gold_boundary": "unchanged existing adapter; qrels/answers never corpus"
+    },
+    {
+      "dataset": "longbench-zh",
+      "dataset_version": "LongBench-ZH-HF-5e628be450b7e67fb7ae6e201bd6d8f7056f7672-SEED20260928-V1",
+      "status": "SOURCE_ASSETS_VERIFIED",
+      "rag_execution": "NOT_RUN",
+      "gold_boundary": "unchanged existing adapter; qrels/answers never corpus"
+    },
+    {
+      "dataset": "hotpotqa",
+      "status": "BLOCKED_EXPLICIT_FREEZE_REQUIRED",
+      "rag_execution": "NOT_RUN"
+    },
+    {
+      "dataset": "mmlongbench-doc",
+      "status": "BLOCKED_EXPLICIT_FREEZE_REQUIRED",
+      "rag_execution": "NOT_RUN"
+    },
+    {
+      "dataset": "omnidocbench",
+      "status": "BLOCKED_EXPLICIT_FREEZE_REQUIRED",
+      "rag_execution": "NOT_RUN"
+    }
+  ],
+  "source_status": "PARTIAL",
+  "p7_full_chain_status": "NOT_RUN",
+  "real_provider_calls": 0,
+  "legacy_execution_grants_loaded": false
+}
