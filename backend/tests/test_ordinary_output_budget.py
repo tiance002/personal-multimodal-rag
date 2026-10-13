@@ -42,6 +42,25 @@ def test_prompt_and_envelope_share_complete_budget():
         QuickSettings(ordinary_output_budget=True, answer_output_token_cap=512)
 
 
+@pytest.mark.parametrize('question,cap', [
+    ('请简短概括学习方法', 1024),
+    ('我应该怎么学习', 2048),
+    ('请详细解释学习方法', 4096),
+])
+@pytest.mark.parametrize('concise', [False, True])
+def test_ordinary_tiers_retain_unit_witness_instruction(question, cap, concise):
+    # The live q0 candidate invented days for an explicitly unitless list.
+    # Increasing the output budget must retain this evidence constraint.
+    source = '间隔时间为1，7，16，35 / 固定间隔'
+    bundle = SimpleNamespace(context=source, labels=('E1',), snapshots=())
+    prompt, budget = LangChainQuickChain.render_answer_prompt(
+        question, bundle, QuickSettings(ordinary_output_budget=True, concise_budgeted_answer=concise))
+    assert budget.max_tokens == cap
+    assert prompt.index('Do not add units to numbers') > prompt.index(source)
+    assert 'leave such values unitless' in prompt
+    assert '180 Chinese' not in prompt and '100 English' not in prompt
+
+
 class SimulatedRenderer:
     identity = DEEPSEEK_RENDERER_IDENTITY
     def __call__(self, body):

@@ -478,6 +478,9 @@ class LangChainQuickChain:
                "Do not add units to numbers whose cited source does not state those units; "
                "leave such values unitless or omit unrequested numeric examples."
                if settings.concise_budgeted_answer and not settings.ordinary_output_budget else "")
+            + ("\nEnd of evidence. Do not add units to numbers whose cited source does not state those units; "
+               "leave such values unitless or omit unrequested numeric examples."
+               if settings.ordinary_output_budget else "")
         )
         return prompt, budget
 
