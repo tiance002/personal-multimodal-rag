@@ -38,7 +38,7 @@ function pause(ms: number, signal: AbortSignal): Promise<void> {
 export async function readRunEvents(runId: string, conversationId: string, onEvent: (event: StreamEvent) => void,
   options: RunEventOptions = {}): Promise<void> {
   let lastSeq = options.afterSeq ?? 0;
-  const waitMs = Math.max(210_000, options.waitTimeoutMs ?? 240_000);
+  const waitMs = Math.max(210_000, options.waitTimeoutMs ?? 300_000);
   const deadline = Date.now() + waitMs;
   const startupDeadline = Date.now() + Math.min(10_000, Math.max(0, options.startupWaitMs ?? 10_000));
   const controller = new AbortController();

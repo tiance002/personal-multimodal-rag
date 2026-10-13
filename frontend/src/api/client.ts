@@ -105,7 +105,7 @@ export async function sendMessageWithEvents(conversationId: string, content: str
   const abort = () => controller.abort();
   options.signal?.addEventListener("abort", abort, { once: true });
   if (options.signal?.aborted) abort();
-  const waitMs = Math.max(210_000, options.waitTimeoutMs ?? 240_000);
+  const waitMs = Math.max(210_000, options.waitTimeoutMs ?? 300_000);
   const timer = setTimeout(abort, waitMs);
   let rejectAbort: (reason: unknown) => void = () => {};
   const aborted = new Promise<never>((_, reject) => { rejectAbort = reject; });

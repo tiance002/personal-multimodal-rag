@@ -104,6 +104,7 @@ export default function App() {
   const scopeSyncRef = useRef(false);
   const sendPendingRef = useRef(false);
   const messageRequestEpoch = useRef(0);
+  const confirmedHistory = useRef<{ epoch: number; statuses: Record<string, "completed" | "failed"> } | null>(null);
   const citationRequestEpoch = useRef(0);
   const citationContextRef = useRef("");
   const closeCitation = () => {
@@ -243,6 +244,7 @@ export default function App() {
     sendPendingRef.current = false;
     setSending(false);
     setRunTimelines({});
+    confirmedHistory.current = null;
     const epoch = ++messageRequestEpoch.current;
     if (!conversationId) {
       setMessages([]);
@@ -270,6 +272,14 @@ export default function App() {
           !sendPendingRef.current
         ) {
           setMessages(items);
+          const statuses: Record<string, "completed" | "failed"> = {};
+          for (const item of items) {
+            if (!item.run_id) continue;
+            if (item.role === "assistant") statuses[item.run_id] = "completed";
+            else if (statuses[item.run_id] !== "completed" &&
+                (runDiagnosticText(item) || clarificationText(item) || evidenceHintText(item))) statuses[item.run_id] = "failed";
+          }
+          confirmedHistory.current = { epoch, statuses };
           const runIds = [...new Set(items.flatMap(row => row.run_id ? [row.run_id] : []))];
           for (const runId of runIds) {
             setRunTimelines(current => ({ ...current, [runId]: { runId, lastSeq: 0, status: "pending", stages: [] } }));
@@ -718,6 +728,15 @@ export default function App() {
       !kbId
     )
       return;
+    // Replay may still be pending when the next question fences its callbacks.
+    // Only persisted history from this scope/epoch can confirm its terminal state.
+    const history = confirmedHistory.current;
+    if (history?.epoch === messageRequestEpoch.current) {
+      setRunTimelines(current => Object.fromEntries(Object.entries(current).map(([id, row]) =>
+        [id, row.status === "pending" && history.statuses[id]
+          ? finishRunTimeline(row, history.statuses[id]) : row])));
+    }
+    confirmedHistory.current = null;
     activeWait.current?.abort();
     sendPendingRef.current = true;
     closeCitation();

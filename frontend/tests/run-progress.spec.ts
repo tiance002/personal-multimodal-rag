@@ -5,9 +5,9 @@ async function offline(page: Page) {
   await page.goto("/");
 }
 
-test("seven healthy SSE windows preserve stages/cursor over simulated 210 seconds", async ({ page }) => {
+for (const windows of [7, 9]) test(`${windows} healthy SSE windows preserve stages/cursor over simulated ${windows * 30} seconds`, async ({ page }) => {
   await offline(page);
-  const result = await page.evaluate(async () => {
+  const result = await page.evaluate(async windows => {
     const { readRunEvents } = await import("/src/api/sse.ts");
     const { applyRunEvent } = await import("/src/app/state.ts");
     const originalNow = Date.now;
@@ -22,7 +22,7 @@ test("seven healthy SSE windows preserve stages/cursor over simulated 210 second
       now += 30_000;
       const stage = ["run", "understand", "retrieval", "evidence", "generation", "validation"][connections - 1];
       const data = { schema_version: "run-progress/v1", stage, status: "completed", candidate_count: stage === "retrieval" ? 12 : undefined };
-      const fresh = connections === 7 ? { event: "answer.completed", data: { answer: "committed", citations: [] } } : { event: "run.progress", data };
+      const fresh = connections === windows ? { event: "answer.completed", data: { answer: "committed", citations: [] } } : { event: "run.progress", data };
       const repeated = connections > 1 ? `id: ${connections - 1}\nevent: run.progress\ndata: ${JSON.stringify(data)}\n\n` : "";
       return new Response(`${repeated}id: ${connections}\nevent: ${fresh.event}\ndata: ${JSON.stringify(fresh.data)}\n\n`, { headers: { "Content-Type": "text/event-stream" } });
     };
@@ -30,13 +30,40 @@ test("seven healthy SSE windows preserve stages/cursor over simulated 210 second
       await readRunEvents("run", "conv", event => { received.push(event.seq); timeline = applyRunEvent(timeline, event); });
       return { connections, elapsed: now - started, cursors, received, timeline };
     } finally { Date.now = originalNow; }
-  });
-  expect(result.connections).toBe(7);
-  expect(result.elapsed).toBe(210_000);
-  expect(result.received).toEqual([1, 2, 3, 4, 5, 6, 7]);
-  expect(result.cursors).toEqual(["", "1", "2", "3", "4", "5", "6"]);
+  }, windows);
+  expect(result.connections).toBe(windows);
+  expect(result.elapsed).toBe(windows * 30_000);
+  expect(result.received).toEqual(Array.from({ length: windows }, (_, i) => i + 1));
+  expect(result.cursors).toEqual(Array.from({ length: windows }, (_, i) => i ? String(i) : ""));
   expect(result.timeline.stages).toHaveLength(6);
   expect(result.timeline.status).toBe("completed");
+});
+
+test("POST and SSE defaults allow 300 seconds while explicit windows retain the 210 second floor", async ({ page }) => {
+  await offline(page);
+  const timers = await page.evaluate(async () => {
+    const { sendMessageWithEvents } = await import("/src/api/client.ts");
+    const { readRunEvents } = await import("/src/api/sse.ts");
+    const originalTimer = window.setTimeout;
+    const deadlines: number[] = [];
+    window.setTimeout = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => {
+      if (timeout && timeout >= 210_000) deadlines.push(timeout);
+      return originalTimer(handler, timeout, ...args);
+    }) as typeof window.setTimeout;
+    window.fetch = async (_input, init) => init?.method === "POST"
+      ? new Response(JSON.stringify({ error: { code: "SIM_REJECTED" } }), { status: 422 })
+      : new Response("", { status: 404 });
+    try {
+      for (const waitTimeoutMs of [undefined, 240_000, 1]) {
+        await readRunEvents("run", "conv", () => {}, { waitTimeoutMs, startupWaitMs: 0 });
+        await sendMessageWithEvents("conv", "q", "quick", ["kb"], [], () => {},
+          { waitTimeoutMs, startupWaitMs: 0 }).catch(() => undefined);
+      }
+      return deadlines;
+    } finally { window.setTimeout = originalTimer; }
+  });
+  // Each POST owns a deadline and starts one SSE reader with that same deadline.
+  expect(timers).toEqual([300_000, 300_000, 300_000, 240_000, 240_000, 240_000, 210_000, 210_000, 210_000]);
 });
 
 test("abnormal failures use bounded retries and resumed cursors without spinning", async ({ page }) => {
@@ -304,4 +331,52 @@ test("switching conversation and KB fences delayed progress replay from old Run"
   await expect(page.locator(".composer-scope")).toHaveText("B");
   await expect(page.getByText("A 的问题", { exact: true })).toHaveCount(0);
   await expect(page.getByText("高能力模型", { exact: false })).toHaveCount(0);
+});
+
+test("new send closes only confirmed history when its SSE replay is still pending", async ({ page }) => {
+  let releaseHistory: () => void = () => {};
+  const historyGate = new Promise<void>(resolve => { releaseHistory = resolve; });
+  let identity = "", posts = 0;
+  const history = [
+    { role: "user", content: "saved question", run_id: "saved-run" },
+    { role: "assistant", content: "saved answer", run_id: "saved-run", citations: [] },
+    { role: "user", content: "failed question", run_id: "failed-run", presentation: {
+      schema_version: "run-presentation-v1", kind: "run_diagnostic", category: "generation_error",
+      reason_code: "MODEL_UNAVAILABLE", text: "Confirmed failure" } },
+    { role: "user", content: "unknown question", run_id: "unknown-run" },
+  ];
+  await page.route("**/api/v1/**", route => route.fulfill({ status: 404, json: { error: { code: "OFFLINE_ONLY" } } }));
+  await page.route("**/api/v1/knowledge-bases", route => route.fulfill({ json: { data: [{ id: "kb", name: "KB" }] } }));
+  await page.route("**/api/v1/knowledge-bases/*/documents", route => route.fulfill({ json: { data: [] } }));
+  await page.route("**/api/v1/conversations", route => route.fulfill({ json: { data: [{ id: "conv", title: "History", knowledge_base_scope: ["kb"], document_scope: [] }] } }));
+  await page.route("**/api/v1/conversations/conv/messages", route => {
+    if (route.request().method() === "POST") {
+      posts++; identity = route.request().postDataJSON().request_id;
+      return route.fulfill({ json: { data: { run_id: identity, answer: "new answer", citations: [] } } });
+    }
+    return route.fulfill({ json: { data: [...history, ...(identity ? [
+      { role: "user", content: "new question", run_id: identity },
+      { role: "assistant", content: "new answer", run_id: identity, citations: [] },
+    ] : [])] } });
+  });
+  await page.route("**/api/v1/runs/*/events?*", async route => {
+    if (/\/runs\/(saved-run|failed-run|unknown-run)\//.test(route.request().url())) {
+      await historyGate;
+      await route.fulfill({ contentType: "text/event-stream", body: ': stopped\n\n' }).catch(() => undefined);
+    } else await route.fulfill({ contentType: "text/event-stream", body:
+      'id: 1\nevent: answer.completed\ndata: {"answer":"new answer","citations":[]}\n\n' });
+  });
+  try {
+    await page.goto("/");
+    await page.getByRole("button", { name: "History", exact: true }).click();
+    await expect(page.getByText("saved answer", { exact: true })).toBeVisible();
+    await expect(page.locator('.run-progress.pending')).toHaveCount(3);
+    await page.getByLabel("输入问题").fill("new question");
+    await page.getByRole("button", { name: "发送问题" }).click();
+    await expect(page.getByText("new answer", { exact: true })).toBeVisible();
+    await expect(page.locator('.run-progress[data-run-id="saved-run"]')).toHaveClass('run-progress completed');
+    await expect(page.locator('.run-progress[data-run-id="failed-run"]')).toHaveClass('run-progress failed');
+    await expect(page.locator('.run-progress[data-run-id="unknown-run"]')).not.toHaveClass('run-progress completed');
+    expect(posts).toBe(1);
+  } finally { releaseHistory(); }
 });
