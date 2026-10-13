@@ -221,7 +221,7 @@ class AsyncHTTPTransport:
             handle = ResponseHandle(response, TokenUsage())
             yield handle
         except ProviderError as error:
-            if not error.sent:
+            if not sent and not error.sent:
                 outcome = "NOT_SENT"
             raise
         except httpx.TimeoutException:
