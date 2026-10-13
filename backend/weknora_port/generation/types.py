@@ -1,6 +1,7 @@
 """Immutable P5 request/attempt/finalization contracts; safety adapters injected."""
 from __future__ import annotations
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Protocol, Any
 from ..models.types import ChatOptions, TokenUsage, CallContext, ProviderError
 from ..retrieval.context import FinalizedContext
@@ -33,8 +34,11 @@ class GenerationRequest:
     options: ChatOptions = field(default_factory=lambda: ChatOptions(temperature=0.3, max_completion_tokens=1024))
     policy: RouterPolicy = field(default_factory=RouterPolicy)
     understanding: ValidatedRewrite | None = field(default=None, repr=False)
+    rendered_at: datetime | None = field(default=None,repr=False)
 
     def __post_init__(self):
+        if self.rendered_at is not None and not isinstance(self.rendered_at,datetime):
+            raise GenerationError('GENERATION_RENDER_TIME_INVALID')
         if not all((isinstance(x, str) and x for x in (self.run_id, self.session_id, self.message_id, self.q0))):
             raise GenerationError('GENERATION_IDENTITY_REQUIRED')
         if not isinstance(self.finalized, FinalizedContext):

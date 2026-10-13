@@ -110,6 +110,7 @@ def compact_known_context(text, registry):
 
 def prepare_generation(request, *, now=None):
     """Prepare once, before routing. Never append Cheap output or reretrieve."""
+    now = now or request.rendered_at
     finalized = request.finalized
     if tuple((e.id for e in request.evidence)) != finalized.result_ids:
         raise ValueError('FINALIZED_EVIDENCE_IDENTITY_MISMATCH')

@@ -417,6 +417,41 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                 assert [row["role"] for row in attempts] == ["cheap", "expensive", "cheap"]
                 assert attempts[-1]["error_code"] == "MODEL_CALL_TIMEOUT"
                 assert ledger[-1]["state"] == "unknown" and ledger[-1]["usage"]["status"] == "UNKNOWN"
+                # Native paired entry: history/memory/retrieval captured once,5stream calls across4modes.
+                from eval_center.weknora_paired import execute_native_pair,MODES
+                from backend.weknora_port.service import OrdinaryTurnRequest
+                fail_cheap=False
+                pair_session=(await client.post('/api/v1/sessions',json={'title':'native-paired-capture',
+                    'knowledge_base_scope':[kb],'document_scope':[document['id']]})).json()['data']['id']
+                pair_turns=[]
+                for mode in MODES:
+                    pair_turns.append(await runtime.turns.accept(OrdinaryTurnRequest(pair_session,'extract source',
+                        str(uuid.uuid4()),knowledge_base_scope=(kb,),document_scope=(document['id'],)),principal))
+                original_prepare=runtime.ordinary.prepare_turn;preparations=[]
+                async def measured_prepare(*args,**kwargs):
+                    value=await original_prepare(*args,**kwargs);preparations.append(value);return value
+                runtime.ordinary.prepare_turn=measured_prepare
+                before_pair=len(wire)
+                paired=await execute_native_pair(runtime,pair_turns,execution_kind='ISOLATED_MOCK')
+                runtime.ordinary.prepare_turn=original_prepare
+                assert len(preparations)==1 and len(paired.outcomes)==4
+                assert [o['mode'] for o in paired.outcomes]==list(MODES)
+                assert all(o['status']=='COMPLETED' for o in paired.outcomes),paired.outcomes
+                assert [o['result'].selected_role for o in paired.outcomes]==['baseline','cheap','expensive','expensive']
+                assert [o['result'].upgraded for o in paired.outcomes]==[False,False,False,True]
+                assert all(o['result'].context_sha256==paired.context_sha256 and o['result'].prompt_sha256==paired.prompt_sha256 for o in paired.outcomes)
+                paired_streams=[w for w in wire[before_pair:] if w['body'].get('stream')]
+                assert len(paired_streams)==5 and all(w['body']['messages']==paired_streams[0]['body']['messages'] for w in paired_streams)
+                assert len({o['run_id'] for o in paired.outcomes})==4 and not runtime._runs
+                assert paired.auxiliary_calls and sum(len(o['model_calls']) for o in paired.outcomes)==5
+                assert paired.model_quality_status=='NOT_RUN_SIMULATED_MODELS'
+                pair_messages=(await client.get(f'/api/v1/sessions/{pair_session}/messages')).json()['data']
+                assert sum(m['role']=='assistant' and m['is_completed'] for m in pair_messages)==4
+                pair_evidence={'capture_sha256':paired.capture_sha256,'prompt_sha256':paired.prompt_sha256,'context_sha256':paired.context_sha256,
+                    'preparations':len(preparations),'outcomes':[{'mode':o['mode'],'run_id':o['run_id'],'role':o['result'].selected_role,
+                        'upgraded':o['result'].upgraded,'generation_seconds':o['generation_seconds'],'model_calls':o['model_calls']} for o in paired.outcomes],
+                    'auxiliary_calls':paired.auxiliary_calls,'preparation_seconds':paired.preparation_seconds,
+                    'model_quality':paired.model_quality_status,'real_provider_calls':0,'persisted_assistants':4,'same_messages_all5streams':True}
                 # Enable source automatic memory only for this new public fixture tenant.
                 async with leases.lease() as memory_guard:
                     roles_ids=dict((await runtime._snapshot(memory_guard)).model_ids)
@@ -503,12 +538,13 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     "mock_wire_count": len(wire), "real_provider_calls": 0,
                     "assertions": "PASS", "cross_tenant_and_wrong_kb_index_activation": untouched,
                     "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "SOURCE_TEXT_ADAPTER_WITH_MOCK_PROVIDER_GO_ORACLE_NOT_RUN",
+                    "p7_native_paired":pair_evidence,
                     "p2_native_image_documents":image_documents,
                     "ordinary_memory_origin_gate":memory_origin_result,
                     "automatic_memory": {"queued_actual_redis": True,"actual_pg_saved": saved_memories,
                         "recalled_before_forget": True,"absent_after_forget": True,"embedding_residual": residual[0]["n"],"private_origin_denies_wire":True,"foreign_subject_denies_wire":True,"delete_http":removed.status_code},
                     "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
-                output = Path("docs/weknora-port/evidence/P2_NATIVE_IMAGE_PROFILE_HTTP_CHAIN_20261013.json")
+                output = Path("docs/weknora-port/evidence/P7_NATIVE_PAIRED_HTTP_CHAIN_20261014.json")
                 output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
         finally:
             server.should_exit = True

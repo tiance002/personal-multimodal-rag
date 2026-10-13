@@ -1,0 +1,2411 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="54" skipped="0" tests="107" time="8.851" timestamp="2026-10-14T07:44:01.936055+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_service" name="test_real_pipeline_generation_context_and_replay_chain" time="0.716"><failure message="AssertionError: assert (not {} and not [('assistant', 'ORDINARY_CHAIN_FAILED')])&#10; +  where {} = &lt;backend.weknora_port.service.RuntimeService object at 0x000002BAB0B53770&gt;.background_errors&#10; +  and   [('assistant', 'ORDINARY_CHAIN_FAILED')] = &lt;test_service.DurableRepository object at 0x000002BAB0B530E0&gt;.failures">&gt;   def test_real_pipeline_generation_context_and_replay_chain():run(scenario_complete())
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_service.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario_complete():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        accepted=await service.accept_turn(REQ,'owner')
+        await service.drain_background()
+&gt;       assert not service.background_errors and not repo.failures
+E       AssertionError: assert (not {} and not [('assistant', 'ORDINARY_CHAIN_FAILED')])
+E        +  where {} = &lt;backend.weknora_port.service.RuntimeService object at 0x000002BAB0B53770&gt;.background_errors
+E        +  and   [('assistant', 'ORDINARY_CHAIN_FAILED')] = &lt;test_service.DurableRepository object at 0x000002BAB0B530E0&gt;.failures
+
+tests\weknora_port\test_service.py:66: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_service" name="test_restart_replays_durable_claim_without_retrieval_or_model" time="0.003"><failure message="AssertionError: assert (not {} and not [('assistant', 'ORDINARY_CHAIN_FAILED')])&#10; +  where {} = &lt;backend.weknora_port.service.RuntimeService object at 0x000002BAB0F26850&gt;.background_errors&#10; +  and   [('assistant', 'ORDINARY_CHAIN_FAILED')] = &lt;test_service.DurableRepository object at 0x000002BAB0F26350&gt;.failures">def test_restart_replays_durable_claim_without_retrieval_or_model():
+        async def scenario():
+            service,accepted=await scenario_complete()
+            replacement,repo,retrieval,co,c,e,store,commit,counts=runtime(repo=service.repository)
+            store.events=service.store.events.copy()
+            existing=await replacement.accept_turn(REQ,'owner')
+            assert await replacement.run_turn(existing) is None
+            assert counts=={'pipeline':0,'generation':0} and not c.calls and not e.calls
+            assert [ev async for ev in replacement.replay(existing,'owner')]==store.events
+&gt;       run(scenario())
+
+tests\weknora_port\test_service.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_service.py:91: in scenario
+    service,accepted=await scenario_complete()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario_complete():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        accepted=await service.accept_turn(REQ,'owner')
+        await service.drain_background()
+&gt;       assert not service.background_errors and not repo.failures
+E       AssertionError: assert (not {} and not [('assistant', 'ORDINARY_CHAIN_FAILED')])
+E        +  where {} = &lt;backend.weknora_port.service.RuntimeService object at 0x000002BAB0F26850&gt;.background_errors
+E        +  and   [('assistant', 'ORDINARY_CHAIN_FAILED')] = &lt;test_service.DurableRepository object at 0x000002BAB0F26350&gt;.failures
+
+tests\weknora_port\test_service.py:66: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_service" name="test_http_disconnect_does_not_cancel_background_run" time="0.004"><failure message="assert (0 == 1)&#10; +  where 0 = len([])&#10; +    where [] = &lt;test_generation.Committer object at 0x000002BAB0F27B10&gt;.calls">def test_http_disconnect_does_not_cancel_background_run():
+        async def scenario():
+            release=asyncio.Event();service,repo,retrieval,co,c,e,store,commit,counts=runtime(blocked=release)
+            accepted=await service.accept_turn(REQ,'owner')
+            iterator=service.replay(accepted,'owner')
+            initial=await anext(iterator);assert initial.type=='agent_query'
+            await iterator.aclose()
+            assert not accepted.context.cancelled or not accepted.context.cancelled.is_set()
+            release.set();await service.drain_background()
+            assert len(commit.calls)==1 and store.events[-1].type=='complete'
+&gt;       run(scenario())
+
+tests\weknora_port\test_service.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        release=asyncio.Event();service,repo,retrieval,co,c,e,store,commit,counts=runtime(blocked=release)
+        accepted=await service.accept_turn(REQ,'owner')
+        iterator=service.replay(accepted,'owner')
+        initial=await anext(iterator);assert initial.type=='agent_query'
+        await iterator.aclose()
+        assert not accepted.context.cancelled or not accepted.context.cancelled.is_set()
+        release.set();await service.drain_background()
+&gt;       assert len(commit.calls)==1 and store.events[-1].type=='complete'
+E       assert (0 == 1)
+E        +  where 0 = len([])
+E        +    where [] = &lt;test_generation.Committer object at 0x000002BAB0F27B10&gt;.calls
+
+tests\weknora_port\test_service.py:109: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_service" name="test_failure_persists_assistant_before_error_complete_without_retry[error0]" time="0.002" /><testcase classname="tests.weknora_port.test_service" name="test_failure_persists_assistant_before_error_complete_without_retry[error1]" time="0.002" /><testcase classname="tests.weknora_port.test_service" name="test_failure_persists_assistant_before_error_complete_without_retry[error2]" time="0.002" /><testcase classname="tests.weknora_port.test_service" name="test_failure_persists_assistant_before_error_complete_without_retry[error3]" time="0.019" /><testcase classname="tests.weknora_port.test_service" name="test_failure_persists_assistant_before_error_complete_without_retry[error4]" time="0.002" /><testcase classname="tests.weknora_port.test_service" name="test_sent_provider_failure_preserves_attempt_unknown_and_no_retry" time="0.003"><failure message="assert (0 == 1)&#10; +  where 0 = len([])&#10; +    where [] = &lt;test_generation.Model object at 0x000002BAB0F92ED0&gt;.calls">def test_sent_provider_failure_preserves_attempt_unknown_and_no_retry():
+        async def scenario():
+            service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+            c.outputs=[event('private draft'),ProviderError('PROVIDER_HTTP_ERROR',sent=True)]
+            await service.accept_turn(REQ,'owner');await service.drain_background()
+            assert len(c.calls)==1 and not e.calls and not commit.calls
+            assert co.lifecycle.finished[0][0].cost_status=='UNKNOWN'
+            assert 'private draft' not in str(store.events) and store.events[-1].type=='complete'
+&gt;       run(scenario())
+
+tests\weknora_port\test_service.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        c.outputs=[event('private draft'),ProviderError('PROVIDER_HTTP_ERROR',sent=True)]
+        await service.accept_turn(REQ,'owner');await service.drain_background()
+&gt;       assert len(c.calls)==1 and not e.calls and not commit.calls
+E       assert (0 == 1)
+E        +  where 0 = len([])
+E        +    where [] = &lt;test_generation.Model object at 0x000002BAB0F92ED0&gt;.calls
+
+tests\weknora_port\test_service.py:129: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_service" name="test_failure_commit_failure_never_manufactures_terminal_completion" time="0.002" /><testcase classname="tests.weknora_port.test_service" name="test_payload_scope_and_owner_rejections_never_start_chain" time="0.003" /><testcase classname="tests.weknora_port.test_service" name="test_generation_identity_overrides_rejected_before_model" time="0.003" /><testcase classname="tests.weknora_port.test_service" name="test_exact_memory_background_adapter_uses_existing_p4_reads" time="0.001" /><testcase classname="tests.weknora_port.test_service" name="test_pipeline_progress_does_not_swallow_cancellation_or_run_deadline[failure0]" time="0.001" /><testcase classname="tests.weknora_port.test_service" name="test_pipeline_progress_does_not_swallow_cancellation_or_run_deadline[failure1]" time="0.001" /><testcase classname="tests.weknora_port.test_service" name="test_pipeline_progress_does_not_swallow_cancellation_or_run_deadline[failure2]" time="0.001" /><testcase classname="tests.weknora_port.test_service" name="test_pipeline_ordinary_observer_failure_nonfatal" time="0.001" /><testcase classname="tests.weknora_port.test_service" name="test_disconnect_offset_zero_replay_uses_source_initial_delta_coalescing" time="0.002" /><testcase classname="tests.weknora_port.test_service" name="test_successful_atomic_final_cannot_be_replaced_by_sse_failure_terminal" time="0.003"><failure message="assert (0 == 1)&#10; +  where 0 = len([])&#10; +    where [] = &lt;test_generation.Committer object at 0x000002BAB7783770&gt;.calls">def test_successful_atomic_final_cannot_be_replaced_by_sse_failure_terminal():
+        async def scenario():
+            service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+            original=store.append_event
+            async def append(session,message,ev):
+                if ev.type=='complete':raise RuntimeError('mock unavailable SSE store')
+                await original(session,message,ev)
+            store.append_event=append
+            async def persist_failure(turn,code):
+                assert commit.calls  # authoritative atomic answer already persisted
+                return False
+            repo.commit_failure=persist_failure
+            await service.accept_turn(REQ,'owner');await service.drain_background()
+            assert len(commit.calls)==1 and not repo.failures
+            assert not any(ev.type=='error' for ev in store.events)
+            assert not any(ev.type=='complete' and ev.data.get('status')=='failed' for ev in store.events)
+&gt;       run(scenario())
+
+tests\weknora_port\test_service.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        original=store.append_event
+        async def append(session,message,ev):
+            if ev.type=='complete':raise RuntimeError('mock unavailable SSE store')
+            await original(session,message,ev)
+        store.append_event=append
+        async def persist_failure(turn,code):
+            assert commit.calls  # authoritative atomic answer already persisted
+            return False
+        repo.commit_failure=persist_failure
+        await service.accept_turn(REQ,'owner');await service.drain_background()
+&gt;       assert len(commit.calls)==1 and not repo.failures
+E       assert (0 == 1)
+E        +  where 0 = len([])
+E        +    where [] = &lt;test_generation.Committer object at 0x000002BAB7783770&gt;.calls
+
+tests\weknora_port\test_service.py:208: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_service" name="test_failure_without_persistence_receipt_cannot_publish_terminal" time="0.013" /><testcase classname="tests.weknora_port.test_service" name="test_memory_unknown_lineage_fails_before_pipeline_and_chat" time="0.003" /><testcase classname="tests.weknora_port.test_service" name="test_memory_lineage_reaches_query_pipeline_and_both_chat_attempts_without_expanding_retrieval" time="0.005"><failure message="AssertionError: assert (not [('assistant', 'ORDINARY_CHAIN_FAILED')])&#10; +  where [('assistant', 'ORDINARY_CHAIN_FAILED')] = &lt;test_service.DurableRepository object at 0x000002BAB77F0350&gt;.failures">def test_memory_lineage_reaches_query_pipeline_and_both_chat_attempts_without_expanding_retrieval():
+        async def scenario():
+            service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+            async def known(context,query):return MemoryBundle('derived private background','memory',('kb-private',))
+            service.memory_loader.load=known
+            original=service.pipeline_factory;seen=[]
+            async def factory(turn,progress):
+                pipeline=await original(turn,progress);actual=pipeline.run
+                async def capture(state,context):
+                    seen.append(context);return await actual(state,context)
+                pipeline.run=capture;return pipeline
+            service.pipeline_factory=factory
+            accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
+            assert not repo.failures and len(seen)==1
+            assert seen[0].scope.knowledge_base_ids==('kb',)
+            assert seen[0].required_origin_kbs==('kb-private',)
+            assert accepted.context.required_origin_kbs==()
+            assert c.calls[0][2].required_origin_kbs==e.calls[0][2].required_origin_kbs==('kb-private',)
+&gt;       run(scenario())
+
+tests\weknora_port\test_service.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        async def known(context,query):return MemoryBundle('derived private background','memory',('kb-private',))
+        service.memory_loader.load=known
+        original=service.pipeline_factory;seen=[]
+        async def factory(turn,progress):
+            pipeline=await original(turn,progress);actual=pipeline.run
+            async def capture(state,context):
+                seen.append(context);return await actual(state,context)
+            pipeline.run=capture;return pipeline
+        service.pipeline_factory=factory
+        accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
+&gt;       assert not repo.failures and len(seen)==1
+E       AssertionError: assert (not [('assistant', 'ORDINARY_CHAIN_FAILED')])
+E        +  where [('assistant', 'ORDINARY_CHAIN_FAILED')] = &lt;test_service.DurableRepository object at 0x000002BAB77F0350&gt;.failures
+
+tests\weknora_port\test_service.py:248: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_service" name="test_shared_stop_marker_cancels_original_run_without_generation_retry_or_reader" time="0.321" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case0]" time="0.007" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case1]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case2]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case3]" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case4]" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case5]" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case6]" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case7]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case8]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case9]" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case10]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case11]" time="0.000" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case12]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case13]" time="0.000" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case14]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case15]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case16]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_exact_frozen_legacy_snapshot[case17]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_router_max_not_sum_rewrite_and_L_unknown" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_input_L_boundaries[2000-0]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_input_L_boundaries[2001-2]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_input_L_boundaries[6000-2]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_input_L_boundaries[6001-5]" time="0.002" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_input_L_boundaries[12000-5]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_input_L_boundaries[12001-8]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_invalid_estimator_never_invents_zero[0]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_invalid_estimator_never_invents_zero[-1]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_invalid_estimator_never_invents_zero[1.5]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_invalid_estimator_never_invents_zero[True]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_baseline_bypasses_router_and_estimator" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_baseline_bypasses_router_and_estimator():
+        class Explodes:
+            def estimate(self,*a):raise AssertionError('baseline must bypass')
+        co,c,e,store,commit,life=setup([],estimator=Explodes())
+&gt;       out=run(co.run(request('OFF'),CTX));assert out.route is None and not c.calls and len(e.calls)==1 and out.selected_role=='baseline'
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_fixed_only_modes_do_not_upgrade[CHEAP_ONLY-calls0]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">mode = 'CHEAP_ONLY', calls = (1, 0)
+
+    @pytest.mark.parametrize('mode,calls', [('CHEAP_ONLY',(1,0)),('EXPENSIVE_ONLY',(0,1))])
+    def test_fixed_only_modes_do_not_upgrade(mode,calls):
+        co,c,e,*_=setup([event('partial',done=True,finish='length',final=True)])
+&gt;       run(co.run(request(mode),CTX));assert (len(c.calls),len(e.calls))==calls
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_fixed_only_modes_do_not_upgrade[EXPENSIVE_ONLY-calls1]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">mode = 'EXPENSIVE_ONLY', calls = (0, 1)
+
+    @pytest.mark.parametrize('mode,calls', [('CHEAP_ONLY',(1,0)),('EXPENSIVE_ONLY',(0,1))])
+    def test_fixed_only_modes_do_not_upgrade(mode,calls):
+        co,c,e,*_=setup([event('partial',done=True,finish='length',final=True)])
+&gt;       run(co.run(request(mode),CTX));assert (len(c.calls),len(e.calls))==calls
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_approved_upgrade_exactly_two_distinct_attempts[outputs0-TRUNCATION]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">outputs = [StreamResponse(response_type='answer', content='cheap partial', done=True, tool_calls=(), usage=None, finish_reason='length', is_final=True)]
+reason = 'TRUNCATION'
+
+    @pytest.mark.parametrize('outputs,reason',[
+        ([event('cheap partial',done=True,finish='length',final=True)],'TRUNCATION'),
+        ([event('',done=True,finish='stop',final=True)],'MODEL_EMPTY'),
+        ([event('cheap answer &lt;ref id="c999"/&gt;',done=True,finish='stop',final=True)],'INVALID_HANDLES'),
+    ])
+    def test_approved_upgrade_exactly_two_distinct_attempts(outputs,reason):
+        co,c,e,store,commit,life=setup(outputs)
+&gt;       out=run(co.run(request(),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_approved_upgrade_exactly_two_distinct_attempts[outputs1-MODEL_EMPTY]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">outputs = [StreamResponse(response_type='answer', content='', done=True, tool_calls=(), usage=None, finish_reason='stop', is_final=True)]
+reason = 'MODEL_EMPTY'
+
+    @pytest.mark.parametrize('outputs,reason',[
+        ([event('cheap partial',done=True,finish='length',final=True)],'TRUNCATION'),
+        ([event('',done=True,finish='stop',final=True)],'MODEL_EMPTY'),
+        ([event('cheap answer &lt;ref id="c999"/&gt;',done=True,finish='stop',final=True)],'INVALID_HANDLES'),
+    ])
+    def test_approved_upgrade_exactly_two_distinct_attempts(outputs,reason):
+        co,c,e,store,commit,life=setup(outputs)
+&gt;       out=run(co.run(request(),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_approved_upgrade_exactly_two_distinct_attempts[outputs2-INVALID_HANDLES]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">outputs = [StreamResponse(response_type='answer', content='cheap answer &lt;ref id="c999"/&gt;', done=True, tool_calls=(), usage=None, finish_reason='stop', is_final=True)]
+reason = 'INVALID_HANDLES'
+
+    @pytest.mark.parametrize('outputs,reason',[
+        ([event('cheap partial',done=True,finish='length',final=True)],'TRUNCATION'),
+        ([event('',done=True,finish='stop',final=True)],'MODEL_EMPTY'),
+        ([event('cheap answer &lt;ref id="c999"/&gt;',done=True,finish='stop',final=True)],'INVALID_HANDLES'),
+    ])
+    def test_approved_upgrade_exactly_two_distinct_attempts(outputs,reason):
+        co,c,e,store,commit,life=setup(outputs)
+&gt;       out=run(co.run(request(),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure0]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = ModelCallTimeout('MODEL_CALL_TIMEOUT')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure1]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = ProviderError('PROVIDER_HTTP_ERROR')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure2]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = ProviderError('PROVIDER_RESPONSE_INVALID')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure3]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = ProviderError('MODEL_BUDGET_DENIED')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure4]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = ProviderError('MODEL_EGRESS_DENIED')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure5]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure6]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = CallCancelled('MODEL_CALL_CANCELLED')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure7]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = RunDeadlineExceeded('RUN_DEADLINE_EXCEEDED')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_model_timeout_and_other_errors_never_upgrade[failure8]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">failure = TimeoutError('untyped timeout')
+
+    @pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+    def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+        co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+&gt;       with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade[\u8bc1\u636e\u4e0d\u8db3]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">text = '证据不足'
+
+    @pytest.mark.parametrize('text',['\u8bc1\u636e\u4e0d\u8db3','No enough information to answer.','I cannot answer this request.'])
+    def test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade(text):
+        co,c,e,*_=setup([event(text,done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer==text and not out.upgraded and not e.calls
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade[No enough information to answer.]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">text = 'No enough information to answer.'
+
+    @pytest.mark.parametrize('text',['\u8bc1\u636e\u4e0d\u8db3','No enough information to answer.','I cannot answer this request.'])
+    def test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade(text):
+        co,c,e,*_=setup([event(text,done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer==text and not out.upgraded and not e.calls
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade[I cannot answer this request.]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">text = 'I cannot answer this request.'
+
+    @pytest.mark.parametrize('text',['\u8bc1\u636e\u4e0d\u8db3','No enough information to answer.','I cannot answer this request.'])
+    def test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade(text):
+        co,c,e,*_=setup([event(text,done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer==text and not out.upgraded and not e.calls
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_empty_truncation_precedes_empty_and_final_source_fallback[length]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">finish = 'length'
+
+    @pytest.mark.parametrize('finish',['length','max_tokens','MAX_OUTPUT_TOKENS'])
+    def test_empty_truncation_precedes_empty_and_final_source_fallback(finish):
+        co,c,e,*_=setup([event('',done=True,finish=finish,final=True)],[event('',done=True,finish=finish,final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer==EMPTY_TRUNCATED_FALLBACK and out.attempts[1].upgrade_reason=='TRUNCATION' and out.truncated
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_empty_truncation_precedes_empty_and_final_source_fallback[max_tokens]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">finish = 'max_tokens'
+
+    @pytest.mark.parametrize('finish',['length','max_tokens','MAX_OUTPUT_TOKENS'])
+    def test_empty_truncation_precedes_empty_and_final_source_fallback(finish):
+        co,c,e,*_=setup([event('',done=True,finish=finish,final=True)],[event('',done=True,finish=finish,final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer==EMPTY_TRUNCATED_FALLBACK and out.attempts[1].upgrade_reason=='TRUNCATION' and out.truncated
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_empty_truncation_precedes_empty_and_final_source_fallback[MAX_OUTPUT_TOKENS]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">finish = 'MAX_OUTPUT_TOKENS'
+
+    @pytest.mark.parametrize('finish',['length','max_tokens','MAX_OUTPUT_TOKENS'])
+    def test_empty_truncation_precedes_empty_and_final_source_fallback(finish):
+        co,c,e,*_=setup([event('',done=True,finish=finish,final=True)],[event('',done=True,finish=finish,final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer==EMPTY_TRUNCATED_FALLBACK and out.attempts[1].upgrade_reason=='TRUNCATION' and out.truncated
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_final_empty_stop_source_semantics_no_invented_fallback" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_final_empty_stop_source_semantics_no_invented_fallback():
+        co,c,e,store,commit,_=setup([event('',done=True,finish='stop',final=True)],[event('',done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer=='' and commit.calls[0].answer=='' and store.events[-1].type=='complete'
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_final_invalid_ref_stripped_current_valid_ref_kept" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_final_invalid_ref_stripped_current_valid_ref_kept():
+        co,c,e,store,commit,_=setup([event('answer &lt;ref id="c999"/&gt; &lt;ref id="c1"/&gt;',done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request('CHEAP_ONLY'),CTX));assert 'c999' not in out.answer and 'chunk_id="chunk-current"' in out.answer and len(out.references)==1
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_split_citations_resources_and_cheap_state_isolated" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_split_citations_resources_and_cheap_state_isolated():
+        evidence=replace(E,content='![image](resource://abcdefghijklmnopqrstuv)')
+        req=request(evidence=(evidence,),history=(History('previous','historic &lt;kb doc="old" chunk_id="chunk-old" /&gt;'),))
+        co,c,e,store,commit,_=setup([event('draft &lt;ref id="c99"/&gt;',done=True,finish='stop',final=True)], [event('![image](re'),event('s://0001) claim &lt;re'),event('f id="c1"/&gt;',done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(req,CTX));assert 'resource://abcdefghijklmnopqrstuv' in out.answer and 'chunk_id="chunk-current"' in out.answer
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_clean_eof_and_duplicate_done_no_duplicate_answer" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_clean_eof_and_duplicate_done_no_duplicate_answer():
+        co,c,e,*_=setup([event('one'),event('two',done=True,finish='stop'),event('ignored duplicate',done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request(),CTX));assert out.answer=='onetwo'
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_cancel_after_cheap_prevents_expensive_and_publication" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_cancel_after_cheap_prevents_expensive_and_publication():
+        async def exercise():
+            cancelled=asyncio.Event()
+            def stop(ctx):cancelled.set();return event('partial',done=True,finish='length',final=True)
+            co,c,e,store,commit,life=setup([stop])
+            with pytest.raises(CallCancelled):await co.run(request(),replace(CTX,cancelled=cancelled))
+            assert not e.calls and not store.events and not commit.calls
+&gt;       run(exercise())
+
+tests\weknora_port\test_generation.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:143: in exercise
+    with pytest.raises(CallCancelled):await co.run(request(),replace(CTX,cancelled=cancelled))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_idempotent_replay_never_invokes_provider_again" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_idempotent_replay_never_invokes_provider_again():
+        co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)])
+&gt;       run(co.run(request(),CTX))
+
+tests\weknora_port\test_generation.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_finalization_failure_never_emits_complete" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_finalization_failure_never_emits_complete():
+        co,c,e,store,commit,_=setup([event('answer',done=True,finish='stop',final=True)],fail_commit=True)
+&gt;       with pytest.raises(GenerationError,match='GENERATION_FINAL_COMMIT_FAILED'):run(co.run(request(),CTX))
+                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_scope_and_endpoint_identity_denials_before_send" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_scope_and_endpoint_identity_denials_before_send():
+        co,c,e,*_=setup([])
+        with pytest.raises(GenerationError,match='GENERATION_EVIDENCE_SCOPE_MISMATCH'):run(co.run(request(),replace(CTX,scope=TrustedScope('owner',('wrong',)))))
+        co.bindings['cheap']=replace(co.bindings['cheap'],endpoint='https://wrong.example')
+&gt;       with pytest.raises(GenerationError,match='GENERATION_ENDPOINT_IDENTITY_MISMATCH'):run(co.run(request(),CTX))
+                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_closed_default_lifecycle_and_unverified_estimator" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_closed_default_lifecycle_and_unverified_estimator():
+        co,c,e,store,commit,_=setup([]);co.lifecycle=None
+        from backend.weknora_port.generation.types import ClosedLifecycle
+        co.lifecycle=ClosedLifecycle()
+&gt;       with pytest.raises(GenerationError,match='GENERATION_LIFECYCLE_UNAVAILABLE'):run(co.run(request(),CTX))
+                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_original_message_order_prompts_and_source_handles" time="0.001"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_original_message_order_prompts_and_source_handles():
+        req=request(history=(History('earlier query','earlier answer'),),memory_prompt='\nMEMORY BLOCK')
+&gt;       prepared=prepare_generation(req)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_full_prompt_estimator_called_once_after_context_and_before_route" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_full_prompt_estimator_called_once_after_context_and_before_route():
+        class Estimator:
+            def __init__(self):self.calls=[]
+            def estimate(self,messages,options):self.calls.append(messages);return TokenEstimate(2001,'PINNED_OFFLINE_ESTIMATOR/v1')
+        estimator=Estimator();co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)],estimator=estimator)
+&gt;       out=run(co.run(request(),CTX));assert len(estimator.calls)==1 and estimator.calls[0] is c.calls[0][0]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:188: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_physical_resource_source_model_output_order_is_preserved" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_physical_resource_source_model_output_order_is_preserved():
+        evidence=replace(E,content='![image](local://folder/image.png?x=1&amp;y=2)')
+        req=request(evidence=(evidence,))
+        co,c,e,*_=setup([event('![image](res://0001)',done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(req,CTX))
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_cancellation_during_atomic_callback_prevents_complete_publication" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_cancellation_during_atomic_callback_prevents_complete_publication():
+        async def exercise():
+            cancelled=asyncio.Event()
+            co,c,e,store,commit,_=setup([event('answer',done=True,finish='stop',final=True)])
+            class CancelOnCommit:
+                async def commit_final(self,data):cancelled.set()
+            co.committer=CancelOnCommit()
+            with pytest.raises(CallCancelled):await co.run(request(),replace(CTX,cancelled=cancelled))
+            assert all(ev.type!='complete' for ev in store.events)
+&gt;       run(exercise())
+
+tests\weknora_port\test_generation.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:207: in exercise
+    with pytest.raises(CallCancelled):await co.run(request(),replace(CTX,cancelled=cancelled))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_final_public_metadata_drops_endpoint_query_credentials" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_policy_flags_and_threshold_cannot_be_reconfigured[kwargs0]" time="0.000" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_policy_flags_and_threshold_cannot_be_reconfigured[kwargs1]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_policy_flags_and_threshold_cannot_be_reconfigured[kwargs2]" time="0.000" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_policy_flags_and_threshold_cannot_be_reconfigured[kwargs3]" time="0.000" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_policy_flags_and_threshold_cannot_be_reconfigured[kwargs4]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_frozen_policy_flags_and_threshold_cannot_be_reconfigured[kwargs5]" time="0.001" /><testcase classname="tests.weknora_port.test_generation" name="test_usage_or_settlement_failure_after_finish_never_publishes_or_upgrades" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_usage_or_settlement_failure_after_finish_never_publishes_or_upgrades():
+        co,c,e,store,commit,life=setup([event('completed draft',done=True,finish='stop'),ProviderError('MODEL_USAGE_SETTLEMENT_FAILED',sent=True)])
+&gt;       with pytest.raises(ProviderError):run(co.run(request(),CTX))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_default_L_unknown_does_not_invent_actual_input_load" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_default_L_unknown_does_not_invent_actual_input_load():
+        co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)])
+&gt;       out=run(co.run(request(),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:231: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_source_encoder_does_not_rewrite_known_ids_in_user_prose" time="0.001"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_source_encoder_does_not_rewrite_known_ids_in_user_prose():
+        req=request(q0='question about doc-current')
+        req=replace(req,finalized=replace(req.finalized,user_content=req.finalized.rendered_contexts+'\nquestion about doc-current'))
+&gt;       prepared=prepare_generation(req)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:238: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_configurable_role_provider_model_endpoint_uses_uniform_interface[DYNAMIC]" time="0.004"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">mode = 'DYNAMIC'
+
+    @pytest.mark.parametrize("mode", ["DYNAMIC", "CHEAP_ONLY", "EXPENSIVE_ONLY", "OFF"])
+    def test_configurable_role_provider_model_endpoint_uses_uniform_interface(mode):
+        co,c,e,store,commit,life=setup([event('partial',done=True,finish='length',final=True)])
+        c.config=provider_config('openai-compatible','configured-small',base_url='https://small.example/v1')
+        e.config=provider_config('siliconflow','configured-large',base_url='https://large.example/v1')
+        co.bindings={role:RoleBinding(role,m.config.provider,m.config.model,m.config.base_url,m) for role,m in [('cheap',c),('expensive',e),('baseline',e)]}
+&gt;       out=run(co.run(request(mode),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_configurable_role_provider_model_endpoint_uses_uniform_interface[CHEAP_ONLY]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">mode = 'CHEAP_ONLY'
+
+    @pytest.mark.parametrize("mode", ["DYNAMIC", "CHEAP_ONLY", "EXPENSIVE_ONLY", "OFF"])
+    def test_configurable_role_provider_model_endpoint_uses_uniform_interface(mode):
+        co,c,e,store,commit,life=setup([event('partial',done=True,finish='length',final=True)])
+        c.config=provider_config('openai-compatible','configured-small',base_url='https://small.example/v1')
+        e.config=provider_config('siliconflow','configured-large',base_url='https://large.example/v1')
+        co.bindings={role:RoleBinding(role,m.config.provider,m.config.model,m.config.base_url,m) for role,m in [('cheap',c),('expensive',e),('baseline',e)]}
+&gt;       out=run(co.run(request(mode),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_configurable_role_provider_model_endpoint_uses_uniform_interface[EXPENSIVE_ONLY]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">mode = 'EXPENSIVE_ONLY'
+
+    @pytest.mark.parametrize("mode", ["DYNAMIC", "CHEAP_ONLY", "EXPENSIVE_ONLY", "OFF"])
+    def test_configurable_role_provider_model_endpoint_uses_uniform_interface(mode):
+        co,c,e,store,commit,life=setup([event('partial',done=True,finish='length',final=True)])
+        c.config=provider_config('openai-compatible','configured-small',base_url='https://small.example/v1')
+        e.config=provider_config('siliconflow','configured-large',base_url='https://large.example/v1')
+        co.bindings={role:RoleBinding(role,m.config.provider,m.config.model,m.config.base_url,m) for role,m in [('cheap',c),('expensive',e),('baseline',e)]}
+&gt;       out=run(co.run(request(mode),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_configurable_role_provider_model_endpoint_uses_uniform_interface[OFF]" time="0.003"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">mode = 'OFF'
+
+    @pytest.mark.parametrize("mode", ["DYNAMIC", "CHEAP_ONLY", "EXPENSIVE_ONLY", "OFF"])
+    def test_configurable_role_provider_model_endpoint_uses_uniform_interface(mode):
+        co,c,e,store,commit,life=setup([event('partial',done=True,finish='length',final=True)])
+        c.config=provider_config('openai-compatible','configured-small',base_url='https://small.example/v1')
+        e.config=provider_config('siliconflow','configured-large',base_url='https://large.example/v1')
+        co.bindings={role:RoleBinding(role,m.config.provider,m.config.model,m.config.base_url,m) for role,m in [('cheap',c),('expensive',e),('baseline',e)]}
+&gt;       out=run(co.run(request(mode),CTX))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_generation.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_configurable_binding_still_checks_actual_configuration_identity" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">def test_configurable_binding_still_checks_actual_configuration_identity():
+        co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)])
+        co.bindings['cheap']=replace(co.bindings['cheap'],model_requested='different-config-model')
+        with pytest.raises(GenerationError,match='GENERATION_MODEL_IDENTITY_MISMATCH'):
+&gt;           run(co.run(request(),CTX))
+
+tests\weknora_port\test_generation.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade[output0]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">output = ModelCallTimeout('MODEL_CALL_TIMEOUT')
+
+    @pytest.mark.parametrize('output', [
+        ModelCallTimeout(sent=True),
+        event('MODEL_CALL_TIMEOUT',kind='error',data={'error_code':'MODEL_CALL_TIMEOUT','error_class':'ModelCallTimeout'},final=True),
+    ])
+    def test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade(output):
+        co,c,e,store,commit,life=setup([event('discarded draft'),output])
+        with pytest.raises(ModelCallTimeout):
+&gt;           run(co.run(request(),CTX))
+
+tests\weknora_port\test_generation.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade[output1]" time="0.002"><failure message="AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'">output = StreamResponse(response_type='error', content='MODEL_CALL_TIMEOUT', done=False, tool_calls=(), usage=None, finish_reason='', is_final=True)
+
+    @pytest.mark.parametrize('output', [
+        ModelCallTimeout(sent=True),
+        event('MODEL_CALL_TIMEOUT',kind='error',data={'error_code':'MODEL_CALL_TIMEOUT','error_class':'ModelCallTimeout'},final=True),
+    ])
+    def test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade(output):
+        co,c,e,store,commit,life=setup([event('discarded draft'),output])
+        with pytest.raises(ModelCallTimeout):
+&gt;           run(co.run(request(),CTX))
+
+tests\weknora_port\test_generation.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:213: in run
+    prepared = prepare_generation(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = GenerationRequest(run_id='run', session_id='session', message_id='assistant', language='Chinese', supports_vision=Fals...mal('0.35'), quality_escalation=True, truncated_escalation=True, abstention_escalation=False, provider_fallback=False))
+now = None
+
+    def prepare_generation(request, *, now=None):
+        """Prepare once, before routing. Never append Cheap output or reretrieve."""
+&gt;       now = now or request.rendered_at
+                     ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'GenerationRequest' object has no attribute 'rendered_at'
+
+backend\weknora_port\generation\context.py:113: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_upgradable_stream_visible_before_provider_finishes[OFF]" time="1.013"><failure message="TimeoutError">fut = &lt;coroutine object Event.wait at 0x000002BAB77827A0&gt;, timeout = 1
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout &lt;= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout &lt;= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+&gt;           return await fut
+                   ^^^^^^^^^
+
+D:\Drivers\python\Lib\asyncio\tasks.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;asyncio.locks.Event object at 0x000002BAB4D957D0 [unset]&gt;
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another task calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+&gt;           await fut
+E           asyncio.exceptions.CancelledError
+
+D:\Drivers\python\Lib\asyncio\locks.py:213: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+mode = 'OFF'
+
+    @pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+    def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def stream(messages,options,context):
+                yield event('first &lt;re')
+                first.set()
+                await release.wait()
+                yield event('f id="c1"/&gt; second',done=True,finish='stop')
+                yield event('duplicate',done=True,finish='stop')
+            c.chat_stream=stream;e.chat_stream=stream
+            task=asyncio.create_task(co.run(request(mode),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+            release.set();out=await asyncio.wait_for(task,1)
+            deltas=[v for v in store.events if v.type=='answer']
+            assert ''.join(v.content for v in deltas)==out.answer
+            assert len({v.event_id for v in deltas})==1
+            assert sum(v.done for v in deltas)==1
+            assert 'duplicate' not in out.answer
+            assert store.trace[-2:]==['COMMIT','complete']
+&gt;       run(exercise())
+
+tests\weknora_port\test_generation.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:290: in exercise
+    await asyncio.wait_for(first.wait(),1)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Timeout [expired]&gt;
+exc_type = &lt;class 'asyncio.exceptions.CancelledError'&gt;
+exc_val = CancelledError(), exc_tb = &lt;traceback object at 0x000002BAB0CA32C0&gt;
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -&gt; Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() &lt;= self._cancelling and exc_type is not None:
+                # Since there are no new cancel requests, we're
+                # handling this.
+                if issubclass(exc_type, exceptions.CancelledError):
+&gt;                   raise TimeoutError from exc_val
+E                   TimeoutError
+
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: TimeoutError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_upgradable_stream_visible_before_provider_finishes[CHEAP_ONLY]" time="1.009"><failure message="TimeoutError">fut = &lt;coroutine object Event.wait at 0x000002BAAF6A1EE0&gt;, timeout = 1
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout &lt;= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout &lt;= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+&gt;           return await fut
+                   ^^^^^^^^^
+
+D:\Drivers\python\Lib\asyncio\tasks.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;asyncio.locks.Event object at 0x000002BAB4C06CF0 [unset]&gt;
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another task calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+&gt;           await fut
+E           asyncio.exceptions.CancelledError
+
+D:\Drivers\python\Lib\asyncio\locks.py:213: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+mode = 'CHEAP_ONLY'
+
+    @pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+    def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def stream(messages,options,context):
+                yield event('first &lt;re')
+                first.set()
+                await release.wait()
+                yield event('f id="c1"/&gt; second',done=True,finish='stop')
+                yield event('duplicate',done=True,finish='stop')
+            c.chat_stream=stream;e.chat_stream=stream
+            task=asyncio.create_task(co.run(request(mode),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+            release.set();out=await asyncio.wait_for(task,1)
+            deltas=[v for v in store.events if v.type=='answer']
+            assert ''.join(v.content for v in deltas)==out.answer
+            assert len({v.event_id for v in deltas})==1
+            assert sum(v.done for v in deltas)==1
+            assert 'duplicate' not in out.answer
+            assert store.trace[-2:]==['COMMIT','complete']
+&gt;       run(exercise())
+
+tests\weknora_port\test_generation.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:290: in exercise
+    await asyncio.wait_for(first.wait(),1)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Timeout [expired]&gt;
+exc_type = &lt;class 'asyncio.exceptions.CancelledError'&gt;
+exc_val = CancelledError(), exc_tb = &lt;traceback object at 0x000002BAAF9C5540&gt;
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -&gt; Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() &lt;= self._cancelling and exc_type is not None:
+                # Since there are no new cancel requests, we're
+                # handling this.
+                if issubclass(exc_type, exceptions.CancelledError):
+&gt;                   raise TimeoutError from exc_val
+E                   TimeoutError
+
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: TimeoutError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_non_upgradable_stream_visible_before_provider_finishes[EXPENSIVE_ONLY]" time="1.007"><failure message="TimeoutError">fut = &lt;coroutine object Event.wait at 0x000002BAB88599A0&gt;, timeout = 1
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout &lt;= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout &lt;= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+&gt;           return await fut
+                   ^^^^^^^^^
+
+D:\Drivers\python\Lib\asyncio\tasks.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;asyncio.locks.Event object at 0x000002BAB4C4B9B0 [unset]&gt;
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another task calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+&gt;           await fut
+E           asyncio.exceptions.CancelledError
+
+D:\Drivers\python\Lib\asyncio\locks.py:213: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+mode = 'EXPENSIVE_ONLY'
+
+    @pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+    def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def stream(messages,options,context):
+                yield event('first &lt;re')
+                first.set()
+                await release.wait()
+                yield event('f id="c1"/&gt; second',done=True,finish='stop')
+                yield event('duplicate',done=True,finish='stop')
+            c.chat_stream=stream;e.chat_stream=stream
+            task=asyncio.create_task(co.run(request(mode),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+            release.set();out=await asyncio.wait_for(task,1)
+            deltas=[v for v in store.events if v.type=='answer']
+            assert ''.join(v.content for v in deltas)==out.answer
+            assert len({v.event_id for v in deltas})==1
+            assert sum(v.done for v in deltas)==1
+            assert 'duplicate' not in out.answer
+            assert store.trace[-2:]==['COMMIT','complete']
+&gt;       run(exercise())
+
+tests\weknora_port\test_generation.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:290: in exercise
+    await asyncio.wait_for(first.wait(),1)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Timeout [expired]&gt;
+exc_type = &lt;class 'asyncio.exceptions.CancelledError'&gt;
+exc_val = CancelledError(), exc_tb = &lt;traceback object at 0x000002BAAF762440&gt;
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -&gt; Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() &lt;= self._cancelling and exc_type is not None:
+                # Since there are no new cancel requests, we're
+                # handling this.
+                if issubclass(exc_type, exceptions.CancelledError):
+&gt;                   raise TimeoutError from exc_val
+E                   TimeoutError
+
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: TimeoutError</failure></testcase><testcase classname="tests.weknora_port.test_generation" name="test_dynamic_cheap_draft_buffered_expensive_stream_live" time="1.011"><failure message="TimeoutError">fut = &lt;coroutine object Event.wait at 0x000002BAAF6A2420&gt;, timeout = 1
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout &lt;= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout &lt;= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+&gt;           return await fut
+                   ^^^^^^^^^
+
+D:\Drivers\python\Lib\asyncio\tasks.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;asyncio.locks.Event object at 0x000002BAB4D6E4B0 [unset]&gt;
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another task calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+&gt;           await fut
+E           asyncio.exceptions.CancelledError
+
+D:\Drivers\python\Lib\asyncio\locks.py:213: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+    def test_dynamic_cheap_draft_buffered_expensive_stream_live():
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def cheap(messages,options,context):
+                yield event('rejected cheap',done=True,finish='length')
+            async def expensive(messages,options,context):
+                assert not store.events
+                yield event('accepted first')
+                first.set();await release.wait()
+                yield event(' second',done=True,finish='stop')
+            c.chat_stream=cheap;e.chat_stream=expensive
+            task=asyncio.create_task(co.run(request(),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='accepted first'
+            release.set();out=await asyncio.wait_for(task,1)
+            assert out.upgraded and len(life.finished)==2
+            assert ''.join(v.content for v in store.events if v.type=='answer')==out.answer
+            assert all('rejected cheap' not in v.content for v in store.events)
+&gt;       run(exercise())
+
+tests\weknora_port\test_generation.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:315: in exercise
+    await asyncio.wait_for(first.wait(),1)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Timeout [expired]&gt;
+exc_type = &lt;class 'asyncio.exceptions.CancelledError'&gt;
+exc_val = CancelledError(), exc_tb = &lt;traceback object at 0x000002BAAF86D240&gt;
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -&gt; Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() &lt;= self._cancelling and exc_type is not None:
+                # Since there are no new cancel requests, we're
+                # handling this.
+                if issubclass(exc_type, exceptions.CancelledError):
+&gt;                   raise TimeoutError from exc_val
+E                   TimeoutError
+
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: TimeoutError</failure></testcase></testsuite></testsuites>

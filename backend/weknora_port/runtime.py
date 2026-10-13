@@ -370,13 +370,14 @@ class ApplicationRuntime:
             LeasedKnowledgeRepository(self, registry), registry, on_progress=progress,
             persist_sink=self._persist_context)
 
-    async def _generation(self, turn, progress):
+    async def _generation(self, turn, progress, *, policy=None):
+        policy=policy or self.policy
         data = self._runs[turn.run_id]
         registry = data["registry"]
         bindings = {}
-        roles = ("cheap", "expensive") if self.policy.mode == "DYNAMIC" else (
-            ("cheap",) if self.policy.mode == "CHEAP_ONLY" else
-            ("expensive",) if self.policy.mode == "EXPENSIVE_ONLY" else ())
+        roles = ("cheap", "expensive") if policy.mode == "DYNAMIC" else (
+            ("cheap",) if policy.mode == "CHEAP_ONLY" else
+            ("expensive",) if policy.mode == "EXPENSIVE_ONLY" else ())
         ids = dict(data["snapshot"].model_ids)
         for role in roles:
             if ids.get(role):
@@ -384,7 +385,7 @@ class ApplicationRuntime:
                 config = model.config
                 bindings[role] = RoleBinding(role, config.provider, config.model,
                     config.endpoint_url or config.base_url, model)
-        if self.policy.mode == "OFF":
+        if policy.mode == "OFF":
             baseline = await registry.chat(data["chat_id"], turn.context)
             config = baseline.config
             bindings["baseline"] = RoleBinding(

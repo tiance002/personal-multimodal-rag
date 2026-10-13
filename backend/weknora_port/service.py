@@ -52,6 +52,12 @@ class MemoryBundle:
     prompt: str = field(default='',repr=False)
     origin_kbs: tuple[str, ...] | None = None
 
+@dataclass(frozen=True)
+class PreparedOrdinaryTurn:
+    request: Any = field(repr=False)
+    context: CallContext = field(repr=False)
+    rankings: tuple[tuple[str,tuple[tuple[str,str,str],...]],...] = ()
+
 @dataclass
 class TurnConfiguration:
     pipeline_state: PipelineState
@@ -215,6 +221,60 @@ class RuntimeService:
                 if event.type=='stop':turn.context.cancelled.set();return
                 if event.type=='complete' or event.type=='error' and event.done:return
 
+    async def prepare_turn(self,turn,progress=None):
+        """The ordinary entry's sole history/memory/retrieval/Context preparation."""
+        self._validate(turn)
+        if turn.replay_only:raise ProviderError('TURN_PREPARATION_REPLAY_DENIED')
+        if progress is None:
+            async def progress(stage,status,**fields):await self._progress(turn,stage,status,**fields)
+        check_context(turn.context)
+        config=await _resolve(self.configuration(turn))
+        if not isinstance(config,TurnConfiguration) or not isinstance(config.pipeline_state,PipelineState):
+            raise ProviderError('TURN_CONFIGURATION_REQUIRED')
+        state=config.pipeline_state
+        # q0 and identities are server admission values, not mutable config.
+        state.query=turn.request.content
+        state.user_message_id=turn.user_message_id
+        await progress('history','started')
+        rounds=tuple(await self.history_service.load(turn.memory_context,turn.session_id,state.max_rounds))
+        history=tuple(History(h.query,h.answer) for h in rounds)
+        state.history=list(rounds)
+        await progress('history','completed')
+        check_context(turn.context)
+        await progress('memory','started')
+        memory=await self.memory_loader.load(turn.memory_context,turn.request.content)
+        if not isinstance(memory,MemoryBundle):
+            raise ProviderError('MEMORY_BUNDLE_REQUIRED')
+        model_context = turn.context
+        if memory.background or memory.prompt:
+            if not isinstance(memory.origin_kbs, tuple) or not memory.origin_kbs or not all(isinstance(k, str) and k for k in memory.origin_kbs):
+                raise ProviderError('MODEL_MEMORY_ORIGIN_UNKNOWN')
+            model_context = replace(turn.context, required_origin_kbs=tuple(sorted(set(turn.context.required_origin_kbs) | set(memory.origin_kbs))))
+        state.memory_background=memory.background
+        await progress('memory','completed')
+        check_context(turn.context)
+        pipeline=await _resolve(self.pipeline_factory(turn,progress))
+        finalized=await pipeline.run(state,model_context)
+        check_context(turn.context)
+        evidence=tuple(Evidence.from_result(r) for r in state.merge_results if r is not None)
+        # Existing query-understand validation supplies the rewrite; P5
+        # retains q0 and computes max features, without another model call.
+        understanding=ValidatedRewrite(turn.request.content,state.rewrite_query) if state.rewrite_query else None
+        from datetime import datetime
+        options=dict(config.generation_options)
+        options.setdefault('rendered_at',datetime.now())
+        options.setdefault('language',state.language)
+        options.setdefault('supports_vision',state.chat_model_supports_vision)
+        options.setdefault('faq_priority_enabled',state.faq_priority_enabled)
+        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding'} & options.keys()
+        if forbidden:
+            raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
+        request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
+            evidence=evidence,history=history,memory_prompt=memory.prompt,understanding=understanding,**options)
+        stages=[('search',state.search_results),('rerank',state.rerank_results),('context',state.merge_results)]
+        rankings=tuple((name,tuple((r.id,r.knowledge_base_id,r.knowledge_id) for r in rows if r is not None)) for name,rows in stages)
+        return PreparedOrdinaryTurn(request,model_context,rankings)
+
     async def run_turn(self, turn):
         self._validate(turn)
         if turn.replay_only:
@@ -227,48 +287,8 @@ class RuntimeService:
         async def progress(stage,status,**fields):
             await self._progress(turn,stage,status,**fields)
         try:
-            check_context(turn.context)
-            config=await _resolve(self.configuration(turn))
-            if not isinstance(config,TurnConfiguration) or not isinstance(config.pipeline_state,PipelineState):
-                raise ProviderError('TURN_CONFIGURATION_REQUIRED')
-            state=config.pipeline_state
-            # q0 and identities are server admission values, not mutable config.
-            state.query=turn.request.content
-            state.user_message_id=turn.user_message_id
-            await progress('history','started')
-            rounds=tuple(await self.history_service.load(turn.memory_context,turn.session_id,state.max_rounds))
-            history=tuple(History(h.query,h.answer) for h in rounds)
-            state.history=list(rounds)
-            await progress('history','completed')
-            check_context(turn.context)
-            await progress('memory','started')
-            memory=await self.memory_loader.load(turn.memory_context,turn.request.content)
-            if not isinstance(memory,MemoryBundle):
-                raise ProviderError('MEMORY_BUNDLE_REQUIRED')
-            model_context = turn.context
-            if memory.background or memory.prompt:
-                if not isinstance(memory.origin_kbs, tuple) or not memory.origin_kbs or not all(isinstance(k, str) and k for k in memory.origin_kbs):
-                    raise ProviderError('MODEL_MEMORY_ORIGIN_UNKNOWN')
-                model_context = replace(turn.context, required_origin_kbs=tuple(sorted(set(turn.context.required_origin_kbs) | set(memory.origin_kbs))))
-            state.memory_background=memory.background
-            await progress('memory','completed')
-            check_context(turn.context)
-            pipeline=await _resolve(self.pipeline_factory(turn,progress))
-            finalized=await pipeline.run(state,model_context)
-            check_context(turn.context)
-            evidence=tuple(Evidence.from_result(r) for r in state.merge_results if r is not None)
-            # Existing query-understand validation supplies the rewrite; P5
-            # retains q0 and computes max features, without another model call.
-            understanding=ValidatedRewrite(turn.request.content,state.rewrite_query) if state.rewrite_query else None
-            options=dict(config.generation_options)
-            options.setdefault('language',state.language)
-            options.setdefault('supports_vision',state.chat_model_supports_vision)
-            options.setdefault('faq_priority_enabled',state.faq_priority_enabled)
-            forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding'} & options.keys()
-            if forbidden:
-                raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
-            request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
-                evidence=evidence,history=history,memory_prompt=memory.prompt,understanding=understanding,**options)
+            prepared=await self.prepare_turn(turn,progress)
+            request,model_context=prepared.request,prepared.context
             coordinator=await _resolve(self.generation_factory(turn,progress))
             return await coordinator.run(request,model_context)
         except GenerationReplay:

@@ -11,3 +11,8 @@ Omni valid original parsingGold D:/RAG-v6-special-subsets-r1/download-verificati
 Continuation priorities: source image HTML/process override/fulltask lifecycle; deterministic source RAG/history/Asynq/stream failure-cancel parity; P7 native original ingestion/four-mode singlecaptured-context pairing and legitimate metrics; P8 isolated artifact build/restore preparation. Personal memory toggle/pending/topic routes remain partial. Exact SDK/worker differences need minimal source evidence before changes. No broad audit/rebuild, oldQuickChain use, realproviders, oldservice/key/config/DB changes, UNKNOWNrelease or push/tag/release. Owner now requested wait; do not automatically resume.
 
 Retained isolation: PG localhost56423 physical7696088403504697382;Redislocalhost56424run c7d5aaff50b2743adea96a426718c5df3483c80f; fresh volume names weknora-python-resume-{pg,redis}-20261013. All failed/successfulsyntheticrecords/history/UNKNOWN and local E originals remain. No cleanup containers/volumes.
+
+
+## Latest Owner pause — P7 capture batch, 2026-10-14
+
+See P7_CAPTURE_PAUSE_20261014.md. Frozen Gold verified locally; native single-preparation/four-mode capture and metric boundaries implemented with offline evidence. Dedicated PG/HTTP execution blocked by unavailable Docker Engine; real-provider and cutover NOT RUN. Owner asked to close and wait. Do not automatically resume or restart services.
