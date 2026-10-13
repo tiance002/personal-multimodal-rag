@@ -51,24 +51,58 @@ def normalize_profile(raw):
     if topics:output['topics']=topics
     return output or None
 
+def extract_balanced_json(content):
+    obj,arr=content.find('{'),content.find('[')
+    if obj<0 and arr<0:return ''
+    start=arr if obj<0 else obj if arr<0 else min(obj,arr)
+    opening=content[start];closing='}' if opening=='{' else ']'
+    depth=0;quoted=False;escaped=False
+    for index,char in enumerate(content[start:],start):
+        if quoted:
+            if escaped:escaped=False
+            elif char=='\\':escaped=True
+            elif char=='"':quoted=False
+            continue
+        if char=='"':quoted=True
+        elif char==opening:depth+=1
+        elif char==closing:
+            depth-=1
+            if depth==0:return go_strip(content[start:index+1])
+    return ''
+
+
 def parse_summary(content):
     content=go_strip(content)
-    try:
-        clean=content
-        if clean.startswith('```json'):clean=clean[7:]
-        elif clean.startswith('```'):clean=clean[3:]
-        if clean.endswith('```'):clean=clean[:-3]
-        raw=json.loads(clean)
-        if not isinstance(raw,dict):raise ValueError()
-        if any(name in raw and raw[name] is not None and not isinstance(raw[name],str)
-               for name in ('summary','gist','doc_type','typical_question')):raise ValueError()
-        if raw.get('topics') is not None and (not isinstance(raw['topics'],list) or
-                any(not isinstance(v,str) for v in raw['topics'])):raise ValueError()
-        raw={k:v for k,v in raw.items() if v is not None}
-        profile=normalize_profile(raw)
-        summary=go_strip(raw.get('summary','')) or (profile or {}).get('gist','')
-        return (summary,profile) if summary else (content,None)
-    except (ValueError,TypeError):return content,None
+    candidates=[content]
+    fence=re.search(r'```(?:json)?[\t\n\f\r ]*([\s\S]*?)```',content)
+    if fence:candidates.append(go_strip(fence[1]))
+    balanced=extract_balanced_json(content)
+    if balanced:candidates.append(balanced)
+    for candidate in candidates:
+        try:
+            def invalid_constant(value):raise ValueError('invalid JSON constant')
+            pairs=json.loads(candidate,object_pairs_hook=lambda values:values,parse_constant=invalid_constant)
+            # Go unmarshals JSON null into the zero-valued output struct.
+            if candidate=='null':raw={}
+            elif not candidate.startswith('{'):raise ValueError()
+            else:
+                raw={}
+                fields={'summary','gist','doc_type','typical_question','topics'}
+                for key,value in pairs:
+                    name=key.lower()
+                    if name not in fields:continue
+                    if name=='topics':
+                        if value is not None and (not isinstance(value,list) or any(v is not None and not isinstance(v,str) for v in value)):raise ValueError()
+                        raw[name]=['' if v is None else v for v in value] if value is not None else []
+                    elif value is not None:
+                        if not isinstance(value,str):raise ValueError()
+                        raw[name]=value
+            profile=normalize_profile(raw)
+            summary=go_strip(raw.get('summary','')) or (profile or {}).get('gist','')
+            return (summary,profile) if summary else (content,None)
+        except (ValueError,TypeError):continue
+    return content,None
+
 
 def reconstruct(rows):
     edited=any(getattr(c,'content_revision',0)>0 for c in rows)
@@ -85,8 +119,33 @@ def reconstruct(rows):
             result=append_overlap(result,row.content,end-row.start_at);end=row.end_at
     return result
 
+def language_name(locale):
+    groups=[(('zh-CN','zh','zh-Hans'),'Chinese (Simplified)'),(('zh-TW','zh-HK','zh-Hant'),'Chinese (Traditional)'),
+        (('en-US','en','en-GB'),'English'),(('ko-KR','ko'),'Korean'),(('ja-JP','ja'),'Japanese'),
+        (('ru-RU','ru'),'Russian'),(('fr-FR','fr'),'French'),(('de-DE','de'),'German'),
+        (('es-ES','es'),'Spanish'),(('pt-BR','pt'),'Portuguese')]
+    for keys,name in groups:
+        if locale in keys:return name
+    return locale
+
+
+def summary_configuration(conversation,templates,locale=None):
+    # Resolved server configuration has precedence; unresolved ID selection
+    # follows source FindTemplateByID. Unknown IDs leave an empty prompt.
+    prompt=getattr(conversation,'generate_summary_prompt',None)
+    if prompt is None:
+        identifier=getattr(conversation,'generate_summary_prompt_id','default_summary')
+        prompt=next((row['content'] for row in templates if row.get('id')==identifier),'')
+    resolved=go_strip(locale or '') or go_strip(getattr(conversation,'language_locale','zh-CN')) or 'zh-CN'
+    settings=conversation.summary
+    limit=settings.get('max_input_chars',8192)
+    tokens=settings.get('max_completion_tokens',1024)
+    limit=limit if type(limit) is int and limit>0 else 8192
+    tokens=tokens if type(tokens) is int and tokens>0 else 1024
+    return prompt.replace('{{language}}',language_name(resolved)),limit,tokens
+
 class SourceDocumentPostprocessor:
-    def __init__(self,application,*,prompt_path=PROMPT_PATH,language='English'):
+    def __init__(self,application,*,prompt_path=PROMPT_PATH,language=None):
         self.app=application;self.prompt_path=Path(prompt_path);self.language=language
 
     async def __call__(self,principal,kb,document,ingest,chunks):
@@ -104,13 +163,21 @@ class SourceDocumentPostprocessor:
         if isinstance(strategy,str):strategy=json.loads(strategy)
         if strategy.get('graph_enabled') or strategy.get('wiki_enabled') or (kb.get('question_generation_config') or {}).get('enabled'):
             return False
-        if not kb.get('summary_model_id') or not self.prompt_path.is_file():return False
+        if not kb.get('summary_model_id'):return False
+        if getattr(app.conversation,'generate_summary_prompt',None) is None and not self.prompt_path.is_file():return False
         content=reconstruct(text)
-        if any(c.chunk_type in ('image_ocr','image_caption') for c in chunks):
-            return False  # image enrichment binding not yet equivalent
+        from .image_multimodal import enrich_summary_images
+        infos=[];seen=set()
+        for chunk in chunks:
+            if chunk.chunk_type not in ('image_ocr','image_caption') or not chunk.image_info:continue
+            for info in json.loads(chunk.image_info):
+                key=info.get('url') or info.get('original_url')
+                if key not in seen:infos.append(info);seen.add(key)
+        if infos:content=enrich_summary_images(content,infos,len(real_text(content))<200)
         settings=app.conversation.summary
-        limit=settings.get('max_input_chars',8192)
-        limit=limit if isinstance(limit,int) and limit>0 else 8192
+        import yaml
+        templates=yaml.safe_load(self.prompt_path.read_text(encoding='utf-8'))['templates'] if self.prompt_path.is_file() else []
+        prompt,limit,max_tokens=summary_configuration(app.conversation,templates,self.language)
         content=sample_long_content(content,limit)
         if len(real_text(content))<10:
             await app.documents._rows('UPDATE knowledges SET description=%s,profile=NULL,summary_status=%s '
@@ -118,9 +185,6 @@ class SourceDocumentPostprocessor:
                 ('','failed',principal.tenant_id,kb['id'],document['id']),
                 writable_knowledge_base_ids=frozenset({kb['id']}))
             return True
-        import yaml
-        prompt=yaml.safe_load(self.prompt_path.read_text(encoding='utf-8'))['templates'][0]['content']
-        prompt=prompt.replace('{{language}}',self.language)
         # Only explicit user metadata enters the model; internal ingestion state excluded.
         async with app.leases.lease() as guard:
             rows=await (await guard.connection.execute('SELECT custom_metadata,metadata FROM knowledges '
@@ -135,7 +199,7 @@ class SourceDocumentPostprocessor:
         try:
             model=await registry.chat(kb['summary_model_id'],context)
             response=await model.chat((Message('system',prompt),Message('user',content)),
-                ChatOptions(temperature=.3,max_tokens=settings.get('max_completion_tokens') or 1024,thinking=False),context)
+                ChatOptions(temperature=.3,max_tokens=max_tokens,thinking=False),context)
             if response is None or not go_strip(response.content):return False
             summary,profile=parse_summary(response.content)
             content='# Summary\n'+summary

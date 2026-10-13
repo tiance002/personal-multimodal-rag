@@ -307,15 +307,18 @@ class DocumentLifecycleService:
                 if self.asset_processor is None:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
                                             "MULTIMODAL_ADAPTER_REQUIRED", metadata)
-                image_chunks = await _resolve(self.asset_processor(principal, kb, doc_scope, ingest.parsed.assets))
-                for chunk in image_chunks:
-                    if (getattr(chunk, "owner_id", None), getattr(chunk, "knowledge_base_id", None),
-                            getattr(chunk, "document_id", None), getattr(chunk, "source_version", None)) != (
-                            principal.subject_id, knowledge_base_id, document_id, source_version):
-                        raise PermissionError("IMAGE_CHUNK_SCOPE_MISMATCH")
-                if image_chunks:
-                    plan = prepare_chunks(doc_scope, (*ingest.chunks, *image_chunks), title=Path(name).stem)
-
+                process_plan=getattr(self.asset_processor,'process_plan',None)
+                if callable(process_plan):
+                    plan=await process_plan(principal,kb,doc_scope,ingest.parsed.assets,plan)
+                else:
+                    image_chunks = await _resolve(self.asset_processor(principal, kb, doc_scope, ingest.parsed.assets))
+                    for chunk in image_chunks:
+                        if (getattr(chunk, "owner_id", None), getattr(chunk, "knowledge_base_id", None),
+                                getattr(chunk, "document_id", None), getattr(chunk, "source_version", None)) != (
+                                principal.subject_id, knowledge_base_id, document_id, source_version):
+                            raise PermissionError("IMAGE_CHUNK_SCOPE_MISMATCH")
+                    if image_chunks:
+                        plan = prepare_chunks(doc_scope, (*ingest.chunks, *image_chunks), title=Path(name).stem)
             strategy = _json_object(kb.get("indexing_strategy"))
             vector_enabled = bool(strategy.get("vector_enabled"))
             keyword_enabled = bool(strategy.get("keyword_enabled"))

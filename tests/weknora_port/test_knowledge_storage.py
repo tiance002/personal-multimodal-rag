@@ -92,7 +92,7 @@ def test_chunk_writer_500_row_batches_and_scope_checked_before_insert():
         context=CallContext("r",TrustedScope("owner",("kb",),("doc",)))
         await repo.create_chunks(ChunkPlan(rows,()),context)
         inserts=[(sql,params) for sql,params in conn.calls if sql.startswith("INSERT INTO chunks")]
-        assert [len(params)//16 for _,params in inserts]==[500,1]
+        assert [len(params)//17 for _,params in inserts]==[500,1]
         assert all(sql.count("%s")==len(params) and "ON CONFLICT" not in sql for sql,params in inserts)
         before=len(conn.calls)
         bad_context=CallContext("r",TrustedScope("owner",("other",)))

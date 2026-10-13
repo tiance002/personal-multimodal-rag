@@ -159,6 +159,17 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
             if request.url.path.endswith("/rerank"):
                 return httpx.Response(200, json={"results": [
                     {"index": i, "relevance_score": .9} for i, _ in enumerate(body["documents"])]})
+            if body.get('model')=='Qwen/Qwen2.5-VL-72B-Instruct':
+                parts=body['messages'][0]['content']
+                assert isinstance(parts,list)
+                prompt=next(p['text'] for p in parts if p['type']=='text')
+                image=next(p['image_url']['url'] for p in parts if p['type']=='image_url')
+                assert image.startswith('data:image/') and ';base64,' in image
+                content='Extracted scan: Blue widgets use protocol W-17.' if 'OCR' in prompt else 'A blue widget protocol sheet.'
+                if 'OCR' in prompt:assert 'BUSINESS_ONLY_CAPTION' not in prompt
+                else:assert 'BUSINESS_ONLY_CAPTION' in prompt and 'Chinese (Simplified)' in prompt
+                return httpx.Response(200,json={'model':body['model'],'choices':[{'message':{'content':content},'finish_reason':'stop'}],
+                    'usage':{'prompt_tokens':20,'completion_tokens':10,'total_tokens':30}})
             if body.get('messages',[{}])[0].get('content','').startswith('You maintain a small set of long-term notes'):
                 assert body['model']=='XingChenAGI/Xing4.0-29B'
                 assert 'I use blue widgets' in body['messages'][1]['content']
@@ -285,6 +296,46 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                         (document['id'],'summary'))).fetchall()
                     assert len(summary_rows)==1 and summary_rows[0]['parent_chunk_id']
                     assert summary_rows[0]['source_type']==0 and summary_rows[0]['is_enabled']
+                # Actual mixed text/scanned PDF and standalone-image native uploads.
+                import io,fitz
+                from PIL import Image,ImageDraw
+                image_buffer=io.BytesIO();image=Image.new('RGB',(800,500),'white')
+                ImageDraw.Draw(image).text((60,80),'Blue widgets use protocol W-17.',fill='black');image.save(image_buffer,format='PNG')
+                image_bytes=image_buffer.getvalue()
+                image_kb_reply=await client.post('/api/v1/knowledge-bases',json={'name':'synthetic-image-main'})
+                image_kb=image_kb_reply.json()['data']['id']
+                await runtime.update_knowledge_base_consent(principal,image_kb,True)
+                async with leases.lease(writable_knowledge_base_ids=frozenset({image_kb})) as image_guard:
+                    image_roles=dict((await runtime._snapshot(image_guard)).model_ids)
+                    await image_guard.connection.execute('UPDATE knowledge_bases SET image_processing_config=%s::jsonb,vlm_config=%s::jsonb WHERE tenant_id=%s AND id=%s',
+                        (json.dumps({'enable_multimodal':True}),json.dumps({'enabled':True,'model_id':image_roles['vlm'],
+                        'custom_instructions':'BUSINESS_ONLY_CAPTION'}),principal.tenant_id,image_kb))
+                pdf=fitz.open();pdf.new_page(width=800,height=500).insert_text((60,80),'A source text page about protocol W-17.')
+                page=pdf.new_page(width=800,height=500);page.insert_image(page.rect,stream=image_bytes)
+                pdf_bytes=pdf.tobytes();pdf.close()
+                image_documents=[]
+                for filename,content,mime in [('fixture-scan.pdf',pdf_bytes,'application/pdf'),('fixture-image.png',image_bytes,'image/png')]:
+                    uploaded=await client.post(f'/api/v1/knowledge-bases/{image_kb}/documents',files={'file':(filename,content,mime)})
+                    assert uploaded.status_code==200,uploaded.text
+                    image_document=uploaded.json()['data'];assert image_document['status']=='completed',image_document
+                    image_documents.append(image_document)
+                    async with leases.lease() as image_guard:
+                        image_rows=await (await image_guard.connection.execute('SELECT c.id,c.chunk_type,c.content,c.parent_chunk_id,c.image_info,e.is_enabled FROM chunks c LEFT JOIN embeddings e ON e.chunk_id=c.id WHERE c.tenant_id=%s AND c.knowledge_id=%s ORDER BY c.chunk_type',
+                            (principal.tenant_id,image_document['id']))).fetchall()
+                        profile_input=await (await image_guard.connection.execute('SELECT summary_status,profile,metadata FROM knowledges WHERE tenant_id=%s AND id=%s',
+                            (principal.tenant_id,image_document['id']))).fetchone()
+                    multimodal=[r for r in image_rows if r['chunk_type'] in ('image_ocr','image_caption')]
+                    assert {r['chunk_type'] for r in multimodal}=={'image_ocr','image_caption'}
+                    assert all(r['parent_chunk_id'] and r['image_info'] and r['is_enabled'] for r in multimodal)
+                    assert any('Extracted scan' in r['content'] for r in multimodal)
+                    assert profile_input['summary_status']=='completed' and profile_input['profile']
+                    image_document['fixture_image_rows']=image_rows
+                    image_document['fixture_parser_metadata']=profile_input['metadata']['parser_metadata']
+                scan=image_documents[0]['fixture_parser_metadata']
+                assert scan['text_page_count']==1 and scan['scanned_page_count']==1
+                vlm_prompts=[next(p['text'] for p in w['body']['messages'][0]['content'] if p['type']=='text') for w in wire if w['body'].get('model')=='Qwen/Qwen2.5-VL-72B-Instruct']
+                assert any('scanned PDF document' in prompt for prompt in vlm_prompts)
+                assert any('OCR assistant' in prompt and 'scanned PDF document' not in prompt for prompt in vlm_prompts)
                 # Verify the finalizer JOIN refuses both foreign tenants and
                 # wrong KBs, using disabled physical embeddings as witnesses.
                 foreign_kb, foreign_doc, foreign_source = [str(uuid.uuid4()) for _ in range(3)]
@@ -452,11 +503,12 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     "mock_wire_count": len(wire), "real_provider_calls": 0,
                     "assertions": "PASS", "cross_tenant_and_wrong_kb_index_activation": untouched,
                     "foreign_kb_http": wrong_scope.status_code, "profile_postprocessor": "SOURCE_TEXT_ADAPTER_WITH_MOCK_PROVIDER_GO_ORACLE_NOT_RUN",
+                    "p2_native_image_documents":image_documents,
                     "ordinary_memory_origin_gate":memory_origin_result,
                     "automatic_memory": {"queued_actual_redis": True,"actual_pg_saved": saved_memories,
                         "recalled_before_forget": True,"absent_after_forget": True,"embedding_residual": residual[0]["n"],"private_origin_denies_wire":True,"foreign_subject_denies_wire":True,"delete_http":removed.status_code},
                     "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
-                output = Path("docs/weknora-port/evidence/RESUME_MEMORY_ORIGIN_HTTP_CHAIN_20261013.json")
+                output = Path("docs/weknora-port/evidence/P2_NATIVE_IMAGE_PROFILE_HTTP_CHAIN_20261013.json")
                 output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
         finally:
             server.should_exit = True

@@ -179,7 +179,7 @@ class ProviderModel:
             raise ProviderError("MODEL_VISION_UNSUPPORTED")
         deadline=asyncio.get_running_loop().time()+env_duration("VLM_HTTP_TIMEOUT_SECONDS",180)
         if context.deadline is None or context.deadline>deadline:
-            context=replace(context,deadline=deadline,deadline_kind="provider")
+            context=replace(context,deadline=deadline,deadline_kind="model")
         if options is None:
             import struct
             temp=float(struct.unpack("f",struct.pack("f",.1))[0])

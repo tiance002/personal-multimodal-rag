@@ -1,0 +1,58 @@
+.............F......                                                     [100%]
+================================== FAILURES ===================================
+______ test_chunk_writer_500_row_batches_and_scope_checked_before_insert ______
+
+    def test_chunk_writer_500_row_batches_and_scope_checked_before_insert():
+        async def exercise():
+            conn=SourceConnection([])
+            retriever=PostgresRetriever(conn,IsolationPolicy("new",frozenset({"old"})),
+                writable_knowledge_base_ids=frozenset({"kb"}))
+            await retriever.verify_identity()
+            repo=ScopedKnowledgeRepository(retriever,tenant)
+            scope=DocumentScope(1,"owner","kb","doc","v")
+            rows=tuple(StoredChunk(str(i),scope,"literal",i,i*10,i*10+7,"text","") for i in range(501))
+            context=CallContext("r",TrustedScope("owner",("kb",),("doc",)))
+            await repo.create_chunks(ChunkPlan(rows,()),context)
+            inserts=[(sql,params) for sql,params in conn.calls if sql.startswith("INSERT INTO chunks")]
+            assert [len(params)//16 for _,params in inserts]==[500,1]
+            assert all(sql.count("%s")==len(params) and "ON CONFLICT" not in sql for sql,params in inserts)
+            before=len(conn.calls)
+            bad_context=CallContext("r",TrustedScope("owner",("other",)))
+            with pytest.raises(PermissionError): await repo.create_chunks(ChunkPlan(rows,()),bad_context)
+            assert len(conn.calls)==before
+>       asyncio.run(exercise())
+
+tests\weknora_port\test_knowledge_storage.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def exercise():
+        conn=SourceConnection([])
+        retriever=PostgresRetriever(conn,IsolationPolicy("new",frozenset({"old"})),
+            writable_knowledge_base_ids=frozenset({"kb"}))
+        await retriever.verify_identity()
+        repo=ScopedKnowledgeRepository(retriever,tenant)
+        scope=DocumentScope(1,"owner","kb","doc","v")
+        rows=tuple(StoredChunk(str(i),scope,"literal",i,i*10,i*10+7,"text","") for i in range(501))
+        context=CallContext("r",TrustedScope("owner",("kb",),("doc",)))
+        await repo.create_chunks(ChunkPlan(rows,()),context)
+        inserts=[(sql,params) for sql,params in conn.calls if sql.startswith("INSERT INTO chunks")]
+>       assert [len(params)//16 for _,params in inserts]==[500,1]
+E       assert [531, 1] == [500, 1]
+E         
+E         At index 0 diff: 531 != 500
+E         Use -v to get more diff
+
+tests\weknora_port\test_knowledge_storage.py:95: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_knowledge_storage.py::test_chunk_writer_500_row_batches_and_scope_checked_before_insert
+1 failed, 19 passed in 2.20s

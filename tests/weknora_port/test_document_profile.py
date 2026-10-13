@@ -21,3 +21,25 @@ def test_source_summary_plain_json_gist_and_empty_shapes():
     assert parse_summary('{"topics":[]}')==('{"topics":[]}',None)
     assert parse_summary('{"summary":123}')==('{"summary":123}',None)
     assert real_text('![x](public.png)<image><image_ocr>real OCR words</image_ocr></image>')=='real OCR words'
+
+
+def test_summary_recovery_matches_executed_go_source():
+    oracle=json.loads((Path(__file__).parent/'fixtures/summary_json_go_oracle.json').read_text(encoding='utf-8'))
+    assert oracle['exit_code']==0 and len(oracle['rows'])==len(oracle['cases']) and oracle['provider_calls']==0
+    for row in oracle['rows']:
+        assert parse_summary(oracle['cases'][row['index']])==(row['summary'],row['profile'])
+
+
+def test_source_summary_configuration_id_resolved_text_language_and_positive_limits():
+    from backend.weknora_port.document_profile import summary_configuration
+    from backend.weknora_port.runtime import ConversationSettings
+    from dataclasses import replace
+    rows=[{'id':'default_summary','content':'DEFAULT {{language}}'}, {'id':'custom','content':'CUSTOM {{language}}'}]
+    cfg=ConversationSettings()
+    assert summary_configuration(cfg,rows)==('DEFAULT Chinese (Simplified)',8192,1024)
+    cfg=replace(cfg,generate_summary_prompt_id='custom',summary={'max_input_chars':0,'max_completion_tokens':-2})
+    assert summary_configuration(cfg,rows,'en-US')==('CUSTOM English',8192,1024)
+    assert summary_configuration(replace(cfg,generate_summary_prompt='RESOLVED {{language}}'),rows,'ja')==('RESOLVED Japanese',8192,1024)
+    assert summary_configuration(replace(cfg,generate_summary_prompt_id='missing'),rows)[0]==''
+    assert summary_configuration(cfg,rows,'Unlisted Display Name')[0]=='CUSTOM Unlisted Display Name'
+    assert ConversationSettings.from_mapping({'conversation':{'generate_summary_prompt_id':'custom','generate_summary_prompt':'YAML MUST NOT WIN'}}).generate_summary_prompt is None

@@ -51,6 +51,8 @@ class StoredChunk:
     next_chunk_id: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    image_info: str = ""
+
     def embedding_content(self) -> str:
         body = self.content.strip()
         return self.context_header + "\n\n" + body if self.context_header else body

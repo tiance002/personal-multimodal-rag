@@ -178,7 +178,7 @@ class ScopedKnowledgeRepository:
         if not rows:
             return
         columns = ("id,tenant_id,knowledge_base_id,knowledge_id,content,source_content,chunk_index,"
-                   "start_at,end_at,chunk_type,context_header,parent_chunk_id,pre_chunk_id,next_chunk_id,metadata,index_status")
+                   "start_at,end_at,chunk_type,context_header,parent_chunk_id,pre_chunk_id,next_chunk_id,metadata,index_status,image_info")
         def clean(value: str) -> str:
             return value.encode("utf-8",errors="ignore").decode("utf-8").replace("\x00", "")
         async with self.retriever.connection.transaction():
@@ -189,8 +189,8 @@ class ScopedKnowledgeRepository:
                     values.extend((row.id,tenant,row.scope.knowledge_base_id,row.scope.knowledge_id,
                         clean(row.content),clean(row.source_content),row.chunk_index,row.start_at,row.end_at,
                         row.chunk_type,clean(row.context_header),row.parent_chunk_id or None,
-                        row.pre_chunk_id or None,row.next_chunk_id or None,json.dumps(row.metadata,ensure_ascii=False),"ready"))
-                placeholder = "(" + ",".join(["%s"] * 14 + ["%s::json", "%s"]) + ")"
+                        row.pre_chunk_id or None,row.next_chunk_id or None,json.dumps(row.metadata,ensure_ascii=False),"ready",clean(row.image_info)))
+                placeholder = "(" + ",".join(["%s"] * 14 + ["%s::json", "%s", "%s"]) + ")"
                 query = f"INSERT INTO chunks ({columns}) VALUES " + ",".join([placeholder] * len(batch))
                 # Source CreateChunks uses fresh UUIDs, not an upsert. A duplicate
                 # identity fails and rolls back all batches, preserving old rows.

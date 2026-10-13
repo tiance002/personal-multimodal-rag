@@ -47,10 +47,14 @@ class ConversationSettings:
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .3, "max_completion_tokens": 1024})
 
+    generate_summary_prompt_id: str = 'default_summary'
+    generate_summary_prompt: str | None = None  # already-resolved server text, not YAML
+    language_locale: str = 'zh-CN'  # explicit server locale; no implicit environment read
+
     @classmethod
     def from_mapping(cls, configuration):
         row = configuration["conversation"]
-        names = cls.__dataclass_fields__.keys()
+        names = cls.__dataclass_fields__.keys() - {'generate_summary_prompt', 'language_locale'}
         return cls(**{k: row[k] for k in names if k in row})
 
 
@@ -221,6 +225,9 @@ class ApplicationRuntime:
         self.memory_hook_errors=[]
         self.history = OrdinaryHistoryService(self.memory_repository)
         self._runs = {}
+        if documents.asset_processor is None:
+            from .image_multimodal import SourceImageProcessor
+            documents.asset_processor=SourceImageProcessor(self)
         if documents.post_processor is None:
             from .document_profile import SourceDocumentPostprocessor
             documents.post_processor = SourceDocumentPostprocessor(self)
