@@ -6,9 +6,9 @@ Full Goal active. Fixed upstream3e8b0bfc, clean starting main55372f7, isolated b
 |---|---|---|
 | P0 | Source/worktree baseline captured; live identity BLOCKED |55verified blobs; initial behavior/legacyP5 snapshots; existing contractFAIL31PREEXISTING; no writes/calls. Local baseline commit a6ddb16. |
 | P1 | IMPLEMENTED / OFFLINE_PASS for protocol subset; native security PARITY_BLOCKED |70mock/source-fixture checks;5executedGoSSEcases. NativeDNS/TLS/redirect work continues; fullGoRequestoracle WindowsCGObuildFAIL. No live call. |
-| P2 | SOURCE_READ in progress, implementation NOT_IMPLEMENTED | Parsing/chunking/index source mapping; isolated PG/ParadeDB runtime availability pending. |
-| P3 | SOURCE_READ in progress, implementation NOT_IMPLEMENTED | Effective config/fusion/merge/rerank/query/context parity; no custom selector. |
-| P4 | NOT_IMPLEMENTED | Synthetic short history/long memory, source handles, isolated persistence. |
+| P2 | IMPLEMENTATION_IN_PROGRESS, full parity pending | 8 chunk oracle fixtures; parser mechanisms still being aligned; PostgreSQL query adapter offline only, schema/index integration pending. |
+| P3 | IMPLEMENTATION_IN_PROGRESS, full parity pending | Effective config and fusion implemented with offline checks; remaining query/rerank/merge/context stages pending. |
+| P4 | SOURCE_READ; IMPLEMENTATION_IN_PROGRESS | Exact history/memory/source-handle source notes; ordinary history and memory worker active; storage wiring pending. |
 | P5 | Frozen legacy snapshots captured; new-chain wiring NOT_IMPLEMENTED | Required selection and upgrade, including explicit model-timeout upgrade; not optional/experimental. |
 | P6 | NOT_IMPLEMENTED | React/new SSE integration, onePOST/recovery/source opening/Smart boundary. |
 | P7 | NOT_IMPLEMENTED | Six dataset representative end-to-end adapters and paired results with Gold boundaries. |
