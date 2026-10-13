@@ -1,0 +1,65 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "license": "MIT / Tencent 2025; docs/weknora-port/UPSTREAM_LICENSE.md",
+  "blocks": [
+    {
+      "source": "migrations/versioned/000084_memory.up.sql",
+      "git_blob": "3178978b7106ab17e93c816071d4d3e4cf405de5",
+      "source_sha256": "3340298fec34c4e8427e5c6691cabfc0de6f1ae7af7cd139f3d810a9c5174fb7",
+      "generated_block_sha256": "eb80b91f4e8c52ced1e990fa0f3baceedb93c060a1625bc860eb28d65f73b6f1",
+      "adaptation": "-- SOURCE BLOCK 000084 (conditional root-owned table alterations only)"
+    },
+    {
+      "source": "migrations/versioned/000094_memory_consistency.up.sql",
+      "git_blob": "78f71100aecfd622da37b13f458ff029c3d123f8",
+      "source_sha256": "756954a66a93ebf3dd89e48be8ebcdde9ff3d24a324ed92b1294a791e234fa24",
+      "generated_block_sha256": "334906c6f2d2ec069db3bd01b63f5cb830a6d2c18149398c3652252187aef809",
+      "adaptation": "-- SOURCE BLOCK 000094 DDL (fresh instance; legacy repair DML excluded)"
+    },
+    {
+      "source": "migrations/versioned/000095_memory_vector_search.up.sql",
+      "git_blob": "4eb196a6bd61ca07fc338102da0e6bf0b0cdae1e",
+      "source_sha256": "d334949d5e139d098d074788965d92cdc845e467b2babf20bee76ae562c2791d",
+      "generated_block_sha256": "98df6d094ea719563773a71572d2a8cbd9bc688cac916d3c8a8a1c428524ca6b",
+      "adaptation": "-- SOURCE BLOCK 000095 (exact source)"
+    }
+  ],
+  "python_sources": {
+    "internal/application/repository/memory.go": {
+      "git_blob": "c3c2bc9714fc9bcb5ce682c39b8922f8f40f4e6e",
+      "source_sha256": "c93ebb68346b616682bd08fd5f3a5b1bf5223d1f3806f7ea4588c957c31bcd26"
+    },
+    "internal/application/repository/memory_lifecycle.go": {
+      "git_blob": "f5647e6d68fb3204201e8a0c9582408302f4ea17",
+      "source_sha256": "b946c3483ac43318c41290c679e2535349a6d53780b77d8b818ac318529fb6a5"
+    },
+    "internal/application/repository/memory_extraction.go": {
+      "git_blob": "cd94ea7e7d456c6c5d068ac5a3c4f257d00d1b34",
+      "source_sha256": "d4c1484a4fe3bbe528f3321d2d7159f76010468f3371a6c7e4a3e7821ce8e370"
+    },
+    "internal/application/repository/memory_vector.go": {
+      "git_blob": "6c8c70597c6f390483b9e96982dfe98ab89b8e0d",
+      "source_sha256": "2f4a46ca66a87a086ee8842bc6080ebc93ff5079b64c8700eb2bb13e2c2dc2a6"
+    },
+    "internal/types/memory.go": {
+      "git_blob": "e45586f8623c8efb661bc4c9a3b35698a6daa2d7",
+      "source_sha256": "8d7b6af1222aa1a0f6232fb4aa770a78757216991efd4971e4fd70757103f9f7"
+    },
+    "internal/types/memory_extraction.go": {
+      "git_blob": "6492404001878bf9c5faf1b0614add6ec044fba5",
+      "source_sha256": "ee38befef0b6e86dca1313b25fc244f6ae724f7584e818b035523e2e13ee8d48"
+    },
+    "internal/application/service/memory/extract.go": {
+      "git_blob": "df7d2c1eb143f34108adc57aa5c672981cec217f",
+      "source_sha256": "af44808881c3f0a53880c772416af962160a51c7f03c01b51de3abb908585780"
+    }
+  },
+  "generated_sha256": "615db120be7eda605156ade0a9f594f7a997dc4959fe54aa784316de65341bb6",
+  "execution": "GENERATION_ONLY",
+  "database_writes": 0,
+  "additional_block": {
+    "purpose": "Approved cache revision CAS, transactional operation identity, and Asynq->PG task-framework adaptation",
+    "sha256": "e1e4ec352d28ba15d7bcce55ac3219260da56f2e4f130bab1709410c4b8ed381",
+    "task_source": "internal/application/service/memory/extract.go:151-175"
+  }
+}
