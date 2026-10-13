@@ -19,6 +19,18 @@ class SearchResult:
     next_chunk_id: str = ""
     match_type: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
+    knowledge_source: str = ""
+    knowledge_title: str = ""
+    knowledge_filename: str = ""
+    knowledge_description: str = ""
+    knowledge_custom_metadata: str = ""
+    image_info: str = ""
+    chunk_metadata: dict[str, Any] = field(default_factory=dict)
+    sub_chunk_ids: list[str] = field(default_factory=list)
+    content_rewritten: bool = False
+    content_revision: int = 0
+    is_enabled: bool = True
+    matched_content: str = ""
 
 
 @dataclass
