@@ -1,0 +1,209 @@
+........................................................................ [ 85%]
+........FFF.                                                             [100%]
+================================== FAILURES ===================================
+______ test_non_upgradable_stream_visible_before_provider_finishes[OFF] _______
+
+mode = 'OFF'
+
+    @pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+    def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def stream(messages,options,context):
+                yield event('first <re')
+                first.set()
+                await release.wait()
+                yield event('f id="c1"/> second',done=True,finish='stop')
+                yield event('duplicate',done=True,finish='stop')
+            c.chat_stream=stream;e.chat_stream=stream
+            task=asyncio.create_task(co.run(request(mode),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+            release.set();out=await asyncio.wait_for(task,1)
+            deltas=[v for v in store.events if v.type=='answer']
+            assert ''.join(v.content for v in deltas)==out.answer
+            assert len({v.id for v in deltas})==1
+            assert sum(v.done for v in deltas)==1
+            assert 'duplicate' not in out.answer
+            assert store.trace[-2:]==['COMMIT','complete']
+>       run(exercise())
+
+tests\weknora_port\test_generation.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def stream(messages,options,context):
+            yield event('first <re')
+            first.set()
+            await release.wait()
+            yield event('f id="c1"/> second',done=True,finish='stop')
+            yield event('duplicate',done=True,finish='stop')
+        c.chat_stream=stream;e.chat_stream=stream
+        task=asyncio.create_task(co.run(request(mode),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+        release.set();out=await asyncio.wait_for(task,1)
+        deltas=[v for v in store.events if v.type=='answer']
+        assert ''.join(v.content for v in deltas)==out.answer
+>       assert len({v.id for v in deltas})==1
+                    ^^^^
+E       AttributeError: 'StreamEvent' object has no attribute 'id'
+
+tests\weknora_port\test_generation.py:296: AttributeError
+___ test_non_upgradable_stream_visible_before_provider_finishes[CHEAP_ONLY] ___
+
+mode = 'CHEAP_ONLY'
+
+    @pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+    def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def stream(messages,options,context):
+                yield event('first <re')
+                first.set()
+                await release.wait()
+                yield event('f id="c1"/> second',done=True,finish='stop')
+                yield event('duplicate',done=True,finish='stop')
+            c.chat_stream=stream;e.chat_stream=stream
+            task=asyncio.create_task(co.run(request(mode),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+            release.set();out=await asyncio.wait_for(task,1)
+            deltas=[v for v in store.events if v.type=='answer']
+            assert ''.join(v.content for v in deltas)==out.answer
+            assert len({v.id for v in deltas})==1
+            assert sum(v.done for v in deltas)==1
+            assert 'duplicate' not in out.answer
+            assert store.trace[-2:]==['COMMIT','complete']
+>       run(exercise())
+
+tests\weknora_port\test_generation.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def stream(messages,options,context):
+            yield event('first <re')
+            first.set()
+            await release.wait()
+            yield event('f id="c1"/> second',done=True,finish='stop')
+            yield event('duplicate',done=True,finish='stop')
+        c.chat_stream=stream;e.chat_stream=stream
+        task=asyncio.create_task(co.run(request(mode),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+        release.set();out=await asyncio.wait_for(task,1)
+        deltas=[v for v in store.events if v.type=='answer']
+        assert ''.join(v.content for v in deltas)==out.answer
+>       assert len({v.id for v in deltas})==1
+                    ^^^^
+E       AttributeError: 'StreamEvent' object has no attribute 'id'
+
+tests\weknora_port\test_generation.py:296: AttributeError
+_ test_non_upgradable_stream_visible_before_provider_finishes[EXPENSIVE_ONLY] _
+
+mode = 'EXPENSIVE_ONLY'
+
+    @pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+    def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+        async def exercise():
+            co,c,e,store,commit,life=setup([])
+            first=asyncio.Event();release=asyncio.Event()
+            async def stream(messages,options,context):
+                yield event('first <re')
+                first.set()
+                await release.wait()
+                yield event('f id="c1"/> second',done=True,finish='stop')
+                yield event('duplicate',done=True,finish='stop')
+            c.chat_stream=stream;e.chat_stream=stream
+            task=asyncio.create_task(co.run(request(mode),CTX))
+            await asyncio.wait_for(first.wait(),1)
+            assert not task.done() and not commit.calls
+            assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+            release.set();out=await asyncio.wait_for(task,1)
+            deltas=[v for v in store.events if v.type=='answer']
+            assert ''.join(v.content for v in deltas)==out.answer
+            assert len({v.id for v in deltas})==1
+            assert sum(v.done for v in deltas)==1
+            assert 'duplicate' not in out.answer
+            assert store.trace[-2:]==['COMMIT','complete']
+>       run(exercise())
+
+tests\weknora_port\test_generation.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def stream(messages,options,context):
+            yield event('first <re')
+            first.set()
+            await release.wait()
+            yield event('f id="c1"/> second',done=True,finish='stop')
+            yield event('duplicate',done=True,finish='stop')
+        c.chat_stream=stream;e.chat_stream=stream
+        task=asyncio.create_task(co.run(request(mode),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+        release.set();out=await asyncio.wait_for(task,1)
+        deltas=[v for v in store.events if v.type=='answer']
+        assert ''.join(v.content for v in deltas)==out.answer
+>       assert len({v.id for v in deltas})==1
+                    ^^^^
+E       AttributeError: 'StreamEvent' object has no attribute 'id'
+
+tests\weknora_port\test_generation.py:296: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_generation.py::test_non_upgradable_stream_visible_before_provider_finishes[OFF]
+FAILED tests/weknora_port/test_generation.py::test_non_upgradable_stream_visible_before_provider_finishes[CHEAP_ONLY]
+FAILED tests/weknora_port/test_generation.py::test_non_upgradable_stream_visible_before_provider_finishes[EXPENSIVE_ONLY]
+3 failed, 81 passed in 2.61s

@@ -1,3 +1,5 @@
+> HISTORICAL AUTHORIZATION NOTE (2026-10-13 resume): timeout-on authorization statements below are retained historical records, superseded by current provider_fallback=false. Model timeout never upgrades. Source function readings remain reusable; old policy text is not current authority.
+
 # P4 / P6 fixed-source investigation
 
 Status: `SOURCE_READ` only. No Python/React implementation, parity execution, DB integration or real model validation is claimed by this document. This worker changed only this file and did not commit.

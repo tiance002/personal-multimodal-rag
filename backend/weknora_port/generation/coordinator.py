@@ -1,4 +1,4 @@
-"""At most two uniform provider streams; selected candidate only reaches P6."""
+"""Source incremental streams; only upgrade-eligible Cheap drafts are buffered."""
 from __future__ import annotations
 import asyncio, hashlib, json, re
 from dataclasses import asdict, replace
@@ -86,6 +86,22 @@ class GenerationCoordinator:
         finish = ''
         reported = None
         answer_done = False
+        publish_live = not (role == 'cheap' and request.policy.mode == 'DYNAMIC')
+        thinking_closed = False
+        live_answer_closed = False
+
+        async def publish(kind, content, done=False):
+            if publish_live:
+                await self.store.append_event(request.session_id, request.message_id,
+                    StreamEvent(attempt_id + '-' + kind, kind, content, done,
+                                data={'attempt_id': attempt_id, 'role': role,
+                                      'finish_reason': finish, 'truncated': is_length(finish)}))
+
+        async def close_thinking():
+            nonlocal thinking_closed
+            if thinking and not thinking_closed:
+                await publish('thinking', '', True)
+                thinking_closed = True
         final_seen = False
         failure = None
         try:
@@ -121,16 +137,38 @@ class GenerationCoordinator:
                             raise RunDeadlineExceeded(sent=True)
                         raise GenerationError(code if isinstance(code, str) else 'PROVIDER_STREAM_FAILED', sent=True)
                     if event.response_type == 'thinking':
-                        thinking.append(thinking_decoder.feed(event.content))
-                    elif event.response_type == 'answer' and (not answer_done):
-                        answer.append(answer_decoder.feed(event.content))
+                        delta = thinking_decoder.feed(event.content)
                         if event.done:
-                            answer.append(answer_decoder.flush())
+                            delta += thinking_decoder.flush()
+                        if delta:
+                            thinking.append(delta)
+                            await publish('thinking', delta)
+                        if event.done:
+                            await close_thinking()
+                    elif event.response_type == 'answer' and (not answer_done):
+                        delta = answer_decoder.feed(event.content)
+                        if event.done:
+                            delta += answer_decoder.flush()
                             answer_done = True
+                        answer.append(delta)
+                        if event.done and is_length(finish) and not ''.join(answer).strip():
+                            delta = EMPTY_TRUNCATED_FALLBACK
+                        await close_thinking()
+                        await publish('answer', delta, event.done)
+                        live_answer_closed = event.done
                     if event.is_final:
                         final_seen = True
-                answer.append(answer_decoder.flush())
-                thinking.append(thinking_decoder.flush())
+                answer_tail = answer_decoder.flush()
+                thinking_tail = thinking_decoder.flush()
+                answer.append(answer_tail)
+                if thinking_tail:
+                    thinking.append(thinking_tail)
+                    await publish('thinking', thinking_tail)
+                await close_thinking()
+                if not live_answer_closed:
+                    if is_length(finish) and not ''.join(answer).strip():
+                        answer_tail = EMPTY_TRUNCATED_FALLBACK
+                    await publish('answer', answer_tail, True)
                 check_context(context)
             finally:
                 close = getattr(stream, 'aclose', None)
@@ -213,11 +251,13 @@ class GenerationCoordinator:
         result = GenerationResult(answer, thinking, references, record.role, record.attempt_id, tuple(attempts), route, total_usage, record.finish_reason, is_length(record.finish_reason), len(attempts) > 1, prepared.prompt_sha256, prepared.context_sha256)
         check_context(context)
         metadata = {'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
-        if thinking:
+        buffered = record.role == 'cheap' and request.policy.mode == 'DYNAMIC'
+        if thinking and buffered:
             await self.store.append_event(request.session_id, request.message_id, StreamEvent(record.attempt_id + '-thinking', 'thinking', thinking, True, data=metadata))
         if references:
             await self.store.append_event(request.session_id, request.message_id, StreamEvent(request.run_id, 'references', data={'references': list(references)}))
-        await self.store.append_event(request.session_id, request.message_id, StreamEvent(record.attempt_id + '-answer', 'answer', answer, True, data=metadata, usage=usage_dict(total_usage)))
+        if buffered:
+            await self.store.append_event(request.session_id, request.message_id, StreamEvent(record.attempt_id + '-answer', 'answer', answer, True, data=metadata, usage=usage_dict(total_usage)))
         check_context(context)
         coordinator=self
         class CheckedCommitter:

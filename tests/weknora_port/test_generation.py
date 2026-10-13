@@ -273,3 +273,50 @@ def test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade(output):
     record=life.finished[0][0]
     assert record.error_code=='MODEL_CALL_TIMEOUT'
     assert record.usage.status==record.cost_status=='UNKNOWN'
+
+@pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def stream(messages,options,context):
+            yield event('first <re')
+            first.set()
+            await release.wait()
+            yield event('f id="c1"/> second',done=True,finish='stop')
+            yield event('duplicate',done=True,finish='stop')
+        c.chat_stream=stream;e.chat_stream=stream
+        task=asyncio.create_task(co.run(request(mode),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+        release.set();out=await asyncio.wait_for(task,1)
+        deltas=[v for v in store.events if v.type=='answer']
+        assert ''.join(v.content for v in deltas)==out.answer
+        assert len({v.event_id for v in deltas})==1
+        assert sum(v.done for v in deltas)==1
+        assert 'duplicate' not in out.answer
+        assert store.trace[-2:]==['COMMIT','complete']
+    run(exercise())
+
+def test_dynamic_cheap_draft_buffered_expensive_stream_live():
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def cheap(messages,options,context):
+            yield event('rejected cheap',done=True,finish='length')
+        async def expensive(messages,options,context):
+            assert not store.events
+            yield event('accepted first')
+            first.set();await release.wait()
+            yield event(' second',done=True,finish='stop')
+        c.chat_stream=cheap;e.chat_stream=expensive
+        task=asyncio.create_task(co.run(request(),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='accepted first'
+        release.set();out=await asyncio.wait_for(task,1)
+        assert out.upgraded and len(life.finished)==2
+        assert ''.join(v.content for v in store.events if v.type=='answer')==out.answer
+        assert all('rejected cheap' not in v.content for v in store.events)
+    run(exercise())
