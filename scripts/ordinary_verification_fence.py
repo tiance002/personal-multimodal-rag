@@ -3,7 +3,8 @@
 Mount this script read-only and use its app factory only after fresh owner
 authorization. Normal production startup does not import or activate it.
 Every admitted request consumes its full bound permanently in the task journal,
-including unsent failures. This deliberately overcounts the 75,000 Token limit.
+including unsent failures. This deliberately overcounts the owner-approved
+150,000 Token limit; the prior journal is carried forward without releasing it.
 """
 from contextlib import contextmanager
 import hashlib
@@ -17,7 +18,7 @@ SESSION = '313909f3-34d9-4f26-8778-3d5bd27f2c60'
 KB = 'd78f3434-0e8f-40bf-afcb-f1c2c311ff51'
 DOC = '1fd5a928-d3d7-4bae-aa00-fc74701f61e5'
 BATCH = Path('/data/storage/weknora-probes-20261012')
-TOKEN_LIMIT = 75000
+TOKEN_LIMIT = 150000
 POLICIES = {'embedding': 'owner-20261011-bge-m3-normal-v1',
             'chat_cheap': 'owner-20261011-xing-normal-v1',
             'chat_expensive': 'owner-20261011-deepseek-normal-v1'}
@@ -42,11 +43,11 @@ class TaskFence:
         grant = json.loads(raw)
         if (set(grant) != {'schema_version', 'owner_authorization', 'run_ids',
                            'probe_snapshot', 'acknowledged_unknown_runs'}
-                or type(grant['schema_version']) is not int or grant['schema_version'] != 1
+                or type(grant['schema_version']) is not int or grant['schema_version'] != 2
                 or not isinstance(grant['owner_authorization'], str) or not grant['owner_authorization'].strip()
                 or grant['owner_authorization'].startswith('PENDING')
-                or type(grant['run_ids']) is not list or len(grant['run_ids']) != 3
-                or len(set(grant['run_ids'])) != 3
+                or type(grant['run_ids']) is not list or len(grant['run_ids']) != 5
+                or len(set(grant['run_ids'])) != 5
                 or any(str(uuid.UUID(v)) != v for v in grant['run_ids'])
                 or not isinstance(grant['probe_snapshot'], dict)
                 or not 1 <= len(grant['probe_snapshot']) <= 7
@@ -190,8 +191,8 @@ def allowed_mutation(method, path, run_ids):
 
 def create_app():
     """Explicit alternate test startup; no installation into the normal service."""
-    fence = TaskFence(BATCH / 'web-owner-grant-v1.json', os.environ['RAG_OWNER_VERIFICATION_GRANT_SHA256'],
-                      BATCH / 'web-task-admissions-v1.json')
+    fence = TaskFence(BATCH / 'web-owner-grant-v2.json', os.environ['RAG_OWNER_VERIFICATION_GRANT_SHA256'],
+                      BATCH / 'web-task-admissions-v2.json')
     from backend.app.main import app
     from fastapi.responses import JSONResponse
     install_fence(app.state.container, fence)

@@ -18,7 +18,7 @@ def competing_admission(grant, sha, journal, batch, run, request_id, queue):
     try:
         TaskFence(Path(grant), sha, Path(journal), batch_root=Path(batch)).admit(
             run_id=run, request_id=request_id, role='chat_cheap', policy_id=POLICIES['chat_cheap'],
-            scope=Scope.from_ids([KB], [DOC]), input_tokens=100, output_tokens=60000)
+            scope=Scope.from_ids([KB], [DOC]), input_tokens=100, output_tokens=TOKEN_LIMIT//2)
         queue.put('ADMITTED')
     except ValueError as error:
         queue.put(str(error))
@@ -33,9 +33,9 @@ class FenceTests(unittest.TestCase):
         self.probe = self.root / 'probe-fixture.json'
         self.probe.write_text(json.dumps(dict(state='UNKNOWN', run_id='old-unknown',
                                              input_reserved=39, output_reserved=1024)))
-        self.runs = [str(uuid.uuid4()) for _ in range(3)]
+        self.runs = [str(uuid.uuid4()) for _ in range(5)]
         self.grant = self.root / 'grant.json'
-        self.value = dict(schema_version=1, owner_authorization='OFFLINE_SIMULATED_OWNER_DECISION',
+        self.value = dict(schema_version=2, owner_authorization='OFFLINE_SIMULATED_OWNER_DECISION',
                           run_ids=self.runs, probe_snapshot={self.probe.name: hashlib.sha256(self.probe.read_bytes()).hexdigest()},
                           acknowledged_unknown_runs=['old-unknown'])
         self.journal = self.root / 'journal.json'
@@ -99,6 +99,25 @@ class FenceTests(unittest.TestCase):
     def test_grant_bytes_must_match_pinned_hash(self):
         with self.assertRaisesRegex(ValueError, 'HASH_MISMATCH'):
             TaskFence(self.grant, '0'*64, self.journal, batch_root=self.root)
+
+    def test_v1_authority_cannot_enable_v2_limits(self):
+        self.value['schema_version'] = 1
+        self.write_grant()
+        with self.assertRaisesRegex(ValueError, 'OWNER_GRANT_INVALID'):
+            TaskFence(self.grant, self.sha, self.journal, batch_root=self.root)
+
+    def test_carried_admissions_still_consume_full_bounds_after_new_grant(self):
+        self.admit(input_tokens=12000, output_tokens=2048)
+        entries = self.fence.read_journal()['entries']
+        self.value['owner_authorization'] = 'OFFLINE_SIMULATED_EXPLICIT_EXTENSION'
+        self.write_grant()
+        self.journal.write_text(json.dumps(dict(grant_sha256=self.sha, entries=entries)))
+        fence = TaskFence(self.grant, self.sha, self.journal, batch_root=self.root)
+        self.assertEqual(fence.read_journal()['entries'], entries)
+        with self.assertRaisesRegex(ValueError, 'OWNER_TASK_TOKEN_LIMIT'):
+            fence.admit(run_id=self.runs[4], request_id='fixture.extension', role='embedding',
+                policy_id=POLICIES['embedding'], scope=Scope.from_ids([KB], [DOC]),
+                input_tokens=TOKEN_LIMIT-1063-14048+1, output_tokens=0)
 
     def test_native_cross_process_serialization(self):
         context = multiprocessing.get_context('spawn')
