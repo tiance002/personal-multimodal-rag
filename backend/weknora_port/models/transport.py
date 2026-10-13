@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import ipaddress
 import json
 import os
 import sys
@@ -19,6 +18,7 @@ import httpx
 
 from .types import (CallContext, PreparedCall, ProviderError, TokenUsage,
                     ModelCallTimeout, CallCancelled, RunDeadlineExceeded)
+from .safe_network import SafeHTTPTransport
 
 
 def env_duration(name: str, fallback: float) -> float:
@@ -103,15 +103,9 @@ def resolve_endpoint(config, path: str) -> str:
 
 def validate_endpoint(url: str, allowed: frozenset[str]):
     parts = urlsplit(url)
-    if (url not in allowed or parts.scheme != "https" or not parts.hostname or
+    if (url not in allowed or parts.scheme not in ("http", "https") or not parts.hostname or
             parts.username or parts.password or parts.fragment):
         raise ProviderError("MODEL_ENDPOINT_NOT_ALLOWED")
-    try:
-        if not ipaddress.ip_address(parts.hostname).is_global:
-            raise ProviderError("MODEL_ENDPOINT_NOT_ALLOWED")
-    except ValueError:
-        if parts.hostname.lower() == "localhost" or parts.hostname.endswith(".localhost"):
-            raise ProviderError("MODEL_ENDPOINT_NOT_ALLOWED")
 
 
 @dataclass
@@ -136,10 +130,13 @@ class AsyncHTTPTransport:
                  http_transport: httpx.AsyncBaseTransport | None = None):
         self.allowed_endpoints = frozenset(allowed_endpoints)
         self.gate, self.credential = gate or DenySendGate(), credential
-        self.live_ready = False
+        if http_transport is None:
+            http_transport = SafeHTTPTransport()
+        self.live_ready = type(http_transport) is SafeHTTPTransport
         self._mock_transport = isinstance(http_transport, httpx.MockTransport)
+        self._safe_transport = type(http_transport) is SafeHTTPTransport
         self.client = httpx.AsyncClient(transport=http_transport, follow_redirects=False,
-            trust_env=False, timeout=httpx.Timeout(None, connect=10),
+            trust_env=False, timeout=httpx.Timeout(None, connect=30),
             limits=httpx.Limits(max_keepalive_connections=5, keepalive_expiry=90))
 
     async def aclose(self):
@@ -149,10 +146,7 @@ class AsyncHTTPTransport:
     async def open(self, config, path, body, context, *, capability, stream=False, affinity="", lifetime=None):
         url = resolve_endpoint(config, path)
         validate_endpoint(url, self.allowed_endpoints)
-        if not self._mock_transport:
-            # httpx's default DNS dialing is not Go's SSRFSafeDialContext.
-            # A gate approving business egress cannot waive this missing
-            # connection-layer protection. There is no boolean proof bypass.
+        if not (self._mock_transport or self._safe_transport):
             raise ProviderError("PROVIDER_SAFE_DIAL_UNIMPLEMENTED")
         if not context.request_id or not context.scope.owner_id or not context.scope.knowledge_base_ids:
             raise ProviderError("MODEL_TRUSTED_SCOPE_REQUIRED")
@@ -202,6 +196,7 @@ class AsyncHTTPTransport:
                 headers.update(session_id=affinity, **{"x-client-request-id": affinity, "x-session-affinity": affinity})
             try:
                 req = self.client.build_request("POST", url, content=wire, headers=headers)
+                req.extensions["weknora_allowed_endpoints"] = self.allowed_endpoints
             except (TypeError, ValueError):
                 raise ProviderError("MODEL_REQUEST_INVALID") from None
             sent, outcome = True, "UNKNOWN"
@@ -225,6 +220,10 @@ class AsyncHTTPTransport:
                 raise error
             handle = ResponseHandle(response, TokenUsage())
             yield handle
+        except ProviderError as error:
+            if not error.sent:
+                outcome = "NOT_SENT"
+            raise
         except httpx.TimeoutException:
             if context.cancelled is not None and context.cancelled.is_set():
                 raise CallCancelled(sent=sent) from None

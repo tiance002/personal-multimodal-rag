@@ -5,7 +5,7 @@ Full Goal active. Fixed upstream3e8b0bfc, clean starting main55372f7, isolated b
 | Phase | Actual status | Evidence / next work |
 |---|---|---|
 | P0 | Source/worktree baseline captured; live identity BLOCKED |55verified blobs; initial behavior/legacyP5 snapshots; existing contractFAIL31PREEXISTING; no writes/calls. Local baseline commit a6ddb16. |
-| P1 | IMPLEMENTED / OFFLINE_PASS for protocol subset; native security PARITY_BLOCKED |70mock/source-fixture checks;5executedGoSSEcases. NativeDNS/TLS/redirect work continues; fullGoRequestoracle WindowsCGObuildFAIL. No live call. |
+| P1 | IMPLEMENTED / OFFLINE_PASS for direct native and protocol subset; full proxy parity pending |146checks (76fake-network native,65protocol,5executedGoSSEcases). Default send gate denied. Configured proxy fail-closed; fullGoRequestoracle WindowsCGObuildFAIL. No live call. |
 | P2 | IMPLEMENTATION_IN_PROGRESS, full parity pending | 8 chunk oracle fixtures; parser mechanisms still being aligned; PostgreSQL query adapter offline only, schema/index integration pending. |
 | P3 | IMPLEMENTATION_IN_PROGRESS, full parity pending | Effective config and fusion implemented with offline checks; remaining query/rerank/merge/context stages pending. |
 | P4 | SOURCE_READ; IMPLEMENTATION_IN_PROGRESS | Exact history/memory/source-handle source notes; ordinary history and memory worker active; storage wiring pending. |

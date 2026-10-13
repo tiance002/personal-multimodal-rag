@@ -287,16 +287,15 @@ def test_gate_settlement_failure_prevents_a_successful_return():
     asyncio.run(run())
 
 
-def test_native_http_backend_is_blocked_even_with_an_authorizing_gate():
+def test_native_http_backend_default_gate_stays_closed_without_a_network_request():
     async def run():
         cfg=provider_config("deepseek","deepseek-flash")
-        gate=Gate()
         transport=AsyncHTTPTransport(allowed_endpoints=[resolve_endpoint(cfg,"/chat/completions")],
-            gate=gate,credential=lambda provider:"SIMULATED-NOT-A-KEY")
+            credential=lambda provider:"SIMULATED-NOT-A-KEY")
         try:
-            with pytest.raises(ProviderError,match="PROVIDER_SAFE_DIAL_UNIMPLEMENTED"):
+            with pytest.raises(ProviderError,match="MODEL_SEND_AUTHORIZATION_REQUIRED"):
                 await ProviderModel(cfg,transport).chat((Message("user","q"),),None,context())
-            assert gate.calls==[] and transport.live_ready is False
+            assert transport.live_ready is True
         finally:
             await transport.aclose()
     asyncio.run(run())
