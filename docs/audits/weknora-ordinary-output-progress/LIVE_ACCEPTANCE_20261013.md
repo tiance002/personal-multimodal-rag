@@ -82,3 +82,29 @@ Fresh long Run `85eb1ecd-6600-4916-ac0b-7372afa99a6d`: one POST, FAIL MODEL_UNAV
 Current totals: task full bound167744/250000; known web32486 plus known probes10793=43279; old+new UNKNOWN32293 (old10671+new21622); actual known+UNKNOWN occupancy75572. Evidence `task-v3-in-flight-readback.json` reports one new UNKNOWN and collector exits1 intentionally to enforce stop. Old failed samples remain preserved, not resent.
 
 Owner's budget-enlargement authority permits preparation of350000 so next full-round headroom exceeds100000; it does not waive the independently agreed new-UNKNOWN stop. V4 code is prepared for seven total attempt identities with exact acknowledged prior web-request IDs in a SHA-pinned owner grant, and retention of all old admissions; Linux14tests exit0, including acknowledgment of one old UNKNOWN without releasing it and immediate blocking of a further unknown. No V4 grant/journal exists or is activated at this checkpoint; continuing after the latest UNKNOWN still requires a fresh explicit decision. Candidate ordinary timeout120 is within existing Settings/transport maximum120; Settings construction120 verified exit0, no frozen limits or global defaults changed. G3 pending-history interruption correction and300second client default are being validated independently; no G5 cleanup yet. Full Goal incomplete.
+
+## G3 interruption repair completed offline
+
+Independent commit `02190463662932d32ee161390b0d1c3370a8c5e7` changes only four frontend files:
+
+- `frontend/src/app/App.tsx`: before a new send invalidates historical SSE callbacks, close pending historical timelines only from this Scope/epoch's persisted assistant or validated definite diagnostic; unknown historical results remain unknown. Scope/cancel/epoch/singlePOST fences remain.
+- `frontend/src/api/client.ts`, `frontend/src/api/sse.ts`: default wait300000ms, explicit window and minimum210000ms unchanged. This covers proposed two120second calls plus local processing; it is not proof of provider availability.
+- `frontend/tests/run-progress.spec.ts`: history-interruption regression, simulated270second recovery, default/explicit/minimum wait contract.
+
+Actual commands from `frontend`, using the already installed Chrome (no dependency install):
+
+```powershell
+$env:PLAYWRIGHT_CHROME_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'
+.\node_modules\.bin\playwright.cmd test tests/run-progress.spec.ts --grep 'new send closes only confirmed history' --reporter=list
+```
+
+RED exit1: old persisted assistant timeline remained pending after a new send.
+
+```powershell
+$env:PLAYWRIGHT_CHROME_PATH='C:\Program Files\Google\Chrome\Application\chrome.exe'
+.\node_modules\.bin\playwright.cmd test tests/run-progress.spec.ts tests/sse.spec.ts --reporter=list
+npm.cmd run build
+git diff --check
+```
+
+GREEN Playwright exit0,19passed25.7s, SIMULATED API/model; build exit0 (`tsc --noEmit`, Vite3346modules, existing chunk-size warning); diff-check exit0. No actual model call or database mutation. The current Vite source changes are local/reversible; API remains the90second candidate and liveV3 fence. Server timeout120/V4 grant still NOT DEPLOYED. G4 long remains FAIL; G5 NOT RUN. No Push/Tag/publication.
