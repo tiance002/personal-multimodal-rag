@@ -36,3 +36,6 @@ New retained restore-only logical database: wk_port_restore_20261014_8e7a3fa ins
 Newexplicitparserdependencies E:/WK/deps/reader,manifestsE:/WK/deps/*manifest.json; newofficialfixedMammothwheel D:/WK/download/mammoth-1.11.0-py2.py3-none-any.whl. wk.ps1 sets Ereader+runtime-deps,originalE/Cvenvnotmodified. NonewDockercontainerorport.
 
 HTMLrenderer dependency: E:/WK/deps/htmlcodec/htmlcodec.exe+manifest.json (hash-bound primitive only, no service/port/container). Fixedsourceoracle E:/WK/oracle/ocr-html/oracle.exe (testing only, not runtime). Officialmodule downloads D:/WK/go/modules,buildcache E:/WK/go/cache. wk.ps1 binds codecmanifest explicitly.
+
+
+New scopedrestorelogicalDBs: wk_port_restore_20261014_history_f53cb53, wk_port_restore_20261014_memory_active_f53cb53, wk_port_restore_20261014_memory_forgotten_f53cb53, allinsidecurrentapprovedPG/volume; E:/WK/restore correspondingshortpaths. RedisSSErestoreprefix wk-restore:20261014:history-f53cb53,newkeys only,originalexpirykept. Nojobworkerstarted. DedicatedAPI56425/UI56426/browserprofilesforMemoryUI arestopped; currentRedisrunid586b92f4649b78508382dfd52d64d848f45b0a7c.

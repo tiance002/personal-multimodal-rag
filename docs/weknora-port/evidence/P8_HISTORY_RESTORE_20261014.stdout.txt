@@ -1,0 +1,119 @@
+{
+  "kind": "CONSISTENT_SYNTHETIC_OWNER_RESTORE_NEW_DATABASE_NATIVE_READBACK",
+  "source_system_identifier": "7696088403504697382",
+  "source_tenant": 104,
+  "target_database": "wk_port_restore_20261014_history_f53cb53",
+  "container_reused_without_rename": "weknora-python-resume-pg-20261013",
+  "new_container": false,
+  "new_volume": false,
+  "artifact_root": "E:\\WK\\restore\\history-f53cb53",
+  "snapshot_tables": {
+    "chunks": {
+      "rows": 2,
+      "sha256": "5b92d9f2958a2c40fa89138cf8c0651784e46c688192c4403a930ecef0e972a9"
+    },
+    "embeddings": {
+      "rows": 2,
+      "sha256": "c10a6f42465f1b98ccd52b6fed2f1ce136adebdcfaedf0e55204222035d65e94"
+    },
+    "generation_attempts": {
+      "rows": 4,
+      "sha256": "b52bdcd9a78d8176c5a2954cb1a9f21092c94beb59d8b57d144d6617f132f445"
+    },
+    "generation_runs": {
+      "rows": 4,
+      "sha256": "df18f0b060483bc6ed4782811cc61dc3dcc3f87d92ee05519ca778500cc15764"
+    },
+    "knowledge_bases": {
+      "rows": 1,
+      "sha256": "06c53b77cfbcd73efcd2faddf29e3893a05c03d7721edf9cfff90b95b8062ff3"
+    },
+    "knowledges": {
+      "rows": 1,
+      "sha256": "a93f684d0e8e4dfd48f70c5f96c6b745754389a8973d9ff914d34efe0a41961d"
+    },
+    "messages": {
+      "rows": 8,
+      "sha256": "5d1e7f0ad99feecc1995801c3dc780d620d7f5dc9a2840dd200cdcc216d4930e"
+    },
+    "models": {
+      "rows": 5,
+      "sha256": "ec55d701ad009909da082eb4f30750eea04aa733abe8b465578b10db45a849f9"
+    },
+    "port_model_configuration": {
+      "rows": 1,
+      "sha256": "c6cc1eb5b04cf7699795270b4dbb1cdeec7b4a76076e3f8a2eaf2ad9adc00c34"
+    },
+    "port_turns": {
+      "rows": 4,
+      "sha256": "f8f47aecdee15b1c217efc30bdc66aed1128bebcd16954e8ac64afd3cf8b0163"
+    },
+    "send_calls": {
+      "rows": 27,
+      "sha256": "5f4f929b98e6af796617aee3efa2b4056d24d67ad909af30e38b0d4df7684034"
+    },
+    "sessions": {
+      "rows": 4,
+      "sha256": "8dc935f3ebfa601fc3cbfd363c441f21f3e0eaea494bf58e8ae4ad1c590ae734"
+    },
+    "tenants": {
+      "rows": 1,
+      "sha256": "1e42eb1f6db13066b44f4cacb4aee1c08954ae8fe302fe9acc46ded419a5e9aa"
+    }
+  },
+  "copied_immutable_files": 1,
+  "storage_hashes": {
+    "104\\013b7228-76b5-41dd-8c06-bc94648028a5\\04a716fc-bafd-4ad1-9ce4-6b763f898401\\def7dacb-c28f-4053-8fbd-6bfafcee2612\\original\\handbook.txt": "1cc2e4002e7c23aa84086fc900bf31bb57beb84234e6746c2b08562d2ac6bad6"
+  },
+  "schema_sha256": "31cdaa829e44cc4ba75897809bd5bea29685932077e3775fc62ac2a1d1c51ea7",
+  "snapshot_sha256": "f6ac51c29f158cab86799851cfc20eed7aaf7aef2d82442d5f413103a759e32a",
+  "path_mapping_document_ids": [
+    "04a716fc-bafd-4ad1-9ce4-6b763f898401"
+  ],
+  "unknown_preserved": {
+    "n": 21,
+    "occupied": "2100"
+  },
+  "restored_active_indices": 2,
+  "native_entry": {
+    "originals": [
+      {
+        "document": "04a716fc-bafd-4ad1-9ce4-6b763f898401",
+        "sha256": "1cc2e4002e7c23aa84086fc900bf31bb57beb84234e6746c2b08562d2ac6bad6"
+      }
+    ],
+    "active_chunks_readback": 2,
+    "history_assistants": [
+      {
+        "assistant": "54d6ecd0-eb22-4361-b24c-b2f9506f0de4",
+        "status": "pending",
+        "is_completed": true,
+        "content_sha256": "82c8701b62d3c263f98e3e355ad28cd90d319f537e4bc827d4b77e02afa921dc"
+      },
+      {
+        "assistant": "9ae8b4ab-56ed-453d-82bc-4a2d28a962a4",
+        "status": "cancelled",
+        "is_completed": true,
+        "content_sha256": "3e66ac45a02e942161d608635ce606c1dbb3eb6a0d98aab0a524b55dd8793656"
+      },
+      {
+        "assistant": "a81b6ba5-7346-4a53-b6cf-465dba798610",
+        "status": "cancelled",
+        "is_completed": true,
+        "content_sha256": "3e66ac45a02e942161d608635ce606c1dbb3eb6a0d98aab0a524b55dd8793656"
+      },
+      {
+        "assistant": "ab7ab7a4-2cb7-4f67-a577-b492c3f4c32e",
+        "status": "cancelled",
+        "is_completed": true,
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "memory_items": 0,
+    "memory_tombstones": 0,
+    "foreign_history_and_memory_denied": true
+  },
+  "real_provider_calls": 0,
+  "old_business_database_accessed": false,
+  "cutover": "NOT_RUN"
+}
