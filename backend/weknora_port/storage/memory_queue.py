@@ -5,6 +5,7 @@ retry policy as handler failures. Only scoped IDs are retained in terminal recor
 """
 import asyncio
 import json
+import math
 import secrets
 import time
 import uuid
@@ -16,8 +17,9 @@ from ..conversation.types import MemoryScope
 
 # An expired lease stays out of the reclaim scan until it is at least this old.
 # Upstream asynq v0.26.0 recoverer.go: cutoff := time.Now().Add(-30 * time.Second);
-# internal/rdb/rdb.go ListLeaseExpired scans ZRANGEBYSCORE lease "-inf" cutoff (inclusive), and
-# recoverer.go archives only when msg.Retried >= msg.Retry.
+# internal/rdb/rdb.go ListLeaseExpired scans ZRANGEBYSCORE lease "-inf" ARGV[1]=cutoff.Unix(), and
+# recoverer.go archives only when msg.Retried >= msg.Retry. Both the lease score and the cutoff are
+# Unix whole seconds upstream, so eligibility is floor(score) <= floor(now-30).
 RECOVERY_GRACE_SECONDS = 30
 
 # Both transitions use the same keys: ready, leased, jobs, dead.
@@ -35,11 +37,12 @@ end
 """
 CLAIM = ARCHIVE_LUA + """
 local now=tonumber(ARGV[1])
-local reclaim_cutoff=tonumber(ARGV[5])
 local jitter=cjson.decode(ARGV[4])
--- A lease is expired at "-inf..now", but only reclaimable at "-inf..now-RECOVERY_GRACE_SECONDS"
--- (upstream cutoff, inclusive). Clock skew inside the grace window must not hand out a new token.
-local expired=redis.call('ZRANGEBYSCORE',KEYS[2],'-inf',reclaim_cutoff,'LIMIT',0,32)
+-- Expired at "-inf..now"; reclaimable only in the integer-second domain, passed as the exclusive
+-- upper bound ARGV[5]="(floor(now-30)+1)" i.e. floor(score) <= floor(now-30). Upstream stores lease
+-- and cutoff as Unix whole seconds, so sub-second skew must not decide eligibility. The float
+-- deadline stays verbatim for the ACK/COMPLETE fence.
+local expired=redis.call('ZRANGEBYSCORE',KEYS[2],'-inf',ARGV[5],'LIMIT',0,32)
 for index,id in ipairs(expired) do
     redis.call('ZREM',KEYS[2],id)
     local raw=redis.call('HGET',KEYS[3],id)
@@ -146,9 +149,10 @@ class RedisMemoryExtractionQueue:
 
     async def run_due(self):
         now = self.clock()
+        # Exclusive integer upper bound == floor(score) <= floor(now-30); keeps the float deadline intact.
+        reclaim_max = "({0}".format(math.floor(now - RECOVERY_GRACE_SECONDS) + 1)
         raw = await self.client.eval(CLAIM, 4, *self.keys, now, now + 600,
-            str(uuid.uuid4()), json.dumps([self.randbelow(30) for _ in range(32)]),
-            now - RECOVERY_GRACE_SECONDS)
+            str(uuid.uuid4()), json.dumps([self.randbelow(30) for _ in range(32)]), reclaim_max)
         if raw is None:
             return False
         job = json.loads(raw)

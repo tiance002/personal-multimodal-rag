@@ -1,0 +1,150 @@
+﻿...........F.......FF.F.F..                                              [100%]
+================================== FAILURES ===================================
+______ test_reclaim_cutoff_matches_upstream_inclusive_grace[0.001-True] _______
+tests\weknora_port\test_memory_queue_recovery.py:247: in test_reclaim_cutoff_matches_upstream_inclusive_grace
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:237: in run
+    assert leased==[] and not dead
+E   AssertionError: assert (['bceb1500-db...693c2e08a4f1'] == []
+E     
+E     Left contains one more item: 'bceb1500-dbe4-4688-a7a5-693c2e08a4f1'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'bceb1500-dbe4-4688-a7a5-693c2e08a4f1',
+E     + ])
+__ test_reclaim_uses_integer_second_domain[1700000600.75-1700000630.2-True] ___
+tests\weknora_port\test_memory_queue_recovery.py:298: in test_reclaim_uses_integer_second_domain
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:292: in run
+    assert leased==[] and stored["retry"]==1
+E   AssertionError: assert (['91225a7a-22...ac252c6853d2'] == []
+E     
+E     Left contains one more item: '91225a7a-22bb-47a8-826f-ac252c6853d2'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     '91225a7a-22bb-47a8-826f-ac252c6853d2',
+E     + ])
+__ test_reclaim_uses_integer_second_domain[1700000600.999-1700000630.2-True] __
+tests\weknora_port\test_memory_queue_recovery.py:298: in test_reclaim_uses_integer_second_domain
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:292: in run
+    assert leased==[] and stored["retry"]==1
+E   AssertionError: assert (['aab5c1e4-d0...a1d43490e9b7'] == []
+E     
+E     Left contains one more item: 'aab5c1e4-d0be-40d1-a946-a1d43490e9b7'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'aab5c1e4-d0be-40d1-a946-a1d43490e9b7',
+E     + ])
+__ test_reclaim_uses_integer_second_domain[1700000580.95-1700000610.9-True] ___
+tests\weknora_port\test_memory_queue_recovery.py:298: in test_reclaim_uses_integer_second_domain
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:292: in run
+    assert leased==[] and stored["retry"]==1
+E   AssertionError: assert (['245c5ad5-4a...8fa2325f4b71'] == []
+E     
+E     Left contains one more item: '245c5ad5-4a43-4649-9fa5-8fa2325f4b71'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     '245c5ad5-4a43-4649-9fa5-8fa2325f4b71',
+E     + ])
+___________ test_reclaim_of_real_float_lease_matches_integer_cutoff ___________
+tests\weknora_port\test_memory_queue_recovery.py:325: in test_reclaim_of_real_float_lease_matches_integer_cutoff
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:320: in run
+    assert not await client.zrange(q.keys[1],0,-1),"integer-domain cutoff must reclaim ...600.75"
+E   AssertionError: integer-domain cutoff must reclaim ...600.75
+E   assert not ['5324f40f-3969-413e-9b52-566fb2d1eaab']
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_reclaim_cutoff_matches_upstream_inclusive_grace[0.001-True] - AssertionError: assert (['bceb1500-db...693c2e08a4f1'] == []
+  
+  Left contains one more item: 'bceb1500-dbe4-4688-a7a5-693c2e08a4f1'
+  
+  Full diff:
+  - []
+  + [
+  +     'bceb1500-dbe4-4688-a7a5-693c2e08a4f1',
+  + ])
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_reclaim_uses_integer_second_domain[1700000600.75-1700000630.2-True] - AssertionError: assert (['91225a7a-22...ac252c6853d2'] == []
+  
+  Left contains one more item: '91225a7a-22bb-47a8-826f-ac252c6853d2'
+  
+  Full diff:
+  - []
+  + [
+  +     '91225a7a-22bb-47a8-826f-ac252c6853d2',
+  + ])
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_reclaim_uses_integer_second_domain[1700000600.999-1700000630.2-True] - AssertionError: assert (['aab5c1e4-d0...a1d43490e9b7'] == []
+  
+  Left contains one more item: 'aab5c1e4-d0be-40d1-a946-a1d43490e9b7'
+  
+  Full diff:
+  - []
+  + [
+  +     'aab5c1e4-d0be-40d1-a946-a1d43490e9b7',
+  + ])
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_reclaim_uses_integer_second_domain[1700000580.95-1700000610.9-True] - AssertionError: assert (['245c5ad5-4a...8fa2325f4b71'] == []
+  
+  Left contains one more item: '245c5ad5-4a43-4649-9fa5-8fa2325f4b71'
+  
+  Full diff:
+  - []
+  + [
+  +     '245c5ad5-4a43-4649-9fa5-8fa2325f4b71',
+  + ])
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_reclaim_of_real_float_lease_matches_integer_cutoff - AssertionError: integer-domain cutoff must reclaim ...600.75
+assert not ['5324f40f-3969-413e-9b52-566fb2d1eaab']
+5 failed, 22 passed in 2.18s

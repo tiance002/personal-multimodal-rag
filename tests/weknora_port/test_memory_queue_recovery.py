@@ -197,7 +197,9 @@ def test_enqueue_after_explicit_stop_does_not_restart_pump():
 
 
 # Upstream asynq v0.26.0 recoverer.go: cutoff := time.Now().Add(-30 * time.Second);
-# internal/rdb/rdb.go ListLeaseExpired scans ZRANGEBYSCORE lease "-inf" cutoff (inclusive <=).
+# internal/rdb/rdb.go ListLeaseExpired scans ZRANGEBYSCORE lease "-inf" ARGV[1]=cutoff.Unix().
+# Lease expiry and cutoff both come from Unix whole seconds, so eligibility is
+# floor(lease_score) <= floor(now-30), i.e. lease_score < floor(now-30)+1 (exclusive upper bound).
 UPSTREAM_RECOVERY_GRACE_SECONDS=30
 
 async def leased_fixture(retry,lease_until):
@@ -215,10 +217,11 @@ async def leased_fixture(retry,lease_until):
 
 @pytest.mark.parametrize("offset_from_cutoff,reclaimed",[
     (29.0,False),   # lease expired 1s ago: inside the 30s grace, must stay leased
-    (0.001,False),  # 1ms above now-30: still inside grace
-    (0.0,True),     # exactly now-30: upstream <= is inclusive
-    (-0.001,True),  # 1ms past the cutoff
-    (-1.0,True),    # safely past the cutoff
+    (1.0,False),    # lease = floor(now-30)+1: first whole second past the cutoff
+    (0.001,True),   # sub-second above the cutoff second floors back onto it (integer domain)
+    (0.0,True),     # exactly the cutoff second (inclusive)
+    (-0.001,True),  # just below the cutoff second
+    (-1.0,True),    # a full second below the cutoff
 ])
 def test_reclaim_cutoff_matches_upstream_inclusive_grace(offset_from_cutoff,reclaimed):
     async def run():
@@ -256,4 +259,67 @@ def test_reclaimed_lease_consumes_retry_then_archives_after_grace():
         finally:
             if q is not None:
                 await client.delete(*q.keys); await client.aclose()
+    asyncio.run(run())
+
+@pytest.mark.parametrize("lease_score,now,reclaimed",[
+    (1700000599.0,1700000630.20,True),   # integer below the cutoff second
+    (1700000600.0,1700000630.20,True),   # exactly the cutoff second (inclusive)
+    (1700000601.0,1700000630.20,False),  # first integer past the cutoff
+    (1700000600.75,1700000630.20,True),  # upstream counterexample E=...600.75, N=...630.20
+    (1700000600.999,1700000630.20,True),
+    (1700000601.999,1700000630.20,False),
+    (1700000580.95,1700000610.90,True),  # other fractional phase on the scan clock
+    (1700000581.00,1700000610.90,False),
+])
+def test_reclaim_uses_integer_second_domain(lease_score,now,reclaimed):
+    async def run():
+        client=q=None
+        try:
+            client=Redis.from_url("redis://127.0.0.1:56424/15",decode_responses=True)
+            assert (await client.info("server"))["run_id"]=="586b92f4649b78508382dfd52d64d848f45b0a7c"
+            owner=SimpleNamespace(tenant_id=9913,subject_id="queue-grace-synthetic")
+            clock=[now]
+            q=RedisMemoryExtractionQueue(client,"weknora-python-port:20261013:mq-grace:"+str(uuid.uuid4()),owner,
+                clock=lambda:clock[0],randbelow=lambda bound:0)
+            job={"id":str(uuid.uuid4()),"payload":{"scope":{"tenant_id":owner.tenant_id,"subject_id":owner.subject_id},
+                "session_id":"int-domain","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":0}
+            await client.hset(q.keys[2],job["id"],json.dumps(job,separators=(",",":")))
+            await client.zadd(q.keys[1],{job["id"]:lease_score})
+            assert not await q.run_due(),"a reclaimed job is re-scheduled into ready, never delivered here"
+            leased=await client.zrange(q.keys[1],0,-1)
+            stored=json.loads(await client.hget(q.keys[2],job["id"]))
+            if reclaimed:
+                assert leased==[] and stored["retry"]==1
+            else:
+                assert leased==[job["id"]] and stored["retry"]==0
+        finally:
+            if q is not None:
+                await client.delete(*q.keys); await client.aclose()
+    asyncio.run(run())
+
+def test_reclaim_of_real_float_lease_matches_integer_cutoff():
+    async def run():
+        client=q=None
+        try:
+            client=Redis.from_url("redis://127.0.0.1:56424/15",decode_responses=True)
+            assert (await client.info("server"))["run_id"]=="586b92f4649b78508382dfd52d64d848f45b0a7c"
+            owner=SimpleNamespace(tenant_id=9913,subject_id="queue-grace-synthetic")
+            clock=[1700000000.75]
+            q=RedisMemoryExtractionQueue(client,"weknora-python-port:20261013:mq-grace:"+str(uuid.uuid4()),owner,
+                clock=lambda:clock[0],randbelow=lambda bound:0)
+            class Crash:
+                async def handle(self,payload): raise asyncio.CancelledError()
+            p=ExtractionPayload(MemoryScope(owner.tenant_id,owner.subject_id),"grace","m","mock")
+            await q.enqueue(p,0,2)   # no pump: worker is unset during enqueue
+            q.worker=Crash()
+            with pytest.raises(asyncio.CancelledError): await q.run_due()
+            leased=await client.zrange(q.keys[1],0,-1,withscores=True)
+            assert len(leased)==1 and abs(leased[0][1]-1700000600.75)<1e-6,"float deadline kept verbatim for ACK"
+            clock[0]=1700000630.20   # upstream counterexample scan clock
+            assert not await q.run_due()
+            assert not await client.zrange(q.keys[1],0,-1),"integer-domain cutoff must reclaim ...600.75"
+            stored=json.loads(await client.hget(q.keys[2],leased[0][0])); assert stored["retry"]==1
+        finally:
+            if q is not None:
+                await q.stop(); await client.delete(*q.keys); await client.aclose()
     asyncio.run(run())
