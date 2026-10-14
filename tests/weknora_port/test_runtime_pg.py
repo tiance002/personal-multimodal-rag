@@ -28,6 +28,7 @@ from backend.weknora_port.model_registry import NeutralModelRegistry
 from backend.weknora_port.streaming.manager import RedisListStreamStore
 from backend.weknora_port.crypto import SecretCipher
 from backend.weknora_port.storage.document_profile_migrate import apply_document_profile_schema
+from backend.weknora_port.storage.image_tasks_migrate import apply_image_task_schema
 from backend.weknora_port.runtime import ApplicationRuntime, ConversationSettings, LeasedSendGate
 from backend.weknora_port.generation import RouterPolicy
 from backend.weknora_port.documents import DocumentLifecycleService, KnowledgeBaseSettings
@@ -129,7 +130,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
         leases = IsolatedConnectionFactory(acquire, release, IsolationPolicy(EXPECTED, PROHIBITED))
         async with leases.lease() as guard:
             for apply in (apply_configuration_schema, apply_generation_schema,
-                          apply_send_gate_schema, apply_turn_schema, apply_model_schema, apply_document_profile_schema):
+                          apply_send_gate_schema, apply_turn_schema, apply_model_schema, apply_document_profile_schema, apply_image_task_schema):
                 await apply(guard)
         persistent_principal = await LocalPrincipalStore(leases).bootstrap()
         # Each integration fixture has its own public synthetic owner namespace;
@@ -160,7 +161,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
             if request.url.path.endswith("/rerank"):
                 return httpx.Response(200, json={"results": [
                     {"index": i, "relevance_score": .9} for i, _ in enumerate(body["documents"])]})
-            if body.get('model')=='Qwen/Qwen2.5-VL-72B-Instruct':
+            if body.get('model')=='Qwen/Qwen3-VL-32B-Instruct':
                 parts=body['messages'][0]['content']
                 assert isinstance(parts,list)
                 prompt=next(p['text'] for p in parts if p['type']=='text')
@@ -250,7 +251,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
             ("rerank", "siliconflow", "BAAI/bge-reranker-v2-m3"),
             ("cheap", "siliconflow", "XingChenAGI/Xing4.0-29B"),
             ("expensive", "deepseek", "deepseek-flash"),
-            ("vlm", "siliconflow", "Qwen/Qwen2.5-VL-72B-Instruct"),
+            ("vlm", "siliconflow", "Qwen/Qwen3-VL-32B-Instruct"),
         ]
         current = await runtime.read_model_configuration(principal)
         await runtime.update_model_configuration(principal, current["revision"], [
@@ -306,11 +307,13 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                 image_kb_reply=await client.post('/api/v1/knowledge-bases',json={'name':'synthetic-image-main'})
                 image_kb=image_kb_reply.json()['data']['id']
                 await runtime.update_knowledge_base_consent(principal,image_kb,True)
-                async with leases.lease(writable_knowledge_base_ids=frozenset({image_kb})) as image_guard:
+                async with leases.lease() as image_guard:
                     image_roles=dict((await runtime._snapshot(image_guard)).model_ids)
-                    await image_guard.connection.execute('UPDATE knowledge_bases SET image_processing_config=%s::jsonb,vlm_config=%s::jsonb WHERE tenant_id=%s AND id=%s',
-                        (json.dumps({'enable_multimodal':True}),json.dumps({'enabled':True,'model_id':image_roles['vlm'],
-                        'custom_instructions':'BUSINESS_ONLY_CAPTION'}),principal.tenant_id,image_kb))
+                configured=await client.patch(f'/api/v1/knowledge-bases/{image_kb}/image-processing',json={
+                    'enable_multimodal':True,'ocr_adapter':'vlm','ocr_model_id':image_roles['vlm'],
+                    'caption_mode':'explicit','caption_model_id':image_roles['vlm'],
+                    'custom_instructions':'BUSINESS_ONLY_CAPTION'})
+                assert configured.status_code==200,configured.text
                 pdf=fitz.open();pdf.new_page(width=800,height=500).insert_text((60,80),'A source text page about protocol W-17.')
                 page=pdf.new_page(width=800,height=500);page.insert_image(page.rect,stream=image_bytes)
                 pdf_bytes=pdf.tobytes();pdf.close()
@@ -318,7 +321,18 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                 for filename,content,mime in [('fixture-scan.pdf',pdf_bytes,'application/pdf'),('fixture-image.png',image_bytes,'image/png')]:
                     uploaded=await client.post(f'/api/v1/knowledge-bases/{image_kb}/documents',files={'file':(filename,content,mime)})
                     assert uploaded.status_code==200,uploaded.text
-                    image_document=uploaded.json()['data'];assert image_document['status']=='completed',image_document
+                    image_document=uploaded.json()['data'];assert image_document['status']=='pending',image_document
+                    # Background task is formal main entry; keep all subsequent witnesses.
+                    deadline=asyncio.get_running_loop().time()+30
+                    while image_document['status'] in ('pending','processing'):
+                        rows=(await client.get(f'/api/v1/knowledge-bases/{image_kb}/documents')).json()['data']
+                        image_document=next(row for row in rows if row['id']==image_document['id'])
+                        if image_document['status'] in ('completed','failed','cancelled'):break
+                        assert asyncio.get_running_loop().time()<deadline,'IMAGE_COMPLETION_DEADLINE'
+                        await asyncio.sleep(.02)
+                    assert image_document['status']=='completed',image_document
+                    original_reply=await client.get(f"/api/v1/knowledge-bases/{image_kb}/documents/{image_document['id']}/source")
+                    assert original_reply.status_code==200 and original_reply.content==content
                     image_documents.append(image_document)
                     async with leases.lease() as image_guard:
                         image_rows=await (await image_guard.connection.execute('SELECT c.id,c.chunk_type,c.content,c.parent_chunk_id,c.image_info,e.is_enabled FROM chunks c LEFT JOIN embeddings e ON e.chunk_id=c.id WHERE c.tenant_id=%s AND c.knowledge_id=%s ORDER BY c.chunk_type',
@@ -334,7 +348,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     image_document['fixture_parser_metadata']=profile_input['metadata']['parser_metadata']
                 scan=image_documents[0]['fixture_parser_metadata']
                 assert scan['text_page_count']==1 and scan['scanned_page_count']==1
-                vlm_prompts=[next(p['text'] for p in w['body']['messages'][0]['content'] if p['type']=='text') for w in wire if w['body'].get('model')=='Qwen/Qwen2.5-VL-72B-Instruct']
+                vlm_prompts=[next(p['text'] for p in w['body']['messages'][0]['content'] if p['type']=='text') for w in wire if w['body'].get('model')=='Qwen/Qwen3-VL-32B-Instruct']
                 assert any('scanned PDF document' in prompt for prompt in vlm_prompts)
                 assert any('OCR assistant' in prompt and 'scanned PDF document' not in prompt for prompt in vlm_prompts)
                 # Verify the finalizer JOIN refuses both foreign tenants and

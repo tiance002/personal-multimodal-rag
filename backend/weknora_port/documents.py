@@ -301,7 +301,7 @@ class DocumentLifecycleService:
             except Exception as exc:
                 return await self._mark(principal,knowledge_base_id,document_id,"failed",
                     _safe_error_code(exc,"IMAGE_TASK_CREATE_FAILED"),metadata)
-            row=await self._mark(principal,knowledge_base_id,document_id,"pending","",metadata)
+            row=await self._document_row(principal,knowledge_base_id,document_id)
             await self.image_tasks.start()
             return row
         return await self._process_document(principal,kb,name,data,document_id,source_version,metadata,
@@ -322,7 +322,7 @@ class DocumentLifecycleService:
             if ingest.parsed.failures or not ingest.parsed.content.strip():
                 code = ingest.parsed.failures[0].code if ingest.parsed.failures else "DOCUMENT_CONTENT_UNREADABLE"
                 return await self._mark(principal, knowledge_base_id, document_id, "failed",
-                                        _safe_error_code(DocumentLifecycleError(code), "DOCUMENT_PARSE_FAILED"), metadata)
+                                        _safe_error_code(DocumentLifecycleError(code), "DOCUMENT_PARSE_FAILED"), metadata,image_task=image_task)
 
             if image_task is not None:
                 await self._assert_current_image_task(principal,image_task)
@@ -340,11 +340,11 @@ class DocumentLifecycleService:
             if extension in {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".webp"}:
                 if not image_config.get("enable_multimodal", False):
                     return await self._mark(principal, knowledge_base_id, document_id, "failed",
-                                            "MULTIMODAL_DISABLED_FOR_IMAGE", metadata)
+                                            "MULTIMODAL_DISABLED_FOR_IMAGE", metadata,image_task=image_task)
             if ingest.parsed.assets and image_config.get("enable_multimodal", False):
                 if self.asset_processor is None:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
-                                            "MULTIMODAL_ADAPTER_REQUIRED", metadata)
+                                            "MULTIMODAL_ADAPTER_REQUIRED", metadata,image_task=image_task)
                 process_plan=getattr(self.asset_processor,'process_plan',None)
                 if callable(process_plan):
                     if image_task is None:
@@ -372,11 +372,11 @@ class DocumentLifecycleService:
             if vector_enabled:
                 if self.embedder_for_kb is None:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
-                                            "EMBEDDING_ADAPTER_REQUIRED", metadata)
+                                            "EMBEDDING_ADAPTER_REQUIRED", metadata,image_task=image_task)
                 embedder = await _resolve(self.embedder_for_kb(principal, kb))
                 if embedder is None:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
-                                            "EMBEDDING_ADAPTER_REQUIRED", metadata)
+                                            "EMBEDDING_ADAPTER_REQUIRED", metadata,image_task=image_task)
 
             if plan.persisted:
                 if image_task is not None:
@@ -402,14 +402,14 @@ class DocumentLifecycleService:
             if self._requires_postprocessing(kb, plan) and self.post_processor is None:
                 metadata["pending_stage"] = "postprocess"
                 return await self._mark(principal, knowledge_base_id, document_id, "pending",
-                                        "POSTPROCESSOR_ADAPTER_REQUIRED", metadata)
+                                        "POSTPROCESSOR_ADAPTER_REQUIRED", metadata,image_task=image_task)
             if self.post_processor is not None:
                 result = await _resolve(self.post_processor(principal, kb,
                     {"id": document_id, "knowledge_base_id": knowledge_base_id,
                      "source_version": source_version}, ingest, plan.persisted))
                 if result is False:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
-                                            "POSTPROCESSOR_PENDING", metadata)
+                                            "POSTPROCESSOR_PENDING", metadata,image_task=image_task)
 
             metadata.update({"chunk_count": len(plan.persisted), "indexed_count": len(plan.indexed),
                              "index_enabled": indexed, "processed_at": datetime.now(timezone.utc).isoformat()})
@@ -419,12 +419,12 @@ class DocumentLifecycleService:
         except asyncio.CancelledError:
             if image_task is None:
                 await asyncio.shield(self._mark(principal, knowledge_base_id, document_id, "cancelled",
-                                                "DOCUMENT_PROCESS_CANCELLED", metadata))
+                                                "DOCUMENT_PROCESS_CANCELLED", metadata,image_task=image_task))
             raise
         except Exception as exc:
             if image_task is not None:raise
             code = _safe_error_code(exc, "DOCUMENT_PROCESSING_FAILED")
-            return await self._mark(principal, knowledge_base_id, document_id, "failed", code, metadata)
+            return await self._mark(principal, knowledge_base_id, document_id, "failed", code, metadata,image_task=image_task)
 
     async def _assert_current_image_task(self,principal,task):
         if principal!=self.principal or (task.tenant_id,task.subject_id)!=(principal.tenant_id,principal.subject_id):
@@ -440,26 +440,38 @@ class DocumentLifecycleService:
                 or rows[0]['state']!='processing' or rows[0]['claim_token']!=task.claim_token):
             raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
 
-    async def process_image_task(self,principal,task,queue):
-        await self._assert_current_image_task(principal,task)
-        kb=await self._kb(principal,task.knowledge_base_id)
-        kb={**kb,'image_processing_config':dict(task.config)}
-        rows=await self._rows('SELECT file_name,metadata FROM knowledges WHERE id=%s AND tenant_id=%s '
-            'AND knowledge_base_id=%s AND deleted_at IS NULL',
-            (task.knowledge_id,task.tenant_id,task.knowledge_base_id))
-        if len(rows)!=1:raise DocumentLifecycleError('IMAGE_TASK_ORPHANED')
-        source=await self.read_document(principal,task.knowledge_base_id,task.knowledge_id)
-        await self._rows("UPDATE knowledges SET parse_status='processing',error_message='',updated_at=now() "
-            "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
-            "AND metadata->>'source_version'=%s AND parse_status IN ('pending','processing') RETURNING id",
-            (task.knowledge_id,task.tenant_id,task.knowledge_base_id,task.source_version),
-            writable_knowledge_base_ids=frozenset({task.knowledge_base_id}))
-        # Only this task's uncommitted version is cleared.  On a failed index
-        # attempt, disabled partial rows cannot accumulate on redelivery.
+    async def _lock_current_image_document(self,guard,principal,task,*,states=('pending','processing')):
+        """Caller owns transaction; every image transition locks task then document."""
+        self._authorize(principal);guard.require_verified()
+        if (task.tenant_id,task.subject_id)!=(principal.tenant_id,principal.subject_id):
+            raise DocumentLifecycleError('IMAGE_TASK_OWNER_MISMATCH')
+        claims=await (await guard.connection.execute(
+            'SELECT state,claim_token,source_version FROM port_image_tasks WHERE id=%s '
+            'AND tenant_id=%s AND subject_id=%s AND knowledge_base_id=%s AND knowledge_id=%s FOR UPDATE',
+            (task.id,task.tenant_id,task.subject_id,task.knowledge_base_id,task.knowledge_id))).fetchall()
+        current=await (await guard.connection.execute(
+            'SELECT metadata,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s '
+            'AND knowledge_base_id=%s AND deleted_at IS NULL FOR UPDATE',
+            (task.knowledge_id,task.tenant_id,task.knowledge_base_id))).fetchall()
+        if (len(current)!=1 or current[0]['metadata'].get('source_version')!=task.source_version
+                or current[0]['parse_status'] not in states):
+            raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+        if (len(claims)!=1 or claims[0]['source_version']!=task.source_version
+                or claims[0]['state']!='processing' or claims[0]['claim_token']!=task.claim_token):
+            raise DocumentLifecycleError('IMAGE_TASK_CLAIM_LOST')
+        return dict(current[0]['metadata'])
+
+    async def _prepare_image_task(self,principal,task):
+        # Validate inside the same transaction that clears the uncommitted rows.
         async with self.connection_factory.lease(
                 writable_knowledge_base_ids=frozenset({task.knowledge_base_id})) as guard:
-            guard.require_verified()
             async with guard.connection.transaction():
+                metadata=await self._lock_current_image_document(guard,principal,task)
+                await guard.connection.execute(
+                    "UPDATE knowledges SET parse_status='processing',error_message='',updated_at=now() "
+                    "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
+                    "AND metadata->>'source_version'=%s AND parse_status IN ('pending','processing')",
+                    (task.knowledge_id,task.tenant_id,task.knowledge_base_id,task.source_version))
                 await guard.connection.execute(
                     "DELETE FROM embeddings e USING chunks c WHERE e.chunk_id=c.id AND "
                     "c.tenant_id=%s AND c.knowledge_base_id=%s AND c.knowledge_id=%s "
@@ -469,18 +481,27 @@ class DocumentLifecycleService:
                     "DELETE FROM chunks WHERE tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s "
                     "AND metadata->>'source_version'=%s",
                     (task.tenant_id,task.knowledge_base_id,task.knowledge_id,task.source_version))
+        return metadata
+
+    async def process_image_task(self,principal,task,queue):
+        await self._assert_current_image_task(principal,task)
+        kb=await self._kb(principal,task.knowledge_base_id)
+        kb={**kb,'image_processing_config':dict(task.config)}
+        source=await self.read_document(principal,task.knowledge_base_id,task.knowledge_id)
+        metadata=await self._prepare_image_task(principal,task)
         return await self._process_document(principal,kb,source.filename,source.content,
-            task.knowledge_id,task.source_version,dict(rows[0]['metadata']),
+            task.knowledge_id,task.source_version,metadata,
             process_overrides=task.config,image_task=task,image_queue=queue)
 
     async def fail_image_task(self,principal,task,code):
-        try:await self._assert_current_image_task(principal,task)
-        except DocumentLifecycleError:return
-        rows=await self._rows('SELECT metadata FROM knowledges WHERE id=%s AND tenant_id=%s '
-            'AND knowledge_base_id=%s AND deleted_at IS NULL',
-            (task.knowledge_id,task.tenant_id,task.knowledge_base_id))
-        if rows:
-            await self._mark(principal,task.knowledge_base_id,task.knowledge_id,'failed',code,rows[0]['metadata'])
+        try:
+            await self._mark(principal,task.knowledge_base_id,task.knowledge_id,'failed',code,
+                             {'source_version':task.source_version},image_task=task)
+        except DocumentLifecycleError as exc:
+            if exc.code not in ('IMAGE_SOURCE_VERSION_CHANGED','IMAGE_TASK_CLAIM_LOST'):raise
+            # A replacement claim, cancelled/new version or committed winner owns it.
+            return False
+        return True
 
     @staticmethod
     def _assert_no_cloud_parser(ingest: IngestResult) -> None:
@@ -539,14 +560,33 @@ class DocumentLifecycleService:
         return manifest
 
     async def _mark(self, principal: LocalPrincipal, knowledge_base_id: str, document_id: str,
-                    status: str, code: str, metadata: Mapping[str, Any]) -> dict[str, Any]:
+                    status: str, code: str, metadata: Mapping[str, Any], *,image_task=None) -> dict[str, Any]:
         self._authorize(principal)
-        await self._rows(
-            "UPDATE knowledges SET parse_status=%s,error_message=%s,metadata=%s::jsonb,updated_at=now() "
-            "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL RETURNING id",
-            (status, code, json.dumps(dict(metadata), ensure_ascii=False), document_id,
-             principal.tenant_id, knowledge_base_id),
-            writable_knowledge_base_ids=frozenset({knowledge_base_id}))
+        if image_task is not None:
+            if (knowledge_base_id,document_id)!=(image_task.knowledge_base_id,image_task.knowledge_id):
+                raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+            async with self.connection_factory.lease(
+                    writable_knowledge_base_ids=frozenset({knowledge_base_id})) as guard:
+                async with guard.connection.transaction():
+                    current=await self._lock_current_image_document(guard,principal,image_task)
+                    current.update(dict(metadata))
+                    if current.get('source_version')!=image_task.source_version:
+                        raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+                    rows=await (await guard.connection.execute(
+                        "UPDATE knowledges SET parse_status=%s,error_message=%s,metadata=%s::jsonb,updated_at=now() "
+                        "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
+                        "AND metadata->>'source_version'=%s AND parse_status IN ('pending','processing') RETURNING id",
+                        (status,code,json.dumps(current,ensure_ascii=False),document_id,principal.tenant_id,
+                         knowledge_base_id,image_task.source_version))).fetchall()
+                    if len(rows)!=1:raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+        else:
+            await self._rows(
+                "UPDATE knowledges SET parse_status=%s,error_message=%s,metadata=%s::jsonb,updated_at=now() "
+                "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
+                "AND metadata->>'source_version'=%s AND parse_status IN ('pending','processing') RETURNING id",
+                (status, code, json.dumps(dict(metadata), ensure_ascii=False), document_id,
+                 principal.tenant_id, knowledge_base_id,metadata.get('source_version')),
+                writable_knowledge_base_ids=frozenset({knowledge_base_id}))
         return await self._document_row(principal, knowledge_base_id, document_id)
 
     async def _finalize(self, principal: LocalPrincipal, knowledge_base_id: str, document_id: str,
@@ -557,18 +597,9 @@ class DocumentLifecycleService:
             retriever.require_verified()
             async with retriever.connection.transaction():
                 if image_task is not None:
-                    current=await (await retriever.connection.execute(
-                        'SELECT metadata,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s '
-                        'AND knowledge_base_id=%s AND deleted_at IS NULL FOR UPDATE',
-                        (document_id,principal.tenant_id,knowledge_base_id))).fetchall()
-                    if (len(current)!=1 or current[0]['metadata'].get('source_version')!=source_version
-                            or current[0]['parse_status']!='processing'):
+                    if (knowledge_base_id,document_id,source_version)!=(image_task.knowledge_base_id,image_task.knowledge_id,image_task.source_version):
                         raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
-                    claim=await (await retriever.connection.execute(
-                        "SELECT id FROM port_image_tasks WHERE id=%s AND tenant_id=%s AND subject_id=%s "
-                        "AND claim_token=%s AND state='processing' FOR UPDATE",
-                        (image_task.id,principal.tenant_id,principal.subject_id,image_task.claim_token))).fetchall()
-                    if len(claim)!=1:raise DocumentLifecycleError('IMAGE_TASK_CLAIM_LOST')
+                    await self._lock_current_image_document(retriever,principal,image_task,states=('processing',))
                 if enabled:
                     await retriever.connection.execute(
                         "UPDATE embeddings SET is_enabled=TRUE FROM knowledges k "

@@ -59,14 +59,20 @@ class ImageTaskQueue:
         task_id=str(uuid.uuid4())
         async with self.leases.lease(writable_knowledge_base_ids=frozenset({kb['id']})) as guard:
             guard.require_verified()
-            rows=await (await guard.connection.execute(
-                'INSERT INTO port_image_tasks(id,tenant_id,subject_id,knowledge_base_id,knowledge_id,source_version,selected_config) '
-                'VALUES(%s,%s,%s,%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,knowledge_base_id,knowledge_id,source_version) '
-                'DO NOTHING RETURNING id',
-                (task_id,principal.tenant_id,principal.subject_id,kb['id'],document_id,source_version,
-                 json.dumps({'selection':selection.public(),'override':cfg},ensure_ascii=False)))).fetchall()
-        if len(rows)!=1:
-            raise DocumentLifecycleError('IMAGE_TASK_CREATE_CONFLICT')
+            async with guard.connection.transaction():
+                rows=await (await guard.connection.execute(
+                    'INSERT INTO port_image_tasks(id,tenant_id,subject_id,knowledge_base_id,knowledge_id,source_version,selected_config) '
+                    'VALUES(%s,%s,%s,%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,knowledge_base_id,knowledge_id,source_version) '
+                    'DO NOTHING RETURNING id',
+                    (task_id,principal.tenant_id,principal.subject_id,kb['id'],document_id,source_version,
+                     json.dumps({'selection':selection.public(),'override':cfg},ensure_ascii=False)))).fetchall()
+                if len(rows)!=1:raise DocumentLifecycleError('IMAGE_TASK_CREATE_CONFLICT')
+                changed=await (await guard.connection.execute(
+                    "UPDATE knowledges SET parse_status='pending',error_message='',updated_at=now() "
+                    "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
+                    "AND metadata->>'source_version'=%s AND parse_status='processing' RETURNING id",
+                    (document_id,principal.tenant_id,kb['id'],source_version))).fetchall()
+                if len(changed)!=1:raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
         return task_id
 
     async def _claim(self):

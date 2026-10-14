@@ -1,0 +1,28 @@
+{
+  "kind": "IMAGE_SERIAL_CANDIDATE_TESTED_WORKTREE_SOURCE_SNAPSHOT",
+  "head_before_fixes": "0f26945ae8112932d1546a1bd3ff72f814132bff",
+  "worktree_sha256": {
+    "backend/weknora_port/documents.py": "e0df4ab5d041afa84864308060854717863907ffa9ea0967726c412ef4826968",
+    "backend/weknora_port/runtime.py": "5a2c2ef02e50744192c7fca78d23db704b4aacdb11e94c6185b513c63421ced5",
+    "backend/weknora_port/http_api.py": "a1059d379a28f7b1848320bf1e86be4c55f216fcb98d69f02e476bc902f0c00c",
+    "backend/weknora_port/image_tasks.py": "54d0833926d2546478eed6b191b76fc975817e3524119606ce43d4e4b25bf831",
+    "backend/weknora_port/image_configuration.py": "e85e02f482823aa69e79b5a644e22f41797d42e543b6a409fa49d3b528fb0037",
+    "backend/weknora_port/image_multimodal.py": "a467aa1ce7025149d147a1bebbd3b31959d98c4ac30f7bed9950fcaa8253adbe",
+    "backend/weknora_port/tesseract_ocr.py": "7a7ab41b146bdc97869759a7242eb9e623be6843fa56a8e0910eb96010a87266",
+    "backend/weknora_port/model_registry.py": "2997412474f36184cbe9c270f69d9259296b2b0e24ab6775256d2399f17a6bc2",
+    "backend/weknora_port/models/provider.py": "a3946398561847582a178caf4b0eda84bd6a060de4993ddf3ad7a244a2ef1813",
+    "backend/weknora_port/storage/models.py": "b2d6234364ffd4680f549e6f3570de3491699f0518b268578260b8b0b6a6fb40",
+    "backend/weknora_port/storage/image_tasks_migrate.py": "53ec68de749a9722b1525cda2d62521f89632eb95bf9825b9ddc2011662fc1a5",
+    "backend/weknora_port/storage/migrations/010_image_tasks.sql": "c6fc4516550d9c38da0347bcd6cf68a5aa8ab5ad172bd5019eda656374f76362",
+    "tests/weknora_port/test_image_claim_fences_pg.py": "3bd20db252d8aa7f0a48c6685ee74e85943ef2b8620b8db8a47c1659413a0651",
+    "tests/weknora_port/test_image_tasks_pg.py": "8ade2aba4970851ca6e8c117e0922bfabf1b1947399fbc86dea59d04e44dcd2e",
+    "tests/weknora_port/test_runtime_pg.py": "06b3949186927359ce7225f55689b1e51ae46eafb19547860266311f5ad9f067"
+  },
+  "race_results": "IMAGE_INTEGRATION_RACES_PG_20261014.junit.xml",
+  "race_source_capture": "after unchanged-source run; no source mutation during command",
+  "legacy_and_offline_capture": "before next verification commands",
+  "owner_tree_modified": false,
+  "integration_db": "wk_image_integration_20261014",
+  "real_provider_calls": 0,
+  "integration_acceptance": "PENDING"
+}

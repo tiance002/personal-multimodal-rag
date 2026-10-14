@@ -566,10 +566,10 @@ class ApplicationRuntime:
         kb=await self.documents._kb(principal,knowledge_base_id)
         allowed={'enable_multimodal','ocr_adapter','ocr_model_id','caption_mode',
                  'caption_model_id','description_language','custom_instructions'}
-        if set(value)-allowed or type(value.get('enable_multimodal')) is not bool:
+        if set(value)-allowed or ('enable_multimodal' in value and type(value['enable_multimodal']) is not bool):
             raise ValueError('IMAGE_CONFIG_INVALID')
         cfg=effective_image_config(kb,value)
-        cfg['enable_multimodal']=value['enable_multimodal']
+        cfg['enable_multimodal']=value.get('enable_multimodal',bool(cfg.get('enable_multimodal',False)))
         if cfg['enable_multimodal']:
             await resolve_image_selection(kb,value,self.models,self.catalogue,
                 CallContext('image-config-validation',TrustedScope(principal.subject_id,(knowledge_base_id,),())))

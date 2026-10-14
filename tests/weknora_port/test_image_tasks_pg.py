@@ -27,7 +27,7 @@ from backend.weknora_port.streaming.manager import RedisListStreamStore
 from tests.weknora_port.test_runtime_pg import FixtureCosts,FixturePermissions
 
 
-DB='wk_image_20261014'
+DB='wk_image_integration_20261014'
 SYSTEM='7696088403504697382'
 PROHIBITED=frozenset({'7691227493754040358','7689510505384681511','7696038373595934758'})
 
@@ -54,7 +54,7 @@ def fixture_png():
 
 
 def test_real_isolated_http_image_task_local_ocr_explicit_caption(monkeypatch):
-    path=Path('E:/RAG quention/var/tessdata')
+    path=Path(os.environ.get('RAG_TESSDATA_DIR','E:/WK/deps/tessdata'))
     assert (path/'eng.traineddata').is_file() and (path/'chi_sim.traineddata').is_file()
     monkeypatch.setenv('RAG_TESSDATA_DIR',str(path))
     async def scenario():
@@ -74,7 +74,7 @@ def test_real_isolated_http_image_task_local_ocr_explicit_caption(monkeypatch):
         principal=LocalPrincipal(tenant,'image-owner:'+str(uuid.uuid4()))
         redis=Redis.from_url('redis://127.0.0.1:56424/0',decode_responses=True)
         assert await redis.ping()
-        prefix='wk-image:20261014:'+str(uuid.uuid4())
+        prefix='wk-image-integration:20261014:'+str(uuid.uuid4())
         stream=RedisListStreamStore(redis,prefix=prefix)
         calls=[]
         def handler(request):
@@ -127,6 +127,22 @@ def test_real_isolated_http_image_task_local_ocr_explicit_caption(monkeypatch):
                     'enable_multimodal':True,'ocr_adapter':'tesseract',
                     'caption_mode':'explicit','caption_model_id':caption_id})
                 assert configured.status_code==200,configured.text
+                # PATCH only provided fields: do not silently clear explicit Caption.
+                only_id=await client.patch(f'/api/v1/knowledge-bases/{kb}/image-processing',json={'caption_model_id':caption_id})
+                assert only_id.status_code==200,only_id.text
+                cfg=only_id.json()['data']['image_processing_config']
+                assert cfg['caption_mode']=='explicit' and cfg['caption_model_id']==caption_id and cfg['enable_multimodal'] is True
+                unrelated=await client.patch(f'/api/v1/knowledge-bases/{kb}/image-processing',json={'description_language':'English'})
+                assert unrelated.status_code==200,unrelated.text
+                cfg=unrelated.json()['data']['image_processing_config']
+                assert cfg['caption_mode']=='explicit' and cfg['caption_model_id']==caption_id and cfg['ocr_adapter']=='tesseract'
+                followed=await client.patch(f'/api/v1/knowledge-bases/{kb}/image-processing',json={'caption_mode':'follow_ocr'})
+                assert followed.status_code==200,followed.text
+                cfg=followed.json()['data']['image_processing_config']
+                assert cfg['caption_mode']=='follow_ocr' and not cfg.get('caption_model_id') and cfg['enable_multimodal'] is True
+                reset=await client.patch(f'/api/v1/knowledge-bases/{kb}/image-processing',json={'caption_model_id':caption_id})
+                assert reset.status_code==200,reset.text
+                assert reset.json()['data']['image_processing_config']['caption_mode']=='explicit'
                 uploaded=await client.post(f'/api/v1/knowledge-bases/{kb}/documents',
                     files={'file':('synthetic.png',fixture_png(),'image/png')})
                 assert uploaded.status_code==200,uploaded.text

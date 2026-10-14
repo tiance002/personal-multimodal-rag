@@ -66,7 +66,7 @@ class KnowledgeBaseCreate(ApiModel):
 
 
 class ImageProcessingWrite(ApiModel):
-    enable_multimodal: StrictBool
+    enable_multimodal: StrictBool = False
     ocr_adapter: str = ''
     ocr_model_id: str = ''
     caption_mode: str = 'follow_ocr'
@@ -509,7 +509,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.patch('/api/v1/knowledge-bases/{knowledge_base_id}/image-processing')
     async def update_image_processing(knowledge_base_id: str,body: ImageProcessingWrite,request: Request):
         return json_data(request,await runtime.update_image_processing(await principal(request),
-            knowledge_base_id,body.model_dump()))
+            knowledge_base_id,body.model_dump(exclude_unset=True)))
 
     @app.post('/api/v1/settings/vision-models')
     async def register_vision_model(body: VisionModelCreate,request: Request):
