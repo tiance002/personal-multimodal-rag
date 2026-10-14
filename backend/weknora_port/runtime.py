@@ -231,6 +231,9 @@ class ApplicationRuntime:
         if documents.post_processor is None:
             from .document_profile import SourceDocumentPostprocessor
             documents.post_processor = SourceDocumentPostprocessor(self)
+        from .image_tasks import ImageTaskQueue
+        self.image_tasks=ImageTaskQueue(leases,principal,documents,self.models,self.catalogue)
+        documents.image_tasks=self.image_tasks
         self.ordinary = BoundOrdinaryService(
             self, self.turns, store, self.history, OrdinaryMemoryLoader(self.memory, self.memory_models.origin_knowledge_bases),
             configuration=self._configuration, pipeline_factory=self._pipeline,
@@ -518,10 +521,12 @@ class ApplicationRuntime:
         await self.memory_manager.delete(MemoryContext(principal.tenant_id,principal.subject_id),item_id)
 
     async def start_background_workers(self):
+        await self.image_tasks.start()
         start=getattr(self.memory_enqueuer,'start',None)
         if callable(start):await start()
 
     async def stop_background_workers(self):
+        await self.image_tasks.stop()
         stop=getattr(self.memory_enqueuer,'stop',None)
         if callable(stop):await stop()
 
@@ -539,14 +544,70 @@ class ApplicationRuntime:
         self._owner(principal)
         return await self.documents.create_knowledge_base(principal, name)
 
+    async def register_vision_model(self,principal,provider,model,base_url,api_key,vision_user_declared=False):
+        self._owner(principal)
+        from .storage.configuration import ConfiguredRole
+        from .image_configuration import _image_wire_supported
+        role=ConfiguredRole('vlm',provider.strip(),model.strip(),base_url.strip(),api_key,
+                            {'vision_user_declared':bool(vision_user_declared)})
+        config=self.catalogue.resolve(role,'vision-registration-validation')
+        if not config.supports_vision or not _image_wire_supported(config):
+            raise ProviderError('MODEL_VISION_UNSUPPORTED')
+        model_id=await self.models.persist(role)
+        row=await self.models.public(model_id)
+        row['vision_capability']='USER_DECLARED_UNTESTED' if vision_user_declared and not config.cataloged else 'CATALOG_DECLARED'
+        return row
+
+    async def update_image_processing(self,principal,knowledge_base_id,value):
+        self._owner(principal)
+        import json
+        from .image_configuration import effective_image_config,resolve_image_selection
+        from .models.types import CallContext,TrustedScope
+        kb=await self.documents._kb(principal,knowledge_base_id)
+        allowed={'enable_multimodal','ocr_adapter','ocr_model_id','caption_mode',
+                 'caption_model_id','description_language','custom_instructions'}
+        if set(value)-allowed or type(value.get('enable_multimodal')) is not bool:
+            raise ValueError('IMAGE_CONFIG_INVALID')
+        cfg=effective_image_config(kb,value)
+        cfg['enable_multimodal']=value['enable_multimodal']
+        if cfg['enable_multimodal']:
+            await resolve_image_selection(kb,value,self.models,self.catalogue,
+                CallContext('image-config-validation',TrustedScope(principal.subject_id,(knowledge_base_id,),())))
+        async with self.leases.lease(writable_knowledge_base_ids=frozenset({knowledge_base_id})) as guard:
+            guard.require_verified()
+            rows=await (await guard.connection.execute(
+                'UPDATE knowledge_bases SET image_processing_config=%s::jsonb,updated_at=now() '
+                'WHERE id=%s AND tenant_id=%s AND deleted_at IS NULL RETURNING id',
+                (json.dumps(cfg,ensure_ascii=False),knowledge_base_id,principal.tenant_id))).fetchall()
+        if len(rows)!=1:raise LookupError('KNOWLEDGE_BASE_NOT_FOUND')
+        return {'id':knowledge_base_id,'image_processing_config':cfg}
+
     async def list_documents(self, principal, knowledge_base_id):
         self._owner(principal)
         return await self.documents.list_documents(principal, knowledge_base_id)
 
-    async def upload_document(self, principal, knowledge_base_id, filename, content_type, source):
+    async def image_task_status(self,principal,knowledge_base_id,document_id):
+        self._owner(principal)
+        await self.documents._kb(principal,knowledge_base_id)
+        rows=await self._rows(
+            'SELECT id,state,attempt,max_retry,error_code,outcomes,selected_config '
+            'FROM port_image_tasks WHERE tenant_id=%s AND subject_id=%s '
+            'AND knowledge_base_id=%s AND knowledge_id=%s ORDER BY created_at DESC LIMIT 1',
+            (principal.tenant_id,principal.subject_id,knowledge_base_id,document_id))
+        if not rows:raise LookupError('IMAGE_TASK_NOT_FOUND')
+        row=rows[0]
+        return {'id':row['id'],'state':row['state'],'attempt':row['attempt'],
+            'max_retry':row['max_retry'],'error_code':row['error_code'],
+            'selection':row['selected_config']['selection'],'outcomes':row['outcomes']}
+
+    async def cancel_image_task(self,principal,knowledge_base_id,document_id):
+        self._owner(principal)
+        return await self.image_tasks.cancel(principal,knowledge_base_id,document_id)
+
+    async def upload_document(self, principal, knowledge_base_id, filename, content_type, source,process_overrides=None):
         self._owner(principal)
         return await self.documents.upload_document(
-            principal, knowledge_base_id, filename, content_type, source)
+            principal, knowledge_base_id, filename, content_type, source,process_overrides)
 
     async def read_document(self,principal,knowledge_base_id,document_id):
         self._owner(principal)

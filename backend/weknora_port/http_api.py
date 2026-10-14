@@ -8,6 +8,7 @@ KB/document IDs into an effective server-side scope.
 from __future__ import annotations
 
 import inspect
+import json
 import re
 import uuid
 from dataclasses import dataclass
@@ -62,6 +63,24 @@ class KnowledgeBaseExternalProcessing(ApiModel):
 
 class KnowledgeBaseCreate(ApiModel):
     name: str = Field(min_length=1, max_length=200)
+
+
+class ImageProcessingWrite(ApiModel):
+    enable_multimodal: StrictBool
+    ocr_adapter: str = ''
+    ocr_model_id: str = ''
+    caption_mode: str = 'follow_ocr'
+    caption_model_id: str = ''
+    description_language: str = ''
+    custom_instructions: str = ''
+
+
+class VisionModelCreate(ApiModel):
+    provider: str
+    model: str
+    base_url: str
+    api_key: SecretStr = SecretStr('')
+    vision_user_declared: StrictBool = False
 
 
 class SessionCreate(ApiModel):
@@ -472,9 +491,31 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.post("/api/v1/knowledge-bases/{knowledge_base_id}/documents")
     async def upload_document(knowledge_base_id: str, request: Request, file: UploadFile = File(...)):
         who = await principal(request)
+        form=await request.form()
+        raw=form.get('process_overrides')
+        try:
+            overrides=json.loads(raw) if isinstance(raw,str) and raw else None
+        except ValueError:
+            raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID') from None
+        if overrides is not None and (not isinstance(overrides,dict) or
+            set(overrides)-{'ocr_adapter','ocr_model_id','caption_mode','caption_model_id',
+                            'description_language','custom_instructions'} or
+            any(not isinstance(value,str) for value in overrides.values())):
+            raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID')
         result = await runtime.upload_document(who, knowledge_base_id, file.filename or "upload",
-                                               file.content_type or "application/octet-stream", file)
+                                               file.content_type or "application/octet-stream", file,overrides)
         return json_data(request, result)
+
+    @app.patch('/api/v1/knowledge-bases/{knowledge_base_id}/image-processing')
+    async def update_image_processing(knowledge_base_id: str,body: ImageProcessingWrite,request: Request):
+        return json_data(request,await runtime.update_image_processing(await principal(request),
+            knowledge_base_id,body.model_dump()))
+
+    @app.post('/api/v1/settings/vision-models')
+    async def register_vision_model(body: VisionModelCreate,request: Request):
+        return json_data(request,await runtime.register_vision_model(await principal(request),
+            body.provider,body.model,body.base_url,body.api_key.get_secret_value(),
+            body.vision_user_declared))
 
     @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/source')
     async def original_document(knowledge_base_id: str,document_id: str,request: Request):
@@ -482,6 +523,16 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         return Response(source.content,media_type=source.media_type,headers={
             'Content-Disposition':"attachment; filename*=UTF-8''"+quote(source.filename,safe=''),
             'X-Content-Type-Options':'nosniff'})
+
+    @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/image-task')
+    async def image_task_status(knowledge_base_id: str,document_id: str,request: Request):
+        return json_data(request,await runtime.image_task_status(await principal(request),
+            knowledge_base_id,document_id))
+
+    @app.post('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/image-task/cancel')
+    async def cancel_image_task(knowledge_base_id: str,document_id: str,request: Request):
+        return json_data(request,await runtime.cancel_image_task(await principal(request),
+            knowledge_base_id,document_id))
 
     @app.get("/api/v1/settings/model-configuration")
     async def read_model_configuration(request: Request):

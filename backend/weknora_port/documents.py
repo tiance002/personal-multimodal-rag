@@ -37,6 +37,8 @@ _SUPPORTED_MEDIA = {
     ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif",
     ".bmp": "image/bmp", ".tif": "image/tiff", ".tiff": "image/tiff", ".webp": "image/webp",
 }
+_IMAGE_BEARING_EXTENSIONS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".bmp",
+    ".tif", ".tiff", ".webp", ".pdf", ".docx", ".doc", ".pptx", ".ppt"})
 _SAFE_CODE = re.compile(r"^[A-Z][A-Z0-9_]{0,79}$")
 
 
@@ -153,6 +155,7 @@ class DocumentLifecycleService:
         self.connection_factory = connection_factory
         self.storage_root = Path(storage_root).expanduser().resolve()
         self.principal = principal
+        self.image_tasks = None
         self.resolve_kb_settings = resolve_kb_settings
         self.embedder_for_kb = embedder_for_kb
         self.parser_registry = parser_registry or ParserRegistry()
@@ -249,7 +252,8 @@ class DocumentLifecycleService:
                  "error_code": row.get("error_message") or ""} for row in rows]
 
     async def upload_document(self, principal: LocalPrincipal, knowledge_base_id: str,
-                              filename: str, content_type: str, source: Any) -> dict[str, Any]:
+                              filename: str, content_type: str, source: Any,
+                              process_overrides: Mapping[str, Any] | None = None) -> dict[str, Any]:
         kb = await self._kb(principal, knowledge_base_id)
         name = _filename(filename)
         extension = Path(name).suffix.lower()
@@ -289,6 +293,25 @@ class DocumentLifecycleService:
             original_path.unlink(missing_ok=True)
             raise DocumentLifecycleError("DOCUMENT_CREATE_FAILED")
 
+        image_config = _json_object(kb.get("image_processing_config"))
+        if (self.image_tasks is not None and image_config.get("enable_multimodal", False)
+                and extension in _IMAGE_BEARING_EXTENSIONS):
+            try:
+                await self.image_tasks.create(principal,kb,document_id,source_version,process_overrides)
+            except Exception as exc:
+                return await self._mark(principal,knowledge_base_id,document_id,"failed",
+                    _safe_error_code(exc,"IMAGE_TASK_CREATE_FAILED"),metadata)
+            row=await self._mark(principal,knowledge_base_id,document_id,"pending","",metadata)
+            await self.image_tasks.start()
+            return row
+        return await self._process_document(principal,kb,name,data,document_id,source_version,metadata,
+                                             process_overrides=process_overrides)
+
+    async def _process_document(self,principal,kb,name,data,document_id,source_version,metadata,
+                                *,process_overrides=None,image_task=None,image_queue=None):
+        knowledge_base_id=kb['id']
+        extension=Path(name).suffix.lower()
+
         try:
             request = DocumentRequest(filename=name, data=data, owner_id=principal.subject_id,
                                       knowledge_base_id=knowledge_base_id, document_id=document_id,
@@ -301,8 +324,11 @@ class DocumentLifecycleService:
                 return await self._mark(principal, knowledge_base_id, document_id, "failed",
                                         _safe_error_code(DocumentLifecycleError(code), "DOCUMENT_PARSE_FAILED"), metadata)
 
+            if image_task is not None:
+                await self._assert_current_image_task(principal,image_task)
             asset_manifest = self._persist_assets(principal, knowledge_base_id, document_id,
-                                                  source_version, ingest.parsed.assets)
+                                                  source_version, ingest.parsed.assets,
+                                                  task_id=image_task.id if image_task is not None else None)
             metadata.update({"parser_engine": ingest.parser_engine,
                              "parser_metadata": dict(ingest.parsed.metadata), "assets": asset_manifest})
             self._assert_no_cloud_parser(ingest)
@@ -321,7 +347,15 @@ class DocumentLifecycleService:
                                             "MULTIMODAL_ADAPTER_REQUIRED", metadata)
                 process_plan=getattr(self.asset_processor,'process_plan',None)
                 if callable(process_plan):
-                    plan=await process_plan(principal,kb,doc_scope,ingest.parsed.assets,plan)
+                    if image_task is None:
+                        plan=await process_plan(principal,kb,doc_scope,ingest.parsed.assets,plan,
+                                                override=process_overrides)
+                    else:
+                        plan=await process_plan(principal,kb,doc_scope,ingest.parsed.assets,plan,
+                            override=process_overrides,selection_snapshot=image_task.selection,
+                            on_before=lambda i,k:image_queue.before(image_task,i,k),
+                            on_result=lambda i,info:image_queue.result(image_task,i,info),
+                            prior=image_task.outcomes)
                 else:
                     image_chunks = await _resolve(self.asset_processor(principal, kb, doc_scope, ingest.parsed.assets))
                     for chunk in image_chunks:
@@ -345,6 +379,8 @@ class DocumentLifecycleService:
                                             "EMBEDDING_ADAPTER_REQUIRED", metadata)
 
             if plan.persisted:
+                if image_task is not None:
+                    await self._assert_current_image_task(principal,image_task)
                 async with self.connection_factory.lease(
                         writable_knowledge_base_ids=frozenset({knowledge_base_id})) as retriever:
                     repository = ScopedKnowledgeRepository(retriever,
@@ -355,6 +391,8 @@ class DocumentLifecycleService:
 
             indexed = vector_enabled or keyword_enabled
             if indexed and plan.indexed:
+                if image_task is not None:
+                    await self._assert_current_image_task(principal,image_task)
                 disabled_indexes = tuple(replace(row, is_enabled=False) for row in plan.indexed)
                 async with self.connection_factory.lease(
                         writable_knowledge_base_ids=frozenset({knowledge_base_id})) as retriever:
@@ -376,15 +414,73 @@ class DocumentLifecycleService:
             metadata.update({"chunk_count": len(plan.persisted), "indexed_count": len(plan.indexed),
                              "index_enabled": indexed, "processed_at": datetime.now(timezone.utc).isoformat()})
             await self._finalize(principal, knowledge_base_id, document_id, source_version,
-                                 metadata, enabled=indexed and bool(plan.indexed))
+                                 metadata, enabled=indexed and bool(plan.indexed),image_task=image_task)
             return await self._document_row(principal, knowledge_base_id, document_id)
         except asyncio.CancelledError:
-            await asyncio.shield(self._mark(principal, knowledge_base_id, document_id, "cancelled",
-                                            "DOCUMENT_PROCESS_CANCELLED", metadata))
+            if image_task is None:
+                await asyncio.shield(self._mark(principal, knowledge_base_id, document_id, "cancelled",
+                                                "DOCUMENT_PROCESS_CANCELLED", metadata))
             raise
         except Exception as exc:
+            if image_task is not None:raise
             code = _safe_error_code(exc, "DOCUMENT_PROCESSING_FAILED")
             return await self._mark(principal, knowledge_base_id, document_id, "failed", code, metadata)
+
+    async def _assert_current_image_task(self,principal,task):
+        if principal!=self.principal or (task.tenant_id,task.subject_id)!=(principal.tenant_id,principal.subject_id):
+            raise DocumentLifecycleError('IMAGE_TASK_OWNER_MISMATCH')
+        rows=await self._rows(
+            "SELECT k.metadata,k.parse_status,t.claim_token,t.state FROM knowledges k "
+            "JOIN port_image_tasks t ON t.knowledge_id=k.id AND t.tenant_id=k.tenant_id "
+            "AND t.knowledge_base_id=k.knowledge_base_id WHERE k.id=%s AND k.tenant_id=%s "
+            "AND k.knowledge_base_id=%s AND k.deleted_at IS NULL AND t.id=%s",
+            (task.knowledge_id,task.tenant_id,task.knowledge_base_id,task.id))
+        if (len(rows)!=1 or rows[0]['metadata'].get('source_version')!=task.source_version
+                or rows[0]['parse_status'] not in ('pending','processing')
+                or rows[0]['state']!='processing' or rows[0]['claim_token']!=task.claim_token):
+            raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+
+    async def process_image_task(self,principal,task,queue):
+        await self._assert_current_image_task(principal,task)
+        kb=await self._kb(principal,task.knowledge_base_id)
+        kb={**kb,'image_processing_config':dict(task.config)}
+        rows=await self._rows('SELECT file_name,metadata FROM knowledges WHERE id=%s AND tenant_id=%s '
+            'AND knowledge_base_id=%s AND deleted_at IS NULL',
+            (task.knowledge_id,task.tenant_id,task.knowledge_base_id))
+        if len(rows)!=1:raise DocumentLifecycleError('IMAGE_TASK_ORPHANED')
+        source=await self.read_document(principal,task.knowledge_base_id,task.knowledge_id)
+        await self._rows("UPDATE knowledges SET parse_status='processing',error_message='',updated_at=now() "
+            "WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
+            "AND metadata->>'source_version'=%s AND parse_status IN ('pending','processing') RETURNING id",
+            (task.knowledge_id,task.tenant_id,task.knowledge_base_id,task.source_version),
+            writable_knowledge_base_ids=frozenset({task.knowledge_base_id}))
+        # Only this task's uncommitted version is cleared.  On a failed index
+        # attempt, disabled partial rows cannot accumulate on redelivery.
+        async with self.connection_factory.lease(
+                writable_knowledge_base_ids=frozenset({task.knowledge_base_id})) as guard:
+            guard.require_verified()
+            async with guard.connection.transaction():
+                await guard.connection.execute(
+                    "DELETE FROM embeddings e USING chunks c WHERE e.chunk_id=c.id AND "
+                    "c.tenant_id=%s AND c.knowledge_base_id=%s AND c.knowledge_id=%s "
+                    "AND c.metadata->>'source_version'=%s",
+                    (task.tenant_id,task.knowledge_base_id,task.knowledge_id,task.source_version))
+                await guard.connection.execute(
+                    "DELETE FROM chunks WHERE tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s "
+                    "AND metadata->>'source_version'=%s",
+                    (task.tenant_id,task.knowledge_base_id,task.knowledge_id,task.source_version))
+        return await self._process_document(principal,kb,source.filename,source.content,
+            task.knowledge_id,task.source_version,dict(rows[0]['metadata']),
+            process_overrides=task.config,image_task=task,image_queue=queue)
+
+    async def fail_image_task(self,principal,task,code):
+        try:await self._assert_current_image_task(principal,task)
+        except DocumentLifecycleError:return
+        rows=await self._rows('SELECT metadata FROM knowledges WHERE id=%s AND tenant_id=%s '
+            'AND knowledge_base_id=%s AND deleted_at IS NULL',
+            (task.knowledge_id,task.tenant_id,task.knowledge_base_id))
+        if rows:
+            await self._mark(principal,task.knowledge_base_id,task.knowledge_id,'failed',code,rows[0]['metadata'])
 
     @staticmethod
     def _assert_no_cloud_parser(ingest: IngestResult) -> None:
@@ -422,16 +518,21 @@ class DocumentLifecycleService:
 
     def _persist_assets(self, principal: LocalPrincipal, knowledge_base_id: str,
                         document_id: str, source_version: str,
-                        assets: Sequence[ParsedAsset]) -> list[dict[str, Any]]:
+                        assets: Sequence[ParsedAsset], *, task_id: str | None = None) -> list[dict[str, Any]]:
         manifest = []
         for index, asset in enumerate(assets):
             original_name = PurePosixPath(asset.path.replace("\\", "/")).name
             name = _filename(original_name or f"asset-{index}")
             relative = Path(str(principal.tenant_id), knowledge_base_id, document_id,
-                            source_version, "assets", f"{index:04d}-{uuid.uuid4()}-{name}")
+                            source_version, "assets", f"{index:04d}-{task_id or uuid.uuid4()}-{name}")
             path = _under_root(self.storage_root, self.storage_root / relative)
-            self._write_immutable(path, asset.data)
-            manifest.append({"path": str(relative), "media_type": asset.media_type,
+            if task_id and _native_io_path(path).exists():
+                if hashlib.sha256(_native_io_path(path).read_bytes()).digest()!=hashlib.sha256(asset.data).digest():
+                    raise DocumentLifecycleError('IMAGE_ASSET_REPLAY_MISMATCH')
+            else:
+                self._write_immutable(path, asset.data)
+            manifest.append({"path": str(relative), "logical_path":asset.path,
+                             "media_type": asset.media_type,
                              "source_type": asset.source_type, "page_number": asset.page_number,
                              "size": len(asset.data), "sha256": hashlib.sha256(asset.data).hexdigest(),
                              "metadata": dict(asset.metadata)})
@@ -449,12 +550,25 @@ class DocumentLifecycleService:
         return await self._document_row(principal, knowledge_base_id, document_id)
 
     async def _finalize(self, principal: LocalPrincipal, knowledge_base_id: str, document_id: str,
-                        source_version: str, metadata: Mapping[str, Any], *, enabled: bool) -> None:
+                        source_version: str, metadata: Mapping[str, Any], *, enabled: bool,image_task=None) -> None:
         self._authorize(principal)
         async with self.connection_factory.lease(
                 writable_knowledge_base_ids=frozenset({knowledge_base_id})) as retriever:
             retriever.require_verified()
             async with retriever.connection.transaction():
+                if image_task is not None:
+                    current=await (await retriever.connection.execute(
+                        'SELECT metadata,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s '
+                        'AND knowledge_base_id=%s AND deleted_at IS NULL FOR UPDATE',
+                        (document_id,principal.tenant_id,knowledge_base_id))).fetchall()
+                    if (len(current)!=1 or current[0]['metadata'].get('source_version')!=source_version
+                            or current[0]['parse_status']!='processing'):
+                        raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+                    claim=await (await retriever.connection.execute(
+                        "SELECT id FROM port_image_tasks WHERE id=%s AND tenant_id=%s AND subject_id=%s "
+                        "AND claim_token=%s AND state='processing' FOR UPDATE",
+                        (image_task.id,principal.tenant_id,principal.subject_id,image_task.claim_token))).fetchall()
+                    if len(claim)!=1:raise DocumentLifecycleError('IMAGE_TASK_CLAIM_LOST')
                 if enabled:
                     await retriever.connection.execute(
                         "UPDATE embeddings SET is_enabled=TRUE FROM knowledges k "
@@ -471,6 +585,12 @@ class DocumentLifecycleService:
                 rows = await cursor.fetchall()
                 if len(rows) != 1 or rows[0]["id"] != document_id:
                     raise DocumentLifecycleError("DOCUMENT_FINALIZE_STATE_MISMATCH")
+                if image_task is not None:
+                    await retriever.connection.execute(
+                        "UPDATE port_image_tasks SET state='completed',claim_token=NULL,lease_until=NULL,"
+                        "error_code='',updated_at=now() WHERE id=%s AND tenant_id=%s AND subject_id=%s "
+                        "AND claim_token=%s AND state='processing'",
+                        (image_task.id,principal.tenant_id,principal.subject_id,image_task.claim_token))
 
     async def _document_row(self, principal: LocalPrincipal, knowledge_base_id: str,
                             document_id: str) -> dict[str, Any]:
