@@ -220,7 +220,7 @@ def test_headers_cache_affinity_and_endpoint_full_path():
     asyncio.run(run())
 
 
-def test_upstream_multimodal_rejection_fallback_reauthorizes_new_identity_only():
+def test_image_vision_rejection_does_not_turn_ocr_or_caption_into_text_only_call():
     async def run():
         cfg=provider_config("siliconflow","m",supports_vision=True)
         sent=[]
@@ -229,12 +229,29 @@ def test_upstream_multimodal_rejection_fallback_reauthorizes_new_identity_only()
             return httpx.Response(400,text="image unsupported") if len(sent)==1 else httpx.Response(200,json=response(cfg))
         model,transport,gate=setup(handler,config=cfg)
         try:
-            out=await model.vision((Message("user","text",images=("data:image/png;base64,AA==",)),),None,context())
-            assert out.content=="answer" and len(sent)==2
-            assert sent[1]["messages"][0]["content"]=="text"
-            assert gate.calls[1].context.request_id=="request/image-fallback"
+            with pytest.raises(ProviderError):
+                await model.vision((Message("user","text",images=("data:image/png;base64,AA==",)),),None,context())
+            assert len(sent)==1 and len(gate.calls)==1
+            assert isinstance(sent[0]['messages'][0]['content'],list)
         finally:
             await transport.aclose()
+    asyncio.run(run())
+
+
+def test_ordinary_chat_multimodal_fallback_keeps_separate_reauthorized_identity():
+    async def run():
+        cfg=provider_config('siliconflow','m',supports_vision=True)
+        sent=[]
+        def handler(req):
+            sent.append(json.loads(req.content))
+            return httpx.Response(400,text='image unsupported') if len(sent)==1 else httpx.Response(200,json=response(cfg))
+        model,transport,gate=setup(handler,config=cfg)
+        try:
+            out=await model.chat((Message('user','text',images=('data:image/png;base64,AA==',)),),None,context())
+            assert out.content=='answer' and len(sent)==2
+            assert sent[1]['messages'][0]['content']=='text'
+            assert gate.calls[1].context.request_id=='request/image-fallback'
+        finally:await transport.aclose()
     asyncio.run(run())
 
 
