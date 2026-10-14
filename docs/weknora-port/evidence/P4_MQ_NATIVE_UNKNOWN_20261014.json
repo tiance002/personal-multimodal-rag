@@ -1,0 +1,64 @@
+{
+  "kind": "ACTUAL_HTTP_TRANSCRIPT_PG_MEMORY_SCHEDULE_REDIS_DELIVERY_NATIVE_EXTRACTION_GATED_MOCK_TIMEOUT",
+  "root": "E:\\WK\\run\\48fe2d10e3da",
+  "prefix": "weknora-resume:20261013:f1a43a6d-faf5-4e58-8054-47382c45810e:mq-native:29ff2b70-39f8-4278-a807-a46db16926b2",
+  "session": "c5cc1cbe-9ef7-4256-b022-1d9ef411603d",
+  "assistant": "7d78327a-56cb-479a-926b-b2dc2c5312ba",
+  "owner": "fixture-owner:b3bce00e-7f1c-40c4-a089-73c8d9aa6c03",
+  "payload": {
+    "scope": {
+      "tenant_id": 121,
+      "subject_id": "fixture-owner:b3bce00e-7f1c-40c4-a089-73c8d9aa6c03"
+    },
+    "session_id": "c5cc1cbe-9ef7-4256-b022-1d9ef411603d",
+    "message_id": "7d78327a-56cb-479a-926b-b2dc2c5312ba",
+    "chat_model_id": "mdl6626b4d966669b285ef9c4d65c9cdd4c1018cd0a4f8e0b94452ca0848fd78",
+    "language": "en-US"
+  },
+  "archive": {
+    "retry": 2,
+    "payload": {
+      "chat_model_id": "mdl6626b4d966669b285ef9c4d65c9cdd4c1018cd0a4f8e0b94452ca0848fd78",
+      "scope": {
+        "subject_id": "fixture-owner:b3bce00e-7f1c-40c4-a089-73c8d9aa6c03",
+        "tenant_id": 121
+      },
+      "message_id": "7d78327a-56cb-479a-926b-b2dc2c5312ba",
+      "language": "en-US",
+      "session_id": "c5cc1cbe-9ef7-4256-b022-1d9ef411603d"
+    },
+    "id": "8882f7d5-45e3-4eae-b773-0d3c548b8c51",
+    "error_class": "ProviderError",
+    "failed_at": 1791980606.6005,
+    "attempts": 3
+  },
+  "ledger_snapshots": [
+    {
+      "request_id": "memory/56b01de6b75d10c1446eb2baa2817a5303a00bc9504c639091ac2852816ae5b5:extract:0",
+      "state": "unknown",
+      "reserved_microunits": 100,
+      "actual_microunits": null,
+      "wire_sha256": "9a4a79f2e3b708a5687bf5073bf397e7c1942aa9222b1ba965b15632cccd3994"
+    },
+    {
+      "request_id": "memory/56b01de6b75d10c1446eb2baa2817a5303a00bc9504c639091ac2852816ae5b5:extract:0",
+      "state": "unknown",
+      "reserved_microunits": 100,
+      "actual_microunits": null,
+      "wire_sha256": "9a4a79f2e3b708a5687bf5073bf397e7c1942aa9222b1ba965b15632cccd3994"
+    },
+    {
+      "request_id": "memory/56b01de6b75d10c1446eb2baa2817a5303a00bc9504c639091ac2852816ae5b5:extract:0",
+      "state": "unknown",
+      "reserved_microunits": 100,
+      "actual_microunits": null,
+      "wire_sha256": "9a4a79f2e3b708a5687bf5073bf397e7c1942aa9222b1ba965b15632cccd3994"
+    }
+  ],
+  "delivery_attempts": 3,
+  "actual_mock_memory_wire_sends": 1,
+  "real_provider_calls": 0,
+  "post_stop_enqueue_did_not_start": true,
+  "ledger_rewritten_or_released": false,
+  "queue_records_retained": true
+}

@@ -112,10 +112,14 @@ class RedisMemoryExtractionQueue:
             pipe.hset(jobs, job["id"], json.dumps(job, separators=(",", ":")))
             pipe.zadd(ready, {job["id"]: self.clock() + max(0, delay_seconds)})
             await pipe.execute()
-        await self.start()
+        await self.start(resume=False)
 
-    async def start(self):
+    async def start(self, *, resume=True):
         async with self.pump_lock:
+            # Enqueue persists work but cannot revive an explicitly stopped pump.
+            # Only application lifecycle start is an explicit restart.
+            if self._stopped and not resume:
+                return
             self._stopped = False
             if self.worker is not None and not any(not task.done() for task in self.tasks):
                 task = asyncio.create_task(self.pump())

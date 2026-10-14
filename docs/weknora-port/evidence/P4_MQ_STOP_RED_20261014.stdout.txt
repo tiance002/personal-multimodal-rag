@@ -1,0 +1,21 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_enqueue_after_explicit_stop_does_not_restart_pump ____________
+tests\weknora_port\test_memory_queue_recovery.py:193: in test_enqueue_after_explicit_stop_does_not_restart_pump
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:190: in run
+    assert q._stopped and not q.tasks
+E   assert (False)
+E    +  where False = <backend.weknora_port.storage.memory_queue.RedisMemoryExtractionQueue object at 0x000001F078B4D940>._stopped
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_enqueue_after_explicit_stop_does_not_restart_pump
+1 failed in 0.52s

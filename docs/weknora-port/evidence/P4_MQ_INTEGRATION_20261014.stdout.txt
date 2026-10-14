@@ -1,0 +1,20 @@
+F.............                                                           [100%]
+================================== FAILURES ===================================
+_ test_native_memory_timeout_retry_archive_preserves_unknown_without_second_send _
+tests\weknora_port\test_memory_queue_native_pg.py:82: in test_native_memory_timeout_retry_archive_preserves_unknown_without_second_send
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_native_pg.py:73: in scenario
+    assert not await app.list_memory(app.principal,'',50,0)
+E   assert not ((), 0)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_memory_queue_native_pg.py::test_native_memory_timeout_retry_archive_preserves_unknown_without_second_send
+1 failed, 13 passed in 5.64s

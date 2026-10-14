@@ -43,3 +43,5 @@ No current REAL_PROVIDER_PASS, CUTOVER_PASS or full parity claim. Go1.26.0 is op
 Owner instructions require autonomous progression through implementable phases; do not end the Goal after P0/P1 or redefine completion around them. Each phase records exact sources/functions, commands/exits, missing evidence and a local commit. No Push/Tag/Release.
 
 2026-10-14 resumed batch: P1 source stream errors/resource tails closed6af200c; P4 configuration precedence bounded offline+actualASGI/PG/Redis passes, see P4_CONFIGURATION_PRECEDENCE_20261014.md. Whole stage/real/cutover not claimed. MQ independent3ef2aa0 awaiting serial integration.
+
+MQ3ef2aa0 serially reviewed20hashes and integrated6854a41; new post-stop enqueue RED->fix, formal PG/Redis extraction3deliveries1mocksend/UNKNOWNunchanged/archive verified. See P4_MEMORY_QUEUE_INTEGRATION_20261014.md; fullAsynq clock-skew/heartbeat/shutdown/byteprotocol not accepted/PASS.

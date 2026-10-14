@@ -176,3 +176,18 @@ def test_lost_ack_response_does_not_redeliver_completed_job():
             assert not await client.lrange(q.keys[3],0,-1)
         finally: await cleanup(client,q)
     asyncio.run(run())
+
+
+def test_enqueue_after_explicit_stop_does_not_restart_pump():
+    async def run():
+        client,q,p,clock=await fixture()
+        class Worker:
+            async def handle(self,payload):raise AssertionError('stopped queue sent work')
+        try:
+            q.worker=Worker()
+            await q.stop()
+            await q.enqueue(p,0,2)
+            assert q._stopped and not q.tasks
+            assert await client.zcard(q.keys[0])==2
+        finally:await cleanup(client,q)
+    asyncio.run(run())
