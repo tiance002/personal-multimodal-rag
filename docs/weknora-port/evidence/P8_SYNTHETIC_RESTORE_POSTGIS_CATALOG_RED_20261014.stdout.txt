@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 148, in <module>
+    parser=argparse.ArgumentParser();parser.add_argument('--database',required=True);parser.add_argument('--output',required=True);parser.add_argument('--resume-empty-target',action='store_true');main(parser.parse_args())
+                                                                                                                                                                                                    ~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 86, in main
+    assert restored.execute(sql.SQL('SELECT count(*) AS n FROM {}').format(sql.Identifier(row['table_name']))).fetchone()['n']==0,'RESTORE_TARGET_NOT_EMPTY'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: RESTORE_TARGET_NOT_EMPTY

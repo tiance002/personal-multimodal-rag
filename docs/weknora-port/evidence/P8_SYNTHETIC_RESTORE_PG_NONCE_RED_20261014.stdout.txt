@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 139, in <module>
+    parser=argparse.ArgumentParser();parser.add_argument('--database',required=True);parser.add_argument('--output',required=True);parser.add_argument('--resume-empty-target',action='store_true');main(parser.parse_args())
+                                                                                                                                                                                                    ~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 63, in main
+    if args.resume_empty_target:assert (destination/'schema.sql').read_bytes()==schema
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

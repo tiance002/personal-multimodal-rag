@@ -21,3 +21,6 @@ Owned browser API helper stopped via validated stop marker, session97828 exit0, 
 
 
 Latest Owner reminder: final P8 source cleanup is explicit and NOT RUN. See P8_SOURCE_CLEANUP_GATE_20261014.md for exact attachment gate and targeted QuickChain/default-entry callers. Packaging is not cleanup; do not waive real acceptance/cutover gates or delete protected history/UNKNOWN.
+
+
+2026-10-14 superseding evidence: reversible candidate-source cleanup explicitly authorized on resume, e3aae15removesobsolete real-send probe whilepreserving7historicalUNKNOWNpredicatechecks. Realcutover/oldserviceretirement/dataremoval remain gated. Shortcandidate E:/WK/pkg/8e7a3fa built/installed/130exactnativefileschecked; syntheticownerrestoreactualpassed into new databaseinexistingPG, not productionmigration. DockerRedisrunid currentad8c707ba74a8b29f84792928bc7da01bc796bf6. Newresources/start/testentry RESOURCES_20261014.md/wk.ps1; noVite/APIownedhelperleftactive. Earlier Vite-mayremain/c7dRedis/noimagebuilt statements are historical, not currentfacts.

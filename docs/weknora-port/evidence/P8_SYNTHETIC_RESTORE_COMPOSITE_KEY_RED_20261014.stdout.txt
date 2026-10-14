@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 125, in <module>
+    parser=argparse.ArgumentParser();parser.add_argument('--database',required=True);parser.add_argument('--output',required=True);main(parser.parse_args())
+                                                                                                                                   ~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 77, in main
+    serial=restored.execute("SELECT pg_get_serial_sequence(%s,'id') AS seq",(name,)).fetchone()['seq']
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG quention\.venv\Lib\site-packages\psycopg\connection.py", line 269, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column "id" of relation "port_model_configuration" does not exist
