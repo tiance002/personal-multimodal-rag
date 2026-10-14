@@ -455,6 +455,27 @@ class ApplicationRuntime:
             "AND (%s='' OR status=%s)",(principal.tenant_id,principal.subject_id,status,status))
         return items,rows[0]['n']
 
+    async def list_memory_topics(self,principal,limit=50,offset=0):
+        self._owner(principal)
+        from .conversation.types import MemoryScope,MemoryConfig
+        scope=MemoryScope(principal.tenant_id,principal.subject_id)
+        cfg=await self.memory_repository.workspace_config(principal.tenant_id) or MemoryConfig()
+        threshold=min(20,cfg.interest_threshold if cfg.interest_threshold>0 else 3)
+        rows=await self._rows('SELECT id,topic,aliases,hits,last_seen_at FROM memory_topic_stats WHERE tenant_id=%s AND subject_id=%s AND promoted_at IS NULL ORDER BY hits DESC,last_seen_at DESC LIMIT %s OFFSET %s',
+            (scope.tenant_id,scope.subject_id,limit,offset))
+        total=await self._rows('SELECT count(*) AS n FROM memory_topic_stats WHERE tenant_id=%s AND subject_id=%s AND promoted_at IS NULL',(scope.tenant_id,scope.subject_id))
+        return [{**row,'aliases':row['aliases'] or [],'threshold':threshold} for row in rows],total[0]['n']
+
+    async def promote_memory_topic(self,principal,topic_id):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_topics.promote(MemoryContext(principal.tenant_id,principal.subject_id),topic_id)
+
+    async def delete_memory_topic(self,principal,topic_id):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        await self.memory_topics.delete(MemoryContext(principal.tenant_id,principal.subject_id),topic_id)
+
     async def consolidate_memory(self,principal):
         self._owner(principal)
         from .conversation.types import MemoryContext

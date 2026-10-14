@@ -368,6 +368,25 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         await runtime.forget_memory(await principal(request),item_id)
         return JSONResponse({'success':True})
 
+    @app.get('/api/v1/memory/topics')
+    async def memory_topics(request: Request,limit: str='50',offset: str='0'):
+        try:page_limit=int(limit)
+        except ValueError:page_limit=50
+        if page_limit<=0 or page_limit>200:page_limit=50
+        try:page_offset=max(0,int(offset))
+        except ValueError:page_offset=0
+        topics,total=await runtime.list_memory_topics(await principal(request),page_limit,page_offset)
+        return JSONResponse({'success':True,'data':jsonable_encoder(topics),'total':total})
+
+    @app.post('/api/v1/memory/topics/{topic_id}/promote')
+    async def promote_memory_topic(topic_id: str,request: Request):
+        return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.promote_memory_topic(await principal(request),topic_id))})
+
+    @app.delete('/api/v1/memory/topics/{topic_id}')
+    async def delete_memory_topic(topic_id: str,request: Request):
+        await runtime.delete_memory_topic(await principal(request),topic_id)
+        return JSONResponse({'success':True})
+
     @app.post('/api/v1/memory/consolidate')
     async def consolidate_memory(request: Request):
         return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.consolidate_memory(await principal(request)))})
