@@ -134,7 +134,12 @@ class TopicService:
         if scope is None: raise MemoryWriteError("MEMORY_DISABLED")
         row = await self._unpromoted(scope, id)
         item = await self.manager.remember(context, MemoryItem("", 0, "", "interest", row.topic, topic=row.topic, origin="manual"))
-        await self.repository.mark_topic_promoted(scope, row.normalized_key)
+        try:await self.repository.mark_topic_promoted(scope, row.normalized_key)
+        except Exception:
+            # Fixed Service.PromoteTopic warns after a successful write; the
+            # created interest remains the result even if marking fails.
+            import logging
+            logging.getLogger(__name__).warning('MEMORY_TOPIC_MARK_PROMOTED_FAILED')
         return item
 
     async def delete(self, context: MemoryContext, id: str):

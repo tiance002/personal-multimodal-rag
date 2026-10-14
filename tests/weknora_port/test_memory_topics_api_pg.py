@@ -33,6 +33,15 @@ def test_actual_topic_view_paging_promotion_deletion_and_scope():
                 assert (await client.get('/api/v1/memory/topics')).json()['total']==0
                 assert await runtime.memory_repository.has_tombstone(scope,fingerprint(second.topic))
                 assert await runtime.memory_repository.has_tombstone(scope,fingerprint('Second alias'))
+                failing=await runtime.memory_repository.bump_topic(scope,'Synthetic warning topic','warning','','seed-warning')
+                original_mark=runtime.memory_repository.mark_topic_promoted
+                async def failed_mark(*args):raise RuntimeError('synthetic mark failure')
+                runtime.memory_repository.mark_topic_promoted=failed_mark
+                warning=await client.post('/api/v1/memory/topics/'+failing.id+'/promote')
+                runtime.memory_repository.mark_topic_promoted=original_mark
+                assert warning.status_code==200 and warning.json()['data']['kind']=='interest'
+                assert (await runtime.memory_repository.get_item(scope,warning.json()['data']['id'])).status=='active'
+                assert (await runtime.memory_repository.topic_by_id(scope,failing.id)).promoted_at is None
                 assert len(wire)==before
-                Path('docs/weknora-port/evidence/P4_MEMORY_TOPICS_API_20261014.json').write_text(json.dumps({'kind':'ACTUAL_FASTAPI_ASGI_PG_TOPIC_MANAGER','tenant':who.tenant_id,'subject':who.subject_id,'promoted':first.id,'deleted':second.id,'threshold_clamped20':True,'no_owner_ids_in_topic_view':True,'foreign_operations_denied':True,'canonical_alias_tombstones':True,'model_sends':0,'real_provider_calls':0},indent=2),encoding='utf-8')
+                Path('docs/weknora-port/evidence/P4_MEMORY_TOPICS_MARK_FAILURE_20261014.json').write_text(json.dumps({'kind':'ACTUAL_FASTAPI_ASGI_PG_TOPIC_MANAGER','tenant':who.tenant_id,'subject':who.subject_id,'promoted':first.id,'deleted':second.id,'threshold_clamped20':True,'no_owner_ids_in_topic_view':True,'foreign_operations_denied':True,'canonical_alias_tombstones':True,'mark_failure_preserves_created_interest':True,'model_sends':0,'real_provider_calls':0},indent=2),encoding='utf-8')
     actual_pg_run(scenario())
