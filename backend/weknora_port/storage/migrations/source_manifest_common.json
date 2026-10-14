@@ -1,0 +1,26 @@
+{
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "generated_sha256": "8076ebbedffcbc398cd9d9bc3f23c56bdbcc2134e286680dc46fb0f4dcfcc7ee",
+  "sources": [
+    {
+      "path": "migrations/paradedb/00-init-db.sql",
+      "sha256": "08b545e761e8fc37349fbc0736ee84250b0123ce2c15f2a510b67d666453f69a"
+    },
+    {
+      "path": "migrations/versioned/000027_message_rendered_content.up.sql",
+      "sha256": "272ffddf6c37a6e8c134ef8fe5ad5f355e8fbdd5857a1ce4e6ee997b74bdd285"
+    },
+    {
+      "path": "migrations/versioned/000034_add_attachments.up.sql",
+      "sha256": "cfe65e8c1cb2902ddede93c3162d88c2977c1e719a7f527c6c0edbac8b0f4951"
+    },
+    {
+      "path": "migrations/versioned/000085_message_usage.up.sql",
+      "sha256": "86799f9f6d6388614311568db167c82d65147cead4d0a2369dd788d9d6433d59"
+    }
+  ],
+  "adaptations": [
+    "local tenant+subject ownership; no authentication business",
+    "immutable message Scope provenance for external-processing permission checks"
+  ]
+}

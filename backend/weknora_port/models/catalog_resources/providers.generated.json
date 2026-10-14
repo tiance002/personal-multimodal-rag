@@ -1,0 +1,1718 @@
+{
+  "compat_fields": {
+    "AnthropicMessagesCompat": {
+      "BetaHeaders": "beta_headers",
+      "DefaultMaxTokens": "default_max_tokens",
+      "ExtraBody": "extra_body",
+      "InterleavedThinkingBeta": "interleaved_thinking_beta",
+      "LongCacheTTL": "long_cache_ttl",
+      "PromptCacheAccounting": "prompt_cache_accounting",
+      "SupportsCacheControl": "supports_cache_control",
+      "SupportsCacheControlOnTool": "supports_cache_control_on_tools",
+      "SupportsEffort": "supports_effort",
+      "SupportsTemperature": "supports_temperature",
+      "SupportsTopP": "supports_top_p",
+      "TemperatureWithThinking": "temperature_with_thinking",
+      "ThinkingBudgets": "thinking_budgets",
+      "ThinkingMode": "thinking_mode",
+      "Version": "version"
+    },
+    "EmbeddingsCompat": {
+      "API": "api",
+      "AcceptsTruncatePromptTokens": "accepts_truncate_prompt_tokens",
+      "DimensionsField": "dimensions_field",
+      "ExtraBody": "extra_body",
+      "InputTypeField": "input_type_field",
+      "InputTypeValues": "input_type_values",
+      "MaxBatchSize": "max_batch_size",
+      "MaxInputChars": "max_input_chars",
+      "Path": "path",
+      "RequestTimeout": "request_timeout_seconds",
+      "SendEncodingFormat": "send_encoding_format",
+      "TruncateField": "truncate_field",
+      "TruncateValue": "truncate_value"
+    },
+    "GoogleGenerativeAICompat": {
+      "APIVersionPrefix": "api_version_prefix",
+      "ExtraGeneration": "extra_generation_config",
+      "IncludeThoughts": "include_thoughts",
+      "PromptCacheAcct": "prompt_cache_accounting",
+      "SupportsPenalty": "supports_penalty",
+      "SupportsSeed": "supports_seed",
+      "ThinkingBudgets": "thinking_budgets",
+      "ThinkingMode": "thinking_mode"
+    },
+    "OpenAICompletionsCompat": {
+      "CacheControlFormat": "cache_control_format",
+      "ExtraBody": "extra_body",
+      "FixedTemperature": "fixed_temperature",
+      "MaxTokensField": "max_tokens_field",
+      "PromptCacheAccounting": "prompt_cache_accounting",
+      "PromptCacheKey": "prompt_cache_key",
+      "ReasoningEffortField": "reasoning_effort_field",
+      "ReasoningFields": "reasoning_fields",
+      "ReplayReasoningContent": "replay_reasoning_content",
+      "SupportsDeveloperRole": "supports_developer_role",
+      "SupportsMultiContent": "supports_multi_content",
+      "SupportsParallelToolCalls": "supports_parallel_tool_calls",
+      "SupportsReasoningEffort": "supports_reasoning_effort",
+      "SupportsResponseFormat": "supports_response_format",
+      "SupportsSeed": "supports_seed",
+      "SupportsStore": "supports_store",
+      "SupportsTemperature": "supports_temperature",
+      "SupportsUsageInStreaming": "supports_usage_in_streaming",
+      "ThinkingAlwaysSend": "thinking_always_send",
+      "ThinkingBudgetExcludesEffort": "thinking_budget_excludes_effort",
+      "ThinkingBudgetField": "thinking_budget_field",
+      "ThinkingDisableOnNonStream": "thinking_disable_on_non_stream",
+      "ThinkingEnabledValue": "thinking_enabled_value",
+      "ThinkingFormat": "thinking_format",
+      "ToolCallExtraFields": "tool_call_extra_fields",
+      "ToolChoiceModes": "tool_choice_modes"
+    },
+    "OpenAIResponsesCompat": {
+      "ExtraBody": "extra_body",
+      "PromptCacheKey": "prompt_cache_key",
+      "SupportsDeveloperRole": "supports_developer_role",
+      "SupportsEncryptedReasoning": "supports_encrypted_reasoning",
+      "SupportsLongCacheRetention": "supports_long_cache_retention",
+      "SupportsMaxOutputTokens": "supports_max_output_tokens",
+      "SupportsParallelToolCalls": "supports_parallel_tool_calls",
+      "SupportsReasoningSummary": "supports_reasoning_summary",
+      "SupportsStore": "supports_store",
+      "SupportsTemperature": "supports_temperature"
+    },
+    "RerankCompat": {
+      "AcceptsTruncatePromptTokens": "accepts_truncate_prompt_tokens",
+      "ExtraBody": "extra_body",
+      "MaxConcurrency": "max_concurrency",
+      "MaxDocumentChars": "max_document_chars",
+      "MaxDocuments": "max_documents",
+      "MaxQueryChars": "max_query_chars",
+      "MaxRequestChars": "max_request_chars",
+      "Path": "path",
+      "RequestTimeout": "request_timeout_seconds",
+      "ScoreScale": "score_scale",
+      "SendReturnDocs": "send_return_documents",
+      "SendTopN": "send_top_n",
+      "Truncate": "truncate",
+      "UnsupportedReason": "unsupported_reason"
+    },
+    "TranscriptionsCompat": {
+      "API": "api",
+      "Formats": "formats",
+      "LanguageParam": "language_param",
+      "MaxEncodedBytes": "max_encoded_bytes",
+      "MaxFileBytes": "max_file_bytes",
+      "Path": "path",
+      "RequestTimeout": "request_timeout_seconds",
+      "ResponseFormat": "response_format",
+      "UnsupportedReason": "unsupported_reason"
+    }
+  },
+  "protocol_defaults": {
+    "DefaultAnthropicMessages": {
+      "DefaultMaxTokens": 4096,
+      "InterleavedThinkingBeta": "interleaved-thinking-2025-05-14",
+      "LongCacheTTL": "1h",
+      "PromptCacheAccounting": true,
+      "SupportsCacheControl": true,
+      "SupportsCacheControlOnTool": true,
+      "SupportsTemperature": true,
+      "SupportsTopP": true,
+      "TemperatureWithThinking": false,
+      "ThinkingBudgets": {
+        "high": 16384,
+        "low": 2048,
+        "max": 63999,
+        "medium": 8192,
+        "minimal": 1024,
+        "xhigh": 32768
+      },
+      "ThinkingMode": "budget",
+      "Version": "2023-06-01"
+    },
+    "DefaultEmbeddings": {
+      "RequestTimeout": 60
+    },
+    "DefaultGoogleGenerativeAI": {
+      "APIVersionPrefix": "/v1beta",
+      "IncludeThoughts": true,
+      "PromptCacheAcct": true,
+      "SupportsPenalty": true,
+      "SupportsSeed": true,
+      "ThinkingBudgets": {
+        "high": 24576,
+        "low": 2048,
+        "max": 32768,
+        "medium": 8192,
+        "minimal": 128,
+        "xhigh": 32768
+      },
+      "ThinkingMode": "budget"
+    },
+    "DefaultOpenAICompletions": {
+      "MaxTokensField": "max_completion_tokens",
+      "ReasoningEffortField": "reasoning_effort",
+      "ReasoningFields": [
+        "reasoning_content",
+        "reasoning",
+        "reasoning_text"
+      ],
+      "ReplayReasoningContent": true,
+      "SupportsMultiContent": true,
+      "SupportsParallelToolCalls": true,
+      "SupportsResponseFormat": true,
+      "SupportsSeed": true,
+      "SupportsTemperature": true,
+      "SupportsUsageInStreaming": true,
+      "ThinkingEnabledValue": "enabled",
+      "ThinkingFormat": "none",
+      "ToolChoiceModes": [
+        "none",
+        "auto",
+        "required",
+        "function"
+      ]
+    },
+    "DefaultOpenAIResponses": {
+      "PromptCacheKey": true,
+      "SupportsDeveloperRole": true,
+      "SupportsEncryptedReasoning": true,
+      "SupportsLongCacheRetention": true,
+      "SupportsMaxOutputTokens": true,
+      "SupportsParallelToolCalls": true,
+      "SupportsReasoningSummary": true,
+      "SupportsStore": true,
+      "SupportsTemperature": true
+    },
+    "DefaultRerank": {
+      "ScoreScale": "probability"
+    },
+    "DefaultTranscriptions": {
+      "Path": "/audio/transcriptions",
+      "RequestTimeout": 300
+    }
+  },
+  "providers": {
+    "aliyun": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "CacheControlFormat": "anthropic",
+          "MaxTokensField": "max_completion_tokens",
+          "PromptCacheAccounting": true,
+          "SupportsReasoningEffort": false,
+          "ThinkingBudgetField": "thinking_budget",
+          "ThinkingFormat": "enable-thinking"
+        },
+        "Rerank": {
+          "MaxDocuments": 500,
+          "SendReturnDocs": true
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "KnowledgeQA": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "Rerank": "https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank",
+        "VLLM": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+      },
+      "Description": "qwen-plus, qwen3.8-max, deepseek-v4-pro, text-embedding-v4, gte-rerank-v2, etc.",
+      "Endpoint": {
+        "source_hook": true
+      },
+      "ID": "aliyun",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "Alibaba Cloud DashScope",
+      "Names": {
+        "zh-CN": "阿里云 DashScope"
+      },
+      "Order": 10,
+      "RequiresAuth": true,
+      "RerankAPI": "dashscope-rerank",
+      "SourcePath": "internal/models/providers/aliyun.go",
+      "URLPatterns": [
+        "dashscope.aliyuncs.com"
+      ],
+      "Website": "https://bailian.console.aliyun.com"
+    },
+    "anthropic": {
+      "API": "anthropic-messages",
+      "Auth": "x-api-key",
+      "Compat": {},
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.anthropic.com/v1"
+      },
+      "Description": "Claude models via the native Anthropic Messages API: claude-opus-5, claude-sonnet-5, claude-haiku-4-5, etc.",
+      "ID": "anthropic",
+      "ModelTypes": [
+        "KnowledgeQA"
+      ],
+      "Name": "Anthropic",
+      "Names": {
+        "zh-CN": "Anthropic"
+      },
+      "Order": 32,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/anthropic.go",
+      "ThinkingLevels": {
+        "minimal": "low"
+      },
+      "URLPatterns": [
+        "api.anthropic.com"
+      ],
+      "Website": "https://console.anthropic.com"
+    },
+    "azure_openai": {
+      "API": "openai-completions",
+      "Auth": "api-key",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "PromptCacheKey": true,
+          "SupportsDeveloperRole": true,
+          "SupportsReasoningEffort": true,
+          "SupportsStore": true,
+          "ThinkingFormat": "openai"
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://{resource}.openai.azure.com",
+        "KnowledgeQA": "https://{resource}.openai.azure.com",
+        "VLLM": "https://{resource}.openai.azure.com"
+      },
+      "Description": "gpt-4o, gpt-5, o3, text-embedding-3-large deployments, etc.",
+      "Endpoint": {
+        "source_hook": true
+      },
+      "ExtraFields": [
+        {
+          "Key": "api_version",
+          "Label": "API Version (legacy deployments path)",
+          "Labels": {
+            "zh-CN": "API 版本（旧版 deployments 路径）"
+          },
+          "Placeholder": "leave empty for /openai/v1, or e.g. 2025-04-01-preview",
+          "Placeholders": {
+            "zh-CN": "留空走 /openai/v1，或填如 2025-04-01-preview"
+          },
+          "Required": false,
+          "Type": "string"
+        }
+      ],
+      "ID": "azure_openai",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "VLLM"
+      ],
+      "Name": "Azure OpenAI",
+      "Names": {
+        "zh-CN": "Azure OpenAI"
+      },
+      "Order": 31,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/azure_openai.go",
+      "URLPatterns": [
+        "openai.azure.com"
+      ],
+      "Website": "https://ai.azure.com"
+    },
+    "deepseek": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "PromptCacheAccounting": true,
+          "SupportsReasoningEffort": true,
+          "SupportsStore": false,
+          "ThinkingFormat": "thinking-type",
+          "ToolChoiceModes": [
+            "none",
+            "auto"
+          ]
+        }
+      },
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.deepseek.com/v1"
+      },
+      "Description": "deepseek-flash, deepseek-v4-pro",
+      "ID": "deepseek",
+      "ModelTypes": [
+        "KnowledgeQA"
+      ],
+      "Name": "DeepSeek",
+      "Names": {
+        "zh-CN": "DeepSeek 深度求索"
+      },
+      "Order": 30,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/deepseek.go",
+      "ThinkingLevels": {
+        "high": "high",
+        "low": "low",
+        "max": "max",
+        "medium": "high",
+        "minimal": "low",
+        "xhigh": "max"
+      },
+      "URLPatterns": [
+        "api.deepseek.com"
+      ],
+      "Website": "https://platform.deepseek.com"
+    },
+    "gemini": {
+      "API": "google-generative-ai",
+      "Auth": "x-goog-api-key",
+      "AuthByAPI": {
+        "openai-completions": "bearer"
+      },
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "outputDimensionality"
+        },
+        "GoogleGenerativeAI": {},
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "openai",
+          "ToolCallExtraFields": [
+            "extra_content"
+          ]
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://generativelanguage.googleapis.com/v1beta",
+        "KnowledgeQA": "https://generativelanguage.googleapis.com/v1beta"
+      },
+      "Description": "gemini-3.8-flash, gemini-3.1-pro-preview, gemini-2.5-pro, gemini-embedding-2, etc. Native generateContent by default; set base_url to https://generativelanguage.googleapis.com/v1beta/openai to keep the OpenAI-compatible protocol.",
+      "Descriptions": {
+        "zh-CN": "gemini-3.8-flash, gemini-3.1-pro-preview, gemini-2.5-pro, gemini-embedding-2 等。默认走原生 generateContent 协议；将 base_url 指向 https://generativelanguage.googleapis.com/v1beta/openai 可继续使用 OpenAI 兼容协议。"
+      },
+      "EmbeddingAPI": "google-embeddings",
+      "ID": "gemini",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding"
+      ],
+      "Name": "Google Gemini",
+      "Names": {
+        "zh-CN": "Google Gemini"
+      },
+      "Order": 33,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/gemini.go",
+      "URLPatterns": [
+        "generativelanguage.googleapis.com"
+      ],
+      "Website": "https://aistudio.google.com"
+    },
+    "generic": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "AcceptsTruncatePromptTokens": true,
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "chat-template-kwargs"
+        },
+        "Rerank": {
+          "AcceptsTruncatePromptTokens": true
+        },
+        "Transcriptions": {
+          "LanguageParam": "form"
+        }
+      },
+      "DefaultBaseURLs": {},
+      "Description": "Any OpenAI-compatible endpoint (vLLM, SGLang, Xinference, Ollama, ...)",
+      "Descriptions": {
+        "zh-CN": "任意 OpenAI 兼容接口（vLLM、SGLang、Xinference、Ollama 等）"
+      },
+      "ExtraFields": [
+        {
+          "Key": "score_scale",
+          "Label": "Rerank score scale",
+          "Labels": {
+            "zh-CN": "Rerank 分数标度"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Options": [
+            {
+              "Label": "Unbounded score (Qwen3-Reranker class)",
+              "Labels": {
+                "zh-CN": "无界分数（Qwen3-Reranker 一类）"
+              },
+              "Value": "logit"
+            },
+            {
+              "Label": "0..1 relevance (BGE class)",
+              "Labels": {
+                "zh-CN": "0~1 相关度（BGE 一类）"
+              },
+              "Value": "probability"
+            }
+          ],
+          "Placeholder": "match the reranker actually deployed behind this endpoint",
+          "Placeholders": {
+            "zh-CN": "按这个端点后面实际部署的重排模型选择"
+          },
+          "Required": false,
+          "Type": "select"
+        },
+        {
+          "Key": "truncate_prompt_tokens",
+          "Label": "Rerank prompt truncation (vLLM)",
+          "Labels": {
+            "zh-CN": "Rerank 提示词截断长度（vLLM）"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "empty unless the backend rejects long documents",
+          "Placeholders": {
+            "zh-CN": "留空，除非后端因文档过长而报错"
+          },
+          "Required": false,
+          "Type": "number"
+        }
+      ],
+      "ID": "generic",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "Custom (OpenAI-compatible)",
+      "Names": {
+        "zh-CN": "自定义 (OpenAI兼容接口)"
+      },
+      "Order": 0,
+      "RequiresAuth": false,
+      "SourcePath": "internal/models/providers/generic.go",
+      "Validate": {
+        "source_hook": true
+      }
+    },
+    "gpustack": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "AcceptsTruncatePromptTokens": true,
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "chat-template-kwargs"
+        },
+        "Rerank": {
+          "AcceptsTruncatePromptTokens": true,
+          "ScoreScale": "logit"
+        },
+        "Transcriptions": {
+          "LanguageParam": "form"
+        }
+      },
+      "DefaultBaseURLs": {
+        "ASR": "http://your_gpustack_server_url/v1",
+        "Embedding": "http://your_gpustack_server_url/v1",
+        "KnowledgeQA": "http://your_gpustack_server_url/v1",
+        "Rerank": "http://your_gpustack_server_url/v1",
+        "VLLM": "http://your_gpustack_server_url/v1"
+      },
+      "Description": "Choose your deployed model on GPUStack",
+      "Descriptions": {
+        "zh-CN": "选择你在 GPUStack 上部署的模型"
+      },
+      "ExtraFields": [
+        {
+          "Key": "score_scale",
+          "Label": "Rerank score scale",
+          "Labels": {
+            "zh-CN": "Rerank 分数标度"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Options": [
+            {
+              "Label": "Unbounded score (Qwen3-Reranker class)",
+              "Labels": {
+                "zh-CN": "无界分数（Qwen3-Reranker 一类）"
+              },
+              "Value": "logit"
+            },
+            {
+              "Label": "0..1 relevance (BGE class)",
+              "Labels": {
+                "zh-CN": "0~1 相关度（BGE 一类）"
+              },
+              "Value": "probability"
+            }
+          ],
+          "Placeholder": "match the reranker actually deployed behind this endpoint",
+          "Placeholders": {
+            "zh-CN": "按这个端点后面实际部署的重排模型选择"
+          },
+          "Required": false,
+          "Type": "select"
+        },
+        {
+          "Key": "truncate_prompt_tokens",
+          "Label": "Rerank prompt truncation (vLLM)",
+          "Labels": {
+            "zh-CN": "Rerank 提示词截断长度（vLLM）"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "empty unless the backend rejects long documents",
+          "Placeholders": {
+            "zh-CN": "留空，除非后端因文档过长而报错"
+          },
+          "Required": false,
+          "Type": "number"
+        }
+      ],
+      "ID": "gpustack",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "GPUStack",
+      "Names": {
+        "zh-CN": "GPUStack"
+      },
+      "Order": 60,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/gpustack.go",
+      "URLPatterns": [
+        "gpustack"
+      ],
+      "Validate": {
+        "source_hook": true
+      },
+      "Website": "https://gpustack.ai"
+    },
+    "hunyuan": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "enable-thinking",
+          "ToolChoiceModes": [
+            "none",
+            "auto"
+          ]
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://api.hunyuan.cloud.tencent.com/v1",
+        "KnowledgeQA": "https://api.hunyuan.cloud.tencent.com/v1"
+      },
+      "Description": "hunyuan-t1-latest, hunyuan-turbos-latest, hunyuan-a13b, hunyuan-embedding, etc.",
+      "ID": "hunyuan",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding"
+      ],
+      "Name": "Tencent Hunyuan",
+      "Names": {
+        "zh-CN": "腾讯混元 Hunyuan"
+      },
+      "Order": 13,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/hunyuan.go",
+      "URLPatterns": [
+        "hunyuan.cloud.tencent.com"
+      ],
+      "Website": "https://cloud.tencent.com/product/hunyuan"
+    },
+    "jina": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "TruncateField": "truncate",
+          "TruncateValue": "true"
+        },
+        "Rerank": {
+          "SendReturnDocs": true
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://api.jina.ai/v1",
+        "Rerank": "https://api.jina.ai/v1"
+      },
+      "Description": "jina-embeddings-v5-text-small, jina-embeddings-v4, jina-reranker-v3.5, jina-reranker-m0, etc.",
+      "ID": "jina",
+      "ModelTypes": [
+        "Embedding",
+        "Rerank"
+      ],
+      "Name": "Jina AI",
+      "Names": {
+        "zh-CN": "Jina"
+      },
+      "Order": 50,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/jina.go",
+      "URLPatterns": [
+        "api.jina.ai"
+      ],
+      "Website": "https://jina.ai"
+    },
+    "litellm": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "openai"
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "http://your_litellm_proxy/v1",
+        "KnowledgeQA": "http://your_litellm_proxy/v1",
+        "Rerank": "http://your_litellm_proxy",
+        "VLLM": "http://your_litellm_proxy/v1"
+      },
+      "Description": "Self-hosted LiteLLM proxy: one OpenAI-compatible endpoint to 100+ ",
+      "Descriptions": {
+        "zh-CN": "自建 LiteLLM 代理：一个 OpenAI 兼容入口对接 100+ 模型服务。"
+      },
+      "ExtraFields": [
+        {
+          "Key": "score_scale",
+          "Label": "Rerank score scale",
+          "Labels": {
+            "zh-CN": "Rerank 分数标度"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Options": [
+            {
+              "Label": "Unbounded score (Qwen3-Reranker class)",
+              "Labels": {
+                "zh-CN": "无界分数（Qwen3-Reranker 一类）"
+              },
+              "Value": "logit"
+            },
+            {
+              "Label": "0..1 relevance (BGE class)",
+              "Labels": {
+                "zh-CN": "0~1 相关度（BGE 一类）"
+              },
+              "Value": "probability"
+            }
+          ],
+          "Placeholder": "match the reranker actually deployed behind this endpoint",
+          "Placeholders": {
+            "zh-CN": "按这个端点后面实际部署的重排模型选择"
+          },
+          "Required": false,
+          "Type": "select"
+        }
+      ],
+      "ID": "litellm",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "LiteLLM",
+      "Names": {
+        "zh-CN": "LiteLLM"
+      },
+      "Order": 41,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/litellm.go",
+      "ThinkingLevels": {
+        "max": "max",
+        "off": "none",
+        "xhigh": "xhigh"
+      },
+      "URLPatterns": [
+        "litellm"
+      ],
+      "Website": "https://docs.litellm.ai"
+    },
+    "lkeap": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "thinking-type"
+        },
+        "Rerank": {
+          "MaxConcurrency": 1,
+          "MaxDocuments": 60,
+          "MaxRequestChars": 2000
+        }
+      },
+      "CredentialLabels": [
+        {
+          "Hint": "Rerank is signed with a CAM key pair; this is not an sk- API key.",
+          "Hints": {
+            "zh-CN": "Rerank 使用 CAM 密钥对签名，不是 sk- 开头的 API Key。"
+          },
+          "Label": "SecretId",
+          "Labels": {
+            "zh-CN": "SecretId（TC3 签名）"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "Tencent Cloud SecretId (AKID...)",
+          "Placeholders": {
+            "zh-CN": "腾讯云 SecretId（AKID 开头）"
+          },
+          "Required": true
+        }
+      ],
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.lkeap.cloud.tencent.com/v1",
+        "Rerank": "https://lkeap.tencentcloudapi.com"
+      },
+      "Description": "deepseek-v3.2, deepseek-v3.1-terminus, deepseek-r1-0528, lke-reranker-base",
+      "Descriptions": {
+        "zh-CN": "DeepSeek-V3.2、DeepSeek-V3.1-Terminus、DeepSeek-R1-0528、lke-reranker-base"
+      },
+      "ExtraFields": [
+        {
+          "Key": "secret_key",
+          "Label": "Secret Key",
+          "Labels": {
+            "zh-CN": "SecretKey（TC3 签名）"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "Tencent Cloud SecretKey (the API Key field holds the SecretId)",
+          "Placeholders": {
+            "zh-CN": "腾讯云 SecretKey（API Key 那一栏填的是 SecretId）"
+          },
+          "Required": true,
+          "Secret": true,
+          "Type": "password"
+        },
+        {
+          "Default": "ap-guangzhou",
+          "Key": "region",
+          "Label": "Region",
+          "Labels": {
+            "zh-CN": "地域"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Options": [
+            {
+              "Label": "ap-guangzhou",
+              "Value": "ap-guangzhou"
+            },
+            {
+              "Label": "ap-beijing",
+              "Value": "ap-beijing"
+            }
+          ],
+          "Placeholder": "ap-guangzhou",
+          "Type": "select"
+        }
+      ],
+      "ID": "lkeap",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Rerank"
+      ],
+      "Name": "Tencent Cloud LKEAP",
+      "Names": {
+        "zh-CN": "腾讯云 LKEAP"
+      },
+      "Order": 23,
+      "RequiresAuth": true,
+      "RerankAPI": "tencent-lkeap",
+      "SourcePath": "internal/models/providers/lkeap.go",
+      "URLPatterns": [
+        "lkeap.cloud.tencent.com",
+        "api.lkeap",
+        "lkeap.tencentcloudapi.com"
+      ],
+      "Website": "https://cloud.tencent.com/product/lkeap"
+    },
+    "longcat": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "thinking-type"
+        }
+      },
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.longcat.chat/openai/v1"
+      },
+      "Description": "LongCat-2.0",
+      "ID": "longcat",
+      "ModelTypes": [
+        "KnowledgeQA"
+      ],
+      "Name": "LongCat AI",
+      "Names": {
+        "zh-CN": "美团 LongCat"
+      },
+      "Order": 22,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/longcat.go",
+      "URLPatterns": [
+        "longcat.chat"
+      ],
+      "Website": "https://longcat.chat/platform"
+    },
+    "mimo": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "ThinkingFormat": "thinking-type",
+          "ToolChoiceModes": [
+            "auto"
+          ]
+        },
+        "Transcriptions": {
+          "Formats": [
+            "wav",
+            "mp3"
+          ],
+          "LanguageParam": "asr_options",
+          "MaxEncodedBytes": 10485760
+        }
+      },
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.xiaomimimo.com/v1"
+      },
+      "Description": "mimo-v2.5-pro, mimo-v2.5",
+      "ID": "mimo",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "ASR"
+      ],
+      "Name": "Xiaomi MiMo",
+      "Names": {
+        "zh-CN": "小米 MiMo"
+      },
+      "Order": 18,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/mimo.go",
+      "TranscriptionAPI": "openai-chat-audio",
+      "URLPatterns": [
+        "xiaomimimo.com"
+      ],
+      "Website": "https://platform.xiaomimimo.com"
+    },
+    "minimax": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "ThinkingEnabledValue": "adaptive",
+          "ThinkingFormat": "thinking-type"
+        },
+        "Transcriptions": {
+          "Formats": [
+            "wav",
+            "aiff",
+            "flac",
+            "m4a",
+            "mp3",
+            "aac",
+            "opus",
+            "ogg"
+          ],
+          "LanguageParam": "header",
+          "MaxFileBytes": 52428800,
+          "Path": "/speech_to_text"
+        }
+      },
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.minimaxi.com/v1"
+      },
+      "Description": "MiniMax-M3, MiniMax-M2.7, MiniMax-M2.7-highspeed, etc. Global endpoint https://api.minimax.io/v1; Anthropic-compatible facade https://api.minimaxi.com/anthropic",
+      "Descriptions": {
+        "zh-CN": "MiniMax-M3, MiniMax-M2.7, MiniMax-M2.7-highspeed 等。国际版 https://api.minimax.io/v1；Anthropic 兼容接口 https://api.minimaxi.com/anthropic"
+      },
+      "ID": "minimax",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "ASR"
+      ],
+      "Name": "MiniMax",
+      "Names": {
+        "zh-CN": "MiniMax"
+      },
+      "Order": 16,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/minimax.go",
+      "URLPatterns": [
+        "minimax.io",
+        "minimaxi.com"
+      ],
+      "Website": "https://platform.minimaxi.com"
+    },
+    "modelscope": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "enable-thinking"
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://api-inference.modelscope.cn/v1",
+        "KnowledgeQA": "https://api-inference.modelscope.cn/v1",
+        "VLLM": "https://api-inference.modelscope.cn/v1"
+      },
+      "Description": "Qwen/Qwen3-235B-A22B-Instruct-2507, ZhipuAI/GLM-4.6, Qwen/Qwen3-Embedding-8B, etc.",
+      "ID": "modelscope",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "VLLM"
+      ],
+      "Name": "ModelScope",
+      "Names": {
+        "zh-CN": "魔搭 ModelScope"
+      },
+      "Order": 19,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/modelscope.go",
+      "URLPatterns": [
+        "modelscope.cn"
+      ],
+      "Website": "https://modelscope.cn"
+    },
+    "moonshot": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "ThinkingFormat": "thinking-type",
+          "ToolChoiceModes": [
+            "none",
+            "auto"
+          ]
+        }
+      },
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.moonshot.ai/v1",
+        "VLLM": "https://api.moonshot.ai/v1"
+      },
+      "Description": "kimi-k3, kimi-k2.7-code, kimi-k2.7-code-highspeed, kimi-k2.6",
+      "ID": "moonshot",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "VLLM"
+      ],
+      "Name": "Moonshot AI",
+      "Names": {
+        "zh-CN": "月之暗面 Moonshot"
+      },
+      "Order": 17,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/moonshot.go",
+      "URLPatterns": [
+        "moonshot.ai",
+        "moonshot.cn"
+      ],
+      "Website": "https://platform.kimi.com"
+    },
+    "novita": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "enable-thinking"
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://api.novita.ai/openai/v1",
+        "KnowledgeQA": "https://api.novita.ai/openai/v1",
+        "Rerank": "https://api.novita.ai/openai/v1",
+        "VLLM": "https://api.novita.ai/openai/v1"
+      },
+      "Description": "moonshotai/kimi-k3, zai-org/glm-5.2, deepseek/deepseek-v4-pro, qwen/qwen3-embedding-0.6b, etc.",
+      "ID": "novita",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM"
+      ],
+      "Name": "Novita AI",
+      "Names": {
+        "zh-CN": "Novita AI"
+      },
+      "Order": 52,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/novita.go",
+      "URLPatterns": [
+        "api.novita.ai",
+        "novita.ai"
+      ],
+      "Website": "https://novita.ai"
+    },
+    "nvidia": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "InputTypeField": "input_type",
+          "InputTypeValues": {
+            "document": "passage",
+            "query": "query"
+          },
+          "SendEncodingFormat": true,
+          "TruncateField": "truncate",
+          "TruncateValue": "END"
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "ThinkingFormat": "chat-template-kwargs"
+        },
+        "Rerank": {
+          "MaxDocuments": 512,
+          "ScoreScale": "logit",
+          "Truncate": "END"
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://integrate.api.nvidia.com/v1",
+        "KnowledgeQA": "https://integrate.api.nvidia.com/v1",
+        "Rerank": "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking",
+        "VLLM": "https://integrate.api.nvidia.com/v1"
+      },
+      "Description": "nvidia/nemotron-3-ultra-550b-a55b, deepseek-ai/deepseek-v4-pro-0813, nvidia/nemotron-3-embed-1b, nvidia/nv-rerankqa-mistral-4b-v3, etc.",
+      "ID": "nvidia",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM"
+      ],
+      "Name": "NVIDIA",
+      "Names": {
+        "zh-CN": "NVIDIA"
+      },
+      "Order": 51,
+      "RequiresAuth": true,
+      "RerankAPI": "nim-rerank",
+      "SourcePath": "internal/models/providers/nvidia.go",
+      "URLPatterns": [
+        "nvidia.com"
+      ],
+      "Website": "https://build.nvidia.com"
+    },
+    "openai": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "MaxBatchSize": 2048,
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "PromptCacheKey": true,
+          "SupportsDeveloperRole": true,
+          "SupportsReasoningEffort": true,
+          "SupportsStore": true,
+          "ThinkingFormat": "openai"
+        },
+        "Transcriptions": {
+          "Formats": [
+            "flac",
+            "mp3",
+            "mp4",
+            "mpeg",
+            "mpga",
+            "m4a",
+            "ogg",
+            "wav",
+            "webm"
+          ],
+          "LanguageParam": "form",
+          "MaxFileBytes": 26214400
+        }
+      },
+      "DefaultBaseURLs": {
+        "ASR": "https://api.openai.com/v1",
+        "Embedding": "https://api.openai.com/v1",
+        "KnowledgeQA": "https://api.openai.com/v1",
+        "VLLM": "https://api.openai.com/v1"
+      },
+      "Description": "gpt-6-astra, gpt-5.6-sol, gpt-5.5, gpt-4.1, text-embedding-3-large, etc.",
+      "ID": "openai",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "OpenAI",
+      "Names": {
+        "zh-CN": "OpenAI"
+      },
+      "Order": 30,
+      "PreferAPI": {
+        "source_symbol": "OpenaiPreferResponsesOnFirstParty"
+      },
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/openai.go",
+      "URLPatterns": [
+        "api.openai.com"
+      ],
+      "Website": "https://developers.openai.com"
+    },
+    "openrouter": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "PromptCacheKey": true,
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "openrouter"
+        },
+        "Transcriptions": {
+          "LanguageParam": "form",
+          "MaxFileBytes": 26214400
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://openrouter.ai/api/v1",
+        "KnowledgeQA": "https://openrouter.ai/api/v1",
+        "Rerank": "https://openrouter.ai/api/v1",
+        "VLLM": "https://openrouter.ai/api/v1"
+      },
+      "Description": "openai/gpt-5.5, anthropic/claude-opus-5, google/gemini-3.8-flash, deepseek/deepseek-v4-pro, etc.",
+      "ID": "openrouter",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "OpenRouter",
+      "Names": {
+        "zh-CN": "OpenRouter"
+      },
+      "Order": 40,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/openrouter.go",
+      "ThinkingLevels": {
+        "max": "max",
+        "xhigh": "xhigh"
+      },
+      "URLPatterns": [
+        "openrouter.ai"
+      ],
+      "Website": "https://openrouter.ai"
+    },
+    "qianfan": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "MaxBatchSize": 16,
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_completion_tokens",
+          "PromptCacheAccounting": true,
+          "ThinkingBudgetField": "thinking_budget",
+          "ThinkingFormat": "enable-thinking"
+        },
+        "Rerank": {
+          "MaxDocumentChars": 4096,
+          "MaxDocuments": 64,
+          "MaxQueryChars": 1600
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://qianfan.baidubce.com/v2",
+        "KnowledgeQA": "https://qianfan.baidubce.com/v2",
+        "Rerank": "https://qianfan.baidubce.com/v2",
+        "VLLM": "https://qianfan.baidubce.com/v2"
+      },
+      "Description": "ernie-5.0-thinking-preview, ernie-4.5-turbo-128k, embedding-v1, bce-reranker-base, etc.",
+      "ID": "qianfan",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM"
+      ],
+      "Name": "Baidu Qianfan",
+      "Names": {
+        "zh-CN": "百度千帆 Baidu Cloud"
+      },
+      "Order": 20,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/qianfan.go",
+      "URLPatterns": [
+        "qianfan.baidubce.com",
+        "baidubce.com"
+      ],
+      "Website": "https://console.bce.baidu.com/qianfan"
+    },
+    "qiniu": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "thinking-type"
+        }
+      },
+      "DefaultBaseURLs": {
+        "KnowledgeQA": "https://api.qnaigc.com/v1"
+      },
+      "Description": "deepseek/deepseek-v3.2-251201, z-ai/glm-4.7, qwen3.5-397b-a17b, etc.",
+      "ID": "qiniu",
+      "ModelTypes": [
+        "KnowledgeQA"
+      ],
+      "Name": "Qiniu Cloud",
+      "Names": {
+        "zh-CN": "七牛云 Qiniu"
+      },
+      "Order": 21,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/qiniu.go",
+      "URLPatterns": [
+        "qiniuapi.com",
+        "qiniu",
+        "qnaigc.com",
+        "modelink.ai"
+      ],
+      "Website": "https://portal.qiniu.com/ai-inference"
+    },
+    "requesty": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "openai"
+        },
+        "Transcriptions": {
+          "Formats": [
+            "flac",
+            "mp3",
+            "mp4",
+            "mpeg",
+            "mpga",
+            "m4a",
+            "ogg",
+            "wav",
+            "webm"
+          ],
+          "LanguageParam": "form",
+          "MaxFileBytes": 33554432
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://router.requesty.ai/v1",
+        "KnowledgeQA": "https://router.requesty.ai/v1",
+        "VLLM": "https://router.requesty.ai/v1"
+      },
+      "Description": "openai/gpt-5.5, anthropic/claude-opus-5, google/gemini-3.1-pro-preview, zai/glm-5.2, etc.",
+      "ID": "requesty",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "Requesty",
+      "Names": {
+        "zh-CN": "Requesty"
+      },
+      "Order": 42,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/requesty.go",
+      "ThinkingLevels": {
+        "max": "max",
+        "minimal": "min",
+        "off": "none",
+        "xhigh": "xhigh"
+      },
+      "URLPatterns": [
+        "router.requesty.ai",
+        "requesty.ai"
+      ],
+      "Website": "https://requesty.ai"
+    },
+    "siliconflow": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "MaxBatchSize": 32,
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "PromptCacheAccounting": true,
+          "SupportsReasoningEffort": true,
+          "ThinkingBudgetField": "thinking_budget",
+          "ThinkingFormat": "enable-thinking"
+        },
+        "Transcriptions": {
+          "MaxFileBytes": 52428800
+        }
+      },
+      "DefaultBaseURLs": {
+        "ASR": "https://api.siliconflow.cn/v1",
+        "Embedding": "https://api.siliconflow.cn/v1",
+        "KnowledgeQA": "https://api.siliconflow.cn/v1",
+        "Rerank": "https://api.siliconflow.cn/v1",
+        "VLLM": "https://api.siliconflow.cn/v1"
+      },
+      "Description": "deepseek-ai/DeepSeek-V4-Pro, zai-org/GLM-5.2, Qwen/Qwen3.5-397B-A17B, BAAI/bge-m3, etc.",
+      "ID": "siliconflow",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "SiliconFlow",
+      "Names": {
+        "zh-CN": "硅基流动 SiliconFlow"
+      },
+      "Order": 14,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/siliconflow.go",
+      "URLPatterns": [
+        "siliconflow.cn"
+      ],
+      "Website": "https://cloud.siliconflow.cn"
+    },
+    "volcengine": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "MaxBatchSize": 1,
+          "SendEncodingFormat": true
+        },
+        "OpenAICompletions": {
+          "PromptCacheAccounting": true,
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "thinking-type"
+        },
+        "Rerank": {
+          "MaxConcurrency": 4,
+          "MaxDocuments": 200
+        }
+      },
+      "CredentialLabels": [
+        {
+          "Hint": "Rerank is signed with an IAM key pair; this is not an Ark API key.",
+          "Hints": {
+            "zh-CN": "Rerank 使用 IAM 密钥对签名，不是方舟的 API Key。"
+          },
+          "Label": "Access Key ID",
+          "Labels": {
+            "zh-CN": "Access Key ID（AK/SK 签名）"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "Volcengine IAM access key id (AKLT...)",
+          "Placeholders": {
+            "zh-CN": "火山引擎 IAM Access Key ID（AKLT 开头）"
+          },
+          "Required": true
+        }
+      ],
+      "DefaultBaseURLs": {
+        "Embedding": "https://ark.cn-beijing.volces.com/api/v3/embeddings/multimodal",
+        "KnowledgeQA": "https://ark.cn-beijing.volces.com/api/v3",
+        "Rerank": "https://api-knowledgebase.mlp.cn-beijing.volces.com",
+        "VLLM": "https://ark.cn-beijing.volces.com/api/v3"
+      },
+      "Description": "doubao-seed-2-1-pro-260628, deepseek-v4-pro-ga-260813, doubao-embedding-vision-250615, doubao-seed-rerank, etc.",
+      "EmbeddingAPI": "ark-embeddings",
+      "Endpoint": {
+        "source_hook": true
+      },
+      "ExtraFields": [
+        {
+          "Key": "secret_key",
+          "Label": "Secret Key",
+          "Labels": {
+            "zh-CN": "Secret Key（AK/SK 签名）"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "Volcengine IAM secret key (the API Key field holds the access key)",
+          "Placeholders": {
+            "zh-CN": "火山引擎 IAM Secret Access Key（API Key 那一栏填的是 Access Key ID）"
+          },
+          "Required": true,
+          "Secret": true,
+          "Type": "password"
+        },
+        {
+          "Default": "cn-beijing",
+          "Key": "region",
+          "Label": "Region",
+          "Labels": {
+            "zh-CN": "地域"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "cn-beijing",
+          "Type": "string"
+        },
+        {
+          "Default": "Whether the document answers the query or matches the content retrieval intent",
+          "Key": "instruction",
+          "Label": "Rerank Instruction",
+          "Labels": {
+            "zh-CN": "重排指令"
+          },
+          "ModelTypes": [
+            "Rerank"
+          ],
+          "Placeholder": "Instruction passed to the rerank model",
+          "Placeholders": {
+            "zh-CN": "传给重排模型的 instruction"
+          },
+          "Type": "string"
+        }
+      ],
+      "ID": "volcengine",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM"
+      ],
+      "Name": "Volcengine Ark",
+      "Names": {
+        "zh-CN": "火山引擎 Volcengine"
+      },
+      "Order": 12,
+      "RequiresAuth": true,
+      "RerankAPI": "volcengine-knowledge",
+      "SourcePath": "internal/models/providers/volcengine.go",
+      "ThinkingLevels": {
+        "high": "high",
+        "low": "low",
+        "max": "max",
+        "medium": "medium",
+        "minimal": "minimal",
+        "xhigh": "xhigh"
+      },
+      "URLPatterns": [
+        "volces.com",
+        "volcengine"
+      ],
+      "Website": "https://console.volcengine.com/ark"
+    },
+    "weknoracloud": {
+      "API": "openai-completions",
+      "Auth": "signed",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions",
+          "Path": "/api/v1/embeddings",
+          "RequestTimeout": 60
+        },
+        "OpenAICompletions": {
+          "PromptCacheAccounting": false,
+          "SupportsMultiContent": false
+        },
+        "Rerank": {
+          "Path": "/api/v1/rerank",
+          "RequestTimeout": 60
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://weknora.weixin.qq.com",
+        "KnowledgeQA": "https://weknora.weixin.qq.com",
+        "Rerank": "https://weknora.weixin.qq.com",
+        "VLLM": "https://weknora.weixin.qq.com"
+      },
+      "Description": "WeKnora managed models: chat, embedding, rerank, vlm",
+      "Descriptions": {
+        "zh-CN": "WeKnora云服务，模型：chat, embedding, rerank, vlm"
+      },
+      "Endpoint": {
+        "source_hook": true
+      },
+      "ID": "weknoracloud",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM"
+      ],
+      "Name": "WeKnora Cloud",
+      "Names": {
+        "zh-CN": "WeKnora 云服务"
+      },
+      "Order": 1,
+      "RequiresAuth": true,
+      "Signer": {
+        "source_hook": true
+      },
+      "SourcePath": "internal/models/providers/weknoracloud.go",
+      "URLPatterns": [
+        "weknora.weixin.qq.com"
+      ],
+      "Validate": {
+        "source_hook": true
+      },
+      "Website": "https://weknora.weixin.qq.com"
+    },
+    "zhipu": {
+      "API": "openai-completions",
+      "Auth": "bearer",
+      "Compat": {
+        "Embeddings": {
+          "DimensionsField": "dimensions"
+        },
+        "OpenAICompletions": {
+          "MaxTokensField": "max_tokens",
+          "PromptCacheAccounting": true,
+          "SupportsReasoningEffort": true,
+          "ThinkingFormat": "thinking-type",
+          "ToolChoiceModes": [
+            "auto"
+          ]
+        },
+        "Rerank": {
+          "MaxDocumentChars": 4096,
+          "MaxDocuments": 128,
+          "MaxQueryChars": 4096,
+          "SendReturnDocs": true
+        },
+        "Transcriptions": {
+          "Formats": [
+            "wav",
+            "mp3"
+          ],
+          "MaxFileBytes": 26214400
+        }
+      },
+      "DefaultBaseURLs": {
+        "Embedding": "https://open.bigmodel.cn/api/paas/v4",
+        "KnowledgeQA": "https://open.bigmodel.cn/api/paas/v4",
+        "Rerank": "https://open.bigmodel.cn/api/paas/v4/rerank",
+        "VLLM": "https://open.bigmodel.cn/api/paas/v4"
+      },
+      "Description": "glm-5.3, glm-5.2, glm-4.7, embedding-3, rerank; Anthropic-compatible facade at https://open.bigmodel.cn/api/anthropic",
+      "Descriptions": {
+        "zh-CN": "glm-5.3, glm-5.2, glm-4.7, embedding-3, rerank；Anthropic 兼容接口 https://open.bigmodel.cn/api/anthropic"
+      },
+      "ID": "zhipu",
+      "ModelTypes": [
+        "KnowledgeQA",
+        "Embedding",
+        "Rerank",
+        "VLLM",
+        "ASR"
+      ],
+      "Name": "Zhipu BigModel",
+      "Names": {
+        "zh-CN": "智谱 BigModel"
+      },
+      "Order": 11,
+      "RequiresAuth": true,
+      "SourcePath": "internal/models/providers/zhipu.go",
+      "ThinkingLevels": {
+        "high": "high",
+        "low": "low",
+        "max": "max",
+        "medium": "medium",
+        "minimal": "minimal",
+        "off": "none",
+        "xhigh": "xhigh"
+      },
+      "URLPatterns": [
+        "open.bigmodel.cn",
+        "zhipu"
+      ],
+      "Website": "https://open.bigmodel.cn"
+    }
+  },
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "version": 1
+}

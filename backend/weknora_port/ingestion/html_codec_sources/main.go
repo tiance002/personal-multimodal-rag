@@ -1,0 +1,4 @@
+package main
+import("encoding/json";"os";htmltomd "github.com/JohannesKaufmann/html-to-markdown/v2";"github.com/JohannesKaufmann/html-to-markdown/v2/converter";"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/base";"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/commonmark";"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/table")
+type Input struct{HTML string `json:"html"`;Table bool `json:"table"`}
+func main(){var request Input;if json.NewDecoder(os.Stdin).Decode(&request)!=nil{os.Exit(2)};var text string;var err error;if request.Table{conv:=converter.NewConverter(converter.WithPlugins(base.NewBasePlugin(),commonmark.NewCommonmarkPlugin(),table.NewTablePlugin()));text,err=conv.ConvertString(request.HTML)}else{text,err=htmltomd.ConvertString(request.HTML)};if err!=nil{json.NewEncoder(os.Stdout).Encode(map[string]any{"error":"CONVERSION_FAILED"});return};json.NewEncoder(os.Stdout).Encode(map[string]string{"text":text})}

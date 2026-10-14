@@ -1,0 +1,765 @@
+{
+  "source_repository": "https://github.com/tiance002/personal-multimodal-rag",
+  "source_commit": "9a604666f557dbcc3d0940f7c0b5b2964147b76f",
+  "fixed_upstream": "Tencent/WeKnora@3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "selection": "New chain and React only; no original Git ancestry, runtime data or historical evidence",
+  "unchanged": {
+    "backend/__init__.py": {
+      "source_git_blob": "f45815a398698488ebcd3821a4298c01c753fda5",
+      "sha256": "280e4e6545fec86181115b54c361f024513743a8486bbfa71c720feee6eb5147"
+    },
+    "backend/weknora_port/__init__.py": {
+      "source_git_blob": "01c4936d867bea76799d08c1079ae70fe5277a11",
+      "sha256": "d3fa2900319b29c1036502fba6191115b3b2ca05e470eed4027d966858bee013"
+    },
+    "backend/weknora_port/conversation/NOTICE": {
+      "source_git_blob": "92d3bdda8e2f83ddec7e7dfe958f396675397185",
+      "sha256": "57690e0701c4e64874a8ea977a6a7022858cfa1239f5d86cd0ed3cd57083d923"
+    },
+    "backend/weknora_port/conversation/__init__.py": {
+      "source_git_blob": "727940c338f1aa9c7dd56f659c0a795a0053e896",
+      "sha256": "73360b632c6c6a17a2f1157ef09fb80f8a6dab31b1973299f84bd54151ae87e9"
+    },
+    "backend/weknora_port/conversation/extraction.py": {
+      "source_git_blob": "d8abb742a60c368a73fc20f428dcec732f6d0eff",
+      "sha256": "c2b146c7636268921e56a2ac103dd31d58c2143ff87839a0ad7b75c11dc39fe8"
+    },
+    "backend/weknora_port/conversation/history.py": {
+      "source_git_blob": "eeddcbf7618c831d1444db0e87d8e80a309e6068",
+      "sha256": "d721e68955304136cee63fee5d6d1e2bfa751cad531d61424245e332cb732225"
+    },
+    "backend/weknora_port/conversation/maintenance.py": {
+      "source_git_blob": "4b6ca316f40efe6aca2f885ad1862897fe003223",
+      "sha256": "3757bf1f0cf9ffd81930bd67dd68674d5737590f93909ed3c36f63cbbf9ee679"
+    },
+    "backend/weknora_port/conversation/maintenance_types.py": {
+      "source_git_blob": "579d62ce31478621ce454b9cb2d2938360d892e9",
+      "sha256": "64afe6d02b8b035f78707da2a976639ce5e4601a5270fb226f6c1a9658c555e7"
+    },
+    "backend/weknora_port/conversation/management.py": {
+      "source_git_blob": "85a695aaff9cefeea1790f87bb4484a8c2b5b9b4",
+      "sha256": "2304b86523add85c9b18e6f6aba0f4986f78e4613c860bf246af06f998eb62ad"
+    },
+    "backend/weknora_port/conversation/memory.py": {
+      "source_git_blob": "3bb07bd758583b8f7b2c55b98f57d543066b3908",
+      "sha256": "2caa74f24740b99e34e9deadb2077bd33045b005e8dd44bd39e6fcca551158dc"
+    },
+    "backend/weknora_port/conversation/prompts.py": {
+      "source_git_blob": "2740c6395b36223795d357f45a4c30858883d1c0",
+      "sha256": "c990ad0e2ae27c91269590a95510b7c892942abafeb6f78a3104030f9a61f90c"
+    },
+    "backend/weknora_port/conversation/ranking.py": {
+      "source_git_blob": "29d4fdcb6c46fbd7f99f89c0e012c02fd6f674a1",
+      "sha256": "94664a7d755762aec28df529756d553aafd428c9862c4bd2cd58cef102671ec6"
+    },
+    "backend/weknora_port/conversation/topics.py": {
+      "source_git_blob": "f117addb7544de6d1792167f3c502e0698bea7c2",
+      "sha256": "f82fee7587d8d997e138598c0b3a80c33963507c79cbdd1ab895b5503d407c56"
+    },
+    "backend/weknora_port/conversation/turns.py": {
+      "source_git_blob": "8d6bd71aab0d44d50ed722638567bb2296aab09f",
+      "sha256": "97221aba413b635108da9abc5a1c325ced59b174a3ff8d235c13f00e96b5a249"
+    },
+    "backend/weknora_port/conversation/types.py": {
+      "source_git_blob": "14d0c7f5e1c5a3ec64f911749b688f26a951c1f3",
+      "sha256": "2483693cf94ec02e5c5bd5f14543fb1bcf55c09dd748f8973d7e9239d17df582"
+    },
+    "backend/weknora_port/conversation/unicode15.py": {
+      "source_git_blob": "ded995f0a1eb82246c574134649d6775658d3126",
+      "sha256": "7f9416bd1a455e110e13525fd2b9c2b37d8d5c23ad8594865ccad8b62483b326"
+    },
+    "backend/weknora_port/crypto.py": {
+      "source_git_blob": "5ce8ab90b1f819565af54071f6f6d5e63311689e",
+      "sha256": "918d19fac0965b0fe7eed1817f4b32e5e26519b36730ec04250f990379b83c8d"
+    },
+    "backend/weknora_port/document_profile.py": {
+      "source_git_blob": "ea8815139a7dbbb3b4a6d38857f87ecf04cedf0a",
+      "sha256": "96e323e7d7883671d73a2b8923850964d6d7350473ddd754cd1f827d299d1180"
+    },
+    "backend/weknora_port/documents.py": {
+      "source_git_blob": "8b0ea2758e1f9aa6c17ccb1bd910b5cdb94bfb4b",
+      "sha256": "9df7aaca47472ba2cf42c1af82e126f0f54678599609ea4e092efb9cb4c2425b"
+    },
+    "backend/weknora_port/generation/__init__.py": {
+      "source_git_blob": "b2240d29363a5ecfd4a08a4b8ebdf5fc0aea0221",
+      "sha256": "4d5b4959365985719632862eb65ac7970a9c4c4f5eff1d6f938190e777c47481"
+    },
+    "backend/weknora_port/generation/context.py": {
+      "source_git_blob": "657eab8b72a0c590327dc793e14dd79b54f8c5b0",
+      "sha256": "bdcc0f0d66da32981c1c9526a53d35f35e627a8c785b4cb51710d0a93e9f2a09"
+    },
+    "backend/weknora_port/generation/coordinator.py": {
+      "source_git_blob": "838b70a7f1847f25a39406e75746ea73e6aea3d6",
+      "sha256": "3979687ceeb186231f3d889780a8f6b8d3919b72efa6f3f71c6bc457ed610b02"
+    },
+    "backend/weknora_port/generation/estimator.py": {
+      "source_git_blob": "fdc263609cd6e5924fa66783bd89134f479b5537",
+      "sha256": "3db5a02df3d6e7a235f1e219a5d204d5b921148d0c6799b50403d7733030b291"
+    },
+    "backend/weknora_port/generation/features.py": {
+      "source_git_blob": "2f7df37144ba002102c2d92c1a0a2710bde48f46",
+      "sha256": "43d074da6079d4136be6450f905eb61f01acbd1273f54ac4764806634e6a2088"
+    },
+    "backend/weknora_port/generation/router.py": {
+      "source_git_blob": "988e99d2914d60c628ebeaf8bc4e44439501434d",
+      "sha256": "eed2ab58b1c0632f7957ab081845d7afc3edb50a4db366a6f9bfd8a8535bfd81"
+    },
+    "backend/weknora_port/generation/types.py": {
+      "source_git_blob": "5f8c98c494ef0488f19107a9935b60836cebf326",
+      "sha256": "250ef4ea7e780adb58dcd5ee72645dde3bdf6006c20dc145cecd000c504395a5"
+    },
+    "backend/weknora_port/http_api.py": {
+      "source_git_blob": "184bac6d135a9c5512d36f7508b48ff61b51a54f",
+      "sha256": "648fe1eb8a8c19c190214f710596d615a79e42e3e9c3e552e839f2864f6b5bf9"
+    },
+    "backend/weknora_port/image_configuration.py": {
+      "source_git_blob": "bfd80ae3f63ec09b50c15c16973823ac6f33b35a",
+      "sha256": "42cfd63ae1cc5e29eb2b6e9cd17a9111b04631cae44ab2f8f4b8e077fbbfc201"
+    },
+    "backend/weknora_port/image_multimodal.py": {
+      "source_git_blob": "ce89da96bcb82cb4ae1eda8f6d028beafb5ced1b",
+      "sha256": "f90947e0face633fe69701ab05def97279de6f04de92d300f7a14657cdfe6201"
+    },
+    "backend/weknora_port/image_tasks.py": {
+      "source_git_blob": "60762285b8537cd3dea7a9e412f97ca8647496aa",
+      "sha256": "46297b0da80f4bfda5718f6a43e36b404919d1854838f6634b28888bd098c0a1"
+    },
+    "backend/weknora_port/ingestion/LICENSE-THIRD-PARTY-WeKnora-MIT.txt": {
+      "source_git_blob": "cfda07abd1dfe2f6a593a6b7b139b91822737e7f",
+      "sha256": "ede5a9f6228fea26642220661d17796bce29c10e09fa9438dfc6418aa8feabd8"
+    },
+    "backend/weknora_port/ingestion/__init__.py": {
+      "source_git_blob": "a14eb2ea8e0223de6277786058c57f990c4b1b1d",
+      "sha256": "1946da06f40818391e7175194f7ae2af5da19230635032b724efc2b5ae77874b"
+    },
+    "backend/weknora_port/ingestion/_docx_runtime_adapter.py": {
+      "source_git_blob": "1ece62f963973cb9a7215fd13f30b0ccc8bc66eb",
+      "sha256": "ad8ff47d20d20f45a108c7078ac7f7840f15a6601c73d3117ffdb6c2c2545942"
+    },
+    "backend/weknora_port/ingestion/_excel_runtime_adapter.py": {
+      "source_git_blob": "ca18004ae43bcddcc7ee60e1dbf32a8826e9b1a6",
+      "sha256": "50e465ce4ef38dbcba2d93377e022be57a16efd828804ca99c9333f8c5492364"
+    },
+    "backend/weknora_port/ingestion/core.py": {
+      "source_git_blob": "d369e981791bd4310d2826ebd058068b39a968f5",
+      "sha256": "aca7bfc2184729eb5e7bfb7a9de5a832a4ee563fffe4695f2c8746e004588123"
+    },
+    "backend/weknora_port/ingestion/html_codec_sources/LICENSE-html-to-markdown.txt": {
+      "source_git_blob": "0adaa6b5b25d2307cab822bd3533acd44d1eac78",
+      "sha256": "fc004fdf94e3bce84695bb866e13f840017161c52d0dd8038fe0c6e2d15e15a8"
+    },
+    "backend/weknora_port/ingestion/html_codec_sources/go.mod": {
+      "source_git_blob": "092bc3240aa5735958ba5937aedbe86a24dbfd00",
+      "sha256": "cc4ecf1360055b6364e3b6cce5e2910dda3c88a75257696eb7d2b15b254aef78"
+    },
+    "backend/weknora_port/ingestion/html_codec_sources/go.sum": {
+      "source_git_blob": "df3c529d9662670a837c73349e1d2dc4d34fe2df",
+      "sha256": "279cff52b368f460f48d7e99cfe21d50198527e7d878a9dae6a7b36faafb4aee"
+    },
+    "backend/weknora_port/ingestion/html_codec_sources/main.go": {
+      "source_git_blob": "deed0c96955a1865c8d2658dc2fe1ce0963f1bfe",
+      "sha256": "893d5d1cc3f09221b0e1881fe2f66cc5385277cb155f53d559522ab3d1314502"
+    },
+    "backend/weknora_port/ingestion/html_conversion.py": {
+      "source_git_blob": "848b01cfab146f601fb49804f76f9b835b2713e7",
+      "sha256": "d53c09eb7c57c785ea00c6d40d1fda8513f45d7bfaeec35918129caa29766c80"
+    },
+    "backend/weknora_port/ingestion/requirements-parser-parity.txt": {
+      "source_git_blob": "a3752c815215bdec1e5a3fbf08a220fbe401d82a",
+      "sha256": "433f5562f4108e9b6a0a50efe0afdf70eccf571fa608b5eef7bce76f75be7eef"
+    },
+    "backend/weknora_port/ingestion/upstream_docx_merge.py": {
+      "source_git_blob": "d5b6cedd91703668b141f60d75881e562dca552e",
+      "sha256": "df3ec6aafd72207836147b655ac0bebfff774234c6a0941b705c283c01a301fc"
+    },
+    "backend/weknora_port/ingestion/upstream_docx_parser.py": {
+      "source_git_blob": "7d532bb1cd054497a154e389999d5ddc6d63e1ab",
+      "sha256": "ecd5e2c10cc4f00b24343ff1c485b8dc89b1f27536b4830187b729170bd63a3e"
+    },
+    "backend/weknora_port/ingestion/upstream_excel_convert.py": {
+      "source_git_blob": "cd9fa9c1b9f7f92d32155d6235d799bacae7909b",
+      "sha256": "19dddd42ae9937714fca071b9503642fabc2841c687083599df3db1abdbf4479"
+    },
+    "backend/weknora_port/ingestion/upstream_excel_parser.py": {
+      "source_git_blob": "807ed299ca268210af3693d698eab19120694627",
+      "sha256": "bc90564e243175d7fd71a3f151a5d357960514c17b78170a84dbdcaef6ebc6f0"
+    },
+    "backend/weknora_port/ingestion/upstream_markdown_helpers.py": {
+      "source_git_blob": "00045cbfb842a4b0376be7b98808bdd29f6a530b",
+      "sha256": "4754f252b67e5153335d4d7c09b27a4d917a4cd86f1524cb0b7a32b042ca1369"
+    },
+    "backend/weknora_port/ingestion/upstream_pdf_parser.py": {
+      "source_git_blob": "edcaba518be62ac92c3d9d7ed5f39711309ae4ca",
+      "sha256": "54eac76b5628cbc8d708af86bc37f2ad6e7d164d05e251c034da528b2eff3154"
+    },
+    "backend/weknora_port/ingestion/upstream_xlsx_merge.py": {
+      "source_git_blob": "b836972ea02c21a1d2a2b9f130f422ddc5498520",
+      "sha256": "49e5fa7ef69d7678f3679215f9717a77f4e023555ffc56c8ee07c2595367aee9"
+    },
+    "backend/weknora_port/ingestion/upstream_xlsx_repair.py": {
+      "source_git_blob": "9a89da9130be496b18d1ea1b54e1a202e232e7c9",
+      "sha256": "1941c6824596123a8036565bd60baf28a9df86445cb3d77841ed337705877b3f"
+    },
+    "backend/weknora_port/memory_runtime.py": {
+      "source_git_blob": "1123f5c16abae10fb908329e3399bd6044bedf60",
+      "sha256": "436a7540ff8c2d9305f8975e26c73ea79b13f8c51699e205b4f74cb9afb5174e"
+    },
+    "backend/weknora_port/model_registry.py": {
+      "source_git_blob": "a5f5fffc2f6f311e4f34926905db4687a0d252c2",
+      "sha256": "6664e581623e728cf2a8a03558b0c11e28cdfde9c7f9b69f6d9bf76428c96dc4"
+    },
+    "backend/weknora_port/models/NOTICE": {
+      "source_git_blob": "c8099f98a03d7440383ef720470350baa2f2e8bd",
+      "sha256": "050a26643b3405ff0f2076a1496584b3015dd3ede7b7b66bea8b4765350ad4f4"
+    },
+    "backend/weknora_port/models/__init__.py": {
+      "source_git_blob": "e8754e55103ddf7e6fee8d7b88fab3e58fadea8f",
+      "sha256": "945f0a8051b8c59d8edd15bf40d791847840584cb2f90c4c066324a0c1e3509e"
+    },
+    "backend/weknora_port/models/catalog.py": {
+      "source_git_blob": "8f55e143e01f37e2eca0204eb77ec3d2d8fa6a39",
+      "sha256": "61824313d21e5b20e135f1e52b716741c81d68ff0ad15b1f5a1243237cc6d78a"
+    },
+    "backend/weknora_port/models/catalog_resources/extract_registry.go": {
+      "source_git_blob": "c4310fe5a71a1699f5e891af47493e26da962860",
+      "sha256": "dea68ca43d68b1b5e8fff091e87739dbc6ed45291e7ee8fa0fd64f9da20248f6"
+    },
+    "backend/weknora_port/models/catalog_resources/models.generated.json": {
+      "source_git_blob": "8978688c628a98554ea0d70700103118935ad2cc",
+      "sha256": "9f9183f0892ce8bc995134ef883553e8b325ad55448deff81c25057df4b876d6"
+    },
+    "backend/weknora_port/models/catalog_resources/native_request_oracle.py": {
+      "source_git_blob": "1734b1722f254289ab1db2addf2d7924ca151319",
+      "sha256": "301b6f3e687966ce1fd612ac9136f399502deb4c5d3a0ee1061b24bdcffce704"
+    },
+    "backend/weknora_port/models/catalog_resources/providers.generated.json": {
+      "source_git_blob": "e0b6f5515af05f5199e407bdc60037b56da93dac",
+      "sha256": "8031b453cf7655ab6e286f2cc3d77b93b60b9e35d3dfe9587d0b880a97a22e87"
+    },
+    "backend/weknora_port/models/compat.py": {
+      "source_git_blob": "956aba7150f4086d2885d48800b513f86ff985db",
+      "sha256": "aae7066b8ec707eddac4a1d57ec740424956eda8d4714a6e7a2682cc8bf93037"
+    },
+    "backend/weknora_port/models/native_request.py": {
+      "source_git_blob": "bf0f59d046c9aba034e11b227f57b930d6b0fe7e",
+      "sha256": "04b7199d532631d7849c152e866e68cc9fe4c5f33c136fb498ac58a47fb2e082"
+    },
+    "backend/weknora_port/models/native_response.py": {
+      "source_git_blob": "c656f013d2aa016a224e68ec518cc313733406f1",
+      "sha256": "a87befc9f79ad067a885a0076fbab1c3ed5342fdbacdaaf2ac2501c308fee621"
+    },
+    "backend/weknora_port/models/provider.py": {
+      "source_git_blob": "dab3d0cda4fa6adc0be9b3a233a9e248cf669f4a",
+      "sha256": "ad7ff0f56927d5bc7a7266df37183bf83212a0ca2282dacbc4a790a96645db8a"
+    },
+    "backend/weknora_port/models/request.py": {
+      "source_git_blob": "0ec08eb2aac6e51b2e19bd6b717666ab7bced72b",
+      "sha256": "01a230cd8d2b95ca15cc1efa4b0cdc783aece15e5c870fa2d2b9c8039871438f"
+    },
+    "backend/weknora_port/models/safe_network.py": {
+      "source_git_blob": "33664785a9bdcb2cc9fe84bc93a1a34fc57a1ed7",
+      "sha256": "2818bb937bea84f79261e3ffb7d08ee373eb00489138268f52103febf2c34c6e"
+    },
+    "backend/weknora_port/models/signing.py": {
+      "source_git_blob": "ae36222823279ae9941a2bcff62f08804759b966",
+      "sha256": "106e7daf351a918a1d0f288866b1be0eba04c1fd8ae09736d8398d3a00be007e"
+    },
+    "backend/weknora_port/models/stream.py": {
+      "source_git_blob": "ae38af3f61fadcba0e5a6b49e366d24389409fe0",
+      "sha256": "14cf01ec88c5fe28281a44c6d931cfee6225e24de46b2131bd6d86d1ac1a5a73"
+    },
+    "backend/weknora_port/models/transport.py": {
+      "source_git_blob": "794fe0020fe3348ef6974e0e4681850e2e5ac861",
+      "sha256": "2faaaf245339460563b5f9a7d6419802c703d619a9130f2d51a28448eaac557c"
+    },
+    "backend/weknora_port/models/types.py": {
+      "source_git_blob": "5c1540ab075f11ce6a06468ac99c4f4d3c3b7a05",
+      "sha256": "b347fe80f309a917f6b05a673fcb1570b84d6dd3e1510f582e505edec80dd5fe"
+    },
+    "backend/weknora_port/models/usage.py": {
+      "source_git_blob": "9ad66e63072a41b970cbf609d2a314b9a481df81",
+      "sha256": "dbd36c038535fd5cd99db85c134a9529c86047b08bb76ba1d78426789cd6411d"
+    },
+    "backend/weknora_port/profile_assets/generate_summary.yaml": {
+      "source_git_blob": "8ad8a262d9d12a77c16d3b8c6e84473b617d6a82",
+      "sha256": "c6f5b6298909a173e1482cb03bb9f84b7c009bf731075580c014cdfa252d1045"
+    },
+    "backend/weknora_port/profile_assets/vlm_ocr_prompts.json": {
+      "source_git_blob": "e432131da280a474947745cee35ec93392092e56",
+      "sha256": "f6e358e19e783721f762467163c647bc2bd63e4bd06c05c20d645122badec7c2"
+    },
+    "backend/weknora_port/references/__init__.py": {
+      "source_git_blob": "bbce7b5e0c28003db1a5e9a8f8eebac93832e2cf",
+      "sha256": "7f1178289f4e9e9e7dd43bf7d79743b9ec21059dcc7326acecac6e5d41995565"
+    },
+    "backend/weknora_port/references/decoder.py": {
+      "source_git_blob": "6a63d326666119ab067b49c41816cfb6d0ccbf44",
+      "sha256": "d25976ae45a347c37efc167d5386d79efd838ed026fb2ec131fcb2a64e32820e"
+    },
+    "backend/weknora_port/references/registry.py": {
+      "source_git_blob": "038bdd39293e4155296b73866af074cd9304eec2",
+      "sha256": "c1c5eabf86c42e34d67e4a9ae3a713b29389cc029fe3ddd28a39e8cf2c28ed12"
+    },
+    "backend/weknora_port/retrieval/__init__.py": {
+      "source_git_blob": "ba2698bd0f07897eb75b9b01e8a97800037af298",
+      "sha256": "07be3313ff2732290ce6703a1cde1b4b4d1b7df5a96a4ca272a8fe14152f9e9d"
+    },
+    "backend/weknora_port/retrieval/context.py": {
+      "source_git_blob": "d1498013ac5edaeb316d232c58ba8c8798c30ae9",
+      "sha256": "9a03f968faf8133562363fbcd09f9e9eaad17171918ade35717083be9f640d3c"
+    },
+    "backend/weknora_port/retrieval/filter_top_k.py": {
+      "source_git_blob": "adeb78e2b637a34ec88bec43ae77ffeb7563ac48",
+      "sha256": "9092411d2acef74f6c8798c8a4052ad5c46ec5e7dd756b498ac5ce2986d15102"
+    },
+    "backend/weknora_port/retrieval/fusion.py": {
+      "source_git_blob": "6a20f1e7683134ea89885a0c99cfc5d60d04ac98",
+      "sha256": "6a7db8f3b7294759dc011ba7bdda7ca3db74df9929c15620121f88a301948968"
+    },
+    "backend/weknora_port/retrieval/merge.py": {
+      "source_git_blob": "63eb17a2f2582d5000146ca9231b0c29ee3dd42b",
+      "sha256": "7cddb7247cf9b4894f47fae5356603408646b9018f8b85fe25c40ecea21ac8a7"
+    },
+    "backend/weknora_port/retrieval/pipeline.py": {
+      "source_git_blob": "079f24f1405b32a33105844a197b5db615c777b3",
+      "sha256": "3e1b4550e14f138bc2db8c0ba105beb310adfa46159f748cef76d77b5b933404"
+    },
+    "backend/weknora_port/retrieval/query.py": {
+      "source_git_blob": "db8b5ab067151c9ad359fdb1ca431744eb977fb5",
+      "sha256": "c3a69f14a1f4f8a8adb929b73b4e5c9e240153f41e58c4551cbfbcb6d970b0da"
+    },
+    "backend/weknora_port/retrieval/requirements-tokenizer.txt": {
+      "source_git_blob": "635478a92dc767bd93f8a1362b380c8ddc566389",
+      "sha256": "a2e62a947551b5ba88d8f2d9a6a93f2ee9618f3d53f40f000aa711a86c5272f6"
+    },
+    "backend/weknora_port/retrieval/rerank.py": {
+      "source_git_blob": "1088153b206cf5fe17e68bd6a4395ab9130a0a79",
+      "sha256": "1c0f6f1b855f9f8bd0bca0e839249e66076698c13b866ab71a901b5af2b95fff"
+    },
+    "backend/weknora_port/retrieval/search.py": {
+      "source_git_blob": "59a8fa3416b7d75d3a7c8474d30408aad75ddad3",
+      "sha256": "cd17a093aa32a26e44fc893f552b425f155c301f88c44d1fe561aebb268e04af"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/GOJIEBA_LICENSE": {
+      "source_git_blob": "95191a1b38a2a0e2b5f667bf0a0eb0be178e6005",
+      "sha256": "d64715c9f769d9a040bfa8c11ceb5f6d7174fbc9a5bd2b4b7368fbf33891028e"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/GO_LICENSE": {
+      "source_git_blob": "2a7cf70da6e498df9c11ab6a5eaa2ddd7af34da4",
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/LICENSE": {
+      "source_git_blob": "6308e939b739d6508837371ccb695a280135132e",
+      "sha256": "ba898a14f729ba5e9965da34e3eecd5edd3795f2cc5d7c923b815ba79bb851b0"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/hmm_model.utf8": {
+      "source_git_blob": "2e1f807a0f31eeee3abe4cd1e0a0419d143af96a",
+      "sha256": "f17790586ac86dd048c8adffed052c4bd2b28ed0682972c1275e59040c0589a7"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/jieba.dict.utf8": {
+      "source_git_blob": "0015948de30f38fa97dd20adef231c1909bd8efd",
+      "sha256": "3043b77068e09c9904f27cad82f12b6ebe9dbdb5aeff3b25e45ab7f9c1122b55"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/manifest.json": {
+      "source_git_blob": "e660f047687e57f71c45c09583dedf29a1d4bf06",
+      "sha256": "9058cc9329bb14754292e4c8d2c2d220c4a88dbc410d2b650bf4749c4f77dc77"
+    },
+    "backend/weknora_port/retrieval/tokenizer_assets/user.dict.utf8": {
+      "source_git_blob": "6a42ee4e06fb197d968d2bb39becad65e01b2e57",
+      "sha256": "495bbf49270408a1234690e1e6a97328f30a482a7a72aa769e8a12e8714b0c62"
+    },
+    "backend/weknora_port/retrieval/types.py": {
+      "source_git_blob": "aae58c57e08428bf4a8c3bbda3cd54be9fabafb0",
+      "sha256": "ed18b654c72d54741ae4271032711ff39d2545ce574440514952c74b37e8e78f"
+    },
+    "backend/weknora_port/runtime.py": {
+      "source_git_blob": "32e76bfa05244575ac9f90f82a4703e615baddb3",
+      "sha256": "07e318e5c2d3f3d4a2eb94a05ea703627e5b63d9d953289f577a545653dff2da"
+    },
+    "backend/weknora_port/service.py": {
+      "source_git_blob": "350473a60ee8bd4ab00728e1a93c475b728c04ea",
+      "sha256": "f4c98eaeb8896359c75e56bb132cf08142b4a27e3b1637584042e1bd80dd95af"
+    },
+    "backend/weknora_port/storage/__init__.py": {
+      "source_git_blob": "183dbad01f91b3f5d80a214f96eee47d23b1bfe1",
+      "sha256": "852bf16be0db85fd596384083f968e5a622f5fe98af935bb4ed0e935d37e8f91"
+    },
+    "backend/weknora_port/storage/chunks.py": {
+      "source_git_blob": "6d7e428963dddf9b4472cde1d2e07c99bda4f55a",
+      "sha256": "c7ab96d87bcb7f0d7d9e1032de03c425178db37cdfc2f6a37d638cf35a5d45e4"
+    },
+    "backend/weknora_port/storage/configuration.py": {
+      "source_git_blob": "bfd30a4a401dca2da15ffa0ef296bcbb4f2599af",
+      "sha256": "2cdcceefa2efc752ba350a38cce26f5da99e86d70193c5a4d2f8fe912640df89"
+    },
+    "backend/weknora_port/storage/configuration_migrate.py": {
+      "source_git_blob": "98258a373f62d7a56fb5fabfd5a7b0de57638fff",
+      "sha256": "3ff133fe92dd9e81e12e7df7e4ef9745598ea269d3f69aed6ab0490d79c0af77"
+    },
+    "backend/weknora_port/storage/connections.py": {
+      "source_git_blob": "2f5608a1188333e467f9be24f2a09d2fe9f11326",
+      "sha256": "bab4d7c9fa269e9cf216686789ae0f763635665545c17c3090ef330ad60a41f3"
+    },
+    "backend/weknora_port/storage/document_profile_migrate.py": {
+      "source_git_blob": "3d40d6a4e9ab90ea2df5d933fd69ee481a2acb45",
+      "sha256": "e054ce8cef1bd2c47e34cae1eb9ee50a2f4cc23c926150c0a54e3550482029e5"
+    },
+    "backend/weknora_port/storage/generation.py": {
+      "source_git_blob": "3136f4107ed9bcbb0827af69222b8e10d3a39164",
+      "sha256": "0dc9d127bcc4522aaff2f9381c8d459e3d5351bb26b5b5606124b44cf4cf32d4"
+    },
+    "backend/weknora_port/storage/generation_migrate.py": {
+      "source_git_blob": "915b08dc39dbad804c61dc0c218b461d45494e1e",
+      "sha256": "9d22efc4074b8bd55a00753560a2af2db7f471630e1140566b0e6fde18b57162"
+    },
+    "backend/weknora_port/storage/history.py": {
+      "source_git_blob": "8ee4623f8a4daacb065d3fbcf7e6f795e4493041",
+      "sha256": "aef6f49ad61d7ca153e06fa6a780c97becb9462861ff0312856ee764a69dfd5d"
+    },
+    "backend/weknora_port/storage/hybrid.py": {
+      "source_git_blob": "fa7cac8f055870a63765e36fb4329f9be0829f16",
+      "sha256": "4971483389d7a05d2332b912c96b27846c90b7fabe59251a39b75331d60e3953"
+    },
+    "backend/weknora_port/storage/image_tasks_migrate.py": {
+      "source_git_blob": "440d833c9ccc12430c3a133384370356630baf1c",
+      "sha256": "adbac6e94107ddc868de9ec560759223165ffd4ae6bc1be359476befe2edbb43"
+    },
+    "backend/weknora_port/storage/indexing.py": {
+      "source_git_blob": "2896b01a628d87416ae4727c11e48d73843e1659",
+      "sha256": "d21c66c95948fa5f209029092f225399e6f4bb6472ff6bd595f172fd1c85f93d"
+    },
+    "backend/weknora_port/storage/knowledge.py": {
+      "source_git_blob": "e5948a1428baff061fda7d9e8e91d2885c3df254",
+      "sha256": "f2e4a5d896ec9515687553778171f59c29385cdcd628dfe4d64c6a079abae3f1"
+    },
+    "backend/weknora_port/storage/local_principal.py": {
+      "source_git_blob": "834be34c129b908030ea1a2dc58af6cf9240c362",
+      "sha256": "cf65a00190963c7c551dfe12e5d8476b5911f7dcb0e602d60a4a93060cd080fb"
+    },
+    "backend/weknora_port/storage/memory.py": {
+      "source_git_blob": "3d17b99591dbf75c58f012f818df7261e11407ee",
+      "sha256": "44fe8707150c9d648b2714d179a293df95e1ec07cb14fa9514b3b5ec222ca6ed"
+    },
+    "backend/weknora_port/storage/memory_queue.py": {
+      "source_git_blob": "e0e5ad77ceaae30ccb098b6b0e09502bd733f157",
+      "sha256": "08f31d9fa03d9a052eed5ede8a0a49b116f2d6c9ddaf35a10fad688df51bc170"
+    },
+    "backend/weknora_port/storage/migrate.py": {
+      "source_git_blob": "15300d8ea78d5a23cb05d1609b66d073f7c9bc0e",
+      "sha256": "3199985e25bde6b6d7d065c2f892c354183117c9fb51479e1d5489ae048ce842"
+    },
+    "backend/weknora_port/storage/migrations/001_retrieval.sql": {
+      "source_git_blob": "863b93457de8175d5b99a72b6d97ed17c5476342",
+      "sha256": "1e82073728a9d1656abd2e0da4a68debd8332f56cb5c1815ad4305b95c9f2dcf"
+    },
+    "backend/weknora_port/storage/migrations/002_memory.sql": {
+      "source_git_blob": "0f1ba7a1c71afce8df8591a876d401508ec09cc3",
+      "sha256": "615db120be7eda605156ade0a9f594f7a997dc4959fe54aa784316de65341bb6"
+    },
+    "backend/weknora_port/storage/migrations/003_common.sql": {
+      "source_git_blob": "04519e45b668bbab4f591009f5aa9596f7a3df71",
+      "sha256": "8076ebbedffcbc398cd9d9bc3f23c56bdbcc2134e286680dc46fb0f4dcfcc7ee"
+    },
+    "backend/weknora_port/storage/migrations/004_generation.sql": {
+      "source_git_blob": "ea31028b4291b96806831cb389e55ba12d6b91ea",
+      "sha256": "b1eb58dfdbef98a51e3c388f12d0e3d6481604cc82812ef4cb1fff98bf091144"
+    },
+    "backend/weknora_port/storage/migrations/005_send_gate.sql": {
+      "source_git_blob": "7aed078e25bd175e77cae0da474e18003a449ec0",
+      "sha256": "93281549bfc22978f8e47d86aaf6c0e62584ad685a1d72f14e15f9b3bc3df6d1"
+    },
+    "backend/weknora_port/storage/migrations/006_configuration.sql": {
+      "source_git_blob": "22567f62469d85450aa5b7ccfe194c4daf01ef2a",
+      "sha256": "09ee0b7bd3a47a8ee4b10396be358c289790b95073b2644f25cc9f84010e9bd4"
+    },
+    "backend/weknora_port/storage/migrations/007_turns.sql": {
+      "source_git_blob": "945f5b5de60362bba318903553870068741bd2a6",
+      "sha256": "ff212d6db2cd21a8823019d47aae4b34aad3b6a2b6df7f39ed3286c7ccf7bf3d"
+    },
+    "backend/weknora_port/storage/migrations/008_models.sql": {
+      "source_git_blob": "72a8484965e9d5e3cf54e4ce35e6c82d86a3bac9",
+      "sha256": "e3d22edc4a5d53415835be33ea2620d955248c038747b62ad8db5e5477427691"
+    },
+    "backend/weknora_port/storage/migrations/009_document_profile.sql": {
+      "source_git_blob": "7277a600ab6e92deed20224b4fd72490b757a027",
+      "sha256": "ce22735323a52840b3f107a3ef7ec88ce46bff26f30350ba5addc58cf74d6f16"
+    },
+    "backend/weknora_port/storage/migrations/010_image_tasks.sql": {
+      "source_git_blob": "d826ec53068fcc86737a06963b2a022a1c88d549",
+      "sha256": "a389812698275d71c5ba6356351ab0bb0618c60e2d1aa592b37ed0d8c18bbc21"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest.json": {
+      "source_git_blob": "af2ce9d6a68e886c86a3bc598244d183287ea759",
+      "sha256": "5f389f76f4922c44e26e11fb2f06940e802995e31c60119f5168bba05cc732d7"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_common.json": {
+      "source_git_blob": "915dd0460d3cfe641dfbd8c91ab6bfc9222f4a01",
+      "sha256": "89e8c8bbcb40da45aeffaa6ec909621882c5cd4357ef6a1e27e7cc75243edc23"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_configuration.json": {
+      "source_git_blob": "11ebbf3948aea63d649e0885fe325e750a06c09f",
+      "sha256": "c7cbe54cd52f612a76bdf06045a2916e91c360d909d47f950f75fb6a5a19a74c"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_document_profile.json": {
+      "source_git_blob": "2901fc5df4e3dccf1bd016ea3a507abf2e668190",
+      "sha256": "4647dc3b08bc71925db4b533b096c0f6850f481a05239c786c05aaefa3d63dc0"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_generation.json": {
+      "source_git_blob": "3c31eba8130e137945ad39df2e08e22c5d7c667c",
+      "sha256": "eae7d17d6467157bf921157033f4130946a931354b2e007580ac5bbda97979dc"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_memory.json": {
+      "source_git_blob": "b75b3839a8ac301cf4e60dba070d7f5ad95e449d",
+      "sha256": "512c5ceb186ef422a104e35d45c229f43c652f064858b5578b8e86685a8894d0"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_models.json": {
+      "source_git_blob": "4fb791082143e71a8b14d6622d20c0bd746f8384",
+      "sha256": "ce70d4257558e3bc74e16b5d43db1bfc3b17d856dfafbb9ac4e6dbbc24c29a83"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_send_gate.json": {
+      "source_git_blob": "848c863711714f3ba4e5a115e12c0e52c9ef1ed9",
+      "sha256": "5af48d0959f2691ea99a73316d5719b905658495917c1e1fd9498a8a461d261a"
+    },
+    "backend/weknora_port/storage/migrations/source_manifest_turns.json": {
+      "source_git_blob": "e59f303d563eb00968c2c0ac514817ea87c4afb4",
+      "sha256": "07f89b82139f8def8ce0ff1baccda9382e389cfa02f57dded4a5bd4c61b542c9"
+    },
+    "backend/weknora_port/storage/models.py": {
+      "source_git_blob": "c3eb005839158bb17870f5e9f7148ca6c0199974",
+      "sha256": "8414fe78019e540fe853a0cc5a5c7521860d3cb3cd31daef70fd76b8e178e6ff"
+    },
+    "backend/weknora_port/storage/models_migrate.py": {
+      "source_git_blob": "de2b23d12ad598f8684fdd3403675e504d6b4643",
+      "sha256": "4d27f9d65baee453b814527930f7f919df61c44863e7f91e2394e9f0fd0279c3"
+    },
+    "backend/weknora_port/storage/postgres.py": {
+      "source_git_blob": "adaf09ee8dd372f33576779e9e75d1866e32a134",
+      "sha256": "7212e85e0a6ce451c870cad5c9e97c6465d05856207ac150a385ac84f09c9905"
+    },
+    "backend/weknora_port/storage/send_gate.py": {
+      "source_git_blob": "cdc7fa54bb6c049859f41b5de568c338379b8183",
+      "sha256": "2371926667efea6445526ad2dfaddf74e5543ba2fb7b11af74ea91ff625673b6"
+    },
+    "backend/weknora_port/storage/send_gate_migrate.py": {
+      "source_git_blob": "b58ff40cbc442ed26ed4d8b520e060e3f2f46266",
+      "sha256": "4d7c979bf54bcc9441c90b3895fdbaa356ac5ffa45394b0081105a754224554a"
+    },
+    "backend/weknora_port/storage/turns.py": {
+      "source_git_blob": "a0f8d9fe46b30c3a2a9e15cbfab24d10fc176609",
+      "sha256": "db0d06f23514d510dd3ed873d131ed27f0621471cf6e9963902e9141f17e9822"
+    },
+    "backend/weknora_port/storage/turns_migrate.py": {
+      "source_git_blob": "b8421fbcf8531010744985778252d5b19d064c3b",
+      "sha256": "d249f60c8dd017fde2d4d182d4e17a059c915d64d444fb6a5ea2007e4933e0db"
+    },
+    "backend/weknora_port/streaming/__init__.py": {
+      "source_git_blob": "5d518bd86ca53b1ddcc7edb3b6e524643e63f277",
+      "sha256": "3a7d1d0b9dc88653488c9186d8b9854cfb0ee320df317943b0a6d0e76b6d90e9"
+    },
+    "backend/weknora_port/streaming/events.py": {
+      "source_git_blob": "e19fe7b8ee1936eff066e56f46838dc2d787fc3c",
+      "sha256": "5fe6e1648be0046a92652dd784f97a5a7a9c56e3b81a35a6175b3fbf3ff35093"
+    },
+    "backend/weknora_port/streaming/manager.py": {
+      "source_git_blob": "6166b6bdefcdf08248276bcd41a5cdeead757d20",
+      "sha256": "9321e5f995a4e724ad2310865d998cae1fcac1a9fc27926cd0277c2867e1710b"
+    },
+    "backend/weknora_port/streaming/replay.py": {
+      "source_git_blob": "0f192dec89dbb8b38299cb5e15992843d44b115b",
+      "sha256": "041ccfab071a2663f3b17f058020b09d8a321dffe62df7e9be411554d0286353"
+    },
+    "backend/weknora_port/tesseract_ocr.py": {
+      "source_git_blob": "983ffab93e4df4668ca5de1815cab05ee4ec55bd",
+      "sha256": "5257e3b7a8ab019d020ac37f14d18f746cfcedc0361f8a2622df0c89bfc23124"
+    },
+    "docs/NOTICE-PyMuPDF.md": {
+      "source_git_blob": "2e03dcbe4e14fbb1ea6bfcabc065b3c2477ac589",
+      "sha256": "d2f707b0f407a5da3c80cb97e469ef6f6be1e2bf431f630546733bb9ceeaebeb"
+    },
+    "docs/weknora-port/UPSTREAM_LICENSE.md": {
+      "source_git_blob": "060a72157b8a9b239a7a044e5fc2cd996e8f2572",
+      "sha256": "61f82824899f26255600dd857752255c7c20af3ed9bd63097fb213d39da412ba"
+    },
+    "frontend/index.html": {
+      "source_git_blob": "cca7523c05a98a6cc89882155474e6c067d3d87b",
+      "sha256": "b6c425c5030e322e8caff314bb7b25684277b2cf631d22cddbedb18eae71832d"
+    },
+    "frontend/package-lock.json": {
+      "source_git_blob": "c21f0c77cdf0399b5e3b92a4bf83b1e5ae106771",
+      "sha256": "7e1010b85e23c9d59e4a72e1a633400f24a7445a87a1d5130eebea7364af33d4"
+    },
+    "frontend/package.json": {
+      "source_git_blob": "99f6f4fb7aa4fab2a9b8c064426dd441b3de3fee",
+      "sha256": "8f2aa99851ec81de3df4ae976cf8a0825496f35c5d447e4d84dd106939e3eb61"
+    },
+    "frontend/src/vite-env.d.ts": {
+      "source_git_blob": "9cbd6a07a36fe8a8d934af307eb7466512def75b",
+      "sha256": "fb3d028926b1e703383879d9f4f198530aa3f721ec2e448e8aaadc4123fdb18f"
+    },
+    "frontend/src/weknora_port/KnowledgeBaseConsent.tsx": {
+      "source_git_blob": "c88d0838d7938a57302ed7403d5475af1bdbaaec",
+      "sha256": "d7db1d5a30f8150a8279af8db472f5d9051290e86c3914d92e1559bebb4b4f06"
+    },
+    "frontend/src/weknora_port/MemoryPanel.tsx": {
+      "source_git_blob": "b902a877220776fd490fcf48100dca5387e0d2f3",
+      "sha256": "adbe67791f17b306bf819222c3ccd45607d6fc96447834cc321afedd537f1da9"
+    },
+    "frontend/src/weknora_port/WeKnoraPythonApp.tsx": {
+      "source_git_blob": "8beafd9e6b14897ba865cb713c6562397d548188",
+      "sha256": "6403d74d0aeb2913ee5a409c6eb11b417f3c8d729b91e0bd9c8e6983ac4b8a54"
+    },
+    "frontend/src/weknora_port/api.ts": {
+      "source_git_blob": "33714bfc0a94fb48e7b6e930d56a288232eef72e",
+      "sha256": "d912a2cf3cfd86dc3a9fd601548ede27dfa12665a1d1e3c5e881b82155f7b966"
+    },
+    "frontend/src/weknora_port/sse.ts": {
+      "source_git_blob": "f2dc2291edac0ddab1eadeab9a0c701af165b690",
+      "sha256": "fee4189bae12b85160991893b024919e78d931891185453c138a4d7134059599"
+    },
+    "frontend/src/weknora_port/styles.css": {
+      "source_git_blob": "b90e2fe249fbdd8c444b9885efa3ef87ffc32c20",
+      "sha256": "8e1ed9ef9b15dc517bd5e67247cdec4c91114475f25b1038ec119e6e0e2ca369"
+    },
+    "frontend/src/weknora_port/types.ts": {
+      "source_git_blob": "e5964ac6d7723256bd5d7d2b11f722630d65df84",
+      "sha256": "0286faa982c61243cf4f792e081336b0cfc7c3094383dee2b61f83ee738991d8"
+    },
+    "frontend/tsconfig.json": {
+      "source_git_blob": "dfc3fbee87d79258402f4bfd95113dbc7d25d1aa",
+      "sha256": "83efc1798334967d5a907f26b8cba31fa213f16b5ac0ed5c02fd38e7cf0ceb66"
+    },
+    "frontend/vite.config.ts": {
+      "source_git_blob": "e6945ebd617924c36954ad6949d9c3e2d2150cd6",
+      "sha256": "790518da502a1c53ec15a4e5442b41cba997c017ffe6191771af3cf28ef44968"
+    },
+    "tests/weknora_port/fixtures/image_functions_go_oracle.json": {
+      "source_git_blob": "3544f1aa6805054eed695d92581f169040c998f8",
+      "sha256": "b91e8e0314d41d4598f84957acf21a73f6910652575da1b80d68f9f89d6f5513"
+    },
+    "tests/weknora_port/fixtures/ocr_sparse_go_oracle.json": {
+      "source_git_blob": "3b1d55f3406576dcc206521c39d9586670a90f58",
+      "sha256": "45000e2120d08611b7641056c19781982c25b60af23b5cba6c45f1ed533117ef"
+    },
+    "tests/weknora_port/test_chunk_storage.py": {
+      "source_git_blob": "59c2c2722ddf4653074850c54f492c20a4a94937",
+      "sha256": "a152bd0534f859f353590d027f7edbcbb5763f1978e638d9dc40798ce163830f"
+    },
+    "tests/weknora_port/test_connection_leases.py": {
+      "source_git_blob": "589a64d7b0cfba66ab717911a5586f3c329dd572",
+      "sha256": "a8ebd912b4ab058e0d6ff05fc652575acb84a699cd129705b298c9bd709e6be9"
+    },
+    "tests/weknora_port/test_cors_delete.py": {
+      "source_git_blob": "0ef239aaedd53fdf67898b2f3f6235773950676d",
+      "sha256": "a824fe532852e5b2f3a832068dbbe39e98a19c6511dcb4a807eb856917eaea9e"
+    },
+    "tests/weknora_port/test_documents.py": {
+      "source_git_blob": "359e4c435f002d34a070be637613a048a493972f",
+      "sha256": "3bb9bcf324c16e71c8a2e1cfb3caebbccb85be3d5f7969994ad08a464806f063"
+    },
+    "tests/weknora_port/test_fusion.py": {
+      "source_git_blob": "84f9de0364eaf1f76e81877b3d958cf32462d12b",
+      "sha256": "d4ecf3c3350971a4d5e995a76016d9c03503d757a5bbd78a59339bc79db6955a"
+    },
+    "tests/weknora_port/test_generation_wire.py": {
+      "source_git_blob": "f0a8faaaa95f0b47358d980bb0f7170d5ff155af",
+      "sha256": "c6800077ff871a6be11ea171fe3b569cfcb98d494124d2a1d6ba3f664a8cb175"
+    },
+    "tests/weknora_port/test_history_storage.py": {
+      "source_git_blob": "0c126e85decf3a9e2e216f5d9cb0dad98d25d26b",
+      "sha256": "39611772f7cc7a603a37ff66d4ba7106bf3e870b7c4faaee0760c2c4b81801d8"
+    },
+    "tests/weknora_port/test_http_api.py": {
+      "source_git_blob": "ea595a8563c17060d04ffc27bd219cc0ce2de4b0",
+      "sha256": "949579f323866d9f291b0564f24d70bdbde0edf9c876a737386db8a1bca12361"
+    },
+    "tests/weknora_port/test_http_consent.py": {
+      "source_git_blob": "23a5971dc7d23a76ea8f49587bf3021b5794b5a6",
+      "sha256": "5a9227ccd29e7754090324ce43c1455bdad278b4af288c619642c4bccf85999d"
+    },
+    "tests/weknora_port/test_image_configuration.py": {
+      "source_git_blob": "54f5ec1717a3c44ecdfb8f46f22ffacbafc1c3ea",
+      "sha256": "1f1a2d43c9c354ed50f1322cf327dfe905c82fafe87ce4f71d7a718b0aa80c7f"
+    },
+    "tests/weknora_port/test_image_multimodal.py": {
+      "source_git_blob": "d7e67c2b4ac2a6a2593f1399163eee65a5112d7c",
+      "sha256": "f507a9745bc6b64be77872a5e4ab14f1d776d1ce92eb8bc2eac083af13cf6991"
+    },
+    "tests/weknora_port/test_image_processing.py": {
+      "source_git_blob": "426f7761ebc358bcfa967fc249adb14e670b9b56",
+      "sha256": "645192985e5e8dac0adf7a26e618480cda4997e006fbfb7eaf6e14bc82801b91"
+    },
+    "tests/weknora_port/test_indexing.py": {
+      "source_git_blob": "881a530e56b71e36e15ad70a1420a5becc43dc8c",
+      "sha256": "3cf04a049ad40eec8f225ef5f1545988c49fd4d1d2c587e100f0df1a67b47c24"
+    },
+    "tests/weknora_port/test_migrate.py": {
+      "source_git_blob": "b7af18b0b4ad111e1086146526e7c5c5d6ea2b89",
+      "sha256": "c9234b4f35ed6943e15cc877469fa4d941cc537c1d26445fdc6f59f05369c6ec"
+    },
+    "tests/weknora_port/test_model_configuration.py": {
+      "source_git_blob": "df25c610454b3a8887665b0029dd2d75bce04b02",
+      "sha256": "169cce203bdd7e96accc086b1d6a4b317639466fac997090a4c99c2ad39ffb67"
+    },
+    "tests/weknora_port/test_model_store.py": {
+      "source_git_blob": "fd495fc7cd1873e6c6f22c3b413f87d61db7b7a4",
+      "sha256": "c02dff0b9757dd00ed90b9bb7ea5b39282d22aa83da8edef3cf85f1585c95e06"
+    },
+    "tests/weknora_port/test_pipeline.py": {
+      "source_git_blob": "a7c3c01e88a0513122ff6ca7339316a50ba8fbbd",
+      "sha256": "959295e952f455cb6a0da61c6558d78c6ffa16bf4b791fab30a08df7501fb81c"
+    },
+    "tests/weknora_port/test_provider_transport.py": {
+      "source_git_blob": "c996fdb5aeb3be0195845cdd2437a8c5c61c561c",
+      "sha256": "d6c46588ce1cfb0661f5773065b45a656ede22db5480b93984bc2b1d10670f71"
+    },
+    "tests/weknora_port/test_references.py": {
+      "source_git_blob": "99610a369531e297e745263dab64e1da58a3c910",
+      "sha256": "8b3ba97de6d794cc586048abd8e7b5bd54aff9bb8948eb202b6c4fa033557135"
+    },
+    "tests/weknora_port/test_service.py": {
+      "source_git_blob": "0acfa6cd56d728e4fa07a5dc314ffc1033c76d13",
+      "sha256": "1c403fcdd593cf8e41a23e81cfd59165533387fcd2d8df8b07ea06c80532b95f"
+    },
+    "tests/weknora_port/test_storage.py": {
+      "source_git_blob": "4d627f9c1e8f51fe67cd59251da54bf67495dc53",
+      "sha256": "64087cf372bbda5117608fd31d5a53ab7d802cc4c40b33285daa2ac1c4c99f5c"
+    },
+    "tests/weknora_port/test_streaming.py": {
+      "source_git_blob": "53c9bfbc75712904899f36a5414b7fc5c1ac9248",
+      "sha256": "01205c5b6917414d27adfc11860c62a5d7a6b1b2f9a465918b20288d81f26017"
+    }
+  },
+  "adapted": {
+    "frontend/src/main.tsx": {
+      "source_sha256": "073d7a597edeab47640593c93e9d8a4e23ef1e704a253cc174761aa8cb69b0e9",
+      "snapshot_sha256": "847dc3108851035e6ded6801694c4b0528856e473ea9ae3851bccc161f25a6a4",
+      "reason": "Direct new React entry; removes old App/static legacy styles imports and implementation selector."
+    },
+    "pyproject.toml": {
+      "source_sha256": "f56ef98d37152d97839c88e499b3f1d1a51bfa937292cae085d30ae0d746cb3e",
+      "snapshot_sha256": "f054f40ecb5ac5a9d8bd524cc0c2ddae957fa3b894ab51d21c5b5752b16a9f68",
+      "reason": "Package only the new chain; omit legacy LangChain/SQLAlchemy/evaluation dependencies; retain parser extras and package data."
+    }
+  },
+  "generated": [
+    "tests/__init__.py",
+    "tests/weknora_port/__init__.py",
+    ".gitignore",
+    ".env.example",
+    "scripts/check_snapshot.py",
+    "scripts/start_frontend.ps1",
+    "docs/SCOPE.md",
+    "CHATGPT_LEARNING_PROMPT.md",
+    "README.md",
+    "SNAPSHOT_VALIDATION.json",
+    ".gitattributes"
+  ],
+  "excluded": [
+    "old backend/app and old frontend/app",
+    "eval_center and dataset corpora",
+    "historical reports and command logs",
+    "screenshots and request/readback artifacts",
+    "databases, storage, caches, node_modules and binaries",
+    "original operational Goal documents and local credential/start scripts"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "source_commit": "9a604666f557dbcc3d0940f7c0b5b2964147b76f",
+  "snapshot_checks": {
+    "syntax_import": {
+      "exit": 0,
+      "parsed_modules": 101,
+      "imported_entry_modules": 4,
+      "service_instantiated": false
+    },
+    "offline_tests": {
+      "exit": 0,
+      "passed": 36,
+      "seconds": 1.13,
+      "selection": [
+        "test_image_configuration",
+        "test_image_processing",
+        "test_http_api",
+        "test_http_consent",
+        "test_cors_delete"
+      ]
+    },
+    "frontend_build": {
+      "exit": 0,
+      "typescript": "PASS",
+      "vite": "PASS",
+      "transformed_modules": 20
+    }
+  },
+  "environment": "Existing libraries/dependencies reused read-only. Fresh standalone dependency installation NOT_RUN. Ignored build output/dependency junction not uploaded.",
+  "real_provider_calls": 0,
+  "database_service_calls": 0,
+  "original_source_validation": "77 offline / 11 isolated / 1 legacy runtime were SOURCE PROJECT evidence; not executed again for this snapshot.",
+  "whole_goal_pass": "NOT_CLAIMED",
+  "snapshot_live_app_acceptance": "NOT_RUN",
+  "public_review": {
+    "files_scanned": 195,
+    "bytes": 7294112,
+    "secret_pattern_hits": {},
+    "forbidden_file_candidates": [],
+    "scope": "Selected new root tree only; no original ancestor history",
+    "source_bytes_match": 181,
+    "diff_whitespace": "PREEXISTING copied-source whitespace retained, generated files clean",
+    "retained_source_whitespace_files": [
+      "backend/weknora_port/ingestion/upstream_excel_parser.py",
+      "backend/weknora_port/runtime.py",
+      "backend/weknora_port/storage/migrations/008_models.sql"
+    ]
+  }
+}
