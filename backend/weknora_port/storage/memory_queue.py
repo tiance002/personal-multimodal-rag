@@ -14,6 +14,12 @@ from redis.exceptions import ConnectionError as RedisConnectionError, TimeoutErr
 from ..conversation.maintenance_types import ExtractionPayload
 from ..conversation.types import MemoryScope
 
+# An expired lease stays out of the reclaim scan until it is at least this old.
+# Upstream asynq v0.26.0 recoverer.go: cutoff := time.Now().Add(-30 * time.Second);
+# internal/rdb/rdb.go ListLeaseExpired scans ZRANGEBYSCORE lease "-inf" cutoff (inclusive), and
+# recoverer.go archives only when msg.Retried >= msg.Retry.
+RECOVERY_GRACE_SECONDS = 30
+
 # Both transitions use the same keys: ready, leased, jobs, dead.
 ARCHIVE_LUA = """
 local function archive(job, now, error_class)
@@ -29,8 +35,11 @@ end
 """
 CLAIM = ARCHIVE_LUA + """
 local now=tonumber(ARGV[1])
+local reclaim_cutoff=tonumber(ARGV[5])
 local jitter=cjson.decode(ARGV[4])
-local expired=redis.call('ZRANGEBYSCORE',KEYS[2],'-inf',now,'LIMIT',0,32)
+-- A lease is expired at "-inf..now", but only reclaimable at "-inf..now-RECOVERY_GRACE_SECONDS"
+-- (upstream cutoff, inclusive). Clock skew inside the grace window must not hand out a new token.
+local expired=redis.call('ZRANGEBYSCORE',KEYS[2],'-inf',reclaim_cutoff,'LIMIT',0,32)
 for index,id in ipairs(expired) do
     redis.call('ZREM',KEYS[2],id)
     local raw=redis.call('HGET',KEYS[3],id)
@@ -138,7 +147,8 @@ class RedisMemoryExtractionQueue:
     async def run_due(self):
         now = self.clock()
         raw = await self.client.eval(CLAIM, 4, *self.keys, now, now + 600,
-            str(uuid.uuid4()), json.dumps([self.randbelow(30) for _ in range(32)]))
+            str(uuid.uuid4()), json.dumps([self.randbelow(30) for _ in range(32)]),
+            now - RECOVERY_GRACE_SECONDS)
         if raw is None:
             return False
         job = json.loads(raw)
