@@ -1,6 +1,6 @@
 """Do not label a sent-but-unproven cap test as an unsent free request."""
 from backend.app.ports.providers import ProviderRequestNotSent, ProviderUnavailable
-from scripts.probe_ordinary_output import failure_state, prior_allows_continuation, ACKNOWLEDGED_UNKNOWN, FOLLOWUP_UNKNOWN, REPAIRED_TRANSPORT_UNKNOWN
+from backend.tests.historical_output_probe_predicates import failure_state, prior_allows_continuation, ACKNOWLEDGED_UNKNOWN, FOLLOWUP_UNKNOWN, REPAIRED_TRANSPORT_UNKNOWN
 
 
 def test_proof_denial_after_response_is_sent_not_proven():
