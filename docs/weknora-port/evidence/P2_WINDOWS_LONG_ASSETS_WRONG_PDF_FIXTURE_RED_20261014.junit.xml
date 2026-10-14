@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="4.817" timestamp="2026-10-14T09:14:21.043940+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_long_paths" name="test_native_long_immutable_io_preserves_original_and_rejects_escape" time="0.028" /><testcase classname="tests.weknora_port.test_mml_pdf_native_pg" name="test_actual_full_mml_pdf_long_assets_readback_and_index" time="3.524"><failure message="assert []">def test_actual_full_mml_pdf_long_assets_readback_and_index():
+        async def scenario():
+            frozen=load_frozen_gold('E:/RAG quention/var/reports/v6-full40-evaluation-entry-r4-r17/frozen-local/source_manifest_40.json','05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d')
+            source=next(d for d in frozen.datasets if d.name=='mmlongbench-doc').files[0]
+            raw=checked_bytes(Path(source['path']),source['sha256'],source['bytes'])
+            async with isolated_mock_application(synthetic_monthly_limit=10000000) as (runtime,wire,root):
+                kb=(await runtime.create_knowledge_base(runtime.principal,'MML full original PDF assets'))['id'];await prepare_public_fixture(runtime,kb,'mmlongbench-doc')
+                document=await runtime.upload_document(runtime.principal,kb,source['doc_id'],'application/pdf',raw)
+                assert document['status']=='completed',document
+                async with runtime.leases.lease() as guard:
+                    metadata=(await (await guard.connection.execute('SELECT metadata FROM knowledges WHERE tenant_id=%s AND id=%s',(runtime.principal.tenant_id,document['id']))).fetchone())['metadata']
+                assert metadata['assets']
+                for asset in metadata['assets']:
+                    data=_native_io_path(root/asset['path']).read_bytes();assert hashlib.sha256(data).hexdigest()==asset['sha256'] and len(data)==asset['size']
+                original=await runtime.read_document(runtime.principal,kb,document['id']);assert original.content==raw
+                Path('docs/weknora-port/evidence/P2_MML_FULL_PDF_ASSETS_20261014.json').write_text(json.dumps({'kind':'ACTUAL_FULL_FROZEN_MML_PDF_NATIVE_ENTRY','source_id':source['doc_id'],'source_sha256':source['sha256'],'native_document':document['id'],'knowledge_base':kb,'assets':len(metadata['assets']),'asset_hashes_verified':True,'original_readback':True,'indexed':metadata['indexed_count'],'windows_extended_length_io':True,'model_transport':'CLOSED_MOCK','real_provider_calls':0},indent=2),encoding='utf-8')
+&gt;       actual_pg_run(scenario())
+
+tests\weknora_port\test_mml_pdf_native_pg.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        frozen=load_frozen_gold('E:/RAG quention/var/reports/v6-full40-evaluation-entry-r4-r17/frozen-local/source_manifest_40.json','05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d')
+        source=next(d for d in frozen.datasets if d.name=='mmlongbench-doc').files[0]
+        raw=checked_bytes(Path(source['path']),source['sha256'],source['bytes'])
+        async with isolated_mock_application(synthetic_monthly_limit=10000000) as (runtime,wire,root):
+            kb=(await runtime.create_knowledge_base(runtime.principal,'MML full original PDF assets'))['id'];await prepare_public_fixture(runtime,kb,'mmlongbench-doc')
+            document=await runtime.upload_document(runtime.principal,kb,source['doc_id'],'application/pdf',raw)
+            assert document['status']=='completed',document
+            async with runtime.leases.lease() as guard:
+                metadata=(await (await guard.connection.execute('SELECT metadata FROM knowledges WHERE tenant_id=%s AND id=%s',(runtime.principal.tenant_id,document['id']))).fetchone())['metadata']
+&gt;           assert metadata['assets']
+E           assert []
+
+tests\weknora_port\test_mml_pdf_native_pg.py:23: AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_documents" name="test_text_and_markdown_uploads_persist_immutable_source_chunks_and_complete_with_injected_postprocessor" time="0.051" /><testcase classname="tests.weknora_port.test_documents" name="test_missing_postprocessor_keeps_text_document_pending_and_not_search_indexed" time="0.013" /><testcase classname="tests.weknora_port.test_documents" name="test_bound_principal_and_kb_scope_are_checked_before_file_write" time="0.004" /></testsuite></testsuites>

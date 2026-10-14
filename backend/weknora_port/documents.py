@@ -119,6 +119,18 @@ def _under_root(root: Path, candidate: Path) -> Path:
     return resolved
 
 
+def _native_io_path(path: Path) -> Path:
+    """Windows extended-length IO after ordinary canonical scope validation.
+
+    Does not change ACLs, redirect paths, or change stored logical references.
+    """
+    if os.name!='nt':return path
+    value=str(path.absolute())
+    if value.startswith('\\\\?\\'):return path
+    if value.startswith('\\\\'):return Path('\\\\?\\UNC\\'+value[2:])
+    return Path('\\\\?\\'+value)
+
+
 class DocumentLifecycleService:
     """Upload, parse, index, and read documents inside one bound local owner.
 
@@ -395,7 +407,7 @@ class DocumentLifecycleService:
         return principal.tenant_id
 
     def _write_immutable(self, path: Path, data: bytes) -> None:
-        path = _under_root(self.storage_root, path)
+        path = _native_io_path(_under_root(self.storage_root, path))
         path.parent.mkdir(parents=True, exist_ok=True)
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
         fd = os.open(path, flags, 0o600)
@@ -485,7 +497,7 @@ class DocumentLifecycleService:
         if not rows:
             raise LookupError("DOCUMENT_NOT_FOUND")
         row = rows[0]
-        path = _under_root(self.storage_root, Path(row["file_path"]))
+        path = _native_io_path(_under_root(self.storage_root, Path(row["file_path"])))
         if not path.is_file():
             raise LookupError("DOCUMENT_SOURCE_UNAVAILABLE")
         extension = "." + (row.get("file_type") or "").lower().lstrip(".")
