@@ -66,9 +66,12 @@ class MemoryConnection:
                 "created_at": "now", "processed_at": None}
             return Cursor([{"id": doc_id}])
         if query.startswith("UPDATE knowledges SET parse_status=%s"):
-            status, code, metadata, doc_id, tenant, kb_id = params
+            status, code, metadata, doc_id, tenant, kb_id, version = params
             row = self.docs.get(doc_id)
-            if row and (row["tenant_id"], row["knowledge_base_id"]) == (tenant, kb_id):
+            if (row and (row["tenant_id"], row["knowledge_base_id"]) == (tenant, kb_id)
+                    and row.get("deleted_at") is None
+                    and row["metadata"].get("source_version") == version
+                    and row["parse_status"] in ("pending", "processing")):
                 row.update(parse_status=status, error_message=code, metadata=json.loads(metadata))
                 return Cursor([{"id": doc_id}])
             return Cursor()
