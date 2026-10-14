@@ -6,6 +6,7 @@ from .documents import DocumentLifecycleError,_json_object
 from .image_configuration import resolve_image_selection,validate_pinned_selection
 from .tesseract_ocr import TesseractOCR
 from .document_profile import language_name
+from .conversation_configuration import resolve_language
 from .models.types import CallContext,TrustedScope,Message,ProviderError
 from .storage.configuration import ModelConfigurationError
 from .retrieval.query import go_strip,go_lower
@@ -95,7 +96,11 @@ class SourceImageProcessor:
                 image='data:'+asset.media_type+';base64,'+base64.b64encode(asset.data).decode('ascii')
                 ocr_prompt=PROMPTS['vlmOCRScannedPDFPrompt' if asset.source_type=='scanned_pdf' else 'vlmOCRPrompt']
                 results={};states={};layout={}
-                language=go_strip(image_cfg.get('description_language') or cfg.get('description_language','')) or language_name(app.conversation.language_locale)
+                # Source buildVLMCaptionPrompt falls back to LanguageNameFromContext
+                # (ResolveLanguage->DefaultLanguage), which never yields an empty
+                # language; an empty interpolated value degrades the prompt to
+                # "in ." and lets the model pick a language.
+                language=go_strip(image_cfg.get('description_language') or cfg.get('description_language','')) or resolve_language(app.conversation.language_locale,'')
                 for kind,prompt in [('ocr_text',ocr_prompt),('caption',caption_prompt(language,image_cfg.get('custom_instructions') or cfg.get('custom_instructions','')))]:
                     previous=(prior or {}).get(str(index),{})
                     prior_state=previous.get(kind,{})
