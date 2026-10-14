@@ -428,6 +428,24 @@ class ApplicationRuntime:
         from .conversation.types import MemoryContext
         return await self.memory_manager.settings(MemoryContext(principal.tenant_id,principal.subject_id))
 
+    async def update_memory_settings(self,principal,enabled):
+        self._owner(principal)
+        if type(enabled) is not bool:raise ProviderError('MEMORY_ENABLED_REQUIRED')
+        from .conversation.types import MemoryContext
+        context=MemoryContext(principal.tenant_id,principal.subject_id)
+        await self.memory_manager.set_enabled(context,enabled)
+        return await self.memory_manager.settings(context)
+
+    async def confirm_memory(self,principal,item_id):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_manager.confirm(MemoryContext(principal.tenant_id,principal.subject_id),item_id)
+
+    async def reject_memory(self,principal,item_id):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        await self.memory_manager.reject(MemoryContext(principal.tenant_id,principal.subject_id),item_id)
+
     async def list_memory(self,principal,status='',limit=50,offset=0):
         self._owner(principal)
         from .conversation.types import MemoryScope

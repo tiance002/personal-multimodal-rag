@@ -41,6 +41,10 @@ class ApiModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class MemorySettingsUpdate(ApiModel):
+    enabled: StrictBool | None = None
+
+
 class KnowledgeBaseExternalProcessing(ApiModel):
     cloud_allowed: StrictBool
 
@@ -332,6 +336,20 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.get('/api/v1/memory/settings')
     async def memory_settings(request: Request):
         return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.memory_settings(await principal(request)))})
+
+    @app.put('/api/v1/memory/settings')
+    async def update_memory_settings(body: MemorySettingsUpdate,request: Request):
+        if body.enabled is None:raise HTTPException(400,'MEMORY_ENABLED_REQUIRED')
+        return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.update_memory_settings(await principal(request),body.enabled))})
+
+    @app.post('/api/v1/memory/items/{item_id}/confirm')
+    async def confirm_memory(item_id: str,request: Request):
+        return JSONResponse({'success':True,'data':jsonable_encoder(await runtime.confirm_memory(await principal(request),item_id))})
+
+    @app.post('/api/v1/memory/items/{item_id}/reject')
+    async def reject_memory(item_id: str,request: Request):
+        await runtime.reject_memory(await principal(request),item_id)
+        return JSONResponse({'success':True})
 
     @app.get('/api/v1/memory/items')
     async def memory_items(request: Request,status: str='',limit: str='50',offset: str='0'):
