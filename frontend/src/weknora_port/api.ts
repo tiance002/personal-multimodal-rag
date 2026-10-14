@@ -77,6 +77,19 @@ export const portApi = {
     await assertPortRuntime();
     await jsonRequest<void>(`/memory/items/${encodeURIComponent(id)}/reject`, { method: "POST" }, true);
   },
+  createMemory: (kind: string, content: string, importance: number) => mutate<MemoryItem>("/memory/items", { method: "POST", body: JSON.stringify({ kind, content, importance }) }),
+  updateMemory: (id: string, content: string, importance: number) => mutate<MemoryItem>(`/memory/items/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify({ content, importance }) }),
+  clearMemory: async () => {
+    await assertPortRuntime();
+    await jsonRequest<void>("/memory/items", { method: "DELETE" }, true);
+  },
+  exportMemory: async (): Promise<{ total: number; truncated: boolean; data: MemoryItem[] }> => {
+    await assertPortRuntime();
+    const response = await fetch(`${API}/memory/export`, { credentials: "same-origin" });
+    const result = await response.json() as { success?: boolean; total: number; truncated: boolean; data: MemoryItem[]; error?: { code?: string; message?: string } };
+    if (!response.ok || !result.success || !Array.isArray(result.data)) throw new PortApiError(result.error?.message ?? "记忆导出失败", response.status, result.error?.code ?? "MEMORY_EXPORT_FAILED");
+    return { total: result.total, truncated: result.truncated, data: result.data };
+  },
   memoryItems: (offset = 0) => jsonRequest<MemoryItem[]>(`/memory/items?limit=50&offset=${offset}`),
   forgetMemory: async (id: string) => {
     await assertPortRuntime();
@@ -98,4 +111,4 @@ export function apiBaseForStream(path: string): string {
   return `${API}${path}`;
 }
 
-export type MemoryItem = { id: string; kind: string; content: string; topic: string; status: string; origin: string };
+export type MemoryItem = { id: string; kind: string; content: string; topic: string; status: string; origin: string; importance?: number };

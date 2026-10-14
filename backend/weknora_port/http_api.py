@@ -260,7 +260,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     app.state.allowed_origins = normalized_allowed
     if normalized_allowed:
         app.add_middleware(CORSMiddleware, allow_origins=sorted(normalized_allowed),
-                           allow_credentials=True, allow_methods=["GET", "POST", "PUT"],
+                           allow_credentials=True, allow_methods=["GET", "POST", "PUT", "DELETE"],
                            allow_headers=["Accept", "Content-Type", "X-Request-ID"])
 
     @app.middleware("http")
