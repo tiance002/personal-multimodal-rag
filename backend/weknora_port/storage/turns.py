@@ -63,12 +63,22 @@ class PostgresTurnRepository:
         await self._resources(guard,kbs,docs)
         return ScopeSnapshot(request.content,kbs,docs)
 
+    @staticmethod
+    def _request_configuration(request):
+        return {name:getattr(request,name) for name in ('summary_model_id','reasoning_effort','accept_language') if getattr(request,name)}
+
     def _payload(self,request,snapshot):
-        return hashlib.sha256(_json({'version':'ordinary-turn/v1','session':request.session_id,'mode':'quick','q0':snapshot.q0,'knowledge_bases':snapshot.knowledge_base_ids,'documents':snapshot.document_ids}).encode()).hexdigest()
+        payload={'version':'ordinary-turn/v1','session':request.session_id,'mode':'quick','q0':snapshot.q0,'knowledge_bases':snapshot.knowledge_base_ids,'documents':snapshot.document_ids}
+        options=self._request_configuration(request)
+        # Empty new options preserve exact historical v1 payloads and hashes.
+        if options:payload.update(version='ordinary-turn/v2',request_configuration=options)
+        return hashlib.sha256(_json(payload).encode()).hexdigest()
 
     def _accepted(self,row,*,new=False):
         kbs,docs=_tuple(row['knowledge_base_scope']),_tuple(row['document_scope'])
-        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs)
+        options=row.get('request_configuration') or {}
+        if isinstance(options,str):options=json.loads(options)
+        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs,**options)
         context=CallContext(row['run_id'],TrustedScope(self.principal.subject_id,kbs,docs),cancelled=asyncio.Event(),session_id=row['session_id'])
         return AcceptedTurn(row['run_id'],row['session_id'],row['user_message_id'],row['assistant_message_id'],context,
                             MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new,row['client_request_id'])
@@ -101,11 +111,11 @@ class PostgresTurnRepository:
                     if len(users)!=1 or len(answers)!=1 or users[0]['content']!=snapshot.q0 or _tuple(users[0]['knowledge_base_scope'])!=snapshot.knowledge_base_ids or _tuple(users[0]['document_scope'])!=snapshot.document_ids:
                         raise ProviderError('TURN_REQUEST_PAYLOAD_CONFLICT')
                     user_id,assistant_id=users[0]['id'],answers[0]['id']
-                row=dict(tenant_id=principal.tenant_id,subject_id=principal.subject_id,session_id=request.session_id,client_request_id=request.request_id,run_id=run_id,user_message_id=user_id,assistant_message_id=assistant_id,q0=snapshot.q0,knowledge_base_scope=snapshot.knowledge_base_ids,document_scope=snapshot.document_ids,payload_sha256=payload)
+                row=dict(tenant_id=principal.tenant_id,subject_id=principal.subject_id,session_id=request.session_id,client_request_id=request.request_id,run_id=run_id,user_message_id=user_id,assistant_message_id=assistant_id,q0=snapshot.q0,knowledge_base_scope=snapshot.knowledge_base_ids,document_scope=snapshot.document_ids,payload_sha256=payload,request_configuration=self._request_configuration(request))
                 if new:
                     for id,role,content in ((user_id,'user',snapshot.q0),(assistant_id,'assistant','')):
                         await conn.execute('INSERT INTO messages(id,request_id,session_id,tenant_id,subject_id,role,content,knowledge_base_scope,document_scope,is_completed,created_at) VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,clock_timestamp())',(id,run_id,request.session_id,*self._owner(principal),role,content,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids),role=='user'))
-                await conn.execute('INSERT INTO port_turns(tenant_id,subject_id,session_id,client_request_id,run_id,user_message_id,assistant_message_id,q0,payload_sha256,knowledge_base_scope,document_scope) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb)',(*self._owner(principal),request.session_id,request.request_id,run_id,user_id,assistant_id,snapshot.q0,payload,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids)))
+                await conn.execute('INSERT INTO port_turns(tenant_id,subject_id,session_id,client_request_id,run_id,user_message_id,assistant_message_id,q0,payload_sha256,knowledge_base_scope,document_scope,request_configuration) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s::jsonb)',(*self._owner(principal),request.session_id,request.request_id,run_id,user_id,assistant_id,snapshot.q0,payload,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids),_json(self._request_configuration(request))))
                 return self._accepted(row,new=new)
 
     async def _messages(self,guard,row):

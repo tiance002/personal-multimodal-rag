@@ -24,10 +24,15 @@ class OrdinaryTurnRequest:
     mode: str = 'quick'
     knowledge_base_scope: tuple[str, ...] = ()
     document_scope: tuple[str, ...] = ()
+    summary_model_id: str = ''
+    reasoning_effort: str = ''
+    accept_language: str = ''
 
     def __post_init__(self):
         if not all(isinstance(x,str) and x for x in (self.session_id,self.content,self.request_id)):
             raise ProviderError('TURN_IDENTITY_REQUIRED')
+        if not all(isinstance(value,str) and len(value)<=256 for value in (self.summary_model_id,self.reasoning_effort,self.accept_language)):
+            raise ProviderError('TURN_CONFIGURATION_INVALID')
         if self.mode != 'quick':
             raise ProviderError('ORDINARY_MODE_REQUIRED')
         if not all(isinstance(x,tuple) and all(isinstance(v,str) and v for v in x) for x in (self.knowledge_base_scope,self.document_scope)):

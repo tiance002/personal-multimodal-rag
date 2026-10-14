@@ -1,0 +1,21 @@
+ORACLE {"input":"rw","kind":"startup","output":{"context":"CONTEXT {{query}}","intents":{"greeting":"GLOBAL {{language}}"},"prompt":"FINAL {{language}}","system":"REWRITE {{language}} {{conversation}}","user":"USER {{query}}"}}
+Warning: rewrite_prompt_id "missing" not found
+ORACLE {"input":"missing","kind":"startup","output":{"context":"CONTEXT {{query}}","intents":{"greeting":"GLOBAL {{language}}"},"prompt":"FINAL {{language}}","system":"SAVED","user":"USER SAVED"}}
+ORACLE {"input":"same","kind":"startup","output":{"context":"CONTEXT {{query}}","intents":{"greeting":"GLOBAL {{language}}"},"prompt":"FINAL {{language}}","system":"SYSTEM FIRST","user":""}}
+ORACLE {"input":"off","kind":"reasoning","output":{"effort":"off","thinking":false}}
+ORACLE {"input":"none","kind":"reasoning","output":{"effort":"off","thinking":false}}
+ORACLE {"input":"on","kind":"reasoning","output":{"effort":"auto","thinking":true}}
+ORACLE {"input":"high","kind":"reasoning","output":{"effort":"high","thinking":true}}
+ORACLE {"input":"HIGH","kind":"reasoning","output":{"effort":"low","thinking":true}}
+ORACLE {"input":"","kind":"reasoning","output":{"effort":"low","thinking":true}}
+ORACLE {"input":"en-US,en;q=0.8","kind":"locale","output":"English"}
+ORACLE {"input":" zh-TW ;q=0.9,en","kind":"locale","output":"Chinese (Traditional)"}
+ORACLE {"input":"","kind":"locale","output":"Chinese (Simplified)"}
+ORACLE {"input":"xx-Test","kind":"locale","output":"xx-Test"}
+ORACLE {"input":"LOCAL","kind":"intent","output":"LOCAL"}
+ORACLE {"input":"  ","kind":"intent","output":"GLOBAL"}
+ORACLE {"input":"","kind":"intent","output":"GLOBAL"}
+ORACLE {"input":"dedicated","kind":"model","output":{"calls":["dedicated"],"id":"dedicated","images":false}}
+ORACLE {"input":"missing","kind":"model","output":{"calls":["missing","baseline"],"id":"baseline","images":false}}
+ORACLE {"input":"baseline","kind":"model","output":{"calls":["baseline"],"id":"baseline","images":false}}
+ORACLE {"input":null,"kind":"prompts","output":{"system":"SESSION Korean ------BEGIN------\nUser question: old\nAssistant answer: answer\n------END------\n","user":"SESSION q0\n\n\u003cno_image_attached /\u003e\n\u003cno_document_attached /\u003e BACKGROUND"}}

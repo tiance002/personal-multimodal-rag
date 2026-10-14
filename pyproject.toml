@@ -69,7 +69,7 @@ addopts = "-ra"
 include = ["backend*", "eval_center*"]
 
 [tool.setuptools.package-data]
-"backend.weknora_port" = ["profile_assets/*.yaml", "profile_assets/*.json"]
+"backend.weknora_port" = ["profile_assets/*.yaml", "profile_assets/*.json", "conversation_assets/*.yaml", "conversation_assets/*.json"]
 "backend.weknora_port.storage" = ["migrations/*.sql", "migrations/*.json"]
 "backend.weknora_port.retrieval" = ["tokenizer_assets/*", "NOTICE"]
 "backend.weknora_port.ingestion" = ["NOTICE", "*.txt", "LICENSE*"]

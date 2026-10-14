@@ -90,6 +90,8 @@ class SessionCreate(ApiModel):
 
 
 class MessageCreate(ApiModel):
+    summary_model_id: str | None = Field(default='',max_length=64)
+    reasoning_effort: str | None = Field(default='',max_length=32)
     content: str = Field(min_length=1, max_length=100_000)
     request_id: str = Field(min_length=1, max_length=128)
     mode: str = Field(default="quick")
@@ -571,7 +573,9 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
             raise HTTPException(status_code=501, detail="SMART_MODE_UNAVAILABLE")
         who = await principal(request)
         turn_request = OrdinaryTurnRequest(session_id, body.content, body.request_id, body.mode,
-                                           tuple(body.knowledge_base_scope), tuple(body.document_scope))
+                                           tuple(body.knowledge_base_scope), tuple(body.document_scope),
+                                           body.summary_model_id or "", body.reasoning_effort or "",
+                                           request.headers.get("Accept-Language", "")[:256])
         accepted = await runtime.accept_turn(turn_request, who)
         if accepted.session_id != session_id or (getattr(accepted, 'client_request_id', '') or accepted.run_id) != body.request_id:
             raise RuntimeContractError("TURN_IDENTITY_MISMATCH")

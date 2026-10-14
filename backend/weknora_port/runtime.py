@@ -19,7 +19,7 @@ from .retrieval.pipeline import PipelineState, RetrievalPipeline
 from .retrieval.search import SearchTarget
 from .service import RuntimeService, TurnConfiguration, OrdinaryMemoryLoader
 from .conversation import OrdinaryHistoryService, MemoryService
-from .storage.configuration import PostgresModelRoleStore
+from .storage.configuration import PostgresModelRoleStore, ModelConfigurationError
 from .storage.models import PostgresModelStore
 from .storage.turns import PostgresTurnRepository
 from .storage.generation import PostgresGenerationLifecycle
@@ -32,8 +32,9 @@ from .storage.send_gate import P1SendGate
 class ConversationSettings:
     """Values resolved from fixed source config/config.yaml conversation.
 
-    Session non-null persisted fields override startup settings. Model identities
-    and the router mode are server configuration, never message JSON.
+    Saved ordinary settings are an explicit local compatibility adapter, resolved
+    per source field (nil/zero are not interchangeable). Request model IDs are
+    owner/type validated; P5 role bindings and router mode remain server-owned.
     """
     max_rounds: int = 5
     embedding_top_k: int = 30
@@ -49,13 +50,21 @@ class ConversationSettings:
 
     generate_summary_prompt_id: str = 'default_summary'
     generate_summary_prompt: str | None = None  # already-resolved server text, not YAML
-    language_locale: str = 'zh-CN'  # explicit server locale; no implicit environment read
+    language_locale: str = ''  # injected startup override; empty permits HTTP locale
+    rewrite_prompt_system: str | None = None
+    rewrite_prompt_user: str | None = None
+    query_understand_model_id: str = ''
+    intent_system_prompts: Mapping[str, str] = field(default_factory=dict)
 
     @classmethod
-    def from_mapping(cls, configuration):
-        row = configuration["conversation"]
-        names = cls.__dataclass_fields__.keys() - {'generate_summary_prompt', 'language_locale'}
-        return cls(**{k: row[k] for k in names if k in row})
+    def from_mapping(cls, configuration, *, prompt_templates=None):
+        from .conversation_configuration import resolve_startup_templates
+        row = resolve_startup_templates(configuration['conversation'], prompt_templates)
+        names = cls.__dataclass_fields__.keys()
+        values = {k: row[k] for k in names if k in row and row[k] is not None}
+        if 'language_locale' in configuration:
+            values['language_locale'] = configuration['language_locale'] or ''
+        return cls(**values)
 
 
 class LeasedMemoryRepository:
@@ -338,25 +347,47 @@ class ApplicationRuntime:
             return model
         registry = NeutralModelRegistry(
             self.models, factory, owner_id=self.principal.subject_id, catalogue=self.catalogue)
+        from .conversation_configuration import resolve_saved_conversation, resolve_language, resolved_chat_options
+        from .retrieval.pipeline import DEFAULT_REWRITE_SYSTEM, DEFAULT_REWRITE_USER, DEFAULT_CONTEXT_TEMPLATE
+        from .generation.context import DEFAULT_SYSTEM_PROMPT
         source = self.conversation
-        chat_id = session.get("summary_model_id") or snapshot.model_id("cheap")
+        effective = resolve_saved_conversation(source, session)
+        chat_id = effective['summary_model_id'] or snapshot.model_id('cheap')
+        # A request override is accepted only after owner-scoped immutable model
+        # lookup and source KnowledgeQA type validation; invalid IDs fall back.
+        override = turn.request.summary_model_id.strip()
+        if override:
+            try:
+                configured = await self.models.resolve(override)
+                if configured.role in ('cheap', 'expensive'):
+                    chat_id = override
+            except (ProviderError, ModelConfigurationError) as error:
+                if getattr(error, 'code', str(error)) not in ('MODEL_NOT_FOUND', 'MODEL_ID_INVALID', 'MODEL_UNAVAILABLE'):
+                    raise
+        self._runs[turn.run_id] = {"registry": registry, "snapshot": snapshot, "chat_id": chat_id}
+        baseline = await registry.chat(chat_id, turn.context)
+        summary = effective['summary']
         state = PipelineState(
             targets=tuple(SearchTarget(kb, "knowledge" if turn.context.scope.document_ids else "knowledge_base",
                 turn.context.scope.document_ids) for kb in turn.context.scope.knowledge_base_ids),
-            chat_model_id=chat_id, query_understand_model_id=chat_id,
-            vlm_model_id=dict(snapshot.model_ids).get("vlm", ""),
-            rerank_model_id=(session.get("rerank_model_id") or dict(snapshot.model_ids).get("rerank", ""))
-                if source.enable_rerank else "",
-            max_rounds=session["max_rounds"], enable_rewrite=session["enable_rewrite"],
-            embedding_top_k=session["embedding_top_k"], vector_threshold=session["vector_threshold"],
-            keyword_threshold=session["keyword_threshold"], rerank_top_k=session["rerank_top_k"],
-            rerank_threshold=session["rerank_threshold"], enable_expansion=source.enable_query_expansion)
-        options = dict(source.summary)
-        options.update(session.get("summary_parameters") or {})
-        allowed = ChatOptions.__dataclass_fields__.keys()
-        self._runs[turn.run_id] = {"registry": registry, "snapshot": snapshot, "chat_id": chat_id}
+            chat_model_id=chat_id, query_understand_model_id=effective['query_understand_model_id'] or chat_id,
+            chat_model_supports_vision=baseline.config.supports_vision,
+            vlm_model_id=dict(snapshot.model_ids).get('vlm', ''),
+            rerank_model_id=(effective['rerank_model_id'] or dict(snapshot.model_ids).get('rerank', ''))
+                if effective['enable_rerank'] else '',
+            max_rounds=effective['max_rounds'], enable_rewrite=effective['enable_rewrite'],
+            embedding_top_k=effective['embedding_top_k'], vector_threshold=effective['vector_threshold'],
+            keyword_threshold=effective['keyword_threshold'], rerank_top_k=effective['rerank_top_k'],
+            rerank_threshold=effective['rerank_threshold'], enable_expansion=effective['enable_query_expansion'],
+            language=resolve_language(source.language_locale, turn.request.accept_language),
+            rewrite_system_prompt=DEFAULT_REWRITE_SYSTEM if effective['rewrite_prompt_system'] is None else effective['rewrite_prompt_system'],
+            rewrite_user_prompt=DEFAULT_REWRITE_USER if effective['rewrite_prompt_user'] is None else effective['rewrite_prompt_user'],
+            context_template=summary.get('context_template', DEFAULT_CONTEXT_TEMPLATE),
+            intent_system_prompts=effective['intent_system_prompts'],
+            global_intent_system_prompts=effective['global_intent_system_prompts'])
         return TurnConfiguration(state, {"policy": self.policy,
-            "options": ChatOptions(**{k: v for k, v in options.items() if k in allowed})})
+            "system_prompt": summary.get('prompt', DEFAULT_SYSTEM_PROMPT),
+            "options": resolved_chat_options(summary, turn.request.reasoning_effort)})
 
     async def _persist_context(self, state, context):
         async with self.leases.lease() as guard:

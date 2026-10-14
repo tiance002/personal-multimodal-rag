@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import re
 from typing import Callable, Sequence
-from ..models.types import ChatOptions, Message
+from ..models.types import ChatOptions, Message, CallCancelled, RunDeadlineExceeded
 STOPWORDS = frozenset('的 是 在 了 和 与 或 a an the is are was were be been being have has had do does did will would could should may might must can to of in for on with at by from as into through about what how why when where which who whom whose'.split())
 
 class TokenizerUnavailable(RuntimeError):
@@ -145,12 +145,11 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
         use_images = model is not None
     if model is None:
         model = await get(state.query_understand_model_id or state.chat_model_id)
-        if model is None and state.query_understand_model_id:
+        if model is None and state.query_understand_model_id and state.query_understand_model_id != state.chat_model_id:
             model = await get(state.chat_model_id)
     if model is None:
         return
     from .context import render_placeholders
-    from ..models.types import CallCancelled, RunDeadlineExceeded
     history = ''.join((f'------BEGIN------\nUser question: {h.query}\nAssistant answer: {h.answer}\n------END------\n' for h in state.history))
     q = state.query + (f'\n\n<images_uploaded count="{len(state.images)}" />' if state.images else '\n\n<no_image_attached />')
     q += state.attachment_prompt or '\n<no_document_attached />'
