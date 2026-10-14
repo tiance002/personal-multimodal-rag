@@ -192,9 +192,7 @@ def parse_ollama_response(env, config: ModelConfig) -> ChatResponse:
     if content == "":
         content = _text(message.get("thinking"))
     calls = tuple(call for _, call in _response_tool_calls(message.get("tool_calls") or []))
-    prompt = completion = 0
-    if _count(env.get("eval_count")) > 0:
-        prompt, completion = _count(env.get("prompt_eval_count")), _count(env.get("eval_count"))
+    prompt, completion = _count(env.get("prompt_eval_count")), _count(env.get("eval_count"))
     return ChatResponse(content, "", "", calls,
         TokenUsage(prompt, completion, prompt + completion, "REPORTED", 0, 0, 0, 0, False, "unsupported"),
         {}, "")
