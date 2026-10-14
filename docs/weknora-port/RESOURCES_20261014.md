@@ -32,3 +32,5 @@ From the worktree, PowerShell: `./wk.ps1 status` inventories; `./wk.ps1 api` run
 Long-path root cause: verbose worktree/batch names plus deeply nested immutable version/asset paths exceeded Windows260. Native asset I/O already uses checked extended paths (78dda16); new fixture roots are shortened now. Existing originals remain untouched. Historical path lengths stay in evidence; no claim that old paths were renamed.
 
 New retained restore-only logical database: wk_port_restore_20261014_8e7a3fa inside current isolatedPG/volume,fixture95 only; original/asset snapshot E:/WK/restore/ocr-8e7a3fa. It is not an applicationservice or oldbusinessDB; no newcontainer/port/volume. Latestcandidate E:/WK/pkg/8e7a3fa (see P8_SHORT_ARTIFACT_20261014.md). Parserlocation/availability caveats: PARSER_STATUS_20261014.md.
+
+Newexplicitparserdependencies E:/WK/deps/reader,manifestsE:/WK/deps/*manifest.json; newofficialfixedMammothwheel D:/WK/download/mammoth-1.11.0-py2.py3-none-any.whl. wk.ps1 sets Ereader+runtime-deps,originalE/Cvenvnotmodified. NonewDockercontainerorport.

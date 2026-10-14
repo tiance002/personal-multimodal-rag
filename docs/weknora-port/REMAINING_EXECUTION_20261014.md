@@ -21,3 +21,5 @@ Each item is scoped work, not an additional milestone or permission reset. Fixed
 No whole-stage PASS is claimed. Each change records sourcefunction/configpriority/actualentry/commandexit/evidence/localcommit. Package source consistency reruns only when affected nativefiles change. Ordinary repair does not request approval again; true provenance/semantic conflict reports minimal evidence and next solution.
 
 Latest: Excel sourcepandas/realmerge/repair/default-headerpairedfixtureandnativeuploadclosed; seeP2_EXCEL_SOURCE_20261014.md. Cancellationreviewnowexplicitlyapprovedminimumsourcefix; no longerawaitingdecision,implementation/tests inprogress. FullOCR/Officeextras/Go/Asynqremainaslisted,notapproveddifferences.
+
+Latestclosures:645027ccancelpublicpartial+sourcecompletedlifecycle+legalreferences/noerrorToast/hiddenCheap/finalatomicrace andUNKNOWNretained,actualHTTP/PG/Redisverified; OfficeEpathclosure andsimpleDOCX/PPTX/CSVactualsource/nativeentryverified. FullOCRHTML,complexOfficePPTXmedia/legacyformats,fullGo/Asynq/imageworker/config proofs remainrequired,notapproveddifferences.
