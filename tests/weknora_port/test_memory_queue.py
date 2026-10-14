@@ -10,10 +10,10 @@ from backend.weknora_port.conversation.types import MemoryScope
 
 def test_actual_redis_retry_two_foreign_scope_and_expired_claim():
     async def scenario():
-        client=Redis.from_url('redis://127.0.0.1:56424/0',decode_responses=True)
-        assert (await client.info('server'))['run_id']=='ad8c707ba74a8b29f84792928bc7da01bc796bf6'
+        client=Redis.from_url('redis://127.0.0.1:56424/15',decode_responses=True)
+        assert (await client.info('server'))['run_id']=='586b92f4649b78508382dfd52d64d848f45b0a7c'
         principal=SimpleNamespace(tenant_id=9913,subject_id='public-queue-fixture')
-        prefix='weknora-resume:queue-fixture:'+str(uuid.uuid4())
+        prefix='weknora-python-port:20261013:mq-regression:'+str(uuid.uuid4())
         clock=[time.time()]
         queue=RedisMemoryExtractionQueue(client,prefix,principal,clock=lambda:clock[0],randbelow=lambda bound:29)
         payload=ExtractionPayload(MemoryScope(principal.tenant_id,principal.subject_id),'session','message','model')
@@ -46,11 +46,13 @@ def test_actual_redis_retry_two_foreign_scope_and_expired_claim():
             'session_id':'recovery','message_id':'m','chat_model_id':'model','language':''},'max_retry':2,'retry':0}
         await client.hset(queue.keys[2],job['id'],json.dumps(job))
         await client.zadd(queue.keys[1],{job['id']:time.time()-1})
-        await queue.start();await queue.drain()
+        assert not await queue.run_due()
+        clock[0]+=44
+        assert await queue.run_due()
         assert len(calls)==4 and calls[-1].session_id=='recovery'
         assert await client.hget(queue.keys[2],job['id']) is None
         assert await client.zcard(queue.keys[1])==0
-        await client.aclose()
+        await client.delete(*queue.keys);await client.aclose()
     asyncio.run(scenario())
 
 

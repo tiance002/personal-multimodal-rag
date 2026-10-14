@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="1.192" timestamp="2026-10-14T19:50:57.429631+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_late_delivery_cannot_ack_or_overwrite_successor[False]" time="0.022" /><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_late_delivery_cannot_ack_or_overwrite_successor[True]" time="0.015" /><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_three_expired_deliveries_archive_scoped_payload" time="0.015"><failure message="assert (1791980491.6227 == 1791980491.6227236)">tests\weknora_port\test_memory_queue_recovery.py:80: in test_three_expired_deliveries_archive_scoped_payload
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:74: in run
+    assert archived["failed_at"]==clock[0] and archived["error_class"]=="LeaseExpired"
+E   assert (1791980491.6227 == 1791980491.6227236)</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped" time="0.754" /></testsuite></testsuites>

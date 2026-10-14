@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="2.894" timestamp="2026-10-14T19:49:46.509016+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_late_delivery_cannot_ack_or_overwrite_successor[False]" time="0.018"><failure message="AssertionError: stale delivery overwrote successor&#10;assert ({}, [('f01c1...218.6725588)]) == ({'f01c128c-4...218.6725588)])&#10;  &#10;  At index 0 diff: {} != {'f01c128c-479c-4a97-9a33-b3fb7eddfa0a': '{&quot;id&quot;:&quot;f01c128c-479c-4a97-9a33-b3fb7eddfa0a&quot;,&quot;payload&quot;:{&quot;scope&quot;:{&quot;tenant_id&quot;:9913,&quot;subject_id&quot;:&quot;queue-recovery-synthetic&quot;},&quot;session_id&quot;:&quot;synthetic-session&quot;,&quot;message_id&quot;:&quot;m&quot;,&quot;chat_model_id&quot;:&quot;mock&quot;,&quot;language&quot;:&quot;&quot;},&quot;max_retry&quot;:2,&quot;retry&quot;:2}'}&#10;  Use -v to get more diff">tests\weknora_port\test_memory_queue_recovery.py:52: in test_late_delivery_cannot_ack_or_overwrite_successor
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:48: in run
+    assert after==before,"stale delivery overwrote successor"
+E   AssertionError: stale delivery overwrote successor
+E   assert ({}, [('f01c1...218.6725588)]) == ({'f01c128c-4...218.6725588)])
+E     
+E     At index 0 diff: {} != {'f01c128c-479c-4a97-9a33-b3fb7eddfa0a': '{"id":"f01c128c-479c-4a97-9a33-b3fb7eddfa0a","payload":{"scope":{"tenant_id":9913,"subject_id":"queue-recovery-synthetic"},"session_id":"synthetic-session","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":2}'}
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_late_delivery_cannot_ack_or_overwrite_successor[True]" time="0.016"><failure message="AssertionError: stale delivery overwrote successor&#10;assert ({'2494ec71-0...217.9413335)]) == ({'2494ec71-0...218.9413335)])&#10;  &#10;  At index 0 diff: {'2494ec71-0b1a-4fdc-a696-186ae1d72523': '{&quot;id&quot;:&quot;2494ec71-0b1a-4fdc-a696-186ae1d72523&quot;,&quot;payload&quot;:{&quot;scope&quot;:{&quot;tenant_id&quot;:9913,&quot;subject_id&quot;:&quot;queue-recovery-synthetic&quot;},&quot;session_id&quot;:&quot;synthetic-session&quot;,&quot;message_id&quot;:&quot;m&quot;,&quot;chat_model_id&quot;:&quot;mock&quot;,&quot;language&quot;:&quot;&quot;},&quot;max_retry&quot;:2,&quot;retry&quot;:1}'} != {'2494ec71-0b1a-4fdc-a696-186ae1d72523': '{&quot;id&quot;:&quot;2494ec71-0b1a-4fdc-a696-186ae1d72523&quot;,&quot;payload&quot;:{&quot;scope&quot;:{&quot;tenant_id&quot;:9913,&quot;subject_id&quot;:&quot;queue-recovery-synthetic&quot;},&quot;session_id&quot;:&quot;synthetic-session&quot;,&quot;message_id&quot;:&quot;m&quot;,&quot;chat_model_id&quot;:&quot;mock&quot;,&quot;language&quot;:&quot;&quot;},&quot;max_retry&quot;:2,&quot;retry&quot;:2}'}&#10;  Use -v to get more diff">tests\weknora_port\test_memory_queue_recovery.py:52: in test_late_delivery_cannot_ack_or_overwrite_successor
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:48: in run
+    assert after==before,"stale delivery overwrote successor"
+E   AssertionError: stale delivery overwrote successor
+E   assert ({'2494ec71-0...217.9413335)]) == ({'2494ec71-0...218.9413335)])
+E     
+E     At index 0 diff: {'2494ec71-0b1a-4fdc-a696-186ae1d72523': '{"id":"2494ec71-0b1a-4fdc-a696-186ae1d72523","payload":{"scope":{"tenant_id":9913,"subject_id":"queue-recovery-synthetic"},"session_id":"synthetic-session","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":1}'} != {'2494ec71-0b1a-4fdc-a696-186ae1d72523': '{"id":"2494ec71-0b1a-4fdc-a696-186ae1d72523","payload":{"scope":{"tenant_id":9913,"subject_id":"queue-recovery-synthetic"},"session_id":"synthetic-session","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":2}'}
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_three_expired_deliveries_archive_scoped_payload" time="0.008"><failure message="asyncio.exceptions.CancelledError">tests\weknora_port\test_memory_queue_recovery.py:80: in test_three_expired_deliveries_archive_scoped_payload
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:65: in run
+    assert not await q.run_due(),"recovery bypassed retry backoff"
+               ^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\memory_queue.py:70: in run_due
+    await self.worker.handle(ExtractionPayload(scope,**payload))
+tests\weknora_port\test_memory_queue_recovery.py:59: in handle
+    calls.append(payload); raise asyncio.CancelledError()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   asyncio.exceptions.CancelledError</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped" time="2.088"><failure message="TimeoutError">D:\Drivers\python\Lib\asyncio\tasks.py:507: in wait_for
+    return await fut
+           ^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\locks.py:213: in wait
+    await fut
+E   asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+tests\weknora_port\test_memory_queue_recovery.py:106: in test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:98: in run
+    await asyncio.wait_for(done.wait(),2)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: in __aexit__
+    raise TimeoutError from exc_val
+E   TimeoutError</failure></testcase></testsuite></testsuites>

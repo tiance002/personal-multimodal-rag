@@ -1,0 +1,109 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_________ test_late_delivery_cannot_ack_or_overwrite_successor[False] _________
+tests\weknora_port\test_memory_queue_recovery.py:52: in test_late_delivery_cannot_ack_or_overwrite_successor
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:48: in run
+    assert after==before,"stale delivery overwrote successor"
+E   AssertionError: stale delivery overwrote successor
+E   assert ({}, [('f01c1...218.6725588)]) == ({'f01c128c-4...218.6725588)])
+E     
+E     At index 0 diff: {} != {'f01c128c-479c-4a97-9a33-b3fb7eddfa0a': '{"id":"f01c128c-479c-4a97-9a33-b3fb7eddfa0a","payload":{"scope":{"tenant_id":9913,"subject_id":"queue-recovery-synthetic"},"session_id":"synthetic-session","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":2}'}
+E     Use -v to get more diff
+_________ test_late_delivery_cannot_ack_or_overwrite_successor[True] __________
+tests\weknora_port\test_memory_queue_recovery.py:52: in test_late_delivery_cannot_ack_or_overwrite_successor
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:48: in run
+    assert after==before,"stale delivery overwrote successor"
+E   AssertionError: stale delivery overwrote successor
+E   assert ({'2494ec71-0...217.9413335)]) == ({'2494ec71-0...218.9413335)])
+E     
+E     At index 0 diff: {'2494ec71-0b1a-4fdc-a696-186ae1d72523': '{"id":"2494ec71-0b1a-4fdc-a696-186ae1d72523","payload":{"scope":{"tenant_id":9913,"subject_id":"queue-recovery-synthetic"},"session_id":"synthetic-session","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":1}'} != {'2494ec71-0b1a-4fdc-a696-186ae1d72523': '{"id":"2494ec71-0b1a-4fdc-a696-186ae1d72523","payload":{"scope":{"tenant_id":9913,"subject_id":"queue-recovery-synthetic"},"session_id":"synthetic-session","message_id":"m","chat_model_id":"mock","language":""},"max_retry":2,"retry":2}'}
+E     Use -v to get more diff
+____________ test_three_expired_deliveries_archive_scoped_payload _____________
+tests\weknora_port\test_memory_queue_recovery.py:80: in test_three_expired_deliveries_archive_scoped_payload
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:65: in run
+    assert not await q.run_due(),"recovery bypassed retry backoff"
+               ^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\memory_queue.py:70: in run_due
+    await self.worker.handle(ExtractionPayload(scope,**payload))
+tests\weknora_port\test_memory_queue_recovery.py:59: in handle
+    calls.append(payload); raise asyncio.CancelledError()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   asyncio.exceptions.CancelledError
+_ test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped _
+D:\Drivers\python\Lib\asyncio\tasks.py:507: in wait_for
+    return await fut
+           ^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\locks.py:213: in wait
+    await fut
+E   asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+tests\weknora_port\test_memory_queue_recovery.py:106: in test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:98: in run
+    await asyncio.wait_for(done.wait(),2)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: in __aexit__
+    raise TimeoutError from exc_val
+E   TimeoutError
+------------------------------ Captured log call ------------------------------
+ERROR    asyncio:base_events.py:1858 Task exception was never retrieved
+future: <Task finished name='Task-16' coro=<RedisMemoryExtractionQueue.pump() done, defined at E:\WK\mq\backend\weknora_port\storage\memory_queue.py:86> exception=ConnectionError('synthetic outage')>
+Traceback (most recent call last):
+  File "E:\WK\mq\backend\weknora_port\storage\memory_queue.py", line 88, in pump
+    if await self.run_due():continue
+       ^^^^^^^^^^^^^^^^^^^^
+  File "E:\WK\mq\backend\weknora_port\storage\memory_queue.py", line 63, in run_due
+    raw=await self.client.eval(CLAIM,3,ready,leased,jobs,now,now+600)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\WK\mq\tests\weknora_port\test_memory_queue_recovery.py", line 92, in eval
+    if self.fail: raise ConnectionError("synthetic outage")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+redis.exceptions.ConnectionError: synthetic outage
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_late_delivery_cannot_ack_or_overwrite_successor[False]
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_late_delivery_cannot_ack_or_overwrite_successor[True]
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_three_expired_deliveries_archive_scoped_payload
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped
+4 failed in 3.36s
