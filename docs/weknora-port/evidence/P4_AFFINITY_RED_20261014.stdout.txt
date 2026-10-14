@@ -1,0 +1,15 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_normal_pipeline_consumes_familiar_document_after_rerank _________
+tests\weknora_port\test_affinity_pipeline.py:9: in test_normal_pipeline_consumes_familiar_document_after_rerank
+    from backend.weknora_port.models.types import RankResult
+E   ImportError: cannot import name 'RankResult' from 'backend.weknora_port.models.types' (E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\models\types.py)
+__________ test_affinity_does_not_add_a_lane_when_rerank_is_disabled __________
+tests\weknora_port\test_affinity_pipeline.py:24: in test_affinity_does_not_add_a_lane_when_rerank_is_disabled
+    s=state();pipe=RetrievalPipeline(Repo([row()]),Registry(),affinity_resolver=affinity)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'affinity_resolver'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_affinity_pipeline.py::test_normal_pipeline_consumes_familiar_document_after_rerank
+FAILED tests/weknora_port/test_affinity_pipeline.py::test_affinity_does_not_add_a_lane_when_rerank_is_disabled
+2 failed in 0.60s

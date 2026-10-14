@@ -13,7 +13,7 @@ export class PortApiError extends Error {
   constructor(message: string, readonly status = 0, readonly code = "REQUEST_FAILED") { super(message); }
 }
 
-async function jsonRequest<T>(path: string, init: RequestInit = {}, allowEmpty = false): Promise<T> {
+async function jsonRequest<T>(path: string, init: RequestInit = {}, allowEmpty = false, includeEnvelope = false): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API}${path}`, {
@@ -34,7 +34,7 @@ async function jsonRequest<T>(path: string, init: RequestInit = {}, allowEmpty =
   if (allowEmpty && (body as { success?: boolean })?.success === true) return undefined as T;
   const envelope = body as PortEnvelope<T>;
   if (!envelope || !("data" in envelope)) throw new PortApiError("API 返回缺少 data 字段", response.status, "API_CONTRACT_INVALID");
-  return envelope.data;
+  return includeEnvelope ? body as T : envelope.data;
 }
 
 export async function assertPortRuntime(): Promise<RuntimeIdentity> {
@@ -90,6 +90,16 @@ export const portApi = {
     if (!response.ok || !result.success || !Array.isArray(result.data)) throw new PortApiError(result.error?.message ?? "记忆导出失败", response.status, result.error?.code ?? "MEMORY_EXPORT_FAILED");
     return { total: result.total, truncated: result.truncated, data: result.data };
   },
+  memoryDocuments: async (offset = 0): Promise<{ data: MemoryDocument[]; total: number }> => {
+    const result = await jsonRequest<{ data: MemoryDocument[]; total: number }>(`/memory/documents?limit=50&offset=${offset}`, {}, false, true);
+    if (!Array.isArray(result.data) || !Number.isInteger(result.total) || result.total < 0) throw new PortApiError("文档偏好列表格式不正确", 502, "API_CONTRACT_INVALID");
+    return result;
+  },
+  stopTrackingDocument: async (id: string) => {
+    await assertPortRuntime();
+    await jsonRequest<void>(`/memory/documents/${encodeURIComponent(id)}`, { method: "DELETE" }, true);
+  },
+  originalDocumentURL: (kbId: string, documentId: string) => `${API}/knowledge-bases/${encodeURIComponent(kbId)}/documents/${encodeURIComponent(documentId)}/source`,
   memoryItems: (offset = 0) => jsonRequest<MemoryItem[]>(`/memory/items?limit=50&offset=${offset}`),
   forgetMemory: async (id: string) => {
     await assertPortRuntime();
@@ -112,3 +122,5 @@ export function apiBaseForStream(path: string): string {
 }
 
 export type MemoryItem = { id: string; kind: string; content: string; topic: string; status: string; origin: string; importance?: number };
+
+export type MemoryDocument = { id: string; knowledge_id: string; knowledge_base_id: string; title: string; hits: number; last_used_at: string };

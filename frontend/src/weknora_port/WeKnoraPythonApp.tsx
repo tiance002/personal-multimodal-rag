@@ -106,6 +106,7 @@ export function WeKnoraPythonApp() {
   const [uploadKbId, setUploadKbId] = useState("");
   const [source, setSource] = useState<SourceChunk | null>(null);
   const [sourceError, setSourceError] = useState("");
+  const [familiarDocument, setFamiliarDocument] = useState<DocumentRow | null>(null);
   const [configError, setConfigError] = useState("");
   const activeAbort = useRef<AbortController | null>(null);
   const activeIdentity = useRef<PortRunIdentity | null>(null);
@@ -334,6 +335,15 @@ export function WeKnoraPythonApp() {
     } catch (error) { setConfigError(errorText(error)); }
   };
 
+  const openMemoryDocument = async (document: import("./api").MemoryDocument) => {
+    await portApi.runtime();
+    const rows = await portApi.documents(document.knowledge_base_id);
+    const original = rows.find(row => row.id === document.knowledge_id);
+    if (!original) throw new Error("文档不存在或当前无权访问");
+    setFamiliarDocument(original); setUploadKbId(document.knowledge_base_id); setPage("library");
+    // Browsing a document must not change an existing chat's saved retrieval scope.
+  };
+
   const openSource = async (chunkId: string) => {
     setSourceError(""); setSource(null);
     try { setSource(await portApi.source(chunkId)); }
@@ -414,9 +424,10 @@ export function WeKnoraPythonApp() {
       {page === "library" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>知识库</h1><p>选择资料范围并查看文件名、索引状态。</p></div></div><div className="wp-library-grid"><div className="wp-panel"><h2>知识库</h2>{bases.map(base => <button key={base.id} className="wp-library-row" onClick={() => setUploadKbId(base.id)}><strong>{base.name}</strong><span>{base.document_count} 份 · {base.cloud_allowed ? "允许外发" : "仅本地"}</span></button>)}<form className="wp-inline-form" onSubmit={event => void createKb(event)}><input value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="新知识库名称"/><button disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</button></form></div><div className="wp-panel"><h2>资料文件</h2><KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/><div className="wp-upload-row"><select value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>{documents.map(doc => <div className="wp-library-row" key={doc.id}><strong>{doc.filename}</strong><span>{doc.status}</span></div>)}{!documents.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div></div></section>}
 
       {page === "models" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>模型角色</h1><p>配置 embedding、rerank、cheap、expensive 和 VLM。API 密钥只写入，不会从服务端读回。</p></div></div><form className="wp-model-form" onSubmit={event => void saveConfig(event)}>{config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<button className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</button></form></section>}
-      {page === "memory" && <MemoryPanel disabled={loading || Boolean(runtimeError)} />}
+      {page === "memory" && <MemoryPanel disabled={loading || Boolean(runtimeError)} onOpenDocument={openMemoryDocument} />}
     </main>
 
+    {page === "library" && familiarDocument && <aside className="wp-source-drawer" aria-label="常用文档详情"><button className="wp-close" onClick={() => setFamiliarDocument(null)}>关闭文档</button><strong>{familiarDocument.filename}</strong><p>{familiarDocument.status}</p><a href={portApi.originalDocumentURL(familiarDocument.knowledge_base_id, familiarDocument.id)} target="_blank" rel="noreferrer">打开原始文件</a></aside>}
     {(source || sourceError) && <div className="wp-source-drawer"><button className="wp-close" onClick={() => { setSource(null); setSourceError(""); }}>关闭 ×</button>{source ? <><strong>来源回读 · {source.filename}</strong><pre>{source.text}</pre>{source.source_url && <a href={source.source_url} target="_blank" rel="noreferrer">打开原始文件</a>}</> : <p role="alert">{sourceError}</p>}</div>}
   </div>;
 }

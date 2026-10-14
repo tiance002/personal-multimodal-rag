@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { portApi, type MemoryItem } from "./api";
+import { portApi, type MemoryItem, type MemoryDocument } from "./api";
 
 type Settings = Awaited<ReturnType<typeof portApi.memorySettings>>;
 type Draft = { id?: string; kind: string; content: string; importance: number };
 const kinds = ["profile", "preference", "fact", "task", "interest"];
-export function MemoryPanel({ disabled }: { disabled: boolean }) {
+export function MemoryPanel({ disabled, onOpenDocument }: { disabled: boolean; onOpenDocument: (document: MemoryDocument) => Promise<void> }) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [items, setItems] = useState<MemoryItem[]>([]);
   const [offset, setOffset] = useState(0);
+  const [tab, setTab] = useState<"items" | "documents">("items");
+  const [documentOffset, setDocumentOffset] = useState(0);
+  const [documents, setDocuments] = useState<MemoryDocument[]>([]);
+  const [documentTotal, setDocumentTotal] = useState(0);
+  const [trackingSelected, setTrackingSelected] = useState<MemoryDocument | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -18,11 +23,13 @@ export function MemoryPanel({ disabled }: { disabled: boolean }) {
   const refresh = useCallback(async () => {
     setBusy(true); setError("");
     try {
-      const [nextSettings, nextItems] = await Promise.all([portApi.memorySettings(), portApi.memoryItems(offset)]);
-      setSettings(nextSettings); setItems(nextItems);
+      const [nextSettings, rows] = await Promise.all([portApi.memorySettings(), tab === "documents" ? portApi.memoryDocuments(documentOffset) : portApi.memoryItems(offset)]);
+      setSettings(nextSettings);
+      if (Array.isArray(rows)) setItems(rows);
+      else { setDocuments(rows.data); setDocumentTotal(rows.total); }
     } catch (failure) { setError(failure instanceof Error ? failure.message : "记忆读取失败"); }
     finally { setBusy(false); }
-  }, [offset]);
+  }, [offset, tab, documentOffset]);
   useEffect(() => { if (!disabled) void refresh(); }, [disabled, refresh]);
   const forget = async () => {
     if (!selected || disabled || busy) return;
@@ -71,25 +78,50 @@ export function MemoryPanel({ disabled }: { disabled: boolean }) {
     } catch (failure) { setError(failure instanceof Error ? failure.message : "记忆导出失败"); }
     finally { setBusy(false); }
   };
+  const stopTracking = async () => {
+    if (!trackingSelected || disabled || busy) return;
+    setBusy(true); setError(""); setNotice("");
+    try {
+      await portApi.stopTrackingDocument(trackingSelected.id);
+      setTrackingSelected(null); setNotice("已停止跟踪此文档；资料和历史回答已保留。");
+      if (documents.length === 1 && documentOffset > 0) setDocumentOffset(Math.max(0, documentOffset - 50));
+      else await refresh();
+    } catch (failure) { setError(failure instanceof Error ? failure.message : "停止跟踪失败"); }
+    finally { setBusy(false); }
+  };
+  const openDocument = async (document: MemoryDocument) => {
+    if (disabled || busy || !document.knowledge_base_id) return;
+    setBusy(true); setError("");
+    try { await onOpenDocument(document); }
+    catch (failure) { setError(failure instanceof Error ? failure.message : "文档无法打开"); }
+    finally { setBusy(false); }
+  };
   return <section className="wp-page-content">
     <div className="wp-page-heading"><div><h1>长期记忆</h1><p>查看和维护当前用户的记忆。</p></div>
       <button disabled={disabled || busy} onClick={() => void refresh()}>刷新记忆</button></div>
     {settings && <p role="status">{settings.effective ? "记忆已启用" : "记忆未启用"} · {settings.write_mode === "auto" ? "自动提取" : "仅在明确要求时记录"} · {settings.item_count} / {settings.max_items} 条有效记忆</p>}
     <label className="wp-inline-form"><input type="checkbox" aria-label="启用我的长期记忆" checked={settings?.user_enabled ?? false} disabled={disabled || busy || !settings} onChange={event => void toggle(event.target.checked)} />启用我的长期记忆</label>
-    <div className="wp-inline-form"><button disabled={disabled || busy || !!draft} onClick={() => setDraft({ kind: "fact", content: "", importance: 3 })}>新增记忆</button>
+    <div className="wp-inline-form" role="tablist" aria-label="记忆类别"><button role="tab" aria-selected={tab === "items"} disabled={disabled || busy} onClick={() => setTab("items")}>记忆条目</button><button role="tab" aria-selected={tab === "documents"} disabled={disabled || busy} onClick={() => setTab("documents")}>常用文档</button></div>
+    {tab === "items" && <div className="wp-inline-form"><button disabled={disabled || busy || !!draft} onClick={() => setDraft({ kind: "fact", content: "", importance: 3 })}>新增记忆</button>
       <button disabled={disabled || busy} onClick={() => void exportItems()}>导出记忆</button>
-      <button disabled={disabled || busy} onClick={() => setClearSelected(true)}>清空记忆</button></div>
+      <button disabled={disabled || busy} onClick={() => setClearSelected(true)}>清空记忆</button></div>}
     {error && <p className="wp-inline-error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     {busy && <p role="status">正在处理记忆…</p>}
-    <div className="wp-panel">{items.map(item => <article className="wp-memory-item" key={item.id}>
+    {tab === "items" && <><div className="wp-panel">{items.map(item => <article className="wp-memory-item" key={item.id}>
       <strong>{item.topic || item.kind}</strong><p>{item.content}</p><small>{item.status} · {item.origin}</small>
       {item.status === "pending" && <><button disabled={disabled || busy} onClick={() => void review(item, true)} aria-label={`确认 ${item.topic || item.kind}`}>确认记忆</button><button disabled={disabled || busy} onClick={() => void review(item, false)} aria-label={`拒绝 ${item.topic || item.kind}`}>拒绝记忆</button></>}
       {(["active", "pending"].includes(item.status)) && <button disabled={disabled || busy || !!draft} onClick={() => setDraft({ id: item.id, kind: item.kind, content: item.content, importance: item.importance ?? 3 })} aria-label={`编辑 ${item.topic || item.kind}`}>编辑</button>}
       <button disabled={disabled || busy} onClick={() => setSelected(item)} aria-label={`遗忘 ${item.topic || item.kind}`}>遗忘</button>
     </article>)}{!busy && items.length === 0 && <p>此页没有记忆。</p>}</div>
     <div className="wp-inline-form"><button disabled={disabled || busy || offset === 0} onClick={() => setOffset(Math.max(0, offset - 50))}>上一页</button>
-      <span>第 {Math.floor(offset / 50) + 1} 页</span><button disabled={disabled || busy || items.length < 50} onClick={() => setOffset(offset + 50)}>下一页</button></div>
+      <span>第 {Math.floor(offset / 50) + 1} 页</span><button disabled={disabled || busy || items.length < 50} onClick={() => setOffset(offset + 50)}>下一页</button></div></>}
+    {tab === "documents" && <><p>你经常从这些资料获取答案。</p><div className="wp-panel">{documents.map(document => <article className="wp-memory-document" key={document.id}>
+      <strong>{document.title || "未命名文档"}</strong><p>引用 {document.hits} 次 · {new Date(document.last_used_at).toLocaleString()}</p>
+      <button disabled={disabled || busy || !document.knowledge_base_id} title={!document.knowledge_base_id ? "缺少知识库信息，无法打开文档" : undefined} onClick={() => void openDocument(document)} aria-label={`打开文档 ${document.title || "未命名文档"}`}>打开文档</button>
+      <button disabled={disabled || busy} onClick={() => setTrackingSelected(document)} aria-label={`停止跟踪 ${document.title || "未命名文档"}`}>停止跟踪</button>
+    </article>)}{!busy && documents.length === 0 && <p>暂无常用文档。</p>}</div><div className="wp-inline-form"><button disabled={disabled || busy || documentOffset === 0} onClick={() => setDocumentOffset(Math.max(0, documentOffset - 50))}>上一页</button><span>第 {Math.floor(documentOffset / 50) + 1} 页 · 共 {documentTotal} 个文档</span><button disabled={disabled || busy || documentOffset + documents.length >= documentTotal} onClick={() => setDocumentOffset(documentOffset + 50)}>下一页</button></div></>}
+    {trackingSelected && <div className="wp-consent" role="dialog" aria-modal="true" aria-label="确认停止跟踪"><p>停止跟踪此文档？资料和历史回答会保留。</p><p>{trackingSelected.title || "未命名文档"}</p><button disabled={disabled || busy} onClick={() => void stopTracking()}>确认停止跟踪</button><button disabled={busy} onClick={() => setTrackingSelected(null)}>取消停止跟踪</button></div>}
     {draft && <form className="wp-consent" role="dialog" aria-modal="true" aria-label={draft.id ? "编辑记忆" : "新增记忆"} onSubmit={event => void save(event)}>
       <label>类型<select aria-label="记忆类型" disabled={!!draft.id || busy} value={draft.kind} onChange={event => setDraft({ ...draft, kind: event.target.value })}>{kinds.map(kind => <option key={kind} value={kind}>{kind}</option>)}</select></label>
       <label>内容<textarea aria-label="记忆内容" autoFocus required disabled={busy} value={draft.content} onChange={event => setDraft({ ...draft, content: event.target.value })} /></label>

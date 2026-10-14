@@ -55,12 +55,13 @@ class PipelineState(SearchState):
 
 class RetrievalPipeline:
 
-    def __init__(self, repository, registry, *, segmenter=None, embedding_resolver=None, web_search=None, entity_search=None, history_loader=None, caption_sink=None, persist_sink=None, on_progress=None):
+    def __init__(self, repository, registry, *, segmenter=None, embedding_resolver=None, web_search=None, entity_search=None, history_loader=None, caption_sink=None, persist_sink=None, on_progress=None, affinity_resolver=None):
         self.repository, self.registry = (repository, registry)
         self.segmenter, self.embedding_resolver = (segmenter or default_segmenter(), embedding_resolver)
         self.web_search, self.entity_search = (web_search, entity_search)
         self.history_loader, self.caption_sink, self.persist_sink = (history_loader, caption_sink, persist_sink)
         self.on_progress = on_progress
+        self.affinity_resolver = affinity_resolver
 
     async def _progress(self, stage, status, **fields):
         if self.on_progress is None:
@@ -95,6 +96,8 @@ class RetrievalPipeline:
         check_context()
         await self._progress("rerank", "started")
         await rerank(state, context, self.registry, self.segmenter)
+        from .memory_affinity import apply_memory_affinity
+        await apply_memory_affinity(state, context, self.affinity_resolver)
         await self._progress("rerank", "completed", candidate_count=sum(r is not None for r in state.rerank_results))
         check_context()
         await self._progress("merge", "started")

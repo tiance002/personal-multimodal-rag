@@ -352,18 +352,27 @@ class ApplicationRuntime:
         from .generation.context import DEFAULT_SYSTEM_PROMPT
         source = self.conversation
         effective = resolve_saved_conversation(source, session)
-        chat_id = effective['summary_model_id'] or snapshot.model_id('cheap')
-        # A request override is accepted only after owner-scoped immutable model
-        # lookup and source KnowledgeQA type validation; invalid IDs fall back.
-        override = turn.request.summary_model_id.strip()
-        if override:
-            try:
-                configured = await self.models.resolve(override)
-                if configured.role in ('cheap', 'expensive'):
-                    chat_id = override
-            except (ProviderError, ModelConfigurationError) as error:
-                if getattr(error, 'code', str(error)) not in ('MODEL_NOT_FOUND', 'MODEL_ID_INVALID', 'MODEL_UNAVAILABLE'):
-                    raise
+        from .model_selection import resolve_chat_model_id
+        context_configuration=session.get('context_config') or {}
+        if isinstance(context_configuration,str):context_configuration=json.loads(context_configuration)
+        profile_id=(context_configuration.get('conversation') or {}).get('model_id','')
+        allowed=set(turn.context.scope.knowledge_base_ids)
+        ordered=tuple(dict.fromkeys(turn.request.knowledge_base_scope or turn.context.scope.knowledge_base_ids))
+        if set(ordered)!=allowed:raise ProviderError('TURN_KB_SCOPE_DENIED')
+        async def get_kb(id):
+            if id not in allowed:raise ProviderError('TURN_KB_SCOPE_DENIED')
+            rows=await self._rows('SELECT id,summary_model_id FROM knowledge_bases WHERE tenant_id=%s AND id=ANY(%s) AND deleted_at IS NULL',
+                (self.principal.tenant_id,[id]))
+            return rows[0] if rows else None
+        async def get_model(id):
+            row,_,_=await self.models._load(id)
+            return {name:row[name] for name in ('id','type','source')}
+        async def list_models():
+            # Source repository List has no ORDER BY; do not invent role priority.
+            rows=await self._rows("SELECT id FROM models WHERE tenant_id=%s AND subject_id=%s AND status='active' AND deleted_at IS NULL",
+                (self.principal.tenant_id,self.principal.subject_id))
+            return [await get_model(row['id']) for row in rows]
+        chat_id=await resolve_chat_model_id(turn.request.summary_model_id,profile_id,ordered,get_kb,get_model,list_models)
         self._runs[turn.run_id] = {"registry": registry, "snapshot": snapshot, "chat_id": chat_id}
         baseline = await registry.chat(chat_id, turn.context)
         summary = effective['summary']
@@ -400,9 +409,11 @@ class ApplicationRuntime:
 
     async def _pipeline(self, turn, progress):
         registry = self._runs[turn.run_id]["registry"]
+        async def affinity(ids):
+            return await self.memory.document_affinity(turn.memory_context,ids)
         return RetrievalPipeline(
             LeasedKnowledgeRepository(self, registry), registry, on_progress=progress,
-            persist_sink=self._persist_context)
+            persist_sink=self._persist_context, affinity_resolver=affinity)
 
     async def _generation(self, turn, progress, *, policy=None):
         policy=policy or self.policy

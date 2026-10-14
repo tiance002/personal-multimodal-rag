@@ -64,12 +64,16 @@ class PostgresTurnRepository:
         return ScopeSnapshot(request.content,kbs,docs)
 
     @staticmethod
-    def _request_configuration(request):
-        return {name:getattr(request,name) for name in ('summary_model_id','reasoning_effort','accept_language') if getattr(request,name)}
+    def _request_configuration(request, *, include_order=True):
+        value={name:getattr(request,name) for name in ('summary_model_id','reasoning_effort','accept_language') if getattr(request,name)}
+        ordered=tuple(dict.fromkeys(request.knowledge_base_scope))
+        if include_order and ordered!=tuple(sorted(ordered)):
+            value['knowledge_base_order']=list(ordered)
+        return value
 
-    def _payload(self,request,snapshot):
+    def _payload(self,request,snapshot,*,include_order=True):
         payload={'version':'ordinary-turn/v1','session':request.session_id,'mode':'quick','q0':snapshot.q0,'knowledge_bases':snapshot.knowledge_base_ids,'documents':snapshot.document_ids}
-        options=self._request_configuration(request)
+        options=self._request_configuration(request,include_order=include_order)
         # Empty new options preserve exact historical v1 payloads and hashes.
         if options:payload.update(version='ordinary-turn/v2',request_configuration=options)
         return hashlib.sha256(_json(payload).encode()).hexdigest()
@@ -78,7 +82,10 @@ class PostgresTurnRepository:
         kbs,docs=_tuple(row['knowledge_base_scope']),_tuple(row['document_scope'])
         options=row.get('request_configuration') or {}
         if isinstance(options,str):options=json.loads(options)
-        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs,**options)
+        options=dict(options)
+        ordered=tuple(options.pop('knowledge_base_order',kbs))
+        if set(ordered)!=set(kbs):raise ProviderError('TURN_KB_ORDER_SNAPSHOT_INVALID')
+        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',ordered,docs,**options)
         context=CallContext(row['run_id'],TrustedScope(self.principal.subject_id,kbs,docs),cancelled=asyncio.Event(),session_id=row['session_id'])
         return AcceptedTurn(row['run_id'],row['session_id'],row['user_message_id'],row['assistant_message_id'],context,
                             MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new,row['client_request_id'])
@@ -98,7 +105,10 @@ class PostgresTurnRepository:
                 rows=await self._rows(guard,'SELECT * FROM port_turns WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND client_request_id=%s FOR UPDATE',(*self._owner(principal),request.session_id,request.request_id))
                 if rows:
                     row=rows[0]
-                    if row['payload_sha256']!=payload:raise ProviderError('TURN_REQUEST_PAYLOAD_CONFLICT')
+                    if row['payload_sha256']!=payload:
+                        # v1 history did not capture order; preserve equivalent replay, never resend.
+                        if row.get('request_configuration') or self._request_configuration(request,include_order=False) or row['payload_sha256']!=self._payload(request,snapshot,include_order=False):
+                            raise ProviderError('TURN_REQUEST_PAYLOAD_CONFLICT')
                     await self._messages(guard,row)
                     return self._accepted(row)
                 # Recover source-existing messages without starting their run again.
