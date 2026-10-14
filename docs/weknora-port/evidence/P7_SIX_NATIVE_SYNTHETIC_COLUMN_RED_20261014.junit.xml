@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.025" timestamp="2026-10-14T08:12:16.834626+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_native_six_runner" name="test_actual_six_adapter_native_ingestion_pairing_and_gold_exclusion" time="0.801"><failure message="psycopg.errors.UndefinedColumn: column &quot;multimodal_config&quot; of relation &quot;knowledge_bases&quot; does not exist&#10;LINE 1: UPDATE knowledge_bases SET vlm_config=$1::jsonb,multimodal_c...&#10;                                                        ^">tmp_path = WindowsPath('C:/Users/22088/AppData/Local/Temp/pytest-of-22088/pytest-1018/test_actual_six_adapter_native0')
+
+    def test_actual_six_adapter_native_ingestion_pairing_and_gold_exclusion(tmp_path):
+        async def scenario():
+            import fitz
+            pdf=fitz.open();page=pdf.new_page();page.insert_text((50,50),'Native PDF public source evidence.');raw_pdf=pdf.tobytes();pdf.close()
+            pdfpath=tmp_path/'original.pdf';pdfpath.write_bytes(raw_pdf)
+            cases=lambda name:(PublicCase(name+'-q','extract source',{name+'-source':1},'synthetic',('DO_NOT_SEND_GOLD_ANSWER',)),)
+            datasets=tuple(NativeDataset(name,'SYNTHETIC_NOT_FROZEN_ACCEPTANCE',cases(name),
+                (PublicDocument(name+'-source','public source','Blue widgets use protocol W-17.'),))
+                for name in ('scifact','miracl-zh','longbench-zh','hotpotqa'))
+            datasets+= (NativeDataset('mmlongbench-doc','SYNTHETIC_NOT_FROZEN_ACCEPTANCE',cases('mmlongbench-doc'),files=({'doc_id':'mmlongbench-doc-source','path':str(pdfpath),'sha256':hashlib.sha256(raw_pdf).hexdigest(),'bytes':len(raw_pdf)},)),)
+            imagepath=tmp_path/'page.png';Image.new('RGB',(100,100),'white').save(imagepath)
+            page={'page_id':'synthetic-omni-page','document_id':'page.png','image_path':str(imagepath),'image_sha256':hashlib.sha256(imagepath.read_bytes()).hexdigest()}
+            frozen=FrozenGold('synthetic',datasets,(page,),{page['page_id']:{'layout_dets':[{'text':'DO_NOT_SEND_OMNI_GOLD'}]}},())
+            async with isolated_mock_application() as (application,wire,root):
+                runner=NativeSixRunner(application,execution_kind='ISOLATED_MOCK',prepare_kb=prepare_public_fixture)
+                result=await runner.run(frozen)
+                cases=[r for r in result['records'] if r['event']=='native_case'];omni=[r for r in result['records'] if r['event']=='native_omni_page']
+                assert len(cases)==5 and len(omni)==1
+                assert all(len(r['modes'])==4 and r['model_quality_status']=='NOT_RUN_SIMULATED_MODELS' for r in cases)
+                assert all(m['status']=='COMPLETED' and m['quality']['quality_metrics'] is None for r in cases for m in r['modes'])
+                assert all(m['citations'] and all(c['readable'] for c in m['citations']) for r in cases for m in r['modes'] if m['mode'] in ('EXPENSIVE_ONLY','DYNAMIC'))
+                assert omni[0]['parsing']['status']=='NOT_RUN'
+                assert 'DO_NOT_SEND_GOLD_ANSWER' not in json.dumps(wire) and 'DO_NOT_SEND_OMNI_GOLD' not in json.dumps(wire)
+                assert all(r['gold_indexed'] is False for r in cases+omni)
+                from pathlib import Path
+                Path('docs/weknora-port/evidence/P7_SIX_NATIVE_SYNTHETIC_20261014.json').write_text(json.dumps(result,ensure_ascii=False,default=str,indent=2),encoding='utf-8')
+&gt;       actual_pg_run(scenario())
+
+tests\weknora_port\test_native_six_runner.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_native_six_runner.py:29: in scenario
+    result=await runner.run(frozen)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+eval_center\weknora_six_runner.py:128: in run
+    await self.ingest_dataset(dataset)
+eval_center\weknora_six_runner.py:52: in ingest_dataset
+    await _resolve(self.prepare_kb(self.app,kb,dataset.name))
+eval_center\weknora_six_runner.py:18: in _resolve
+    return await value if inspect.isawaitable(value) else value
+           ^^^^^^^^^^^
+scripts\weknora_port_six_mock.py:15: in prepare_public_fixture
+    await guard.connection.execute('UPDATE knowledge_bases SET vlm_config=%s::jsonb,multimodal_config=%s::jsonb WHERE tenant_id=%s AND id=%s',
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;psycopg.AsyncConnection [BAD] at 0x1aea5bacc80&gt;
+query = 'UPDATE knowledge_bases SET vlm_config=%s::jsonb,multimodal_config=%s::jsonb WHERE tenant_id=%s AND id=%s'
+params = ('{"enabled": true, "model_id": "mdlec96904da0bf9c3e29cd0bcd55b4e9c8d59c97764c6d8e98cdf1ac75e1601", "description_langu...om_instructions": "BUSINESS_ONLY_CAPTION"}', '{"enable_multimodal": true}', 69, '6bd8272e-09f7-468f-a8e2-3c271806e72d')
+prepare = None, binary = False
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -&gt; AsyncCursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            return await cur.execute(query, params, prepare=prepare)
+    
+        except e._NO_TRACEBACK as ex:
+&gt;           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "multimodal_config" of relation "knowledge_bases" does not exist
+E           LINE 1: UPDATE knowledge_bases SET vlm_config=$1::jsonb,multimodal_c...
+E                                                                   ^
+
+E:\RAG quention\.venv\Lib\site-packages\psycopg\connection_async.py:295: UndefinedColumn</failure></testcase></testsuite></testsuites>

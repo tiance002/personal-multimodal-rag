@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="14.873" timestamp="2026-10-14T08:12:57.663268+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_native_six_runner" name="test_actual_six_adapter_native_ingestion_pairing_and_gold_exclusion" time="13.768"><failure message="backend.weknora_port.documents.DocumentLifecycleError: DOCUMENT_TYPE_UNSUPPORTED">tmp_path = WindowsPath('C:/Users/22088/AppData/Local/Temp/pytest-of-22088/pytest-1019/test_actual_six_adapter_native0')
+
+    def test_actual_six_adapter_native_ingestion_pairing_and_gold_exclusion(tmp_path):
+        async def scenario():
+            import fitz
+            pdf=fitz.open();page=pdf.new_page();page.insert_text((50,50),'Native PDF public source evidence.');raw_pdf=pdf.tobytes();pdf.close()
+            pdfpath=tmp_path/'original.pdf';pdfpath.write_bytes(raw_pdf)
+            cases=lambda name:(PublicCase(name+'-q','extract source',{name+'-source':1},'synthetic',('DO_NOT_SEND_GOLD_ANSWER',)),)
+            datasets=tuple(NativeDataset(name,'SYNTHETIC_NOT_FROZEN_ACCEPTANCE',cases(name),
+                (PublicDocument(name+'-source','public source','Blue widgets use protocol W-17.'),))
+                for name in ('scifact','miracl-zh','longbench-zh','hotpotqa'))
+            datasets+= (NativeDataset('mmlongbench-doc','SYNTHETIC_NOT_FROZEN_ACCEPTANCE',cases('mmlongbench-doc'),files=({'doc_id':'mmlongbench-doc-source','path':str(pdfpath),'sha256':hashlib.sha256(raw_pdf).hexdigest(),'bytes':len(raw_pdf)},)),)
+            imagepath=tmp_path/'page.png';Image.new('RGB',(100,100),'white').save(imagepath)
+            page={'page_id':'synthetic-omni-page','document_id':'page.png','image_path':str(imagepath),'image_sha256':hashlib.sha256(imagepath.read_bytes()).hexdigest()}
+            frozen=FrozenGold('synthetic',datasets,(page,),{page['page_id']:{'layout_dets':[{'text':'DO_NOT_SEND_OMNI_GOLD'}]}},())
+            async with isolated_mock_application() as (application,wire,root):
+                runner=NativeSixRunner(application,execution_kind='ISOLATED_MOCK',prepare_kb=prepare_public_fixture)
+                result=await runner.run(frozen)
+                cases=[r for r in result['records'] if r['event']=='native_case'];omni=[r for r in result['records'] if r['event']=='native_omni_page']
+                assert len(cases)==5 and len(omni)==1
+                assert all(len(r['modes'])==4 and r['model_quality_status']=='NOT_RUN_SIMULATED_MODELS' for r in cases)
+                assert all(m['status']=='COMPLETED' and m['quality']['quality_metrics'] is None for r in cases for m in r['modes'])
+                assert all(m['citations'] and all(c['readable'] for c in m['citations']) for r in cases for m in r['modes'] if m['mode'] in ('EXPENSIVE_ONLY','DYNAMIC'))
+                assert omni[0]['parsing']['status']=='NOT_RUN'
+                assert 'DO_NOT_SEND_GOLD_ANSWER' not in json.dumps(wire) and 'DO_NOT_SEND_OMNI_GOLD' not in json.dumps(wire)
+                assert all(r['gold_indexed'] is False for r in cases+omni)
+                from pathlib import Path
+                Path('docs/weknora-port/evidence/P7_SIX_NATIVE_SYNTHETIC_20261014.json').write_text(json.dumps(result,ensure_ascii=False,default=str,indent=2),encoding='utf-8')
+&gt;       actual_pg_run(scenario())
+
+tests\weknora_port\test_native_six_runner.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_native_six_runner.py:29: in scenario
+    result=await runner.run(frozen)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+eval_center\weknora_six_runner.py:128: in run
+    await self.ingest_dataset(dataset)
+eval_center\weknora_six_runner.py:61: in ingest_dataset
+    receipt=await self._upload(kb,file['doc_id'],file['doc_id'],'application/pdf',raw)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+eval_center\weknora_six_runner.py:35: in _upload
+    document=await self.app.upload_document(self.app.principal,kb,filename,media,raw)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\runtime.py:478: in upload_document
+    return await self.documents.upload_document(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;backend.weknora_port.documents.DocumentLifecycleService object at 0x000001D1AB1E6120&gt;
+principal = LocalPrincipal(tenant_id=70, subject_id='fixture-owner:037c4d09-f5c6-4ce5-95d2-679b15e66207')
+knowledge_base_id = '665e8003-21e5-40ec-bcc8-64df0938792a'
+filename = 'mmlongbench-doc-source', content_type = 'application/pdf'
+source = b'%PDF-1.7\n%\xc2\xb5\xc2\xb6\n\n1 0 obj\n&lt;&lt;/Type/Catalog/Pages 2 0 R&gt;&gt;\nendobj\n\n2 0 obj\n&lt;&lt;/Type/Pages/Count 1/Kids.../Size 7/Root 1 0 R/ID[&lt;0F4D1366C2814F02C3937BC3A171C2B0&gt;&lt;644E112A435602E23BEAC38974668423&gt;]&gt;&gt;\nstartxref\n525\n%%EOF\n'
+
+    async def upload_document(self, principal: LocalPrincipal, knowledge_base_id: str,
+                              filename: str, content_type: str, source: Any) -&gt; dict[str, Any]:
+        kb = await self._kb(principal, knowledge_base_id)
+        name = _filename(filename)
+        extension = Path(name).suffix.lower()
+        if extension not in _SUPPORTED_MEDIA:
+&gt;           raise DocumentLifecycleError("DOCUMENT_TYPE_UNSUPPORTED")
+E           backend.weknora_port.documents.DocumentLifecycleError: DOCUMENT_TYPE_UNSUPPORTED
+
+backend\weknora_port\documents.py:245: DocumentLifecycleError</failure></testcase></testsuite></testsuites>
