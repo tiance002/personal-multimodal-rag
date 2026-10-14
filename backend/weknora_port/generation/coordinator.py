@@ -173,9 +173,42 @@ class GenerationCoordinator:
             finally:
                 close = getattr(stream, 'aclose', None)
                 if close:
-                    await close()
+                    import sys
+                    if isinstance(sys.exc_info()[1], (CallCancelled, asyncio.CancelledError)):
+                        try:await asyncio.wait_for(close(),2)
+                        except (Exception,asyncio.CancelledError):pass
+                    else:
+                        await close()
         except BaseException as exc:
             failure = exc
+        if isinstance(failure, (CallCancelled, asyncio.CancelledError)):
+            async def close_cancelled_public_stream():
+                nonlocal thinking_closed, live_answer_closed
+                answer_tail = answer_decoder.flush()
+                thinking_tail = thinking_decoder.flush()
+                answer.append(answer_tail)
+                if thinking_tail:
+                    thinking.append(thinking_tail)
+                    await publish('thinking', thinking_tail)
+                await close_thinking()
+                if not live_answer_closed:
+                    await publish('answer', answer_tail, True)
+                    live_answer_closed = True
+                # DYNAMIC Cheap has never been public; do not expose its draft or citations.
+                if publish_live:
+                    references = self._references(request, registry)
+                    if references:
+                        await self.store.append_event(request.session_id, request.message_id,
+                            StreamEvent(attempt_id + '-cancel-references', 'references',
+                                data={'references': list(references)}))
+            cleanup = asyncio.create_task(close_cancelled_public_stream())
+            try:
+                await asyncio.wait_for(asyncio.shield(cleanup), 5)
+            except BaseException:
+                cleanup.cancel()
+                await asyncio.gather(cleanup, return_exceptions=True)
+                # Preserve cancellation identity; persistence reads only acknowledged events.
+                setattr(failure, 'cleanup_error_code', 'CANCELLED_STREAM_FLUSH_UNAVAILABLE')
         text = ''.join(answer)
         thought = ''.join(thinking)
         objectives = tuple((name for name, present in (('TRUNCATED', is_length(finish)), ('EMPTY', not text.strip()), ('INVALID_HANDLES', registry.invalid_count > 0)) if present))
@@ -195,12 +228,17 @@ class GenerationCoordinator:
             return (record, None, failure)
         if is_length(finish) and (not text.strip()):
             text = EMPTY_TRUNCATED_FALLBACK
+        references = self._references(request, registry)
+        return (record, (text, thought, references), None)
+
+    @staticmethod
+    def _references(request, registry):
         snapshot = registry.snapshot()
         used = set(registry.used_handles)
         chunk_ids = {ref[0] for handle, ref in snapshot.chunks if handle in used}
         urls = {url for handle, url, title in snapshot.webs if handle in used}
         references = tuple(({'id': e.id, 'content': e.source_content or e.content, 'score': e.score, 'knowledge_id': e.knowledge_id, 'knowledge_base_id': e.knowledge_base_id, 'knowledge_title': e.knowledge_title, 'knowledge_filename': e.knowledge_filename, 'chunk_index': e.chunk_index, 'chunk_type': e.chunk_type, 'knowledge_source': e.knowledge_source} for e in request.evidence if e.id in chunk_ids or e.id in urls))
-        return (record, (text, thought, references), None)
+        return references
 
     async def run(self, request, context):
         check_context(context)
@@ -230,6 +268,8 @@ class GenerationCoordinator:
             check_context(context)
             record, candidate, error = await self._attempt(request, prepared, context, role, ordinal, reason)
             attempts.append(record)
+            if isinstance(error, (CallCancelled, asyncio.CancelledError)):
+                raise error
             check_context(context)
             upgrade = ordinal == 1 and role == 'cheap' and (request.policy.mode == 'DYNAMIC') and error is None and bool(record.objective)
             if upgrade:

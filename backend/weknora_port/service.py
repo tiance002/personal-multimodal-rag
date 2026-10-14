@@ -170,9 +170,41 @@ class RuntimeService:
         code=getattr(error,'code','ORDINARY_CHAIN_FAILED')
         return code if isinstance(code,str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,127}',code) else 'ORDINARY_CHAIN_FAILED'
 
+    async def _publish_cancelled(self, accepted):
+        events,_=await self.store.get_events(accepted.session_id,accepted.assistant_message_id,0)
+        answer=''.join(event.content for event in events if event.type=='answer')
+        thinking=''.join(event.content for event in events if event.type=='thinking')
+        import html
+        references={}
+        for event in events:
+            if event.type!='references':continue
+            for ref in (event.data or {}).get('references',[]):
+                identifier=ref.get('id','')
+                if not identifier:continue
+                attribute='url' if ref.get('knowledge_source','').lower()=='web_search' else 'chunk_id'
+                if f'{attribute}="{html.escape(identifier,quote=True)}"' in answer:references[identifier]=ref
+        receipt=await self.repository.commit_cancelled(accepted,answer,thinking,list(references.values()))
+        if receipt is not True and receipt is not False:raise ProviderError('TURN_CANCEL_COMMIT_UNVERIFIED')
+        status='cancelled';code='MODEL_CALL_CANCELLED'
+        if receipt is False:
+            state=await self.repository.status(accepted.session_id,accepted.assistant_message_id)
+            status='failed' if state.status=='error' else state.status
+            code=state.error_code
+        events,_=await self.store.get_events(accepted.session_id,accepted.assistant_message_id,0)
+        if not any(event.type=='complete' for event in events):
+            await self.store.append_event(accepted.session_id,accepted.assistant_message_id,
+                StreamEvent(accepted.run_id,'complete',data={'status':status,'error_code':code,'lifecycle_completed':True}))
+
     async def publish_error(self, accepted, error):
         self._validate(accepted)
         code=self._safe_code(error)
+        if isinstance(error,(CallCancelled,asyncio.CancelledError)):
+            cleanup=asyncio.create_task(self._publish_cancelled(accepted))
+            try:await asyncio.wait_for(asyncio.shield(cleanup),5)
+            except BaseException:
+                cleanup.cancel();await asyncio.gather(cleanup,return_exceptions=True)
+                raise
+            return
         receipt=await self.repository.commit_failure(accepted,code)
         if receipt is False:
             return

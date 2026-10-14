@@ -31,7 +31,7 @@ try {
  assert.equal(metricsAfterStop.answer_stream_calls,1);assert.equal(metricsAfterStop.real_provider_calls,0);
  const sessions=await data(await page.request.get(api+'/sessions'));assert.equal(sessions.length,1);
  const messages=await data(await page.request.get(api+`/sessions/${sessions[0].id}/messages`));
- const assistant=messages.find(m=>m.role==='assistant');assert.equal(assistant.turn_error_code,'MODEL_CALL_CANCELLED');assert.equal(assistant.is_completed,false);
+ const assistant=messages.find(m=>m.role==='assistant');assert.equal(assistant.turn_error_code,'MODEL_CALL_CANCELLED');assert.equal(assistant.is_completed,true);assert.equal(assistant.turn_status,'cancelled');
  const completedStop=await page.request.post(api+`/sessions/${sessions[0].id}/stop`,{data:{message_id:assistant.id}});assert.equal(completedStop.status(),200);
  await page.screenshot({path:out+'/cancelled.png',fullPage:true});
  observations.push({kind:'actual_stop',metricsAfterStop,session:sessions[0].id,assistant,snapshot:await page.locator('body').ariaSnapshot()});

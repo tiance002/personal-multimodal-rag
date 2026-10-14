@@ -41,7 +41,7 @@ class IsolatedFixturePool:
 
 
 @asynccontextmanager
-async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None):
+async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None):
     tree=ast.parse(inspect.getsource(fixture.test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout_no_upgrade))
     scenario=next(n for n in tree.body[0].body if isinstance(n,ast.AsyncFunctionDef) and n.name=='scenario')
     body=[]
@@ -61,9 +61,16 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_tex
     # IsolatedConnectionFactory still constructs a fresh scoped identity guard.
     first=source.index('async def acquire():');last=source.index('leases = IsolatedConnectionFactory',first)
     source=source[:first]+"async def open_connection():\n    conn, _ = await connection(dsn)\n    return conn\npool = IsolatedFixturePool(open_connection)\nacquire = pool.acquire\nrelease = pool.release\n"+source[last:]
+    if answer_stream_factory is not None:
+        if not callable(answer_stream_factory):raise ValueError('MOCK_ANSWER_STREAM_FACTORY_REQUIRED')
+        expected=["return stream_response(body['model'], 'CHEAP_REJECTED_DRAFT', 'length')",
+                  "return stream_response(body['model'], 'Blue widgets use W-17. <ref id=\"c1\"/>', 'stop')"]
+        for branch in expected:
+            assert branch in source
+            source=source.replace(branch,"return ANSWER_STREAM_FACTORY(body['model'])")
     source+='\nruntime.fixture_connection_pool=pool\nreturn runtime,redis,wire,root,pool'
     program='async def build_native_fixture():\n'+'\n'.join('    '+line for line in source.splitlines())
-    namespace=dict(fixture.__dict__);namespace['dsn']=fixture.approved_dsn();namespace['IsolatedFixturePool']=IsolatedFixturePool
+    namespace=dict(fixture.__dict__);namespace['dsn']=fixture.approved_dsn();namespace['IsolatedFixturePool']=IsolatedFixturePool;namespace['ANSWER_STREAM_FACTORY']=answer_stream_factory
     if synthetic_monthly_limit is not None:
         from dataclasses import replace
         if type(synthetic_monthly_limit) is not int or not 1000000<=synthetic_monthly_limit<=10000000:

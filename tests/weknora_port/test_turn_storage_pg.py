@@ -143,6 +143,15 @@ def test_actual_pg_failure_receipt_and_atomic_final_authority():
             failure_row = next(row for row in rows if row['id'] == failed.assistant_message_id)
             assert success_row['content'] == final.answer and success_row['is_completed'] and not success_row['turn_error_code']
             assert failure_row['content'] == '' and failure_row['turn_status'] == 'error' and not failure_row['is_completed']
+            cancelled = await repo.accept(OrdinaryTurnRequest(session, 'fixture user cancellation', str(uuid.uuid4())), principal)
+            assert await repo.commit_cancelled(cancelled,'public partial','public thought',[]) is True
+            assert await repo.commit_cancelled(cancelled,'must not overwrite','',[]) is False
+            assert (await repo.status(session,cancelled.assistant_message_id,principal)).status=='cancelled'
+            cancelled_row=await (await conn.execute('SELECT content,is_completed,turn_status,agent_steps FROM messages WHERE id=%s',(cancelled.assistant_message_id,))).fetchone()
+            assert cancelled_row['is_completed'] and cancelled_row['turn_status']=='cancelled' and cancelled_row['content']=='public partial'
+            assert cancelled_row['agent_steps'][0]['reasoning_content']=='public thought'
+            with pytest.raises(ProviderError,match='TURN_ALREADY_FAILED'):
+                await repo.commit_final(FinalCommit(session,cancelled.assistant_message_id,cancelled.run_id,'late fake success',[]))
             save('failure_final', {'session_id': session, 'failed_run_id': failed.run_id, 'successful_run_id': successful.run_id,
                 'messages': rows, 'late_failure_receipt': False, 'late_final_after_failure_denied': True,
                 'budget_ledger_operations': 0})

@@ -159,8 +159,9 @@ export function WeKnoraPythonApp() {
     try {
       const history = await portApi.messages(session.id);
       setMessages(history.map(row => ({ id: row.id, role: row.role === "user" ? "user" : "assistant", content: row.content,
-        status: row.role === "user" || row.is_completed ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.turn_status === "error" ? "failed" : "unknown",
+        status: row.role === "user" ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.is_completed ? "completed" : row.turn_status === "error" ? "failed" : "unknown",
         error: row.turn_status === "error",
+        progress: (row.agent_steps ?? []).filter(step => step.reasoning_content).map(step => ({ type: "thinking", text: step.reasoning_content ?? "" })),
       })));
       setNotice("已读取保存的会话历史；实时阶段仅显示当前连接收到的事件");
     } catch (error) { setMessages([assistantBubble(`历史读取失败：${errorText(error)}`)]); }

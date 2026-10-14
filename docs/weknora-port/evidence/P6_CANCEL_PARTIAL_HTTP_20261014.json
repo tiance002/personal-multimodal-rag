@@ -1,0 +1,53 @@
+{
+  "kind": "ACTUAL_LOOPBACK_HTTP_PG_REDIS_CLOSED_PROVIDER_STREAM",
+  "storage_root": "E:\\WK\\run\\8687db5a1018",
+  "cases": [
+    {
+      "case": "partial",
+      "request": "55440622-38f6-453d-8a24-67f70b505da2",
+      "assistant": "a81b6ba5-7346-4a53-b6cf-465dba798610",
+      "partial_saved": true,
+      "references": 1,
+      "lifecycle_completed": true,
+      "status": "cancelled",
+      "error_toast_events": 0,
+      "answer_calls": 1,
+      "unknown_occupied": 100
+    },
+    {
+      "case": "disconnect",
+      "request": "49572f95-159b-4ce7-bcf7-11b99e2bacea",
+      "assistant": "9ae8b4ab-56ed-453d-82bc-4a2d28a962a4",
+      "partial_saved": true,
+      "references": 1,
+      "lifecycle_completed": true,
+      "status": "cancelled",
+      "error_toast_events": 0,
+      "answer_calls": 1,
+      "unknown_occupied": 100
+    },
+    {
+      "case": "hidden-cheap",
+      "request": "757454bb-174f-4830-b02d-bc958d1c125f",
+      "assistant": "ab7ab7a4-2cb7-4f67-a577-b492c3f4c32e",
+      "partial_saved": false,
+      "references": 0,
+      "lifecycle_completed": true,
+      "status": "cancelled",
+      "error_toast_events": 0,
+      "answer_calls": 1,
+      "unknown_occupied": 100
+    },
+    {
+      "case": "final-commit-wins",
+      "request": "fcf6c158-79c7-40dc-85b4-50ec3e22e6ae",
+      "assistant": "54d6ecd0-eb22-4361-b24c-b2f9506f0de4",
+      "status": "completed",
+      "late_cancel_did_not_overwrite": true,
+      "terminal_events": 1,
+      "interleaving": "HTTP stop queued before commit; controlled watcher poll after atomic DB commit"
+    }
+  ],
+  "real_provider_calls": 0,
+  "old_data_changed": false
+}

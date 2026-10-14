@@ -147,11 +147,48 @@ class PostgresTurnRepository:
                 await guard.connection.execute("UPDATE port_turns SET status='error',error_code=%s,updated_at=now() WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND run_id=%s",(safe_code,*self._owner(self.principal),accepted.session_id,accepted.run_id))
                 return True
 
-    async def status(self,session_id,assistant_id,principal):
+    async def commit_cancelled(self,accepted,answer,thinking,references) -> bool:
+        if not isinstance(accepted,AcceptedTurn) or accepted.memory_context!=MemoryContext(self.principal.tenant_id,self.principal.subject_id):raise ProviderError('TURN_OWNER_MISMATCH')
+        if not isinstance(answer,str) or not isinstance(thinking,str):raise ProviderError('TURN_CANCELLED_CONTENT_INVALID')
+        encoded=_json(references)
+        async with self.leases.lease() as guard:
+            async with guard.connection.transaction():
+                await guard.connection.execute("SET LOCAL statement_timeout='4500ms'")
+                await guard.connection.execute("SET LOCAL lock_timeout='4500ms'")
+                await self._session(guard,accepted.session_id,self.principal)
+                row=await self._row(guard,accepted.session_id,accepted.assistant_message_id)
+                if row['run_id']!=accepted.run_id:raise ProviderError('TURN_RUN_IDENTITY_MISMATCH')
+                messages=await self._rows(guard,"SELECT is_completed,agent_steps FROM messages WHERE id=%s AND request_id=%s AND session_id=%s AND tenant_id=%s AND subject_id=%s AND role='assistant' AND deleted_at IS NULL FOR UPDATE",
+                    (accepted.assistant_message_id,accepted.run_id,accepted.session_id,*self._owner(self.principal)))
+                if len(messages)!=1:raise ProviderError('TURN_MESSAGES_UNAVAILABLE')
+                if messages[0]['is_completed'] or row['status']!='pending':return False
+                for reference in references:
+                    if reference.get('knowledge_source','').lower()=='web_search':continue
+                    if reference.get('knowledge_base_id') not in accepted.context.scope.knowledge_base_ids or (accepted.context.scope.document_ids and reference.get('knowledge_id') not in accepted.context.scope.document_ids):raise ProviderError('TURN_CANCELLED_REFERENCE_SCOPE_MISMATCH')
+                    source=await self._rows(guard,"SELECT content,source_content FROM chunks WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s AND deleted_at IS NULL",
+                        (reference.get('id'),self.principal.tenant_id,reference.get('knowledge_base_id'),reference.get('knowledge_id')))
+                    if len(source)!=1 or (source[0]['source_content'] or source[0]['content'])!=reference.get('content'):raise ProviderError('TURN_CANCELLED_REFERENCE_UNAVAILABLE')
+                steps=messages[0]['agent_steps'] or []
+                if thinking:
+                    from datetime import datetime,timezone
+                    steps=list(steps)
+                    if not steps:steps=[{'iteration':0,'timestamp':datetime.now(timezone.utc).isoformat(),'tool_calls':[]}]
+                    steps[0]={**steps[0],'reasoning_content':thinking}
+                await guard.connection.execute("UPDATE messages SET content=%s,rendered_content=%s,knowledge_references=%s::jsonb,agent_steps=%s::jsonb,is_completed=true,turn_status='cancelled',turn_error_code='MODEL_CALL_CANCELLED',updated_at=now() WHERE id=%s AND request_id=%s AND session_id=%s AND tenant_id=%s AND subject_id=%s AND role='assistant'",
+                    (answer,answer,encoded,_json(steps),accepted.assistant_message_id,accepted.run_id,accepted.session_id,*self._owner(self.principal)))
+                # Existing coarse terminal CHECK stays unchanged; error_code/message status distinguish cancel from success.
+                await guard.connection.execute("UPDATE port_turns SET status='error',error_code='MODEL_CALL_CANCELLED',updated_at=now() WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND run_id=%s",
+                    (*self._owner(self.principal),accepted.session_id,accepted.run_id))
+                return True
+
+    async def status(self,session_id,assistant_id,principal=None):
+        principal=self.principal if principal is None else principal
         self._owner(principal)
         async with self.leases.lease() as guard:
-            rows=await self._rows(guard,"SELECT t.status,t.error_code,m.is_completed FROM port_turns t JOIN messages m ON m.id=t.assistant_message_id AND m.tenant_id=t.tenant_id AND m.subject_id=t.subject_id JOIN sessions s ON s.id=t.session_id AND s.tenant_id=t.tenant_id AND s.subject_id=t.subject_id WHERE t.tenant_id=%s AND t.subject_id=%s AND t.session_id=%s AND t.assistant_message_id=%s AND m.deleted_at IS NULL AND s.deleted_at IS NULL",(*self._owner(principal),session_id,assistant_id))
+            rows=await self._rows(guard,"SELECT t.status,t.error_code,m.is_completed,m.turn_status FROM port_turns t JOIN messages m ON m.id=t.assistant_message_id AND m.tenant_id=t.tenant_id AND m.subject_id=t.subject_id JOIN sessions s ON s.id=t.session_id AND s.tenant_id=t.tenant_id AND s.subject_id=t.subject_id WHERE t.tenant_id=%s AND t.subject_id=%s AND t.session_id=%s AND t.assistant_message_id=%s AND m.deleted_at IS NULL AND s.deleted_at IS NULL",(*self._owner(principal),session_id,assistant_id))
             if len(rows)!=1:raise ProviderError('TURN_RUN_UNAVAILABLE')
+            if rows[0]['turn_status']=='cancelled':return TurnState('cancelled',rows[0]['error_code'])
+            if rows[0]['status']=='error':return TurnState('error',rows[0]['error_code'])
             return TurnState('completed','') if rows[0]['is_completed'] else TurnState(rows[0]['status'],rows[0]['error_code'])
 
     async def commit_final(self,commit):

@@ -311,7 +311,7 @@ class ApplicationRuntime:
         async with self.leases.lease() as guard:
             await self.turns._session(guard, session_id, principal)
             return await (await guard.connection.execute(
-                "SELECT id,request_id,role,content,created_at,knowledge_references,is_completed,turn_status,"
+                "SELECT id,request_id,role,content,created_at,knowledge_references,agent_steps,is_completed,turn_status,"
                 "turn_error_code,knowledge_base_scope,document_scope FROM messages WHERE "
                 "tenant_id=%s AND subject_id=%s AND session_id=%s AND deleted_at IS NULL "
                 "ORDER BY created_at,id", (principal.tenant_id, principal.subject_id, session_id))).fetchall()

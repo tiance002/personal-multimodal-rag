@@ -1,0 +1,294 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race ____
+
+fut = <coroutine object Event.wait at 0x00000130654D5700>, timeout = 3
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+D:\Drivers\python\Lib\asyncio\tasks.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <asyncio.locks.Event object at 0x0000013069B77830 [unset]>
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another task calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+>           await fut
+E           asyncio.exceptions.CancelledError
+
+D:\Drivers\python\Lib\asyncio\locks.py:213: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+    def test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race():
+        async def scenario():
+            control={'started':asyncio.Event(),'closed':False,'race':False,'models':[]}
+            def stream_factory(model):
+                control['models'].append(model)
+                if control['race']:return stream_response(model,'Final winner <ref id="c1"/>','stop')
+                return httpx.Response(200,headers={'content-type':'text/event-stream'},stream=PartialStream(control,model))
+            async with isolated_mock_application(answer_stream_factory=stream_factory) as (app,wire,root):
+                kb=(await app.create_knowledge_base(app.principal,'Cancellation native fixture'))['id']
+                await app.update_knowledge_base_consent(app.principal,kb,True)
+                document=await app.upload_document(app.principal,kb,'handbook.txt','text/plain',SOURCE.encode());assert document['status']=='completed'
+                sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close()
+                base=f'http://127.0.0.1:{port}'
+                native=create_app(app,resolve_principal=lambda request:app.principal,allowed_origins=(base,))
+                server=uvicorn.Server(uvicorn.Config(native,host='127.0.0.1',port=port,log_level='error',lifespan='off'))
+                server_task=asyncio.create_task(server.serve())
+                for _ in range(200):
+                    if server.started:break
+                    if server_task.done():await server_task
+                    await asyncio.sleep(.01)
+                assert server.started
+                receipts=[]
+                try:
+                    async with httpx.AsyncClient(base_url=base,headers={'Origin':base},timeout=20) as client:
+                        for label,mode,disconnect in [('partial','EXPENSIVE_ONLY',False),('disconnect','EXPENSIVE_ONLY',True),('hidden-cheap','DYNAMIC',True)]:
+                            app.policy=RouterPolicy(mode=mode)
+                            control.update(started=asyncio.Event(),closed=False,race=False,models=[])
+                            session=(await client.post('/api/v1/sessions',json={'knowledge_base_scope':[kb],'document_scope':[document['id']]})).json()['data']['id']
+                            request={'content':'What protocol do blue widgets use?','request_id':str(uuid.uuid4()),'knowledge_base_scope':[kb],'document_scope':[document['id']]}
+                            async with client.stream('POST',f'/api/v1/sessions/{session}/messages',json=request) as response:
+                                assert response.status_code==200
+                                await asyncio.wait_for(control['started'].wait(),5)
+                                rows=(await client.get(f'/api/v1/sessions/{session}/messages')).json()['data']
+                                assistant=next(r for r in rows if r['role']=='assistant')
+                                before=len(control['models'])
+                                if not disconnect:
+                                    stopped=await client.post(f'/api/v1/sessions/{session}/stop',json={'message_id':assistant['id']});assert stopped.status_code==200
+                            if disconnect:
+                                assert not control['closed'],'SSE disconnect incorrectly cancelled provider'
+                                stopped=await client.post(f'/api/v1/sessions/{session}/stop',json={'message_id':assistant['id']});assert stopped.status_code==200
+                            await asyncio.wait_for(app.drain_background(),8)
+                            rows=(await client.get(f'/api/v1/sessions/{session}/messages')).json()['data'];saved=next(r for r in rows if r['id']==assistant['id'])
+                            assert saved['is_completed'] and saved['turn_status']=='cancelled' and saved['turn_error_code']=='MODEL_CALL_CANCELLED'
+                            assert (await app.turns.status(session,assistant['id'])).status=='cancelled'
+                            events,_=await app.store.get_events(session,assistant['id'],0)
+                            assert not any(e.type=='error' for e in events)
+                            assert sum(e.type=='complete' for e in events)==1 and events[-1].data['status']=='cancelled'
+                            assert len(control['models'])==before==1 and control['closed']
+                            if mode=='DYNAMIC':
+                                assert saved['content']=='' and saved['knowledge_references']==[] and saved['agent_steps']==[]
+                                assert not any(e.type in ('answer','thinking','references') for e in events)
+                            else:
+                                assert saved['content'].startswith('Visible partial ') and '<ref' not in saved['content'] and saved['content'].endswith(' and held ')
+                                assert len(saved['knowledge_references'])==1 and saved['agent_steps'][0]['reasoning_content']=='Public thought'
+                                assert (await client.get('/api/v1/chunks/'+saved['knowledge_references'][0]['id'])).status_code==200
+                            repeat=await client.post(f'/api/v1/sessions/{session}/stop',json={'message_id':assistant['id']});assert repeat.json()['message']=='Message already completed'
+                            after,_=await app.store.get_events(session,assistant['id'],0);assert len(after)==len(events)
+                            async with app.leases.lease() as guard:
+                                ledger=await (await guard.connection.execute("SELECT state,reserved_microunits,actual_microunits FROM send_calls WHERE request_id LIKE %s",(saved['request_id']+'/answer/%',))).fetchall()
+                                assert len(ledger)==1 and ledger[0]['state']=='unknown' and ledger[0]['reserved_microunits']>0 and ledger[0]['actual_microunits'] is None
+                            receipts.append({'case':label,'request':saved['request_id'],'assistant':saved['id'],'partial_saved':bool(saved['content']),'references':len(saved['knowledge_references']),'lifecycle_completed':True,'status':'cancelled','error_toast_events':0,'answer_calls':1,'unknown_occupied':ledger[0]['reserved_microunits']})
+                        # Final DB commit wins before a later stop; cancel must not overwrite or label it cancelled.
+                        app.policy=RouterPolicy(mode='EXPENSIVE_ONLY');control.update(race=True,models=[])
+                        original_commit=app.turns.commit_final;written=asyncio.Event();release=asyncio.Event();contexts={}
+                        original_factory=app.ordinary.generation_factory
+                        async def capture(turn,progress):contexts[turn.run_id]=turn.context;return await original_factory(turn,progress)
+                        app.ordinary.generation_factory=capture
+                        async def blocked_final(commit):await original_commit(commit);written.set();await release.wait()
+                        app.turns.commit_final=blocked_final
+                        session=(await client.post('/api/v1/sessions',json={'knowledge_base_scope':[kb],'document_scope':[document['id']]})).json()['data']['id']
+                        request={'content':'What protocol do blue widgets use?','request_id':str(uuid.uuid4()),'knowledge_base_scope':[kb],'document_scope':[document['id']]}
+                        async with client.stream('POST',f'/api/v1/sessions/{session}/messages',json=request) as response:
+                            await asyncio.wait_for(written.wait(),5)
+                            rows=(await client.get(f'/api/v1/sessions/{session}/messages')).json()['data'];saved=next(r for r in rows if r['role']=='assistant')
+                            assert saved['is_completed']
+                            await client.post(f'/api/v1/sessions/{session}/stop',json={'message_id':saved['id']})
+                            await asyncio.wait_for(contexts[saved['request_id']].cancelled.wait(),3)
+                            release.set();await asyncio.wait_for(app.drain_background(),8)
+                        rows=(await client.get(f'/api/v1/sessions/{session}/messages')).json()['data'];saved=next(r for r in rows if r['role']=='assistant')
+                        assert saved['content'].startswith('Final winner') and saved['is_completed'] and not saved['turn_error_code']
+                        assert (await app.turns.status(session,saved['id'])).status=='completed'
+                        events,_=await app.store.get_events(session,saved['id'],0)
+                        assert not any(e.type=='error' for e in events) and sum(e.type=='complete' for e in events)==1 and events[-1].data['status']=='completed'
+                        receipts.append({'case':'final-commit-wins','request':saved['request_id'],'assistant':saved['id'],'status':'completed','late_cancel_did_not_overwrite':True,'terminal_events':1})
+                        Path('docs/weknora-port/evidence/P6_CANCEL_PARTIAL_HTTP_20261014.json').write_text(json.dumps({'kind':'ACTUAL_LOOPBACK_HTTP_PG_REDIS_CLOSED_PROVIDER_STREAM','storage_root':str(root),'cases':receipts,'real_provider_calls':0,'old_data_changed':False},indent=2),encoding='utf-8')
+                finally:
+                    server.should_exit=True;await asyncio.wait_for(server_task,5)
+>       actual_pg_run(scenario())
+
+tests\weknora_port\test_cancel_partial_http_pg.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_cancel_partial_http_pg.py:101: in scenario
+    await asyncio.wait_for(contexts[saved['request_id']].cancelled.wait(),3)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x0000013069C4E3C0>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is not None:
+                # Since there are no new cancel requests, we're
+                # handling this.
+                if issubclass(exc_type, exceptions.CancelledError):
+>                   raise TimeoutError from exc_val
+E                   TimeoutError
+
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: TimeoutError
+------------------------------ Captured log call ------------------------------
+ERROR    asyncio:base_events.py:1858 unhandled exception during asyncio.run() shutdown
+task: <Task finished name='ordinary:a4e75dda-5f16-4f1e-a4a8-962bf99546df' coro=<BoundOrdinaryService.run_turn() done, defined at E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\runtime.py:165> exception=RuntimeError('FIXTURE_POOL_CLOSED')>
+Traceback (most recent call last):
+  File "D:\Drivers\python\Lib\asyncio\tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\locks.py", line 213, in wait
+    await fut
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_memory_storage_pg.py", line 36, in actual_pg_run
+    return runner.run(awaitable)
+           ~~~~~~~~~~^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_cancel_partial_http_pg.py", line 101, in scenario
+    await asyncio.wait_for(contexts[saved['request_id']].cancelled.wait(),3)
+  File "D:\Drivers\python\Lib\asyncio\tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\service.py", line 155, in completed
+    done.result()
+    ~~~~~~~~~~~^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\runtime.py", line 167, in run_turn
+    result = await super().run_turn(turn)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\service.py", line 329, in run_turn
+    await self.publish_error(turn,exc)
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\service.py", line 203, in publish_error
+    try:await asyncio.wait_for(asyncio.shield(cleanup),5)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\service.py", line 186, in _publish_cancelled
+    receipt=await self.repository.commit_cancelled(accepted,answer,thinking,list(references.values()))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\storage\turns.py", line 154, in commit_cancelled
+    async with self.leases.lease() as guard:
+               ~~~~~~~~~~~~~~~~~^^
+  File "D:\Drivers\python\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\storage\connections.py", line 19, in lease
+    connection = await self.acquire()
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\native_fixture.py", line 16, in acquire
+    if self.closed:raise RuntimeError('FIXTURE_POOL_CLOSED')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: FIXTURE_POOL_CLOSED
+============================== warnings summary ===============================
+tests/weknora_port/test_cancel_partial_http_pg.py::test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_cancel_partial_http_pg.py::test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_cancel_partial_http_pg.py::test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race
+1 failed, 2 warnings in 9.81s

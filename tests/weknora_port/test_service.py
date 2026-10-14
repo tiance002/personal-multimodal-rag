@@ -34,6 +34,8 @@ class DurableRepository:
         if (session,message)!=(t.session_id,t.assistant_message_id):raise ProviderError('SCOPE_DENIED')
         return replace(t,is_new=False,replay_only=True)
     async def commit_failure(self,turn,code):self.failures.append((turn.assistant_message_id,code));self.trace.append('FAILURE_COMMIT');return True
+    async def commit_cancelled(self,turn,answer,thinking,references):
+        self.failures.append((turn.assistant_message_id,'MODEL_CALL_CANCELLED'));self.trace.append('CANCEL_COMMIT');return True
 class History:
     def __init__(self):self.calls=[]
     async def load(self,context,session,max_rounds):
@@ -116,7 +118,12 @@ def test_failure_persists_assistant_before_error_complete_without_retry(error):
         accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
         assert not c.calls and not e.calls and not commit.calls and len(repo.failures)==1
         assert repo.failures[0][0]=='assistant'
-        assert store.events[-2].type=='error' and store.events[-1].type=='complete'
+        if isinstance(error,CallCancelled):
+            assert not any(event.type=='error' for event in store.events)
+            assert store.events[-1].type=='complete' and store.events[-1].data['status']=='cancelled'
+            assert store.events[-1].data['lifecycle_completed']
+        else:
+            assert store.events[-2].type=='error' and store.events[-1].type=='complete'
         assert 'private' not in str(store.events) and 'secret' not in str(store.events)
         await service.accept_turn(REQ,'owner');assert counts['pipeline']==1
     run(scenario())

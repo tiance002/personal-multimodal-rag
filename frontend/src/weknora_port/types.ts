@@ -3,7 +3,7 @@ export type RuntimeIdentity = { implementation: string; api_version?: string };
 export type KnowledgeBase = { id: string; name: string; cloud_allowed: boolean; document_count: number };
 export type DocumentRow = { id: string; knowledge_base_id: string; filename: string; status: string };
 export type SessionRow = { id: string; title: string; knowledge_base_scope: string[]; document_scope: string[]; updated_at: string };
-export type MessageRow = { id: string; role: "user" | "assistant" | "tool"; content: string; request_id: string; created_at: string; is_completed?: boolean; turn_status?: string; turn_error_code?: string };
+export type MessageRow = { id: string; role: "user" | "assistant" | "tool"; content: string; request_id: string; created_at: string; agent_steps?: { reasoning_content?: string }[]; is_completed?: boolean; turn_status?: string; turn_error_code?: string };
 export type ModelRole = "embedding" | "rerank" | "cheap" | "expensive" | "vlm";
 export type ModelConfigurationRole = {
   role: ModelRole;

@@ -1,0 +1,50 @@
+........................................................................ [ 65%]
+.................F....................                                   [100%]
+================================== FAILURES ===================================
+_ test_failure_persists_assistant_before_error_complete_without_retry[error2] _
+
+error = CallCancelled('MODEL_CALL_CANCELLED')
+
+    @pytest.mark.parametrize('error',[ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_HTTP_ERROR',sent=True),CallCancelled(),RunDeadlineExceeded(),RuntimeError('private URL secret')])
+    def test_failure_persists_assistant_before_error_complete_without_retry(error):
+        async def scenario():
+            service,repo,retrieval,co,c,e,store,commit,counts=runtime(error=error)
+            accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
+            assert not c.calls and not e.calls and not commit.calls and len(repo.failures)==1
+            assert repo.failures[0][0]=='assistant'
+            assert store.events[-2].type=='error' and store.events[-1].type=='complete'
+            assert 'private' not in str(store.events) and 'secret' not in str(store.events)
+            await service.accept_turn(REQ,'owner');assert counts['pipeline']==1
+>       run(scenario())
+
+tests\weknora_port\test_service.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_service.py:16: in run
+    def run(value):return asyncio.run(value)
+                          ^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime(error=error)
+        accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
+        assert not c.calls and not e.calls and not commit.calls and len(repo.failures)==1
+        assert repo.failures[0][0]=='assistant'
+>       assert store.events[-2].type=='error' and store.events[-1].type=='complete'
+E       AssertionError: assert ('progress' == 'error'
+E         
+E         - error
+E         + progress)
+
+tests\weknora_port\test_service.py:121: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_service.py::test_failure_persists_assistant_before_error_complete_without_retry[error2]
+1 failed, 109 passed in 3.20s
