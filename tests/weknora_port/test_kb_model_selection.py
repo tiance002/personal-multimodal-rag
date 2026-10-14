@@ -69,3 +69,14 @@ def test_canonical_scope_retains_explicit_order_in_new_request_snapshot():
     assert repo._request_configuration(request)=={'knowledge_base_order':['b','a']}
     snapshot=ScopeSnapshot('q',('a','b'),())
     assert repo._payload(request,snapshot)!=repo._payload(request,snapshot,include_order=False)
+
+
+def test_sorted_multi_kb_new_request_is_not_unversioned_legacy():
+    from dataclasses import replace
+    from backend.weknora_port.storage.turns import PostgresTurnRepository,ScopeSnapshot
+    repo=object.__new__(PostgresTurnRepository)
+    request=OrdinaryTurnRequest('s','q','r',knowledge_base_scope=('a','b'))
+    snapshot=ScopeSnapshot('q',('a','b'),())
+    assert repo._request_configuration(request)=={'knowledge_base_order':['a','b']}
+    assert repo._payload(request,snapshot)!=repo._payload(replace(request,knowledge_base_scope=('b','a')),snapshot)
+    assert repo._payload(request,snapshot,include_order=False)==repo._payload(replace(request,knowledge_base_scope=('b','a')),snapshot,include_order=False)

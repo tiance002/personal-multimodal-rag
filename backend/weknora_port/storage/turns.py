@@ -67,7 +67,7 @@ class PostgresTurnRepository:
     def _request_configuration(request, *, include_order=True):
         value={name:getattr(request,name) for name in ('summary_model_id','reasoning_effort','accept_language') if getattr(request,name)}
         ordered=tuple(dict.fromkeys(request.knowledge_base_scope))
-        if include_order and ordered!=tuple(sorted(ordered)):
+        if include_order and len(ordered)>1:
             value['knowledge_base_order']=list(ordered)
         return value
 

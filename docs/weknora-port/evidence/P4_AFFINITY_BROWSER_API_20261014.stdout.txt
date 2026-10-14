@@ -1,0 +1,18 @@
+PUBLIC_FULL_CORPUS_ERROR ProviderError MODEL_ORIGIN_KB_EGRESS_DENIED [('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\models\\transport.py', 209, 'open'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\runtime.py', 107, 'authorize'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\runtime.py', 104, '_call'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\storage\\send_gate.py', 169, 'authorize'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\storage\\send_gate.py', 141, '_permission')]
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_affinity_browser_fixture.py", line 57, in <module>
+    actual_pg_run(run())
+    ~~~~~~~~~~~~~^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_memory_storage_pg.py", line 36, in actual_pg_run
+    return runner.run(awaitable)
+           ~~~~~~~~~~^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_affinity_browser_fixture.py", line 18, in run
+    assert doc['status']=='completed'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

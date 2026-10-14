@@ -1,0 +1,75 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "baseline": "143ddb74d43fa510d8d6a9cff335b88cd8f7e784",
+  "checkpoint": "303a124cabf849fcca16c8fee91d4d72a205a018",
+  "source_raw_git_sha256": {
+    "internal/application/service/chat_pipeline/memory_affinity.go": "47bd27392a995d5bcac503bc834c17f337ab0cddc22058b2db0de72265206f66",
+    "internal/application/service/session_knowledge_qa.go": "bfc76618b54725ff85f6f3fba194c0e93b5ef9bab50c2d067e2fc54443228dc3",
+    "internal/application/service/session_qa_helpers.go": "daac1e03b819763bc6fc5a72a3077c5edc2466637ee2ebd95d1cfdb00841455d",
+    "internal/models/chat/chat.go": "1916e21849a136172d6a529a3e976cdd50237e579f3337af60acaec1efdea641",
+    "internal/application/repository/model.go": "bc985cfb9a480949d47c1404e796a335810e5bf20bf1487cf8ca1a9896a9e24e",
+    "frontend/src/views/settings/MemorySettings.vue": "8aafb0d06bdb2c4e31431cf839a3cc1d2973102a5d2e21cd5a43bc5ecbf8e879"
+  },
+  "local_sha256": {
+    "backend/weknora_port/model_selection.py": "80a5175c740810f953b96fc5c60b536e7e6604961540e7ee322bf91d446fa10c",
+    "backend/weknora_port/retrieval/memory_affinity.py": "f8c1da502f4100dd3166c067525a6aa3dcf893bcb515b90d8b6d29d72639db35",
+    "backend/weknora_port/retrieval/pipeline.py": "2c0041f0259707e3f6fee8d2fe573c5ebcb62467086c8617ec07330d61b881ac",
+    "backend/weknora_port/runtime.py": "40501a4d138df4716b3367991f15433f6d12d8d312b57d9dfecfa6b5614ef25f",
+    "backend/weknora_port/storage/turns.py": "b331a460421ac19a056fdf84ac7a29a2297352d3e3c4cf6e8580abd6579e667b",
+    "frontend/src/weknora_port/MemoryPanel.tsx": "3f6188f2f274fd63612f4f661bacf27af381f5247ffe98e7ce5a328b7d2b0be6",
+    "frontend/src/weknora_port/WeKnoraPythonApp.tsx": "15575c684165b53227e7f58ddd75d3d3d6f40660176571f4509542041a3165b3",
+    "frontend/src/weknora_port/api.ts": "93cd9182402a3b9c27535ddd1578a260439dea2cb02615a28a10905f88b889c6",
+    "tests/weknora_port/fixtures/affinity_kb_go_oracle.json": "f21dcfaffc58a42d7dbcede97897f5de38b1de873acc73b3a1e66961ae2b9cdd",
+    "tests/weknora_port/test_affinity_kb_http_pg.py": "6eeae94dcf890fd8cd8b9d563e21b5a2297a1df43077b70e28f1fc0acfb91ac3",
+    "tests/weknora_port/test_affinity_pipeline.py": "5b6ab808fd40ba3c2e6c95690548cc730957c9b7afca8e05aa0612d787effba9",
+    "tests/weknora_port/test_kb_model_selection.py": "9d59f2f3b43f237910a2099d2468a567c57c73ea59b1c96ec562dc09b24c3967",
+    "scripts/weknora_port_affinity_browser_fixture.py": "31d402bfba21970a0bf981e6451e0a1879bbcf269e561a6886f10ce8428ea9aa",
+    "scripts/weknora_port_affinity_kb_oracle.py": "36da6ac150a79459bed4a8e823036174609f6fefa219cf5fe568e386b841e5ae",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_20261014.png": "220a6efde243f3f29c0e8647b64d3c9f66aaa482c62ac540744bcf20a46e624d",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_API_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_API_20261014.stdout.txt": "3860e6021b3cc8347315fb12278a566e665b14c5fa927b791c9108ee88844d4e",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_API_RETRY_20261014.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_API_RETRY_20261014.stdout.txt": "f57ef4b3ad5170269204b83101f3a0c069d6f5be889642bfb82c52fe4e97c58f",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_CANCEL_20261014.json": "3485e0c92d0cfbe07d3bf19e5065986bd8d4f63025716377b36b9a28de927eaa",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_DELETE_20261014.json": "00c70edb7d6aa54d63b87040060a99a3b5056dcc420715192038c308e5636754",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_IDENTITY_20261014.json": "15c81945a30641ffcdae461e5de8160dee0193cabaafe02125f428cb92450262",
+    "docs/weknora-port/evidence/P4_AFFINITY_BROWSER_SOURCE_20261014.json": "1c970957f8dce937db1311cbcced70a2356b41136a994387e31cb0ae43918153",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_ENTRY_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_ENTRY_20261014.junit.xml": "dd700ed85c205a8b3b16c247acf9ad1a502eaf3c853201c6e132a9278e5291bd",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_ENTRY_20261014.stdout.txt": "c02cedf0f941acee3deb8bda39395a1057a9259844cc6bfaa9297683809811af",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_GO_20261014.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_GREEN_20261014.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_GREEN_20261014.stdout.txt": "bd644b49dad2f13be66da2cfd877778e334ae8b5ba37696ff3b667f651e92196",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_HTTP_20261014.json": "2362b1722ff8d6dec0ddb53a98cf865508477b65e2631fa1c35a15a6f2b64b08",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_RED_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_RED_20261014.stdout.txt": "f344a83e45898018245aac2a99b0ba5e5b2822033c6ded37e8f3229ad5e9c2eb",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_RESUME_20261014.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_RESUME_20261014.junit.xml": "635ada57a73bd30dcb082bde274a45a6bf0936a567143b49da2c80ce33e66e67",
+    "docs/weknora-port/evidence/P4_AFFINITY_KB_RESUME_20261014.stdout.txt": "e4d4672adeb83397068c96a9812e258ae2682ead1383bd67c390a3be0ff1e6aa",
+    "docs/weknora-port/evidence/P4_AFFINITY_REACT_BUILD_20261014.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs/weknora-port/evidence/P4_AFFINITY_REACT_BUILD_20261014.stdout.txt": "9a43d564e03d30b76baea7dc699fec53b00f7092dc74dac88302c3c1cb0ad1a1",
+    "docs/weknora-port/evidence/P4_AFFINITY_RED_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P4_AFFINITY_RED_20261014.stdout.txt": "ff79423811f0557ac759bd98b323568bc0f053451dbcdea68cdb1a6bd8ec79dd"
+  },
+  "real_provider_calls": 0,
+  "scope": "bounded functions and native mock entry, not full Go engine",
+  "commands": {
+    "resume_pytest": {
+      "exit": 0,
+      "passed": 82
+    },
+    "react_build": {
+      "exit": 0
+    },
+    "initial_entry": {
+      "exit": 1,
+      "failed": 1
+    },
+    "browser_api_first": {
+      "exit": 1
+    },
+    "browser_api_retry_shutdown": {
+      "exit": 0
+    }
+  }
+}
