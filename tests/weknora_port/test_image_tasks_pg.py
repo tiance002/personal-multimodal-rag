@@ -159,6 +159,19 @@ def test_real_isolated_http_image_task_local_ocr_explicit_caption(monkeypatch):
                 caption_chunk=next(row for row in chunks if row['chunk_type']=='image_caption')
                 readback=await client.get(f'/api/v1/chunks/{caption_chunk["id"]}')
                 assert readback.status_code==200 and 'white image' in readback.text
+                async with leases.lease() as guard:
+                    await guard.connection.execute(
+                        "UPDATE knowledges SET metadata=jsonb_set(metadata,'{source_version}',to_jsonb(%s::text)) "
+                        "WHERE id=%s AND tenant_id=%s",(str(uuid.uuid4()),doc['id'],tenant))
+                stale_readback=await client.get(f'/api/v1/chunks/{caption_chunk["id"]}')
+                assert stale_readback.status_code==404
+                async with leases.lease() as guard:
+                    await guard.connection.execute(
+                        "UPDATE knowledges SET metadata=jsonb_set(metadata,'{source_version}',to_jsonb(%s::text)) "
+                        "WHERE id=%s AND tenant_id=%s",
+                        ((await (await guard.connection.execute(
+                            'SELECT source_version FROM port_image_tasks WHERE knowledge_id=%s',
+                            (doc['id'],))).fetchone())['source_version'],doc['id'],tenant))
                 assert task['outcomes']['0']['ocr_text']['status']=='completed'
                 assert task['outcomes']['0']['caption']['status']=='completed'
                 status=await client.get(f'/api/v1/knowledge-bases/{kb}/documents/{doc["id"]}/image-task')
@@ -420,5 +433,12 @@ def test_real_isolated_image_final_commit_version_delete_and_duplicate_fence():
         outsider=LocalPrincipal(tenant,'different-owner')
         with pytest.raises(PermissionError):
             await docs._finalize(outsider,kb,good.knowledge_id,good.source_version,
+                                 {'source_version':good.source_version},enabled=False,image_task=good)
+        other_tenant=LocalPrincipal(tenant+100000,'different-tenant')
+        with pytest.raises(PermissionError):
+            await docs._finalize(other_tenant,kb,good.knowledge_id,good.source_version,
+                                 {'source_version':good.source_version},enabled=False,image_task=good)
+        with pytest.raises(DocumentLifecycleError,match='IMAGE_SOURCE_VERSION_CHANGED'):
+            await docs._finalize(owner,str(uuid.uuid4()),good.knowledge_id,good.source_version,
                                  {'source_version':good.source_version},enabled=False,image_task=good)
     run(scenario())

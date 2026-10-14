@@ -13,7 +13,7 @@
 
 `POST /api/v1/settings/vision-models` 使用现有模型表、供应商适配器和加密凭据存储。任务仅保存模型 ID、配置版本／来源、文档版本、状态和结果，不保存密钥。模型目录能力、适配器图片请求能力、租户可见性和启用状态在选择时校验，执行前重查。没有视觉自动探测或真实模型调用。
 
-图片及含扫描页的 PDF 从正式上传写入独立 `port_image_tasks` 后由后台处理。OCR 与 Caption 各自记录结果、错误和图片位置；有效输出进入普通图片子切块、索引和引用回读。任务状态可用 `GET /api/v1/knowledge-bases/{kb}/documents/{doc}/image-task` 查看，并可用对应 `/cancel` 取消。任务重试上限遵照固定源码 3 次重试（最多 4 次领取）；30 分钟租约加心跳。送出状态未确定时标记 `unknown`，不通过恢复重新请求。重复领取有 claim token 栅栏；最终提交同时核对文档版本、删除状态、租户／知识库及任务 claim。图片任务不复用 `RedisMemoryExtractionQueue` 的记忆 payload 或 max_retry=2。
+图片及含扫描页的 PDF 从正式上传写入独立 `port_image_tasks` 后由后台处理。OCR 与 Caption 各自记录结果、错误和图片位置；有效输出进入普通图片子切块、索引和引用回读。图片子切块的原文回读须文档完成且切块版本等于当前文档版本。任务状态可用 `GET /api/v1/knowledge-bases/{kb}/documents/{doc}/image-task` 查看，并可用对应 `/cancel` 取消。任务重试上限遵照固定源码 3 次重试（最多 4 次领取）；30 分钟租约加心跳。送出状态未确定时标记 `unknown`，不通过恢复重新请求。重复领取有 claim token 栅栏；最终提交同时核对文档版本、删除状态、租户／知识库及任务 claim。图片任务不复用 `RedisMemoryExtractionQueue` 的记忆 payload 或 max_retry=2。
 
 ## 上游函数映射
 

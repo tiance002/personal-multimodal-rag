@@ -639,7 +639,9 @@ class DocumentLifecycleService:
             "SELECT c.id AS chunk_id,c.knowledge_id AS document_id,c.knowledge_base_id,c.content,"
             "c.source_content,c.chunk_index,c.start_at,c.end_at,k.file_name AS filename,k.parse_status "
             "FROM chunks c JOIN knowledges k ON k.id=c.knowledge_id AND k.knowledge_base_id=c.knowledge_base_id "
-            "WHERE c.id=%s AND c.tenant_id=%s AND k.tenant_id=%s AND c.deleted_at IS NULL AND k.deleted_at IS NULL",
+            "WHERE c.id=%s AND c.tenant_id=%s AND k.tenant_id=%s AND c.deleted_at IS NULL AND k.deleted_at IS NULL "
+            "AND (c.chunk_type NOT IN ('image_ocr','image_caption') OR "
+            "(k.parse_status='completed' AND c.metadata->>'source_version'=k.metadata->>'source_version'))",
             (chunk_id, principal.tenant_id, principal.tenant_id))
         if not rows:
             raise LookupError("SOURCE_CHUNK_NOT_FOUND")
