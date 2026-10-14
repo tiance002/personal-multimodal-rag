@@ -49,6 +49,8 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None):
         if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='app' for t in node.targets):break
         body.append(node)
     source='\n'.join(ast.unparse(node) for node in body)
+    # New fixture data only; previous originals/volumes stay at their recorded paths.
+    source=source.replace("Path('E:/RAG-Tests/runtime-source-' + str(uuid.uuid4()))","Path('E:/WK/run/' + uuid.uuid4().hex[:12])")
     assert 'httpx.MockTransport(handler)' in source and 'fixture.invalid' in source
     # Replace only the verified fixture's connection opening/closing strategy.
     # IsolatedConnectionFactory still constructs a fresh scoped identity guard.

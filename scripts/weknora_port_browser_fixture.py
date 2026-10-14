@@ -21,7 +21,7 @@ for node in scenario.body:
     setup.append(node)
 text='\n'.join(ast.unparse(n) for n in setup)
 text=text.replace("principal = LocalPrincipal(fixture_tenant, 'fixture-owner:' + str(uuid.uuid4()))","principal = REUSE or LocalPrincipal(fixture_tenant, 'fixture-owner:' + str(uuid.uuid4()))")
-text=text.replace("root = Path('E:/RAG-Tests/runtime-source-' + str(uuid.uuid4()))","root = REUSE_STORAGE or Path('E:/RAG-Tests/runtime-source-' + str(uuid.uuid4()))")
+text=text.replace("root = Path('E:/RAG-Tests/runtime-source-' + str(uuid.uuid4()))","root = REUSE_STORAGE or Path('E:/WK/run/' + uuid.uuid4().hex[:12])")
 text=text.replace("prefix = 'weknora-resume:20261013:' + str(uuid.uuid4())","prefix = REUSE_PREFIX or ('weknora-resume:20261013:' + str(uuid.uuid4()))")
 text=text.replace('create_app(runtime, resolve_principal=lambda _request: principal)',
     "create_app(runtime, resolve_principal=lambda _request: principal,allowed_origins=('http://127.0.0.1:56426',))")
