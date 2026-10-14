@@ -17,3 +17,11 @@ def test_pinned_go_image_functions_same_fixture():
 def test_html_ocr_converter_explicitly_unavailable():
     with pytest.raises(DocumentLifecycleError,match='OCR_HTML_SOURCE_CONVERTER_REQUIRED'):
         sanitize_ocr('<p>This is substantial HTML OCR content.</p>')
+
+
+def test_sparse_inline_tags_preserve_source_markdown_utf8_threshold():
+    value=json.loads((Path(__file__).parent/'fixtures/ocr_sparse_go_oracle.json').read_text(encoding='utf-8'))
+    assert value['exit_code']==0 and value['provider_calls']==0
+    ocr=[row for row in value['rows'] if row['kind']=='ocr']
+    assert len(ocr)==4
+    for row in ocr:assert sanitize_ocr(value['cases'][row['index']])==row['output']

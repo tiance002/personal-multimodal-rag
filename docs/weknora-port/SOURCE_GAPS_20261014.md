@@ -25,3 +25,5 @@ Latest closure2026-10-14: native personal-memory/pending UI actual browser passe
 
 
 2026-10-14 resumed closure: manual create/update/clear/export and document-affinity list/delete native HTTP routes now implemented;502-row2-page export,owner negatives and scoped synthetic clear pass actualPG/ASGI test. See P4_MEMORY_MANUAL_API_20261014.md. UI controls and fullGopairedhandler parity remain open. P8 reversible source cleanup began under latest Owner authorization e3aae15; prior cutover-only source-cleanup wording is superseded for recoverable candidate code only. Old services/data/history/UNKNOWN still protected.
+
+Sparse inline tag OCR rejection now closed with exact UTF-8 source classifier,actualGo samefixture and upload/index/readback entry. FullHTML andinline table converter remains notimplemented; do not call this fullOCR parity. See P2_OCR_SPARSE_20261014.md.

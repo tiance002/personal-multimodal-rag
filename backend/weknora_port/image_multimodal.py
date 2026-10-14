@@ -27,7 +27,12 @@ def sanitize_ocr(raw):
     tags=re.findall(r'<[^>]+>',text)
     plain=go_strip(re.sub(r'<[^>]+>','',text))
     if tags and len(plain.encode('utf-8'))<10:return ''
-    if tags:raise DocumentLifecycleError('OCR_HTML_SOURCE_CONVERTER_REQUIRED')
+    if tags:
+        # Source looksLikeHTML counts UTF-8 bytes, not Unicode code points.
+        document=bool(re.match(r'^\s*(<!DOCTYPE|<html|<body|<div|<p[\s>]|<table|<h[1-6][\s>])',text,re.I|re.ASCII))
+        dominant=sum(len(tag.encode('utf-8')) for tag in tags)/len(text.encode('utf-8'))>0.3
+        if document or dominant or re.search(r'<table',text,re.I|re.ASCII):
+            raise DocumentLifecycleError('OCR_HTML_SOURCE_CONVERTER_REQUIRED')
     empty={'无文字内容','无法识别','no text','no text content','no content','empty','图片中没有文字','图片中没有可识别文字'}
     if go_lower(go_strip(text)).rstrip('.!?。！？') in empty:return ''
     return go_strip(re.sub(r'\n{3,}','\n\n',text))

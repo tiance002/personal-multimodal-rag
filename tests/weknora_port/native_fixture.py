@@ -41,7 +41,7 @@ class IsolatedFixturePool:
 
 
 @asynccontextmanager
-async def isolated_mock_application(*,synthetic_monthly_limit=None):
+async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None):
     tree=ast.parse(inspect.getsource(fixture.test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout_no_upgrade))
     scenario=next(n for n in tree.body[0].body if isinstance(n,ast.AsyncFunctionDef) and n.name=='scenario')
     body=[]
@@ -51,6 +51,11 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None):
     source='\n'.join(ast.unparse(node) for node in body)
     # New fixture data only; previous originals/volumes stay at their recorded paths.
     source=source.replace("Path('E:/RAG-Tests/runtime-source-' + str(uuid.uuid4()))","Path('E:/WK/run/' + uuid.uuid4().hex[:12])")
+    if image_ocr_text is not None:
+        if not isinstance(image_ocr_text,str) or len(image_ocr_text)>100000:raise ValueError('MOCK_OCR_TEXT_INVALID')
+        original=repr('Extracted scan: Blue widgets use protocol W-17.')
+        assert source.count(original)==1
+        source=source.replace(original,repr(image_ocr_text))
     assert 'httpx.MockTransport(handler)' in source and 'fixture.invalid' in source
     # Replace only the verified fixture's connection opening/closing strategy.
     # IsolatedConnectionFactory still constructs a fresh scoped identity guard.
