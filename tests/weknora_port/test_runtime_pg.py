@@ -255,7 +255,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
         ]
         current = await runtime.read_model_configuration(principal)
         await runtime.update_model_configuration(principal, current["revision"], [
-            {"role": role, "provider": provider, "model": name,
+            {"role": role, "provider": provider, "model": name, "source":"remote",
              "base_url": "https://fixture.invalid/v1", "api_key": "SYNTHETIC-NOT-A-KEY"}
             for role, provider, name in roles])
         app = create_app(runtime, resolve_principal=lambda request: principal,

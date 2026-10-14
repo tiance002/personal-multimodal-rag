@@ -1,5 +1,5 @@
 """Configured, archived model identities behind one neutral Provider interface."""
-from dataclasses import dataclass,field
+from dataclasses import dataclass,field,replace
 import inspect
 from typing import Any,Callable
 
@@ -55,8 +55,10 @@ class SourceCatalogue:
                 raise ProviderError('MODEL_PARAMETER_IDENTITY_CONFLICT')
             parameters.pop(name, None)
         parameters.pop('app_secret', None)
-        return resolve_model_config(role.provider,role.model,base_url=role.base_url,
+        if role.source not in ('','local','remote'):raise ProviderError('MODEL_SOURCE_INVALID')
+        config=resolve_model_config(role.provider,role.model,base_url=role.base_url,
             model_id=model_id,model_type=MODEL_TYPES[role.role],internal_overrides=parameters)
+        return replace(config,source=role.source)
 
     def validate(self, role: ConfiguredRole) -> None:
         if role.role not in ROLES or not all((role.provider,role.model,role.base_url)):
@@ -76,6 +78,7 @@ class NeutralModelRegistry:
             raise ProviderError('MODEL_OWNER_MISMATCH')
         if model_id not in self._models:
             role = await self.store.resolve(model_id)
+            if role.source=='local':raise ProviderError('MODEL_LOCAL_SERVICE_NOT_IMPLEMENTED')
             config = self.catalogue.resolve(role,model_id)
             model = self.model_factory(config,role.api_key)
             if inspect.isawaitable(model):

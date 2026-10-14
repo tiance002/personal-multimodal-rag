@@ -1,0 +1,82 @@
+{
+  "kind": "ACTUAL_ASGI_HTTP_PG_REDIS_NATIVE_RAG_PROVIDER_MOCK",
+  "root": "E:\\WK\\run\\b3c80d145b0e",
+  "cases": [
+    {
+      "case": "first-kb-order",
+      "run_id": "c11a362e-bdbd-43eb-bcdf-4e05e9283164",
+      "requested_order": [
+        "faa275e1-27fc-4fe4-bb3c-8e7284239f6b",
+        "7a02ae5f-af1a-459e-a256-4a05d6a41d59"
+      ],
+      "model": "deepseek-flash",
+      "replay_no_send": true,
+      "changed_order_conflict": true
+    },
+    {
+      "case": "reversed-first-kb",
+      "run_id": "701f47eb-00f8-450c-b2d8-cb7b82a66911",
+      "requested_order": [
+        "7a02ae5f-af1a-459e-a256-4a05d6a41d59",
+        "faa275e1-27fc-4fe4-bb3c-8e7284239f6b"
+      ],
+      "model": "XingChenAGI/Xing4.0-29B",
+      "replay_no_send": true,
+      "changed_order_conflict": true
+    },
+    {
+      "case": "literal-remote-priority",
+      "run_id": "7e7d0359-0812-4f81-abe3-a621cc60f1f4",
+      "requested_order": [
+        "faa275e1-27fc-4fe4-bb3c-8e7284239f6b",
+        "7a02ae5f-af1a-459e-a256-4a05d6a41d59"
+      ],
+      "model": "fixture-remote",
+      "replay_no_send": true,
+      "changed_order_conflict": true
+    },
+    {
+      "case": "valid-request-overrides-kb",
+      "run_id": "0e7d6ef9-a43c-42de-8b6b-23597cd833dc",
+      "requested_order": [
+        "faa275e1-27fc-4fe4-bb3c-8e7284239f6b",
+        "7a02ae5f-af1a-459e-a256-4a05d6a41d59"
+      ],
+      "model": "XingChenAGI/Xing4.0-29B",
+      "replay_no_send": true,
+      "changed_order_conflict": true
+    },
+    {
+      "case": "formal-affinity-consumer",
+      "observations": [
+        {
+          "ids": [
+            "56c7fcea-e3a2-4478-8f63-352c98712cbb"
+          ],
+          "values": {
+            "56c7fcea-e3a2-4478-8f63-352c98712cbb": 8
+          }
+        },
+        {
+          "ids": [
+            "56c7fcea-e3a2-4478-8f63-352c98712cbb"
+          ],
+          "values": {}
+        },
+        {
+          "ids": [
+            "56c7fcea-e3a2-4478-8f63-352c98712cbb"
+          ],
+          "values": {}
+        }
+      ],
+      "stop_tracking_removed_signal": true,
+      "source_and_history_preserved": true,
+      "disabled_user_no_boost": true,
+      "legacy_v1_replay_no_send": true
+    }
+  ],
+  "real_provider_calls": 0,
+  "existing_history_rewritten": false,
+  "legacy_fixture_only": true
+}

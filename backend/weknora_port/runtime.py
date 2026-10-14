@@ -586,12 +586,12 @@ class ApplicationRuntime:
         self._owner(principal)
         return await self.documents.create_knowledge_base(principal, name)
 
-    async def register_vision_model(self,principal,provider,model,base_url,api_key,vision_user_declared=False):
+    async def register_vision_model(self,principal,provider,model,base_url,api_key,vision_user_declared=False,source=''):
         self._owner(principal)
         from .storage.configuration import ConfiguredRole
         from .image_configuration import _image_wire_supported
         role=ConfiguredRole('vlm',provider.strip(),model.strip(),base_url.strip(),api_key,
-                            {'vision_user_declared':bool(vision_user_declared)})
+                            {'vision_user_declared':bool(vision_user_declared)},source=source)
         config=self.catalogue.resolve(role,'vision-registration-validation')
         if not config.supports_vision or not _image_wire_supported(config):
             raise ProviderError('MODEL_VISION_UNSUPPORTED')

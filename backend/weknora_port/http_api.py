@@ -76,6 +76,7 @@ class ImageProcessingWrite(ApiModel):
 
 
 class VisionModelCreate(ApiModel):
+    source: str
     provider: str
     model: str
     base_url: str
@@ -104,6 +105,7 @@ class StopSessionRequest(ApiModel):
 
 
 class ModelRoleWrite(ApiModel):
+    source: str | None = None
     role: str
     provider: str = Field(max_length=200)
     model: str = Field(max_length=300)
@@ -201,6 +203,7 @@ def _public_model_configuration(value: Mapping[str, Any]) -> dict[str, Any]:
             "model": str(row.get("model", "")),
             "base_url": str(row.get("base_url", "")),
             "key_configured": bool(row.get("key_configured", row.get("api_key"))),
+            "source": str(row.get("source","")),
         })
     revision = value.get("revision", 0)
     if type(revision) is int and revision >= 0:
@@ -517,7 +520,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     async def register_vision_model(body: VisionModelCreate,request: Request):
         return json_data(request,await runtime.register_vision_model(await principal(request),
             body.provider,body.model,body.base_url,body.api_key.get_secret_value(),
-            body.vision_user_declared))
+            body.vision_user_declared,body.source))
 
     @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/source')
     async def original_document(knowledge_base_id: str,document_id: str,request: Request):
@@ -549,6 +552,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         roles = []
         for row in body.roles:
             item = {"role": row.role, "provider": row.provider, "model": row.model, "base_url": row.base_url}
+            if row.source is not None:item['source']=row.source
             if row.api_key is not None:
                 item["api_key"] = row.api_key.get_secret_value()
             roles.append(item)

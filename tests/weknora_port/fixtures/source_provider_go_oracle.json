@@ -1,0 +1,59 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "source_sha256": "1916e21849a136172d6a529a3e976cdd50237e579f3337af60acaec1efdea641",
+  "cases": [
+    {
+      "ID": "remote",
+      "Name": "fixture",
+      "Source": "remote",
+      "Parameters": {
+        "Provider": "deepseek",
+        "BaseURL": "http://fixture.invalid/v1"
+      }
+    },
+    {
+      "ID": "local",
+      "Name": "fixture",
+      "Source": "local",
+      "Parameters": {
+        "Provider": "deepseek",
+        "BaseURL": "http://fixture.invalid/ignored"
+      }
+    },
+    {
+      "ID": "legacy",
+      "Name": "fixture",
+      "Source": "deepseek",
+      "Parameters": {
+        "Provider": "deepseek"
+      }
+    },
+    null
+  ],
+  "rows": [
+    {
+      "dispatch": "{remote deepseek}",
+      "error": "",
+      "model": "fixture",
+      "provider": "deepseek",
+      "source": "remote"
+    },
+    {
+      "dispatch": "{local deepseek}",
+      "error": "",
+      "model": "fixture",
+      "provider": "deepseek",
+      "source": "local"
+    },
+    {
+      "dispatch": "<nil>",
+      "error": "unsupported chat model source: deepseek",
+      "model": "fixture",
+      "provider": "deepseek",
+      "source": "deepseek"
+    },
+    null
+  ],
+  "exit_code": 0,
+  "scope": "Exact ConfigFromModel/NewChat; protocol constructors and wrappers stubbed. Not local/remote wire or full ordinary engine."
+}

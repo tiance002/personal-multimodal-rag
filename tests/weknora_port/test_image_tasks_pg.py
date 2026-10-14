@@ -119,7 +119,7 @@ def test_real_isolated_http_image_task_local_ocr_explicit_caption(monkeypatch):
                                            json={'cloud_allowed':True})
                 assert consent.status_code==200,consent.text
                 registered=await client.post('/api/v1/settings/vision-models',json={
-                    'provider':'siliconflow','model':'Qwen/Qwen3-VL-32B-Instruct',
+                    'source':'remote','provider':'siliconflow','model':'Qwen/Qwen3-VL-32B-Instruct',
                     'base_url':'https://fixture.invalid/v1','api_key':'SYNTHETIC-NOT-A-KEY'})
                 assert registered.status_code==200,registered.text
                 caption_id=registered.json()['data']['id']
@@ -244,7 +244,7 @@ def test_real_isolated_http_image_task_local_ocr_explicit_caption(monkeypatch):
                 assert second['selected_config']['selection']['caption']['source']=='ocr_inherited'
                 assert [call['kind'] for call in calls[-2:]]==['ocr','caption']
                 alternative=await client.post('/api/v1/settings/vision-models',json={
-                    'provider':'siliconflow','model':'Qwen/Qwen3.5-35B-A3B',
+                    'source':'remote','provider':'siliconflow','model':'Qwen/Qwen3.5-35B-A3B',
                     'base_url':'https://fixture.invalid/v1','api_key':'SYNTHETIC-NOT-A-KEY'})
                 assert alternative.status_code==200,alternative.text
                 alternative_id=alternative.json()['data']['id']

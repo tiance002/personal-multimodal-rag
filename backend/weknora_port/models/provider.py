@@ -101,6 +101,7 @@ def parse_chat_response(env, config):
 
 class ProviderModel:
     def __init__(self, config, transport, *, image_resolver=None):
+        if config.source=='local':raise ProviderError('MODEL_LOCAL_SERVICE_NOT_IMPLEMENTED')
         self.config, self.transport, self.image_resolver = config, transport, image_resolver
 
     def _options(self, options, context):

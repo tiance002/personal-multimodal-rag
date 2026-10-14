@@ -31,7 +31,7 @@ def store(conn):
 
 
 def values():
-    return [{'role':role,'provider':'custom','model':'model-'+role,'base_url':'https://configured.example/v1','api_key':'synthetic-secret'} for role in ROLES]
+    return [{'role':role,'provider':'custom','model':'model-'+role,'base_url':'https://configured.example/v1','api_key':'synthetic-secret','source':'remote'} for role in ROLES]
 
 
 def test_configured_roles_are_generic_and_credentials_do_not_enter_public_or_repr():
@@ -84,4 +84,21 @@ def test_internal_fields_and_duplicate_roles_cannot_be_configured():
         roles[0]['role'] = 'cheap'
         with pytest.raises(ModelConfigurationError,match='ROLES_REQUIRED'):
             await store(conn).update(0,roles)
+    asyncio.run(run())
+
+
+def test_legacy_role_update_preserves_source_interpretation_requires_explicit_rebind():
+    async def run():
+        conn=ConfigurationConnection()
+        legacy={v['role']:{k:value for k,value in v.items() if k!='source'} for v in values()}
+        conn.saved={'revision':7,'roles':legacy}
+        old=await store(conn).read()
+        assert all(role.source=='' for role in old[1])
+        update=[{k:value for k,value in v.items() if k!='source'} for v in values()]
+        result=await store(conn).update(7,update)
+        assert all(v['source']=='' for v in result['roles'])
+        update[0]['model']='new-model-without-source'
+        with pytest.raises(ModelConfigurationError,match='MODEL_SOURCE_REQUIRED'):await store(conn).update(8,update)
+        update[0]['source']='remote';update[0]['api_key']=''
+        with pytest.raises(ModelConfigurationError,match='CREDENTIAL_REBINDING_REQUIRED'):await store(conn).update(8,update)
     asyncio.run(run())

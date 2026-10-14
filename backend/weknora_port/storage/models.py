@@ -52,14 +52,17 @@ class PostgresModelStore:
             raise ModelConfigurationError('MODEL_ROLE_INVALID')
         if not all(isinstance(value, str) and value for value in (role.provider, role.model, role.base_url)) or not isinstance(role.api_key, str):
             raise ModelConfigurationError('MODEL_IDENTITY_REQUIRED')
+        if role.source not in ('','local','remote'):raise ModelConfigurationError('MODEL_SOURCE_INVALID')
         self.catalogue.validate(role)
         parameters = _parameters(role)
         physical = {'version': 'model-physical/v1', 'provider': role.provider,
                     'model': role.model, 'base_url': role.base_url,
                     'type': MODEL_TYPES[role.role], 'parameters': _without_secrets(parameters)}
+        if role.source:physical.update(version='model-physical/v2',source=role.source)
         physical_hash = hashlib.sha256(_json(physical).encode('utf-8')).hexdigest()
         identity = {'version': 'model-catalog/v1', 'tenant_id': self.principal.tenant_id,
                     'subject_id': self.principal.subject_id, 'role': role.role, 'physical': physical}
+        if role.source:identity['version']='model-catalog/v2'
         identity_hash = hashlib.sha256(_json(identity).encode('utf-8')).hexdigest()
         return 'mdl' + identity_hash[:61], identity_hash, physical_hash, parameters
 
@@ -70,7 +73,7 @@ class PostgresModelStore:
         if isinstance(stored, str):
             stored = json.loads(stored)
         if (row['role'], row['name'], row['type'], row['source'], row['identity_sha256'], row['physical_sha256']) != (
-            role.role, role.model, MODEL_TYPES[role.role], role.provider, identity_hash, physical_hash
+            role.role, role.model, MODEL_TYPES[role.role], role.source or role.provider, identity_hash, physical_hash
         ) or _json(_without_secrets(stored)) != _json(_without_secrets(parameters)):
             raise ModelConfigurationError('MODEL_IDENTITY_COLLISION')
         if row['deleted_at'] is not None or row['status'] != 'active':
@@ -97,9 +100,10 @@ class PostgresModelStore:
                     await guard.connection.execute('UPDATE models SET parameters=%s::jsonb,updated_at=now() WHERE id=%s AND tenant_id=%s AND subject_id=%s',
                         (_json(stored), model_id, self.principal.tenant_id, self.principal.subject_id))
                 else:
+                    if not role.source:raise ModelConfigurationError('MODEL_SOURCE_REQUIRED')
                     inserted = await self._rows(guard, 'INSERT INTO models(id,tenant_id,subject_id,name,type,source,parameters,role,identity_sha256,physical_sha256) '
                         'VALUES(%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s) ON CONFLICT(id) DO NOTHING RETURNING id',
-                        (model_id, self.principal.tenant_id, self.principal.subject_id, role.model, MODEL_TYPES[role.role], role.provider,
+                        (model_id, self.principal.tenant_id, self.principal.subject_id, role.model, MODEL_TYPES[role.role], role.source,
                          _json(stored), role.role, identity_hash, physical_hash))
                     if len(inserted) != 1:
                         raise ModelConfigurationError('MODEL_IDENTITY_COLLISION')
@@ -119,8 +123,14 @@ class PostgresModelStore:
         if isinstance(parameters, str):
             parameters = json.loads(parameters)
         # Validate the full non-secret identity before returning even a public projection.
-        role = ConfiguredRole(row['role'], row['source'], row['name'], parameters['base_url'], '',
-                              {key: value for key, value in parameters.items() if key not in SECRET_FIELDS})
+        # v2 is identified by its pinned hash, not a vendor/source guess.
+        candidate_source=row['source'] if row['source'] in ('local','remote') else ''
+        candidate_provider=parameters.get('provider',row['source'])
+        role = ConfiguredRole(row['role'], candidate_provider, row['name'], parameters['base_url'], '',
+                              {key: value for key, value in parameters.items() if key not in SECRET_FIELDS}, candidate_source)
+        if self._identity(role)[0]!=model_id:
+            role=ConfiguredRole(row['role'],row['source'],row['name'],parameters['base_url'],'',
+                {key:value for key,value in parameters.items() if key not in SECRET_FIELDS})
         expected_id, identity_hash, physical_hash, expected_params = self._identity(role)
         self._check(row, role, identity_hash, physical_hash, expected_params)
         if expected_id != model_id:
@@ -131,12 +141,13 @@ class PostgresModelStore:
         row, parameters, role = await self._load(model_id)
         decrypted = {key: self.cipher.decrypt(value, strict=True) if key in SECRET_FIELDS else value for key, value in parameters.items()}
         return ConfiguredRole(role.role, role.provider, role.model, role.base_url, decrypted.pop('api_key', ''),
-                              {key: value for key, value in decrypted.items() if key not in {'base_url', 'provider'}})
+                              {key: value for key, value in decrypted.items() if key not in {'base_url', 'provider'}},role.source)
 
     async def public(self, model_id: str):
         row, parameters, role = await self._load(model_id)
         result={'id': model_id, 'role': role.role, 'provider': role.provider, 'model': role.model,
-                'base_url': role.base_url, 'key_configured': bool(parameters.get('api_key'))}
+                'base_url': role.base_url, 'key_configured': bool(parameters.get('api_key')),
+                'source':role.source,'stored_source':row['source'],'representation':'source-provider/v2' if role.source else 'legacy-vendor/v1'}
         if role.role=='vlm':
             from ..models.catalog import find_model
             known=find_model(role.provider,role.model,'VLLM')

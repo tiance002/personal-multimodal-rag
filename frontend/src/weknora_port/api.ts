@@ -66,8 +66,8 @@ export const portApi = {
   modelConfiguration: () => jsonRequest<ModelConfiguration>("/settings/model-configuration"),
   saveModelConfiguration: (config: ModelConfiguration) => mutate<ModelConfiguration>("/settings/model-configuration", {
     method: "PUT",
-    body: JSON.stringify({ revision: config.revision, roles: config.roles.map(({ role, provider, model, base_url, api_key }) => ({
-      role, provider, model, base_url, ...(api_key?.trim() ? { api_key } : {}),
+    body: JSON.stringify({ revision: config.revision, roles: config.roles.map(({ role, provider, model, base_url, api_key, source }) => ({
+      role, provider, model, base_url, ...(source ? { source } : {}), ...(api_key?.trim() ? { api_key } : {}),
     })) }),
   }),
   memorySettings: () => jsonRequest<{ workspace_enabled: boolean; user_enabled: boolean; effective: boolean; write_mode: string; max_items: number; item_count: number }>("/memory/settings"),

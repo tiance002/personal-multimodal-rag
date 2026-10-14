@@ -29,7 +29,7 @@ def test_native_model_priority_order_replay_and_affinity_delete_entry():
             async with app.leases.lease() as guard:
                 ids=dict((await app._snapshot(guard)).model_ids)
                 await guard.connection.execute('UPDATE knowledge_bases SET summary_model_id=%s WHERE tenant_id=%s AND id=%s',(ids['expensive'],app.principal.tenant_id,upper))
-            remote=await app.models.persist(ConfiguredRole('expensive','remote','fixture-remote','http://fixture.invalid/v1','synthetic-not-secret'))
+            remote=await app.models.persist(ConfiguredRole('expensive','remote','fixture-remote','http://fixture.invalid/v1','synthetic-not-secret',source='remote'))
             api=create_app(app,resolve_principal=lambda request:app.principal,allowed_origins=('http://127.0.0.1:56425',))
             receipts=[]
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=api),base_url='http://127.0.0.1:56425',headers={'Origin':'http://127.0.0.1:56425'},timeout=20) as client:
@@ -40,6 +40,8 @@ def test_native_model_priority_order_replay_and_affinity_delete_entry():
                     ('literal-remote-priority',[upper,lower],'','fixture-remote'),
                     ('valid-request-overrides-kb',[upper,lower],ids['cheap'],'XingChenAGI/Xing4.0-29B')]:
                     if label=='literal-remote-priority':
+                        local=await app.models.persist(ConfiguredRole('expensive','deepseek','fixture-local','http://fixture.invalid/ignored','synthetic-not-secret',source='local'))
+                        async with app.leases.lease() as guard:await guard.connection.execute('UPDATE knowledge_bases SET summary_model_id=%s WHERE tenant_id=%s AND id=%s',(local,app.principal.tenant_id,upper))
                         async with app.leases.lease() as guard:await guard.connection.execute('UPDATE knowledge_bases SET summary_model_id=%s WHERE tenant_id=%s AND id=%s',(remote,app.principal.tenant_id,lower))
                     session=(await client.post('/api/v1/sessions',json={'knowledge_base_scope':request_order,'document_scope':[]})).json()['data']['id']
                     body={'content':'What protocol do blue widgets use?','request_id':str(uuid.uuid4()),'knowledge_base_scope':request_order,'document_scope':[],'summary_model_id':override}
@@ -67,6 +69,10 @@ def test_native_model_priority_order_replay_and_affinity_delete_entry():
                 # Enable source conditioning only for this new owner. It is an explicit_only memory setup.
                 async with app.leases.lease() as guard:await guard.connection.execute('UPDATE tenants SET memory_config=%s::jsonb WHERE id=%s',(json.dumps({'enabled':True,'write_mode':'explicit_only','retrieval_conditioning':True}),app.principal.tenant_id))
                 await app.update_memory_settings(app.principal,True)
+                # End source-local model selection fixture before the independent affinity lane.
+                async with app.leases.lease() as guard:
+                    await guard.connection.execute('UPDATE knowledge_bases SET summary_model_id=%s WHERE tenant_id=%s AND id=%s',(ids['expensive'],app.principal.tenant_id,upper))
+                    await guard.connection.execute('UPDATE knowledge_bases SET summary_model_id=%s WHERE tenant_id=%s AND id=%s',(ids['cheap'],app.principal.tenant_id,lower))
                 familiar=documents[1]
                 async with app.leases.lease() as guard:
                     await guard.connection.execute('INSERT INTO memory_doc_affinity(id,tenant_id,subject_id,knowledge_id,knowledge_base_id,title,hits,last_used_at) VALUES(%s,%s,%s,%s,%s,%s,8,now())',(str(uuid.uuid4()),app.principal.tenant_id,app.principal.subject_id,familiar['id'],familiar['knowledge_base_id'],'Familiar fixture'))
@@ -92,5 +98,5 @@ def test_native_model_priority_order_replay_and_affinity_delete_entry():
                 await ask();assert familiar['id'] not in observed[-1]['values']
                 await app.update_memory_settings(app.principal,False);await ask();assert observed[-1]['values']=={}
                 receipts.append({'case':'formal-affinity-consumer','observations':observed,'stop_tracking_removed_signal':True,'source_and_history_preserved':True,'disabled_user_no_boost':True,'legacy_v1_replay_no_send':True})
-            Path('docs/weknora-port/evidence/P4_AFFINITY_KB_HTTP_20261014.json').write_text(json.dumps({'kind':'ACTUAL_ASGI_HTTP_PG_REDIS_NATIVE_RAG_PROVIDER_MOCK','root':str(root),'cases':receipts,'real_provider_calls':0,'existing_history_rewritten':False,'legacy_fixture_only':True},indent=2),encoding='utf-8')
+            Path('docs/weknora-port/evidence/P1_SOURCE_PROVIDER_AFFINITY_HTTP_20261014.json').write_text(json.dumps({'kind':'ACTUAL_ASGI_HTTP_PG_REDIS_NATIVE_RAG_PROVIDER_MOCK','root':str(root),'cases':receipts,'real_provider_calls':0,'existing_history_rewritten':False,'legacy_fixture_only':True},indent=2),encoding='utf-8')
     actual_pg_run(scenario())

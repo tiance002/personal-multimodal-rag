@@ -13,7 +13,7 @@ from backend.weknora_port.crypto import SecretCipher
 
 
 ROLE = ConfiguredRole('embedding', 'fixture', 'fixture-model', 'https://fixture.invalid/v1',
-    'synthetic-key', {'embedding_parameters': {'dimension': 3}, 'spec': {'api': 'openai-embeddings'}, 'app_secret': 'synthetic-app-secret'})
+    'synthetic-key', {'embedding_parameters': {'dimension': 3}, 'spec': {'api': 'openai-embeddings'}, 'app_secret': 'synthetic-app-secret'},source='remote')
 CATALOGUE = SimpleNamespace(validate=lambda role: None)
 
 
@@ -42,7 +42,7 @@ def store(db=None, cipher=None):
 def row_for(repo, role=ROLE):
     id, identity, physical, parameters = repo._identity(role)
     return {'id': id, 'tenant_id': PRINCIPAL.tenant_id, 'subject_id': PRINCIPAL.subject_id,
-            'name': role.model, 'type': 'Embedding', 'source': role.provider, 'role': role.role,
+            'name': role.model, 'type': 'Embedding', 'source': role.source or role.provider, 'role': role.role,
             'identity_sha256': identity, 'physical_sha256': physical, 'parameters': parameters,
             'deleted_at': None, 'status': 'active'}
 

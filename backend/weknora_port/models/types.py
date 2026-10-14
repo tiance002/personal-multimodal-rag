@@ -220,8 +220,10 @@ class ModelConfig:
     cataloged: bool = False
     model_type: str = "KnowledgeQA"
     supports_dimension_override: bool = False
+    source: str = ''
 
     def __post_init__(self):
+        if self.source not in ('','local','remote'):raise ProviderError('MODEL_SOURCE_INVALID')
         if not self.provider or not self.model or not self.model_id:
             raise ProviderError("MODEL_CONFIGURATION_INVALID")
         if any(type(n) is not int or n < 0 for n in (self.context_window, self.max_output_tokens, self.dimensions)):

@@ -7,6 +7,7 @@ export type MessageRow = { id: string; role: "user" | "assistant" | "tool"; cont
 export type ModelRole = "embedding" | "rerank" | "cheap" | "expensive" | "vlm";
 export type ModelConfigurationRole = {
   role: ModelRole;
+  source?: string;
   provider: string;
   model: string;
   base_url: string;

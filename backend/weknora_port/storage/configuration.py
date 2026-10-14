@@ -26,9 +26,11 @@ class ConfiguredRole:
     api_key: str = field(default='', repr=False)
     parameters: Mapping[str, Any] = field(default_factory=dict, repr=False)
 
+    source: str = ''  # empty is the explicit legacy-vendor/v1 representation
+
     def public(self):
         return {'role':self.role, 'provider':self.provider, 'model':self.model,
-                'base_url':self.base_url, 'key_configured':bool(self.api_key)}
+                'base_url':self.base_url, 'key_configured':bool(self.api_key), 'source':self.source}
 
 
 class ModelCatalogue(Protocol):
@@ -77,22 +79,26 @@ class PostgresModelRoleStore:
             previous = {role.role:role for role in current}
             prepared = {}
             for value in roles:
-                if set(value) - {'role','provider','model','base_url','api_key'}:
+                if set(value) - {'role','provider','model','base_url','api_key','source'}:
                     raise ModelConfigurationError('MODEL_CONFIGURATION_FIELD_INVALID')
                 old = previous[value['role']]
                 provider = value.get('provider','').strip()
                 endpoint = value.get('base_url','').strip()
-                if old.api_key and (provider,endpoint) != (old.provider,old.base_url) and not value.get('api_key'):
+                source = value.get('source',old.source)
+                if source not in ('','local','remote'):raise ModelConfigurationError('MODEL_SOURCE_INVALID')
+                if (provider or value.get('model') or endpoint) and not source and (not old.provider or (provider,value.get('model','').strip(),endpoint)!=(old.provider,old.model,old.base_url)):
+                    raise ModelConfigurationError('MODEL_SOURCE_REQUIRED')
+                if old.api_key and (provider,endpoint,source) != (old.provider,old.base_url,old.source) and not value.get('api_key'):
                     raise ModelConfigurationError('MODEL_CREDENTIAL_REBINDING_REQUIRED')
                 # Blank key preserves its prior credential, never echoes it.
                 key = value.get('api_key') or old.api_key
                 name = value.get('model','').strip()
                 parameters = old.parameters if (provider,name) == (old.provider,old.model) else {}
-                role = ConfiguredRole(value['role'], provider,name,endpoint,key,parameters)
+                role = ConfiguredRole(value['role'], provider,name,endpoint,key,parameters,source)
                 if role.provider or role.model or role.base_url or role.api_key:
                     self.catalogue.validate(role)
                 prepared[role.role] = {'role':role.role,'provider':role.provider,'model':role.model,
-                    'base_url':role.base_url,'api_key':role.api_key,'parameters':dict(role.parameters)}
+                    'base_url':role.base_url,'api_key':role.api_key,'parameters':dict(role.parameters),'source':role.source}
             stored = {name:{**value,'api_key':self.cipher.encrypt(value['api_key'])} for name,value in prepared.items()}
             await self.guard.connection.execute('INSERT INTO port_model_configuration(tenant_id,subject_id,revision,roles) '
                 'VALUES(%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,subject_id) DO UPDATE '
