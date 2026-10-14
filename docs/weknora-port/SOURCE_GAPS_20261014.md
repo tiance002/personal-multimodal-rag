@@ -1,3 +1,5 @@
+Latest closed item: P2 actual valid UTF-8/U+FFFD ingestion blocker fixed with8Go-byte fixtures and actual native six-adapter upload/index/pairing checks,4tests exit0. See P2_SIMPLE_TEXT_FIX_20261014.md.
+
 # Remaining source equivalence work — concrete closure criteria
 
 Fixed Tencent/WeKnora3e8b0bfc. Current checkpoints16fed6e/220ba22/7622ebb are bounded and must not be relabelled whole-stage acceptance. This list prioritizes ordinary main-chain behavior, not legacy QuickChain/Validator/TaskFence repairs.

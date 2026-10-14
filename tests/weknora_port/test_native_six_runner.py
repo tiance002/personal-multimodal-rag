@@ -18,7 +18,7 @@ def test_actual_six_adapter_native_ingestion_pairing_and_gold_exclusion(tmp_path
         pdfpath=tmp_path/'original.pdf';pdfpath.write_bytes(raw_pdf)
         cases=lambda name:(PublicCase(name+'-q','extract source',{name+'-source':1},'synthetic',('DO_NOT_SEND_GOLD_ANSWER',)),)
         datasets=tuple(NativeDataset(name,'SYNTHETIC_NOT_FROZEN_ACCEPTANCE',cases(name),
-            (PublicDocument(name+'-source','public source','Blue widgets use protocol W-17.'),))
+            (PublicDocument(name+'-source','public source','Blue widgets use protocol W-17. Literal replacement symbol: \ufffd.'),))
             for name in ('scifact','miracl-zh','longbench-zh','hotpotqa'))
         datasets+= (NativeDataset('mmlongbench-doc','SYNTHETIC_NOT_FROZEN_ACCEPTANCE',(replace(cases('mmlongbench-doc')[0],qrels={'mmlongbench-doc-source.pdf':1}),),files=({'doc_id':'mmlongbench-doc-source.pdf','path':str(pdfpath),'sha256':hashlib.sha256(raw_pdf).hexdigest(),'bytes':len(raw_pdf)},)),)
         imagepath=tmp_path/'page.png';Image.new('RGB',(100,100),'white').save(imagepath)

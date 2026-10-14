@@ -187,25 +187,41 @@ def _base_metadata(request: DocumentRequest, engine: str, **extra: Any) -> dict[
             "document_id": request.document_id, "source_version": request.source_version, **extra}
 
 
+def _decode_simple_text(raw: bytes) -> str:
+    """SimpleFormatReader string(bytes), observed through Go JSON/rune iteration.
+
+    Valid UTF-8 including BOM and literal U+FFFD is preserved. Go's invalid
+    UTF-8 iterator emits one replacement rune per offending byte.
+    """
+    try:return raw.decode('utf-8')
+    except UnicodeDecodeError:pass
+    output=[];position=0
+    while position<len(raw):
+        first=raw[position]
+        size=1 if first<128 else 2 if 0xC2<=first<=0xDF else 3 if 0xE0<=first<=0xEF else 4 if 0xF0<=first<=0xF4 else 0
+        if size and position+size<=len(raw):
+            try:
+                value=raw[position:position+size].decode('utf-8')
+                output.append(value);position+=size;continue
+            except UnicodeDecodeError:pass
+        output.append('\ufffd');position+=1
+    return ''.join(output)
+
+
 def _parse_plain(request: DocumentRequest) -> ParsedDocument:
-    text = request.data.decode("utf-8-sig", errors="replace")
-    failures: tuple[ParseFailure, ...] = ()
-    if "\ufffd" in text:
-        failures = (ParseFailure("decode", "TEXT_DECODE_REPLACED", "UnicodeDecodeError",
-                                 "invalid UTF-8 bytes were replaced during decoding"),)
-    return ParsedDocument(text, metadata=_base_metadata(request, "plain"), failures=failures)
+    # Fixed builtin_converter.go TXT branch accepts raw content, not an
+    # invented U+FFFD-based failure signal. Original bytes remain immutable.
+    return ParsedDocument(_decode_simple_text(request.data),metadata=_base_metadata(request,'plain'))
 
 
 def _parse_markdown(request: DocumentRequest) -> ParsedDocument:
-    text = request.data.decode("utf-8-sig", errors="replace")
+    text = _decode_simple_text(request.data)
     from .upstream_markdown_helpers import extract_markdown_data_images, format_markdown_tables
     failures: list[ParseFailure] = []
     rewritten = format_markdown_tables(text)
     rewritten, image_outputs = extract_markdown_data_images(rewritten)
     assets = tuple(ParsedAsset(path, raw, media, "markdown_data_uri") for path, raw, media in image_outputs)
-    if "\ufffd" in rewritten:
-        failures.append(ParseFailure("decode", "MARKDOWN_DECODE_REPLACED", "UnicodeDecodeError",
-                                     "invalid UTF-8 bytes were replaced during decoding"))
+
     return ParsedDocument(rewritten, assets, _base_metadata(request, "markdown", embedded_image_count=len(assets)), tuple(failures))
 
 
