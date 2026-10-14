@@ -71,6 +71,12 @@ export const portApi = {
     })) }),
   }),
   memorySettings: () => jsonRequest<{ workspace_enabled: boolean; user_enabled: boolean; effective: boolean; write_mode: string; max_items: number; item_count: number }>("/memory/settings"),
+  updateMemorySettings: (enabled: boolean) => mutate<{ workspace_enabled: boolean; user_enabled: boolean; effective: boolean; write_mode: string; max_items: number; item_count: number }>("/memory/settings", { method: "PUT", body: JSON.stringify({ enabled }) }),
+  confirmMemory: (id: string) => mutate<MemoryItem>(`/memory/items/${encodeURIComponent(id)}/confirm`, { method: "POST" }),
+  rejectMemory: async (id: string) => {
+    await assertPortRuntime();
+    await jsonRequest<void>(`/memory/items/${encodeURIComponent(id)}/reject`, { method: "POST" }, true);
+  },
   memoryItems: (offset = 0) => jsonRequest<MemoryItem[]>(`/memory/items?limit=50&offset=${offset}`),
   forgetMemory: async (id: string) => {
     await assertPortRuntime();

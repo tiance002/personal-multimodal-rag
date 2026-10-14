@@ -1,0 +1,36 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.uncheck: Clicking the checkbox did not change its state
+Call log:
+  - waiting for getByRole('checkbox', { name: '鍚敤鎴戠殑闀挎湡璁板繂', exact: true })
+    - locator resolved to <input type="checkbox" aria-label="鍚敤鎴戠殑闀挎湡璁板繂"/>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - performing click action
+    - click action done
+    - waiting for scheduled navigations to finish
+    - navigations have finished
+
+    at E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_memory_review_browser.mjs:20:15 {
+  log: [
+    "  - waiting for getByRole('checkbox', { name: '鍚敤鎴戠殑闀挎湡璁板繂', exact: true })",
+    '    - locator resolved to <input type="checkbox" aria-label="鍚敤鎴戠殑闀挎湡璁板繂"/>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed',
+    '    - done scrolling',
+    '    - performing click action',
+    '    - click action done',
+    '    - waiting for scheduled navigations to finish',
+    '    - navigations have finished'
+  ],
+  name: 'Error'
+}
+
+Node.js v24.18.0

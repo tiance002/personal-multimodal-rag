@@ -67,6 +67,13 @@ extra='''
                     (principal.tenant_id,principal.subject_id))
             await runtime.memory_manager._rebuild(MemoryScope(principal.tenant_id,principal.subject_id))
             return {'success':True,'restored_id':item.id,'backup_sha256':backup_hash,'tombstone_preserved':True}
+    if UI_SCENARIOS:
+        @app.post('/_fixture/memory-review-seed')
+        async def seed_memory_review():
+            confirm=await runtime.memory_manager.remember(context,MemoryItem('',0,'','fact','Synthetic review confirm content',topic='Review confirm fixture',inferred=True))
+            reject=await runtime.memory_manager.remember(context,MemoryItem('',0,'','fact','Synthetic review reject content',topic='Review reject fixture',inferred=True))
+            assert confirm.status==reject.status=='pending'
+            return {'success':True,'data':{'confirm_id':confirm.id,'reject_id':reject.id,'synthetic_owner_only':True}}
     @app.post('/_fixture/fail-next-cheap')
     async def fail_next_cheap():
         nonlocal fail_cheap

@@ -24,14 +24,29 @@ export function MemoryPanel({ disabled }: { disabled: boolean }) {
     try { await portApi.forgetMemory(selected.id); setSelected(null); await refresh(); }
     catch (failure) { setError(failure instanceof Error ? failure.message : "遗忘失败"); setBusy(false); }
   };
+  const toggle = async (enabled: boolean) => {
+    const previous = settings;
+    setBusy(true); setError("");
+    if (previous) setSettings({ ...previous, user_enabled: enabled, effective: previous.workspace_enabled && enabled });
+    try { setSettings(await portApi.updateMemorySettings(enabled)); }
+    catch (failure) { setSettings(previous); setError(failure instanceof Error ? failure.message : "记忆设置更新失败"); }
+    finally { setBusy(false); }
+  };
+  const review = async (item: MemoryItem, confirm: boolean) => {
+    setBusy(true); setError("");
+    try { if (confirm) await portApi.confirmMemory(item.id); else await portApi.rejectMemory(item.id); await refresh(); }
+    catch (failure) { setError(failure instanceof Error ? failure.message : "记忆审核失败"); setBusy(false); }
+  };
   return <section className="wp-page-content">
     <div className="wp-page-heading"><div><h1>长期记忆</h1><p>查看当前用户的记忆，或遗忘不再需要的内容。</p></div>
       <button disabled={disabled || busy} onClick={() => void refresh()}>刷新记忆</button></div>
     {settings && <p role="status">{settings.effective ? "记忆已启用" : "记忆未启用"} · {settings.write_mode === "auto" ? "自动提取" : "仅明确要求时记录"} · {settings.item_count} / {settings.max_items} 条有效记忆</p>}
+    <label className="wp-inline-form"><input type="checkbox" aria-label="启用我的长期记忆" checked={settings?.user_enabled ?? false} disabled={disabled || busy || !settings} onChange={event => void toggle(event.target.checked)} />启用我的长期记忆</label>
     {error && <p className="wp-inline-error" role="alert">{error}</p>}
     {busy && <p role="status">正在处理记忆</p>}
     <div className="wp-panel">{items.map(item => <article className="wp-memory-item" key={item.id}>
       <strong>{item.topic || item.kind}</strong><p>{item.content}</p><small>{item.status} · {item.origin}</small>
+      {item.status === "pending" && <><button disabled={disabled || busy} onClick={() => void review(item, true)} aria-label={`确认 ${item.topic || item.kind}`}>确认记忆</button><button disabled={disabled || busy} onClick={() => void review(item, false)} aria-label={`拒绝 ${item.topic || item.kind}`}>拒绝记忆</button></>}
       <button disabled={disabled || busy} onClick={() => setSelected(item)} aria-label={`遗忘 ${item.topic || item.kind}`}>遗忘</button>
     </article>)}{!busy && items.length === 0 && <p>本页没有记忆。</p>}</div>
     <div className="wp-inline-form"><button disabled={disabled || busy || offset === 0} onClick={() => setOffset(Math.max(0, offset - 50))}>上一页</button>

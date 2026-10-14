@@ -1,0 +1,11 @@
+# Actual native React memory settings and pending review
+
+Native MemoryPanel/API now expose personal memory on/off and pending confirm/reject, using verified owner-scoped endpoints. Toggle tracks the requested state while busy and rolls it back on server failure; mutation response is authoritative. Confirmation/rejection refreshes current server rows; no generation request or new model role path.
+
+Actual browser command: `node scripts/weknora_port_memory_review_browser.mjs`, exit0, ACTUAL_MEMORY_REVIEW_BROWSER_PASS. Existing Chrome with explicit E:/RAG-Tests/playwright-memory-review-port-14 profile exercises native UI→loopback HTTP→dedicated PG owner82. On/off persisted through reload, oneconfirm/one reject updated actual rows, twoPUTs/oneconfirmPOST/one rejectPOST captured; before/after model wire_calls0 and real_provider_calls0. Pending samples from failed UI setup were reused only under this known fresh synthetic owner; no historical/private memory deletion. Browser screenshot/readback: output/playwright/memory-review-native/reviewed.png and readback.json.
+
+Failures preserved: initial hydration check uncheck before loaded state; navigation/controlled-checkbox diagnostics and pending response error. Final browser assertions wait for PUT response and server state. Controlled checkbox rollback fixed actual state flicker. No functional assertions removed. DOM/screenshot minimum reproductions retained. Own API exited0 via validated stop marker; ownVite PID41652 validated by full E-path/56426 command and stopped intentionally(exit-1), not a test failure. Dedicated PG/Redis/data retained; old services untouched.
+
+Production build command: explicit `VITE_RAG_IMPLEMENTATION=weknora_python` then `npm --prefix frontend run build`, exit0. Native final assets include WeKnoraPythonApp-D1bw6z9T.js and itsCSS. Earlier default-mode npm builds show only default entry/types and must not be treated as proof that native lazy entry was bundled; this report supersedes that broader wording. No default/cutover environment was changed or deployment performed. Build evidence P6_MEMORY_NATIVE_FINAL_BUILD_20261014 stdout/exitcode.
+
+Bounded native UI/HTTP/PG ISOLATED_INTEGRATION_PASS. Full source cancellation/partial completion mapping, real model quality and cutover remain NOT RUN. No whole P6/P4 or Goal completion claim.
