@@ -1,0 +1,9 @@
+# Actual LongBench large-index transaction boundary
+
+The complete frozen attempt12859f4 completed SciFact5183originals+8QAs and MIRACL6000originals+8QAs, then LongBench failed. Whole command exit1 is retained; completed components are not a whole-run PASS. Minimum frozen LongBench first-document replay exposed psycopg.OutOfOrderTransactionNesting: HybridIndexer errgroup batches shared one PostgresRetriever.connection and interleaved its transaction savepoints.
+
+Native PostgresRetriever.batch_save now serializes write transaction contexts on that injected connection, while independent connection leases/documents still parallelize. Same row values, fixed source OnConflict DoNothing and write-scope/physical identity checks remain. This is framework adaptation, not a retrieval/indexing algorithm change. No schema/source data/threshold modification.
+
+Actual command: `E:/RAG quention/.venv/Scripts/python.exe -B -m pytest tests/weknora_port/test_long_document_index_pg.py tests/weknora_port/test_documents_pg.py -q --junitxml=docs/weknora-port/evidence/P2_LONG_DOCUMENT_INDEX_20261014.junit.xml`, exit0;2passed2.47s. Frozen original source267385515b5041ede7ea3d0ca4e8a368a01a59cefae46dbea98dc2d84c110c1b(27670bytes) yields102chunks/102activeindices, verified original-byte readback. Associated actual tenant/KB/index activation boundary test passed. Prior transaction RED preserved. Models/vectors/prices are closed mocks; full Go engine comparison and model quality not claimed.
+
+The remaining CLI dataset-selection option selects only entire frozen datasets, never Gold-filtered documents. It permits continuing LongBench400/Hotpot73/MML3PDF/Omni24images in a new namespace while retaining complete first two dataset evidence and all failed/UNKNOWN history. A separate aggregator must verify manifest/QIDs/native persisted assistants and original hashes before treating the combined40QA cohort as completed wiring. No real provider or cutover PASS.

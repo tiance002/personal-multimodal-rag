@@ -29,18 +29,19 @@ async def main(args):
                 print(json.dumps({'event':row['event'],'dataset':row.get('dataset'),'qid':row.get('qid'),'page_id':row.get('page_id')},ensure_ascii=False),flush=True)
         paths=sorted((ROOT/'backend/weknora_port').rglob('*.py'))+[ROOT/'eval_center'/name for name in ('weknora_frozen_gold.py','weknora_six_runner.py','weknora_paired.py','weknora_scoring.py')]+[Path(__file__),ROOT/'tests/weknora_port/native_fixture.py',ROOT/'tests/weknora_port/test_runtime_pg.py']
         await record({'event':'execution_start','manifest_sha256':frozen.manifest_sha256,
+            'selected_datasets':args.datasets or [d.name for d in frozen.datasets]+['omnidocbench'],
             'git_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
             'source_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},
             'model_quality':'NOT_RUN_SIMULATED_MODELS','independent_omni_qa':'NOT_RUN_OVERLAY_UNAVAILABLE'})
         async with isolated_mock_application(synthetic_monthly_limit=10000000) as (application,wire,root):
             await record({'event':'fixture_capacity','monthly_limit_synthetic_microunits':10000000,'price_source':'SYNTHETIC-NOT-BILLING','real_spending_authorized':False})
             runner=NativeSixRunner(application,execution_kind='ISOLATED_MOCK',prepare_kb=prepare_public_fixture,on_record=record,ingest_workers=args.ingest_workers)
-            await runner.run(frozen)
+            await runner.run(frozen,datasets=args.datasets)
             await record({'event':'execution_complete','transport':'httpx.MockTransport fixture.invalid only',
                 'supplier_requests_real':0,'wire_calls_simulated':len(wire),'storage_root':str(root),
                 'model_quality':'NOT_RUN_SIMULATED_MODELS','stage_acceptance':'NOT_CLAIMED'})
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--manifest',required=True);parser.add_argument('--manifest-sha256',required=True);parser.add_argument('--output',required=True);parser.add_argument('--ingest-workers',type=int,default=4)
+    parser=argparse.ArgumentParser();parser.add_argument('--manifest',required=True);parser.add_argument('--manifest-sha256',required=True);parser.add_argument('--output',required=True);parser.add_argument('--ingest-workers',type=int,default=4);parser.add_argument('--datasets',nargs='+')
     actual_pg_run(main(parser.parse_args()))

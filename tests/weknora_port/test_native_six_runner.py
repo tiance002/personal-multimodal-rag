@@ -37,5 +37,5 @@ def test_actual_six_adapter_native_ingestion_pairing_and_gold_exclusion(tmp_path
             assert 'DO_NOT_SEND_GOLD_ANSWER' not in json.dumps(wire) and 'DO_NOT_SEND_OMNI_GOLD' not in json.dumps(wire)
             assert all(r['gold_indexed'] is False for r in cases+omni)
             from pathlib import Path
-            Path('docs/weknora-port/evidence/P7_SIX_NATIVE_SYNTHETIC_20261014.json').write_text(json.dumps(result,ensure_ascii=False,default=str,indent=2),encoding='utf-8')
+            Path('docs/weknora-port/evidence/P7_SIX_NATIVE_UTF8_SYNTHETIC_20261014.json').write_text(json.dumps(result,ensure_ascii=False,default=str,indent=2),encoding='utf-8')
     actual_pg_run(scenario())

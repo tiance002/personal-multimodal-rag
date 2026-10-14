@@ -131,12 +131,18 @@ class NativeSixRunner:
             await self.record(row);result.append(row)
         return result
 
-    async def run(self,frozen,*,native_prediction=None):
+    async def run(self,frozen,*,native_prediction=None,datasets=None):
+        known={d.name for d in frozen.datasets}|{'omnidocbench'}
+        selected=tuple(datasets) if datasets is not None else tuple(d.name for d in frozen.datasets)+('omnidocbench',)
+        if not selected or len(set(selected))!=len(selected) or set(selected)-known:
+            raise ValueError('NATIVE_DATASET_SELECTION_INVALID')
         for dataset in frozen.datasets:
+            if dataset.name not in selected:continue
             await self.ingest_dataset(dataset)
             for case in dataset.cases:await self.execute_case(dataset,case)
-        await self.execute_omni(frozen.omni_pages,frozen.omni_gold,native_prediction=native_prediction)
+        if 'omnidocbench' in selected:
+            await self.execute_omni(frozen.omni_pages,frozen.omni_gold,native_prediction=native_prediction)
         return {'schema':'native-six-execution-v1','execution_kind':self.kind,
-            'manifest_sha256':frozen.manifest_sha256,'records':self.records,
+            'manifest_sha256':frozen.manifest_sha256,'selected_datasets':selected,'records':self.records,
             'real_model_quality':'NOT_RUN' if self.kind=='ISOLATED_MOCK' else 'REQUIRES_RECEIPT_REVIEW',
             'stage_acceptance':'NOT_CLAIMED'}

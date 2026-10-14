@@ -72,6 +72,8 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None):
     previous_safe=doc_module._safe_error_code
     def public_fixture_diagnostic(error,fallback):
         import traceback
+        if isinstance(error,BaseExceptionGroup):
+            for child in error.exceptions:public_fixture_diagnostic(child,fallback)
         print('PUBLIC_FULL_CORPUS_ERROR',type(error).__name__,str(error),
             [(row.filename,row.lineno,row.name) for row in traceback.extract_tb(error.__traceback__)[-5:]],flush=True)
         return previous_safe(error,fallback)

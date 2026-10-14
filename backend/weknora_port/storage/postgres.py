@@ -6,6 +6,8 @@ Connections are injected; importing this module never opens a database.
 """
 from __future__ import annotations
 
+import asyncio
+
 import math
 from dataclasses import dataclass
 from typing import Any, Mapping, Protocol, Sequence
@@ -116,6 +118,7 @@ class PostgresRetriever:
         self.connection, self.isolation = connection, isolation
         self.writable_knowledge_base_ids = writable_knowledge_base_ids
         self._verified = False
+        self._batch_write_lock=asyncio.Lock()
 
     async def verify_identity(self) -> DatabaseIdentity:
         # Read-only verification must precede any migration, index write or query.
@@ -166,8 +169,13 @@ class PostgresRetriever:
         sql = f"INSERT INTO embeddings ({columns}) VALUES " + ",".join([placeholder] * len(rows))
         # Fixed source BatchSave uses OnConflict{DoNothing:true}; no silent
         # replacement of an already indexed source identity.
-        async with self.connection.transaction():
-            await self.connection.execute(sql + " ON CONFLICT DO NOTHING", values)
+        # errgroup batches share this injected psycopg connection. Concurrent
+        # transaction contexts on one client interleave savepoint nesting;
+        # serialize only this client's write contexts (other leases parallelize).
+        async with self._batch_write_lock:
+            self.require_verified()
+            async with self.connection.transaction():
+                await self.connection.execute(sql + " ON CONFLICT DO NOTHING", values)
 
     async def vectors(self, params: RetrieveParams) -> list[Mapping[str, Any]]:
         self.require_verified()
