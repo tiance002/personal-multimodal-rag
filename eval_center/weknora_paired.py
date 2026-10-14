@@ -41,10 +41,14 @@ async def execute_native_pair(application,turns,*,execution_kind):
         application.ordinary._validate(turn)
         if turn.replay_only or not turn.is_new or turn.context.scope!=first.context.scope or turn.memory_context!=first.memory_context or turn.session_id!=first.session_id or turn.request.content!=first.request.content:
             raise ProviderError('PAIRED_SERVER_SCOPE_OR_QUERY_MISMATCH')
+    run_ids=tuple(turn.run_id for turn in turns)
     async def ledger_snapshot():
         rows=await application._rows('SELECT request_id,provider,model,capability,state,usage,reserved_microunits,actual_microunits,price_source FROM send_calls WHERE tenant_id=%s AND subject_id=%s',
             (application.principal.tenant_id,application.principal.subject_id))
-        return {row['request_id']:row for row in rows}
+        # Owner-window alone could include unrelated background jobs.
+        # All ordinary sends use an exact admitted run or run/operation ID.
+        return {row['request_id']:row for row in rows
+            if any(row['request_id']==run or row['request_id'].startswith(run+'/') for run in run_ids)}
     before=await ledger_snapshot()
     tick=time.perf_counter()
     try:prepared=await application.ordinary.prepare_turn(first)
@@ -91,5 +95,8 @@ async def execute_native_pair(application,turns,*,execution_kind):
             prepared.rankings,preparation_seconds,execution_kind,
             'NOT_RUN_SIMULATED_MODELS' if execution_kind=='ISOLATED_MOCK' else 'RECORDED_RESULTS_REQUIRE_RECEIPT_VERIFICATION',auxiliary)
     finally:
-        application._runs.pop(first.run_id,None)
+        # Setup can fail before the per-mode finally; remove only shared state.
+        for turn in turns:
+            if application._runs.get(turn.run_id) is base_state:
+                application._runs.pop(turn.run_id,None)
         await base_state['registry'].close()

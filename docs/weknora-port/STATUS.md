@@ -1,3 +1,5 @@
+Latest follow-up2026-10-14: native paired ledger now filtered to admitted Run/operation IDs; initialization failures clean shared state.3offline+1actualisolatedentry passed, exit0; finalnativeReactproductionbuild exit0. See P7_PAIR_ATTRIBUTION_20261014.md. Fullstage/realprovider/cutover not accepted.
+
 Latest 2026-10-14: Owner authorized existing Docker Desktop recovery. Existing dedicated PG/Redis restored with container/volume and PG physical identity checks; Redis new process run ID recorded. Native captured four-mode actual HTTP/PG/Redis synthetic chain passed (1test, exit0), checkpoint16fed6e. See P7_DOCKER_RECOVERED_20261014.md; real quality and fullP7 NOT RUN.
 
 Memory retry default corrected to pinned Asynq0.26.0 pre-increment formula;90Go/Pythonfixture comparisons + actualRedis retry/scope/expired-lease test passed (2tests, exit0). See P4_RETRY_PARITY_20261014.md. Full Asynq protocol/worker parity remains open. Old services/data/UNKNOWN retained; no real provider/cutover/push/tag/release.

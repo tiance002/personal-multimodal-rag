@@ -545,7 +545,7 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
                     "automatic_memory": {"queued_actual_redis": True,"actual_pg_saved": saved_memories,
                         "recalled_before_forget": True,"absent_after_forget": True,"embedding_residual": residual[0]["n"],"private_origin_denies_wire":True,"foreign_subject_denies_wire":True,"delete_http":removed.status_code},
                     "retained": "synthetic source + UNKNOWN fixture; old DB untouched"}
-                output = Path("docs/weknora-port/evidence/P7_NATIVE_PAIRED_HTTP_CHAIN_20261014.json")
+                output = Path("docs/weknora-port/evidence/P7_NATIVE_PAIRED_CAUSAL_CHAIN_20261014.json")
                 output.write_text(json.dumps(evidence, default=str, indent=2), encoding="utf-8")
         finally:
             server.should_exit = True

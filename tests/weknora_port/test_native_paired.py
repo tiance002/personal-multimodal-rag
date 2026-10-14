@@ -55,3 +55,26 @@ def test_pair_rejects_scope_or_query_change_before_preparation():
             await execute_native_pair(app,(*turns[:-1],altered),execution_kind='ISOLATED_MOCK')
         assert not retrieval.calls
     asyncio.run(scenario())
+
+
+def test_pair_setup_failure_cleans_all_shared_run_state():
+    async def scenario():
+        service,repo,retrieval,co,cheap,expensive,store,committer,counts=runtime()
+        registry=SimpleNamespace(closed=0)
+        async def close():registry.closed+=1
+        registry.close=close
+        runs={};original=service.configuration
+        async def config(turn):
+            runs[turn.run_id]={'registry':registry}
+            return original(turn)
+        service.configuration=config
+        turns=tuple([await repo.accept(replace(REQ,request_id='setup-fail-'+mode),'owner') for mode in MODES])
+        app=SimpleNamespace(ordinary=service,_runs=runs,principal=SimpleNamespace(tenant_id=1,subject_id='owner'))
+        async def rows(*args):return []
+        app._rows=rows
+        async def fail(*args,**kwargs):raise RuntimeError('fixture setup failure')
+        app._generation=fail
+        with pytest.raises(RuntimeError,match='fixture setup failure'):
+            await execute_native_pair(app,turns,execution_kind='ISOLATED_MOCK')
+        assert not runs and registry.closed==1
+    asyncio.run(scenario())
