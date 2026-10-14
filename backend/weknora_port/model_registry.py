@@ -36,8 +36,17 @@ async def role_snapshot(configuration_store,model_store) -> RoleSnapshot:
 class SourceCatalogue:
     """Resolve source protocol/capacity metadata, with no role-specific HTTP path."""
     def resolve(self, role: ConfiguredRole, model_id: str) -> ModelConfig:
-        from .models.catalog import resolve_model_config
+        from .models.catalog import find_model, resolve_model_config
         parameters = dict(role.parameters)
+        declared = parameters.pop('vision_user_declared', False)
+        if type(declared) is not bool:
+            raise ProviderError('MODEL_VISION_DECLARATION_INVALID')
+        if declared:
+            known = find_model(role.provider, role.model, 'VLLM')
+            if known is not None and 'image' not in known.get('input', ()):
+                raise ProviderError('MODEL_VISION_DECLARATION_CONFLICT')
+            if known is None:
+                parameters['spec_override'] = {'input': ['image']}
         # Stored source ModelParameters includes identity and encrypted-secret
         # slots. They are supplied separately by the trusted immutable role.
         for name, expected in (('provider', role.provider), ('base_url', role.base_url),

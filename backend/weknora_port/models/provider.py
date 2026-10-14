@@ -139,7 +139,7 @@ class ProviderModel:
     async def chat(self, messages: Sequence[Message], options: ChatOptions | None, context, *, _capability="chat"):
         options = self._options(options, context)
         async with call_lifetime(context, DEFAULT_CHAT_TIMEOUT) as lifetime:
-            for retry in (False, True):
+            for retry in ((False,) if _capability == "vision" else (False, True)):
                 body = self.build_request_body(strip_images(messages) if retry else messages, options)
                 call_context = context.child("image-fallback") if retry else context
                 try:
@@ -170,12 +170,12 @@ class ProviderModel:
                         handle.observed(response.usage)
                         return response
                 except ProviderError as error:
-                    if not retry and getattr(error, "multimodal_unsupported", False):
+                    if _capability != "vision" and not retry and getattr(error, "multimodal_unsupported", False):
                         continue
                     raise
 
     async def vision(self, messages, options, context):
-        if not self.config.supports_vision and self.config.model_type != "VLLM":
+        if not self.config.supports_vision:
             raise ProviderError("MODEL_VISION_UNSUPPORTED")
         deadline=asyncio.get_running_loop().time()+env_duration("VLM_HTTP_TIMEOUT_SECONDS",180)
         if context.deadline is None or context.deadline>deadline:

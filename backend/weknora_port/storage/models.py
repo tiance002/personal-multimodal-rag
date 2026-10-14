@@ -135,8 +135,15 @@ class PostgresModelStore:
 
     async def public(self, model_id: str):
         row, parameters, role = await self._load(model_id)
-        return {'id': model_id, 'role': role.role, 'provider': role.provider, 'model': role.model,
+        result={'id': model_id, 'role': role.role, 'provider': role.provider, 'model': role.model,
                 'base_url': role.base_url, 'key_configured': bool(parameters.get('api_key'))}
+        if role.role=='vlm':
+            from ..models.catalog import find_model
+            known=find_model(role.provider,role.model,'VLLM')
+            result['vision_capability']=('USER_DECLARED_UNTESTED' if parameters.get('vision_user_declared')
+                and known is None else 'CATALOG_DECLARED' if known and 'image' in known.get('input',())
+                else 'UNKNOWN')
+        return result
 
     async def physical_key(self, model_id: str) -> str:
         row, _, _ = await self._load(model_id)

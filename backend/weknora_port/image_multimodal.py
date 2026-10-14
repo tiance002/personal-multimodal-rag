@@ -3,8 +3,11 @@ from __future__ import annotations
 import base64,json,re,uuid
 from pathlib import Path
 from .documents import DocumentLifecycleError,_json_object
+from .image_configuration import resolve_image_selection,validate_pinned_selection
+from .tesseract_ocr import TesseractOCR
 from .document_profile import language_name
 from .models.types import CallContext,TrustedScope,Message,ProviderError
+from .storage.configuration import ModelConfigurationError
 from .retrieval.query import go_strip,go_lower
 from .storage.chunks import StoredChunk,ChunkPlan
 from .storage.indexing import IndexInfo
@@ -66,45 +69,87 @@ def enrich_summary_images(content,infos,full):
 class SourceImageProcessor:
     def __init__(self,application):self.app=application
 
-    async def process_plan(self,principal,kb,scope,assets,plan):
+    async def process_plan(self,principal,kb,scope,assets,plan,*,override=None,
+                           selection_snapshot=None,on_before=None,on_result=None,prior=None):
         app=self.app;app._owner(principal)
         if scope.tenant_id!=principal.tenant_id or scope.owner_id!=principal.subject_id or scope.knowledge_base_id!=kb['id']:
             raise DocumentLifecycleError('IMAGE_CHUNK_SCOPE_MISMATCH')
         cfg=_json_object(kb.get('vlm_config'))
-        if not cfg.get('enabled') or not cfg.get('model_id'):
-            raise DocumentLifecycleError('VLM_CONFIG_REQUIRED')
+        image_cfg=_json_object(kb.get('image_processing_config'))
+        if override:
+            image_cfg={**image_cfg, **{k:v for k,v in override.items() if v not in (None,'')}}
         rows=await app.documents._rows('SELECT metadata,parse_status FROM knowledges WHERE tenant_id=%s AND knowledge_base_id=%s AND id=%s AND deleted_at IS NULL',
             (principal.tenant_id,kb['id'],scope.knowledge_id))
         if len(rows)!=1 or rows[0]['parse_status']!='processing' or rows[0]['metadata'].get('source_version')!=scope.source_version:
             raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+        context=CallContext(scope.source_version+'/image/config',TrustedScope(principal.subject_id,(kb['id'],),(scope.knowledge_id,)))
+        selection=(await validate_pinned_selection(selection_snapshot,app.models,app.catalogue,context)
+                   if selection_snapshot is not None else
+                   await resolve_image_selection(kb,override,app.models,app.catalogue,context))
         registry=app.registry_for_context();created=[];indexed=[]
         try:
             for index,asset in enumerate(assets):
                 parent=next((chunk for chunk in plan.persisted if chunk.chunk_type=='text' and asset.path in chunk.content),None)
                 if parent is None:raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
                 context=CallContext(scope.source_version+'/image/'+str(index),TrustedScope(principal.subject_id,(kb['id'],),(scope.knowledge_id,)))
-                model=await registry.get(cfg['model_id'],context)
                 image='data:'+asset.media_type+';base64,'+base64.b64encode(asset.data).decode('ascii')
                 ocr_prompt=PROMPTS['vlmOCRScannedPDFPrompt' if asset.source_type=='scanned_pdf' else 'vlmOCRPrompt']
-                results={}
-                language=go_strip(cfg.get('description_language','')) or language_name(app.conversation.language_locale)
-                for kind,prompt in [('ocr_text',ocr_prompt),('caption',caption_prompt(language,cfg.get('custom_instructions','')))]:
+                results={};states={};layout={}
+                language=go_strip(image_cfg.get('description_language') or cfg.get('description_language','')) or language_name(app.conversation.language_locale)
+                for kind,prompt in [('ocr_text',ocr_prompt),('caption',caption_prompt(language,image_cfg.get('custom_instructions') or cfg.get('custom_instructions','')))]:
+                    previous=(prior or {}).get(str(index),{})
+                    prior_state=previous.get(kind,{})
+                    if prior_state.get('status') in {'completed','failed','unavailable'}:
+                        states[kind]=prior_state
+                        results[kind]=previous.get('ocr_result' if kind=='ocr_text' else 'caption_result','')
+                        if kind=='ocr_text':layout=previous.get('ocr_layout',{})
+                        continue
+                    binding=selection.ocr if kind=='ocr_text' else selection.caption
+                    if binding is None:
+                        states[kind]={'status':'unavailable','error':selection.caption_error}
+                        continue
                     try:
-                        response=await model.vision((Message('user',prompt,images=(image,)),),None,context.child(kind))
-                        value=response.content if response else ''
-                        results[kind]=sanitize_ocr(value) if kind=='ocr_text' else value
+                        if binding.adapter=='tesseract':
+                            ocr=await __import__('asyncio').to_thread(TesseractOCR().recognize,asset.data,asset.media_type)
+                            value=ocr.text;layout=ocr.layout
+                            if ocr.error:raise DocumentLifecycleError(ocr.error)
+                        else:
+                            # The task pins identity; authorization and current
+                            # model availability are checked again per send.
+                            await app.models.resolve(binding.model_id)
+                            model=await registry.get(binding.model_id,context)
+                            if on_before is not None:await on_before(index,kind)
+                            response=await model.vision((Message('user',prompt,images=(image,)),),None,context.child(kind))
+                            value=response.content if response else ''
+                        value=sanitize_ocr(value) if kind=='ocr_text' else go_strip(value)
+                        if not value:raise DocumentLifecycleError('IMAGE_'+('OCR' if kind=='ocr_text' else 'CAPTION')+'_EMPTY')
+                        results[kind]=value
+                        states[kind]={'status':'completed','error':'','binding':binding.public()}
                     except ProviderError as error:
                         # Source handles ordinary OCR/caption errors independently;
                         # permission/fee/identity denials remain fatal safety boundaries.
-                        if any(token in error.code for token in ('DENIED','AUTHORIZATION','PROVENANCE','BUDGET','IDENTITY','SCOPE','CANCELLED','DEADLINE')):raise
-                        results[kind]=''
+                        if error.sent or any(token in error.code for token in ('DENIED','AUTHORIZATION','PROVENANCE','BUDGET','IDENTITY','SCOPE','CANCELLED','DEADLINE')):raise
+                        states[kind]={'status':'failed','error':error.code,'binding':binding.public()}
+                    except DocumentLifecycleError as error:
+                        states[kind]={'status':'failed','error':error.code,'binding':binding.public()}
+                    except ModelConfigurationError as error:
+                        # Revocation after task creation invalidates only this
+                        # binding; an already valid sibling result is retained.
+                        states[kind]={'status':'failed','error':str(error) or 'IMAGE_MODEL_CONFIGURATION_INVALID',
+                                      'binding':binding.public()}
                 info={'url':asset.path,'original_url':asset.path,'start_pos':0,'end_pos':0,
-                    'caption':results.get('caption',''),'ocr_text':results.get('ocr_text','')}
+                    'page_number':asset.page_number,'source_type':asset.source_type,
+                    'caption':results.get('caption',''),'ocr_text':results.get('ocr_text',''),
+                    'ocr_layout':layout,'ocr_status':states.get('ocr_text',{}),
+                    'caption_status':states.get('caption',{})}
+                if on_result is not None:
+                    await on_result(index,info)
                 for field,chunk_type in [('ocr_text','image_ocr'),('caption','image_caption')]:
                     if not info[field]:continue
                     identifier=str(uuid.uuid4())
                     chunk=StoredChunk(identifier,scope,info[field],0,0,0,chunk_type,'',parent_chunk_id=parent.id,
-                        metadata={'source_version':scope.source_version,'image_source_type':asset.source_type,'recommended':True},
+                        metadata={'source_version':scope.source_version,'image_source_type':asset.source_type,
+                                  'page_number':asset.page_number,'recommended':True},
                         image_info=json.dumps([info],ensure_ascii=False))
                     created.append(chunk);indexed.append(IndexInfo(identifier,0,identifier,scope.knowledge_id,kb['id'],info[field]))
             return ChunkPlan((*plan.persisted,*created),(*plan.indexed,*indexed))
