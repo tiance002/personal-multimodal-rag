@@ -18,7 +18,7 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse,Response
 from starlette.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool, StrictInt
 
 from .streaming.events import StreamEvent, to_sse
 from .models.types import ProviderError
@@ -39,6 +39,17 @@ _SAFE_EXCEPTION_CODES = frozenset({
 
 class ApiModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+
+class MemoryItemCreate(ApiModel):
+    kind: str = ""
+    content: str = ""
+    importance: StrictInt = 0
+
+
+class MemoryItemUpdate(ApiModel):
+    content: str = ""
+    importance: StrictInt = 0
 
 
 class MemorySettingsUpdate(ApiModel):
@@ -351,6 +362,32 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         await runtime.reject_memory(await principal(request),item_id)
         return JSONResponse({'success':True})
 
+    @app.post('/api/v1/memory/items')
+    async def create_memory(body: MemoryItemCreate,request: Request):
+        item=await runtime.create_memory(await principal(request),body.kind,body.content,body.importance)
+        return JSONResponse({'success':True,'data':jsonable_encoder(item)})
+
+    @app.put('/api/v1/memory/items/{item_id}')
+    async def update_memory(item_id: str,body: MemoryItemUpdate,request: Request):
+        item=await runtime.update_memory(await principal(request),item_id,body.content,body.importance)
+        return JSONResponse({'success':True,'data':jsonable_encoder(item)})
+
+    @app.delete('/api/v1/memory/items')
+    async def clear_memory(request: Request):
+        removed=await runtime.clear_memory(await principal(request))
+        return JSONResponse({'success':True,'removed':removed})
+
+    @app.get('/api/v1/memory/export')
+    async def export_memory(request: Request):
+        who=await principal(request)
+        items=[];total=0
+        while True:
+            page,total=await runtime.list_memory(who,'',500,len(items))
+            items.extend(page)
+            if len(page)<500 or len(items)>=total or len(items)>=20000:break
+        return JSONResponse({'success':True,'total':total,'truncated':len(items)<total,'data':jsonable_encoder(items)},
+            headers={'Content-Disposition':'attachment; filename="weknora-memories.json"'})
+
     @app.get('/api/v1/memory/items')
     async def memory_items(request: Request,status: str='',limit: str='50',offset: str='0'):
         if status not in ('','active','superseded','archived','pending'):
@@ -366,6 +403,21 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.delete('/api/v1/memory/items/{item_id}')
     async def delete_memory(item_id: str,request: Request):
         await runtime.forget_memory(await principal(request),item_id)
+        return JSONResponse({'success':True})
+
+    @app.get('/api/v1/memory/documents')
+    async def memory_documents(request: Request,limit: str='50',offset: str='0'):
+        try:page_limit=int(limit)
+        except ValueError:page_limit=50
+        if page_limit<=0 or page_limit>200:page_limit=50
+        try:page_offset=max(0,int(offset))
+        except ValueError:page_offset=0
+        rows,total=await runtime.list_memory_documents(await principal(request),page_limit,page_offset)
+        return JSONResponse({'success':True,'data':jsonable_encoder(rows),'total':total})
+
+    @app.delete('/api/v1/memory/documents/{affinity_id}')
+    async def delete_memory_document(affinity_id: str,request: Request):
+        await runtime.delete_memory_document(await principal(request),affinity_id)
         return JSONResponse({'success':True})
 
     @app.get('/api/v1/memory/topics')

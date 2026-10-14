@@ -446,6 +446,37 @@ class ApplicationRuntime:
         from .conversation.types import MemoryContext
         await self.memory_manager.reject(MemoryContext(principal.tenant_id,principal.subject_id),item_id)
 
+    async def create_memory(self,principal,kind,content,importance):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_manager.create(MemoryContext(principal.tenant_id,principal.subject_id),kind,content,importance)
+
+    async def update_memory(self,principal,item_id,content,importance):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_manager.update(MemoryContext(principal.tenant_id,principal.subject_id),item_id,content,importance)
+
+    async def clear_memory(self,principal):
+        self._owner(principal)
+        from .conversation.types import MemoryContext
+        return await self.memory_manager.clear(MemoryContext(principal.tenant_id,principal.subject_id))
+
+    async def list_memory_documents(self,principal,limit=50,offset=0):
+        self._owner(principal)
+        where='tenant_id=%s AND subject_id=%s AND hits>=2'
+        rows=await self._rows('SELECT id,knowledge_id,knowledge_base_id,title,hits,last_used_at FROM memory_doc_affinity WHERE '+where+' ORDER BY hits DESC,last_used_at DESC LIMIT %s OFFSET %s',
+            (principal.tenant_id,principal.subject_id,limit,offset))
+        total=await self._rows('SELECT count(*) AS n FROM memory_doc_affinity WHERE '+where,(principal.tenant_id,principal.subject_id))
+        return rows,total[0]['n']
+
+    async def delete_memory_document(self,principal,affinity_id):
+        self._owner(principal)
+        from .conversation.management import MemoryWriteError
+        async with self.leases.lease() as guard:
+            rows=await (await guard.connection.execute('DELETE FROM memory_doc_affinity WHERE tenant_id=%s AND subject_id=%s AND id=%s RETURNING id',
+                (principal.tenant_id,principal.subject_id,affinity_id))).fetchall()
+            if not rows:raise MemoryWriteError('MEMORY_ITEM_NOT_FOUND')
+
     async def list_memory(self,principal,status='',limit=50,offset=0):
         self._owner(principal)
         from .conversation.types import MemoryScope
