@@ -14,7 +14,9 @@ def test_pinned_go_image_functions_same_fixture():
         else:actual=enrich_summary_images('body ![alt](image.png)',value['infos'],row['full'])
         assert actual==row['output']
 
-def test_html_ocr_converter_explicitly_unavailable():
+def test_html_ocr_converter_explicitly_unavailable(monkeypatch):
+    monkeypatch.delenv("WEKNORA_HTML_CODEC_PATH",raising=False)
+    monkeypatch.delenv("WEKNORA_HTML_CODEC_SHA256",raising=False)
     with pytest.raises(DocumentLifecycleError,match='OCR_HTML_SOURCE_CONVERTER_REQUIRED'):
         sanitize_ocr('<p>This is substantial HTML OCR content.</p>')
 

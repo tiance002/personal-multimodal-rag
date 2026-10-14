@@ -34,3 +34,5 @@ Long-path root cause: verbose worktree/batch names plus deeply nested immutable 
 New retained restore-only logical database: wk_port_restore_20261014_8e7a3fa inside current isolatedPG/volume,fixture95 only; original/asset snapshot E:/WK/restore/ocr-8e7a3fa. It is not an applicationservice or oldbusinessDB; no newcontainer/port/volume. Latestcandidate E:/WK/pkg/8e7a3fa (see P8_SHORT_ARTIFACT_20261014.md). Parserlocation/availability caveats: PARSER_STATUS_20261014.md.
 
 Newexplicitparserdependencies E:/WK/deps/reader,manifestsE:/WK/deps/*manifest.json; newofficialfixedMammothwheel D:/WK/download/mammoth-1.11.0-py2.py3-none-any.whl. wk.ps1 sets Ereader+runtime-deps,originalE/Cvenvnotmodified. NonewDockercontainerorport.
+
+HTMLrenderer dependency: E:/WK/deps/htmlcodec/htmlcodec.exe+manifest.json (hash-bound primitive only, no service/port/container). Fixedsourceoracle E:/WK/oracle/ocr-html/oracle.exe (testing only, not runtime). Officialmodule downloads D:/WK/go/modules,buildcache E:/WK/go/cache. wk.ps1 binds codecmanifest explicitly.

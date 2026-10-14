@@ -5,6 +5,9 @@ Set-Location -LiteralPath $PSScriptRoot
 $Python='E:\RAG quention\.venv\Scripts\python.exe'
 if (!(Test-Path -LiteralPath $Python)) { throw 'Verified Python runtime missing' }
 $env:PYTHONDONTWRITEBYTECODE='1'
+$Codec=Get-Content -LiteralPath 'E:\WK\deps\htmlcodec\manifest.json' -Raw | ConvertFrom-Json
+$env:WEKNORA_HTML_CODEC_PATH=$Codec.path
+$env:WEKNORA_HTML_CODEC_SHA256=$Codec.sha256
 # Public synthetic fixture only; test connection checks physical DB identity.
 $env:WEKNORA_PORT_TEST_DSN='postgresql://port_fixture:synthetic-isolated-fixture@127.0.0.1:56423/weknora_python_port_20261013'
 $env:PYTHONPATH='E:\WK\deps\reader;'+(Join-Path $PSScriptRoot 'var\weknora-port\runtime-deps')
