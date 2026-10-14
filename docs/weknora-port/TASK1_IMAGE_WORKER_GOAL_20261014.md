@@ -58,3 +58,8 @@ Python业务规则不等于所有底层代码Python。现有OCR HTML渲染依赖
 每批报告实际文件/上游函数/配置优先级/原样命令/退出码/证据路径/本地commit。分开SOURCE_READ、IMPLEMENTED、OFFLINE_PASS、ISOLATED_INTEGRATION_PASS；REAL_PROVIDER_PASS/CUTOVER_PASS保持NOT RUN。重大SOURCE_PARITY/安全冲突给最小证据与方案，不私改上游断言/阈值。持续完成离线隔离部分，不因真实模型门未批而停所有编码。禁止push/tag/release、替换现有本机/ECS服务或配置、旧业务DB变更、UNKNOWN清除、历史证据删除。
 
 交付可回滚本地提交和共享文件列表，由父级独立审查、串行整合。不要自称全Goal完成或已验收。
+
+
+## Superseding Owner correction after initial handoff
+
+Independent local OCR text recognition plus separate configurable VLM Caption is now Owner-approved source adaptation. Read OCR_CAPTION_OWNER_ADAPTATION_20261014.md; its latest decision replaces the shared-VLM assumption above. Real provider/model choice and calls remain unapproved. Owner task1 worktree E:/WK/image from b961e7a, own DB/Redis queue prefix; no shared writable DB/queue with original thread. Existing RedisMemoryExtractionQueue is memory-specific, ExtractionPayload and max_retry2; only source_retry_delay is a general reusable formula. Do not repurpose it as a complete image Asynq protocol; new common interfaces require explicit compatible contract and serial integration.

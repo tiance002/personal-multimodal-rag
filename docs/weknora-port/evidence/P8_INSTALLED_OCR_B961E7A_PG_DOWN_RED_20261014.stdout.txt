@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\var\weknora-port\p8-build\verify_installed_ocr_b961e7a.py", line 39, in <module>
+    receipt={"source_commit":manifest["source_commit"],"wheel_sha256":manifest["sha256"],"verified_installed_native_files":len(verified),"installed_runtime":str(runtime.__file__),"installed_ocr_module":str(images.__file__),"native_fixture":actual_pg_run(scenario()),"native_codec_sha256":codec["sha256"],"renderer_language":"Go third-party html-to-markdown primitive; Python business rules","real_provider_calls":0,"full_goal_pass":"NOT_CLAIMED","standalone_dependencies":"NOT_CLAIMED","cutover":"NOT_RUN"}
+                                                                                                                                                                                                                                                ~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_memory_storage_pg.py", line 36, in actual_pg_run
+    return runner.run(awaitable)
+           ~~~~~~~~~~^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\var\weknora-port\p8-build\verify_installed_ocr_b961e7a.py", line 27, in scenario
+    async with isolated_mock_application(image_ocr_text=row["input"]) as (app,wire,data):
+               ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\native_fixture.py", line 95, in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<verified-isolated-native-assembly>", line 9, in build_native_fixture
+  File "D:\Drivers\python\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\var\weknora-port\p8-build\venv\Lib\site-packages\backend\weknora_port\storage\connections.py", line 19, in lease
+    connection = await self.acquire()
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\native_fixture.py", line 19, in acquire
+    try:return await self.open_connection()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<verified-isolated-native-assembly>", line 3, in open_connection
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_memory_storage_pg.py", line 42, in connection
+    conn = await psycopg.AsyncConnection.connect(dsn,autocommit=True,row_factory=dict_row,connect_timeout=5)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG quention/.venv/Lib/site-packages\psycopg\connection_async.py", line 140, in connect
+    raise last_ex.with_traceback(None)
+psycopg.errors.ConnectionTimeout: connection timeout expired

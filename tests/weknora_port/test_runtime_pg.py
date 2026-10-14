@@ -35,7 +35,7 @@ from backend.weknora_port.http_api import create_app
 
 
 # Existing container/volume recovered after Owner-authorized Docker restart.
-REDIS_RUN_ID = "ad8c707ba74a8b29f84792928bc7da01bc796bf6"
+REDIS_RUN_ID = "586b92f4649b78508382dfd52d64d848f45b0a7c"
 SOURCE = "The source handbook says blue widgets use protocol W-17. Keep the widgets dry."
 
 
