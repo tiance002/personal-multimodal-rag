@@ -11,19 +11,30 @@ from backend.weknora_port.conversation.types import MemoryScope
 def test_actual_redis_retry_two_foreign_scope_and_expired_claim():
     async def scenario():
         client=Redis.from_url('redis://127.0.0.1:56424/0',decode_responses=True)
-        assert (await client.info('server'))['run_id']=='c7d5aaff50b2743adea96a426718c5df3483c80f'
+        assert (await client.info('server'))['run_id']=='ad8c707ba74a8b29f84792928bc7da01bc796bf6'
         principal=SimpleNamespace(tenant_id=9913,subject_id='public-queue-fixture')
         prefix='weknora-resume:queue-fixture:'+str(uuid.uuid4())
-        queue=RedisMemoryExtractionQueue(client,prefix,principal)
+        clock=[time.time()]
+        queue=RedisMemoryExtractionQueue(client,prefix,principal,clock=lambda:clock[0],randbelow=lambda bound:29)
         payload=ExtractionPayload(MemoryScope(principal.tenant_id,principal.subject_id),'session','message','model')
         calls=[]
         class Failure:
             async def handle(self,value):calls.append(value);raise RuntimeError('synthetic')
-        queue.worker=Failure()
         with pytest.raises(PermissionError):
             await queue.enqueue(ExtractionPayload(MemoryScope(9913,'foreign'),'s','m'),0,2)
         await queue.enqueue(payload,0,2)
-        await queue.drain()
+        queue.worker=Failure()
+        assert await queue.run_due()
+        first=(await client.zrange(queue.keys[0],0,-1,withscores=True))[0]
+        assert first[1]-clock[0]==44  # n=0 BEFORE increment
+        assert not await queue.run_due()
+        clock[0]+=44
+        assert await queue.run_due()
+        second=(await client.zrange(queue.keys[0],0,-1,withscores=True))[0]
+        assert second[1]-clock[0]==74  # n=1 BEFORE increment
+        assert not await queue.run_due()
+        clock[0]+=74
+        assert await queue.run_due()
         assert len(calls)==3
         assert all(row==payload for row in calls)
         assert len(await client.lrange(queue.keys[3],0,-1))==1
@@ -41,3 +52,12 @@ def test_actual_redis_retry_two_foreign_scope_and_expired_claim():
         assert await client.zcard(queue.keys[1])==0
         await client.aclose()
     asyncio.run(scenario())
+
+
+def test_source_retry_same_fixtures_go_oracle():
+    from pathlib import Path
+    from backend.weknora_port.storage.memory_queue import source_retry_delay
+    rows=[json.loads(row) for row in Path('docs/weknora-port/evidence/P4_RETRY_GO_20261014.jsonl').read_text(encoding='utf-8-sig').splitlines()]
+    assert len(rows)==90
+    for row in rows:
+        assert source_retry_delay(row['retried'],lambda bound:row['jitter'])==row['seconds']

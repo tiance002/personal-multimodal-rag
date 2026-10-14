@@ -4,7 +4,7 @@ Injected client/prefix only. Payload contains scoped IDs, no transcript. Jobs ar
 leased before execution; expired deliveries re-enter ready, max retry is source2.
 This queue transport is not an Asynq byte-protocol compatibility claim.
 """
-import asyncio,json,time,uuid
+import asyncio,json,time,uuid,secrets
 from dataclasses import asdict
 from ..conversation.maintenance_types import ExtractionPayload
 from ..conversation.types import MemoryScope
@@ -18,9 +18,20 @@ local id=ids[1];redis.call('ZREM',KEYS[1],id);redis.call('ZADD',KEYS[2],ARGV[2],
 return redis.call('HGET',KEYS[3],id)
 """
 
+def source_retry_delay(retried, randbelow=secrets.randbelow):
+    """Asynq v0.26.0 DefaultRetryDelayFunc; n is PRE-increment Retried.
+
+    Uniform integer jitter preserves the source distribution, not Go PRNG state.
+    """
+    if isinstance(retried, bool) or not isinstance(retried, int) or retried < 0:
+        raise ValueError('MEMORY_RETRY_COUNT_INVALID')
+    return retried**4 + 15 + randbelow(30) * (retried + 1)
+
+
 class RedisMemoryExtractionQueue:
-    def __init__(self,client,prefix,principal):
+    def __init__(self,client,prefix,principal,*,clock=time.time,randbelow=secrets.randbelow):
         self.client,self.prefix,self.principal=client,prefix,principal
+        self.clock,self.randbelow=clock,randbelow
         self.tasks=set();self.worker=None;self.pump_lock=asyncio.Lock()
     @property
     def keys(self):return tuple(self.prefix+suffix for suffix in (':ready',':leased',':jobs',':dead'))
@@ -33,7 +44,7 @@ class RedisMemoryExtractionQueue:
         ready,leased,jobs,dead=self.keys
         async with self.client.pipeline(transaction=True) as pipe:
             pipe.hset(jobs,job['id'],json.dumps(job,separators=(',',':')))
-            pipe.zadd(ready,{job['id']:time.time()+max(0,delay_seconds)})
+            pipe.zadd(ready,{job['id']:self.clock()+max(0,delay_seconds)})
             await pipe.execute()
         await self.start()
 
@@ -48,7 +59,7 @@ class RedisMemoryExtractionQueue:
         if tasks:await asyncio.gather(*tasks,return_exceptions=True)
 
     async def run_due(self):
-        ready,leased,jobs,dead=self.keys;now=time.time()
+        ready,leased,jobs,dead=self.keys;now=self.clock()
         raw=await self.client.eval(CLAIM,3,ready,leased,jobs,now,now+600)
         if raw is None:return False
         job=json.loads(raw);payload=dict(job['payload']);scope=MemoryScope(**payload.pop('scope'))
@@ -62,9 +73,10 @@ class RedisMemoryExtractionQueue:
         async with self.client.pipeline(transaction=True) as pipe:
             pipe.zrem(leased,job['id'])
             if error and job['retry']<job['max_retry']:
+                delay=source_retry_delay(job['retry'],self.randbelow)
                 job['retry']+=1
                 pipe.hset(jobs,job['id'],json.dumps(job,separators=(',',':')))
-                pipe.zadd(ready,{job['id']:time.time()+min(30,2**job['retry'])})
+                pipe.zadd(ready,{job['id']:self.clock()+delay})
             else:
                 pipe.hdel(jobs,job['id'])
                 if error:pipe.rpush(dead,json.dumps({'id':job['id'],'retry':job['retry'],'error_class':error}))
