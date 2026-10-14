@@ -1,0 +1,11 @@
+# Docker recovery and bounded native paired integration
+
+Owner explicitly authorized starting the existing Docker Desktop and continuing. Existing installation `E:/Docker/DockerDesktop/Docker Desktop.exe` (Docker Inc.) started with Start-Process -WindowStyle Hidden, exit 0. Docker Engine29.8.0 became ready. Only existing weknora-python-resume-{pg,redis}-20261013 containers were manually started; original container IDs and mounted named volumes were verified. No rebuild, volume clearing, system security change or old application startup. Old WeKnora-redis was observed automatically running after Engine startup and was left untouched.
+
+PG physical identity remains7696088403504697382. Redis run ID changed normally on restart fromc7d5aaff50b2743adea96a426718c5df3483c80f toad8c707ba74a8b29f84792928bc7da01bc796bf6; container692b84d8fee031b145e6b1b0037625a955f0bb3cdb321854d11a6bbb03b02664 and named volume remained the same. The test's fixed expected run ID was updated only after this read-only identity check. See P7_DOCKER_RECOVERY_20261014.json.
+
+Command: `E:/RAG quention/.venv/Scripts/python.exe -B -m pytest tests/weknora_port/test_runtime_pg.py -q --junitxml=docs/weknora-port/evidence/P7_NATIVE_PAIRED_HTTP_RECOVERED.junit.xml`, explicit approved isolated DSN and dedicated runtime-deps PYTHONPATH. Exit0;1passed/7dependency-deprecation warnings in23.07s. Previous failed/Engine-unavailable evidence preserved.
+
+Actual loopback FastAPI upload, source RAG, P5 upgrade, scoped citations/source downloads, history, Redis replay, timeoutOFF, image OCR/caption/profile and memory checks completed in the retained isolated PG/Redis environment. Added four-mode native pairing prepares once and confirms five identical stream inputs, four separate assistant records, original baseline binding and role/upgrade outcomes. Evidence: P7_NATIVE_PAIRED_HTTP_CHAIN_20261014.json and P7_NATIVE_PAIRED_HTTP_RECOVERED stdout/JUnit/exitcode.
+
+Bounded ISOLATED_INTEGRATION_PASS for this synthetic chain only. Mock responses/vectors/permissions/prices are explicit fixtures; REAL_PROVIDER_PASS, real model quality, full frozen-corpus evaluation and CUTOVER_PASS remain NOT RUN. No entire P7 PASS. Dedicated test API shuts down in test finally; PG/Redis and synthetic/history/UNKNOWN are retained. No push/tag/release.
