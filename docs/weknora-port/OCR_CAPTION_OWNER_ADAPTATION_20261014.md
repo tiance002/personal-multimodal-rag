@@ -11,3 +11,10 @@ Task1 portability: independently provision necessary approved PyMuPDF/native OCR
 Fixed-source request behavior for comparison: ImageMultimodalService.Handle checks orphan/aborted before VLM, then resolves VLM and reads bytes; unreadable image returns without model calls. OCR Predict only under payload.EnableOCR; ordinary error/empty OCR does not prevent Caption. Caption Predict is unconditional in this pinned source despite payload.EnableCaption being logged. Task1 must document how this maps to the newly approved independent local OCR/Caption interfaces and preserve unrelated lifecycle behavior; cannot say every input necessarily makes two requests.
 
 Existing source-shared mock model configuration is historical test evidence only: siliconflow / Qwen/Qwen2.5-VL-72B-Instruct, provider fixture.invalid and MockTransport; real provider calls0. Original new port production role/provider/model settings are not established by this mock, status UNKNOWN.
+
+
+## Latest superseding configuration contract
+
+Owner further refines the above absolute split: OCR is an abstract configurable engine/model interface. Explicit user Caption/VLM configuration has precedence; when absent, it may reuse the OCR model only if image-description capability is established. A dedicated OCR engine such as Tesseract must not be treated as VLM: preserve OCR and explicitly mark Caption unconfigured/unavailable. Explicit Caption call failure is not absence and must not cause automatic fallback. Sharing model configuration does not merge OCR and Caption calls or introduce a new routing strategy. Real provider/model selection/calls remain unapproved. Parent is finalizing capability registration; no thread should expand an incomplete capability policy yet. Task1 owns implementation; original thread only records this approved source adaptation and continues nonimage work.
+
+RedisMemoryExtractionQueue remains memory-specific ExtractionPayload/max_retry2; only source_retry_delay can be reused independently. Old fitz import failure remains a runtime gap; pinned data files/distribution metadata do not promise immediate native OCR execution.

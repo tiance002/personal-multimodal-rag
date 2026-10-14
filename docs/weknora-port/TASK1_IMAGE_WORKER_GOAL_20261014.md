@@ -63,3 +63,6 @@ Python业务规则不等于所有底层代码Python。现有OCR HTML渲染依赖
 ## Superseding Owner correction after initial handoff
 
 Independent local OCR text recognition plus separate configurable VLM Caption is now Owner-approved source adaptation. Read OCR_CAPTION_OWNER_ADAPTATION_20261014.md; its latest decision replaces the shared-VLM assumption above. Real provider/model choice and calls remain unapproved. Owner task1 worktree E:/WK/image from b961e7a, own DB/Redis queue prefix; no shared writable DB/queue with original thread. Existing RedisMemoryExtractionQueue is memory-specific, ExtractionPayload and max_retry2; only source_retry_delay is a general reusable formula. Do not repurpose it as a complete image Asynq protocol; new common interfaces require explicit compatible contract and serial integration.
+
+
+Latest Owner refinement supersedes absolute independent model selection: configurable OCR engine/model abstraction; explicit Caption/VLM config first, otherwise reuse OCR model only with established image-description capability. Tesseract cannot be VLM; OCR continues and Caption explicitly unavailable. Explicit Caption failure does not fallback; shared model does not merge requests. Capability registration policy still being finalized by parent, do not expand it autonomously. See latest section of OCR_CAPTION_OWNER_ADAPTATION_20261014.md.
