@@ -14,6 +14,7 @@ from .usage import normalize_usage, accumulate_usage
 from .stream import StreamAssembler, sse_events, decode_tool_calls
 from .native_request import build_native_body
 from .native_response import parse_native_response, NativeStreamState, native_usage
+from .local_ollama import build_ollama_body, parse_ollama_response, OllamaStreamState, local_error_event
 
 
 def decode_json(raw):
@@ -100,9 +101,12 @@ def parse_chat_response(env, config):
 
 
 class ProviderModel:
-    def __init__(self, config, transport, *, image_resolver=None):
-        if config.source=='local':raise ProviderError('MODEL_LOCAL_SERVICE_NOT_IMPLEMENTED')
+    def __init__(self, config, transport, *, local_service=None, image_resolver=None):
         self.config, self.transport, self.image_resolver = config, transport, image_resolver
+        # source=='local' routes to an injected Ollama connection instead of the
+        # row's inline BaseURL/APIKey; a missing service fails loudly at call
+        # time and is never silently rewritten into a remote send.
+        self.local_service = local_service
 
     def _options(self, options, context):
         if context.session_id and (options is None or not options.prompt_cache_key):
@@ -110,6 +114,9 @@ class ProviderModel:
         return options
 
     def build_request_body(self, messages, options=None, *, stream=False):
+        if self.config.source=='local':
+            return build_ollama_body(self.config, messages, options, stream=stream,
+                                     image_resolver=self.image_resolver)
         if self.config.provider=="weknoracloud" and self.config.model_type=="VLLM":
             # Specialized source VLM wire; ordinary cloud chat flattens images.
             from .request import convert_messages
@@ -138,6 +145,8 @@ class ProviderModel:
                     self.config.protocol_settings.get(self.config.api,{}).get("prompt_cache_key")) else "")
 
     async def chat(self, messages: Sequence[Message], options: ChatOptions | None, context, *, _capability="chat"):
+        if self.config.source=='local':
+            return await self._local_chat(messages, options, context, _capability=_capability)
         options = self._options(options, context)
         async with call_lifetime(context, DEFAULT_CHAT_TIMEOUT) as lifetime:
             for retry in ((False,) if _capability == "vision" else (False, True)):
@@ -190,6 +199,10 @@ class ProviderModel:
         return await self.chat(messages, options, context, _capability="vision")
 
     async def chat_stream(self, messages, options, context):
+        if self.config.source=='local':
+            async for event in self._local_stream(messages, options, context):
+                yield event
+            return
         if self.config.api != "openai-completions":
             async for event in self._native_stream(messages,options,context):
                 yield event
@@ -252,6 +265,68 @@ class ProviderModel:
         except ProviderError as error:
             for event in assembler.fail(error):
                 yield identity_event(event)
+
+    async def _local_chat(self, messages, options, context, *, _capability="chat"):
+        service = self.local_service
+        if service is None:
+            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
+        try:
+            await service.ensure_model_available(self.config.model)
+        except CallCancelled:
+            raise
+        except ProviderError:
+            raise
+        except Exception:
+            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE") from None
+        body = build_ollama_body(self.config, messages, options, stream=False,
+                                 image_resolver=self.image_resolver)
+        last: dict = {}
+        try:
+            async for envelope in service.chat(self.config.model, body):
+                last = envelope
+        except CallCancelled:
+            raise
+        except ProviderError:
+            raise
+        except Exception:
+            raise ProviderError("MODEL_LOCAL_CHAT_FAILED") from None
+        return parse_ollama_response(last, self.config)
+
+    async def _local_stream(self, messages, options, context):
+        image_resolver = self.image_resolver
+        def identity(event):
+            return replace(event, data={**(event.data or {}),
+                "model_requested": self.config.model, "model_reported": None})
+        service = self.local_service
+        if service is None:
+            yield identity(local_error_event(ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")))
+            return
+        try:
+            await service.ensure_model_available(self.config.model)
+        except CallCancelled:
+            raise
+        except ProviderError as error:
+            yield identity(local_error_event(error))
+            return
+        except Exception:
+            yield identity(local_error_event(ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")))
+            return
+        body = build_ollama_body(self.config, messages, options, stream=True, image_resolver=image_resolver)
+        state = OllamaStreamState(self.config)
+        try:
+            async for envelope in service.chat(self.config.model, body):
+                for event in state.feed(envelope):
+                    yield identity(event)
+        except CallCancelled:
+            raise
+        except ProviderError as error:
+            for event in state.finish_thinking():
+                yield identity(event)
+            yield identity(local_error_event(error))
+        except Exception:
+            for event in state.finish_thinking():
+                yield identity(event)
+            yield identity(local_error_event(ProviderError("MODEL_LOCAL_CHAT_FAILED")))
 
     async def _native_stream(self,messages,options,context):
         options=self._options(options,context)

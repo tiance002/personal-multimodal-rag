@@ -78,7 +78,6 @@ class NeutralModelRegistry:
             raise ProviderError('MODEL_OWNER_MISMATCH')
         if model_id not in self._models:
             role = await self.store.resolve(model_id)
-            if role.source=='local':raise ProviderError('MODEL_LOCAL_SERVICE_NOT_IMPLEMENTED')
             config = self.catalogue.resolve(role,model_id)
             model = self.model_factory(config,role.api_key)
             if inspect.isawaitable(model):

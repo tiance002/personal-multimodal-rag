@@ -6,7 +6,7 @@ import pytest,httpx
 from backend.weknora_port.storage.configuration import ConfiguredRole,ModelConfigurationError
 from backend.weknora_port.storage.models import SECRET_FIELDS,_json
 from backend.weknora_port.model_registry import SourceCatalogue,NeutralModelRegistry
-from backend.weknora_port.models.types import CallContext,TrustedScope,ProviderError
+from backend.weknora_port.models.types import CallContext,TrustedScope,ProviderError,Message
 from backend.weknora_port.http_api import create_app
 from backend.weknora_port.runtime import ConversationSettings
 from backend.weknora_port.generation import RouterPolicy
@@ -15,20 +15,23 @@ from tests.weknora_port.test_memory_storage_pg import actual_pg_run
 from tests.weknora_port.test_runtime_pg import SOURCE,stream_response
 
 
-def test_local_source_never_falls_through_to_remote_factory():
+def test_local_source_stays_local_and_only_needs_a_local_service():
     async def run():
         role=ConfiguredRole('cheap','deepseek','synthetic-local','http://fixture.invalid/ignored',source='local')
         class Store:
             async def resolve(self,id):return role
-        called=[]
-        registry=NeutralModelRegistry(Store(),lambda *args:called.append(args),owner_id='owner')
-        with pytest.raises(ProviderError,match='MODEL_LOCAL_SERVICE_NOT_IMPLEMENTED'):
-            await registry.get('id',CallContext('run',TrustedScope('owner',())))
-        assert not called
-        assert SourceCatalogue().resolve(role,'id').source=='local'
         from backend.weknora_port.models.provider import ProviderModel
-        with pytest.raises(ProviderError,match='MODEL_LOCAL_SERVICE_NOT_IMPLEMENTED'):
-            ProviderModel(SourceCatalogue().resolve(role,'id'),None)
+        config=SourceCatalogue().resolve(role,'id')
+        assert config.source=='local'
+        seen=[]
+        def factory(cfg,key):seen.append(cfg);return ProviderModel(cfg,None)
+        registry=NeutralModelRegistry(Store(),factory,owner_id='owner')
+        model=await registry.get('id',CallContext('run',TrustedScope('owner',())))
+        # local stays local through the factory; it is never rewritten into a remote send.
+        assert seen and seen[0].source=='local' and model.config.source=='local'
+        # No injected local service is an explicit, readable refusal, not a silent remote call.
+        with pytest.raises(ProviderError,match='MODEL_LOCAL_SERVICE_UNAVAILABLE'):
+            await model.chat((Message('user',content='hi'),),None,CallContext('run',TrustedScope('owner',())))
     asyncio.run(run())
 
 

@@ -2,6 +2,8 @@
 from .compat import provider_config
 from .provider import ProviderModel, parse_chat_response
 from .request import build_chat_body, build_embedding_body, build_rerank_body
+from .local_ollama import (build_ollama_body, parse_ollama_response, convert_ollama_messages,
+    OllamaStreamState, ndjson_events, HTTPLocalService, LocalChatService, local_error_event)
 from .transport import AsyncHTTPTransport, call_lifetime, resolve_endpoint
 from .types import (CallContext, TrustedScope, ChatOptions, Message, Tool, ToolCall, FunctionCall,
     ModelConfig, ChatSettings, EmbeddingSettings, RerankSettings, ProviderError,
