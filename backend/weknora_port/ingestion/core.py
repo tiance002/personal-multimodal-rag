@@ -413,53 +413,15 @@ def _cell_value(value: Any) -> str:
 
 
 def _parse_excel(request: DocumentRequest) -> ParsedDocument:
-    ext = _extension(request.filename)
+    from .upstream_excel_parser import ExcelParser
     first_row_header = _truthy(_effective_parser_overrides(request).get("xlsx_first_row_as_header", False))
-    try:
-        if ext == ".xls":
-            import xlrd  # type: ignore[import-not-found]
-            workbook = xlrd.open_workbook(file_contents=request.data)
-            sheets = [(sheet.name, [[sheet.cell_value(r, c) if sheet.cell_value(r, c) != "" else None
-                                     for c in range(sheet.ncols)] for r in range(sheet.nrows)])
-                      for sheet in workbook.sheets()]
-        else:
-            from openpyxl import load_workbook  # type: ignore[import-not-found]
-            workbook = load_workbook(io.BytesIO(request.data), read_only=True, data_only=True)
-            sheets = [(ws.title, [list(row) for row in ws.iter_rows(values_only=True)]) for ws in workbook.worksheets]
-    except ImportError:
-        raise
-    rows_out: list[str] = []
-    row_records: list[dict[str, Any]] = []
-    for sheet_name, sheet_rows in sheets:
-        nonempty = [list(row) for row in sheet_rows if any(v is not None and str(v).strip() != "" for v in row)]
-        if not nonempty:
-            continue
-        width = max(map(len, nonempty))
-        nonempty = [row + [None] * (width - len(row)) for row in nonempty]
-        if first_row_header and len(nonempty) >= 2:
-            labels: list[str] = []
-            counts: dict[str, int] = {}
-            for col, value in enumerate(nonempty[0], start=1):
-                label = _cell_value(value).strip() or _column_name(col)
-                counts[label] = counts.get(label, 0) + 1
-                labels.append(label if counts[label] == 1 else f"{label}_{counts[label]}")
-            data_rows = nonempty[1:]
-        else:
-            labels = [_column_name(i + 1) for i in range(width)]
-            data_rows = nonempty
-        for row_no, row in enumerate(data_rows, start=2 if first_row_header else 1):
-            items = [f"{labels[i]}: {_cell_value(value)}" for i, value in enumerate(row)
-                     if value is not None and not _IMAGE_FUNCTION.match(str(value).strip())]
-            if not items:
-                continue
-            rendered = ",".join(items) + "\n"
-            rows_out.append(rendered)
-            row_records.append({"sheet": sheet_name, "row": row_no})
-    if "workbook" in locals() and hasattr(workbook, "close"):
-        workbook.close()
-    return ParsedDocument("".join(rows_out), metadata=_base_metadata(request, "excel", sheet_count=len(sheets), row_count=len(rows_out),
-                                                                         row_sources=row_records,
-                                                                         xlsx_first_row_as_header=first_row_header))
+    parser = ExcelParser(file_name=request.filename, file_type=_extension(request.filename).lstrip("."),
+                         xlsx_first_row_as_header=first_row_header)
+    parsed = parser.parse_into_text(request.data)
+    rows = [{"seq": c.seq, "start": c.start, "end": c.end} for c in parsed.chunks]
+    return ParsedDocument(parsed.content, metadata=_base_metadata(request, "excel",
+        sheet_count=parser._parsed_sheet_count, row_count=len(parsed.chunks), row_sources=parser._native_row_sources, source_row_chunks=rows,
+        xlsx_first_row_as_header=first_row_header, excel_source="fixed_upstream_pandas"))
 
 
 def _column_name(index: int) -> str:

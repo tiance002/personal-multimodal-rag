@@ -7,7 +7,7 @@ if (!(Test-Path -LiteralPath $Python)) { throw 'Verified Python runtime missing'
 $env:PYTHONDONTWRITEBYTECODE='1'
 # Public synthetic fixture only; test connection checks physical DB identity.
 $env:WEKNORA_PORT_TEST_DSN='postgresql://port_fixture:synthetic-isolated-fixture@127.0.0.1:56423/weknora_python_port_20261013'
-$env:PYTHONPATH=Join-Path $PSScriptRoot 'var\weknora-port\runtime-deps'
+$env:PYTHONPATH='E:\WK\deps\reader;'+(Join-Path $PSScriptRoot 'var\weknora-port\runtime-deps')
 switch ($Action) {
  'status' {
   git rev-parse HEAD

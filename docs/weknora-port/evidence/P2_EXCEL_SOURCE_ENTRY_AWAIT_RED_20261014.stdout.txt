@@ -1,0 +1,74 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_fixed_excel_source_real_helpers_and_native_upload ____________
+
+    def test_fixed_excel_source_real_helpers_and_native_upload():
+        raw=workbook_bytes();cases=[('default',raw,False),('header',raw,True),('repair',dangling_sharedstrings(raw),True)]
+        receipts=[]
+        for name,payload,header in cases:
+            with upstream_excel() as source:
+                expected=source.ExcelParser(file_name='source.xlsx',file_type='xlsx',xlsx_first_row_as_header=header).parse_into_text(payload)
+            engine,parsed=parse_document(DocumentRequest('source.xlsx',payload,upload_parser_overrides={'xlsx_first_row_as_header':str(header)}))
+            assert engine=='excel' and parsed.content==expected.content
+            assert parsed.metadata['source_row_chunks']==[{'seq':r.seq,'start':r.start,'end':r.end} for r in expected.chunks]
+            assert parsed.metadata['sheet_count']==2
+            assert parsed.content.count('Blue widgets')==2
+            assert 'IMAGE(' not in parsed.content
+            receipts.append({'name':name,'raw_sha256':hashlib.sha256(payload).hexdigest(),'parsed_sha256':hashlib.sha256(parsed.content.encode()).hexdigest(),'rows':len(expected.chunks),'sheet_count':2})
+        async def scenario():
+            async with isolated_mock_application() as (app,wire,root):
+                kb=(await app.create_knowledge_base(app.principal,'Source Excel fixture'))['id']
+                await prepare_public_fixture(app,kb,'excel')
+                document=await app.upload_document(app.principal,kb,'merged.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',raw)
+                assert document['status']=='completed',document
+                original=await app.read_document(app.principal,kb,document['id']);assert original.content==raw
+                expected=parse_document(DocumentRequest('merged.xlsx',raw))[1].content
+                async with app.leases.lease() as guard:
+                    rows=await (await guard.connection.execute("SELECT content,source_content FROM chunks WHERE tenant_id=%s AND knowledge_id=%s AND chunk_type='text' ORDER BY chunk_index",(app.principal.tenant_id,document['id']))).fetchall()
+                    assert rows and any((r['source_content'] or r['content'])==expected for r in rows)
+                    indexes=await (await guard.connection.execute('SELECT count(*) AS n FROM embeddings WHERE knowledge_id=%s AND is_enabled=true',(document['id'],))).fetchone()['n']
+                    assert indexes>0
+                Path('docs/weknora-port/evidence/P2_EXCEL_SOURCE_ENTRY_20261014.json').write_text(json.dumps({'kind':'FIXED_SOURCE_PYTHON_EXCEL_REAL_HELPERS_PLUS_NATIVE_UPLOAD_INDEX','cases':receipts,
+                    'document':document['id'],'storage_root':str(root),'active_indices':indexes,'original_hash_readback':True,'source_text_same':True,'mock_calls':len(wire),'real_provider_calls':0,'old_environment_changed':False},indent=2),encoding='utf-8')
+>       actual_pg_run(scenario())
+
+tests\weknora_port\test_excel_source_pg.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        async with isolated_mock_application() as (app,wire,root):
+            kb=(await app.create_knowledge_base(app.principal,'Source Excel fixture'))['id']
+            await prepare_public_fixture(app,kb,'excel')
+            document=await app.upload_document(app.principal,kb,'merged.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',raw)
+            assert document['status']=='completed',document
+            original=await app.read_document(app.principal,kb,document['id']);assert original.content==raw
+            expected=parse_document(DocumentRequest('merged.xlsx',raw))[1].content
+            async with app.leases.lease() as guard:
+                rows=await (await guard.connection.execute("SELECT content,source_content FROM chunks WHERE tenant_id=%s AND knowledge_id=%s AND chunk_type='text' ORDER BY chunk_index",(app.principal.tenant_id,document['id']))).fetchall()
+                assert rows and any((r['source_content'] or r['content'])==expected for r in rows)
+>               indexes=await (await guard.connection.execute('SELECT count(*) AS n FROM embeddings WHERE knowledge_id=%s AND is_enabled=true',(document['id'],))).fetchone()['n']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               TypeError: 'coroutine' object is not subscriptable
+
+tests\weknora_port\test_excel_source_pg.py:73: TypeError
+============================== warnings summary ===============================
+tests/weknora_port/test_excel_source_pg.py::test_fixed_excel_source_real_helpers_and_native_upload
+  E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_excel_source_pg.py:73: RuntimeWarning: coroutine 'AsyncCursor.fetchone' was never awaited
+    indexes=await (await guard.connection.execute('SELECT count(*) AS n FROM embeddings WHERE knowledge_id=%s AND is_enabled=true',(document['id'],))).fetchone()['n']
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_excel_source_pg.py::test_fixed_excel_source_real_helpers_and_native_upload
+1 failed, 1 warning in 3.96s
