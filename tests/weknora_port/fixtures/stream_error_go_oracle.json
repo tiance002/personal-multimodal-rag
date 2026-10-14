@@ -1,0 +1,155 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "scope": "exact OnEvent channel-consumer goroutine and exact resource streamHold/decoder; stubbed DTO/event bus/registry. Not full Go engine/citation oracle.",
+  "source_sha256": {
+    "chat_completion_stream.go": "e1deb514b4c875c8b112d676094f98c8949c8ee85a4a392396af43869ce18591",
+    "stream.go": "8f17f16d6a0dfc478603be1f1a799c67abd184ef598e31a4c43f3087780a45cb"
+  },
+  "cases": [
+    [
+      {
+        "ResponseType": "thinking",
+        "Content": "first",
+        "Done": true
+      },
+      {
+        "ResponseType": "thinking",
+        "Content": "second"
+      },
+      {
+        "ResponseType": "answer",
+        "Content": "partial "
+      },
+      {
+        "ResponseType": "error",
+        "Content": "PROVIDER_RESPONSE_INVALID"
+      },
+      {
+        "ResponseType": "answer",
+        "Content": "recovered",
+        "Done": true,
+        "FinishReason": "stop"
+      }
+    ],
+    [
+      {
+        "ResponseType": "thinking",
+        "Content": "thought re"
+      },
+      {
+        "ResponseType": "answer",
+        "Content": "answer re"
+      },
+      {
+        "ResponseType": "error",
+        "Content": "PROVIDER_RESPONSE_INVALID"
+      }
+    ],
+    [
+      {
+        "ResponseType": "answer",
+        "Content": "image re"
+      },
+      {
+        "ResponseType": "error",
+        "Content": "PROVIDER_RESPONSE_INVALID"
+      },
+      {
+        "ResponseType": "answer",
+        "Content": "s://0001",
+        "Done": true,
+        "FinishReason": "stop"
+      }
+    ]
+  ],
+  "rows": [
+    [
+      {
+        "content": "first",
+        "done": false,
+        "kind": "thinking"
+      },
+      {
+        "content": "",
+        "done": true,
+        "kind": "thinking"
+      },
+      {
+        "content": "second",
+        "done": false,
+        "kind": "thinking"
+      },
+      {
+        "content": "",
+        "done": true,
+        "kind": "thinking"
+      },
+      {
+        "content": "partial ",
+        "done": false,
+        "kind": "answer"
+      },
+      {
+        "content": "PROVIDER_RESPONSE_INVALID",
+        "done": true,
+        "kind": "error"
+      },
+      {
+        "content": "recovered",
+        "done": true,
+        "kind": "answer"
+      }
+    ],
+    [
+      {
+        "content": "thought ",
+        "done": false,
+        "kind": "thinking"
+      },
+      {
+        "content": "",
+        "done": true,
+        "kind": "thinking"
+      },
+      {
+        "content": "answer ",
+        "done": false,
+        "kind": "answer"
+      },
+      {
+        "content": "PROVIDER_RESPONSE_INVALID",
+        "done": true,
+        "kind": "error"
+      },
+      {
+        "content": "re",
+        "done": false,
+        "kind": "thinking"
+      },
+      {
+        "content": "re",
+        "done": false,
+        "kind": "answer"
+      }
+    ],
+    [
+      {
+        "content": "image ",
+        "done": false,
+        "kind": "answer"
+      },
+      {
+        "content": "PROVIDER_RESPONSE_INVALID",
+        "done": true,
+        "kind": "error"
+      },
+      {
+        "content": "resource://abcdefghijklmnopqrstuv",
+        "done": true,
+        "kind": "answer"
+      }
+    ]
+  ],
+  "exit_code": 0,
+  "real_provider_calls": 0
+}

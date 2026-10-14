@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="7.382" timestamp="2026-10-14T19:46:21.510620+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_generic_error_does_not_drop_subsequent_answer_or_reopen_thinking" time="0.022" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_generic_error_eof_flushes_held_tail_without_success_or_upgrade" time="0.011" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_hard_boundaries_do_not_recover_or_upgrade[MODEL_BUDGET_DENIED]" time="0.009" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_hard_boundaries_do_not_recover_or_upgrade[MODEL_EGRESS_DENIED]" time="0.008" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_hard_boundaries_do_not_recover_or_upgrade[PROVIDER_MODEL_IDENTITY_MISMATCH]" time="0.010" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_hard_boundaries_do_not_recover_or_upgrade[MODEL_USAGE_SETTLEMENT_FAILED]" time="0.011" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_hard_boundaries_do_not_recover_or_upgrade[MODEL_CALL_TIMEOUT]" time="0.009" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_buffered_cheap_recovered_error_only_publishes_selected_attempt" time="0.019" /><testcase classname="tests.weknora_port.test_stream_error_continuation" name="test_exact_go_consumer_resource_traces" time="0.039" /><testcase classname="tests.weknora_port.test_stream_error_http_pg" name="test_actual_http_same_channel_recovery_and_error_eof_unknown" time="3.355"><failure message="KeyError: 'data'">tests\weknora_port\test_stream_error_http_pg.py:65: in test_actual_http_same_channel_recovery_and_error_eof_unknown
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_stream_error_http_pg.py:41: in scenario
+    session=(await client.post('/api/v1/sessions',json={'knowledge_base_scope':[kb],'document_scope':[doc['id']]})).json()['data']['id']
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'</failure></testcase></testsuite></testsuites>

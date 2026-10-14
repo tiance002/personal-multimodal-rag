@@ -24,7 +24,10 @@ class CitationStreamDecoder:
         return self.registry.resources.decode_text(combined)
 
     def feed(self, chunk: str) -> str:
-        data = self.pending + self._feed_resources(chunk)
+        return self._feed_citations(self._feed_resources(chunk))
+
+    def _feed_citations(self, chunk: str) -> str:
+        data = self.pending + chunk
         self.pending = ""
         out: list[str] = []
         while data:
@@ -56,7 +59,7 @@ class CitationStreamDecoder:
     def flush(self) -> str:
         resource_tail, self.resource_pending = self.resource_pending, ""
         resource_tail = self.registry.resources.decode_text(resource_tail)
-        decoded_resource_tail = self.feed(resource_tail) if resource_tail else ""
+        decoded_resource_tail = self._feed_citations(resource_tail) if resource_tail else ""
         pending, self.pending = self.pending, ""
         lower = pending.lower()
         if any(lower.startswith(prefix) or (len(lower) <= len(prefix) and prefix.startswith(lower)) for prefix in ("<ref", "<kb", "<web")):

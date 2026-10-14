@@ -1,0 +1,14 @@
+.F...................................................................... [ 72%]
+...........................                                              [100%]
+================================== FAILURES ===================================
+_____ test_generic_error_eof_flushes_held_tail_without_success_or_upgrade _____
+tests\weknora_port\test_stream_error_continuation.py:32: in test_generic_error_eof_flushes_held_tail_without_success_or_upgrade
+    assert ''.join(x.content for x in store.events if x.type=='thinking')=='thought re'
+E   AssertionError: assert 'thought ' == 'thought re'
+E     
+E     - thought re
+E     ?         --
+E     + thought
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_stream_error_continuation.py::test_generic_error_eof_flushes_held_tail_without_success_or_upgrade
+1 failed, 98 passed in 1.03s

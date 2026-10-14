@@ -218,6 +218,9 @@ export function WeKnoraPythonApp() {
         return { ...previous, content: finalContent, progress, status: "completed" };
       }
       if (event.response_type === "error") {
+        if (event.data.non_terminal === true && event.data.stage === "chat_completion_stream") {
+          return { ...previous, progress: progress.slice(-80) };
+        }
         return { ...previous, content: event.content || "运行发生错误", progress: progress.slice(-80), error: true };
       }
       return { ...previous, progress: progress.slice(-80) };

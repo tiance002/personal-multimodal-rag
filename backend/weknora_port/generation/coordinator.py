@@ -104,6 +104,24 @@ class GenerationCoordinator:
                 thinking_closed = True
         final_seen = False
         failure = None
+        stream_error = None
+        error_events = []
+        decoders_flushed = False
+
+        async def flush_decoders():
+            nonlocal decoders_flushed, thinking_closed
+            if decoders_flushed:
+                return
+            decoders_flushed = True
+            thinking_tail = thinking_decoder.flush()
+            if thinking_tail:
+                thinking.append(thinking_tail)
+                await publish('thinking', thinking_tail)
+            answer_tail = answer_decoder.flush()
+            if answer_tail:
+                answer.append(answer_tail)
+                await publish('answer', answer_tail)
+            await close_thinking()
         try:
             check_context(context)
             if context.deadline_kind == 'model' and context.deadline is not None and context.deadline <= asyncio.get_running_loop().time():
@@ -135,12 +153,25 @@ class GenerationCoordinator:
                             raise CallCancelled(sent=True)
                         if code == 'RUN_DEADLINE_EXCEEDED':
                             raise RunDeadlineExceeded(sent=True)
-                        raise GenerationError(code if isinstance(code, str) else 'PROVIDER_STREAM_FAILED', sent=True)
+                        code = code if isinstance(code, str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,79}', code) else 'PROVIDER_STREAM_FAILED'
+                        # Source OnEvent emits errors and continues the SAME channel.
+                        # Security/identity/settlement denials are never recoverable.
+                        if code.startswith(('MODEL_', 'SCOPE_', 'TURN_', 'GENERATION_')) or code == 'PROVIDER_MODEL_IDENTITY_MISMATCH':
+                            raise GenerationError(code, sent=True)
+                        stream_error = GenerationError(code, sent=True)
+                        notice = StreamEvent(attempt_id + '-error-' + str(len(error_events)), 'error', code, True,
+                            data={'error_code': code, 'stage': 'chat_completion_stream', 'non_terminal': True,
+                                  'attempt_id': attempt_id, 'role': role})
+                        error_events.append(notice)
+                        if publish_live:
+                            await self.store.append_event(request.session_id, request.message_id, notice)
+                        continue
                     if event.response_type == 'thinking':
                         delta = thinking_decoder.feed(event.content)
                         if event.done:
                             delta += thinking_decoder.flush()
                         if delta:
+                            thinking_closed = False
                             thinking.append(delta)
                             await publish('thinking', delta)
                         if event.done:
@@ -158,17 +189,13 @@ class GenerationCoordinator:
                         live_answer_closed = event.done
                     if event.is_final:
                         final_seen = True
-                answer_tail = answer_decoder.flush()
-                thinking_tail = thinking_decoder.flush()
-                answer.append(answer_tail)
-                if thinking_tail:
-                    thinking.append(thinking_tail)
-                    await publish('thinking', thinking_tail)
-                await close_thinking()
+                await flush_decoders()
+                if stream_error is not None and not answer_done:
+                    raise stream_error  # error-only EOF is not a successful answer or P5 upgrade.
                 if not live_answer_closed:
-                    if is_length(finish) and not ''.join(answer).strip():
-                        answer_tail = EMPTY_TRUNCATED_FALLBACK
-                    await publish('answer', answer_tail, True)
+                    tail = EMPTY_TRUNCATED_FALLBACK if is_length(finish) and not ''.join(answer).strip() else ''
+                    await publish('answer', tail, True)
+                    live_answer_closed = True
                 check_context(context)
             finally:
                 close = getattr(stream, 'aclose', None)
@@ -181,6 +208,11 @@ class GenerationCoordinator:
                         await close()
         except BaseException as exc:
             failure = exc
+            if not isinstance(exc, (CallCancelled, asyncio.CancelledError)):
+                try:
+                    await flush_decoders()
+                except Exception:
+                    setattr(exc, 'cleanup_error_code', 'FAILED_STREAM_FLUSH_UNAVAILABLE')
         if isinstance(failure, (CallCancelled, asyncio.CancelledError)):
             async def close_cancelled_public_stream():
                 nonlocal thinking_closed, live_answer_closed
@@ -229,7 +261,7 @@ class GenerationCoordinator:
         if is_length(finish) and (not text.strip()):
             text = EMPTY_TRUNCATED_FALLBACK
         references = self._references(request, registry)
-        return (record, (text, thought, references), None)
+        return (record, (text, thought, references, tuple(error_events)), None)
 
     @staticmethod
     def _references(request, registry):
@@ -286,12 +318,15 @@ class GenerationCoordinator:
             break
         if selected is None:
             raise GenerationError('GENERATION_NO_SELECTED_ATTEMPT')
-        answer, thinking, references = selected
+        answer, thinking, references, error_events = selected
         total_usage = accumulate_usage([record.usage for record in attempts])
         result = GenerationResult(answer, thinking, references, record.role, record.attempt_id, tuple(attempts), route, total_usage, record.finish_reason, is_length(record.finish_reason), len(attempts) > 1, prepared.prompt_sha256, prepared.context_sha256)
         check_context(context)
         metadata = {'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
         buffered = record.role == 'cheap' and request.policy.mode == 'DYNAMIC'
+        if buffered:
+            for notice in error_events:
+                await self.store.append_event(request.session_id, request.message_id, notice)
         if thinking and buffered:
             await self.store.append_event(request.session_id, request.message_id, StreamEvent(record.attempt_id + '-thinking', 'thinking', thinking, True, data=metadata))
         if references:
