@@ -1,7 +1,7 @@
 {
   "kind": "EXACT_PATH_STATIC_RETIREMENT_REVIEW_NOT_DELETE_AUTHORIZATION",
-  "source_commit": "b5f396dc5d48d64dd6f4825524e872f0967d3402",
-  "candidate_count": 45,
+  "source_commit": "e22e4289f76f4497e455c5e00bee302fb24960ae",
+  "candidate_count": 42,
   "candidates": [
     {
       "path": "backend/app/adapters/models/cloud.py",
@@ -478,12 +478,6 @@
           "text": "script=\"import sys,json,hashlib;from pathlib import Path;print(json.dumps(dict(python=sys.version.split()[0],executable=sys.executable,files={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [Path('/app/backend/app/main.py'),Path("
         },
         {
-          "file": "scripts/smoke_ordinary_deepseek_tls.py",
-          "line": 8,
-          "kind": "AST_IMPORT",
-          "module": "backend.app.adapters.models.cloud"
-        },
-        {
           "file": "scripts/v6_batch_operator.py",
           "line": 253,
           "kind": "AST_IMPORT",
@@ -638,6 +632,12 @@
           "line": 311,
           "kind": "AST_IMPORT",
           "module": "backend.app.adapters.models.cloud"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "external_callers": [
@@ -1258,6 +1258,12 @@
           "line": 311,
           "kind": "AST_IMPORT",
           "module": "backend.app.adapters.models.cloud"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "post_delete_checks": [
@@ -1547,6 +1553,12 @@
           "line": 201,
           "kind": "EXPLICIT_TEXT_REFERENCE",
           "text": "names = {'backend/app/adapters/models/factory.py',"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "external_callers": [
@@ -1825,6 +1837,12 @@
           "line": 201,
           "kind": "EXPLICIT_TEXT_REFERENCE",
           "text": "names = {'backend/app/adapters/models/factory.py',"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "post_delete_checks": [
@@ -1880,6 +1898,12 @@
           "line": 12,
           "kind": "AST_IMPORT",
           "module": "backend.app.adapters.redis_stream"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "external_callers": [
@@ -1924,6 +1948,12 @@
           "line": 12,
           "kind": "AST_IMPORT",
           "module": "backend.app.adapters.redis_stream"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "post_delete_checks": [
@@ -8356,6 +8386,12 @@
           "text": "uvicorn.run('backend.app.main:app', host=settings.host, port=settings.port)"
         },
         {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        },
+        {
           "file": "scripts/with_clean_slate.py",
           "line": 134,
           "kind": "EXPLICIT_TEXT_REFERENCE",
@@ -8544,6 +8580,12 @@
           "text": "uvicorn.run('backend.app.main:app', host=settings.host, port=settings.port)"
         },
         {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        },
+        {
           "file": "scripts/with_clean_slate.py",
           "line": 134,
           "kind": "EXPLICIT_TEXT_REFERENCE",
@@ -8635,6 +8677,12 @@
           "text": "from backend.app.workers.ingestion import run_once"
         },
         {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        },
+        {
           "file": "scripts/with_clean_slate.py",
           "line": 135,
           "kind": "EXPLICIT_TEXT_REFERENCE",
@@ -8715,6 +8763,12 @@
           "text": "from backend.app.workers.ingestion import run_once"
         },
         {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        },
+        {
           "file": "scripts/with_clean_slate.py",
           "line": 135,
           "kind": "EXPLICIT_TEXT_REFERENCE",
@@ -8738,6 +8792,18 @@
           "line": 9,
           "kind": "EXPLICIT_TEXT_REFERENCE",
           "text": "? lazy(() => import(\"./app/App\"))"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 38,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "if target=='frontend/src/app/App.tsx':tokens+=['./app/App']"
         }
       ],
       "external_callers": [
@@ -8746,6 +8812,18 @@
           "line": 9,
           "kind": "EXPLICIT_TEXT_REFERENCE",
           "text": "? lazy(() => import(\"./app/App\"))"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 38,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "if target=='frontend/src/app/App.tsx':tokens+=['./app/App']"
         }
       ],
       "post_delete_checks": [
@@ -8759,8 +8837,22 @@
       "sha256": "557c8b0e121b2e3c9d2587042ec26c39e439f88d694ed93f0b4d9024c4003e08",
       "reason": "old provider/entry or grant-specific probe",
       "status": "REVIEW_ONLY_DO_NOT_DELETE",
-      "current_callers": [],
-      "external_callers": [],
+      "current_callers": [
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        }
+      ],
+      "external_callers": [
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        }
+      ],
       "post_delete_checks": [
         "affected import/contract tests and callers in this row",
         "new wheel member/import guard",
@@ -8772,8 +8864,22 @@
       "sha256": "35f6326f20c58b1fd82147e9fb63c99b8246563d91e712b04e7d0123905cf258",
       "reason": "old provider/entry or grant-specific probe",
       "status": "REVIEW_ONLY_DO_NOT_DELETE",
-      "current_callers": [],
-      "external_callers": [],
+      "current_callers": [
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        }
+      ],
+      "external_callers": [
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        }
+      ],
       "post_delete_checks": [
         "affected import/contract tests and callers in this row",
         "new wheel member/import guard",
@@ -8797,6 +8903,12 @@
           "line": 123,
           "kind": "AST_IMPORT",
           "module": "scripts.ordinary_verification_fence"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "external_callers": [
@@ -8811,6 +8923,12 @@
           "line": 123,
           "kind": "AST_IMPORT",
           "module": "scripts.ordinary_verification_fence"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "post_delete_checks": [
@@ -8824,8 +8942,22 @@
       "sha256": "6b95f3d206d56c48bfdd20f6b220828769a2745b5d3b21e987561c221a2b00c7",
       "reason": "old provider/entry or grant-specific probe",
       "status": "REVIEW_ONLY_DO_NOT_DELETE",
-      "current_callers": [],
-      "external_callers": [],
+      "current_callers": [
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        }
+      ],
+      "external_callers": [
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
+        }
+      ],
       "post_delete_checks": [
         "affected import/contract tests and callers in this row",
         "new wheel member/import guard",
@@ -8849,6 +8981,12 @@
           "line": 51,
           "kind": "AST_IMPORT",
           "module": "scripts.replay_p5_router"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "external_callers": [
@@ -8863,6 +9001,12 @@
           "line": 51,
           "kind": "AST_IMPORT",
           "module": "scripts.replay_p5_router"
+        },
+        {
+          "file": "scripts/weknora_port_retirement_inventory.py",
+          "line": 10,
+          "kind": "EXPLICIT_TEXT_REFERENCE",
+          "text": "candidates.update({p:'old provider/entry or grant-specific probe' for p in ['backend/app/main.py','backend/app/workers/ingestion.py','backend/app/adapters/redis_stream.py','backend/app/adapters/models/cloud.py','backend/app/adapters/models/"
         }
       ],
       "post_delete_checks": [
@@ -8870,48 +9014,13 @@
         "new wheel member/import guard",
         "new HTTP upload/index/QA/reference/history/SSE boundary tests"
       ]
-    },
-    {
-      "path": "scripts/smoke_ordinary_deepseek_tls.py",
-      "sha256": "7ea1f365f7ecc92f27d97b01cca5b17d988a97d3b71c5a35ef038a0c4c5c7c6e",
-      "reason": "old provider/entry or grant-specific probe",
-      "status": "REVIEW_ONLY_DO_NOT_DELETE",
-      "current_callers": [],
-      "external_callers": [],
-      "post_delete_checks": [
-        "affected import/contract tests and callers in this row",
-        "new wheel member/import guard",
-        "new HTTP upload/index/QA/reference/history/SSE boundary tests"
-      ]
-    },
-    {
-      "path": "scripts/smoke_ordinary_output_capacity.py",
-      "sha256": "dd63f7a73a6f0872decc433a483b014800f40521d82c0f1f4f004ae7e5eb8df1",
-      "reason": "old provider/entry or grant-specific probe",
-      "status": "REVIEW_ONLY_DO_NOT_DELETE",
-      "current_callers": [],
-      "external_callers": [],
-      "post_delete_checks": [
-        "affected import/contract tests and callers in this row",
-        "new wheel member/import guard",
-        "new HTTP upload/index/QA/reference/history/SSE boundary tests"
-      ]
-    },
-    {
-      "path": "scripts/smoke_service_capacity_linux.py",
-      "sha256": "e417697bc2f4db4805dcc749eb7733ae954cdc5dcfa6e8af1093c5f7052ec333",
-      "reason": "old provider/entry or grant-specific probe",
-      "status": "REVIEW_ONLY_DO_NOT_DELETE",
-      "current_callers": [],
-      "external_callers": [],
-      "post_delete_checks": [
-        "affected import/contract tests and callers in this row",
-        "new wheel member/import guard",
-        "new HTTP upload/index/QA/reference/history/SSE boundary tests"
-      ]
     }
   ],
-  "requested_paths_not_present": [],
+  "requested_paths_not_present": [
+    "scripts/smoke_ordinary_deepseek_tls.py",
+    "scripts/smoke_ordinary_output_capacity.py",
+    "scripts/smoke_service_capacity_linux.py"
+  ],
   "parse_errors": [],
   "protected_support_code_review_hold": [
     "backend/app/adapters/models/usage.py",

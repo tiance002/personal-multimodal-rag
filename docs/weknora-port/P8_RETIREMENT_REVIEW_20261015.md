@@ -1,14 +1,14 @@
 # P8 exact retirement candidates (review only)
 
-Frozen source before inventory: `b5f396dc5d48d64dd6f4825524e872f0967d3402`. 45 exact files. No deletion authorization or deletion performed. Historical records are retained.
+Frozen source before inventory: `e22e4289f76f4497e455c5e00bee302fb24960ae`. 42 exact files. No deletion authorization or deletion performed. Historical records are retained.
 
 AST import and explicit text callers are listed per file in evidence/P8_RETIREMENT_REVIEW_20261015/inventory.json, with line numbers and hashes. This is not a dynamic reachability proof; an empty caller list is not deletion approval.
 
 | Exact file | Current caller locations | Outside candidate set |
 |---|---:|---:|
-| `backend/app/adapters/models/cloud.py` | 105 | 103 |
-| `backend/app/adapters/models/factory.py` | 46 | 46 |
-| `backend/app/adapters/redis_stream.py` | 7 | 7 |
+| `backend/app/adapters/models/cloud.py` | 105 | 104 |
+| `backend/app/adapters/models/factory.py` | 47 | 47 |
+| `backend/app/adapters/redis_stream.py` | 8 | 8 |
 | `backend/app/application/agent_ports.py` | 4 | 2 |
 | `backend/app/application/answer_hardening.py` | 20 | 12 |
 | `backend/app/application/answer_service.py` | 16 | 16 |
@@ -40,17 +40,14 @@ AST import and explicit text callers are listed per file in evidence/P8_RETIREME
 | `backend/app/application/router_feature_extraction.py` | 3 | 2 |
 | `backend/app/application/rule_router_v1.py` | 59 | 55 |
 | `backend/app/application/static_pair_validation.py` | 5 | 5 |
-| `backend/app/main.py` | 33 | 31 |
-| `backend/app/workers/ingestion.py` | 13 | 13 |
-| `frontend/src/app/App.tsx` | 1 | 1 |
-| `scripts/evaluate_rag_quality.py` | 0 | 0 |
-| `scripts/model_probe.py` | 0 | 0 |
-| `scripts/ordinary_verification_fence.py` | 2 | 2 |
-| `scripts/replay_answer_hardening.py` | 0 | 0 |
-| `scripts/replay_p5_router.py` | 2 | 2 |
-| `scripts/smoke_ordinary_deepseek_tls.py` | 0 | 0 |
-| `scripts/smoke_ordinary_output_capacity.py` | 0 | 0 |
-| `scripts/smoke_service_capacity_linux.py` | 0 | 0 |
+| `backend/app/main.py` | 34 | 32 |
+| `backend/app/workers/ingestion.py` | 14 | 14 |
+| `frontend/src/app/App.tsx` | 3 | 3 |
+| `scripts/evaluate_rag_quality.py` | 1 | 1 |
+| `scripts/model_probe.py` | 1 | 1 |
+| `scripts/ordinary_verification_fence.py` | 3 | 3 |
+| `scripts/replay_answer_hardening.py` | 1 | 1 |
+| `scripts/replay_p5_router.py` | 3 | 3 |
 
 ## Required caller changes before any later deletion
 
@@ -67,4 +64,4 @@ AST import and explicit text callers are listed per file in evidence/P8_RETIREME
 4. React typecheck/build and actual new-chain UI/HTTP route contract checks; verify legacy selector removal explicitly if approved.
 5. Preserve hashes of all historical receipts/Gold/protected files and confirm no schema/volume/UNKNOWN/data deletions. Existing service/cutover and real-provider checks remain separately approved.
 
-Python parse errors: 0; absent requested paths: []. No blanket directory deletion proposed.
+Python parse errors: 0; absent requested paths: ['scripts/smoke_ordinary_deepseek_tls.py', 'scripts/smoke_ordinary_output_capacity.py', 'scripts/smoke_service_capacity_linux.py']. No blanket directory deletion proposed.

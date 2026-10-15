@@ -1,0 +1,17 @@
+﻿....                                                                     [100%]
+============================== warnings summary ===============================
+..\..\RAG quention\.venv\Lib\site-packages\_pytest\config\__init__.py:1345
+  E:\RAG quention\.venv\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+tests/weknora_port/test_development_entry_pg.py::test_executable_api_and_worker_image_ingest_memory_and_replay
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_development_entry_pg.py::test_executable_api_and_worker_image_ingest_memory_and_replay
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 3 warnings in 26.78s
+INSTALLED_PRODUCTION_MODULES 101 BYTE_VERIFIED 101 SOURCE_BACKEND_IMPORTS 0
