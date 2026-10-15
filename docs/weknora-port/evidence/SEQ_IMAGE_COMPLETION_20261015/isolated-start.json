@@ -1,0 +1,42 @@
+{
+  "scope": "existing approved isolated test containers only; no business container/config/volume change",
+  "before": [
+    {
+      "id": "a5464dff5efb5e6c28811d06b9676dcd3c6910f1d5d63aaf872a619be635693d",
+      "name": "/weknora-python-resume-pg-20261013",
+      "state": "exited",
+      "image": "sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2",
+      "ports": {
+        "5432/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "56423"
+          }
+        ]
+      }
+    },
+    {
+      "id": "692b84d8fee031b145e6b1b0037625a955f0bb3cdb321854d11a6bbb03b02664",
+      "name": "/weknora-python-resume-redis-20261013",
+      "state": "exited",
+      "image": "sha256:fbdbaea47b9ae4ecc2082ecdb4e1cea81e32176ffb1dcf643d422ad07427e5d9",
+      "ports": {
+        "6379/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "56424"
+          }
+        ]
+      }
+    }
+  ],
+  "argv": [
+    "docker",
+    "start",
+    "a5464dff5efb5e6c28811d06b9676dcd3c6910f1d5d63aaf872a619be635693d",
+    "692b84d8fee031b145e6b1b0037625a955f0bb3cdb321854d11a6bbb03b02664"
+  ],
+  "exit_code": 0,
+  "stdout": "a5464dff5efb5e6c28811d06b9676dcd3c6910f1d5d63aaf872a619be635693d\n692b84d8fee031b145e6b1b0037625a955f0bb3cdb321854d11a6bbb03b02664\n",
+  "stderr": ""
+}

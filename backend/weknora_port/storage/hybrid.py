@@ -7,12 +7,14 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import replace
+from types import SimpleNamespace
 from typing import Awaitable, Callable, Mapping, Sequence
 
 from ..models.types import CallContext, CallCancelled, RunDeadlineExceeded
 from ..retrieval.fusion import Hit, RetrievalConfig, fuse_or_deduplicate
 from ..retrieval.search import SearchParams, SearchTarget, validate_targets, validate_results
 from ..retrieval.types import SearchResult
+from ..retrieval.merge import collect_image_info
 from .knowledge import ScopedKnowledgeRepository, _json_object
 from .postgres import RetrieveParams
 
@@ -115,6 +117,14 @@ class PostgresKnowledgeRepository(ScopedKnowledgeRepository):
             if source is None:
                 continue
             results.append(replace(source,score=hit.score,match_type=hit.metadata['match_type'],matched_content=hit.content))
+        # Fixed processSearchResults enriches empty ImageInfo unconditionally,
+        # including the formal RAG path that skips standalone context enrichment.
+        empty_ids = [row.id for row in results if row.image_info == '']
+        if empty_ids:
+            images = await collect_image_info(empty_ids, SimpleNamespace(targets=targets),
+                context, self, source_chunks={row.id: row for row in results})
+            results = [replace(row, image_info=images[row.id])
+                       if row.image_info == '' and row.id in images else row for row in results]
         if not params.skip_context_enrichment:
             # Formal RAG explicitly asks for skip=true and handles this in merge.
             # Standalone enriched search is a separate required adapter, not a

@@ -1,0 +1,14 @@
+{
+  "tool_chunk": "2b1d43",
+  "command": [
+    "docker",
+    "ps",
+    "-a",
+    "--format",
+    "{{.Names}}|{{.Status}}|{{.Ports}}"
+  ],
+  "exit_code": 1,
+  "stderr": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+  "pytest_started": false,
+  "product_changed_for_infra": false
+}

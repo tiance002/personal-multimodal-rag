@@ -137,7 +137,7 @@ class ScopedKnowledgeRepository:
             result[row["id"]] = SearchResult(
                 id=row["id"],content=row["content"],score=0,
                 knowledge_id=row["knowledge_id"],knowledge_base_id=row["knowledge_base_id"],
-                chunk_type=row["chunk_type"],chunk_index=row["chunk_index"],
+                chunk_type=row["chunk_type"],chunk_index=row["chunk_index"],seq=row["chunk_index"],
                 start_at=row["start_at"],end_at=row["end_at"],
                 parent_chunk_id=row.get("parent_chunk_id") or "",
                 pre_chunk_id=row.get("pre_chunk_id") or "",next_chunk_id=row.get("next_chunk_id") or "",

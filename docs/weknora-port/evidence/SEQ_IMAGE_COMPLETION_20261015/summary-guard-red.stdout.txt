@@ -1,0 +1,29 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_summary_child_without_source_version_is_ignored_by_image_collector ___
+tests\weknora_port\test_search_image_completion.py:178: in test_summary_child_without_source_version_is_ignored_by_image_collector
+    rows,_,_=asyncio.run(search(data,['parent']))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_search_image_completion.py:59: in search
+    result=await repo.hybrid_search(targets,SearchParams('scan',skip_context_enrichment=True),context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\hybrid.py:124: in hybrid_search
+    images = await collect_image_info(empty_ids, SimpleNamespace(targets=targets),
+backend\weknora_port\retrieval\merge.py:160: in collect_image_info
+    for child in await children(ids):
+                 ^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\merge.py:138: in children
+    raise RetrievalScopeError()
+E   backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_search_image_completion.py::test_summary_child_without_source_version_is_ignored_by_image_collector
+1 failed in 1.05s

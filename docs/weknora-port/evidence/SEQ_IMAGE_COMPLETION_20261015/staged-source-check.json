@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+    "--work-tree=E:\\RAG-Worktrees\\weknora-python-port-20261013",
+    "diff",
+    "--cached",
+    "--check",
+    "--",
+    ".",
+    ":(exclude)docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-guard-fixed.junit.xml",
+    ":(exclude)docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-guard-fixed.stdout.txt",
+    ":(exclude)docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-initial.junit.xml",
+    ":(exclude)docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-initial.stdout.txt",
+    ":(exclude)docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/red.junit.xml",
+    ":(exclude)docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/red.stdout.txt"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "",
+  "full_raw_evidence_check_exit": 2,
+  "excluded_exact_raw_failure_files": [
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-guard-fixed.junit.xml",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-guard-fixed.stdout.txt",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-initial.junit.xml",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-initial.stdout.txt",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/red.junit.xml",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/red.stdout.txt"
+  ],
+  "reason": "six original pytest E-lines contain trailing spaces; raw evidence retained without byte edits"
+}

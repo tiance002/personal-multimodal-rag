@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="4.815" timestamp="2026-10-15T14:55:31.907501+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_search_image_completion_pg" name="test_actual_complete_search_context_and_http_reference_readback" time="1.519"><failure message="AssertionError: {'image_ingest': False, 'memory_extract': False}&#10;assert False">tests\weknora_port\test_search_image_completion_pg.py:118: in test_actual_complete_search_context_and_http_reference_readback
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_search_image_completion_pg.py:42: in scenario
+    assert outcome['image_ingest'],outcome
+E   AssertionError: {'image_ingest': False, 'memory_extract': False}
+E   assert False</failure></testcase></testsuite></testsuites>

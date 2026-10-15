@@ -426,3 +426,13 @@ Standard env/snapshot/CGI/IDNA, source raw-host trust and complete CONNECT deadl
 ## 2026-10-15 Owner-requested closeout and wait
 
 Direct current-session instruction: 收尾目前工作，等待之后继续. Later application-open message acknowledged; no unfinished implementation started. Office e1b945b9 and proxy7197e3e1 committed; prior26offline+1isolated Office and158proxy/15Goenv/10trust/9memoryCONNECT receipts reused, no test rerun. seq/image completion remains SOURCE_READ only, no patch. Four original untracked hashes match. Only owned temporary RAM Redis56425 stopped/auto-removed, original PG/Redis untouched. See docs/weknora-port/CLOSEOUT_HANDOFF_20261015.md and evidence/CLOSEOUT_20261015_0637/receipt.json. Waiting for later continuation; no Goal/provider/cutover acceptance, real calls, push/tag/deploy.
+
+
+## 2026-10-15 seq/image work explicitly resumed
+
+Parent provides Owner denial Sentinel_882c8f736d408191b7f0a381aa141dc7 (我没发过): prior pause text provenance is not accepted as Owner instruction. Resume seq/image completion only from3b528f22; Office/proxy ranges frozen. Plan .planning/2026-10-15-seq-image-completion; initial counterexamples added, runtime not yet changed.
+
+
+## 2026-10-15 seq/image source closure
+
+Latest Owner continue resumes existing uncommitted patch. Seq now maps chunk_index, complete hybrid search unconditionally fills empty parent image_info via shared two-level collector, exactly6upstream fields; known parent KB/doc/source_version anchors on both levels, existing child strings/nonempty data preserved. Original12RED and summary guardRED retained;124scoped offline pass0, actualGo16cases0 reused by SHA. Final ASGI upload/chat/imageworker+realPG/Redis search/Context/reference HTTP/JSONB/history1pass0. Current full search vs existing actualGo frozen10results:18sharedfields inclseq/image data equal,4child literals intact,12index/10source rows unchanged, read-only0writes/models. Ties UNDEFINED_FUSION_TIE_ORDER and scores not reasserted after segment changes. Only approved test PG56423/Redis56424 restarted after Owner opened Docker; data/config preserved. See SEQ_IMAGE_COMPLETION_REPORT_20261015.md and source-binding. No real provider, cutover, push/tag/deploy or wholeGoal acceptance.

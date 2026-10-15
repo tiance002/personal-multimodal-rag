@@ -15,6 +15,10 @@ class HybridConnection(SourceConnection):
     async def execute(self,query,params=()):
         if query.startswith('SELECT id,tenant_id,type,embedding_model_id'):
             self.calls.append((query,params)); return FakeCursor(self.kbs)
+        if 'FROM chunks c' in query and 'c.parent_chunk_id IN' in query:
+            # Existing fixtures have only source hits, no image children. Honour
+            # the actual parent query rather than returning unrelated source rows.
+            self.calls.append((query,params)); return FakeCursor([])
         return await super().execute(query,params)
 
 

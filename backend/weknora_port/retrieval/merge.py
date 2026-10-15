@@ -106,7 +106,7 @@ def prune_images(content, raw):
     allowed = {v for img in image_infos(raw) for v in (img.get('url'), img.get('original_url')) if v}
     return go_strip(re.sub('\\n{3,}', '\n\n', IMAGE.sub(lambda m: m[0] if m[2] in allowed else '', content)))
 
-async def collect_image_info(ids, state, context, repository):
+async def collect_image_info(ids, state, context, repository, *, source_chunks=None):
     """Source two-level enabled-child aggregation. Order of URLs is unspecified upstream."""
     ids = tuple(dict.fromkeys((i for i in ids if i)))
     if not ids:
@@ -114,12 +114,30 @@ async def collect_image_info(ids, state, context, repository):
     if not hasattr(repository, 'get_chunk_children'):
         raise RuntimeError('IMAGE_CHILD_COLLECTION_UNIMPLEMENTED')
 
+    # New parent aggregation must stay anchored to the actual source document
+    # and immutable version, even if several documents are allowed by the query.
+    # Legacy callers without source rows retain the existing scoped collector.
+    sources = dict(source_chunks or {})
+
+    def domain(row):
+        return (row.knowledge_base_id, row.knowledge_id,
+                row.chunk_metadata.get('source_version'))
+
     async def children(parent_ids):
         try:
             rows = list(await repository.get_chunk_children(parent_ids, context))
             if any((r.parent_chunk_id not in parent_ids for r in rows)):
                 raise RetrievalScopeError()
-            return validate_results(rows, state.targets, context)
+            rows = validate_results(rows, state.targets, context)
+            if source_chunks is not None:
+                for row in rows:
+                    if (not getattr(row, 'is_enabled', True) or
+                            row.chunk_type not in ('text', 'image_ocr', 'image_caption')):
+                        continue
+                    parent = sources.get(row.parent_chunk_id)
+                    if parent is None or domain(row) != domain(parent):
+                        raise RetrievalScopeError()
+            return rows
         except (RetrievalScopeError, PermissionError, CallCancelled, RunDeadlineExceeded):
             raise
         except Exception:
@@ -133,7 +151,8 @@ async def collect_image_info(ids, state, context, repository):
                 continue
             agg = aggs.setdefault(target, {})
             if key not in agg:
-                agg[key] = deepcopy(info)
+                agg[key] = {field: info[field] for field in
+                            ('url', 'original_url', 'start_pos', 'end_pos', 'caption', 'ocr_text')}
             else:
                 for field in ('ocr_text', 'caption'):
                     if info.get(field):
@@ -146,6 +165,7 @@ async def collect_image_info(ids, state, context, repository):
             add(child.parent_chunk_id, child)
         elif child.chunk_type == 'text':
             text_to_parent[child.id] = child.parent_chunk_id
+            sources[child.id] = child
     if text_to_parent:
         for child in await children(tuple(text_to_parent)):
             if getattr(child, 'is_enabled', True) and child.chunk_type in ('image_ocr', 'image_caption'):
@@ -158,7 +178,8 @@ async def resolve_parents(results, state, context, repository):
         return results
     parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
     child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
-    scoped = await collect_image_info(child_ids, state, context, repository)
+    scoped = await collect_image_info(child_ids, state, context, repository,
+        source_chunks={**parents, **{r.id: r for r in results}})
     for r in results:
         parent = parents.get(r.parent_chunk_id)
         if not parent or not parent.content:
