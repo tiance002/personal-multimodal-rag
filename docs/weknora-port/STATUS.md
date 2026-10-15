@@ -60,3 +60,8 @@ Latest root delegation explicitly resumed ec98695; earlier pause provenance UNKN
 ## 2026-10-15 reference metadata and receipt follow-up
 
 Reference DTO fix4488ac1 preserves source Unicode half-open coordinates including0, and audited metadata through real final commit/JSONB/history.168 scoped offline checks and1 actual HTTP/PG/Redis two-turn check passed, exits0. Separate estimator addendum archives exact old receipt byte form (only final newline CRLF), canonical Git byte form, AST identity and1+1 targeted local-tokenizer checks0; original receipt unchanged. See REFERENCE_METADATA_REPORT_20261015.md and ESTIMATOR_RECEIPT_BINDING_20261015.md. Full paired differential independent re-review pending; no whole-stage/provider/cutover acceptance. Additional missing-summary-model POSTPROCESSOR_PENDING observation recorded for root review, not silently deferred.
+
+
+## 2026-10-15 missing-summary-model closure and final installed package
+
+Source no-summary-model behavior differs from prior Python pending: fixed upstream marks summary failed, terminal task drains, parsed/indexed document remains usable. Minimal fixb5f396d; RED1fail/1pass -> GREEN7pass0. New final wheel sourceb5f396d includes referencefix4488ac1; SHA256aebf8eb475dad38f45c8267071771f97b10adeed007e9acc80dad17498b053e8. Fresh E-installed proof4pass0,97 installed backend module hashes match,0 source imports. No complete dependency-install/provider/cutover PASS.45 exact retirement candidates with callers and21 protected support hold paths are review-only; none deleted. See P8_FINAL_PACKAGE_REPORT_20261015.md and P8_RETIREMENT_REVIEW_20261015.md. Historical evidence/four protected files unchanged; no deployment.

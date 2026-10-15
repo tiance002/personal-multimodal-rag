@@ -1,0 +1,75 @@
+{
+  "kind": "ACTUAL_ASGI_PG_REDIS_MOCK_MODEL",
+  "configured": false,
+  "document": {
+    "parse_status": "completed",
+    "summary_status": "failed",
+    "error_message": ""
+  },
+  "summary_chunks": [],
+  "upload_chat_calls": 0,
+  "indexed": [
+    {
+      "chunk_id": "7e660a69-f688-4c21-8721-57ee0d553441",
+      "is_enabled": true
+    }
+  ],
+  "assistant": {
+    "id": "bc5b0e75-ea38-4ee4-bfbf-450443a079fa",
+    "request_id": "1e4bf78c-cbea-4fca-b083-c902ff766107",
+    "role": "assistant",
+    "content": "Blue widgets use W-17. <kb doc=\"summary-case\" chunk_id=\"7e660a69-f688-4c21-8721-57ee0d553441\" kb_id=\"6c9fd323-9110-48ec-93d2-6bb166231327\" />",
+    "created_at": "2026-10-15T04:29:21.314731+00:00",
+    "knowledge_references": [
+      {
+        "id": "7e660a69-f688-4c21-8721-57ee0d553441",
+        "seq": 0,
+        "score": 0.6449180327868853,
+        "end_at": 61,
+        "content": "The source handbook says blue widgets use protocol W-17. 中😀A.",
+        "metadata": {
+          "assets": "[]",
+          "sha256": "83f56acb3626f14b2b8cf4cb172ec150b3665bb392811f2cb7b708e6dfde0228",
+          "base_score": "0.0164",
+          "media_type": "text/plain",
+          "chunk_count": "1",
+          "model_score": "0.9000",
+          "processed_at": "2026-10-15T04:29:21.170092+00:00",
+          "index_enabled": "true",
+          "indexed_count": "1",
+          "parser_engine": "plain",
+          "source_version": "6507cb65-48dd-4ceb-8e3e-3b6b631d938c",
+          "parser_metadata": "map[document_id:a9dc2ed6-c972-47e4-9306-38ef5f703260 file_type:.txt filename:summary-case.txt input_bytes:66 knowledge_base_id:6c9fd323-9110-48ec-93d2-6bb166231327 owner_id:fixture-owner:cf502d88-9f41-4cd0-85e3-2564057ad94b parser_engine:plain source_version:6507cb65-48dd-4ceb-8e3e-3b6b631d938c status:parsed]"
+        },
+        "start_at": 0,
+        "chunk_type": "text",
+        "image_info": "",
+        "match_type": 0,
+        "chunk_index": 0,
+        "knowledge_id": "a9dc2ed6-c972-47e4-9306-38ef5f703260",
+        "sub_chunk_id": null,
+        "chunk_metadata": {
+          "source_version": "6507cb65-48dd-4ceb-8e3e-3b6b631d938c",
+          "source_filename": "summary-case.txt",
+          "parsed_source_id": "a9dc2ed6-c972-47e4-9306-38ef5f703260:child:0"
+        },
+        "knowledge_title": "summary-case",
+        "matched_content": "summary-case\nThe source handbook says blue widgets use protocol W-17. 中😀A.",
+        "parent_chunk_id": "",
+        "knowledge_source": "summary-case.txt",
+        "knowledge_base_id": "6c9fd323-9110-48ec-93d2-6bb166231327",
+        "knowledge_channel": "",
+        "knowledge_filename": "summary-case.txt"
+      }
+    ],
+    "agent_steps": null,
+    "is_completed": true,
+    "turn_status": "pending",
+    "turn_error_code": "",
+    "knowledge_base_scope": [
+      "6c9fd323-9110-48ec-93d2-6bb166231327"
+    ],
+    "document_scope": []
+  },
+  "real_provider_calls": 0
+}
