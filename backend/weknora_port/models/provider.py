@@ -7,14 +7,15 @@ import math
 from dataclasses import replace
 from collections.abc import Mapping, Sequence
 from .types import (Message, ChatOptions, ChatResponse, TokenUsage, ProviderError,
-                    EmbeddingResponse, RerankResponse, RerankResult, CallCancelled)
+                    EmbeddingResponse, RerankResponse, RerankResult, CallCancelled, RunDeadlineExceeded)
 from .request import build_chat_body, build_embedding_body, build_rerank_body, split_batches, strip_images
 from .transport import call_lifetime, DEFAULT_CHAT_TIMEOUT, DEFAULT_STREAM_TIMEOUT, env_duration
 from .usage import normalize_usage, accumulate_usage
 from .stream import StreamAssembler, sse_events, decode_tool_calls
 from .native_request import build_native_body
 from .native_response import parse_native_response, NativeStreamState, native_usage
-from .local_ollama import build_ollama_body, parse_ollama_response, OllamaStreamState, local_error_event
+from .local_ollama import (build_ollama_body, parse_ollama_response, OllamaStreamState,
+                           local_error_event, ndjson_events, local_connection_config)
 
 
 def decode_json(raw):
@@ -266,58 +267,73 @@ class ProviderModel:
             for event in assembler.fail(error):
                 yield identity_event(event)
 
-    async def _local_chat(self, messages, options, context, *, _capability="chat"):
-        service = self.local_service
-        if service is None:
-            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
+    async def _local_ensure(self, service, effective, context, lifetime):
         try:
-            await service.ensure_model_available(self.config.model)
+            if context.cancelled is not None and context.cancelled.is_set():raise CallCancelled()
+            if context.deadline is not None and context.deadline<=asyncio.get_running_loop().time():
+                from .types import RunDeadlineExceeded
+                if context.deadline_kind=="run":raise RunDeadlineExceeded()
+                raise ProviderError("MODEL_ADMISSION_TIMEOUT")
+            await service.ensure_model_available(self.config.model,transport=self.transport,
+                config=effective,context=context,lifetime=lifetime)
         except CallCancelled:
             raise
         except ProviderError:
             raise
         except Exception:
             raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE") from None
-        body = build_ollama_body(self.config, messages, options, stream=False,
-                                 image_resolver=self.image_resolver)
-        last: dict = {}
-        try:
-            async for envelope in service.chat(self.config.model, body):
-                last = envelope
-        except CallCancelled:
-            raise
-        except ProviderError:
-            raise
-        except Exception:
-            raise ProviderError("MODEL_LOCAL_CHAT_FAILED") from None
-        return parse_ollama_response(last, self.config)
+
+    async def _local_chat(self, messages, options, context, *, _capability="chat"):
+        service = self.local_service
+        if service is None:
+            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
+        effective = local_connection_config(self.config, service.base_url,allow_pull=service.allow_pull)
+        async with call_lifetime(context, DEFAULT_CHAT_TIMEOUT) as lifetime:
+            await self._local_ensure(service,effective,context,lifetime)
+            lifetime.phase="admission"
+            body = build_ollama_body(self.config, messages, options, stream=False,
+                                     image_resolver=self.image_resolver)
+            async with self.transport.open(effective, "/api/chat", body, context,
+                    capability=_capability, stream=False, lifetime=lifetime) as handle:
+                env = decode_json(await handle.response.aread())
+                assert_response_identity(env,self.config)
+                response = parse_ollama_response(env, self.config)
+                handle.observed(response.usage)
+                return response
 
     async def _local_stream(self, messages, options, context):
-        image_resolver = self.image_resolver
+        reported=None
         def identity(event):
             return replace(event, data={**(event.data or {}),
-                "model_requested": self.config.model, "model_reported": None})
+                "model_requested": self.config.model, "model_reported": reported})
         service = self.local_service
         if service is None:
             yield identity(local_error_event(ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")))
             return
-        try:
-            await service.ensure_model_available(self.config.model)
-        except CallCancelled:
-            raise
-        except ProviderError as error:
-            yield identity(local_error_event(error))
-            return
-        except Exception:
-            yield identity(local_error_event(ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")))
-            return
-        body = build_ollama_body(self.config, messages, options, stream=True, image_resolver=image_resolver)
+        effective = local_connection_config(self.config, service.base_url,allow_pull=service.allow_pull)
         state = OllamaStreamState(self.config)
         try:
-            async for envelope in service.chat(self.config.model, body):
-                for event in state.feed(envelope):
-                    yield identity(event)
-        except CallCancelled:
+            async with call_lifetime(context, DEFAULT_STREAM_TIMEOUT) as lifetime:
+                await self._local_ensure(service,effective,context,lifetime)
+                lifetime.phase="admission"
+                body = build_ollama_body(self.config, messages, options, stream=True,
+                                         image_resolver=self.image_resolver)
+                async with self.transport.open(effective, "/api/chat", body, context,
+                        capability="chat", stream=True, lifetime=lifetime) as handle:
+                    usage = None
+                    completed=False
+                    async for env in ndjson_events(handle.response):
+                        assert_response_identity(env,self.config)
+                        if env.get("model") is not None:reported=env["model"]
+                        for event in state.feed(env):
+                            if event.is_final:
+                                completed=True
+                                usage=event.usage
+                                handle.observed(usage or TokenUsage(cache_status="unsupported"))
+                            yield identity(event)
+                        if completed:break
+                    if not completed:raise ProviderError("PROVIDER_STREAM_INCOMPLETE",sent=True)
+        except (CallCancelled,RunDeadlineExceeded):
             raise
         except ProviderError as error:
             for event in state.finish_thinking():

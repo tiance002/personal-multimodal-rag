@@ -8,6 +8,7 @@ import asyncio
 import json
 
 import httpx
+from dataclasses import replace
 import pytest
 
 from backend.weknora_port.models import (ChatOptions, Message, ModelConfig, Tool, ToolCall,
@@ -30,22 +31,30 @@ class RecordingTransport:
         raise AssertionError("local chat must never touch the remote transport")
 
 
-class FakeLocalService:
-    def __init__(self, responses=(), *, ensure_error=None, chat_error=None):
-        self.responses, self.ensure_error, self.chat_error = list(responses), ensure_error, chat_error
-        self.ensured, self.bodies = [], []
-
-    async def ensure_model_available(self, model_name):
+class FakeLocalService(HTTPLocalService):
+    def __init__(self,responses=(),*,ensure_error=None,chat_error=None):
+        super().__init__('http://127.0.0.1:12499',allow_pull=False)
+        self.responses,self.ensure_error,self.chat_error=list(responses),ensure_error,chat_error
+        self.ensured,self.bodies=[],[]
+    async def ensure_model_available(self,model_name,**controlled):
         self.ensured.append(model_name)
-        if self.ensure_error is not None:
-            raise self.ensure_error
+        if self.ensure_error is not None:raise self.ensure_error
+        await super().ensure_model_available(model_name,**controlled)
 
-    async def chat(self, model_name, request):
-        self.bodies.append((model_name, dict(request)))
-        if self.chat_error is not None:
-            raise self.chat_error
-        for response in self.responses:
-            yield response
+
+def make_local(service):
+    from backend.weknora_port.models.transport import AsyncHTTPTransport,endpoint_urls
+    from backend.weknora_port.models.local_ollama import local_connection_config
+    from tests.weknora_port.test_provider_transport import Gate
+    def handler(request):
+        if request.url.path=='/api/tags':return httpx.Response(200,json={'models':[{'name':'qwen3:8b'}]})
+        body=json.loads(request.content);service.bodies.append((body['model'],body))
+        if service.chat_error is not None:raise service.chat_error
+        if body['stream']:return httpx.Response(200,content=b''.join(json.dumps(v).encode()+b'\n' for v in service.responses))
+        return httpx.Response(200,json=service.responses[0])
+    config=local_config()
+    transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(local_connection_config(config,service.base_url)),gate=Gate(),http_transport=httpx.MockTransport(handler))
+    return ProviderModel(config,transport,local_service=service)
 
 
 def local_config(**kw):
@@ -57,7 +66,7 @@ def local_config(**kw):
 
 
 def context():
-    return CallContext("run", TrustedScope("owner", ()))
+    return CallContext("run", TrustedScope("owner", ("kb",)))
 
 
 # ------------------------------------------------------------------- request
@@ -134,7 +143,7 @@ def test_local_chat_uses_injected_service_and_records_exact_body():
     async def run():
         service = FakeLocalService([{"message": {"content": "hi there"}, "prompt_eval_count": 4,
                                      "eval_count": 6, "done": True}])
-        model = ProviderModel(local_config(), RecordingTransport(), local_service=service)
+        model = make_local(service)
         response = await model.chat((Message("user", "hi"),),
                                     ChatOptions(temperature=.2, max_tokens=64), context())
         assert response.content == "hi there" and response.usage.total_tokens == 10
@@ -153,7 +162,7 @@ def test_local_stream_order_thinking_answer_done_usage():
             {"message": {"thinking": "t1"}},
             {"message": {"content": "a1"}},
             {"done": True, "prompt_eval_count": 3, "eval_count": 4}])
-        model = ProviderModel(local_config(), RecordingTransport(), local_service=service)
+        model = make_local(service)
         events = [event async for event in model.chat_stream((Message("user", "hi"),), None, context())]
         assert [(event.response_type, event.content, event.done, event.is_final) for event in events] == [
             ("thinking", "t1", False, False),
@@ -173,7 +182,7 @@ def test_local_stream_tool_call_and_thinking_tool_event():
                 {"function": {"index": 0, "name": "search", "arguments": {"q": "x"}}},
                 {"function": {"index": 1, "name": "thinking", "arguments": {"thought": "hmm"}}}]}},
             {"done": True}])
-        model = ProviderModel(local_config(), RecordingTransport(), local_service=service)
+        model = make_local(service)
         events = [event async for event in model.chat_stream((Message("user", "hi"),), None, context())]
         tool = next(event for event in events if event.response_type == "tool_call")
         assert tuple(call.id for call in tool.tool_calls) == ("0", "1")
@@ -229,63 +238,29 @@ def test_ndjson_rejects_invalid_line():
 # ------------------------------------------------- default HTTP local service
 
 def test_http_local_service_over_mock_transport():
-    seen = []
-
-    def handler(request):
-        seen.append((request.method, request.url.path))
-        if request.url.path == "/api/tags":
-            return httpx.Response(200, json={"models": [{"name": "qwen3:8b"}]})
-        if request.url.path == "/api/chat":
-            payload = json.loads(request.content)
-            if payload["stream"]:
-                body = b'{"message":{"content":"a"}}\n{"done":true,"prompt_eval_count":1,"eval_count":1}\n'
-            else:
-                body = json.dumps({"message": {"content": "one"}}).encode()
-            return httpx.Response(200, content=body, headers={"content-type": "application/json"})
-        return httpx.Response(404)
-
     async def run():
-        service = HTTPLocalService(transport=httpx.MockTransport(handler))
+        service=FakeLocalService([{'message':{'content':'one'},'done':True,'prompt_eval_count':1,'eval_count':1}])
+        model=make_local(service)
         try:
-            await service.ensure_model_available("qwen3:8b")
-            streamed = [item async for item in service.chat("qwen3:8b", {"model": "qwen3:8b", "stream": True})]
-            single = [item async for item in service.chat("qwen3:8b", {"model": "qwen3:8b", "stream": False})]
-        finally:
-            await service.aclose()
-        return streamed, single
-    streamed, single = asyncio.run(run())
-    assert streamed == [{"message": {"content": "a"}}, {"done": True, "prompt_eval_count": 1, "eval_count": 1}]
-    assert single == [{"message": {"content": "one"}}]
-    assert ("GET", "/api/tags") in seen and seen.count(("POST", "/api/chat")) == 2
-
-
-def test_http_local_service_pulls_missing_model_and_fails_on_error():
-    def handler(request):
-        if request.url.path == "/api/tags":
-            return httpx.Response(200, json={"models": [{"name": "other:latest"}]})
-        if request.url.path == "/api/pull":
-            return httpx.Response(200, content=b'{"status":"pulling"}\n{"status":"success"}\n')
-        return httpx.Response(404)
-
-    async def run():
-        service = HTTPLocalService(transport=httpx.MockTransport(handler))
-        try:
-            await service.ensure_model_available("missing")
-        finally:
-            await service.aclose()
+            answer=await model.chat((Message('user','hi'),),None,context())
+            events=[e async for e in model.chat_stream((Message('user','hi'),),None,replace(context(),request_id='second'))]
+            assert answer.content=='one' and any(e.done and e.response_type=='answer' for e in events)
+            assert len(model.transport.gate.calls)==4
+        finally:await model.transport.aclose()
     asyncio.run(run())
 
-    def unreachable(request):
-        raise httpx.ConnectError("refused")
 
-    async def run_unreachable():
-        service = HTTPLocalService(transport=httpx.MockTransport(unreachable))
+def test_http_local_service_missing_model_is_not_pulled():
+    from tests.weknora_port.test_local_controlled import make,MS,OPT,CTX
+    async def run():
+        seen=[]
+        def handler(r):seen.append(r.url.path);return httpx.Response(200,json={'models':[]})
+        model,transport,gate=make(handler)
         try:
-            with pytest.raises(ProviderError, match="MODEL_LOCAL_SERVICE_UNAVAILABLE"):
-                await service.ensure_model_available("missing")
-        finally:
-            await service.aclose()
-    asyncio.run(run_unreachable())
+            with pytest.raises(ProviderError,match='MODEL_LOCAL_MODEL_UNAVAILABLE'):await model.chat(MS,OPT,CTX)
+            assert seen==['/api/tags']
+        finally:await transport.aclose()
+    asyncio.run(run())
 
 
 def test_ollama_stream_state_tool_only_then_done_keeps_explicit_done():

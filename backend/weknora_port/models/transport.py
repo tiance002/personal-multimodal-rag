@@ -133,6 +133,10 @@ def configured_endpoint(config, capability="chat", *, stream=False):
             parts=urlsplit(base)
             return parts.scheme+"://"+parts.netloc+"/api/knowledge/service/rerank"
         return resolve_endpoint(config, config.reranking.path or "/rerank")
+    if capability=="local_model_check" and config.source=="local" and config.api=="ollama":
+        return resolve_endpoint(config,"/api/tags")
+    if capability=="local_model_pull" and config.source=="local" and config.api=="ollama" and config.extra_config.get("local_allow_pull")=="true":
+        return resolve_endpoint(config,"/api/pull")
     raise ProviderError("MODEL_CAPABILITY_UNSUPPORTED")
 
 
@@ -142,6 +146,9 @@ def endpoint_urls(config):
     urls = [configured_endpoint(config,capability)]
     if capability == "chat":
         urls.append(configured_endpoint(config,capability,stream=True))
+    if config.source=="local":
+        urls.append(configured_endpoint(config,"local_model_check"))
+        if config.extra_config.get("local_allow_pull")=="true":urls.append(configured_endpoint(config,"local_model_pull"))
     return tuple(dict.fromkeys(urls))
 
 
@@ -187,7 +194,9 @@ class AsyncHTTPTransport:
         await self.client.aclose()
 
     @asynccontextmanager
-    async def open(self, config, path, body, context, *, capability, stream=False, affinity="", lifetime=None):
+    async def open(self, config, path, body, context, *, capability, stream=False, affinity="", lifetime=None, method="POST"):
+        if method!="POST" and not (method=="GET" and capability=="local_model_check" and config.source=="local"):
+            raise ProviderError("MODEL_HTTP_METHOD_NOT_ALLOWED")
         url = configured_endpoint(config, capability, stream=stream)
         validate_endpoint(url, self.allowed_endpoints)
         if not (self._mock_transport or self._safe_transport):
@@ -202,7 +211,7 @@ class AsyncHTTPTransport:
         call = PreparedCall(context, config.provider, config.model, config.model_id, capability,
             url, hashlib.sha256(wire).hexdigest(), len(wire),
             body.get("max_tokens", body.get("max_completion_tokens", body.get("max_output_tokens",
-                (body.get("generationConfig") or {}).get("maxOutputTokens")))))
+                (body.get("generationConfig") or {}).get("maxOutputTokens", (body.get("options") or {}).get("num_predict") if config.source=="local" else None)))))
         if context.cancelled is not None and context.cancelled.is_set():
             raise CallCancelled()
         try:
@@ -226,7 +235,7 @@ class AsyncHTTPTransport:
                         "accept", "host", "content-length", "cookie", "proxy-authorization"}
             headers.update({key: value for key, value in config.custom_headers.items() if key.lower() not in reserved})
             try:
-                key = self.credential(config.provider) if self.credential is not None else ""
+                key = self.credential(config.provider) if config.source!="local" and self.credential is not None else ""
                 if not isinstance(key, str):
                     raise ValueError()
             except Exception:
@@ -260,11 +269,11 @@ class AsyncHTTPTransport:
                         if beta.strip() and beta.strip() not in betas: betas.append(beta.strip())
                 if betas: headers["anthropic-beta"]=",".join(betas)
             if stream:
-                headers["Accept"] = "text/event-stream"
+                headers["Accept"] = "application/x-ndjson" if config.source=="local" else "text/event-stream"
             if affinity:
                 headers.update(session_id=affinity, **{"x-client-request-id": affinity, "x-session-affinity": affinity})
             try:
-                req = self.client.build_request("POST", url, content=wire, headers=headers)
+                req = self.client.build_request(method, url, content=wire, headers=headers)
                 req.extensions["weknora_allowed_endpoints"] = self.allowed_endpoints
             except (TypeError, ValueError):
                 raise ProviderError("MODEL_REQUEST_INVALID") from None

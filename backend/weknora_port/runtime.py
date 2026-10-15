@@ -174,7 +174,12 @@ class BoundOrdinaryService(RuntimeService):
     async def run_turn(self, turn):
         try:
             result = await super().run_turn(turn)
+            succeeded=False
             if result is not None:
+                rows=await self.application._rows("SELECT status,error_code FROM port_turns WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND run_id=%s",
+                    (self.application.principal.tenant_id,self.application.principal.subject_id,turn.session_id,turn.run_id))
+                succeeded=len(rows)==1 and rows[0]['status']=='completed' and not rows[0]['error_code']
+            if succeeded:
                 try:
                     await self.application.record_turn_memory(turn,result)
                 except Exception as exc:
@@ -196,11 +201,12 @@ class ApplicationRuntime:
     """
     def __init__(self, leases, principal, store, documents, *, model_factory,
                  cipher: SecretCipher, conversation=None, policy=None,
-                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None):
+                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None):
         self.leases, self.principal = leases, principal
         self.store, self.documents = store, documents
         self.cipher, self.catalogue = cipher, catalogue or SourceCatalogue()
         self.model_factory, self.permissions, self.costs = model_factory, permissions, costs
+        self.local_service=local_service
         self.conversation = conversation or ConversationSettings()
         self.policy = policy or RouterPolicy()
         self.estimator = estimator if estimator is not None else LocalTextTokenEstimator(tokenizer_asset)
@@ -248,14 +254,35 @@ class ApplicationRuntime:
             configuration=self._configuration, pipeline_factory=self._pipeline,
             generation_factory=self._generation)
 
+    async def _make_model(self,config,key,gate):
+        from .models.local_ollama import local_connection_config
+        from .models.transport import validate_endpoint,endpoint_urls,AsyncHTTPTransport
+        from .models.provider import ProviderModel
+        effective=config
+        if config.source=='local':
+            if self.local_service is None:raise ProviderError('MODEL_LOCAL_SERVICE_UNAVAILABLE')
+            effective=local_connection_config(config,self.local_service.base_url,allow_pull=self.local_service.allow_pull)
+        model=self.model_factory(effective,key,gate)
+        model=await model if inspect.isawaitable(model) else model
+        if getattr(getattr(model,'transport',None),'gate',None) is not gate:
+            raise ProviderError('RUNTIME_DURABLE_GATE_REQUIRED')
+        if getattr(model,'config',None)!=effective:raise ProviderError('MODEL_FACTORY_IDENTITY_MISMATCH')
+        if config.source=='local':
+            if not isinstance(model,ProviderModel) or not isinstance(model.transport,AsyncHTTPTransport):
+                raise ProviderError('RUNTIME_LOCAL_PROVIDER_REQUIRED')
+            try:
+                for endpoint in endpoint_urls(effective):validate_endpoint(endpoint,model.transport.allowed_endpoints)
+            except BaseException:
+                await model.transport.aclose()
+                raise
+            model.config=config
+            model.local_service=self.local_service
+        return model
+
     def registry_for_context(self):
         gate = LeasedSendGate(self)
         async def factory(config, key):
-            model = self.model_factory(config, key, gate)
-            model = await model if inspect.isawaitable(model) else model
-            if getattr(getattr(model, "transport", None), "gate", None) is not gate:
-                raise ProviderError("RUNTIME_DURABLE_GATE_REQUIRED")
-            return model
+            return await self._make_model(config,key,gate)
         return NeutralModelRegistry(self.models, factory, owner_id=self.principal.subject_id,
                                     catalogue=self.catalogue)
 
@@ -340,11 +367,7 @@ class ApplicationRuntime:
         gate = LeasedSendGate(self)
 
         async def factory(config, key):
-            model = self.model_factory(config, key, gate)
-            model = await model if inspect.isawaitable(model) else model
-            if getattr(getattr(model, "transport", None), "gate", None) is not gate:
-                raise ProviderError("RUNTIME_DURABLE_GATE_REQUIRED")
-            return model
+            return await self._make_model(config,key,gate)
         registry = NeutralModelRegistry(
             self.models, factory, owner_id=self.principal.subject_id, catalogue=self.catalogue)
         from .conversation_configuration import resolve_saved_conversation, resolve_language, resolved_chat_options

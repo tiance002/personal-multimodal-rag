@@ -1,0 +1,25 @@
+.....F...............................                                    [100%]
+================================== FAILURES ===================================
+_______________ test_ensure_error_has_no_pull_or_chat[payload1] _______________
+tests\weknora_port\test_local_controlled.py:54: in test_ensure_error_has_no_pull_or_chat
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_local_controlled.py:52: in run
+    assert len(g.finishes)==1 and g.finishes[0][1]=='UNKNOWN'
+E   AssertionError: assert (1 == 1 and 'RESPONSE_RECEIVED' == 'UNKNOWN'
+E    +  where 1 = len([(PreparedCall(context=CallContext(request_id='local/local-availability', scope=TrustedScope(owner_id='owner', knowled...=0, cache_read_tokens=0, cache_write_tokens=0, cache_miss_tokens=0, cache_reported=False, cache_status='unsupported'))])
+E    +    where [(PreparedCall(context=CallContext(request_id='local/local-availability', scope=TrustedScope(owner_id='owner', knowled...=0, cache_read_tokens=0, cache_write_tokens=0, cache_miss_tokens=0, cache_reported=False, cache_status='unsupported'))] = <tests.weknora_port.test_provider_transport.Gate object at 0x000001F8AAEC6B10>.finishes
+E     
+E     - UNKNOWN
+E     + RESPONSE_RECEIVED)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_local_controlled.py::test_ensure_error_has_no_pull_or_chat[payload1]
+1 failed, 36 passed in 5.60s

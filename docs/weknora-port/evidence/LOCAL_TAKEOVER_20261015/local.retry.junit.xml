@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="29" time="1.758" timestamp="2026-10-15T09:51:21.400732+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_local_runtime_pg" name="test_native_local_both_runtime_factories_share_gate_and_complete" time="0.398"><failure message="AssertionError">tests\weknora_port\test_local_runtime_pg.py:80: in test_native_local_both_runtime_factories_share_gate_and_complete
+    actual_pg_run(run())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_local_runtime_pg.py:64: in run
+    async with isolated_mock_application() as (app,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:95: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;verified-isolated-native-assembly&gt;:18: in build_native_fixture
+    ???
+E   AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_local_runtime_pg" name="test_failed_remember_http_turn_never_writes_memory_or_queues" time="0.111"><failure message="AssertionError">tests\weknora_port\test_local_runtime_pg.py:96: in test_failed_remember_http_turn_never_writes_memory_or_queues
+    actual_pg_run(run())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_local_runtime_pg.py:84: in run
+    async with isolated_mock_application() as (app,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:95: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;verified-isolated-native-assembly&gt;:18: in build_native_fixture
+    ???
+E   AssertionError</failure></testcase><testcase classname="tests.weknora_port.test_local_controlled" name="test_pre_cancel_deadline_ensure_and_chat_zero[cancelled-False]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_pre_cancel_deadline_ensure_and_chat_zero[cancelled-True]" time="0.001" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_pre_cancel_deadline_ensure_and_chat_zero[expired-False]" time="0.001" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_pre_cancel_deadline_ensure_and_chat_zero[expired-True]" time="0.001" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_ensure_error_has_no_pull_or_chat[payload0]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_ensure_error_has_no_pull_or_chat[payload1]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_chat_usage_does_not_fill_missing_zero[env0-expected0]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_chat_usage_does_not_fill_missing_zero[env1-expected1]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_chat_usage_does_not_fill_missing_zero[env2-expected2]" time="0.001" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_true_stream_first_event_before_eof_cancel_closes_unknown" time="0.001" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_stream_error_or_truncation_never_success[{&quot;message&quot;:{&quot;content&quot;:&quot;partial&quot;}}\n]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_stream_error_or_truncation_never_success[{&quot;error&quot;:&quot;private synthetic failure&quot;}\n]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_stream_error_or_truncation_never_success[{&quot;done&quot;:tru]" time="0.002" /><testcase classname="tests.weknora_port.test_local_controlled" name="test_closed_endpoint_set_cannot_be_expanded_by_service" time="0.001" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_request_body_is_exact_ollama_wire" time="0.001" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_options_think_and_format_guards" time="0.000" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_images_only_inlined_for_user_role_and_multicontent_merge" time="0.000" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_non_stream_thinking_fallback_tools_and_usage" time="0.000" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_chat_uses_injected_service_and_records_exact_body" time="0.002" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_stream_order_thinking_answer_done_usage" time="0.002" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_stream_tool_call_and_thinking_tool_event" time="0.002" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_local_stream_and_chat_fail_loudly_never_fall_back_to_remote" time="0.001" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_ndjson_decodes_one_object_per_line_across_chunks" time="0.001" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_ndjson_rejects_invalid_line" time="0.001" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_http_local_service_over_mock_transport" time="0.002" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_http_local_service_missing_model_is_not_pulled" time="0.009" /><testcase classname="tests.weknora_port.test_local_ollama" name="test_ollama_stream_state_tool_only_then_done_keeps_explicit_done" time="0.000" /></testsuite></testsuites>
