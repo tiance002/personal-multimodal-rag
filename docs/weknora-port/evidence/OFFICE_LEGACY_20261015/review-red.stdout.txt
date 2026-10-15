@@ -1,0 +1,28 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+________ test_doc_proxy_present_primary_overrides_fallback_verbatim[] _________
+tests\weknora_port\test_office_legacy.py:230: in test_doc_proxy_present_primary_overrides_fallback_verbatim
+    assert _proxy_setting() == primary
+E   AssertionError: assert 'http://fallback.invalid:1' == ''
+E     
+E     + http://fallback.invalid:1
+_______ test_doc_proxy_present_primary_overrides_fallback_verbatim[   ] _______
+tests\weknora_port\test_office_legacy.py:230: in test_doc_proxy_present_primary_overrides_fallback_verbatim
+    assert _proxy_setting() == primary
+E   AssertionError: assert 'http://fallback.invalid:1' == '   '
+E     
+E     Strings contain only whitespace, escaping them using repr()
+E     - '   '
+E     + 'http://fallback.invalid:1'
+__________ test_doc_bridge_preserves_explicit_file_type_and_filename __________
+tests\weknora_port\test_office_legacy.py:244: in test_doc_bridge_preserves_explicit_file_type_and_filename
+    assert hints == [".doc", ".docx"]
+E   AssertionError: assert ['.bin', '.doc'] == ['.doc', '.docx']
+E     
+E     At index 0 diff: '.bin' != '.doc'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_office_legacy.py::test_doc_proxy_present_primary_overrides_fallback_verbatim[]
+FAILED tests/weknora_port/test_office_legacy.py::test_doc_proxy_present_primary_overrides_fallback_verbatim[   ]
+FAILED tests/weknora_port/test_office_legacy.py::test_doc_bridge_preserves_explicit_file_type_and_filename
+3 failed, 19 deselected in 4.11s

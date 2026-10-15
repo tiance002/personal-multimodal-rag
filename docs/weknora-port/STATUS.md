@@ -70,3 +70,10 @@ Source no-summary-model behavior differs from prior Python pending: fixed upstre
 ## 2026-10-15 explicit entry migration and scoped source retirement
 
 Non-deletion migration e20b5d9:15new contracts PASS; actual verify-default/Schema0, refusal modes2; native collection1296/0, legacy4098/9missing-file errors/2; old289test/fixture hashes unchanged. Native/legacy Playwright lists7/97nodes0 and Reactbuild0, no browser execution. Separate exact-three smoke removal follows new Owner approval Sentinel_cbdb2f4b286081918285cf3361fdad09; matched source hashes/zero active callers,3approved leaf deletions only,356held hashes unchanged. All other42candidates/21support holds retained. Reports ENTRY_MIGRATION_REPORT_20261015.md and THREE_SMOKE_RETIREMENT_REPORT_20261015.md. Actual native eval execution, real providers, browser, deployment and full-repository GREEN not claimed.
+
+
+## 2026-10-15 scoped legacy Office closure
+
+DOC default/source fallback, PPT normalization and conditional PPTX media attach implemented. Original RED2fail preserved; final23offline and1real isolated native PG/Redis entry passed, exits0. Legacy external tools are substituted; real DOCX/PPTX/Pillow decode and synthetic native runner timeout are exercised. See OFFICE_LEGACY_REPORT_20261015.md and evidence/OFFICE_LEGACY_20261015. No real conversion/provider/cutover or whole P2 acceptance.
+
+Office review closure: empty-primary config and explicit source file_type fixed after3RED cases. Final26offline pass0 and1current-source native PG/Redis pass0; source-binding updated, original failures retained. See OFFICE_LEGACY_REPORT_20261015.md.

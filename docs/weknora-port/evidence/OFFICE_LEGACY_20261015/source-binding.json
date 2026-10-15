@@ -1,0 +1,271 @@
+{
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "baseline_commit": "9d6d35553429ed40e0e6568e96ffb94886aa86a8",
+  "source_bindings": [
+    {
+      "upstream_path": "docreader/parser/doc_parser.py",
+      "upstream_sha256": "ef6a41a9f30feaf4c3b7eef125dbd0733beabd45f5e32198114f4f8631f45a21",
+      "port_path": "backend/weknora_port/ingestion/upstream_doc_parser.py",
+      "port_sha256": "473718b00322487607df050e51e93c1a99d8c206dc3318ebb3d16684721e6c6f",
+      "functions": [
+        {
+          "function": "SandboxExecutor.__init__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "SandboxExecutor.execute_in_sandbox",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "SandboxExecutor._execute_with_proxy",
+          "exact_body_equal": false,
+          "equal_excluding_info_logs": true,
+          "adaptation": "redact configured proxy value"
+        },
+        {
+          "function": "SandboxExecutor._kill_timed_out_command",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "SandboxExecutor._signal_process_group",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "SandboxExecutor._reap_timed_out_process",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser.__init__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser.parse_into_text",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser._parse_with_docx",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser._parse_with_antiword",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser._parse_with_textract",
+          "status": "OMITTED_DISABLED_UPSTREAM_DEAD_METHOD",
+          "active_source_call": false
+        },
+        {
+          "function": "DocParser._try_convert_doc_to_docx",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser._try_find_executable_path",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser._try_find_soffice",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "DocParser._try_find_antiword",
+          "exact_ast_equal": true
+        }
+      ]
+    },
+    {
+      "upstream_path": "docreader/parser/chain_parser.py",
+      "upstream_sha256": "8eec2ae4a64531c3687dda160dc0119c57ff70db5e4e75f9738c298d6b9cfbe9",
+      "port_path": "backend/weknora_port/ingestion/upstream_chain_parser.py",
+      "port_sha256": "5018cd4b74d92eb396c0bc2bc14ddbfa01c2df126c1faccbeef1daae217cd29b",
+      "functions": [
+        {
+          "function": "FirstParser.__init__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "FirstParser.parse_into_text",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "FirstParser.create",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "PipelineParser.__init__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "PipelineParser.parse_into_text",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "PipelineParser.create",
+          "exact_ast_equal": true
+        }
+      ]
+    },
+    {
+      "upstream_path": "docreader/parser/ppt_convert.py",
+      "upstream_sha256": "b9f58900c2cedcd61bf2308b705d81bd031a7919843982f10cf6e15dfbda6e36",
+      "port_path": "backend/weknora_port/ingestion/upstream_ppt_convert.py",
+      "port_sha256": "bf1866e97299903a18bad24bc79d10172edfa0b112196e1124ea9cbc866de13c",
+      "functions": [
+        {
+          "function": "is_ole_compound",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "is_zip_openxml",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "needs_ppt_to_pptx_conversion",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "convert_ppt_to_pptx_bytes",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "normalize_ppt_bytes",
+          "exact_ast_equal": true
+        }
+      ]
+    },
+    {
+      "upstream_path": "docreader/parser/pptx_media.py",
+      "upstream_sha256": "e0f3d27aa9d266431b91b278ac93161e0c55a0f582761b6adf3a601943d3b82a",
+      "port_path": "backend/weknora_port/ingestion/upstream_pptx_media.py",
+      "port_sha256": "820c1f33a5a246c87616e40a917daeee67ebe7d8f8fccd392f850d24989b131f",
+      "functions": [
+        {
+          "function": "_find_convert",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "_rasterize_with_imagemagick",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "_rasterize_with_pillow",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "rasterize_media_bytes",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "list_pptx_media",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "extract_pptx_media_rasterized",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "_is_unresolved_image_ref",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "attach_pptx_media_to_markdown",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "markdown_needs_pptx_media_attach",
+          "exact_ast_equal": true
+        }
+      ]
+    },
+    {
+      "upstream_path": "docreader/parser/concurrency.py",
+      "upstream_sha256": "65e0fb96ceba15805069a040c2f2cac722ea27b69fbd3f3b9d8df4b978211a39",
+      "port_path": "backend/weknora_port/ingestion/upstream_concurrency.py",
+      "port_sha256": "5ad3910e11abde2a8df4154d6a63e62af935f629e3f8e92f2a8beb92c1bb802b",
+      "functions": [
+        {
+          "function": "_get_limiter",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "parser_worker_limit",
+          "exact_ast_equal": true
+        }
+      ]
+    },
+    {
+      "upstream_path": "docreader/utils/tempfile.py",
+      "upstream_sha256": "e6533592cf96531ff0a750e3fdc9789818b6e627d859c0b075d7675fdb09a8ad",
+      "port_path": "backend/weknora_port/ingestion/upstream_office_tempfile.py",
+      "port_sha256": "24ecde971a8833a0e489d5fc4f6c7e103cbdb6070d345c9c216e455ff16f0100",
+      "functions": [
+        {
+          "function": "TempFileContext.__init__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "TempFileContext._cleanup",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "TempFileContext.__enter__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "TempFileContext.__exit__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "TempDirContext.__init__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "TempDirContext.__enter__",
+          "exact_ast_equal": true
+        },
+        {
+          "function": "TempDirContext.__exit__",
+          "exact_ast_equal": true
+        }
+      ]
+    }
+  ],
+  "protected_files": {
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+  },
+  "integration_files": {
+    "backend/weknora_port/ingestion/core.py": "1f4119850d6a0676682c70351c23bec4669fc12a76879e5ed8b41b298948aad8",
+    "backend/weknora_port/ingestion/_office_runtime_adapter.py": "3cc7c1ce63c8377b21b9d06ae94bed449ae54849989be53be572a8957144fd23",
+    "backend/weknora_port/ingestion/_docx_runtime_adapter.py": "10ed924b046e90a06d014cb7ece811e6f40c522c541d2034bf3fef4baf1739ef",
+    "tests/weknora_port/test_office_legacy.py": "20e134515c77c4901766462d6d95dbbb6a3fe1baa60fdc4aa6dd9df6f5aaf9ea",
+    "tests/weknora_port/test_office_legacy_pg.py": "3f3a8de521d4e4f594a9b0a4f4e83eb505809aaef10165f663a7be9ce4d972ac",
+    "tests/weknora_port/test_ingest.py": "d246f40d1fcebea7412f5761a883f449110657752d03f3730b96f7c133382bd4",
+    "tests/weknora_port/native_fixture.py": "b9790bca6cd70dfa7689c82588d43767ba70fc2dd93c378f0707162a0dfe3f9b"
+  },
+  "execution_boundary": "No real Office tool/provider execution; native synthetic Python runner and actual isolated PG/Redis integration exercised.",
+  "final_evidence_sha256": {
+    "final-offline.stdout.txt": "a15dbd56df27da963780fa5d10a29e887d1a4bd28f6a71bddd100b72855669a5",
+    "accepted-native.stdout.txt": "86ac580eeeee1320dbc40626e5de9225e5ca48c6674812ecfd9e4981d38530e3",
+    "accepted-native-pg.json": "a1386a35c22c6eae1713ebda5011f8ce39028859e11c710ed441b1e4637aa5fa",
+    "review-red.stdout.txt": "3163d59e3ee70ce77ad27ce752cd8a8470e724055aac9c6fab4a0922ffe8479d",
+    "red.stdout.txt": "b25d7a910a85fa0757a3ad6931c00ccc479b15fc8865f8f343b9ce20aa4aee91"
+  },
+  "final_tests": {
+    "offline": {
+      "command_exit": 0,
+      "passed": 26,
+      "deselected": 7,
+      "evidence": "final-offline.stdout.txt"
+    },
+    "native_entry": {
+      "command_exit": 0,
+      "passed": 1,
+      "evidence": "accepted-native.stdout.txt",
+      "receipt": "accepted-native-pg.json"
+    },
+    "oracle_boundary": "Fixed DOC conversion/retry/antiword bodies independently loaded; DOCX bridge/DTO is shared, not claimed a wholly independent subparser oracle."
+  }
+}

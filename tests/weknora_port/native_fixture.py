@@ -41,7 +41,7 @@ class IsolatedFixturePool:
 
 
 @asynccontextmanager
-async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None,expected_redis_run_id=None,redis_db=0,response_handler=None):
+async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None,expected_redis_run_id=None,redis_db=0,redis_port=56424,response_handler=None):
     tree=ast.parse(inspect.getsource(fixture.test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout_no_upgrade))
     scenario=next(n for n in tree.body[0].body if isinstance(n,ast.AsyncFunctionDef) and n.name=='scenario')
     body=[]
@@ -58,12 +58,12 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_tex
         source=source.replace(original,repr(image_ocr_text))
     if expected_redis_run_id is not None:
         import re
-        if not re.fullmatch('[0-9a-f]{40}',expected_redis_run_id) or redis_db!=15:
+        if not re.fullmatch('[0-9a-f]{40}',expected_redis_run_id) or redis_db!=15 or redis_port not in (56424,56425):
             raise ValueError('EXPLICIT_ISOLATED_REDIS_ID_DB_REQUIRED')
         assert source.count('redis://127.0.0.1:56424/0')==1
-        source=source.replace('redis://127.0.0.1:56424/0','redis://127.0.0.1:56424/15')
+        source=source.replace('redis://127.0.0.1:56424/0',f'redis://127.0.0.1:{redis_port}/15')
         source=source.replace('weknora-resume:20261013:','serial-integration:20261015:')
-    elif redis_db!=0:raise ValueError('EXPLICIT_ISOLATED_REDIS_ID_REQUIRED')
+    elif redis_db!=0 or redis_port!=56424:raise ValueError('EXPLICIT_ISOLATED_REDIS_ID_REQUIRED')
     if response_handler is not None:
         assert callable(response_handler)
         marker="wire.append({'path': request.url.path, 'body': body})"

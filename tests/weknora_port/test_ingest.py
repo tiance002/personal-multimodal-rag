@@ -113,22 +113,21 @@ def _upstream_markitdown(filename: str, payload: bytes) -> tuple[str, list[bytes
     docx_merge.fill_vertical_merged_cells_docx = lambda data: data
     markdown_placeholder = types.ModuleType("docreader.parser.markdown_parser")
     markdown_placeholder.MarkdownParser = chain.PipelineParser
-    ppt_convert = types.ModuleType("docreader.parser.ppt_convert")
-    ppt_convert.normalize_ppt_bytes = lambda data, _ft: (data, ".pptx")
-    pptx_media = types.ModuleType("docreader.parser.pptx_media")
-    pptx_media.attach_pptx_media_to_markdown = lambda text, _data: (text, {})
-    pptx_media.markdown_needs_pptx_media_attach = lambda _text: False
     stubbed.update({
         "docreader.parser.chain_parser": chain,
         "docreader.parser.concurrency": concurrency,
         "docreader.parser.docx_merge": docx_merge,
         "docreader.parser.markdown_parser": markdown_placeholder,
-        "docreader.parser.ppt_convert": ppt_convert,
-        "docreader.parser.pptx_media": pptx_media,
     })
     extension = Path(filename).suffix.lstrip(".").lower()
     source_path = UPSTREAM / "docreader" / "parser" / "markitdown_parser.py"
-    with _upstream_module("docreader.parser.markitdown_parser", source_path, stubbed) as source:
+    with contextlib.ExitStack() as stack:
+        for name in ("excel_convert", "ppt_convert", "pptx_media"):
+            module_name = "docreader.parser." + name
+            dependency = stack.enter_context(_upstream_module(
+                module_name, UPSTREAM / "docreader" / "parser" / (name + ".py"), stubbed))
+            stubbed[module_name] = dependency
+        source = stack.enter_context(_upstream_module("docreader.parser.markitdown_parser", source_path, stubbed))
         converted = source.StdMarkitdownParser(file_name=filename, file_type=extension).parse_into_text(payload)
 
     # Exercise the fixed upstream Markdown pipeline classes directly after the
@@ -143,7 +142,9 @@ def _upstream_markitdown(filename: str, payload: bytes) -> tuple[str, list[bytes
     with _upstream_module("docreader.parser.markdown_parser", UPSTREAM / "docreader" / "parser" / "markdown_parser.py", markdown_stubbed) as markdown:
         formatted = markdown.MarkdownTableFormatter().parse_into_text(converted.content.encode("utf-8"))
         extracted = markdown.MarkdownImageBase64().parse_into_text(formatted.content.encode("utf-8"))
-    return extracted.content, [base64.b64decode(value) for value in extracted.images.values()]
+    images = dict(converted.images)
+    images.update(extracted.images)
+    return extracted.content, [base64.b64decode(value) for value in images.values()]
 
 
 def _png_bytes(color: tuple[int, int, int] = (12, 34, 56), size: tuple[int, int] = (256, 256)) -> bytes:

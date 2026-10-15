@@ -29,6 +29,10 @@ class DocumentModel:
     metadata: dict[str, object] = field(default_factory=dict)
 
 
+    def is_valid(self) -> bool:
+        return self.content != ""
+
+
 class BaseParser:
     def __init__(self, file_name: str = "", file_type: str | None = None, **_kwargs: object):
         self.file_name = file_name
@@ -50,4 +54,4 @@ def decode_image(image: object) -> str:
     raise ValueError(f"Unsupported image type: {type(image)}")
 
 
-endecode = SimpleNamespace(decode_image=decode_image)
+endecode = SimpleNamespace(decode_image=decode_image, encode_bytes=lambda text: text.encode("utf-8"))

@@ -409,3 +409,10 @@ Source no-summary-model behavior differs from prior Python pending: fixed upstre
 ## 2026-10-15 explicit entry migration and scoped source retirement
 
 Non-deletion migration e20b5d9:15new contracts PASS; actual verify-default/Schema0, refusal modes2; native collection1296/0, legacy4098/9missing-file errors/2; old289test/fixture hashes unchanged. Native/legacy Playwright lists7/97nodes0 and Reactbuild0, no browser execution. Separate exact-three smoke removal follows new Owner approval Sentinel_cbdb2f4b286081918285cf3361fdad09; matched source hashes/zero active callers,3approved leaf deletions only,356held hashes unchanged. All other42candidates/21support holds retained. Reports ENTRY_MIGRATION_REPORT_20261015.md and THREE_SMOKE_RETIREMENT_REPORT_20261015.md. Actual native eval execution, real providers, browser, deployment and full-repository GREEN not claimed.
+
+
+## 2026-10-15 scoped Office source implementation
+
+Fixed DOC/PPT/PPTX wrapper gaps implemented with attributed source functions and source hash/AST binding. RED2fail → scoped23offline+1actual native PG/Redis entry pass0; real conversion tools substituted, real converted OOXML decoding/assets/version/original readback verified. Prior stopped Redis left untouched; temporary independent RAM Redis56425 used. Original infra/PYTHONPATH failures retained, no install. Report docs/weknora-port/OFFICE_LEGACY_REPORT_20261015.md; real soffice/antiword/complex quality/providers/cutover NOT RUN.
+
+Office review closure: empty-primary config and explicit source file_type fixed after3RED cases. Final26offline pass0 and1current-source native PG/Redis pass0; source-binding updated, original failures retained. See OFFICE_LEGACY_REPORT_20261015.md.

@@ -225,26 +225,53 @@ def _parse_markdown(request: DocumentRequest) -> ParsedDocument:
     return ParsedDocument(rewritten, assets, _base_metadata(request, "markdown", embedded_image_count=len(assets)), tuple(failures))
 
 
-def _parse_markitdown(request: DocumentRequest) -> ParsedDocument:
-    from markitdown import MarkItDown  # type: ignore[import-not-found]  # optional reader
+def _parse_markitdown(request: DocumentRequest, *, file_type: str | None = None) -> ParsedDocument:
+    from markitdown import MarkItDown
+    from ._office_runtime_adapter import CONFIG
+    from .upstream_concurrency import parser_worker_limit
     from .upstream_markdown_helpers import extract_markdown_data_images, format_markdown_tables
+    from .upstream_ppt_convert import normalize_ppt_bytes
+    from .upstream_pptx_media import attach_pptx_media_to_markdown, markdown_needs_pptx_media_attach
 
-    extension = _extension(request.filename)
+    extension = _extension(request.filename) if file_type is None else file_type
+    if extension and not extension.startswith("."):
+        extension = "." + extension
+    normalized_type = extension.lstrip(".").lower()
     data = request.data
-    if extension == ".docx":
+    pptx_bytes = None
+    if normalized_type in ("ppt", "pptx"):
+        data, extension = normalize_ppt_bytes(data, extension)
+        pptx_bytes = data
+    elif normalized_type == "docx":
         from .upstream_docx_merge import fill_vertical_merged_cells_docx
         data = fill_vertical_merged_cells_docx(data)
     converter = MarkItDown()
-    try:
-        result = converter.convert(io.BytesIO(data), file_extension=extension, keep_data_uris=True)
-    except Exception:
-        result = converter.convert(io.BytesIO(data), file_extension=extension, keep_data_uris=False)
-    content = format_markdown_tables(getattr(result, "text_content", "") or "")
+    with parser_worker_limit("markitdown", CONFIG.markitdown_max_workers):
+        try:
+            result = converter.convert(io.BytesIO(data), file_extension=extension, keep_data_uris=True)
+        except Exception:
+            result = converter.convert(io.BytesIO(data), file_extension=extension, keep_data_uris=False)
+    content = getattr(result, "text_content", "") or ""
+    attached = {}
+    if pptx_bytes is not None and markdown_needs_pptx_media_attach(content):
+        content, attached = attach_pptx_media_to_markdown(content, pptx_bytes)
+    content = format_markdown_tables(content)
     content, image_outputs = extract_markdown_data_images(content)
-    assets = tuple(ParsedAsset(path, raw, media, "markitdown_data_uri")
-                   for path, raw, media in image_outputs)
+    assets = tuple(ParsedAsset(path, base64.b64decode(encoded, validate=True), "image/png", "pptx_media")
+                   for path, encoded in attached.items()) + tuple(
+        ParsedAsset(path, raw, media, "markitdown_data_uri") for path, raw, media in image_outputs)
     return ParsedDocument(content, assets,
                           _base_metadata(request, "markitdown", embedded_image_count=len(assets)))
+
+
+def _parse_doc(request: DocumentRequest) -> ParsedDocument:
+    from .upstream_doc_parser import DocParser
+    source = DocParser(file_name=request.filename).parse_into_text(request.data)
+    assets = tuple(ParsedAsset(path, base64.b64decode(encoded, validate=True),
+                               mimetypes.guess_type(path)[0] or "image/png", "doc_embedded_image")
+                   for path, encoded in source.images.items())
+    return ParsedDocument(source.content, assets,
+                          _base_metadata(request, "doc", embedded_image_count=len(assets)))
 
 
 def _parse_image(request: DocumentRequest) -> ParsedDocument:
@@ -456,6 +483,7 @@ class ParserRegistry:
     def _register_defaults(self) -> None:
         self.register("pdf", (".pdf",), _parse_pdf, default=True)
         self.register("docx", (".docx",), _parse_docx, default=True)
+        self.register("doc", (".doc",), _parse_doc, default=True)
         self.register("excel", (".xlsx", ".xlsm", ".xls"), _parse_excel, default=True)
         self.register("image", tuple(_IMAGE_EXTENSIONS), _parse_image, default=True)
         self.register("markdown", (".md", ".markdown"), _parse_markdown, default=True)

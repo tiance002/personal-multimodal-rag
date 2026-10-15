@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="6.083" timestamp="2026-10-15T14:01:27.630671+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_office_legacy_pg" name="test_native_legacy_office_original_assets_versions_and_failure_isolation" time="0.447"><failure message="ModuleNotFoundError: No module named 'cryptography'">tests\weknora_port\test_office_legacy_pg.py:73: in test_native_legacy_office_original_assets_versions_and_failure_isolation
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_office_legacy_pg.py:30: in scenario
+    async with isolated_mock_application(expected_redis_run_id=run_id, redis_db=15, redis_port=56425) as (app, wire, root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:109: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;verified-isolated-native-assembly&gt;:93: in build_native_fixture
+    ???
+backend\weknora_port\runtime.py:320: in update_model_configuration
+    return await PostgresModelRoleStore(
+backend\weknora_port\storage\configuration.py:102: in update
+    stored = {name:{**value,'api_key':self.cipher.encrypt(value['api_key'])} for name,value in prepared.items()}
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\crypto.py:17: in encrypt
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+E   ModuleNotFoundError: No module named 'cryptography'</failure></testcase></testsuite></testsuites>
