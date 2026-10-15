@@ -110,7 +110,8 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             permissions=ServerPermissionResolver(leases,authority_settings,tokens=token_authority)
             import httpx
             from .models.synthetic import transport_handler
-            from .source_facts import bind_synthetic,bind_wire_facts
+            from .source_facts import bind_synthetic,bind_wire_facts,build_call_sources
+            from dataclasses import replace
             def model_factory(config,key,gate):
                 if (config.provider,config.model) not in authority_settings.allowed_models:
                     raise DevelopmentConfigurationError('AUTHORITY_MODEL_NOT_ALLOWED')
@@ -121,8 +122,10 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                         raise DevelopmentConfigurationError('APPROVED_METER_REQUIRED')
                     transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,
                         credential=lambda _:key)
+                    transport.facts_mock_only=False
                     transport.bind_facts=lambda config,context,body,wire,capability:bind_wire_facts(
-                        config,context,body,wire,config_sha=authority_settings.config_sha,
+                        config,replace(context,source_facts=build_call_sources(context,body,wire,capability=capability)),
+                        body,wire,config_sha=authority_settings.config_sha,
                         recipe=authority_settings.meter.recipe)
                     return ProviderModel(config,transport)
                 if any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):

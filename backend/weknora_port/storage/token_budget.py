@@ -135,3 +135,25 @@ class TokenBudgetStore:
                 (state, outcome, lower, held, settled, encode(numeric), row['call_id']))
         if overrun:
             raise ProviderError('TOKEN_USAGE_EXCEEDS_RESERVATION', sent=True)
+
+
+async def ledger_carry_in(connection, account_id, provider, month):
+    """Conservative carry-in for a new UTC month, read from the existing token ledger.
+
+    Sums strictly earlier months of the SAME account/provider: settled rows use
+    their actual total, reserved/unknown rows use their held (already a conservative
+    occupancy), so the result is never below the real prior consumption. Rows with
+    unknown usage make the bound UNKNOWN (still a positive conservative value), never 0.
+    Read-only; no write, no reset, no money conversion.
+    """
+    if not account_id or not provider:
+        raise ProviderError('TOKEN_MONTH_AUTHORITY_REQUIRED')
+    row = await (await connection.execute(
+        "SELECT COALESCE(SUM(CASE WHEN state='settled' THEN actual_total "
+        "WHEN state IN ('reserved','unknown') THEN held_tokens ELSE 0 END),0) AS carried, "
+        "COUNT(*) FILTER (WHERE state='unknown') AS unknown_rows "
+        "FROM port_token_calls WHERE account_id=%s AND budget_provider=%s AND month < %s",
+        (account_id, provider, month))).fetchone()
+    return {'carry_in_tokens': int(row['carried']),
+            'carry_status': 'UNKNOWN' if row['unknown_rows'] else 'KNOWN',
+            'carry_source': 'LEDGER:port_token_calls:<' + str(month)}

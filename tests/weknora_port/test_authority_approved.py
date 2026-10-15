@@ -15,7 +15,7 @@ from backend.weknora_port.authority import (
 from backend.weknora_port.models.types import CallContext, ModelConfig, ProviderError, PreparedCall, TrustedScope
 from backend.weknora_port.source_facts import (
     BoundCallFacts, OperationSlot, SourceFacts, SourceSlice, TokenReservationBound,
-    bind_wire_facts, measure_final_input, sha)
+    bind_wire_facts, build_call_sources, measure_final_input, sha)
 
 ROOT = __import__('pathlib').Path('E:/WK/run')/'authority-approved-20261015'
 
@@ -124,6 +124,30 @@ def test_bind_wire_facts_requires_real_sources_and_matching_wire():
         config_sha=settings.config_sha, recipe=settings.meter.recipe)
     assert facts.simulated is False and facts.bound.source == settings.meter.recipe
     assert facts.bound.input_upper == len(wire) and facts.bound.output_upper == 64
+
+
+def test_build_call_sources_binds_real_elements_and_refuses_empty():
+    settings = _approved_settings()
+    from dataclasses import replace
+    context = CallContext('op/answer/1/cheap', TrustedScope(settings.subject_id, ('kb-1',)),
+        required_origin_kbs=('kb-2',))
+    body = {'messages': [{'role': 'system', 'content': 's'}, {'role': 'user', 'content': 'q'},
+        {'role': 'assistant', 'content': 'a'}, {'role': 'user', 'content': 'f'}]}
+    wire = b'{"messages":1}'
+    facts = build_call_sources(context, body, wire, capability='chat')
+    assert [s.kind for s in facts.slices] == ['system', 'question', 'history', 'history']
+    assert facts.wire_sha256 == sha(wire)
+    assert all(s.origin_kbs == ('kb-1', 'kb-2') for s in facts.slices)
+    assert all(s.sent_value_sha256 == s.original_sha256 for s in facts.slices)
+    embedding = build_call_sources(context, {'input': ['a', 'b']}, wire, capability='embedding')
+    assert [s.kind for s in embedding.slices] == ['document', 'document']
+    with pytest.raises(ProviderError, match='SOURCE_FACTS_REQUIRED'):
+        build_call_sources(context, {'messages': []}, wire, capability='chat')
+    config = ModelConfig(provider='deepseek', model='deepseek-flash', model_id='mid',
+        base_url='https://api.deepseek.com')
+    bound = bind_wire_facts(config, replace(context, source_facts=facts), {'max_tokens': 8}, wire,
+        config_sha=settings.config_sha, recipe=settings.meter.recipe)
+    assert bound.simulated is False and bound.sources.slices == facts.slices
 
 
 def test_approved_authority_rejects_simulated_facts_and_maps_real_month():

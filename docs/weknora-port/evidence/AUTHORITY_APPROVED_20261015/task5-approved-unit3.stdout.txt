@@ -1,0 +1,36 @@
+............F....F                                                       [100%]
+================================== FAILURES ===================================
+________ test_build_call_sources_binds_real_elements_and_refuses_empty ________
+tests\weknora_port\test_authority_approved.py:146: in test_build_call_sources_binds_real_elements_and_refuses_empty
+    bound = bind_wire_facts(None, replace(context, source_facts=facts), {'max_tokens': 8}, wire,
+backend\weknora_port\source_facts.py:136: in bind_wire_facts
+    fingerprint = sha(json.dumps(asdict(config), sort_keys=True, separators=(',', ':'),
+                                 ^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\dataclasses.py:1358: in asdict
+    raise TypeError("asdict() should be called on dataclass instances")
+E   TypeError: asdict() should be called on dataclass instances
+_____________ test_ledger_carry_in_is_conservative_and_read_only ______________
+tests\weknora_port\test_authority_carry_in_pg.py:61: in test_ledger_carry_in_is_conservative_and_read_only
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_authority_carry_in_pg.py:41: in scenario
+    await _call(conn, account, '2026-08-01', 'settled', held=1000, actual=1000)
+tests\weknora_port\test_authority_carry_in_pg.py:25: in _call
+    await conn.execute("INSERT INTO port_token_calls(call_id,request_id,tenant_id,subject_id,session_id,"
+E:\RAG quention\.venv\Lib\site-packages\psycopg\connection_async.py:295: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.ForeignKeyViolation: insert or update on table "port_token_calls" violates foreign key constraint "port_token_calls_call_id_fkey"
+E   DETAIL:  Key (call_id)=(call-546470f6f4004562a0431df299ae6ca1) is not present in table "port_call_slots".
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_authority_approved.py::test_build_call_sources_binds_real_elements_and_refuses_empty - TypeError: asdict() should be called on dataclass instances
+FAILED tests/weknora_port/test_authority_carry_in_pg.py::test_ledger_carry_in_is_conservative_and_read_only - psycopg.errors.ForeignKeyViolation: insert or update on table "port_token_calls" violates foreign key constraint "port_token_calls_call_id_fkey"
+DETAIL:  Key (call_id)=(call-546470f6f4004562a0431df299ae6ca1) is not present in table "port_call_slots".
+2 failed, 16 passed in 2.34s

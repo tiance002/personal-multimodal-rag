@@ -137,3 +137,36 @@ def bind_wire_facts(config, context, body, wire, *, config_sha, recipe):
         allow_nan=False).encode())
     return BoundCallFacts(sources, TokenReservationBound(measure_final_input(recipe, wire), output, recipe),
         config_sha, fingerprint, False)
+
+
+def build_call_sources(context, body, wire, *, capability):
+    """Per-call SourceFacts from the real serialized wire and the server-resolved scope.
+
+    One slice per sent element (chat message, embedding input, rerank document). `kind`
+    comes from the element role/shape; origins are the server-resolved KB set
+    (`context.scope` union `context.required_origin_kbs`). This binds real sent-value
+    hashes and real origins; it is a conservative per-element binding, not a
+    per-sentence provenance proof, and it refuses when there is nothing to bind.
+    """
+    scope = tuple(sorted(set(context.scope.knowledge_base_ids + context.required_origin_kbs)))
+    slices = []
+    if capability in ('chat', 'vision'):
+        for index, message in enumerate(body.get('messages') or []):
+            role = str((message or {}).get('role', '') or '')
+            kind = {'system': 'system', 'assistant': 'history'}.get(role, 'question' if index <= 1 else 'history')
+            sent = sha(json.dumps(message, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode())
+            slices.append(SourceSlice(kind, f'WIRE:message:{index}', sent, sent, scope,
+                'wire-element/v1', f'/messages/{index}'))
+    elif capability == 'embedding':
+        for index, text in enumerate(body.get('input') or []):
+            sent = sha(str(text).encode())
+            slices.append(SourceSlice('document', f'WIRE:embedding:{index}', sent, sent, scope,
+                'wire-element/v1', f'/input/{index}'))
+    elif capability == 'rerank':
+        for index, text in enumerate(body.get('documents') or []):
+            sent = sha(str(text).encode())
+            slices.append(SourceSlice('evidence', f'WIRE:document:{index}', sent, sent, scope,
+                'wire-element/v1', f'/documents/{index}'))
+    if not slices:
+        raise ProviderError('SOURCE_FACTS_REQUIRED')
+    return SourceFacts(operation_slot(context.request_id, capability), tuple(slices), sha(wire))

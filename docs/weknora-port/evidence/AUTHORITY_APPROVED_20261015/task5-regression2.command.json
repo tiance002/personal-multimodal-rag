@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "--noconftest",
+    "-q",
+    "tests/weknora_port/test_authority_usage.py",
+    "tests/weknora_port/test_send_gate.py",
+    "tests/weknora_port/test_token_authority_pg.py",
+    "tests/weknora_port/test_authority_cli_pg.py",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "-p",
+    "redirect_plugin",
+    "--basetemp=E:\\WK\\run\\authority-integration-20261015\\pytest-task5-regression2",
+    "--junitxml=E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\AUTHORITY_APPROVED_20261015\\task5-regression2.junit.xml"
+  ],
+  "cwd": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "env_paths": {
+    "PYTHONPATH": "E:\\RAG-Worktrees\\weknora-python-port-20261013;E:\\WK\\deps\\reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps;E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\AUTHORITY_APPROVED_20261015",
+    "TMP": "E:\\WK\\run\\authority-integration-20261015\\tmp",
+    "TEMP": "E:\\WK\\run\\authority-integration-20261015\\tmp",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}

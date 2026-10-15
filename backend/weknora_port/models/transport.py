@@ -205,6 +205,8 @@ class AsyncHTTPTransport:
         self.live_ready = type(http_transport) is SafeHTTPTransport
         self._mock_transport = isinstance(http_transport, httpx.MockTransport)
         self._safe_transport = type(http_transport) is SafeHTTPTransport
+        # Synthetic fact binding stays closed-fixture only; approved wiring clears this.
+        self.facts_mock_only = True
         self.client = httpx.AsyncClient(transport=http_transport, follow_redirects=False,
             trust_env=False, timeout=httpx.Timeout(None, connect=30),
             limits=httpx.Limits(max_keepalive_connections=5, keepalive_expiry=90))
@@ -233,7 +235,10 @@ class AsyncHTTPTransport:
                 (body.get("generationConfig") or {}).get("maxOutputTokens", (body.get("options") or {}).get("num_predict") if config.source=="local" else None)))))
         binder=getattr(self,'bind_facts',None)
         if binder is not None:
-            if not self._mock_transport:raise ProviderError('SYNTHETIC_TRANSPORT_REQUIRED')
+            # The synthetic binder is closed-fixture only; an approved binder binds
+            # real per-source facts and is allowed on the safe (real) transport.
+            if getattr(self,'facts_mock_only',True) and not self._mock_transport:
+                raise ProviderError('SYNTHETIC_TRANSPORT_REQUIRED')
             call=replace(call,bound_facts=binder(config,context,body,wire,capability))
         if context.cancelled is not None and context.cancelled.is_set():
             raise CallCancelled()
