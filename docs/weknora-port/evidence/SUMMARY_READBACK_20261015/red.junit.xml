@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="12" time="1.510" timestamp="2026-10-15T18:35:11.983001+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_generated_summary_keeps_content_and_identity_with_parent_verified_version" time="0.005"><failure message="LookupError: SOURCE_CHUNK_UNAVAILABLE">tests\weknora_port\test_summary_source_readback.py:31: in test_generated_summary_keeps_content_and_identity_with_parent_verified_version
+    source = read(tmp_path, row)
+             ^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_summary_source_readback.py:26: in read
+    return asyncio.run(service.read_source_chunk(PRINCIPAL, 'summary'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\documents.py:687: in read_source_chunk
+    raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
+E   LookupError: SOURCE_CHUNK_UNAVAILABLE</failure></testcase><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change0]" time="0.006" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change1]" time="0.004" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change2]" time="0.004" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change3]" time="0.004" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change4]" time="0.004" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change5]" time="0.003" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change6]" time="0.003" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change7]" time="0.003" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change8]" time="0.003" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change9]" time="0.004" /><testcase classname="tests.weknora_port.test_summary_source_readback" name="test_summary_binding_and_ordinary_missing_version_fail_closed[change10]" time="0.004" /></testsuite></testsuites>

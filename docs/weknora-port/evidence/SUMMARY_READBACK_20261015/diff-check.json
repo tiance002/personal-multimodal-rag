@@ -1,0 +1,32 @@
+{
+  "full": {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exitcode": 0,
+    "stdout": ""
+  },
+  "excluding_raw_pytest_stdout_junit": {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/red.stdout.txt",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/red.junit.xml",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/green.stdout.txt",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/green.junit.xml",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/pg.stdout.txt",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/pg.junit.xml",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/related.stdout.txt",
+      ":!docs/weknora-port/evidence/SUMMARY_READBACK_20261015/related.junit.xml"
+    ],
+    "exitcode": 0,
+    "stdout": ""
+  }
+}

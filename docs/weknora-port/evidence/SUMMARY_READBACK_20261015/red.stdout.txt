@@ -1,0 +1,24 @@
+F...........                                                             [100%]
+================================== FAILURES ===================================
+_ test_generated_summary_keeps_content_and_identity_with_parent_verified_version _
+tests\weknora_port\test_summary_source_readback.py:31: in test_generated_summary_keeps_content_and_identity_with_parent_verified_version
+    source = read(tmp_path, row)
+             ^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_summary_source_readback.py:26: in read
+    return asyncio.run(service.read_source_chunk(PRINCIPAL, 'summary'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\documents.py:687: in read_source_chunk
+    raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
+E   LookupError: SOURCE_CHUNK_UNAVAILABLE
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_summary_source_readback.py::test_generated_summary_keeps_content_and_identity_with_parent_verified_version
+1 failed, 11 passed in 1.51s

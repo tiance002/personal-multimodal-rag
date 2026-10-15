@@ -670,8 +670,12 @@ class DocumentLifecycleService:
         rows = await self._rows(
             "SELECT c.id AS chunk_id,c.knowledge_id AS document_id,c.knowledge_base_id,c.content,"
             "c.source_content,c.chunk_index,c.start_at,c.end_at,c.chunk_type,c.image_info,"
-            "c.metadata AS chunk_metadata,k.metadata AS document_metadata,k.file_name AS filename,k.parse_status "
+            "c.metadata AS chunk_metadata,k.metadata AS document_metadata,k.file_name AS filename,k.parse_status,"
+            "p.id AS source_parent_id,p.metadata AS source_parent_metadata "
             "FROM chunks c JOIN knowledges k ON k.id=c.knowledge_id AND k.knowledge_base_id=c.knowledge_base_id "
+            "LEFT JOIN chunks p ON c.chunk_type='summary' AND p.id=c.parent_chunk_id "
+            "AND p.tenant_id=c.tenant_id AND p.knowledge_base_id=c.knowledge_base_id "
+            "AND p.knowledge_id=c.knowledge_id AND p.chunk_type='text' AND p.deleted_at IS NULL "
             "WHERE c.id=%s AND c.tenant_id=%s AND k.tenant_id=%s AND c.deleted_at IS NULL AND k.deleted_at IS NULL "
             "AND (c.chunk_type NOT IN ('image_ocr','image_caption') OR "
             "(k.parse_status='completed' AND c.metadata->>'source_version'=k.metadata->>'source_version'))",
@@ -683,6 +687,17 @@ class DocumentLifecycleService:
             raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
         metadata = _json_object(row.get("chunk_metadata"))
         version = metadata.get("source_version")
+        if row.get("chunk_type") == "summary":
+            # ProcessSummaryGeneration binds its generated chunk to original text;
+            # it deliberately does not persist a source_version on the summary.
+            parent_version = _json_object(row.get("source_parent_metadata")).get("source_version")
+            if (row.get("parse_status") != "completed" or not row.get("source_parent_id")
+                    or metadata.get("origin") != "model_generated_summary"
+                    or metadata.get("upstream_parent_link") is not True
+                    or not isinstance(parent_version, str) or not parent_version
+                    or ("source_version" in metadata and version != parent_version)):
+                raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
+            version = parent_version
         if not isinstance(version, str) or not version or version != _json_object(row.get("document_metadata")).get("source_version"):
             raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
         images = row.get("image_info") or []
