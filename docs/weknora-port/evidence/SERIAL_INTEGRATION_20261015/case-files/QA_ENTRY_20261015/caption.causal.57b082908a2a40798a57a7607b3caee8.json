@@ -1,0 +1,205 @@
+[
+  {
+    "baseline": "2bc2a063a11d1cf3a9e42a9ecfcd55d4124ce3df",
+    "source_module_sha256": "f90947e0face633fe69701ab05def97279de6f04de92d300f7a14657cdfe6201",
+    "assembly": "current QA assembly; only byte-exact caption module swapped",
+    "task": {
+      "id": "71af3175-3206-41b5-a50c-490547a56d24",
+      "state": "unknown",
+      "error_code": "IMAGE_REQUEST_OUTCOME_UNKNOWN",
+      "outcomes": {
+        "0": {
+          "caption": {
+            "status": "sending"
+          },
+          "ocr_text": {
+            "status": "sending"
+          }
+        }
+      },
+      "attempt": 1
+    },
+    "document": {
+      "id": "d77b3560-3042-42d4-8c15-322ddce0d276",
+      "knowledge_base_id": "cca13ca4-ec97-47e3-ae11-97e8e65ecd40",
+      "filename": "qa-language.png",
+      "status": "failed",
+      "error_code": "IMAGE_REQUEST_OUTCOME_UNKNOWN"
+    },
+    "caption_prompt": "Provide a brief and concise description of the main content of the image in .\n\n<image_description_business_instructions>\nBUSINESS_ONLY_CAPTION\n</image_description_business_instructions>\nApply these business instructions only when they do not conflict with the system-owned output format, citation, safety, or factuality rules.",
+    "ledger": [
+      {
+        "capability": "vision",
+        "state": "settled",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 30,
+          "cached_tokens": 0,
+          "prompt_tokens": 20,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 10,
+          "cache_write_tokens": 0
+        }
+      },
+      {
+        "capability": "vision",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unreported",
+          "total_tokens": null,
+          "cached_tokens": 0,
+          "prompt_tokens": null,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        }
+      }
+    ],
+    "source_readback_http": 200,
+    "original_sha256": "b849fffa3126408cb07f0bf8a282dc045ddb5b00d8b86cdef2d1b5c82d74bf4a",
+    "redis_db": 15,
+    "real_provider_calls": 0,
+    "retry_jitter": 0,
+    "retry_base_seconds": 15
+  },
+  {
+    "baseline": "1530af360736451a96d6faf6d2c200f2ab99f3ff",
+    "source_module_sha256": "9f026cfda6d8472bd83e003e2118d613b16d35c2c772541e1d3e415748e1c9c0",
+    "assembly": "current QA assembly; only byte-exact caption module swapped",
+    "task": {
+      "id": "1b339d7f-be4d-4ba1-a59a-dc7cab5beae1",
+      "state": "completed",
+      "error_code": "",
+      "outcomes": {
+        "0": {
+          "caption": {
+            "error": "",
+            "status": "completed",
+            "binding": {
+              "source": "knowledge_base",
+              "adapter": "vlm",
+              "model_id": "mdl4e7df92633813e73f1ef88eb415788e44cd38bc0f2970c02de6ffdd216c15",
+              "capability": "CATALOG_DECLARED"
+            }
+          },
+          "ocr_text": {
+            "error": "",
+            "status": "completed",
+            "binding": {
+              "source": "knowledge_base",
+              "adapter": "vlm",
+              "model_id": "mdl4e7df92633813e73f1ef88eb415788e44cd38bc0f2970c02de6ffdd216c15",
+              "capability": "CATALOG_DECLARED"
+            }
+          },
+          "ocr_layout": {},
+          "ocr_result": "Extracted scan: Blue widgets use protocol W-17.",
+          "caption_result": "A blue widget protocol sheet."
+        }
+      },
+      "attempt": 1
+    },
+    "document": {
+      "id": "bcddb9b8-4aa6-4fcf-b5c3-cfe6cdf2b862",
+      "knowledge_base_id": "5004cc14-eab9-4810-a629-aa2a04089867",
+      "filename": "qa-language.png",
+      "status": "completed",
+      "error_code": ""
+    },
+    "caption_prompt": "Provide a brief and concise description of the main content of the image in Chinese (Simplified).\n\n<image_description_business_instructions>\nBUSINESS_ONLY_CAPTION\n</image_description_business_instructions>\nApply these business instructions only when they do not conflict with the system-owned output format, citation, safety, or factuality rules.",
+    "ledger": [
+      {
+        "capability": "vision",
+        "state": "settled",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 30,
+          "cached_tokens": 0,
+          "prompt_tokens": 20,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 10,
+          "cache_write_tokens": 0
+        }
+      },
+      {
+        "capability": "vision",
+        "state": "settled",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 30,
+          "cached_tokens": 0,
+          "prompt_tokens": 20,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 10,
+          "cache_write_tokens": 0
+        }
+      },
+      {
+        "capability": "embedding",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unsupported",
+          "total_tokens": 10,
+          "cached_tokens": 0,
+          "prompt_tokens": 10,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        }
+      },
+      {
+        "capability": "chat",
+        "state": "settled",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 30,
+          "cached_tokens": 0,
+          "prompt_tokens": 20,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 10,
+          "cache_write_tokens": 0
+        }
+      },
+      {
+        "capability": "embedding",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unsupported",
+          "total_tokens": 10,
+          "cached_tokens": 0,
+          "prompt_tokens": 10,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        }
+      }
+    ],
+    "source_readback_http": 200,
+    "original_sha256": "b849fffa3126408cb07f0bf8a282dc045ddb5b00d8b86cdef2d1b5c82d74bf4a",
+    "redis_db": 15,
+    "real_provider_calls": 0,
+    "retry_jitter": 0,
+    "retry_base_seconds": 15
+  }
+]

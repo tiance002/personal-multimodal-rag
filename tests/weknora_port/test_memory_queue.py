@@ -2,6 +2,7 @@
 import asyncio,json,time,uuid
 from types import SimpleNamespace
 import pytest
+from tests.weknora_port.redis_fixture_identity import expected_redis_run_id
 from redis.asyncio import Redis
 from backend.weknora_port.storage.memory_queue import RedisMemoryExtractionQueue
 from backend.weknora_port.conversation.maintenance_types import ExtractionPayload
@@ -11,7 +12,7 @@ from backend.weknora_port.conversation.types import MemoryScope
 def test_actual_redis_retry_two_foreign_scope_and_expired_claim():
     async def scenario():
         client=Redis.from_url('redis://127.0.0.1:56424/15',decode_responses=True)
-        assert (await client.info('server'))['run_id']=='586b92f4649b78508382dfd52d64d848f45b0a7c'
+        assert (await client.info('server'))['run_id']==expected_redis_run_id()
         principal=SimpleNamespace(tenant_id=9913,subject_id='public-queue-fixture')
         prefix='weknora-python-port:20261013:mq-regression:'+str(uuid.uuid4())
         clock=[time.time()]

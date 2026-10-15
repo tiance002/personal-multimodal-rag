@@ -2,6 +2,7 @@
 import asyncio, json, time, uuid
 from types import SimpleNamespace
 import pytest
+from tests.weknora_port.redis_fixture_identity import expected_redis_run_id
 from redis.asyncio import Redis
 from redis.exceptions import ConnectionError
 from backend.weknora_port.storage.memory_queue import RedisMemoryExtractionQueue
@@ -13,7 +14,7 @@ from backend.weknora_port.conversation.types import MemoryScope
 
 async def fixture():
     client=Redis.from_url("redis://127.0.0.1:56424/15",decode_responses=True)
-    assert (await client.info("server"))["run_id"]=="586b92f4649b78508382dfd52d64d848f45b0a7c"
+    assert (await client.info("server"))["run_id"]==expected_redis_run_id()
     owner=SimpleNamespace(tenant_id=9913,subject_id="queue-recovery-synthetic")
     clock=[time.time()]
     q=RedisMemoryExtractionQueue(client,"weknora-python-port:20261013:mq:"+str(uuid.uuid4()),owner,
@@ -204,7 +205,7 @@ UPSTREAM_RECOVERY_GRACE_SECONDS=30
 
 async def leased_fixture(retry,lease_until):
     client=Redis.from_url("redis://127.0.0.1:56424/15",decode_responses=True)
-    assert (await client.info("server"))["run_id"]=="586b92f4649b78508382dfd52d64d848f45b0a7c"
+    assert (await client.info("server"))["run_id"]==expected_redis_run_id()
     owner=SimpleNamespace(tenant_id=9913,subject_id="queue-grace-synthetic")
     clock=[1700000000.0]
     q=RedisMemoryExtractionQueue(client,"weknora-python-port:20261013:mq-grace:"+str(uuid.uuid4()),owner,
@@ -276,7 +277,7 @@ def test_reclaim_uses_integer_second_domain(lease_score,now,reclaimed):
         client=q=None
         try:
             client=Redis.from_url("redis://127.0.0.1:56424/15",decode_responses=True)
-            assert (await client.info("server"))["run_id"]=="586b92f4649b78508382dfd52d64d848f45b0a7c"
+            assert (await client.info("server"))["run_id"]==expected_redis_run_id()
             owner=SimpleNamespace(tenant_id=9913,subject_id="queue-grace-synthetic")
             clock=[now]
             q=RedisMemoryExtractionQueue(client,"weknora-python-port:20261013:mq-grace:"+str(uuid.uuid4()),owner,
@@ -302,7 +303,7 @@ def test_reclaim_of_real_float_lease_matches_integer_cutoff():
         client=q=None
         try:
             client=Redis.from_url("redis://127.0.0.1:56424/15",decode_responses=True)
-            assert (await client.info("server"))["run_id"]=="586b92f4649b78508382dfd52d64d848f45b0a7c"
+            assert (await client.info("server"))["run_id"]==expected_redis_run_id()
             owner=SimpleNamespace(tenant_id=9913,subject_id="queue-grace-synthetic")
             clock=[1700000000.75]
             q=RedisMemoryExtractionQueue(client,"weknora-python-port:20261013:mq-grace:"+str(uuid.uuid4()),owner,

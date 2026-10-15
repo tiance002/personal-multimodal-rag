@@ -379,3 +379,8 @@ See [TLS_STATE_REPAIR.md](docs/audits/weknora-ordinary-output-progress/TLS_STATE
 ## 2026-10-13 Owner-requested pause and review handoff
 
 Stopped implementation and real generation at owner request. Current HEAD e6848a9; seven unfinished stream integration files preserved uncommitted, not deployed. Runtime remains ce3398a nonstream/120s/V4 NEW_UNKNOWN_STOP. Real original2048 and short1024 PASS with citation recovery; long4096 FAIL twice at90/120s. Full bound189408/350000, known43321+UNKNOWN53915=97236; no UNKNOWN released. Candidate Windows56passed1skipped is simulated, Linux/native framing/build/real streaming NOT RUN. G5 NOT RUN. Current pause handoff: [PAUSE_REVIEW_HANDOFF_20261013.md](docs/audits/weknora-ordinary-output-progress/PAUSE_REVIEW_HANDOFF_20261013.md). Goal incomplete and paused pending owner review of solutions; no new paid calls, deployment, DB operations, Push/Tag/release.
+
+
+## 2026-10-15 accepted branch serial integration
+
+Local/MQ/QA nine accepted commits integrated with source SHA trailers from actual base 2bc2a06. Report: docs/weknora-port/SERIAL_INTEGRATION_REPORT_20261015.md. Necessary targeted commands returned 0: 253 offline, 27 real isolated Redis, 8 Local/ordinary HTTP+PG/Redis MockTransport tests. Test pre/post hashes and four prior untracked-file hashes match. Shared fixture conflicts were resolved by preserving both safety checks and parameters; runtime Local factory/success hook and QA fallback AST checks pass. No historical evidence overwrite, UNKNOWN release, real provider/model pull, default entry switch, P8 deletion or push/deploy. Go public entry, actual Ollama and cutover remain unverified; no milestone acceptance claimed.
