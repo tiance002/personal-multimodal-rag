@@ -222,6 +222,8 @@ class SourceDocumentPostprocessor:
                 metadata={'origin':'model_generated_summary','upstream_parent_link':True})
             index=IndexInfo(summary_id,0,summary_id,document['id'],kb['id'],content,is_enabled=False)
             embedder=await app.documents.embedder_for_kb(principal,kb) if strategy.get('vector_enabled') else None
+            if callable(getattr(embedder,'for_operation',None)):
+                embedder=embedder.for_operation(document['source_version']+'/summary-embedding',document['id'])
             async with app.leases.lease(writable_knowledge_base_ids=frozenset({kb['id']})) as guard:
                 async with guard.connection.transaction():
                     current=await (await guard.connection.execute('SELECT metadata,custom_metadata FROM knowledges WHERE tenant_id=%s '

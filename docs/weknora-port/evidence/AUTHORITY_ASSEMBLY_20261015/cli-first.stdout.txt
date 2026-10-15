@@ -1,0 +1,22 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_two_standard_cli_processes_upload_question_worker_and_replay ______
+tests\weknora_port\test_authority_cli_pg.py:111: in test_two_standard_cli_processes_upload_question_worker_and_replay
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_authority_cli_pg.py:65: in scenario
+    assert result.status_code==200,result.text
+E   AssertionError: {"error":{"code":"REQUEST_INVALID","message":"REQUEST_INVALID"},"meta":{"request_id":"b64d9956-4e71-4022-aa3d-090b0c930605"}}
+E   assert 422 == 200
+E    +  where 422 = <Response [422 Unprocessable Content]>.status_code
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_authority_cli_pg.py::test_two_standard_cli_processes_upload_question_worker_and_replay
+1 failed in 5.09s

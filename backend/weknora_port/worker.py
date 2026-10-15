@@ -17,9 +17,11 @@ async def serve(settings,once=False,*,runtime_factory=None):
 def main():
     parser=argparse.ArgumentParser(description='Consume persisted WeKnora image-ingest and memory-extraction jobs; text ingest runs in API')
     parser.add_argument('--once',action='store_true')
+    parser.add_argument('--authority-config')
     args=parser.parse_args()
     try:
-        with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:result=runner.run(serve(DevelopmentSettings.from_environment(),args.once))
+        from .authority import runtime_factory
+        with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:result=runner.run(serve(DevelopmentSettings.from_environment(),args.once,runtime_factory=runtime_factory(args.authority_config)))
         if result is not None:print(json.dumps(result))
     except KeyboardInterrupt:pass
 

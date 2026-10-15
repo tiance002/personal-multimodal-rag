@@ -90,10 +90,40 @@ def _object(value): return json.loads(value) if isinstance(value,str) else value
 
 class P1SendGate:
     def __init__(self, identity_guard: PostgresRetriever, *, tenant_id: int,
-                 permissions: PermissionResolver | None = None, costs: CostAuthority | None = None):
+                 permissions: PermissionResolver | None = None, costs: CostAuthority | None = None,
+                 token_authority=None):
         if type(tenant_id) is not int or tenant_id<=0: raise ProviderError("MODEL_GATE_TENANT_REQUIRED")
         self.guard,self.connection,self.tenant_id=identity_guard,identity_guard.connection,tenant_id
         self.permissions,self.costs=permissions,costs
+        self.token_authority=token_authority
+
+    def _slot_id(self, call):
+        from ..source_facts import operation_slot
+        expected = operation_slot(call.context.request_id, call.capability)
+        slot = call.bound_facts.sources.slot if call.bound_facts else expected
+        if slot != expected:
+            raise ProviderError('MODEL_OPERATION_SLOT_MISMATCH')
+        import hashlib
+        return hashlib.sha256(_json([self.tenant_id,call.context.scope.owner_id,slot.identity()]).encode()).hexdigest()
+
+    async def _call_lock(self, call):
+        # Same lock in both units, before any monthly lock. No model/wire/config
+        # in this key: changing a model cannot create a new recovery identity.
+        await self.connection.execute('SELECT pg_advisory_xact_lock(hashtext(%s))',
+            ('weknora-call:'+self._slot_id(call),))
+
+    async def _token_tables(self):
+        row = await self._one("SELECT to_regclass('port_call_slots') AS slots")
+        return bool(row and row['slots'])
+
+    async def _deny_existing(self, call):
+        from ..source_facts import historical_ids
+        if await self._one('SELECT request_id FROM send_calls WHERE request_id=ANY(%s)',(historical_ids(call.context.request_id),)):
+            raise ProviderError('MODEL_CALL_ID_REUSE_DENIED')
+        if await self._one('SELECT call_id FROM port_call_slots WHERE call_id=%s', (self._slot_id(call),)):
+            raise ProviderError('MODEL_CALL_ID_REUSE_DENIED')
+        if await self._one('SELECT call_id FROM port_token_calls WHERE request_id=ANY(%s)', (historical_ids(call.context.request_id),)):
+            raise ProviderError('MODEL_CALL_ID_REUSE_DENIED')
 
     def _call(self,call):
         self.guard.require_verified()
@@ -163,13 +193,25 @@ class P1SendGate:
         await self.connection.execute("SELECT pg_advisory_xact_lock(hashtext(%s))",(f"personal-rag-budget:{account}:{month.isoformat()}",))
 
     async def authorize(self,call):
+        if self.token_authority is not None:
+            from .token_budget import TokenBudgetStore
+            return await TokenBudgetStore(self).reserve(call)
         request,tenant,owner=self._call(call)
         if self.permissions is None or self.costs is None: raise ProviderError("MODEL_SEND_AUTHORIZATION_REQUIRED")
+        if hasattr(self.connection,'autocommit'):
+            from psycopg.pq import TransactionStatus
+            if not self.connection.autocommit or self.connection.info.transaction_status!=TransactionStatus.IDLE:
+                raise ProviderError('MODEL_ADMISSION_OWN_TRANSACTION_REQUIRED')
         grant=await self.permissions.resolve(call)
         origin_kbs=self._permission(call,grant)
         authority,estimate=await self.costs.monthly(call),await self.costs.estimate(call)
         async with self.connection.transaction():
-            clock=await self._one("SELECT (date_trunc('month',now() AT TIME ZONE 'UTC'))::date AS month")
+            await self.connection.execute('SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
+            await self._call_lock(call)
+            token_tables = await self._token_tables()
+            if token_tables:
+                await self._deny_existing(call)
+            clock=await self._one("SELECT (date_trunc('month',clock_timestamp() AT TIME ZONE 'UTC'))::date AS month")
             month=clock['month'];self._authority(authority,estimate,grant,month)
             await self._month_lock(authority.account_id,month)
             existing=await self._one("SELECT request_id FROM send_calls WHERE request_id=%s",(request,))
@@ -186,6 +228,10 @@ class P1SendGate:
             # attempt also invokes the resolver afresh, including upgrades.
             self._permission(call,grant)
             await self.connection.execute("INSERT INTO send_calls(request_id,tenant_id,subject_id,session_id,account_id,budget_month,provider,model,model_id,capability,endpoint,wire_sha256,wire_bytes,output_budget,retrieval_kbs,retrieval_documents,origin_kbs,permission_source,price_source,estimator_source,reserved_microunits) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s::jsonb,%s,%s,%s,%s)",(request,tenant,owner,call.context.session_id,authority.account_id,month,call.provider,call.model,call.model_id,call.capability,call.endpoint,call.wire_sha256,call.wire_bytes,call.output_budget,_json(call.context.scope.knowledge_base_ids),_json(call.context.scope.document_ids),_json(origin_kbs),grant.approval_source,estimate.price_source,estimate.estimator_source,estimate.microunits))
+            if token_tables:
+                from .token_budget import fingerprint
+                await self.connection.execute('INSERT INTO port_call_slots(call_id,unit,tenant_id,subject_id,fingerprint) VALUES(%s,%s,%s,%s,%s)',
+                    (self._slot_id(call),'money',tenant,owner,fingerprint(call)))
 
     def _same(self,call,row):
         expected=(call.provider,call.model,call.model_id,call.capability,call.endpoint,call.wire_sha256,call.wire_bytes,call.output_budget,call.context.session_id)
@@ -194,6 +240,9 @@ class P1SendGate:
             raise ProviderError("MODEL_FINISH_IDENTITY_MISMATCH",sent=True)
 
     async def finish(self,call,*,outcome,usage):
+        if self.token_authority is not None:
+            from .token_budget import TokenBudgetStore
+            return await TokenBudgetStore(self).finish(call,outcome=outcome,usage=usage)
         # Cancellation must not prevent preserving occupancy after possible send.
         self.guard.require_verified()
         request,tenant,owner=call.context.request_id,self.tenant_id,call.context.scope.owner_id
@@ -210,6 +259,7 @@ class P1SendGate:
             except Exception: cost=None
         overrun=False
         async with self.connection.transaction():
+            await self._call_lock(call)
             await self._month_lock(row['account_id'],row['budget_month'])
             current=await self._one("SELECT * FROM send_calls WHERE request_id=%s AND tenant_id=%s AND subject_id=%s FOR UPDATE",(request,tenant,owner));self._same(call,current)
             if current['state'] in ('settled','released'):

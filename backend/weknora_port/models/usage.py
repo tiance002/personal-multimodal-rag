@@ -1,6 +1,7 @@
 """api/usage.go cache normalization with explicitly UNKNOWN absent usage."""
 from collections.abc import Mapping
 from .types import TokenUsage, ProviderError
+from .usage_facts import capture_usage,aggregate_facts
 _MISSING = object()
 
 
@@ -39,7 +40,7 @@ def normalize_usage(raw, cache_accounting: bool = False) -> TokenUsage:
     cache_status = ("hit" if read > 0 else "miss") if reported else ("unreported" if cache_accounting else "unsupported")
     return TokenUsage(prompt, completion, total,
         "REPORTED" if prompt is not None and completion is not None and total is not None else "UNKNOWN",
-        read, read, write, miss, reported, cache_status)
+        read, read, write, miss, reported, cache_status, capture_usage(dict(raw)))
 
 
 def accumulate_usage(usages: list[TokenUsage]) -> TokenUsage:
@@ -54,4 +55,4 @@ def accumulate_usage(usages: list[TokenUsage]) -> TokenUsage:
         "unsupported" if all(u.cache_status == "unsupported" for u in usages) else "unreported")
     return TokenUsage(total("prompt_tokens"), total("completion_tokens"), total("total_tokens"),
         "REPORTED" if all(u.status == "REPORTED" for u in usages) else "UNKNOWN", read, read,
-        sum(u.cache_write_tokens for u in usages), sum(u.cache_miss_tokens for u in usages), reported, status)
+        sum(u.cache_write_tokens for u in usages), sum(u.cache_miss_tokens for u in usages), reported, status,aggregate_facts(usages))

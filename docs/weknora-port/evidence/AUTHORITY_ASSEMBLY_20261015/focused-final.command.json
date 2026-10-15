@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "--noconftest",
+    "-q",
+    "tests/weknora_port/test_authority_usage.py",
+    "tests/weknora_port/test_send_gate.py",
+    "tests/weknora_port/test_provider_usage.py",
+    "tests/weknora_port/test_provider_transport.py",
+    "tests/weknora_port/test_transport_occupancy.py",
+    "tests/weknora_port/test_development_entry.py",
+    "tests/weknora_port/test_document_profile.py",
+    "tests/weknora_port/test_documents.py",
+    "tests/weknora_port/test_native_protocols.py",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=E:\\WK\\run\\authority-assembly-20261015\\pytest-focused-final",
+    "--junitxml=E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\AUTHORITY_ASSEMBLY_20261015\\focused-final.junit.xml"
+  ],
+  "cwd": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "env_paths": {
+    "PYTHONPATH": "E:\\RAG-Worktrees\\weknora-python-port-20261013;E:\\WK\\deps\\reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps",
+    "TMP": "E:\\WK\\run\\authority-assembly-20261015\\tmp",
+    "TEMP": "E:\\WK\\run\\authority-assembly-20261015\\tmp",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}

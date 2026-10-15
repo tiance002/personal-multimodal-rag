@@ -32,6 +32,8 @@ class RuntimeMemoryModels:
         return rows[0]['id'] if rows else ''
 
     async def complete(self,request):
+        if getattr(self.app,"token_authority",None) is not None and not request.operation_id:
+            raise ProviderError('MEMORY_OPERATION_ID_REQUIRED')
         context=await self.context(request.scope,request.operation_id or str(uuid.uuid4()))
         registry=self.app.registry_for_context()
         try:
@@ -42,8 +44,10 @@ class RuntimeMemoryModels:
             return ModelResponse(response.content,response.finish_reason) if response is not None else None
         finally:await registry.close()
 
-    async def embed_query(self,scope,model_id,text):
-        context=await self.context(scope,'embedding/'+str(uuid.uuid4()))
+    async def embed_query(self,scope,model_id,text,*,operation_id=''):
+        if getattr(self.app,"token_authority",None) is not None and not operation_id:
+            raise ProviderError('MEMORY_OPERATION_ID_REQUIRED')
+        context=await self.context(scope,operation_id or 'embedding/'+str(uuid.uuid4()))
         registry=self.app.registry_for_context()
         try:
             model=await registry.embedding(model_id,context)

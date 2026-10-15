@@ -63,7 +63,7 @@ def own_storage(settings):
 
 
 @asynccontextmanager
-async def assemble(settings,*,model_factory=None,permissions=None,costs=None,principal=None):
+async def assemble(settings,*,model_factory=None,permissions=None,costs=None,principal=None,authority_settings=None):
     # Optional dependencies are test/server injections, never request JSON or env module imports.
     import psycopg
     from psycopg.rows import dict_row
@@ -94,6 +94,31 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             if not row['principal'] or not row['image']:raise DevelopmentConfigurationError('EXPLICIT_SCHEMA_INITIALIZATION_REQUIRED')
         if (await redis.info('server'))['run_id']!=settings.redis_run_id:raise DevelopmentConfigurationError('REDIS_IDENTITY_MISMATCH')
         own_storage(settings)
+        token_authority=None
+        if authority_settings is not None:
+            from .authority import ServerPermissionResolver,ConfiguredTokenAuthority
+            from .storage.history import LocalPrincipal
+            if any(v is not None for v in (model_factory,permissions,costs,principal)):
+                raise DevelopmentConfigurationError('AUTHORITY_INJECTION_CONFLICT')
+            async with leases.lease() as guard:
+                check=await (await guard.connection.execute("SELECT to_regclass('port_token_calls') AS tokens,to_regclass('port_call_slots') AS slots")).fetchone()
+                if not all(check.values()):raise DevelopmentConfigurationError('EXPLICIT_TOKEN_SCHEMA_INITIALIZATION_REQUIRED')
+            principal=LocalPrincipal(authority_settings.tenant_id,authority_settings.subject_id)
+            permissions=ServerPermissionResolver(leases,authority_settings)
+            token_authority=ConfiguredTokenAuthority(authority_settings)
+            import httpx
+            from .models.synthetic import transport_handler
+            from .source_facts import bind_synthetic
+            def model_factory(config,key,gate):
+                if authority_settings.mode!='synthetic' or any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):
+                    raise DevelopmentConfigurationError('SYNTHETIC_ENDPOINT_REQUIRED')
+                if config.api!='openai-completions' or config.embedding_api!='openai-embeddings' or config.rerank_api!='cohere-rerank':
+                    raise DevelopmentConfigurationError('SYNTHETIC_PROTOCOL_UNSUPPORTED')
+                transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,
+                    credential=lambda _:'SYNTHETIC-NOT-A-CREDENTIAL',http_transport=httpx.MockTransport(transport_handler))
+                transport.bind_facts=lambda config,context,body,wire,capability:bind_synthetic(
+                    config,context,body,wire,authority_settings.config_sha,capability=capability)
+                return ProviderModel(config,transport)
         principal=principal or await LocalPrincipalStore(leases).bootstrap()
         store=RedisListStreamStore(redis,prefix=settings.redis_prefix)
         box={}
@@ -104,13 +129,17 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             return KnowledgeBaseSettings(roles.get('embedding',''),roles.get('cheap',''),roles.get('rerank',''),{},
                 {'vector_enabled':True,'keyword_enabled':True,'wiki_enabled':False,'graph_enabled':False},{'enable_multimodal':False})
         async def embedder(who,kb):
-            app=box['runtime'];registry=app.registry_for_context()
-            context=CallContext(str(uuid.uuid4()),TrustedScope(who.subject_id,(kb['id'],)))
+            app=box['runtime']
             class Embedder:
+                def __init__(self,context=None):self.context=context
+                def for_operation(self,operation_id,document_id):
+                    return Embedder(CallContext(operation_id,TrustedScope(who.subject_id,(kb['id'],),(document_id,))))
                 async def batch_embed_with_pool(self,texts,*,attempt):
+                    if self.context is None:raise DevelopmentConfigurationError('EMBEDDING_OPERATION_ID_REQUIRED')
+                    registry=app.registry_for_context()
                     try:
-                        model=await registry.embedding(kb['embedding_model_id'],context)
-                        return (await model.embed(texts,context.child('ingest-'+str(attempt)))).vectors
+                        model=await registry.embedding(kb['embedding_model_id'],self.context)
+                        return (await model.embed(texts,self.context)).vectors
                     finally:await registry.close()
             return Embedder()
         if model_factory is None:
@@ -121,7 +150,8 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             embedder_for_kb=embedder,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
-            permissions=permissions,costs=costs,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
+            permissions=permissions,costs=costs,token_authority=token_authority,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
+        runtime.authority_config_sha=authority_settings.config_sha if authority_settings else None
         box['runtime']=runtime
         yield runtime
     finally:

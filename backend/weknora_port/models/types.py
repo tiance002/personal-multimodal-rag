@@ -50,6 +50,7 @@ class CallContext:
     deadline_kind: str = "model"  # run deadlines must never trigger model upgrade
     # Additional server-resolved derived-content sources; never retrieval scope.
     required_origin_kbs: tuple[str, ...] = ()
+    source_facts: Any = field(default=None, repr=False, compare=False)
 
     def child(self, suffix: str) -> CallContext:
         return replace(self, request_id=f"{self.request_id}/{suffix}")
@@ -244,6 +245,7 @@ class TokenUsage:
     cache_miss_tokens: int = 0
     cache_reported: bool = False
     cache_status: str = "unreported"
+    provider_usage_facts: Any = field(default=None, repr=False)
 
 
 @dataclass(frozen=True)
@@ -309,6 +311,7 @@ class PreparedCall:
     wire_sha256: str
     wire_bytes: int
     output_budget: int | None
+    bound_facts: Any = field(default=None, repr=False)
 
 
 class SendGate(Protocol):

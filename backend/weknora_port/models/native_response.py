@@ -5,6 +5,7 @@ import secrets
 from dataclasses import replace
 from .types import ChatResponse, ToolCall, FunctionCall, ProviderError
 from .usage import normalize_usage
+from .usage_facts import capture_usage
 
 
 def _dump(value):
@@ -35,7 +36,8 @@ def native_usage(config,raw):
             if any(type(raw.get(k,0)) is not int for k in ("candidatesTokenCount","thoughtsTokenCount")):
                 raise ProviderError("PROVIDER_USAGE_INVALID",sent=True)
             mapped["completion_tokens"]=raw.get("candidatesTokenCount",0)+raw.get("thoughtsTokenCount",0)
-    return normalize_usage(mapped,s.get("prompt_cache_accounting",False))
+    return replace(normalize_usage(mapped,s.get("prompt_cache_accounting",False)),
+        provider_usage_facts=capture_usage(raw,semantics=config.api+'/v1'))
 
 
 def native_finish(api,reason,tools=False,incomplete=False):

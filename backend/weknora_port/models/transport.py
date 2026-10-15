@@ -11,7 +11,7 @@ import json
 import os
 import sys
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from urllib.parse import urlencode, urlsplit
 from typing import Callable
 import httpx
@@ -159,14 +159,33 @@ def validate_endpoint(url: str, allowed: frozenset[str]):
         raise ProviderError("MODEL_ENDPOINT_NOT_ALLOWED")
 
 
-@dataclass
 class ResponseHandle:
-    response: httpx.Response
-    usage: TokenUsage
-    outcome: str = "UNKNOWN"
+    def __init__(self,response,usage):
+        self.response,self._usage,self.outcome=response,usage,'UNKNOWN'
+
+    @property
+    def usage(self):return self._usage
+
+    @usage.setter
+    def usage(self,value):
+        old=self._usage.provider_usage_facts
+        new=value.provider_usage_facts
+        if old is not None:
+            if new is None:
+                value=replace(value,provider_usage_facts=old)
+            else:
+                history=old.prior_numeric_raw
+                if old.numeric_raw!=new.numeric_raw:history=(*history,old.numeric_raw)
+                new=replace(new,observed_lower_bound=max(old.accounting()[1],new.accounting()[1]),prior_numeric_raw=history)
+                value=replace(value,provider_usage_facts=new)
+        self._usage=value
 
     def observed(self, usage: TokenUsage, *, outcome: str = "RESPONSE_RECEIVED"):
         self.usage, self.outcome = usage, outcome
+
+    def capture(self, raw):
+        from .usage_facts import capture_usage
+        self.usage=replace(self.usage,provider_usage_facts=capture_usage(raw))
 
 
 class AsyncHTTPTransport:
@@ -212,6 +231,10 @@ class AsyncHTTPTransport:
             url, hashlib.sha256(wire).hexdigest(), len(wire),
             body.get("max_tokens", body.get("max_completion_tokens", body.get("max_output_tokens",
                 (body.get("generationConfig") or {}).get("maxOutputTokens", (body.get("options") or {}).get("num_predict") if config.source=="local" else None)))))
+        binder=getattr(self,'bind_facts',None)
+        if binder is not None:
+            if not self._mock_transport:raise ProviderError('SYNTHETIC_TRANSPORT_REQUIRED')
+            call=replace(call,bound_facts=binder(config,context,body,wire,capability))
         if context.cancelled is not None and context.cancelled.is_set():
             raise CallCancelled()
         try:
@@ -223,6 +246,8 @@ class AsyncHTTPTransport:
         except Exception:
             raise ProviderError("MODEL_SEND_AUTHORIZATION_FAILED") from None
         handle, response, outcome, sent = None, None, "NOT_SENT", False
+        from .usage_facts import SIMULATED_USAGE
+        simulation_token=SIMULATED_USAGE.set(self._mock_transport)
         try:
             if context.cancelled is not None and context.cancelled.is_set():
                 raise CallCancelled()
@@ -309,6 +334,7 @@ class AsyncHTTPTransport:
         except httpx.HTTPError:
             raise ProviderError("PROVIDER_TRANSPORT_ERROR", sent=sent) from None
         finally:
+            SIMULATED_USAGE.reset(simulation_token)
             if lifetime is not None:
                 if isinstance(sys.exc_info()[1], asyncio.CancelledError):
                     lifetime.cancelled_phase = lifetime.phase
@@ -316,8 +342,10 @@ class AsyncHTTPTransport:
             if response is not None:
                 await response.aclose()
             try:
-                await self.gate.finish(call, outcome=handle.outcome if handle is not None else outcome,
-                    usage=handle.usage if handle is not None else TokenUsage())
+                usage=handle.usage if handle is not None else TokenUsage()
+                if usage.provider_usage_facts is not None and self._mock_transport:
+                    usage=replace(usage,provider_usage_facts=replace(usage.provider_usage_facts,simulated=True))
+                await self.gate.finish(call, outcome=handle.outcome if handle is not None else outcome,usage=usage)
             except asyncio.CancelledError:
                 raise
             except Exception:

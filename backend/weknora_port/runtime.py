@@ -105,7 +105,7 @@ class LeasedSendGate:
         app = self.application
         async with app.leases.lease() as guard:
             gate = P1SendGate(guard, tenant_id=app.principal.tenant_id,
-                              permissions=app.permissions, costs=app.costs)
+                              permissions=app.permissions, costs=app.costs,token_authority=app.token_authority)
             return await getattr(gate, name)(call, **kwargs)
 
     async def authorize(self, call):
@@ -206,11 +206,12 @@ class ApplicationRuntime:
     """
     def __init__(self, leases, principal, store, documents, *, model_factory,
                  cipher: SecretCipher, conversation=None, policy=None,
-                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None):
+                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None,token_authority=None):
         self.leases, self.principal = leases, principal
         self.store, self.documents = store, documents
         self.cipher, self.catalogue = cipher, catalogue or SourceCatalogue()
         self.model_factory, self.permissions, self.costs = model_factory, permissions, costs
+        self.token_authority=token_authority
         self.local_service=local_service
         self.conversation = conversation or ConversationSettings()
         self.policy = policy or RouterPolicy()
@@ -229,7 +230,7 @@ class ApplicationRuntime:
         async def after_memory_write(scope, cfg, item):
             if cfg.embedding_model_id:
                 vector=tuple(await asyncio.wait_for(self.memory_models.embed_query(
-                    scope,cfg.embedding_model_id,embeddable_text(item)),10))
+                    scope,cfg.embedding_model_id,embeddable_text(item),operation_id='memory-item/'+item.id+'/embedding'),10))
                 if vector:
                     await self.memory_repository.upsert_item_embedding(scope,item,cfg.embedding_model_id,vector)
         self.memory_manager = MemoryManager(self.memory_repository,self.memory,after_write=after_memory_write)

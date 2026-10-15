@@ -375,6 +375,8 @@ class DocumentLifecycleService:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
                                             "EMBEDDING_ADAPTER_REQUIRED", metadata,image_task=image_task)
                 embedder = await _resolve(self.embedder_for_kb(principal, kb))
+                if callable(getattr(embedder,'for_operation',None)):
+                    embedder=embedder.for_operation(source_version+'/source-embedding',document_id)
                 if embedder is None:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
                                             "EMBEDDING_ADAPTER_REQUIRED", metadata,image_task=image_task)

@@ -1,0 +1,1147 @@
+{
+  "kind": "TWO_REAL_STANDARD_CLI_PROCESSES_CLOSED_MOCK_MODELS",
+  "root": "E:\\WK\\run\\authority-cli-1dd4a918115b",
+  "tenant": 237,
+  "api_argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "backend.weknora_port.entrypoint",
+    "--port",
+    "62957",
+    "--authority-config",
+    "E:\\WK\\run\\authority-cli-1dd4a918115b\\authority.json"
+  ],
+  "worker_argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "backend.weknora_port.worker",
+    "--once",
+    "--authority-config",
+    "E:\\WK\\run\\authority-cli-1dd4a918115b\\authority.json"
+  ],
+  "worker_exitcode": 0,
+  "readiness": {
+    "implementation": "weknora-python-port",
+    "model_send_authority": "configured",
+    "budget_unit": "tokens",
+    "authority_config_sha": "c3bb9622189a35afbdb1b4650ec5e873dd353b25404415dec1d2d0c620c23872"
+  },
+  "answer": {
+    "id": "feee3291-6ff0-4c9b-bf22-b88d6d2961b0",
+    "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01",
+    "role": "assistant",
+    "content": "Blue widgets use W-17. <kb doc=\"protocol\" chunk_id=\"25dd3993-9671-5218-8d0c-57d92a2062bd\" kb_id=\"eb7720d8-1245-4133-98ee-13c7e453fa69\" />",
+    "created_at": "2026-10-15T11:32:46.871630+00:00",
+    "knowledge_references": [
+      {
+        "id": "25dd3993-9671-5218-8d0c-57d92a2062bd",
+        "seq": 1,
+        "score": 0.6448942358540455,
+        "end_at": 0,
+        "content": "# Summary\nBlue widget protocol\n\nBlue widgets use protocol W-17.",
+        "metadata": {
+          "assets": "[]",
+          "sha256": "cb870d8e92225071f0fbbf7d78644683d44bddbcc650385912a35eeaf39194ca",
+          "base_score": "0.0163",
+          "media_type": "text/plain",
+          "chunk_count": "1",
+          "model_score": "0.9000",
+          "processed_at": "2026-10-15T11:32:46.484942+00:00",
+          "index_enabled": "true",
+          "indexed_count": "1",
+          "parser_engine": "plain",
+          "source_version": "4c06d98e-9e5b-4e6d-9913-71f282ebed02",
+          "parser_metadata": "map[document_id:bf7f4955-7cda-469b-81b1-0055f6a7dfc0 file_type:.txt filename:protocol.txt input_bytes:77 knowledge_base_id:eb7720d8-1245-4133-98ee-13c7e453fa69 owner_id:synthetic-1dd4a918115b parser_engine:plain source_version:4c06d98e-9e5b-4e6d-9913-71f282ebed02 status:parsed]"
+        },
+        "start_at": 0,
+        "chunk_type": "summary",
+        "image_info": "",
+        "match_type": 0,
+        "chunk_index": 1,
+        "knowledge_id": "bf7f4955-7cda-469b-81b1-0055f6a7dfc0",
+        "sub_chunk_id": null,
+        "chunk_metadata": {
+          "origin": "model_generated_summary",
+          "upstream_parent_link": true
+        },
+        "knowledge_title": "protocol",
+        "matched_content": "# Summary\nBlue widget protocol\n\nBlue widgets use protocol W-17.",
+        "parent_chunk_id": "5573fd2b-fff9-440c-9963-89f6b31fef27",
+        "knowledge_source": "protocol.txt",
+        "knowledge_base_id": "eb7720d8-1245-4133-98ee-13c7e453fa69",
+        "knowledge_channel": "",
+        "knowledge_filename": "protocol.txt",
+        "knowledge_description": "Blue widgets use protocol W-17."
+      }
+    ],
+    "agent_steps": null,
+    "is_completed": true,
+    "turn_status": "pending",
+    "turn_error_code": "",
+    "knowledge_base_scope": [
+      "eb7720d8-1245-4133-98ee-13c7e453fa69"
+    ],
+    "document_scope": [
+      "bf7f4955-7cda-469b-81b1-0055f6a7dfc0"
+    ]
+  },
+  "worker_task": {
+    "state": "completed",
+    "error_code": ""
+  },
+  "ledger": [
+    {
+      "request_id": "4c06d98e-9e5b-4e6d-9913-71f282ebed02/document-summary",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 2845,
+      "reserved_output": 1024,
+      "held_tokens": 30,
+      "actual_total": 30,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 10,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 30,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+        "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+        "derived_total": 30,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 30
+      }
+    },
+    {
+      "request_id": "4c06d98e-9e5b-4e6d-9913-71f282ebed02/source-embedding",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 213,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "4c06d98e-9e5b-4e6d-9913-71f282ebed02/summary-embedding",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 192,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "89d52a1a-6a3f-4296-a3cb-21915d38160e/document-summary",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 2948,
+      "reserved_output": 1024,
+      "held_tokens": 30,
+      "actual_total": 30,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 10,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 30,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+        "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+        "derived_total": 30,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 30
+      }
+    },
+    {
+      "request_id": "89d52a1a-6a3f-4296-a3cb-21915d38160e/image/0/caption",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 580,
+      "reserved_output": 5000,
+      "held_tokens": 30,
+      "actual_total": 30,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 10,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 30,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+        "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+        "derived_total": 30,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 30
+      }
+    },
+    {
+      "request_id": "89d52a1a-6a3f-4296-a3cb-21915d38160e/image/0/ocr_text",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 1081,
+      "reserved_output": 5000,
+      "held_tokens": 30,
+      "actual_total": 30,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 10,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 30,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+        "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+        "derived_total": 30,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 30
+      }
+    },
+    {
+      "request_id": "89d52a1a-6a3f-4296-a3cb-21915d38160e/source-embedding",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 260,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "89d52a1a-6a3f-4296-a3cb-21915d38160e/summary-embedding",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 192,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01/answer/1/cheap",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 5560,
+      "reserved_output": 1024,
+      "held_tokens": 30,
+      "actual_total": 30,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 10,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 30,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+        "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+        "derived_total": 30,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 30
+      }
+    },
+    {
+      "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01/query-embedding-eb7720d8-1245-4133-98ee-13c7e453fa69-08c07051187ca5d4",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 133,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01/query-embedding-eb7720d8-1245-4133-98ee-13c7e453fa69-2ea88c7a30351b12",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 134,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01/query-embedding-eb7720d8-1245-4133-98ee-13c7e453fa69-98134dca8ff1c117",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 147,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    },
+    {
+      "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01/query_rewrite",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 11186,
+      "reserved_output": 150,
+      "held_tokens": 30,
+      "actual_total": 30,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 10,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 30,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+        "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+        "derived_total": 30,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 30
+      }
+    },
+    {
+      "request_id": "af8fe6e6-6bf1-4656-876e-e11f1b148c01/rerank",
+      "provider": "siliconflow",
+      "state": "settled",
+      "reserved_input": 292,
+      "reserved_output": 0,
+      "held_tokens": 20,
+      "actual_total": 20,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 20,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": true,
+        "raw_sha256": "33b9971aca76a80df6c1e9211248734615b331f8dfba793711005438c430f159",
+        "numeric_raw": "{\"prompt_tokens\":20,\"total_tokens\":20}",
+        "derived_total": null,
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 20
+      }
+    }
+  ],
+  "replay_new_claims": 0,
+  "real_provider_calls": 0,
+  "api_forced_stop_exitcode": 1,
+  "api_restart_forced_stop_exitcode": 1,
+  "restart_claims": 0,
+  "worker_replay_exitcode": 0,
+  "disabled_api_argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "backend.weknora_port.entrypoint",
+    "--port",
+    "62957"
+  ],
+  "disabled_status": 503
+}

@@ -51,6 +51,7 @@ class SQLDouble:
         if 'pg_control_system()' in sql:return Cursor([dict(database=POLICY.database,system_identifier='fixture-new')])
         if sql.startswith("SELECT (date_trunc"):return Cursor([dict(month=MONTH)])
         if sql.startswith('SELECT pg_advisory'):return Cursor([])
+        if sql.startswith("SELECT to_regclass('port_call_slots')"):return Cursor([{'slots':None}])
         if sql.startswith('SELECT'):return Cursor(self.answers.pop(0) if self.answers else [])
         return Cursor([])
     @asynccontextmanager

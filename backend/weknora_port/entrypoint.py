@@ -30,18 +30,31 @@ def create_app(*,settings=None,runtime_factory=None):
     @app.get('/readyz')
     async def ready():
         from fastapi.responses import JSONResponse
-        authorized=proxy.target.permissions is not None and proxy.target.costs is not None
-        return JSONResponse({'implementation':'weknora-python-port','model_send_authority':'configured' if authorized else 'DENY_UNCONFIGURED'},status_code=200 if authorized else 503)
+        runtime=proxy.target
+        token=getattr(runtime,'token_authority',None)
+        authorized=runtime.permissions is not None and (runtime.costs is not None or token is not None)
+        if token is not None:
+            from datetime import datetime,timezone
+            from .authority import ConfiguredTokenAuthority,ServerPermissionResolver
+            now=datetime.now(timezone.utc)
+            authorized=(isinstance(token,ConfiguredTokenAuthority) and isinstance(runtime.permissions,ServerPermissionResolver)
+                and token.settings.expires_at>now and token.settings.month==now.date().replace(day=1)
+                and token.settings.subject_id==runtime.principal.subject_id and token.settings.tenant_id==runtime.principal.tenant_id)
+        return JSONResponse({'implementation':'weknora-python-port','model_send_authority':'configured' if authorized else 'DENY_UNCONFIGURED',
+            'budget_unit':'tokens' if token is not None else 'money' if authorized else 'disabled','authority_config_sha':getattr(runtime,'authority_config_sha',None)},status_code=200 if authorized else 503)
     return app
 
 
 def main():
     parser=argparse.ArgumentParser(description='WeKnora Python development API; explicit isolated environment required')
     parser.add_argument('--host',default='127.0.0.1');parser.add_argument('--port',type=int,default=8000)
+    parser.add_argument('--authority-config')
     args=parser.parse_args()
     import uvicorn
     import asyncio
-    server=uvicorn.Server(uvicorn.Config('backend.weknora_port.entrypoint:create_app',factory=True,host=args.host,port=args.port))
+    from .authority import runtime_factory
+    app=create_app(runtime_factory=runtime_factory(args.authority_config))
+    server=uvicorn.Server(uvicorn.Config(app,host=args.host,port=args.port))
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:runner.run(server.serve())
 
 if __name__=='__main__':main()

@@ -172,6 +172,7 @@ class ProviderModel:
                                 reasoning_signature=state.metadata.get("reasoning_signature",""))
                         else:
                             env = decode_json(await handle.response.aread())
+                            if self.config.api=="openai-completions" and "usage" in env:handle.capture(env.get("usage"))
                             # Retain real counters even when response identity fails.
                             handle.usage=(normalize_usage(env.get("usage"),self.config.chat.prompt_cache_accounting)
                                 if self.config.api=="openai-completions" else native_usage(self.config,
@@ -227,6 +228,7 @@ class ProviderModel:
                                 if not raw:
                                     continue
                                 env = decode_json(raw)
+                                if self.config.api=="openai-completions" and "usage" in env:handle.capture(env.get("usage"))
                                 # Usage can arrive even on a mismatched/error answer.
                                 # Retain counters without treating the answer as valid.
                                 if env.get("usage") is not None:
@@ -296,6 +298,7 @@ class ProviderModel:
             async with self.transport.open(effective, "/api/chat", body, context,
                     capability=_capability, stream=False, lifetime=lifetime) as handle:
                 env = decode_json(await handle.response.aread())
+                if self.config.api=="openai-completions" and "usage" in env:handle.capture(env.get("usage"))
                 assert_response_identity(env,self.config)
                 response = parse_ollama_response(env, self.config)
                 handle.observed(response.usage)
@@ -392,6 +395,7 @@ class ProviderModel:
                 body = build_embedding_body(self.config, batch, kind)
                 async with self.transport.open(self.config, s.path or "/embeddings", body, ctx, capability="embedding", lifetime=lifetime) as handle:
                     env = decode_json(await handle.response.aread())
+                    if self.config.api=="openai-completions" and "usage" in env:handle.capture(env.get("usage"))
                     usage = normalize_usage(env.get("usage"))
                     handle.observed(usage)
                     assert_response_identity(env, self.config)
@@ -440,6 +444,7 @@ class ProviderModel:
                 body = build_rerank_body(self.config, query, batch)
                 async with self.transport.open(self.config, s.path or "/rerank", body, ctx, capability="rerank", lifetime=lifetime) as handle:
                     env = decode_json(await handle.response.aread())
+                    if self.config.api=="openai-completions" and "usage" in env:handle.capture(env.get("usage"))
                     usage = normalize_usage(env.get("usage"))
                     handle.observed(usage)
                     assert_response_identity(env, self.config)
