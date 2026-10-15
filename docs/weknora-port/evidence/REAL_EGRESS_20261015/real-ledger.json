@@ -1,0 +1,191 @@
+{
+  "kind": "REAL_PROVIDER_GRADED_CALLS",
+  "real_provider_calls": 2,
+  "ledger": [
+    {
+      "request_id": "real/embedding-0",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "state": "settled",
+      "outcome": "RESPONSE_RECEIVED",
+      "reserved_input": 85,
+      "reserved_output": 0,
+      "known_lower_bound": 14,
+      "held_tokens": 14,
+      "actual_total": 14,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 14,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 0,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 14,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": false,
+        "raw_sha256": "9a12eb563f8ca93e7ce761722ca0837d5e11942c2405de7bf2a713438c2d5e58",
+        "numeric_raw": "{\"completion_tokens\":0,\"prompt_tokens\":14,\"total_tokens\":14}",
+        "derived_total": 14,
+        "reported_total": {
+          "path": "total_tokens",
+          "valid": true,
+          "value": 14,
+          "present": true
+        },
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 14
+      },
+      "bound_source": "wire-bytes-upper-bound/v1",
+      "permission_source": "OWNER:20261015-real-egress"
+    },
+    {
+      "request_id": "real/answer/1/cheap",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "capability": "chat",
+      "state": "unknown",
+      "outcome": "RESPONSE_RECEIVED",
+      "reserved_input": 195,
+      "reserved_output": 64,
+      "known_lower_bound": 221,
+      "held_tokens": 259,
+      "actual_total": null,
+      "usage_facts": {
+        "fields": [
+          [
+            "input",
+            {
+              "path": "prompt_tokens",
+              "valid": true,
+              "value": 44,
+              "present": true
+            }
+          ],
+          [
+            "output",
+            {
+              "path": "completion_tokens",
+              "valid": true,
+              "value": 177,
+              "present": true
+            }
+          ],
+          [
+            "total",
+            {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 221,
+              "present": true
+            }
+          ],
+          [
+            "cache_read",
+            {
+              "path": "prompt_cache_hit_tokens",
+              "valid": true,
+              "value": 0,
+              "present": true
+            }
+          ],
+          [
+            "cache_write",
+            {
+              "path": "cache_creation_input_tokens",
+              "valid": false,
+              "value": null,
+              "present": false
+            }
+          ],
+          [
+            "cache_miss",
+            {
+              "path": "prompt_cache_miss_tokens",
+              "valid": true,
+              "value": 44,
+              "present": true
+            }
+          ]
+        ],
+        "semantics": "openai-input-inclusive/v1",
+        "simulated": false,
+        "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+        "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+        "derived_total": 221,
+        "reported_total": {
+          "path": "total_tokens",
+          "valid": true,
+          "value": 221,
+          "present": true
+        },
+        "prior_numeric_raw": [],
+        "observed_lower_bound": 221
+      },
+      "bound_source": "wire-bytes-upper-bound/v1",
+      "permission_source": "OWNER:20261015-real-egress"
+    }
+  ],
+  "months": [
+    {
+      "account_id": "deepseek-owner-main",
+      "provider": "deepseek",
+      "month": "2026-10-01",
+      "limit_tokens": 1000000,
+      "carry_in_tokens": 0,
+      "carry_status": "KNOWN",
+      "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+      "blocked_reason": "USAGE_EXCEEDS_RESERVATION"
+    }
+  ],
+  "note": "no key values present"
+}
