@@ -1,0 +1,59 @@
+{
+  "probe": "M0 local model capabilities",
+  "status": "PASS",
+  "cloud_enabled": false,
+  "local_only": true,
+  "models": {
+    "chat": "qwen3.5:4b",
+    "embedding": "bge-m3:latest"
+  },
+  "checks": [
+    {
+      "name": "ollama_list",
+      "exit_code": 0,
+      "output": "NAME             ID              SIZE      MODIFIED    \nqwen3.5:4b       2a654d98e6fb    3.4 GB    2 weeks ago    \nbge-m3:latest    790764642607    1.2 GB    2 weeks ago    \nornith-1.5:9b    e5df7dcdd8a2    6.6 GB    2 weeks ago",
+      "expected_models_present": true
+    },
+    {
+      "name": "ollama_show_chat",
+      "exit_code": 0,
+      "output": "Model\n    architecture        qwen35    \n    parameters          4.7B      \n    context length      262144    \n    embedding length    2560      \n    quantization        Q4_K_M    \n    requires            0.17.1    \n\n  Capabilities\n    completion     \n    vision         \n    tools          \n    thinking       \n        levels     false, true    \n        default    true           \n\n  Parameters\n    presence_penalty    1.5     \n    temperature         1       \n    top_k               20      \n    top_p               0.95    \n\n  License\n    Apache License               \n    Version 2.0, January 2004    \n    ..."
+    },
+    {
+      "name": "ollama_show_embedding",
+      "exit_code": 0,
+      "output": "Model\n    architecture        bert       \n    parameters          566.70M    \n    context length      8192       \n    embedding length    1024       \n    quantization        F16        \n\n  Capabilities\n    embedding    \n\n  License\n    MIT License                        \n    Copyright (c) [year] [fullname]    \n    ..."
+    },
+    {
+      "name": "ollama_version",
+      "http_status": 200,
+      "latency_ms": 35.1,
+      "response": {
+        "version": "0.34.4"
+      }
+    },
+    {
+      "name": "structured_chat",
+      "http_status": 200,
+      "latency_ms": 9395.5,
+      "content": {
+        "answer": 1,
+        "ok": true
+      },
+      "response": {
+        "done_reason": "stop"
+      },
+      "valid_json": true
+    },
+    {
+      "name": "embedding",
+      "http_status": 200,
+      "latency_ms": 3413.7,
+      "dimensions": 1024,
+      "response": {
+        "model": "bge-m3:latest"
+      },
+      "expected_dimensions": true
+    }
+  ]
+}
