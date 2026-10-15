@@ -1,7 +1,8 @@
 # 任务三专项审查：真实工具与公开语料评测（只读盘点 + 无外发分层执行）
 
 - 审查者：本轮执行者。基线 HEAD：`ee5919f`（任务二提交）。
-- 结论：**层 1（真实 Office 转换）PASS；层 2（真实本地 Ollama）PASS（本地、零外发）；层 3（云端真实模型）BLOCKED（本交接无新授权）；层 4–6（真实最小问答闭环／三模式对照／准确性指标）BLOCKED 且不作任何准确率声明。**
+- **更正（2026-10-15，Owner 指令）**：本报告早期版本把**测试夹具**角色（`siliconflow Qwen/Qwen3-VL-32B-Instruct`）当作正式 VLM 选择，**这是错的**。正式五角色以 Owner 方案为准：**vision 与 expensive 同为 `deepseek` / `deepseek-flash`**（来源：`deploy/service-policy.example.json` 策略 `owner-20261011-deepseek-normal-v1`（roles=[chat_expensive,vision]，limit=1000000）、`docs/model-provider-registry.md`、`backend/weknora_port/generation/router.py:6`、`deploy/clean-slate/models.json`）。模型 ID 来源全表见 `docs/weknora-port/COMPLETION_STATUS_CORRECTION_20261015.md`。
+- 结论（更正后）：**层 1（真实 Office 转换）PASS；层 2（真实本地 Ollama）PASS（本地、零外发）；层 3 云端真实模型、层 4–6（真实最小问答闭环／三模式对照／准确性指标）BLOCKED 且不作任何准确率声明。本任务只在隔离/模拟层完成，真实问答与评测仍未完成。**
 - 全程`real_provider_calls=0`；未下载任何大模型、未重建环境、未上传新私有数据。
 
 ## 1. 层 0：只读盘点（事实与出处）
@@ -20,7 +21,7 @@
 
 **模型配置**
 - 角色存储：`storage/configuration.py` L49-107（`port_model_configuration`：embedding/rerank/cheap/expensive/vlm）；解析：`model_registry.py` L36-66（`SourceCatalogue.resolve`，支持 local/remote source）。
-- 文档 `docs/RUNNING.md` L13：默认角色 SiliconFlow `BAAI/bge-m3`（普通）、cheap `XingChenAGI/Xing4.0-29B`、expensive/vision `deepseek-flash`；rerank 角色为 `BAAI/bge-reranker-v2-m3`（见 `tests/weknora_port/test_authority_cli_pg.py`）。
+- **正式角色**（来源：`docs/model-provider-registry.md`、`deploy/clean-slate/models.json`、`deploy/service-policy.example.json`、`generation/router.py:6`）：embedding siliconflow `BAAI/bge-m3`；rerank siliconflow `BAAI/bge-reranker-v2-m3`；cheap siliconflow `XingChenAGI/Xing4.0-29B`；expensive **deepseek `deepseek-flash`**；vision **deepseek `deepseek-flash`**（与 expensive 共用 1,000,000/月）。`docs/RUNNING.md` L13 为历史 Go 服务记录且一致；测试夹具 `test_authority_cli_pg.py` 的 vlm 值为**夹具专用，非正式选择**。
 - **本机无本地 rerank 模型**，故配置的 rerank/cheap/expensive 角色只能走云端。
 
 **公开语料与 Gold**
@@ -64,8 +65,10 @@
 | embedding | siliconflow `BAAI/bge-m3` | 入库/检索向量 | 与月限共用 |
 | rerank | siliconflow `BAAI/bge-reranker-v2-m3` | 混合检索重排 | 同上 |
 | cheap | siliconflow `XingChenAGI/Xing4.0-29B` | 动态路由低档 | 同上 |
-| expensive | deepseek `deepseek-flash` | 动态路由高档/vision | 同上 |
-| vlm | siliconflow `Qwen/Qwen3-VL-32B-Instruct` | 图像 OCR/Caption | 同上 |
+| expensive（chat_expensive） | deepseek `deepseek-flash` | 动态路由高档 | **1,000,000/月（与 vision 共用）** |
+| vision（vlm） | **deepseek `deepseek-flash`** | 图像 OCR/Caption | **与 expensive 共用 1,000,000/月** |
+
+正式角色来源：`deploy/service-policy.example.json`（`owner-20261011-deepseek-normal-v1`: deepseek/`deepseek-flash`, roles=[chat_expensive,vision], limit=1000000）、`docs/model-provider-registry.md`、`deploy/clean-slate/models.json`、`generation/router.py:6`、`models/catalog_resources/models.generated.json`（`deepseek-flash` = "DeepSeek V4.1 Flash"）。**测试夹具与隔离库中的 Qwen VLM 不是正式选择。**
 
 - 月度上限：`limit_tokens = 1,000,000`（任务一 authority 配置固定值）；单调用上界：`input_limit=200000`、`output_limit=8192`（合成配置值，**真实供应商语义未核实**）。
 - 待批准数据：冻结公开语料（SciFact 5183 / MIRACL-ZH 6000 / LongBench 400 / Hotpot 73 / MML 3 / Omni 24 页）与 40 题 Gold；仓库内 `evaluations/core.jsonl`（20）+ `quality_v1.jsonl`（9）。

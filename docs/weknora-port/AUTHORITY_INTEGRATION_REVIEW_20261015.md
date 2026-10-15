@@ -1,5 +1,7 @@
 # 任务二专项审查：装配改动后的整合验收（标准 CLI / worker + 五项主链检查）
 
+> **更正（2026-10-15）**：本任务只在隔离 PG/Redis + 合成/closed MockTransport 层完成；**真实浏览器与真实模型 NOT RUN**，真实问答未验证。见 `docs/weknora-port/COMPLETION_STATUS_CORRECTION_20261015.md`。
+
 - 审查者：本轮执行者。基线 HEAD：`4fa522b70ddd40667b16f783221044c33f7cca53`（任务一提交）。
 - 结论：**PASS（API／HTTP 层与真实标准 CLI 进程、隔离 PG/Redis、closed MockTransport 范围）**。
   **真实浏览器本轮 NOT RUN**；**authority 模式下追问／隔离／路由升级的 wire 级断言为复用证据，非本轮新跑**。
