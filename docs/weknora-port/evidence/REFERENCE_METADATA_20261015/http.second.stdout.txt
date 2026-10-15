@@ -1,0 +1,35 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing _
+tests\weknora_port\test_reference_metadata_pg.py:81: in test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_reference_metadata_pg.py:39: in scenario
+    assert reply.status_code==200 and reply.json()['data']['status']=='completed',reply.text
+E   AssertionError: {"data":{"id":"89f4dc6e-c412-4b4d-a7cc-184da49d03b8","knowledge_base_id":"08c8844e-dad9-4d47-820d-93cf77155783","filename":"source.txt","status":"pending","error_code":"POSTPROCESSOR_PENDING"},"meta":{"request_id":"f011fa69-ad13-4b07-9f44-84e06156508a"}}
+E   assert (200 == 200 and 'pending' == 'completed'
+E    +  where 200 = <Response [200 OK]>.status_code
+E     
+E     - completed
+E     + pending)
+============================== warnings summary ===============================
+tests/weknora_port/test_reference_metadata_pg.py::test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_reference_metadata_pg.py::test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_reference_metadata_pg.py::test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+1 failed, 2 warnings in 3.16s

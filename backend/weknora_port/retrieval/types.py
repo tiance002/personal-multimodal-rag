@@ -31,6 +31,8 @@ class SearchResult:
     content_revision: int = 0
     is_enabled: bool = True
     matched_content: str = ""
+    seq: int = 0
+    knowledge_channel: str = ""
 
 
 @dataclass

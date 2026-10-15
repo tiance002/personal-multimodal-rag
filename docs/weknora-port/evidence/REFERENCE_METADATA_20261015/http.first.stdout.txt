@@ -1,0 +1,31 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing _
+tests\weknora_port\test_reference_metadata_pg.py:77: in test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_reference_metadata_pg.py:40: in scenario
+    assert len(chunks)==1 and chunks[0]['content']==source
+E   AssertionError: assert (2 == 1)
+E    +  where 2 = len([{'id': '533e9912-449d-45c9-9f0d-56e07b90a11f', 'content': 'Blue widgets use W-17. 涓煒€A.', 'start_at': 0, 'end_at': 27}...otocol\n\nThe source handbook says blue widgets use protocol W-17. Keep the widgets dry.', 'start_at': 0, 'end_at': 0}])
+============================== warnings summary ===============================
+tests/weknora_port/test_reference_metadata_pg.py::test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_reference_metadata_pg.py::test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_reference_metadata_pg.py::test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing
+1 failed, 2 warnings in 3.39s

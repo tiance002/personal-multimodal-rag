@@ -1,6 +1,6 @@
 """Original ordinary completion messages and request-local source handles."""
 from __future__ import annotations
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 import hashlib, json
 from urllib.parse import urlsplit
 from ..models.types import Message
@@ -25,11 +25,40 @@ class Evidence:
     published_at: str = ''
     score: float = 0.0
     source_content: str = ''
+    # Source character offsets: Unicode code points, half-open; zero is data.
+    start_at: int = 0
+    end_at: int = 0
+    seq: int = 0
+    match_type: int = 0
+    sub_chunk_ids: tuple[str, ...] | None = None
+    metadata: dict | None = None
+    parent_chunk_id: str = ''
+    image_info: str = ''
+    knowledge_channel: str = ''
+    chunk_metadata: dict = field(default_factory=dict)
+    matched_content: str = ''
+    knowledge_description: str = ''
+    knowledge_custom_metadata: str = ''
+
+    def __post_init__(self):
+        if type(self.start_at) is not int or type(self.end_at) is not int:
+            raise ValueError('EVIDENCE_SOURCE_OFFSETS_MUST_BE_INTEGERS')
 
     @classmethod
     def from_result(cls, row):
         from ..retrieval.context import enriched_chat_passage
-        return cls(row.id, enriched_chat_passage(row), row.knowledge_id, row.knowledge_base_id, row.knowledge_title, row.knowledge_filename, row.chunk_index, row.chunk_type, row.knowledge_source, str((row.metadata or {}).get('published_at', '')), row.score, row.content)
+        from copy import deepcopy
+        # Internal retrieval names encode the pinned types/embedding.go enum.
+        kinds={'':0,'embedding':0,'keywords':1,'nearby':2,'history':3,'parent':4,
+               'relation':5,'graph':6,'web_search':7,'direct_load':8,'data_analysis':9}
+        match_type=row.match_type if type(row.match_type) is int else kinds[row.match_type]
+        return cls(row.id, enriched_chat_passage(row), row.knowledge_id, row.knowledge_base_id, row.knowledge_title, row.knowledge_filename, row.chunk_index, row.chunk_type, row.knowledge_source, str((row.metadata or {}).get('published_at', '')), row.score, row.content,
+            start_at=row.start_at,end_at=row.end_at,seq=row.seq,match_type=match_type,
+            sub_chunk_ids=tuple(row.sub_chunk_ids) if row.sub_chunk_ids else None,
+            metadata=deepcopy(row.metadata),parent_chunk_id=row.parent_chunk_id,image_info=row.image_info,
+            knowledge_channel=row.knowledge_channel,chunk_metadata=deepcopy(row.chunk_metadata),
+            matched_content=row.matched_content,knowledge_description=row.knowledge_description,
+            knowledge_custom_metadata=row.knowledge_custom_metadata)
 
 @dataclass(frozen=True)
 class History:

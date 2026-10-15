@@ -297,8 +297,23 @@ class GenerationCoordinator:
         used = set(registry.used_handles)
         chunk_ids = {ref[0] for handle, ref in snapshot.chunks if handle in used}
         urls = {url for handle, url, title in snapshot.webs if handle in used}
-        references = tuple(({'id': e.id, 'content': e.source_content or e.content, 'score': e.score, 'knowledge_id': e.knowledge_id, 'knowledge_base_id': e.knowledge_base_id, 'knowledge_title': e.knowledge_title, 'knowledge_filename': e.knowledge_filename, 'chunk_index': e.chunk_index, 'chunk_type': e.chunk_type, 'knowledge_source': e.knowledge_source} for e in request.evidence if e.id in chunk_ids or e.id in urls))
-        return references
+        references=[]
+        for e in request.evidence:
+            if e.id not in chunk_ids and e.id not in urls:continue
+            row={'id':e.id,'content':e.source_content or e.content,'score':e.score,
+                 'knowledge_id':e.knowledge_id,'knowledge_base_id':e.knowledge_base_id,
+                 'knowledge_title':e.knowledge_title,'knowledge_filename':e.knowledge_filename,
+                 'chunk_index':e.chunk_index,'chunk_type':e.chunk_type,'knowledge_source':e.knowledge_source,
+                 'start_at':e.start_at,'end_at':e.end_at,'seq':e.seq,'match_type':e.match_type,
+                 'sub_chunk_id':list(e.sub_chunk_ids) if e.sub_chunk_ids is not None else None,
+                 'metadata':e.metadata,'parent_chunk_id':e.parent_chunk_id,'image_info':e.image_info,
+                 'knowledge_channel':e.knowledge_channel}
+            # Match upstream SearchResult JSON omitempty, without losing populated metadata.
+            for name in ('chunk_metadata','matched_content','knowledge_description','knowledge_custom_metadata'):
+                value=getattr(e,name)
+                if value:row[name]=value
+            references.append(row)
+        return tuple(references)
 
     async def _fixed_fallback(self,request,context,*,attempts=(),route=None,partial='',buffered=False):
         from ..references.registry import SourceRegistry
