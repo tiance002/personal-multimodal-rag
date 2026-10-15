@@ -1,0 +1,71 @@
+{
+  "commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "status": "SOURCE_READ; no new full Go upload run",
+  "files": {
+    "internal/application/service/knowledge_process.go": {
+      "sha256": "66756daeb35e39d7d043c9600bee9baff17ef0ac02c02704beaa508356f901fe",
+      "ranges": [
+        {
+          "start": 1247,
+          "end": 1258,
+          "text": "\tdefer func() {\n\t\t// Decrement the parent's enrichment counter on terminal exit.\n\t\t// \"Terminal\" is keyed on the value RETURNED to asynq, not on\n\t\t// summaryErr: several branches record a failure on the span\n\t\t// (summaryErr != nil) yet deliberately `return nil` so asynq does\n\t\t// NOT retry (e.g. insufficient text content, KB/knowledge fetch\n\t\t// failures). Those are terminal and must drain — keying on\n\t\t// summaryErr would skip them and leave the row stuck in\n\t\t// \"finalizing\". When we DO return an error asynq will retry, so\n\t\t// we only drain on the final attempt.\n\t\tfinalizeSubtaskDetached(ctx, s.repo, payload.KnowledgeID, \"summary\",\n\t\t\tretErr, false, isFinalAsynqAttempt(ctx))"
+        },
+        {
+          "start": 1276,
+          "end": 1295,
+          "text": "\t// Get knowledge base\n\tkb, err := s.kbService.GetKnowledgeBaseByID(ctx, payload.KnowledgeBaseID)\n\tif err != nil {\n\t\tlogger.Errorf(ctx, \"Failed to get knowledge base: %v\", err)\n\t\tsummaryErr = err\n\t\treturn nil\n\t}\n\t// Capture the resolved model id on the span output the moment we\n\t// know it — debugging \"summary stage took 60s\" benefits hugely from\n\t// seeing WHICH chat model was actually used (kb config drift, fall-\n\t// throughs to a slow upstream, etc.).\n\tsummaryOut[\"model_id\"] = kb.SummaryModelID\n\tprofileKB = kb\n\n\tif kb.SummaryModelID == \"\" {\n\t\tlogger.Warn(ctx, \"Knowledge base summary model ID is empty, skipping summary generation\")\n\t\t_ = s.repo.UpdateKnowledgeColumn(ctx, payload.KnowledgeID, \"summary_status\", types.SummaryStatusFailed)\n\t\tsummaryOut[\"skipped\"] = \"no_summary_model\"\n\t\treturn nil\n\t}"
+        }
+      ]
+    },
+    "internal/application/service/knowledge_post_process.go": {
+      "sha256": "4a04fd35dcb2cf5b5deac2c362e93b056191f84196e0e533aaeca6fc3a8309a8",
+      "ranges": [
+        {
+          "start": 193,
+          "end": 211,
+          "text": "\t// 3. Compute the enrichment subtask count up front so we can flip to\n\t//    \"finalizing\" with the right counter BEFORE spawning any subtasks.\n\t//    Each subtask handler atomically decrements pending_subtasks_count\n\t//    on its terminal exit; the row promotes itself to \"completed\" when\n\t//    the counter hits zero (see knowledgeRepository.FinalizeSubtask).\n\t//\n\t//    Wiki ingest IS counted (as a single subtask): although it's a\n\t//    KB-scoped debounced batch, each upload enqueues exactly one\n\t//    per-knowledge op, and the batch worker calls FinalizeSubtask once\n\t//    when that op reaches a terminal state (mapped successfully or\n\t//    dead-lettered after exhausting retries). Counting it keeps the row\n\t//    in \"finalizing\" — i.e. shown as in-progress and still cancellable —\n\t//    until wiki generation actually finishes instead of flipping to\n\t//    completed while wiki runs minutes later. A wiki op that never\n\t//    drains is bounded by the housekeeping finalizing sweep.\n\twillSpawnSummary := eff.SummaryEnabled && len(textChunks) > 0\n\twillSpawnQuestion := len(textChunks) > 0 && kb.NeedsEmbeddingModel() &&\n\t\teff.QuestionGenerationConfig.Enabled\n\twillSpawnWiki := kb.IndexingStrategy.WikiEnabled && len(textChunks) > 0"
+        },
+        {
+          "start": 295,
+          "end": 306,
+          "text": "\tcase expectedSubtasks == 0:\n\t\tcompleted, err := s.knowledgeRepo.CompleteProcessingWithoutSubtasks(ctx, payload.KnowledgeID)\n\t\tif err != nil {\n\t\t\ts.tracker().FailSpan(ctx, postSpan, \"COMPLETION_FAILED\", err.Error(), err)\n\t\t\treturn fmt.Errorf(\"complete knowledge without enrichment: %w\", err)\n\t\t}\n\t\tif !completed {\n\t\t\toutput := types.JSONMap{\"skipped\": \"knowledge_no_longer_processing\"}\n\t\t\ts.tracker().EndSpan(ctx, postSpan, output)\n\t\t\ts.tracker().FinalizeAttempt(ctx, payload.KnowledgeID, attempt, types.SpanStatusDone, output, \"\", \"\")\n\t\t\treturn nil\n\t\t}"
+        },
+        {
+          "start": 338,
+          "end": 348,
+          "text": "\t\tif promoted {\n\t\t\tenteredFinalizing = true\n\t\t\t// Reflect summary status separately so the UI shows the\n\t\t\t// summary as queued for users who already had it visible.\n\t\t\tsummaryStatus := types.SummaryStatusNone\n\t\t\tif willSpawnSummary {\n\t\t\t\tsummaryStatus = types.SummaryStatusPending\n\t\t\t}\n\t\t\tif err := s.knowledgeRepo.UpdateKnowledgeColumn(ctx,\n\t\t\t\tpayload.KnowledgeID, \"summary_status\", summaryStatus); err != nil {\n\t\t\t\tlogger.Warnf(ctx, \"[KnowledgePostProcess] Failed to update summary_status for %s: %v\","
+        }
+      ]
+    },
+    "internal/application/service/model.go": {
+      "sha256": "ff0f47fe7e78547c570652698c0f29c5816bf02b9655c0016c98b069bc55f1f6",
+      "ranges": [
+        {
+          "start": 589,
+          "end": 615,
+          "text": "// GetChatModel retrieves and initializes a chat model instance\n// Takes a model ID and returns a Chat interface implementation\nfunc (s *modelService) GetChatModel(ctx context.Context, modelId string) (chat.Chat, error) {\n\t// Check if model ID is empty\n\tif modelId == \"\" {\n\t\tlogger.Error(ctx, \"Model ID is empty\")\n\t\treturn nil, errors.New(\"model ID cannot be empty\")\n\t}\n\n\ttenantID := types.MustTenantIDFromContext(ctx)\n\n\t// Get the model directly from repository to avoid status checks\n\tmodel, err := s.repo.GetByID(ctx, tenantID, modelId)\n\tif err != nil {\n\t\tlogger.ErrorWithFields(ctx, err, map[string]interface{}{\n\t\t\t\"model_id\":  modelId,\n\t\t\t\"tenant_id\": tenantID,\n\t\t})\n\t\treturn nil, err\n\t}\n\n\tif model == nil {\n\t\tlogger.Error(ctx, \"Chat model not found\")\n\t\treturn nil, ErrModelNotFound\n\t}\n\n\tlogger.Infof(ctx, \"Getting chat model: %s, source: %s\", model.Name, model.Source)"
+        }
+      ]
+    },
+    "internal/application/service/knowledge.go": {
+      "sha256": "c103de214235aae1425e2379972a3b42a0b75445af505298e0860460a7b868a1",
+      "ranges": [
+        {
+          "start": 229,
+          "end": 243,
+          "text": "func finalizeSubtaskDetached(\n\tctx context.Context,\n\trepo interfaces.KnowledgeRepository,\n\tknowledgeID, source string,\n\tretErr error,\n\tsuperseded, final bool,\n) {\n\twillDrain := repo != nil && knowledgeID != \"\" && !superseded && (retErr == nil || final)\n\tif !willDrain {\n\t\treturn\n\t}\n\tdctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), finalizeSubtaskDetachedTimeout)\n\tdefer cancel()\n\tif _, _, err := repo.FinalizeSubtask(dctx, knowledgeID); err != nil {\n\t\tlogger.Warnf(ctx, \"finalize subtask decrement failed source=%s knowledge=%s err=%v\","
+        }
+      ]
+    },
+    "internal/application/repository/knowledge.go": {
+      "sha256": "3c06d576a4e9e9a0236692c811180482994aceedea4af4cc89f3b28cb63b9d0a",
+      "ranges": [
+        {
+          "start": 697,
+          "end": 719,
+          "text": "\t// 2) Guarded promote. EVERY caller unconditionally attempts this after\n\t//    decrementing — we must NOT gate it on a separate SELECT of the\n\t//    counter. That read can be served by a lagging read-replica (or a\n\t//    stale connection snapshot) and return a non-zero value even after\n\t//    the counter has truly reached zero on the primary; if every caller\n\t//    trusts that stale read, NONE of them runs the promote and the row\n\t//    is stranded in `finalizing` forever (the observed \"stuck\n\t//    pending_subtasks_count\" bug). The promote is a WRITE, so it executes\n\t//    on the primary and its `pending_subtasks_count = 0` WHERE clause is\n\t//    the single authoritative, atomic check on the live row: only the\n\t//    caller whose decrement actually brought the counter to zero matches,\n\t//    and cancel/delete cannot be clobbered by a late promote.\n\tpromoteRes := db.Model(&types.Knowledge{}).\n\t\tWhere(\"id = ? AND parse_status = ? AND pending_subtasks_count = 0\",\n\t\t\tid, types.ParseStatusFinalizing).\n\t\tUpdates(map[string]interface{}{\n\t\t\t\"parse_status\":  types.ParseStatusCompleted,\n\t\t\t\"error_message\": \"\",\n\t\t\t\"processed_at\":  now,\n\t\t\t\"updated_at\":    now,\n\t\t})\n\tif promoteRes.Error != nil {\n\t\treturn false, promoteRes.Error"
+        }
+      ]
+    }
+  }
+}

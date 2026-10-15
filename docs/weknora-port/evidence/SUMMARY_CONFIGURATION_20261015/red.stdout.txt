@@ -1,0 +1,25 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+____ test_source_summary_configuration_terminal_state_and_actual_qa[False] ____
+tests\weknora_port\test_summary_configuration_pg.py:48: in test_source_summary_configuration_terminal_state_and_actual_qa
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_summary_configuration_pg.py:27: in scenario
+    assert reply.status_code==200 and reply.json()['data']['status']=='completed',reply.text
+E   AssertionError: {"data":{"id":"11084bc4-518b-4ce4-b284-efa5862e9f9a","knowledge_base_id":"b555bd7a-e8b0-43ba-b77c-17d9e44d8e1d","filename":"summary-case.txt","status":"pending","error_code":"POSTPROCESSOR_PENDING"},"meta":{"request_id":"d7da2d59-fde7-4e25-911e-d4c968f05b22"}}
+E   assert (200 == 200 and 'pending' == 'completed'
+E    +  where 200 = <Response [200 OK]>.status_code
+E     
+E     - completed
+E     + pending)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_summary_configuration_pg.py::test_source_summary_configuration_terminal_state_and_actual_qa[False]
+1 failed, 1 passed in 4.73s

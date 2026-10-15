@@ -163,7 +163,17 @@ class SourceDocumentPostprocessor:
         if isinstance(strategy,str):strategy=json.loads(strategy)
         if strategy.get('graph_enabled') or strategy.get('wiki_enabled') or (kb.get('question_generation_config') or {}).get('enabled'):
             return False
-        if not kb.get('summary_model_id'):return False
+        if not kb.get('summary_model_id'):
+            # Fixed ProcessSummaryGeneration: terminal no_summary_model branch,
+            # summary_status=failed and nil task error drain the parent subtask.
+            # Parsing/indexing already ran; do not strand the document pending.
+            rows=await app.documents._rows(
+                "UPDATE knowledges SET summary_status='failed',updated_at=now() "
+                "WHERE tenant_id=%s AND knowledge_base_id=%s AND id=%s AND deleted_at IS NULL "
+                "AND metadata->>'source_version'=%s AND parse_status='processing' RETURNING id",
+                (principal.tenant_id,kb['id'],document['id'],document['source_version']))
+            if len(rows)!=1:raise DocumentLifecycleError('PROFILE_SOURCE_VERSION_CHANGED')
+            return True
         if getattr(app.conversation,'generate_summary_prompt',None) is None and not self.prompt_path.is_file():return False
         content=reconstruct(text)
         from .image_multimodal import enrich_summary_images
