@@ -33,6 +33,8 @@ Compose 项目 slug 为 `eviroute-rag`，Docker Desktop 通常以这个 slug 分
 
 本次只迁移 PG/Redis 依赖容器；API 与 React 仍作为宿主进程运行，尚未容器化。此记录证明容器迁移和所列数据连续性检查，不代表整个应用已通过验收。
 
+Owner 后续确认：前端、app/API 和解析部分暂不封装容器，继续以宿主机进程开发；当前分组仅包含 PostgreSQL 和 Redis。
+
 ## 验证记录
 
 - `docker compose --project-name eviroute-rag --file docker-compose.eviroute-rag.yml config --quiet`：PASS，退出码 0。
