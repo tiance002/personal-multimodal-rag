@@ -404,3 +404,8 @@ Reference DTO fix4488ac1 preserves source Unicode half-open coordinates includin
 ## 2026-10-15 missing-summary-model closure and final installed package
 
 Source no-summary-model behavior differs from prior Python pending: fixed upstream marks summary failed, terminal task drains, parsed/indexed document remains usable. Minimal fixb5f396d; RED1fail/1pass -> GREEN7pass0. New final wheel sourceb5f396d includes referencefix4488ac1; SHA256aebf8eb475dad38f45c8267071771f97b10adeed007e9acc80dad17498b053e8. Fresh E-installed proof4pass0,97 installed backend module hashes match,0 source imports. No complete dependency-install/provider/cutover PASS.45 exact retirement candidates with callers and21 protected support hold paths are review-only; none deleted. See P8_FINAL_PACKAGE_REPORT_20261015.md and P8_RETIREMENT_REVIEW_20261015.md. Historical evidence/four protected files unchanged; no deployment.
+
+
+## 2026-10-15 explicit entry migration and scoped source retirement
+
+Non-deletion migration e20b5d9:15new contracts PASS; actual verify-default/Schema0, refusal modes2; native collection1296/0, legacy4098/9missing-file errors/2; old289test/fixture hashes unchanged. Native/legacy Playwright lists7/97nodes0 and Reactbuild0, no browser execution. Separate exact-three smoke removal follows new Owner approval Sentinel_cbdb2f4b286081918285cf3361fdad09; matched source hashes/zero active callers,3approved leaf deletions only,356held hashes unchanged. All other42candidates/21support holds retained. Reports ENTRY_MIGRATION_REPORT_20261015.md and THREE_SMOKE_RETIREMENT_REPORT_20261015.md. Actual native eval execution, real providers, browser, deployment and full-repository GREEN not claimed.

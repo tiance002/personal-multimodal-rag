@@ -1,11 +1,11 @@
 # Explicit legacy tools
 
-The default wheel excludes backend.app and backend.tests. No legacy service, script or experiment is a new-chain prerequisite. These remain in the source checkout for history/recovery; their old grants do not authorize new sends.
+The default wheel excludes backend.app and backend.tests. No legacy service, script or experiment is a new-chain prerequisite. Retained entries remain in the source checkout; specifically retired scripts are recoverable from Git as recorded below; their old grants do not authorize new sends.
 
 - Previous API/ingestion source configuration: deploy/legacy/compose.legacy.yml and Dockerfile.*.legacy. Running it is an explicit, separately approved service action; no command is executed here.
 - backend.app.main:app, backend.app.workers.ingestion: previous API and old text-job polling worker.
 - scripts/ordinary_verification_fence.py: previous grant-specific TaskFence startup, never imported by the new API.
-- scripts/smoke_ordinary_output_capacity.py and scripts/model_probe.py: historical provider probes, not startup checks and not authorized to run by this migration.
+- scripts/model_probe.py: retained historical provider probe, called only by the explicit legacy verification wrapper; not a native startup check and not authorized to run by this migration.
 - scripts/evaluate_rag_quality.py: old QuickChain evaluation. Six-package new-chain evaluation remains under eval_center/weknora*.
 - Optional old React build: explicitly set VITE_RAG_IMPLEMENTATION=legacy. The unset default is weknora_python; unknown values fail rather than silently choosing legacy.
 
@@ -18,3 +18,7 @@ Ledger, UNKNOWN, Run/Attempt, Gold, original source versions, references, report
 - `scripts/legacy/eval.ps1` preserves the old Schema/Retrieval/Quality dispatch. `scripts/legacy/verify-m0.ps1` preserves the old test/probe/schema workflow with the explicit legacy pytest config. These are historical operational commands, not authorized to run here: the latter may start Compose, migrate the old DB and send model probes. Their existence does not grant permission.
 - Native eval explicitly distinguishes verify-existing (read existing results plus isolated DB) from execute-native (fresh original ingestion/four-mode execution using closed model fixtures). No old default QuickChain evaluator is dispatched. Missing inputs/output/isolation permission fail closed; simulated metrics never become real quality claims.
 - This entry migration deletes no files. A separately authorized three-script follow-up must be a different commit; all other retirement remains prohibited. New caller migration is not deletion authorization. Legacy App remains explicitly selectable and cannot yet be deleted; old grants/journals/probe evidence remain unchanged.
+
+## Specifically authorized source-only retirement
+
+On2026-10-15 only scripts/smoke_ordinary_deepseek_tls.py, scripts/smoke_ordinary_output_capacity.py and scripts/smoke_service_capacity_linux.py were removed after the new exact-file Owner approval and zero-active-caller/hash checks. Source recovery point is e20b5d9. Existing reports/tokenizer/recipe assets and all other candidates/support code are retained. See THREE_SMOKE_RETIREMENT_REPORT_20261015.md; this grants no browser privilege, service replacement or broader deletion.
