@@ -50,3 +50,8 @@ MQ3ef2aa0 serially reviewed20hashes and integrated6854a41; new post-stop enqueue
 ## 2026-10-15 Owner-requested P8 pause
 
 Development API/worker/React/package entry changes saved as an unaccepted checkpoint. Targeted offline checks: 23 passed, exit 0. React build: exit 0. New-entry isolated HTTP/PG/Redis test: exit 1 (expected pending memory task count 1, observed 0); worker assertions not reached. Installed-wheel and compose configuration checks NOT RUN. No real provider calls or deployment. Resume from docs/weknora-port/PAUSE_P8_DEVELOPMENT_ENTRY_20261015.md. Owner requested waiting; Goal incomplete and paused.
+
+
+## 2026-10-15 P8 resumed and scoped entry proof
+
+Latest root delegation explicitly resumed ec98695; earlier pause provenance UNKNOWN (no verifiable ID/time/sender). API enqueue-autostart defect repaired in9567c88 while retaining old default behavior. Scoped new-entry actual HTTP/PG/Redis/worker test passed, including second assembly memory/image processing and later image after idle. Installed wheel same test passed,97 backend modules from installed paths,0 source imports.11 queue/config checks and both compose config checks exit0; prior23 offline/React build0 reused unchanged. WheelSHA2565fb5215b3b4da0f12dc7af4c8bcb13815ba4d2413405c2103b632911fe784459. Third-party dependency paths reused; full fresh dependency installation NOT CLAIMED. No REAL_PROVIDER_PASS/CUTOVER_PASS or whole differential PASS. See P8_DEVELOPMENT_ENTRY_REPORT_20261015.md.
