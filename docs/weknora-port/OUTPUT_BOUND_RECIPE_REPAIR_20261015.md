@@ -1,7 +1,7 @@
 # 输出上界 Recipe 修复与关联链路审查报告 — 2026-10-15
 
 - 工作树：`E:\RAG-Worktrees\weknora-python-port-20261013`
-- 分支：`codex/weknora-python-port-integrate-image-20261014`；审查基准 HEAD `04f7b0d78f0b539f0d70a2db79359487168e940d`
+- 分支：`codex/weknora-python-port-integrate-image-20261014`；审查基准 HEAD `04f7b0d78f0b539f0d70a2db79359487168e940d`；本轮提交 `561e3bc8a5a6d13a7199c48f35daf40be3cd04e1`
 - 固定参考：`Tencent/WeKnora@3e8b0bfc`（`E:\RAG-reference\WeKnora-3e8b0bfc`）
 - 执行边界：**全程离线**（未发起任何真实模型请求）；未 Push/部署；未改旧库；未 flush Redis；未删除历史；未解除 UNKNOWN/月阻断；未换账户标签；未放宽校验；未修改旧账本。真实密钥未读取、未回显、未入证据。
 - 规划文件：`docs/weknora-port/spec.md`、`docs/weknora-port/tasks.md`
@@ -239,5 +239,5 @@ REAL_UNKNOWN_ROWS {n:1}
 4. **测试**：通过 **18 + 85 + 1422**；失败 **1**（`OCR_HTML_SOURCE_CONVERTER_REQUIRED`，环境）；未运行/阻塞：66 项缺 DSN skip、真实冒烟（无授权）、供应商合同履约核验。
 5. **历史账本与预算保护**：**保持不变**（UNKNOWN 1 条、blocked 月、原 recipe 预留数值、`real-ledger.json` 均未改；见第 7 节）。
 6. **剩余阻断**：供应商合同履约（UNVERIFIED）、真实问答闭环、2026-10 月阻断前置、SourceFacts 架构级来源、非流式 usage 一致性、环境 OCR。
-7. **Git**：分支 `codex/weknora-python-port-integrate-image-20261014`；HEAD `04f7b0d…`；本轮改动未提交（待 T10 按已审查文件提交）；未 Push。
+7. **Git**：分支 `codex/weknora-python-port-integrate-image-20261014`；审查基准 HEAD `04f7b0d…`；本轮改动提交 **`561e3bc8a5a6d13a7199c48f35daf40be3cd04e1`**（20 files changed, 1057 insertions(+), 20 deletions(-)；仅提交已审查文件，逐文件 `git add`）；**未 Push**、未部署。工作树仅剩受保护项：`.serena/project.yml` 与 6 个受保护未跟踪文件（未被暂存/修改）。
 8. **最终状态与报告**：`READY_FOR_AUTHORIZED_REAL_SMOKE`；报告 `docs/weknora-port/OUTPUT_BOUND_RECIPE_REPAIR_20261015.md`。
