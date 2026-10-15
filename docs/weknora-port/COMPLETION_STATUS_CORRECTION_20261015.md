@@ -47,6 +47,8 @@ Owner 指令：不得把测试夹具中的 Qwen 当作正式 VLM 选择；核对
 5. **approved 配置解析 + readyz**：`load_authority_settings` 当前对 `mode=approved` 直接抛错；`/readyz` 的 approved 合同校验与 `--authority-config` 的 approved 分支。
 6. **稳定 operation_id**：`RuntimeMemoryModels.complete/embed_query` 与 maintenance 的无 operation_id 分支必须收窄到持久任务/消息/版本派生 ID。
 
+**状态更新（2026-10-15，提交 `docs/weknora-port/AUTHORITY_APPROVED_IMPLEMENTATION_REVIEW_20261015.md` 同批）**：第 1/2/4/5 项已在契约层实现（approved 配置解析 + `ApprovedTokenAuthority` + `measure_final_input`/`bind_wire_facts` + approved 装配接线 + `/readyz` 识别），全部 fail-closed 且零真实请求。**仍缺**：应用侧按能力组装真实 `CallContext.source_facts`（未接前标准 API 的真实问答在 `bind_wire_facts` 处拒绝）、从既有账本实际核对 carry-in/UNKNOWN 上界、真实凭据与额度。
+
 ## 5. 边界
 
 - 本记录不改受保护文件（`OWNER_DEEPSEEK_*`、`AUTHORITY_STOP_STATE_*`、`P6_ORDINARY_GO_BUILD_*`）。

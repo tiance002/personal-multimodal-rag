@@ -1,0 +1,20 @@
+.........F.F...                                                          [100%]
+================================== FAILURES ===================================
+________ test_approved_loader_rejects_unverified_or_unsupported_meter _________
+tests\weknora_port\test_authority_approved.py:89: in test_approved_loader_rejects_unverified_or_unsupported_meter
+    _config(path, meter, meter_sha, meter=unsupported); load_authority_settings(path)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: _config() got multiple values for argument 'meter'
+________ test_bind_wire_facts_requires_real_sources_and_matching_wire _________
+tests\weknora_port\test_authority_approved.py:121: in test_bind_wire_facts_requires_real_sources_and_matching_wire
+    facts = bind_wire_facts(None, replace(bare, source_facts=sources), body, wire,
+backend\weknora_port\source_facts.py:136: in bind_wire_facts
+    fingerprint = sha(json.dumps(asdict(config), sort_keys=True, separators=(',', ':'),
+                                 ^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\dataclasses.py:1358: in asdict
+    raise TypeError("asdict() should be called on dataclass instances")
+E   TypeError: asdict() should be called on dataclass instances
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_authority_approved.py::test_approved_loader_rejects_unverified_or_unsupported_meter - TypeError: _config() got multiple values for argument 'meter'
+FAILED tests/weknora_port/test_authority_approved.py::test_bind_wire_facts_requires_real_sources_and_matching_wire - TypeError: asdict() should be called on dataclass instances
+2 failed, 13 passed in 1.13s

@@ -96,7 +96,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
         own_storage(settings)
         token_authority=None
         if authority_settings is not None:
-            from .authority import ServerPermissionResolver,ConfiguredTokenAuthority
+            from .authority import ServerPermissionResolver,ConfiguredTokenAuthority,ApprovedTokenAuthority,MeterAsset
             from .storage.history import LocalPrincipal
             if any(v is not None for v in (model_factory,permissions,costs,principal)):
                 raise DevelopmentConfigurationError('AUTHORITY_INJECTION_CONFLICT')
@@ -104,13 +104,28 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 check=await (await guard.connection.execute("SELECT to_regclass('port_token_calls') AS tokens,to_regclass('port_call_slots') AS slots")).fetchone()
                 if not all(check.values()):raise DevelopmentConfigurationError('EXPLICIT_TOKEN_SCHEMA_INITIALIZATION_REQUIRED')
             principal=LocalPrincipal(authority_settings.tenant_id,authority_settings.subject_id)
-            permissions=ServerPermissionResolver(leases,authority_settings)
-            token_authority=ConfiguredTokenAuthority(authority_settings)
+            approved=authority_settings.mode=='approved'
+            token_authority=(ApprovedTokenAuthority(authority_settings) if approved
+                             else ConfiguredTokenAuthority(authority_settings))
+            permissions=ServerPermissionResolver(leases,authority_settings,tokens=token_authority)
             import httpx
             from .models.synthetic import transport_handler
-            from .source_facts import bind_synthetic
+            from .source_facts import bind_synthetic,bind_wire_facts
             def model_factory(config,key,gate):
-                if authority_settings.mode!='synthetic' or any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):
+                if (config.provider,config.model) not in authority_settings.allowed_models:
+                    raise DevelopmentConfigurationError('AUTHORITY_MODEL_NOT_ALLOWED')
+                if approved:
+                    # Real hosted transport: exact endpoints and the delivered credential.
+                    # Facts must come from real server-resolved sources, never a mock slice.
+                    if not isinstance(authority_settings.meter,MeterAsset):
+                        raise DevelopmentConfigurationError('APPROVED_METER_REQUIRED')
+                    transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,
+                        credential=lambda _:key)
+                    transport.bind_facts=lambda config,context,body,wire,capability:bind_wire_facts(
+                        config,context,body,wire,config_sha=authority_settings.config_sha,
+                        recipe=authority_settings.meter.recipe)
+                    return ProviderModel(config,transport)
+                if any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):
                     raise DevelopmentConfigurationError('SYNTHETIC_ENDPOINT_REQUIRED')
                 if config.api!='openai-completions' or config.embedding_api!='openai-embeddings' or config.rerank_api!='cohere-rerank':
                     raise DevelopmentConfigurationError('SYNTHETIC_PROTOCOL_UNSUPPORTED')

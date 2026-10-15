@@ -95,3 +95,45 @@ def bind_synthetic(config, context, body, wire, config_sha, *, capability):
         allow_nan=False).encode())
     return BoundCallFacts(facts, TokenReservationBound(len(wire) + 64, output,
         'SYNTHETIC_ONLY/closed-mock-bounded-response/v1'), config_sha, fingerprint, True)
+
+
+# Approved-mode meter recipes. A recipe is a named, code-owned conservative
+# bound; it is never a hosted actual count and never a price/money estimate.
+METER_RECIPES = frozenset({'wire-bytes-upper-bound/v1'})
+
+
+def measure_final_input(recipe, wire):
+    """Conservative input upper bound for one final wire payload.
+
+    `wire-bytes-upper-bound/v1` returns the serialized wire byte length. This is
+    a strict upper bound for byte-level BPE tokenizers (every token spans at least
+    one byte), so it never under-reserves; it is deliberately loose and must not
+    be reported as a provider actual token count. Unknown recipes are refused.
+    """
+    if recipe not in METER_RECIPES:
+        raise ProviderError('TOKEN_BOUND_RECIPE_UNSUPPORTED')
+    if not isinstance(wire, (bytes, bytearray)) or not wire:
+        raise ProviderError('MODEL_WIRE_REQUIRED')
+    return len(wire)
+
+
+def bind_wire_facts(config, context, body, wire, *, config_sha, recipe):
+    """Approved-mode facts from real per-source evidence; never a synthetic slice.
+
+    Requires the server-resolved `CallContext.source_facts` to already hold real
+    SourceFacts for this call (question/history/evidence/memory/document/image/
+    system-template). Missing or mismatched evidence refuses the send; a whole-wire
+    synthetic slice is not accepted here.
+    """
+    sources = getattr(context, 'source_facts', None)
+    if not isinstance(sources, SourceFacts):
+        raise ProviderError('SOURCE_FACTS_REQUIRED')
+    if sources.wire_sha256 != sha(wire):
+        raise ProviderError('WIRE_FACTS_MISMATCH')
+    output = body.get('max_tokens', body.get('max_completion_tokens', 0))
+    if type(output) is not int or output < 0:
+        raise ProviderError('MODEL_OUTPUT_HARD_LIMIT_DENIED')
+    fingerprint = sha(json.dumps(asdict(config), sort_keys=True, separators=(',', ':'),
+        allow_nan=False).encode())
+    return BoundCallFacts(sources, TokenReservationBound(measure_final_input(recipe, wire), output, recipe),
+        config_sha, fingerprint, False)
