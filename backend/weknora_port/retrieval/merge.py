@@ -106,6 +106,53 @@ def prune_images(content, raw):
     allowed = {v for img in image_infos(raw) for v in (img.get('url'), img.get('original_url')) if v}
     return go_strip(re.sub('\\n{3,}', '\n\n', IMAGE.sub(lambda m: m[0] if m[2] in allowed else '', content)))
 
+class _ImageInfoObject(list):
+    """JSON object pairs kept in order, including repeated/case-equivalent keys."""
+
+
+def _reject_image_json_constant(value):
+    raise ValueError('INVALID_IMAGE_JSON_CONSTANT')
+
+
+def _parent_image_infos(raw):
+    """Decode fixed Go ImageInfo fields for aggregation only (64-bit Go int).
+
+    encoding/json applies exact/folded tags in input order, ignores null for
+    primitives, and reports any typed-field error for the entire child array.
+    Child passthrough and the shared rerank/context decoder remain unchanged.
+    """
+    try:
+        values = json.loads(raw, object_pairs_hook=_ImageInfoObject,
+                            parse_constant=_reject_image_json_constant)
+        if type(values) is not list:
+            return []
+        output = []
+        for value in values:
+            if value is None:
+                continue
+            if not isinstance(value, _ImageInfoObject):
+                return []
+            info = dict(url='', original_url='', start_pos=0, end_pos=0,
+                        caption='', ocr_text='')
+            for key, item in value:
+                # Go simple-fold equivalence for these ASCII tags includes long
+                # s, but never expands ligatures as Unicode full casefold does.
+                key = ''.join(chr(ord(c) + 32) if 'A' <= c <= 'Z'
+                              else 's' if c == '\u017f' else c for c in key)
+                if key not in info or item is None:
+                    continue
+                if key in ('start_pos', 'end_pos'):
+                    if type(item) is not int or not -(1 << 63) <= item < (1 << 63):
+                        return []
+                elif not isinstance(item, str):
+                    return []
+                info[key] = item
+            output.append(info)
+        return output
+    except (ValueError, TypeError):
+        return []
+
+
 async def collect_image_info(ids, state, context, repository, *, source_chunks=None):
     """Source two-level enabled-child aggregation. Order of URLs is unspecified upstream."""
     ids = tuple(dict.fromkeys((i for i in ids if i)))
@@ -145,7 +192,7 @@ async def collect_image_info(ids, state, context, repository, *, source_chunks=N
     aggs = {}
 
     def add(target, child):
-        for info in image_infos(child.image_info):
+        for info in _parent_image_infos(child.image_info):
             key = info.get('url') or info.get('original_url')
             if not key:
                 continue

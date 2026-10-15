@@ -1,0 +1,153 @@
+{
+  "baseline_commit": "42c1a278506d26bb0eb7df4cba89ce07e1260abe",
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "changed_runtime": [
+    "backend/weknora_port/retrieval/merge.py"
+  ],
+  "only_existing_ast_change": "collect_image_info.add calls new parent-only decoder; replacing call name and removing three new private definitions produces exact baseline merge AST",
+  "unchanged_shared_or_scope_ast": [
+    "backend/weknora_port/retrieval/rerank.py",
+    "backend/weknora_port/retrieval/context.py",
+    "backend/weknora_port/storage/knowledge.py",
+    "backend/weknora_port/storage/hybrid.py",
+    "backend/weknora_port/generation/context.py",
+    "backend/weknora_port/generation/router.py"
+  ],
+  "source_sha256": {
+    "backend/weknora_port/retrieval/merge.py": "5f37e8689541be1c9718adb112a8be79141e7afee2112851cc200c30f2fff334",
+    "scripts/weknora_port_image_json_oracle.py": "501b91bba2bbb2f439dfb6290e4ec1948fd04ff016eb580ca46b64e753a999c7",
+    "tests/weknora_port/test_image_json_boundary.py": "453fd5af7c9938fa6d1c94a564526a7ad6c3fc8ba905d9b92a8822959f682ac2",
+    "tests/weknora_port/fixtures/image_json_boundary_go_oracle.json": "4b6391aa6067b229003fea7f795fcba4147d5be086611e8f8879fd31b829e4f9",
+    "tests/weknora_port/test_search_image_completion_pg.py": "93a09337fb2c634ecb62fbf0f8ea38aeaae2442f078e0d60dc95c3ab20dc86c0",
+    "backend/weknora_port/retrieval/rerank.py": "c3d6f6654772543f90afcce04cf1d4b850ebb7df5d87e438b7c54d98d149ecfe",
+    "backend/weknora_port/retrieval/context.py": "6a2907a5e3b7fd067faddbb05ffc81fe816691584497edc2b7c2c28bd855ad7f",
+    "backend/weknora_port/storage/knowledge.py": "ccb3c3a41d68d58623841bee1d02beae70978fe184e7cbdd091b6e23f398387d",
+    "backend/weknora_port/storage/hybrid.py": "49789246535a67b19be7083d964451ad32a9b3ab5b223979876211193caf8a9a",
+    "backend/weknora_port/generation/context.py": "f771e408f2773de524305371a4e2a997028d63d1bc8df7644b55460c6a640d73",
+    "backend/weknora_port/generation/router.py": "270363dc71bc59295dc7c816a21e16492e8ff1f652ea49d6e3f59dda5e8b649b",
+    "pyproject.toml": "7e565bbc90813702de693f19448b935955e9e01dcd75687ff33c6920ea56859e",
+    "backend/weknora_port/entrypoint.py": "7313c71fe4f679e394eb3a4076d329c0c403dad020aa7a75be81c79951ba9927",
+    "backend/weknora_port/development.py": "c5d2a1e70bcfaa2c6e051e5883f94045ce840b9835b571aeb8db70539f34a3c2",
+    "backend/weknora_port/worker.py": "02a3f03f45c5d6edfa3905beab798d024129586a04f0b2e19cbb3b945b459e24",
+    "frontend/package.json": "7555bb10c320a500d4eeee4f6b00be8f04ef390c0637cabcc4a76f07d5890b62",
+    "frontend/src/main.tsx": "6aa46caba58247a005ef4ac43de55712441b08b784e89d6da9b9c3420f91d739",
+    "frontend/vite.config.ts": "590835b8237a1c29241e4225b7a267ad34530e1296f33e8cd5dbaf38b1b85a55",
+    "frontend/playwright.config.ts": "6d4a85fdca4a653fcd7fa1028a9c6997c567f42a54bb787aa9efea97db3c9043",
+    "frontend/tests/weknora-port/adapter.spec.ts": "474ddb9dc7b394baf6a66932526bd28d4006efe863dc33b12b0eda0e18ae2dac",
+    "frontend/tests/weknora-port/consent.spec.ts": "f44f400fcf46c51f8e88a8ca814fe912c3fa7fb2b6c1f833ddde6b62726068b7",
+    "scripts/weknora_port_browser_fixture.py": "227d95018b6741f859c2b49ac03315808a43419a88ead8a3b081a1e5f29a02cd",
+    "scripts/weknora_port_affinity_browser_fixture.py": "31d402bfba21970a0bf981e6451e0a1879bbcf269e561a6886f10ce8428ea9aa"
+  },
+  "go_sdk_source_sha256": {
+    "E:\\RAG-reference\\toolchains\\go1.26.0\\go\\VERSION": "abe46ae8f122de59f40ec8cf3eb77ee6e89d00e8fee634e39b247574249a7779",
+    "E:\\RAG-reference\\toolchains\\go1.26.0\\go\\src\\encoding\\json\\fold.go": "5b3c91bfbf6943e04d9aeb934031331a3f08a83b10079a0a7f0def3466b2f39e",
+    "E:\\RAG-reference\\toolchains\\go1.26.0\\go\\src\\encoding\\json\\decode.go": "a91535f18f9a2c8380448b1c84c4c2017dbe3d530a10faf8babf03494042da48"
+  },
+  "review_input_sha256": {
+    "E:\\WK\\go-linux\\evidence\\review-seq-image-42c1a278-20261015\\REPORT.md": "c6d1acc85e8daed9b6b28a5d1126c9ddb2872e9b1acbb5fa28919da19d68a682",
+    "E:\\WK\\go-linux\\evidence\\review-seq-image-42c1a278-20261015\\json-boundary-comparison.json": "1dbe683adae5321c98e01938d6d8395612bac52d2e9af4e70ba69ff908f8f634"
+  },
+  "oracle_program_sha256": "2cafbd47675952cc31d78f5a5ceb84a33b1c197c464dff315d0dfc0ab58a7527",
+  "protected_original_files": {
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+  },
+  "tests": {
+    "red": {
+      "exit": 1,
+      "failed": 14,
+      "passed": 20
+    },
+    "go": {
+      "exit": 0,
+      "cases": 30,
+      "kind": "actual Go encoding/json with source-extracted collector/enrich/type"
+    },
+    "green": {
+      "exit": 0,
+      "passed": 158
+    },
+    "isolated_asgi_pg_redis": {
+      "exit": 0,
+      "passed": 1,
+      "models": "closed MockTransport only"
+    },
+    "existing_actual_go_frozen": {
+      "exit": 0,
+      "results": 10,
+      "shared_fields": 18,
+      "db_writes": 0,
+      "models": 0
+    }
+  },
+  "real_provider_calls": 0,
+  "browser": "NOT RUN by Owner delegation",
+  "scope": "parent JSON case/order/null/signed64 only; no claim of all possible JSON/Unicode byte parity",
+  "evidence_sha256": {
+    ".gitattributes": "2cacd8c5b88d28a6324a5b106d17970ce30df8e32f9b76c87d00d4ca430747a8",
+    "frozen-current.command.json": "1bf3cffdc1bbb5f5ec069feeb25c2f0c778027d727e89e63e614b3ae8e801d70",
+    "frozen-current.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "frozen-current.pg.json": "b013c8d76e00cf108d9922c16211e25fef75bd848b46099715f43c950cf27276",
+    "frozen-current.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frozen-current.stdout.txt": "9d6ca36eadda30af2b19c2ffd3ebc997782dc9eee7973a0ef77154275a7030ee",
+    "go.command.json": "7249c2671315ea2c38d82d758b20d6ab410f706a57fef3e82092e70d61c92ce0",
+    "go.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "go.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "go.stdout.txt": "a1920c139fca36e5c97466613aeaa7c0ffa2e86f69799c000a23064d836724ae",
+    "green.command.json": "ee99dca87738679a710383d14ddbc53f0c1a47a84db99c39d54ec13651dc1569",
+    "green.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "green.junit.xml": "f75eaf2ef4264ccfcf55fcdf9e0465d193406e30ce850cf61f92f79704d5b70f",
+    "green.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "green.stdout.txt": "33a90425efaf4977e882f290cc0b73cff32f141ed3cd957c74ddfd0b8dfe156c",
+    "pg.command.json": "f85ae74dc64cb6abbeb6bfd2f4d386b21470733d8545706e5cab0c370dff5916",
+    "pg.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "pg.junit.xml": "4d2220e5f432b7c4056d4f66e3c70c52f544dd8869021965fbc345aea15f0bef",
+    "pg.pg.json": "133253d9c46d5f7432173e517f4f706bf4ae06cf06917aacb22e82d8fafe1750",
+    "pg.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg.stdout.txt": "8d2a68a41879fae3789311fd5b5bfca72fe84d630e42933555fefa3ad40e11af",
+    "red.command.json": "6410f5418066e4536431eefc8319d1db9801961587561874544c86ea14d70d1d",
+    "red.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "red.junit.xml": "ad9a36c90c0b331d68e68ab4313b1bbad10f6e6604d46a2dbb87c022b9e4bdca",
+    "red.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "red.stdout.txt": "010d83e6a87e19d8cda7f3e33e4e3f894a71546ad259679749be5cbbda3a2d15",
+    "run-check.py": "33ddf7f8f54c3f8ec15f85bb981fada00161ef1ff3d0d3db01d1b1f0b1a2610b",
+    "run-frozen-search.py": "ebe7b7e6ebfb37c54401afe8d5af4ce86f931af16bb93ddf7b40530e89dba8d7",
+    "staged-check.json": "2f088030f46892b86ddb828f43328323567b8f576bced08949f1498e0ec7755a",
+    "staged-source-check.json": "0e0e5576ee371f4e80ef1bca9881fa87a0b8e546638e52e4cf567f3fe22246fc"
+  },
+  "staged_diff_check": {
+    "full_raw_exit": 2,
+    "source_exit": 0,
+    "exact_raw_exclusions": [
+      "docs/weknora-port/evidence/IMAGE_JSON_BOUNDARY_20261015/red.junit.xml",
+      "docs/weknora-port/evidence/IMAGE_JSON_BOUNDARY_20261015/red.stdout.txt"
+    ]
+  },
+  "git_blob_sha256": {
+    "backend/weknora_port/retrieval/merge.py": "1335463f4ce7e068f55068a9e86e6ed80109c77cf50c8304db7a5cb14bfc1b5e",
+    "scripts/weknora_port_image_json_oracle.py": "adb11ad822ab8f17e2d4d6890f18d4c9eeb8057985d7c6c98fd14aa113869d48",
+    "tests/weknora_port/test_image_json_boundary.py": "289dd67e2a29717210ee4298049659f17224fb396a4bd1f4816aa96fd52980bf",
+    "tests/weknora_port/fixtures/image_json_boundary_go_oracle.json": "056eff3cb7b9f5fc3b5205f7371a3bb160c258c82367485f7dfc129b14dfe9b3",
+    "tests/weknora_port/test_search_image_completion_pg.py": "83a758d9749de74f90d6083bee1d7b3221b8ecf04483b75a8f7d1437eacf57f5",
+    "backend/weknora_port/retrieval/rerank.py": "1c0f6f1b855f9f8bd0bca0e839249e66076698c13b866ab71a901b5af2b95fff",
+    "backend/weknora_port/retrieval/context.py": "9a03f968faf8133562363fbcd09f9e9eaad17171918ade35717083be9f640d3c",
+    "backend/weknora_port/storage/knowledge.py": "28928c56ea21fb5ff33d50a4439210b500e2c61cb10f9e995e02e7d3293fb0cf",
+    "backend/weknora_port/storage/hybrid.py": "efd4b6268ca8438aa4079ce99fc94ad1ea9125f70380b5de198899c3821a32b3",
+    "backend/weknora_port/generation/context.py": "8ceac316b0d2d9e55a139fe647642830e0fcc7d5abe1fdf093b2cf88f9f1552d",
+    "backend/weknora_port/generation/router.py": "eed2ab58b1c0632f7957ab081845d7afc3edb50a4db366a6f9bfd8a8535bfd81",
+    "pyproject.toml": "e7b37859ee39b1c6691ec3edd21a1e92f1944028e63b780b1624d0ab42441443",
+    "backend/weknora_port/entrypoint.py": "876caaa7aa77b6f1afbdecd58e00c23490070fb9e3ed934ebcfc401734ba4904",
+    "backend/weknora_port/development.py": "bd2f30eb9129983801021b91aaa9caf181cb31ea774a8aba2070db946db3cb0c",
+    "backend/weknora_port/worker.py": "c0d1a106a6cd6cc2dc15fcf66e172ca8a99dec1ac6707ac91f178aad39e8f4e8",
+    "frontend/package.json": "8f2aa99851ec81de3df4ae976cf8a0825496f35c5d447e4d84dd106939e3eb61",
+    "frontend/src/main.tsx": "1acce1d2777340d198f4a5af36c308a718e009bbe02b30ef47223d4db276c033",
+    "frontend/vite.config.ts": "790518da502a1c53ec15a4e5442b41cba997c017ffe6191771af3cf28ef44968",
+    "frontend/playwright.config.ts": "ac2b00f36646b3c5d3f501a3beff08b0018b377ce869b2692b51e553ea5be037",
+    "frontend/tests/weknora-port/adapter.spec.ts": "15ee239010eb15c5c636205966b65332998a074f78ee1cefaefcdc6cb06e6aaf",
+    "frontend/tests/weknora-port/consent.spec.ts": "5e3477536dc2ccca4d501d24e92d78a70995fcc3f918f695c9baca6683901fa9",
+    "scripts/weknora_port_browser_fixture.py": "c534a35e926faf1325c046d721f5c7abe956e0f33b5005acfe2e0ac5ac4f8f22",
+    "scripts/weknora_port_affinity_browser_fixture.py": "31d402bfba21970a0bf981e6451e0a1879bbcf269e561a6886f10ce8428ea9aa"
+  }
+}
