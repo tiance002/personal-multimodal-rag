@@ -111,6 +111,7 @@ export function WeKnoraPythonApp() {
   const [configError, setConfigError] = useState("");
   const activeAbort = useRef<AbortController | null>(null);
   const activeIdentity = useRef<PortRunIdentity | null>(null);
+  const terminalErrorMessages = useRef(new Set<string>());
 
   const refreshBases = useCallback(async () => setBases(await portApi.knowledgeBases()), []);
   const refreshSessions = useCallback(async () => setSessions(await portApi.sessions()), []);
@@ -213,6 +214,19 @@ export function WeKnoraPythonApp() {
   };
 
   const applyEvent = (messageId: string, event: WeKnoraSSEMessage) => {
+    if (event.response_type === "complete") {
+      const hadTerminalError = terminalErrorMessages.current.has(messageId);
+      terminalErrorMessages.current.delete(messageId);
+      setNotice(event.data.status === "cancelled"
+        ? "生成已取消，服务端已保存终态"
+        : event.data.status === "failed" || hadTerminalError ? "生成失败，服务端已保存终态" : "回答已完成并保存");
+    } else if (event.response_type === "error") {
+      const nonTerminalStreamError = event.data.non_terminal === true && event.data.stage === "chat_completion_stream";
+      if (!nonTerminalStreamError) {
+        terminalErrorMessages.current.add(messageId);
+        setNotice(event.content || "运行发生错误");
+      }
+    }
     updateMessage(messageId, previous => {
       const progress = [...(previous.progress ?? [])];
       if (event.response_type !== "answer") progress.push({
@@ -291,6 +305,7 @@ export function WeKnoraPythonApp() {
     let session = activeSession;
     const userLine: ChatLine = { id: crypto.randomUUID(), role: "user", content };
     const assistantLine: ChatLine = { id: crypto.randomUUID(), role: "assistant", content: "", segments: [], progress: [], status: "running" };
+    setNotice("正在提交问题");
     setMessages(current => [...current, userLine, assistantLine]);
     try {
       if (!session) {
@@ -307,6 +322,7 @@ export function WeKnoraPythonApp() {
 
   const resume = async (line: ChatLine) => {
     if (!line.identity || busy) return;
+    setNotice("正在续读原回答");
     const controller = new AbortController();
     activeAbort.current = controller;
     setBusy(true);
@@ -378,9 +394,9 @@ export function WeKnoraPythonApp() {
   const stopGeneration = async () => {
     const identity = activeIdentity.current;
     if (!identity) { setNotice("正在确认原始运行，请稍后停止"); return; }
+    setNotice("正在请求停止原始生成");
     try {
       await portApi.stopSession(identity.sessionId, identity.assistantMessageId);
-      setNotice("已请求停止原始生成，等待保存终止状态");
     } catch (failure) { setNotice(`停止失败：${errorText(failure)}`); }
   };
 
