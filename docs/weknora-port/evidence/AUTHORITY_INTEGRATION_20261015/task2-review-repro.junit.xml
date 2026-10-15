@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="21.434" timestamp="2026-10-15T20:27:04.175778+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_authority_cli_pg" name="test_two_standard_cli_processes_upload_question_worker_and_replay" time="20.506"><failure message="KeyError: 'WEKNORA_SEQ_IMAGE_RECEIPT'">tests\weknora_port\test_authority_cli_pg.py:172: in test_two_standard_cli_processes_upload_question_worker_and_replay
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_authority_cli_pg.py:167: in scenario
+    Path(os.environ['WEKNORA_SEQ_IMAGE_RECEIPT']).write_text(json.dumps(receipt,indent=2,default=str)+'\n',encoding='utf-8')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen os&gt;:716: in __getitem__
+    ???
+E   KeyError: 'WEKNORA_SEQ_IMAGE_RECEIPT'</failure></testcase></testsuite></testsuites>

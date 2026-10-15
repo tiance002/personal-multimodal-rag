@@ -35,8 +35,10 @@ from backend.weknora_port.documents import DocumentLifecycleService, KnowledgeBa
 from backend.weknora_port.http_api import create_app
 
 
-# Existing container/volume recovered after Owner-authorized Docker restart.
-REDIS_RUN_ID = "586b92f4649b78508382dfd52d64d848f45b0a7c"
+# Dedicated Redis test target; identity comes from the explicit env convention so the
+# approved isolated container's run_id is re-verified on every connection, not pinned.
+from tests.weknora_port.redis_fixture_identity import expected_redis_run_id
+REDIS_RUN_ID = expected_redis_run_id()
 SOURCE = "The source handbook says blue widgets use protocol W-17. Keep the widgets dry."
 
 

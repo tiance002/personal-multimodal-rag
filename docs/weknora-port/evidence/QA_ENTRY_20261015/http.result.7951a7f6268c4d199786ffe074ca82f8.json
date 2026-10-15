@@ -1,0 +1,1363 @@
+{
+  "kind": "actual-loopback-http-postgres-redis-mock-provider-only",
+  "real_provider_calls": 0,
+  "redis_db": 15,
+  "redis_run_id": "de03f13f2ffba1146b01434f25514c4478e046fd",
+  "redis_prefix": "serial-integration:20261015:5784104d-72f1-4583-b03f-01c6b4a34df6",
+  "history": {
+    "session": "3cc8794c-bb27-4993-8d47-4e5cfe89e3a2",
+    "first_request_id": "2f8f944a-011c-479e-8b38-ac63cec892c6",
+    "second_request_id": "dbbf1b4f-6413-4570-a178-c96431762633",
+    "first_assistant": "035f6555-201d-4aef-8173-9d4c834d243c",
+    "second_assistant": "e17e2e8e-3143-4d66-9211-81ff62c7cf4d",
+    "message_count": 4,
+    "rewrite_contains_first_round": true,
+    "final_contains_first_round": true,
+    "citation_readback_http": 200,
+    "replay_new_sends": 0
+  },
+  "fallback": [
+    {
+      "case": "default",
+      "session": "16e55b70-4e18-4594-a0d9-f3778f85b4a6",
+      "assistant": "14c16402-7350-4ddb-acf1-bf7e5599e894",
+      "content": "Blue widgets use W-17. ",
+      "stream_calls": 2,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+            "query": "What is available in this knowledge base?",
+            "session_id": "16e55b70-4e18-4594-a0d9-f3778f85b4a6",
+            "assistant_message_id": "14c16402-7350-4ddb-acf1-bf7e5599e894"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "cheap",
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/1/cheap"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "cheap",
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/1/cheap"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "expensive",
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "answer",
+          "content": "Blue widgets use W-17. ",
+          "done": false,
+          "data": {
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive",
+            "role": "expensive",
+            "finish_reason": "",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive-answer"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "answer",
+          "content": "",
+          "done": true,
+          "data": {
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive",
+            "role": "expensive",
+            "finish_reason": "stop",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive-answer"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "expensive",
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive"
+          }
+        },
+        {
+          "id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive",
+            "role": "expensive",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "model_requested": "deepseek-flash",
+            "model_reported": "deepseek-flash",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 1,
+            "attempts": [
+              {
+                "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "c8b091584370bdb7c54ce8359789bb60a13ca9d599addc740bb92158a21e1b5a",
+                "prompt_sha256": "9437f03e55c97153c78afbd4d6f054b36b7696b222b10de428bbd12ea84fda96",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported",
+                  "provider_usage_facts": {
+                    "semantics": "openai-input-inclusive/v1",
+                    "fields": [
+                      [
+                        "input",
+                        {
+                          "value": 100,
+                          "present": true,
+                          "valid": true,
+                          "path": "prompt_tokens"
+                        }
+                      ],
+                      [
+                        "output",
+                        {
+                          "value": 10,
+                          "present": true,
+                          "valid": true,
+                          "path": "completion_tokens"
+                        }
+                      ],
+                      [
+                        "total",
+                        {
+                          "value": 110,
+                          "present": true,
+                          "valid": true,
+                          "path": "total_tokens"
+                        }
+                      ],
+                      [
+                        "cache_read",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_hit_tokens"
+                        }
+                      ],
+                      [
+                        "cache_write",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "cache_creation_input_tokens"
+                        }
+                      ],
+                      [
+                        "cache_miss",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_miss_tokens"
+                        }
+                      ]
+                    ],
+                    "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+                    "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+                    "derived_total": 110,
+                    "simulated": true,
+                    "observed_lower_bound": 0,
+                    "prior_numeric_raw": []
+                  }
+                },
+                "objective": [
+                  "INVALID_HANDLES"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 1,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              },
+              {
+                "attempt_id": "e8afcdc5-2c05-4317-9614-b2f3ab55c73b/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "3cc162c344818946ed369a6a08084d358cac9ce86f757701a770d1c533dd98e8",
+                "prompt_sha256": "9437f03e55c97153c78afbd4d6f054b36b7696b222b10de428bbd12ea84fda96",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported",
+                  "provider_usage_facts": {
+                    "semantics": "openai-input-inclusive/v1",
+                    "fields": [
+                      [
+                        "input",
+                        {
+                          "value": 100,
+                          "present": true,
+                          "valid": true,
+                          "path": "prompt_tokens"
+                        }
+                      ],
+                      [
+                        "output",
+                        {
+                          "value": 10,
+                          "present": true,
+                          "valid": true,
+                          "path": "completion_tokens"
+                        }
+                      ],
+                      [
+                        "total",
+                        {
+                          "value": 110,
+                          "present": true,
+                          "valid": true,
+                          "path": "total_tokens"
+                        }
+                      ],
+                      [
+                        "cache_read",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_hit_tokens"
+                        }
+                      ],
+                      [
+                        "cache_write",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "cache_creation_input_tokens"
+                        }
+                      ],
+                      [
+                        "cache_miss",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_miss_tokens"
+                        }
+                      ]
+                    ],
+                    "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+                    "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+                    "derived_total": 110,
+                    "simulated": true,
+                    "observed_lower_bound": 0,
+                    "prior_numeric_raw": []
+                  }
+                },
+                "objective": [
+                  "INVALID_HANDLES"
+                ],
+                "upgrade_reason": "INVALID_HANDLES",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 1,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              }
+            ],
+            "router": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "unknown"
+              ],
+              "task_anchors": [],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1028,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            }
+          },
+          "usage": {
+            "prompt_tokens": 200,
+            "completion_tokens": 20,
+            "total_tokens": 220,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": {
+              "semantics": "aggregate-disjoint-calls/v1",
+              "fields": [
+                [
+                  "input",
+                  {
+                    "value": 200,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/input"
+                  }
+                ],
+                [
+                  "output",
+                  {
+                    "value": 20,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/output"
+                  }
+                ],
+                [
+                  "total",
+                  {
+                    "value": 220,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/total"
+                  }
+                ],
+                [
+                  "cache_read",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_read"
+                  }
+                ],
+                [
+                  "cache_write",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_write"
+                  }
+                ],
+                [
+                  "cache_miss",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_miss"
+                  }
+                ]
+              ],
+              "numeric_raw": "[{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110},{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}]",
+              "raw_sha256": "230c218f4326b0f1701aecde341bf9042ad63966ae93e95f3b77768b7572400f",
+              "derived_total": 220,
+              "simulated": true,
+              "observed_lower_bound": 0,
+              "prior_numeric_raw": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "fixed",
+      "session": "851d826e-9cc1-4d1c-8c41-d641ea04842d",
+      "assistant": "43fb828a-9ad2-47a7-8fdd-df3f679d8ac9",
+      "content": "FIXED_SOURCE_REPLY",
+      "stream_calls": 0,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+            "query": "What is available in this knowledge base?",
+            "session_id": "851d826e-9cc1-4d1c-8c41-d641ea04842d",
+            "assistant_message_id": "43fb828a-9ad2-47a7-8fdd-df3f679d8ac9"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "answer",
+          "content": "FIXED_SOURCE_REPLY",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "6356dc16-830e-42ea-9c0d-25a366fd8b58-fallback"
+          }
+        },
+        {
+          "id": "6356dc16-830e-42ea-9c0d-25a366fd8b58",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": [],
+            "router": null
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": null
+          }
+        }
+      ]
+    },
+    {
+      "case": "empty_prompt",
+      "session": "d2f0b263-0c7e-4e20-8538-e7a0e01bd68d",
+      "assistant": "7daae827-e39b-4645-ba62-7ba2510b6220",
+      "content": "EMPTY_PROMPT_FIXED",
+      "stream_calls": 0,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "4f29de43-d805-408f-96ca-04e536a355f0",
+            "query": "What is available in this knowledge base?",
+            "session_id": "d2f0b263-0c7e-4e20-8538-e7a0e01bd68d",
+            "assistant_message_id": "7daae827-e39b-4645-ba62-7ba2510b6220"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "answer",
+          "content": "EMPTY_PROMPT_FIXED",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "4f29de43-d805-408f-96ca-04e536a355f0-fallback"
+          }
+        },
+        {
+          "id": "4f29de43-d805-408f-96ca-04e536a355f0",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": [],
+            "router": null
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": null
+          }
+        }
+      ]
+    },
+    {
+      "case": "unknown_strategy",
+      "session": "c42f4fc4-38f7-424a-954b-978c47301f6e",
+      "assistant": "748cc4b2-bf25-4639-b3a7-cebd03d254de",
+      "content": "OTHER_FIXED",
+      "stream_calls": 0,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+            "query": "What is available in this knowledge base?",
+            "session_id": "c42f4fc4-38f7-424a-954b-978c47301f6e",
+            "assistant_message_id": "748cc4b2-bf25-4639-b3a7-cebd03d254de"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "answer",
+          "content": "OTHER_FIXED",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4-fallback"
+          }
+        },
+        {
+          "id": "d3b98a2a-abf5-4421-a65b-e00ec1b1cfe4",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": [],
+            "router": null
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": null
+          }
+        }
+      ]
+    },
+    {
+      "case": "model",
+      "session": "3eb8a24b-90b0-45cb-af6d-f628f366ce27",
+      "assistant": "e458d941-6958-446f-b18d-a988bbc3cf1f",
+      "content": "GENERAL_FALLBACK_REPLY",
+      "stream_calls": 1,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+            "query": "What is available in this knowledge base?",
+            "session_id": "3eb8a24b-90b0-45cb-af6d-f628f366ce27",
+            "assistant_message_id": "e458d941-6958-446f-b18d-a988bbc3cf1f"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "cheap",
+            "attempt_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488/answer/1/cheap"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "cheap",
+            "attempt_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488/answer/1/cheap"
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "answer",
+          "content": "GENERAL_FALLBACK_REPLY",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "model_requested": "XingChenAGI/Xing4.0-29B",
+            "model_reported": "XingChenAGI/Xing4.0-29B",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 0,
+            "event_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488/answer/1/cheap-answer"
+          },
+          "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 10,
+            "total_tokens": 110,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": {
+              "semantics": "aggregate-disjoint-calls/v1",
+              "fields": [
+                [
+                  "input",
+                  {
+                    "value": 100,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/input"
+                  }
+                ],
+                [
+                  "output",
+                  {
+                    "value": 10,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/output"
+                  }
+                ],
+                [
+                  "total",
+                  {
+                    "value": 110,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/total"
+                  }
+                ],
+                [
+                  "cache_read",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_read"
+                  }
+                ],
+                [
+                  "cache_write",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_write"
+                  }
+                ],
+                [
+                  "cache_miss",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_miss"
+                  }
+                ]
+              ],
+              "numeric_raw": "[{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}]",
+              "raw_sha256": "aedc4550080b5fe364aae6ffafe66831e03b8402b3660250f8d70df6f3805de8",
+              "derived_total": 110,
+              "simulated": true,
+              "observed_lower_bound": 0,
+              "prior_numeric_raw": []
+            }
+          }
+        },
+        {
+          "id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "model_requested": "XingChenAGI/Xing4.0-29B",
+            "model_reported": "XingChenAGI/Xing4.0-29B",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 0,
+            "attempts": [
+              {
+                "attempt_id": "a0072c7e-1b78-4a8b-bf62-8c1209d52488/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "b1a02ce398fa41a3cb6e31eea2244d2ffe4a47857f5b01a07204678bd4b3e7b9",
+                "prompt_sha256": "4d1d7a229a107c77e621d7dcf20575969b4c164ed81bce06bf1acb31e6fa31b8",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported",
+                  "provider_usage_facts": {
+                    "semantics": "openai-input-inclusive/v1",
+                    "fields": [
+                      [
+                        "input",
+                        {
+                          "value": 100,
+                          "present": true,
+                          "valid": true,
+                          "path": "prompt_tokens"
+                        }
+                      ],
+                      [
+                        "output",
+                        {
+                          "value": 10,
+                          "present": true,
+                          "valid": true,
+                          "path": "completion_tokens"
+                        }
+                      ],
+                      [
+                        "total",
+                        {
+                          "value": 110,
+                          "present": true,
+                          "valid": true,
+                          "path": "total_tokens"
+                        }
+                      ],
+                      [
+                        "cache_read",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_hit_tokens"
+                        }
+                      ],
+                      [
+                        "cache_write",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "cache_creation_input_tokens"
+                        }
+                      ],
+                      [
+                        "cache_miss",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_miss_tokens"
+                        }
+                      ]
+                    ],
+                    "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+                    "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+                    "derived_total": 110,
+                    "simulated": true,
+                    "observed_lower_bound": 0,
+                    "prior_numeric_raw": []
+                  }
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              }
+            ],
+            "router": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "unknown"
+              ],
+              "task_anchors": [],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 857,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            }
+          },
+          "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 10,
+            "total_tokens": 110,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": {
+              "semantics": "aggregate-disjoint-calls/v1",
+              "fields": [
+                [
+                  "input",
+                  {
+                    "value": 100,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/input"
+                  }
+                ],
+                [
+                  "output",
+                  {
+                    "value": 10,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/output"
+                  }
+                ],
+                [
+                  "total",
+                  {
+                    "value": 110,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/total"
+                  }
+                ],
+                [
+                  "cache_read",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_read"
+                  }
+                ],
+                [
+                  "cache_write",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_write"
+                  }
+                ],
+                [
+                  "cache_miss",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_miss"
+                  }
+                ]
+              ],
+              "numeric_raw": "[{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}]",
+              "raw_sha256": "aedc4550080b5fe364aae6ffafe66831e03b8402b3660250f8d70df6f3805de8",
+              "derived_total": 110,
+              "simulated": true,
+              "observed_lower_bound": 0,
+              "prior_numeric_raw": []
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "private_error": "ORDINARY_CHAIN_FAILED",
+  "budget_error": "ORDINARY_CHAIN_FAILED",
+  "observed_budget_gate_codes": [
+    "MONTHLY_BUDGET_EXCEEDED",
+    "MONTHLY_BUDGET_EXCEEDED"
+  ],
+  "observed_private_gate_code": "MODEL_ORIGIN_KB_EGRESS_DENIED"
+}

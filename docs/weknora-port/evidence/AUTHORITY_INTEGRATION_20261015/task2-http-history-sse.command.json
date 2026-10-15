@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "--noconftest",
+    "-q",
+    "tests/weknora_port/test_qa_followup_fallback_pg.py",
+    "tests/weknora_port/test_stream_error_http_pg.py",
+    "tests/weknora_port/test_cancel_partial_http_pg.py",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=E:\\WK\\run\\authority-assembly-20261015\\pytest-task2-http-history-sse",
+    "--junitxml=E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\AUTHORITY_INTEGRATION_20261015\\task2-http-history-sse.junit.xml"
+  ],
+  "cwd": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "env_paths": {
+    "PYTHONPATH": "E:\\RAG-Worktrees\\weknora-python-port-20261013;E:\\WK\\deps\\reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps",
+    "TMP": "E:\\WK\\run\\authority-assembly-20261015\\tmp",
+    "TEMP": "E:\\WK\\run\\authority-assembly-20261015\\tmp",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}

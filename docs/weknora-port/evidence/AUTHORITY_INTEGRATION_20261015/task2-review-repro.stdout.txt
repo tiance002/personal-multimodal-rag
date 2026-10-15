@@ -1,0 +1,23 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_two_standard_cli_processes_upload_question_worker_and_replay ______
+tests\weknora_port\test_authority_cli_pg.py:172: in test_two_standard_cli_processes_upload_question_worker_and_replay
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_authority_cli_pg.py:167: in scenario
+    Path(os.environ['WEKNORA_SEQ_IMAGE_RECEIPT']).write_text(json.dumps(receipt,indent=2,default=str)+'\n',encoding='utf-8')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen os>:716: in __getitem__
+    ???
+E   KeyError: 'WEKNORA_SEQ_IMAGE_RECEIPT'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_authority_cli_pg.py::test_two_standard_cli_processes_upload_question_worker_and_replay - KeyError: 'WEKNORA_SEQ_IMAGE_RECEIPT'
+1 failed in 21.43s

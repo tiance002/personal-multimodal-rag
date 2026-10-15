@@ -1,0 +1,129 @@
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+____________ test_followup_and_source_fallback_through_formal_http ____________
+tests\weknora_port\test_qa_followup_fallback_pg.py:158: in test_followup_and_source_fallback_through_formal_http
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_followup_fallback_pg.py:74: in scenario
+    async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,response_handler=response) as (runtime,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:109: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:18: in build_native_fixture
+    ???
+E   AssertionError
+_________ test_model_fallback_stop_and_scope_failures_remain_terminal _________
+tests\weknora_port\test_qa_followup_fallback_pg.py:208: in test_model_fallback_stop_and_scope_failures_remain_terminal
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_followup_fallback_pg.py:174: in scenario
+    async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,response_handler=response) as (runtime,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:109: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:18: in build_native_fixture
+    ???
+E   AssertionError
+_________ test_fallback_listing_preserves_document_scope_through_http _________
+tests\weknora_port\test_qa_followup_fallback_pg.py:244: in test_fallback_listing_preserves_document_scope_through_http
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_followup_fallback_pg.py:220: in scenario
+    async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,response_handler=response) as (runtime,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:109: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:18: in build_native_fixture
+    ???
+E   AssertionError
+________ test_actual_http_same_channel_recovery_and_error_eof_unknown _________
+tests\weknora_port\test_stream_error_http_pg.py:65: in test_actual_http_same_channel_recovery_and_error_eof_unknown
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_stream_error_http_pg.py:21: in scenario
+    async with isolated_mock_application(answer_stream_factory=stream_factory) as (app,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:109: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:18: in build_native_fixture
+    ???
+E   AssertionError
+___ test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race ____
+tests\weknora_port\test_cancel_partial_http_pg.py:121: in test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_cancel_partial_http_pg.py:32: in scenario
+    async with isolated_mock_application(answer_stream_factory=stream_factory) as (app,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:109: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:18: in build_native_fixture
+    ???
+E   AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_qa_followup_fallback_pg.py::test_followup_and_source_fallback_through_formal_http - AssertionError
+FAILED tests/weknora_port/test_qa_followup_fallback_pg.py::test_model_fallback_stop_and_scope_failures_remain_terminal - AssertionError
+FAILED tests/weknora_port/test_qa_followup_fallback_pg.py::test_fallback_listing_preserves_document_scope_through_http - AssertionError
+FAILED tests/weknora_port/test_stream_error_http_pg.py::test_actual_http_same_channel_recovery_and_error_eof_unknown - AssertionError
+FAILED tests/weknora_port/test_cancel_partial_http_pg.py::test_actual_http_partial_disconnect_hidden_draft_and_final_commit_race - AssertionError
+5 failed in 3.05s

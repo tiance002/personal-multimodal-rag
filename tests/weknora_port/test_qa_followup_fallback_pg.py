@@ -7,7 +7,8 @@ from backend.weknora_port.http_api import create_app
 from tests.weknora_port.native_fixture import isolated_mock_application
 from tests.weknora_port.test_memory_storage_pg import actual_pg_run
 
-REDIS_ID='fa7bde76dcd020d396902fa924d0ea3e7b26ceb2'
+from tests.weknora_port.redis_fixture_identity import expected_redis_run_id
+REDIS_ID=expected_redis_run_id()
 
 @asynccontextmanager
 async def http_client(runtime):
