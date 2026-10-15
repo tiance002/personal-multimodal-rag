@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="5.106" timestamp="2026-10-15T11:05:05.371656+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_qa_followup_fallback_pg" name="test_fallback_listing_preserves_document_scope_through_http" time="3.931"><failure message="AssertionError: assert ([{'enable_thinking': False, 'max_tokens': 1024, 'messages': [{'content': 'QA_FALLBACK - selected-public (txt): The sou...n', 'role': 'system'}, {'content': 'blue widgets protocol', 'role': 'user'}], 'model': 'XingChenAGI/Xing4.0-29B', ...}] and 'selected-public.txt' in 'QA_FALLBACK - selected-public (txt): The source handbook says blue widgets use protocol W-17. Keep the widgets dry.\n... msN server IDs and mtN tool references. Copy them exactly from the directory or describe result; never invent them.\n')">tests\weknora_port\test_qa_followup_fallback_pg.py:230: in test_fallback_listing_preserves_document_scope_through_http
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_followup_fallback_pg.py:224: in scenario
+    assert captured and 'selected-public.txt' in captured[0]['messages'][0]['content']
+E   AssertionError: assert ([{'enable_thinking': False, 'max_tokens': 1024, 'messages': [{'content': 'QA_FALLBACK - selected-public (txt): The sou...n', 'role': 'system'}, {'content': 'blue widgets protocol', 'role': 'user'}], 'model': 'XingChenAGI/Xing4.0-29B', ...}] and 'selected-public.txt' in 'QA_FALLBACK - selected-public (txt): The source handbook says blue widgets use protocol W-17. Keep the widgets dry.\n... msN server IDs and mtN tool references. Copy them exactly from the directory or describe result; never invent them.\n')</failure></testcase></testsuite></testsuites>

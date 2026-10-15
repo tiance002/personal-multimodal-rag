@@ -28,6 +28,8 @@ class GenerationRequest:
     memory_prompt: str = field(default='', repr=False)
     language: str = 'Chinese'
     system_prompt: str = field(default=DEFAULT_SYSTEM_PROMPT, repr=False)
+    is_fallback: bool = False
+    fixed_fallback: str | None = field(default=None,repr=False)
     supports_vision: bool = False
     citations_enabled: bool = True
     faq_priority_enabled: bool = False

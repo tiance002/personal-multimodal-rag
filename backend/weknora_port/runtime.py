@@ -48,6 +48,11 @@ class ConversationSettings:
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .3, "max_completion_tokens": 1024})
 
+    fallback_strategy: str = 'model'
+    fallback_response: str = 'Sorry, I am unable to answer this question.'
+    fallback_prompt_id: str = 'default_fallback_prompt'
+    fallback_prompt: str | None = None
+
     generate_summary_prompt_id: str = 'default_summary'
     generate_summary_prompt: str | None = None  # already-resolved server text, not YAML
     language_locale: str = ''  # injected startup override; empty permits HTTP locale
@@ -419,7 +424,41 @@ class ApplicationRuntime:
             global_intent_system_prompts=effective['global_intent_system_prompts'])
         return TurnConfiguration(state, {"policy": self.policy,
             "system_prompt": summary.get('prompt', DEFAULT_SYSTEM_PROMPT),
-            "options": resolved_chat_options(summary, turn.request.reasoning_effort)})
+            "options": resolved_chat_options(summary, turn.request.reasoning_effort)},
+            fallback={"strategy":source.fallback_strategy,"response":source.fallback_response,
+                "prompt":self._fallback_prompt(),"documents":lambda:self._fallback_documents(turn),
+                "options":ChatOptions(temperature=summary.get('temperature',0),
+                    max_completion_tokens=summary.get('max_completion_tokens',0),thinking=False)})
+
+    def _fallback_prompt(self):
+        if self.conversation.fallback_prompt is not None:return self.conversation.fallback_prompt
+        from .conversation_configuration import source_prompt_templates
+        return next((row.get('content','') for row in source_prompt_templates()['fallback']
+            if row.get('id')==self.conversation.fallback_prompt_id),'')
+
+    async def _fallback_documents(self,turn):
+        # Source listing capped at 50 enabled documents. Safety wrapper also
+        # restricts it to admission's document scope, never broader than retrieval.
+        async with self.leases.lease() as guard:
+            await self.turns._session(guard,turn.session_id,self.principal)
+            rows=await (await guard.connection.execute(
+                "SELECT title,file_name,file_type,description FROM knowledges WHERE tenant_id=%s "
+                "AND knowledge_base_id=ANY(%s) AND deleted_at IS NULL AND enable_status='enabled' "
+                "AND (COALESCE(title,'')<>'' OR COALESCE(file_name,'')<>'') "
+                "AND (%s::boolean OR id=ANY(%s)) LIMIT 50",
+                (self.principal.tenant_id,list(turn.context.scope.knowledge_base_ids),
+                 not bool(turn.context.scope.document_ids),list(turn.context.scope.document_ids)))).fetchall()
+        lines=[]
+        for row in rows:
+            title=row['title'] or row['file_name']
+            if not title:continue
+            line='- '+title
+            if row['file_type']:line+=' ('+row['file_type']+')'
+            description=row['description'] or ''
+            if description:line+=': '+description[:100]+('...' if len(description)>100 else '')
+            lines.append(line+'\n')
+        if len(lines)>=50:lines.append('... (showing first 50 documents)\n')
+        return ''.join(lines)
 
     async def _persist_context(self, state, context):
         async with self.leases.lease() as guard:

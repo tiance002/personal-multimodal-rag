@@ -50,6 +50,9 @@ def resolve_startup_templates(row,templates=None):
     rewrite=find(row.get('rewrite_prompt_id',''))
     if rewrite is not None:
         result['rewrite_prompt_system']=rewrite.get('content','');result['rewrite_prompt_user']=rewrite.get('user','')
+    for identifier,target in [('fallback_prompt_id','fallback_prompt'),('generate_summary_prompt_id','generate_summary_prompt')]:
+        found=find(row.get(identifier,''))
+        if found is not None:result[target]=found.get('content','')
     summary=dict(row.get('summary') or {})
     for identifier,target in [('prompt_id','prompt'),('context_template_id','context_template')]:
         if summary.get(identifier):summary.setdefault(target,'')

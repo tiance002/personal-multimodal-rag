@@ -117,6 +117,7 @@ def prepare_generation(request, *, now=None):
     registry = SourceRegistry(request.citations_enabled)
     system = render_placeholders(finalized.system_prompt_override or request.system_prompt, {'query': request.q0, 'contexts': finalized.rendered_contexts, 'language': request.language}, now)
     system += '\n\n' + SOURCE_DATA_BOUNDARY + '\n\n' + SOURCED_ANSWER_OUTPUT + request.memory_prompt
+    if request.is_fallback and not (finalized.system_prompt_override or request.system_prompt).strip():system=''
     system = system.rstrip(' \t\r\n') + registry.protocol_prompt
     messages = [Message('system', system)]
     for h in request.history:

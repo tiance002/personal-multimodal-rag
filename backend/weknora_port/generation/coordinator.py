@@ -95,7 +95,7 @@ class GenerationCoordinator:
                 await self.store.append_event(request.session_id, request.message_id,
                     StreamEvent(attempt_id + '-' + kind, kind, content, done,
                                 data={'attempt_id': attempt_id, 'role': role,
-                                      'finish_reason': finish, 'truncated': is_length(finish)}))
+                                      'finish_reason': finish, 'truncated': is_length(finish), 'is_fallback': request.is_fallback}))
 
         async def close_thinking():
             nonlocal thinking_closed
@@ -272,6 +272,27 @@ class GenerationCoordinator:
         references = tuple(({'id': e.id, 'content': e.source_content or e.content, 'score': e.score, 'knowledge_id': e.knowledge_id, 'knowledge_base_id': e.knowledge_base_id, 'knowledge_title': e.knowledge_title, 'knowledge_filename': e.knowledge_filename, 'chunk_index': e.chunk_index, 'chunk_type': e.chunk_type, 'knowledge_source': e.knowledge_source} for e in request.evidence if e.id in chunk_ids or e.id in urls))
         return references
 
+    async def _fixed_fallback(self,request,context):
+        from ..references.registry import SourceRegistry
+        text=request.fixed_fallback
+        if not request.citations_enabled:text=SourceRegistry(False).decode_output_text(text)
+        await self.lifecycle.claim_run(request.run_id,digest({'run':request.run_id,'fixed':text}),context)
+        check_context(context)
+        await self.store.append_event(request.session_id,request.message_id,
+            StreamEvent(request.run_id+'-fallback','answer',text,True,data={'is_fallback':True}))
+        check_context(context)
+        coordinator=self
+        class CheckedCommitter:
+            async def commit_final(self,commit):
+                check_context(context)
+                await coordinator.committer.commit_final(commit)
+                check_context(context)
+        # There is no provider attempt or usage report for a fixed reply.
+        usage=TokenUsage()
+        await finalize_turn(self.store,CheckedCommitter(),FinalCommit(request.session_id,request.message_id,
+            request.run_id,text,[],usage_dict(usage)),complete_data={'is_fallback':True,'attempts':[]})
+        return GenerationResult(text,'',(),'fixed','',(),None,usage,'',False,False,'','')
+
     async def run(self, request, context):
         check_context(context)
         if context.request_id != request.run_id or (context.session_id and context.session_id != request.session_id):
@@ -280,6 +301,8 @@ class GenerationCoordinator:
             raise GenerationError('GENERATION_SCOPE_REQUIRED')
         if any((e.knowledge_base_id not in context.scope.knowledge_base_ids or (context.scope.document_ids and e.knowledge_id not in context.scope.document_ids) for e in request.evidence if e.knowledge_source.lower() != 'web_search' and e.chunk_type.lower() != 'web_search')):
             raise GenerationError('GENERATION_EVIDENCE_SCOPE_MISMATCH')
+        if request.fixed_fallback is not None:
+            return await self._fixed_fallback(request,context)
         prepared = prepare_generation(request)
         route = None
         role = 'baseline'
@@ -322,7 +345,7 @@ class GenerationCoordinator:
         total_usage = accumulate_usage([record.usage for record in attempts])
         result = GenerationResult(answer, thinking, references, record.role, record.attempt_id, tuple(attempts), route, total_usage, record.finish_reason, is_length(record.finish_reason), len(attempts) > 1, prepared.prompt_sha256, prepared.context_sha256)
         check_context(context)
-        metadata = {'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
+        metadata = {'is_fallback':request.is_fallback, 'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
         buffered = record.role == 'cheap' and request.policy.mode == 'DYNAMIC'
         if buffered:
             for notice in error_events:

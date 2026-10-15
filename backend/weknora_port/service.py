@@ -13,6 +13,7 @@ from .generation import GenerationRequest, GenerationReplay, Evidence, History, 
 from .generation.coordinator import check_context
 from .models.types import CallContext, ProviderError, CallCancelled, RunDeadlineExceeded
 from .retrieval.pipeline import PipelineState
+from .retrieval.search import SearchNothing
 from .streaming.events import StreamEvent
 from .streaming.replay import ReplayService, AssistantRun
 
@@ -67,6 +68,7 @@ class PreparedOrdinaryTurn:
 class TurnConfiguration:
     pipeline_state: PipelineState
     generation_options: dict[str, Any] = field(default_factory=dict)
+    fallback: dict[str, Any] | None = None
 
 class OrdinaryMemoryLoader:
     """Use existing P4 reads and the exact QUERY_UNDERSTAND background wrapper."""
@@ -291,7 +293,26 @@ class RuntimeService:
         await progress('memory','completed')
         check_context(turn.context)
         pipeline=await _resolve(self.pipeline_factory(turn,progress))
-        finalized=await pipeline.run(state,model_context)
+        fallback=None
+        try:
+            finalized=await pipeline.run(state,model_context)
+        except SearchNothing:
+            if config.fallback is None:raise
+            from .retrieval.context import FinalizedContext,render_placeholders
+            from .retrieval.query import go_strip
+            check_context(model_context)
+            fallback=config.fallback
+            query=go_strip(state.rewrite_query) or state.query
+            prompt=fallback['prompt']
+            if fallback['strategy']=='model' and prompt!='':
+                listing=await _resolve(fallback['documents']())
+                check_context(model_context)
+                prompt=render_placeholders(prompt,{'query':query,'language':state.language,'kb_documents':listing})
+                if state.image_description and not state.chat_model_supports_vision:
+                    prompt+='\n\n[用户上传图片描述]\n'+state.image_description
+                if state.quoted_context:prompt+='\n\n'+state.quoted_context
+            finalized=FinalizedContext(query,'',(),prompt,state.images)
+            state.merge_results=[]
         check_context(turn.context)
         evidence=tuple(Evidence.from_result(r) for r in state.merge_results if r is not None)
         # Existing query-understand validation supplies the rewrite; P5
@@ -299,6 +320,9 @@ class RuntimeService:
         understanding=ValidatedRewrite(turn.request.content,state.rewrite_query) if state.rewrite_query else None
         from datetime import datetime
         options=dict(config.generation_options)
+        if fallback is not None:
+            options.update(is_fallback=True,options=fallback['options'],system_prompt=finalized.system_prompt_override)
+            if fallback['strategy']!='model' or fallback['prompt']=='':options['fixed_fallback']=fallback['response']
         options.setdefault('rendered_at',datetime.now())
         options.setdefault('language',state.language)
         options.setdefault('supports_vision',state.chat_model_supports_vision)
@@ -307,7 +331,7 @@ class RuntimeService:
         if forbidden:
             raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
         request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
-            evidence=evidence,history=history,memory_prompt=memory.prompt,understanding=understanding,**options)
+            evidence=evidence,history=history,memory_prompt='' if fallback is not None else memory.prompt,understanding=understanding,**options)
         stages=[('search',state.search_results),('rerank',state.rerank_results),('context',state.merge_results)]
         rankings=tuple((name,tuple((r.id,r.knowledge_base_id,r.knowledge_id) for r in rows if r is not None)) for name,rows in stages)
         return PreparedOrdinaryTurn(request,model_context,rankings)

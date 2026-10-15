@@ -42,4 +42,22 @@ def test_source_summary_configuration_id_resolved_text_language_and_positive_lim
     assert summary_configuration(replace(cfg,generate_summary_prompt='RESOLVED {{language}}'),rows,'ja')==('RESOLVED Japanese',8192,1024)
     assert summary_configuration(replace(cfg,generate_summary_prompt_id='missing'),rows)[0]==''
     assert summary_configuration(cfg,rows,'Unlisted Display Name')[0]=='CUSTOM Unlisted Display Name'
-    assert ConversationSettings.from_mapping({'conversation':{'generate_summary_prompt_id':'custom','generate_summary_prompt':'YAML MUST NOT WIN'}}).generate_summary_prompt is None
+    # Source backfillConversationDefaults: a missing ID retains raw text.
+    mapping={'conversation':{'generate_summary_prompt_id':'custom','generate_summary_prompt':'RAW YAML'}}
+    assert ConversationSettings.from_mapping(mapping,prompt_templates={}).generate_summary_prompt=='RAW YAML'
+    assert ConversationSettings.from_mapping(mapping,prompt_templates={'generate_summary':rows}).generate_summary_prompt=='CUSTOM {{language}}'
+
+
+def test_qa_summary_and_fallback_resolution_match_executed_go_backfill():
+    from backend.weknora_port.conversation_configuration import resolve_startup_templates
+    oracle=json.loads((Path(__file__).parent/'fixtures/configuration_go_qa_20261015.json').read_text(encoding='utf-8'))
+    assert oracle['exit_code']==0
+    templates={'generate_summary':[{'id':'known','content':'RESOLVED SUMMARY'}],
+               'fallback':[{'id':'known-fallback','content':'RESOLVED FALLBACK'}]}
+    cases=[r for r in oracle['rows'] if r['kind'] in ('qa_summary','qa_fallback')]
+    assert len(cases)==6
+    for row in cases:
+        prefix='generate_summary' if row['kind']=='qa_summary' else 'fallback'
+        raw='RAW YAML' if prefix=='generate_summary' else 'RAW FALLBACK'
+        result=resolve_startup_templates({prefix+'_prompt_id':row['input'],prefix+'_prompt':raw},templates)
+        assert result[prefix+'_prompt']==row['output']

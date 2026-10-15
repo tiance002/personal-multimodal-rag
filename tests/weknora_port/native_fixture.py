@@ -41,7 +41,7 @@ class IsolatedFixturePool:
 
 
 @asynccontextmanager
-async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None,expected_redis_run_id=None,redis_db=0):
+async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None,expected_redis_run_id=None,redis_db=0,response_handler=None):
     tree=ast.parse(inspect.getsource(fixture.test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout_no_upgrade))
     scenario=next(n for n in tree.body[0].body if isinstance(n,ast.AsyncFunctionDef) and n.name=='scenario')
     body=[]
@@ -58,11 +58,17 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_tex
         source=source.replace(original,repr(image_ocr_text))
     if expected_redis_run_id is not None:
         import re
-        if not re.fullmatch('[0-9a-f]{40}',expected_redis_run_id) or redis_db!=15:raise ValueError('EXPLICIT_ISOLATED_REDIS_ID_DB_REQUIRED')
+        if not re.fullmatch('[0-9a-f]{40}',expected_redis_run_id) or redis_db!=15:
+            raise ValueError('EXPLICIT_ISOLATED_REDIS_ID_DB_REQUIRED')
         assert source.count('redis://127.0.0.1:56424/0')==1
         source=source.replace('redis://127.0.0.1:56424/0','redis://127.0.0.1:56424/15')
-        source=source.replace('weknora-resume:20261013:','local-takeover:20261015:')
+        source=source.replace('weknora-resume:20261013:','serial-integration:20261015:')
     elif redis_db!=0:raise ValueError('EXPLICIT_ISOLATED_REDIS_ID_REQUIRED')
+    if response_handler is not None:
+        assert callable(response_handler)
+        marker="wire.append({'path': request.url.path, 'body': body})"
+        assert source.count(marker)==1
+        source=source.replace(marker,marker+"\n    overridden = RESPONSE_HANDLER(request,body)\n    if overridden is not None:return overridden")
     assert 'httpx.MockTransport(handler)' in source and 'fixture.invalid' in source
     # Replace only the verified fixture's connection opening/closing strategy.
     # IsolatedConnectionFactory still constructs a fresh scoped identity guard.
@@ -77,7 +83,7 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_tex
             source=source.replace(branch,"return ANSWER_STREAM_FACTORY(body['model'])")
     source+='\nruntime.fixture_connection_pool=pool\nreturn runtime,redis,wire,root,pool'
     program='async def build_native_fixture():\n'+'\n'.join('    '+line for line in source.splitlines())
-    namespace=dict(fixture.__dict__);namespace['dsn']=fixture.approved_dsn();namespace['IsolatedFixturePool']=IsolatedFixturePool;namespace['ANSWER_STREAM_FACTORY']=answer_stream_factory
+    namespace=dict(fixture.__dict__);namespace['dsn']=fixture.approved_dsn();namespace['IsolatedFixturePool']=IsolatedFixturePool;namespace['ANSWER_STREAM_FACTORY']=answer_stream_factory;namespace['RESPONSE_HANDLER']=response_handler
     if expected_redis_run_id is not None:namespace['REDIS_RUN_ID']=expected_redis_run_id
     if synthetic_monthly_limit is not None:
         from dataclasses import replace

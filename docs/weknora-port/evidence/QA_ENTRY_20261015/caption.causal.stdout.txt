@@ -1,0 +1,37 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_caption_language_assertion_task_and_send_ledger_causal_comparison ____
+tests\weknora_port\test_qa_caption_causal_pg.py:67: in test_caption_language_assertion_task_and_send_ledger_causal_comparison
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_caption_causal_pg.py:50: in scenario
+    ledger=await runtime._rows('SELECT capability,state,error_code,usage FROM send_calls WHERE account_id=%s ORDER BY created_at',
+backend\weknora_port\runtime.py:273: in _rows
+    return await (await guard.connection.execute(sql, params)).fetchall()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\psycopg\connection_async.py:295: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column "error_code" does not exist
+E   LINE 1: SELECT capability,state,error_code,usage FROM send_calls WHE...
+E                                   ^
+============================== warnings summary ===============================
+tests/weknora_port/test_qa_caption_causal_pg.py::test_caption_language_assertion_task_and_send_ledger_causal_comparison
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_qa_caption_causal_pg.py::test_caption_language_assertion_task_and_send_ledger_causal_comparison
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_qa_caption_causal_pg.py::test_caption_language_assertion_task_and_send_ledger_causal_comparison
+1 failed, 2 warnings in 32.56s
