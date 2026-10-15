@@ -33,7 +33,7 @@ async def main(args):
             'git_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
             'source_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},
             'model_quality':'NOT_RUN_SIMULATED_MODELS','independent_omni_qa':'NOT_RUN_OVERLAY_UNAVAILABLE'})
-        async with isolated_mock_application(synthetic_monthly_limit=10000000) as (application,wire,root):
+        async with isolated_mock_application(synthetic_monthly_limit=10000000,expected_redis_run_id=args.redis_run_id,redis_db=args.redis_db) as (application,wire,root):
             await record({'event':'fixture_capacity','monthly_limit_synthetic_microunits':10000000,'price_source':'SYNTHETIC-NOT-BILLING','real_spending_authorized':False})
             runner=NativeSixRunner(application,execution_kind='ISOLATED_MOCK',prepare_kb=prepare_public_fixture,on_record=record,ingest_workers=args.ingest_workers)
             await runner.run(frozen,datasets=args.datasets)
@@ -43,5 +43,5 @@ async def main(args):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--manifest',required=True);parser.add_argument('--manifest-sha256',required=True);parser.add_argument('--output',required=True);parser.add_argument('--ingest-workers',type=int,default=4);parser.add_argument('--datasets',nargs='+')
+    parser=argparse.ArgumentParser();parser.add_argument('--manifest',required=True);parser.add_argument('--manifest-sha256',required=True);parser.add_argument('--output',required=True);parser.add_argument('--ingest-workers',type=int,default=4);parser.add_argument('--datasets',nargs='+');parser.add_argument('--redis-run-id',required=True);parser.add_argument('--redis-db',type=int,choices=(15,),default=15)
     actual_pg_run(main(parser.parse_args()))

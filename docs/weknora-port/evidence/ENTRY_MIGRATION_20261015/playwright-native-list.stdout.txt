@@ -1,0 +1,13 @@
+
+> personal-rag-workbench@1.0.0 test
+> playwright test --list --reporter=line
+
+Listing tests:
+  adapter.spec.ts:25:1 鈥?port adapter loads visible scope and five masked model roles without old app fallback
+  adapter.spec.ts:40:1 鈥?POST once and recover by offset-zero GET of the same assistant message without duplicate answer text
+  adapter.spec.ts:86:1 鈥?runtime identity mismatch blocks mutations and remains visibly isolated from the existing backend
+  adapter.spec.ts:99:1 鈥?runtime mismatch during a run is shown in its assistant bubble and never starts generation
+  consent.spec.ts:31:1 鈥?current KB consent displays false and persists explicit enable/disable without model calls
+  consent.spec.ts:45:1 鈥?failed consent save keeps persisted false and shows inline error
+  consent.spec.ts:54:1 鈥?runtime identity change blocks consent mutation
+Total: 7 tests in 2 files

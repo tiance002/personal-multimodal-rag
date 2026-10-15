@@ -1,3 +1,11 @@
+> Current native entry migration (2026-10-15): default pytest now collects `tests/weknora_port`; run the intact historical suites explicitly with `python -m pytest -c pytest.legacy.ini`. Default `npm test` selects native browser tests without setting an implementation selector; legacy tests use `npm test -- --config=playwright.legacy.config.ts`. Actual browser execution remains BLOCKED by the independently documented path permissions. No whole-repository GREEN follows from changing defaults.
+>
+> `scripts/verify-m0.ps1` now checks only native imports/resources and two named offline contract files; it does not probe models, start Compose or apply schemas, and its report is NOT historical M0 acceptance. Explicit legacy wrappers are retained under `scripts/legacy/` with their old side effects and require separate authorization; do not run them as native verification.
+>
+> `scripts/eval.ps1 -Mode Schema` validates the frozen schema only. `-Mode Verify-Existing` requires manifest/results plus their SHA256, a new `-Report`, `-AllowIsolatedRead` and the explicit approved isolated DSN; it makes no model requests and does not execute evaluation. `-Mode Execute-Native` requires manifest/SHA, a new `-Report`, `-AllowIsolatedMockExecution`, explicit isolated DSN and `WEKNORA_PORT_TEST_REDIS_RUN_ID`; it invokes only the existing native closed-MockTransport runner on Redis DB15. Its output is simulated-model wiring evidence, not real answer quality. Legacy ambiguous Retrieval/Quality modes refuse rather than invoke old RAG. None of these flags authorizes real providers or old data changes.
+>
+> The older documentation below is preserved as historical procedure/evidence; it does not describe the current native defaults. All old tests/assertions and historical outcomes remain intact.
+
 # 测试入口与副作用边界
 
 本说明不表示任何新测试已通过。开发与验证当前暂停；[首补丁状态](SOURCE-STATE.md)为已落地、未GREEN。

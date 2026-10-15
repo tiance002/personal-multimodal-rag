@@ -1,0 +1,103 @@
+
+> personal-rag-workbench@1.0.0 test
+> playwright test --config=playwright.legacy.config.ts --list --reporter=line
+
+Listing tests:
+  app.spec.ts:3:1 鈥?three-column workbench hides graph controls when the selected knowledge base is default-off
+  app.spec.ts:12:1 鈥?graph-enabled knowledge base exposes the opt-in graph tab
+  clarification-response.spec.ts:6:1 鈥?versioned generation failure renders on agent side for the same run after refresh
+  clarification-response.spec.ts:50:1 鈥?an explicit safe clarification retains the actual prompt and is not a failure notice
+  clarification-response.spec.ts:58:1 鈥?a completed response still displays the answer and completed status
+  clarification-response.spec.ts:73:3 鈥?plain no candidates remains an ordinary error
+  clarification-response.spec.ts:73:3 鈥?missing explicit flag remains an ordinary error
+  clarification-response.spec.ts:73:3 鈥?false flag remains an ordinary error
+  clarification-response.spec.ts:73:3 鈥?wrong error remains an ordinary error
+  clarification-response.spec.ts:73:3 鈥?cancelled remains an ordinary error
+  clarification-response.spec.ts:73:3 鈥?empty hint remains an ordinary error
+  clarification-response.spec.ts:73:3 鈥?claimed factual citation remains an ordinary error
+  clarification-response.spec.ts:83:1 鈥?a duplicate API rejection is shown without inventing another assistant reply
+  clarification-response.spec.ts:90:1 鈥?an input length rejection is explicit and never a clarification
+  clarification-response.spec.ts:97:1 鈥?refresh of a user-only history uses a generic unsaved-reply hint, not a reconstructed clarification
+  clarification-response.spec.ts:107:1 鈥?a pending replay cannot be duplicated or switched into another conversation
+  clarification-response.spec.ts:128:1 鈥?running refresh remains neutral and never implies an incomplete question
+  clarification-response.spec.ts:155:3 鈥?failed clarification refresh also remains neutral without persisted terminal metadata
+  clarification-response.spec.ts:155:3 鈥?genuine provider error refresh also remains neutral without persisted terminal metadata
+  clarification-response.spec.ts:169:1 鈥?persisted terminal clarification restores the exact prompt after refresh without an assistant fact
+  clarification-response.spec.ts:190:3 鈥?invalid persisted false marker remains neutral
+  clarification-response.spec.ts:190:3 鈥?invalid persisted ordinary error remains neutral
+  clarification-response.spec.ts:190:3 鈥?invalid persisted missing run remains neutral
+  clarification-response.spec.ts:190:3 鈥?invalid persisted empty hint remains neutral
+  clarification-response.spec.ts:190:3 鈥?invalid persisted citation remains neutral
+  first-use-ingestion.spec.ts:3:1 鈥?an empty installation can create a knowledge base, upload its first file, and see indexing finish
+  first-use-ingestion.spec.ts:38:1 鈥?a failed ingestion job shows its error and can be queued for worker retry
+  first-use-ingestion.spec.ts:63:1 鈥?a second upload cannot replace the first job while its receipt or ingestion is pending
+  history-citation.spec.ts:5:1 鈥?a reopened conversation keeps its run link and reads the frozen citation back
+  ingestion-refresh-recovery.spec.ts:6:1 鈥?a failed ingestion stays visible with a retry entry after a page refresh
+  kb-ingestion-isolation.spec.ts:22:1 鈥?a failed A job cannot become B's task after switching libraries
+  kb-ingestion-isolation.spec.ts:43:1 鈥?a running A job cannot block an upload to B
+  kb-ingestion-isolation.spec.ts:74:1 鈥?a late A document response cannot replace B's scoped list
+  model-settings.spec.ts:4:1 鈥?five model roles save local configuration and never refill secrets
+  model-settings.spec.ts:35:1 鈥?scope picker shows complete long names without horizontal overflow
+  p55b21-memory.spec.ts:3:1 鈥?explicit Global choice, Scoped default, late responses, edit/source/delete
+  p55c-memory-scope.spec.ts:3:1 鈥?memory uses conversation documents; late old scope cannot replace new rows
+  run-progress.spec.ts:8:31 鈥?7 healthy SSE windows preserve stages/cursor over simulated 210 seconds
+  run-progress.spec.ts:8:31 鈥?9 healthy SSE windows preserve stages/cursor over simulated 270 seconds
+  run-progress.spec.ts:42:1 鈥?POST and SSE defaults allow 300 seconds while explicit windows retain the 210 second floor
+  run-progress.spec.ts:69:1 鈥?abnormal failures use bounded retries and resumed cursors without spinning
+  run-progress.spec.ts:83:1 鈥?startup scoped 404 grace is at most ten seconds and healthy windows respect overall deadline
+  run-progress.spec.ts:104:1 鈥?typed API rejection is prompt while mismatched POST identity waits for exact GET
+  run-progress.spec.ts:133:3 鈥?committed scoped GET beats lost POST with one generation and no duplicate completion
+  run-progress.spec.ts:133:3 鈥?committed scoped GET beats pending POST with one generation and no duplicate completion
+  run-progress.spec.ts:133:3 鈥?committed scoped GET beats late POST with one generation and no duplicate completion
+  run-progress.spec.ts:170:1 鈥?unmatched committed history cannot promote dirty terminal text to an answer
+  run-progress.spec.ts:187:1 鈥?cancellation fences late SSE and POST even when simulated IO ignores abort
+  run-progress.spec.ts:213:1 鈥?SSE cancellation resolves even when simulated fetch and body cleanup ignore abort
+  run-progress.spec.ts:234:1 鈥?versioned stage reducer rejects invalid progress and closes pending without inventing success
+  run-progress.spec.ts:256:1 鈥?live timeline sits on assistant side, collapses at commit and restores after refresh
+  run-progress.spec.ts:307:1 鈥?switching conversation and KB fences delayed progress replay from old Run
+  run-progress.spec.ts:336:1 鈥?new send closes only confirmed history when its SSE replay is still pending
+  scope-sync.spec.ts:20:1 鈥?switching knowledge bases patches the active conversation scope
+  scope-sync.spec.ts:48:1 鈥?marking a document as the retrieval scope patches the active conversation
+  scope-sync.spec.ts:75:1 鈥?a delayed knowledge-base PATCH blocks sending until the server scope changes
+  scope-sync.spec.ts:112:1 鈥?a delayed document-scope PATCH blocks sending and failure resyncs the actual server scope
+  scope-sync.spec.ts:153:1 鈥?a failed knowledge-base PATCH restores the server's old scope but keeps questions blocked
+  scope-sync.spec.ts:174:1 鈥?an unreadable server scope fails closed after PATCH failure
+  scope-sync.spec.ts:205:1 鈥?a failed PATCH that commits after resync keeps questions blocked
+  scope-sync.spec.ts:238:1 鈥?an in-flight question cannot be moved to another knowledge base
+  scope-sync.spec.ts:271:1 鈥?conversation creation in flight keeps the selected knowledge base fixed
+  scope-sync.spec.ts:302:1 鈥?a server scope conflict reselects the actual knowledge base and blocks another send
+  sse.spec.ts:3:1 鈥?SSE client deduplicates seq and resumes with Last-Event-ID
+  sse.spec.ts:33:1 鈥?lost POST recovers clarification only from the same committed user run with one POST
+  sse.spec.ts:65:1 鈥?retrieval failure, empty recall and absent history diagnostics are distinct
+  stale-citation.spec.ts:19:1 鈥?a late citation cannot reopen after switching conversation
+  stale-citation.spec.ts:36:1 鈥?a late first citation cannot overwrite the newer selected citation
+  stale-message-scope.spec.ts:3:1 鈥?a late historical message response cannot overwrite the newer conversation
+  stale-message-scope.spec.ts:33:1 鈥?switching knowledge bases drops the previous transcript
+  stale-message-scope.spec.ts:54:1 鈥?a delayed A transcript cannot reappear after the same conversation switches to B
+  stale-message-scope.spec.ts:88:1 鈥?selecting another history conversation clears the old transcript before its load finishes
+  stale-message-scope.spec.ts:112:1 鈥?a new conversation draft creates on send without an empty history reload
+  stale-message-scope.spec.ts:144:1 鈥?implicit conversation creation skips history reload and retains its answer
+  table-header-hint.spec.ts:60:3 鈥?quick pdf hint reaches current UI, persisted refresh and scope switch without facts
+  table-header-hint.spec.ts:60:3 鈥?quick docx hint reaches current UI, persisted refresh and scope switch without facts
+  table-header-hint.spec.ts:60:3 鈥?smart pdf hint reaches current UI, persisted refresh and scope switch without facts
+  table-header-hint.spec.ts:60:3 鈥?smart docx hint reaches current UI, persisted refresh and scope switch without facts
+  table-header-hint.spec.ts:89:51 鈥?quick no metadata does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?smart no metadata does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?quick ordinary no candidates does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?smart ordinary no candidates does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?quick provider error does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?smart provider error does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?quick cancelled does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?smart cancelled does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?quick cited reply does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?smart cited reply does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?quick unrelated format does not show an XLSX recommendation
+  table-header-hint.spec.ts:89:51 鈥?smart unrelated format does not show an XLSX recommendation
+  table-header-hint.spec.ts:102:3 鈥?txt completed answer remains completed without conversion advice
+  table-header-hint.spec.ts:102:3 鈥?md completed answer remains completed without conversion advice
+  table-header-hint.spec.ts:102:3 鈥?html completed answer remains completed without conversion advice
+  table-header-hint.spec.ts:102:3 鈥?xlsx completed answer remains completed without conversion advice
+  table-header-hint.spec.ts:113:1 鈥?existing clarification remains an object clarification
+  upload-and-citation.spec.ts:3:1 鈥?citation inspector has a readable evidence surface
+  upload-and-citation.spec.ts:9:1 鈥?clicking an answer citation opens the frozen evidence
+Total: 97 tests in 16 files
