@@ -46,6 +46,12 @@ class ProviderUsageFacts:
             v = self.get(k).value
             if v is not None and inp.value is not None and v > inp.value:
                 valid = False
+        reasoning = self.get('reasoning')
+        if (reasoning.present and reasoning.value is not None and out.value is not None
+                and not 0 <= reasoning.value <= out.value):
+            # reasoning is a breakdown of completion and can never exceed it; an
+            # out-of-range breakdown makes the whole usage unsettleable.
+            valid = False
         settled = total.value if valid and total.present and total.valid and total.value>=lower and self.semantics=='openai-input-inclusive/v1' else None
         return settled, lower
 
@@ -56,7 +62,10 @@ def capture_usage(raw, *, semantics='openai-input-inclusive/v1', simulated=None)
     paths = {'input': ('prompt_tokens',), 'output': ('completion_tokens',),
              'total': ('total_tokens',), 'cache_read': ('prompt_cache_hit_tokens', 'prompt_tokens_details.cached_tokens', 'cached_tokens'),
              'cache_write': ('cache_creation_input_tokens', 'prompt_tokens_details.cache_write_tokens'),
-             'cache_miss': ('prompt_cache_miss_tokens',)}
+             'cache_miss': ('prompt_cache_miss_tokens',),
+             # Completion breakdown; absence is NOT zero and is never added to
+             # input/completion/total (that would double count reasoning).
+             'reasoning': ('completion_tokens_details.reasoning_tokens',)}
     if semantics=='openai-responses/v1':
         paths.update(input=('input_tokens',),output=('output_tokens',),cache_read=('input_tokens_details.cached_tokens',))
     elif semantics=='anthropic-messages/v1':

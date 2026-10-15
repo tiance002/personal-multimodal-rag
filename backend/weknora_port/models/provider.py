@@ -253,7 +253,15 @@ class ProviderModel:
                                 for event in assembler.process(reasoning=_reasoning(delta, self.config.chat),
                                         content=_string(delta, "content"), tools=tools, finish_reason=_string(choice, "finish_reason")):
                                     yield event
-                            handle.observed(assembler.usage or normalize_usage(None, self.config.chat.prompt_cache_accounting))
+                            # When usage was reported, settle and emit the SAME
+                            # object so the counters handed to the gate are the
+                            # ones the consumer sees. When nothing was reported the
+                            # final event keeps usage=None while the gate still
+                            # receives the retained UNKNOWN occupancy.
+                            reported = assembler.usage
+                            handle.observed(reported or normalize_usage(None, self.config.chat.prompt_cache_accounting))
+                            if reported is not None:
+                                assembler.usage = handle.usage
                         # Emit final only after durable gate finish has succeeded.
                         for event in assembler.end():
                             yield identity_event(event)

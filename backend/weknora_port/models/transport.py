@@ -31,6 +31,8 @@ def env_duration(name: str, fallback: float) -> float:
 
 DEFAULT_CHAT_TIMEOUT = env_duration("WEKNORA_LLM_CHAT_TIMEOUT_SECONDS", 300)
 DEFAULT_STREAM_TIMEOUT = env_duration("WEKNORA_LLM_STREAM_TIMEOUT_SECONDS", 600)
+# Bounded settlement protection: durable ledger settlement must not hang a call.
+SETTLEMENT_TIMEOUT = env_duration("WEKNORA_LLM_SETTLEMENT_TIMEOUT_SECONDS", 30)
 
 
 @dataclass
@@ -339,19 +341,44 @@ class AsyncHTTPTransport:
         except httpx.HTTPError:
             raise ProviderError("PROVIDER_TRANSPORT_ERROR", sent=sent) from None
         finally:
-            SIMULATED_USAGE.reset(simulation_token)
+            try:
+                SIMULATED_USAGE.reset(simulation_token)
+            except ValueError:
+                # The generator can be closed from a different Context (e.g. a
+                # cleanup task driving `aclose`). The copied context dies with
+                # that task, so a best-effort reset is correct and must never
+                # mask settlement.
+                pass
             if lifetime is not None:
                 if isinstance(sys.exc_info()[1], asyncio.CancelledError):
                     lifetime.cancelled_phase = lifetime.phase
                 lifetime.phase = "settlement"
-            if response is not None:
-                await response.aclose()
+            # Settlement is durable ledger state and must run even when network
+            # cleanup fails, so it happens BEFORE response.aclose() and is bounded
+            # so a stuck close can never hang the call. Cancellation still
+            # propagates; an already-sent request is never flipped to NOT_SENT and
+            # a settlement failure never triggers a retry or a model switch.
+            settlement_error = None
             try:
                 usage=handle.usage if handle is not None else TokenUsage()
                 if usage.provider_usage_facts is not None and self._mock_transport:
                     usage=replace(usage,provider_usage_facts=replace(usage.provider_usage_facts,simulated=True))
-                await self.gate.finish(call, outcome=handle.outcome if handle is not None else outcome,usage=usage)
-            except asyncio.CancelledError:
-                raise
+                await asyncio.wait_for(self.gate.finish(call,
+                    outcome=handle.outcome if handle is not None else outcome,usage=usage),
+                    timeout=SETTLEMENT_TIMEOUT)
+            except asyncio.CancelledError as error:
+                settlement_error = error
+            except ProviderError as error:
+                settlement_error = error
             except Exception:
-                raise ProviderError("MODEL_USAGE_SETTLEMENT_FAILED", sent=sent) from None
+                settlement_error = ProviderError("MODEL_USAGE_SETTLEMENT_FAILED", sent=sent)
+            if response is not None:
+                try:
+                    await asyncio.wait_for(response.aclose(), timeout=SETTLEMENT_TIMEOUT)
+                except asyncio.CancelledError:
+                    raise
+                except Exception:
+                    # Network cleanup failure must never skip or mask settlement.
+                    pass
+            if settlement_error is not None:
+                raise settlement_error

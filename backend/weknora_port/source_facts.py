@@ -3,7 +3,9 @@ from dataclasses import dataclass,asdict
 import hashlib
 import json
 import re
+from typing import Any
 from .models.types import ProviderError
+from .models.output_contract import resolve_output_contract
 
 
 def sha(value):
@@ -75,6 +77,9 @@ class BoundCallFacts:
     config_sha: str
     model_fingerprint: str
     simulated: bool
+    # Immutable, recomputable output-budget contract for approved calls only.
+    # Synthetic fixtures and legacy direct constructions leave it None.
+    output_contract: Any = None
 
 
 def bind_synthetic(config, context, body, wire, config_sha, *, capability):
@@ -99,7 +104,12 @@ def bind_synthetic(config, context, body, wire, config_sha, *, capability):
 
 # Approved-mode meter recipes. A recipe is a named, code-owned conservative
 # bound; it is never a hosted actual count and never a price/money estimate.
-METER_RECIPES = frozenset({'wire-bytes-upper-bound/v1'})
+# v1 keeps its historical name and, for a contract-compliant request, its
+# historical reserved numbers (= the provider-declared completion cap); it now
+# additionally fails closed on a request whose wire field is not the provider's
+# declared cap field. v2 records the full recomputable output-budget contract.
+# Historical ledger rows keep their original recipe and reserved values.
+METER_RECIPES = frozenset({'wire-bytes-upper-bound/v1', 'provider-completion-cap/v2'})
 
 
 def measure_final_input(recipe, wire):
@@ -117,26 +127,63 @@ def measure_final_input(recipe, wire):
     return len(wire)
 
 
-def bind_wire_facts(config, context, body, wire, *, config_sha, recipe):
+def _unbounded_input_present(body):
+    """Sent message parts whose provider-side token count the wire-bytes input
+    recipe cannot bound.
+
+    The recipe's strict upper bound holds only while every input token consumes
+    at least one wire byte. A hosted image/video/audio part is tokenized by the
+    vendor from pixels/frames bytes the wire never carries (it carries a URL or a
+    base64 string), so the bound is not proven for it. Text-only wires are fine.
+    """
+    if not isinstance(body, dict):
+        return False
+    for message in list(body.get('messages') or []) + list(body.get('contents') or []):
+        if not isinstance(message, dict):
+            continue
+        content = message.get('content')
+        parts = content if isinstance(content, list) else (message.get('parts') or [])
+        if not isinstance(parts, list):
+            continue
+        for part in parts:
+            if not isinstance(part, dict):
+                continue
+            if (part.get('type') in ('image_url', 'input_image', 'video_url', 'input_video', 'audio_url')
+                    or any(key in part for key in ('image_url', 'inlineData', 'inline_data', 'fileData', 'file_data'))):
+                return True
+    return False
+
+
+def bind_wire_facts(config, context, body, wire, capability="chat", *, config_sha, recipe):
     """Approved-mode facts from real per-source evidence; never a synthetic slice.
 
     Requires the server-resolved `CallContext.source_facts` to already hold real
     SourceFacts for this call (question/history/evidence/memory/document/image/
     system-template). Missing or mismatched evidence refuses the send; a whole-wire
     synthetic slice is not accepted here.
+
+    The output reservation upper bound is recomputed from the same immutable
+    output-budget contract (`resolve_output_contract`) instead of trusting the
+    request cap blindly: a wire whose generation-cap field is not the provider's
+    declared cap field (or whose combination has no verifiable hard upper bound)
+    fails closed. For a contract-compliant request v1 keeps its historical
+    reserved value (= the declared cap).
     """
     sources = getattr(context, 'source_facts', None)
     if not isinstance(sources, SourceFacts):
         raise ProviderError('SOURCE_FACTS_REQUIRED')
     if sources.wire_sha256 != sha(wire):
         raise ProviderError('WIRE_FACTS_MISMATCH')
-    output = body.get('max_tokens', body.get('max_completion_tokens', 0))
-    if type(output) is not int or output < 0:
-        raise ProviderError('MODEL_OUTPUT_HARD_LIMIT_DENIED')
+    if recipe not in METER_RECIPES:
+        raise ProviderError('TOKEN_BOUND_RECIPE_UNSUPPORTED')
+    if _unbounded_input_present(body):
+        # Fail closed rather than add an unproven constant for hosted media input.
+        raise ProviderError('MODEL_INPUT_BOUND_NOT_APPLICABLE')
+    contract = resolve_output_contract(config, body, capability=capability)
     fingerprint = sha(json.dumps(asdict(config), sort_keys=True, separators=(',', ':'),
         allow_nan=False).encode())
-    return BoundCallFacts(sources, TokenReservationBound(measure_final_input(recipe, wire), output, recipe),
-        config_sha, fingerprint, False)
+    return BoundCallFacts(sources, TokenReservationBound(measure_final_input(recipe, wire),
+        contract.output_upper, recipe), config_sha, fingerprint, False, contract)
 
 
 def build_call_sources(context, body, wire, *, capability):
@@ -163,6 +210,13 @@ def build_call_sources(context, body, wire, *, capability):
             slices.append(SourceSlice('document', f'WIRE:embedding:{index}', sent, sent, scope,
                 'wire-element/v1', f'/input/{index}'))
     elif capability == 'rerank':
+        # The query is a first-class sent element with its own origin; without it
+        # only the documents would be provenance-bound while the query rides the
+        # wire unrecorded. Non-string protocols keep the document slices only.
+        query = body.get('query')
+        if isinstance(query, str) and query:
+            slices.append(SourceSlice('question', 'WIRE:query', sha(query.encode()), sha(query.encode()),
+                scope, 'wire-element/v1', '/query'))
         for index, text in enumerate(body.get('documents') or []):
             sent = sha(str(text).encode())
             slices.append(SourceSlice('evidence', f'WIRE:document:{index}', sent, sent, scope,

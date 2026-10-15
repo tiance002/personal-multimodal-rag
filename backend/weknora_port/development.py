@@ -125,7 +125,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                     transport.facts_mock_only=False
                     transport.bind_facts=lambda config,context,body,wire,capability:bind_wire_facts(
                         config,replace(context,source_facts=build_call_sources(context,body,wire,capability=capability)),
-                        body,wire,config_sha=authority_settings.config_sha,
+                        body,wire,capability,config_sha=authority_settings.config_sha,
                         recipe=authority_settings.meter.recipe)
                     return ProviderModel(config,transport)
                 if any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):

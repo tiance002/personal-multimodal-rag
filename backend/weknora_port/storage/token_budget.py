@@ -19,6 +19,22 @@ def fingerprint(call):
     return hashlib.sha256(encode(values).encode()).hexdigest()
 
 
+def same_month_authority(stored, expected):
+    """Quota-authority identity comparison with a controlled legacy compatibility.
+
+    The quota identity is the stable approval identity (account/provider/limit/
+    carry-in/approval_source). Legacy rows stored the old
+    `<approval_source>:<config_sha>` spelling, so a config/meter version change
+    would previously mint a conflict. This is a read-only comparison: it never
+    rewrites the stored row, never resets a blocked month and never creates a new
+    quota pool.
+    """
+    if stored == expected:
+        return True
+    return (isinstance(stored, str) and isinstance(expected, str) and bool(expected)
+            and stored.startswith(expected + ':'))
+
+
 class TokenBudgetStore:
     def __init__(self, gate):
         self.gate = gate
@@ -67,7 +83,11 @@ class TokenBudgetStore:
                 (*key, month_authority.limit_tokens, month_authority.carry_in_tokens,
                  month_authority.carry_status, month_authority.carry_source, month_authority.approval_source))
             stored = await g._one('SELECT * FROM port_token_budget_months WHERE account_id=%s AND provider=%s AND month=%s FOR UPDATE', key)
-            if any(stored[k] != getattr(month_authority, k) for k in ('limit_tokens','carry_in_tokens','carry_status','carry_source','approval_source')):
+            if (stored['limit_tokens'] != month_authority.limit_tokens
+                    or stored['carry_in_tokens'] != month_authority.carry_in_tokens
+                    or stored['carry_status'] != month_authority.carry_status
+                    or stored['carry_source'] != month_authority.carry_source
+                    or not same_month_authority(stored['approval_source'], month_authority.approval_source)):
                 raise ProviderError('TOKEN_MONTH_AUTHORITY_CONFLICT')
             if stored['blocked_reason']:
                 raise ProviderError('TOKEN_MONTH_BLOCKED')

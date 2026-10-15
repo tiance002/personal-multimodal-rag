@@ -12,6 +12,7 @@ import hashlib
 import json
 
 from .models.types import ProviderError
+from .models.output_contract import OutputBudgetContract
 from .source_facts import METER_RECIPES, BoundCallFacts
 from .storage.send_gate import SendAuthorization, ContentOrigin
 
@@ -239,16 +240,33 @@ class ApprovedTokenAuthority:
         bound = self.validate(call).bound
         if (type(bound.input_upper) is not int or not 0 < bound.input_upper <= self.settings.input_limit
                 or type(bound.output_upper) is not int or not 0 <= bound.output_upper <= self.settings.output_limit
-                or bound.output_upper != (call.output_budget or 0)
                 or bound.source != self.settings.meter.recipe):
+            raise ProviderError('TOKEN_BOUND_UNSUPPORTED')
+        # The output reservation upper bound is verified against the SAME immutable
+        # output-budget contract the wire was bound with, not against an equality
+        # between the upper bound and the request cap. `call.output_budget` is the
+        # wire cap; `bound.output_upper` may exceed it when a provider bounds
+        # visible output and reasoning separately (case B). The metering layer must
+        # never widen the caller's generation cap: the contract only reads the
+        # wire's existing declared field.
+        contract = getattr(call.bound_facts, 'output_contract', None)
+        if (not isinstance(contract, OutputBudgetContract)
+                or contract.output_upper != bound.output_upper
+                or contract.cap_value != (call.output_budget or 0)
+                or contract.provider != call.provider
+                or (contract.capability not in ('chat', 'vision') and bound.output_upper != 0)
+                or (contract.capability in ('chat', 'vision') and bound.output_upper <= 0)):
             raise ProviderError('TOKEN_BOUND_UNSUPPORTED')
         return bound
 
     def monthly(self, call):
         self.validate(call)
         s = self.settings
+        # The monthly quota pool is keyed by the real billing account/provider and
+        # the stable approval identity; a meter/config version change no longer
+        # mints a new pool or resets the accumulated carry-in.
         return TokenMonthlyAuthority(s.account_id, s.provider, s.month, s.limit_tokens,
-            s.carry_in_tokens, s.carry_status, s.carry_source, s.approval_source + ':' + s.config_sha)
+            s.carry_in_tokens, s.carry_status, s.carry_source, s.approval_source)
 
 
 class ServerPermissionResolver:
