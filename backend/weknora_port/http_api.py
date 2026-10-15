@@ -260,7 +260,7 @@ def _normalize_origin(value: str) -> str | None:
 
 
 def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
-               allowed_origins: Sequence[str] = ()) -> FastAPI:
+               allowed_origins: Sequence[str] = (), manage_background_workers: bool = True) -> FastAPI:
     """Build the port API using explicit application dependencies.
 
     The required resolver prevents an implicit user identity, and the required
@@ -272,11 +272,11 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @asynccontextmanager
     async def lifespan(app):
         start=getattr(runtime,'start_background_workers',None)
-        if callable(start):await start()
+        if manage_background_workers and callable(start):await start()
         try:yield
         finally:
             stop=getattr(runtime,'stop_background_workers',None)
-            if callable(stop):await stop()
+            if manage_background_workers and callable(stop):await stop()
     app = FastAPI(title="WeKnora Python Port", version="v1", lifespan=lifespan)
     app.state.runtime_service = runtime
     app.state.resolve_principal = resolve_principal

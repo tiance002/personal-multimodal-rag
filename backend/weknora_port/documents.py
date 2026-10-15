@@ -147,7 +147,7 @@ class DocumentLifecycleService:
                  parser_registry: ParserRegistry | None = None,
                  asset_processor: AssetProcessor | None = None,
                  post_processor: PostProcessor | None = None,
-                 max_upload_bytes: int = 50 * 1024 * 1024):
+                 max_upload_bytes: int = 50 * 1024 * 1024, start_image_worker_on_upload: bool = True):
         if not isinstance(principal, LocalPrincipal):
             raise PermissionError("LOCAL_PRINCIPAL_REQUIRED")
         if max_upload_bytes <= 0:
@@ -162,6 +162,7 @@ class DocumentLifecycleService:
         self.asset_processor = asset_processor
         self.post_processor = post_processor
         self.max_upload_bytes = max_upload_bytes
+        self.start_image_worker_on_upload = start_image_worker_on_upload
         self._parse_lock = asyncio.Lock()
 
     def _authorize(self, principal: LocalPrincipal) -> None:
@@ -302,7 +303,7 @@ class DocumentLifecycleService:
                 return await self._mark(principal,knowledge_base_id,document_id,"failed",
                     _safe_error_code(exc,"IMAGE_TASK_CREATE_FAILED"),metadata)
             row=await self._document_row(principal,knowledge_base_id,document_id)
-            await self.image_tasks.start()
+            if self.start_image_worker_on_upload:await self.image_tasks.start()
             return row
         return await self._process_document(principal,kb,name,data,document_id,source_version,metadata,
                                              process_overrides=process_overrides)
