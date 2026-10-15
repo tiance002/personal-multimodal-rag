@@ -6,7 +6,7 @@ import httpx,uvicorn
 from PIL import Image
 from backend.weknora_port.development import DevelopmentSettings,assemble
 from backend.weknora_port.entrypoint import create_app
-from backend.weknora_port.worker import run_once
+from backend.weknora_port.worker import run_once,serve
 from tests.weknora_port.native_fixture import isolated_mock_application
 from tests.weknora_port.test_memory_storage_pg import approved_dsn,actual_pg_run,EXPECTED
 from tests.weknora_port.test_runtime_pg import SOURCE
@@ -59,7 +59,7 @@ def test_executable_api_and_worker_image_ingest_memory_and_replay():
                     assert (await client.get('/api/v1/chunks/'+ref['id'])).status_code==200
                     before=len(wire);await client.post(f'/api/v1/sessions/{sid}/messages',json=request);assert len(wire)==before
                     assert await runtime.store.client.hlen(runtime.memory_enqueuer.keys[2])==1
-                    assert runtime.image_tasks._pump is None and runtime.memory_enqueuer._pump is None
+                    assert runtime.image_tasks._pump is None and not runtime.memory_enqueuer.tasks
                     configured=await client.patch(f'/api/v1/knowledge-bases/{kb}/image-processing',json={'enable_multimodal':True,
                         'ocr_adapter':'vlm','ocr_model_id':roles['vlm'],'caption_mode':'explicit','caption_model_id':roles['vlm'],'custom_instructions':'BUSINESS_ONLY_CAPTION'})
                     assert configured.status_code==200,configured.text
@@ -67,17 +67,37 @@ def test_executable_api_and_worker_image_ingest_memory_and_replay():
                     reply=await client.post(f'/api/v1/knowledge-bases/{kb}/documents',files={'file':('entry.png',image.getvalue(),'image/png')})
                     assert reply.status_code==200 and reply.json()['data']['status']=='pending',reply.text
                     did=reply.json()['data']['id']
-                    runtime.memory_enqueuer.clock=lambda:time.time()+10
-                    result=await run_once(runtime)
+                    # A second assembly uses separate connections and queue objects,
+                    # matching the standalone worker's persisted-state boundary.
+                    async with assemble(cfg,model_factory=fixture.model_factory,permissions=fixture.permissions,costs=fixture.costs,principal=fixture.principal) as consumer:
+                        consumer.memory_enqueuer.clock=lambda:time.time()+10
+                        result=await run_once(consumer)
                     assert result=={'image_ingest':True,'memory_extract':True},result
                     rows=await runtime._rows('SELECT state FROM port_image_tasks WHERE tenant_id=%s AND knowledge_id=%s',(runtime.principal.tenant_id,did))
                     assert rows[0]['state']=='completed',rows
                     memories=await runtime._rows("SELECT id FROM memory_items WHERE tenant_id=%s AND subject_id=%s AND status='active'",(runtime.principal.tenant_id,runtime.principal.subject_id))
                     assert len(memories)==1,memories
                     before=len(wire);assert await run_once(runtime)=={'image_ingest':False,'memory_extract':False};assert len(wire)==before
+                    # Start on empty queues, then enqueue a later image over HTTP.
+                    # The standalone worker must keep polling without a hidden API pump.
+                    worker=asyncio.create_task(serve(cfg,runtime_factory=factory))
+                    try:
+                        await asyncio.sleep(1.1)
+                        assert not worker.done()
+                        late=await client.post(f'/api/v1/knowledge-bases/{kb}/documents',files={'file':('late.png',image.getvalue(),'image/png')})
+                        assert late.status_code==200 and late.json()['data']['status']=='pending',late.text
+                        late_id=late.json()['data']['id']
+                        for _ in range(100):
+                            late_rows=await runtime._rows('SELECT state FROM port_image_tasks WHERE tenant_id=%s AND knowledge_id=%s',(runtime.principal.tenant_id,late_id))
+                            if late_rows[0]['state']=='completed':break
+                            if worker.done():await worker
+                            await asyncio.sleep(.1)
+                        assert late_rows[0]['state']=='completed',late_rows
+                    finally:
+                        worker.cancel();await asyncio.gather(worker,return_exceptions=True)
                     output=Path('docs/weknora-port/evidence/P8_DEVELOPMENT_ENTRY_20261015/http.'+tag+'.json')
                     output.write_text(json.dumps({'root':str(root),'session':sid,'assistant':assistant,'worker_once':result,
-                        'image_task':rows,'memory_items':memories,'replay_sends':0,'duplicate_worker_sends':0,'model_wire_count':len(wire),
+                        'image_task':rows,'late_image_task':late_rows,'memory_items':memories,'replay_sends':0,'duplicate_worker_sends':0,'model_wire_count':len(wire),
                         'real_provider_calls':0,'API_consumer_pumps':False},indent=2,default=str)+'\n',encoding='utf-8')
             finally:server.should_exit=True;await task
     actual_pg_run(scenario())

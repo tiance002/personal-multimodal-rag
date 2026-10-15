@@ -5,12 +5,14 @@ from .development import DevelopmentSettings,assemble
 async def run_once(runtime):
     return {'image_ingest':await runtime.image_tasks.run_due(),'memory_extract':await runtime.memory_enqueuer.run_due()}
 
-async def serve(settings,once=False):
-    async with assemble(settings) as runtime:
+async def serve(settings,once=False,*,runtime_factory=None):
+    async with (runtime_factory or assemble)(settings) as runtime:
         if once:return await run_once(runtime)
-        await runtime.start_background_workers()
-        try:await asyncio.Event().wait()
-        finally:await runtime.stop_background_workers()
+        # A queue pump may exit while empty; a standalone worker must keep polling
+        # for jobs enqueued later by the separate API process.
+        while True:
+            result=await run_once(runtime)
+            if not any(result.values()):await asyncio.sleep(1)
 
 def main():
     parser=argparse.ArgumentParser(description='Consume persisted WeKnora image-ingest and memory-extraction jobs; text ingest runs in API')

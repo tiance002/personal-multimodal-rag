@@ -14,7 +14,7 @@ Install with python -m pip install '.[weknora-port]'. Run weknora-python-api and
 
 API: source bytes/upload, ordinary text parsing+indexing inline, session/RAG/SSE/reference and settings routes. Image-bearing uploads persist image tasks and return pending; the new development API does not start a hidden consumer.
 
-Worker: actual ImageTaskQueue and RedisMemoryExtractionQueue consumers. Image task continues parse/OCR/caption/chunk/index/profile ingestion. Memory task uses the bound ExtractionWorker. No legacy backend.app.workers.ingestion polling or placeholder loop. --once runs one due task in each actual queue and reports their outcomes; normal mode runs their existing source-aligned loops. Separate API/worker instances share physically verified resources and local principal; claim fencing/UNKNOWN remain unchanged.
+Worker: actual ImageTaskQueue and RedisMemoryExtractionQueue consumers. Image task continues parse/OCR/caption/chunk/index/profile ingestion. Memory task uses the bound ExtractionWorker. No legacy backend.app.workers.ingestion polling or placeholder loop. --once runs one due task in each actual queue and reports their outcomes; normal mode continuously polls both persisted queues, including jobs arriving after an idle period. Separate API/worker instances share physically verified resources and local principal; claim fencing/UNKNOWN remain unchanged.
 
 Schema is never migrated by API startup. Only an explicitly approved EMPTY new database can run weknora-python-init --empty-new-database; it verifies physical identity and emptiness before the existing hash-checked001–011 migrations. It refuses an existing populated database. This batch does not invoke that initializer on business data.
 

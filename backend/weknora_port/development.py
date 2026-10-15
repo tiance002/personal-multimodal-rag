@@ -70,6 +70,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
     from redis.asyncio import Redis
     from .storage.connections import IsolatedConnectionFactory
     from .storage.postgres import IsolationPolicy
+    from .storage.memory_queue import RedisMemoryExtractionQueue
     from .storage.local_principal import LocalPrincipalStore
     from .streaming.manager import RedisListStreamStore
     from .crypto import SecretCipher
@@ -120,7 +121,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             embedder_for_kb=embedder,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
-            permissions=permissions,costs=costs,local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
+            permissions=permissions,costs=costs,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         box['runtime']=runtime
         yield runtime
     finally:

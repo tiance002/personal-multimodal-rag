@@ -101,9 +101,10 @@ def source_retry_delay(retried, randbelow=secrets.randbelow):
 
 
 class RedisMemoryExtractionQueue:
-    def __init__(self, client, prefix, principal, *, clock=time.time, randbelow=secrets.randbelow):
+    def __init__(self, client, prefix, principal, *, clock=time.time, randbelow=secrets.randbelow, autostart_on_enqueue=True):
         self.client, self.prefix, self.principal = client, prefix, principal
         self.clock, self.randbelow = clock, randbelow
+        self.autostart_on_enqueue = autostart_on_enqueue
         self.tasks = set()
         self.worker = None
         self.pump_lock = asyncio.Lock()
@@ -124,7 +125,8 @@ class RedisMemoryExtractionQueue:
             pipe.hset(jobs, job["id"], json.dumps(job, separators=(",", ":")))
             pipe.zadd(ready, {job["id"]: self.clock() + max(0, delay_seconds)})
             await pipe.execute()
-        await self.start(resume=False)
+        if self.autostart_on_enqueue:
+            await self.start(resume=False)
 
     async def start(self, *, resume=True):
         async with self.pump_lock:
