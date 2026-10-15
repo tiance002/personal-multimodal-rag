@@ -170,3 +170,8 @@ Full BuildRequestBody oracle attempted against an ignored exact-source copy (exi
 PARITY_ORACLE_BLOCKED: GoCGO_ENABLED0 and no gcc/clang; upstream utils/inject.go depends on libpg_query Parse/Deparse symbols not built in this Windows configuration. Build log: ignored var/weknora-port/oracle/provider/provider-oracle.log. No renderer output captured; do not label full Go wire comparison passed. Source-derived request fixtures remain useful but narrower evidence. Dependency downloads used fixed go.mod/go.sum; no upstream checkout changes or model requests.
 
 The earlier native DNS/SSRF/redirect blocker is resolved for the implemented direct path by the native follow-up above. The default business gate remains closed. Native direct behavior has fake-network evidence; actual providers and full proxy parity remain unverified/pending, and P1 is not declared fully complete.
+
+
+## 2026-10-15 current-code addendum
+
+Earlier configured-proxy BLOCKED paragraphs describe historical checkpoints. Current default transport implements HTTP/HTTPS/SOCKS. Scoped environment/trust/deadline repairs and actual Go/protocol evidence are in PROXY_BOUNDARY_REPORT_20261015.md. Two stricter acceptance differences remain pending Owner; real proxies/providers/cutover remain NOT RUN. Historical text/evidence is preserved.

@@ -77,3 +77,8 @@ Non-deletion migration e20b5d9:15new contracts PASS; actual verify-default/Schem
 DOC default/source fallback, PPT normalization and conditional PPTX media attach implemented. Original RED2fail preserved; final23offline and1real isolated native PG/Redis entry passed, exits0. Legacy external tools are substituted; real DOCX/PPTX/Pillow decode and synthetic native runner timeout are exercised. See OFFICE_LEGACY_REPORT_20261015.md and evidence/OFFICE_LEGACY_20261015. No real conversion/provider/cutover or whole P2 acceptance.
 
 Office review closure: empty-primary config and explicit source file_type fixed after3RED cases. Final26offline pass0 and1current-source native PG/Redis pass0; source-binding updated, original failures retained. See OFFICE_LEGACY_REPORT_20261015.md.
+
+
+## 2026-10-15 scoped Provider proxy safety repair
+
+Standard env/snapshot/CGI/IDNA, source raw-host trust and complete CONNECT deadline fixed. Initial13RED and three independent2-caseRED sets retained; final158offline/native-protocol checks pass0. Actual Go15env/10trust/9in-memoryCONNECT cases executed with E-only caches/telemetry. Empty SOCKS password and URL path/query/fragment restrictions retained pending Owner; no full P1/provider/cutover acceptance. See PROXY_BOUNDARY_REPORT_20261015.md and evidence/PROXY_BOUNDARY_20261015.

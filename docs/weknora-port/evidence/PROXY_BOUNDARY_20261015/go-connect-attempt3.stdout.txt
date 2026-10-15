@@ -1,0 +1,25 @@
+=== RUN   TestSourceConnectDeadlines
+=== RUN   TestSourceConnectDeadlines/write-block
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":false,"case":"write-block","elapsed_seconds":60,"real_network_calls":0,"request_failed_before_target_tls":true}
+=== RUN   TestSourceConnectDeadlines/headers-block
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":false,"case":"headers-block","elapsed_seconds":60,"real_network_calls":0,"request_failed_before_target_tls":true}
+=== RUN   TestSourceConnectDeadlines/trickle
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":false,"case":"trickle","elapsed_seconds":60,"real_network_calls":0,"request_failed_before_target_tls":true}
+=== RUN   TestSourceConnectDeadlines/short-parent
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":false,"case":"short-parent","elapsed_seconds":12,"real_network_calls":0,"request_failed_before_target_tls":true}
+=== RUN   TestSourceConnectDeadlines/long-parent
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":false,"case":"long-parent","elapsed_seconds":60,"real_network_calls":0,"request_failed_before_target_tls":true}
+=== RUN   TestSourceConnectDeadlines/malformed
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":false,"case":"malformed","elapsed_seconds":0,"real_network_calls":0,"request_failed_before_target_tls":true}
+=== RUN   TestSourceConnectDeadlines/complete
+PROXY_CONNECT_ORACLE_JSON:{"callback_after_complete_headers":true,"case":"complete","elapsed_seconds":0,"real_network_calls":0,"request_failed_before_target_tls":true}
+--- PASS: TestSourceConnectDeadlines (0.00s)
+    --- PASS: TestSourceConnectDeadlines/write-block (0.00s)
+    --- PASS: TestSourceConnectDeadlines/headers-block (0.00s)
+    --- PASS: TestSourceConnectDeadlines/trickle (0.00s)
+    --- PASS: TestSourceConnectDeadlines/short-parent (0.00s)
+    --- PASS: TestSourceConnectDeadlines/long-parent (0.00s)
+    --- PASS: TestSourceConnectDeadlines/malformed (0.00s)
+    --- PASS: TestSourceConnectDeadlines/complete (0.00s)
+PASS
+ok  	command-line-arguments	1.923s

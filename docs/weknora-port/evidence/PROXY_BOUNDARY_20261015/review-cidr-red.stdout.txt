@@ -1,0 +1,16 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__ test_mapped_ipv6_no_proxy_cidr_matches_equivalent_ipv4[[::ffff:8.8.8.8]] ___
+tests\weknora_port\test_proxy_boundary.py:246: in test_mapped_ipv6_no_proxy_cidr_matches_equivalent_ipv4
+    assert environment_proxy("https://"+host+"/",{"HTTPS_PROXY":"http://proxy.example:8080","NO_PROXY":"::ffff:8.8.0.0/112"}) is None
+E   AssertionError: assert 'http://proxy.example:8080' is None
+E    +  where 'http://proxy.example:8080' = environment_proxy((('https://' + '[::ffff:8.8.8.8]') + '/'), {'HTTPS_PROXY': 'http://proxy.example:8080', 'NO_PROXY': '::ffff:8.8.0.0/112'})
+_______ test_mapped_ipv6_no_proxy_cidr_matches_equivalent_ipv4[8.8.8.8] _______
+tests\weknora_port\test_proxy_boundary.py:246: in test_mapped_ipv6_no_proxy_cidr_matches_equivalent_ipv4
+    assert environment_proxy("https://"+host+"/",{"HTTPS_PROXY":"http://proxy.example:8080","NO_PROXY":"::ffff:8.8.0.0/112"}) is None
+E   AssertionError: assert 'http://proxy.example:8080' is None
+E    +  where 'http://proxy.example:8080' = environment_proxy((('https://' + '8.8.8.8') + '/'), {'HTTPS_PROXY': 'http://proxy.example:8080', 'NO_PROXY': '::ffff:8.8.0.0/112'})
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_proxy_boundary.py::test_mapped_ipv6_no_proxy_cidr_matches_equivalent_ipv4[[::ffff:8.8.8.8]]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_mapped_ipv6_no_proxy_cidr_matches_equivalent_ipv4[8.8.8.8]
+2 failed, 33 deselected in 0.58s

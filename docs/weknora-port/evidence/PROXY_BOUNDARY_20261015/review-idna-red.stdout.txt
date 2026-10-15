@@ -1,0 +1,114 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_proxy_target_tls_uses_ascii_idna_for_unicode_and_punycode[fa\xdf.example] _
+tests\weknora_port\test_proxy_boundary.py:230: in test_proxy_target_tls_uses_ascii_idna_for_unicode_and_punycode
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:228: in run
+    assert (await client.get("https://"+host+"/v1")).status_code==200
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1768: in get
+    return await self.request(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:619: in handle_async_request
+    response=await self._request(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:609: in _request
+    raise _mapped_core_error(error) from None
+backend\weknora_port\models\safe_network.py:607: in _request
+    response=await self.pools[key].handle_async_request(req)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\connection_pool.py:256: in handle_async_request
+    raise exc from None
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\connection_pool.py:236: in handle_async_request
+    response = await connection.handle_async_request(
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\http_proxy.py:316: in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\http11.py:376: in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:419: in start_tls
+    upgraded = await super().start_tls(ssl_context,server_hostname,timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:209: in start_tls
+    raise ProviderError("PROVIDER_TLS_VERIFICATION_REQUIRED")
+E   backend.weknora_port.models.types.ProviderError: PROVIDER_TLS_VERIFICATION_REQUIRED
+_ test_proxy_target_tls_uses_ascii_idna_for_unicode_and_punycode[xn--fa-hia.example] _
+tests\weknora_port\test_proxy_boundary.py:230: in test_proxy_target_tls_uses_ascii_idna_for_unicode_and_punycode
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:228: in run
+    assert (await client.get("https://"+host+"/v1")).status_code==200
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1768: in get
+    return await self.request(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:619: in handle_async_request
+    response=await self._request(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:609: in _request
+    raise _mapped_core_error(error) from None
+backend\weknora_port\models\safe_network.py:607: in _request
+    response=await self.pools[key].handle_async_request(req)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\connection_pool.py:256: in handle_async_request
+    raise exc from None
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\connection_pool.py:236: in handle_async_request
+    response = await connection.handle_async_request(
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\http_proxy.py:316: in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpcore\_async\http11.py:376: in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:419: in start_tls
+    upgraded = await super().start_tls(ssl_context,server_hostname,timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:209: in start_tls
+    raise ProviderError("PROVIDER_TLS_VERIFICATION_REQUIRED")
+E   backend.weknora_port.models.types.ProviderError: PROVIDER_TLS_VERIFICATION_REQUIRED
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_proxy_boundary.py::test_proxy_target_tls_uses_ascii_idna_for_unicode_and_punycode[fa\xdf.example]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_proxy_target_tls_uses_ascii_idna_for_unicode_and_punycode[xn--fa-hia.example]
+2 failed, 29 deselected in 0.99s

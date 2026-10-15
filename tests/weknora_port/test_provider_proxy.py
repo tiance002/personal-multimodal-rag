@@ -12,14 +12,14 @@ from tests.weknora_port.test_provider_safe_network import Resolver, Dialer, Reco
 @pytest.mark.parametrize("url,env,want",[
     ("https://api.example/v1",{"HTTPS_PROXY":"http://proxy:8080","https_proxy":"http://other:8080"},"http://proxy:8080"),
     ("https://api.example/v1",{"ALL_PROXY":"http://proxy:8080"},None),
-    ("https://api.example/v1",{"https":"http://proxy:8080","no":"example"},None),
-    ("https://example/v1",{"https":"proxy","no":".example"},"proxy"),
-    ("https://api.example:8443/v1",{"https":"proxy","no":".example:443"},"proxy"),
-    ("https://api.example/v1",{"https":"proxy","no":".example:443"},None),
-    ("https://8.8.8.8/v1",{"https":"proxy","no":"8.8.0.0/16"},None),
-    ("https://localhost/v1",{"https":"proxy"},None),
-    ("http://127.0.0.2/v1",{"http":"proxy"},None),
-    ("https://api.example/v1",{"https":"proxy","no":"*"},None),
+    ("https://api.example/v1",{"HTTPS_PROXY":"http://proxy:8080","NO_PROXY":"example"},None),
+    ("https://example/v1",{"HTTPS_PROXY":"proxy","NO_PROXY":".example"},"proxy"),
+    ("https://api.example:8443/v1",{"HTTPS_PROXY":"proxy","NO_PROXY":".example:443"},"proxy"),
+    ("https://api.example/v1",{"HTTPS_PROXY":"proxy","NO_PROXY":".example:443"},None),
+    ("https://8.8.8.8/v1",{"HTTPS_PROXY":"proxy","NO_PROXY":"8.8.0.0/16"},None),
+    ("https://localhost/v1",{"HTTPS_PROXY":"proxy"},None),
+    ("http://127.0.0.2/v1",{"HTTP_PROXY":"proxy"},None),
+    ("https://api.example/v1",{"HTTPS_PROXY":"proxy","NO_PROXY":"*"},None),
 ])
 def test_go_environment_proxy_resolution(url,env,want):
     assert environment_proxy(url,env) == want
@@ -27,7 +27,7 @@ def test_go_environment_proxy_resolution(url,env,want):
 
 def test_go_cgi_http_proxy_refusal():
     with pytest.raises(ProviderError,match="PROVIDER_PROXY_CGI_BLOCKED"):
-        environment_proxy("http://api.example",{"http":"proxy","REQUEST_METHOD":"GET"})
+        environment_proxy("http://api.example",{"HTTP_PROXY":"proxy","REQUEST_METHOD":"GET"})
 
 
 @pytest.mark.parametrize("scheme",["http","https"])
@@ -37,7 +37,7 @@ def test_connect_tunnel_tls_auth_never_reaches_model_headers(scheme):
         dns=Resolver(("8.8.8.8",),("127.0.0.1",))
         dialer=Dialer([raw])
         safe=SafeHTTPTransport(policy=SSRFPolicy(resolver=dns),network_backend=dialer,
-            proxy_environment={"https":scheme+"://user:SECRET@proxy.example:8080"})
+            proxy_environment={"HTTPS_PROXY":scheme+"://user:SECRET@proxy.example:8080"})
         async with httpx.AsyncClient(transport=safe,timeout=None) as client:
             response=await client.post("https://api.example/v1",headers={"Authorization":"Bearer MODEL_KEY"},content=b"{}")
             assert response.status_code == 200
@@ -57,7 +57,7 @@ def test_http_proxy_absolute_form_and_auth():
     async def run():
         raw=RecordedStream([http_packet()]); dialer=Dialer([raw])
         safe=SafeHTTPTransport(policy=SSRFPolicy(resolver=Resolver(("8.8.8.8",))),network_backend=dialer,
-            proxy_environment={"http":"proxy.example:8080"})
+            proxy_environment={"HTTP_PROXY":"proxy.example:8080"})
         async with httpx.AsyncClient(transport=safe) as client:
             assert (await client.get("http://api.example/path?q=1")).status_code == 200
         assert b"GET http://api.example/path?q=1 HTTP/1.1" in b"".join(raw.written)
@@ -70,7 +70,7 @@ def test_non200_connect_rejected_without_model_send_or_credential_errors(status)
     async def run():
         raw=RecordedStream([http_packet(status)]); dialer=Dialer([raw])
         safe=SafeHTTPTransport(policy=SSRFPolicy(resolver=Resolver(("8.8.8.8",))),network_backend=dialer,
-            proxy_environment={"https":"http://user:SECRET@proxy.example:8080"})
+            proxy_environment={"HTTPS_PROXY":"http://user:SECRET@proxy.example:8080"})
         async with httpx.AsyncClient(transport=safe) as client:
             with pytest.raises(httpx.ProxyError) as error:
                 await client.post("https://api.example/v1",content=b"MODEL_BODY")
@@ -88,7 +88,7 @@ def test_socks5_remote_dns_auth_wire_and_tls(scheme,auth):
         packets.extend([b"\x05\x00\x00\x01",b"\x00\x00\x00\x00\x1f\x90",http_packet()])
         raw=RecordedStream(packets); dialer=Dialer([raw])
         safe=SafeHTTPTransport(policy=SSRFPolicy(resolver=Resolver(("8.8.8.8",))),network_backend=dialer,
-            proxy_environment={"https":scheme+"://"+("u:p@" if auth else "")+"proxy.example:1080"})
+            proxy_environment={"HTTPS_PROXY":scheme+"://"+("u:p@" if auth else "")+"proxy.example:1080"})
         async with httpx.AsyncClient(transport=safe) as client:
             assert (await client.get("https://api.example/v1")).status_code == 200
         assert raw.written[0] == (b"\x05\x02\x00\x02" if auth else b"\x05\x01\x00")
@@ -102,7 +102,7 @@ def test_proxy_keeps_destination_ssrf_and_connect_time_proxy_dns_pin():
     async def run():
         dialer=Dialer(); resolver=Resolver(("127.0.0.1",))
         safe=SafeHTTPTransport(policy=SSRFPolicy(resolver=resolver),network_backend=dialer,
-            proxy_environment={"https":"http://proxy.example:8080"})
+            proxy_environment={"HTTPS_PROXY":"http://proxy.example:8080"})
         async with httpx.AsyncClient(transport=safe) as client:
             with pytest.raises(ProviderError,match="PROVIDER_SSRF_IP_BLOCKED"):
                 await client.get("https://api.example/v1")
