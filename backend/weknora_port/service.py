@@ -309,7 +309,7 @@ class RuntimeService:
                 check_context(model_context)
                 prompt=render_placeholders(prompt,{'query':query,'language':state.language,'kb_documents':listing})
                 if state.image_description and not state.chat_model_supports_vision:
-                    prompt+='\n\n[用户上传图片描述]\n'+state.image_description
+                    prompt+='\n\n[用户上传图片内容]\n'+state.image_description
                 if state.quoted_context:prompt+='\n\n'+state.quoted_context
             finalized=FinalizedContext(query,'',(),prompt,state.images)
             state.merge_results=[]
@@ -321,7 +321,7 @@ class RuntimeService:
         from datetime import datetime
         options=dict(config.generation_options)
         if fallback is not None:
-            options.update(is_fallback=True,options=fallback['options'],system_prompt=finalized.system_prompt_override)
+            options.update(is_fallback=True,fallback_response=fallback['response'],options=fallback['options'],system_prompt=finalized.system_prompt_override)
             if fallback['strategy']!='model' or fallback['prompt']=='':options['fixed_fallback']=fallback['response']
         options.setdefault('rendered_at',datetime.now())
         options.setdefault('language',state.language)

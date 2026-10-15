@@ -30,6 +30,7 @@ class GenerationRequest:
     system_prompt: str = field(default=DEFAULT_SYSTEM_PROMPT, repr=False)
     is_fallback: bool = False
     fixed_fallback: str | None = field(default=None,repr=False)
+    fallback_response: str = field(default='Sorry, I am unable to answer this question.',repr=False)
     supports_vision: bool = False
     citations_enabled: bool = True
     faq_priority_enabled: bool = False

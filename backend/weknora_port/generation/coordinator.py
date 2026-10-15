@@ -12,6 +12,21 @@ from .router import decide
 from .types import GenerationError, GenerationResult, AttemptRecord, ClosedLifecycle, TokenEstimate
 EMPTY_TRUNCATED_FALLBACK = "Sorry, this answer hit the model's per-response output limit before any text was produced. Try narrowing the question, or raise max_completion_tokens."
 
+
+class FallbackChannelError(GenerationError):
+    """Only constructed at this coordinator's unavailable/incomplete channel boundary."""
+
+
+def fallback_output_failure(error):
+    # Closed allowlist over actual adapter types/codes. In particular, no
+    # subclass timeout/cancel/deadline, unknown API body, identity or gate error.
+    if type(error) is FallbackChannelError:return True
+    if type(error) is not ProviderError:return False
+    if error.code=='PROVIDER_HTTP_ERROR':
+        return type(error.status_code) is int and error.status_code in {400,404,409,422,429,500,502,503}
+    return error.code in {'PROVIDER_TRANSPORT_ERROR','PROVIDER_RESPONSE_INVALID','PROVIDER_STREAM_FAILED','PROVIDER_NO_RESPONSE'}
+
+
 def is_length(reason):
     return reason.strip().lower() in ('length', 'max_tokens', 'max_output_tokens')
 
@@ -132,7 +147,8 @@ class GenerationCoordinator:
             if hasattr(stream, '__await__'):
                 stream = await stream
             if stream is None:
-                raise GenerationError('PROVIDER_STREAM_UNAVAILABLE', sent=False)
+                error=FallbackChannelError if request.is_fallback else GenerationError
+                raise error('PROVIDER_STREAM_UNAVAILABLE', sent=False)
             try:
                 async for event in stream:
                     check_context(context)
@@ -158,6 +174,11 @@ class GenerationCoordinator:
                         # Security/identity/settlement denials are never recoverable.
                         if code.startswith(('MODEL_', 'SCOPE_', 'TURN_', 'GENERATION_')) or code == 'PROVIDER_MODEL_IDENTITY_MISMATCH':
                             raise GenerationError(code, sent=True)
+                        if request.is_fallback:
+                            if data.get('error_class')!='ProviderError':raise GenerationError(code,sent=True)
+                            stream_error=ProviderError(code,status_code=data.get('status_code'),sent=True)
+                            if not fallback_output_failure(stream_error):raise stream_error
+                            continue  # Go fallback consumer ignores non-answer events.
                         stream_error = GenerationError(code, sent=True)
                         notice = StreamEvent(attempt_id + '-error-' + str(len(error_events)), 'error', code, True,
                             data={'error_code': code, 'stage': 'chat_completion_stream', 'non_terminal': True,
@@ -166,6 +187,10 @@ class GenerationCoordinator:
                         if publish_live:
                             await self.store.append_event(request.session_id, request.message_id, notice)
                         continue
+                    if request.is_fallback and event.is_final and event.response_type=='answer' and data.get('provider_answer_done') is False:
+                        continue  # adapter EOF bookkeeping is not the source channel's Done.
+                    if request.is_fallback and event.response_type=='thinking':
+                        continue  # fixed source fallback consumer handles answer events only.
                     if event.response_type == 'thinking':
                         delta = thinking_decoder.feed(event.content)
                         if event.done:
@@ -189,6 +214,8 @@ class GenerationCoordinator:
                         live_answer_closed = event.done
                     if event.is_final:
                         final_seen = True
+                if request.is_fallback and not answer_done:
+                    raise stream_error or FallbackChannelError('PROVIDER_STREAM_INCOMPLETE',sent=True)
                 await flush_decoders()
                 if stream_error is not None and not answer_done:
                     raise stream_error  # error-only EOF is not a successful answer or P5 upgrade.
@@ -208,7 +235,7 @@ class GenerationCoordinator:
                         await close()
         except BaseException as exc:
             failure = exc
-            if not isinstance(exc, (CallCancelled, asyncio.CancelledError)):
+            if not isinstance(exc, (CallCancelled, asyncio.CancelledError)) and (not request.is_fallback or answer_done):
                 try:
                     await flush_decoders()
                 except Exception:
@@ -257,7 +284,8 @@ class GenerationCoordinator:
             raise GenerationError('GENERATION_ATTEMPT_FINALIZE_FAILED', sent=True) from None
         await self._progress('generation', record.status.lower(), attempt_id=attempt_id, role=role)
         if failure is not None:
-            return (record, None, failure)
+            partial=(text,thought,(),tuple(error_events)) if request.is_fallback and fallback_output_failure(failure) else None
+            return (record, partial, failure)
         if is_length(finish) and (not text.strip()):
             text = EMPTY_TRUNCATED_FALLBACK
         references = self._references(request, registry)
@@ -272,14 +300,19 @@ class GenerationCoordinator:
         references = tuple(({'id': e.id, 'content': e.source_content or e.content, 'score': e.score, 'knowledge_id': e.knowledge_id, 'knowledge_base_id': e.knowledge_base_id, 'knowledge_title': e.knowledge_title, 'knowledge_filename': e.knowledge_filename, 'chunk_index': e.chunk_index, 'chunk_type': e.chunk_type, 'knowledge_source': e.knowledge_source} for e in request.evidence if e.id in chunk_ids or e.id in urls))
         return references
 
-    async def _fixed_fallback(self,request,context):
+    async def _fixed_fallback(self,request,context,*,attempts=(),route=None,partial='',buffered=False):
         from ..references.registry import SourceRegistry
-        text=request.fixed_fallback
+        text=request.fixed_fallback if request.fixed_fallback is not None else request.fallback_response
         if not request.citations_enabled:text=SourceRegistry(False).decode_output_text(text)
-        await self.lifecycle.claim_run(request.run_id,digest({'run':request.run_id,'fixed':text}),context)
+        if not attempts:
+            await self.lifecycle.claim_run(request.run_id,digest({'run':request.run_id,'fixed':text}),context)
         check_context(context)
+        if partial and buffered:
+            await self.store.append_event(request.session_id,request.message_id,
+                StreamEvent(request.run_id+'-fallback-partial','answer',partial,False,data={'is_fallback':True}))
         await self.store.append_event(request.session_id,request.message_id,
             StreamEvent(request.run_id+'-fallback','answer',text,True,data={'is_fallback':True}))
+        text=partial+text  # qa.go completion handler appends every source answer chunk.
         check_context(context)
         coordinator=self
         class CheckedCommitter:
@@ -287,11 +320,11 @@ class GenerationCoordinator:
                 check_context(context)
                 await coordinator.committer.commit_final(commit)
                 check_context(context)
-        # There is no provider attempt or usage report for a fixed reply.
-        usage=TokenUsage()
+        # Fixed output causes no new provider attempt; retain existing attempt usage.
+        usage=accumulate_usage([a.usage for a in attempts]) if attempts else TokenUsage()
         await finalize_turn(self.store,CheckedCommitter(),FinalCommit(request.session_id,request.message_id,
-            request.run_id,text,[],usage_dict(usage)),complete_data={'is_fallback':True,'attempts':[]})
-        return GenerationResult(text,'',(),'fixed','',(),None,usage,'',False,False,'','')
+            request.run_id,text,[],usage_dict(usage)),complete_data={'is_fallback':True,'attempts':[public_attempt(a) for a in attempts],'router':route})
+        return GenerationResult(text,'',(),'fixed','',tuple(attempts),route,usage,'',False,len(attempts)>1,'','')
 
     async def run(self, request, context):
         check_context(context)
@@ -326,6 +359,9 @@ class GenerationCoordinator:
             if isinstance(error, (CallCancelled, asyncio.CancelledError)):
                 raise error
             check_context(context)
+            if request.is_fallback and fallback_output_failure(error):
+                return await self._fixed_fallback(request,context,attempts=tuple(attempts),route=route,
+                    partial=candidate[0] if candidate else '',buffered=role=='cheap' and request.policy.mode=='DYNAMIC')
             upgrade = ordinal == 1 and role == 'cheap' and (request.policy.mode == 'DYNAMIC') and error is None and bool(record.objective)
             if upgrade:
                 reason = 'TRUNCATION' if 'TRUNCATED' in record.objective else 'MODEL_EMPTY' if 'EMPTY' in record.objective else 'INVALID_HANDLES'

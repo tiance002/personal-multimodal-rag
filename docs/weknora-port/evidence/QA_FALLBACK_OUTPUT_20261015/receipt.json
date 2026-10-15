@@ -1,0 +1,67 @@
+{
+  "base": "f6232e6f1a16e943c07d32de3c930c31947fd722",
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "files": {
+    "backend/weknora_port/generation/coordinator.py": "5d787aac10e3943c0d60c8cba0f5c514b5acf33571f6e29f7a9ea7fd96ebbc1f",
+    "backend/weknora_port/generation/types.py": "79c2cabe70cfc887f9a8e9b9b116d969db23749720e42af081bb5494a70ef1c9",
+    "backend/weknora_port/models/stream.py": "dc4fe76a75654146e0527151b32c3515ad7f4ca1763c7b927d197ed1703741cf",
+    "backend/weknora_port/service.py": "6e2af126b0b9a19eb332778e0d2ca92491cd9c0cff80cfff257aaa2b23d9ad59",
+    "tests/weknora_port/test_fallback_output.py": "9a5b09f4320662e050ded02079e72649e39f660383e66070cd33d452ad75cada",
+    "tests/weknora_port/test_fallback_output_pg.py": "353775d6f74343bca06195582cf9486d1f71ede27f6cbb132de42437c7f33bbc",
+    "tests/weknora_port/fixtures/fallback_output_go_20261015.json": "e0b013bdb5fb76cad4724643ad9626a63f1a0e4e03158e55ae02df506da074ae",
+    "scripts/weknora_port_fallback_output_oracle.py": "b0176950b73ff4b4b7f4308dc3b894d29a193101f9d0ac32abb095d4a75718e0",
+    "docs\\weknora-port\\QA_FALLBACK_OUTPUT_REPORT_20261015.md": "efaa42d1d5d3e2a7926aec0d7c29197e0a9f523b3c3d3980a26ac775b23fd935"
+  },
+  "evidence_sha256": {
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\.gitattributes": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\go.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\go.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\go.stdout.txt": "ae4d1670c68d6560bf61ad7166a72f78139c46bdbd9e28192b69ef0db03917c8",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\green.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\green.stdout.txt": "858302d91f52d11ece32f7fba8e7d139d75162816799d3af8056de1768d46672",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.10a9de6d01a04dda8914eff6b9bc8ba2.json": "bbf13b94fe32a0adb5f7543ae2568de1b65c8698ba211cec878da45076843ff5",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.7dd40b73073343a39f1b5db2b22556f1.json": "b28a0ea31bfc7c8794ba7756f3db5be83719021682d19ce893b6dd3b40588fc3",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.final.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.final.junit.xml": "c5b429d93175deb87f35ec846d24bba75bf2b3f0dc2302a26f7187af7087fb4d",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.final.stdout.txt": "ec55fb4eda2753fac160ff35ce55314503421e09fb9278211162c69803e11439",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.junit.xml": "f41337851b32f74d985bcc6618611d6e10a72a20c51c3eb38b7af88b8331ce85",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\http.stdout.txt": "8a9b01cd5b9bb66f7c513ec3b9d8738f07e526e30887eaafc5b6ea5a5aa3db0a",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\offline.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\offline.final.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\offline.final.junit.xml": "cbc6db4000be3393ce7ad04169fb749236fe0a3110a43db8b250f09356e5aeba",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\offline.final.stdout.txt": "71af7ee888c8230a218c30b242059474b7036e2a628ac4cf84c17b8a41d4dd37",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\offline.junit.xml": "56aa937506deabe1617c07ee59b3a68d700703b9df53ae1bd273baea5cc8d5c8",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\offline.stdout.txt": "86d6e738264bb61563681b82c73e2d0594184640ccb1e5337375bd5442e3cfe1",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\red.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs\\weknora-port\\evidence\\QA_FALLBACK_OUTPUT_20261015\\red.stdout.txt": "88efe757c204476547337d5ced1ecd13edbe52f2be5d3e6b6ecc609830116f5a"
+  },
+  "additional_unique_qa_results": {
+    "docs/weknora-port/evidence/QA_ENTRY_20261015/cancel-scope.result.3a21a057d5744003b711b8bdf6b36525.json": "ae9778f3c3a3ed11a132bdd84fe7358de064de31f22a78585aec343dbe9f0075",
+    "docs/weknora-port/evidence/QA_ENTRY_20261015/http.result.fabbb10cae7c43dab2b934284997b978.json": "fb72b8dd289b52e899438a4fbda2d983d1c37fd742b012889886e5e282ae29e3",
+    "docs/weknora-port/evidence/QA_ENTRY_20261015/listing.scope.ca969c197d7d41658b308fe80747e9cc.json": "23bc3a9efef3ed7d11cfcf558e4a9f8cefac6031b53f15e160c79e874d3ce84b"
+  },
+  "source_sha256": {
+    "internal/application/service/session_knowledge_qa.go": "bfc76618b54725ff85f6f3fba194c0e93b5ef9bab50c2d067e2fc54443228dc3",
+    "internal/handler/session/qa.go": "f77699de82d49a73ebe894c7f5e094b43299c20b486058f5c28d37691189a1ae"
+  },
+  "loaded_modules": {
+    "backend.weknora_port.generation.coordinator": "E:\\WK\\qa-entry\\backend\\weknora_port\\generation\\coordinator.py",
+    "backend.weknora_port.models.stream": "E:\\WK\\qa-entry\\backend\\weknora_port\\models\\stream.py",
+    "backend.weknora_port.service": "E:\\WK\\qa-entry\\backend\\weknora_port\\service.py"
+  },
+  "router_unchanged": true,
+  "provider_fallback_switch_changed": false,
+  "real_provider_calls": 0,
+  "new_model_send_due_to_output_fallback": 0,
+  "status": {
+    "OFFLINE_PASS": 168,
+    "HTTP_FIRST_BATCH_PASS": 4,
+    "HTTP_FINAL_TEST_PASS": 1,
+    "HTTP_FINAL_SUBCASES": 9,
+    "GO_FUNCTION_ROWS": 5,
+    "GO_PUBLIC_ENTRY": "BLOCKED",
+    "REAL_PROVIDER_PASS": "NOT_RUN",
+    "CUTOVER_PASS": "NOT_RUN"
+  }
+}

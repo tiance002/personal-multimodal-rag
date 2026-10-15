@@ -167,7 +167,8 @@ class StreamAssembler:
         return events
 
     def end(self):
-        data = {"reasoning_metadata": {"reasoning_details": self.reasoning_details}} if self.reasoning_details else None
+        data = {"provider_answer_done": bool(self.last_finish_reason)}
+        if self.reasoning_details:data["reasoning_metadata"]={"reasoning_details":self.reasoning_details}
         return [*self.finish_thinking(), StreamResponse("answer", done=True,
             tool_calls=self.ordered_calls(), usage=self.usage,
             finish_reason=self.last_finish_reason, data=data, is_final=True)]
@@ -175,4 +176,4 @@ class StreamAssembler:
     def fail(self, error):
         return [*self.finish_thinking(), StreamResponse("error", error.code, True,
             self.ordered_calls(), self.usage, "incomplete",
-            {"error_code": error.code, "error_class": type(error).__name__}, True)]
+            {"error_code": error.code, "error_class": type(error).__name__, "status_code": error.status_code}, True)]
