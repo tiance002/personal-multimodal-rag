@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_source_summary_configuration_id_resolved_text_language_and_positive_limits _
+tests\weknora_port\test_document_profile.py:45: in test_source_summary_configuration_id_resolved_text_language_and_positive_limits
+    assert ConversationSettings.from_mapping({'conversation':{'generate_summary_prompt_id':'custom','generate_summary_prompt':'YAML MUST NOT WIN'}}).generate_summary_prompt is None
+E   AssertionError: assert 'YAML MUST NOT WIN' is None
+E    +  where 'YAML MUST NOT WIN' = ConversationSettings(max_rounds=5, embedding_top_k=30, vector_threshold=0.2, keyword_threshold=0.3, rerank_top_k=30, r...own when appropriate.\n\nDefault response language: {{language}}; follow an explicit request for another language.\n'}).generate_summary_prompt
+E    +    where ConversationSettings(max_rounds=5, embedding_top_k=30, vector_threshold=0.2, keyword_threshold=0.3, rerank_top_k=30, r...own when appropriate.\n\nDefault response language: {{language}}; follow an explicit request for another language.\n'}) = from_mapping({'conversation': {'generate_summary_prompt_id': 'custom', 'generate_summary_prompt': 'YAML MUST NOT WIN'}})
+E    +      where from_mapping = <class 'backend.weknora_port.runtime.ConversationSettings'>.from_mapping
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_document_profile.py::test_source_summary_configuration_id_resolved_text_language_and_positive_limits
+1 failed in 1.44s
