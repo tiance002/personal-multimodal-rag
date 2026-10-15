@@ -55,3 +55,8 @@ Development API/worker/React/package entry changes saved as an unaccepted checkp
 ## 2026-10-15 P8 resumed and scoped entry proof
 
 Latest root delegation explicitly resumed ec98695; earlier pause provenance UNKNOWN (no verifiable ID/time/sender). API enqueue-autostart defect repaired in9567c88 while retaining old default behavior. Scoped new-entry actual HTTP/PG/Redis/worker test passed, including second assembly memory/image processing and later image after idle. Installed wheel same test passed,97 backend modules from installed paths,0 source imports.11 queue/config checks and both compose config checks exit0; prior23 offline/React build0 reused unchanged. WheelSHA2565fb5215b3b4da0f12dc7af4c8bcb13815ba4d2413405c2103b632911fe784459. Third-party dependency paths reused; full fresh dependency installation NOT CLAIMED. No REAL_PROVIDER_PASS/CUTOVER_PASS or whole differential PASS. See P8_DEVELOPMENT_ENTRY_REPORT_20261015.md.
+
+
+## 2026-10-15 reference metadata and receipt follow-up
+
+Reference DTO fix4488ac1 preserves source Unicode half-open coordinates including0, and audited metadata through real final commit/JSONB/history.168 scoped offline checks and1 actual HTTP/PG/Redis two-turn check passed, exits0. Separate estimator addendum archives exact old receipt byte form (only final newline CRLF), canonical Git byte form, AST identity and1+1 targeted local-tokenizer checks0; original receipt unchanged. See REFERENCE_METADATA_REPORT_20261015.md and ESTIMATOR_RECEIPT_BINDING_20261015.md. Full paired differential independent re-review pending; no whole-stage/provider/cutover acceptance. Additional missing-summary-model POSTPROCESSOR_PENDING observation recorded for root review, not silently deferred.
