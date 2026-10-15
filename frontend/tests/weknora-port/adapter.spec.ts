@@ -121,3 +121,90 @@ test("runtime mismatch during a run is shown in its assistant bubble and never s
   await expect(page.locator(".wp-message.assistant.error").getByText(/身份不匹配/)).toBeVisible();
   expect(generationPosts).toBe(0);
 });
+
+test("library selection reads its KB scope and upload polling exposes terminal completion and error codes", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/knowledge-bases", route => route.fulfill({ json: envelope([
+    { id: "kb-1", name: "课程资料", cloud_allowed: false, document_count: 1 },
+    { id: "kb-2", name: "图片资料", cloud_allowed: false, document_count: 1 },
+  ]) }));
+  const documentReads: string[] = [];
+  let uploadReads = 0;
+  let uploaded = false;
+  await page.route("**/api/v1/knowledge-bases/*/documents", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (route.request().method() === "POST") {
+      uploaded = true;
+      await route.fulfill({ json: envelope({ id: "doc-upload", knowledge_base_id: "kb-2", filename: "figure.png", status: "pending" }) });
+      return;
+    }
+    documentReads.push(path);
+    if (path.endsWith("/kb-1/documents")) {
+      await route.fulfill({ json: envelope([{ id: "doc-1", knowledge_base_id: "kb-1", filename: "chapter.pdf", status: "completed" }]) });
+      return;
+    }
+    if (!uploaded) {
+      await route.fulfill({ json: envelope([]) });
+      return;
+    }
+    uploadReads++;
+    const rows = uploadReads === 1
+      ? [{ id: "doc-upload", knowledge_base_id: "kb-2", filename: "figure.png", status: "pending" }]
+      : [{ id: "doc-upload", knowledge_base_id: "kb-2", filename: "figure.png", status: "completed" },
+        { id: "doc-failed", knowledge_base_id: "kb-2", filename: "bad-image.png", status: "failed", error_code: "OCR_UNAVAILABLE" }];
+    await route.fulfill({ json: envelope(rows) });
+  });
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "资料库" }).click();
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await expect(page.getByText("chapter.pdf", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /^图片资料/ }).click();
+  await expect(page.getByText("chapter.pdf", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("combobox")).toHaveValue("kb-2");
+  await expect(page.getByText("资料文件", { exact: true })).toBeVisible();
+  await page.locator('input[type="file"]').setInputFiles({ name: "figure.png", mimeType: "image/png", buffer: Buffer.from("image") });
+  await expect(page.getByText("figure.png", { exact: true })).toBeVisible();
+  await expect(page.getByText(/completed/)).toBeVisible();
+  await expect(page.getByText(/OCR_UNAVAILABLE/)).toBeVisible();
+  expect(documentReads.some(path => path.endsWith("/kb-1/documents"))).toBe(true);
+  expect(documentReads.some(path => path.endsWith("/kb-2/documents"))).toBe(true);
+  expect(uploadReads).toBeGreaterThanOrEqual(2);
+});
+
+test("citation drawer renders scoped version, chunk position and image OCR/caption metadata", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/sessions", async route => {
+    if (route.request().method() === "POST") {
+      await route.fulfill({ json: envelope({ id: "session-cite", title: "引用", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" }) });
+    } else await route.fulfill({ json: envelope([]) });
+  });
+  const citedAnswer = '参见 <kb chunk_id="chunk-image" doc="结构图" />。';
+  await page.route("**/api/v1/sessions/session-cite/messages", route => route.fulfill({
+    status: 200,
+    contentType: "text/event-stream",
+    body: frame({ id: "request-cite", response_type: "agent_query", content: "", done: false,
+      data: { request_id: "request-cite", session_id: "session-cite", assistant_message_id: "assistant-cite" } }) +
+      frame({ id: "request-cite", response_type: "answer", content: citedAnswer, done: true, data: { event_id: "answer-cite" } }) +
+      frame({ id: "request-cite", response_type: "complete", content: "", done: false, data: { final_content: citedAnswer } }),
+  }));
+  await page.route("**/api/v1/chunks/chunk-image", route => route.fulfill({ json: envelope({
+    knowledge_base_id: "kb-1", document_id: "doc-1", chunk_id: "chunk-image", filename: "结构图.pdf", text: "图中展示模块关系",
+    source_url: "/api/v1/source", source_version: "version-7", chunk_type: "image_caption", chunk_index: 4,
+    start: 120, end: 168, page_number: 3,
+    image_info: [{ page_number: 3, source_type: "embedded_image", caption: "结构依赖关系", ocr_text: "入口 服务 数据库",
+      ocr_status: { status: "completed" }, caption_status: { status: "failed", error: "CAPTION_TIMEOUT" } }],
+  }) }));
+
+  await page.goto("/");
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await page.getByPlaceholder("询问当前资料…").fill("问题");
+  await page.getByRole("button", { name: "发送" }).click();
+  await page.getByRole("button", { name: "结构图" }).click();
+  await expect(page.getByText("kb-1", { exact: true })).toBeVisible();
+  await expect(page.getByText("version-7")).toBeVisible();
+  await expect(page.getByText("第 4 段 · 字符 120–168 · 第 3 页")).toBeVisible();
+  await expect(page.getByText("embedded_image")).toBeVisible();
+  await expect(page.getByText("OCR 文本：入口 服务 数据库")).toBeVisible();
+  await expect(page.getByText("图片说明：failed · CAPTION_TIMEOUT")).toBeVisible();
+});

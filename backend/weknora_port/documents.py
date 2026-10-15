@@ -669,7 +669,8 @@ class DocumentLifecycleService:
             raise DocumentLifecycleError("CHUNK_ID_REQUIRED")
         rows = await self._rows(
             "SELECT c.id AS chunk_id,c.knowledge_id AS document_id,c.knowledge_base_id,c.content,"
-            "c.source_content,c.chunk_index,c.start_at,c.end_at,k.file_name AS filename,k.parse_status "
+            "c.source_content,c.chunk_index,c.start_at,c.end_at,c.chunk_type,c.image_info,"
+            "c.metadata AS chunk_metadata,k.metadata AS document_metadata,k.file_name AS filename,k.parse_status "
             "FROM chunks c JOIN knowledges k ON k.id=c.knowledge_id AND k.knowledge_base_id=c.knowledge_base_id "
             "WHERE c.id=%s AND c.tenant_id=%s AND k.tenant_id=%s AND c.deleted_at IS NULL AND k.deleted_at IS NULL "
             "AND (c.chunk_type NOT IN ('image_ocr','image_caption') OR "
@@ -680,8 +681,31 @@ class DocumentLifecycleService:
         row = rows[0]
         if row.get("parse_status") not in ("completed", "processing", "pending"):
             raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
+        metadata = _json_object(row.get("chunk_metadata"))
+        version = metadata.get("source_version")
+        if not isinstance(version, str) or not version or version != _json_object(row.get("document_metadata")).get("source_version"):
+            raise LookupError("SOURCE_CHUNK_UNAVAILABLE")
+        images = row.get("image_info") or []
+        if isinstance(images, str):
+            try:
+                images = json.loads(images)
+            except ValueError:
+                images = []
+        public_images = []
+        for image in images if isinstance(images, list) else []:
+            if not isinstance(image, Mapping):
+                continue
+            # Storage paths and adapter internals are not citation data.
+            public = {key: image[key] for key in ("page_number", "source_type", "caption", "ocr_text") if key in image}
+            for kind in ("ocr_status", "caption_status"):
+                state = image.get(kind)
+                if isinstance(state, Mapping):
+                    public[kind] = {key: state[key] for key in ("status", "error") if isinstance(state.get(key), str)}
+            public_images.append(public)
         return {"chunk_id": row["chunk_id"], "document_id": row["document_id"],
                 "knowledge_base_id": row["knowledge_base_id"], "filename": row.get("filename") or "",
                 "text": row.get("source_content") or row.get("content") or "",
                 "chunk_index": row["chunk_index"], "start": row["start_at"], "end": row["end_at"],
+                "source_version": version, "chunk_type": row.get("chunk_type") or "text",
+                "page_number": metadata.get("page_number"), "image_info": public_images,
                 "source_url": f"/api/v1/knowledge-bases/{row['knowledge_base_id']}/documents/{row['document_id']}/source"}

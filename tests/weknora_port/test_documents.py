@@ -101,7 +101,9 @@ class MemoryConnection:
                     "knowledge_base_id": row.scope.knowledge_base_id, "content": row.content,
                     "source_content": row.source_content, "chunk_index": row.chunk_index,
                     "start_at": row.start_at, "end_at": row.end_at, "filename": doc["file_name"],
-                    "parse_status": doc["parse_status"]}])
+                    "parse_status": doc["parse_status"], "chunk_metadata": dict(row.metadata),
+                    "document_metadata": doc["metadata"], "chunk_type": row.chunk_type,
+                    "image_info": row.image_info}])
             return Cursor()
         raise AssertionError(f"unhandled test SQL: {query}")
 
@@ -182,6 +184,36 @@ def make_service(tmp_path, *, post_processor=None):
     service = DocumentLifecycleService(factory, tmp_path / "storage-new", principal=PRINCIPAL,
         resolve_kb_settings=fixture_settings, post_processor=post_processor)
     return service, factory
+
+
+def test_source_readback_exposes_version_position_and_safe_image_details_and_rejects_stale(tmp_path, monkeypatch):
+    service, _ = make_service(tmp_path)
+    row = {"chunk_id": "chunk", "document_id": "document", "knowledge_base_id": "kb",
+           "filename": "scan.png", "content": "OCR source", "source_content": "",
+           "chunk_index": 2, "start_at": 10, "end_at": 20, "parse_status": "completed",
+           "chunk_type": "image_ocr", "chunk_metadata": {"source_version": "version-1", "page_number": 3},
+           "document_metadata": {"source_version": "version-1"},
+           "image_info": json.dumps([{"url": "E:/private/internal.png", "page_number": 3,
+               "source_type": "scanned_pdf", "ocr_text": "OCR source", "caption": "A chart",
+               "ocr_status": {"status": "completed", "binding": {"internal": "hidden"}},
+               "caption_status": {"status": "failed", "error": "MODEL_CALL_FAILED"}}])}
+    async def rows(query, params):
+        assert params == ("chunk", PRINCIPAL.tenant_id, PRINCIPAL.tenant_id)
+        return [row]
+    monkeypatch.setattr(service, "_rows", rows)
+    async def exercise():
+        source = await service.read_source_chunk(PRINCIPAL, "chunk")
+        assert (source["source_version"], source["page_number"], source["start"], source["end"]) == ("version-1", 3, 10, 20)
+        assert source["image_info"][0]["ocr_status"] == {"status": "completed"}
+        assert source["image_info"][0]["caption_status"] == {"status": "failed", "error": "MODEL_CALL_FAILED"}
+        assert "private" not in json.dumps(source) and "binding" not in json.dumps(source)
+        row["document_metadata"]["source_version"] = "version-2"
+        with pytest.raises(LookupError, match="SOURCE_CHUNK_UNAVAILABLE"):
+            await service.read_source_chunk(PRINCIPAL, "chunk")
+        row["chunk_metadata"] = {}
+        with pytest.raises(LookupError, match="SOURCE_CHUNK_UNAVAILABLE"):
+            await service.read_source_chunk(PRINCIPAL, "chunk")
+    asyncio.run(exercise())
 
 
 def test_text_and_markdown_uploads_persist_immutable_source_chunks_and_complete_with_injected_postprocessor(tmp_path, monkeypatch):

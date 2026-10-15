@@ -104,6 +104,7 @@ export function WeKnoraPythonApp() {
   const [query, setQuery] = useState("");
   const [newKbName, setNewKbName] = useState("");
   const [uploadKbId, setUploadKbId] = useState("");
+  const [documentRefresh, setDocumentRefresh] = useState(0);
   const [source, setSource] = useState<SourceChunk | null>(null);
   const [sourceError, setSourceError] = useState("");
   const [familiarDocument, setFamiliarDocument] = useState<DocumentRow | null>(null);
@@ -142,14 +143,34 @@ export function WeKnoraPythonApp() {
   const documentScopeLocked = Boolean(activeSession);
   const canSubmit = !busy && !loading && !runtimeError && selectedBases.length > 0 && query.trim().length > 0;
 
+  const documentKnowledgeBaseIds = page === "library"
+    ? (uploadKbId ? [uploadKbId] : [])
+    : page === "chat" ? selectedBases : [];
   useEffect(() => {
     let cancelled = false;
-    if (selectedBases.length === 0) { setDocuments([]); return; }
-    void Promise.all(selectedBases.map(id => portApi.documents(id))).then(groups => {
-      if (!cancelled) setDocuments(groups.flat());
-    }).catch(error => { if (!cancelled) setNotice(`资料列表读取失败：${errorText(error)}`); });
-    return () => { cancelled = true; };
-  }, [selectedBases]);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    setDocuments([]);
+    if (documentKnowledgeBaseIds.length === 0) return () => { cancelled = true; };
+
+    const loadDocuments = async () => {
+      try {
+        const groups = await Promise.all(documentKnowledgeBaseIds.map(id => portApi.documents(id)));
+        if (cancelled) return;
+        const rows = groups.flat();
+        setDocuments(rows);
+        if (rows.some(row => row.status === "pending" || row.status === "processing")) {
+          timer = setTimeout(() => void loadDocuments(), 1000);
+        }
+      } catch (error) {
+        if (!cancelled) setNotice(`资料列表读取失败：${errorText(error)}`);
+      }
+    };
+    void loadDocuments();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [documentKnowledgeBaseIds.join("\u0000"), page, documentRefresh]);
 
   const openSession = async (session: SessionRow) => {
     setActiveSession(session);
@@ -306,9 +327,13 @@ export function WeKnoraPythonApp() {
 
   const upload = async (file?: File) => {
     if (!file || !uploadKbId) return;
+    const targetKbId = uploadKbId;
     try {
-      const row = await portApi.upload(uploadKbId, file);
-      setDocuments(current => [...current.filter(item => item.id !== row.id), row]);
+      const row = await portApi.upload(targetKbId, file);
+      if (page === "library" && uploadKbId === targetKbId) {
+        setDocuments(current => [...current.filter(item => item.id !== row.id), row]);
+        setDocumentRefresh(current => current + 1);
+      }
       setBases(await portApi.knowledgeBases());
       setNotice(`已提交资料：${row.filename} · ${row.status}`);
     } catch (error) { setNotice(`上传失败：${errorText(error)}`); }
@@ -364,6 +389,7 @@ export function WeKnoraPythonApp() {
     setNotice("已停止读取当前 SSE；服务端运行不变，可继续读取同一 assistant message");
   };
 
+  const visibleDocuments = documents.filter(doc => documentKnowledgeBaseIds.includes(doc.knowledge_base_id));
   const selectedNames = useMemo(() => bases.filter(base => selectedBases.includes(base.id)).map(base => base.name), [bases, selectedBases]);
 
   return <div className="wp-shell">
@@ -395,7 +421,7 @@ export function WeKnoraPythonApp() {
           <div className="wp-scope-heading"><div><strong>检索范围</strong><small>{documentScopeLocked ? "会话使用已保存的知识库范围；新范围请新建会话" : "先选择一个或多个知识库，再限定文档"}</small></div><span>{selectedBases.length} 个知识库 · {selectedDocuments.length} 个资料</span></div>
           <div className="wp-scope-grid">
             <div className="wp-scope-column"><label>知识库</label>{bases.map(base => <label key={base.id} className="wp-check-row"><input type="checkbox" checked={selectedBases.includes(base.id)} disabled={documentScopeLocked || busy} onChange={() => toggleBase(base.id)} /><span><strong>{base.name}</strong><small>{base.document_count} 份资料 · {base.cloud_allowed ? "允许外发" : "仅本地"}</small></span></label>)}{!bases.length && <p className="wp-empty-small">尚无知识库，请到资料库创建</p>}</div>
-            <div className="wp-scope-column"><label>资料文件</label>{documents.map(doc => <label key={doc.id} className="wp-check-row"><input type="checkbox" checked={selectedDocuments.includes(doc.id)} disabled={documentScopeLocked || busy || !selectedBases.includes(doc.knowledge_base_id)} onChange={() => toggleDocument(doc.id)} /><span><strong>{doc.filename}</strong><small>{doc.status}</small></span></label>)}{selectedBases.length > 0 && documents.length === 0 && <p className="wp-empty-small">所选知识库暂无资料</p>}</div>
+            <div className="wp-scope-column"><label>资料文件</label>{visibleDocuments.map(doc => <label key={doc.id} className="wp-check-row"><input type="checkbox" checked={selectedDocuments.includes(doc.id)} disabled={documentScopeLocked || busy || !selectedBases.includes(doc.knowledge_base_id)} onChange={() => toggleDocument(doc.id)} /><span><strong>{doc.filename}</strong><small>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</small></span></label>)}{selectedBases.length > 0 && visibleDocuments.length === 0 && <p className="wp-empty-small">所选知识库暂无资料</p>}</div>
           </div>
         </div>
 
@@ -421,13 +447,26 @@ export function WeKnoraPythonApp() {
         </div>
       </section>}
 
-      {page === "library" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>知识库</h1><p>选择资料范围并查看文件名、索引状态。</p></div></div><div className="wp-library-grid"><div className="wp-panel"><h2>知识库</h2>{bases.map(base => <button key={base.id} className="wp-library-row" onClick={() => setUploadKbId(base.id)}><strong>{base.name}</strong><span>{base.document_count} 份 · {base.cloud_allowed ? "允许外发" : "仅本地"}</span></button>)}<form className="wp-inline-form" onSubmit={event => void createKb(event)}><input value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="新知识库名称"/><button disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</button></form></div><div className="wp-panel"><h2>资料文件</h2><KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/><div className="wp-upload-row"><select value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>{documents.map(doc => <div className="wp-library-row" key={doc.id}><strong>{doc.filename}</strong><span>{doc.status}</span></div>)}{!documents.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div></div></section>}
+      {page === "library" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>知识库</h1><p>选择资料范围并查看文件名、索引状态。</p></div></div><div className="wp-library-grid"><div className="wp-panel"><h2>知识库</h2>{bases.map(base => <button key={base.id} className="wp-library-row" onClick={() => setUploadKbId(base.id)}><strong>{base.name}</strong><span>{base.document_count} 份 · {base.cloud_allowed ? "允许外发" : "仅本地"}</span></button>)}<form className="wp-inline-form" onSubmit={event => void createKb(event)}><input value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="新知识库名称"/><button disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</button></form></div><div className="wp-panel"><h2>资料文件</h2><KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/><div className="wp-upload-row"><select value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>{visibleDocuments.map(doc => <div className="wp-library-row" key={doc.id}><strong>{doc.filename}</strong><span>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</span></div>)}{!visibleDocuments.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div></div></section>}
 
       {page === "models" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>模型角色</h1><p>配置 embedding、rerank、cheap、expensive 和 VLM。API 密钥只写入，不会从服务端读回。</p></div></div><form className="wp-model-form" onSubmit={event => void saveConfig(event)}>{config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Source<select aria-label={`Source ${role.role}`} value={role.source ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, source: event.target.value } : row) }))}><option value="">Choose source / preserve legacy</option><option value="remote">Remote</option><option value="local">Local (calls unavailable)</option></select></label><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<button className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</button></form></section>}
       {page === "memory" && <MemoryPanel disabled={loading || Boolean(runtimeError)} onOpenDocument={openMemoryDocument} />}
     </main>
 
     {page === "library" && familiarDocument && <aside className="wp-source-drawer" aria-label="常用文档详情"><button className="wp-close" onClick={() => setFamiliarDocument(null)}>关闭文档</button><strong>{familiarDocument.filename}</strong><p>{familiarDocument.status}</p><a href={portApi.originalDocumentURL(familiarDocument.knowledge_base_id, familiarDocument.id)} target="_blank" rel="noreferrer">打开原始文件</a></aside>}
-    {(source || sourceError) && <div className="wp-source-drawer"><button className="wp-close" onClick={() => { setSource(null); setSourceError(""); }}>关闭 ×</button>{source ? <><strong>来源回读 · {source.filename}</strong><pre>{source.text}</pre>{source.source_url && <a href={source.source_url} target="_blank" rel="noreferrer">打开原始文件</a>}</> : <p role="alert">{sourceError}</p>}</div>}
+    {(source || sourceError) && <div className="wp-source-drawer"><button className="wp-close" onClick={() => { setSource(null); setSourceError(""); }}>关闭 ×</button>{source ? <><strong>来源回读 · {source.filename}</strong><dl className="wp-source-metadata">
+      {source.knowledge_base_id && <><dt>知识库 ID</dt><dd>{source.knowledge_base_id}</dd></>}
+      <dt>文档 ID</dt><dd>{source.document_id}</dd>
+      {source.source_version && <><dt>文档版本</dt><dd>{source.source_version}</dd></>}
+      {source.chunk_type && <><dt>片段类型</dt><dd>{source.chunk_type}</dd></>}
+      {source.chunk_index !== undefined && <><dt>片段位置</dt><dd>第 {source.chunk_index} 段 · 字符 {source.start ?? "?"}–{source.end ?? "?"}{source.page_number != null ? ` · 第 ${source.page_number} 页` : ""}</dd></>}
+    </dl>{source.image_info?.map((image, index) => <section className="wp-source-image-info" key={`${image.page_number ?? "page"}-${index}`}>
+      <strong>图片信息{image.page_number != null ? ` · 第 ${image.page_number} 页` : ""}</strong>
+      {image.source_type && <p>来源类型：{image.source_type}</p>}
+      {image.ocr_status && <p>OCR：{image.ocr_status.status ?? "未知"}{image.ocr_status.error ? ` · ${image.ocr_status.error}` : ""}</p>}
+      {image.ocr_text && <p>OCR 文本：{image.ocr_text}</p>}
+      {image.caption_status && <p>图片说明：{image.caption_status.status ?? "未知"}{image.caption_status.error ? ` · ${image.caption_status.error}` : ""}</p>}
+      {image.caption && <p>图片说明文本：{image.caption}</p>}
+    </section>)}<pre>{source.text}</pre>{source.source_url && <a href={source.source_url} target="_blank" rel="noreferrer">打开原始文件</a>}</> : <p role="alert">{sourceError}</p>}</div>}
   </div>;
 }
