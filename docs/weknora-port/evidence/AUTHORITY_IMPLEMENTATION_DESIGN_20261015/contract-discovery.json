@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "git",
+    "grep",
+    "-in",
+    "-e",
+    "SourceFacts",
+    "-e",
+    "source_facts",
+    "-e",
+    "input_usage",
+    "-e",
+    "InputUsage",
+    "--",
+    ":!docs/weknora-port/evidence",
+    ":!frontend/package-lock.json"
+  ],
+  "exitcode": 1,
+  "stdout": "",
+  "stderr": "",
+  "meaning": "No exact named tracked contract found in this baseline; proposed SourceFacts below is NOT an existing implementation."
+}
