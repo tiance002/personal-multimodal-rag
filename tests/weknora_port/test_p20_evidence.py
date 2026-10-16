@@ -42,6 +42,24 @@ def test_wrong_claim_with_real_quote_is_not_certified():
     assert out['structurally_valid'] and not out['ready_for_automatic_publish']
     assert out['semantic_support']=='MODEL_JUDGMENT_NOT_CERTIFICATION'
 
+def test_quote_from_other_real_chunk_is_not_reassigned():
+    # Actual P20 failure: c1 is title-only, while the quote belongs to body c2.
+    sources={'c1':dict(S['c1'],text='Biographical title only.'),'c2':dict(S['c1'],chunk_id='body')}
+    out=validate_audit(json.dumps(body(handle='c1')),U,sources,finish_reason='stop',original_citations=[{'id':'ch'}])
+    assert not out['structurally_valid'] and out['citations_added']==0
+    assert not out['experimental_candidate_retained']
+
+def test_single_complete_fenced_json_preserves_all_binding_rules():
+    out=validate_audit('```json\n'+json.dumps(body())+'\n```',U,S,finish_reason='stop',original_citations=[{'id':'ch'}])
+    assert out['structurally_valid'] and out['transport_envelope']=='single_json_fence'
+    assert not out['ready_for_automatic_publish']
+    bad=body(quote='invented incorrect source quote')
+    assert not validate_audit('```json\n'+json.dumps(bad)+'\n```',U,S,finish_reason='stop',original_citations=[])['structurally_valid']
+
+@pytest.mark.parametrize('text',['Explanation\n```json\n{}\n```','```json\n{}\n```\n```json\n{}\n```','```json\n{}\n``` extra'])
+def test_fence_does_not_salvage_extra_prose_or_multiple_documents(text):
+    assert not validate_audit(text,U,S,finish_reason='stop',original_citations=[])['structurally_valid']
+
 def test_units_cover_mixed_paragraph_and_preserve_original_spans():
     text='# Title\n\nFirst fact. Second inference.\n\n<ref id="c1"/>'
     units=answer_units(text);assert len(units)==1

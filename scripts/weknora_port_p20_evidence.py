@@ -53,10 +53,15 @@ def unique_object(pairs):
 
 def validate_audit(text,units,sources,*,finish_reason,original_citations):
     """Validate structure and provenance; SUPPORTED remains a model judgment."""
-    errors=[];rows=[]
+    errors=[];rows=[];envelope='plain_json'
     try:
         if finish_reason!='stop':raise ValueError('NON_STOP_COMPLETION')
         if len(text)>100000:raise ValueError('OUTPUT_SIZE')
+        # Observed P20 audit-02/04 wrap their JSON once. Only unwrap a complete
+        # single json fence; never salvage prose, concatenate blocks or repair JSON.
+        fenced=re.fullmatch(r'\s*```json\s*\n(.*?)\n```\s*',text,re.S)
+        if fenced:
+            text=fenced.group(1);envelope='single_json_fence'
         obj=json.loads(text,object_pairs_hook=unique_object)
         if not isinstance(obj,dict) or set(obj)!={'units'} or not isinstance(obj['units'],list):raise ValueError('SCHEMA')
         expected={u['unit_id'] for u in units}
@@ -94,7 +99,7 @@ def validate_audit(text,units,sources,*,finish_reason,original_citations):
     elif not candidate_clear:holds.append('MODEL_REPORTED_UNSUPPORTED_CONFLICT_OR_UNKNOWN')
     if not original_citations:holds.append('ORIGINAL_ANSWER_HAS_NO_CITATIONS')
     return dict(schema='p20-provenance-audit/v1',structurally_valid=not errors,errors=errors,
-        units=rows,model_support_clear=candidate_clear,hold_reasons=holds,
+        units=rows,model_support_clear=candidate_clear,hold_reasons=holds,transport_envelope=envelope,
         experimental_candidate_retained=not holds,semantic_support='MODEL_JUDGMENT_NOT_CERTIFICATION',
         ready_for_automatic_publish=False,answer_modified=False,citations_added=0)
 
