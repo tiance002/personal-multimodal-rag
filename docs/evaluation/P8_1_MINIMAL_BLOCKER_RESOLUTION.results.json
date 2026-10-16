@@ -1,0 +1,400 @@
+{
+  "schema": "p8-1-minimal-blocker-resolution/v1",
+  "completion": "BOUNDED_SCOPE_COMPLETE_WITH_RETAINED_FAILURES",
+  "source": {
+    "baseline": "2477ecd38a1768f28dd9941e4ed13f515411b570",
+    "fixed_upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "commits": [
+      "304defd0184c09003e59236dcf2bb4d3f530b695",
+      "d711231d73de6ccb6609453c691d0f8991a1e55f",
+      "4b45c70cf6b5c9f138312143ae1ad1d44db415ba"
+    ],
+    "binding": {
+      "initial": "2477ecd38a1768f28dd9941e4ed13f515411b570",
+      "recheck": "d711231d73de6ccb6609453c691d0f8991a1e55f"
+    },
+    "final_production_live_verification": "NOT_RUN"
+  },
+  "p8_frozen": {
+    "attempts": 11,
+    "PASS": 5,
+    "FAIL": 4,
+    "PARTIAL": 2,
+    "modified": false
+  },
+  "new_real_questions": 3,
+  "new_goal_path_counts": {
+    "FAIL": 1,
+    "PASS": 1,
+    "PARTIAL": 1
+  },
+  "raw_scorer_counts_unchanged": {
+    "FAIL": 1,
+    "PASS": 2
+  },
+  "scorer_limit": "Quote readback validity alone does not establish that OCR reached the answer model.",
+  "attempts": [
+    {
+      "dataset": "omnidocbench",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png:p8-diagnostic:p8-1-text-evidence",
+      "recorded_wiring_status": "FAIL",
+      "goal_path_status": "FAIL",
+      "reason": [
+        "CITATION_IDENTITY_VERSION_QUOTE_OR_SOURCE_HASH_FAILED"
+      ],
+      "http_seconds": 55.613994,
+      "stage_counts": {
+        "search": 3,
+        "rerank": 3,
+        "context": 1
+      },
+      "valid_citations": 0,
+      "qa_quality": {
+        "status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+        "metrics": null
+      }
+    },
+    {
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "recorded_wiring_status": "PASS",
+      "goal_path_status": "PASS",
+      "reason": [],
+      "http_seconds": 37.948767,
+      "stage_counts": {
+        "search": 30,
+        "rerank": 7,
+        "context": 7
+      },
+      "valid_citations": 1,
+      "qa_quality": {
+        "status": "COMPUTED_PROJECT_TYPED_ANSWER_DIAGNOSTIC",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.0224
+        },
+        "official_judge": "NOT_RUN"
+      }
+    },
+    {
+      "dataset": "omnidocbench",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png:p8-diagnostic:p8-1-text-evidence:quote-recheck",
+      "recorded_wiring_status": "PASS",
+      "goal_path_status": "PARTIAL",
+      "reason": "VALID_PLACEHOLDER_REFERENCE_BUT_PROJECTION_DROPS_MERGED_IMAGE_INFO_AFTER_FIXED_OVERLAP",
+      "http_seconds": 31.640579,
+      "stage_counts": {
+        "search": 3,
+        "rerank": 3,
+        "context": 1
+      },
+      "valid_citations": 1,
+      "qa_quality": {
+        "status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+        "metrics": null
+      }
+    }
+  ],
+  "provider_usage": {
+    "actual_provider_responses": 30,
+    "capabilities": {
+      "embedding": 20,
+      "chat": 7,
+      "rerank": 3
+    },
+    "states": {
+      "settled": 27,
+      "unknown": 3
+    },
+    "known_actual_total_tokens": 38375,
+    "known_input_tokens": 37505,
+    "known_output_tokens": 870,
+    "unknown_count": 3,
+    "unknown_held_tokens": 17091,
+    "reserved_count": 0,
+    "deepseek_new_calls": 0
+  },
+  "http_seconds_total": 125.20334,
+  "mml": {
+    "official_supported_qid": "row-0687",
+    "all_frozen_qids_reviewed": 8,
+    "selection_sha256": "9e8ff657cdebc23da390d334bc4534beec9ff273e6aebe5056d2bf08b53b92b1",
+    "real_complete_wiring": "PASS",
+    "answer_quality": "FAIL",
+    "status": "READY_SUBSET_ONLY",
+    "row_0430": "CAPABILITY_LIMIT_VISUAL_COUNTING_FAILURE_PRESERVED",
+    "official_judge": "NOT_RUN"
+  },
+  "omni": {
+    "original_p8_loss": "RERANK_ZERO_RESULTS_BEFORE_MERGE",
+    "first_new_failure": "IMAGE_CHILD_MERGED_MARKDOWN_USED_AS_ORIGINAL_QUOTE",
+    "recheck_failure": "PROJECTION_DISCARDED_PARENT_AGGREGATED_IMAGE_INFO_AFTER_FIXED_OVERLAP",
+    "fixes": "MINIMAL_SOURCE_PROJECTION_ONLY",
+    "offline_verification": "PASS",
+    "final_real_ocr_to_answer_verification": "NOT_RUN_RECHECK_LIMIT_REACHED",
+    "status": "METRIC_PARTIAL",
+    "official_qa": "NOT_APPLICABLE_NO_QA_GOLD",
+    "complete_real_ocr_to_answer": "NOT_ESTABLISHED"
+  },
+  "four_dataset_readiness": [
+    {
+      "dataset": "scifact",
+      "primary_status": "READY_SUBSET_ONLY"
+    },
+    {
+      "dataset": "miracl-zh",
+      "primary_status": "READY_SUBSET_ONLY"
+    },
+    {
+      "dataset": "longbench-zh",
+      "primary_status": "READY_SUBSET_ONLY"
+    },
+    {
+      "dataset": "hotpotqa",
+      "primary_status": "METRIC_PARTIAL"
+    }
+  ],
+  "next_cheap_only": {
+    "available_subset_metrics_ready": true,
+    "full_official_corpus_ready": false,
+    "started_by_this_task": false,
+    "low_answer_quality_is_not_a_start_blocker": true,
+    "metrics": {
+      "scifact": "DOCUMENT_QRELS_RETRIEVAL_ONLY",
+      "miracl-zh": "PASSAGE_QRELS_RETRIEVAL_ONLY",
+      "longbench-zh": "MULTIFIELDQA_ZH_F1_AND_DUREADER_ROUGE_L_SEPARATELY",
+      "hotpotqa": "ANSWER_EM_F1_AVAILABLE_SUPPORTING_FACT_AND_JOINT_NOT_RUN"
+    }
+  },
+  "tests": [
+    {
+      "log": "observer-test.log",
+      "passed": 3,
+      "exit_code": 0
+    },
+    {
+      "log": "image-projection-red2.log",
+      "failed": 12,
+      "exit_code": 1
+    },
+    {
+      "log": "image-projection-final.log",
+      "passed": 86,
+      "exit_code": 0
+    },
+    {
+      "log": "parent-enrichment-red.log",
+      "failed": 1,
+      "exit_code": 1
+    },
+    {
+      "log": "parent-enrichment-green.log",
+      "passed": 31,
+      "exit_code": 0
+    }
+  ],
+  "preservation": {
+    "p8_ledger_rows": 127,
+    "p8_ledger_changes": [],
+    "p8_file_count": 157,
+    "p8_file_changes": [],
+    "protected_file_count": 6,
+    "protected_changes": [],
+    "deepseek_unchanged": true
+  },
+  "processes": [
+    {
+      "state": "COMPLETED",
+      "at": "2026-10-16T07:36:35.010096+00:00",
+      "metadata": {
+        "pids": [
+          30400,
+          32292
+        ]
+      },
+      "finished_at": "2026-10-16T07:36:39.255012+00:00",
+      "remaining": []
+    },
+    {
+      "state": "COMPLETED",
+      "at": "2026-10-16T07:42:02.719763+00:00",
+      "metadata": {
+        "pids": [
+          30304,
+          31436
+        ]
+      },
+      "finished_at": "2026-10-16T07:42:07.568587+00:00",
+      "remaining": []
+    }
+  ],
+  "resource_identity": {
+    "pg": "127.0.0.1:56423/weknora_python_port_20261013",
+    "pg_system_identifier": "7696088403504697382",
+    "redis": "127.0.0.1:56424/15",
+    "redis_run_id": "87b4c2a9f76f9f94b34b5f21fe31a967926f343a",
+    "prefixes": [
+      "weknora-python-p8-1:0e0ba705a839423895ece62fa72c5f59",
+      "weknora-python-p8-1:32a18828346b41aa85882688c6b3c3cf"
+    ],
+    "owned_api_ports_56429_56430_final_listeners": 0
+  },
+  "changes": {
+    "production_shared_files": [
+      "backend/weknora_port/runtime.py"
+    ],
+    "migration": [],
+    "dependency": [],
+    "entrypoint": [],
+    "schema": [],
+    "other_files": [
+      "scripts/weknora_port_p8_1_real.py",
+      "scripts/weknora_port_p8_1_observed_api.py",
+      "tests/weknora_port/test_p8_1_observer.py",
+      "tests/weknora_port/test_mvp_source_evidence.py",
+      "docs/evaluation/P8_1_MINIMAL_BLOCKER_RESOLUTION.md",
+      "docs/evaluation/P8_1_MINIMAL_BLOCKER_RESOLUTION.results.json",
+      "progress.md"
+    ],
+    "integration_order": [
+      "IMAGE_QUOTE_READBACK",
+      "PARENT_OCR_ENRICHMENT",
+      "EVALUATION_AND_DOCS"
+    ],
+    "push": false,
+    "deploy": false,
+    "tag": false,
+    "merge": false
+  },
+  "exitcode_receipts": [
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\closeout-audit.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\configure.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\mml-parse-audit.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\preflight.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\prepare.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\query-mml.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\query-omni.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-configure.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-prepare.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-query.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-score.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-snapshot.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-start.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\recheck-stop.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\score-initial.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\snapshot-initial.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\start.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\stop-initial.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "receipt": "E:\\WK\\run\\p8-1-20261016\\upload-mml.exitcode.txt",
+      "exit_code": 0
+    }
+  ],
+  "evidence": [
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\selection.json",
+      "sha256": "9e8ff657cdebc23da390d334bc4534beec9ff273e6aebe5056d2bf08b53b92b1"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\mml-qid-audit.json",
+      "sha256": "abeb4b7f2a31d7b6a5c6e54ab69e0d894814ada759d8c6a03313955df7e8a862"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\mml-source-parse-audit.json",
+      "sha256": "2964b0e681aa815c79ee31c234fecc44fce44a420fbbd493c058f739a0140ab9"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\omni-stage-diagnostic.json",
+      "sha256": "49586cbfaab818e5bd19e24487cd91e8f4f69843965f7ac3fe452f81f6e97fca"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\omni-initial-quote-failure.json",
+      "sha256": "ca07fce9e02c163e9f6b818935a05654f9391e18b2861b7b531cddcd17ce270b"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\results.json",
+      "sha256": "4adcdc2b833810946c547128b2bc92a9bc1a4477a79e3b6a71337eadf51b2cf2"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\recheck\\results.json",
+      "sha256": "8a62ec7482e02c35827cd07e0999f03c28a919fd1f3b781c2485d888e471a3a9"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\four-dataset-readiness.json",
+      "sha256": "2dd78650d107db24ae275824d539288ee86d702ecd24a96bc05f2d897844cf3d"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\closeout-audit.json",
+      "sha256": "73d1680ea4faa66268c5264c4f9c05564032cb5b33e6281e0e17e1d04c1e5ce1"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\parent-enrichment-red.log",
+      "sha256": "6099cb17e32c91bb3b967ce1c72c669e738dabcd3ace0c8c79f5f133b2e05abd"
+    },
+    {
+      "path": "E:\\WK\\run\\p8-1-20261016\\parent-enrichment-green.log",
+      "sha256": "d77c7bdbb7bed3bca14d2af6335a58924ae63ec18a64280ae8fd00deec486071"
+    }
+  ],
+  "limitations": [
+    "No full-corpus official benchmark",
+    "No new visual counting capability",
+    "Omni final repair has offline evidence only; real-provider post-fix check NOT RUN",
+    "MML median answer quality failed",
+    "Historical failures, UNKNOWN and Gold unchanged"
+  ]
+}
