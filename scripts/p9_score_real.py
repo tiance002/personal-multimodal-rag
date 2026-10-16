@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import re
 import sys
+from types import FunctionType
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -139,7 +140,25 @@ def system_answer_gold(run, dataset, case, prediction, *, completed, query_attem
 
 def inspect_run(run):
     """Read an existing P8/P8.1/P9 run without altering any evidence artifact."""
-    result = p8.evaluate(run)
+    marker = p8.load(run / 'snapshot-selection.json', {'label': 'after'})
+    label = marker.get('label')
+    if not isinstance(label, str) or not re.fullmatch('[A-Za-z0-9_-]+', label):
+        raise ValueError('INVALID_RECORDED_SNAPSHOT_SELECTION')
+    snapshot_names = ('ledger', 'documents', 'chunks', 'image-tasks')
+    snapshot_paths = {run / (name + '-after.json'): run / (name + '-' + label + '.json') for name in snapshot_names}
+    missing = [str(path) for path in snapshot_paths.values() if not path.exists()]
+    def snapshot_load(path, default=None):
+        return p8.load(snapshot_paths.get(path, path), default)
+    # Clone only evaluate's globals; P8 source/module and historical evidence
+    # remain untouched. Its source/Gold readers keep their existing behavior.
+    evaluate = FunctionType(p8.evaluate.__code__, {**p8.evaluate.__globals__, 'load': snapshot_load})
+    result = evaluate(run)
+    for alias, actual in snapshot_paths.items():
+        result['inputs'][alias.name] = {'status': 'PRESENT' if actual.exists() else 'BLOCKED_MISSING_SELECTED_SNAPSHOT',
+            'path': str(actual), 'sha256': artifact_hash(actual), 'snapshot_label': label}
+    result['inputs']['snapshot-selection.json'] = {'path': str(run / 'snapshot-selection.json'),
+        'sha256': artifact_hash(run / 'snapshot-selection.json'), 'label': label,
+        'status': 'PRESENT' if (run / 'snapshot-selection.json').exists() else 'DEFAULT_AFTER'}
     state = p8.load(run / 'state.json', {})
     selected = p8.load(run / 'selection.json', {'datasets': []})
     case_config = {(dataset['name'], case['qid']): case for dataset in selected['datasets'] for case in dataset.get('cases', [])}
@@ -149,11 +168,14 @@ def inspect_run(run):
     captures = [p8.load(path) for path in sorted((run / 'captures').glob('*.json'))]
     stages = [p8.load(path) for path in sorted((run / 'stages').glob('*.json'))]
     requests = [p8.load(path) for path in sorted((run / 'provider-requests').glob('*.json'))]
-    after = p8.load(run / 'ledger-after.json', [])
+    after = p8.load(run / ('ledger-' + label + '.json'), [])
     before = p8.load(run / 'ledger-before.json', [])
     before_ids = {row.get('call_id') for row in before}
     delta = [row for row in after if row.get('call_id') not in before_ids] if (run / 'ledger-before.json').exists() else None
     for row in result['cases']:
+        if missing:
+            row['wiring_status'] = 'BLOCKED'
+            row['wiring_reasons'].append('RECORDED_SNAPSHOT_INCOMPLETE_NO_FALLBACK')
         record = row['question_identity']
         found = [capture for capture in captures if capture.get('session_id') == record.get('session') and capture.get('question') == row['question']]
         capture = found[0] if len(found) == 1 else None
@@ -210,6 +232,8 @@ def inspect_run(run):
     return {**result, 'schema': 'p9-readonly-real-evidence-results/v1', 'run_directory': str(run),
         'wiring_counts': dict(Counter(row['wiring_status'] for row in result['cases'])),
         'source_code_sha': state.get('source_sha'), 'ledger_delta': delta,
+        'snapshot_selection': {'label': label, 'status': 'BLOCKED_MISSING_SELECTED_SNAPSHOT' if missing else 'SELECTED',
+                               'missing_artifacts': missing, 'fallback_used': False},
         'ledger_before_available': (run / 'ledger-before.json').exists(),
         'method': 'QUOTE_IDENTITY_OCR_PAYLOAD_DELIVERY_AND_GOLD_QUALITY_SEPARATE',
         'official_omni_qa': 'NOT_APPLICABLE_NO_INDEPENDENT_QA_GOLD'}

@@ -8,7 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import pytest
 
-from scripts.p9_score_real import ocr_delivery, evaluate_p9, citation_offsets, system_answer_gold
+from scripts.p9_score_real import ocr_delivery, evaluate_p9, citation_offsets, system_answer_gold, inspect_run
 from scripts.weknora_port_p9_observed_api import install_wire_observer
 
 
@@ -123,6 +123,34 @@ def test_completed_fixed_refusal_counts_system_answer_metric_without_claiming_an
     no_gold = system_answer_gold(tmp_path, 'scifact', {'qid': 'claim', 'answers': []}, 'fixed refusal',
         completed=True, query_attempted=True, answer_model_called=False, fixed_refusal=True)
     assert no_gold['status'] == 'NOT_APPLICABLE_NO_ANSWER_GOLD' and no_gold['metrics'] is None
+
+
+def test_recorded_final_snapshot_supplies_new_calls_without_touching_old_after(tmp_path):
+    def save(name, value):
+        (tmp_path / name).write_text(json.dumps(value), encoding='utf-8')
+    save('selection.json', {'datasets': []})
+    save('state.json', {'datasets': {}})
+    save('snapshot-selection.json', {'label': 'final'})
+    save('ledger-before.json', [{'call_id': 'old'}])
+    save('ledger-after.json', [{'call_id': 'old'}])
+    old_bytes = (tmp_path / 'ledger-after.json').read_bytes()
+    save('ledger-final.json', [{'call_id': 'old'}, {'call_id': 'new'}])
+    for name in ('documents', 'chunks', 'image-tasks'):
+        save(name + '-after.json', [])
+        save(name + '-final.json', [])
+    result = inspect_run(tmp_path)
+    assert result['snapshot_selection']['label'] == 'final'
+    assert result['snapshot_selection']['status'] == 'SELECTED'
+    assert result['ledger_delta'] == [{'call_id': 'new'}]
+    assert result['inputs']['ledger-after.json']['path'] == str(tmp_path / 'ledger-final.json')
+    assert result['inputs']['ledger-after.json']['sha256'] == hashlib.sha256((tmp_path / 'ledger-final.json').read_bytes()).hexdigest()
+    assert (tmp_path / 'ledger-after.json').read_bytes() == old_bytes
+    (tmp_path / 'ledger-final.json').unlink()
+    missing = inspect_run(tmp_path)
+    assert missing['snapshot_selection']['status'] == 'BLOCKED_MISSING_SELECTED_SNAPSHOT'
+    assert missing['snapshot_selection']['fallback_used'] is False
+    assert missing['ledger_delta'] == []
+    assert (tmp_path / 'ledger-after.json').read_bytes() == old_bytes
 
 
 def test_wire_observer_preserves_single_gate_and_model_call_and_records_wire_hash(tmp_path):
