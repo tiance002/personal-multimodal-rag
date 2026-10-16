@@ -135,7 +135,16 @@ def stop():
     owned=[r for r in rows if needle in (r['CommandLine'] or '').replace('\\','/').lower() and (r['ProcessId']==process['pid'] or r['ParentProcessId']==process['pid'])]
     save('process-stop.json',owned)
     for row in sorted(owned,key=lambda x:x['ProcessId']==process['pid']):
-        subprocess.run(['powershell','-NoProfile','-Command',f"Stop-Process -Id {int(row['ProcessId'])} -ErrorAction Stop"],check=True)
+        # Stopping the interpreter child can also make its venv launcher exit.
+        # Verify command identity again inside the same shell before stopping.
+        target=int(row['ProcessId'])
+        command=(f"$p19Process=Get-CimInstance Win32_Process -Filter 'ProcessId={target}'; "
+            "if ($p19Process -and $p19Process.CommandLine -like '*scripts.weknora_port_p19_observed_api*' "
+            f"-and $p19Process.CommandLine.Replace('\\','/').ToLower().Contains('{needle}')) "
+            f"{{ Stop-Process -Id {target} -ErrorAction Stop }}")
+        subprocess.run(['powershell','-NoProfile','-Command',command],check=True)
+    with socket.socket() as sock:
+        assert sock.connect_ex(('127.0.0.1',56429))!=0,'OWNED_API_PORT_STILL_OPEN'
     print('STOPPED_OWNED',len(owned))
 
 
