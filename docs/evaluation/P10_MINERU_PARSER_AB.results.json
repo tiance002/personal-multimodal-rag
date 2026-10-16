@@ -1,0 +1,2379 @@
+{
+  "schema": "p10-mineru-parser-ab/v1",
+  "outcome": "A_MINIMAL_OPT_IN_INTEGRATION_OFFLINE_VERIFIED",
+  "base_sha": "5e2b4fc83d2b816a70b53e6bf6f560890d8bf2ec",
+  "implementation_sha": "24e9782e445617f005fa8180a71a3a51ca33c09e",
+  "date": "2026-10-16",
+  "source_file_sha256": {
+    "backend/weknora_port/ingestion/mineru.py": "60653e9bc0e46ae14e8dff0bce36d3edb6eef75302fe9c4f57de7c4b95846e54",
+    "backend/weknora_port/ingestion/mineru_runner.py": "9a2e7d13dc455d87ac1d151f5c60357b54d822fd72b86ec7442171243c377149",
+    "backend/weknora_port/ingestion/core.py": "1002849bd8d6e12da0013657b2c8b37a5233c77987450e84cb38f62b70af207a",
+    "backend/weknora_port/documents.py": "9175afafac2154aa61c442e0bbebe76911733a44cabaca644d6eef721a5f16f4",
+    "backend/weknora_port/development.py": "c1f9395e56a68c63b09f49a02ab71df4312272ab1f8bffa276ff63c57b5ab41b",
+    "scripts/weknora_port_mineru_offline.py": "9815297e54ceec0d905a3048fd14479c3b735be9ff71d44e4fbef2ad518651c2",
+    "tests/weknora_port/test_mineru.py": "9f0cae1acba3168e7bc8f406be7d66b01aac42df881b63bd24b748d82cdd1ff3",
+    "tests/weknora_port/test_development_entry.py": "160fa22107e801177ee8ac99e5a3a6f8ec31e6aecb0c511d1053911403d3722b",
+    "pyproject.toml": "e9b3f524ac28e669c45bd25957a18854f8ab22e89cd4822293cb7b83f017fe9d"
+  },
+  "scope": {
+    "provider_calls": 0,
+    "database_calls": 0,
+    "ledger_mutations": 0,
+    "advanced": "NOT_RUN",
+    "http_upload_and_vector_index": "NOT_RUN",
+    "rag_quality_ab": "NOT_RUN",
+    "production_enablement": "NOT_RUN",
+    "official_omni_total": "NOT_RUN"
+  },
+  "environment": {
+    "python": "3.12.7",
+    "mineru": "4.0.12",
+    "docvortex": "0.5.16",
+    "onnxruntime": "1.31.0",
+    "mineru_llama_cpp": "0.1.3",
+    "mineru_vl_utils": "2.0.7",
+    "venv": "E:/WK/mineru-env",
+    "os": "Windows11 10.0.26200",
+    "cpu": "i7-13650HX (14 cores)",
+    "physical_ram_KiB": 33271672,
+    "gpu": "RTX4060 Laptop 8188MiB",
+    "gpu_driver": "581.80",
+    "basic_device": "ONNX CPU",
+    "standard_device": "local llama-cpp GGUF Vulkan; actual VLM inference confirmed in forced OCR, b3 and formula logs",
+    "standard_gpu_sample_max_MiB": 2104,
+    "standard_gpu_sample_max_utilization_percent": 80,
+    "weights_bytes": 2098683085,
+    "dependencies_in_rag_venv_added": false
+  },
+  "model_sources": [
+    {
+      "repo": "opendatalab/MinerU-4_models_onnx",
+      "revision": "358310b4f64b95f9fefc372ad899356e4111f376"
+    },
+    {
+      "repo": "jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF",
+      "revision": "9185688a0495e1577d521a757c7c0b62dd38ca48",
+      "selection": "official 4.0.12 registry default GGUF selection; third-party quantization repository"
+    }
+  ],
+  "license": {
+    "package": "Apache2.0 plus additional commercial-threshold and online-service attribution terms; not unqualified Apache2.0",
+    "file": "E:\\WK\\run\\p10-mineru\\installed-MinerU-LICENSE.md",
+    "sha256": "2d9aeb5d15159329a20dd804f251c64860ba954fbd26ec02f802220e6d71cf5c",
+    "online_service_attribution_required": true,
+    "weight_repository_license_metadata": "not declared in fetched metadata; no blanket redistribution/commercial clearance inferred"
+  },
+  "input_manifests": {
+    "basic-case-plan.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\basic-case-plan.json",
+      "sha256": "0d7e7e981e7df91421a5af5440cf3b2611a509f5d26ad5e7551497e5ba787cd0"
+    },
+    "full-scan-basic-case-plan.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\full-scan-basic-case-plan.json",
+      "sha256": "c166db870bc2ff69a814f1815178583c08f8fa3dcb72722fc656492bbae5c03e"
+    },
+    "metric-protocol.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\metric-protocol.json",
+      "sha256": "19837bcb60a46dbf79883da0dca4731975b63d39264c7ddd67df363008afbe6d"
+    },
+    "mml-pdfs-and-qid-pages.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\mml-pdfs-and-qid-pages.json",
+      "sha256": "570c2c0edd65e699b1137dcc94a6daaf887fdcae18d785d1dbf37440880d075b"
+    },
+    "normal-text-pdf-control.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\normal-text-pdf-control.json",
+      "sha256": "eb61a476d7258290ca884e3948a3ac74e93a2610b7a2ca29cb187fd498426af2"
+    },
+    "omni24-original-pages-and-gold.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\omni24-original-pages-and-gold.json",
+      "sha256": "a216e68d83b790ddf4344eed30213f0d7a4569a1d0958c013f2db2c4c8f1baee"
+    },
+    "provenance-correction.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\provenance-correction.json",
+      "sha256": "385141e9f7bb003acfb85a6e11e750240a789083a1130bcf6caafcd260496931"
+    },
+    "standard-case-plan.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\standard-case-plan.json",
+      "sha256": "cba4eeafb8383d6bbf918b227476fc5799891a54d18881b835a16cd8d5b2eba1"
+    },
+    "standard-case-plan.v2.json": {
+      "path": "E:\\WK\\run\\p10-mineru\\frozen\\standard-case-plan.v2.json",
+      "sha256": "bf7a2581ec02cbd081c4fbc5f98d178b819b4801dcd6633c02d6694ddf5fddde"
+    }
+  },
+  "flash": {
+    "pages": 45,
+    "status": "PASS",
+    "inference_seconds_from_log": 8.170385,
+    "wall_seconds": null,
+    "output": "E:\\WK\\run\\p10-mineru\\outputs\\flash\\pew.zip"
+  },
+  "parse_groups": {
+    "basic-fixed": {
+      "successful_cases": 27,
+      "page_executions": 44,
+      "sum_case_wall_seconds": 558.5076360999956,
+      "max_sdk_process_peak_working_set_bytes": 2662858752,
+      "cases": [
+        {
+          "id": "b3-key-pages",
+          "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "pages": [
+            0,
+            8,
+            9,
+            16,
+            17,
+            18
+          ],
+          "wall_seconds": 18.79153899999801,
+          "peak_working_set_bytes": 1373282304,
+          "assets": 9,
+          "block_types": {
+            "paragraph_title": 4,
+            "text": 40,
+            "image": 8,
+            "chart": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\b3-key-pages"
+        },
+        {
+          "id": "cat-key-pages",
+          "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "pages": [
+            0,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34
+          ],
+          "wall_seconds": 17.989388399990276,
+          "peak_working_set_bytes": 1505705984,
+          "assets": 13,
+          "block_types": {
+            "header": 3,
+            "doc_title": 3,
+            "image": 13,
+            "text": 33
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\cat-key-pages"
+        },
+        {
+          "id": "omni-00",
+          "source_sha256": "b96bbf617b52a7626ceccf1bc15d4fc74c2500df30a90882154daf990e8fce00",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 13.677644299998065,
+          "peak_working_set_bytes": 1684131840,
+          "assets": 1,
+          "block_types": {
+            "header": 1,
+            "paragraph_title": 3,
+            "table": 1,
+            "text": 9,
+            "footer": 1,
+            "page_number": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-00"
+        },
+        {
+          "id": "omni-01",
+          "source_sha256": "ed01f2d5e8157c375502a926e24606751104abe70a1f95520a9fdf252310091c",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 23.057068900001468,
+          "peak_working_set_bytes": 2288918528,
+          "assets": 2,
+          "block_types": {
+            "header": 2,
+            "page_number": 1,
+            "table": 1,
+            "image": 1,
+            "paragraph_title": 1,
+            "text": 3,
+            "footer": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-01"
+        },
+        {
+          "id": "omni-02",
+          "source_sha256": "f2e079f35e9813d1054656805e2ad8c5b70b1f5fbbd367073b193c0da8cde394",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 22.401648700004444,
+          "peak_working_set_bytes": 2022658048,
+          "assets": 3,
+          "block_types": {
+            "paragraph_title": 2,
+            "text": 6,
+            "image": 3
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-02"
+        },
+        {
+          "id": "omni-03",
+          "source_sha256": "bce4e102948824826f61dde270bb92fdb9fd5e32bdf8250b38702d7b28e12da8",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 14.706938999996055,
+          "peak_working_set_bytes": 1315827712,
+          "assets": 4,
+          "block_types": {
+            "header": 3,
+            "doc_title": 2,
+            "text": 38,
+            "image": 4,
+            "paragraph_title": 4,
+            "footer": 5
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-03"
+        },
+        {
+          "id": "omni-04",
+          "source_sha256": "d0f87c71999e2e9439d8d66bda2886955800bb3adfcbe5bdd575a575c4651d6e",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 67.33888460000162,
+          "peak_working_set_bytes": 2402516992,
+          "assets": 2,
+          "block_types": {
+            "header": 2,
+            "image": 2,
+            "text": 8,
+            "footer": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-04"
+        },
+        {
+          "id": "omni-05",
+          "source_sha256": "cee5dfe5832d25aaf999a07ccee36b931340ae088152a0dee79ad05e33aedc54",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 11.625634399999399,
+          "peak_working_set_bytes": 926339072,
+          "assets": 2,
+          "block_types": {
+            "header": 1,
+            "page_number": 1,
+            "image": 2,
+            "paragraph_title": 3,
+            "text": 4
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-05"
+        },
+        {
+          "id": "omni-06",
+          "source_sha256": "3471a533f957c8aed9d8732878a763c039017f454c70eecf1cc832038d76e956",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 10.49378100001195,
+          "peak_working_set_bytes": 748765184,
+          "assets": 0,
+          "block_types": {
+            "text": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-06"
+        },
+        {
+          "id": "omni-07",
+          "source_sha256": "477ea3f2303b379dfb273b8e55bb6c4cc6564802e18ff38aeccb9a02f8f996ed",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 10.771241399997962,
+          "peak_working_set_bytes": 904441856,
+          "assets": 0,
+          "block_types": {
+            "header": 3,
+            "text": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-07"
+        },
+        {
+          "id": "omni-08",
+          "source_sha256": "e50bedfce6755d6987307c35bf2b6f08207af5ec9088bb5a36e6cc005a9972aa",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 11.763506200004485,
+          "peak_working_set_bytes": 973377536,
+          "assets": 0,
+          "block_types": {
+            "paragraph_title": 7,
+            "header": 2,
+            "text": 31,
+            "page_number": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-08"
+        },
+        {
+          "id": "omni-09",
+          "source_sha256": "5bf98977353643999616d974a9fe3168b56dc770a60181bc2aa8d849b464d91d",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 26.631524500000523,
+          "peak_working_set_bytes": 2487853056,
+          "assets": 2,
+          "block_types": {
+            "page_number": 1,
+            "text": 8,
+            "equation": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-09"
+        },
+        {
+          "id": "omni-10",
+          "source_sha256": "428cca795816237571181f0b2f491ecb81d895359a142c07aa93d160ab58dd9d",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 10.530690099985804,
+          "peak_working_set_bytes": 726675456,
+          "assets": 0,
+          "block_types": {
+            "paragraph_title": 2,
+            "text": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-10"
+        },
+        {
+          "id": "omni-11",
+          "source_sha256": "2d5dd15d51beb6e5a74c1c48208f3464c10ef9893f251956e3e8ea6ac44f700e",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 19.764021299997694,
+          "peak_working_set_bytes": 1899835392,
+          "assets": 4,
+          "block_types": {
+            "page_number": 1,
+            "header": 3,
+            "table": 1,
+            "text": 3,
+            "paragraph_title": 4,
+            "image": 3
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-11"
+        },
+        {
+          "id": "omni-12",
+          "source_sha256": "7da5ed976b27d3c24f6b269e7aaa46b9ab35bc1f3c7997e25119d8180366e860",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 19.239603200010606,
+          "peak_working_set_bytes": 949776384,
+          "assets": 0,
+          "block_types": {
+            "header": 1,
+            "page_number": 1,
+            "text": 8
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-12"
+        },
+        {
+          "id": "omni-13",
+          "source_sha256": "f035c220a167a19439dd3ce1245d633db01382b609bb18aa6feea7156dc3126a",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 50.2993298000074,
+          "peak_working_set_bytes": 2662858752,
+          "assets": 5,
+          "block_types": {
+            "text": 9,
+            "equation": 5,
+            "page_number": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-13"
+        },
+        {
+          "id": "omni-14",
+          "source_sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 20.93849929999851,
+          "peak_working_set_bytes": 1579077632,
+          "assets": 0,
+          "block_types": {
+            "text": 3
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-14"
+        },
+        {
+          "id": "omni-15",
+          "source_sha256": "8e7278d62f6a1af8675cd9bb1babfabe945c73998bd96d3d4604bef976b9bd86",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 12.5195720000047,
+          "peak_working_set_bytes": 902287360,
+          "assets": 0,
+          "block_types": {
+            "text": 4
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-15"
+        },
+        {
+          "id": "omni-16",
+          "source_sha256": "1cf6737ad4bca84fc82cb93d446aaef001357d7dd08e46a509875f2ed7e6b436",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 18.3995789999899,
+          "peak_working_set_bytes": 1222418432,
+          "assets": 2,
+          "block_types": {
+            "header": 2,
+            "page_number": 1,
+            "image": 1,
+            "text": 9,
+            "doc_title": 1,
+            "paragraph_title": 1,
+            "table": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-16"
+        },
+        {
+          "id": "omni-17",
+          "source_sha256": "643f1b7e4c0f1db2890f0f452cea6ce7fc8fb81abd3e2ea45e94c41d3de0b16e",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 24.393591099986224,
+          "peak_working_set_bytes": 1521938432,
+          "assets": 4,
+          "block_types": {
+            "header": 2,
+            "text": 79,
+            "doc_title": 6,
+            "paragraph_title": 3,
+            "image": 4
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-17"
+        },
+        {
+          "id": "omni-18",
+          "source_sha256": "55204e21c7d46913df3736befad467caa7ba39b2f177cf91e4a54c1b1e2cdbd3",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 10.242077600007178,
+          "peak_working_set_bytes": 883986432,
+          "assets": 0,
+          "block_types": {
+            "header": 1,
+            "text": 3,
+            "page_number": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-18"
+        },
+        {
+          "id": "omni-19",
+          "source_sha256": "9dcbf54a42f97ec64a804ed454d5dc480c395b78cc7b106646cbc4d1d1730027",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 18.777928099996643,
+          "peak_working_set_bytes": 1915219968,
+          "assets": 1,
+          "block_types": {
+            "header": 1,
+            "paragraph_title": 1,
+            "text": 2,
+            "equation": 1,
+            "footer": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-19"
+        },
+        {
+          "id": "omni-20",
+          "source_sha256": "e83b311d1208ee6e95f5adbf143846a25475b51d310576ff280a336bcca083c2",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 37.48107770000934,
+          "peak_working_set_bytes": 1981669376,
+          "assets": 5,
+          "block_types": {
+            "page_number": 1,
+            "header": 1,
+            "equation": 5,
+            "text": 4
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-20"
+        },
+        {
+          "id": "omni-21",
+          "source_sha256": "854a9981be969d8373367d40d21f7c64778148c2fe1b6558e581cb962e29a5b2",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 13.351640100008808,
+          "peak_working_set_bytes": 1201369088,
+          "assets": 2,
+          "block_types": {
+            "header": 2,
+            "page_number": 1,
+            "doc_title": 4,
+            "text": 43,
+            "image": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-21"
+        },
+        {
+          "id": "omni-22",
+          "source_sha256": "dc35626bf3405e7829e35c36265b06be82c95d5d03318a6eab17662afc4f6601",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 24.560356699992553,
+          "peak_working_set_bytes": 2377793536,
+          "assets": 5,
+          "block_types": {
+            "header": 2,
+            "paragraph_title": 2,
+            "table": 1,
+            "text": 10,
+            "page_number": 1,
+            "footer": 2
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-22"
+        },
+        {
+          "id": "omni-23",
+          "source_sha256": "c99c8655ef4070c55307afd220e4d29931cbe2fbc92e11cd4e607efb310323fa",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 11.102098899995326,
+          "peak_working_set_bytes": 1180401664,
+          "assets": 1,
+          "block_types": {
+            "header": 1,
+            "text": 3,
+            "paragraph_title": 1,
+            "table": 1,
+            "page_number": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\omni-23"
+        },
+        {
+          "id": "pew-key-pages",
+          "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "pages": [
+            0,
+            9,
+            10,
+            27,
+            28,
+            29
+          ],
+          "wall_seconds": 17.65877080000064,
+          "peak_working_set_bytes": 1447387136,
+          "assets": 8,
+          "block_types": {
+            "header": 7,
+            "text": 42,
+            "doc_title": 2,
+            "footer": 7,
+            "page_number": 5,
+            "paragraph_title": 8,
+            "chart": 8
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-fixed\\pew-key-pages"
+        }
+      ]
+    },
+    "basic-full": {
+      "successful_cases": 2,
+      "page_executions": 89,
+      "sum_case_wall_seconds": 129.5327752000012,
+      "max_sdk_process_peak_working_set_bytes": 4407590912,
+      "cases": [
+        {
+          "id": "full-b3-key-pages",
+          "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "pages": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "wall_seconds": 46.77328639999905,
+          "peak_working_set_bytes": 3189342208,
+          "assets": 35,
+          "block_types": {
+            "paragraph_title": 12,
+            "text": 123,
+            "image": 25,
+            "chart": 3,
+            "equation": 2,
+            "table": 4
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-full\\full-b3-key-pages"
+        },
+        {
+          "id": "full-cat-key-pages",
+          "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "pages": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "wall_seconds": 82.75948880000215,
+          "peak_working_set_bytes": 4407590912,
+          "assets": 69,
+          "block_types": {
+            "header": 17,
+            "doc_title": 9,
+            "image": 62,
+            "text": 251,
+            "paragraph_title": 69,
+            "footer": 5,
+            "chart": 5,
+            "page_number": 5,
+            "equation": 2,
+            "aside_text": 1,
+            "code": 10
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-full\\full-cat-key-pages"
+        }
+      ]
+    },
+    "standard": {
+      "successful_cases": 4,
+      "page_executions": 6,
+      "sum_case_wall_seconds": 91.522377900008,
+      "max_sdk_process_peak_working_set_bytes": 1840705536,
+      "cases": [
+        {
+          "id": "b3-reflection-one",
+          "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "pages": [
+            8
+          ],
+          "wall_seconds": 30.948823400001856,
+          "peak_working_set_bytes": 1801674752,
+          "assets": 3,
+          "block_types": {
+            "text": 10,
+            "image": 3
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\standard\\b3-reflection-one"
+        },
+        {
+          "id": "omni-formula",
+          "source_sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+          "pages": [
+            0
+          ],
+          "wall_seconds": 21.505712300000596,
+          "peak_working_set_bytes": 1814216704,
+          "assets": 0,
+          "block_types": {
+            "text": 3
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\standard\\omni-formula"
+        },
+        {
+          "id": "pew-chart-forced-ocr",
+          "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "pages": [
+            9,
+            10
+          ],
+          "wall_seconds": 21.37201229999482,
+          "peak_working_set_bytes": 1802682368,
+          "assets": 3,
+          "block_types": {
+            "header": 2,
+            "page_number": 2,
+            "paragraph_title": 3,
+            "text": 15,
+            "chart": 3,
+            "footer": 2,
+            "doc_title": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\standard\\pew-chart-forced-ocr"
+        },
+        {
+          "id": "pew-chart-one",
+          "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "pages": [
+            9,
+            10
+          ],
+          "wall_seconds": 17.69582990001072,
+          "peak_working_set_bytes": 1840705536,
+          "assets": 3,
+          "block_types": {
+            "header": 2,
+            "page_number": 2,
+            "paragraph_title": 3,
+            "text": 15,
+            "chart": 3,
+            "footer": 2,
+            "doc_title": 1
+          },
+          "path": "E:\\WK\\run\\p10-mineru\\outputs\\standard\\pew-chart-one"
+        }
+      ]
+    }
+  },
+  "basic_unique_coverage": {
+    "scanned_pdf_pages": 89,
+    "native_pdf_selected_pages": 6,
+    "omni_images": 24,
+    "unique_pages": 119,
+    "page_executions": 133,
+    "note": "The key scan pages are repeated in subsequent full Basic runs; live adapter smoke is additional and not part of A/B denominator."
+  },
+  "omni": {
+    "inputs": 24,
+    "basic_parsed": 24,
+    "p9_ocr_completed_nonempty": 21,
+    "p9_ocr_failed": 3,
+    "p9_failure_code": "OCR_HTML_SOURCE_CONVERTER_REQUIRED",
+    "ned": {
+      "baseline_mean": 0.4367952772506853,
+      "basic_mean": 0.10639074863055387,
+      "computed_pages": 3,
+      "total_pages": 24,
+      "absolute_reduction": 0.3304045286201314,
+      "standard_formula_only_ned": 0.25157232704402516,
+      "standard_comparison_denominator": 1,
+      "official_score": "NOT_RUN",
+      "per_page": [
+        {
+          "p9_tesseract": 0.6021505376344086,
+          "mineru_basic": 0.053763440860215055,
+          "gold_text": "课题中的 “囚” 是什么意思？囚歌又是什么意思呢？\n从字形上看，人被四堵高墙紧紧围住，如笼中之鸟，失去自由。 “囚”的意思是把人关在监狱里。 “囚歌”在本文指革命者在敌人监狱里写的诗歌。",
+          "comparison": "LITERAL_UNMODIFIED_STRINGS; frozen span projection"
+        },
+        {
+          "p9_tesseract": 0.12,
+          "mineru_basic": 0.13333333333333333,
+          "gold_text": "Changes to English (in America)\n□ Change 7 (pronunciation)\n\\t■ We actually kept some old Shakespearian habits that the English lost:\n\\t\\t☐ 1)\n\\t\\t☐ 2)",
+          "comparison": "LITERAL_UNMODIFIED_STRINGS; frozen span projection"
+        },
+        {
+          "p9_tesseract": 0.5882352941176471,
+          "mineru_basic": 0.1320754716981132,
+          "gold_text": "Matrix representation of system of linear equations\nGiven a system of linear equations $ \\begin{cases} x_1 - 2x_2 + x_3 = 0 \\\\ 2x_2 - 8x_3 = 8 \\\\ -4x_1 + 5x_2 + 9x_3 = -9 \\end{cases} $\nThe coefficient matrix is $\\begin{bmatrix} 1 & -2 & 1 \\\\ 0 & 2 & -8 \\\\ -4 & 5 & 9 \\end{bmatrix}$\nThe augmented matrix is $ \\begin{bmatrix} 1 & -2 & 1 & 0 \\\\ 0 & 2 & -8 & 8 \\\\ -4 & 5 & 9 & -9 \\end{bmatrix} $",
+          "comparison": "LITERAL_UNMODIFIED_STRINGS; frozen span projection"
+        }
+      ]
+    },
+    "remaining_21_gold_order": "NOT_RUN, no invented ordering",
+    "table_formula_layout_official_metrics": "NOT_RUN; structural inventory and literal text only"
+  },
+  "mml": [
+    {
+      "qid": "row-0430",
+      "status": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+      "basic": "Animal pictures retained; species/count not validated. Gold zero cannot be inferred from OCR absence.",
+      "standard": "NOT_RUN_FOR_QID"
+    },
+    {
+      "qid": "row-0431",
+      "status": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+      "basic": "Diagram crops retained; face-network five-layer structure not established from text.",
+      "standard": "NOT_RUN_FOR_QID"
+    },
+    {
+      "qid": "row-0434",
+      "status": "READY_PARSED_EVIDENCE",
+      "basic": {
+        "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-full\\full-cat-key-pages",
+        "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "middle_json_sha256": "968553ee60df473d352a53b993d3e9a40a65f09a0f1eecb12df008cee1969085",
+        "page_idx": 33,
+        "physical_page_one_based": 34,
+        "block_index": 0,
+        "block_type": "doc_title",
+        "bbox": [
+          0.522,
+          0.031,
+          0.975,
+          0.285
+        ],
+        "quote": "Kaggle's Cat vs Dog dataset (25k dog/cat pictures)"
+      },
+      "existing_default": "Scanned PDF default contained image placeholders; separate Tesseract page OCR also recovers relevant text.",
+      "standard": "NOT_RUN_FOR_QID",
+      "qa": "NOT_RUN"
+    },
+    {
+      "qid": "row-0684",
+      "status": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+      "basic": "Chart bodies empty/crop-only; prose about no significant differences does not provide required men/women percentages.",
+      "standard": "Pew auto/txt and forced OCR retain empty chart body; no adequate evidence."
+    },
+    {
+      "qid": "row-0685",
+      "status": "UNANSWERABILITY_NOT_ESTABLISHED",
+      "basic": "Missing chart fields cannot prove Gold not-answerable; no adequate audit of requested racial comparison.",
+      "standard": "No demonstrated resolution."
+    },
+    {
+      "qid": "row-0687",
+      "status": "PREEXISTING_TEXT_EVIDENCE",
+      "basic": "Not counted among seven newly limited QIDs. Original native text path remains available; previous answer median/mean error is outside P10.",
+      "standard": "NOT_RUN_FOR_QID",
+      "qa": "NOT_RUN"
+    },
+    {
+      "qid": "row-0958",
+      "status": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+      "basic": "Shiny surface wording alone insufficient for required shiny object/mirror evidence; diagram remains a crop.",
+      "standard": "Reflection physical page9 real VLM run did not restore sufficient target evidence."
+    },
+    {
+      "qid": "row-0959",
+      "status": "READY_PARSED_EVIDENCE",
+      "basic": {
+        "path": "E:\\WK\\run\\p10-mineru\\outputs\\basic-full\\full-b3-key-pages",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "middle_json_sha256": "fb542b100a41f8544946e48c1e7a85c0326028a4f3529a700358df6d8600f10b",
+        "page_idx": 16,
+        "physical_page_one_based": 17,
+        "block_index": 3,
+        "block_type": "text",
+        "bbox": [
+          0.345,
+          0.033,
+          0.677,
+          0.333
+        ],
+        "quote": "Long distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites"
+      },
+      "existing_default": "Scanned PDF default contained image placeholders; standalone Tesseract also recovers textual evidence.",
+      "standard": "NOT_RUN_FOR_QID",
+      "qa": "NOT_RUN"
+    }
+  ],
+  "native_pdf_regression": {
+    "status": "PASS_DEFAULT_NATIVE_PDF_UNCHANGED",
+    "parser_engine": "pdf",
+    "content_sha256": "89e9e2fa069a6973984da116565ea7b993de7921f216896abfe09e1a60e01c11",
+    "baseline_saved_file_sha256": "2cc165359091efa0dd924065bc2007417aed6c5ff18c8d733c306135768e915c",
+    "baseline_crlf_count": 1878,
+    "exact_unicode_text_equal": true,
+    "chunk_count": 162,
+    "characters": 70220,
+    "elapsed_seconds": 0.9534014999953797,
+    "rag_python_prefix": "E:\\RAG quention\\.venv",
+    "mineru_installed_in_rag_environment": null,
+    "first_failure_explanation": "First harness compared Windows CRLF saved-file bytes hash against LF in-memory text hash; v2 validates both distinct identities and exact Unicode text equality. First failure retained.",
+    "scope": "actual current source default parser, no cloud/DB"
+  },
+  "native_comparison": {
+    "cases": [
+      {
+        "case_id": "pew-key-pages",
+        "source_id": "11-21-16-Updated-Post-Election-Release.pdf",
+        "source_path": "D:\\RAG-v6-special-subsets-r1\\download-verification-attempt1\\source-files\\object-00.pdf",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "source_bytes": 5924004,
+        "parser_engine": "pdf",
+        "parser_module_sha256": "1f4119850d6a0676682c70351c23bec4669fc12a76879e5ed8b41b298948aad8",
+        "elapsed_seconds": 0.9679715999955079,
+        "status": "parsed",
+        "markdown_path": "E:\\WK\\run\\p10-mineru\\native\\ingestion\\pew-key-pages\\parsed.md",
+        "markdown_sha256": "2cc165359091efa0dd924065bc2007417aed6c5ff18c8d733c306135768e915c",
+        "markdown_chars": 70220,
+        "metadata": {
+          "filename": "11-21-16-Updated-Post-Election-Release.pdf",
+          "file_type": ".pdf",
+          "parser_engine": "pdf",
+          "input_bytes": 5924004,
+          "status": "parsed",
+          "owner_id": "p10-offline",
+          "knowledge_base_id": "p10-offline",
+          "document_id": "11-21-16-Updated-Post-Election-Release.pdf",
+          "source_version": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "page_count": 45,
+          "scanned_page_count": 0,
+          "text_page_count": 45,
+          "embedded_image_count": 0,
+          "vector_figure_count": 0,
+          "image_source_type": "pdf_text_layer",
+          "ocr_status": "NOT_RUN",
+          "source_metadata": {
+            "page_count": 45,
+            "scanned_page_count": 0,
+            "text_page_count": 45,
+            "embedded_image_count": 0,
+            "vector_figure_count": 0,
+            "image_source_type": "pdf_text_layer"
+          },
+          "pages": [
+            {
+              "page_number": 1,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 2,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 3,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 4,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 5,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 6,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 7,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 8,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 9,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 10,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 11,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 12,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 13,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 14,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 15,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 16,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 17,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 18,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 19,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 20,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 21,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 22,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 23,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 24,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 25,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 26,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 27,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 28,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 29,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 30,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 31,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 32,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 33,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 34,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 35,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 36,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 37,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 38,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 39,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 40,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 41,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 42,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 43,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 44,
+              "route": "text_layer",
+              "asset_paths": []
+            },
+            {
+              "page_number": 45,
+              "route": "text_layer",
+              "asset_paths": []
+            }
+          ]
+        },
+        "failures": [],
+        "chunk_count": 162,
+        "chunk_config": {
+          "chunk_size": 0,
+          "chunk_overlap": 0,
+          "separators": [],
+          "strategy": "",
+          "token_limit": 0,
+          "languages": [],
+          "enable_parent_child": false,
+          "parent_chunk_size": 0,
+          "child_chunk_size": 0
+        },
+        "note": "Current PDF ingestion entrypoint only; the separate page OCR below does not imply this parser auto-OCRs PDF pages."
+      },
+      {
+        "case_id": "cat-key-pages",
+        "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+        "source_path": "D:\\RAG-v6-special-subsets-r1\\download-verification-attempt1\\source-files\\object-01.pdf",
+        "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "source_bytes": 5296218,
+        "parser_engine": "pdf",
+        "parser_module_sha256": "1f4119850d6a0676682c70351c23bec4669fc12a76879e5ed8b41b298948aad8",
+        "elapsed_seconds": 4.02598289999878,
+        "status": "parsed",
+        "markdown_path": "E:\\WK\\run\\p10-mineru\\native\\ingestion\\cat-key-pages\\parsed.md",
+        "markdown_sha256": "6a166aac23ab5b2e0fea24b8d2d2e8298700b94c1d5a028b2f01c0fbfda6c710",
+        "markdown_chars": 9092,
+        "metadata": {
+          "filename": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+          "file_type": ".pdf",
+          "parser_engine": "pdf",
+          "input_bytes": 5296218,
+          "status": "parsed",
+          "owner_id": "p10-offline",
+          "knowledge_base_id": "p10-offline",
+          "document_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+          "source_version": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "page_count": 68,
+          "scanned_page_count": 68,
+          "text_page_count": 0,
+          "embedded_image_count": 0,
+          "vector_figure_count": 0,
+          "image_source_type": "scanned_pdf",
+          "ocr_status": "NOT_RUN",
+          "source_metadata": {
+            "page_count": 68,
+            "scanned_page_count": 68,
+            "text_page_count": 0,
+            "embedded_image_count": 0,
+            "vector_figure_count": 0,
+            "image_source_type": "scanned_pdf"
+          },
+          "pages": [
+            {
+              "page_number": 1,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_1.jpg"
+              ]
+            },
+            {
+              "page_number": 2,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_2.jpg"
+              ]
+            },
+            {
+              "page_number": 3,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_3.jpg"
+              ]
+            },
+            {
+              "page_number": 4,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_4.jpg"
+              ]
+            },
+            {
+              "page_number": 5,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_5.jpg"
+              ]
+            },
+            {
+              "page_number": 6,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_6.jpg"
+              ]
+            },
+            {
+              "page_number": 7,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_7.jpg"
+              ]
+            },
+            {
+              "page_number": 8,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_8.jpg"
+              ]
+            },
+            {
+              "page_number": 9,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_9.jpg"
+              ]
+            },
+            {
+              "page_number": 10,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_10.jpg"
+              ]
+            },
+            {
+              "page_number": 11,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_11.jpg"
+              ]
+            },
+            {
+              "page_number": 12,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_12.jpg"
+              ]
+            },
+            {
+              "page_number": 13,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_13.jpg"
+              ]
+            },
+            {
+              "page_number": 14,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_14.jpg"
+              ]
+            },
+            {
+              "page_number": 15,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_15.jpg"
+              ]
+            },
+            {
+              "page_number": 16,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_16.jpg"
+              ]
+            },
+            {
+              "page_number": 17,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_17.jpg"
+              ]
+            },
+            {
+              "page_number": 18,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_18.jpg"
+              ]
+            },
+            {
+              "page_number": 19,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_19.jpg"
+              ]
+            },
+            {
+              "page_number": 20,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_20.jpg"
+              ]
+            },
+            {
+              "page_number": 21,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_21.jpg"
+              ]
+            },
+            {
+              "page_number": 22,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_22.jpg"
+              ]
+            },
+            {
+              "page_number": 23,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_23.jpg"
+              ]
+            },
+            {
+              "page_number": 24,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_24.jpg"
+              ]
+            },
+            {
+              "page_number": 25,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_25.jpg"
+              ]
+            },
+            {
+              "page_number": 26,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_26.jpg"
+              ]
+            },
+            {
+              "page_number": 27,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_27.jpg"
+              ]
+            },
+            {
+              "page_number": 28,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_28.jpg"
+              ]
+            },
+            {
+              "page_number": 29,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_29.jpg"
+              ]
+            },
+            {
+              "page_number": 30,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_30.jpg"
+              ]
+            },
+            {
+              "page_number": 31,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_31.jpg"
+              ]
+            },
+            {
+              "page_number": 32,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_32.jpg"
+              ]
+            },
+            {
+              "page_number": 33,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_33.jpg"
+              ]
+            },
+            {
+              "page_number": 34,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_34.jpg"
+              ]
+            },
+            {
+              "page_number": 35,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_35.jpg"
+              ]
+            },
+            {
+              "page_number": 36,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_36.jpg"
+              ]
+            },
+            {
+              "page_number": 37,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_37.jpg"
+              ]
+            },
+            {
+              "page_number": 38,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_38.jpg"
+              ]
+            },
+            {
+              "page_number": 39,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_39.jpg"
+              ]
+            },
+            {
+              "page_number": 40,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_40.jpg"
+              ]
+            },
+            {
+              "page_number": 41,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_41.jpg"
+              ]
+            },
+            {
+              "page_number": 42,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_42.jpg"
+              ]
+            },
+            {
+              "page_number": 43,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_43.jpg"
+              ]
+            },
+            {
+              "page_number": 44,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_44.jpg"
+              ]
+            },
+            {
+              "page_number": 45,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_45.jpg"
+              ]
+            },
+            {
+              "page_number": 46,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_46.jpg"
+              ]
+            },
+            {
+              "page_number": 47,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_47.jpg"
+              ]
+            },
+            {
+              "page_number": 48,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_48.jpg"
+              ]
+            },
+            {
+              "page_number": 49,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_49.jpg"
+              ]
+            },
+            {
+              "page_number": 50,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_50.jpg"
+              ]
+            },
+            {
+              "page_number": 51,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_51.jpg"
+              ]
+            },
+            {
+              "page_number": 52,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_52.jpg"
+              ]
+            },
+            {
+              "page_number": 53,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_53.jpg"
+              ]
+            },
+            {
+              "page_number": 54,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_54.jpg"
+              ]
+            },
+            {
+              "page_number": 55,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_55.jpg"
+              ]
+            },
+            {
+              "page_number": 56,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_56.jpg"
+              ]
+            },
+            {
+              "page_number": 57,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_57.jpg"
+              ]
+            },
+            {
+              "page_number": 58,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_58.jpg"
+              ]
+            },
+            {
+              "page_number": 59,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_59.jpg"
+              ]
+            },
+            {
+              "page_number": 60,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_60.jpg"
+              ]
+            },
+            {
+              "page_number": 61,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_61.jpg"
+              ]
+            },
+            {
+              "page_number": 62,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_62.jpg"
+              ]
+            },
+            {
+              "page_number": 63,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_63.jpg"
+              ]
+            },
+            {
+              "page_number": 64,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_64.jpg"
+              ]
+            },
+            {
+              "page_number": 65,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_65.jpg"
+              ]
+            },
+            {
+              "page_number": 66,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_66.jpg"
+              ]
+            },
+            {
+              "page_number": 67,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_67.jpg"
+              ]
+            },
+            {
+              "page_number": 68,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_68.jpg"
+              ]
+            }
+          ]
+        },
+        "failures": [],
+        "chunk_count": 23,
+        "chunk_config": {
+          "chunk_size": 0,
+          "chunk_overlap": 0,
+          "separators": [],
+          "strategy": "",
+          "token_limit": 0,
+          "languages": [],
+          "enable_parent_child": false,
+          "parent_chunk_size": 0,
+          "child_chunk_size": 0
+        },
+        "note": "Current PDF ingestion entrypoint only; the separate page OCR below does not imply this parser auto-OCRs PDF pages."
+      },
+      {
+        "case_id": "b3-key-pages",
+        "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+        "source_path": "D:\\RAG-v6-special-subsets-r1\\download-verification-attempt1\\source-files\\object-02.pdf",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "source_bytes": 1906963,
+        "parser_engine": "pdf",
+        "parser_module_sha256": "1f4119850d6a0676682c70351c23bec4669fc12a76879e5ed8b41b298948aad8",
+        "elapsed_seconds": 0.8844855999923311,
+        "status": "parsed",
+        "markdown_path": "E:\\WK\\run\\p10-mineru\\native\\ingestion\\b3-key-pages\\parsed.md",
+        "markdown_sha256": "393a6837d276d402651182b4b076a39265877de0a77916fc1c83ce198d3215f1",
+        "markdown_chars": 2668,
+        "metadata": {
+          "filename": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+          "file_type": ".pdf",
+          "parser_engine": "pdf",
+          "input_bytes": 1906963,
+          "status": "parsed",
+          "owner_id": "p10-offline",
+          "knowledge_base_id": "p10-offline",
+          "document_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+          "source_version": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "page_count": 21,
+          "scanned_page_count": 21,
+          "text_page_count": 0,
+          "embedded_image_count": 0,
+          "vector_figure_count": 0,
+          "image_source_type": "scanned_pdf",
+          "ocr_status": "NOT_RUN",
+          "source_metadata": {
+            "page_count": 21,
+            "scanned_page_count": 21,
+            "text_page_count": 0,
+            "embedded_image_count": 0,
+            "vector_figure_count": 0,
+            "image_source_type": "scanned_pdf"
+          },
+          "pages": [
+            {
+              "page_number": 1,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_1.jpg"
+              ]
+            },
+            {
+              "page_number": 2,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_2.jpg"
+              ]
+            },
+            {
+              "page_number": 3,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_3.jpg"
+              ]
+            },
+            {
+              "page_number": 4,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_4.jpg"
+              ]
+            },
+            {
+              "page_number": 5,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_5.jpg"
+              ]
+            },
+            {
+              "page_number": 6,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_6.jpg"
+              ]
+            },
+            {
+              "page_number": 7,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_7.jpg"
+              ]
+            },
+            {
+              "page_number": 8,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_8.jpg"
+              ]
+            },
+            {
+              "page_number": 9,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg"
+              ]
+            },
+            {
+              "page_number": 10,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_10.jpg"
+              ]
+            },
+            {
+              "page_number": 11,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_11.jpg"
+              ]
+            },
+            {
+              "page_number": 12,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_12.jpg"
+              ]
+            },
+            {
+              "page_number": 13,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_13.jpg"
+              ]
+            },
+            {
+              "page_number": 14,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_14.jpg"
+              ]
+            },
+            {
+              "page_number": 15,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_15.jpg"
+              ]
+            },
+            {
+              "page_number": 16,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_16.jpg"
+              ]
+            },
+            {
+              "page_number": 17,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_17.jpg"
+              ]
+            },
+            {
+              "page_number": 18,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_18.jpg"
+              ]
+            },
+            {
+              "page_number": 19,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_19.jpg"
+              ]
+            },
+            {
+              "page_number": 20,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_20.jpg"
+              ]
+            },
+            {
+              "page_number": 21,
+              "route": "scanned_image",
+              "asset_paths": [
+                "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_21.jpg"
+              ]
+            }
+          ]
+        },
+        "failures": [],
+        "chunk_count": 6,
+        "chunk_config": {
+          "chunk_size": 0,
+          "chunk_overlap": 0,
+          "separators": [],
+          "strategy": "",
+          "token_limit": 0,
+          "languages": [],
+          "enable_parent_child": false,
+          "parent_chunk_size": 0,
+          "child_chunk_size": 0
+        },
+        "note": "Current PDF ingestion entrypoint only; the separate page OCR below does not imply this parser auto-OCRs PDF pages."
+      }
+    ]
+  },
+  "standalone_tesseract": {
+    "selected_pages": 20,
+    "successful_pages": 20,
+    "scope": "Separate rendered-page OCR; not default PDF auto-OCR"
+  },
+  "integration": {
+    "engine": "mineru-basic",
+    "default_changed": false,
+    "source_mapping": "NormalizedDocument → ParsedDocument → unchanged splitter → ChunkRecord locator intersection; actual saved sidecar/crops + immutable asset manifest",
+    "offset_space": "derived Unicode codepoints, never PDF byte offsets",
+    "supported": "Explicit scanned PDF or single-frame images; basic/ocr only; native/mixed PDFs rejected with clear error; no implicit fallback",
+    "live_smoke": "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni06-live.json",
+    "final_replay_checks": [
+      "E:\\WK\\run\\p10-mineru\\adapter-tests\\cat-key-pages-recheck.json",
+      "E:\\WK\\run\\p10-mineru\\adapter-tests\\b3-key-pages-recheck.json",
+      "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni-00-recheck.json",
+      "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni-06-recheck.json"
+    ],
+    "validation": {
+      "base_commit": "5e2b4fc83d2b816a70b53e6bf6f560890d8bf2ec",
+      "not_committed": true,
+      "checks": {
+        "pytest-first": 2,
+        "pytest-second": 1,
+        "pytest-final": 0,
+        "pytest-closure": 0,
+        "omni06-live": 0,
+        "cat-key-pages-recheck": 0,
+        "b3-key-pages-recheck": 0,
+        "omni-00-recheck": 0,
+        "omni-06-recheck": 0,
+        "wheel-first": 2,
+        "wheel-recheck": 0,
+        "wheel-content": 0,
+        "wheel-import": 0,
+        "diff-check": 0
+      },
+      "final_tests": "49 passed",
+      "fixed_splitter_regression": "44 passed in prior ingest/documents/adapter run",
+      "real_local_basic_smoke": "omni06-live.json",
+      "provider_calls": 0,
+      "database_calls": 0,
+      "quote_validation_boundary": "derived Unicode quote/range verified against trusted parser source mapping and hash-bound immutable asset manifest; no claim of re-OCR or PDF byte-offset verification",
+      "files": [
+        "backend/weknora_port/ingestion/mineru.py",
+        "backend/weknora_port/ingestion/mineru_runner.py",
+        "backend/weknora_port/ingestion/core.py",
+        "backend/weknora_port/documents.py",
+        "backend/weknora_port/development.py",
+        "scripts/weknora_port_mineru_offline.py",
+        "tests/weknora_port/test_mineru.py",
+        "tests/weknora_port/test_development_entry.py",
+        "pyproject.toml"
+      ],
+      "unchanged_scope": [
+        "fixed chunking algorithms",
+        "retrieval/rerank/merge thresholds",
+        "prompts",
+        "DB schema",
+        "default parser selections",
+        "historical P8/P8.1/P9 evidence"
+      ],
+      "initial_failures_preserved": true
+    },
+    "new_tests_final": 49,
+    "old_ingest_related_group": 44,
+    "test_groups_overlap": true,
+    "validation_boundary": "Live adapter smoke preceded final normalized-content hash correction; final source tested with saved real outputs and independent hash assertions. HTTP/DB/index/RAG remains NOT_RUN.",
+    "validation_snapshot_scope": "implementation-validation.json is an immutable pre-commit validation snapshot; not_committed=true there describes that time. Final implementation_sha above binds identical tested source bytes."
+  },
+  "initial_failures": {
+    "sdk_harness": "Nine first observations failed due missing Windows spawn main guard; source/helper logs preserved under outputs/basic, fixed once before successful basic-fixed. Not counted as parser-quality failures.",
+    "fixture": "Initial test imports lacked reader dependency path; one fake fixture positional signature was incorrect; preserved logs.",
+    "packaging": "RAG venv lacks setuptools, first build exit2; independent environment existing build tooling used; namespace wheel isolated-import passed.",
+    "native_hash": "First root regression compared CRLF saved bytes vs LF content; preserved exit1, v2 exact text comparison passed."
+  },
+  "protected_integrity": {
+    "status": "PASS",
+    "checked_files": 376,
+    "changed": [],
+    "scope": "Historical frozen files and pre-existing dirty files only; no live provider ledger/DB reads or writes were executed in P10."
+  },
+  "command_exit_receipts": [
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\b3-full-replay.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\b3-key-pages-recheck.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\cat-full-replay.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\cat-key-pages-recheck.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\diff-check.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni-00-recheck.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni-06-recheck.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni00-replay.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\omni06-live.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\pytest-closure.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\pytest-final.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\pytest-first.exitcode.txt",
+      "exit_code": 2
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\pytest-reader.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\pytest-second.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\pytest-third.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\recheck-all.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\wheel-content.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\wheel-final.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\wheel-first.exitcode.txt",
+      "exit_code": 2
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\wheel-import.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\wheel-recheck.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\adapter-tests\\wheel-stage.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\analysis-all-runs.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-b3-key-pages.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-batch.exitcode.txt",
+      "exit_code": -1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-cat-key-pages.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-b3-key-pages.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-batch.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-cat-key-pages.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-00.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-01.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-02.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-03.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-04.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-05.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-06.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-07.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-08.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-09.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-10.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-11.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-12.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-13.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-14.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-15.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-16.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-17.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-18.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-19.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-20.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-21.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-22.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-omni-23.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-fixed-pew-key-pages.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-full-b3-key-pages.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-full-cat-key-pages.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-omni-00.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-omni-01.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-omni-02.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-omni-03.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-omni-04.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-omni-05.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\basic-pew-key-pages.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\flash-pew.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\install.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\models-basic-download.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\models-basic-verify.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\models-standard-download.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\models-standard-verify.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\native\\native-compare.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\native-after-regression-v2.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\native-after-regression.exitcode.txt",
+      "exit_code": 1
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\standard-b3-reflection-one.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\standard-omni-formula.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\standard-pew-chart-forced-ocr.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\standard-pew-chart-one.exitcode.txt",
+      "exit_code": 0
+    },
+    {
+      "path": "E:\\WK\\run\\p10-mineru\\venv.exitcode.txt",
+      "exit_code": 0
+    }
+  ],
+  "evidence_manifest": "E:\\WK\\run\\p10-mineru\\evidence-manifest.json",
+  "recommendation": "Retain current defaults. Offer Basic opt-in for images and explicitly scanned-only PDFs; no Standard/Flash default or broad PDF replacement. Later bounded same-QID RAG A/B for0434/0959 and Omni eligible pages requires independent evaluation, not executed here."
+}
