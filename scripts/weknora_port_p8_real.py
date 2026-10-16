@@ -335,6 +335,7 @@ async def query(dataset_filter, qid_filter):
             if dataset_filter and dataset_filter != name: continue
             entry = s['datasets'][name]; kb = entry['kb']
             docs = [row['id'] for row in entry.get('documents', {}).values() if row['status'] == 'completed']
+            requested_docs = [] if dataset.get('scope_mode') == 'knowledge_base' else docs
             if not docs:
                 save('failures/query-' + key(name) + '.json', {'error': 'NO_COMPLETED_DOCUMENTS', 'dataset': name}); continue
             for case in dataset['cases']:
@@ -347,13 +348,13 @@ async def query(dataset_filter, qid_filter):
                 try:
                     if not record.get('session'):
                         session = await request(http, 'session-' + ident, 'POST', '/api/v1/sessions',
-                            json={'title': 'P8 ' + name + ' ' + case['qid'], 'knowledge_base_scope': [kb], 'document_scope': docs})
+                            json={'title': 'P8 ' + name + ' ' + case['qid'], 'knowledge_base_scope': [kb], 'document_scope': requested_docs})
                         record['session'] = session['data']['id']; save('state.json', s)
                     op = 'query-' + ident
                     if op not in read('attempts.json'):
                         response = await request(http, op, 'POST', f"/api/v1/sessions/{record['session']}/messages", binary=True,
                             json={'content': case['question'], 'request_id': record['request_id'], 'knowledge_base_scope': [kb],
-                                  'document_scope': docs, 'reasoning_effort': 'off'})
+                                  'document_scope': requested_docs, 'reasoning_effort': 'off'})
                         (OUT / (prefix + '.sse')).write_bytes(response.content)
                     messages = await request(http, 'messages-' + key(ident, stamp()), 'GET', f"/api/v1/sessions/{record['session']}/messages")
                     save(prefix + '-messages.json', messages)
