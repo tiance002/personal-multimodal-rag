@@ -42,3 +42,18 @@ def test_uncertain_attempt_cannot_be_reclaimed(tmp_path):
     c=frozen()['proposal']['cases'][0];d=claim(tmp_path,c);before=(d/'intent.json').read_bytes()
     with pytest.raises(FileExistsError):claim(tmp_path,c)
     assert (d/'intent.json').read_bytes()==before
+
+@pytest.mark.parametrize('current,summary,version,expected_error',[
+    ({'doc':'v1'},True,None,None),
+    ({'doc':'v1'},False,'v1',None),
+    ({'doc':'v2'},True,None,'P13_STALE_SOURCE'),
+    ({},True,None,'P13_STALE_SOURCE'),
+    ({'doc':'v1'},False,None,'P13_UNVERSIONED_NON_SUMMARY'),
+    ({'doc':'v1'},False,'v0','P13_CANDIDATE_VERSION_MISMATCH'),
+])
+def test_summary_uses_frozen_document_version_without_waiving_staleness(current,summary,version,expected_error):
+    from scripts.weknora_port_p13_rerank import check_source_versions
+    p={'scope':{'source_versions':['v1']},'pool':[{'generated_candidate':summary,'provenance':{'document_id':'doc','source_version':version,'chunk_type':'summary' if summary else 'text'}}]}
+    if expected_error:
+        with pytest.raises(ValueError,match=expected_error):check_source_versions(p,{'doc':'v1'},current)
+    else:check_source_versions(p,{'doc':'v1'},current)

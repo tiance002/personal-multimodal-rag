@@ -48,6 +48,17 @@ def validate(plan):
     return p
 
 
+def check_source_versions(proposal,expected,current):
+    require(bool(expected) and set(expected.values())==set(proposal['scope']['source_versions']),'P13_FROZEN_SOURCE_VERSIONS')
+    require(all(current.get(doc)==version for doc,version in expected.items()),'P13_STALE_SOURCE')
+    for row in proposal['pool']:
+        origin=row['provenance'];doc=origin['document_id'];version=origin.get('source_version')
+        require(doc in expected,'P13_UNBOUND_SOURCE_DOCUMENT')
+        if version is None:
+            require(row.get('generated_candidate') is True and origin.get('chunk_type')=='summary','P13_UNVERSIONED_NON_SUMMARY')
+        else:require(version==expected[doc],'P13_CANDIDATE_VERSION_MISMATCH')
+
+
 def exclusive(path,value):
     path.parent.mkdir(parents=True,exist_ok=True)
     with path.open('x',encoding='utf-8') as f:
@@ -98,7 +109,7 @@ async def execute(plan_path):
                 require(hashlib.sha256(expected).hexdigest()==c['wire_sha256'],'P13_TRUSTED_BODY_MISMATCH')
                 docs=await app._rows('SELECT id,parse_status,deleted_at,metadata FROM knowledges WHERE tenant_id=%s AND knowledge_base_id=%s',(332,p['scope']['kb_id']))
                 versions={r['id']:(json.loads(r['metadata']) if isinstance(r['metadata'],str) else r['metadata'])['source_version'] for r in docs if r['deleted_at'] is None and r['parse_status']=='completed'}
-                require(all(versions.get(r['provenance']['document_id'])==r['provenance']['source_version'] for r in p['pool']),'P13_STALE_SOURCE')
+                check_source_versions(p,plan['document_versions'],versions)
                 months=await app._rows("SELECT * FROM port_token_budget_months WHERE account_id='siliconflow-owner-main' AND provider='siliconflow' AND month='2026-10-01'")
                 calls=await app._rows("SELECT state,actual_total,held_tokens FROM port_token_calls WHERE account_id='siliconflow-owner-main' AND budget_provider='siliconflow' AND month='2026-10-01'")
                 held=sum((r['actual_total'] or 0) if r['state']=='settled' else r['held_tokens'] if r['state'] in ('unknown','reserved') else 0 for r in calls)
