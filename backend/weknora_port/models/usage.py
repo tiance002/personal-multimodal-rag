@@ -56,3 +56,19 @@ def accumulate_usage(usages: list[TokenUsage]) -> TokenUsage:
     return TokenUsage(total("prompt_tokens"), total("completion_tokens"), total("total_tokens"),
         "REPORTED" if all(u.status == "REPORTED" for u in usages) else "UNKNOWN", read, read,
         sum(u.cache_write_tokens for u in usages), sum(u.cache_miss_tokens for u in usages), reported, status,aggregate_facts(usages))
+
+
+def normalize_rerank_usage(env, provider: str) -> TokenUsage:
+    """SiliconFlow token counts are separate from Cohere-style billing units.
+
+    Preserve top-level usage precedence. Never use billed_units as tokens and
+    never turn missing/invalid token fields into a reported zero.
+    """
+    if provider != 'siliconflow' or env.get('usage') is not None:
+        return normalize_usage(env.get('usage'))
+    facts = capture_usage(env, semantics='siliconflow-rerank-tokens/v1')
+    settled, _ = facts.accounting()
+    total = facts.get('total').value if facts.get('total').present else facts.derived_total
+    return TokenUsage(facts.get('input').value, facts.get('output').value, total,
+                      'REPORTED' if settled is not None else 'UNKNOWN',
+                      cache_status='unsupported', provider_usage_facts=facts)

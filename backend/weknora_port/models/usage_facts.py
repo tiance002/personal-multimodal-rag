@@ -53,6 +53,16 @@ class ProviderUsageFacts:
             # out-of-range breakdown makes the whole usage unsettleable.
             valid = False
         settled = total.value if valid and total.present and total.valid and total.value>=lower and self.semantics=='openai-input-inclusive/v1' else None
+        if self.semantics == 'siliconflow-rerank-tokens/v1':
+            image = self.get('image')
+            lower = max(lower, image.value or 0)
+            # Text-only responses explicitly report image_tokens=0. Do not guess
+            # whether positive image counts are included in input_tokens.
+            if (valid and inp.present and inp.valid and out.present and out.valid
+                    and image.present and image.valid and image.value == 0
+                    and (not total.present or total.value == self.derived_total)
+                    and self.derived_total >= lower):
+                settled = self.derived_total
         return settled, lower
 
 
@@ -74,6 +84,12 @@ def capture_usage(raw, *, semantics='openai-input-inclusive/v1', simulated=None)
         paths.update(input=('promptTokenCount',),output=('candidatesTokenCount',),total=('totalTokenCount',),cache_read=('cachedContentTokenCount',))
     elif semantics=='ollama/v1':
         paths.update(input=('prompt_eval_count',),output=('eval_count',))
+    elif semantics=='siliconflow-rerank-tokens/v1':
+        paths = {'input': ('meta.tokens.input_tokens',),
+                 'output': ('meta.tokens.output_tokens',),
+                 'total': ('meta.tokens.total_tokens',),
+                 'image': ('meta.tokens.image_tokens',),
+                 **{k: v for k, v in paths.items() if k.startswith('cache_') or k == 'reasoning'}}
     fields, numeric = [], {}
     for name, choices in paths.items():
         for path in choices:
@@ -103,7 +119,7 @@ def aggregate_facts(usages):
     if not facts or not all(isinstance(f,ProviderUsageFacts) for f in facts):return None
     fields=[]
     for key,_ in facts[0].fields:
-        values=[f.get(key) for f in facts]
+        values=[dict(f.fields).get(key, UsageValue(None, False, False, key)) for f in facts]
         complete=all(v.present and v.valid for v in values)
         fields.append((key,UsageValue(sum(v.value for v in values) if complete else None,
             all(v.present for v in values),complete,'disjoint-physical-calls/'+key)))

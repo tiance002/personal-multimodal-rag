@@ -10,7 +10,7 @@ from .types import (Message, ChatOptions, ChatResponse, TokenUsage, ProviderErro
                     EmbeddingResponse, RerankResponse, RerankResult, CallCancelled, RunDeadlineExceeded)
 from .request import build_chat_body, build_embedding_body, build_rerank_body, split_batches, strip_images
 from .transport import call_lifetime, DEFAULT_CHAT_TIMEOUT, DEFAULT_STREAM_TIMEOUT, env_duration
-from .usage import normalize_usage, accumulate_usage
+from .usage import normalize_usage, accumulate_usage, normalize_rerank_usage
 from .stream import StreamAssembler, sse_events, decode_tool_calls
 from .native_request import build_native_body
 from .native_response import parse_native_response, NativeStreamState, native_usage
@@ -453,7 +453,7 @@ class ProviderModel:
                 async with self.transport.open(self.config, s.path or "/rerank", body, ctx, capability="rerank", lifetime=lifetime) as handle:
                     env = decode_json(await handle.response.aread())
                     if self.config.api=="openai-completions" and "usage" in env:handle.capture(env.get("usage"))
-                    usage = normalize_usage(env.get("usage"))
+                    usage = normalize_rerank_usage(env, self.config.provider)
                     handle.observed(usage)
                     assert_response_identity(env, self.config)
                     protocol=self.config.rerank_api
