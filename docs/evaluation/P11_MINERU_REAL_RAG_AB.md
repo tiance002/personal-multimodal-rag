@@ -1,186 +1,160 @@
-# P11 — MinerU 真实 RAG A/B 验收：预算阻断收口
+# P11 — MinerU 真实 RAG A/B：恢复执行与有限收口
 
-日期：2026-10-16。状态：**BLOCKED；真实 RAG 成对 A/B 未执行，不能宣称 P11 验收通过。**
+日期：2026-10-16。**两道 MML 已完成可比较的真实 KB 向量检索 A/B；取得一例有依据的改善及一例未解决失败。Omni 仅完成有限接线诊断，未完成成对向量问答。** 不宣称全部验收PASS。
 
-已完成真实 FastAPI 上传、本地 Parser、独立 Worker、PG 切块与资产准备。**未完成 Embedding、pgvector 索引、Search、Rerank、Context、Cheap 回答和生成引用验收。** 原因是剩余本地围栏只有 6,147 Token 占用额度，现有可信流程没有同账户同月增额操作。本轮模型调用为 0，未用离线输出、Mock、HTTP200或已有 P10 成绩替代真实 RAG 结果。
+机器结果：[P11_MINERU_REAL_RAG_AB.results.json](P11_MINERU_REAL_RAG_AB.results.json)。证据根 `E:/WK/run/p11-real-20261016`，710个证据文件的哈希/大小见 `evidence-manifest.json`。原预算阻断版保留在Git提交 `770c6d955bcdf420af2af9b05fc392d05a1e1649`，并原样复制为证据根的 `P11-blocked-original.md/.results.json`；P8/P8.1/P9/P10冻结结果没有改写。
 
-**未实现的命令不得报告通过。**
+**未实现的命令不得报告通过。** 真实模型、真实服务、离线测评工具与未执行项分别记录。
 
-机器结果：[P11_MINERU_REAL_RAG_AB.results.json](P11_MINERU_REAL_RAG_AB.results.json)。原始证据：`E:/WK/run/p11-20261016`；`evidence-manifest.json` 保存400个证据文件的哈希与大小。后续报告审计/提交回执另存同目录。
+## 1. 授权恢复与本轮围栏
 
-## 1. 源码与边界
+Owner本轮明确批准本地执行上限增加600,000，最多1,000,000→1,600,000；未用部分不能作为后续实验额度。Owner对当前SF模型的不限使用授权保留，这个数字仅为本轮有限实验上界，不是Owner或供应商全局硬额度。
 
-- 工作树：`E:/RAG-Worktrees/weknora-python-port-20261013`。
-- 分支：`codex/weknora-python-port-integrate-image-20261014`。
-- 实测源码：`55634295ca5e79aaa36853c35625056f750e6e7d`，其中 MinerU 实现提交为 `24e9782e445617f005fa8180a71a3a51ca33c09e`。
-- 本轮没有修改生产源码、模型、Prompt、检索参数、Chunking、路由、数据库结构或依赖。机器结果记录125个后端Python文件的实际哈希；`git diff --exit-code -- backend pyproject.toml tests scripts` 实际exit0。
-- P8/P8.1/P9/P10冻结证据与接手时已有改动，**378个保护文件哈希均不变**。`.serena/project.yml` 与六个既有未跟踪文件保留。
-- 新增仓库文件仅本报告、同名results及progress记录；本轮辅助脚本、原始日志、隔离资产在E盘，不覆盖旧评测目录。
+新增独立、明确调用的 `scripts/weknora_port_p11_fence.py`，固定grant `P11-20261016-SF-600000`。它在与正常Token门相同的月度advisory锁下核对PG/database、原account/provider/month、carry14、原approval_source及blocked状态，再CAS更新现有月行。没有修改正常P1SendGate/TokenBudgetStore守卫、换账户或新建月账。
 
-## 2. 授权与账本：不是Owner限制，而是缺少可信增额实现
+| 操作 | 真实PG结果 |
+|---|---|
+| open | limit1,000,000→1,600,000；可预留占用606,147 |
+| close，停止本轮进程后 | limit收口为 **1,200,898**，恰好等于已结算＋UNKNOWN占用＋carry14 |
+| 未用空间 | **399,102已撤回；可预留空间0** |
 
-### 2.1 已确认的有效授权
+收据目录：`E:/WK/run/p11-20261016/fence-600000`，保存不可覆盖的Owner intent、before/precommit/commit确认、全部历史call ID/行哈希与open/close收据。相同grant不能再次增额，收口后的旧160万配置与月行冲突；没有给后续任务留用本轮余量。未将UNKNOWN当免费或释放。
 
-Owner 已授权 SiliconFlow 三模型继续使用，无需逐次询问。本轮不调用 DeepSeek。以下既有证据明确说明 **100万是MVP自行追加的有限执行围栏，非Owner或供应商硬限制**：
+原账户 `siliconflow-owner-main / siliconflow / 2026-10-01`、原approval/carry身份保持不变。新权威配置只用于本轮API/Worker，仍走真实 `ApprovedTokenAuthority → ServerPermissionResolver → P1SendGate`。配置中的有效期续至本轮运行所需；没有读取或输出密钥正文，没有DeepSeek请求。
 
-- `docs/weknora-port/REAL_EGRESS_AUTHORIZATION_20261015.md`。
-- `docs/weknora-port/MVP_REAL_RAG_ACCEPTANCE.md`。
-- `scripts/weknora_port_mvp_real.py` 的 `prepare()`，以及 `scripts/weknora_port_p8_real.py`。
-- `E:/WK/run/p8-20261016/execution-fence.json` 的原文：Additional local execution fence; not an Owner SiliconFlow quota.
+## 2. 源码、固定输入与实际范围
 
-只读实测原授权配置仍可加载，原有效期为 **2026-10-16 19:47:22 Asia/Shanghai**。本轮未续期、未改变授权身份、未读出密钥正文。
+- 工作树 `E:/RAG-Worktrees/weknora-python-port-20261013`；分支 `codex/weknora-python-port-integrate-image-20261014`。
+- 实际API启动SHA **b33369d86dfbacc08f1762a5d8a95e01e0bdcfbd**。其生产后端125个Python文件与P10/P11阻断版逐字哈希一致；`runtime-source.json` 保存实际指纹。state中的770c6d9是增额提交前的冻结时间标识，不冒充运行SHA。
+- 评分器提交 **74b0bd7361400d397783162c1abf2a2298913f5f**，未改变运行中的后端。
+- 原 `E:/WK/run/p11-20261016/frozen.json` 字节不变，问题、原件SHA、Gold、Chunking、Embedding/Rerank/Cheap模型、Prompt与检索阈值均未优化。
+- 固定模型：SiliconFlow `BAAI/bge-m3`、`BAAI/bge-reranker-v2-m3`、`XingChenAGI/Xing4.0-29B`。模型身份由实际账本核对。
+- 相同原件：cat68页SHA `40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b`；b3 21页SHA `43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22`；Omni06/10/14三张原图；普通Pew45页。全部原始图片/PDF SHA见冻结副本及11/11 HTTP source回读。
 
-### 2.2 实际账户占用
+两道原官方问题及原Gold没有修改：0434询问coding time介绍的数据集；0959询问幻灯片介绍的远距离通信方式。三个Omni问题沿用原冻结“请根据这页资料概括主要内容，并引用原文证据。”没有官方QA Gold。
 
-| 项目 | 前后实测一致 |
+### 实际配置阻断及一次修正
+
+首轮错误地传入 `document_scope`，触发现有正常的**直接文档加载**语义，跳过Query Embedding/向量检索。这8次是真实HTTP及适用的真实模型调用，完整回答、失败、Token和引用均保留，但**不能当作要求的完整RAG A/B**。
+
+发现后只修正测评Scope：使用两组内容相同的隔离MML KB（每组相同cat＋b3两份来源），`document_scope=[]`，在正常KB查询入口补做0434/0959各一对，共4次。没有改模型、问题、Gold、索引、阈值或Prompt，没有重建已成功的索引，没有重发任何UNKNOWN请求。
+
+总问答尝试严格为 **12：首轮文档加载诊断8＋正式KB向量复核4**。两种合同分开保存：根目录A/B与 `vector/A/B`，不混成绩。由于修正占用了剩余4次，B组三个Omni不追加问答；保留真实上传/索引，明确其QA未执行。普通Pew也没有追加向量问答。
+
+## 3. 正常入口与真实存储证据
+
+没有Mock应用API、模型响应或预写完成状态。复用P9被动观察器启动真实FastAPI，正常HTTP创建KB、授权外发、上传、轮询、会话/SSE、原文和引用回读；模型传输经过真实Token门。
+
+| 项目 | 实际结果 |
+|---|---|
+| 原件与文档 | 11/11原件SHA回读匹配；11份新文档最终completed |
+| 切块与索引 | **295 chunks / 295已启用索引行，维度1024**，真实PG/pgvector |
+| 解析资产 | **219个**真实文件，SHA全部核验；原件/sidecar/crop与document/version绑定 |
+| A图片任务 | 独立真实Worker完成3个Tesseract任务；OCR结果保存，Caption未配置视觉模型时保持unavailable，不冒充描述 |
+| B MinerU | 4.0.12 Basic/ocr在正常API ingestion运行；按P10设计跳过旧OCR任务队列，未假称B由旧图片Worker解析 |
+| 正式查询 | 4次KB复核均有真实Query Embedding回执；实际向量检索、适用的Rerank、Context与Cheap/固定拒答均留证 |
+
+普通PDF对照：Pew默认路径162个原文块、70,220 Unicode字符与P10原默认正文的每个对应区间完全一致，SHA `89e9e2fa069a6973984da116565ea7b993de7921f216896abfe09e1a60e01c11`；索引真实完成，并执行一次真实直接文档加载回答。结论为解析/切块/索引无退化；**Pew向量问答对照NOT_RUN**。
+
+解析统计不包含把模型生成摘要当原文。295行包含既有正常入库后处理；原文块和生成内容的来源身份仍由现有引用机制区分。
+
+## 4. MML正式KB向量A/B：独立维度
+
+| QID/组 | 关键解析文字 | Search关键文字 | Rerank保留 | 最终Context | 回答事实要点 | 引用 |
+|---|---|---|---|---|---|---|
+| 0434 A | 无，只有图片占位 | 无 | 本轮策略未触发真实Rerank | 无关键证据 | 错答CIFAR-10，并编造材料支持 | 1条身份合法，但来自b3负例文档，不支持答案 |
+| 0434 B | 有Kaggle Cat vs Dog dataset | **命中** | **未保留** | 空 | 固定拒答 | 无 |
+| 0959 A | 无，只有图片占位 | 无 | 本轮策略未触发真实Rerank | 无关键证据 | 明确缺少OCR，未给出通信方式 | 无 |
+| 0959 B | 有radiowaves/ionosphere/microwaves | **命中** | **保留** | **含关键证据** | **回答无线电波、电离层折射及微波卫星通信，要点与Gold一致** | 1条合法、来源相关，实际定位回读通过 |
+
+Source身份Recall不等于关键证据召回。A即使检索到PDF ID，仍没有文字；B0434即使Search命中正确文字，仍没进Context。A的两次Rerank未执行如实标NOT_RUN，不用B的模型回执填补A。
+
+### 0959：真实贡献成立的具体证据
+
+B的原文chunk `df6098cb-68e6-4546-b9e0-8682b4bf19e9`，Unicode区间 **[10575,11061)**，物理页17/page_idx16，包含真实段落：电离层折射radiowaves、microwaves向卫星发信号。回读包含document/source_version、原PDF SHA、block/index/JSON pointer、归一化bbox、middle_json SHA与原件source URL。
+
+该派生文字在最终Context、准备消息及**实际HTTP发送body**均存在；发送body哈希与可信账本RESPONSE_RECEIVED一致，finish_reason=stop。`vector-score.json` 的 `derived_text_delivery=PASS`，不是仅因引用合法就判送达。offset是派生Unicode字符区间，不是PDF字节偏移。
+
+### 0434：未解决的是Rerank/Context质量
+
+B原文及Search都找回数据集名称，但真实Rerank返回的最高分约 **0.00203365**，低于现有 **0.3** 阈值，最终Context为空，系统按原规则固定拒答。这是本轮实际质量失败；没有证据证明适配器错误丢失候选，不修改阈值或反复重问。
+
+A0434的引用ID/KB/版本/offset/quote确实可回读，但引用的是b3文档；它与正确数据集问题无关。引用合法性、Gold来源相关性与语义支持分别记录，不能用“引用合法”洗掉错误回答。
+
+### 原Gold评分（保留完整答案）
+
+| 正式样本 | 项目全文normalized EM | character F1 | 补充解释 |
+|---|---:|---:|---|
+| 0434 A | 0 | 0.1217391 | CIFAR-10事实错误、引用负例来源 |
+| 0434 B | 0 | 0.4081633 | 固定拒答；字符重合高不表示答案更正确 |
+| 0959 A | 0 | 0.0658979 | 缺证据，未回答Gold要点 |
+| 0959 B | 0 | 0.1851852 | 人工核对核心通信要点正确，但完整中文解释与简短Gold不完全相等 |
+
+这是沿用现有评分代码的项目诊断，非官方GPT归一化裁判。只做两题，不能推成MML整体准确率；无额外付费judge调用。正式4条系统响应中3次真实Cheap回答、1次固定拒答；固定拒答也留在适用答案分母中。
+
+正式阶段2条现有引用均身份/原文/offset有效，1条为Gold相关来源、1条为同KB负例来源。没有引用的题单列，不能只用现有引用作完整性分母。
+
+## 5. Omni及首轮诊断的实际限制
+
+三张Omni图片两组均完成真实解析、入库、索引；A通过独立Worker，B通过MinerU正常上传。A三次原冻结诊断都走了文档加载路径，Rerank后最终Context为空，固定拒答；没有证明OCR进入回答模型。
+
+B三张图片没有新增问答，原因是首轮配置错误后需要一次4问修正，12次尝试上限已满。因此：**Omni成对KB向量问答、B OCR实际进入回答wire、官方QA分数均NOT_RUN**。不以P10的3页NED或本轮合法引用替代这些指标，不补造QA Gold。
+
+首轮8次全部保留在 `diagnostic-score.json`。例如原直接文档模式A0434曾答出Kaggle猫狗、B0959曾正确且有2条引用，但它们不进入正式向量A/B成绩。没有选择更漂亮的答案作为正式成绩。
+
+## 6. 实际调用、Token与延迟
+
+| 项目 | 本轮实际 |
 |---|---:|
-| 真实账户/provider/月 | siliconflow-owner-main / siliconflow / 2026-10-01 |
-| 原本地围栏 | 1,000,000 |
-| carry-in | 14 |
-| settled＋reserved/UNKNOWN占用 | 993,839 |
-| 剩余可预留占用 | **6,147** |
-| 历史调用记录 | 469：432 settled、37 UNKNOWN |
-| 全部历史UNKNOWN保守占用 | **517,098** |
-| P11新增调用、Token、UNKNOWN | **0 / 0 / 0** |
+| 问答尝试 | **12**，其中8文档加载诊断、4正式KB向量 |
+| 真实回答模型调用 / 固定拒答 | **7 / 5** |
+| 全部供应商响应 | **94**，不是94道问答 |
+| Embedding / chat / Rerank | **58 / 28 / 8**；chat中7次回答、21次辅助 |
+| settled / UNKNOWN / reserved | **86 / 8 / 0** |
+| 实际input / output / total Token | **128,188 / 2,799 / 130,987** |
+| 新增UNKNOWN保守占用 | **76,058**，单列，不当实际Token或免费 |
+| 本轮新增占用 | **207,045** |
+| 12问HTTP时长合计 | **72.9751秒**，不含上传，不是纯模型时间 |
 
-这37条是当前账户全部历史UNKNOWN，不等于P9新产生的17条；P9自己的314417占用仍完整保留。469条账本逐行、原月行与DeepSeek历史前后完全一致。原快照与最终快照见 `siliconflow-ledger-before.json`、`final-v2/ledger.json`、`final-v2/months.json`、`final-v2/deepseek.json`。
+正式四问HTTP时长：A0434 7.087秒、A0959 7.336秒、B0434 4.270秒、B0959 6.273秒；逐题关联调用数、实际Token和UNKNOWN见机器结果 `actual_call_usage`。上传、Embedding、摘要及其它辅助调用计入全部94条，未混成问答数。
 
-### 2.3 为什么没有建立P11增量额度
+新UNKNOWN均为缺少可结算usage的Rerank响应；回执及正常结果仍保存。原469条账本逐行不变，原37条UNKNOWN/517098占用保留；DeepSeek历史不变，新增DeepSeek0。结束全账户563条记录，月上限1200898与当前占用＋carry严格相等，未用399102撤回，不估算人民币费用。
 
-正常可信链路仍是：
+## 7. 命令与验收证据
 
-`--authority-config → ApprovedTokenAuthority → ServerPermissionResolver → P1SendGate → TokenBudgetStore.reserve`
+cwd为上述工作树，RAG Python为 `E:/RAG quention/.venv/Scripts/python.exe -B`。PYTHONPATH复用工作树、E:/WK/deps/reader、工作树var/weknora-port/runtime-deps；所有新下载/临时文件/日志/资产均在D/E，没有新依赖。
 
-`authority.py::_approved_provider_limit_valid` 允许SF任意正整数有限围栏；但 `storage/token_budget.py::TokenBudgetStore.reserve` 对同一真实account/provider/month加锁后，要求已存 `limit_tokens/carry/approval_source` 与配置一致。直接提高配置会触发 **TOKEN_MONTH_AUTHORITY_CONFLICT**。
+| 实际命令 | exit | 证据 |
+|---|---:|---|
+| `-m scripts.weknora_port_p11_fence open --approval-file E:/WK/run/p11-real-20261016/owner-approval.txt` | 0 | fence-open.log；真实PG open-after收据 |
+| `E:/WK/run/p11-real-20261016/run.py freeze` | 0 | freeze.log；原冻结清单字节哈希绑定 |
+| `stage.ps1 -Stage start/configure -Group A/B` | 各0 | A/B-start、configure.log及实际API argv |
+| `stage.ps1 -Stage upload -Group A/B -Dataset mmlongbench-doc/omnidocbench`；A另pew | 各0 | 对应upload.log、HTTP/source回执及completed状态 |
+| `stage.ps1 -Stage worker -Group A` | starter0 | 独立backend.weknora_port.worker实际处理3个图片任务；PG最终completed |
+| `stage.ps1 -Stage query ...` | 8次各0 | 根目录A/B/queries，首轮文档加载诊断 |
+| `stage_kb.ps1 -Stage query -Group A/B -Dataset mmlongbench-doc -Qid <原0434/0959>` | 4次各0 | vector/A/B/queries；实际Query Embedding、stages、wire、引用 |
+| `stage.ps1 -Stage snapshot -Group A/B -Label before/final` | 各0 | 只读PG快照，原始P9被动观察产物原样复制至vector用于独立评分 |
+| `scripts/p11_score_real.py --root-dir .../vector --output .../vector-score.json`；另根目录diagnostic-score.json | 各0 | 四正式结果与八诊断结果严格分开 |
+| 命令核验后的PowerShell Stop-Process | 0 | stop-owned-before.json、stop.exitcode.txt |
+| `-m scripts.weknora_port_p11_fence close` | 0 | fence-close.log；真实PG close-after收据 |
+| `E:/WK/run/p11-real-20261016/closeout_v3.py` | 0 | closeout-v3.log；v3/closeout-audit.json、原行/资产/索引审计 |
+| `-m pytest tests/weknora_port/test_p11_fence.py tests/weknora_port/test_p11_score_real.py -q --tb=short -p no:cacheprovider --basetemp E:/WK/run/p11-real-20261016/unit-final` | 0 | **32 passed**，unit-final.log；离线边界测试，不替代真实服务 |
+| `E:/WK/run/p11-real-20261016/deliver.py` | 0 | delivery.log、机器结果和710证据哈希索引 |
 
-全仓与交接核对未发现现有受信的同账户同月增额API、CLI或人工runbook。旧“root reconciliation required”只是错误文案；既有授权续期只更改有效期，未改变100万围栏。`P1_SEND_GATE.md` 同样说明没有自动账本重置/协调命令。
+`stage*.ps1`只是传参/日志包装，完整argv及HTTP intent保留。API仍为真实 `scripts.weknora_port_p9_observed_api` 装配普通FastAPI，并以被动观察器保存正常stage与实际HTTPX body；无业务API Mock。
 
-`budget_proof.py` 对**真实只读PG快照**执行实际源码AST判断，exit0：原limit不冲突，同账户同月limit仅加1也冲突。**这是源码条件实测，不是实际PG admission拒绝，也没有发送模型请求。** 未直接UPDATE月行、移除守卫、换account/approval或修改历史占用。
+PG为127.0.0.1:56423、库weknora_python_port_20261013、system identifier **7696088403504697382**；Redis127.0.0.1:56424 DB15、run_id **87b4c2a9f76f9f94b34b5f21fe31a967926f343a**。A/B新KB、独立资产与Redis前缀，原tenant332和加密模型登记复用。收尾本任务API/Worker停止，56429/56431无监听；共享PG/Redis仍healthy。没有操作旧业务服务或flush。
 
-沿用P9已有保守准入参考，同链MML所需观察占用为36,006、Omni为26,713，均超过6,147；这些是既有观察的准入参考，**不是本轮实际Token，也不是尚未生成的P11精确wire上界**。不消耗残余额度去得到无法配对的单边结果。
+## 8. 失败、改动与决定
 
-本轮按Owner“仅现有可信流程允许时建立增量”的约束，将增量流程记 **NOT_IMPLEMENTED**、依赖它的真实问答记 **BLOCKED/NOT_RUN**；没有扩大到开发新的额度治理接口。
+实际修复只限测评阻断：document_scope→KBscope一次修正；评分器相应严格核对KB完整文档集合，区分合法负例引用与Gold相关性。所有首轮回答/拒答/费用保留，未重发UNKNOWN。
 
-## 3. 冻结范围与可比条件
+两个收尾辅助脚本失败也保留：首版用普通Python路径读长资产文件失败，改用现有 `_native_io_path`，没有改ACL或系统长路径设置；第二版误用tenant级账本作全账户基线，改为原全账户469条快照，v3通过。没有改账本来使审计通过。
 
-`frozen.json` 在本轮上传前保存全部原件SHA、原问题、模型、源码与Scope计划；`gold-evaluation-only.json` 单独保存原官方Gold，不进入Parser/模型输入。
+代码新增仅两套实验工具及测试：P11一次性围栏open/close、只读P11评分器；正常服务入口、模型、Parser、Chunking、检索、Prompt、P1门均未改。无schema/migration/依赖锁变化，无整项目回归。
 
-| 样本 | 原件SHA-256 | 计划 |
-|---|---|---|
-| row-0434 / cat PDF68页 | `40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b` | A/B各1次 |
-| row-0959 / b3 PDF21页 | `43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22` | A/B各1次 |
-| Omni06 yanbaoPPT4185 | `3471a533f957c8aed9d8732878a763c039017f454c70eecf1cc832038d76e956` | A/B各1次诊断，无官方QA Gold |
-| Omni10 English transition | `428cca795816237571181f0b2f491ecb81d895359a142c07aa93d160ab58dd9d` | A/B各1次诊断，无官方QA Gold |
-| Omni14 lecture1公式 | `95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601` | A/B各1次诊断，无官方QA Gold |
-| Pew普通文字PDF45页 | `8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb` | 默认路径1次对照 |
+**建议：保留普通PDF默认，扫描PDF/图片仅显式使用Basic。** 0959已证明真实的“恢复文字→检索→Context→模型→可回读引用”贡献；0434证明更好解析不自动等于更好回答。尚不扩大自动替换或Standard，不宣称通用质量保证。
 
-原始官方MML问题保持：
+下一轮最值得单独研究的是0434低Rerank分数与关键证据保留；Omni应另做真正KB向量诊断。不要把A0434幻觉、负例引用或Cheap漏引用全部归因于解析。当前不优化这些策略、不追加调用。
 
-- row-0434：Which dataset was introduced in the 'coding time' section of the PPT for training?
-- row-0959：What are used for long-distance communication as introduced in this slide?
-
-三个Omni页面统一冻结简短诊断：“请根据这页资料概括主要内容，并引用原文证据。”没有官方QA分数。普通PDF冻结原中位数问题作为后续诊断，本轮只完成默认解析回归。
-
-计划合计11次问答，上限12；实际**0次**。全部11个group/sample记录保持NOT_RUN，未将“计划”计为执行题数。P9历史结果不合并为P11成绩。
-
-固定模型为 bge-m3 / bge-reranker-v2-m3 / Xing4.0-29B，复用原tenant332已加密登记的模型，未重登记密钥。A/B新KB的模型ID、默认chunking与索引配置相同；分别使用新KB、document/version及资产根，计划查询再按原件document范围限定。
-
-**云阻断下的准备状态不是正式A/B运行条件**：全部新KB保持 `cloud_allowed=false`，不授予云外发；vector/keyword配置仍保持真实默认True，没有用关闭vector或伪造向量来“完成”入库。普通Pew只走A的默认PDF；B实例显式扫描PDF选择不用于Pew，以免已知原生PDF拒绝被误认成默认路径退化。
-
-## 4. 实际经过的链路与落地结果
-
-两组使用真实正常FastAPI业务API；观察器复用P9，只被动记录真实调用，未Mock应用或模型。A使用现有PDF/Tesseract；B使用独立MinerU4.0.12 Basic/ocr，仍由正常上传装配选择。
-
-| 部分 | 实际状态 | 证据含义 |
-|---|---|---|
-| HTTP ready、创建KB、上传、原件回读 | PASS，11份文档记录，11/11原件SHA一致 | 真实业务API，不是测试旁路 |
-| A原生PDF解析、B MinerU解析 | PASS到PG来源/切块 | 无模型质量结论 |
-| A独立Worker本地Tesseract | 3次实际领取，OCR均completed | Caption因无视觉模型unavailable，未冒充OCR为Caption |
-| B Worker | 实际--once运行，image_ingest=false | Basic解析在API ingestion执行，不冒称走了图片队列 |
-| PG source chunks/assets | 286块、216资产逐文件SHA核对 | 保存真实document/version和定位，尚非可检索索引 |
-| Embedding/pgvector | **NOT_RUN，向量行0** | 全部文档在MODEL_ORIGIN_KB_EGRESS_DENIED停止 |
-| Search/Rerank/Context | **NOT_RUN** | 无证据召回成绩 |
-| Cheap回答/finish_reason/Gold评分 | **NOT_RUN** | 无答案正确率 |
-| 生成引用及派生OCR引用回读 | **NOT_RUN** | 无生成回答，不能给引用通过率 |
-
-11份文档均保留真实失败状态，没有预写completed；3个A图片任务也都失败收口，没有遗留pending/processing。此处的 **MODEL_ORIGIN_KB_EGRESS_DENIED 是为零云调用准备保留cloud_allowed=false产生的预期拒绝**，不是实测预算门拒绝，更不是MinerU解析失败。
-
-### 4.1 每源解析差异
-
-| 原件 | A：PG块/关键证据 | B：PG块/关键证据 | B资产 |
-|---|---|---|---:|
-| cat68页 | 23，图片占位；未含数据集名称证据 | **52，含Kaggle's Cat vs Dog dataset**；page_idx33，物理34页 | 73 |
-| b3 21页 | 6，图片占位；未含完整通信证据 | **34，含ionosphere refracts radiowaves及microwaves通信文字**；page_idx16，物理17页 | 39 |
-| Omni06 | 2，本地Tesseract OCR真实保存 | 1，MinerU结构化文字 | 5 |
-| Omni10 | 2，本地Tesseract OCR真实保存 | 1，MinerU结构化文字 | 5 |
-| Omni14 | 2，本地Tesseract OCR真实保存 | 1，MinerU结构化文字/公式 | 5 |
-| Pew45页 | 162，默认解析逐字回归通过 | 不改为MinerU | — |
-
-MML B关键块的真实chunkID、quote、页/块locator和source_version保存在机器结果 `real_http_worker_pg_preparation.sources[].key_chunks`。原件SHA与派生文本SHA分开；派生offset仍是Unicode codepoints，不是PDF原始字节偏移。216个资产在隔离资产目录实际存在且SHA匹配。
-
-这比P10多证明了 **真实HTTP→Parser→PG切块/资产** 的接线，但不证明Search命中、Context交付模型、回答正确或引用可用。P10的3页NED不作为P11新成绩；本轮不新增NED总分或官方QA指标。
-
-两次真实 `/api/v1/chunks/{id}` 读取A/B失败文档的代表块均返回 **404**，保留 `citation-unavailable-guards.json`；这是阻止失败文档被当作答案来源的正常保护，**不能写成生成引用验证PASS**。
-
-### 4.2 普通PDF默认路径
-
-通过真实HTTP上传同一Pew PDF，PG实际保存162块；逐块内容与P10原默认正文的对应区间完全相等，覆盖全部 **70,220 Unicode字符**，文本SHA仍为 `89e9e2fa069a6973984da116565ea7b993de7921f216896abfe09e1a60e01c11`。
-
-结论仅为 **默认解析与切块无退化**。其Embedding、检索和问答未运行，不宣称普通PDF完整RAG回归通过。
-
-## 5. 调用、Token、延迟及资源身份
-
-- 正式问答尝试0；Embedding0、Rerank0、Cheap0、DeepSeek0；没有供应商请求wire记录。
-- 本轮实际input/output Token均0，新增UNKNOWN占用0；既有37条UNKNOWN完整保留。
-- QA延迟 **NOT_RUN**。B组上传到响应的实测墙钟（包含本地解析与正常处理）：cat **132.96秒**、b3 **58.80秒**、Omni06 **33.57秒**、Omni10 **14.87秒**、Omni14 **23.00秒**。这不是模型回答延迟。A组上传延迟因本地状态汇总问题未保留完整，标 **NOT_RECORDED**，不以时间戳猜补。
-- PG：127.0.0.1:56423，`weknora_python_port_20261013`，system identifier **7696088403504697382**。
-- Redis：127.0.0.1:56424，DB15，run_id **87b4c2a9f76f9f94b34b5f21fe31a967926f343a**；A/B各自唯一 `weknora-python-p11:*` prefix，详见机器结果。未flush。
-- 两组各自隔离资产/TEMP根 `E:/WK/run/p11-20261016/A`、`B`。模型环境复用 `E:/WK/mineru-env`；权重复用P10 E盘模型；加密模型登记继续使用原master.key路径，没有输出密钥。
-- API A端口56429，parent35024/child16352；B端口56431，parent10448/child44524。独立Worker starter PID：A23008/10156/39440，B22568。启动前确认旧同tenant图片任务均已terminal，未消费其他任务队列；B空Worker未领取A任务。
-- 仅停止本任务命令核验的API进程树；Worker/本地解析进程已退出。收尾56429/56431无监听，PG/Redis仍healthy，无清库/卷重建或容器变更。
-
-## 6. 实际命令、退出码及失败保留
-
-所有命令cwd为工作树；Python为 `E:/RAG quention/.venv/Scripts/python.exe -B`，辅助纯JSON聚合使用 `E:/WK/mineru-env/Scripts/python.exe -B`。PYTHONPATH为工作树、`E:/WK/deps/reader`、工作树var/weknora-port/runtime-deps，TEMP/TMP为P11 E盘目录。
-
-| 实际命令 | 退出码/结果 | 证据 |
-|---|---|---|
-| RAG Python `E:/WK/run/p11-20261016/preflight.py` | 0，只读PG/Redis/授权/账本 | preflight.log、preflight-read-only.json |
-| RAG Python `E:/WK/run/p11-20261016/budget_proof.py` | 0，配置/源码条件审计；增额BLOCKED | budget-proof.log/.json |
-| RAG Python `E:/WK/run/p11-20261016/prepare_no_cloud.py freeze` | 0，冻结6源/6问题 | freeze.log、frozen.json |
-| 同脚本 `start` | 0，两个API进程启动 | start.log、A/B/api-command.json |
-| 同脚本 `upload --group A`、`upload --group B` | 各0，6份/5份HTTP接收并原件回读 | upload-A/B.log、A/B/http与intents |
-| 同脚本 `worker --group A` 三次；`--group B` 一次 | starter命令各0；实际Worker stdout有正常run_once结果 | worker-A*-start.log、A/B/worker.stdout、PG task snapshots |
-| 实际Worker子进程 `-m backend.weknora_port.worker --once --authority-config <A或B/authority.json>` | **子进程退出码未单独捕获**；启动命令exit0不能冒称worker验收exit0 | 每次stdout与terminal任务状态已保留 |
-| 同脚本 `inspect --label checkpoint`、`interim` | 各0，早期局部快照 | inspect-*.log；保留，不作最终全集 |
-| RAG Python `E:/WK/run/p11-20261016/final_audit.py` | **1**，只读SQL误假设embeddings有tenant_id | final-audit-first.log、first final/快照保留 |
-| RAG Python `E:/WK/run/p11-20261016/final_audit_v2.py` | **0**，按实际schema/五个P11 KB收口 | final-audit-v2.log、final-v2/、audit-results.json |
-| 命令核验PID后PowerShell `Stop-Process -Id <owned PID>` | 0，无本任务API残留 | stop-owned-before.json、stop.exitcode.txt、ports-after.json |
-| MinerU Python `E:/WK/run/p11-20261016/compose_delivery.py` | 0，机器结果/400文件哈希索引 | compose-delivery.log、evidence-manifest.json |
-
-API实际命令复用 `-m scripts.weknora_port_p9_observed_api --port 56429/56431 --authority-config <A/B/authority.json> --evidence-dir <A/B>`，其内部创建真实FastAPI应用、受信装配和正常业务API；不是业务API Mock。完整argv见各command.json。
-
-首次失败全部保留：
-
-1. 初始化检查默认GBK读取UTF8失败，未发生请求或文件修改；显式UTF8修正。
-2. 准备脚本并行保存整个共享state，导致本地汇总丢失A组join。原HTTP回执、PG、原件均未丢失；按不可变HTTP回执一次重建为 `state-reconciled-v2.json`，没有重发任何上传/模型请求。原state、checkpoint、interim保留，不当全集。
-3. 首次收尾SQL误认为upstream embeddings表有tenant_id；只读失败exit1。通过information_schema核实，以确切P11 KB IDs查询，v2 exit0，未修改schema或隔离保护。
-
-这些是评测辅助代码问题，不是本轮生产RAG Bug。**没有生产修复、迁移或新增依赖，未运行额外pytest或全项目回归。** 没有把旧49项离线测试作为P11真实A/B通过证据。
-
-## 7. 独立评分与停止决定
-
-| 维度 | row-0434 A/B | row-0959 A/B | Omni3 A/B | Pew默认 |
-|---|---|---|---|---|
-| 新解析证据/PG保存 | A缺失 / B存在 | A缺失 / B存在 | 两组真实OCR产物保存 | 正文/切块逐字PASS |
-| 向量/检索/Rerank/Context | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
-| 答案Gold一致性 | NOT_RUN | NOT_RUN | 无官方QA Gold，诊断也NOT_RUN | NOT_RUN |
-| 生成引用合法性/完整性 | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
-
-**MinerU是否值得正式用于真实RAG：本轮尚不能给出肯定结论。** 已证明扫描件/图片的正常HTTP→PG解析接线可行，未证明检索、答案或引用收益。建议保留P10显式Basic候选、普通PDF旧默认，不切换生产默认或扩大Standard/自动解析器路由。
-
-剩余明确阻断是 **可信的同账户同月增量围栏协调操作尚未实现**，不是Owner未授权使用SF、供应商账户余额已证实不足或MinerU模型无法运行。下一步应单独处理该可信操作并定向审计；保留原账户/月、全部历史记录与UNKNOWN，然后恢复这份冻结计划的有限成对实测。当前不自行开发新额度接口。
-
-模型答错、漏引用、Rerank分数或Context证据丢失，本轮都没有新执行数据，不能归因于解析，也不据此修改Prompt/检索/路由。P9历史质量问题继续原样保留。
-
-按本轮允许的预算阻断停止条件收口；这不是负责人确认的里程碑验收。无Push、部署、合并或Tag，不继续六套全量评测或其它优化。
+所有378个原保护文件哈希不变；原.serena修改及六个未跟踪文件保留。完成限定执行与收口后停止，无Push、部署、合并或Tag。这是有限实测交付，不是负责人确认的全面上线验收。
