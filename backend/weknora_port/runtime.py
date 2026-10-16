@@ -470,12 +470,61 @@ class ApplicationRuntime:
                 (state.user_content, state.user_message_id, context.request_id, context.session_id,
                  self.principal.tenant_id, self.principal.subject_id))
 
+    async def _project_source_evidence(self, state, context, repository):
+        from .retrieval.filter_top_k import filter_top_k
+        from .retrieval.search import SearchNothing, RetrievalScopeError, validate_results
+        if not state.needs_retrieval:
+            return
+        # Generated summaries can help recall, but cannot become final evidence.
+        state.merge_results = [r for r in state.merge_results if r is not None and r.chunk_type != 'summary']
+        filter_top_k(state)
+        ids = tuple(dict.fromkeys(chunk_id for row in state.merge_results if row.chunk_type == 'text'
+                                  for chunk_id in (row.id, *row.sub_chunk_ids)))
+        chunks = await repository.get_chunks(ids, context) if ids else {}
+        projected, seen = [], set()
+        for merged in state.merge_results:
+            if merged.chunk_type != 'text':
+                projected.append(merged)
+                continue
+            version = merged.chunk_metadata.get('source_version')
+            if not isinstance(version, str) or not version:
+                raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
+            originals = []
+            for chunk_id in dict.fromkeys((merged.id, *merged.sub_chunk_ids)):
+                raw = chunks.get(chunk_id)
+                if raw is None or raw.id != chunk_id or raw.chunk_type != 'text':
+                    raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
+                validate_results([raw], state.targets, context)
+                if (raw.knowledge_base_id, raw.knowledge_id, raw.chunk_metadata.get('source_version')) != (
+                        merged.knowledge_base_id, merged.knowledge_id, version):
+                    raise RetrievalScopeError()
+                originals.append(raw)
+            for raw in sorted(originals, key=lambda row: (row.chunk_index, row.start_at)):
+                if raw.id in seen:
+                    continue
+                source = await self.documents.read_source_chunk(self.principal, raw.id)
+                if (source.get('chunk_id'), source.get('knowledge_base_id'), source.get('document_id'),
+                        source.get('source_version'), source.get('chunk_type'), source.get('start'), source.get('end')) != (
+                        raw.id, raw.knowledge_base_id, raw.knowledge_id, version, 'text', raw.start_at, raw.end_at):
+                    raise RetrievalScopeError()
+                if not isinstance(source.get('text'), str) or not source['text']:
+                    raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
+                projected.append(replace(raw, content=source['text'], score=merged.score, sub_chunk_ids=[],
+                    chunk_metadata={**raw.chunk_metadata, 'source_version': source['source_version']}))
+                seen.add(raw.id)
+        state.merge_results = projected
+        if not projected:
+            raise SearchNothing()
+
     async def _pipeline(self, turn, progress):
         registry = self._runs[turn.run_id]["registry"]
+        repository = LeasedKnowledgeRepository(self, registry)
         async def affinity(ids):
             return await self.memory.document_affinity(turn.memory_context,ids)
+        async def project(state, context):
+            await self._project_source_evidence(state, context, repository)
         return RetrievalPipeline(
-            LeasedKnowledgeRepository(self, registry), registry, on_progress=progress,
+            repository, registry, on_progress=progress, final_evidence_projection=project,
             persist_sink=self._persist_context, affinity_resolver=affinity)
 
     async def _generation(self, turn, progress, *, policy=None):
