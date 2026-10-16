@@ -73,3 +73,8 @@ exit **0**：original account/month/calls and UNKNOWN unchanged；日志 `E:\WK\
 新增真实模型请求 **NOT_RUN/0**；新增供应商Token0、新UNKNOWN0、未建立围栏。公开GitHub源码读取是参考资料HTTP，不是供应商调用。只读PG system_identifier7696088403504697382，weknora_python_port_20261013；618条SiliconFlow调用/61条UNKNOWN/reserved0、月账本及DeepSeek记录与P14关闭快照逐值相同。旧UNKNOWN未修改或释放。P11—P15既有保护证据、P16独立OCR结果和输入、P13/P14原始响应哈希不变。原工作区改动保留。
 
 交付状态：计量兼容PASS；引用四题现象及证据边界明确，但生成/解码根因仍UNRESOLVED；0434 OCR/无可靠关联结论PASS。综合不宣称全部通过，状态P16_PARTIAL。必要下一步仅建议取得未来解码前后成对证据；本轮不自动采集、不加生成后补引，不继续Rerank或框架改造。无Push、部署、合并、Tag，完成限定工作后停止。
+
+
+## Owner补充验收
+
+见[P16_ACCEPTANCE_SUPPLEMENT.md](P16_ACCEPTANCE_SUPPLEMENT.md)：补充官方SiliconFlow结构证据、十份真实响应Token/billed_units反例和四题三类原因的证据缺失分类；0434关联记录为TD-P16-0434-SECTION，按Owner排除本轮研究，无新增OCR/Rerank。状态保持PARTIAL_SAFE_STOP，不以无法确认的历史原因宣称修复。
