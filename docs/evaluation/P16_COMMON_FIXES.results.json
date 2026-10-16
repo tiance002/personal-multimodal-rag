@@ -1,0 +1,665 @@
+{
+  "schema": "p16-common-fixes/v1",
+  "status": "P16_PARTIAL",
+  "status_reason": "Metering fix offline verified and OCR/link conclusion complete; historical missing-citation cause cannot be attributed without uncaptured supplier content. No speculative citation fix.",
+  "baseline_sha": "3055bf5d8f41d42ee5fb13d3f4355292e45dc937",
+  "implementation_sha": "c2f7197abbf9336bea7d19e047f7a5f7c7b713ae",
+  "production_changed": [
+    "backend/weknora_port/models/provider.py",
+    "backend/weknora_port/models/usage.py",
+    "backend/weknora_port/models/usage_facts.py"
+  ],
+  "production_other_files_unchanged": 564,
+  "response_replays": [
+    {
+      "file": "p13-R1-0434-EN-original.json",
+      "source": "E:\\WK\\run\\p13-20261016\\trials\\R1-0434-EN-original\\response.body",
+      "sha256": "41111ecfac2a3b79d8da3f87b8bf38796961953f76d9506ca7b260fe2008e2d0",
+      "input_tokens": 5343,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5343,
+      "physical_call_accounting": [
+        5343,
+        5343
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p13-R2-0434-ZH-original.json",
+      "source": "E:\\WK\\run\\p13-20261016\\trials\\R2-0434-ZH-original\\response.body",
+      "sha256": "1af369a100fd28b175986c15d500c7fd7395d10c74eccbafe26617effc9308e0",
+      "input_tokens": 5157,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5157,
+      "physical_call_accounting": [
+        5157,
+        5157
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p13-R3-0434-EN-context.json",
+      "source": "E:\\WK\\run\\p13-20261016\\trials\\R3-0434-EN-context\\response.body",
+      "sha256": "3feed4871c015ca570a9d817b47d23f04b56ff839294dd977242e58212820615",
+      "input_tokens": 5788,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5788,
+      "physical_call_accounting": [
+        5788,
+        5788
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p13-R4-0434-ZH-context.json",
+      "source": "E:\\WK\\run\\p13-20261016\\trials\\R4-0434-ZH-context\\response.body",
+      "sha256": "8cf72d438b834cee0ff1bb6acdb18430a1c8eeb8f20966ee7848ee8b6598473d",
+      "input_tokens": 5602,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5602,
+      "physical_call_accounting": [
+        5602,
+        5602
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p13-R5-0959-EN-control.json",
+      "source": "E:\\WK\\run\\p13-20261016\\trials\\R5-0959-EN-control\\response.body",
+      "sha256": "7a2bbc4f61eebccd4594596661faa711004915cfdac96baa8550928da70cd7d1",
+      "input_tokens": 5188,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5188,
+      "physical_call_accounting": [
+        5188,
+        5188
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p13-R6-0959-ZH-control.json",
+      "source": "E:\\WK\\run\\p13-20261016\\trials\\R6-0959-ZH-control\\response.body",
+      "sha256": "fb10ffb8d39b68963820d4da43ab2f1d47baae14fe79e50068f2d1b9f4175dcc",
+      "input_tokens": 5188,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5188,
+      "physical_call_accounting": [
+        5188,
+        5188
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p14-R1-0434-ZH-original.json",
+      "source": "E:\\WK\\run\\p14-20261016\\trials\\R1-0434-ZH-original\\response.body",
+      "sha256": "a88d843138c06ea65a690091425a0a1fd6821670f03fd893476470681a48b0dc",
+      "input_tokens": 5157,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 5157,
+      "physical_call_accounting": [
+        5157,
+        5157
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p14-R2-0434-ZH-near.json",
+      "source": "E:\\WK\\run\\p14-20261016\\trials\\R2-0434-ZH-near\\response.body",
+      "sha256": "07031c1903251aa9c5872e60182a86d420c5f9ef736ac9fa9a9d2f5ee9da1a65",
+      "input_tokens": 12157,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 12157,
+      "physical_call_accounting": [
+        12157,
+        12157
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p14-R3-0434-ZH-length.json",
+      "source": "E:\\WK\\run\\p14-20261016\\trials\\R3-0434-ZH-length\\response.body",
+      "sha256": "57ecbe91c63cd90e9a7dedc363875b62b2e318aacc67c2aa5f93f29d4722c45f",
+      "input_tokens": 12189,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 12189,
+      "physical_call_accounting": [
+        12189,
+        12189
+      ],
+      "historical_ledger_changed": false
+    },
+    {
+      "file": "p14-R4-0959-ZH-near.json",
+      "source": "E:\\WK\\run\\p14-20261016\\trials\\R4-0959-ZH-near\\response.body",
+      "sha256": "d2d1d83c1b2fb7ad0f28e97f7659e6b1c9d1ef015648f9b2ef5d49fd1d8dffd5",
+      "input_tokens": 12188,
+      "output_tokens": 0,
+      "offline_replay_status": "REPORTED",
+      "derived_total": 12188,
+      "physical_call_accounting": [
+        12188,
+        12188
+      ],
+      "historical_ledger_changed": false
+    }
+  ],
+  "citation_diagnosis": {
+    "schema": "p16-offline-citation-diagnosis/v1",
+    "head": "3055bf5d8f41d42ee5fb13d3f4355292e45dc937",
+    "result": "PASS_OFFLINE_EVIDENCE_AUDIT",
+    "causal_attribution": "UNRESOLVED",
+    "confirmed_decoder_bug": false,
+    "provider_response_capture_limitation": "P9 response_hook stores status/header-receipt state only. terminal stores parsed finish_reason/usage/final flag; neither stores raw response bytes nor predecoder answer deltas.",
+    "provider_record_inventory": {
+      "count": 178,
+      "keys_union": [
+        "body",
+        "boundary",
+        "capability",
+        "finish_reason",
+        "headers_saved",
+        "model",
+        "parsed_final_observed",
+        "parsed_usage",
+        "provider",
+        "request_id",
+        "run_id",
+        "schema",
+        "stage",
+        "state",
+        "status_code",
+        "wire_bytes",
+        "wire_sha256"
+      ]
+    },
+    "cases": [
+      {
+        "dataset": "miracl-zh",
+        "qid": "692002#0",
+        "run_id": "42417b62-f20d-4b79-9156-53728e2ad83b",
+        "question": "美国有哪些经济学专家？",
+        "application_messages": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\ced1c6adb3057c9376d84f07-messages.json",
+          "sha256": "e8ea57d4a713ed81d39796fd296005e45602e12f14acf35632003e6da23c0c6e",
+          "bytes": 2136
+        },
+        "application_sse": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\ced1c6adb3057c9376d84f07.sse",
+          "sha256": "a2c02eaa4ee2d9233fb610e8433834f6c8e5b86c06f4126ec4248e0edee9c216",
+          "bytes": 83343
+        },
+        "capture": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\captures\\35aae7237009a0a5668efb8153a50d15f7a5eac9cc62931f8426270b886bdf12.json",
+          "sha256": "5743584d582ee6a3ccfd5f41c978de9137b9ebc3b22fc234da236fbefc86f91d",
+          "bytes": 17879
+        },
+        "actual_provider_request": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\provider-requests\\c6e505bb02e1794aecaad82bada601220d4e3c67eff7f2ada2e39819141e7d65.json",
+          "sha256": "3106f628853208663cb636c33d4f55f496b908eb5fe8bb0076bd40b973dc7000",
+          "bytes": 8932
+        },
+        "provider_response": {
+          "path": null,
+          "sha256": null,
+          "status": "NOT_CAPTURED",
+          "original_output_has_valid_marker": "UNKNOWN",
+          "raw_to_decoded_difference": "NOT_COMPARABLE"
+        },
+        "provider_finish_reason": "stop",
+        "provider_record_keys": [
+          "body",
+          "boundary",
+          "capability",
+          "finish_reason",
+          "headers_saved",
+          "model",
+          "parsed_final_observed",
+          "parsed_usage",
+          "provider",
+          "request_id",
+          "run_id",
+          "schema",
+          "stage",
+          "state",
+          "status_code",
+          "wire_bytes",
+          "wire_sha256"
+        ],
+        "application_answer": "# 美国经济学专家\n\n根据提供的参考资料，芝加哥大学（University of Chicago）的经济学领域汇聚了众多诺贝尔奖得主，被誉为**芝加哥经济学派**，代表人物包括：\n\n- **米尔顿·弗里德曼**（Milton Friedman）——诺贝尔经济学奖得主\n- **乔治·斯蒂格勒**（George Stigler）——1982年诺贝尔经济学奖得主，是全球商学院教授获此殊荣的第一人\n- **罗纳德·科斯**（Ronald Coase）——诺贝尔经济学奖得主\n- **尤金·法马**（Eugene Fama）——诺贝尔经济学奖得主\n- **拉尔斯·彼得·汉森**（Lars Peter Hansen）——诺贝尔经济学奖得主\n\n截至2019年，芝加哥大学经济系共有**33位**诺贝尔奖得主曾在此学习或工作，位居世界首位。\n\n> **说明：** 以上资料仅提供了芝加哥大学经济学派的代表人物，并未涵盖全部美国经济学专家。如需更全面的信息，建议参考更多学术资料。",
+        "application_marker_occurrences": [],
+        "application_references": [],
+        "application_sse_answer_equals_persisted": true,
+        "application_answer_equals_p9_report_raw_answer": true,
+        "offline_redecode_of_already_decoded_sse": {
+          "text_unchanged": true,
+          "used_handles": [],
+          "invalid_handles": [],
+          "limitation": "This is an idempotence check on application output; not a provider replay."
+        },
+        "context_candidate_count": 1,
+        "context_sha256": "da3c104d8ce60b8194ffed76720421caa253e1fab9cd4cf85225ba89b45a7eae",
+        "context_source_handles": [
+          "c1"
+        ],
+        "wire_contains_enabled_citation_protocol": true,
+        "wire_contains_exact_ref_protocol": true,
+        "root_cause": "UNRESOLVED_MISSING_PREDECODE_PROVIDER_OUTPUT",
+        "minimum_fix_recommendation": "NO_PRODUCTION_CHANGE_WITHOUT_CAUSAL_EVIDENCE"
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "704170#0",
+        "run_id": "9bb532e3-14cd-4733-9b44-f59530eea0db",
+        "question": "醇类化合物有哪些特征？",
+        "application_messages": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\49942a27e157e9c07470c7c1-messages.json",
+          "sha256": "8b26e3f78a19bab5fdf66a6b0cd30e908f93cb77876f00ac3a02f85dbaa1feb5",
+          "bytes": 1977
+        },
+        "application_sse": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\49942a27e157e9c07470c7c1.sse",
+          "sha256": "44b0dfa43e025e261261b4c9a98020e22e002b2551e193d03fc176886d060948",
+          "bytes": 72336
+        },
+        "capture": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\captures\\f7a1f515defa8ef2081420815e00c4b09a005cbdac7567435d2394eb74da50a0.json",
+          "sha256": "83fc55e9f40cbf9ab4bdc5a0ee461c807503b59cb78aa2c55cdf55a7bfbaeb62",
+          "bytes": 15486
+        },
+        "actual_provider_request": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\provider-requests\\e9c73216c1aa25e0f4b946e3b8bcb6ac629c33ec95248d8030dc0e48b278945f.json",
+          "sha256": "36698f149780928de244fed9a53b49fb02e22e7ab93792d118821ce214f9ab5d",
+          "bytes": 8608
+        },
+        "provider_response": {
+          "path": null,
+          "sha256": null,
+          "status": "NOT_CAPTURED",
+          "original_output_has_valid_marker": "UNKNOWN",
+          "raw_to_decoded_difference": "NOT_COMPARABLE"
+        },
+        "provider_finish_reason": "stop",
+        "provider_record_keys": [
+          "body",
+          "boundary",
+          "capability",
+          "finish_reason",
+          "headers_saved",
+          "model",
+          "parsed_final_observed",
+          "parsed_usage",
+          "provider",
+          "request_id",
+          "run_id",
+          "schema",
+          "stage",
+          "state",
+          "status_code",
+          "wire_bytes",
+          "wire_sha256"
+        ],
+        "application_answer": "# 醇类化合物的特征\n\n根据参考资料，醇类化合物的氧原子具有**孤电子对**（即没有成对的电子），这是醇类化合物的一个重要结构特征。\n\n具体而言：\n\n- **氧原子的电子结构**：醇类化合物中的氧原子具有孤电子对，这意味着氧原子未参与形成共价键，保留了未成对的电子。\n- **弱碱性表现**：与强酸性物质（如硫酸）反应时，醇类化合物可表现出一定的弱碱性。例如，甲醇在硫酸作用下可以表现出弱碱性。\n\n> **说明**：参考资料中仅提供了上述两点关于醇类化合物特征的信息。醇类化合物的其他常见特征（如羟基官能团、分子中可形成氢键、能与金属反应等）在提供的材料中未涉及，因此无法从该材料中补充回答。",
+        "application_marker_occurrences": [],
+        "application_references": [],
+        "application_sse_answer_equals_persisted": true,
+        "application_answer_equals_p9_report_raw_answer": true,
+        "offline_redecode_of_already_decoded_sse": {
+          "text_unchanged": true,
+          "used_handles": [],
+          "invalid_handles": [],
+          "limitation": "This is an idempotence check on application output; not a provider replay."
+        },
+        "context_candidate_count": 1,
+        "context_sha256": "11fa277a14696bdd982cf1823258bb0ae1ab007251357284d5b598cf37246454",
+        "context_source_handles": [
+          "c1"
+        ],
+        "wire_contains_enabled_citation_protocol": true,
+        "wire_contains_exact_ref_protocol": true,
+        "root_cause": "UNRESOLVED_MISSING_PREDECODE_PROVIDER_OUTPUT",
+        "minimum_fix_recommendation": "NO_PRODUCTION_CHANGE_WITHOUT_CAUSAL_EVIDENCE"
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+        "run_id": "0ba32433-8519-4494-945a-74be9de7a633",
+        "question": "辐射避难所怎么刷箱子",
+        "application_messages": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\ae207325cef2a3957bebb062-messages.json",
+          "sha256": "931e2a6c610907d6ede10095747d813a22950ff7a8c198b437252134477be1c1",
+          "bytes": 3568
+        },
+        "application_sse": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\ae207325cef2a3957bebb062.sse",
+          "sha256": "50d998e20002f17371be38ddba34f9c83b04a1af095e3dfb958b4c1a028066df",
+          "bytes": 210208
+        },
+        "capture": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\captures\\288f2a1b0461ec9a65c33816082ca2b661cac47a36553e9c9cc4f7f7df5ff3ad.json",
+          "sha256": "45c8a07c655cf2ed52bb772b069c4b198a43367f27c08b331653f689410e98f6",
+          "bytes": 97142
+        },
+        "actual_provider_request": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\provider-requests\\42d5816abce2a24d242e521818f03b50f0bdb972b328c4062bd9c4a6a65b66d0.json",
+          "sha256": "4f611e9e3c0858f618900859bfde2f68c1b649f92cba3e9c9e8599a5afb4f84e",
+          "bytes": 21036
+        },
+        "provider_response": {
+          "path": null,
+          "sha256": null,
+          "status": "NOT_CAPTURED",
+          "original_output_has_valid_marker": "UNKNOWN",
+          "raw_to_decoded_difference": "NOT_COMPARABLE"
+        },
+        "provider_finish_reason": "stop",
+        "provider_record_keys": [
+          "body",
+          "boundary",
+          "capability",
+          "finish_reason",
+          "headers_saved",
+          "model",
+          "parsed_final_observed",
+          "parsed_usage",
+          "provider",
+          "request_id",
+          "run_id",
+          "schema",
+          "stage",
+          "state",
+          "status_code",
+          "wire_bytes",
+          "wire_sha256"
+        ],
+        "application_answer": "# 辐射避难所刷箱子方法\n\n根据多个攻略来源，以下是刷箱子的主要方法：\n\n## 方法一：调系统时间重置任务（最常用）\n\n这是最主流的方法，核心思路是**通过修改手机系统时间来重置任务**，让任务不断刷新，从而持续获得箱子奖励。\n\n**操作步骤：**\n\n1. **进入游戏前**，将手机时间往回调（过去方向），关闭自动设置功能，回调七八个月即可。\n2. **进入游戏后重新建号**，选择喜欢的避难所编号（如000号）。\n3. **新手任务**中很多任务会奖励箱子（如成功启动一次极速模式奖励一个箱子）。\n4. **收集资源类任务**（水、食物等）难度不高，且有箱子奖励。\n5. 利用**删除任务功能**（任务前有个小叉），删掉不想做的任务，重新刷出新的收集类任务，箱子就会源源不断。\n\n> 来源：百度经验攻略（c3、c4）\n\n## 方法二：开局循环刷箱子\n\n1. **开局随便做任务**，可以领取3个箱子。\n2. 当出现\"出售一个武器或装备\"任务时，**放弃该任务**（系统调过24小时可以免费放弃一次）。\n3. 放弃后会刷出3个任务：2个可以得到箱子（收集50水、升级小人），50食物任务得到25瓶盖。\n4. **循环操作**：重复上述过程，刷个20多个箱子就可以继续玩。\n\n> 来源：快吧攻略（c5）\n\n## 方法三：无限刷箱子（进阶）\n\n1. **开局无限刷箱子**，使用调系统时间的手段。\n2. **注意**：刷出来的所有武器装备不要使用也不要卖，否则无法继续刷任务。\n3. 所有房子可以**扩大但不要升级**（升级后刷出的蟑螂更厉害，容易灭）。\n4. 刷出全人物、武器、衣服估计需要**1000个左右箱子**。\n\n> 来源：乐游网攻略（c8）\n\n## 注意事项\n\n- 刷道具可能会使游戏趣味性体验消失，玩家需考虑是否使用。\n- 箱子产出有一定随机性，反复开箱子顺序和内容可能相同，单纯调系统时间不一定能改变结果。\n- 如果不满意箱子内容，可以通过存档/读档，触发打怪等随机行为后再存档开箱，直到满意为止。\n\n> 来源：快吧攻略（c6）\n\n---\n\n**总结**：最实用的方法是**调系统时间重置任务**，配合**开局循环放弃武器任务**的方法，可以高效刷出大量箱子。",
+        "application_marker_occurrences": [],
+        "application_references": [],
+        "application_sse_answer_equals_persisted": true,
+        "application_answer_equals_p9_report_raw_answer": true,
+        "offline_redecode_of_already_decoded_sse": {
+          "text_unchanged": true,
+          "used_handles": [],
+          "invalid_handles": [],
+          "limitation": "This is an idempotence check on application output; not a provider replay."
+        },
+        "context_candidate_count": 9,
+        "context_sha256": "d3ce582abefa82b8f2aeba3cc8e18fefd4e13ed9c3c3de5d3204d1cd58edbcbb",
+        "context_source_handles": [
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "c5",
+          "c6",
+          "c7",
+          "c8",
+          "c9"
+        ],
+        "wire_contains_enabled_citation_protocol": true,
+        "wire_contains_exact_ref_protocol": true,
+        "root_cause": "UNRESOLVED_MISSING_PREDECODE_PROVIDER_OUTPUT",
+        "minimum_fix_recommendation": "NO_PRODUCTION_CHANGE_WITHOUT_CAUSAL_EVIDENCE"
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "run_id": "8796ce53-cca1-4086-a0e6-89ff1b2cf1bb",
+        "question": "在基于立体卫星影像的DSM生产作业中，影像星下点的分辨率应该满足什么要求？",
+        "application_messages": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\7bcc1fbe136343f72286ff25-messages.json",
+          "sha256": "1d19fa7eb7f56195de664dff074108a405b4731eb00283a349a905342122b056",
+          "bytes": 1600
+        },
+        "application_sse": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\queries\\7bcc1fbe136343f72286ff25.sse",
+          "sha256": "24627e77376d0d939a70f297c33c2850c64525c6602771516d26c74b2d097bec",
+          "bytes": 39750
+        },
+        "capture": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\captures\\8acef2e482bea2ee19f367de4acef7729f09f6e44a47dadc71d5f8ea19a44b8b.json",
+          "sha256": "540e728c86bd288174a7020b5ba562d86ab356cd38b071d57adaf9b180873b7f",
+          "bytes": 83609
+        },
+        "actual_provider_request": {
+          "path": "E:\\WK\\run\\p9-20261016\\baseline\\provider-requests\\465018f03323038fd21d7a940a4c939b0be3742f049694c3054c9c512464b75f.json",
+          "sha256": "80e11306d29cda13a72066142ac2c329d627a2cfb1f996371cddb1906dfb5e8a",
+          "bytes": 18769
+        },
+        "provider_response": {
+          "path": null,
+          "sha256": null,
+          "status": "NOT_CAPTURED",
+          "original_output_has_valid_marker": "UNKNOWN",
+          "raw_to_decoded_difference": "NOT_COMPARABLE"
+        },
+        "provider_finish_reason": "stop",
+        "provider_record_keys": [
+          "body",
+          "boundary",
+          "capability",
+          "finish_reason",
+          "headers_saved",
+          "model",
+          "parsed_final_observed",
+          "parsed_usage",
+          "provider",
+          "request_id",
+          "run_id",
+          "schema",
+          "stage",
+          "state",
+          "status_code",
+          "wire_bytes",
+          "wire_sha256"
+        ],
+        "application_answer": "## 答案\n\n根据标准规定，卫星影像星下点的分辨率应**优于 5m**。\n\n该要求出自标准第 6.1.1 条\"卫星影像资料\"中的选择要求：\n\n> a）影像星下点的分辨率应优于 5m；\n\n这是基于立体测图能力的卫星影像数据的基本要求之一，确保影像能够提供足够的立体信息来生成数字表面模型（DSM）。",
+        "application_marker_occurrences": [],
+        "application_references": [],
+        "application_sse_answer_equals_persisted": true,
+        "application_answer_equals_p9_report_raw_answer": true,
+        "offline_redecode_of_already_decoded_sse": {
+          "text_unchanged": true,
+          "used_handles": [],
+          "invalid_handles": [],
+          "limitation": "This is an idempotence check on application output; not a provider replay."
+        },
+        "context_candidate_count": 8,
+        "context_sha256": "37e093367750e5091602845bcbde33c1efe141f55eb608f766c69948cd4a4085",
+        "context_source_handles": [
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "c5",
+          "c6",
+          "c7",
+          "c8"
+        ],
+        "wire_contains_enabled_citation_protocol": true,
+        "wire_contains_exact_ref_protocol": true,
+        "root_cause": "UNRESOLVED_MISSING_PREDECODE_PROVIDER_OUTPUT",
+        "minimum_fix_recommendation": "NO_PRODUCTION_CHANGE_WITHOUT_CAUSAL_EVIDENCE"
+      }
+    ],
+    "synthetic_decoder_checks": [
+      {
+        "name": "valid_ref",
+        "split_positions": 20,
+        "result": "PASS",
+        "synthetic": true,
+        "used_handles": [
+          "c1"
+        ]
+      },
+      {
+        "name": "no_marker",
+        "split_positions": 6,
+        "result": "PASS",
+        "synthetic": true,
+        "used_handles": []
+      },
+      {
+        "name": "fabricated_handle",
+        "split_positions": 22,
+        "result": "PASS",
+        "synthetic": true,
+        "used_handles": []
+      },
+      {
+        "name": "model_written_public_tag",
+        "split_positions": 52,
+        "result": "PASS",
+        "synthetic": true,
+        "used_handles": []
+      }
+    ],
+    "source_files": [
+      {
+        "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\weknora_port_p9_observed_api.py",
+        "sha256": "f408a4faa88116b30a674d826217a5b1f64449c616f97c47afeb93881681e747",
+        "bytes": 5382
+      },
+      {
+        "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\weknora_port_p8_observed_api.py",
+        "sha256": "27ede896c5e3f3d468293a305f1060977e5370ba0f43fa31073f55d2f29f4fa5",
+        "bytes": 3063
+      },
+      {
+        "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\references\\decoder.py",
+        "sha256": "07758203ad12bd946df12d72d68c2c82639cc15d0ece808d30cefa7908b6b5c1",
+        "bytes": 2857
+      },
+      {
+        "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\references\\registry.py",
+        "sha256": "40bbc2e2d047020458b22a6637e836f4d280ffb7f93d90794e9cff5be40ee4e1",
+        "bytes": 17649
+      },
+      {
+        "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\generation\\coordinator.py",
+        "sha256": "d84f4a0a250abdd28fb462af60f239f1cac7b9272b1ad87073ac09b61836ae4f",
+        "bytes": 26666
+      }
+    ],
+    "network_calls": 0,
+    "database_calls": 0,
+    "model_calls": 0,
+    "production_changes": [],
+    "next_test_plan": [
+      "Freeze these four decoded outputs and their Context/source identity maps; keep the historical baseline immutable.",
+      "Add offline tests for canonical valid ref, absent ref, fabricated ref, uncitable/history-only handle, public tag injection, and split boundaries. Do not infer citations from Context presence.",
+      "If future separately authorized provider collection is needed, record predecoder response bytes/deltas, exact registry snapshot, channel ordering, finish_reason and application output. Hash both sides; exclude headers/credentials. Never relabel future runs as historical causes.",
+      "Any proposed citation completion must first be a separately versioned offline candidate on frozen samples; require claim-to-source support and valid KB/document/version/hash/offset evidence, include unsupported/no-evidence/JSON-format counterexamples, no production enablement."
+    ],
+    "ragflow_reference": "Local docs/reviews/rag-reference-adaptation.md pins v0.27.2 retrieval comparison only. No local RAGFlow citation implementation was identified in E:/RAG-reference; no citation algorithm was imported and no web request was needed for this diagnostic."
+  },
+  "existing_ocr_result": {
+    "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\evaluation\\P16_TITLE_OCR_ASSOCIATION.results.json",
+    "sha256": "4dded071e3aec2399b35ad09a2fedac7e8d4c1c90fd4235f5d372cdbb81ed1e1",
+    "reused": true,
+    "recognized_title": "Coding time!",
+    "reliable_cross_page_association": false,
+    "new_ocr_calls": 0,
+    "new_rerank_calls": 0
+  },
+  "references": {
+    "litellm": [
+      {
+        "commit": "7c49197f29d136bdde0b997aead2a8486d79d72d",
+        "path": "litellm/types/rerank.py",
+        "url": "https://raw.githubusercontent.com/BerriAI/litellm/7c49197f29d136bdde0b997aead2a8486d79d72d/litellm/types/rerank.py",
+        "sha256": "511dd1b3487f91362d4841c7b7ac69d62e20fc4ded0685c374c946a976c97315"
+      }
+    ],
+    "ragflow": {
+      "ref": "v0.27.2",
+      "path": "rag/nlp/search.py",
+      "url": "https://raw.githubusercontent.com/infiniflow/ragflow/v0.27.2/rag/nlp/search.py",
+      "sha256": "e11c2aa749db1a44d0698f3cdda9b85c0519a5919e05d173fec793dfca3b9387"
+    }
+  },
+  "commands": [
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest tests/weknora_port/test_siliconflow_rerank_usage.py tests/weknora_port/test_provider_usage.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_provider_stream.py -q --tb=short -p no:cacheprovider --basetemp E:/WK/run/p16-common-20261016/unit-final",
+      "exitcode": 0,
+      "result": "104 passed in1.35s",
+      "log": "E:\\WK\\run\\p16-common-20261016\\unit-final.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p16-common-20261016/citations/diagnose.py",
+      "exitcode": 0,
+      "result": "4 application evidence reconciliations;100 synthetic split positions",
+      "log": "E:\\WK\\run\\p16-common-20261016\\citations\\diagnose.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p16-common-20261016/ledger-audit.py",
+      "exitcode": 0,
+      "result": "original account/month/calls and UNKNOWN unchanged",
+      "log": "E:\\WK\\run\\p16-common-20261016\\ledger-audit.log"
+    }
+  ],
+  "ledger_preservation": {
+    "status": "PASS",
+    "identity": {
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382"
+    },
+    "equal_to_p14_closed": true,
+    "counts": {
+      "ledger": 618,
+      "unknown": 61,
+      "reserved": 0,
+      "months": 1,
+      "deepseek-calls": 2,
+      "deepseek-months": 1
+    },
+    "snapshot_sha256": {
+      "ledger": "f6d8502c6bc3bcc60f7540d3e42909bef705ecf7117f3ba5c3f4a23bbf962b51",
+      "months": "34a549c7e74f41db6710efe94489e45de1b517e290b9885b30918d99db1efb58",
+      "deepseek-calls": "9389f05a8fcfa000d1b026498e0a9889683964d7276659dfb9568ccea31f1269",
+      "deepseek-months": "fba3ca45c355e011d8d8eaf8a137d6eddd27f68bd5da60926e4e0f7fc667d7bc"
+    },
+    "new_provider_calls": 0,
+    "new_token_occupancy": 0,
+    "read_only": true
+  },
+  "provider_calls": "NOT_RUN",
+  "new_provider_tokens": 0,
+  "new_unknown": 0,
+  "new_real_model_requests": 0,
+  "historical_evidence_unchanged": true,
+  "raw_fixture_replay_is_not_new_model_quality_validation": true,
+  "evidence_sha256": {
+    "E:\\WK\\run\\p16-common-20261016\\deliver-v2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "E:\\WK\\run\\p16-common-20261016\\deliver-v2.py": "6082671f2e14684c450eda1e0de83b7c3a3987799b9fad1c939058e6070793d1",
+    "E:\\WK\\run\\p16-common-20261016\\deliver.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "E:\\WK\\run\\p16-common-20261016\\deliver.log": "2b47e14dba822f2da8998cfb1cc859d09b3a1ff05a154dcdfc3180c03996565e",
+    "E:\\WK\\run\\p16-common-20261016\\deliver.py": "8937c3d4b3da2e2897e938427455ae2745981e71734106dc3cd3bee2a96a21d4",
+    "E:\\WK\\run\\p16-common-20261016\\ledger-audit.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-common-20261016\\ledger-audit.log": "c4f74b9fb09949d41544f84458c4df8cff2db2a91e78bdffac23cab8749e0729",
+    "E:\\WK\\run\\p16-common-20261016\\ledger-audit.py": "21620378353a8e4f4e5c31f51aa22cc2f434a86b9806b5e894a28d625e2bbf9d",
+    "E:\\WK\\run\\p16-common-20261016\\ledger-preservation.json": "87bbf936e958e91ce674054747234035d828c72d3a998abbf9920e4c27d33a68",
+    "E:\\WK\\run\\p16-common-20261016\\unit-final.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-common-20261016\\unit-final.log": "59720a351bf71cbfadf5ab1ed73463619687ea4417d0e953d1f08b56cc81730e",
+    "E:\\WK\\run\\p16-common-20261016\\unit.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-common-20261016\\unit.log": "79fcb6720a961d5e7e3c535b39cdc578c9c5ef289c521b8975ff9de15aeba55c",
+    "E:\\WK\\run\\p16-common-20261016\\citations\\diagnose-first-fixture-expectation-failure.log": "2f0a1dd63ae9206de6086f8c774d12c5d1c53607a10992b4111eaca1978c9643",
+    "E:\\WK\\run\\p16-common-20261016\\citations\\diagnose.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-common-20261016\\citations\\diagnose.log": "be2df8d1d9f2c35234c18501626424f980a666b3389358029c4da5a53bf302b4",
+    "E:\\WK\\run\\p16-common-20261016\\citations\\diagnose.py": "c2d7ec044cb2f2135b0165f9282db0b2dfc407f5233a8f0f961a8f75fa90ac44",
+    "E:\\WK\\run\\p16-common-20261016\\citations\\diagnosis.json": "e13a8adec534c2421f077d98e99b7a62600067a0eb92ad5fb8bbecdf611ab45c",
+    "E:\\WK\\run\\p16-common-20261016\\citations\\diagnosis.md": "a202ab19021dc619945638f7f04c8dcbf66919fab5bdb7608b9d3b27435320fb",
+    "E:\\WK\\run\\p16-common-20261016\\references\\litellm-litellm_types_rerank.py": "511dd1b3487f91362d4841c7b7ac69d62e20fc4ded0685c374c946a976c97315",
+    "E:\\WK\\run\\p16-common-20261016\\references\\litellm-source-manifest.json": "dac380d34ebc654b31ea7ccdecb965f3b554557745f81d3948be9150f17dfed4",
+    "E:\\WK\\run\\p16-common-20261016\\references\\ragflow-source-manifest.json": "665a1c8d9c0f1df9dfaac3e106186163823b057dd358af5266a4e15a529db57f",
+    "E:\\WK\\run\\p16-common-20261016\\references\\ragflow-v0.27.2-search.py": "e11c2aa749db1a44d0698f3cdda9b85c0519a5919e05d173fec793dfca3b9387"
+  }
+}
