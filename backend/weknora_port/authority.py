@@ -1,7 +1,7 @@
 """Shared trusted assembly. Synthetic mode is inseparable from closed HTTP.
 
 No prices, credentials, default grants, dynamic module loaders or live recipe
-claims. Approved hosted meters remain explicitly unsupported and fail closed.
+claims. Approved hosted meters require explicit provider/account configuration.
 """
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -96,11 +96,25 @@ def load_authority_settings(path):
         obj['carry_source'], tuple(tuple(m) for m in models), obj['input_limit'], obj['output_limit'])
 
 
+def _approved_provider_limit_valid(provider, limit):
+    # SiliconFlow uses an explicit finite run fence, not an owner quota grant.
+    # DeepSeek retains the owner's fixed cumulative token limit.
+    return (type(limit) is int and limit > 0
+            and (provider == 'siliconflow' or provider == 'deepseek' and limit == 1_000_000))
+
+
+def _approved_models_match_provider(models, provider):
+    return (isinstance(models, (list, tuple)) and bool(models)
+            and all(isinstance(model, (list, tuple)) and len(model) == 2
+                    and model[0] == provider and isinstance(model[1], str) and bool(model[1])
+                    for model in models))
+
+
 def _load_approved(obj, raw, names):
     """Approved hosted-meter config. Fail-closed.
 
     Requires a real (non-synthetic) identity, a verified hash-pinned meter asset
-    with a known recipe, a ledger-referenced carry-in, and a known provider limit.
+    with a known recipe, a ledger-referenced carry-in, and a valid provider fence.
     Missing/unknown inputs refuse here, so approved mode is not "config only".
     """
     if set(obj) != names:
@@ -108,7 +122,7 @@ def _load_approved(obj, raw, names):
     provider = obj['provider']
     if not isinstance(provider, str) or not provider:
         raise ProviderError('AUTHORITY_CONFIG_INVALID')
-    if provider != 'deepseek' or obj['limit_tokens'] != 1_000_000:
+    if not _approved_provider_limit_valid(provider, obj['limit_tokens']):
         raise ProviderError('APPROVED_PROVIDER_LIMIT_UNKNOWN')
     for k in ('tenant_id', 'input_limit', 'output_limit', 'limit_tokens', 'carry_in_tokens'):
         if type(obj[k]) is not int or obj[k] < (0 if k == 'carry_in_tokens' else 1):
@@ -142,6 +156,8 @@ def _load_approved(obj, raw, names):
     if not isinstance(models, list) or not models or any(not isinstance(m, list) or len(m) != 2
             or any(not isinstance(s, str) or not s for s in m) for m in models):
         raise ProviderError('AUTHORITY_MODELS_REQUIRED')
+    if not _approved_models_match_provider(models, provider):
+        raise ProviderError('APPROVED_MODEL_PROVIDER_MISMATCH')
     expires = datetime.fromisoformat(obj['expires_at'])
     if expires.tzinfo is None or expires <= datetime.now(timezone.utc):
         raise ProviderError('AUTHORITY_EXPIRED')
@@ -214,7 +230,8 @@ class ApprovedTokenAuthority:
     """
     def __init__(self, settings):
         if (not isinstance(settings, AuthoritySettings) or settings.mode != 'approved'
-                or settings.provider != 'deepseek' or settings.limit_tokens != 1_000_000
+                or not _approved_provider_limit_valid(settings.provider, settings.limit_tokens)
+                or not _approved_models_match_provider(settings.allowed_models, settings.provider)
                 or type(settings.carry_in_tokens) is not int or settings.carry_in_tokens < 0
                 or settings.carry_status not in ('KNOWN', 'UNKNOWN')
                 or settings.carry_status == 'UNKNOWN' and settings.carry_in_tokens == 0
@@ -232,6 +249,7 @@ class ApprovedTokenAuthority:
         if (not isinstance(facts, BoundCallFacts) or facts.config_sha != cfg.config_sha
                 or facts.simulated or facts.sources.wire_sha256 != call.wire_sha256
                 or call.context.scope.owner_id != cfg.subject_id
+                or call.provider != cfg.provider
                 or (call.provider, call.model) not in cfg.allowed_models):
             raise ProviderError('MODEL_BOUND_FACTS_REQUIRED')
         return facts

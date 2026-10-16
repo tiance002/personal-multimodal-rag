@@ -17,7 +17,7 @@ from backend.weknora_port.source_facts import (
     BoundCallFacts, OperationSlot, SourceFacts, SourceSlice, TokenReservationBound,
     bind_wire_facts, build_call_sources, measure_final_input, sha)
 
-ROOT = __import__('pathlib').Path('E:/WK/run')/'authority-approved-20261015'
+ROOT = __import__('pathlib').Path('E:/WK/run/mvp-20261016')/'authority-approved'
 
 
 def _paths():
@@ -74,7 +74,9 @@ def test_approved_loader_accepts_real_verified_config():
     ('carry_source', 'synthetic-new-empty-account', 'APPROVED_CARRY_SOURCE_UNTRUSTED'),
     ('carry_status', 'UNKNOWN', 'APPROVED_CARRY_BOUND_REQUIRED'),
     ('limit_tokens', 999_999, 'APPROVED_PROVIDER_LIMIT_UNKNOWN'),
-    ('provider', 'siliconflow', 'APPROVED_PROVIDER_LIMIT_UNKNOWN'),
+    # Changing only the provider leaves DeepSeek models in the config: reject
+    # this mixed identity even though SiliconFlow itself is now authorized.
+    ('provider', 'siliconflow', 'APPROVED_MODEL_PROVIDER_MISMATCH'),
     ('expires_at', '2020-01-01T00:00:00+00:00', 'AUTHORITY_EXPIRED'),
 ])
 def test_approved_loader_fail_closed(field, value, code):
@@ -174,5 +176,49 @@ def test_configured_synthetic_authority_still_refuses_approved_settings():
 def test_approved_authority_requires_a_real_meter_asset():
     settings = _approved_settings()
     broken = AuthoritySettings(**{**settings.__dict__, 'meter': None})
+    with pytest.raises(ProviderError, match='TOKEN_MONTH_AUTHORITY_REQUIRED'):
+        ApprovedTokenAuthority(broken)
+
+
+def test_approved_siliconflow_uses_explicit_account_and_run_fence():
+    models = [['siliconflow', name] for name in ('BAAI/bge-m3', 'BAAI/bge-reranker-v2-m3', 'Xing')]
+    settings = _approved_settings(provider='siliconflow', account_id='sf-account-main',
+        allowed_models=models, limit_tokens=250_000)
+    authority = ApprovedTokenAuthority(settings)
+    for _, model in models:
+        call = _call(settings, provider='siliconflow', model=model)
+        authority.validate(call)
+        monthly = authority.monthly(call)
+        assert monthly.provider == 'siliconflow' and monthly.account_id == 'sf-account-main'
+        assert monthly.limit_tokens == 250_000
+    with pytest.raises(ProviderError, match='MODEL_BOUND_FACTS_REQUIRED'):
+        authority.validate(_call(settings))
+
+
+@pytest.mark.parametrize('provider,models', [
+    ('siliconflow', (('siliconflow', 'BAAI/bge-m3'), ('deepseek', 'deepseek-flash'))),
+    ('deepseek', (('deepseek', 'deepseek-flash'), ('siliconflow', 'BAAI/bge-m3'))),
+])
+def test_approved_rejects_mixed_provider_models_at_load_and_init(provider, models):
+    with pytest.raises(ProviderError, match='APPROVED_MODEL_PROVIDER_MISMATCH'):
+        _approved_settings(provider=provider, allowed_models=[list(model) for model in models])
+    settings = _approved_settings()
+    broken = AuthoritySettings(**{**settings.__dict__, 'provider': provider, 'allowed_models': models})
+    with pytest.raises(ProviderError, match='TOKEN_MONTH_AUTHORITY_REQUIRED'):
+        ApprovedTokenAuthority(broken)
+
+
+@pytest.mark.parametrize('provider,limit', [
+    ('deepseek', 999_999), ('deepseek', 1_000_001),
+    ('siliconflow', 0), ('siliconflow', -1), ('siliconflow', True),
+    ('siliconflow', 250_000.0), ('siliconflow', '250000'),
+])
+def test_approved_rejects_invalid_provider_fences_at_load_and_init(provider, limit):
+    models = [[provider, 'deepseek-flash' if provider == 'deepseek' else 'BAAI/bge-m3']]
+    with pytest.raises(ProviderError, match='APPROVED_PROVIDER_LIMIT_UNKNOWN'):
+        _approved_settings(provider=provider, allowed_models=models, limit_tokens=limit)
+    settings = _approved_settings()
+    broken = AuthoritySettings(**{**settings.__dict__, 'provider': provider,
+        'allowed_models': tuple(tuple(model) for model in models), 'limit_tokens': limit})
     with pytest.raises(ProviderError, match='TOKEN_MONTH_AUTHORITY_REQUIRED'):
         ApprovedTokenAuthority(broken)
