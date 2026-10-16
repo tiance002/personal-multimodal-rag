@@ -1,0 +1,560 @@
+{
+  "schema": "p16-title-ocr-association-validation/v1",
+  "status": "P16_COMPLETE_STOP_NO_RELIABLE_SECTION_LINK",
+  "source_sha": "5bc48ba149f7212c7e89cb9621bbd1103dac2b2a",
+  "real_ocr": {
+    "schema": "p16-real-local-ocr/v1",
+    "source_sha": "5bc48ba149f7212c7e89cb9621bbd1103dac2b2a",
+    "adapter": "backend.weknora_port.tesseract_ocr.TesseractOCR.recognize",
+    "adapter_sha256": "7a7ab41b146bdc97869759a7242eb9e623be6843fa56a8e0910eb96010a87266",
+    "real_local_ocr_calls": 1,
+    "new_provider_requests": 0,
+    "new_provider_tokens": 0,
+    "new_unknown": 0,
+    "configuration": {
+      "language": "eng+chi_sim",
+      "dpi": 150,
+      "full": true,
+      "tessdata": "E:\\WK\\deps\\tessdata",
+      "traineddata_sha256": {
+        "eng.traineddata": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+        "chi_sim.traineddata": "a5fcb6f0db1e1d6d8522f39db4e848f05984669172e584e8d76b6b3141e1f730"
+      },
+      "pymupdf": "1.26.4",
+      "pillow": "12.3.0"
+    },
+    "input": {
+      "document_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+      "source_version": "03f5a072-4021-4aca-9233-2dca910614f2",
+      "kb_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "source_pdf_path": "E:\\WK\\run\\p11-real-20261016\\B\\assets\\332\\7f1d720d-9561-446f-a8cc-6a562c339d23\\4019d2aa-c21d-42c2-8e8f-4d5aee4039ce\\03f5a072-4021-4aca-9233-2dca910614f2\\original\\catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+      "source_pdf_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+      "image_path": "E:\\WK\\run\\p11-real-20261016\\B\\assets\\332\\7f1d720d-9561-446f-a8cc-6a562c339d23\\4019d2aa-c21d-42c2-8e8f-4d5aee4039ce\\03f5a072-4021-4aca-9233-2dca910614f2\\assets\\0032-63478a34-6faa-411e-a921-0c959446bc77-page_32_image_0.jpg",
+      "image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+      "image_dimensions": {
+        "width": 1753,
+        "height": 1277
+      },
+      "middle_path": "E:\\WK\\run\\p11-real-20261016\\B\\assets\\332\\7f1d720d-9561-446f-a8cc-6a562c339d23\\4019d2aa-c21d-42c2-8e8f-4d5aee4039ce\\03f5a072-4021-4aca-9233-2dca910614f2\\assets\\0070-9e6b2e8b-9fcf-4a9e-b3ff-143175d6d98f-middle_json.json",
+      "middle_sha256": "968553ee60df473d352a53b993d3e9a40a65f09a0f1eecb12df008cee1969085",
+      "middle_pointer": "/pages/32/blocks/0/content/0",
+      "logical_path": "images/page_32_image_0.jpg",
+      "physical_page": 33,
+      "normalized_image_bbox": [
+        0.113,
+        0.07,
+        0.934,
+        0.868
+      ],
+      "page_dimensions_points": {
+        "width": 768,
+        "height": 576
+      }
+    },
+    "raw_ocr": {
+      "text": "a\nGj\nCoding time!\nies\nSyt,\nREx\nab\nour ingredients...\nad",
+      "layout": {
+        "schema": "image-ocr-layout-v1",
+        "coordinate_basis": "image-pixels-top-left",
+        "lines": [
+          {
+            "text": "a",
+            "bbox": [
+              1285.3199869791665,
+              20.472941080729164,
+              1305.7482096354165,
+              40.325986226399735
+            ],
+            "start": 0,
+            "end": 1
+          },
+          {
+            "text": "Gj",
+            "bbox": [
+              234.15985107421875,
+              20.47296142578125,
+              344.20218912760413,
+              240.7777099609375
+            ],
+            "start": 2,
+            "end": 4
+          },
+          {
+            "text": "Coding time!",
+            "bbox": [
+              1095.3050944010415,
+              20.47296142578125,
+              1737.13330078125,
+              240.7777099609375
+            ],
+            "start": 5,
+            "end": 17
+          },
+          {
+            "text": "ies",
+            "bbox": [
+              228.40181477864581,
+              233.52001953125,
+              751.4419759114583,
+              526.8327229817708
+            ],
+            "start": 18,
+            "end": 21
+          },
+          {
+            "text": "Syt,",
+            "bbox": [
+              185.5364990234375,
+              476.63688151041663,
+              1057.8395182291665,
+              859.6084798177083
+            ],
+            "start": 22,
+            "end": 26
+          },
+          {
+            "text": "REx",
+            "bbox": [
+              683.9258626302083,
+              662.8131103515625,
+              1340.9169921875,
+              975.9788411458333
+            ],
+            "start": 27,
+            "end": 30
+          },
+          {
+            "text": "ab",
+            "bbox": [
+              1012.7733561197916,
+              909.7685546875,
+              1414.4597981770833,
+              1187.0707194010415
+            ],
+            "start": 31,
+            "end": 33
+          },
+          {
+            "text": "our ingredients...",
+            "bbox": [
+              19.833211263020832,
+              909.7685546875,
+              927.8617350260416,
+              1215.7041829427083
+            ],
+            "start": 34,
+            "end": 52
+          },
+          {
+            "text": "ad",
+            "bbox": [
+              1191.272216796875,
+              1095.3050944010415,
+              1192.4749348958333,
+              1215.7041829427083
+            ],
+            "start": 53,
+            "end": 55
+          }
+        ]
+      },
+      "error": ""
+    },
+    "mapped_lines": [
+      {
+        "text": "a",
+        "bbox": [
+          1285.3199869791665,
+          20.472941080729164,
+          1305.7482096354165,
+          40.325986226399735
+        ],
+        "start": 0,
+        "end": 1,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.7149667480375903,
+          0.08279358416791063,
+          0.7245341016033525,
+          0.0951997940553383
+        ],
+        "page_bbox_points_approx": [
+          549.0944624928693,
+          47.68910448071652,
+          556.4421900313747,
+          54.83508137587486
+        ]
+      },
+      {
+        "text": "Gj",
+        "bbox": [
+          234.15985107421875,
+          20.47296142578125,
+          344.20218912760413,
+          240.7777099609375
+        ],
+        "start": 2,
+        "end": 4,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.2226664219805668,
+          0.0827935968815767,
+          0.27420364932901486,
+          0.22046250003823661
+        ],
+        "page_bbox_points_approx": [
+          171.00781208107531,
+          47.68911180378818,
+          210.58840268468342,
+          126.98640002202428
+        ]
+      },
+      {
+        "text": "Coding time!",
+        "bbox": [
+          1095.3050944010415,
+          20.47296142578125,
+          1737.13330078125,
+          240.7777099609375
+        ],
+        "start": 5,
+        "end": 17,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.6259751754154336,
+          0.0827935968815767,
+          0.926568990268914,
+          0.22046250003823661
+        ],
+        "page_bbox_points_approx": [
+          480.74893471905295,
+          47.68911180378818,
+          711.604984526526,
+          126.98640002202428
+        ]
+      },
+      {
+        "text": "ies",
+        "bbox": [
+          228.40181477864581,
+          233.52001953125,
+          751.4419759114583,
+          526.8327229817708
+        ],
+        "start": 18,
+        "end": 21,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.2199697033275917,
+          0.21592715394356893,
+          0.464930326425161,
+          0.39921888248978316
+        ],
+        "page_bbox_points_approx": [
+          168.93673215559042,
+          124.3740406714957,
+          357.0664906945237,
+          229.9500763141151
+        ]
+      },
+      {
+        "text": "Syt,",
+        "bbox": [
+          185.5364990234375,
+          476.63688151041663,
+          1057.8395182291665,
+          859.6084798177083
+        ],
+        "start": 22,
+        "end": 26,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.19989416183584838,
+          0.36785139502373726,
+          0.608428547898543,
+          0.6071711565344802
+        ],
+        "page_bbox_points_approx": [
+          153.51871628993155,
+          211.88240353367266,
+          467.273124786081,
+          349.7305861638606
+        ]
+      },
+      {
+        "text": "REx",
+        "bbox": [
+          683.9258626302083,
+          662.8131103515625,
+          1340.9169921875,
+          975.9788411458333
+        ],
+        "start": 27,
+        "end": 30,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.43330983070131257,
+          0.4841933140646413,
+          0.7410050488225542,
+          0.6798912413738254
+        ],
+        "page_bbox_points_approx": [
+          332.78194997860805,
+          278.8953489012334,
+          569.0918774957216,
+          391.6173550313234
+        ]
+      },
+      {
+        "text": "ab",
+        "bbox": [
+          1012.7733561197916,
+          909.7685546875,
+          1414.4597981770833,
+          1187.0707194010415
+        ],
+        "start": 31,
+        "end": 33,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.5873222620503987,
+          0.6385162933755875,
+          0.7754480857406648,
+          0.8118030024134935
+        ],
+        "page_bbox_points_approx": [
+          451.06349725470625,
+          367.7853849843384,
+          595.5441298488306,
+          467.59852939017225
+        ]
+      },
+      {
+        "text": "our ingredients...",
+        "bbox": [
+          19.833211263020832,
+          909.7685546875,
+          927.8617350260416,
+          1215.7041829427083
+        ],
+        "start": 34,
+        "end": 52,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.12228868593664581,
+          0.6385162933755875,
+          0.5475547543961097,
+          0.8296961143212853
+        ],
+        "page_bbox_points_approx": [
+          93.91771079934398,
+          367.7853849843384,
+          420.52205137621223,
+          477.9049618490603
+        ]
+      },
+      {
+        "text": "ad",
+        "bbox": [
+          1191.272216796875,
+          1095.3050944010415,
+          1192.4749348958333,
+          1215.7041829427083
+        ],
+        "start": 53,
+        "end": 55,
+        "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+        "pdf_page": 33,
+        "pdf_page_idx": 32,
+        "page_bbox_normalized_approx": [
+          0.670920416423408,
+          0.7544584693281371,
+          0.6714836974041524,
+          0.8296961143212853
+        ],
+        "page_bbox_points_approx": [
+          515.2668798131774,
+          434.56807833300695,
+          515.699479606389,
+          477.9049618490603
+        ]
+      }
+    ],
+    "seconds": 0.45526339998468757,
+    "coordinate_caveat": "Crop pixels exact in OCR layout. Page projection uses existing rounded MinerU bbox; approximate, not pixel-exact original PDF geometry.",
+    "source_version_not_mutated": true,
+    "gold_loaded": false,
+    "manual_title_added": false,
+    "image_preprocessing": false
+  },
+  "recognized_title_line": {
+    "text": "Coding time!",
+    "bbox": [
+      1095.3050944010415,
+      20.47296142578125,
+      1737.13330078125,
+      240.7777099609375
+    ],
+    "start": 5,
+    "end": 17,
+    "source_image_sha256": "3a48bfaa8438f3b680ab11200f15b027a430552fcf9d96136d4d258c61cc17a0",
+    "pdf_page": 33,
+    "pdf_page_idx": 32,
+    "page_bbox_normalized_approx": [
+      0.6259751754154336,
+      0.0827935968815767,
+      0.926568990268914,
+      0.22046250003823661
+    ],
+    "page_bbox_points_approx": [
+      480.74893471905295,
+      47.68911180378818,
+      711.604984526526,
+      126.98640002202428
+    ]
+  },
+  "recognition_result": "EXACT_TEXT_OBSERVED_IN_REAL_LOCAL_OCR_NOT_MANUALLY_ADDED",
+  "heading_role": "NOT_CLASSIFIED_BY_EXISTING_OCR",
+  "confidence": "NOT_EXPOSED_BY_EXISTING_ADAPTER; no numeric confidence/accuracy claim",
+  "section_association": {
+    "status": "NOT_ESTABLISHED",
+    "source": "P15 complete saved middle/structured/model output audit plus currentOCRlayout",
+    "reasons": [
+      "OCR gives text and line geometry only, no heading level/section/parent/boundary identity",
+      "Existing MinerU outputs have no explicit missing chapter link from page33 to dataset evidence",
+      "SamePDF/version and next-page order are provenance, not proof of section membership"
+    ],
+    "no_adjacent_page_inference": true
+  },
+  "rerank": {
+    "status": "NOT_RUN",
+    "physical_calls": 0,
+    "reason": "Owner requires reliable title AND section association; second condition not met",
+    "scores": null
+  },
+  "usage": {
+    "real_local_ocr_calls": 1,
+    "new_provider_requests": 0,
+    "new_provider_tokens": 0,
+    "new_unknown": 0,
+    "new_fence_opened": false
+  },
+  "verification": {
+    "status": "PASS",
+    "real_local_ocr_calls": 1,
+    "ocr_lines_with_valid_source_ranges": 9,
+    "ocr_geometry_exact_in_crop": true,
+    "page_projection_approximate": true,
+    "p15_original_pdf_and_structured_inputs_unchanged": true,
+    "p14_evidence_unchanged": true,
+    "inherited_files_unchanged": 378,
+    "production_files_unchanged": 567,
+    "script_sha256": "d64ceb2ceee2b4b4310f3a55cab3f7ac9e5c3d850892da70207d460718bcaa29",
+    "source_sha": "5bc48ba149f7212c7e89cb9621bbd1103dac2b2a"
+  },
+  "ledger_preservation": {
+    "status": "PASS",
+    "identity": {
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382"
+    },
+    "equal_to_p14_closed": true,
+    "counts": {
+      "ledger": 618,
+      "unknown": 61,
+      "reserved": 0,
+      "months": 1,
+      "deepseek-calls": 2,
+      "deepseek-months": 1
+    },
+    "snapshot_sha256": {
+      "ledger": "f6d8502c6bc3bcc60f7540d3e42909bef705ecf7117f3ba5c3f4a23bbf962b51",
+      "months": "34a549c7e74f41db6710efe94489e45de1b517e290b9885b30918d99db1efb58",
+      "deepseek-calls": "9389f05a8fcfa000d1b026498e0a9889683964d7276659dfb9568ccea31f1269",
+      "deepseek-months": "fba3ca45c355e011d8d8eaf8a137d6eddd27f68bd5da60926e4e0f7fc667d7bc"
+    },
+    "new_provider_calls": 0,
+    "new_token_occupancy": 0,
+    "read_only": true
+  },
+  "commands": [
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B scripts/weknora_port_p16_title_ocr.py --output E:/WK/run/p16-20261016/ocr-page33.json",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p16-20261016\\ocr-page33.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p16-20261016/verify.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p16-20261016\\verify.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p16-20261016/ledger-audit.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p16-20261016\\ledger-audit.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p16-20261016/deliver.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p16-20261016\\deliver.log"
+    }
+  ],
+  "production_changes": [],
+  "gold_used": false,
+  "evidence_sha256": {
+    "E:\\WK\\run\\p16-20261016\\deliver.log": "5d298e2a60ebf91e26838744b37bf9c8458e5944c57df4533703db0ca40a672b",
+    "E:\\WK\\run\\p16-20261016\\deliver.py": "9842fae408defebdbdaefcf671d3288fc7408af9b770e8c937d91101d682d272",
+    "E:\\WK\\run\\p16-20261016\\ledger-audit.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-20261016\\ledger-audit.log": "c4f74b9fb09949d41544f84458c4df8cff2db2a91e78bdffac23cab8749e0729",
+    "E:\\WK\\run\\p16-20261016\\ledger-audit.py": "6b376f88f27b03e12d274a19a9d1c2b63fd78285268b7f238055a904df295e07",
+    "E:\\WK\\run\\p16-20261016\\ledger-preservation.json": "87bbf936e958e91ce674054747234035d828c72d3a998abbf9920e4c27d33a68",
+    "E:\\WK\\run\\p16-20261016\\ocr-page33.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-20261016\\ocr-page33.json": "56a38bafda7cdb1286a5015ca8d4ca0fff1a7e0574873b31c760a7ebdeafa1b8",
+    "E:\\WK\\run\\p16-20261016\\ocr-page33.log": "63c67ea7b02d630a79125a73dded6c2d82ffd3da9fa6c56f78e7a9e736dbdb75",
+    "E:\\WK\\run\\p16-20261016\\preflight.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-20261016\\preflight.log": "ffde8270395c44777ad05324cc011a6b0e7c1d62f37b2d31ffc3cfe2c4ed4d08",
+    "E:\\WK\\run\\p16-20261016\\verification.json": "74bae235ffd1730553265e67dab5defc6154df48e21e2536ad5e77a90a63d17a",
+    "E:\\WK\\run\\p16-20261016\\verify.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-20261016\\verify.log": "522bb6cb3a6c463fb4ad3a78810cf439a88513758e2b3ee4068c945d206545bb",
+    "E:\\WK\\run\\p16-20261016\\verify.py": "33db47faaaf95acfc183dfc30a5c2b98886c204147e65fbe401c2ae112c14ab1",
+    "E:\\WK\\run\\p16-20261016\\deliver.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p16-20261016\\association-review.json": "18e57bf695a813c5e2fbfc1c30ea9d5a8ce9914a1b5714c3846b8abfbd1a3d73",
+    "E:\\WK\\run\\p16-20261016\\pdf-review-executed-stdin.py": "a32ab9eb9649461383ff35d4c9abdab8ed72a7567b9da6cce974e405dace1add",
+    "E:\\WK\\run\\p16-20261016\\pdf-review.stdout.txt": "a2e5733c66435f326dd5b56c0b29150f73f2fb34197d6d4fc359bdf5130d602c"
+  },
+  "independent_read_only_pdf_review": {
+    "executed_by": "/root/p16_association_review",
+    "mode": "Read-only; no OCR/network/model; result transcribed from completed tool report, not rerun by root",
+    "command": "$env:PYTHONPATH='E:/RAG-Worktrees/weknora-python-port-20261013/backend;E:/WK/deps/reader;E:/RAG-Worktrees/weknora-python-port-20261013/var/weknora-port/runtime-deps'; $env:PYTHONIOENCODING='utf-8'; <here-string containing pdf-review-executed-stdin.py> | & 'E:/RAG quention/.venv/Scripts/python.exe' -B -",
+    "executed_python_stdin_record": "E:\\WK\\run\\p16-20261016\\pdf-review-executed-stdin.py",
+    "stdout": "E:\\WK\\run\\p16-20261016\\pdf-review.stdout.txt",
+    "exitcode": 0,
+    "pages": 68,
+    "toc": [],
+    "page_labels": [],
+    "catalog_xref": 1,
+    "catalog_has_outlines": false,
+    "catalog_has_struct_tree_root": false,
+    "setup_failures": {
+      "count": 2,
+      "error": "ModuleNotFoundError using backend.weknora_port with incompatible subagent import path; readonly, before PDF examination; changed PYTHONPATH/import to weknora_port",
+      "exitcode": 1
+    }
+  }
+}
