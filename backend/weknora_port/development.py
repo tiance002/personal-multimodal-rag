@@ -24,6 +24,8 @@ class DevelopmentSettings:
     local_url:str=''
     origins:tuple[str,...]=('http://127.0.0.1:5173','http://localhost:5173')
     fallback_strategy:str='model'
+    mineru_settings:object|None=None
+    mineru_extensions:tuple[str,...]=()
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -37,6 +39,10 @@ class DevelopmentSettings:
         if not self.storage.is_absolute() or not self.secret_key_file.is_absolute():raise DevelopmentConfigurationError('ABSOLUTE_STORAGE_AND_KEY_PATHS_REQUIRED')
         if self.router_mode not in ('OFF','DYNAMIC','CHEAP_ONLY','EXPENSIVE_ONLY'):raise DevelopmentConfigurationError('ROUTER_MODE_INVALID')
         if self.fallback_strategy not in ('model','fixed'):raise DevelopmentConfigurationError('FALLBACK_STRATEGY_INVALID')
+        if self.mineru_settings is not None:
+            from .ingestion.mineru import EXTENSIONS
+            if not self.mineru_extensions or set(self.mineru_extensions)-set(EXTENSIONS):
+                raise DevelopmentConfigurationError('MINERU_EXPLICIT_EXTENSIONS_REQUIRED')
 
     @classmethod
     def from_environment(cls,environment=None):
@@ -45,12 +51,16 @@ class DevelopmentSettings:
             value=env.get('WEKNORA_PORT_'+name,'')
             if not value:raise DevelopmentConfigurationError('WEKNORA_PORT_'+name+'_REQUIRED')
             return value
+        from .ingestion.mineru import MinerUSettings
         return cls(required('DATABASE_URL'),required('DATABASE_SYSTEM_ID'),required('DATABASE_NAME'),
             required('REDIS_URL'),required('REDIS_RUN_ID'),required('REDIS_PREFIX'),Path(required('STORAGE_ROOT')),
             Path(required('SECRET_KEY_FILE')),Path(env['WEKNORA_PORT_TOKENIZER_ASSET']) if env.get('WEKNORA_PORT_TOKENIZER_ASSET') else None,
             env.get('WEKNORA_PORT_ROUTER_MODE','DYNAMIC'),env.get('WEKNORA_PORT_OLLAMA_URL',''),
             tuple(v.strip() for v in env.get('WEKNORA_PORT_ORIGINS','http://127.0.0.1:5173,http://localhost:5173').split(',') if v.strip()),
-            fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'))
+            fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'),
+            mineru_settings=MinerUSettings.from_environment(env),
+            mineru_extensions=tuple(v.strip().lower() for v in
+                env.get('WEKNORA_PORT_MINERU_EXTENSIONS','').split(',') if v.strip()))
 
 
 def own_storage(settings):
@@ -167,8 +177,15 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             def model_factory(config,key,gate):
                 transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,credential=lambda _:key)
                 return ProviderModel(config,transport)
+        from .ingestion.core import ParserRegistry
+        parsers=ParserRegistry()
+        if settings.mineru_settings is not None:
+            from .ingestion.mineru import register_mineru
+            register_mineru(parsers,settings.mineru_settings)
         documents=DocumentLifecycleService(leases,settings.storage,principal=principal,resolve_kb_settings=kb_settings,
-            embedder_for_kb=embedder,start_image_worker_on_upload=False)
+            embedder_for_kb=embedder,parser_registry=parsers,
+            parser_overrides={ext:'mineru-basic' for ext in settings.mineru_extensions}
+                if settings.mineru_settings is not None else None,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
             permissions=permissions,costs=costs,token_authority=token_authority,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)

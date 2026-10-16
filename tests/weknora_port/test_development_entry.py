@@ -56,6 +56,11 @@ def test_new_package_and_frontend_default_selectors():
     config=tomllib.loads(Path('pyproject.toml').read_text())
     assert config['project']['scripts']['weknora-python-api']=='backend.weknora_port.entrypoint:main'
     assert config['project']['scripts']['weknora-python-worker']=='backend.weknora_port.worker:main'
-    assert 'backend.app*' in config['tool']['setuptools']['packages']['find']['exclude']
+    discovery=config['tool']['setuptools']['packages']['find']
+    # The MinerU bridge uses only the existing pure domain DTO. The app parent
+    # stays a namespace in wheels, excluding its old bootstrap/API/service code.
+    assert 'backend.app.domain' in discovery['include']
+    assert 'backend.app' not in discovery['include'] and 'backend.app*' not in discovery['include']
+    assert 'backend.tests*' in discovery['exclude']
     main=Path('frontend/src/main.tsx').read_text(encoding='utf-8')
     assert '?? "weknora_python"' in main and 'implementation === "legacy"' in main

@@ -145,6 +145,7 @@ class DocumentLifecycleService:
                  *, principal: LocalPrincipal, resolve_kb_settings: SettingsResolver,
                  embedder_for_kb: EmbedderResolver | None = None,
                  parser_registry: ParserRegistry | None = None,
+                 parser_overrides: Mapping[str, str] | None = None,
                  asset_processor: AssetProcessor | None = None,
                  post_processor: PostProcessor | None = None,
                  max_upload_bytes: int = 50 * 1024 * 1024, start_image_worker_on_upload: bool = True):
@@ -159,6 +160,7 @@ class DocumentLifecycleService:
         self.resolve_kb_settings = resolve_kb_settings
         self.embedder_for_kb = embedder_for_kb
         self.parser_registry = parser_registry or ParserRegistry()
+        self.parser_overrides = dict(parser_overrides or {})
         self.asset_processor = asset_processor
         self.post_processor = post_processor
         self.max_upload_bytes = max_upload_bytes
@@ -294,9 +296,12 @@ class DocumentLifecycleService:
             original_path.unlink(missing_ok=True)
             raise DocumentLifecycleError("DOCUMENT_CREATE_FAILED")
 
+        selected_parser = str((process_overrides or {}).get("parser_engine")
+                              or self.parser_overrides.get(extension, ""))
         image_config = _json_object(kb.get("image_processing_config"))
         if (self.image_tasks is not None and image_config.get("enable_multimodal", False)
-                and extension in _IMAGE_BEARING_EXTENSIONS):
+                and extension in _IMAGE_BEARING_EXTENSIONS
+                and selected_parser != "mineru-basic"):
             try:
                 await self.image_tasks.create(principal,kb,document_id,source_version,process_overrides)
             except Exception as exc:
@@ -317,10 +322,12 @@ class DocumentLifecycleService:
             request = DocumentRequest(filename=name, data=data, owner_id=principal.subject_id,
                                       knowledge_base_id=knowledge_base_id, document_id=document_id,
                                       source_version=source_version,
+                                      parser_engine=str((process_overrides or {}).get("parser_engine")
+                                          or self.parser_overrides.get(extension, "")),
                                       kb_chunking_config=_json_object(kb.get("chunking_config")))
             async with self._parse_lock:
                 ingest = await asyncio.to_thread(ingest_document, request, self.parser_registry)
-            if ingest.parsed.failures or not ingest.parsed.content.strip():
+            if ingest.parsed.failures or (not ingest.parsed.content.strip() and ingest.parser_engine != "mineru-basic"):
                 code = ingest.parsed.failures[0].code if ingest.parsed.failures else "DOCUMENT_CONTENT_UNREADABLE"
                 return await self._mark(principal, knowledge_base_id, document_id, "failed",
                                         _safe_error_code(DocumentLifecycleError(code), "DOCUMENT_PARSE_FAILED"), metadata,image_task=image_task)
@@ -332,33 +339,42 @@ class DocumentLifecycleService:
                                                   task_id=image_task.id if image_task is not None else None)
             metadata.update({"parser_engine": ingest.parser_engine,
                              "parser_metadata": dict(ingest.parsed.metadata), "assets": asset_manifest})
+            if not ingest.parsed.content.strip():
+                return await self._mark(principal, knowledge_base_id, document_id, "failed",
+                    "DOCUMENT_CONTENT_UNREADABLE", metadata, image_task=image_task)
             self._assert_no_cloud_parser(ingest)
             doc_scope = DocumentScope(principal.tenant_id, principal.subject_id,
                                       knowledge_base_id, document_id, source_version)
             plan = prepare_chunks(doc_scope, ingest.chunks, title=Path(name).stem)
 
             image_config = _json_object(kb.get("image_processing_config"))
+            local_parser_complete = (ingest.parser_engine == "mineru-basic"
+                and ingest.parsed.metadata.get("asset_processing") == "parser_complete")
+            pending_assets = ingest.parsed.assets
+            if local_parser_complete:
+                from .ingestion.mineru import pending_image_assets
+                pending_assets = pending_image_assets(ingest.parsed.assets)
             if extension in {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".webp"}:
-                if not image_config.get("enable_multimodal", False):
+                if not image_config.get("enable_multimodal", False) and not local_parser_complete:
                     return await self._mark(principal, knowledge_base_id, document_id, "failed",
                                             "MULTIMODAL_DISABLED_FOR_IMAGE", metadata,image_task=image_task)
-            if ingest.parsed.assets and image_config.get("enable_multimodal", False):
+            if pending_assets and image_config.get("enable_multimodal", False):
                 if self.asset_processor is None:
                     return await self._mark(principal, knowledge_base_id, document_id, "pending",
                                             "MULTIMODAL_ADAPTER_REQUIRED", metadata,image_task=image_task)
                 process_plan=getattr(self.asset_processor,'process_plan',None)
                 if callable(process_plan):
                     if image_task is None:
-                        plan=await process_plan(principal,kb,doc_scope,ingest.parsed.assets,plan,
+                        plan=await process_plan(principal,kb,doc_scope,pending_assets,plan,
                                                 override=process_overrides)
                     else:
-                        plan=await process_plan(principal,kb,doc_scope,ingest.parsed.assets,plan,
+                        plan=await process_plan(principal,kb,doc_scope,pending_assets,plan,
                             override=process_overrides,selection_snapshot=image_task.selection,
                             on_before=lambda i,k:image_queue.before(image_task,i,k),
                             on_result=lambda i,info:image_queue.result(image_task,i,info),
                             prior=image_task.outcomes)
                 else:
-                    image_chunks = await _resolve(self.asset_processor(principal, kb, doc_scope, ingest.parsed.assets))
+                    image_chunks = await _resolve(self.asset_processor(principal, kb, doc_scope, pending_assets))
                     for chunk in image_chunks:
                         if (getattr(chunk, "owner_id", None), getattr(chunk, "knowledge_base_id", None),
                                 getattr(chunk, "document_id", None), getattr(chunk, "source_version", None)) != (
@@ -719,10 +735,16 @@ class DocumentLifecycleService:
                 if isinstance(state, Mapping):
                     public[kind] = {key: state[key] for key in ("status", "error") if isinstance(state.get(key), str)}
             public_images.append(public)
+        parser_location = {}
+        if metadata.get("mineru_source"):
+            from .ingestion.mineru import public_chunk_locators
+            parser_location = public_chunk_locators(metadata, _json_object(row.get("document_metadata")),
+                row["document_id"], version, row["start_at"], row["end_at"],
+                row.get("source_content") or row.get("content") or "")
         return {"chunk_id": row["chunk_id"], "document_id": row["document_id"],
                 "knowledge_base_id": row["knowledge_base_id"], "filename": row.get("filename") or "",
                 "text": row.get("source_content") or row.get("content") or "",
                 "chunk_index": row["chunk_index"], "start": row["start_at"], "end": row["end_at"],
                 "source_version": version, "chunk_type": row.get("chunk_type") or "text",
-                "page_number": metadata.get("page_number"), "image_info": public_images,
+                "page_number": metadata.get("page_number"), "image_info": public_images, **parser_location,
                 "source_url": f"/api/v1/knowledge-bases/{row['knowledge_base_id']}/documents/{row['document_id']}/source"}

@@ -79,8 +79,8 @@ pythonpath = ["."]
 addopts = "-ra"
 
 [tool.setuptools.packages.find]
-include = ["backend", "backend.weknora_port*", "eval_center*"]
-exclude = ["backend.app*", "backend.tests*"]
+include = ["backend", "backend.weknora_port*", "backend.app.domain", "eval_center*"]
+exclude = ["backend.tests*"]
 
 [tool.setuptools.package-data]
 "backend.weknora_port" = ["profile_assets/*.yaml", "profile_assets/*.json", "conversation_assets/*.yaml", "conversation_assets/*.json"]

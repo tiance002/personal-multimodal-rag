@@ -506,6 +506,10 @@ class ParserRegistry:
         requested = self._engines.get(requested_engine)
         if requested and ext in requested.extensions:
             return requested_engine
+        if requested_engine == "mineru-basic":
+            # Explicit scan-only local opt-in must never become the default PDF
+            # parser when unavailable or used for an unsupported file type.
+            raise ValueError("MINERU_EXPLICIT_PARSER_UNAVAILABLE")
         default = self._defaults.get(ext)
         if default:
             return default
@@ -586,8 +590,17 @@ def ingest_document(request: DocumentRequest, registry: ParserRegistry | None = 
         for child in parent_child.children:
             parent_id = parent_ids[child.parent_index] if child.parent_index >= 0 else None
             rows.append(_chunk_record(request, child.chunk, "child", parent_id))
-        return IngestResult(parsed, tuple(rows), config, engine)
-    return IngestResult(parsed, tuple(_chunk_record(request, chunk, "child", None) for chunk in split(parsed.content, config)), config, engine)
+        return IngestResult(parsed, _annotate_parser_locators(parsed, rows), config, engine)
+    rows = tuple(_chunk_record(request, chunk, "child", None) for chunk in split(parsed.content, config))
+    return IngestResult(parsed, _annotate_parser_locators(parsed, rows), config, engine)
+
+
+def _annotate_parser_locators(parsed: ParsedDocument, rows: Sequence[ChunkRecord]) -> tuple[ChunkRecord, ...]:
+    if "mineru_source" not in parsed.metadata:
+        return tuple(rows)
+    from .mineru import chunk_locators
+    return tuple(replace(row, metadata={**row.metadata, **chunk_locators(parsed, row.start, row.end)})
+                 for row in rows)
 
 
 def _chunk_record(request: DocumentRequest, chunk: Chunk, role: str, parent_id: str | None) -> ChunkRecord:
