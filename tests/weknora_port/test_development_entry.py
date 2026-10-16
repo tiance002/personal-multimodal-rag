@@ -13,6 +13,32 @@ def test_missing_settings_never_fall_back_to_legacy():
     with pytest.raises(DevelopmentConfigurationError,match='DATABASE_URL_REQUIRED'):
         DevelopmentSettings.from_environment({'RAG_DATABASE_URL':'postgresql://legacy/old'})
 
+def development_environment(cfg):
+    return {'WEKNORA_PORT_'+name:str(value) for name,value in {
+        'DATABASE_URL':cfg.database_url,'DATABASE_SYSTEM_ID':cfg.system_id,'DATABASE_NAME':cfg.database,
+        'REDIS_URL':cfg.redis_url,'REDIS_RUN_ID':cfg.redis_run_id,'REDIS_PREFIX':cfg.redis_prefix,
+        'STORAGE_ROOT':cfg.storage,'SECRET_KEY_FILE':cfg.secret_key_file}.items()}
+
+def test_fallback_strategy_keeps_model_default(tmp_path):
+    cfg=settings(tmp_path)
+    assert cfg.fallback_strategy=='model'
+    assert DevelopmentSettings.from_environment(development_environment(cfg)).fallback_strategy=='model'
+
+@pytest.mark.parametrize('strategy',['model','fixed'])
+def test_fallback_strategy_loads_explicit_environment(tmp_path,strategy):
+    env=development_environment(settings(tmp_path))
+    env['WEKNORA_PORT_FALLBACK_STRATEGY']=strategy
+    assert DevelopmentSettings.from_environment(env).fallback_strategy==strategy
+
+@pytest.mark.parametrize('strategy',['','unknown','FIXED'])
+def test_fallback_strategy_rejects_invalid_environment_and_direct_settings(tmp_path,strategy):
+    cfg=settings(tmp_path);env=development_environment(cfg)
+    env['WEKNORA_PORT_FALLBACK_STRATEGY']=strategy
+    with pytest.raises(DevelopmentConfigurationError,match='FALLBACK_STRATEGY_INVALID'):
+        DevelopmentSettings.from_environment(env)
+    with pytest.raises(DevelopmentConfigurationError,match='FALLBACK_STRATEGY_INVALID'):
+        replace(cfg,fallback_strategy=strategy)
+
 @pytest.mark.parametrize('change',[{'system_id':'7691227493754040358'},{'redis_url':'redis://127.0.0.1:56424/0'},
     {'redis_run_id':'not-an-id'},{'database':'old'},{'redis_prefix':'old-prefix'},{'storage':Path('relative')}])
 def test_explicit_resource_identity_validation(tmp_path,change):

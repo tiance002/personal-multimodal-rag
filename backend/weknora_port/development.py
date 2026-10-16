@@ -23,6 +23,7 @@ class DevelopmentSettings:
     router_mode:str='DYNAMIC'
     local_url:str=''
     origins:tuple[str,...]=('http://127.0.0.1:5173','http://localhost:5173')
+    fallback_strategy:str='model'
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -35,6 +36,7 @@ class DevelopmentSettings:
             raise DevelopmentConfigurationError('EXPLICIT_REDIS_IDENTITY_PREFIX_REQUIRED')
         if not self.storage.is_absolute() or not self.secret_key_file.is_absolute():raise DevelopmentConfigurationError('ABSOLUTE_STORAGE_AND_KEY_PATHS_REQUIRED')
         if self.router_mode not in ('OFF','DYNAMIC','CHEAP_ONLY','EXPENSIVE_ONLY'):raise DevelopmentConfigurationError('ROUTER_MODE_INVALID')
+        if self.fallback_strategy not in ('model','fixed'):raise DevelopmentConfigurationError('FALLBACK_STRATEGY_INVALID')
 
     @classmethod
     def from_environment(cls,environment=None):
@@ -47,7 +49,8 @@ class DevelopmentSettings:
             required('REDIS_URL'),required('REDIS_RUN_ID'),required('REDIS_PREFIX'),Path(required('STORAGE_ROOT')),
             Path(required('SECRET_KEY_FILE')),Path(env['WEKNORA_PORT_TOKENIZER_ASSET']) if env.get('WEKNORA_PORT_TOKENIZER_ASSET') else None,
             env.get('WEKNORA_PORT_ROUTER_MODE','DYNAMIC'),env.get('WEKNORA_PORT_OLLAMA_URL',''),
-            tuple(v.strip() for v in env.get('WEKNORA_PORT_ORIGINS','http://127.0.0.1:5173,http://localhost:5173').split(',') if v.strip()))
+            tuple(v.strip() for v in env.get('WEKNORA_PORT_ORIGINS','http://127.0.0.1:5173,http://localhost:5173').split(',') if v.strip()),
+            fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'))
 
 
 def own_storage(settings):
@@ -167,7 +170,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
         documents=DocumentLifecycleService(leases,settings.storage,principal=principal,resolve_kb_settings=kb_settings,
             embedder_for_kb=embedder,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
-            conversation=ConversationSettings(),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
+            conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
             permissions=permissions,costs=costs,token_authority=token_authority,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         runtime.authority_config_sha=authority_settings.config_sha if authority_settings else None
         box['runtime']=runtime
