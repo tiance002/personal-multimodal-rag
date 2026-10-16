@@ -27,7 +27,8 @@ def validate(p):
             sources=[dict(handle=h,text=v['text']) for h,v in c['sources'].items()]),'P20_DATA_CHANGED')
         require(hashlib.sha256(c['original_answer'].encode()).hexdigest()==c['original_answer_sha256'],'P20_ORIGINAL_ANSWER_CHANGED')
         require(hashlib.sha256(wire(c['body'])).hexdigest()==c['wire_sha256'],'P20_WIRE_CHANGED')
-        require(set(c['body'])=={'model','messages','temperature','max_tokens','stream','stream_options'},'P20_BODY_FIELDS')
+        require(set(c['body'])=={'model','messages','temperature','max_tokens','stream','stream_options','enable_thinking'}
+                and c['body']['enable_thinking'] is False,'P20_BODY_FIELDS')
     require(sum(len(wire(c['body']))+c['body']['max_tokens'] for c in p['cases'])<=100000,'P20_LOCAL_FENCE_BOUND')
 
 
