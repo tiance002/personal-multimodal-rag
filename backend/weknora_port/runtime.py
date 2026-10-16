@@ -511,7 +511,9 @@ class ApplicationRuntime:
                 if not isinstance(source.get('text'), str) or not source['text']:
                     raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
                 projected.append(replace(raw, content=source['text'], score=merged.score, sub_chunk_ids=[],
-                    image_info=(merged.image_info or raw.image_info) if raw.chunk_type in ('image_ocr', 'image_caption') else raw.image_info,
+                    # Fixed search/merge already scopes image-child aggregation.
+                    # Keep that prompt enrichment while the quote stays raw.
+                    image_info=merged.image_info or raw.image_info,
                     chunk_metadata={**raw.chunk_metadata, 'source_version': source['source_version']}))
                 seen.add(raw.id)
         state.merge_results = projected

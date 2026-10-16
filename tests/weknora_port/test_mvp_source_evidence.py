@@ -295,3 +295,48 @@ def test_image_readback_rejects_scope_version_offsets_and_ocr_caption_type_chang
     app, _, _ = application([child], {child.id: change})
     with pytest.raises(RetrievalScopeError):
         asyncio.run(app._project_source_evidence(state([child]), CTX, Repository([child])))
+
+
+def test_parent_wins_actual_merge_keeps_ocr_enrichment_but_quotes_only_original_markdown():
+    from backend.weknora_port.retrieval.merge import merge
+    from backend.weknora_port.retrieval.query import default_segmenter
+    # Recheck run 2d9733f9: text parent outranks OCR child. The stored parent
+    # carries only Markdown; real search/merge adds the scoped child's image info.
+    ocr = 'Changes to English (in America)\n日Change7 (pronunciation)\nm@ We actually kept some old\nShakespearian habits that the English\nlost:\nD 1)\nD 2)'
+    markdown = '![PPT_EnglishtoAmericanTransition_page_012.png](images/PPT_EnglishtoAmericanTransition_page_012.png)'
+    stored_parent = row('parent', markdown, score=.31277927025671926, image_info='')
+    image_info = json.dumps([{'url': 'images/PPT_EnglishtoAmericanTransition_page_012.png',
+        'original_url': 'images/PPT_EnglishtoAmericanTransition_page_012.png',
+        'start_pos': 0, 'end_pos': 0, 'caption': '', 'ocr_text': ocr}])
+    parent_candidate = replace(stored_parent, image_info=image_info)
+    child = row('ocr', ocr, chunk_type='image_ocr', score=.3104449628806505,
+                parent_chunk_id=stored_parent.id, start_at=0, end_at=0, image_info=image_info)
+    repo = Repository([stored_parent, child])
+    app, sources, _ = application([stored_parent, child])
+    selected = state([])
+    selected.query = "According to the uploaded knowledge-base page, what is Change 7 about?"
+    selected.rerank_results = [parent_candidate, child]
+
+    async def run():
+        await merge(selected, CTX, repo, default_segmenter())
+        assert len(selected.merge_results) == 1
+        assert selected.merge_results[0].id == stored_parent.id
+        assert selected.merge_results[0].content == markdown
+        assert ocr in json.loads(selected.merge_results[0].image_info)[0]['ocr_text']
+        merged_images = selected.merge_results[0].image_info
+        await app._project_source_evidence(selected, CTX, repo)
+        projected = selected.merge_results[0]
+        finalized = await into_chat_message(selected, CTX)
+        evidence = Evidence.from_result(projected)
+        assert projected.image_info == merged_images
+        assert 'Image text (OCR)' in finalized.rendered_contexts
+        assert 'Change7 (pronunciation)' in finalized.rendered_contexts
+        assert 'Image text (OCR)' in evidence.content
+        assert evidence.source_content == sources[stored_parent.id]['text'] == markdown
+        assert ocr not in evidence.source_content
+        assert evidence.id == stored_parent.id and evidence.chunk_type == 'text'
+        assert evidence.score == parent_candidate.score
+        assert evidence.chunk_metadata['source_version'] == 'v1'
+        assert (evidence.start_at, evidence.end_at) == (0, len(markdown))
+    asyncio.run(run())
+    assert stored_parent.image_info == '' and child.content == ocr
