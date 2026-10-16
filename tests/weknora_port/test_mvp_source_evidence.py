@@ -1,6 +1,7 @@
 """Offline final evidence projection; no database, network or model calls."""
 import asyncio
 from copy import deepcopy
+import json
 from dataclasses import replace
 from types import SimpleNamespace
 
@@ -38,6 +39,9 @@ class Repository:
     async def get_chunks(self, ids, context):
         self.calls.append(tuple(ids))
         return {key: self.rows[key] for key in ids if key in self.rows}
+
+    async def get_chunk_children(self, ids, context):
+        return [value for value in self.rows.values() if value.parent_chunk_id in ids]
 
 
 def application(rows, overrides=None):
@@ -246,3 +250,48 @@ def test_generated_marker_and_history_filter_use_isolated_merge_view(metadata_fi
     assert selected.history == before.history and selected.history[0] is history
     assert history.knowledge_references == history_refs
     assert selected.search_results == before.search_results and selected.rerank_results == []
+
+
+@pytest.mark.parametrize('kind', ['image_ocr', 'image_caption'])
+def test_actual_image_merge_projects_readback_content_with_zero_offsets_and_original_type(kind):
+    from backend.weknora_port.retrieval.merge import merge
+    from backend.weknora_port.retrieval.query import default_segmenter
+    # The OCR payload is the actual P8.1 readback; parent Markdown is merge-only
+    # context and must not become the cited image child content.
+    ocr = 'Changes to English (in America)\n日Change7 (pronunciation)\nm@ We actually kept some old\nShakespearian habits that the English\nlost:\nD 1)\nD 2)'
+    content = ocr if kind == 'image_ocr' else 'A slide discussing pronunciation changes.'
+    parent = row('image-parent', '![PPT_EnglishtoAmericanTransition_page_012.png](images/page.png)',
+                 image_info=json.dumps([{'url': 'images/page.png', 'ocr_text': ocr, 'caption': ''}]))
+    child = row('image-child', content, chunk_type=kind, start_at=0, end_at=0,
+                parent_chunk_id=parent.id, image_info=parent.image_info)
+    repo = Repository([parent, child])
+    app, sources, _ = application([parent, child])
+    selected = state([])
+    selected.rerank_results = [child]
+
+    async def run():
+        await merge(selected, CTX, repo, default_segmenter())
+        assert selected.merge_results[0].content != content
+        assert '![PPT_' in selected.merge_results[0].content
+        merged_images = selected.merge_results[0].image_info
+        await app._project_source_evidence(selected, CTX, repo)
+        result = selected.merge_results[0]
+        evidence = Evidence.from_result(result)
+        assert result.id == child.id and result.chunk_type == kind
+        assert result.content == evidence.source_content == sources[child.id]['text'] == content
+        assert result.start_at == evidence.start_at == 0
+        assert result.end_at == evidence.end_at == 0
+        assert result.score == child.score and result.image_info == merged_images
+        assert result.parent_chunk_id == parent.id and result.chunk_metadata['source_version'] == 'v1'
+        assert result.sub_chunk_ids == []
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('kind,change', [(kind, change) for kind in ('image_ocr', 'image_caption')
+    for change in ({'document_id': 'other-doc'}, {'knowledge_base_id': 'other-kb'}, {'source_version': 'v2'},
+                   {'chunk_type': 'image_caption' if kind == 'image_ocr' else 'image_ocr'}, {'start': 1})])
+def test_image_readback_rejects_scope_version_offsets_and_ocr_caption_type_changes(kind, change):
+    child = row('image-child', 'actual image output', chunk_type=kind, start_at=0, end_at=0)
+    app, _, _ = application([child], {child.id: change})
+    with pytest.raises(RetrievalScopeError):
+        asyncio.run(app._project_source_evidence(state([child]), CTX, Repository([child])))

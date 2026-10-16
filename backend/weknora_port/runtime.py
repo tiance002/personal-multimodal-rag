@@ -478,12 +478,13 @@ class ApplicationRuntime:
         # Generated summaries can help recall, but cannot become final evidence.
         state.merge_results = [r for r in state.merge_results if r is not None and r.chunk_type != 'summary']
         filter_top_k(state)
-        ids = tuple(dict.fromkeys(chunk_id for row in state.merge_results if row.chunk_type == 'text'
+        source_types = ('text', 'image_ocr', 'image_caption')
+        ids = tuple(dict.fromkeys(chunk_id for row in state.merge_results if row.chunk_type in source_types
                                   for chunk_id in (row.id, *row.sub_chunk_ids)))
         chunks = await repository.get_chunks(ids, context) if ids else {}
         projected, seen = [], set()
         for merged in state.merge_results:
-            if merged.chunk_type != 'text':
+            if merged.chunk_type not in source_types:
                 projected.append(merged)
                 continue
             version = merged.chunk_metadata.get('source_version')
@@ -492,7 +493,7 @@ class ApplicationRuntime:
             originals = []
             for chunk_id in dict.fromkeys((merged.id, *merged.sub_chunk_ids)):
                 raw = chunks.get(chunk_id)
-                if raw is None or raw.id != chunk_id or raw.chunk_type != 'text':
+                if raw is None or raw.id != chunk_id or raw.chunk_type != merged.chunk_type:
                     raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
                 validate_results([raw], state.targets, context)
                 if (raw.knowledge_base_id, raw.knowledge_id, raw.chunk_metadata.get('source_version')) != (
@@ -505,11 +506,12 @@ class ApplicationRuntime:
                 source = await self.documents.read_source_chunk(self.principal, raw.id)
                 if (source.get('chunk_id'), source.get('knowledge_base_id'), source.get('document_id'),
                         source.get('source_version'), source.get('chunk_type'), source.get('start'), source.get('end')) != (
-                        raw.id, raw.knowledge_base_id, raw.knowledge_id, version, 'text', raw.start_at, raw.end_at):
+                        raw.id, raw.knowledge_base_id, raw.knowledge_id, version, raw.chunk_type, raw.start_at, raw.end_at):
                     raise RetrievalScopeError()
                 if not isinstance(source.get('text'), str) or not source['text']:
                     raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
                 projected.append(replace(raw, content=source['text'], score=merged.score, sub_chunk_ids=[],
+                    image_info=(merged.image_info or raw.image_info) if raw.chunk_type in ('image_ocr', 'image_caption') else raw.image_info,
                     chunk_metadata={**raw.chunk_metadata, 'source_version': source['source_version']}))
                 seen.add(raw.id)
         state.merge_results = projected
