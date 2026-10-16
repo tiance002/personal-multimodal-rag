@@ -15,6 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts import p8_score_real as p8
+from eval_center.weknora_scoring import answer_diagnostics
 
 
 def texts(value):
@@ -116,12 +117,34 @@ def citation_offsets(reference, chunk):
             'convention': 'SOURCE_UNICODE_HALF_OPEN_ZERO_IS_DATA'}
 
 
+def system_answer_gold(run, dataset, case, prediction, *, completed, query_attempted, answer_model_called, fixed_refusal):
+    """Score the actual completed application answer, including fixed refusal.
+
+    This system-level denominator is independent of whether answer generation
+    called a model. Missing/unfinished output is never invented as a zero score.
+    """
+    origin = 'FIXED_REFUSAL' if fixed_refusal else 'REAL_LLM_RESPONSE' if answer_model_called else 'APP_RESPONSE_MODEL_EXECUTION_UNCONFIRMED'
+    base = {'origin': origin, 'answer_model_called': answer_model_called,
+            'included_in_answer_metric_denominator': False, 'metrics': None}
+    if not case or not case.get('answers'):
+        return {**base, 'status': 'NOT_APPLICABLE_NO_ANSWER_GOLD'}
+    if not query_attempted or not completed or prediction is None:
+        return {**base, 'status': 'NOT_RUN_NO_COMPLETED_REAL_APP_RESPONSE'}
+    diagnostic = p8.long_answer(run, case['qid'], prediction, case['answers']) if dataset == 'longbench-zh' else answer_diagnostics(prediction, case['answers'], dataset)
+    return {**base, **diagnostic, 'origin': origin, 'answer_model_called': answer_model_called,
+            'included_in_answer_metric_denominator': diagnostic.get('metrics') is not None,
+            'evaluation_unit': 'COMPLETED_APP_SYSTEM_RESPONSE_INCLUDING_FIXED_REFUSALS',
+            'official_judge': 'NOT_RUN' if dataset == 'mmlongbench-doc' else diagnostic.get('official_judge', 'NOT_APPLICABLE')}
+
+
 def inspect_run(run):
     """Read an existing P8/P8.1/P9 run without altering any evidence artifact."""
     result = p8.evaluate(run)
     state = p8.load(run / 'state.json', {})
     selected = p8.load(run / 'selection.json', {'datasets': []})
     case_config = {(dataset['name'], case['qid']): case for dataset in selected['datasets'] for case in dataset.get('cases', [])}
+    gold = p8.load(run / 'gold-selected.json', {'datasets': []})
+    answer_gold = {(dataset['name'], case['qid']): case for dataset in gold['datasets'] for case in dataset.get('cases', [])}
     operations = p8.load(run / 'attempts.json', {})
     captures = [p8.load(path) for path in sorted((run / 'captures').glob('*.json'))]
     stages = [p8.load(path) for path in sorted((run / 'stages').glob('*.json'))]
@@ -151,6 +174,9 @@ def inspect_run(run):
             'actual_model_call_claimed': row['real_provider_receipts']['physical_counts']['response_received'] > 0}
         row['case_execution_status'] = frozen_config.get('execution_status')
         row['case_execution_reason'] = frozen_config.get('execution_reason')
+        row['system_answer_gold'] = system_answer_gold(run, row['dataset'], answer_gold.get((row['dataset'], row['qid'])),
+            row['plain_answer'], completed=row['completed_assistant'], query_attempted=query_attempted,
+            answer_model_called=row['real_provider_receipts']['checks']['chat'], fixed_refusal=row['fixed_fallback'])
         messages = p8.load(Path(str(prefix) + '-messages.json'), {}).get('data', [])
         native_refs = [ref for message in messages if message.get('role') == 'assistant'
             and message.get('id') == (capture or {}).get('message_id') for ref in (message.get('knowledge_references') or [])]

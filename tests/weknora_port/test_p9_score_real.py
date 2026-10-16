@@ -8,7 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import pytest
 
-from scripts.p9_score_real import ocr_delivery, evaluate_p9, citation_offsets
+from scripts.p9_score_real import ocr_delivery, evaluate_p9, citation_offsets, system_answer_gold
 from scripts.weknora_port_p9_observed_api import install_wire_observer
 
 
@@ -105,6 +105,24 @@ def test_unexecuted_selected_cases_are_not_recorded_attempts_and_capability_stay
     assert result['cases'][1]['status'] == 'RECORDED_ATTEMPTS'
     assert result['cases'][1]['actual_query_attempt_count'] == 1
     assert not result['cases'][1]['attempts'][0]['query_execution_evidence']['actual_model_call_claimed']
+
+
+def test_completed_fixed_refusal_counts_system_answer_metric_without_claiming_answer_model(tmp_path):
+    case = {'qid': 'hotpot', 'answers': ['Pieter van Musschenbroek']}
+    result = system_answer_gold(tmp_path, 'hotpotqa', case, 'Sorry, I am unable to answer this question.',
+        completed=True, query_attempted=True, answer_model_called=False, fixed_refusal=True)
+    assert result['origin'] == 'FIXED_REFUSAL'
+    assert result['answer_model_called'] is False
+    assert result['included_in_answer_metric_denominator'] is True
+    assert result['metrics']['hotpot_answer_em'] == 0
+    assert result['metrics']['hotpot_answer_token_f1'] == 0
+    missing = system_answer_gold(tmp_path, 'hotpotqa', case, None,
+        completed=False, query_attempted=False, answer_model_called=False, fixed_refusal=False)
+    assert missing['status'] == 'NOT_RUN_NO_COMPLETED_REAL_APP_RESPONSE'
+    assert missing['metrics'] is None and not missing['included_in_answer_metric_denominator']
+    no_gold = system_answer_gold(tmp_path, 'scifact', {'qid': 'claim', 'answers': []}, 'fixed refusal',
+        completed=True, query_attempted=True, answer_model_called=False, fixed_refusal=True)
+    assert no_gold['status'] == 'NOT_APPLICABLE_NO_ANSWER_GOLD' and no_gold['metrics'] is None
 
 
 def test_wire_observer_preserves_single_gate_and_model_call_and_records_wire_hash(tmp_path):
