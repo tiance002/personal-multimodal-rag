@@ -8,7 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import pytest
 
-from scripts.p9_score_real import ocr_delivery, evaluate_p9
+from scripts.p9_score_real import ocr_delivery, evaluate_p9, citation_offsets
 from scripts.weknora_port_p9_observed_api import install_wire_observer
 
 
@@ -35,6 +35,18 @@ def test_valid_placeholder_quote_is_not_ocr_context_or_delivery_pass():
     assert result['status'] == 'FAIL_OCR_MISSING_FROM_FINAL_CONTEXT'
     assert result['pass'] is False
     assert result['quote_validity_implies_ocr_delivery'] is False
+
+
+@pytest.mark.parametrize('reference,chunk,status', [
+    ({'start_at': 0, 'end_at': 0}, {'start': 0, 'end': 0}, 'PASS'),
+    ({'start_at': 0, 'end_at': 139}, {'start': 0, 'end': 139}, 'PASS'),
+    ({'start_at': 0, 'end_at': 139}, {'start': 0, 'end': 0}, 'FAIL_OFFSET_READBACK_MISMATCH'),
+    ({'end_at': 0}, {'start': 0, 'end': 0}, 'NOT_RUN_EXPLICIT_SOURCE_OFFSETS_REQUIRED'),
+])
+def test_citation_offsets_require_explicit_exact_readback_and_preserve_zero(reference, chunk, status):
+    result = citation_offsets(reference, chunk)
+    assert result['status'] == status
+    assert result['valid'] is (status == 'PASS')
 
 
 def test_real_ocr_delivery_requires_body_hash_and_ledger_while_quote_stays_raw():
@@ -71,6 +83,28 @@ def test_missing_results_keep_40_questions_and_24_pages(tmp_path):
     assert result['question_denominator'] == 40 and result['omni_page_denominator'] == 24
     assert all(row['status'] == 'NOT_RUN' for row in result['cases'])
     assert all(row['status'] == 'NOT_RUN' for row in result['omni_pages'])
+
+
+def test_unexecuted_selected_cases_are_not_recorded_attempts_and_capability_stays_blocked(tmp_path):
+    selected = {'datasets': [{'name': 'mmlongbench-doc', 'files': [], 'cases': [
+        {'qid': 'blocked', 'question': 'visual question', 'execution_status': 'NO_MODEL_CALL_CAPABILITY_LIMIT',
+         'execution_reason': 'Native text path lacks visual evidence'},
+        {'qid': 'later', 'question': 'future question'}]}]}
+    baseline = tmp_path / 'baseline'; baseline.mkdir()
+    for path in (tmp_path / 'selection.json', baseline / 'selection.json'):
+        path.write_text(json.dumps(selected), encoding='utf-8')
+    (baseline / 'state.json').write_text(json.dumps({'datasets': {}}), encoding='utf-8')
+    result = evaluate_p9(tmp_path)
+    assert result['question_denominator'] == 2
+    assert [row['status'] for row in result['cases']] == ['BLOCKED_CAPABILITY_LIMIT', 'NOT_RUN']
+    assert all(row['actual_query_attempt_count'] == 0 and row['attempts'] == [] for row in result['cases'])
+    from scripts.p8_score_real import identity
+    (baseline / 'attempts.json').write_text(json.dumps({'query-' + identity('mmlongbench-doc', 'later'):
+        {'state': 'UNKNOWN', 'at': '2026-10-16T12:00:00+00:00'}}), encoding='utf-8')
+    result = evaluate_p9(tmp_path)
+    assert result['cases'][1]['status'] == 'RECORDED_ATTEMPTS'
+    assert result['cases'][1]['actual_query_attempt_count'] == 1
+    assert not result['cases'][1]['attempts'][0]['query_execution_evidence']['actual_model_call_claimed']
 
 
 def test_wire_observer_preserves_single_gate_and_model_call_and_records_wire_hash(tmp_path):

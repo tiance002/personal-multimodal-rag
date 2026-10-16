@@ -142,7 +142,21 @@ async def main(args):
     elif args.stage=='start': prior.start()
     elif args.stage=='configure': await prior.configure()
     elif args.stage=='upload':
-        await preflight('upload-'+p8.key(args.dataset,p8.stamp()));await prior.upload(args.dataset)
+        await preflight('upload-'+p8.key(args.dataset,p8.stamp()))
+        original=p8.selection
+        def limited_selection():
+            selected=deepcopy(original())
+            if args.limit is not None:
+                state=p8.read('state.json')
+                for row in selected['datasets']:
+                    existing=state['datasets'][row['name']]['documents']
+                    known=[f for f in row['files'] if f['source_id'] in existing]
+                    missing=[f for f in row['files'] if f['source_id'] not in existing]
+                    row['files']=known+missing[:args.limit]
+            return selected
+        p8.selection=limited_selection
+        try: await prior.upload(args.dataset)
+        finally: p8.selection=original
     elif args.stage=='query': await query(args.dataset,args.qid)
     elif args.stage=='batch': await batch(args.dataset,args.phase)
     elif args.stage=='snapshot': await prior.snapshot(args.label)
@@ -157,6 +171,7 @@ if __name__=='__main__':
     parser.add_argument('stage',choices=['prepare','preflight','start','configure','upload','query','batch','snapshot','start-worker','stop'])
     parser.add_argument('--run-dir',required=True,type=Path);parser.add_argument('--dataset');parser.add_argument('--qid')
     parser.add_argument('--phase',choices=['first','rest'],default='first')
+    parser.add_argument('--limit',type=int)
     parser.add_argument('--label',default='after');args=parser.parse_args()
     assert __import__('re').fullmatch('[A-Za-z0-9_-]+',args.label), 'LABEL_REQUIRED'
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as loop:loop.run(main(args))

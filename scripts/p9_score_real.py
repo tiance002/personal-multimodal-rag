@@ -105,10 +105,24 @@ def artifact_hash(path):
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
 
 
+def citation_offsets(reference, chunk):
+    values = (reference.get('start_at'), reference.get('end_at'), chunk.get('start'), chunk.get('end'))
+    if any(type(value) is not int for value in values):
+        return {'status': 'NOT_RUN_EXPLICIT_SOURCE_OFFSETS_REQUIRED', 'valid': False,
+                'reference_offsets': list(values[:2]), 'readback_offsets': list(values[2:])}
+    valid = values[:2] == values[2:] and 0 <= values[0] <= values[1]
+    return {'status': 'PASS' if valid else 'FAIL_OFFSET_READBACK_MISMATCH', 'valid': valid,
+            'reference_offsets': list(values[:2]), 'readback_offsets': list(values[2:]),
+            'convention': 'SOURCE_UNICODE_HALF_OPEN_ZERO_IS_DATA'}
+
+
 def inspect_run(run):
     """Read an existing P8/P8.1/P9 run without altering any evidence artifact."""
     result = p8.evaluate(run)
     state = p8.load(run / 'state.json', {})
+    selected = p8.load(run / 'selection.json', {'datasets': []})
+    case_config = {(dataset['name'], case['qid']): case for dataset in selected['datasets'] for case in dataset.get('cases', [])}
+    operations = p8.load(run / 'attempts.json', {})
     captures = [p8.load(path) for path in sorted((run / 'captures').glob('*.json'))]
     stages = [p8.load(path) for path in sorted((run / 'stages').glob('*.json'))]
     requests = [p8.load(path) for path in sorted((run / 'provider-requests').glob('*.json'))]
@@ -125,8 +139,36 @@ def inspect_run(run):
         delivery = ocr_delivery(capture, stage, requests, after, required=row['dataset'] == 'omnidocbench')
         matching_calls = [call for call in after if run_id and call.get('request_id', '').startswith(run_id + '/')]
         refs = row['citations']
+        prefix = run / ('queries/' + p8.identity(row['dataset'], row['qid']))
+        operation_key = 'query-' + p8.identity(row['dataset'], row['qid'])
+        query_operation = operations.get(operation_key)
+        result_artifact_present = any(Path(str(prefix) + suffix).exists() for suffix in ('-messages.json', '.sse'))
+        query_attempted = bool(query_operation) or bool(record.get('session') and record.get('request_id') and result_artifact_present)
+        frozen_config = case_config.get((row['dataset'], row['qid']), {})
+        row['query_execution_evidence'] = {'attempted': query_attempted,
+            'operation_key': operation_key, 'operation_recorded': bool(query_operation),
+            'identity_and_result_artifact': bool(record.get('session') and record.get('request_id') and result_artifact_present),
+            'actual_model_call_claimed': row['real_provider_receipts']['physical_counts']['response_received'] > 0}
+        row['case_execution_status'] = frozen_config.get('execution_status')
+        row['case_execution_reason'] = frozen_config.get('execution_reason')
+        messages = p8.load(Path(str(prefix) + '-messages.json'), {}).get('data', [])
+        native_refs = [ref for message in messages if message.get('role') == 'assistant'
+            and message.get('id') == (capture or {}).get('message_id') for ref in (message.get('knowledge_references') or [])]
+        chunks = {item['data']['chunk_id']: item['data'] for item in p8.load(Path(str(prefix) + '-chunkreadback.json'), [])}
+        for ref in refs:
+            actual = next((item for item in native_refs if item.get('id') == ref['chunk_id']), {})
+            offsets = citation_offsets(actual, chunks.get(ref['chunk_id'], {}))
+            ref['offset_readback'] = offsets
+            ref['checks']['offsets_match_readback'] = offsets['valid']
+            ref['valid'] = ref['valid'] and offsets['valid']
+        if refs and not all(ref['valid'] for ref in refs):
+            if row['wiring_status'] == 'PASS': row['wiring_status'] = 'FAIL'
+            if not all(ref['offset_readback']['valid'] for ref in refs):
+                row['wiring_reasons'].append('CITATION_OFFSETS_MISSING_OR_READBACK_MISMATCH')
         row.update(source_code_sha=state.get('source_sha'), run_directory=str(run), server_run_id=run_id,
-            quote_validity={'status': 'PASS' if refs and all(ref['valid'] for ref in refs) else 'FAIL' if refs else 'NOT_RUN_NO_CITATION',
+            quote_validity={'status': 'PASS' if refs and all(ref['valid'] for ref in refs) else
+                'NOT_RUN_EXPLICIT_SOURCE_OFFSETS_REQUIRED' if any(ref['offset_readback']['status'].startswith('NOT_RUN') for ref in refs)
+                else 'FAIL' if refs else 'NOT_RUN_NO_CITATION',
                             'valid': sum(ref['valid'] for ref in refs), 'total': len(refs)},
             ocr_delivery=delivery, answer_correctness=row['gold_quality']['answer'],
             provider_finish_reasons=[{'request_id': request.get('request_id'), 'finish_reason': request.get('finish_reason'),
@@ -140,6 +182,7 @@ def inspect_run(run):
             delivery['status'] if delivery['status'] != 'PASS' else row['wiring_status'])
         row['provider_finish_reason_status'] = 'RECORDED' if any(item['status'] == 'RECORDED' for item in row['provider_finish_reasons']) else 'NOT_RUN_NO_CAPTURED_PROVIDER_FINISH_REASON'
     return {**result, 'schema': 'p9-readonly-real-evidence-results/v1', 'run_directory': str(run),
+        'wiring_counts': dict(Counter(row['wiring_status'] for row in result['cases'])),
         'source_code_sha': state.get('source_sha'), 'ledger_delta': delta,
         'ledger_before_available': (run / 'ledger-before.json').exists(),
         'method': 'QUOTE_IDENTITY_OCR_PAYLOAD_DELIVERY_AND_GOLD_QUALITY_SEPARATE',
@@ -149,21 +192,32 @@ def inspect_run(run):
 def evaluate_p9(root):
     selection = p8.load(root / 'selection.json')
     if not selection: raise ValueError('P9_FROZEN_SELECTION_REQUIRED')
-    run_dirs = sorted({path.parent for path in root.rglob('selection.json') if path.parent != root
-        and path.parent.name not in ('selection-recheck', 'selection')})
+    # Actual runner roots can live directly below P9 or below runs/. Avoid
+    # treating nested frozen selection helpers as independent executed runs.
+    state_paths = [*root.glob('*/state.json'), *root.glob('runs/*/state.json')]
+    run_dirs = sorted({path.parent for path in state_paths if (path.parent / 'selection.json').exists()})
     inspected = [inspect_run(path) for path in run_dirs]
     attempts = defaultdict(list)
+    availability = defaultdict(list)
     for report in inspected:
-        for case in report['cases']: attempts[(case['dataset'], case['qid'])].append(case)
+        for case in report['cases']:
+            identity = (case['dataset'], case['qid'])
+            availability[identity].append(case)
+            if case['query_execution_evidence']['attempted']: attempts[identity].append(case)
     frozen_cases = []
     for dataset in selection['datasets']:
         if dataset['name'] == 'omnidocbench': continue
         for case in dataset.get('cases', []):
             records = attempts.get((dataset['name'], case['qid']), [])
+            unexecuted = availability.get((dataset['name'], case['qid']), [])
+            capability = ('CAPABILITY_LIMIT' in case.get('execution_status', '') or any(
+                'CAPABILITY_LIMIT' in (item.get('case_execution_status') or '') for item in unexecuted))
             frozen_cases.append({'dataset': dataset['name'], 'qid': case['qid'], 'question': case['question'],
                 'status': 'BLOCKED_FROZEN_QUESTION_MISMATCH' if any(item['question'] != case['question'] for item in records)
-                    else 'RECORDED_ATTEMPTS' if records else 'NOT_RUN', 'attempts': records,
-                'reason': None if records else 'NO_NATIVE_RESULT_OR_CAPABILITY_NOT_EXECUTED',
+                    else 'RECORDED_ATTEMPTS' if records else 'BLOCKED_CAPABILITY_LIMIT' if capability else 'NOT_RUN', 'attempts': records,
+                'reason': None if records else case.get('execution_reason') or next((item['case_execution_reason'] for item in unexecuted
+                    if item.get('case_execution_reason')), None) or 'NO_ACTUAL_QUERY_ATTEMPT_EVIDENCE',
+                'actual_query_attempt_count': len(records),
                 'quality_failures_remain_in_denominator': True})
     gold = p8.load(root / 'gold-selected.json', {'datasets': []})
     pages = [page for dataset in gold.get('datasets', []) if dataset['name'] == 'omnidocbench' for page in dataset.get('pages', [])]
