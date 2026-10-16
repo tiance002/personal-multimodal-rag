@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +21,22 @@ BASE = Path('E:/WK/run/p9-20261016')
 OLD = Path('E:/WK/run/p8-20261016')
 P81 = Path('E:/WK/run/p8-1-20261016')
 
+def save_checkpoint(name,value):
+    """Retry only an atomic rename briefly held by a Windows reader."""
+    target=p8.OUT/name
+    assert target.resolve().is_relative_to(BASE.resolve()), 'P9_CHECKPOINT_ROOT_REQUIRED'
+    target.parent.mkdir(parents=True,exist_ok=True)
+    temporary=target.with_name(target.name+'.tmp')
+    temporary.write_text(json.dumps(value,ensure_ascii=False,indent=2,default=str),encoding='utf-8')
+    for attempt in range(6):
+        try:
+            temporary.replace(target)
+            return
+        except PermissionError as error:
+            if getattr(error,'winerror',None) not in (5,32) or attempt==5:
+                raise
+            time.sleep(.02*(2**attempt))
+
 def bind(directory):
     global OUT
     OUT = directory.resolve()
@@ -27,6 +44,7 @@ def bind(directory):
     prior.OUT = OUT
     prior.MODULE = 'scripts.weknora_port_p9_observed_api'
     prior.bind()
+    p8.save=save_checkpoint
 
 async def preflight(label):
     authority, original = prior.trusted_authority()
