@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import pytest
 from scripts.p8_score_real import (DEFAULT_RUN, MODELS, evaluate, evaluate_case, identity, long_answer, plain_answer, page_text_diagnostic,
-                                  stage_rankings, validate_reference, http_latency, receipt_facts)
+                                  stage_rankings, validate_reference, http_latency, receipt_facts, classify_stage_execution)
 
 
 def write(root, name, value):
@@ -66,6 +66,24 @@ def test_rank_mapping_refuses_cross_scope():
         kb='kb', bindings={'d1': 'source1'}, qrels={'source1': 1})
     assert result['search']['status'] == 'BLOCKED'
     assert result['search']['metrics'] is None
+
+
+@pytest.mark.parametrize('rerank_received', [False, True])
+def test_empty_rerank_without_real_execution_is_not_a_zero_quality_score(rerank_received):
+    ranks = stage_rankings({'rankings': {'search': [('a', 'kb', 'doc')], 'rerank': [],
+        'context': [('a', 'kb', 'doc')]}}, kb='kb', bindings={'doc': 'source'}, qrels={'source': 1})
+    result = classify_stage_execution(ranks, {'checks': {'embedding': False, 'rerank': rerank_received}})
+    assert result['rerank']['ranked_source_ids'] == []
+    assert result['rerank']['original_chunk_count'] == 0
+    if rerank_received:
+        assert result['rerank']['status'] == 'COMPUTED'
+        assert result['rerank']['metrics']['recall_at_k'] == 0
+    else:
+        assert result['rerank']['status'] == 'NOT_RUN_NO_REAL_RERANK_EXECUTION'
+        assert result['rerank']['metrics'] is None
+    assert result['search']['status'] == 'DIRECT_DOCUMENT_LOAD_DIAGNOSTIC'
+    assert result['search']['metrics']['recall_at_k'] == 1
+    assert result['search']['metric_interpretation'] == 'SOURCE_IDENTITY_DIAGNOSTIC_NOT_VECTOR_RETRIEVAL_QUALITY'
 
 
 def test_plain_answer_only_strips_system_citation_markup():

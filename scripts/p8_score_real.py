@@ -152,6 +152,22 @@ def receipt_facts(ledger, request_ids):
         'usage_unknown_is_free': False}
 
 
+def classify_stage_execution(rankings, receipts):
+    """Distinguish observed identities from actual model stage execution."""
+    result = {stage: dict(row) for stage, row in rankings.items()}
+    rerank = result['rerank']
+    if (rerank.get('original_chunk_count') == 0 and not receipts['checks']['rerank']
+            and 'ranked_source_ids' in rerank):
+        rerank.update(status='NOT_RUN_NO_REAL_RERANK_EXECUTION', metrics=None,
+                      execution_evidence='EMPTY_CAPTURED_RANKING_AND_NO_REAL_RERANK_RESPONSE_RECEIPT')
+    search = result['search']
+    if search.get('original_chunk_count', 0) > 0 and not receipts['checks']['embedding']:
+        search.update(status='DIRECT_DOCUMENT_LOAD_DIAGNOSTIC',
+                      execution_evidence='CAPTURED_DOCUMENT_IDENTITIES_WITHOUT_QUERY_EMBEDDING_RESPONSE_RECEIPT',
+                      metric_interpretation='SOURCE_IDENTITY_DIAGNOSTIC_NOT_VECTOR_RETRIEVAL_QUALITY')
+    return result
+
+
 def http_latency(run, name, qid):
     attempt_key = 'query-' + identity(name, qid)
     attempt = load(run / 'attempts.json', {}).get(attempt_key, {})
@@ -232,7 +248,7 @@ def evaluate_case(run, dataset, selected_case, gold_case, *, state, ledger, docu
     wiring = 'PASS' if not reasons else ('NOT_RUN' if not record else 'BLOCKED' if not assistant else 'PARTIAL' if fixed and completed else 'FAIL')
     case = PublicCase(**{**gold_case, 'answers': tuple(gold_case.get('answers', []))}) if gold_case else None
     qrels = case.qrels if case else {}
-    ranks = stage_rankings(capture, kb=kb, bindings=bindings, qrels=qrels)
+    ranks = classify_stage_execution(stage_rankings(capture, kb=kb, bindings=bindings, qrels=qrels), receipts)
     if case and prediction is not None and receipts['checks']['chat']:
         quality = score_native_qa(case, dataset=name, prediction=prediction,
             ranked_source_ids=ranks['context'].get('ranked_source_ids', []), citations=[r['valid'] for r in citations],
