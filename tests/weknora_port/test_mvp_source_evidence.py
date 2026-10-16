@@ -1,5 +1,6 @@
 """Offline final evidence projection; no database, network or model calls."""
 import asyncio
+from copy import deepcopy
 from dataclasses import replace
 from types import SimpleNamespace
 
@@ -147,3 +148,101 @@ def test_production_hook_removes_summary_before_top_k_and_finalizes_projected_st
     assert finalized.result_ids == ('first',)
     assert 'readable original' in finalized.rendered_contexts
     assert 'generated claim' not in finalized.rendered_contexts
+
+
+def chinese_overlap_rows():
+    text = '人马座西接天蝎座，东连摩羯座，北面是蛇夫座、盾牌座和巨蛇座。'
+    original = row('original-chinese', text, score=.8)
+    summary = row('summary-chinese', text + '\n' + text, score=.99, chunk_type='summary',
+                  parent_chunk_id=original.id, metadata={'origin': 'model_generated_summary'})
+    return original, summary
+
+
+def test_actual_chinese_merge_reproduces_summary_suppression_and_adapter_preserves_raw(monkeypatch):
+    from backend.weknora_port.retrieval.merge import merge
+    from backend.weknora_port.retrieval.query import default_segmenter
+    import backend.weknora_port.retrieval.pipeline as module
+    original, summary = chinese_overlap_rows()
+    app, _, _ = application([original])
+    repo = Repository([original])
+    selected = state([])
+    selected.query = '人马座有哪些临近星座？'
+    selected.enable_rewrite = selected.enable_expansion = False
+    selected.search_results = [original, summary]
+    selected.rerank_results = [summary, original]
+    before = deepcopy(selected)
+
+    async def run():
+        # Actual fixed merge and actual production segmenter reproduce the
+        # pre-projection loss; neither is replaced by a mock in this test.
+        baseline = deepcopy(selected)
+        await merge(baseline, CTX, repo, default_segmenter())
+        assert [r.id for r in baseline.merge_results] == [summary.id]
+        with pytest.raises(SearchNothing):
+            await app._project_source_evidence(baseline, CTX, repo)
+
+        async def noop(*args, **kwargs):
+            pass
+        for name in ('understand_query', 'search', 'rerank'):
+            monkeypatch.setattr(module, name, noop)
+        async def project(current, context):
+            await app._project_source_evidence(current, context, repo)
+        pipeline = RetrievalPipeline(repo, object(), merge_input_adapter=app._source_merge_input,
+                                     final_evidence_projection=project)
+        return await pipeline.run(selected, CTX)
+
+    finalized = asyncio.run(run())
+    assert finalized.result_ids == (original.id,)
+    assert original.content in finalized.rendered_contexts
+    assert selected.search_results == before.search_results
+    assert selected.rerank_results == before.rerank_results
+    assert selected.search_results[0] is original and selected.rerank_results[0] is summary
+
+
+def test_summary_only_rerank_does_not_fall_back_to_unselected_search():
+    from backend.weknora_port.retrieval.merge import merge
+    from backend.weknora_port.retrieval.query import default_segmenter
+    original, summary = chinese_overlap_rows()
+    app, _, _ = application([original])
+    selected = state([])
+    selected.search_results = [original]
+    selected.rerank_results = [summary]
+    view = app._source_merge_input(selected)
+    assert view.search_results == view.rerank_results == []
+    asyncio.run(merge(view, CTX, Repository([original]), default_segmenter()))
+    assert view.merge_results == []
+    with pytest.raises(SearchNothing):
+        asyncio.run(app._project_source_evidence(view, CTX, Repository([original])))
+    assert selected.search_results == [original] and selected.rerank_results == [summary]
+
+
+@pytest.mark.parametrize('metadata_field', ['metadata', 'chunk_metadata'])
+def test_generated_marker_and_history_filter_use_isolated_merge_view(metadata_field):
+    from backend.weknora_port.conversation.types import HistoryRound
+    from backend.weknora_port.retrieval.merge import merge
+    from backend.weknora_port.retrieval.query import default_segmenter
+    from datetime import datetime, timezone
+    original, summary = chinese_overlap_rows()
+    marked = row('marked', summary.content, score=1, **{metadata_field: {'origin': 'model_generated_summary'}})
+    # Production history rounds are frozen dataclasses and their refs are dicts.
+    history_refs = ({'id': 'history-summary', 'content': summary.content, 'score': 1,
+                     'chunk_type': 'summary', 'knowledge_base_id': 'kb', 'knowledge_id': 'doc'},
+                    {'id': 'history-marked', 'content': summary.content, 'score': 1,
+                     metadata_field: {'origin': 'model_generated_summary'},
+                     'knowledge_base_id': 'kb', 'knowledge_id': 'doc'})
+    history = HistoryRound('prior', 'question', 'answer', datetime.now(timezone.utc), history_refs)
+    selected = state([])
+    selected.query = original.content
+    selected.search_results = [original, marked]
+    selected.history = [history]
+    before = deepcopy(selected)
+    app, _, _ = application([original])
+    view = app._source_merge_input(selected)
+    assert view is not selected and view.history[0] is not history
+    assert view.history[0].knowledge_references == ()
+    assert view.search_results == [] and view.rerank_results == [original]
+    asyncio.run(merge(view, CTX, Repository([original]), default_segmenter()))
+    assert [r.id for r in view.merge_results] == [original.id]
+    assert selected.history == before.history and selected.history[0] is history
+    assert history.knowledge_references == history_refs
+    assert selected.search_results == before.search_results and selected.rerank_results == []

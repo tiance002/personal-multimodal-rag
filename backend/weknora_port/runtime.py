@@ -516,6 +516,44 @@ class ApplicationRuntime:
         if not projected:
             raise SearchNothing()
 
+    def _source_merge_input(self, state):
+        """Exclude generated evidence before overlap can suppress original text.
+
+        Preserve source merge's rerank-or-search selection before filtering, so
+        a summary-only rerank cannot fall back to unselected search candidates.
+        The fixed merge deep-copies these candidates and any injected history.
+        """
+        from copy import copy
+        from dataclasses import is_dataclass
+
+        def original(row):
+            if row is None:
+                return False
+            get = row.get if isinstance(row, Mapping) else lambda name, default=None: getattr(row, name, default)
+            if get('chunk_type') == 'summary':
+                return False
+            return all(not isinstance(get(name), Mapping) or get(name).get('origin') != 'model_generated_summary'
+                       for name in ('metadata', 'chunk_metadata'))
+
+        view = copy(state)
+        candidates = state.rerank_results or sorted(state.search_results, key=lambda row: row.score, reverse=True)
+        view.rerank_results = [row for row in candidates if original(row)]
+        view.search_results = []
+        view.history = []
+        for history in state.history:
+            refs = getattr(history, 'knowledge_references', ())
+            if not refs:
+                view.history.append(history)
+                continue
+            filtered = tuple(row for row in refs if original(row))
+            if is_dataclass(history):
+                view.history.append(replace(history, knowledge_references=filtered))
+            else:
+                copied = copy(history)
+                copied.knowledge_references = filtered
+                view.history.append(copied)
+        return view
+
     async def _pipeline(self, turn, progress):
         registry = self._runs[turn.run_id]["registry"]
         repository = LeasedKnowledgeRepository(self, registry)
@@ -525,7 +563,8 @@ class ApplicationRuntime:
             await self._project_source_evidence(state, context, repository)
         return RetrievalPipeline(
             repository, registry, on_progress=progress, final_evidence_projection=project,
-            persist_sink=self._persist_context, affinity_resolver=affinity)
+            persist_sink=self._persist_context, affinity_resolver=affinity,
+            merge_input_adapter=self._source_merge_input)
 
     async def _generation(self, turn, progress, *, policy=None):
         policy=policy or self.policy
