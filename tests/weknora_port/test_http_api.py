@@ -212,24 +212,34 @@ def test_runtime_identity_and_read_envelopes_use_server_resolved_principal():
     asyncio.run(exercise())
 
 
-def test_upload_forwards_normalized_physical_page_override_and_rejects_non_pdf_scope():
+def test_upload_keeps_image_model_overrides_and_rejects_retired_page_selector():
     async def exercise():
         runtime, _, client = make_client()
         async with client:
             accepted = await client.post("/api/v1/knowledge-bases/kb-1/documents",
                 data={"process_overrides": json.dumps({"ocr_adapter": "tesseract",
-                    "caption_mode": "explicit", "caption_model_id": "deepseek-config-id",
-                    "image_pages": [9]})},
+                    "caption_mode": "explicit", "caption_model_id": "deepseek-config-id"})},
                 files={"file": ("b3.pdf", b"synthetic-pdf-bytes", "application/pdf")})
-            rejected = await client.post("/api/v1/knowledge-bases/kb-1/documents",
-                data={"process_overrides": json.dumps({"image_pages": [9]})},
-                files={"file": ("b3.txt", b"synthetic-text", "text/plain")})
+            for name, media in (("b3.pdf", "application/pdf"), ("b3.txt", "text/plain")):
+                rejected = await client.post("/api/v1/knowledge-bases/kb-1/documents",
+                    data={"process_overrides": json.dumps({"image_pages": [9]})},
+                    files={"file": (name, b"synthetic-bytes", media)})
+                assert rejected.status_code == 422
+                assert rejected.json()["error"]["code"] == "IMAGE_PAGES_UNSUPPORTED"
+            for value in ("[9]", ""):
+                direct_rejected = await client.post("/api/v1/knowledge-bases/kb-1/documents",
+                    data={"image_pages": value},
+                    files={"file": ("b3.pdf", b"synthetic-bytes", "application/pdf")})
+                assert direct_rejected.status_code == 422
+                assert direct_rejected.json()["error"]["code"] == "IMAGE_PAGES_UNSUPPORTED"
+            config_rejected = await client.patch("/api/v1/knowledge-bases/kb-1/image-processing",
+                json={"image_pages": [9]})
         assert accepted.status_code == 200
         assert runtime.upload_calls[0] == ("kb-1", "b3.pdf", "application/pdf", {
             "ocr_adapter": "tesseract", "caption_mode": "explicit",
-            "caption_model_id": "deepseek-config-id", "image_pages": [9]})
-        assert rejected.status_code == 422
-        assert rejected.json()["error"]["code"] == "IMAGE_PAGE_SCOPE_PDF_ONLY"
+            "caption_model_id": "deepseek-config-id"})
+        assert config_rejected.status_code == 422
+        assert config_rejected.json()["error"]["code"] == "REQUEST_INVALID"
         assert len(runtime.upload_calls) == 1
 
     asyncio.run(exercise())

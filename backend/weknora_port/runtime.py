@@ -2,7 +2,7 @@
 
 Tencent/WeKnora3e8b0bfc stage mechanisms are reused rather than copied. The
 application supplies verified leases, principal, source conversation settings
-and optional permission/cost authorities. Missing authorities deny sends.
+and ordinary provider configuration. Historical budget authorities are not used.
 """
 from __future__ import annotations
 from dataclasses import dataclass, field, replace
@@ -25,7 +25,6 @@ from .storage.turns import PostgresTurnRepository
 from .storage.generation import PostgresGenerationLifecycle
 from .storage.memory import PostgresMemoryRepository
 from .storage.hybrid import PostgresKnowledgeRepository
-from .storage.send_gate import P1SendGate
 
 
 @dataclass(frozen=True)
@@ -101,18 +100,79 @@ class LeasedSendGate:
     def __init__(self, application):
         self.application = application
 
-    async def _call(self, name, call, **kwargs):
-        app = self.application
-        async with app.leases.lease() as guard:
-            gate = P1SendGate(guard, tenant_id=app.principal.tenant_id,
-                              permissions=app.permissions, costs=app.costs,token_authority=app.token_authority)
-            return await getattr(gate, name)(call, **kwargs)
-
     async def authorize(self, call):
-        return await self._call("authorize", call)
+        app = self.application
+        scope = call.context.scope
+        if scope.owner_id != app.principal.subject_id:
+            raise ProviderError('MODEL_ORIGIN_KB_ACCESS_DENIED')
+        if call.context.cancelled is not None and call.context.cancelled.is_set():
+            raise ProviderError('MODEL_CALL_CANCELLED')
+        if call.capability in ('chat', 'vision') and (type(call.output_budget) is not int or call.output_budget <= 0):
+            raise ProviderError('MODEL_OUTPUT_HARD_LIMIT_REQUIRED')
+        from .source_facts import operation_slot
+        call_id = hashlib.sha256(json.dumps([app.principal.tenant_id, scope.owner_id,
+            operation_slot(call.context.request_id, call.capability).identity()],
+            ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        kbs = set(scope.knowledge_base_ids) | set(call.context.required_origin_kbs)
+        async with app.leases.lease() as guard:
+            async with guard.connection.transaction():
+                rows = await (await guard.connection.execute(
+                    'SELECT id,cloud_allowed FROM knowledge_bases WHERE tenant_id=%s AND id=ANY(%s) AND deleted_at IS NULL',
+                    (app.principal.tenant_id, list(kbs)))).fetchall()
+                if not kbs or {r['id'] for r in rows} != kbs:
+                    raise ProviderError('MODEL_ORIGIN_KB_ACCESS_DENIED')
+                models = await (await guard.connection.execute(
+                    "SELECT source FROM models WHERE tenant_id=%s AND subject_id=%s AND id=%s AND status='active' AND deleted_at IS NULL",
+                    (app.principal.tenant_id, app.principal.subject_id, call.model_id))).fetchall()
+                if len(models) != 1:
+                    raise ProviderError('MODEL_NOT_FOUND')
+                if models[0]['source'] != 'local' and (not app.cloud_allowed or not all(r['cloud_allowed'] for r in rows)):
+                    raise ProviderError('MODEL_ORIGIN_KB_EGRESS_DENIED')
+                if scope.document_ids:
+                    docs = await (await guard.connection.execute(
+                        'SELECT id FROM knowledges WHERE tenant_id=%s AND id=ANY(%s) AND knowledge_base_id=ANY(%s) AND deleted_at IS NULL',
+                        (app.principal.tenant_id, list(scope.document_ids), list(scope.knowledge_base_ids)))).fetchall()
+                    if {r['id'] for r in docs} != set(scope.document_ids):
+                        raise ProviderError('MODEL_DOCUMENT_ACCESS_DENIED')
+                # Reuse only the old operation identity, never its account balance.
+                await guard.connection.execute('SELECT pg_advisory_xact_lock(hashtext(%s))',
+                                               ('weknora-call:'+call_id,))
+                tables = await (await guard.connection.execute(
+                    "SELECT to_regclass('port_call_slots') AS slots")).fetchall()
+                if tables and tables[0]['slots']:
+                    old = await (await guard.connection.execute(
+                        'SELECT call_id FROM port_call_slots WHERE call_id=%s', (call_id,))).fetchall()
+                    if old:
+                        raise ProviderError('MODEL_CALL_ID_REUSE_DENIED')
+                # A durable claim, not a Token reservation. An interrupted call
+                # remains UNKNOWN and the same operation is never resent.
+                claimed = await (await guard.connection.execute(
+                    'INSERT INTO port_provider_calls(tenant_id,subject_id,call_id,request_id,capability,session_id,provider,model,model_id,wire_sha256) '
+                    'VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING request_id',
+                    (app.principal.tenant_id, scope.owner_id, call_id, call.context.request_id, call.capability,
+                     call.context.session_id, call.provider, call.model, call.model_id, call.wire_sha256))).fetchall()
+                if not claimed:
+                    raise ProviderError('MODEL_CALL_ID_REUSE_DENIED')
 
     async def finish(self, call, *, outcome, usage):
-        return await self._call("finish", call, outcome=outcome, usage=usage)
+        from dataclasses import asdict
+        app = self.application
+        try:
+            async with asyncio.timeout(10):
+                async with app.leases.lease() as guard:
+                    await guard.connection.execute(
+                        'UPDATE port_provider_calls SET outcome=%s,usage=%s::jsonb,finished_at=now() '
+                        'WHERE tenant_id=%s AND subject_id=%s AND request_id=%s AND capability=%s AND wire_sha256=%s AND finished_at IS NULL',
+                        (outcome, json.dumps(asdict(usage)), app.principal.tenant_id,
+                         call.context.scope.owner_id, call.context.request_id, call.capability, call.wire_sha256))
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            # Preserve the durable UNKNOWN claim and the successful answer.
+            # Usage persistence is observable but no longer a settlement gate.
+            import logging
+            logging.getLogger(__name__).error('PROVIDER_USAGE_RECORD_FAILED request_id=%s error=%s',
+                                             call.context.request_id, type(exc).__name__)
 
 
 class LeasedLifecycle:
@@ -206,12 +266,13 @@ class ApplicationRuntime:
     """
     def __init__(self, leases, principal, store, documents, *, model_factory,
                  cipher: SecretCipher, conversation=None, policy=None,
-                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None,token_authority=None):
+                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None,token_authority=None,cloud_allowed=False):
         self.leases, self.principal = leases, principal
         self.store, self.documents = store, documents
         self.cipher, self.catalogue = cipher, catalogue or SourceCatalogue()
         self.model_factory, self.permissions, self.costs = model_factory, permissions, costs
-        self.token_authority=token_authority
+        self.token_authority=None  # P31: legacy argument never controls production sends
+        self.cloud_allowed=cloud_allowed
         self.local_service=local_service
         self.conversation = conversation or ConversationSettings()
         self.policy = policy or RouterPolicy()
@@ -470,105 +531,14 @@ class ApplicationRuntime:
                 (state.user_content, state.user_message_id, context.request_id, context.session_id,
                  self.principal.tenant_id, self.principal.subject_id))
 
-    async def _project_source_evidence(self, state, context, repository):
-        from .retrieval.filter_top_k import filter_top_k
-        from .retrieval.search import SearchNothing, RetrievalScopeError, validate_results
-        if not state.needs_retrieval:
-            return
-        # Generated summaries can help recall, but cannot become final evidence.
-        state.merge_results = [r for r in state.merge_results if r is not None and r.chunk_type != 'summary']
-        filter_top_k(state)
-        source_types = ('text', 'image_ocr', 'image_caption')
-        ids = tuple(dict.fromkeys(chunk_id for row in state.merge_results if row.chunk_type in source_types
-                                  for chunk_id in (row.id, *row.sub_chunk_ids)))
-        chunks = await repository.get_chunks(ids, context) if ids else {}
-        projected, seen = [], set()
-        for merged in state.merge_results:
-            if merged.chunk_type not in source_types:
-                projected.append(merged)
-                continue
-            version = merged.chunk_metadata.get('source_version')
-            if not isinstance(version, str) or not version:
-                raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
-            originals = []
-            for chunk_id in dict.fromkeys((merged.id, *merged.sub_chunk_ids)):
-                raw = chunks.get(chunk_id)
-                if raw is None or raw.id != chunk_id or raw.chunk_type != merged.chunk_type:
-                    raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
-                validate_results([raw], state.targets, context)
-                if (raw.knowledge_base_id, raw.knowledge_id, raw.chunk_metadata.get('source_version')) != (
-                        merged.knowledge_base_id, merged.knowledge_id, version):
-                    raise RetrievalScopeError()
-                originals.append(raw)
-            for raw in sorted(originals, key=lambda row: (row.chunk_index, row.start_at)):
-                if raw.id in seen:
-                    continue
-                source = await self.documents.read_source_chunk(self.principal, raw.id)
-                if (source.get('chunk_id'), source.get('knowledge_base_id'), source.get('document_id'),
-                        source.get('source_version'), source.get('chunk_type'), source.get('start'), source.get('end')) != (
-                        raw.id, raw.knowledge_base_id, raw.knowledge_id, version, raw.chunk_type, raw.start_at, raw.end_at):
-                    raise RetrievalScopeError()
-                if not isinstance(source.get('text'), str) or not source['text']:
-                    raise ProviderError('SOURCE_EVIDENCE_UNAVAILABLE')
-                projected.append(replace(raw, content=source['text'], score=merged.score, sub_chunk_ids=[],
-                    # Fixed search/merge already scopes image-child aggregation.
-                    # Keep that prompt enrichment while the quote stays raw.
-                    image_info=merged.image_info or raw.image_info,
-                    chunk_metadata={**raw.chunk_metadata, 'source_version': source['source_version']}))
-                seen.add(raw.id)
-        state.merge_results = projected
-        if not projected:
-            raise SearchNothing()
-
-    def _source_merge_input(self, state):
-        """Exclude generated evidence before overlap can suppress original text.
-
-        Preserve source merge's rerank-or-search selection before filtering, so
-        a summary-only rerank cannot fall back to unselected search candidates.
-        The fixed merge deep-copies these candidates and any injected history.
-        """
-        from copy import copy
-        from dataclasses import is_dataclass
-
-        def original(row):
-            if row is None:
-                return False
-            get = row.get if isinstance(row, Mapping) else lambda name, default=None: getattr(row, name, default)
-            if get('chunk_type') == 'summary':
-                return False
-            return all(not isinstance(get(name), Mapping) or get(name).get('origin') != 'model_generated_summary'
-                       for name in ('metadata', 'chunk_metadata'))
-
-        view = copy(state)
-        candidates = state.rerank_results or sorted(state.search_results, key=lambda row: row.score, reverse=True)
-        view.rerank_results = [row for row in candidates if original(row)]
-        view.search_results = []
-        view.history = []
-        for history in state.history:
-            refs = getattr(history, 'knowledge_references', ())
-            if not refs:
-                view.history.append(history)
-                continue
-            filtered = tuple(row for row in refs if original(row))
-            if is_dataclass(history):
-                view.history.append(replace(history, knowledge_references=filtered))
-            else:
-                copied = copy(history)
-                copied.knowledge_references = filtered
-                view.history.append(copied)
-        return view
-
     async def _pipeline(self, turn, progress):
         registry = self._runs[turn.run_id]["registry"]
         repository = LeasedKnowledgeRepository(self, registry)
         async def affinity(ids):
             return await self.memory.document_affinity(turn.memory_context,ids)
-        async def project(state, context):
-            await self._project_source_evidence(state, context, repository)
         return RetrievalPipeline(
-            repository, registry, on_progress=progress, final_evidence_projection=project,
-            persist_sink=self._persist_context, affinity_resolver=affinity,
-            merge_input_adapter=self._source_merge_input)
+            repository, registry, on_progress=progress,
+            persist_sink=self._persist_context, affinity_resolver=affinity)
 
     async def _generation(self, turn, progress, *, policy=None):
         policy=policy or self.policy
@@ -762,7 +732,7 @@ class ApplicationRuntime:
         from .models.types import CallContext,TrustedScope
         kb=await self.documents._kb(principal,knowledge_base_id)
         allowed={'enable_multimodal','ocr_adapter','ocr_model_id','caption_mode',
-                 'caption_model_id','description_language','custom_instructions','image_pages'}
+                 'caption_model_id','description_language','custom_instructions'}
         if set(value)-allowed or ('enable_multimodal' in value and type(value['enable_multimodal']) is not bool):
             raise ValueError('IMAGE_CONFIG_INVALID')
         cfg=effective_image_config(kb,value)

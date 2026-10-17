@@ -41,10 +41,6 @@ class Document:
     metadata: dict = field(default_factory=dict)
 
 
-class PDFPageScopeError(ValueError):
-    """A requested physical page is invalid; never fall back to whole-file work."""
-
-
 class BaseParser:
     """Minimal BaseParser interface needed by the upstream PDF implementation."""
     def __init__(self, file_name: str = "", file_type=None, **kwargs):
@@ -1477,15 +1473,11 @@ class PDFParser(BaseParser):
     """
 
     def __init__(self, file_name: str = "", file_type=None, **kwargs):
+        if "image_pages" in kwargs:
+            raise ValueError("IMAGE_PAGES_UNSUPPORTED")
         # Capture per-upload override before BaseParser consumes kwargs.
         raw = kwargs.pop("pdf_force_scanned", None)
-        image_pages = kwargs.pop("image_pages", ())
         super().__init__(file_name=file_name, file_type=file_type, **kwargs)
-        if (not isinstance(image_pages, (list, tuple))
-                or any(type(page) is not int or page < 1 for page in image_pages)
-                or len(image_pages) > 1000 or len(set(image_pages)) != len(image_pages)):
-            raise PDFPageScopeError("PDF_IMAGE_PAGE_SCOPE_INVALID")
-        self._image_pages = tuple(sorted(image_pages))
         # Priority: per-upload override > global env > default (False).
         if raw is not None:
             self._force_scanned = str(raw).strip().lower() in {
@@ -1507,8 +1499,6 @@ class PDFParser(BaseParser):
 
             # Align metadata fields with automatic scanned route
             page_count = doc.metadata.get("page_count", 0)
-            if any(page > page_count for page in self._image_pages):
-                raise PDFPageScopeError("PDF_IMAGE_PAGE_OUT_OF_RANGE")
             doc.metadata.update({
                 "scanned_page_count": page_count,
                 "text_page_count": 0,
@@ -1519,8 +1509,6 @@ class PDFParser(BaseParser):
 
         try:
             return self._route(content)
-        except PDFPageScopeError:
-            raise
         except Exception:
             logger.exception(
                 "PDFParser: per-page routing failed for %s; "
@@ -1551,9 +1539,6 @@ class PDFParser(BaseParser):
         images: dict = {}
         try:
             page_count = len(pdf)
-            if any(page > page_count for page in self._image_pages):
-                raise PDFPageScopeError("PDF_IMAGE_PAGE_OUT_OF_RANGE")
-            requested_indices = {page - 1 for page in self._image_pages}
 
             # Pass 1: cheap text extraction + image-area classification.
             texts: list = []
@@ -1606,24 +1591,19 @@ class PDFParser(BaseParser):
             texts = _strip_repeating_lines(texts, classes)
             scanned_indices = [i for i, c in enumerate(classes) if c == "scanned"]
 
-            # Pass 2: render scanned pages plus explicitly selected native
-            # pages. The original text remains in the complete document.
-            rendered_indices = sorted(set(scanned_indices) | requested_indices)
-            if rendered_indices:
+            # Pass 2: render scanned pages to images.
+            if scanned_indices:
                 with parser_worker_limit("pdf_render", CONFIG.pdf_render_max_workers):
                     rendered = _render_scanned_pages(
                         pdf,
                         content,
-                        rendered_indices,
+                        scanned_indices,
                         scale,
                         quality,
                         CONFIG.pdf_render_max_edge,
                     )
                 for i, img_bytes in rendered.items():
-                    if i in requested_indices and classes[i] == "text":
-                        ref_path = f"images/{base_name}_p{i+1}_requested_render.jpg"
-                    else:
-                        ref_path = f"images/{base_name}_page_{i+1}.jpg"
+                    ref_path = f"images/{base_name}_page_{i+1}.jpg"
                     images[ref_path] = base64.b64encode(img_bytes).decode("utf-8")
 
             # Pass 3: extract embedded figures from native text pages so the Go
@@ -1651,13 +1631,6 @@ class PDFParser(BaseParser):
                 stripped = texts[i].strip()
                 if stripped:
                     blocks.append(stripped)
-                if i in requested_indices:
-                    # Scanned pages already use the normal scanned-page asset
-                    # identity. Only a native text page gets the explicit
-                    # requested-render identity above.
-                    page_filename = (f"{base_name}_p{i+1}_requested_render.jpg"
-                                     if classes[i] == "text" else f"{base_name}_page_{i+1}.jpg")
-                    blocks.append(f"![{page_filename}](images/{page_filename})")
                 vector_figure_count += len(vector_clips.get(i, []))
                 page_images = list(embedded.get(i, []))
                 page_images.sort(key=lambda item: item[2], reverse=True)
@@ -1675,8 +1648,6 @@ class PDFParser(BaseParser):
             "embedded_image_count": embedded_count,
             "vector_figure_count": vector_figure_count,
             "image_source_type": "scanned_pdf" if scanned_indices else "pdf_text_layer",
-            "requested_image_pages": list(self._image_pages),
-            "requested_rendered_pages": [page for page in self._image_pages if classes[page-1] == "text"],
         }
 
         logger.info(

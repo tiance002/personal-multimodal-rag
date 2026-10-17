@@ -31,31 +31,20 @@ def create_app(*,settings=None,runtime_factory=None):
     async def ready():
         from fastapi.responses import JSONResponse
         runtime=proxy.target
-        token=getattr(runtime,'token_authority',None)
-        authorized=runtime.permissions is not None and (runtime.costs is not None or token is not None)
-        if token is not None:
-            from datetime import datetime,timezone
-            from .authority import (ConfiguredTokenAuthority,ApprovedTokenAuthority,
-                                    ApprovedTokenAuthorityBundle,ServerPermissionResolver)
-            now=datetime.now(timezone.utc)
-            authorized=(isinstance(token,(ConfiguredTokenAuthority,ApprovedTokenAuthority,ApprovedTokenAuthorityBundle)) and isinstance(runtime.permissions,ServerPermissionResolver)
-                and runtime.permissions.tokens is token and runtime.permissions.settings == token.settings
-                and token.settings.expires_at>now and token.settings.month==now.date().replace(day=1)
-                and token.settings.subject_id==runtime.principal.subject_id and token.settings.tenant_id==runtime.principal.tenant_id)
-        return JSONResponse({'implementation':'weknora-python-port','model_send_authority':'configured' if authorized else 'DENY_UNCONFIGURED',
-            'budget_unit':'tokens' if token is not None else 'money' if authorized else 'disabled','authority_config_sha':getattr(runtime,'authority_config_sha',None)},status_code=200 if authorized else 503)
+        return JSONResponse({'implementation':'weknora-python-port',
+            'model_send_authority':'provider_configuration', 'cloud_allowed':runtime.cloud_allowed,
+            'budget_unit':'none', 'account_hard_budget':False},status_code=200)
+
     return app
 
 
 def main():
     parser=argparse.ArgumentParser(description='WeKnora Python development API; explicit isolated environment required')
     parser.add_argument('--host',default='127.0.0.1');parser.add_argument('--port',type=int,default=8000)
-    parser.add_argument('--authority-config')
     args=parser.parse_args()
     import uvicorn
     import asyncio
-    from .authority import runtime_factory
-    app=create_app(runtime_factory=runtime_factory(args.authority_config))
+    app=create_app()
     server=uvicorn.Server(uvicorn.Config(app,host=args.host,port=args.port))
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:runner.run(server.serve())
 

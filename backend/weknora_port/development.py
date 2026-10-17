@@ -26,6 +26,7 @@ class DevelopmentSettings:
     fallback_strategy:str='model'
     mineru_settings:object|None=None
     mineru_extensions:tuple[str,...]=()
+    cloud_allowed:bool=False
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -58,6 +59,7 @@ class DevelopmentSettings:
             env.get('WEKNORA_PORT_ROUTER_MODE','DYNAMIC'),env.get('WEKNORA_PORT_OLLAMA_URL',''),
             tuple(v.strip() for v in env.get('WEKNORA_PORT_ORIGINS','http://127.0.0.1:5173,http://localhost:5173').split(',') if v.strip()),
             fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'),
+            cloud_allowed=env.get('WEKNORA_PORT_CLOUD_ALLOWED','false').lower()=='true',
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','').split(',') if v.strip()))
@@ -107,54 +109,12 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             if not row['principal'] or not row['image']:raise DevelopmentConfigurationError('EXPLICIT_SCHEMA_INITIALIZATION_REQUIRED')
         if (await redis.info('server'))['run_id']!=settings.redis_run_id:raise DevelopmentConfigurationError('REDIS_IDENTITY_MISMATCH')
         own_storage(settings)
-        token_authority=None
         if authority_settings is not None:
-            from .authority import (ServerPermissionResolver,ConfiguredTokenAuthority,ApprovedTokenAuthority,
-                                    ApprovedTokenAuthorityBundle,AuthorityBundleSettings,MeterAsset)
-            from .storage.history import LocalPrincipal
-            if any(v is not None for v in (model_factory,permissions,costs,principal)):
-                raise DevelopmentConfigurationError('AUTHORITY_INJECTION_CONFLICT')
-            async with leases.lease() as guard:
-                check=await (await guard.connection.execute("SELECT to_regclass('port_token_calls') AS tokens,to_regclass('port_call_slots') AS slots")).fetchone()
-                if not all(check.values()):raise DevelopmentConfigurationError('EXPLICIT_TOKEN_SCHEMA_INITIALIZATION_REQUIRED')
-            principal=LocalPrincipal(authority_settings.tenant_id,authority_settings.subject_id)
-            approved=authority_settings.mode=='approved'
-            token_authority=(ApprovedTokenAuthorityBundle(authority_settings)
-                             if isinstance(authority_settings,AuthorityBundleSettings)
-                             else ApprovedTokenAuthority(authority_settings) if approved
-                             else ConfiguredTokenAuthority(authority_settings))
-            permissions=ServerPermissionResolver(leases,authority_settings,tokens=token_authority)
-            import httpx
-            from .models.synthetic import transport_handler
-            from .source_facts import bind_synthetic,bind_wire_facts,build_call_sources
-            from dataclasses import replace
-            def model_factory(config,key,gate):
-                if (config.provider,config.model) not in authority_settings.allowed_models:
-                    raise DevelopmentConfigurationError('AUTHORITY_MODEL_NOT_ALLOWED')
-                if approved:
-                    member=(authority_settings.for_provider(config.provider)
-                            if isinstance(authority_settings,AuthorityBundleSettings) else authority_settings)
-                    # Real hosted transport: exact endpoints and the delivered credential.
-                    # Facts must come from real server-resolved sources, never a mock slice.
-                    if not isinstance(member.meter,MeterAsset):
-                        raise DevelopmentConfigurationError('APPROVED_METER_REQUIRED')
-                    transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,
-                        credential=lambda _:key)
-                    transport.facts_mock_only=False
-                    transport.bind_facts=lambda config,context,body,wire,capability:bind_wire_facts(
-                        config,replace(context,source_facts=build_call_sources(context,body,wire,capability=capability)),
-                        body,wire,capability,config_sha=member.config_sha,
-                        recipe=member.meter.recipe)
-                    return ProviderModel(config,transport)
-                if any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):
-                    raise DevelopmentConfigurationError('SYNTHETIC_ENDPOINT_REQUIRED')
-                if config.api!='openai-completions' or config.embedding_api!='openai-embeddings' or config.rerank_api!='cohere-rerank':
-                    raise DevelopmentConfigurationError('SYNTHETIC_PROTOCOL_UNSUPPORTED')
-                transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,
-                    credential=lambda _:'SYNTHETIC-NOT-A-CREDENTIAL',http_transport=httpx.MockTransport(transport_handler))
-                transport.bind_facts=lambda config,context,body,wire,capability:bind_synthetic(
-                    config,context,body,wire,authority_settings.config_sha,capability=capability)
-                return ProviderModel(config,transport)
+            raise DevelopmentConfigurationError('LEGACY_AUTHORITY_CONFIG_NOT_SUPPORTED')
+        async with leases.lease() as guard:
+            check=await (await guard.connection.execute("SELECT to_regclass('port_provider_calls') AS calls")).fetchone()
+            if not check['calls']:
+                raise DevelopmentConfigurationError('EXPLICIT_PROVIDER_USAGE_SCHEMA_REQUIRED')
         principal=principal or await LocalPrincipalStore(leases).bootstrap()
         store=RedisListStreamStore(redis,prefix=settings.redis_prefix)
         box={}
@@ -193,8 +153,8 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 if settings.mineru_settings is not None else None,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
-            permissions=permissions,costs=costs,token_authority=token_authority,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
-        runtime.authority_config_sha=authority_settings.config_sha if authority_settings else None
+            permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
+        runtime.authority_config_sha=None
         box['runtime']=runtime
         yield runtime
     finally:

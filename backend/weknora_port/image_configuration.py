@@ -7,7 +7,7 @@ It never probes a provider to infer image capability.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 from .documents import DocumentLifecycleError, _json_object
 from .models.types import CallContext
@@ -39,38 +39,18 @@ class ImageSelection:
                 "config_version": self.config_version}
 
 
-def normalize_image_pages(value: Any) -> list[int]:
-    """Validate a one-based physical PDF page selection and return stable order."""
-    if (not isinstance(value, (list, tuple)) or not value
-            or any(type(page) is not int or page < 1 for page in value)
-            or len(value) > 1000 or len(set(value)) != len(value)):
-        raise DocumentLifecycleError("IMAGE_PAGE_SCOPE_INVALID")
-    return sorted(value)
-
-
-def select_image_assets(assets: Sequence[Any], pages: Sequence[int] | None) -> tuple[Any, ...]:
-    """Keep only page-bound assets; fail closed if a requested page has no asset."""
-    rows = tuple(assets)
-    if pages is None:
-        return rows
-    selected_pages = set(normalize_image_pages(list(pages)))
-    selected = tuple(asset for asset in rows if getattr(asset, "page_number", None) in selected_pages)
-    found = {asset.page_number for asset in selected}
-    if found != selected_pages:
-        raise DocumentLifecycleError("IMAGE_PAGE_ASSET_MISSING")
-    return selected
-
-
 def effective_image_config(kb: Mapping[str, Any], override: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """KB defaults followed by nonempty upload values; empty is not a reset."""
     base = _json_object(kb.get("image_processing_config"))
+    # P31 retires the P27 physical-page selector; preserve stored history.
+    base.pop("image_pages", None)
+    if override is not None and "image_pages" in override:
+        raise DocumentLifecycleError("IMAGE_PAGES_UNSUPPORTED")
     vlm = _json_object(kb.get("vlm_config"))
     if vlm.get("enabled") and vlm.get("model_id") and not base.get("ocr_model_id"):
         base["ocr_model_id"] = vlm["model_id"]
     if not base.get("ocr_adapter") and base.get("ocr_model_id"):
         base["ocr_adapter"] = "vlm"
-    if base.get("image_pages") is not None:
-        base["image_pages"] = normalize_image_pages(base["image_pages"])
     if override:
         for key in ("ocr_adapter", "ocr_model_id", "caption_mode", "caption_model_id",
                     "description_language", "custom_instructions"):
@@ -81,8 +61,6 @@ def effective_image_config(kb: Mapping[str, Any], override: Mapping[str, Any] | 
             base.pop('caption_model_id', None)
         elif override.get('caption_model_id') and not override.get('caption_mode'):
             base['caption_mode'] = 'explicit'
-        if override.get("image_pages") is not None:
-            base["image_pages"] = normalize_image_pages(override["image_pages"])
     return base
 
 

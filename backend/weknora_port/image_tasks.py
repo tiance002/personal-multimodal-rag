@@ -9,7 +9,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import re
 import secrets
 import uuid
 from dataclasses import dataclass
@@ -38,28 +37,6 @@ class ImageTask:
     claim_token: str
     outcomes: dict
     source_sha256: str = ""
-    page_scope: dict | None = None
-
-
-def page_scope_snapshot_valid(scope, row, override):
-    """Bind a requested page set to the exact uploaded document version/hash."""
-    if scope is None:
-        return not (isinstance(override, dict) and override.get("image_pages") is not None)
-    if not isinstance(scope, dict) or not isinstance(override, dict):
-        return False
-    pages = override.get("image_pages")
-    if pages is not None and (not isinstance(pages, list) or not pages
-            or any(type(page) is not int or page < 1 for page in pages)
-            or pages != sorted(set(pages))):
-        return False
-    expected = {
-        "tenant_id": row["tenant_id"], "subject_id": row["subject_id"],
-        "knowledge_base_id": row["knowledge_base_id"], "document_id": row["knowledge_id"],
-        "source_version": row["source_version"], "physical_pages": pages,
-    }
-    digest = scope.get("source_sha256")
-    return (all(scope.get(key) == value for key, value in expected.items())
-            and isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest) is not None)
 
 
 class ImageTaskQueue:
@@ -78,16 +55,9 @@ class ImageTaskQueue:
         selection=await resolve_image_selection(kb,override,self.model_store,self.catalogue,context)
         cfg={key:value for key,value in effective_image_config(kb,override).items() if key in {
             'description_language','custom_instructions','ocr_adapter','ocr_model_id',
-            'caption_mode','caption_model_id','image_pages'} and value not in (None,'')}
+            'caption_mode','caption_model_id'} and value not in (None,'')}
         cfg['enable_multimodal']=True
-        page_scope={"tenant_id":principal.tenant_id,"subject_id":principal.subject_id,
-            "knowledge_base_id":kb['id'],"document_id":document_id,"source_version":source_version,
-            "source_sha256":source_sha256,"physical_pages":cfg.get('image_pages')}
-        snapshot={"selection":selection.public(),"override":cfg,"page_scope":page_scope}
-        scope_row={"tenant_id":principal.tenant_id,"subject_id":principal.subject_id,
-            "knowledge_base_id":kb['id'],"knowledge_id":document_id,"source_version":source_version}
-        if not page_scope_snapshot_valid(page_scope,scope_row,cfg):
-            raise DocumentLifecycleError('IMAGE_SOURCE_IDENTITY_REQUIRED')
+        snapshot={"selection":selection.public(),"override":cfg,"source_sha256":source_sha256}
         task_id=str(uuid.uuid4())
         async with self.leases.lease(writable_knowledge_base_ids=frozenset({kb['id']})) as guard:
             guard.require_verified()
@@ -149,23 +119,17 @@ class ImageTaskQueue:
                     "lease_until=now()+interval '30 minutes',updated_at=now() WHERE id=%s",
                     (token,row['id']))
                 selected=row['selected_config'] if isinstance(row['selected_config'],dict) else json.loads(row['selected_config'])
-                override=selected.get('override') if isinstance(selected,dict) else None
-                page_scope=selected.get('page_scope') if isinstance(selected,dict) else None
-                if not page_scope_snapshot_valid(page_scope,row,override):
-                    await guard.connection.execute(
-                        "UPDATE port_image_tasks SET state='orphaned',error_code='IMAGE_PAGE_SCOPE_IDENTITY_MISMATCH',"
-                        'claim_token=NULL,lease_until=NULL,updated_at=now() WHERE id=%s',(row['id'],))
-                    await guard.connection.execute(
-                        "UPDATE knowledges SET parse_status='failed',error_message='IMAGE_PAGE_SCOPE_IDENTITY_MISMATCH',"
-                        "updated_at=now() WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s "
-                        "AND metadata->>'source_version'=%s AND deleted_at IS NULL AND parse_status IN ('pending','processing')",
-                        (row['knowledge_id'],row['tenant_id'],row['knowledge_base_id'],row['source_version']))
-                    return None
+                # P27 snapshots stay intact in storage; their retired selector
+                # must not constrain a resumed full-document image task.
+                override=dict(selected['override'])
+                override.pop('image_pages',None)
+                legacy_scope=selected.get('page_scope')
+                digest=selected.get('source_sha256','')
+                if not digest and isinstance(legacy_scope,dict):
+                    digest=legacy_scope.get('source_sha256','')
                 return ImageTask(row['id'],row['tenant_id'],row['subject_id'],row['knowledge_base_id'],
-                    row['knowledge_id'],row['source_version'],selected['selection'],selected['override'],
-                    row['attempt']+1,token,outcomes,
-                    page_scope.get('source_sha256','') if isinstance(page_scope,dict) else '',
-                    page_scope)
+                    row['knowledge_id'],row['source_version'],selected['selection'],override,
+                    row['attempt']+1,token,outcomes,digest)
 
     async def cancel(self,principal,knowledge_base_id,knowledge_id):
         if principal!=self.principal:raise PermissionError('IMAGE_TASK_OWNER_MISMATCH')

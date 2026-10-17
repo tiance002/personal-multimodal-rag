@@ -1,0 +1,158 @@
+{
+  "status": "P31_COMPLETE",
+  "cases": {
+    "row-0959": {
+      "status": "PASS_REAL_API_PG_REDIS_PROVIDER",
+      "answer": "## 长距离通信的用途\n\n根据幻灯片内容，用于长距离通信的方法包括：\n\n1. **无线电波（Radiowaves）**：可以被大气层中的不同层折射，使信号能够传播更远。其中，**电离层（ionosphere）** 会折射无线电波，这是实现长距离通信的关键机制之一。\n\n2. **微波（Microwaves）**：可以用于将信号发送到卫星，从而实现远距离通信。\n\n此外，幻灯片还提到了一些导致长距离通信困难的问题，例如信号扩散、波在不同大气层中折射导致信号难以精确发送、以及信号质量下降等。",
+      "sse_history_refreshed_equal": true,
+      "error_events": 0,
+      "finish_reason": "stop",
+      "scope": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "document_scope": [],
+      "stages": [
+        {
+          "stage": "understand",
+          "fields": {}
+        },
+        {
+          "stage": "retrieval",
+          "fields": {
+            "candidate_count": 30
+          }
+        },
+        {
+          "stage": "rerank",
+          "fields": {
+            "candidate_count": 2
+          }
+        },
+        {
+          "stage": "merge",
+          "fields": {
+            "candidate_count": 2
+          }
+        },
+        {
+          "stage": "context",
+          "fields": {
+            "selected_evidence_count": 2
+          }
+        }
+      ],
+      "context_types": [
+        "text",
+        "text"
+      ],
+      "necessary_fact_in_actual_wire": "ionosphere refracts radiowaves",
+      "final_calls": 1,
+      "elapsed_seconds": 9.174001,
+      "manual_fact_check": "Text communication statement matches existing chunks; synthetic image answer matches original image text. No official new dataset score."
+    },
+    "image-query": {
+      "status": "PASS_REAL_API_PG_REDIS_PROVIDER",
+      "answer": "EviRoute 提灯使用**琥珀色（amber）**镜片。",
+      "sse_history_refreshed_equal": true,
+      "error_events": 0,
+      "finish_reason": "stop",
+      "scope": "7176f41d-695b-4804-bda9-a99b0e8726b7",
+      "document_scope": [],
+      "stages": [
+        {
+          "stage": "understand",
+          "fields": {}
+        },
+        {
+          "stage": "retrieval",
+          "fields": {
+            "candidate_count": 4
+          }
+        },
+        {
+          "stage": "rerank",
+          "fields": {
+            "candidate_count": 4
+          }
+        },
+        {
+          "stage": "merge",
+          "fields": {
+            "candidate_count": 3
+          }
+        },
+        {
+          "stage": "context",
+          "fields": {
+            "selected_evidence_count": 3
+          }
+        }
+      ],
+      "context_types": [
+        "image_ocr",
+        "summary",
+        "image_caption"
+      ],
+      "necessary_fact_in_actual_wire": "amber lenses",
+      "final_calls": 1,
+      "elapsed_seconds": 5.617673,
+      "manual_fact_check": "Text communication statement matches existing chunks; synthetic image answer matches original image text. No official new dataset score."
+    }
+  },
+  "historical_tables_unchanged": true,
+  "cloud_calls": 16,
+  "groups": {
+    "siliconflow:chat": {
+      "calls": 5,
+      "input": 8076,
+      "output": 299,
+      "total": 8375
+    },
+    "siliconflow:embedding": {
+      "calls": 8,
+      "input": 203,
+      "output": 0,
+      "total": 203
+    },
+    "siliconflow:rerank": {
+      "calls": 2,
+      "input": 4301,
+      "output": 0,
+      "total": 4301
+    },
+    "deepseek:vision": {
+      "calls": 1,
+      "input": 1012,
+      "output": 375,
+      "total": 1387
+    }
+  },
+  "input_tokens": 13592,
+  "output_tokens": 674,
+  "total_tokens": 14266,
+  "new_unknown_calls": 0,
+  "new_budget_fences": 0,
+  "scope_isolation": {
+    "tenant332_kb_used_by": 344,
+    "http_status": 403,
+    "provider_calls_before": 0,
+    "provider_calls_after": 0,
+    "provider_delta": 0,
+    "expected": "403_or_404_and_zero_send_delta"
+  },
+  "image_ingest": {
+    "chunk_types": [
+      "text",
+      "image_ocr",
+      "image_caption",
+      "summary"
+    ],
+    "embedding_count": 4,
+    "physical_pages": 1,
+    "original_pdf_sha256": "3c2bc88546f1f91b5b52181c2a208396be112bcff56c61d3a92a9d9139b26e45",
+    "image_pages_parameter_sent": false,
+    "ocr": "local Tesseract",
+    "caption_model": "deepseek-flash",
+    "caption_calls": 1,
+    "source_readbacks": "source-readbacks.json",
+    "image_task_state": "completed"
+  }
+}

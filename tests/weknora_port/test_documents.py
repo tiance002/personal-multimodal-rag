@@ -293,3 +293,48 @@ def test_bound_principal_and_kb_scope_are_checked_before_file_write(tmp_path):
         assert not (tmp_path / "storage-new").exists()
 
     asyncio.run(exercise())
+
+
+def test_legacy_page_selection_does_not_filter_full_pdf_image_processing(tmp_path, monkeypatch):
+    """P31 removes P27 filtering while preserving the historical KB setting."""
+    import io
+    import fitz
+    from PIL import Image
+
+    async def exercise():
+        service, factory = make_service(tmp_path, post_processor=lambda *args: None)
+        monkeypatch.setattr(documents, "ScopedKnowledgeRepository",
+                            lambda repo, resolve_tenant: FakeChunks(repo, resolve_tenant))
+        monkeypatch.setattr(documents, "HybridIndexer", FakeIndex)
+        kb = await service.create_knowledge_base(PRINCIPAL, "Full PDF")
+        config = factory.connection.kbs[kb["id"]]["image_processing_config"]
+        config.update(enable_multimodal=True, image_pages=[999])
+        processed = []
+
+        async def process_images(principal, image_kb, scope, assets):
+            assert principal == PRINCIPAL and image_kb["id"] == scope.knowledge_base_id
+            processed.extend(assets)
+            return ()
+
+        service.asset_processor = process_images
+        pdf = fitz.open()
+        image = io.BytesIO()
+        Image.new("RGB", (360, 480), (70, 100, 150)).save(image, format="PNG")
+        native = pdf.new_page(width=595, height=842)
+        native.insert_text((55, 80), "Native text evidence with an embedded figure.")
+        native.insert_image(fitz.Rect(100, 200, 400, 600), stream=image.getvalue())
+        scanned = pdf.new_page(width=595, height=842)
+        scanned.insert_image(scanned.rect, stream=image.getvalue())
+        raw = pdf.tobytes()
+        pdf.close()
+        item = await service.upload_document(PRINCIPAL, kb["id"], "full.pdf", "application/pdf",
+                                             FixtureUpload(raw))
+        assert item["status"] == "completed", item
+        assert {(asset.page_number, asset.source_type) for asset in processed} == {
+            (1, "embedded_pdf_image"), (2, "scanned_pdf")}
+        metadata = factory.connection.docs[item["id"]]["metadata"]
+        assert len(metadata["assets"]) == 2
+        assert config["image_pages"] == [999]
+        assert (await service.read_document(PRINCIPAL, kb["id"], item["id"])).content == raw
+
+    asyncio.run(exercise())
