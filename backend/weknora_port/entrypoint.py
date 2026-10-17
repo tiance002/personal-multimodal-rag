@@ -35,9 +35,11 @@ def create_app(*,settings=None,runtime_factory=None):
         authorized=runtime.permissions is not None and (runtime.costs is not None or token is not None)
         if token is not None:
             from datetime import datetime,timezone
-            from .authority import ConfiguredTokenAuthority,ApprovedTokenAuthority,ServerPermissionResolver
+            from .authority import (ConfiguredTokenAuthority,ApprovedTokenAuthority,
+                                    ApprovedTokenAuthorityBundle,ServerPermissionResolver)
             now=datetime.now(timezone.utc)
-            authorized=(isinstance(token,(ConfiguredTokenAuthority,ApprovedTokenAuthority)) and isinstance(runtime.permissions,ServerPermissionResolver)
+            authorized=(isinstance(token,(ConfiguredTokenAuthority,ApprovedTokenAuthority,ApprovedTokenAuthorityBundle)) and isinstance(runtime.permissions,ServerPermissionResolver)
+                and runtime.permissions.tokens is token and runtime.permissions.settings == token.settings
                 and token.settings.expires_at>now and token.settings.month==now.date().replace(day=1)
                 and token.settings.subject_id==runtime.principal.subject_id and token.settings.tenant_id==runtime.principal.tenant_id)
         return JSONResponse({'implementation':'weknora-python-port','model_send_authority':'configured' if authorized else 'DENY_UNCONFIGURED',

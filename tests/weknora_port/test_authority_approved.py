@@ -73,7 +73,7 @@ def test_approved_loader_accepts_real_verified_config():
     ('approval_source', 'SYNTHETIC:closed', 'APPROVED_APPROVAL_SOURCE_REJECTED'),
     ('carry_source', 'synthetic-new-empty-account', 'APPROVED_CARRY_SOURCE_UNTRUSTED'),
     ('carry_status', 'UNKNOWN', 'APPROVED_CARRY_BOUND_REQUIRED'),
-    ('limit_tokens', 999_999, 'APPROVED_PROVIDER_LIMIT_UNKNOWN'),
+    ('limit_tokens', 0, 'APPROVED_PROVIDER_LIMIT_UNKNOWN'),
     # Changing only the provider leaves DeepSeek models in the config: reject
     # this mixed identity even though SiliconFlow itself is now authorized.
     ('provider', 'siliconflow', 'APPROVED_MODEL_PROVIDER_MISMATCH'),
@@ -209,7 +209,7 @@ def test_approved_rejects_mixed_provider_models_at_load_and_init(provider, model
 
 
 @pytest.mark.parametrize('provider,limit', [
-    ('deepseek', 999_999), ('deepseek', 1_000_001),
+    ('deepseek', 0), ('deepseek', 1_000_001),
     ('siliconflow', 0), ('siliconflow', -1), ('siliconflow', True),
     ('siliconflow', 250_000.0), ('siliconflow', '250000'),
 ])
@@ -222,3 +222,12 @@ def test_approved_rejects_invalid_provider_fences_at_load_and_init(provider, lim
         'allowed_models': tuple(tuple(model) for model in models), 'limit_tokens': limit})
     with pytest.raises(ProviderError, match='TOKEN_MONTH_AUTHORITY_REQUIRED'):
         ApprovedTokenAuthority(broken)
+
+
+@pytest.mark.parametrize('limit', [1, 750_000, 999_999])
+def test_approved_deepseek_accepts_a_narrower_run_fence(limit):
+    # The owner ceiling remains 1m; a paired task must be able to allocate a
+    # smaller DeepSeek fence while keeping SiliconFlow in its own real pool.
+    settings = _approved_settings(limit_tokens=limit)
+    authority = ApprovedTokenAuthority(settings)
+    assert authority.monthly(_call(settings)).limit_tokens == limit

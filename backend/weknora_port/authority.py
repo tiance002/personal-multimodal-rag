@@ -46,7 +46,52 @@ class AuthoritySettings:
     meter: MeterAsset | None = None
 
 
+@dataclass(frozen=True)
+class AuthorityBundleSettings:
+    """Read-only composition; each provider retains its own config and quota."""
+    config_sha: str
+    authorities: tuple[AuthoritySettings, ...]
+    mode: str = 'approved'
+
+    def __post_init__(self):
+        members = self.authorities
+        if (self.mode != 'approved' or not isinstance(members, tuple) or len(members) < 2
+                or any(not isinstance(s, AuthoritySettings) or s.mode != 'approved' for s in members)):
+            raise ProviderError('AUTHORITY_BUNDLE_APPROVED_MEMBERS_REQUIRED')
+        if len({(s.tenant_id, s.subject_id, s.month) for s in members}) != 1:
+            raise ProviderError('AUTHORITY_BUNDLE_IDENTITY_MISMATCH')
+        if (len({s.provider for s in members}) != len(members)
+                or len({(s.account_id, s.provider) for s in members}) != len(members)):
+            raise ProviderError('AUTHORITY_BUNDLE_DUPLICATE_PROVIDER')
+
+    @property
+    def tenant_id(self): return self.authorities[0].tenant_id
+
+    @property
+    def subject_id(self): return self.authorities[0].subject_id
+
+    @property
+    def month(self): return self.authorities[0].month
+
+    @property
+    def expires_at(self): return min(s.expires_at for s in self.authorities)
+
+    @property
+    def allowed_models(self):
+        return tuple(dict.fromkeys(model for s in self.authorities for model in s.allowed_models))
+
+    def for_provider(self, provider):
+        for member in self.authorities:
+            if member.provider == provider:
+                return member
+        raise ProviderError('AUTHORITY_PROVIDER_NOT_ALLOWED')
+
+
 def load_authority_settings(path):
+    return _load_authority_settings(path, allow_bundle=True)
+
+
+def _load_authority_settings(path, *, allow_bundle):
     if path is None:
         return None
     def unique(pairs):
@@ -60,6 +105,16 @@ def load_authority_settings(path):
         raise ProviderError('AUTHORITY_ABSOLUTE_DE_PATH_REQUIRED')
     raw = target.read_bytes()
     obj = json.loads(raw, object_pairs_hook=unique)
+    if isinstance(obj, dict) and obj.get('schema') == 'weknora-token-authority-bundle/v1':
+        paths = obj.get('authorities')
+        if (not allow_bundle or set(obj) != {'schema', 'authorities'}
+                or not isinstance(paths, list) or len(paths) < 2
+                or any(not isinstance(p, str) or not p for p in paths)):
+            raise ProviderError('AUTHORITY_BUNDLE_CONFIG_INVALID')
+        # The root SHA pins membership/path bytes; member SHAs bind each call's
+        # facts to the independently verified approved config and meter asset.
+        members = tuple(_load_authority_settings(p, allow_bundle=False) for p in paths)
+        return AuthorityBundleSettings(hashlib.sha256(raw).hexdigest(), members)
     if obj=={'schema':'weknora-token-authority/v1','mode':'disabled'}:
         return None
     base = {'schema','mode','tenant_id','subject_id','account_id','expires_at','approval_source','month',
@@ -98,9 +153,9 @@ def load_authority_settings(path):
 
 def _approved_provider_limit_valid(provider, limit):
     # SiliconFlow uses an explicit finite run fence, not an owner quota grant.
-    # DeepSeek retains the owner's fixed cumulative token limit.
+    # A task may narrow DeepSeek's run fence below the owner's 1m ceiling.
     return (type(limit) is int and limit > 0
-            and (provider == 'siliconflow' or provider == 'deepseek' and limit == 1_000_000))
+            and (provider == 'siliconflow' or provider == 'deepseek' and limit <= 1_000_000))
 
 
 def _approved_models_match_provider(models, provider):
@@ -287,15 +342,37 @@ class ApprovedTokenAuthority:
             s.carry_in_tokens, s.carry_status, s.carry_source, s.approval_source)
 
 
+class ApprovedTokenAuthorityBundle:
+    """Dispatch to existing authorities without merging account/provider pools."""
+    def __init__(self, settings):
+        if not isinstance(settings, AuthorityBundleSettings):
+            raise ProviderError('TOKEN_MONTH_AUTHORITY_REQUIRED')
+        self.settings = settings
+        self.authorities = {s.provider: ApprovedTokenAuthority(s) for s in settings.authorities}
+
+    def _for_call(self, call):
+        self.settings.for_provider(call.provider)  # Fail closed for unknown providers.
+        return self.authorities[call.provider]
+
+    def validate(self, call): return self._for_call(call).validate(call)
+
+    def reserve_bound(self, call): return self._for_call(call).reserve_bound(call)
+
+    def monthly(self, call): return self._for_call(call).monthly(call)
+
+
 class ServerPermissionResolver:
     def __init__(self, leases, settings, tokens=None):
         self.leases, self.settings = leases, settings
-        self.tokens = tokens or (ConfiguredTokenAuthority(settings) if settings.mode == 'synthetic'
+        self.tokens = tokens or (ApprovedTokenAuthorityBundle(settings)
+                                 if isinstance(settings, AuthorityBundleSettings)
+                                 else ConfiguredTokenAuthority(settings) if settings.mode == 'synthetic'
                                  else ApprovedTokenAuthority(settings))
 
     async def resolve(self, call):
         facts = self.tokens.validate(call)
-        cfg = self.settings
+        cfg = (self.settings.for_provider(call.provider)
+               if isinstance(self.settings, AuthorityBundleSettings) else self.settings)
         kbs = set(call.context.scope.knowledge_base_ids) | set(call.context.required_origin_kbs)
         origins = []
         for src in facts.sources.slices:

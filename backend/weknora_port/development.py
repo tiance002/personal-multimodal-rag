@@ -109,7 +109,8 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
         own_storage(settings)
         token_authority=None
         if authority_settings is not None:
-            from .authority import ServerPermissionResolver,ConfiguredTokenAuthority,ApprovedTokenAuthority,MeterAsset
+            from .authority import (ServerPermissionResolver,ConfiguredTokenAuthority,ApprovedTokenAuthority,
+                                    ApprovedTokenAuthorityBundle,AuthorityBundleSettings,MeterAsset)
             from .storage.history import LocalPrincipal
             if any(v is not None for v in (model_factory,permissions,costs,principal)):
                 raise DevelopmentConfigurationError('AUTHORITY_INJECTION_CONFLICT')
@@ -118,7 +119,9 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 if not all(check.values()):raise DevelopmentConfigurationError('EXPLICIT_TOKEN_SCHEMA_INITIALIZATION_REQUIRED')
             principal=LocalPrincipal(authority_settings.tenant_id,authority_settings.subject_id)
             approved=authority_settings.mode=='approved'
-            token_authority=(ApprovedTokenAuthority(authority_settings) if approved
+            token_authority=(ApprovedTokenAuthorityBundle(authority_settings)
+                             if isinstance(authority_settings,AuthorityBundleSettings)
+                             else ApprovedTokenAuthority(authority_settings) if approved
                              else ConfiguredTokenAuthority(authority_settings))
             permissions=ServerPermissionResolver(leases,authority_settings,tokens=token_authority)
             import httpx
@@ -129,17 +132,19 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 if (config.provider,config.model) not in authority_settings.allowed_models:
                     raise DevelopmentConfigurationError('AUTHORITY_MODEL_NOT_ALLOWED')
                 if approved:
+                    member=(authority_settings.for_provider(config.provider)
+                            if isinstance(authority_settings,AuthorityBundleSettings) else authority_settings)
                     # Real hosted transport: exact endpoints and the delivered credential.
                     # Facts must come from real server-resolved sources, never a mock slice.
-                    if not isinstance(authority_settings.meter,MeterAsset):
+                    if not isinstance(member.meter,MeterAsset):
                         raise DevelopmentConfigurationError('APPROVED_METER_REQUIRED')
                     transport=AsyncHTTPTransport(allowed_endpoints=endpoint_urls(config),gate=gate,
                         credential=lambda _:key)
                     transport.facts_mock_only=False
                     transport.bind_facts=lambda config,context,body,wire,capability:bind_wire_facts(
                         config,replace(context,source_facts=build_call_sources(context,body,wire,capability=capability)),
-                        body,wire,capability,config_sha=authority_settings.config_sha,
-                        recipe=authority_settings.meter.recipe)
+                        body,wire,capability,config_sha=member.config_sha,
+                        recipe=member.meter.recipe)
                     return ProviderModel(config,transport)
                 if any(urlsplit(v).hostname!='fixture.invalid' for v in endpoint_urls(config)):
                     raise DevelopmentConfigurationError('SYNTHETIC_ENDPOINT_REQUIRED')
