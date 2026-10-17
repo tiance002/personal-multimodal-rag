@@ -1,0 +1,1345 @@
+{
+  "schema": "rag-m3-machine-results/v1",
+  "provenance": {
+    "baseline_head": "862b0642c3136dcbe12ab1e2914389b67fe8d2de",
+    "source_commit": "862b0642c3136dcbe12ab1e2914389b67fe8d2de",
+    "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "artifacts": {
+      "plan_sha256": "5bdc2932f1da071fc10079a508c6a683918844d7b677d10923634ab000624674",
+      "plan_frozen_p32_sha256": "88a44dab00333521dd1c2d1dd845ff423dc352fe14bc000cda15414735bbb318",
+      "rubric_sha256": "a4e3323cfcb62e524b11eaea109ec0fdb95c0f70343e6a139d6099b52055d8c2",
+      "rubric_frozen_p32_results_sha256": "ce1c914e423a8a9b21d52a00e97b6b10e12862ad65fdd183689a871ce014b1dd",
+      "summary_sha256": "927a464bd359dd3e98d7e76e97b2a663c990c93f0f09a5f2b5e4f3ac0b81be4a",
+      "scored_results_sha256": "f9344068b50692bf054a8f2c0e0f3f7ec9d19b6c0a2c881c4ad0dd7eaabc43ca"
+    }
+  },
+  "decision": {
+    "status": "M3_PARTIAL",
+    "production_default": "A",
+    "production_config_changed": false,
+    "rationale": [
+      "B (DeepSeek query understanding) was faster on 9/10 paired cases.",
+      "B misclassified the explicit KB follow-up as follow_up and skipped Search/Context.",
+      "Neither Omni variant received the numeric OCR chunk in final Context; B supplied unsupported specific numbers while A reported insufficient numeric evidence.",
+      "Keep A as production default; no production configuration change."
+    ],
+    "e2e_faster_pairs_for_b": {
+      "count": 9,
+      "of": 10
+    }
+  },
+  "execution": {
+    "completed_variant_runs": 20,
+    "completed_ab_pairs": 10,
+    "preserved_pre_send_failures": 1,
+    "preserved_failures": [
+      {
+        "case_id": "scifact-339",
+        "variant": "A",
+        "status": "FAILED_OBSERVER_BEFORE_PROVIDER_SEND",
+        "error_code": "RUNTIME_DURABLE_GATE_REQUIRED",
+        "attempt_number": 1
+      }
+    ],
+    "provider_calls": 73,
+    "actual_reported_tokens": 201275,
+    "unknown_outcomes": 0,
+    "missing_usage": 0,
+    "offline_scoring_performed": true,
+    "cloud_calls_by_scorer": 0,
+    "m3_ingest_or_reindex_performed": false,
+    "legacy_accounting_unchanged": true
+  },
+  "metric_scope": {
+    "retrieval_qrels": "SciFact and MIRACL source-level retrieval metrics only; not answer accuracy.",
+    "answer_metrics": "LongBench multifieldqa_zh and HotpotQA are task-specific selected-sample diagnostics; do not claim whole-benchmark performance.",
+    "mmlongbench": "Project native typed-gold diagnostics only; official judge NOT_RUN and semantic review is separate.",
+    "omnidocbench": "OCR/source-presence diagnostic only; official QA accuracy NOT_APPLICABLE; current reparse NOT_RUN.",
+    "no_official_scifact_miracl_answer_metrics": true,
+    "no_omni_qa_accuracy_claim": true
+  },
+  "semantic_review": {
+    "scifact-339": {
+      "A": {
+        "source_qrels_recall_at_10": 1.0,
+        "status": "FAIL_ANSWER_FACTS_MISREPORTED",
+        "finding": "Source qrels recall is complete; low-dose numbers were misreported."
+      },
+      "B": {
+        "source_qrels_recall_at_10": 1.0,
+        "status": "FAIL_ANSWER_FACTS_MISREPORTED",
+        "finding": "Source qrels recall is complete; low-dose numbers were misreported."
+      },
+      "answer_accuracy_metric": "NOT_APPLICABLE_RETRIEVAL_QRELS_ONLY"
+    },
+    "miracl-91294": {
+      "A": {
+        "source_qrels_recall_at_10": 1.0,
+        "status": "PASS_CORE_FACTS_SUPPORTED",
+        "answer_shape": "FINAL_SUMMARY_ONLY"
+      },
+      "B": {
+        "source_qrels_recall_at_10": 1.0,
+        "status": "PASS_CORE_FACTS_SUPPORTED",
+        "answer_shape": "FINAL_SUMMARY_ONLY"
+      },
+      "answer_accuracy_metric": "NOT_APPLICABLE_RETRIEVAL_QRELS_ONLY"
+    },
+    "longbench-51abd206": {
+      "A": {
+        "status": "PASS_CORE_FACT_2_2_WAN_CORRECT",
+        "task_f1": 0.08333333333333333
+      },
+      "B": {
+        "status": "PASS_CORE_FACT_2_2_WAN_CORRECT",
+        "task_f1": 0.14285714285714288
+      },
+      "metric_scope": "Small selected sample; task-specific full-response F1, not whole-benchmark performance."
+    },
+    "hotpot-5a7631": {
+      "A": {
+        "status": "FAIL_SECOND_HOP_LOCATION_MISSING",
+        "franconia_nh_in_rerank": false,
+        "answer_em": 0.0,
+        "answer_token_f1": 0.044444444444444446
+      },
+      "B": {
+        "status": "FAIL_SECOND_HOP_LOCATION_MISSING",
+        "franconia_nh_in_rerank": false,
+        "answer_em": 0.0,
+        "answer_token_f1": 0.05
+      },
+      "finding": "Both lose the Franconia, New Hampshire location at Rerank; supporting-fact scoring is separate from answer scoring."
+    },
+    "mml-0959": {
+      "A": {
+        "status": "PASS_CORE_FACTS_SUPPORTED",
+        "radio_ionosphere": true,
+        "microwave_satellite": true,
+        "character_f1": 0.18099547511312217
+      },
+      "B": {
+        "status": "PASS_CORE_FACTS_SUPPORTED",
+        "radio_ionosphere": true,
+        "microwave_satellite": true,
+        "character_f1": 0.18604651162790697
+      },
+      "official_judge": "NOT_RUN",
+      "semantic_review_separate_from_automatic_metric": true
+    },
+    "mml-0434": {
+      "A": {
+        "status": "FAIL_RELEVANT_SOURCE_DROPPED_AFTER_SEARCH",
+        "kaggle_chunk_in_search": true,
+        "kaggle_chunk_in_rerank": false,
+        "kaggle_chunk_in_context": false,
+        "kaggle_search_rank": 11
+      },
+      "B": {
+        "status": "FAIL_RELEVANT_SOURCE_DROPPED_AFTER_SEARCH",
+        "kaggle_chunk_in_search": true,
+        "kaggle_chunk_in_rerank": false,
+        "kaggle_chunk_in_context": false,
+        "kaggle_search_rank": 10
+      },
+      "cross_page_coding_time_attribution": "UNKNOWN_UNPROVEN"
+    },
+    "mml-followup-summary": {
+      "A": {
+        "status": "PARTIAL_REQUEST_NOT_MET",
+        "history_present": true,
+        "requested_two_sentences": true,
+        "two_sentences": false,
+        "core_facts_retained": true
+      },
+      "B": {
+        "status": "PASS_WITH_GENERIC_EXTRA",
+        "history_present": true,
+        "requested_two_sentences": true,
+        "two_sentences": true,
+        "core_facts_retained": true
+      }
+    },
+    "mml-followup-search-B": {
+      "status": "FAIL_KB_RETRIEVAL_BYPASSED",
+      "expected_intent": "kb_search",
+      "observed_intent": "follow_up",
+      "search": false,
+      "rerank": false,
+      "context": false,
+      "finding": "Explicit KB follow-up was misclassified and returned without a fresh search or context."
+    },
+    "omni-page007": {
+      "A": {
+        "status": "NO_NUMERIC_ANSWER_OCR_CONTEXT_MISSING",
+        "target_source_in_search": true,
+        "target_source_in_rerank": true,
+        "target_source_in_context": true,
+        "target_ocr_chunk_in_search": true,
+        "target_ocr_chunk_in_rerank": false,
+        "target_ocr_chunk_in_context": false,
+        "target_ocr_chunk_in_final_evidence": false
+      },
+      "B": {
+        "status": "FALSE_SPECIFIC_NUMBERS",
+        "target_source_in_search": true,
+        "target_source_in_rerank": true,
+        "target_source_in_context": true,
+        "target_ocr_chunk_in_search": true,
+        "target_ocr_chunk_in_rerank": false,
+        "target_ocr_chunk_in_context": false,
+        "target_ocr_chunk_in_final_evidence": false
+      },
+      "current_reparse": "NOT_RUN",
+      "official_qa_accuracy": "NOT_APPLICABLE"
+    },
+    "chitchat-control": {
+      "A": {
+        "status": "PASS_NO_KB_RETRIEVAL",
+        "intent": "chitchat",
+        "search_count": 0,
+        "context_count": 0
+      },
+      "B": {
+        "status": "PASS_NO_KB_RETRIEVAL",
+        "intent": "greeting",
+        "search_count": 0,
+        "context_count": 0
+      }
+    }
+  },
+  "cases": {
+    "scifact-339": {
+      "dataset": "scifact",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 10,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "rerank": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "context": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 19.41994630001136,
+            "understand_stage_seconds": 2.27377329999581,
+            "understand_provider_seconds": 2.2643893999920692,
+            "generation_provider_seconds": 13.622955800005002,
+            "first_answer_seconds": 19.271395700023277,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5768685000075493,
+            "complete_seconds": 19.387544900004286
+          },
+          "tokens": 10789,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 10,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "rerank": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "context": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 14.446638199995505,
+            "understand_stage_seconds": 1.074547199998051,
+            "understand_provider_seconds": 1.034975199989276,
+            "generation_provider_seconds": 11.158156999998027,
+            "first_answer_seconds": 14.428022700012662,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.500389399996493,
+            "complete_seconds": 14.428612400020938
+          },
+          "tokens": 10645,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "miracl-91294": {
+      "dataset": "miracl-zh",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 10,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "rerank": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "context": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 7.229218400025275,
+            "understand_stage_seconds": 2.4720807999838144,
+            "understand_provider_seconds": 2.46318489999976,
+            "generation_provider_seconds": 1.9934499000082724,
+            "first_answer_seconds": 7.21021390001988,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5679234000272118,
+            "complete_seconds": 7.210722400021041
+          },
+          "tokens": 7136,
+          "usage_calls": 5,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 10,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "rerank": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            },
+            "context": {
+              "status": "COMPUTED_FROZEN_SOURCE_QRELS",
+              "unit": "FROZEN_SOURCE_ID",
+              "gold_source_present": true,
+              "metrics": {
+                "recall_at_k": 1.0,
+                "precision_at_k": 0.1,
+                "f1_at_k": 0.18181818181818182,
+                "hit_at_k": 1,
+                "mrr_at_k": 1.0,
+                "map_at_k": 1.0,
+                "ndcg_at_k": 1.0,
+                "retrieved_count_at_k": 1,
+                "no_answer_retrieval_empty": null
+              }
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 14.683607500017388,
+            "understand_stage_seconds": 0.9428060000063851,
+            "understand_provider_seconds": 0.9059412000060547,
+            "generation_provider_seconds": 10.798657899984391,
+            "first_answer_seconds": 14.663340800005244,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5520304000237957,
+            "complete_seconds": 14.663858600019012
+          },
+          "tokens": 7053,
+          "usage_calls": 6,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "longbench-51abd206": {
+      "dataset": "longbench-zh",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_OFFICIAL_TASK_METRIC_ON_SMALL_SELECTED_SAMPLE",
+            "metrics": {
+              "qa_f1_zh_score": 0.08333333333333333
+            },
+            "task": "multifieldqa_zh",
+            "function": "qa_f1_zh_score",
+            "included_in_answer_metric_denominator": true,
+            "evaluation_unit": "FULL_COMPLETED_APP_RESPONSE_INCLUDING_FIXED_REFUSALS",
+            "official_whole_benchmark": "NOT_CLAIMED"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 29.79856579998159,
+            "understand_stage_seconds": 10.88282710002386,
+            "understand_provider_seconds": 10.876414700003807,
+            "generation_provider_seconds": 16.41677010001149,
+            "first_answer_seconds": 29.779854699998396,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5327303999802098,
+            "complete_seconds": 29.780180299974745
+          },
+          "tokens": 12577,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_OFFICIAL_TASK_METRIC_ON_SMALL_SELECTED_SAMPLE",
+            "metrics": {
+              "qa_f1_zh_score": 0.14285714285714288
+            },
+            "task": "multifieldqa_zh",
+            "function": "qa_f1_zh_score",
+            "included_in_answer_metric_denominator": true,
+            "evaluation_unit": "FULL_COMPLETED_APP_RESPONSE_INCLUDING_FIXED_REFUSALS",
+            "official_whole_benchmark": "NOT_CLAIMED"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 18.223945700010518,
+            "understand_stage_seconds": 1.104673099995125,
+            "understand_provider_seconds": 1.038922600011574,
+            "generation_provider_seconds": 14.365900500008138,
+            "first_answer_seconds": 18.07969020001474,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.6190351000113878,
+            "complete_seconds": 18.19824399999925
+          },
+          "tokens": 12419,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "hotpot-5a7631": {
+      "dataset": "hotpotqa",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_ANSWER_DIAGNOSTICS",
+            "metrics": {
+              "hotpot_answer_em": 0.0,
+              "hotpot_answer_token_f1": 0.044444444444444446
+            },
+            "supporting_facts": "SEPARATE_FROM_ANSWER"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 195.65316429999075,
+            "understand_stage_seconds": 188.82326049997937,
+            "understand_provider_seconds": 188.8151707999932,
+            "generation_provider_seconds": 4.021793699997943,
+            "first_answer_seconds": 195.51175299999886,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.6289930999919306,
+            "complete_seconds": 195.6258708999958
+          },
+          "tokens": 7512,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_ANSWER_DIAGNOSTICS",
+            "metrics": {
+              "hotpot_answer_em": 0.0,
+              "hotpot_answer_token_f1": 0.05
+            },
+            "supporting_facts": "SEPARATE_FROM_ANSWER"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 15.524983699986478,
+            "understand_stage_seconds": 1.0910931999969762,
+            "understand_provider_seconds": 1.0350457000022288,
+            "generation_provider_seconds": 11.933814799995162,
+            "first_answer_seconds": 15.50527759999386,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.6647534999938216,
+            "complete_seconds": 15.505733600002714
+          },
+          "tokens": 7658,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "mml-0959": {
+      "dataset": "mmlongbench-doc",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+            "metrics": {
+              "normalized_exact_match": 0,
+              "character_f1": 0.18099547511312217
+            },
+            "official_judge": "NOT_RUN",
+            "typed_gold": true,
+            "semantic_judgment": "NOT_AUTOMATED_SEPARATE_MANUAL_REVIEW"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 27.47426109999651,
+            "understand_stage_seconds": 10.734407299984014,
+            "understand_provider_seconds": 10.728377399995225,
+            "generation_provider_seconds": 11.990304500010097,
+            "first_answer_seconds": 27.319773000024725,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5086222999962047,
+            "complete_seconds": 27.44361650000792
+          },
+          "tokens": 8224,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+            "metrics": {
+              "normalized_exact_match": 0,
+              "character_f1": 0.18604651162790697
+            },
+            "official_judge": "NOT_RUN",
+            "typed_gold": true,
+            "semantic_judgment": "NOT_AUTOMATED_SEPARATE_MANUAL_REVIEW"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 25.079079200018896,
+            "understand_stage_seconds": 0.9417037999955937,
+            "understand_provider_seconds": 0.9014897999877576,
+            "generation_provider_seconds": 19.58015880000312,
+            "first_answer_seconds": 25.060337500006426,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5182096000062302,
+            "complete_seconds": 25.060613300011028
+          },
+          "tokens": 8139,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "omni-page007": {
+      "dataset": "omnidocbench",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_OFFICIAL_QA_GOLD",
+            "metrics": null,
+            "official_qa_accuracy": "NOT_APPLICABLE"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": {
+            "status": "OCR_SOURCE_PRESENCE_DIAGNOSTIC_ONLY",
+            "metrics": null,
+            "target_source_id": "PPT_lecture1_page_007.png",
+            "target_source_id_raw": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_lecture1_page_007.png",
+            "target_source_identity_in_stages": {
+              "search": true,
+              "rerank": true,
+              "context": true
+            },
+            "target_source_in_stages": {
+              "search": true,
+              "rerank": true,
+              "context": true
+            },
+            "target_ocr_chunk_ids": [
+              "51316a20-67fd-4732-b520-c049999933d0"
+            ],
+            "target_ocr_chunk_in_stages": {
+              "search": true,
+              "rerank": false,
+              "context": false
+            },
+            "ocr_chunk_ids_observed": [],
+            "target_ocr_chunk_observed_in_evidence": false,
+            "current_reparse": "NOT_RUN",
+            "official_qa_accuracy": "NOT_APPLICABLE"
+          },
+          "latency_seconds": {
+            "e2e_seconds": 28.753351399995154,
+            "understand_stage_seconds": 6.600929600012023,
+            "understand_provider_seconds": 6.5945968000160065,
+            "generation_provider_seconds": 19.328038999985438,
+            "first_answer_seconds": 28.733517299988307,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5085698000038974,
+            "complete_seconds": 28.733903899992583
+          },
+          "tokens": 33638,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_OFFICIAL_QA_GOLD",
+            "metrics": null,
+            "official_qa_accuracy": "NOT_APPLICABLE"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": {
+            "status": "OCR_SOURCE_PRESENCE_DIAGNOSTIC_ONLY",
+            "metrics": null,
+            "target_source_id": "PPT_lecture1_page_007.png",
+            "target_source_id_raw": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_lecture1_page_007.png",
+            "target_source_identity_in_stages": {
+              "search": true,
+              "rerank": true,
+              "context": true
+            },
+            "target_source_in_stages": {
+              "search": true,
+              "rerank": true,
+              "context": true
+            },
+            "target_ocr_chunk_ids": [
+              "51316a20-67fd-4732-b520-c049999933d0"
+            ],
+            "target_ocr_chunk_in_stages": {
+              "search": true,
+              "rerank": false,
+              "context": false
+            },
+            "ocr_chunk_ids_observed": [],
+            "target_ocr_chunk_observed_in_evidence": false,
+            "current_reparse": "NOT_RUN",
+            "official_qa_accuracy": "NOT_APPLICABLE"
+          },
+          "latency_seconds": {
+            "e2e_seconds": 16.386324899998726,
+            "understand_stage_seconds": 0.8807097999961115,
+            "understand_provider_seconds": 0.8416834999807179,
+            "generation_provider_seconds": 12.801122999982908,
+            "first_answer_seconds": 16.3674527000112,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.47445280000101775,
+            "complete_seconds": 16.368053899990628
+          },
+          "tokens": 32412,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "mml-0434": {
+      "dataset": "mmlongbench-doc",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+            "metrics": {
+              "normalized_exact_match": 0,
+              "character_f1": 0.15384615384615385
+            },
+            "official_judge": "NOT_RUN",
+            "typed_gold": true,
+            "semantic_judgment": "NOT_AUTOMATED_SEPARATE_MANUAL_REVIEW"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 43.72041270000045,
+            "understand_stage_seconds": 17.377284799993504,
+            "understand_provider_seconds": 17.36873809999088,
+            "generation_provider_seconds": 22.83799599998747,
+            "first_answer_seconds": 43.588955200015334,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.49144450001767837,
+            "complete_seconds": 43.69337540000561
+          },
+          "tokens": 8478,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "FROZEN_P32_P9_GOLD_READ_AFTER_EXECUTION",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+            "metrics": {
+              "normalized_exact_match": 0,
+              "character_f1": 0.05813953488372093
+            },
+            "official_judge": "NOT_RUN",
+            "typed_gold": true,
+            "semantic_judgment": "NOT_AUTOMATED_SEPARATE_MANUAL_REVIEW"
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 35.904121600004146,
+            "understand_stage_seconds": 0.9208692000247538,
+            "understand_provider_seconds": 0.8651543000014499,
+            "generation_provider_seconds": 31.35632630001055,
+            "first_answer_seconds": 35.87936500000069,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.624644099996658,
+            "complete_seconds": 35.88003390000085
+          },
+          "tokens": 8459,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "mml-followup-summary": {
+      "dataset": "multiturn-control",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "NOT_APPLICABLE_NO_FROZEN_DATASET_GOLD",
+          "intent": "follow_up",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_AUTOMATIC_ANSWER_METRIC",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 13.971906599996146,
+            "understand_stage_seconds": 4.378080099995714,
+            "understand_provider_seconds": 4.367097100010142,
+            "generation_provider_seconds": 8.710943999991287,
+            "first_answer_seconds": 13.953916700003901,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5508893999794964,
+            "complete_seconds": 13.954258799989475
+          },
+          "tokens": 3749,
+          "usage_calls": 2,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "NOT_APPLICABLE_NO_FROZEN_DATASET_GOLD",
+          "intent": "follow_up",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_AUTOMATIC_ANSWER_METRIC",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 10.13510050001787,
+            "understand_stage_seconds": 1.0570459999726154,
+            "understand_provider_seconds": 1.008176100003766,
+            "generation_provider_seconds": 8.272913599997992,
+            "first_answer_seconds": 10.113369200000307,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.5179236000112724,
+            "complete_seconds": 10.113734300015494
+          },
+          "tokens": 3590,
+          "usage_calls": 2,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "mml-followup-search": {
+      "dataset": "multiturn-control",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "NOT_APPLICABLE_NO_FROZEN_DATASET_GOLD",
+          "intent": "kb_search",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_AUTOMATIC_ANSWER_METRIC",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 19.985206000012113,
+            "understand_stage_seconds": 6.965066500008106,
+            "understand_provider_seconds": 6.951045399997383,
+            "generation_provider_seconds": 8.645799099991564,
+            "first_answer_seconds": 19.967042000003858,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.6788617999991402,
+            "complete_seconds": 19.96742699999595
+          },
+          "tokens": 8154,
+          "usage_calls": 4,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "NOT_APPLICABLE_NO_FROZEN_DATASET_GOLD",
+          "intent": "follow_up",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_AUTOMATIC_ANSWER_METRIC",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 11.690625999995973,
+            "understand_stage_seconds": 0.9572363000188489,
+            "understand_provider_seconds": 0.9113152000063565,
+            "generation_provider_seconds": 9.890363600017736,
+            "first_answer_seconds": 11.545605499995872,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.516455600009067,
+            "complete_seconds": 11.66594140001689
+          },
+          "tokens": 3826,
+          "usage_calls": 2,
+          "unknown_outcome_calls": 0
+        }
+      }
+    },
+    "chitchat-control": {
+      "dataset": "conversation-control",
+      "variants": {
+        "A": {
+          "status": "COMPLETED",
+          "gold_status": "NOT_APPLICABLE_NO_FROZEN_DATASET_GOLD",
+          "intent": "chitchat",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_AUTOMATIC_ANSWER_METRIC",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 71.22748859997955,
+            "understand_stage_seconds": 30.380581900011748,
+            "understand_provider_seconds": 30.372187499975553,
+            "generation_provider_seconds": 39.76921100000618,
+            "first_answer_seconds": 71.08681499998784,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.6756843999901321,
+            "complete_seconds": 71.19253669999307
+          },
+          "tokens": 3506,
+          "usage_calls": 2,
+          "unknown_outcome_calls": 0
+        },
+        "B": {
+          "status": "COMPLETED",
+          "gold_status": "NOT_APPLICABLE_NO_FROZEN_DATASET_GOLD",
+          "intent": "greeting",
+          "answer_gold": {
+            "status": "NOT_APPLICABLE_NO_AUTOMATIC_ANSWER_METRIC",
+            "metrics": null
+          },
+          "source_stages": {
+            "search": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "rerank": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            },
+            "context": {
+              "status": "NOT_APPLICABLE_RETRIEVAL_QRELS_NOT_USED_FOR_DATASET",
+              "unit": null,
+              "gold_source_present": null,
+              "metrics": null
+            }
+          },
+          "ocr_diagnostic": null,
+          "latency_seconds": {
+            "e2e_seconds": 36.05591070000082,
+            "understand_stage_seconds": 1.006693199975416,
+            "understand_provider_seconds": 0.9385849999962375,
+            "generation_provider_seconds": 33.97884319999139,
+            "first_answer_seconds": 35.92781290001585,
+            "e2e_basis": "client_http_post_seconds",
+            "first_progress_seconds": 0.6532226999988779,
+            "complete_seconds": 36.03308940000716
+          },
+          "tokens": 3311,
+          "usage_calls": 2,
+          "unknown_outcome_calls": 0
+        }
+      }
+    }
+  }
+}
