@@ -1,0 +1,118 @@
+{
+  "schema": "p33-frozen-record-consistency-check/v1",
+  "status": "PASS",
+  "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B docs/evaluation/evidence/p33-evidence-loss-20261017/check_frozen_records.py",
+  "exit_code": 0,
+  "provider_calls": 0,
+  "database_writes": 0,
+  "checks": [
+    {
+      "check": "baseline_matches_P32",
+      "result": "PASS"
+    },
+    {
+      "check": "P33_provider_calls_and_tokens_are_zero",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0434_has_30_search_and_rerank_candidates",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0434_target_maps_to_search_rank_minus_one",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0434_embedding_text_equals_rerank_query",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0434_prepared_provider_messages_verified",
+      "result": "PASS"
+    },
+    {
+      "check": "hotpot-5a7631_has_30_search_and_rerank_candidates",
+      "result": "PASS"
+    },
+    {
+      "check": "hotpot-5a7631_target_maps_to_search_rank_minus_one",
+      "result": "PASS"
+    },
+    {
+      "check": "hotpot-5a7631_embedding_text_equals_rerank_query",
+      "result": "PASS"
+    },
+    {
+      "check": "hotpot-5a7631_prepared_provider_messages_verified",
+      "result": "PASS"
+    },
+    {
+      "check": "omni-page007_has_30_search_and_rerank_candidates",
+      "result": "PASS"
+    },
+    {
+      "check": "omni-page007_target_maps_to_search_rank_minus_one",
+      "result": "PASS"
+    },
+    {
+      "check": "omni-page007_embedding_text_equals_rerank_query",
+      "result": "PASS"
+    },
+    {
+      "check": "omni-page007_prepared_provider_messages_verified",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0959_has_30_search_and_rerank_candidates",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0959_target_maps_to_search_rank_minus_one",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0959_embedding_text_equals_rerank_query",
+      "result": "PASS"
+    },
+    {
+      "check": "mml-0959_prepared_provider_messages_verified",
+      "result": "PASS"
+    },
+    {
+      "check": "mml0434_lost_at_empty_rerank_before_merge",
+      "result": "PASS"
+    },
+    {
+      "check": "hotpot_location_chunk_not_in_rerank_merge_context",
+      "result": "PASS"
+    },
+    {
+      "check": "hotpot_merge_ids_equal_context_ids",
+      "result": "PASS"
+    },
+    {
+      "check": "omni_ocr_is_enabled_ready_and_indexed_in_same_version",
+      "result": "PASS"
+    },
+    {
+      "check": "omni_merge_ids_equal_context_ids",
+      "result": "PASS"
+    },
+    {
+      "check": "omni_required_ocr_chunk_absent_from_final_context",
+      "result": "PASS"
+    },
+    {
+      "check": "mml0959_required_chunk_survives_through_context",
+      "result": "PASS"
+    },
+    {
+      "check": "rejected_candidate_raw_scores_are_explicitly_unknown",
+      "result": "PASS"
+    }
+  ],
+  "prior_attempt": {
+    "exit_code": 1,
+    "reason": "The first assertion used a nonexistent top-level source_version key; the read-only evidence stores it under chunk.metadata. No application code or data changed."
+  }
+}
