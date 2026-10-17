@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import subprocess
 import traceback
 import time
 import uuid
@@ -179,6 +180,12 @@ async def run(send: bool) -> int:
     }}
     for name in allowed_env:
         os.environ[name] = env[name]
+    # PYTHONPATH is consumed only at interpreter startup. This diagnostic runs
+    # in-process, unlike P32's child service, so apply the same explicit paths
+    # before importing optional runtime dependencies (notably cryptography).
+    for path in reversed(env.get("PYTHONPATH", "").split(os.pathsep)):
+        if path and path not in sys.path:
+            sys.path.insert(0, path)
 
     marker = Path(primary["storage_root"]) / ".weknora-python-storage.json"
     if not marker.is_file():
@@ -213,7 +220,7 @@ async def run(send: bool) -> int:
     preflight = {
         "schema": "p34-rerank-preflight/v1",
         "created_at": utc_now(),
-        "source_sha": "f8ec9c548e48ef565f5011b8a02a705d4bfabb7c",
+        "source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "fixed_upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
         "owner_authorization": "current P34 user instruction: at most four SiliconFlow rerank calls",
         "account_token_fence": "not restored; P31 revoked",
@@ -596,9 +603,12 @@ async def run(send: bool) -> int:
 
 
 def main() -> int:
+    global RUN_ROOT
     parser = argparse.ArgumentParser()
     parser.add_argument("--send", action="store_true", help="Send the four P34-authorized rerank requests once")
+    parser.add_argument("--output", type=Path, default=RUN_ROOT, help="Dedicated evidence directory; never reuse a historical experiment")
     args = parser.parse_args()
+    RUN_ROOT = args.output.resolve()
     try:
         with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
             return runner.run(run(args.send))
