@@ -205,6 +205,11 @@ def _public_model_configuration(value: Mapping[str, Any]) -> dict[str, Any]:
             "key_configured": bool(row.get("key_configured", row.get("api_key"))),
             "source": str(row.get("source","")),
         })
+        if row.get('credential_status') in ('UNAVAILABLE','CONFIGURED','NOT_CONFIGURED'):
+            roles[-1]['credential_status'] = row['credential_status']
+            error = row.get('credential_error','')
+            roles[-1]['credential_error'] = error if error in (
+                'STORED_SECRET_RUNTIME_UNAVAILABLE','STORED_SECRET_DECRYPT_FAILED') else ''
     revision = value.get("revision", 0)
     if type(revision) is int and revision >= 0:
         revision = str(revision)

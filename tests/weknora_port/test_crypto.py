@@ -43,6 +43,23 @@ def test_role_store_encryption_at_rest_and_public_safe_rotation():
         _,roles = await store.read()
         assert all(role.api_key == 'synthetic-secret' for role in roles)
         rotated = PostgresModelRoleStore(guard,store.principal,Catalogue(),cipher=SecretCipher(b'b'*32))
-        assert all(not role['key_configured'] for role in (await rotated.read_public())['roles'])
+        # A saved but unreadable credential is unavailable, not absent.
+        assert all(role['key_configured'] and role['credential_status']=='UNAVAILABLE'
+                   for role in (await rotated.read_public())['roles'])
         with pytest.raises(ValueError): await rotated.read()
     asyncio.run(run())
+
+
+def test_missing_crypto_runtime_is_not_reported_as_bad_ciphertext(monkeypatch):
+    import builtins
+    original=builtins.__import__
+    def missing(name,*args,**kwargs):
+        if name.startswith('cryptography'):
+            raise ModuleNotFoundError('synthetic missing dependency')
+        return original(name,*args,**kwargs)
+    monkeypatch.setattr(builtins,'__import__',missing)
+    for strict in (True,False):
+        with pytest.raises(ValueError,match='STORED_SECRET_RUNTIME_UNAVAILABLE'):
+            SecretCipher(b'a'*32).decrypt('enc:v1:invalid',strict=strict)
+    with pytest.raises(ValueError,match='STORED_SECRET_RUNTIME_UNAVAILABLE'):
+        SecretCipher(b'a'*32).encrypt('synthetic')

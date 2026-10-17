@@ -12,6 +12,8 @@ export type ModelConfigurationRole = {
   model: string;
   base_url: string;
   key_configured: boolean;
+  credential_status?: "UNAVAILABLE" | "CONFIGURED" | "NOT_CONFIGURED";
+  credential_error?: string;
   api_key?: string;
 };
 export type ModelConfiguration = { revision: string; roles: ModelConfigurationRole[] };

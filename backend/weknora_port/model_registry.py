@@ -16,21 +16,25 @@ class RoleSnapshot:
     revision: int
     model_ids: tuple[tuple[str,str], ...]
     configurations: tuple[ConfiguredRole, ...] = field(repr=False)
+    credential_errors: tuple[tuple[str,str], ...] = ()
 
     def model_id(self, role: str) -> str:
         value = dict(self.model_ids).get(role,'')
         if not value:
+            error = dict(self.credential_errors).get(role)
+            if error:
+                raise ProviderError(error)
             raise ProviderError('MODEL_ROLE_NOT_CONFIGURED')
         return value
 
 
 async def role_snapshot(configuration_store,model_store) -> RoleSnapshot:
-    revision,roles = await configuration_store.read()
+    revision,roles,errors = await configuration_store.read_available()
     ids = []
     for role in roles:
         if role.provider or role.model or role.base_url:
             ids.append((role.role,await model_store.persist(role)))
-    return RoleSnapshot(revision,tuple(ids),roles)
+    return RoleSnapshot(revision,tuple(ids),roles,errors)
 
 
 class SourceCatalogue:

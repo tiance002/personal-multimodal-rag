@@ -8,7 +8,7 @@ from typing import Any, Mapping, Protocol
 
 from .history import LocalPrincipal
 from .postgres import PostgresRetriever
-from ..crypto import SecretCipher
+from ..crypto import SecretCipher, SecretCipherError
 
 ROLES = ('embedding', 'rerank', 'cheap', 'expensive', 'vlm')
 
@@ -47,18 +47,48 @@ class PostgresModelRoleStore:
         self.guard.require_verified()
         return await (await self.guard.connection.execute(query,args)).fetchall()
 
-    async def read(self, *, strict_secrets=True) -> tuple[int, tuple[ConfiguredRole, ...]]:
+    async def _stored(self):
         rows = await self._rows('SELECT revision,roles FROM port_model_configuration WHERE tenant_id=%s AND subject_id=%s',
                                (self.principal.tenant_id,self.principal.subject_id))
         if not rows:
-            return 0, tuple(ConfiguredRole(role,'','','') for role in ROLES)
-        values = rows[0]['roles']
-        return rows[0]['revision'], tuple(ConfiguredRole(**{**values[role],
+            return 0, {role:{'role':role,'provider':'','model':'','base_url':'','api_key':''} for role in ROLES}
+        return rows[0]['revision'], rows[0]['roles']
+
+    async def read(self, *, strict_secrets=True) -> tuple[int, tuple[ConfiguredRole, ...]]:
+        revision, values = await self._stored()
+        return revision, tuple(ConfiguredRole(**{**values[role],
             'api_key':self.cipher.decrypt(values[role]['api_key'],strict=strict_secrets)}) for role in ROLES)
 
+    async def read_available(self):
+        revision, values = await self._stored()
+        available, errors = [], []
+        for name in ROLES:
+            try:
+                available.append(ConfiguredRole(**{**values[name],
+                    'api_key':self.cipher.decrypt(values[name]['api_key'])}))
+            except SecretCipherError as error:
+                errors.append((name,error.code))
+        return revision, tuple(available), tuple(errors)
+
+    def _public(self, revision, values):
+        roles=[]
+        for name in ROLES:
+            value=values[name]
+            error=''
+            try:
+                self.cipher.decrypt(value['api_key'])
+            except SecretCipherError as exc:
+                error=exc.code
+            public=ConfiguredRole(**{**value,'api_key':''}).public()
+            public.update(key_configured=bool(value['api_key']),
+                credential_status='UNAVAILABLE' if error else 'CONFIGURED' if value['api_key'] else 'NOT_CONFIGURED',
+                credential_error=error)
+            roles.append(public)
+        return {'revision':revision,'roles':roles}
+
     async def read_public(self):
-        revision,roles = await self.read(strict_secrets=False)
-        return {'revision':revision,'roles':[role.public() for role in roles]}
+        revision,values = await self._stored()
+        return self._public(revision,values)
 
     async def update(self, revision: int, roles: list[dict[str, Any]]):
         import json
@@ -73,10 +103,10 @@ class PostgresModelRoleStore:
             # This immutable owner lock also serializes initial configuration.
             await self.guard.connection.execute('SELECT pg_advisory_xact_lock(hashtext(%s))',
                 (f'port-model-config:{self.principal.tenant_id}:{self.principal.subject_id}',))
-            current_revision, current = await self.read()
+            current_revision, current = await self._stored()
             if revision != current_revision:
                 raise ModelConfigurationError('MODEL_CONFIGURATION_REVISION_CONFLICT')
-            previous = {role.role:role for role in current}
+            previous = {name:ConfiguredRole(**value) for name,value in current.items()}
             prepared = {}
             for value in roles:
                 if set(value) - {'role','provider','model','base_url','api_key','source'}:
@@ -91,18 +121,21 @@ class PostgresModelRoleStore:
                 if old.api_key and (provider,endpoint,source) != (old.provider,old.base_url,old.source) and not value.get('api_key'):
                     raise ModelConfigurationError('MODEL_CREDENTIAL_REBINDING_REQUIRED')
                 # Blank key preserves its prior credential, never echoes it.
-                key = value.get('api_key') or old.api_key
+                new_key = value.get('api_key','')
+                key = self.cipher.encrypt(new_key) if new_key else old.api_key
                 name = value.get('model','').strip()
                 parameters = old.parameters if (provider,name) == (old.provider,old.model) else {}
-                role = ConfiguredRole(value['role'], provider,name,endpoint,key,parameters,source)
-                if role.provider or role.model or role.base_url or role.api_key:
+                # Catalogue validates identity/capability. Preserved ciphertext
+                # is never passed to a model or interpreted as an API key.
+                role = ConfiguredRole(value['role'], provider,name,endpoint,'',parameters,source)
+                if role.provider or role.model or role.base_url or key:
                     self.catalogue.validate(role)
                 prepared[role.role] = {'role':role.role,'provider':role.provider,'model':role.model,
-                    'base_url':role.base_url,'api_key':role.api_key,'parameters':dict(role.parameters),'source':role.source}
-            stored = {name:{**value,'api_key':self.cipher.encrypt(value['api_key'])} for name,value in prepared.items()}
+                    'base_url':role.base_url,'api_key':key,'parameters':dict(role.parameters),'source':role.source}
+            stored = prepared
             await self.guard.connection.execute('INSERT INTO port_model_configuration(tenant_id,subject_id,revision,roles) '
                 'VALUES(%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,subject_id) DO UPDATE '
                 'SET revision=EXCLUDED.revision,roles=EXCLUDED.roles,updated_at=now()',
                 (self.principal.tenant_id,self.principal.subject_id,current_revision+1,
                  json.dumps(stored,ensure_ascii=False,allow_nan=False)))
-        return {'revision':current_revision+1,'roles':[ConfiguredRole(**prepared[role]).public() for role in ROLES]}
+        return self._public(current_revision+1,stored)
