@@ -1,5 +1,5 @@
 .wp-shell { height:100dvh; min-height:560px; display:grid; grid-template-columns:248px minmax(0,1fr); overflow:hidden; color:#17221d; background:#fff; }
-.wp-sidebar { display:flex; flex-direction:column; min-height:0; padding:20px 12px 14px; border-right:1px solid #e6e9e7; background:#f7f8f7; }
+.wp-sidebar { display:flex; flex-direction:column; min-width:0; min-height:0; padding:20px 12px 14px; border-right:1px solid #e6e9e7; background:#f7f8f7; }
 .wp-brand { display:flex; align-items:center; gap:11px; padding:3px 10px 25px; }
 .wp-brand-mark { display:grid; place-items:center; width:35px; height:35px; border-radius:10px; background:#163129; color:white; font-size:18px; font-weight:700; }
 .wp-brand strong { display:block; font-size:17px; letter-spacing:.02em; }
@@ -11,10 +11,10 @@
 .wp-new-chat { margin-top:17px; padding:10px 12px; border:1px solid #a9ddc6; border-radius:8px; background:#fff; color:#078a59; font-weight:650; text-align:left; }
 .wp-new-chat:hover { background:#e9f8f1; }
 .wp-history-title { margin:21px 10px 8px; color:#85908c; font-size:11px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; }
-.wp-history-list { display:grid; align-content:start; gap:3px; min-height:0; overflow:auto; }
-.wp-history-list button { padding:9px 10px; }
+.wp-history-list { display:grid; align-content:start; gap:3px; width:100%; min-width:0; min-height:0; overflow:auto; }
+.wp-history-list button { display:block; width:100%; min-width:0; box-sizing:border-box; overflow:hidden; padding:9px 10px; }
 .wp-history-list button.selected,.wp-history-list button:hover { background:#edf0ee; }
-.wp-history-list strong,.wp-history-list small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.wp-history-list strong,.wp-history-list small { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .wp-history-list strong { font-size:12px; font-weight:600; }
 .wp-history-list small { margin-top:4px; color:#85908c; font-size:10px; }
 .wp-sidebar-footer { margin-top:auto; padding:11px 10px 0; border-top:1px solid #e6e9e7; color:#9aa39f; font-size:11px; }
@@ -53,7 +53,24 @@
 .wp-message.user { width:max-content; max-width:82%; margin-right:0; margin-left:auto; padding:11px 14px; border-radius:13px 13px 3px 13px; background:#e9f8f1; }
 .wp-message.assistant { padding:0 2px; }
 .wp-message-label { margin-bottom:7px; color:#85908c; font-size:10px; font-weight:650; }
-.wp-message-content { white-space:pre-wrap; overflow-wrap:anywhere; font-size:13px; line-height:1.75; }
+.wp-message-content { overflow-wrap:anywhere; font-size:13px; line-height:1.75; }
+.wp-message.user .wp-message-content { white-space:pre-wrap; }
+.wp-message-content > :first-child { margin-top:0; }
+.wp-message-content > :last-child { margin-bottom:0; }
+.wp-message-content p { margin:0 0 10px; }
+.wp-message-content h1,.wp-message-content h2,.wp-message-content h3,.wp-message-content h4 { margin:15px 0 7px; color:#26372e; line-height:1.35; }
+.wp-message-content h1 { font-size:20px; }
+.wp-message-content h2 { font-size:17px; }
+.wp-message-content h3,.wp-message-content h4 { font-size:15px; }
+.wp-message-content ul,.wp-message-content ol { margin:6px 0 12px; padding-left:24px; }
+.wp-message-content li + li { margin-top:4px; }
+.wp-message-content blockquote { margin:10px 0; padding:7px 12px; border-left:3px solid #8bd8ac; background:#f4fbf6; color:#52665a; }
+.wp-message-content pre { max-width:100%; margin:10px 0 12px; padding:12px 14px; overflow:auto; border-radius:8px; background:#18251e; color:#e8f5ed; font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre; }
+.wp-message-content code:not(pre code) { padding:2px 5px; border-radius:4px; background:#eef5f0; color:#276543; font-size:.92em; }
+.wp-message-content a { color:#078a59; text-decoration:underline; }
+.wp-message-content img { max-width:100%; height:auto; }
+.wp-message-content table { display:block; max-width:100%; overflow:auto; border-collapse:collapse; }
+.wp-message-content th,.wp-message-content td { padding:5px 8px; border:1px solid #dce5df; }
 .wp-message.error .wp-message-content { color:#9b4037; }
 .wp-progress { margin:0 0 10px; padding:8px 10px; border-left:2px solid #b8e8d2; background:#f7fbf8; color:#58665f; font-size:10px; }
 .wp-progress summary { cursor:pointer; font-weight:650; }

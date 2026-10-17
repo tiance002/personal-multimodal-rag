@@ -26,6 +26,8 @@ test("port adapter loads visible scope and five masked model roles without old a
   await installCatalogRoutes(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "从你的资料中寻找答案" })).toBeVisible();
+  await expect(page.getByText("选择检索范围，快速问答会显示实际检索与回答进度。")).toBeVisible();
+  await expect(page.getByText("选择检索范围，快速问答会显示服务端实际发送的执行事件与引用。")).toHaveCount(0);
   await expect(page.getByText("课程资料", { exact: true }).first()).toBeVisible();
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("教材 第三章.pdf")).toBeVisible();
@@ -197,10 +199,11 @@ test("normal answers suppress citation controls and strip internal SSE markup ou
   await page.getByRole("button", { name: "发送" }).click();
   const renderedAnswer = page.locator(".wp-message.assistant .wp-message-content");
   await expect(renderedAnswer).toContainText("前文 E1  后文");
-  await expect(renderedAnswer).toContainText("行内代码 `<ref>keep</ref>`");
+  await expect(renderedAnswer.locator("p > code")).toHaveText("<ref>keep</ref>");
   await expect(renderedAnswer).toContainText("<ref>keep</ref>");
   await expect(renderedAnswer).toContainText("<kb chunk_id=\"code-chunk\" doc=\"样例\" />");
-  await expect(renderedAnswer).toContainText("[链接](https://example.test/path) ![图](image.png)");
+  await expect(renderedAnswer.getByRole("link", { name: "链接" })).toHaveAttribute("href", "https://example.test/path");
+  await expect(renderedAnswer.locator("img[alt='图']")).toHaveAttribute("src", "image.png");
   await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
   expect(chunkReads).toBe(0);
 });
@@ -221,9 +224,104 @@ test("old history strips internal reference markers without changing inline or f
   await expect(renderedAnswer).toContainText("历史 原始引文");
   await expect(renderedAnswer).toContainText("块文字 网页文字 <reference>普通标签</reference> 末尾");
   await expect(renderedAnswer).not.toContainText("<ref id=");
-  await expect(renderedAnswer).toContainText("`<ref>code</ref>`");
+  await expect(renderedAnswer.locator("p > code")).toHaveText("<ref>code</ref>");
+  await expect(renderedAnswer.locator("pre code")).toContainText("<ref>code</ref>");
   await expect(renderedAnswer).toContainText("<ref>code</ref>");
   await expect(renderedAnswer).not.toContainText("<ref id=");
+  await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
+});
+
+test("history titles stay inside the sidebar and remain selectable by mouse and Enter", async ({ page }) => {
+  await installCatalogRoutes(page);
+  const longChinese = "关于视觉检索与正文引用关系的历史会话标题".repeat(8);
+  const longEnglish = "A long English title for reviewing source evidence and saved answers ".repeat(3);
+  const continuous = "x".repeat(140);
+  const sessions = [
+    { id: "cjk", title: longChinese, knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+    { id: "english", title: longEnglish, knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+    { id: "continuous", title: continuous, knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+    { id: "ordinary", title: "普通会话", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+  ];
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope(sessions) }));
+  await page.route("**/api/v1/sessions/*/messages", route => {
+    const id = new URL(route.request().url()).pathname.split("/").at(-2);
+    return route.fulfill({ json: envelope([
+      { id: `message-${id}`, role: "assistant", request_id: `run-${id}`, created_at: "now", is_completed: true, content: `历史会话 ${id}` },
+    ]) });
+  });
+
+  await page.goto("/");
+  const sidebar = page.locator(".wp-sidebar");
+  const historyButtons = page.locator(".wp-history-list button");
+  await expect(historyButtons).toHaveCount(4);
+  for (const button of await historyButtons.all()) {
+    const dimensions = await button.evaluate(element => ({
+      buttonWidth: element.getBoundingClientRect().width,
+      sidebarWidth: element.closest(".wp-sidebar")!.getBoundingClientRect().width,
+      titleWidth: element.querySelector("strong")!.clientWidth,
+      titleScrollWidth: element.querySelector("strong")!.scrollWidth,
+    }));
+    expect(dimensions.buttonWidth).toBeLessThanOrEqual(dimensions.sidebarWidth);
+    expect(dimensions.titleWidth).toBeGreaterThan(0);
+  }
+  expect(await historyButtons.nth(0).locator("strong").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  expect(await historyButtons.nth(1).locator("strong").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  expect(await historyButtons.nth(2).locator("strong").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+
+  await historyButtons.nth(0).click();
+  await expect(page.getByText("历史会话 cjk", { exact: true })).toBeVisible();
+  await historyButtons.nth(3).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("历史会话 ordinary", { exact: true })).toBeVisible();
+  await expect(historyButtons.nth(3)).toHaveClass(/selected/);
+  await expect(sidebar).toBeVisible();
+});
+
+test("history Markdown renders safely without leaking internal reference tags", async ({ page }) => {
+  await installCatalogRoutes(page);
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADUlEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC", "base64");
+  await page.route("https://example.test/figure.png", route => route.fulfill({ contentType: "image/png", body: png }));
+  const markdown = [
+    "# 清洁步骤",
+    "",
+    "1. **关闭扫描仪**",
+    "2. 使用无尘干布。",
+    "",
+    "普通说明文字。",
+    "",
+    "```python",
+    "print('safe')",
+    "```",
+    "",
+    "[维修手册](https://example.test/manual) ![示意图](https://example.test/figure.png)",
+    "",
+    "内部标记 <ref>原文证据</ref>",
+    "",
+    "![不支持的地址](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAA)",
+    "",
+    "<img src=x onerror=alert(1)>",
+  ].join("\n");
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope([
+    { id: "markdown-history", title: "格式验证", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+  ]) }));
+  await page.route("**/api/v1/sessions/markdown-history/messages", route => route.fulfill({ json: envelope([
+    { id: "markdown-answer", role: "assistant", request_id: "run-markdown", created_at: "now", is_completed: true, content: markdown },
+  ]) }));
+
+  await page.goto("/");
+  await page.getByRole("button", { name: /格式验证/ }).click();
+  const answer = page.locator(".wp-message.assistant .wp-message-content");
+  await expect(answer.getByRole("heading", { name: "清洁步骤" })).toBeVisible();
+  await expect(answer.locator("ol li strong")).toHaveText("关闭扫描仪");
+  await expect(answer.getByText("普通说明文字。", { exact: true })).toBeVisible();
+  await expect(answer.locator("pre code")).toHaveText("print('safe')");
+  await expect(answer.getByRole("link", { name: "维修手册" })).toHaveAttribute("href", "https://example.test/manual");
+  const image = answer.locator("img[alt='示意图']");
+  await expect(image).toHaveAttribute("src", "https://example.test/figure.png");
+  await expect(image).toHaveJSProperty("naturalWidth", 1);
+  await expect(answer).toContainText("内部标记 原文证据");
+  await expect(answer.locator("img[alt='不支持的地址']")).toHaveCount(0);
+  await expect(answer.locator("img[onerror], script")).toHaveCount(0);
   await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
 });
 

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { PortApiError, portApi } from "./api";
 import { resumePortChat, runPortChat } from "./sse";
 import type {
@@ -54,7 +56,7 @@ function eventLabel(event: WeKnoraSSEMessage): string {
     tool_result: "检索结果",
     thinking: "推理",
     reflection: "复核",
-    references: "证据引用",
+    references: "整理证据",
     error: "运行错误",
     complete: "完成并已保存",
   };
@@ -133,8 +135,14 @@ function isIncompleteInternalTagSuffix(value: string): boolean {
   return knownNames.some(candidate => candidate.startsWith(name));
 }
 
+function MarkdownImage({ src, alt }: { src?: string; alt?: string }) {
+  return src ? <img src={src} alt={alt ?? ""} /> : null;
+}
+
 function MessageContent({ content }: { content: string }) {
-  return <>{stripInternalReferenceMarkup(content)}</>;
+  return <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={false} components={{ img: MarkdownImage }}>
+    {stripInternalReferenceMarkup(content)}
+  </ReactMarkdown>;
 }
 
 export function WeKnoraPythonApp() {
@@ -484,7 +492,7 @@ export function WeKnoraPythonApp() {
         </div>
 
         <div className="wp-transcript" aria-live="polite">
-          {messages.length === 0 && <div className="wp-welcome"><span className="wp-welcome-icon">✳</span><h1>从你的资料中寻找答案</h1><p>选择检索范围，快速问答会显示服务端实际发送的执行事件与引用。</p><div className="wp-scope-tags">{selectedNames.map(name => <span key={name}>{name}</span>)}</div></div>}
+          {messages.length === 0 && <div className="wp-welcome"><span className="wp-welcome-icon">✳</span><h1>从你的资料中寻找答案</h1><p>选择检索范围，快速问答会显示实际检索与回答进度。</p><div className="wp-scope-tags">{selectedNames.map(name => <span key={name}>{name}</span>)}</div></div>}
           {messages.map(message => <article key={message.id} className={`wp-message ${message.role} ${message.error ? "error" : ""}`}>
             <div className="wp-message-label">{message.role === "user" ? "你" : message.error ? "运行提示" : "WeKnora"}</div>
             {message.role === "user" ? <p className="wp-message-content">{message.content}</p> : <>
