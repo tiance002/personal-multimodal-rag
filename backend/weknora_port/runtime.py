@@ -762,7 +762,7 @@ class ApplicationRuntime:
         from .models.types import CallContext,TrustedScope
         kb=await self.documents._kb(principal,knowledge_base_id)
         allowed={'enable_multimodal','ocr_adapter','ocr_model_id','caption_mode',
-                 'caption_model_id','description_language','custom_instructions'}
+                 'caption_model_id','description_language','custom_instructions','image_pages'}
         if set(value)-allowed or ('enable_multimodal' in value and type(value['enable_multimodal']) is not bool):
             raise ValueError('IMAGE_CONFIG_INVALID')
         cfg=effective_image_config(kb,value)

@@ -262,6 +262,13 @@ class DocumentLifecycleService:
         extension = Path(name).suffix.lower()
         if extension not in _SUPPORTED_MEDIA:
             raise DocumentLifecycleError("DOCUMENT_TYPE_UNSUPPORTED")
+        from .image_configuration import effective_image_config
+        image_config = effective_image_config(kb, process_overrides)
+        image_pages = image_config.get("image_pages")
+        if image_pages and extension != ".pdf":
+            raise DocumentLifecycleError("IMAGE_PAGE_SCOPE_PDF_ONLY")
+        if image_pages and not image_config.get("enable_multimodal", False):
+            raise DocumentLifecycleError("IMAGE_PAGE_SCOPE_REQUIRES_MULTIMODAL")
         data = await source.read() if hasattr(source, "read") else bytes(source)
         if not isinstance(data, bytes) or not data:
             raise DocumentLifecycleError("DOCUMENT_CONTENT_EMPTY")
@@ -298,12 +305,12 @@ class DocumentLifecycleService:
 
         selected_parser = str((process_overrides or {}).get("parser_engine")
                               or self.parser_overrides.get(extension, ""))
-        image_config = _json_object(kb.get("image_processing_config"))
         if (self.image_tasks is not None and image_config.get("enable_multimodal", False)
                 and extension in _IMAGE_BEARING_EXTENSIONS
                 and selected_parser != "mineru-basic"):
             try:
-                await self.image_tasks.create(principal,kb,document_id,source_version,process_overrides)
+                await self.image_tasks.create(principal,kb,document_id,source_version,
+                    process_overrides,source_sha256=digest)
             except Exception as exc:
                 return await self._mark(principal,knowledge_base_id,document_id,"failed",
                     _safe_error_code(exc,"IMAGE_TASK_CREATE_FAILED"),metadata)
@@ -319,12 +326,20 @@ class DocumentLifecycleService:
         extension=Path(name).suffix.lower()
 
         try:
+            from .image_configuration import effective_image_config, select_image_assets
+            effective_image = effective_image_config(kb, process_overrides)
+            image_pages = effective_image.get("image_pages")
+            if image_pages and extension != ".pdf":
+                raise DocumentLifecycleError("IMAGE_PAGE_SCOPE_PDF_ONLY")
+            if image_pages and not effective_image.get("enable_multimodal", False):
+                raise DocumentLifecycleError("IMAGE_PAGE_SCOPE_REQUIRES_MULTIMODAL")
             request = DocumentRequest(filename=name, data=data, owner_id=principal.subject_id,
                                       knowledge_base_id=knowledge_base_id, document_id=document_id,
                                       source_version=source_version,
                                       parser_engine=str((process_overrides or {}).get("parser_engine")
                                           or self.parser_overrides.get(extension, "")),
-                                      kb_chunking_config=_json_object(kb.get("chunking_config")))
+                                      kb_chunking_config=_json_object(kb.get("chunking_config")),
+                                      pdf_image_pages=tuple(image_pages or ()))
             async with self._parse_lock:
                 ingest = await asyncio.to_thread(ingest_document, request, self.parser_registry)
             if ingest.parsed.failures or (not ingest.parsed.content.strip() and ingest.parser_engine != "mineru-basic"):
@@ -354,6 +369,12 @@ class DocumentLifecycleService:
             if local_parser_complete:
                 from .ingestion.mineru import pending_image_assets
                 pending_assets = pending_image_assets(ingest.parsed.assets)
+            if image_pages:
+                try:
+                    pending_assets = select_image_assets(pending_assets, image_pages)
+                except DocumentLifecycleError as exc:
+                    return await self._mark(principal, knowledge_base_id, document_id, "failed",
+                        exc.code, metadata, image_task=image_task)
             if extension in {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".webp"}:
                 if not image_config.get("enable_multimodal", False) and not local_parser_complete:
                     return await self._mark(principal, knowledge_base_id, document_id, "failed",
@@ -449,12 +470,13 @@ class DocumentLifecycleService:
         if principal!=self.principal or (task.tenant_id,task.subject_id)!=(principal.tenant_id,principal.subject_id):
             raise DocumentLifecycleError('IMAGE_TASK_OWNER_MISMATCH')
         rows=await self._rows(
-            "SELECT k.metadata,k.parse_status,t.claim_token,t.state FROM knowledges k "
+            "SELECT k.metadata,k.file_hash,k.parse_status,t.claim_token,t.state FROM knowledges k "
             "JOIN port_image_tasks t ON t.knowledge_id=k.id AND t.tenant_id=k.tenant_id "
             "AND t.knowledge_base_id=k.knowledge_base_id WHERE k.id=%s AND k.tenant_id=%s "
             "AND k.knowledge_base_id=%s AND k.deleted_at IS NULL AND t.id=%s",
             (task.knowledge_id,task.tenant_id,task.knowledge_base_id,task.id))
         if (len(rows)!=1 or rows[0]['metadata'].get('source_version')!=task.source_version
+                or task.source_sha256 and rows[0].get('file_hash')!=task.source_sha256
                 or rows[0]['parse_status'] not in ('pending','processing')
                 or rows[0]['state']!='processing' or rows[0]['claim_token']!=task.claim_token):
             raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
@@ -469,10 +491,11 @@ class DocumentLifecycleService:
             'AND tenant_id=%s AND subject_id=%s AND knowledge_base_id=%s AND knowledge_id=%s FOR UPDATE',
             (task.id,task.tenant_id,task.subject_id,task.knowledge_base_id,task.knowledge_id))).fetchall()
         current=await (await guard.connection.execute(
-            'SELECT metadata,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s '
+            'SELECT metadata,file_hash,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s '
             'AND knowledge_base_id=%s AND deleted_at IS NULL FOR UPDATE',
             (task.knowledge_id,task.tenant_id,task.knowledge_base_id))).fetchall()
         if (len(current)!=1 or current[0]['metadata'].get('source_version')!=task.source_version
+                or task.source_sha256 and current[0].get('file_hash')!=task.source_sha256
                 or current[0]['parse_status'] not in states):
             raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
         if (len(claims)!=1 or claims[0]['source_version']!=task.source_version

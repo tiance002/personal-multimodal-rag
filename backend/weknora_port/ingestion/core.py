@@ -61,6 +61,7 @@ class DocumentRequest:
     kb_chunking_config: Mapping[str, Any] = field(default_factory=dict)
     process_chunking_override: Mapping[str, Any] = field(default_factory=dict)
     upload_chunking_override: Mapping[str, Any] = field(default_factory=dict)
+    pdf_image_pages: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -292,7 +293,9 @@ def _filename_base(filename: str) -> str:
 def _parse_pdf(request: DocumentRequest) -> ParsedDocument:
     from .upstream_pdf_parser import PDFParser
     overrides = _effective_parser_overrides(request)
-    upstream = PDFParser(file_name=request.filename, pdf_force_scanned=overrides.get("pdf_force_scanned")).parse_into_text(request.data)
+    upstream = PDFParser(file_name=request.filename,
+        pdf_force_scanned=overrides.get("pdf_force_scanned"),
+        image_pages=request.pdf_image_pages).parse_into_text(request.data)
     assets: list[ParsedAsset] = []
     for index, (path, encoded) in enumerate(upstream.images.items(), start=1):
         raw = base64.b64decode(encoded, validate=True)
@@ -300,9 +303,11 @@ def _parse_pdf(request: DocumentRequest) -> ParsedDocument:
         scanned_match = re.search(r"_page_(\d+)\.jpg$", basename)
         embedded_match = re.search(r"_p(\d+)_img(\d+)\.jpg$", basename)
         vector_match = re.search(r"_p(\d+)_fig(\d+)\.jpg$", basename)
-        page_match = scanned_match or embedded_match or vector_match
+        requested_match = re.search(r"_p(\d+)_requested_render\.jpg$", basename)
+        page_match = scanned_match or embedded_match or vector_match or requested_match
         page_no = int(page_match.group(1)) if page_match else None
-        source_type = "scanned_pdf" if scanned_match else "vector_pdf_figure" if vector_match else "embedded_pdf_image"
+        source_type = ("scanned_pdf" if scanned_match else "requested_pdf_page_render" if requested_match
+                       else "vector_pdf_figure" if vector_match else "embedded_pdf_image")
         assets.append(ParsedAsset(path, raw, mimetypes.guess_type(path)[0] or "image/jpeg", source_type,
                                   page_no, {"upstream_image_order": index}))
     source_metadata = dict(upstream.metadata)

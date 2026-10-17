@@ -24,6 +24,7 @@ class FakeRuntime:
         self.error_calls = []
         self.principals = []
         self.model_write = None
+        self.upload_calls = []
         self.gate_run = False
         self.disconnect_after_initial = False
         self.run_started = asyncio.Event()
@@ -51,8 +52,10 @@ class FakeRuntime:
         self._record_principal(principal)
         return [{"id": "doc-1", "knowledge_base_id": knowledge_base_id, "filename": "fixture.pdf", "status": "ready"}]
 
-    async def upload_document(self, principal, knowledge_base_id, filename, content_type, source):
+    async def upload_document(self, principal, knowledge_base_id, filename, content_type, source,
+                              process_overrides=None):
         self._record_principal(principal)
+        self.upload_calls.append((knowledge_base_id, filename, content_type, process_overrides))
         return {"id": "doc-upload", "knowledge_base_id": knowledge_base_id, "filename": filename, "status": "processing"}
 
     async def read_model_configuration(self, principal):
@@ -205,6 +208,29 @@ def test_runtime_identity_and_read_envelopes_use_server_resolved_principal():
         assert bases.json()["data"][0]["id"] == "kb-1"
         assert identity.json()["meta"]["request_id"]
         assert len(runtime.principals) == 2
+
+    asyncio.run(exercise())
+
+
+def test_upload_forwards_normalized_physical_page_override_and_rejects_non_pdf_scope():
+    async def exercise():
+        runtime, _, client = make_client()
+        async with client:
+            accepted = await client.post("/api/v1/knowledge-bases/kb-1/documents",
+                data={"process_overrides": json.dumps({"ocr_adapter": "tesseract",
+                    "caption_mode": "explicit", "caption_model_id": "deepseek-config-id",
+                    "image_pages": [9]})},
+                files={"file": ("b3.pdf", b"synthetic-pdf-bytes", "application/pdf")})
+            rejected = await client.post("/api/v1/knowledge-bases/kb-1/documents",
+                data={"process_overrides": json.dumps({"image_pages": [9]})},
+                files={"file": ("b3.txt", b"synthetic-text", "text/plain")})
+        assert accepted.status_code == 200
+        assert runtime.upload_calls[0] == ("kb-1", "b3.pdf", "application/pdf", {
+            "ocr_adapter": "tesseract", "caption_mode": "explicit",
+            "caption_model_id": "deepseek-config-id", "image_pages": [9]})
+        assert rejected.status_code == 422
+        assert rejected.json()["error"]["code"] == "IMAGE_PAGE_SCOPE_PDF_ONLY"
+        assert len(runtime.upload_calls) == 1
 
     asyncio.run(exercise())
 

@@ -27,11 +27,9 @@
     ]
   },
   "blockers": [
-    "No newly approved finite P27 external-call token fence was established; the closed P25 fence was not reused.",
-    "P26 active-config audit records multimodal processing disabled, empty VLM configuration, and no configured VLM role; Cheap is not declared vision-capable.",
-    "Product Python 3.13.0 cannot import the declared optional pypdfium2==5.8.0 parser dependency.",
-    "Normal image upload/task processing has no page selector; B3 would create 21 image assets and require 21 VLM Caption calls with local Tesseract OCR or 42 VLM OCR+Caption calls, exceeding the P27 cap of four.",
-    "The current default PDF parser produced no image/vector asset for the Pew chart on physical page 10."
+    "Owner authorized a new 1,000,000-token maximum and selected DeepSeek V4.1 Flash, but the trusted approved authority cannot issue a production send because APPROVED_METER_UNIMPLEMENTED and production source-fact assembly, historical UNKNOWN bounds, real account carry-in, and shared-account consumers remain unverified.",
+    "The last recorded P26 KB state had multimodal disabled and no VLM role. This continuation did not inspect secret contents or modify live model/KB configuration.",
+    "Real HTTP/API/Worker/PostgreSQL/Redis/DeepSeek/Embedding/Rerank/Cheap execution was not run; neither target completed a real visual RAG loop."
   ],
   "implementation_audit": {
     "configuration": "backend/weknora_port/image_configuration.py: effective_image_config, _vision_binding, resolve_image_selection; KB defaults and non-empty upload overrides, separate OCR/Caption selection, registry/capability validation; no provider probe.",
@@ -48,7 +46,9 @@
     "pypdfium2": "5.14.0",
     "evidence_json": "E:\\WK\\run\\p27-20261017\\offline_parser_asset_inventory.json",
     "exit_code": 0,
-    "warnings": ["PDFium emitted PdfBitmap explicit-close safety warnings after parsing."],
+    "warnings": [
+      "PDFium emitted PdfBitmap explicit-close safety warnings after parsing."
+    ],
     "cases": [
       {
         "qid": "row-0684",
@@ -82,18 +82,22 @@
   "product_runtime": {
     "interpreter": "E:\\RAG quention\\.venv\\Scripts\\python.exe",
     "python": "3.13.0",
-    "pypdfium2_spec": null,
+    "pypdfium2_spec": "5.8.0",
     "declared_optional_requirement": "pypdfium2==5.8.0",
-    "dependency_check_exit_code": 0
+    "dependency_check_exit_code": 0,
+    "pypdfium2_import_exit_code": 0,
+    "dependency_fixed_in_local_venv_only": true
   },
   "scenarios": {
     "row-0684": {
       "status": "NOT_RUN",
-      "reason": "Default parser produced no page-10 image/figure asset; no active VLM configuration or P27 fence."
+      "offline_parser_status": "PASS",
+      "reason": "Page 10 native PDF render asset and source-bound Markdown parent are ready, but real image Caption/RAG is blocked by trusted approved-meter/source-fact assembly."
     },
     "row-0958": {
       "status": "NOT_RUN",
-      "reason": "Target page image exists in offline parser inventory, but normal ingestion has no page filter and would exceed the four-VLM-call limit; no active VLM configuration or P27 fence."
+      "offline_parser_status": "PASS",
+      "reason": "Page 9 asset and source-bound Markdown parent are ready, but real image Caption/RAG is blocked by trusted approved-meter/source-fact assembly."
     }
   },
   "calls": {
@@ -108,7 +112,8 @@
     "provider_tokens": 0,
     "new_unknown": 0,
     "latency_ms": null,
-    "database_or_redis_writes": 0
+    "database_or_redis_writes": 0,
+    "local_tesseract_synthetic_smokes": 1
   },
   "tests": [
     {
@@ -128,9 +133,57 @@
       "kind": "real HTTP/API/Worker/PG/Redis/model RAG",
       "status": "NOT_RUN",
       "reason": "P27 blockers above; no services were started."
+    },
+    {
+      "kind": "offline targeted suite (no provider traffic)",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_page_scoped_vision.py tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_catalog.py tests/weknora_port/test_documents.py tests/weknora_port/test_http_api.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27r1",
+      "exit_code": 0,
+      "result": "491 passed in 3.44s",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\focused-suite.log"
+    },
+    {
+      "kind": "focused upstream ingestion module collection",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_ingest.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27-ingest-blocked",
+      "exit_code": 2,
+      "result": "ERROR during collection: ModuleNotFoundError: No module named 'pptx'",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\test-ingest-collection-failure.log"
+    },
+    {
+      "kind": "local synthetic Tesseract smoke",
+      "command": "Product Python 3.13.0; TesseractOCR(r'E:/WK/deps/tessdata') on generated PNG reading LOCAL OCR PAGE 9",
+      "exit_code": 0,
+      "result": "recognized expected text; image-ocr-layout-v1",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\local-tesseract-smoke.log"
+    },
+    {
+      "kind": "frozen source product-runtime scoped parser",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope-final.py",
+      "exit_code": 0,
+      "result": "row-0958 p9 and row-0684 p10 source SHA, selected image asset, and parent Markdown reference verified",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.json"
+    },
+    {
+      "kind": "first frozen source script attempt (preserved failure)",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.py",
+      "exit_code": 1,
+      "result": "repository package was not on sys.path when launching a script from E drive; corrected in final script",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.log"
+    },
+    {
+      "kind": "final offline targeted suite (includes actual upload endpoint page-scope contract)",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_page_scoped_vision.py tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_catalog.py tests/weknora_port/test_documents.py tests/weknora_port/test_http_api.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27r3",
+      "exit_code": 0,
+      "result": "492 passed in 3.61s",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.log"
+    },
+    {
+      "kind": "first page-scope HTTP assertion attempt (preserved test failure)",
+      "exit_code": 1,
+      "result": "The test expected a detail field; the API error envelope uses error.code. The test assertion was corrected; production behavior was unchanged.",
+      "evidence": "Observed in the initial focused suite output; final 492-test run passed."
     }
   ],
-  "production_code_changed": false,
+  "production_code_changed": true,
   "new_report_files": [
     "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
     "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json"
@@ -138,7 +191,132 @@
   "external_evidence": [
     "E:\\WK\\run\\p27-20261017\\offline_parser_asset_inventory.json",
     "E:\\WK\\run\\p27-20261017\\image_offline_pytest.log",
-    "E:\\WK\\run\\p27-20261017\\product_runtime_dependency_check.log"
+    "E:\\WK\\run\\p27-20261017\\product_runtime_dependency_check.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite.exitcode.txt",
+    "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.json",
+    "E:\\WK\\run\\p27-resume-20261017\\local-tesseract-smoke.log",
+    "E:\\WK\\run\\p27-resume-20261017\\test-ingest-collection-failure.log",
+    "E:\\WK\\run\\p27-resume-20261017\\pypdfium-install.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.exitcode.txt",
+    "E:\\WK\\run\\p27-resume-20261017\\pypdfium-product-version.log",
+    "E:\\WK\\run\\p27-resume-20261017\\diff-check.log"
   ],
-  "next_step": "Establish a new finite P27 token fence; configure an explicitly validated vision-capable adapter/model; make the pinned existing parser dependency available in product runtime through normal environment setup; add/use approved target-page scoping for normal upload before attempting external requests."
+  "next_step": "Complete real approved-meter/source-fact assembly without changing historical UNKNOWN or the 1,000,000-token cap; configure the isolated KB and model roles through the normal authorized API; then run row-0958 first and row-0684 only if the first stage stays within the request cap.",
+  "prior_blockers_at_initial_p27_run": [
+    "No newly approved finite P27 external-call token fence was established; the closed P25 fence was not reused.",
+    "P26 active-config audit records multimodal processing disabled, empty VLM configuration, and no configured VLM role; Cheap is not declared vision-capable.",
+    "Product Python 3.13.0 cannot import the declared optional pypdfium2==5.8.0 parser dependency.",
+    "Normal image upload/task processing has no page selector; B3 would create 21 image assets and require 21 VLM Caption calls with local Tesseract OCR or 42 VLM OCR+Caption calls, exceeding the P27 cap of four.",
+    "The current default PDF parser produced no image/vector asset for the Pew chart on physical page 10."
+  ],
+  "continuation_start_head": "e3945f94575a91000335f99f70b9a73b73e20d6e",
+  "continuation": {
+    "date": "2026-10-17",
+    "owner_authorization": {
+      "new_max_tokens": 1000000,
+      "vision_provider": "deepseek",
+      "vision_api_model_id": "deepseek-flash",
+      "ocr": "local Tesseract preferred",
+      "final_answer": "existing SiliconFlow Cheap"
+    },
+    "trusted_live_fence": "BLOCKED_APPROVED_METER_UNIMPLEMENTED",
+    "provider_calls": 0,
+    "schema_migration": false,
+    "dependency_manifest_changed": false,
+    "product_runtime_dependency": {
+      "python": "3.13.0",
+      "pypdfium2": "5.8.0",
+      "install_scope": "E:\\RAG quention\\.venv only",
+      "compatible_parser_smoke": true
+    },
+    "deepseek_model_resolution": {
+      "registry_api_model_id": "deepseek-flash",
+      "provider": "deepseek",
+      "role": "vlm",
+      "catalog_input": [
+        "text",
+        "image"
+      ],
+      "supports_vision": true,
+      "api": "openai-completions",
+      "supports_multi_content": true,
+      "image_wire": "user message content has image_url data URI plus text prompt",
+      "network_probe": false
+    },
+    "local_ocr_smoke": {
+      "engine": "TesseractOCR via product PyMuPDF runtime",
+      "tessdata": "E:\\WK\\deps\\tessdata",
+      "synthetic_text_expected_and_read": "LOCAL OCR PAGE 9",
+      "layout_schema": "image-ocr-layout-v1",
+      "benchmark_documents_sent_to_ocr": false
+    },
+    "page_scope": {
+      "config_field": "image_pages",
+      "semantics": "one-based physical PDF pages; 1..1000, unique positive strict integers",
+      "precedence": "upload override over KB default; null does not clear existing setting",
+      "task_snapshot": [
+        "tenant_id",
+        "subject_id",
+        "knowledge_base_id",
+        "document_id",
+        "source_version",
+        "source_sha256",
+        "physical_pages"
+      ],
+      "worker_checks_source_version_and_hash_before_processing": true,
+      "original_pdf_retained": true,
+      "only_selected_page_assets_dispatched_to_image_processor": true
+    },
+    "offline_parser_targets": [
+      {
+        "qid": "row-0958",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "physical_page": 9,
+        "pdf_asset_count": 21,
+        "target_asset_count": 1,
+        "target_asset": "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg",
+        "markdown_parent_reference": true
+      },
+      {
+        "qid": "row-0684",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "physical_page": 10,
+        "pdf_asset_count": 1,
+        "target_asset_count": 1,
+        "target_asset": "images/11-21-16-Updated-Post-Election-Release_p10_requested_render.jpg",
+        "markdown_parent_reference": true
+      }
+    ],
+    "real_rag_scenarios": {
+      "row-0958": "NOT_RUN_AUTHORITY_BLOCKED",
+      "row-0684": "NOT_RUN_AUTHORITY_BLOCKED"
+    },
+    "local_test_failure": {
+      "module": "tests/weknora_port/test_ingest.py",
+      "exit_code": 2,
+      "reason": "python-pptx import unavailable in product venv; parser coverage isolated in test_p27_page_scoped_vision.py",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\test-ingest-collection-failure.log"
+    },
+    "harness_failure": {
+      "first_actual_pdf_script_exit_code": 1,
+      "reason": "script launched from E drive did not initially add repository to sys.path; final script added explicit repository path and passed",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.log"
+    },
+    "upload_endpoint_contract_test": "PASS: page override forwarded and non-PDF page scope rejected with 422 error.code IMAGE_PAGE_SCOPE_PDF_ONLY"
+  },
+  "changed_files": [
+    "backend/weknora_port/documents.py",
+    "backend/weknora_port/http_api.py",
+    "backend/weknora_port/image_configuration.py",
+    "backend/weknora_port/image_tasks.py",
+    "backend/weknora_port/ingestion/core.py",
+    "backend/weknora_port/ingestion/upstream_pdf_parser.py",
+    "backend/weknora_port/runtime.py",
+    "tests/weknora_port/test_p27_page_scoped_vision.py",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json",
+    "tests/weknora_port/test_http_api.py"
+  ]
 }

@@ -19,11 +19,12 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse,Response
 from starlette.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool, StrictInt
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool, StrictInt, field_validator
 
 from .streaming.events import StreamEvent, to_sse
 from .models.types import ProviderError
 from .documents import DocumentLifecycleError
+from .image_configuration import normalize_image_pages
 
 
 _CODE = re.compile(r"^[A-Z][A-Z0-9_]{0,79}$")
@@ -73,6 +74,17 @@ class ImageProcessingWrite(ApiModel):
     caption_model_id: str = ''
     description_language: str = ''
     custom_instructions: str = ''
+    image_pages: list[StrictInt] | None = Field(default=None, min_length=1, max_length=1000)
+
+    @field_validator("image_pages")
+    @classmethod
+    def valid_image_pages(cls, value):
+        if value is None:
+            return None
+        try:
+            return normalize_image_pages(value)
+        except DocumentLifecycleError as exc:
+            raise ValueError(exc.code) from None
 
 
 class VisionModelCreate(ApiModel):
@@ -502,11 +514,25 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
             overrides=json.loads(raw) if isinstance(raw,str) and raw else None
         except ValueError:
             raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID') from None
-        if overrides is not None and (not isinstance(overrides,dict) or
-            set(overrides)-{'ocr_adapter','ocr_model_id','caption_mode','caption_model_id',
-                            'description_language','custom_instructions'} or
-            any(not isinstance(value,str) for value in overrides.values())):
+        allowed_strings={'ocr_adapter','ocr_model_id','caption_mode','caption_model_id',
+                         'description_language','custom_instructions'}
+        if overrides is not None and not isinstance(overrides,dict):
             raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID')
+        if overrides is not None:
+            pages=overrides.get('image_pages')
+            invalid=(set(overrides)-(allowed_strings|{'image_pages'}) or
+                any(not isinstance(value,str) for key,value in overrides.items() if key in allowed_strings) or
+                ('image_pages' in overrides and (not isinstance(pages,list) or
+                    any(type(page) is not int for page in pages))))
+            if invalid:
+                raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID')
+            if 'image_pages' in overrides:
+                try:
+                    overrides['image_pages']=normalize_image_pages(pages)
+                except DocumentLifecycleError:
+                    raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID') from None
+                if not (file.filename or '').lower().endswith('.pdf'):
+                    raise HTTPException(status_code=422,detail='IMAGE_PAGE_SCOPE_PDF_ONLY')
         result = await runtime.upload_document(who, knowledge_base_id, file.filename or "upload",
                                                file.content_type or "application/octet-stream", file,overrides)
         return json_data(request, result)
