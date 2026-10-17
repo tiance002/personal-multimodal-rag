@@ -1,0 +1,2187 @@
+{
+  "schema": "p29-quality/v1",
+  "generated_from": "Saved normal HTTP/SSE and passive observer artifacts only; no new calls.",
+  "overall_interpretation": "Small observational rerank-on/off sample; no global default-change recommendation. For 0434, embedding inputs differ and candidate pools overlap only 27/30, so the comparison is not a rerank-only causal estimate. Gold diagnostics are separate from manual correctness and source support.",
+  "diagnostic_contract": {
+    "implementation": "eval_center/weknora_scoring.py::answer_diagnostics",
+    "normalization": "lowercase and retain Unicode alphanumeric characters",
+    "metrics": "normalized exact match and character multiset F1",
+    "limitation": "Project diagnostics only; official MMLongBench judge and semantic citation-support evaluation were NOT RUN."
+  },
+  "cases": [
+    {
+      "case_id": "row-0434-on",
+      "source_case": "row-0434",
+      "tenant_id": 332,
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "enable_rerank": true,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "1dffb9f4-a0f4-4e06-a08d-9421ad56db03",
+      "response_sha256": "961cb35b643e88ac012354fcc3eea9e70437b3d224848cf7361875f115c44ec9",
+      "answer_sha256": "21187ac1fdf238e75f12b54a6457bd4370b5103a244b85767ff0220b41623d55",
+      "assistant_answer": "抱歉，我无法回答这个问题。\n\n我目前的知识库中仅包含两份文档：\n\n1. **catvsdogdlpycon15se-150512122612-lva1-app6891_95** — 2015年PYCON深度学习与深度数据科学主题的PPT，由Roelof Pieters主讲。\n2. **b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95** — 一份家用物理复习指南，涵盖能量概念。\n\n这两份文档中都没有涉及\"coding time\"部分，也没有包含任何关于训练数据集的信息。因此，我无法根据现有资料回答您的问题。\n\n如果您能提供相关的PPT文件或更多上下文信息，我可以尝试帮您查找相关内容。",
+      "gold": {
+        "source": "P25 frozen native typed Gold: E:\\WK\\run\\p25-20261017\\runtime\\gold-evaluation-only.json",
+        "answers": [
+          "Cat vs Dog dataset"
+        ]
+      },
+      "answer_diagnostics": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "normalized_exact_match": false,
+        "character_f1": 0.107143,
+        "official_judge": "NOT_RUN",
+        "scorer": "eval_center/weknora_scoring.py::answer_diagnostics"
+      },
+      "manual_assessment": "Refusal is incorrect against Gold; live pool lacks explicit Kaggle name and final prompt has no evidence.",
+      "context_support": "No context in final Cheap prompt. Of 30 search passages, none contains Kaggle or an explicit training-dataset name; only generic cat-vs-dog summary and MLP-training chunks. Top rerank scores 0.024474, 0.002197.",
+      "fallback": {
+        "mode": "fallback_no_matching_context",
+        "answer_disclosure": "Answer says cannot answer, but claim that neither document has training-dataset information conflicts with the deck."
+      },
+      "unsupported_or_overextended_claims": [
+        "negative claim that deck has no training-dataset information"
+      ],
+      "retrieval": {
+        "candidate_count": 30,
+        "merge_count": null,
+        "selected_context_count": null,
+        "source_readback_count": 0,
+        "final_stage_artifact": "49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json"
+      },
+      "provider_usage": {
+        "calls": 4,
+        "settled": 4,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 8369,
+        "models": [
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 940,
+              "completion_tokens": 191,
+              "total_tokens": 1131,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 940,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 191,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 1131,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":191,\"prompt_tokens\":940,\"total_tokens\":1131}",
+                "raw_sha256": "114065bb03c41a92bb82d53e65c96f5ad236ce80e48ea5b66cb08533c3dd2fe4",
+                "derived_total": 1131,
+                "simulated": false,
+                "observed_lower_bound": 1131,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0434-on/observer/provider-requests/0ebada5d2f8edc146c66e48d35160de27bd97c8a19006f7be10f413d5f1a072f.json"
+          },
+          {
+            "capability": "rerank",
+            "model": "BAAI/bge-reranker-v2-m3",
+            "stage": "auxiliary",
+            "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/rerank",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0434-on/observer/provider-requests/9a046d0d9f7be8e52cb279e362de8caf2f07279da52e7a397fef568ad260b883.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2535,
+              "completion_tokens": 30,
+              "total_tokens": 2565,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2535,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 30,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2565,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":30,\"prompt_tokens\":2535,\"total_tokens\":2565}",
+                "raw_sha256": "f59779069f3230531cf7614b2ef6a44f4a258420ec072d10974ae5edb765f303",
+                "derived_total": 2565,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0434-on/observer/provider-requests/b5411abae92bcf1b7af7b83cf43e6790ad3a3a154892f5be4f30271b364c1f8e.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-687fe7d79567f2c3",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0434-on/observer/provider-requests/e1677f265486b63be688390772747a7b857965be45fa360792bf49fcb55313cf.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/answer/1/cheap"
+        },
+        "embedding_wire_inputs": [
+          [
+            "PPT中coding time部分引入的用于训练的数据集是什么"
+          ]
+        ]
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/row-0434-on/result.json",
+          "cases/row-0434-on/answer.sse",
+          "cases/row-0434-on/messages.json",
+          "cases/row-0434-on/source-readbacks.json",
+          "cases/row-0434-on/observer/stages/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json",
+          "cases/row-0434-on/observer/captures/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json",
+          "cases/row-0434-on/observer/rerank/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json"
+        ],
+        "provider_request_files": [
+          "cases/row-0434-on/observer/provider-requests/0ebada5d2f8edc146c66e48d35160de27bd97c8a19006f7be10f413d5f1a072f.json",
+          "cases/row-0434-on/observer/provider-requests/9a046d0d9f7be8e52cb279e362de8caf2f07279da52e7a397fef568ad260b883.json",
+          "cases/row-0434-on/observer/provider-requests/b5411abae92bcf1b7af7b83cf43e6790ad3a3a154892f5be4f30271b364c1f8e.json",
+          "cases/row-0434-on/observer/provider-requests/e1677f265486b63be688390772747a7b857965be45fa360792bf49fcb55313cf.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-332/raw/0ebada5d2f8edc146c66e48d35160de27bd97c8a19006f7be10f413d5f1a072f.body"
+        ]
+      }
+    },
+    {
+      "case_id": "row-0434-off",
+      "source_case": "row-0434",
+      "tenant_id": 332,
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "enable_rerank": false,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "11fb3810-328c-4c1d-af2a-27b7b0b0ace5",
+      "response_sha256": "cb43d557c2eeeb16ed22abdc045c4dafed6a80ec48ed6322069d463a1116f84e",
+      "answer_sha256": "aa09374bc99f92dcd6c21cc044b71540d9320a8100d77ff98b653568b7472b5f",
+      "assistant_answer": "## Answer\n\nBased on the reference materials, the dataset introduced in the \"coding time\" section of the PPT for training is the **Kaggle's Cat vs Dog dataset** (25,000 dog/cat pictures).\n\nThis is referenced in the slides under the section discussing deep learning applications, where it states:\n\n> \"Kaggle's Cat vs Dog dataset (25k dog/cat pictures)\"\n\nThe dataset is used as a practical example for training a deep neural network to classify whether an image is a cat or a dog. The slides describe the workflow of loading a pretrained convolutional neural network (CaffeNet), extracting features from images, and then training a Multi-Layer Perceptron (MLP) on those extracted features.",
+      "gold": {
+        "source": "P25 frozen native typed Gold: E:\\WK\\run\\p25-20261017\\runtime\\gold-evaluation-only.json",
+        "answers": [
+          "Cat vs Dog dataset"
+        ]
+      },
+      "answer_diagnostics": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "normalized_exact_match": false,
+        "character_f1": 0.05386,
+        "official_judge": "NOT_RUN",
+        "scorer": "eval_center/weknora_scoring.py::answer_diagnostics"
+      },
+      "manual_assessment": "Entity matches Gold; coding-time section association is unsupported.",
+      "context_support": "Context has Kaggle Cat vs Dog dataset (25k dog/cat pictures) plus separate MLP-training workflow; it does not link dataset to coding time.",
+      "fallback": {
+        "mode": "none",
+        "answer_disclosure": "not_applicable"
+      },
+      "unsupported_or_overextended_claims": [
+        "coding-time section association"
+      ],
+      "retrieval": {
+        "candidate_count": 30,
+        "merge_count": 15,
+        "selected_context_count": 28,
+        "source_readback_count": 28,
+        "final_stage_artifact": "b50e9d26493ebf59e2261df55bc36812b7d3591b07c684f502c024330349b48b.json"
+      },
+      "provider_usage": {
+        "calls": 3,
+        "settled": 3,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 9344,
+        "models": [
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "6f01e3a0-b4ea-49e7-b0a9-6997352588c5/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2535,
+              "completion_tokens": 28,
+              "total_tokens": 2563,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2535,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 28,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2563,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":28,\"prompt_tokens\":2535,\"total_tokens\":2563}",
+                "raw_sha256": "6e4ffd2a923507af042b72f84526ffc65c9b2bd0b95f38f8f26c8101fca3220e",
+                "derived_total": 2563,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0434-off/observer/provider-requests/84275aa6f272449521315e03cbdcbe6deca7db3c51f8d91dc6da4302a2ff8504.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "6f01e3a0-b4ea-49e7-b0a9-6997352588c5/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 6602,
+              "completion_tokens": 164,
+              "total_tokens": 6766,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 6602,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 164,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 6766,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":164,\"prompt_tokens\":6602,\"total_tokens\":6766}",
+                "raw_sha256": "c0d3f70a3d305b07b757be9cb266b740ebbaa5ae8e10bcb54ca283a8b56a239d",
+                "derived_total": 6766,
+                "simulated": false,
+                "observed_lower_bound": 6766,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0434-off/observer/provider-requests/8e7cea1048d5bc61d24765708ca247ab8534584ae21c1c0419af3d42cfe2f808.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "6f01e3a0-b4ea-49e7-b0a9-6997352588c5/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-d1fcef3c479d2d36",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0434-off/observer/provider-requests/a6473a104ac5eb34c8687e4cde044ac08cb8ea2bf6406d08fe10e3f2ee81230c.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "6f01e3a0-b4ea-49e7-b0a9-6997352588c5/answer/1/cheap"
+        },
+        "embedding_wire_inputs": [
+          [
+            "PPT中coding time部分介绍的训练数据集是什么"
+          ]
+        ]
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/row-0434-off/result.json",
+          "cases/row-0434-off/answer.sse",
+          "cases/row-0434-off/messages.json",
+          "cases/row-0434-off/source-readbacks.json",
+          "cases/row-0434-off/observer/stages/b50e9d26493ebf59e2261df55bc36812b7d3591b07c684f502c024330349b48b.json",
+          "cases/row-0434-off/observer/captures/b50e9d26493ebf59e2261df55bc36812b7d3591b07c684f502c024330349b48b.json",
+          "cases/row-0434-off/observer/rerank/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json"
+        ],
+        "provider_request_files": [
+          "cases/row-0434-off/observer/provider-requests/84275aa6f272449521315e03cbdcbe6deca7db3c51f8d91dc6da4302a2ff8504.json",
+          "cases/row-0434-off/observer/provider-requests/8e7cea1048d5bc61d24765708ca247ab8534584ae21c1c0419af3d42cfe2f808.json",
+          "cases/row-0434-off/observer/provider-requests/a6473a104ac5eb34c8687e4cde044ac08cb8ea2bf6406d08fe10e3f2ee81230c.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-332/raw/8e7cea1048d5bc61d24765708ca247ab8534584ae21c1c0419af3d42cfe2f808.body"
+        ]
+      }
+    },
+    {
+      "case_id": "row-0959-on",
+      "source_case": "row-0959",
+      "tenant_id": 332,
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "question": "What are used for long-distance communication as introduced in this slide?",
+      "enable_rerank": true,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "0e55e6a7-bb78-47d9-90b6-2ac27a64ce02",
+      "response_sha256": "29ed8017a87b238beb2b389af4ca3e31149ebbca7f270e7071bf8b1825af352a",
+      "answer_sha256": "579a28ac53901d1bdbdaa9a44b591aac2a6aff2b4c4e07a0d7edeb013e06c7bf",
+      "assistant_answer": "## 长距离通信的用途\n\n根据提供的幻灯片内容，用于长距离通信的方法包括：\n\n1. **无线电波（Radiowaves）**：可以被大气中的不同层折射，从而传播更远。\n2. **微波（Microwaves）**：可用于将信号发送到卫星。\n\n此外，幻灯片还提到，由于地球曲率的影响，信号无法直接传输到远处的接收器，因此需要利用大气层中的不同折射层来延长信号的传播距离。",
+      "gold": {
+        "source": "P25 frozen native typed Gold: E:\\WK\\run\\p25-20261017\\runtime\\gold-evaluation-only.json",
+        "answers": [
+          "['radiowaves', 'microwaves']"
+        ]
+      },
+      "answer_diagnostics": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "normalized_exact_match": false,
+        "character_f1": 0.242424,
+        "official_judge": "NOT_RUN",
+        "scorer": "eval_center/weknora_scoring.py::answer_diagnostics"
+      },
+      "manual_assessment": "Correct and complete against two-item Gold; both methods have the requested long-distance relation.",
+      "context_support": "Supported: selected context chunks 26 and 24 directly state long-distance communication and both methods.",
+      "fallback": {
+        "mode": "none",
+        "answer_disclosure": "not_applicable"
+      },
+      "unsupported_or_overextended_claims": [],
+      "retrieval": {
+        "candidate_count": 30,
+        "merge_count": 2,
+        "selected_context_count": 2,
+        "source_readback_count": 2,
+        "final_stage_artifact": "5feb4afd695a7fcddbff1663fe68853f84dbd363d531332b1bf0b18b00483da1.json"
+      },
+      "provider_usage": {
+        "calls": 4,
+        "settled": 4,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 8274,
+        "models": [
+          {
+            "capability": "rerank",
+            "model": "BAAI/bge-reranker-v2-m3",
+            "stage": "auxiliary",
+            "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/rerank",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0959-on/observer/provider-requests/30ceff3ee763587fe6c829bb357eeb9cc86ef53dea2b80da00d26fd2444f807f.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2531,
+              "completion_tokens": 32,
+              "total_tokens": 2563,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2531,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 32,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2563,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":32,\"prompt_tokens\":2531,\"total_tokens\":2563}",
+                "raw_sha256": "29f4c1a51678a6b6276f7d39c1341614fe3d8f10de777ac113341d27282646f2",
+                "derived_total": 2563,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0959-on/observer/provider-requests/33fc8e458999e9c48df4f396585f6de459736694160e148545d174b0f30c2fc6.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 1168,
+              "completion_tokens": 104,
+              "total_tokens": 1272,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 1168,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 104,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 1272,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":104,\"prompt_tokens\":1168,\"total_tokens\":1272}",
+                "raw_sha256": "4122776fcebd87904890b323916e046d3dbfece6c40ac03da41ecd7f8c1e70ee",
+                "derived_total": 1272,
+                "simulated": false,
+                "observed_lower_bound": 1272,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0959-on/observer/provider-requests/c17332f71f8384f3641e15aeabf7f4922852c90af61e718d45078431d3278073.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-faf5fb89bed56b6a",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0959-on/observer/provider-requests/f144fd873ffa78e4d9f2d68322af73036fd68f12becb6d8c79df4710657581b9.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/answer/1/cheap"
+        },
+        "embedding_wire_inputs": [
+          [
+            "What are used for long-distance communication as introduced in this slide?"
+          ]
+        ]
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/row-0959-on/result.json",
+          "cases/row-0959-on/answer.sse",
+          "cases/row-0959-on/messages.json",
+          "cases/row-0959-on/source-readbacks.json",
+          "cases/row-0959-on/observer/stages/5feb4afd695a7fcddbff1663fe68853f84dbd363d531332b1bf0b18b00483da1.json",
+          "cases/row-0959-on/observer/captures/5feb4afd695a7fcddbff1663fe68853f84dbd363d531332b1bf0b18b00483da1.json",
+          "cases/row-0959-on/observer/rerank/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json",
+          "cases/row-0959-on/observer/rerank/5feb4afd695a7fcddbff1663fe68853f84dbd363d531332b1bf0b18b00483da1.json"
+        ],
+        "provider_request_files": [
+          "cases/row-0959-on/observer/provider-requests/30ceff3ee763587fe6c829bb357eeb9cc86ef53dea2b80da00d26fd2444f807f.json",
+          "cases/row-0959-on/observer/provider-requests/33fc8e458999e9c48df4f396585f6de459736694160e148545d174b0f30c2fc6.json",
+          "cases/row-0959-on/observer/provider-requests/c17332f71f8384f3641e15aeabf7f4922852c90af61e718d45078431d3278073.json",
+          "cases/row-0959-on/observer/provider-requests/f144fd873ffa78e4d9f2d68322af73036fd68f12becb6d8c79df4710657581b9.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-332/raw/c17332f71f8384f3641e15aeabf7f4922852c90af61e718d45078431d3278073.body"
+        ]
+      }
+    },
+    {
+      "case_id": "row-0959-off",
+      "source_case": "row-0959",
+      "tenant_id": 332,
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "question": "What are used for long-distance communication as introduced in this slide?",
+      "enable_rerank": false,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "4082a129-6934-4e03-9178-07afa11cd37b",
+      "response_sha256": "15ff91e8c33fd4b010e313a14b5815946e6ee8a717e422b2e40bdf9f1f9f9db9",
+      "answer_sha256": "1cb6eb445e6721c65d587c438a2b81c9a918ae71f34af75889e8192311e14529",
+      "assistant_answer": "## 长距离通信方式\n\n根据提供的资料，用于长距离通信的方式包括：\n\n1. **无线电波（Radiowaves）**：通过大气层不同层次的折射来传播信号，使信号能够传播更远。电离层（ionosphere）会折射无线电波。\n\n2. **微波（Microwaves）**：可用于将信号发送到卫星，实现远距离通信。微波可以穿透大气层。\n\n3. **光纤（Fibre Optics）**：利用全内反射（TIR）原理，通过细密的光纤传输光信号，实现高速数据传输。\n\n4. **有线通信**：资料提到有线通信的一个优势是\"可以发送大量数据非常快速地\"，但具体用于长距离通信的方式未详细展开。\n\n资料还提到，由于地球曲率的影响，长距离信号传输存在障碍，因此微波发射器通常被放置在靠近山顶的高处，以避免障碍物遮挡，确保信号传输质量。",
+      "gold": {
+        "source": "P25 frozen native typed Gold: E:\\WK\\run\\p25-20261017\\runtime\\gold-evaluation-only.json",
+        "answers": [
+          "['radiowaves', 'microwaves']"
+        ]
+      },
+      "answer_diagnostics": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "normalized_exact_match": false,
+        "character_f1": 0.132013,
+        "official_judge": "NOT_RUN",
+        "scorer": "eval_center/weknora_scoring.py::answer_diagnostics"
+      },
+      "manual_assessment": "Core Gold concepts correct, but answer adds Fibre Optics and wired communication as long-distance examples without support for that association.",
+      "context_support": "Partial: context says long-distance, ionosphere refracts radiowaves, microwaves send signals to satellites. Fibre Optics occurs elsewhere as TIR; wired communication is mentioned for data speed, not distance.",
+      "fallback": {
+        "mode": "none",
+        "answer_disclosure": "not_applicable"
+      },
+      "unsupported_or_overextended_claims": [
+        "Fibre Optics as a long-distance method on this slide",
+        "wired communication as an answer to this long-distance question"
+      ],
+      "retrieval": {
+        "candidate_count": 30,
+        "merge_count": 11,
+        "selected_context_count": 28,
+        "source_readback_count": 28,
+        "final_stage_artifact": "e1d75f7ef88b863f3efa026bd8643a5e28cb8c2a8892cdf3cfbcadcb9ebadfdd.json"
+      },
+      "provider_usage": {
+        "calls": 3,
+        "settled": 3,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 9231,
+        "models": [
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "846d4410-abf0-4e74-98c1-619ebbcc4855/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 6446,
+              "completion_tokens": 206,
+              "total_tokens": 6652,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 6446,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 206,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 6652,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":206,\"prompt_tokens\":6446,\"total_tokens\":6652}",
+                "raw_sha256": "bee631476dec88fe6b30a23175d889c370f4769d0d96fa0f29aa9326be03a586",
+                "derived_total": 6652,
+                "simulated": false,
+                "observed_lower_bound": 6652,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0959-off/observer/provider-requests/4915f74380ae448b3ca67605669f69328d3f7441bcbfcfb1a6065d94a561f059.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "846d4410-abf0-4e74-98c1-619ebbcc4855/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2531,
+              "completion_tokens": 31,
+              "total_tokens": 2562,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2531,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 31,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2562,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":31,\"prompt_tokens\":2531,\"total_tokens\":2562}",
+                "raw_sha256": "6cef11d2d89730776bab0a2eb985ec6bb0d119d322edd7256323e46a43453533",
+                "derived_total": 2562,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0959-off/observer/provider-requests/79ff6bc2ae4ed0ec316646d5f8a75347a9dfe54056f34857ddff4c2989708faf.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "846d4410-abf0-4e74-98c1-619ebbcc4855/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-d4ebda33726abc29",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0959-off/observer/provider-requests/ad8bcbb38e381bdeeb78d279745f4d0250c0a8062761a7c63369135fd3a80b61.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "846d4410-abf0-4e74-98c1-619ebbcc4855/answer/1/cheap"
+        },
+        "embedding_wire_inputs": [
+          [
+            "What are used for long-distance communication as introduced in this slide"
+          ]
+        ]
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/row-0959-off/result.json",
+          "cases/row-0959-off/answer.sse",
+          "cases/row-0959-off/messages.json",
+          "cases/row-0959-off/source-readbacks.json",
+          "cases/row-0959-off/observer/stages/e1d75f7ef88b863f3efa026bd8643a5e28cb8c2a8892cdf3cfbcadcb9ebadfdd.json",
+          "cases/row-0959-off/observer/captures/e1d75f7ef88b863f3efa026bd8643a5e28cb8c2a8892cdf3cfbcadcb9ebadfdd.json",
+          "cases/row-0959-off/observer/rerank/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json",
+          "cases/row-0959-off/observer/rerank/5feb4afd695a7fcddbff1663fe68853f84dbd363d531332b1bf0b18b00483da1.json"
+        ],
+        "provider_request_files": [
+          "cases/row-0959-off/observer/provider-requests/4915f74380ae448b3ca67605669f69328d3f7441bcbfcfb1a6065d94a561f059.json",
+          "cases/row-0959-off/observer/provider-requests/79ff6bc2ae4ed0ec316646d5f8a75347a9dfe54056f34857ddff4c2989708faf.json",
+          "cases/row-0959-off/observer/provider-requests/ad8bcbb38e381bdeeb78d279745f4d0250c0a8062761a7c63369135fd3a80b61.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-332/raw/4915f74380ae448b3ca67605669f69328d3f7441bcbfcfb1a6065d94a561f059.body"
+        ]
+      }
+    },
+    {
+      "case_id": "row-0958-on",
+      "source_case": "row-0958",
+      "tenant_id": 344,
+      "knowledge_base_id": "63236a5c-c0d6-499d-84e5-34475564f1c0",
+      "question": "What are two examples of reflecting surfaces?",
+      "enable_rerank": true,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "4da123bc-c6da-41e8-9c8d-edf5815b5db1",
+      "response_sha256": "901652f9eca304332b214b0dd33e276cf0d497c84ae91365f406ea3de3852cb0",
+      "answer_sha256": "18015a25fcce93de11d4fc543d35c06de06ced2f43e89ba1d37046891942bb25",
+      "assistant_answer": "# 什么是反射面\n\n反射面是指能够使入射的波（如光波、声波、电磁波等）发生反射的界面或表面。当波从一种介质传播到另一种介质时，在两种介质的交界处，部分能量会被反射回原来的介质，这个交界面或表面就是反射面。\n\n反射面的核心条件是：两种介质的**声阻抗（或折射率）不同**，波在界面处发生反射。\n\n---\n\n# 常见的反射面例子\n\n| 反射面 | 说明 |\n|--------|------|\n| **平面镜** | 最经典的反射面，如家中镜子，光照射后反射成像 |\n| **水面** | 光线射向平静的水面会发生反射，形成倒影 |\n| **墙壁/墙面** | 光线照射到墙壁上会发生反射 |\n| **金属表面** | 金属是良好的反射面，如镜子背面镀的金属层 |\n| **光滑的玻璃表面** | 玻璃对光有反射作用 |\n| **反射天线（抛物面天线）** | 利用抛物面反射面将电磁波聚焦或反射 |\n| **声学反射面** | 如音乐厅的弧形墙壁，用于反射声音，增强混响 |\n\n---\n\n**简单总结：** 任何两种不同介质的交界处，只要波遇到时发生反射，都可以称为反射面。最典型的例子就是**平面镜**——日常生活中最常见的反射面。",
+      "gold": {
+        "source": "P27 frozen offline Gold: E:\\WK\\run\\p27-live-20261017\\frozen-gold-offline-only.json",
+        "answers": [
+          "['shiny object', 'mirror']"
+        ]
+      },
+      "answer_diagnostics": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "normalized_exact_match": false,
+        "character_f1": 0.0,
+        "official_judge": "NOT_RUN",
+        "scorer": "eval_center/weknora_scoring.py::answer_diagnostics"
+      },
+      "manual_assessment": "Generic examples include mirror but omit shiny object; unsupported by retrieved evidence.",
+      "context_support": "No context in final Cheap prompt; fallback system says no content matched and lists KB document.",
+      "fallback": {
+        "mode": "fallback_no_matching_context",
+        "answer_disclosure": "answer does not disclose general-knowledge/no-source status"
+      },
+      "unsupported_or_overextended_claims": [
+        "water, wall, metal, glass, antenna and acoustic examples lack retrieved support"
+      ],
+      "retrieval": {
+        "candidate_count": 9,
+        "merge_count": null,
+        "selected_context_count": null,
+        "source_readback_count": 0,
+        "final_stage_artifact": "4795aae4805bff579730733eced84298f1538dfde5e1ef87a6837748b5d43340.json"
+      },
+      "provider_usage": {
+        "calls": 8,
+        "settled": 8,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 5263,
+        "models": [
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2525,
+              "completion_tokens": 25,
+              "total_tokens": 2550,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2525,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 25,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2550,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":25,\"prompt_tokens\":2525,\"total_tokens\":2550}",
+                "raw_sha256": "bf4a1b966427a17fe289b8591213f67aa17a2b24c09b4c6c70231a0cf08119ce",
+                "derived_total": 2550,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0958-on/observer/provider-requests/2f997162475d238f8af2bb991868517c8f853e3806163fadebd2ac520b1de31c.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-7b9992a820bcd6a9",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-on/observer/provider-requests/30c04d630963216d75cc479fc5f9965718a76fa92e277f3c09b696e4fc09a4c5.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-645aa16ef26e40e3",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-on/observer/provider-requests/360890cc2be44ce28b921985121a9bd7221e14903da3aa924087fb78fed9e576.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-d0b228cd70ce900f",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-on/observer/provider-requests/790fbc529dcb58ab553b6df35b57d9d5ce2b1848c53cfa8ec0c4f430258bc1a8.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-0d57ed9e4b7a377c",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-on/observer/provider-requests/9f92d9871b2b55f6efe334cac191355fcc77f8d17c03faa20bd9062a0c29c0dc.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-5fca2d9e05431da9",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-on/observer/provider-requests/a286f5cc80acb25fc47fa79722fc207ee59136481fdeede7233e8814b4995e83.json"
+          },
+          {
+            "capability": "rerank",
+            "model": "BAAI/bge-reranker-v2-m3",
+            "stage": "auxiliary",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/rerank",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-on/observer/provider-requests/cc19967cc8a98fadff91e4ebc477b9486e6660de0a0965d1cbbcc16e5c57c2f0.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 904,
+              "completion_tokens": 317,
+              "total_tokens": 1221,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 904,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 317,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 1221,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":317,\"prompt_tokens\":904,\"total_tokens\":1221}",
+                "raw_sha256": "64863ed99d4cc3703bbda20eda5f60feb25f4ac10c113f371eabbbe6c8725071",
+                "derived_total": 1221,
+                "simulated": false,
+                "observed_lower_bound": 1221,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0958-on/observer/provider-requests/f36cd1a150abb8bce4ee7c99a36e8a22c4332725be613a05fa515e5c1da956ce.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/answer/1/cheap"
+        },
+        "embedding_wire_inputs": [
+          [
+            "两个反射面的例子"
+          ],
+          [
+            "什么是反射面 两个反射面的例子"
+          ],
+          [
+            "什么 反射 反射面 两个 反射 反射面 例子"
+          ],
+          [
+            "反射面 两个反射面的例子"
+          ],
+          [
+            "什么是反射面"
+          ]
+        ]
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/row-0958-on/result.json",
+          "cases/row-0958-on/answer.sse",
+          "cases/row-0958-on/messages.json",
+          "cases/row-0958-on/source-readbacks.json",
+          "cases/row-0958-on/observer/stages/4795aae4805bff579730733eced84298f1538dfde5e1ef87a6837748b5d43340.json",
+          "cases/row-0958-on/observer/captures/4795aae4805bff579730733eced84298f1538dfde5e1ef87a6837748b5d43340.json",
+          "cases/row-0958-on/observer/rerank/4795aae4805bff579730733eced84298f1538dfde5e1ef87a6837748b5d43340.json"
+        ],
+        "provider_request_files": [
+          "cases/row-0958-on/observer/provider-requests/2f997162475d238f8af2bb991868517c8f853e3806163fadebd2ac520b1de31c.json",
+          "cases/row-0958-on/observer/provider-requests/30c04d630963216d75cc479fc5f9965718a76fa92e277f3c09b696e4fc09a4c5.json",
+          "cases/row-0958-on/observer/provider-requests/360890cc2be44ce28b921985121a9bd7221e14903da3aa924087fb78fed9e576.json",
+          "cases/row-0958-on/observer/provider-requests/790fbc529dcb58ab553b6df35b57d9d5ce2b1848c53cfa8ec0c4f430258bc1a8.json",
+          "cases/row-0958-on/observer/provider-requests/9f92d9871b2b55f6efe334cac191355fcc77f8d17c03faa20bd9062a0c29c0dc.json",
+          "cases/row-0958-on/observer/provider-requests/a286f5cc80acb25fc47fa79722fc207ee59136481fdeede7233e8814b4995e83.json",
+          "cases/row-0958-on/observer/provider-requests/cc19967cc8a98fadff91e4ebc477b9486e6660de0a0965d1cbbcc16e5c57c2f0.json",
+          "cases/row-0958-on/observer/provider-requests/f36cd1a150abb8bce4ee7c99a36e8a22c4332725be613a05fa515e5c1da956ce.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-344/raw/f36cd1a150abb8bce4ee7c99a36e8a22c4332725be613a05fa515e5c1da956ce.body"
+        ]
+      }
+    },
+    {
+      "case_id": "row-0958-off",
+      "source_case": "row-0958",
+      "tenant_id": 344,
+      "knowledge_base_id": "63236a5c-c0d6-499d-84e5-34475564f1c0",
+      "question": "What are two examples of reflecting surfaces?",
+      "enable_rerank": false,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "fee52179-ac2f-465e-bcf5-f2e8954db8f1",
+      "response_sha256": "d75191a7b74ee5e08b277f0100ff5315b2aa9b6c364ba87d922c8502d6d137a0",
+      "answer_sha256": "c2e1d96bc442ed0afb56606c36f45d824c19645873d66c78cbe3f60654fa13b7",
+      "assistant_answer": "## 反射面的两个例子\n\n根据参考资料，反射（Reflection）是指波从表面**反弹回来**的现象。参考资料中给出的反射面例子是：\n\n1. **镜子的表面**（shiny surface）——即光滑的反射面，如镜子。\n\n参考资料明确指出：\"Reflecting surface, eg shiny surface\"，说明反射面可以是光滑、有光泽的表面。\n\n此外，参考资料还提到反射定律：**入射角等于反射角**，适用于任何反射面。\n\n> **注意：** 参考资料中仅提到\"shiny surface\"这一个具体的反射面例子，并未提供第二个例子。如果需要第二个例子，可能需要查阅其他资料。",
+      "gold": {
+        "source": "P27 frozen offline Gold: E:\\WK\\run\\p27-live-20261017\\frozen-gold-offline-only.json",
+        "answers": [
+          "['shiny object', 'mirror']"
+        ]
+      },
+      "answer_diagnostics": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "normalized_exact_match": false,
+        "character_f1": 0.106996,
+        "official_judge": "NOT_RUN",
+        "scorer": "eval_center/weknora_scoring.py::answer_diagnostics"
+      },
+      "manual_assessment": "Incomplete. OCR has only garbled shiny-surface phrase; mirror is inferred; answer explicitly says second example absent.",
+      "context_support": "Partial/weak: image_ocr says “Reflecting surtace, eg shinyet”; caption is generic. Neither names mirror nor gives two clear examples.",
+      "fallback": {
+        "mode": "none",
+        "answer_disclosure": "discloses_missing_second_example"
+      },
+      "unsupported_or_overextended_claims": [
+        "mirror as a source-stated example",
+        "quoted Reflecting surface, eg shiny surface is not a verbatim quote of garbled OCR context"
+      ],
+      "retrieval": {
+        "candidate_count": 9,
+        "merge_count": 3,
+        "selected_context_count": 8,
+        "source_readback_count": 8,
+        "final_stage_artifact": "fb3bcba12f5b3a2937a974f2d0c995e7f4c6ad16387a80eff6a3f84a683cb9f3.json"
+      },
+      "provider_usage": {
+        "calls": 7,
+        "settled": 7,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 6583,
+        "models": [
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-e2f2171b795c9c6e",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-off/observer/provider-requests/0e67783263e3df11a461db520d146098cf9eea9e31d349c5999932134f51fdb5.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-dc169e00979f64ad",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-off/observer/provider-requests/27f489fbd67ad1ba98ab3cabf4844eea0946e472afb1919e751890687813f5e0.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2525,
+              "completion_tokens": 26,
+              "total_tokens": 2551,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2525,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 26,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2551,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":26,\"prompt_tokens\":2525,\"total_tokens\":2551}",
+                "raw_sha256": "828aefc7951eacb3dea3dff3badcedb97eabf5801a1c63b9bda57f1d687ed988",
+                "derived_total": 2551,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0958-off/observer/provider-requests/4b15eaa3235cc78f26bfbc26d0e25cc8ad4c7105b08b80762a535015e77e2a39.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 3857,
+              "completion_tokens": 141,
+              "total_tokens": 3998,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 3857,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 141,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 3998,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":141,\"prompt_tokens\":3857,\"total_tokens\":3998}",
+                "raw_sha256": "9c7e42a6d39f8c808b8136131b296363e9ad019bd722f481927be8e97568db7f",
+                "derived_total": 3998,
+                "simulated": false,
+                "observed_lower_bound": 3998,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/row-0958-off/observer/provider-requests/60981fcbff9c7e6f8e2be56c1af8785c744c79a91e65de55e34e12c7d67acf72.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-c39b9c280c6250a6",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-off/observer/provider-requests/9c3473d83164cd63628c31a224a3facfef4786dbbec4ef628865703c2b6a4a98.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-0dc405fbb2e973d9",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-off/observer/provider-requests/af8b3fefaf3894e596b0db1f5442f0ce911241bf17cab054bc471dd91258474d.json"
+          },
+          {
+            "capability": "embedding",
+            "model": "BAAI/bge-m3",
+            "stage": "auxiliary",
+            "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-c590b3c924c35c2f",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": null,
+            "file": "cases/row-0958-off/observer/provider-requests/f49f68f2e67685c2f1e75caf68152112dd3bea04791b04acee4021be689de1e4.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/answer/1/cheap"
+        },
+        "embedding_wire_inputs": [
+          [
+            "What are two examples of reflecting surfaces?"
+          ],
+          [
+            "two examples reflecting surfaces"
+          ],
+          [
+            "reflecting"
+          ],
+          [
+            "surfaces"
+          ],
+          [
+            "examples"
+          ]
+        ]
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/row-0958-off/result.json",
+          "cases/row-0958-off/answer.sse",
+          "cases/row-0958-off/messages.json",
+          "cases/row-0958-off/source-readbacks.json",
+          "cases/row-0958-off/observer/stages/fb3bcba12f5b3a2937a974f2d0c995e7f4c6ad16387a80eff6a3f84a683cb9f3.json",
+          "cases/row-0958-off/observer/captures/fb3bcba12f5b3a2937a974f2d0c995e7f4c6ad16387a80eff6a3f84a683cb9f3.json",
+          "cases/row-0958-off/observer/rerank/4795aae4805bff579730733eced84298f1538dfde5e1ef87a6837748b5d43340.json"
+        ],
+        "provider_request_files": [
+          "cases/row-0958-off/observer/provider-requests/0e67783263e3df11a461db520d146098cf9eea9e31d349c5999932134f51fdb5.json",
+          "cases/row-0958-off/observer/provider-requests/27f489fbd67ad1ba98ab3cabf4844eea0946e472afb1919e751890687813f5e0.json",
+          "cases/row-0958-off/observer/provider-requests/4b15eaa3235cc78f26bfbc26d0e25cc8ad4c7105b08b80762a535015e77e2a39.json",
+          "cases/row-0958-off/observer/provider-requests/60981fcbff9c7e6f8e2be56c1af8785c744c79a91e65de55e34e12c7d67acf72.json",
+          "cases/row-0958-off/observer/provider-requests/9c3473d83164cd63628c31a224a3facfef4786dbbec4ef628865703c2b6a4a98.json",
+          "cases/row-0958-off/observer/provider-requests/af8b3fefaf3894e596b0db1f5442f0ce911241bf17cab054bc471dd91258474d.json",
+          "cases/row-0958-off/observer/provider-requests/f49f68f2e67685c2f1e75caf68152112dd3bea04791b04acee4021be689de1e4.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-344/raw/60981fcbff9c7e6f8e2be56c1af8785c744c79a91e65de55e34e12c7d67acf72.body"
+        ]
+      }
+    },
+    {
+      "case_id": "utc-empty",
+      "source_case": "p21-utc-empty",
+      "tenant_id": 332,
+      "knowledge_base_id": "4b365704-9663-431f-8d29-1f27dacf4044",
+      "question": "utc时间转换北京时间",
+      "enable_rerank": true,
+      "http_status": 200,
+      "status": "RECEIVED",
+      "request_id": "9cf5cfb9-b427-420a-a9f3-8502d45638d4",
+      "response_sha256": "c23251478634acb3a88aacf6f42305a3c3575263bd888742d7aaa9d59b92e903",
+      "answer_sha256": "e8de9be5d523da237fbd2427d01ab3912dcfe12719f58b8b9dc31c47483ae375",
+      "assistant_answer": "# utc时间转北京时间\n\n北京时间（UTC+8）与UTC的时差为 **+8小时**。\n\n转换公式：\n\n> **北京时间 = UTC时间 + 8小时**\n\n例如：\n- UTC 00:00 → 北京时间 08:00\n- UTC 12:00 → 北京时间 20:00\n- UTC 23:00 → 北京时间 次日 07:00\n\n如需将某个具体UTC时间转换为北京时间，请提供该时间，我可以立即为您换算。",
+      "gold": {
+        "source": "none",
+        "answers": null
+      },
+      "answer_diagnostics": {
+        "status": "N/A_NO_ANSWER_GOLD",
+        "metrics": null,
+        "official_judge": "NOT_RUN"
+      },
+      "manual_assessment": "Factually correct general UTC+8 conversion; no specific time was supplied.",
+      "context_support": "Empty KB, zero search/context/readback; general timezone fact, not KB-grounded.",
+      "fallback": {
+        "mode": "answer_without_context",
+        "answer_disclosure": "answer does not disclose no KB source, but makes no claim KB supplied it",
+        "native_model_fallback_triggered": false
+      },
+      "unsupported_or_overextended_claims": [
+        "timezone facts unsupported by empty KB although generic conversion is correct"
+      ],
+      "retrieval": {
+        "candidate_count": 0,
+        "merge_count": 0,
+        "selected_context_count": 0,
+        "source_readback_count": 0,
+        "final_stage_artifact": "585523e37b9229698840f78fbf3ea178eb373b7576bee49bac2fd0fe8489f621.json"
+      },
+      "provider_usage": {
+        "calls": 2,
+        "settled": 2,
+        "unknown": 0,
+        "reserved": 0,
+        "settled_tokens": 3480,
+        "models": [
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "auxiliary",
+            "request_id": "3bca0077-86e2-4cf8-84bd-381c45b645eb/query_rewrite",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 2521,
+              "completion_tokens": 22,
+              "total_tokens": 2543,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 2521,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 22,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 2543,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":22,\"prompt_tokens\":2521,\"total_tokens\":2543}",
+                "raw_sha256": "935f453674015f64544b9048c18e1eceacb3b500640dcd4273fd49bcd7be7a35",
+                "derived_total": 2543,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/utc-empty/observer/provider-requests/3bb2521596e7cdcb47d8a73e97b6c804430d743bc3cfc7e83ddaac95355a682f.json"
+          },
+          {
+            "capability": "chat",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "stage": "answer",
+            "request_id": "3bca0077-86e2-4cf8-84bd-381c45b645eb/answer/1/cheap",
+            "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+            "status_code": 200,
+            "usage": {
+              "prompt_tokens": 814,
+              "completion_tokens": 123,
+              "total_tokens": 937,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 814,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 123,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 937,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":123,\"prompt_tokens\":814,\"total_tokens\":937}",
+                "raw_sha256": "6aa56b9ea03ef577eefe6e2119f162c052d92616bef387185242457a4a96109f",
+                "derived_total": 937,
+                "simulated": false,
+                "observed_lower_bound": 937,
+                "prior_numeric_raw": []
+              }
+            },
+            "file": "cases/utc-empty/observer/provider-requests/f88d8c0ad5ce9a5f5dff52598a49f95d207852d5cde07618b5afee91e2fcbcc0.json"
+          }
+        ],
+        "cheap_generation": {
+          "model": "XingChenAGI/Xing4.0-29B",
+          "temperature": 0.3,
+          "top_p": null,
+          "max_tokens": 1024,
+          "enable_thinking": false,
+          "stream": true,
+          "request_id": "3bca0077-86e2-4cf8-84bd-381c45b645eb/answer/1/cheap"
+        },
+        "embedding_wire_inputs": []
+      },
+      "visible_public_references": [],
+      "public_reference_count": 0,
+      "raw_ref_tags": {
+        "case_evidence_files": [
+          "cases/utc-empty/result.json",
+          "cases/utc-empty/answer.sse",
+          "cases/utc-empty/messages.json",
+          "cases/utc-empty/source-readbacks.json",
+          "cases/utc-empty/observer/stages/585523e37b9229698840f78fbf3ea178eb373b7576bee49bac2fd0fe8489f621.json",
+          "cases/utc-empty/observer/captures/585523e37b9229698840f78fbf3ea178eb373b7576bee49bac2fd0fe8489f621.json",
+          "cases/utc-empty/observer/rerank/49b346886d6055b8c65e21c8ebfc1d93f71309e8e5303be6ca7154fb50412b49.json",
+          "cases/utc-empty/observer/rerank/5feb4afd695a7fcddbff1663fe68853f84dbd363d531332b1bf0b18b00483da1.json"
+        ],
+        "provider_request_files": [
+          "cases/utc-empty/observer/provider-requests/3bb2521596e7cdcb47d8a73e97b6c804430d743bc3cfc7e83ddaac95355a682f.json",
+          "cases/utc-empty/observer/provider-requests/f88d8c0ad5ce9a5f5dff52598a49f95d207852d5cde07618b5afee91e2fcbcc0.json"
+        ],
+        "raw_answer_response_bodies": [
+          "E:/WK/run/p29-20261017/evidence-332/raw/f88d8c0ad5ce9a5f5dff52598a49f95d207852d5cde07618b5afee91e2fcbcc0.body"
+        ]
+      },
+      "intended_scenario_status": "FAIL_NOT_SEARCH_NOTHING",
+      "coverage_note": "Empty KB was real, but this request bypassed retrieval; native fallback not triggered. Exact classifier intent was not captured. Seven-request cap exhausted; no retry."
+    }
+  ],
+  "pair_comparisons": {
+    "row-0434": {
+      "off_enable_rerank": false,
+      "on_enable_rerank": true,
+      "embedding_wire_input_off": "PPT中coding time部分介绍的训练数据集是什么",
+      "embedding_wire_input_on": "PPT中coding time部分引入的用于训练的数据集是什么",
+      "search_candidates_off": 30,
+      "search_candidates_on": 30,
+      "candidate_intersection": 27,
+      "off_only_ids": [
+        "9d2e8908-2dd1-4f14-bb59-e09c1b930e7d",
+        "0793dec2-9699-4766-8e52-249f261ce048",
+        "085643dc-5ebb-4b8a-b7f1-75427da40015"
+      ],
+      "on_only_ids": [
+        "0ea1d8ed-920b-4efa-8795-e4ec3782f818",
+        "1ca53651-d20a-45f2-bb22-f8e9c6606ae8",
+        "42561e56-985e-4c8b-8fa3-a0987b77692f"
+      ],
+      "explicit_kaggle_passage_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+      "explicit_kaggle_passage_in_on_pool": false,
+      "all_on_search_passages_inspected": true,
+      "on_pool_remaining_related_content": "Generic cat-vs-dog detector summary and separate MLP training material; no Kaggle dataset name or explicit training-dataset name.",
+      "rerank_on_top_scores": [
+        0.0244742911309004,
+        0.00219698855653405
+      ],
+      "cheap_prompt_on": "Only rewritten question; no source evidence.",
+      "cheap_prompt_off": "Contains Kaggle Cat vs Dog dataset (25k dog/cat pictures) and separate MLP training workflow, but no coding-time section association.",
+      "inference_limit": "Candidate pools and embedding text differ; do not attribute this pair solely to rerank enablement."
+    }
+  },
+  "overall_status": "P29_PARTIAL_COVERAGE_GAP"
+}
