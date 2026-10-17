@@ -1,0 +1,52 @@
+{
+  "schema": "p27-read-only-provider-account-endpoints/v1",
+  "generation_calls": 0,
+  "credential_source": "existing .env.local / DEEPSEEK_API_KEY; value not exported",
+  "credential_sha256": "a9152466b4630eb420b73081c9e3cab5a9c28eccf364d8f5cd81cecaf97017f3",
+  "requests": [
+    {
+      "method": "GET",
+      "endpoint": "https://api.deepseek.com/models",
+      "status": 200,
+      "response_sha256": "b86388abe65929c84de3825eee299b8d78bae23e82e300239f3c788569eb5f39",
+      "top_level_fields": [
+        "data",
+        "object"
+      ],
+      "models": [
+        {
+          "id": "deepseek-flash",
+          "owned_by": "deepseek",
+          "name": "DeepSeek-V4.1-Flash",
+          "max_output_tokens": 393216,
+          "input_modalities": [
+            "text",
+            "image"
+          ]
+        },
+        {
+          "id": "deepseek-v4-pro",
+          "owned_by": "deepseek",
+          "name": "DeepSeek-V4-Pro",
+          "max_output_tokens": 393216,
+          "input_modalities": [
+            "text"
+          ]
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "endpoint": "https://api.deepseek.com/user/balance",
+      "status": 200,
+      "response_sha256": "1513ed76eca0c3820341dc839f2897cb182e42db86a7204a3449efdda804af60",
+      "top_level_fields": [
+        "balance_infos",
+        "is_available"
+      ],
+      "is_available": true,
+      "identity_fields_present": []
+    }
+  ],
+  "billing_account_association": "UNVERIFIED: metadata/balance cannot establish UID-to-key association or exclusivity"
+}

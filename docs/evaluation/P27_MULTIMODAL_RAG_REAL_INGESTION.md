@@ -8,7 +8,59 @@
 
 **Branch / starting HEAD:** `codex/weknora-python-port-integrate-image-20261014` / `78d277b12ed6ea5eb82a61a73160ef41a5c7027f`
 
-## Outcome
+## Latest continuation — historical cap incident recovered
+
+Starting source: `9d4788a6b7f47f31459fbebdf5873577a7599dac`. **P27 remains BLOCKED only on unverified account association / consumer coverage before live activation. The historical DeepSeek month block has now been explicitly recovered.** The earlier sections below retain their earlier stop state; they do not describe the current month block.
+
+### Exact historical request and root cause
+
+The old renderer at `04f7b0d78f0b539f0d70a2db79359487168e940d` and the original synthetic messages reconstruct a 195-byte canonical wire. Its SHA-256 is `59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f`, exactly matching the original durable call. This is a hash-confirmed reconstruction, not a claim that a packet capture or full response body was retained.
+
+The wire contains `max_completion_tokens:64`, **no `max_tokens`**, no `thinking`, and no `reasoning_effort`. The test constructed `ModelConfig` directly, bypassing catalog resolution. Its default ChatSettings selected the wrong field. DeepSeek declares `max_tokens` as its completion cap. The cap-contract repair already exists in `561e3bc8a5a6d13a7199c48f35daf40be3cd04e1`; this continuation does not redo it. Current code rejects the old wire and renders the correct field through normal catalog configuration.
+
+The real retained usage is input44/output177/total221. A full response body and reasoning breakdown were not retained, so the 113-token difference cannot be assigned to thinking. Current vendor documentation says unspecified thinking defaults to enabled; historical actual reasoning participation remains unverified. The old report's claim that the vendor exceeded a correctly sent cap is superseded, without editing that report.
+
+### Explicit recovery decision and real PostgreSQL execution
+
+Under the Owner's latest recovery instruction, `scripts/weknora_port_p27_recover.py` uses the existing month advisory lock and immutable P22 receipt helpers. It pins the old ledger digest and incident wire, checks the repaired contract, snapshots call/slot/month identities, and **changes only `blocked_reason` from `USAGE_EXCEEDS_RESERVATION` to empty**. Before, precommit and postcommit receipts support crash reconciliation; a completed recovery cannot clear a subsequently changed state. It creates no account, permission, spending allocation or send path.
+
+Executed against PG `127.0.0.1:56423`, database `weknora_python_port_20261013`, system identifier `7696088403504697382`. Commit and repeat-invocation checks passed. UNKNOWN remains UNKNOWN; held remains259; actual_total remainsnull; raw usage remains44/177/221. Month limit1,000,000, carry, approval and every other month field remain unchanged. Original DeepSeek-bucket2 and SiliconFlow726 full call rows retain their prior SHA-256 values; call slots are unchanged within the recovery. SF's closed P25 fence and 61 UNKNOWN /823,355 held remain untouched. No Redis writes, API/worker startup, index changes or model-configuration changes occurred.
+
+### Actual image request size — no recipe change
+
+Only the two target pages were rendered with the existing product renderer and its normal settings to measure bytes. No OCR experiment, full reparse, upload, Gold injection or model request occurred. The proposed normal Caption body uses the existing Chinese caption prompt, default temperature and `max_tokens=5000`; this is a local size measurement, not a saved sent request.
+
+| Target | JPEG bytes | Image dimensions | Wire bytes | Input upper bound | Output cap | Total reservation |
+|---|---:|---|---:|---:|---:|---:|
+| B3 row-0958 p9 | 228,312 | 2000×1125 | 304,728 | 305,752 | 5,000 | 310,752 |
+| Pew row-0684 p10 | 307,605 | 1546×2000 | 410,452 | 411,476 | 5,000 | 416,476 |
+
+Both reservations sum to727,228, leaving272,772 of the authorized1,000,000 for other P27 reservations if simultaneously held. Actual model usage is not inferred from these byte upper bounds. Neither single image exhausts the fence. Keep the current recipe; verify the final configured wire at admission. An additional image call is not assumed to fit while UNKNOWN occupies its reservation.
+
+### Actual credential / account checks and remaining external fact
+
+Two read-only official requests used the existing credential in process, without recording its plaintext: `GET https://api.deepseek.com/models` and `GET https://api.deepseek.com/user/balance`, both200. The actual returned Flash entry declares `DeepSeek-V4.1-Flash`, `deepseek-flash`, image input and maximum accepted output393,216. Balance reports available. The API does not expose a billing UID in those responses; `owned_by=deepseek` describes the model publisher and is not the user's billing account. No amount was recorded or converted to Tokens.
+
+Edge opened `https://platform.deepseek.com/usage`, but page inspection repeatedly returned `Debugger unattached`. The tab is preserved for the Owner to check. Local files provide no independently verified UID↔current-key mapping or proof/bound of other consumers. A focused pending question requests a redacted UID/Key association, usage export, and whether/from when the account is exclusive. This is a missing account fact, not another numeric authorization request. No additional metering system was built.
+
+**Generation calls this continuation:0; generation Tokens:0; new UNKNOWN:0.** Read-only provider metadata/balance HTTP calls:2. Both P27 visual RAG cases remain NOT_RUN, with generation latency NOT_APPLICABLE. The combined1,000,000 ceiling is approved but no live temporary allocation was opened; there is none to revoke. Once account evidence is available, reuse existing authority/fence machinery and the recovered month; do not replay the old uncertain logical request.
+
+### Commands and evidence
+
+All commands ran with product Python `E:\RAG quention\.venv\Scripts\python.exe`, `-B`, in the stated repository. Short run root: `E:/WK/run/p27-gate-20261017` (abbreviated `<run>` here). Every command below exited0.
+
+| Exact command tail after the interpreter | Result |
+|---|---|
+| `-B E:/WK/run/p27-gate-20261017/old_wire_audit.py` | Real read-only PG; 195-byte reconstructed wire hash matches stored call. |
+| `-B -m pytest tests/weknora_port/test_p27_incident_recovery.py tests/weknora_port/test_output_budget_contract.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27incident` | 25 offline tests passed; no provider sends. |
+| `-B -m scripts.weknora_port_p27_recover --approval-file E:/WK/run/p27-gate-20261017/recovery-owner-decision.txt` | Executed once, repeated once; RECOVERED both times; durable receipt. |
+| `-B E:/WK/run/p27-gate-20261017/verify_recovery.py` | Real read-only PG; both historical call sets unchanged, only intended month field changed. |
+| `-B E:/WK/run/p27-gate-20261017/image_request_size.py` | Existing renderer and builder; target-image request bounds measured, no network. |
+| `-B E:/WK/run/p27-gate-20261017/account_endpoint_audit.py` | Two real official read-only HTTP200 responses; zero generation. |
+
+Committed evidence directory: `docs/evaluation/evidence/p27-incident-recovery-20261017/`, including scripts, wire reconstruction, size JSON, account metadata, immutable recovery receipts, tests/logs/exitcodes and preservation hashes. Actual image bytes stay at `<run>/row-0958-p9.jpg` and `<run>/row-0684-p10.jpg`, linked by source and image SHA; no extra benchmark image copy is committed. Historical reports and raw evidence remain unchanged. Current new files are the recovery script, focused test, this report/result update and the dedicated evidence directory. No backend/Prompt/threshold/router/parser/migration/dependency change in this continuation.
+
+## Prior gate continuation (superseded by the recovery below)
 
 **Current outcome: `P27_BLOCKED` at the existing DeepSeek account/month safety block.** This gate-focused continuation starts at `c145ef6659857318919b20a8d16552c3894dcef5`. No real model calls, uploads, worker processing, index writes, or live model/KB configuration changes were made.
 
@@ -104,7 +156,7 @@ The combined P27 limit remains **1,000,000 tokens authorized, 0 live headroom op
 
 Read-only before/after SHA-256 comparisons confirm both original account call sets (DeepSeek bucket 2 rows; SiliconFlow 726 rows) and their month rows are unchanged. Evidence: `E:\WK\run\p27-gate-20261017\account-audit.json`, `deepseek-block.json` and `history-preservation.json`.
 
-## Acceptance results
+## Prior meter-continuation acceptance results
 
 | Acceptance item | Status | Evidence |
 |---|---|---|
@@ -135,7 +187,7 @@ No claim is made that P27 validated real HTTP, Worker, PostgreSQL/pgvector, Redi
 | Product-interpreter page-scoped parse for frozen `row-0958` p9 and `row-0684` p10 | 0 | Both original SHA values matched; both target assets and parent Markdown references were found. JSON/log: `E:\WK\run\p27-resume-20261017\actual-pdf-page-scope.json` and `actual-pdf-page-scope-final.log`. |
 | Real upload / API / Worker / Redis / DeepSeek / Cheap RAG | `NOT RUN` | Existing DeepSeek month block and unverified whole-account coverage prevent activation. Approved assembly already exists. Only read-only PostgreSQL ledger audits ran. |
 
-## Current continuation commands and source changes
+## Prior meter-continuation commands and source changes
 
 | Command | Exit | Result |
 |---|---:|---|
@@ -146,6 +198,6 @@ No claim is made that P27 validated real HTTP, Worker, PostgreSQL/pgvector, Redi
 
 Changed this continuation: `backend/weknora_port/source_facts.py`, `tests/weknora_port/test_p27_vision_meter.py`, this report and its result JSON. No parser, image-task, model registry, ordinary Prompt, retrieval threshold, routing, schema/migration or dependency changes were made. Existing dirty files remain outside the local delivery commit. No real key was read, copied or printed. Earlier P27/P9–P26 results and raw evidence remain preserved.
 
-## Stop and remaining prerequisite
+## Prior stop state before incident recovery
 
 `P27_BLOCKED`: both target questions remain unexecuted because the original DeepSeek month is blocked and required whole-account facts are unverified. Obtain authoritative incident/account/shared-consumer facts and use a trusted recovery procedure that preserves UNKNOWN and original limits before opening any combined P27 fence. The owner has already authorized this task's numeric ceiling; another numeric allowance alone does not resolve the missing evidence. This pass stops here without enabling live roles, pushing, deploying, merging, tagging or opening another stage. The final local commit SHA is provided in the delivery message.

@@ -1,0 +1,112 @@
+{
+  "schema": "p27-historical-wire-audit/v1",
+  "access": "read-only",
+  "provider_calls": 0,
+  "request_body": {
+    "model": "deepseek-flash",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Answer only from the user sentence."
+      },
+      {
+        "role": "user",
+        "content": "What protocol do blue widgets use?"
+      }
+    ],
+    "max_completion_tokens": 64
+  },
+  "reconstructed_wire": "{\"max_completion_tokens\":64,\"messages\":[{\"content\":\"Answer only from the user sentence.\",\"role\":\"system\"},{\"content\":\"What protocol do blue widgets use?\",\"role\":\"user\"}],\"model\":\"deepseek-flash\"}",
+  "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f",
+  "wire_bytes": 195,
+  "ledger": {
+    "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+    "request_id": "real/answer/1/cheap",
+    "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f",
+    "wire_bytes": 195,
+    "endpoint": "https://api.deepseek.com/chat/completions",
+    "state": "unknown",
+    "outcome": "RESPONSE_RECEIVED",
+    "reserved_input": 195,
+    "reserved_output": 64,
+    "held_tokens": 259,
+    "actual_total": null,
+    "usage_facts": {
+      "fields": [
+        [
+          "input",
+          {
+            "path": "prompt_tokens",
+            "valid": true,
+            "value": 44,
+            "present": true
+          }
+        ],
+        [
+          "output",
+          {
+            "path": "completion_tokens",
+            "valid": true,
+            "value": 177,
+            "present": true
+          }
+        ],
+        [
+          "total",
+          {
+            "path": "total_tokens",
+            "valid": true,
+            "value": 221,
+            "present": true
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "path": "prompt_cache_hit_tokens",
+            "valid": true,
+            "value": 0,
+            "present": true
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "path": "cache_creation_input_tokens",
+            "valid": false,
+            "value": null,
+            "present": false
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "path": "prompt_cache_miss_tokens",
+            "valid": true,
+            "value": 44,
+            "present": true
+          }
+        ]
+      ],
+      "semantics": "openai-input-inclusive/v1",
+      "simulated": false,
+      "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+      "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+      "derived_total": 221,
+      "reported_total": {
+        "path": "total_tokens",
+        "valid": true,
+        "value": 221,
+        "present": true
+      },
+      "prior_numeric_raw": [],
+      "observed_lower_bound": 221
+    }
+  },
+  "historical_renderer_commit": "561e3bc^",
+  "thinking_on_wire": null,
+  "reasoning_effort_on_wire": null,
+  "response_body_retained": false,
+  "response_usage_retained": true,
+  "matches_durable_wire_identity": true
+}

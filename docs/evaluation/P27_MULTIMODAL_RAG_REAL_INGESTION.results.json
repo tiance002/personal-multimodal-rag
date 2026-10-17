@@ -27,9 +27,8 @@
     ]
   },
   "blockers": [
-    "Existing deepseek-owner-main October month has USAGE_EXCEEDS_RESERVATION; historical UNKNOWN and output overrun must not be cleared by a new grant or recipe.",
-    "Current key/billing-account association, full historical/carry coverage and other shared-account consumers lack independently verified evidence.",
-    "SiliconFlow P25 fence remains closed. The combined new P27 1,000,000-token fence and live model/KB configuration were not activated while DeepSeek prerequisites were false."
+    "Current credential-to-billing-UID association and complete account/other-consumer coverage are not independently established; Edge console inspection cannot attach.",
+    "No live combined P27 fence activated until those account facts are available. Historical cap-field block was explicitly recovered; it is no longer the blocker."
   ],
   "implementation_audit": {
     "configuration": "backend/weknora_port/image_configuration.py: effective_image_config, _vision_binding, resolve_image_selection; KB defaults and non-empty upload overrides, separate OCR/Caption selection, registry/capability validation; no provider probe.",
@@ -108,12 +107,15 @@
     "embedding": 0,
     "rerank": 0,
     "cheap_final_answers": 0,
-    "provider_requests": 0,
+    "provider_requests": 2,
     "provider_tokens": 0,
     "new_unknown": 0,
     "latency_ms": null,
-    "database_or_redis_writes": 0,
-    "local_tesseract_synthetic_smokes": 1
+    "database_or_redis_writes": 1,
+    "local_tesseract_synthetic_smokes": 1,
+    "provider_generation_requests": 0,
+    "read_only_provider_metadata_requests": 2,
+    "database_month_rows_updated": 1
   },
   "tests": [
     {
@@ -222,7 +224,7 @@
     "E:\\WK\\run\\p27-gate-20261017\\meter-tests-final.log",
     "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
   ],
-  "next_step": "Authoritative reconciliation/recovery of existing blocked DeepSeek account and whole-account/shared-consumer facts; then normal configured two-provider P27 admission within 1,000,000 total tokens. No other stage started.",
+  "next_step": "Obtain verifiable current Key/billing-account association and actual exclusive/shared-consumer scope, then activate the already authorized bounded P27 flow using existing machinery. Do not replay the historical UNKNOWN call.",
   "prior_blockers_at_initial_p27_run": [
     "No newly approved finite P27 external-call token fence was established; the closed P25 fence was not reused.",
     "P26 active-config audit records multimodal processing disabled, empty VLM configuration, and no configured VLM role; Cheap is not declared vision-capable.",
@@ -652,5 +654,533 @@
     "tests/weknora_port/test_p27_vision_meter.py",
     "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
     "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json"
-  ]
+  ],
+  "prior_blockers_before_incident_recovery": [
+    "Existing deepseek-owner-main October month has USAGE_EXCEEDS_RESERVATION; historical UNKNOWN and output overrun must not be cleared by a new grant or recipe.",
+    "Current key/billing-account association, full historical/carry coverage and other shared-account consumers lack independently verified evidence.",
+    "SiliconFlow P25 fence remains closed. The combined new P27 1,000,000-token fence and live model/KB configuration were not activated while DeepSeek prerequisites were false."
+  ],
+  "prior_call_counters_before_incident_recovery": {
+    "uploads": 0,
+    "worker_image_tasks": 0,
+    "ocr_model": 0,
+    "vlm": 0,
+    "embedding": 0,
+    "rerank": 0,
+    "cheap_final_answers": 0,
+    "provider_requests": 0,
+    "provider_tokens": 0,
+    "new_unknown": 0,
+    "latency_ms": null,
+    "database_or_redis_writes": 0,
+    "local_tesseract_synthetic_smokes": 1
+  },
+  "incident_recovery_20261017": {
+    "status": "RECOVERED",
+    "source_head": "9d4788a6b7f47f31459fbebdf5873577a7599dac",
+    "historical_wire": {
+      "schema": "p27-historical-wire-audit/v1",
+      "access": "read-only",
+      "provider_calls": 0,
+      "request_body": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer only from the user sentence."
+          },
+          {
+            "role": "user",
+            "content": "What protocol do blue widgets use?"
+          }
+        ],
+        "max_completion_tokens": 64
+      },
+      "reconstructed_wire": "{\"max_completion_tokens\":64,\"messages\":[{\"content\":\"Answer only from the user sentence.\",\"role\":\"system\"},{\"content\":\"What protocol do blue widgets use?\",\"role\":\"user\"}],\"model\":\"deepseek-flash\"}",
+      "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f",
+      "wire_bytes": 195,
+      "ledger": {
+        "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+        "request_id": "real/answer/1/cheap",
+        "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f",
+        "wire_bytes": 195,
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "state": "unknown",
+        "outcome": "RESPONSE_RECEIVED",
+        "reserved_input": 195,
+        "reserved_output": 64,
+        "held_tokens": 259,
+        "actual_total": null,
+        "usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 44,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 177,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 221,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": true,
+                "value": 0,
+                "present": true
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": true,
+                "value": 44,
+                "present": true
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false,
+          "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+          "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+          "derived_total": 221,
+          "reported_total": {
+            "path": "total_tokens",
+            "valid": true,
+            "value": 221,
+            "present": true
+          },
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 221
+        }
+      },
+      "historical_renderer_commit": "561e3bc^",
+      "thinking_on_wire": null,
+      "reasoning_effort_on_wire": null,
+      "response_body_retained": false,
+      "response_usage_retained": true,
+      "matches_durable_wire_identity": true
+    },
+    "request_size": {
+      "schema": "p27-actual-image-request-size/v1",
+      "provider_calls": 0,
+      "cases": [
+        {
+          "qid": "row-0958",
+          "physical_page": 9,
+          "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "image_path": "E:\\WK\\run\\p27-gate-20261017\\row-0958-p9.jpg",
+          "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+          "dimensions": [
+            2000,
+            1125
+          ],
+          "image_bytes": 228312,
+          "base64_chars": 304416,
+          "request_wire_bytes": 304728,
+          "wire_sha256": "6c6d1b0e7620f123b24010d25fabed8b52bc5abe66c57377bbe6785d9c117ff2",
+          "max_tokens": 5000,
+          "thinking": null,
+          "input_reservation": 305752,
+          "output_reservation": 5000,
+          "total_reservation": 310752,
+          "fits_1000000": true,
+          "scope": "offline target render and proposed default Caption request; not a sent request or ingestion"
+        },
+        {
+          "qid": "row-0684",
+          "physical_page": 10,
+          "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "image_path": "E:\\WK\\run\\p27-gate-20261017\\row-0684-p10.jpg",
+          "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+          "dimensions": [
+            1546,
+            2000
+          ],
+          "image_bytes": 307605,
+          "base64_chars": 410140,
+          "request_wire_bytes": 410452,
+          "wire_sha256": "78122679c747af52b4279ab3f222aa16f398b7645eebb18445661c496df7eeea",
+          "max_tokens": 5000,
+          "thinking": null,
+          "input_reservation": 411476,
+          "output_reservation": 5000,
+          "total_reservation": 416476,
+          "fits_1000000": true,
+          "scope": "offline target render and proposed default Caption request; not a sent request or ingestion"
+        }
+      ],
+      "sum_two_reservations": 727228
+    },
+    "account_endpoint_audit": {
+      "schema": "p27-read-only-provider-account-endpoints/v1",
+      "generation_calls": 0,
+      "credential_source": "existing .env.local / DEEPSEEK_API_KEY; value not exported",
+      "credential_sha256": "a9152466b4630eb420b73081c9e3cab5a9c28eccf364d8f5cd81cecaf97017f3",
+      "requests": [
+        {
+          "method": "GET",
+          "endpoint": "https://api.deepseek.com/models",
+          "status": 200,
+          "response_sha256": "b86388abe65929c84de3825eee299b8d78bae23e82e300239f3c788569eb5f39",
+          "top_level_fields": [
+            "data",
+            "object"
+          ],
+          "models": [
+            {
+              "id": "deepseek-flash",
+              "owned_by": "deepseek",
+              "name": "DeepSeek-V4.1-Flash",
+              "max_output_tokens": 393216,
+              "input_modalities": [
+                "text",
+                "image"
+              ]
+            },
+            {
+              "id": "deepseek-v4-pro",
+              "owned_by": "deepseek",
+              "name": "DeepSeek-V4-Pro",
+              "max_output_tokens": 393216,
+              "input_modalities": [
+                "text"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "endpoint": "https://api.deepseek.com/user/balance",
+          "status": 200,
+          "response_sha256": "1513ed76eca0c3820341dc839f2897cb182e42db86a7204a3449efdda804af60",
+          "top_level_fields": [
+            "balance_infos",
+            "is_available"
+          ],
+          "is_available": true,
+          "identity_fields_present": []
+        }
+      ],
+      "billing_account_association": "UNVERIFIED: metadata/balance cannot establish UID-to-key association or exclusivity"
+    },
+    "history_preservation": {
+      "provider_generation_calls": 0,
+      "account_calls": {
+        "deepseek-owner-main": {
+          "rows": 2,
+          "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+          "unchanged": true
+        },
+        "siliconflow-owner-main": {
+          "rows": 726,
+          "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+          "unchanged": true
+        }
+      },
+      "only_expected_month_change": true,
+      "status": "PASS"
+    },
+    "recovery_receipt": {
+      "data": {
+        "after": {
+          "calls": [
+            {
+              "account_id": "deepseek-owner-main",
+              "actual_total": 14,
+              "bound_source": "wire-bytes-upper-bound/v1",
+              "budget_provider": "deepseek",
+              "call_id": "87802219ded5bd2071961ed48f82a3831f8d9194f21644154bdebe417bf7d1b7",
+              "capability": "embedding",
+              "endpoint": "https://api.siliconflow.cn/v1/embeddings",
+              "fingerprint": "af078b5f58fc80cfdde27b0887c3823d572cd4e6fbe1539776e5f98d5359a422",
+              "finished_at": "2026-10-15 14:11:31.809652+00:00",
+              "held_tokens": 14,
+              "known_lower_bound": 14,
+              "model": "BAAI/bge-m3",
+              "model_id": "sf-embed",
+              "month": "2026-10-01",
+              "origin_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "outcome": "RESPONSE_RECEIVED",
+              "permission_source": "OWNER:20261015-real-egress",
+              "provider": "siliconflow",
+              "request_id": "real/embedding-0",
+              "reserved_input": 85,
+              "reserved_output": 0,
+              "retrieval_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "session_id": "",
+              "state": "settled",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "usage_facts": {
+                "derived_total": 14,
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "path": "prompt_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 14
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "path": "completion_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 0
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "path": "total_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 14
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "path": "prompt_cache_hit_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "path": "cache_creation_input_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "path": "prompt_cache_miss_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":0,\"prompt_tokens\":14,\"total_tokens\":14}",
+                "observed_lower_bound": 14,
+                "prior_numeric_raw": [],
+                "raw_sha256": "9a12eb563f8ca93e7ce761722ca0837d5e11942c2405de7bf2a713438c2d5e58",
+                "reported_total": {
+                  "path": "total_tokens",
+                  "present": true,
+                  "valid": true,
+                  "value": 14
+                },
+                "semantics": "openai-input-inclusive/v1",
+                "simulated": false
+              },
+              "wire_bytes": 85,
+              "wire_sha256": "8cff33dce0f9a2b0e82fd0c296287a13bc1e1ee2c3f8e8ddfd4b4df68057326b"
+            },
+            {
+              "account_id": "deepseek-owner-main",
+              "actual_total": null,
+              "bound_source": "wire-bytes-upper-bound/v1",
+              "budget_provider": "deepseek",
+              "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+              "capability": "chat",
+              "endpoint": "https://api.deepseek.com/chat/completions",
+              "fingerprint": "35fd324a0c965968195a77f6a3815f6432d021a612fa0acef4c7ca0090b3207b",
+              "finished_at": "2026-10-15 14:11:33.518744+00:00",
+              "held_tokens": 259,
+              "known_lower_bound": 221,
+              "model": "deepseek-flash",
+              "model_id": "ds-chat",
+              "month": "2026-10-01",
+              "origin_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "outcome": "RESPONSE_RECEIVED",
+              "permission_source": "OWNER:20261015-real-egress",
+              "provider": "deepseek",
+              "request_id": "real/answer/1/cheap",
+              "reserved_input": 195,
+              "reserved_output": 64,
+              "retrieval_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "session_id": "",
+              "state": "unknown",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "usage_facts": {
+                "derived_total": 221,
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "path": "prompt_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 44
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "path": "completion_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 177
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "path": "total_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 221
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "path": "prompt_cache_hit_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 0
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "path": "cache_creation_input_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "path": "prompt_cache_miss_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 44
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+                "observed_lower_bound": 221,
+                "prior_numeric_raw": [],
+                "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+                "reported_total": {
+                  "path": "total_tokens",
+                  "present": true,
+                  "valid": true,
+                  "value": 221
+                },
+                "semantics": "openai-input-inclusive/v1",
+                "simulated": false
+              },
+              "wire_bytes": 195,
+              "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f"
+            }
+          ],
+          "month": {
+            "account_id": "deepseek-owner-main",
+            "approval_source": "OWNER:20261015-real-egress:0f16e911c36ee71d841c7c63403bc9ec803a196c2188c4a4e12d2351db866bad",
+            "blocked_reason": "",
+            "carry_in_tokens": 0,
+            "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+            "carry_status": "KNOWN",
+            "limit_tokens": 1000000,
+            "month": "2026-10-01",
+            "provider": "deepseek"
+          },
+          "slots": [
+            {
+              "call_id": "87802219ded5bd2071961ed48f82a3831f8d9194f21644154bdebe417bf7d1b7",
+              "created_at": "2026-10-15 14:11:31.393866+00:00",
+              "fingerprint": "af078b5f58fc80cfdde27b0887c3823d572cd4e6fbe1539776e5f98d5359a422",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "unit": "tokens"
+            },
+            {
+              "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+              "created_at": "2026-10-15 14:11:31.892717+00:00",
+              "fingerprint": "35fd324a0c965968195a77f6a3815f6432d021a612fa0acef4c7ca0090b3207b",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "unit": "tokens"
+            }
+          ]
+        },
+        "calls_sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+        "commit_confirmed": true,
+        "intent_sha256": "78b405c7751a6a3d296e6dfdc36a65551f46a443f7359e7cc0f23f5c29cd98eb",
+        "slots_sha256": "1518790ab2c1fa27d3e2ad5bded1468795b2ea44b2bb14f6d239fa45ce9ce2a7"
+      },
+      "sha256": "11c30850453f3533ec1fcb8833062b7c8e6fd7ff9b1af33cc324e345e1d028b0"
+    },
+    "actual_generation_calls": 0,
+    "actual_generation_tokens": 0,
+    "new_unknown": 0,
+    "task_token_ceiling": 1000000,
+    "temporary_live_allocation_opened": false,
+    "offline_test_result": {
+      "passed": 25,
+      "exitcode": 0
+    },
+    "account_identity": "UNVERIFIED",
+    "exclusive_consumers": "UNVERIFIED",
+    "browser_console": "https://platform.deepseek.com/usage; Debugger unattached; handoff tab retained",
+    "evidence_directory": "docs\\evaluation\\evidence\\p27-incident-recovery-20261017",
+    "changed_files": [
+      "scripts/weknora_port_p27_recover.py",
+      "tests/weknora_port/test_p27_incident_recovery.py",
+      "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+      "docs\\evaluation\\P27_MULTIMODAL_RAG_REAL_INGESTION.results.json",
+      "docs\\evaluation\\evidence\\p27-incident-recovery-20261017"
+    ]
+  }
 }
