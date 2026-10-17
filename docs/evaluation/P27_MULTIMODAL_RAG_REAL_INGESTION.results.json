@@ -27,9 +27,9 @@
     ]
   },
   "blockers": [
-    "Owner authorized a new 1,000,000-token maximum and selected DeepSeek V4.1 Flash, but the trusted approved authority cannot issue a production send because APPROVED_METER_UNIMPLEMENTED and production source-fact assembly, historical UNKNOWN bounds, real account carry-in, and shared-account consumers remain unverified.",
-    "The last recorded P26 KB state had multimodal disabled and no VLM role. This continuation did not inspect secret contents or modify live model/KB configuration.",
-    "Real HTTP/API/Worker/PostgreSQL/Redis/DeepSeek/Embedding/Rerank/Cheap execution was not run; neither target completed a real visual RAG loop."
+    "Existing deepseek-owner-main October month has USAGE_EXCEEDS_RESERVATION; historical UNKNOWN and output overrun must not be cleared by a new grant or recipe.",
+    "Current key/billing-account association, full historical/carry coverage and other shared-account consumers lack independently verified evidence.",
+    "SiliconFlow P25 fence remains closed. The combined new P27 1,000,000-token fence and live model/KB configuration were not activated while DeepSeek prerequisites were false."
   ],
   "implementation_audit": {
     "configuration": "backend/weknora_port/image_configuration.py: effective_image_config, _vision_binding, resolve_image_selection; KB defaults and non-empty upload overrides, separate OCR/Caption selection, registry/capability validation; no provider probe.",
@@ -92,12 +92,12 @@
     "row-0684": {
       "status": "NOT_RUN",
       "offline_parser_status": "PASS",
-      "reason": "Page 10 native PDF render asset and source-bound Markdown parent are ready, but real image Caption/RAG is blocked by trusted approved-meter/source-fact assembly."
+      "reason": "Offline parser readiness preserved; no real upload/RAG because the original DeepSeek account month is blocked and whole-account coverage is not verified."
     },
     "row-0958": {
       "status": "NOT_RUN",
       "offline_parser_status": "PASS",
-      "reason": "Page 9 asset and source-bound Markdown parent are ready, but real image Caption/RAG is blocked by trusted approved-meter/source-fact assembly."
+      "reason": "Offline parser readiness preserved; no real upload/RAG because the original DeepSeek account month is blocked and whole-account coverage is not verified."
     }
   },
   "calls": {
@@ -181,6 +181,20 @@
       "exit_code": 1,
       "result": "The test expected a detail field; the API error envelope uses error.code. The test assertion was corrected; production behavior was unchanged.",
       "evidence": "Observed in the initial focused suite output; final 492-test run passed."
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-final",
+      "exit_code": 0,
+      "result": "113 passed in 1.82s",
+      "kind": "offline contracts only; no provider or DB fixture writes",
+      "log": "E:\\WK\\run\\p27-gate-20261017\\meter-tests-final.log"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-verified",
+      "exit_code": 0,
+      "result": "116 passed in 1.78s",
+      "kind": "offline contracts only; no provider or DB fixture writes",
+      "log": "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
     }
   ],
   "production_code_changed": true,
@@ -201,9 +215,14 @@
     "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.log",
     "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.exitcode.txt",
     "E:\\WK\\run\\p27-resume-20261017\\pypdfium-product-version.log",
-    "E:\\WK\\run\\p27-resume-20261017\\diff-check.log"
+    "E:\\WK\\run\\p27-resume-20261017\\diff-check.log",
+    "E:\\WK\\run\\p27-gate-20261017\\account-audit.json",
+    "E:\\WK\\run\\p27-gate-20261017\\deepseek-block.json",
+    "E:\\WK\\run\\p27-gate-20261017\\history-preservation.json",
+    "E:\\WK\\run\\p27-gate-20261017\\meter-tests-final.log",
+    "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
   ],
-  "next_step": "Complete real approved-meter/source-fact assembly without changing historical UNKNOWN or the 1,000,000-token cap; configure the isolated KB and model roles through the normal authorized API; then run row-0958 first and row-0684 only if the first stage stays within the request cap.",
+  "next_step": "Authoritative reconciliation/recovery of existing blocked DeepSeek account and whole-account/shared-consumer facts; then normal configured two-provider P27 admission within 1,000,000 total tokens. No other stage started.",
   "prior_blockers_at_initial_p27_run": [
     "No newly approved finite P27 external-call token fence was established; the closed P25 fence was not reused.",
     "P26 active-config audit records multimodal processing disabled, empty VLM configuration, and no configured VLM role; Cheap is not declared vision-capable.",
@@ -221,7 +240,7 @@
       "ocr": "local Tesseract preferred",
       "final_answer": "existing SiliconFlow Cheap"
     },
-    "trusted_live_fence": "BLOCKED_APPROVED_METER_UNIMPLEMENTED",
+    "trusted_live_fence": "BLOCKED_EXISTING_DEEPSEEK_MONTH_AND_ACCOUNT_FACTS",
     "provider_calls": 0,
     "schema_migration": false,
     "dependency_manifest_changed": false,
@@ -318,5 +337,320 @@
     "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
     "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json",
     "tests/weknora_port/test_http_api.py"
+  ],
+  "previous_p27_gate_diagnosis_superseded": [
+    "Owner authorized a new 1,000,000-token maximum and selected DeepSeek V4.1 Flash, but the trusted approved authority cannot issue a production send because APPROVED_METER_UNIMPLEMENTED and production source-fact assembly, historical UNKNOWN bounds, real account carry-in, and shared-account consumers remain unverified.",
+    "The last recorded P26 KB state had multimodal disabled and no VLM role. This continuation did not inspect secret contents or modify live model/KB configuration.",
+    "Real HTTP/API/Worker/PostgreSQL/Redis/DeepSeek/Embedding/Rerank/Cheap execution was not run; neither target completed a real visual RAG loop."
+  ],
+  "gate_resolution": {
+    "baseline": "c145ef6659857318919b20a8d16552c3894dcef5",
+    "stale_diagnosis_corrected": "APPROVED_METER_UNIMPLEMENTED is absent from current executable source; production ApprovedTokenAuthority and per-call SourceFacts assembly already exist and were used in P22/P25.",
+    "actual_image_meter_gap_before_patch": "source_facts.bind_wire_facts rejects hosted media with MODEL_INPUT_BOUND_NOT_APPLICABLE for its text-only recipes.",
+    "minimal_change": {
+      "recipe": "deepseek-inline-image-1024/v1",
+      "input_bound": "all immutable wire bytes + 1024 * validated inline image count",
+      "applicable_identity": "official DeepSeek / deepseek-flash / OpenAI Chat Completions / vision",
+      "media": "static inline JPEG/PNG only",
+      "output_bound": "existing max_tokens full-completion contract including reasoning",
+      "old_text_media_denial_preserved": true,
+      "live_config_or_grant_created": false,
+      "source": "https://api-docs.deepseek.com/guides/vision/#token-usage",
+      "output_contract_source": "https://api-docs.deepseek.com/api/create-chat-completion/"
+    },
+    "earliest_remaining_live_blocker": "TOKEN_MONTH_BLOCKED: USAGE_EXCEEDS_RESERVATION on existing deepseek-owner-main/2026-10-01",
+    "account_audit": {
+      "at": "2026-10-17T07:55:13.340530+00:00",
+      "access": "read-only",
+      "real_provider_requests": 0,
+      "postgres_identity": {
+        "database": "weknora_python_port_20261013",
+        "system_identifier": "7696088403504697382"
+      },
+      "months": [
+        {
+          "account_id": "deepseek-owner-main",
+          "provider": "deepseek",
+          "month": "2026-10-01",
+          "limit_tokens": 1000000,
+          "carry_in_tokens": 0,
+          "carry_status": "KNOWN",
+          "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+          "approval_source": "OWNER:20261015-real-egress:0f16e911c36ee71d841c7c63403bc9ec803a196c2188c4a4e12d2351db866bad",
+          "blocked_reason": "USAGE_EXCEEDS_RESERVATION"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "limit_tokens": 1693086,
+          "carry_in_tokens": 14,
+          "carry_status": "KNOWN",
+          "carry_source": "LEDGER:real/embedding-0:14-preserved-original-bucket",
+          "approval_source": "OWNER:20261016-unrestricted-siliconflow-MVP",
+          "blocked_reason": ""
+        }
+      ],
+      "token_calls": [
+        {
+          "account_id": "deepseek-owner-main",
+          "budget_provider": "deepseek",
+          "provider": "deepseek",
+          "month": "2026-10-01",
+          "model": "deepseek-flash",
+          "capability": "chat",
+          "state": "unknown",
+          "rows": 1,
+          "reserved_input": "195",
+          "reserved_output": "64",
+          "held_tokens": "259",
+          "actual_total": null,
+          "known_lower_bound": "221"
+        },
+        {
+          "account_id": "deepseek-owner-main",
+          "budget_provider": "deepseek",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "settled",
+          "rows": 1,
+          "reserved_input": "85",
+          "reserved_output": "0",
+          "held_tokens": "14",
+          "actual_total": "14",
+          "known_lower_bound": "14"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "settled",
+          "rows": 395,
+          "reserved_input": "758979",
+          "reserved_output": "0",
+          "held_tokens": "202980",
+          "actual_total": "202980",
+          "known_lower_bound": "202980"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "settled",
+          "rows": 23,
+          "reserved_input": "424535",
+          "reserved_output": "0",
+          "held_tokens": "115504",
+          "actual_total": "115504",
+          "known_lower_bound": "115504"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "rows": 61,
+          "reserved_input": "823355",
+          "reserved_output": "0",
+          "held_tokens": "823355",
+          "actual_total": null,
+          "known_lower_bound": "0"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "rows": 247,
+          "reserved_input": "2141801",
+          "reserved_output": "193548",
+          "held_tokens": "551233",
+          "actual_total": "551233",
+          "known_lower_bound": "551233"
+        }
+      ],
+      "preservation_hashes": {
+        "deepseek-owner-main": {
+          "rows": 2,
+          "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30"
+        },
+        "siliconflow-owner-main": {
+          "rows": 726,
+          "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a"
+        }
+      },
+      "monetary_send_groups": [],
+      "shared_account_consumers": "NOT_VERIFIED: local ledger cannot establish provider-account-wide external consumers"
+    },
+    "deepseek_original_numeric_usage": {
+      "access": "read-only",
+      "rows": [
+        {
+          "request_id": "real/answer/1/cheap",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "capability": "chat",
+          "state": "unknown",
+          "outcome": "RESPONSE_RECEIVED",
+          "reserved_input": 195,
+          "reserved_output": 64,
+          "held_tokens": 259,
+          "actual_total": null,
+          "known_lower_bound": 221,
+          "usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 44,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 177,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 221,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": true,
+                  "value": 44,
+                  "present": true
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+            "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+            "derived_total": 221,
+            "reported_total": {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 221,
+              "present": true
+            },
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 221
+          }
+        }
+      ],
+      "real_provider_requests": 0
+    },
+    "history_preservation": {
+      "access": "read-only",
+      "provider_requests": 0,
+      "account_calls": {
+        "deepseek-owner-main": {
+          "rows": 2,
+          "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+          "unchanged": true
+        },
+        "siliconflow-owner-main": {
+          "rows": 726,
+          "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+          "unchanged": true
+        }
+      },
+      "months_unchanged": true,
+      "status": "PASS"
+    },
+    "run_fence": {
+      "owner_authorized_total_tokens": 1000000,
+      "opened_live_headroom": 0,
+      "consumed_tokens": 0,
+      "temporary_allocations_opened": 0,
+      "unused_issued_allocation_to_revoke": 0,
+      "p25_fence_reused": false,
+      "account_limits_or_historical_rows_changed": false,
+      "combined_two_provider_admission_activated": false
+    },
+    "stage_2_configuration": "NOT_RUN_ACCOUNT_GATE_BLOCKED",
+    "stage_3": {
+      "row-0958": "NOT_RUN_ACCOUNT_GATE_BLOCKED",
+      "row-0684": "NOT_RUN_ACCOUNT_GATE_BLOCKED"
+    },
+    "model_calls": {
+      "deepseek_vision": 0,
+      "cheap_final": 0,
+      "embedding": 0,
+      "rerank": 0,
+      "other_auxiliary": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "new_unknown": 0,
+      "model_latency_ms": null
+    },
+    "test": {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-verified",
+      "exit_code": 0,
+      "result": "116 passed in 1.78s",
+      "kind": "offline contracts only; no provider or DB fixture writes",
+      "log": "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
+    },
+    "modified_source_hashes": {
+      "backend/weknora_port/source_facts.py": "f3ce75acd53c276308818cafb5bb0104c9a022495b3e62bdc407f6b9e17b6723",
+      "tests/weknora_port/test_p27_vision_meter.py": "843d243935fbb21c7c64b24e119dfa44d5a258cd549f08e39359f0e0349e8c86"
+    },
+    "missing_materials": [
+      "authoritative incident review and trusted recovery decision preserving old UNKNOWN/month limits",
+      "current existing key to provider billing account association and complete consumption/carry source",
+      "verified coverage or conservative upper bound for other shared-account consumers"
+    ]
+  },
+  "changed_files_this_continuation": [
+    "backend/weknora_port/source_facts.py",
+    "tests/weknora_port/test_p27_vision_meter.py",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json"
   ]
 }

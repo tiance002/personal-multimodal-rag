@@ -10,11 +10,13 @@
 
 ## Outcome
 
-The P27 continuation completed the bounded offline wiring: the product virtual environment now has the already-pinned `pypdfium2==5.8.0`; DeepSeek V4.1 Flash resolves through the existing model catalogue as image-capable; the normal PDF upload override and worker snapshot carry a one-based physical-page scope bound to document identity and SHA-256; and both frozen target pages produce a correctly linked image asset in the product interpreter. The local Tesseract path also recognized a synthetic test image using the existing tessdata directory.
+**Current outcome: `P27_BLOCKED` at the existing DeepSeek account/month safety block.** This gate-focused continuation starts at `c145ef6659857318919b20a8d16552c3894dcef5`. No real model calls, uploads, worker processing, index writes, or live model/KB configuration changes were made.
 
-The owner explicitly authorized a new maximum fence of 1,000,000 tokens and selected `deepseek-flash` for ingestion-time Caption. No provider calls were sent: the repository's trusted approved authority still reports `APPROVED_METER_UNIMPLEMENTED` and does not verify production source facts, historical UNKNOWN upper bounds, or shared-account carry-in. The last recorded P26 knowledge-base configuration was also multimodal-disabled with no VLM role, and no new database/model configuration was applied. No upload, worker task, PostgreSQL/Redis write, embedding, rerank, DeepSeek image request, or Cheap answer was started. No Gold content was added to a request, parser input, or index.
+The previous P27 diagnosis that current approved mode raises `APPROVED_METER_UNIMPLEMENTED` was incorrect: that literal no longer exists in executable source. `ApprovedTokenAuthority`, actual transport, per-call production `build_call_sources`/`bind_wire_facts`, durable pre-send reservations, actual-usage settlement and UNKNOWN handling already exist and were used by P22/P25. The old assembly report described an earlier revision. This continuation corrects the diagnosis against actual code and the live isolated ledger, without modifying that historical report.
 
-`P27_BLOCKED` remains the accurate result because neither target completed the real visual-evidence-to-RAG loop. This continuation is an offline implementation and parser-readiness result only, not a partial real RAG acceptance.
+The actual missing image capability was the intentional `MODEL_INPUT_BOUND_NOT_APPLICABLE` refusal in the text-only meter. A minimal opt-in recipe, `deepseek-inline-image-1024/v1`, now bounds official DeepSeek Flash inline static JPEG/PNG requests as all wire bytes plus 1024 tokens per image, and reuses the existing full-completion output contract. **116 focused offline tests passed, exit 0.** The new recipe was not installed as a live grant or used to send a request.
+
+Real external execution stopped after the read-only ledger audit: the existing `deepseek-owner-main` October month has `blocked_reason=USAGE_EXCEEDS_RESERVATION`. Its historical call reserved 64 output tokens but reported 177; its UNKNOWN state and 259-token occupancy remain intact. The current local SiliconFlow fence is closed, and provider-account-wide shared-consumer/history coverage has not been independently established. The owner's combined 1,000,000-token maximum is authorized but unopened; no usable credit was invented from that number.
 
 ## P24–P26 state and ownership
 
@@ -79,11 +81,28 @@ Using the frozen source manifest and verifying both source SHA-256 values, the p
 
 The B3 parser still emits its 21 scanned-page assets for the full document; the normal image-task filter selects only page 9 for VLM processing. The Pew parser retains all native document text and renders page 10 as an additional sourced asset. These are parser/selection results, not persistence, indexing, retrieval, or answer results.
 
-## Active execution blockers
+## Current gate audit and minimal repair (2026-10-17)
 
-The owner has now authorized a new P27 maximum fence of 1,000,000 tokens and selected DeepSeek V4.1 Flash / `deepseek-flash`; that authorization is recorded and the closed P25 fence was not reused. The trusted production authority still cannot establish an approved send: `docs/weknora-port/AUTHORITY_ASSEMBLY_REPORT_20261015.md` reports `APPROVED_METER_UNIMPLEMENTED`, missing production source-fact assembly, and unverified real carry-in/history-UNKNOWN bounds/shared-account consumers. The system does not permit a real request merely from a requested numeric limit, so the 1,000,000-token cap has not been installed as a trusted live fence and no request was attempted.
+Repository AGENTS.md and progress.md were read. No ADR index file exists under docs/adr; the relevant existing ADR-001 and ADR-002 documents were read directly.
 
-P26's last saved configuration audit also recorded `enable_multimodal=false`, empty KB VLM config, and no VLM model role. The continuation did not read secret values or change the live model configuration. Therefore no active DeepSeek model credential/authorization or corresponding Cheap/embedding/rerank config was verified for the isolation KB. No service or database was started or changed.
+The isolated PostgreSQL identity was verified before any query: `127.0.0.1:56423`, database `weknora_python_port_20261013`, system identifier `7696088403504697382`. All account inspection transactions used `SET TRANSACTION READ ONLY`. Redis and application processes were not started or changed.
+
+| Account | Observed original state | P27 action |
+|---|---|---|
+| DeepSeek `deepseek-owner-main` | October limit 1,000,000; stored carry 0/KNOWN with source `LEDGER:port_token_calls:<2026-10-01`; month blocked by `USAGE_EXCEEDS_RESERVATION`. One actual DeepSeek UNKNOWN holds 259, reserved input/output 195/64, provider-reported input/output/total 44/177/221. The same historical bucket also contains an incorrectly assigned settled SiliconFlow embedding call of 14 tokens. | Kept all rows, carry values, misassignment and month block unchanged. The stored carry value is not treated as independent proof of complete provider-account consumption. No new account/alias or live authority file was created. |
+| SiliconFlow `siliconflow-owner-main` | October limit 1,693,086; settled actual total 869,717; 61 historical UNKNOWN hold 823,355; preserved carry 14; occupied including carry 1,693,086, headroom 0. | P25 remains closed. Its CAS/receipt/month-lock mechanism is reusable for SiliconFlow, but it does not unblock DeepSeek. No new increase was opened. |
+
+The direct cause of the DeepSeek month block is an observed output component overrun (177 > 64), even though reported total 221 is below the original combined reservation 259. Current P1 correctly refuses such a month with `TOKEN_MONTH_BLOCKED`. This audit did not establish why that old request exceeded its output reservation, reconcile its original wire contract, or approve clearing the incident. A new input meter cannot clear it.
+
+The code change is confined to `source_facts.py` and its focused tests. The new opt-in recipe verifies provider `deepseek`, model `deepseek-flash`, official HTTPS deployment, OpenAI Chat Completions and `vision` capability; it requires inline valid static JPEG/PNG in user messages and an exact body/wire match. Remote URLs, files, GIF/animated media, other deployments, different models/protocols and unsupported media remain denied. It keeps all serialized bytes in the input bound, including base64, then adds the documented image allowance. This is deliberately conservative and is never provider actual usage. Existing text recipes still reject image input.
+
+The upper bound is based on DeepSeek's [Vision Token Usage documentation](https://api-docs.deepseek.com/guides/vision/#token-usage), which bounds each image at 1024 input tokens. Output continues through the existing `resolve_output_contract`: the wire must carry the provider-declared `max_tokens`, and the bound covers full completion including reasoning; no visible-answer-only allowance is used. See the official [Chat Completions schema](https://api-docs.deepseek.com/api/create-chat-completion/). The recipe remains behind the existing hash-pinned meter configuration, ApprovedTokenAuthority, SendGate and ledger; it does not create permission or modify actual-usage/UNKNOWN settlement.
+
+Missing facts that cannot be filled by this code change are: authoritative review/reconciliation and a trusted recovery decision for the existing DeepSeek overrun block; current key-to-billing-account association and complete consumption coverage for that account; and coverage or a conservative bound for other consumers of both shared provider accounts. No provider-account export or exclusive-consumer evidence was supplied or independently established in this pass. Local ledger emptiness or a stored zero is not proof of those facts.
+
+The combined P27 limit remains **1,000,000 tokens authorized, 0 live headroom opened, 0 consumed**. No temporary allocation was created, so there is no issued unused allocation to revoke. Two-provider run admission/configuration was not activated while these prerequisites were false. Stage 2 Model Registry/KB updates and both Stage 3 RAG cases are `NOT_RUN`; this is an account/authorization blocker, not a Caption or answer-quality failure.
+
+Read-only before/after SHA-256 comparisons confirm both original account call sets (DeepSeek bucket 2 rows; SiliconFlow 726 rows) and their month rows are unchanged. Evidence: `E:\WK\run\p27-gate-20261017\account-audit.json`, `deepseek-block.json` and `history-preservation.json`.
 
 ## Acceptance results
 
@@ -92,11 +111,11 @@ P26's last saved configuration audit also recorded `enable_multimodal=false`, em
 | Image extraction | `PASS / offline product-runtime parser only` | Verified frozen source hashes; B3 page 9 and Pew page 10 assets and matching Markdown references in `E:\WK\run\p27-resume-20261017\actual-pdf-page-scope.json`. |
 | OCR/VLM | `PARTIAL / local smoke; DeepSeek NOT_RUN` | Local synthetic OCR returned `LOCAL OCR PAGE 9`; DeepSeek image requests: 0. No benchmark Caption was generated. |
 | Persistence | `NOT_RUN` | Uploads: 0; image tasks: 0; OCR/Caption child chunks: 0. |
-| Vector retrieval | `NOT_RUN` | Embeddings/search/rerank requests: 0; no PG/Redis mutation or query. |
+| Vector retrieval | `NOT_RUN` | Embeddings/search/rerank requests: 0; only read-only account/ledger PostgreSQL queries ran in this continuation. |
 | Context to Cheap | `NOT_RUN` | Cheap final answers: 0; no model Context was constructed or sent. |
 | Answer/Gold comparison | `NOT_APPLICABLE` | No answer was generated. Gold remained evaluation-only. |
 | Token / latency | `0 new provider tokens`; latency `N/A` | Provider requests: 0; new `UNKNOWN`: 0. |
-| Focused offline regression | `PASS (offline/mock tests only)` | 492 passed across image config, image processing, JSON boundary, retrieval completion, provider request/transport, model catalog, document lifecycle, HTTP API, and P27 page-scope tests. Log: `E:\WK\run\p27-resume-20261017\focused-suite-final.log`. |
+| Focused offline regression | `PASS (offline contract tests only)` | Current meter change: 116 passed in 1.78s, exit 0; the prior 492-test parser/image run belongs to the earlier P27 source. Log: `E:\WK\run\p27-gate-20261017\meter-tests-verified.log`. |
 
 No claim is made that P27 validated real HTTP, Worker, PostgreSQL/pgvector, Redis, indexing, or model quality.
 
@@ -111,13 +130,22 @@ No claim is made that P27 validated real HTTP, Worker, PostgreSQL/pgvector, Redi
 | `pip install --no-index --no-deps --find-links E:\WK\run\p27-resume-20261017\wheels pypdfium2==5.8.0` | 0 | Installed into `E:\RAG quention\.venv`; no global environment or dependency manifest changed. |
 | Product interpreter import/version check for `pypdfium2` | 0 | Python `3.13.0`; package metadata `5.8.0`; module loaded from the project `.venv`. |
 | `& 'E:\RAG quention\.venv\Scripts\python.exe' -B -m pytest tests/weknora_port/test_p27_page_scoped_vision.py tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_catalog.py tests/weknora_port/test_documents.py tests/weknora_port/test_http_api.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27r3` | 0 | `492 passed in 3.61s`; log and exit-code file in `E:\WK\run\p27-resume-20261017\`. |
-| `& 'E:\RAG quention\.venv\Scripts\python.exe' -B -m pytest tests/weknora_port/test_ingest.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27-ingest-blocked` | 2 | Collection blocked by missing `pptx` module. Evidence: `E:\WK\run\p27-resume-20261017\test-ingest-collection-failure.log`; independent P27 parser tests passed in the 491-test suite. |
+| `& 'E:\RAG quention\.venv\Scripts\python.exe' -B -m pytest tests/weknora_port/test_ingest.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27-ingest-blocked` | 2 | Collection blocked by missing `pptx` module. Evidence: `E:\WK\run\p27-resume-20261017\test-ingest-collection-failure.log`; independent P27 parser tests passed in the historical 492-test suite. |
 | `& 'E:\RAG quention\.venv\Scripts\python.exe' -B -c "import io; from PIL import Image, ImageDraw, ImageFont; from backend.weknora_port.tesseract_ocr import TesseractOCR; image=Image.new('RGB',(1200,300),'white'); draw=ImageDraw.Draw(image); draw.text((40,90),'LOCAL OCR PAGE 9',fill='black',font=ImageFont.truetype('C:/Windows/Fonts/arial.ttf',72)); out=io.BytesIO(); image.save(out,format='PNG'); result=TesseractOCR(r'E:/WK/deps/tessdata').recognize(out.getvalue(),'image/png'); print('error='+result.error); print('text='+repr(result.text)); print('layout='+result.layout.get('schema',''))"` | 0 | Text `LOCAL OCR PAGE 9`, `image-ocr-layout-v1`; log `E:\WK\run\p27-resume-20261017\local-tesseract-smoke.log`. |
 | Product-interpreter page-scoped parse for frozen `row-0958` p9 and `row-0684` p10 | 0 | Both original SHA values matched; both target assets and parent Markdown references were found. JSON/log: `E:\WK\run\p27-resume-20261017\actual-pdf-page-scope.json` and `actual-pdf-page-scope-final.log`. |
-| Real upload / API / Worker / PG / Redis / DeepSeek / Cheap RAG | `NOT RUN` | Blocked because trusted approved meter/source-fact assembly is unimplemented and no active model/KB configuration was applied. No services were started. |
+| Real upload / API / Worker / Redis / DeepSeek / Cheap RAG | `NOT RUN` | Existing DeepSeek month block and unverified whole-account coverage prevent activation. Approved assembly already exists. Only read-only PostgreSQL ledger audits ran. |
 
-## Minimal next step
+## Current continuation commands and source changes
 
-The next blocking work is to complete production approved-meter/source-fact assembly without changing historical UNKNOWN or the owner's 1,000,000-token ceiling, then configure the isolated KB/model roles through the normal authorized API. After those gates, run `row-0958` first and proceed to `row-0684` only if the first stage stays within the call cap. No real model calls, database writes, deployments, pushes, merges, tags, or P28 work were performed here.
+| Command | Exit | Result |
+|---|---:|---|
+| `& 'E:\RAG quention\.venv\Scripts\python.exe' -B 'E:\WK\run\p27-gate-20261017\audit_accounts.py'` | 0 | Real isolated PG identity and both existing provider-account ledgers; read-only. |
+| `& 'E:\RAG quention\.venv\Scripts\python.exe' -B 'E:\WK\run\p27-gate-20261017\audit_deepseek_block.py'` | 0 | Original numeric usage confirms output 177 > reserved 64. No answer/key content read. |
+| `& 'E:\RAG quention\.venv\Scripts\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-verified` | 0 | 116 passed in 1.78s. No provider calls or real-account fixture writes. |
+| `& 'E:\RAG quention\.venv\Scripts\python.exe' -B 'E:\WK\run\p27-gate-20261017\verify_history.py'` | 0 | Both account call sets and month rows unchanged. |
 
-P27 continuation code changes are limited to page configuration/task snapshot, PDF page rendering/asset selection, and runtime/API adaptation. The exact changed files are recorded in the result JSON; the final local commit SHA is reported in the delivery message. Retrieval thresholds, routing, Gold, ordinary prompts, supplier set, migration files, and dependency locks were not changed.
+Changed this continuation: `backend/weknora_port/source_facts.py`, `tests/weknora_port/test_p27_vision_meter.py`, this report and its result JSON. No parser, image-task, model registry, ordinary Prompt, retrieval threshold, routing, schema/migration or dependency changes were made. Existing dirty files remain outside the local delivery commit. No real key was read, copied or printed. Earlier P27/P9–P26 results and raw evidence remain preserved.
+
+## Stop and remaining prerequisite
+
+`P27_BLOCKED`: both target questions remain unexecuted because the original DeepSeek month is blocked and required whole-account facts are unverified. Obtain authoritative incident/account/shared-consumer facts and use a trusted recovery procedure that preserves UNKNOWN and original limits before opening any combined P27 fence. The owner has already authorized this task's numeric ceiling; another numeric allowance alone does not resolve the missing evidence. This pass stops here without enabling live roles, pushing, deploying, merging, tagging or opening another stage. The final local commit SHA is provided in the delivery message.
