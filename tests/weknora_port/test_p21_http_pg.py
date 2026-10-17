@@ -2,17 +2,19 @@
 import hashlib
 import json
 import os
+from dataclasses import replace
 from pathlib import Path
 
 import httpx
 
 from backend.weknora_port.generation import RouterPolicy
-from backend.weknora_port.service import KNOWLEDGE_EVIDENCE_INSUFFICIENT
 from tests.weknora_port.native_fixture import isolated_mock_application
 from tests.weknora_port.redis_fixture_identity import expected_redis_run_id
 from tests.weknora_port.test_memory_storage_pg import actual_pg_run, approved_dsn, connection
 from tests.weknora_port.test_qa_followup_fallback_pg import http_client, kb, session, ask, frames
 from tests.weknora_port.test_runtime_pg import SOURCE
+
+UTC_GENERAL_REPLY='This answer uses general knowledge, not this knowledge base. Beijing time is UTC+8.'
 
 
 def test_normal_http_citations_off_retrieval_refusal_history_and_gates():
@@ -30,7 +32,10 @@ def test_normal_http_citations_off_retrieval_refusal_history_and_gates():
         def response(request, body):
             if body.get('stream'):
                 assert 'Source citations are disabled' in body['messages'][0]['content']
-                parts = ['Blue widgets use W-17. <re', 'f><ref id="c1"/>', '</ref> [manual](https://example.test) ![figure](https://example.test/i.png)']
+                if 'No content directly matched' in body['messages'][0]['content']:
+                    parts = [UTC_GENERAL_REPLY+' <re', 'f><ref id="c1"/>', '</ref>']
+                else:
+                    parts = ['Blue widgets use W-17. <re', 'f><ref id="c1"/>', '</ref> [manual](https://example.test) ![figure](https://example.test/i.png)']
                 lines = [{'model': body['model'], 'choices': [{'delta': {'content': p}, 'finish_reason': None}]} for p in parts]
                 lines.append({'model': body['model'], 'choices': [{'delta': {}, 'finish_reason': 'stop'}],
                               'usage': {'prompt_tokens': 100, 'completion_tokens': 10, 'total_tokens': 110}})
@@ -92,14 +97,44 @@ def test_normal_http_citations_off_retrieval_refusal_history_and_gates():
                             assert any(m['role'] == 'assistant' and 'W-17' in m['content'] for m in final[0]['messages'])
                     checks.append('greeting_and_history_followup_no_retrieval_with_history_to_provider')
                     empty = await kb(client, 'P21 empty evidence')
-                    empty_sid = await session(client, empty)
-                    start = len(wire)
-                    refusal, message, _ = await ask(client, runtime, empty_sid, empty, 'utc时间转换北京时间')
-                    assert message['content'] == KNOWLEDGE_EVIDENCE_INSUFFICIENT
-                    assert not any(r['body'].get('stream') for r in wire[start:])
-                    assert any(r['path'].endswith('/embeddings') for r in wire[start:])
-                    assert frames(refusal)[-1]['response_type'] == 'complete'
-                    checks.append('unknown_utc_retrieves_and_empty_evidence_fixed_refusal_no_generation')
+                    original = runtime.conversation
+                    assert original.fallback_strategy == 'model'
+                    fallback_cases = []
+                    for strategy, configuration, expected, expected_streams in (
+                        ('model', original, UTC_GENERAL_REPLY, 1),
+                        ('fixed', replace(original, fallback_strategy='fixed',
+                                          fallback_response='CONFIGURED_FIXED_SOURCE_REPLY'), 'CONFIGURED_FIXED_SOURCE_REPLY', 0),
+                    ):
+                        runtime.conversation = configuration
+                        empty_sid = await session(client, empty)
+                        start = len(wire)
+                        fallback_reply, message, fallback_request = await ask(client, runtime, empty_sid, empty, 'utc时间转换北京时间')
+                        sent = wire[start:]
+                        generation = [r['body'] for r in sent if r['body'].get('stream')]
+                        assert len(generation) == expected_streams
+                        assert message['content'].strip() == expected
+                        assert message['is_completed'] and not message['turn_error_code'] and not message['knowledge_references']
+                        assert any(r['path'].endswith('/embeddings') for r in sent)
+                        if generation:
+                            assert 'No content directly matched' in generation[0]['messages'][0]['content']
+                            assert SOURCE not in json.dumps(generation[0])
+                        event_frames = frames(fallback_reply)
+                        assert event_frames[-1]['response_type'] == 'complete'
+                        assert sum(f['response_type'] == 'complete' for f in event_frames) == 1
+                        assert any(f.get('data', {}).get('is_fallback') for f in event_frames if f['response_type'] == 'answer')
+                        assert ''.join(f['content'] for f in event_frames if f['response_type'] == 'answer') == message['content']
+                        assert '<ref' not in fallback_reply.text and '</ref' not in fallback_reply.text and '<kb ' not in fallback_reply.text
+                        fresh = (await client.get(f'/api/v1/sessions/{empty_sid}/messages')).json()['data']
+                        assert next(m for m in fresh if m['id'] == message['id'])['content'] == message['content']
+                        replay_start = len(wire)
+                        replay = await client.post(f'/api/v1/sessions/{empty_sid}/messages', json=fallback_request)
+                        assert replay.status_code == 200 and len(wire) == replay_start
+                        assert ''.join(f['content'] for f in frames(replay) if f['response_type'] == 'answer') == message['content']
+                        fallback_cases.append({'strategy': strategy, 'stream_calls': len(generation),
+                            'content': message['content'], 'events': event_frames,
+                            'sse_history_refreshed_equal': True, 'replay_new_sends': 0})
+                    runtime.conversation = original
+                    checks.append('unknown_utc_retrieves_and_empty_evidence_respects_model_or_fixed_strategy')
                     before_scope = len(wire)
                     denied = await client.post(f'/api/v1/sessions/{sid}/messages', json={**req,
                         'request_id': 'p21-cross-kb', 'knowledge_base_scope': [empty]})
@@ -120,7 +155,7 @@ def test_normal_http_citations_off_retrieval_refusal_history_and_gates():
                               'pg_system_id': '7696088403504697382', 'owner_ledger_unchanged_sha256': before,
                               'internal_source_readback': source,
                               'mock_transport_requests': len(wire), 'synthetic_usage_rows': ledger,
-                              'events': frames(reply), 'fixed_refusal': frames(refusal)}
+                              'events': frames(reply), 'fallback_cases': fallback_cases}
                     out = Path(os.environ['P21_EVIDENCE_DIR']) / 'http-pg-result.json'
                     assert not out.exists()
                     out.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str), encoding='utf-8')

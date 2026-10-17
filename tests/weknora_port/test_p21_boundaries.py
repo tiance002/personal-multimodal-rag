@@ -8,7 +8,8 @@ from backend.weknora_port.generation import GenerationRequest, RouterPolicy, pre
 from backend.weknora_port.retrieval.context import FinalizedContext
 from backend.weknora_port.retrieval.pipeline import RetrievalPipeline
 from backend.weknora_port.retrieval.query import needs_retrieval, resolve_intent
-from backend.weknora_port.service import TurnConfiguration, KNOWLEDGE_EVIDENCE_INSUFFICIENT
+from backend.weknora_port.service import TurnConfiguration
+from backend.weknora_port.models.types import ChatOptions
 from test_generation import CTX, E, event, setup
 from test_pipeline import Model, Registry, Repo, row, state
 from test_service import runtime, REQ
@@ -69,11 +70,18 @@ def test_disabled_default_keeps_internal_evidence_and_source_identity():
     assert prepared.registry.snapshot().chunks[0][1][:3] == (E.id, E.knowledge_id, E.knowledge_base_id)
 
 
-@pytest.mark.parametrize('fallback', [None, {'strategy': 'model', 'prompt': 'FREE ANSWER {{query}}',
-                                          'response': 'old fallback', 'options': None,
-                                          'documents': lambda: pytest.fail('must not list sources for free-form answer')}])
-def test_no_evidence_commits_fixed_refusal_without_answer_model(fallback):
+@pytest.mark.parametrize('strategy', ['model', 'fixed'])
+def test_no_evidence_respects_native_fallback_and_replay(strategy):
+    # P28 Owner reversal: an empty KB must respect model/fixed, not force P21's
+    # fixed Chinese refusal. Scope/gate/citation counterexamples remain below.
     async def scenario():
+        listings = []
+        def documents():
+            listings.append(True)
+            return '- document title (metadata only)'
+        fallback = {'strategy': strategy, 'prompt': 'FALLBACK {{query}} {{kb_documents}}',
+                    'response': 'configured fixed reply', 'options': ChatOptions(thinking=False),
+                    'documents': documents}
         service, repo, retrieval, co, cheap, expensive, store, commit, counts = runtime(
             configuration=lambda turn: TurnConfiguration(state(), {'policy': RouterPolicy(mode='CHEAP_ONLY')}, fallback))
         retrieval.rows = []
@@ -81,15 +89,23 @@ def test_no_evidence_commits_fixed_refusal_without_answer_model(fallback):
         await service.drain_background()
         assert not repo.failures
         assert len(retrieval.calls) == 1
-        assert not cheap.calls and not expensive.calls
-        assert len(commit.calls) == 1 and commit.calls[0].answer == KNOWLEDGE_EVIDENCE_INSUFFICIENT
+        assert len(cheap.calls) == (strategy == 'model') and not expensive.calls
+        assert len(commit.calls) == 1
+        assert commit.calls[0].answer == ('partial' if strategy == 'model' else 'configured fixed reply')
+        assert bool(listings) == (strategy == 'model')
+        if strategy == 'model':
+            rendered = '\n'.join(message.content for message in cheap.calls[0][0])
+            assert 'FALLBACK extract source' in rendered and 'metadata only' in rendered
+            assert 'historic question' in rendered and 'historic answer' in rendered
+            assert 'memory prompt' not in rendered
         assert not commit.calls[0].references
         assert store.events[-1].type == 'complete'
-        # Replay reuses the same durable refusal without another call.
+        # Replay reuses the same durable answer without another call.
         before = len(store.events)
         replay = await service.accept_turn(REQ, 'owner')
         assert replay.replay_only and await service.run_turn(replay) is None
         assert len(store.events) == before
+        assert len(cheap.calls) == (strategy == 'model')
     run(scenario())
 
 

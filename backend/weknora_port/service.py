@@ -11,13 +11,11 @@ from typing import Any, Protocol
 from .conversation.types import MemoryContext, resolve_scope
 from .generation import GenerationRequest, GenerationReplay, Evidence, History, ValidatedRewrite
 from .generation.coordinator import check_context
-from .models.types import CallContext, ChatOptions, ProviderError, CallCancelled, RunDeadlineExceeded
+from .models.types import CallContext, ProviderError, CallCancelled, RunDeadlineExceeded
 from .retrieval.pipeline import PipelineState
 from .retrieval.search import SearchNothing
 from .streaming.events import StreamEvent
 from .streaming.replay import ReplayService, AssistantRun
-
-KNOWLEDGE_EVIDENCE_INSUFFICIENT = '当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。'
 
 @dataclass(frozen=True)
 class OrdinaryTurnRequest:
@@ -299,17 +297,11 @@ class RuntimeService:
         try:
             finalized=await pipeline.run(state,model_context)
         except SearchNothing:
-            kb_bounded = state.needs_retrieval and any(t.knowledge_base_id for t in state.targets)
-            if config.fallback is None and not kb_bounded:raise
+            if config.fallback is None:raise
             from .retrieval.context import FinalizedContext,render_placeholders
             from .retrieval.query import go_strip
             check_context(model_context)
-            fallback=dict(config.fallback or {})
-            if kb_bounded:
-                # No evidence is a completed fixed refusal, never a second
-                # free-form generation using general knowledge or a doc listing.
-                fallback.update(strategy='fixed', response=KNOWLEDGE_EVIDENCE_INSUFFICIENT, prompt='')
-                fallback.setdefault('options', config.generation_options.get('options', ChatOptions()))
+            fallback=dict(config.fallback)
             query=go_strip(state.rewrite_query) or state.query
             prompt=fallback['prompt']
             if fallback['strategy']=='model' and prompt!='':
