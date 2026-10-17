@@ -1,0 +1,808 @@
+{
+  "schema": "p25-mml-minimal-wiring/v2",
+  "status": "P25_COMPLETE",
+  "date": "2026-10-17",
+  "baseline": {
+    "requested": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "actual": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "branch": "codex/weknora-python-port-integrate-image-20261014",
+    "production_code_changed": false
+  },
+  "authorization": {
+    "owner_authorized_additional_tokens": 1000000,
+    "grant_id": "P25-20261017-SF-1000000",
+    "scope": "P25 only: one full Cheap Only RAG attempt each for frozen MML rows 0959, 0434, 0685; auxiliary provider calls count against this additional fence; close after task-owned services stop.",
+    "before": {
+      "limit_tokens": 1669727,
+      "occupied_with_carry": 1669727,
+      "headroom": 0,
+      "ledger_rows": 715,
+      "historical_unknown": 61
+    },
+    "opened": {
+      "limit_tokens": 2669727,
+      "occupied_with_carry": 1669727,
+      "headroom": 1000000
+    },
+    "closed": {
+      "limit_tokens": 1693086,
+      "occupied_with_carry": 1693086,
+      "headroom": 0,
+      "ledger_rows": 726,
+      "historical_unknown": 61
+    },
+    "receipt_paths": [
+      "E:\\WK\\run\\p25-20261017\\fence\\open-after.json",
+      "E:\\WK\\run\\p25-20261017\\fence\\close-after.json"
+    ]
+  },
+  "runtime": {
+    "api": "real FastAPI, port 56425",
+    "api_ready": true,
+    "worker_started_and_alive": true,
+    "worker_processed_ingestion_jobs": 0,
+    "database": "weknora_python_port_20261013",
+    "postgres_system_identifier": "7696088403504697382",
+    "postgres_container_id": "89c5cb748e2ec7aca3b1e3b181dfe936a4054137ddb4de5c4e8689e86387e720",
+    "postgres_container_after_run": "running",
+    "redis_db": 15,
+    "redis_container_id": "15fe772fab7d9ac5b6023ff2075ebb5e12ccee80e274f91b16fe612e8748e897",
+    "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+    "redis_prefix": "weknora-python-p25:00a84e1963ee4b22819a00dfe2b60023",
+    "redis_container_after_run": "running",
+    "models": {
+      "embedding": "BAAI/bge-m3",
+      "rerank": "BAAI/bge-reranker-v2-m3",
+      "cheap": "XingChenAGI/Xing4.0-29B",
+      "expensive": "NOT_CONFIGURED_NOT_CALLED"
+    },
+    "provider_calls": 11,
+    "provider_calls_by_capability": {
+      "chat": {
+        "calls": 5,
+        "settled_tokens": 10146
+      },
+      "embedding": {
+        "calls": 3,
+        "settled_tokens": 54
+      },
+      "rerank": {
+        "calls": 3,
+        "settled_tokens": 13159
+      }
+    },
+    "settled_tokens": 23359,
+    "reported_input_tokens": 23028,
+    "reported_output_tokens": 331,
+    "new_unknown": 0,
+    "reserved_calls_after": 0,
+    "official_benchmark_judge": "NOT_RUN",
+    "browser_ui": "NOT_RUN",
+    "uploads": 0,
+    "reingest": 0,
+    "index_writes": 0,
+    "final_answer_requests": 2,
+    "fixed_evidence_insufficient_refusals": 1,
+    "all_three_query_message_requests_http_200": true,
+    "source_sha": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "post_stop_infra_check_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\post-stop-infra-check.json"
+  },
+  "cases": [
+    {
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+      "short_qid": "row-0959",
+      "dataset": "mmlongbench-doc",
+      "question": "What are used for long-distance communication as introduced in this slide?",
+      "run_id": "a32e743c-7d9b-4a6b-92c0-c605c14a11e7",
+      "request_id": "795e09b9-0a3a-41c1-bd4d-5ec8a93312ec",
+      "session_id": "4f94e5c7-560a-44cd-96b6-186fd15aa024",
+      "http_status": 200,
+      "api_finish_reason": null,
+      "provider_answer_finish_reason": "stop",
+      "answer_model_called": true,
+      "gold": [
+        "['radiowaves', 'microwaves']"
+      ],
+      "gold_validity": "FROZEN_OFFICIAL_TYPED_ANSWER",
+      "gold_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.19230769230769232
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "gold_judge": "NOT_RUN",
+      "source": {
+        "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+        "sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+        "kb_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "document_scope": []
+      },
+      "retrieval": {
+        "search_candidate_count": 30,
+        "expected_document_candidate_count": 19,
+        "rerank_model_returned_count": 30,
+        "rerank_accepted_count": 2,
+        "scores": {
+          "rerank_query": "What are used for long-distance communication as introduced in this slide",
+          "returned_scores": [
+            {
+              "rank": 1,
+              "input_index": 0,
+              "score": 0.6060662865638733
+            },
+            {
+              "rank": 2,
+              "input_index": 1,
+              "score": 0.384914368391037
+            },
+            {
+              "rank": 3,
+              "input_index": 2,
+              "score": 0.05740296095609665
+            },
+            {
+              "rank": 4,
+              "input_index": 4,
+              "score": 0.02591560408473015
+            },
+            {
+              "rank": 5,
+              "input_index": 6,
+              "score": 0.013942587189376354
+            },
+            {
+              "rank": 6,
+              "input_index": 5,
+              "score": 0.009160489775240421
+            },
+            {
+              "rank": 7,
+              "input_index": 3,
+              "score": 0.006929471157491207
+            },
+            {
+              "rank": 8,
+              "input_index": 7,
+              "score": 0.006068732123821974
+            },
+            {
+              "rank": 9,
+              "input_index": 13,
+              "score": 0.005538091994822025
+            },
+            {
+              "rank": 10,
+              "input_index": 9,
+              "score": 0.0013735140673816204
+            }
+          ],
+          "rerank_file": "E:\\WK\\run\\p25-20261017\\runtime\\rerank\\bd69db7fc3c825088a209705360c79ce70bd2296b10359939e6aac4ae3d3e532.json",
+          "rerank_file_sha256": "2bc65b786a41d3ae6d926cb9c599cf10204a70d14ee3235bcf460171ae520723"
+        }
+      },
+      "context": {
+        "candidate_count": 30,
+        "expected_document_candidates": 19,
+        "reranked_candidate_count": 2,
+        "rerank_retained_count": 2,
+        "final_evidence_count": 2,
+        "context_characters": 1720,
+        "context_term_hits": {
+          "radiowaves": true,
+          "microwaves": true,
+          "ionosphere": true
+        },
+        "answer_request_term_hits": {
+          "radiowaves": true,
+          "microwaves": true,
+          "ionosphere": true
+        },
+        "evidence_chunk_ids": [
+          "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+          "df6098cb-68e6-4546-b9e0-8682b4bf19e9"
+        ],
+        "public_structured_reference_count": 0,
+        "context_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\stages\\bd69db7fc3c825088a209705360c79ce70bd2296b10359939e6aac4ae3d3e532.json",
+        "context_artifact_sha256": "c5ff56f115951f79d52c1d014784b6b25662fb932e39bf3292b4b92a5facc016"
+      },
+      "answer": "## 长距离通信使用的手段\n\n根据该幻灯片内容，长距离通信主要使用以下方法：\n\n1. **无线电波（Radiowaves）**：可以被大气层中的不同层折射，使信号能够传播更远。其中**电离层（ionosphere）**会折射无线电波，帮助信号远距离传输。\n\n2. **微波（Microwaves）**：可用于将信号发送到**卫星**，实现远距离通信。\n\n此外，幻灯片还提到了一些长距离通信中可能遇到的问题，例如信号扩散、信号在不同大气层中折射导致难以精确发送、以及信号质量下降等。",
+      "latency_seconds": 24.395009,
+      "usage": {
+        "calls": 4,
+        "settled_calls": 4,
+        "unknown_calls": 0,
+        "reserved_calls": 0,
+        "settled_tokens": 8216,
+        "unknown_held_tokens": 0,
+        "reported_input_tokens": 8052,
+        "reported_output_tokens": 164,
+        "models": [
+          "BAAI/bge-m3",
+          "BAAI/bge-reranker-v2-m3",
+          "XingChenAGI/Xing4.0-29B"
+        ],
+        "capabilities": [
+          "chat",
+          "embedding",
+          "rerank"
+        ]
+      },
+      "public_references": [],
+      "reference_readback_count": 0,
+      "result_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\results\\row-0959-complete.json",
+      "result_artifact_sha256": "f64922ce38b2721295165da67ee282e57b698c082d42a8f3ff1b9b4ef925309c",
+      "capture_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\captures\\bd69db7fc3c825088a209705360c79ce70bd2296b10359939e6aac4ae3d3e532.json",
+      "capture_artifact_sha256": "e9f0085aaf6ff71ec2172b8822258204cf069ec6496d2cd9dde642e99953cead",
+      "provider_request_artifacts": [
+        {
+          "file": "207089f4771994943c51613f2e9679d0aede348c979cc36c17cb61b048e5fc00.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\207089f4771994943c51613f2e9679d0aede348c979cc36c17cb61b048e5fc00.json",
+          "sha256": "77c111572e6727f273c3231fcbd4928d04cd119fdd9d6e79b68f467d699db2e0",
+          "stage": "answer",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "status_code": 200,
+          "finish_reason": "stop"
+        },
+        {
+          "file": "3a635e7a62f316c9be37fcb398e85dcbf0ecf8156f15bfaa97ad910543ae8f38.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\3a635e7a62f316c9be37fcb398e85dcbf0ecf8156f15bfaa97ad910543ae8f38.json",
+          "sha256": "9d7b25083f61fd449e2983bc75c636790e134b98a6fd90695ff590c0d533b334",
+          "stage": "auxiliary",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "status_code": 200,
+          "finish_reason": null
+        },
+        {
+          "file": "5787f02a263abb538ac091d97279483d3b358c752ee4f27676766921e1716668.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\5787f02a263abb538ac091d97279483d3b358c752ee4f27676766921e1716668.json",
+          "sha256": "80bf3c836e648efd386b291e0f4bd2c830d74f3caac87576d61e4f5d5da66d57",
+          "stage": "auxiliary",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "status_code": 200,
+          "finish_reason": "stop"
+        },
+        {
+          "file": "7977bec50584787af30c42e03cd85d7ce439f87ca184b5e68a7f6fc5b6e499b9.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\7977bec50584787af30c42e03cd85d7ce439f87ca184b5e68a7f6fc5b6e499b9.json",
+          "sha256": "bfdb2597d4c45771033534c29d0d6d78ce5c65a2e96c14814b9556027537844a",
+          "stage": "auxiliary",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "status_code": 200,
+          "finish_reason": null
+        }
+      ],
+      "failure": {
+        "class": "QUALITY_METRIC_MISMATCH_OR_ANSWER_VARIANCE",
+        "code_bug_confirmed": false,
+        "reason": "Final answer contains the core Gold concepts on manual inspection, while strict normalized exact match is 0 and project character F1 is low; official judge was not run."
+      }
+    },
+    {
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "short_qid": "row-0434",
+      "dataset": "mmlongbench-doc",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "run_id": "a97bdd1e-c265-47f6-9de8-674d5843b4fe",
+      "request_id": "621b2890-404c-4c00-a7fb-d6543626199e",
+      "session_id": "c7017e4f-2b04-44a1-8619-082715dbfd1c",
+      "http_status": 200,
+      "api_finish_reason": null,
+      "provider_answer_finish_reason": null,
+      "answer_model_called": false,
+      "gold": [
+        "Cat vs Dog dataset"
+      ],
+      "gold_validity": "FROZEN_OFFICIAL_TYPED_ANSWER",
+      "gold_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.0
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "gold_judge": "NOT_RUN",
+      "source": {
+        "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+        "sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "document_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+        "kb_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "document_scope": []
+      },
+      "retrieval": {
+        "search_candidate_count": 30,
+        "expected_document_candidate_count": 28,
+        "rerank_model_returned_count": 30,
+        "rerank_accepted_count": 0,
+        "scores": {
+          "rerank_query": "PPT中coding time部分介绍的训练数据集是什么",
+          "returned_scores": [
+            {
+              "rank": 1,
+              "input_index": 6,
+              "score": 0.002143416553735733
+            },
+            {
+              "rank": 2,
+              "input_index": 4,
+              "score": 0.0012898939894512296
+            },
+            {
+              "rank": 3,
+              "input_index": 2,
+              "score": 0.0012510677333921194
+            },
+            {
+              "rank": 4,
+              "input_index": 20,
+              "score": 0.0011684172786772251
+            },
+            {
+              "rank": 5,
+              "input_index": 0,
+              "score": 0.000994888716377318
+            },
+            {
+              "rank": 6,
+              "input_index": 8,
+              "score": 0.0008114823140203953
+            },
+            {
+              "rank": 7,
+              "input_index": 3,
+              "score": 0.0005986343021504581
+            },
+            {
+              "rank": 8,
+              "input_index": 22,
+              "score": 0.0005646927747875452
+            },
+            {
+              "rank": 9,
+              "input_index": 28,
+              "score": 0.0005480324034579098
+            },
+            {
+              "rank": 10,
+              "input_index": 21,
+              "score": 0.00036894172080792487
+            }
+          ],
+          "rerank_file": "E:\\WK\\run\\p25-20261017\\runtime\\rerank\\f8a2adbd0be91176dfacf5d46070387e8d6d3a20051e6672b28bb542f17063e2.json",
+          "rerank_file_sha256": "5f389dad715df7f691ee0b4d83868ea7cddfb318f84d257fe80143505c6f2295",
+          "target_candidate": {
+            "rank": 9,
+            "input_index": 28,
+            "score": 0.0005480324034579098,
+            "chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+            "base_search_score": 0.01069431051108968,
+            "key_terms": [
+              "Kaggle",
+              "Cat vs Dog",
+              "dataset"
+            ]
+          },
+          "effective_rerank_threshold": 0.3,
+          "top1_fallback_floor": 0.15,
+          "highest_rerank_score": 0.002143416553735733,
+          "accepted_candidates": 0
+        }
+      },
+      "context": {
+        "candidate_count": 30,
+        "expected_document_candidates": 28,
+        "reranked_candidate_count": 0,
+        "rerank_retained_count": 0,
+        "final_evidence_count": 0,
+        "context_characters": 0,
+        "context_term_hits": {
+          "kaggle": false,
+          "cat vs dog": false,
+          "dataset": false
+        },
+        "answer_request_term_hits": null,
+        "evidence_chunk_ids": [],
+        "public_structured_reference_count": 0,
+        "context_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\stages\\f8a2adbd0be91176dfacf5d46070387e8d6d3a20051e6672b28bb542f17063e2.json",
+        "context_artifact_sha256": "6dedbea694b5d3d02b36b0ab22ff615d6d2c681f6e4ce6738fa9bdf0d7e492c9"
+      },
+      "answer": "当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。",
+      "latency_seconds": 4.5185572000045795,
+      "usage": {
+        "calls": 3,
+        "settled_calls": 3,
+        "unknown_calls": 0,
+        "reserved_calls": 0,
+        "settled_tokens": 7257,
+        "unknown_held_tokens": 0,
+        "reported_input_tokens": 7229,
+        "reported_output_tokens": 28,
+        "models": [
+          "BAAI/bge-m3",
+          "BAAI/bge-reranker-v2-m3",
+          "XingChenAGI/Xing4.0-29B"
+        ],
+        "capabilities": [
+          "chat",
+          "embedding",
+          "rerank"
+        ]
+      },
+      "public_references": [],
+      "reference_readback_count": 0,
+      "result_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\results\\row-0434.json",
+      "result_artifact_sha256": "d55a1a2ebcb184226148035973019c7a0f45e993e5c4a40433878f77997593b0",
+      "capture_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\captures\\f8a2adbd0be91176dfacf5d46070387e8d6d3a20051e6672b28bb542f17063e2.json",
+      "capture_artifact_sha256": "d540996d0e7a072fed2ecb329f117e45ec696ecab6c69dac1a7a6bc669f131bd",
+      "provider_request_artifacts": [
+        {
+          "file": "37e8418a224ce26e6b0f791c237bc72597772ab40a95e407b3b4c571f3f81e0d.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\37e8418a224ce26e6b0f791c237bc72597772ab40a95e407b3b4c571f3f81e0d.json",
+          "sha256": "d35da44858eedf4eae56e764825138031995a0b90974e5bb97ea74d983feddad",
+          "stage": "auxiliary",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "status_code": 200,
+          "finish_reason": "stop"
+        },
+        {
+          "file": "6c82c661c524f1c376bfa755a90b3fe69a77f6316f8a6236d18c9d9e022d7b8b.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\6c82c661c524f1c376bfa755a90b3fe69a77f6316f8a6236d18c9d9e022d7b8b.json",
+          "sha256": "0796449ac470bc35ef880c3c8d7b59699ed40d959036cd9e38d76b24321ab3da",
+          "stage": "auxiliary",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "status_code": 200,
+          "finish_reason": null
+        },
+        {
+          "file": "cf4b7754c0cb6a99fa8ce621585cceb998901910151f7233a39f7a43ddb94f50.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\cf4b7754c0cb6a99fa8ce621585cceb998901910151f7233a39f7a43ddb94f50.json",
+          "sha256": "74f6dc159bf69cd647fdd1d95f2763eb9ac6d15d3add0585454ec3a196371710",
+          "stage": "auxiliary",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "status_code": 200,
+          "finish_reason": null
+        }
+      ],
+      "failure": {
+        "class": "RETRIEVAL_RERANK_QUALITY_FAILURE",
+        "code_bug_confirmed": false,
+        "reason": "Correct-source positive passage was retrieved, but all rerank scores were far below the recorded 0.3 threshold and 0.15 fallback floor; no final context and no final-answer call."
+      }
+    },
+    {
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0685",
+      "short_qid": "row-0685",
+      "dataset": "pew",
+      "question": "Do more White or Black Americans (in %) think a female president will be elected in a lifetime?",
+      "run_id": "8754be66-4628-44e7-a448-0205152c0937",
+      "request_id": "a4bef8e8-27d4-45f8-8d2e-6c311977c3b7",
+      "session_id": "998e2699-d790-4610-a160-acd4fa09af37",
+      "http_status": 200,
+      "api_finish_reason": null,
+      "provider_answer_finish_reason": "stop",
+      "answer_model_called": true,
+      "gold": [
+        "Not answerable"
+      ],
+      "gold_validity": "UNVERIFIED_PER_P24",
+      "gold_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.06989247311827956
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "gold_judge": "NOT_RUN",
+      "source": {
+        "source_id": "11-21-16-Updated-Post-Election-Release.pdf",
+        "sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "document_id": "bac918ff-e8e0-4b00-a889-b17431734845",
+        "kb_id": "8363529a-0ad1-4b0d-8f2b-24c36e9cd20b",
+        "document_scope": []
+      },
+      "retrieval": {
+        "search_candidate_count": 30,
+        "expected_document_candidate_count": 30,
+        "rerank_model_returned_count": 30,
+        "rerank_accepted_count": 1,
+        "scores": {
+          "rerank_query": "White Americans and Black Americans 的百分比分别认为女性总统会在一生中当选",
+          "returned_scores": [
+            {
+              "rank": 1,
+              "input_index": 5,
+              "score": 0.8148090243339539
+            },
+            {
+              "rank": 2,
+              "input_index": 4,
+              "score": 0.1833396852016449
+            },
+            {
+              "rank": 3,
+              "input_index": 10,
+              "score": 0.03957834839820862
+            },
+            {
+              "rank": 4,
+              "input_index": 16,
+              "score": 0.015031293965876102
+            },
+            {
+              "rank": 5,
+              "input_index": 12,
+              "score": 0.009623085148632526
+            },
+            {
+              "rank": 6,
+              "input_index": 20,
+              "score": 0.007427483331412077
+            },
+            {
+              "rank": 7,
+              "input_index": 15,
+              "score": 0.00642174668610096
+            },
+            {
+              "rank": 8,
+              "input_index": 8,
+              "score": 0.004514078143984079
+            },
+            {
+              "rank": 9,
+              "input_index": 14,
+              "score": 0.003672592807561159
+            },
+            {
+              "rank": 10,
+              "input_index": 3,
+              "score": 0.002966582076624036
+            }
+          ],
+          "rerank_file": "E:\\WK\\run\\p25-20261017\\runtime\\rerank\\ccad781bac76529814500ff9970fafb2e878d8a6d55ee6e7075fe34ebf7a9815.json",
+          "rerank_file_sha256": "edd9a4c546f9740f907d4ce453a953a7bfa3e1f8cfe05f17719b04fb14104473"
+        }
+      },
+      "context": {
+        "candidate_count": 30,
+        "expected_document_candidates": 30,
+        "reranked_candidate_count": 1,
+        "rerank_retained_count": 1,
+        "final_evidence_count": 1,
+        "context_characters": 815,
+        "context_term_hits": {
+          "79%": true,
+          "white": false,
+          "black": false,
+          "no significant differences": true
+        },
+        "answer_request_term_hits": {
+          "79%": true,
+          "white": true,
+          "black": true,
+          "no significant differences": true
+        },
+        "evidence_chunk_ids": [
+          "991ec343-0d7d-44ac-a743-1abc1ae272f0"
+        ],
+        "public_structured_reference_count": 0,
+        "context_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\stages\\ccad781bac76529814500ff9970fafb2e878d8a6d55ee6e7075fe34ebf7a9815.json",
+        "context_artifact_sha256": "7dbbb85404f3e7de5381337d831415c17381257d5c31b0d69b81a9b36c447053"
+      },
+      "answer": "## Answer\n\nAccording to the reference material, **79% of voters** (across both White and Black Americans) still expect there will be a female president \"in their lifetime\" following Clinton's defeat. The material notes there are no significant differences in these opinions between groups, meaning both White and Black Americans held essentially the same level of expectation.\n\n**Source:** *11-21-16-Updated-Post-Election-Release* (document d1, chunk c1)",
+      "latency_seconds": 8.01873969999724,
+      "usage": {
+        "calls": 4,
+        "settled_calls": 4,
+        "unknown_calls": 0,
+        "reserved_calls": 0,
+        "settled_tokens": 7886,
+        "unknown_held_tokens": 0,
+        "reported_input_tokens": 7747,
+        "reported_output_tokens": 139,
+        "models": [
+          "BAAI/bge-m3",
+          "BAAI/bge-reranker-v2-m3",
+          "XingChenAGI/Xing4.0-29B"
+        ],
+        "capabilities": [
+          "chat",
+          "embedding",
+          "rerank"
+        ]
+      },
+      "public_references": [],
+      "reference_readback_count": 0,
+      "result_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\results\\row-0685.json",
+      "result_artifact_sha256": "9749c419c994ff8946b137a58f26772845020fdda9bd1d6cb0c3212bb1c84e50",
+      "capture_artifact": "E:\\WK\\run\\p25-20261017\\runtime\\captures\\ccad781bac76529814500ff9970fafb2e878d8a6d55ee6e7075fe34ebf7a9815.json",
+      "capture_artifact_sha256": "fb312e3caa09a0aa0109b52e8f78de71a660120b6140b5428d98fd1d4d7bf27a",
+      "provider_request_artifacts": [
+        {
+          "file": "02db4a9f1d2375243a044ce201baf3173627ca2a505c1898d7567faea9ab9f80.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\02db4a9f1d2375243a044ce201baf3173627ca2a505c1898d7567faea9ab9f80.json",
+          "sha256": "737162b71911b66a7c15df71d6efcfcc55649955bb5b557a439e694ae0a9fb30",
+          "stage": "auxiliary",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "status_code": 200,
+          "finish_reason": null
+        },
+        {
+          "file": "6bc633a745d21fc022cb5d8894feecd3b5c3453ea153ce5d38aba07999c7f85f.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\6bc633a745d21fc022cb5d8894feecd3b5c3453ea153ce5d38aba07999c7f85f.json",
+          "sha256": "bd85604dd02832797314e07fc56f00cb5e25cd872b8274208101486a5f4a5ae4",
+          "stage": "auxiliary",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "status_code": 200,
+          "finish_reason": null
+        },
+        {
+          "file": "863aab4cd90b8612aab94e50618dcdbd55c4e59bb14aae37a0ba17d32fc66574.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\863aab4cd90b8612aab94e50618dcdbd55c4e59bb14aae37a0ba17d32fc66574.json",
+          "sha256": "c88fa78d3548bac1543295c91c25d59115da72feee28dbb414cc7caca073000f",
+          "stage": "answer",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "status_code": 200,
+          "finish_reason": "stop"
+        },
+        {
+          "file": "a64d17cf8e4887019a4550b0f17aff914cb31be2a77de3ea784db5f0a7accb21.json",
+          "path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\a64d17cf8e4887019a4550b0f17aff914cb31be2a77de3ea784db5f0a7accb21.json",
+          "sha256": "429dad5dc831dcf3a0d316fd6643d10acf87ff68e60522412f8b046d2a144c4d",
+          "stage": "auxiliary",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "status_code": 200,
+          "finish_reason": "stop"
+        }
+      ],
+      "failure": {
+        "class": "INSUFFICIENT_SUBGROUP_EVIDENCE_AND_UNVERIFIED_NEGATIVE_GOLD",
+        "code_bug_confirmed": false,
+        "reason": "Retrieved context includes an aggregate 79% and no-significant-differences statement but no subgroup percentages. The answer asserts equal expectations beyond this context. Whole-document unanswerability coverage remains unverified per P24."
+      }
+    }
+  ],
+  "failure_summary": {
+    "confirmed_code_blockers": 0,
+    "quality_failures": {
+      "row-0434": "Rerank low scores discard correct-source evidence under current validated threshold/fallback; code behavior followed policy.",
+      "row-0685": "Context did not contain subgroup percentages; answer asserted a group comparison beyond evidence; source unanswerability coverage remains unverified.",
+      "row-0959": "Core concepts manually aligned, strict exact-match/character diagnostic low; official judge not run."
+    },
+    "harness_failures": [
+      {
+        "issue": "first row-0959 session POST returned HTTP 403 due wrong Origin before any message or model send",
+        "tokens": 0,
+        "recovery": "fixed harness Origin and submitted exactly one message request; preserved failed attempt"
+      },
+      {
+        "issue": "successful row-0959 request was followed by collector query for nonexistent created_at column",
+        "exit_code": 1,
+        "recovery": "read saved SSE/history and PG ledger; did not resend"
+      }
+    ]
+  },
+  "citation_behavior": {
+    "public_citations_enabled": false,
+    "reason": "P21 default; structured knowledge_references remained empty",
+    "internal_context_and_source_capture": "retained in stage and provider request artifacts",
+    "validated_public_citations": 0
+  },
+  "repository": {
+    "inherited_dirty_files_preserved": true,
+    "production_code_changed": false,
+    "only_task_owned_repo_updates": [
+      "docs/evaluation/P25_MML_MINIMAL_REAL_WIRING.md",
+      "docs/evaluation/P25_MML_MINIMAL_REAL_WIRING.results.json",
+      "progress.md"
+    ],
+    "commit": null,
+    "push": false,
+    "deployment": false,
+    "tag": false
+  },
+  "evidence_root": "E:\\WK\\run\\p25-20261017",
+  "final_process_stop": {
+    "status": "PASS",
+    "stopped_pids": [
+      33840,
+      23108
+    ],
+    "ports_free": [
+      56425,
+      56426
+    ],
+    "containers_stopped": false
+  },
+  "commands": [
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_fence.py open",
+      "exit_code": 0,
+      "evidence": "fence-open.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_runtime.py start",
+      "exit_code": 0,
+      "evidence": "runtime-start.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_runtime.py one --qid row-0959 (initial session create only; 403 before message)",
+      "exit_code": 0,
+      "evidence": "query-0959.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_runtime.py one --qid row-0959 (one successful message; post-run collector failed)",
+      "exit_code": 1,
+      "evidence": "query-0959-attempt02.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_runtime.py one --qid row-0434",
+      "exit_code": 0,
+      "evidence": "query-0434.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_runtime.py one --qid row-0685",
+      "exit_code": 0,
+      "evidence": "query-0685.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\analyze_p25.py",
+      "exit_code": 0,
+      "evidence": "analyze_p25-retry2.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\snapshot_sessions.py",
+      "exit_code": 0,
+      "evidence": "snapshot_sessions.stdout.txt"
+    },
+    {
+      "command": "P25 process identity check and stop (PIDs 33840, 23108)",
+      "exit_code": 0,
+      "evidence": "runtime/stop-record.json"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\p25_fence.py close",
+      "exit_code": 0,
+      "evidence": "fence-close.stdout.txt"
+    },
+    {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\snapshot_budget.py",
+      "exit_code": 0,
+      "evidence": "snapshot_after_close.stdout.txt"
+    }
+  ],
+  "validation": {
+    "report_validator": {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p25-20261017\\validate_p25_complete.py",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    "git_diff_check": {
+      "command": "git diff --check -- progress.md",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    "additional_checks": [
+      "results JSON parses",
+      "Markdown has no trailing whitespace",
+      "per-case scope and token totals reconcile",
+      "fence and UNKNOWN preservation reconcile",
+      "no credential-like key material in report"
+    ]
+  }
+}
