@@ -1,0 +1,184 @@
+{
+  "phase": "P21",
+  "status": "P21_COMPLETE",
+  "acceptance": "bounded acceptance passed; one supplemental pre-existing metadata contract failure retained",
+  "date": "2026-10-17",
+  "baseline_sha": "8e45001737c4d0e99ff5a0c5b72ee0a16136d2b0",
+  "implementation_sha": "2c08fc6c494e2bab80eefe53709823fa35719e8d",
+  "tested_source_files": {
+    "backend/weknora_port/generation/types.py": "c486f7bb819983a70b1b556ef16918786791851f97855a5c11e06a596bad0ae1",
+    "backend/weknora_port/references/decoder.py": "02451e9a5ec42dd37402673a0b0281d50fcc454775103b958eb4a75dd319ef32",
+    "backend/weknora_port/references/registry.py": "79fb886268149fe378bd8ae1912bb662104f8ccb2e15961761569cc7123ec9bf",
+    "backend/weknora_port/retrieval/pipeline.py": "481a54b288d05243b96d415645b53d6032e3b02fd49b3df65ccfcde2fef11cbe",
+    "backend/weknora_port/retrieval/query.py": "3c2c44c83cd097f495f0153d3c1f4aec23e97fe8eb5bb65d589af35ed71d8e6f",
+    "backend/weknora_port/service.py": "13ec2eb64d79bae40995219024d0cfc33aa131d91df635e70facda3e56ad7c03",
+    "frontend/src/weknora_port/WeKnoraPythonApp.tsx": "c119c2c583a0fcf47735d911cc08c762795e7c0fca5b5f925c9245f48256a5b9",
+    "frontend/tests/weknora-port/adapter.spec.ts": "2e5174a8f097defef2c6e553e5de519f38fd8492999b80be048da14f15bd5232",
+    "tests/weknora_port/native_fixture.py": "4917afb9f55eeadfa9bfb564386c3a19d2392cd7e5a5c3564851d7d8c3b3cf72",
+    "tests/weknora_port/test_generation.py": "96f2e94228da8d45d875248bcb08f2196f2b8e4307009f0e0fcd271a63261a9a",
+    "tests/weknora_port/test_pipeline.py": "3ffe608fa4d48be6fbc166305c682d42968d3f846a100d71b2a3c1148311d9e8",
+    "tests/weknora_port/test_qa_followup_fallback_pg.py": "c07e0d15f23134b40728d6440ad21ad8163e2c45a9a3b791fe7308774fabfd80",
+    "tests/weknora_port/test_reference_metadata_pg.py": "cc40d6bfd0ccdc60e26d71b35115ee78b62b8b907354eca71c7ff43538e0431f",
+    "tests/weknora_port/test_references.py": "fff1e64506285a6778366800bdb1d08a81b88f34e2cbeda05500196cd1b2ed40",
+    "tests/weknora_port/test_runtime_pg.py": "5d71abbe7719451db7260372e6f34487339e7ba3e6ff03aa0adf7120da413054",
+    "tests/weknora_port/test_p21_boundaries.py": "4922ee478b60854a30e33e10d73e6ec08b23c0b2d61999f5fc5dd5544b7cfa77",
+    "tests/weknora_port/test_p21_http_pg.py": "f89829a4adb4b4986942b8bdd4dc1a5dddd6efb274835683a485f7ea2d624f51"
+  },
+  "changes": {
+    "backend": {
+      "generation/types.py": "GenerationRequest.citations_enabled=False",
+      "references/registry.py": "expand_text: remove complete/incomplete transport tags outside Markdown code; retain enabled source validation",
+      "references/decoder.py": "CitationStreamDecoder: split opening/closing tags and EOF filtering with resource decoding preserved",
+      "retrieval/query.py": "needs_retrieval unknown defaults to retrieval; resolve_intent original-request source veto and history/attachment prerequisites",
+      "retrieval/pipeline.py": "run: apply resolved intent and clear non-retrieval prompt override when retrieval is required",
+      "service.py": "prepare_turn: scoped SearchNothing becomes fixed evidence-insufficient completion without answer-model/listing call"
+    },
+    "frontend": "WeKnoraPythonApp stripInternalReferenceMarkup/MessageContent: display-only old/new tag filtering, no citation buttons or chunk drawer",
+    "schema_migrations": [],
+    "dependencies": [],
+    "production_router_model_threshold_mineru_changes": []
+  },
+  "tests": {
+    "offline": {
+      "status": "PASS",
+      "passed": 273,
+      "exit_code": 0,
+      "log": "E:\\WK\\run\\p21-20261017\\offline-final-v2.log"
+    },
+    "normal_http_pg_redis_mock_model": {
+      "status": "PASS",
+      "passed": 4,
+      "exit_code": 0,
+      "command": {
+        "argv": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "E:\\RAG-Worktrees\\weknora-python-port-20261013\\tests\\weknora_port\\test_p21_http_pg.py",
+          "E:\\RAG-Worktrees\\weknora-python-port-20261013\\tests\\weknora_port\\test_qa_followup_fallback_pg.py",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp",
+          "E:\\WK\\run\\p21-20261017\\pg-final-v2\\tmp"
+        ],
+        "cwd": "E:\\WK\\run\\p21-20261017",
+        "exit_code": 0,
+        "redis_run_id": "baf0e65bbd8c7cc4a53a61ae90a333d9075e142b"
+      },
+      "checks": [
+        "wrong_chitchat_explicit_kb_retrieves_context_and_clean_sse_history_replay",
+        "greeting_and_history_followup_no_retrieval_with_history_to_provider",
+        "unknown_utc_retrieves_and_empty_evidence_fixed_refusal_no_generation",
+        "scope_and_egress_denials_prevent_model_transport"
+      ],
+      "result": "E:\\WK\\run\\p21-20261017\\pg-final-v2\\http-pg-result.json"
+    },
+    "edge_ui_mock_api": {
+      "status": "PASS",
+      "distinct_cases_passed": 8,
+      "latest_full_run": {
+        "passed": 7,
+        "failed": 1,
+        "failure": "assertion substring matched intentionally preserved </reference>",
+        "log": "E:\\WK\\run\\p21-20261017\\frontend-playwright-edge-final2.log"
+      },
+      "after_assertion_fix": {
+        "passed": 1,
+        "exit_code": 0,
+        "command": "npx playwright test tests/weknora-port/adapter.spec.ts --grep \"partial SSE reference tags\"",
+        "log": "E:\\WK\\run\\p21-20261017\\frontend-playwright-partial-edge-final.log"
+      },
+      "full_suite_after_final_assertion_edit": "NOT_RUN",
+      "browser": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+      "business_api": "MOCK"
+    },
+    "frontend_build": {
+      "status": "PASS",
+      "command": "npm run build",
+      "exit_code": 0,
+      "log": "E:\\WK\\run\\p21-20261017\\frontend-build.log"
+    },
+    "supplemental_reference_metadata": {
+      "status": "FAIL",
+      "reason": "KeyError: matched_content; optional search matched text absent after existing original-source projection",
+      "current_log": "E:\\WK\\run\\p21-20261017\\pg-final\\pytest.log",
+      "baseline_sha": "8e45001737c4d0e99ff5a0c5b72ee0a16136d2b0",
+      "baseline_log": "E:\\WK\\run\\p21-20261017\\baseline-metadata-v3.log",
+      "baseline_exit_code": 1,
+      "baseline_control": "Git source loader restores the six P21 backend modules to baseline. An unused fixed-text symbol is supplied solely for current test-helper import. No production behavior is patched.",
+      "assertion_preserved": true,
+      "scope_decision": "record per Owner nonblocking-bug instruction; no projection or reference schema change"
+    },
+    "full_project_regression": "NOT_RUN",
+    "real_cloud_models": "NOT_RUN"
+  },
+  "utc_diagnosis": {
+    "question": "utc时间转换北京时间",
+    "historical_capture": "E:/WK/run/p19-20261016/captures/c92c6a99b1e65338a60f032a6708a80e56e71993a2c2aeee4ea7cad3cb171750.json",
+    "observed": "empty Search/Rerank/Context/evidence and fixed_fallback=null; retrieval-bypass path confirmed by existing projection guard",
+    "historical_raw_rewrite_intent": "NOT_CAPTURED; exact label UNRESOLVED",
+    "current_regressions": "unknown/empty intents retrieve; historyless follow_up and unattached image_only/doc_only retrieve; explicit KB/source acquisition overrides wrong known labels; actual empty-KB UTC unknown-intent HTTP fixed refusal verified",
+    "limits": "synthetic intent replay is not a reconstruction of missing historical provider output"
+  },
+  "usage": {
+    "real_provider_calls": 0,
+    "actual_cloud_tokens": 0,
+    "new_real_unknown": 0,
+    "fence_opened": false,
+    "siliconflow_rows": 705,
+    "settled": 644,
+    "unknown_preserved": 61,
+    "exact_p20_owner_ledger_match": true,
+    "deepseek_calls_and_months_match": true,
+    "month_rows_match": true,
+    "synthetic_provider_usage": "Mock wire usage/UNKNOWN is recorded in isolated fixture send_calls; not real consumption"
+  },
+  "isolation": {
+    "pg": {
+      "host": "127.0.0.1",
+      "port": 56423,
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382"
+    },
+    "redis": {
+      "host": "127.0.0.1",
+      "port": 56424,
+      "db": 15,
+      "run_id": "baf0e65bbd8c7cc4a53a61ae90a333d9075e142b"
+    },
+    "final_http_fixture": {
+      "tenant": 339,
+      "redis_prefix": "serial-integration:20261015:9f8e07ce-e48a-4745-8000-504af0300774"
+    },
+    "new_synthetic_records_only": true,
+    "original_gold_reports_preserved": 18,
+    "owner_ledger_digest": "5651389f1a2acb2f1fa8b8d3e3bde03a5edb76aab753f481cfb5ed44433f11ac"
+  },
+  "limits": [
+    "Source phrase guards cover tested explicit forms, not every natural-language misclassification. Known social intents remain available.",
+    "A nonempty retrieved context is not an entailment guarantee; P20 semantic audit is not enabled.",
+    "Code examples may contain literal reference tags intentionally; protocol tags outside code are suppressed.",
+    "No full browser-to-PG workflow or real cloud quality evaluation claimed; UI API mocks and actual HTTP/PG model mocks are separately identified."
+  ],
+  "cleanup": {
+    "task_started_eviroute_pg_redis": "stopped after tests; volumes preserved",
+    "uvicorn_vite_fixture_workers": "finished by test finalizers",
+    "unrelated_containers": "not stopped",
+    "stop_exit_code": 0
+  },
+  "evidence_root": "E:\\WK\\run\\p21-20261017",
+  "initial_failures_retained": [
+    "initial-test.log",
+    "second-test.log",
+    "offline-final.log",
+    "pg-final/pytest.log",
+    "baseline-metadata.log",
+    "baseline-metadata-v2.log",
+    "baseline-metadata-v3.log",
+    "frontend-playwright.log",
+    "frontend-playwright-edge-final.log",
+    "frontend-playwright-edge-final2.log"
+  ]
+}
