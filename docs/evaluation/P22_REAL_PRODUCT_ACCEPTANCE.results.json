@@ -1,0 +1,319 @@
+{
+  "phase": "P22",
+  "status": "MVP_READY",
+  "date": "2026-10-17",
+  "source_sha": "1bd7d993bc56e2b9182b86476e75f3fe30742ae7",
+  "production_source_unchanged": true,
+  "model_transport": "real approved SiliconFlow HTTPS; no mocks",
+  "browser": "existing user Edge profile via browser extension, browser id3 tab1176741845",
+  "models": [
+    [
+      "siliconflow",
+      "BAAI/bge-m3"
+    ],
+    [
+      "siliconflow",
+      "BAAI/bge-reranker-v2-m3"
+    ],
+    [
+      "siliconflow",
+      "XingChenAGI/Xing4.0-29B"
+    ]
+  ],
+  "cases": {
+    "no_evidence": {
+      "run_id": "2be9660f-4818-46df-9671-e7f83e17701d",
+      "session_id": "b8addbc6-998f-46bc-89c3-9c0c5359447f",
+      "assistant_id": "558c2c2c-29ed-4ad3-9312-fd5c6fd3537a",
+      "question": "请仅根据知识库回答：代号 ZXQ-P22-VOID-7391 的核聚变飞船，其授权发射验证码是什么？若资料中没有，请说明证据不足。",
+      "answer": "当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。",
+      "rankings": {
+        "search": 6,
+        "rerank": 0,
+        "context": 0
+      },
+      "model_calls": 4,
+      "tokens": 3358,
+      "latency_seconds": 4.5507097244262695,
+      "final_model_calls": 0,
+      "finish_reason": "FIXED_REFUSAL",
+      "answer_deltas": 1,
+      "sse_equals_persisted": true,
+      "public_references": 0,
+      "status": "PASS"
+    },
+    "normal": {
+      "run_id": "d76a9d7c-312c-41dc-8f6f-40b70881f0d9",
+      "session_id": "cf1ac67f-11d1-4010-aa23-335451502927",
+      "assistant_id": "43396293-6b62-4bc3-b8bd-0b2366083f0b",
+      "question": "请根据知识库说明如何清洁打印盒，简要列出步骤。",
+      "answer": "根据知识库说明，清洁打印盒的步骤如下：\n\n1. **关闭扫描仪**，取出打印盒。\n2. **清洁喷嘴金属板**：用无尘干布轻轻擦去喷嘴金属板上过量的油墨（勿用纸巾）。\n3. **确认喷嘴金属板已清洁**，重新安装打印盒。\n4. **清洁打印盒座底部**：打开打印部位，用吸水干布或抹布轻轻按压擦去油墨；确认后关闭打印部位，重新安装打印盒。\n5. **清洁转轮**：打开打印部位，手动旋转塑料转轮，一边旋转一边用蘸有 F1 清洁剂的湿布擦拭转轮表面；确认转轮已清洁后，关闭打印部位。\n\n提示：清洁转轮时，小心不要碰触位于打印部位的金属轮。",
+      "rankings": {
+        "search": 30,
+        "rerank": 8,
+        "context": 8
+      },
+      "model_calls": 4,
+      "tokens": 15535,
+      "latency_seconds": 15.47048020362854,
+      "final_model_calls": 1,
+      "finish_reason": "stop",
+      "answer_deltas": 179,
+      "sse_equals_persisted": true,
+      "public_references": 0,
+      "status": "PASS"
+    },
+    "followup": {
+      "run_id": "a1651358-9e6e-4824-b8f8-b95edd870a03",
+      "session_id": "cf1ac67f-11d1-4010-aa23-335451502927",
+      "assistant_id": "3669109e-fb46-4347-834b-3c3cba735a11",
+      "question": "上面步骤中应用什么样的布擦拭喷嘴金属板？",
+      "answer": "根据之前步骤的说明，擦拭喷嘴金属板应使用**无尘干布**，且**不要使用纸巾**。",
+      "rankings": {
+        "search": 0,
+        "rerank": 0,
+        "context": 0
+      },
+      "model_calls": 2,
+      "tokens": 4248,
+      "latency_seconds": 9.31583309173584,
+      "final_model_calls": 1,
+      "finish_reason": "stop",
+      "answer_deltas": 26,
+      "sse_equals_persisted": true,
+      "public_references": 0,
+      "status": "PASS"
+    }
+  },
+  "recovery": {
+    "status": "PASS",
+    "method": "full page refresh, then reopen the saved session using visible history entry and keyboard activation",
+    "same_persisted_answers": true,
+    "same_run_ids": true,
+    "new_model_calls": 0,
+    "new_tokens": 0,
+    "sse_midstream_disconnect_test": "NOT_RUN"
+  },
+  "cross_checks": {
+    "ui_sse_persistence_exact": true,
+    "source_readbacks": 8,
+    "scope_verified": true,
+    "followup_previous_answer_in_actual_provider_messages": true,
+    "no_cross_session_kb_contamination": true,
+    "public_citation_controls": 0,
+    "chunk_cards": 0,
+    "internal_reference_tags": 0,
+    "permanent_loading": false,
+    "browser_console_errors": []
+  },
+  "usage": {
+    "total_tokens": 23141,
+    "calls": 10,
+    "by_stage": {
+      "rewrite": {
+        "calls": 3,
+        "tokens": 7923,
+        "input": 7829,
+        "output": 94
+      },
+      "answer": {
+        "calls": 2,
+        "tokens": 5863,
+        "input": 4693,
+        "output": 1170
+      },
+      "embedding": {
+        "calls": 3,
+        "tokens": 71,
+        "input": 71,
+        "output": 0
+      },
+      "rerank": {
+        "calls": 2,
+        "tokens": 9284,
+        "input": 9284,
+        "output": 0
+      }
+    },
+    "new_unknown": 0,
+    "historical_unknown": 61,
+    "refresh_new_calls": 0,
+    "source_readbacks_valid": 8,
+    "indexes_unchanged": true
+  },
+  "manual_fact_check": {
+    "method": "agent manual read of actual returned source text and actual answers; not independent official answer Gold or automated P20 judge",
+    "claims": [
+      {
+        "claim": "关闭扫描仪并取出打印盒",
+        "chunk_id": "3f85997c-db46-46b0-97f2-9b03fe530826",
+        "document_id": "017e23b8-9b4b-44b9-9ddb-60c9d7302170",
+        "kb": "76770fba-17c3-4704-8663-10aa669476ce",
+        "version": "0caacea6-3006-4563-9ea1-8bbfbb20c068",
+        "quote": "如果清洁打印盒后喷嘴仍然是堵塞状态，请更换成 新的打印盒。 1 关闭扫描仪。 2 取出打印盒。 （请参阅 “3.4 更换打印盒 ” ( 第 13 页 )。） 喷嘴金属板 连接部位 注意 小心不要用手接触喷嘴金属板或连接部位，否则可 能导致打印质量下降或接触错误。 3 轻轻擦去喷嘴金属板上过量的油墨。 4 确认已擦去过量的油墨，然后再重装打印盒。 （请参阅 “",
+        "source_offset": [
+          13180,
+          13360
+        ]
+      },
+      {
+        "claim": "喷嘴金属板使用无尘干布，不用纸巾",
+        "chunk_id": "3f85997c-db46-46b0-97f2-9b03fe530826",
+        "document_id": "017e23b8-9b4b-44b9-9ddb-60c9d7302170",
+        "kb": "76770fba-17c3-4704-8663-10aa669476ce",
+        "version": "0caacea6-3006-4563-9ea1-8bbfbb20c068",
+        "quote": "护的一部分，按下列步骤清洁打印盒座底部。 注意 清洁时，请用无尘干布轻轻擦掉喷嘴板上过量的油 墨。（请勿使用纸巾。） 提示 如果清洁打印盒后喷嘴仍然是堵塞状态，请更换成 新的打印盒。 1 关闭扫描仪。 2 取出打印盒。 （请参阅 “3.4 更换打印盒 ” ( 第 13 页 )。） 喷嘴金属板 连接部位 注意 小心不要用手接触喷嘴金属板或连接部位，否则可 能导",
+        "source_offset": [
+          13118,
+          13298
+        ]
+      },
+      {
+        "claim": "打印盒座用吸水干布或抹布",
+        "chunk_id": "03c9ed7d-4932-404f-9e89-6a390fdd950d",
+        "document_id": "017e23b8-9b4b-44b9-9ddb-60c9d7302170",
+        "kb": "76770fba-17c3-4704-8663-10aa669476ce",
+        "version": "0caacea6-3006-4563-9ea1-8bbfbb20c068",
+        "quote": " 注意 安装打印盒时，请注意正确安装。 注意 清洁时，请使用吸水干布或抹布轻轻擦去过量的油 墨。 如果油墨已干，请用湿布轻轻擦。（因为油墨是水溶 性的，可用水来清洗。） 1 关闭扫描仪。 2 取出打印盒。 （请参阅 “3.4 更换打印盒 ” ( 第 13 页 )。） 3 打开打印部位。 4 清洁打印盒座时，用吸水干布或抹布轻轻按压以擦 去过量的油墨。 注意 ",
+        "source_offset": [
+          13384,
+          13564
+        ]
+      },
+      {
+        "claim": "转轮使用蘸F1清洁剂的湿布",
+        "chunk_id": "a830f2a6-da1c-4280-83d9-f2a53868aa88",
+        "document_id": "017e23b8-9b4b-44b9-9ddb-60c9d7302170",
+        "kb": "76770fba-17c3-4704-8663-10aa669476ce",
+        "version": "0caacea6-3006-4563-9ea1-8bbfbb20c068",
+        "quote": "黑色）。 塑料转轮 打印部位 一边手动旋转转轮，一边用蘸有 F1 清洁剂的湿布轻 轻擦去转轮表面的污渍和灰尘。 4 确认已擦去污渍，然后关闭打印部位。 清洁进纸部位下的橡皮转轮 （共 8 个）。 4.4 清洁材料 橡胶转轮 名称 产品编号 说明 F1 清洁剂 PA03950- 0352 容量：100 ml 打印部位 用蘸有 F1 清洁剂的湿布轻轻擦去转轮表面",
+        "source_offset": [
+          13873,
+          14053
+        ]
+      }
+    ],
+    "normal": "core operations and cleaning materials supported; minor overbroad label in step4 combines 打印盒座 with 底部",
+    "followup": "无尘干布 and 不要使用纸巾 both directly supported by same original source and prior answer",
+    "no_evidence": "random authorization-code question unsupported in selected three-page KB; real rerank rejected all candidates; fixed refusal used"
+  },
+  "budget": {
+    "old_limit": 1646586,
+    "increment": 100000,
+    "opened_limit": 1746586,
+    "closed_limit": 1669727,
+    "unused_revoked": 76859,
+    "headroom": 0,
+    "historical_unknown_preserved": 61,
+    "historical_rows_preserved": 705,
+    "new_unknown": 0,
+    "deepseek_changed": false,
+    "same_account_month": true
+  },
+  "indexes": {
+    "existing_kbs": 2,
+    "source_vectors_fingerprinted": 287,
+    "unchanged": true,
+    "uploads": 0,
+    "index_rebuilds": 0
+  },
+  "changes": {
+    "product_files": [],
+    "acceptance_scripts": [
+      "scripts/weknora_port_p22_fence.py",
+      "scripts/weknora_port_p22_observed_api.py"
+    ],
+    "dependencies": [],
+    "migrations": []
+  },
+  "nonblocking_findings": [
+    {
+      "id": "P22-UI-HISTORY-WIDTH",
+      "finding": "history button width1106px exceeds248px sidebar, causing horizontal overflow and automation center-click miss; keyboard Enter restored same session normally",
+      "evidence": "history-layout.json; restored.png; restored-final.png; restored-followup-visible.png",
+      "fix": "not implemented in bounded acceptance"
+    },
+    {
+      "id": "P22-ANSWER-TERMINOLOGY",
+      "finding": "normal answer step4 says 打印盒座底部 while using source section4.2 打印盒座 actions; core cleaning steps/materials supported; no prompt/model changes"
+    },
+    {
+      "id": "P21-MATCHED-CONTENT",
+      "finding": "previous optional matched_content contract failure retained; default-off product workflow and eight original source readbacks passed; no new repair/retest"
+    }
+  ],
+  "limits": [
+    "bounded two-answer product acceptance, not broad quality certification",
+    "midstream SSE disconnect/reconnect and process crash recovery NOT_RUN",
+    "new upload/parser/worker processing NOT_RUN because ingestion and reindexing forbidden"
+  ],
+  "commands": [
+    {
+      "command": "python -B E:/WK/run/p22-20261017/preflight.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python -B -m scripts.weknora_port_p22_fence open --approval-file E:/WK/run/p22-20261017/owner-approval.txt",
+      "exit_code": 0
+    },
+    {
+      "command": "python -B E:/WK/run/p22-20261017/start.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python -B -m scripts.weknora_port_p22_observed_api --port 56429 --authority-config E:/WK/run/p22-20261017/authority.json --evidence-dir E:/WK/run/p22-20261017",
+      "result": "Uvicorn started normally; stopped after completed calls"
+    },
+    {
+      "command": "npm run dev -- --host 127.0.0.1 --port 56430 --strictPort",
+      "result": "real React dev server started normally; stopped after acceptance"
+    },
+    {
+      "command": "python -B E:/WK/run/p22-20261017/audit_v2.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python -B E:/WK/run/p22-20261017/receipt_summary.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python -B -m scripts.weknora_port_p22_fence close",
+      "exit_code": 0
+    },
+    {
+      "command": "python -B E:/WK/run/p22-20261017/final_account.py",
+      "exit_code": 0
+    }
+  ],
+  "initial_failures_retained": [
+    {
+      "failure": "first fence script expected a newly dated approval_source, existing ledger denied it before mutation; corrected script to preserve original approval_source and kept failed intent directory",
+      "evidence": "fence-first-authority-mismatch/intent.json"
+    },
+    {
+      "failure": "audit helper processed followup before normal due directory order; fixed deterministic iteration; no new model request",
+      "evidence": "audit.py and audit.log; corrected audit_v2.py"
+    },
+    {
+      "failure": "first receipt-summary helper assumed KNOWN status; actual chat usage is REPORTED and nonchat wire observer omits parsed_usage; final check uses settled ledger plus preserved raw receipts",
+      "evidence": "provider-receipt-summary.json; console tool result"
+    }
+  ],
+  "cleanup": {
+    "task_servers_stopped": 8,
+    "api_frontend_ports_closed": [
+      56429,
+      56430
+    ],
+    "eviroute_pg_redis": "restored stopped state, volumes preserved",
+    "unrelated_services": "not modified"
+  },
+  "evidence_root": "E:\\WK\\run\\p22-20261017",
+  "screenshots": [
+    "no-evidence.png",
+    "normal-complete.png",
+    "followup.png",
+    "restored-final.png",
+    "restored-followup-visible.png"
+  ]
+}
