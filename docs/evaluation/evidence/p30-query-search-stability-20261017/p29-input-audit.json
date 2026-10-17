@@ -1,0 +1,400 @@
+{
+  "schema": "p30-p29-input-audit/v1",
+  "source": "Read-only extraction from P29 metrics.json and captured provider-requests records; no calls/replay.",
+  "rewrite_prompt_language_constraint": "Actual request system prompt says: \"Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.\"",
+  "interpretation": "The prompt wire is identical on/off within each qid, but downstream actual embedding inputs differ. Since raw rewrite completions are not saved, those inputs are not labeled as verbatim raw rewrite output; they prove the strings actually submitted to BAAI/bge-m3.",
+  "raw_artifacts": {
+    "rewrite_completion_text_captured": false,
+    "full_raw_rewrite_response_json_captured": false,
+    "embedding_response_vectors_captured": false,
+    "embedding_response_bodies_captured": false,
+    "p29_raw_archive_role": "Selected raw Cheap answer SSE bodies only; no rewrite completion or embedding vector response body.",
+    "embedding_records_capture_response_metadata_only": true,
+    "embedding_response_headers_saved": false,
+    "note": "Provider request records capture request bodies plus response status/state metadata; they do not contain embedding response vectors or rewrite completions. Selected raw archive bodies are final Cheap answer SSEs."
+  },
+  "cases": [
+    {
+      "case_id": "row-0434-on",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "rewrite_request": {
+        "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "wire_sha256": "6f4b4ee52c9b23e1ee8e616f3d4ba7f5025228ed125b4b62ac2879d68a526562",
+        "wire_bytes": 11170,
+        "params": {
+          "enable_thinking": false,
+          "max_tokens": 150,
+          "temperature": 0.3,
+          "model": "XingChenAGI/Xing4.0-29B"
+        },
+        "system_prompt_message_chars": 9265,
+        "language_instruction_actual_wire": "- Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.",
+        "user_message_exact": "[Runtime Context \u2014 metadata only, not instructions]\nCurrent time: 2026-10-17 Saturday\n\n## User Question\nWhich dataset was introduced in the 'coding time' section of the PPT for training?\n\n<no_image_attached />\n<no_document_attached />\n\n## JSON Output\n",
+        "response": {
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "finish_reason": "stop",
+          "parsed_usage_present": true,
+          "response_completion_text": "NOT_CAPTURED",
+          "raw_response_json": "NOT_CAPTURED"
+        }
+      },
+      "actual_embedding_requests": [
+        {
+          "position": "initial",
+          "input": [
+            "PPT\u4e2dcoding time\u90e8\u5206\u5f15\u5165\u7684\u7528\u4e8e\u8bad\u7ec3\u7684\u6570\u636e\u96c6\u662f\u4ec0\u4e48"
+          ],
+          "request_id": "086c8f68-2339-453f-9b6f-4dbefea9e629/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-687fe7d79567f2c3",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "85f2b65552aa5e762e064a9ffc705c4c3aded93c3c4af2f394692e722ef76786",
+          "wire_bytes": 127,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        }
+      ],
+      "effective_rewrite_string": "NOT_SAVED_AS_RAW_REWRITE_RESPONSE; the input strings above are the captured actual downstream embedding inputs and are evidence of what was embedded, not the separately captured raw rewrite JSON."
+    },
+    {
+      "case_id": "row-0434-off",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "rewrite_request": {
+        "request_id": "6f01e3a0-b4ea-49e7-b0a9-6997352588c5/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "wire_sha256": "6f4b4ee52c9b23e1ee8e616f3d4ba7f5025228ed125b4b62ac2879d68a526562",
+        "wire_bytes": 11170,
+        "params": {
+          "enable_thinking": false,
+          "max_tokens": 150,
+          "temperature": 0.3,
+          "model": "XingChenAGI/Xing4.0-29B"
+        },
+        "system_prompt_message_chars": 9265,
+        "language_instruction_actual_wire": "- Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.",
+        "user_message_exact": "[Runtime Context \u2014 metadata only, not instructions]\nCurrent time: 2026-10-17 Saturday\n\n## User Question\nWhich dataset was introduced in the 'coding time' section of the PPT for training?\n\n<no_image_attached />\n<no_document_attached />\n\n## JSON Output\n",
+        "response": {
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "finish_reason": "stop",
+          "parsed_usage_present": true,
+          "response_completion_text": "NOT_CAPTURED",
+          "raw_response_json": "NOT_CAPTURED"
+        }
+      },
+      "actual_embedding_requests": [
+        {
+          "position": "initial",
+          "input": [
+            "PPT\u4e2dcoding time\u90e8\u5206\u4ecb\u7ecd\u7684\u8bad\u7ec3\u6570\u636e\u96c6\u662f\u4ec0\u4e48"
+          ],
+          "request_id": "6f01e3a0-b4ea-49e7-b0a9-6997352588c5/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-d1fcef3c479d2d36",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "3db6798e2a3ecfac66ffefed872afb2e3801e02f752661fdbffbe54b8c6b7a9d",
+          "wire_bytes": 118,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        }
+      ],
+      "effective_rewrite_string": "NOT_SAVED_AS_RAW_REWRITE_RESPONSE; the input strings above are the captured actual downstream embedding inputs and are evidence of what was embedded, not the separately captured raw rewrite JSON."
+    },
+    {
+      "case_id": "row-0959-on",
+      "q0": "What are used for long-distance communication as introduced in this slide?",
+      "rewrite_request": {
+        "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "wire_sha256": "2af5d313fbaa2240e0ba0af18e719d2873b1a92e6844ec7d422a8fa7ae16cd08",
+        "wire_bytes": 11162,
+        "params": {
+          "enable_thinking": false,
+          "max_tokens": 150,
+          "temperature": 0.3,
+          "model": "XingChenAGI/Xing4.0-29B"
+        },
+        "system_prompt_message_chars": 9265,
+        "language_instruction_actual_wire": "- Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.",
+        "user_message_exact": "[Runtime Context \u2014 metadata only, not instructions]\nCurrent time: 2026-10-17 Saturday\n\n## User Question\nWhat are used for long-distance communication as introduced in this slide?\n\n<no_image_attached />\n<no_document_attached />\n\n## JSON Output\n",
+        "response": {
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "finish_reason": "stop",
+          "parsed_usage_present": true,
+          "response_completion_text": "NOT_CAPTURED",
+          "raw_response_json": "NOT_CAPTURED"
+        }
+      },
+      "actual_embedding_requests": [
+        {
+          "position": "initial",
+          "input": [
+            "What are used for long-distance communication as introduced in this slide?"
+          ],
+          "request_id": "892471b4-209b-4d25-a228-0f2ad3e7de80/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-faf5fb89bed56b6a",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "4af308810cf32233dfbe762eb96a1928b0c9963c0ccdfea23e4dd56cfc7b8881",
+          "wire_bytes": 136,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        }
+      ],
+      "effective_rewrite_string": "NOT_SAVED_AS_RAW_REWRITE_RESPONSE; the input strings above are the captured actual downstream embedding inputs and are evidence of what was embedded, not the separately captured raw rewrite JSON."
+    },
+    {
+      "case_id": "row-0959-off",
+      "q0": "What are used for long-distance communication as introduced in this slide?",
+      "rewrite_request": {
+        "request_id": "846d4410-abf0-4e74-98c1-619ebbcc4855/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "wire_sha256": "2af5d313fbaa2240e0ba0af18e719d2873b1a92e6844ec7d422a8fa7ae16cd08",
+        "wire_bytes": 11162,
+        "params": {
+          "enable_thinking": false,
+          "max_tokens": 150,
+          "temperature": 0.3,
+          "model": "XingChenAGI/Xing4.0-29B"
+        },
+        "system_prompt_message_chars": 9265,
+        "language_instruction_actual_wire": "- Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.",
+        "user_message_exact": "[Runtime Context \u2014 metadata only, not instructions]\nCurrent time: 2026-10-17 Saturday\n\n## User Question\nWhat are used for long-distance communication as introduced in this slide?\n\n<no_image_attached />\n<no_document_attached />\n\n## JSON Output\n",
+        "response": {
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "finish_reason": "stop",
+          "parsed_usage_present": true,
+          "response_completion_text": "NOT_CAPTURED",
+          "raw_response_json": "NOT_CAPTURED"
+        }
+      },
+      "actual_embedding_requests": [
+        {
+          "position": "initial",
+          "input": [
+            "What are used for long-distance communication as introduced in this slide"
+          ],
+          "request_id": "846d4410-abf0-4e74-98c1-619ebbcc4855/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-d4ebda33726abc29",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "495e1accc815b237ab6388472a51bc3693aa0dca08d55bc601a4dcceb3255056",
+          "wire_bytes": 135,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        }
+      ],
+      "effective_rewrite_string": "NOT_SAVED_AS_RAW_REWRITE_RESPONSE; the input strings above are the captured actual downstream embedding inputs and are evidence of what was embedded, not the separately captured raw rewrite JSON."
+    },
+    {
+      "case_id": "row-0958-on",
+      "q0": "What are two examples of reflecting surfaces?",
+      "rewrite_request": {
+        "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "wire_sha256": "1ee3e66caf156528642f4b7f8919d62a5b9249763c46faba2555181453194f87",
+        "wire_bytes": 11133,
+        "params": {
+          "enable_thinking": false,
+          "max_tokens": 150,
+          "temperature": 0.3,
+          "model": "XingChenAGI/Xing4.0-29B"
+        },
+        "system_prompt_message_chars": 9265,
+        "language_instruction_actual_wire": "- Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.",
+        "user_message_exact": "[Runtime Context \u2014 metadata only, not instructions]\nCurrent time: 2026-10-17 Saturday\n\n## User Question\nWhat are two examples of reflecting surfaces?\n\n<no_image_attached />\n<no_document_attached />\n\n## JSON Output\n",
+        "response": {
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "finish_reason": "stop",
+          "parsed_usage_present": true,
+          "response_completion_text": "NOT_CAPTURED",
+          "raw_response_json": "NOT_CAPTURED"
+        }
+      },
+      "actual_embedding_requests": [
+        {
+          "position": "initial",
+          "input": [
+            "\u4ec0\u4e48\u662f\u53cd\u5c04\u9762 \u4e24\u4e2a\u53cd\u5c04\u9762\u7684\u4f8b\u5b50"
+          ],
+          "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-645aa16ef26e40e3",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "22b927df5001569bf801ef83d84ac2ae3b27f4206f876b65a21a4692cbe93ec1",
+          "wire_bytes": 105,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "\u4e24\u4e2a\u53cd\u5c04\u9762\u7684\u4f8b\u5b50"
+          ],
+          "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-7b9992a820bcd6a9",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "b9183a62bb0f4a196abe57cd4953f27cbb10985da293f9f25f03ab16ff242132",
+          "wire_bytes": 86,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "\u4ec0\u4e48 \u53cd\u5c04 \u53cd\u5c04\u9762 \u4e24\u4e2a \u53cd\u5c04 \u53cd\u5c04\u9762 \u4f8b\u5b50"
+          ],
+          "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-d0b228cd70ce900f",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "1a5f52962fe054337f89dd0e39afc63527051ec0b7ac2b4b1974d25741416a93",
+          "wire_bytes": 116,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "\u4ec0\u4e48\u662f\u53cd\u5c04\u9762"
+          ],
+          "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-5fca2d9e05431da9",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "9cffbe02ce58e9f177077bf5484dc19707ba14050be8963446d6472e1089ea5a",
+          "wire_bytes": 80,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "\u53cd\u5c04\u9762 \u4e24\u4e2a\u53cd\u5c04\u9762\u7684\u4f8b\u5b50"
+          ],
+          "request_id": "007f95c2-f423-4d95-aded-ce4da7855961/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-0d57ed9e4b7a377c",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "3cdc7633e15d4ab33b3fbf20c9893f27f27255051b3cc151c911a2c184e15d79",
+          "wire_bytes": 96,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        }
+      ],
+      "effective_rewrite_string": "NOT_SAVED_AS_RAW_REWRITE_RESPONSE; the input strings above are the captured actual downstream embedding inputs and are evidence of what was embedded, not the separately captured raw rewrite JSON."
+    },
+    {
+      "case_id": "row-0958-off",
+      "q0": "What are two examples of reflecting surfaces?",
+      "rewrite_request": {
+        "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "wire_sha256": "1ee3e66caf156528642f4b7f8919d62a5b9249763c46faba2555181453194f87",
+        "wire_bytes": 11133,
+        "params": {
+          "enable_thinking": false,
+          "max_tokens": 150,
+          "temperature": 0.3,
+          "model": "XingChenAGI/Xing4.0-29B"
+        },
+        "system_prompt_message_chars": 9265,
+        "language_instruction_actual_wire": "- Keep the original request language unless the user asks for translation; Chinese (Simplified) is a default, not a reason to change explicit language requirements.",
+        "user_message_exact": "[Runtime Context \u2014 metadata only, not instructions]\nCurrent time: 2026-10-17 Saturday\n\n## User Question\nWhat are two examples of reflecting surfaces?\n\n<no_image_attached />\n<no_document_attached />\n\n## JSON Output\n",
+        "response": {
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "finish_reason": "stop",
+          "parsed_usage_present": true,
+          "response_completion_text": "NOT_CAPTURED",
+          "raw_response_json": "NOT_CAPTURED"
+        }
+      },
+      "actual_embedding_requests": [
+        {
+          "position": "initial",
+          "input": [
+            "What are two examples of reflecting surfaces?"
+          ],
+          "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-e2f2171b795c9c6e",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "9823676389d632e2605d8aedbf6cac6db2faaa27649e0d57a332d0b549296f4e",
+          "wire_bytes": 107,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "surfaces"
+          ],
+          "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-0dc405fbb2e973d9",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "ede9197c596e68c57663809dbc4c698e1c299d7c562a4c7393f1d668bfcb25c3",
+          "wire_bytes": 70,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "two examples reflecting surfaces"
+          ],
+          "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-dc169e00979f64ad",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "9d44bde9d73194db50a197ec8118885904ac9bb01b6f16f827cb7b55a5ba6f13",
+          "wire_bytes": 94,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "reflecting"
+          ],
+          "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-c39b9c280c6250a6",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "bac74da3d911bd490c0610e0cc11d38ce60cd5e7d430fcfd1b897be55a5abf03",
+          "wire_bytes": 72,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        },
+        {
+          "position": "expansion",
+          "input": [
+            "examples"
+          ],
+          "request_id": "7b3bb5a5-46e3-4b9c-b9d4-9784de7daa75/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-c590b3c924c35c2f",
+          "model": "BAAI/bge-m3",
+          "encoding_format": "float",
+          "wire_sha256": "82e529363118f20c063a8829614f3c161bb281a577799cfc75f2ed2e0b51fec0",
+          "wire_bytes": 70,
+          "http_status": 200,
+          "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+          "response_body_captured": false
+        }
+      ],
+      "effective_rewrite_string": "NOT_SAVED_AS_RAW_REWRITE_RESPONSE; the input strings above are the captured actual downstream embedding inputs and are evidence of what was embedded, not the separately captured raw rewrite JSON."
+    }
+  ]
+}

@@ -1,0 +1,359 @@
+{
+  "schema": "p30-query-search-stability/v1",
+  "status": "P30_COMPLETE_DIAG_ONLY",
+  "date": "2026-10-17",
+  "baseline_sha": "a974736d6a26e07969a110975224e490d9ca461e",
+  "fixed_upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "production_changes": [],
+  "diagnostic_tool": "scripts/p30_search_stability.py",
+  "budget": {
+    "new_provider_calls": 0,
+    "new_tokens": 0,
+    "fence_opened": false,
+    "historical_unknown_modified": false
+  },
+  "database": {
+    "access": "REPEATABLE READ READ ONLY",
+    "identity": {
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382",
+      "transaction_read_only": "on",
+      "transaction_isolation": "repeatable read",
+      "snapshot": "230956:230956:",
+      "observed_at": "2026-10-17 10:49:56.849468+00:00"
+    },
+    "index_fingerprints_match_p29": true,
+    "writes": 0
+  },
+  "pairs": [
+    {
+      "qid": "row-0434",
+      "search_counts": [
+        30,
+        30
+      ],
+      "intersection": 27,
+      "target_off_rank": 29,
+      "target_off_score": 0.01069431051108968,
+      "target_chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+      "current_keyword_target_ranks": [
+        62,
+        62
+      ],
+      "current_keyword_target_score": 0.873098,
+      "classification": [
+        "stochastic_wording",
+        "existing_language_instruction_noncompliance"
+      ],
+      "earliest_observed_divergence": "different_rewrite_embedding_inputs_then_pre_rerank_search",
+      "historical_causality": "NOT_PROVEN: old query vectors and component rankings unavailable; current keyword rankings identical",
+      "sql_pool_clips_target": false
+    },
+    {
+      "qid": "row-0959",
+      "search_counts": [
+        30,
+        30
+      ],
+      "intersection": 27,
+      "classification": [
+        "stochastic_punctuation"
+      ],
+      "actual_embedding_input_different": true,
+      "historical_embedding_vector_difference": "NOT_CAPTURED",
+      "current_keyword_changed_score_count": 13,
+      "fixed_input_repeats": 3,
+      "fixed_input_stable": true,
+      "parser_internal_question_mark_mechanism": "NOT_PROVEN",
+      "historical_final_top30_causality": "NOT_PROVEN"
+    },
+    {
+      "qid": "row-0958",
+      "search_counts": [
+        9,
+        9
+      ],
+      "intersection": 9,
+      "order_changed": true,
+      "classification": [
+        "existing_language_instruction_noncompliance",
+        "semantic_broadening"
+      ],
+      "expansion_per_side": 4,
+      "actual_expansion_sets_match_existing_code": true,
+      "candidate_membership_improvement": false,
+      "individual_expansion_ranking_contribution": "NOT_PROVEN"
+    }
+  ],
+  "offline_checks": {
+    "status": "PASS_OFFLINE_DETERMINISM_NOT_HISTORICAL_CAUSAL_PROOF",
+    "cloud_calls": 0,
+    "database_calls": 0,
+    "checks": [
+      {
+        "case": "row-0434-on",
+        "kind": "captured_final_search_dedup_topk",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "c6ec1da3bedda735f5aac201f4dcf7a1cfb2f0860c73c7b1f96dedaa876dbd8f",
+        "same_score_topk_secondary_order_stable": true,
+        "not_pre_fusion_or_historical_vector_replay": true
+      },
+      {
+        "case": "row-0434-off",
+        "kind": "captured_final_search_dedup_topk",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "78109cc60b126e63aca6232f58106354cc4523cc8d2814bde6585ea5c2d8bd32",
+        "same_score_topk_secondary_order_stable": true,
+        "not_pre_fusion_or_historical_vector_replay": true
+      },
+      {
+        "case": "row-0959-on",
+        "kind": "captured_final_search_dedup_topk",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "ec0028b9cf74554819e8236fae3c7639f72be923c39bb5689341c077e0258277",
+        "same_score_topk_secondary_order_stable": true,
+        "not_pre_fusion_or_historical_vector_replay": true
+      },
+      {
+        "case": "row-0959-off",
+        "kind": "captured_final_search_dedup_topk",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "858264359969d1e1814dd93ec55c143457b999ba3ece52e55c1fb619936dc3cf",
+        "same_score_topk_secondary_order_stable": true,
+        "not_pre_fusion_or_historical_vector_replay": true
+      },
+      {
+        "case": "row-0958-on",
+        "kind": "captured_final_search_dedup_topk",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "d00df2345efdf8d5b92c2e3bc4946b855aab4de26f84d0b60f639762a31ea806",
+        "same_score_topk_secondary_order_stable": true,
+        "not_pre_fusion_or_historical_vector_replay": true
+      },
+      {
+        "case": "row-0958-off",
+        "kind": "captured_final_search_dedup_topk",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "60163911bc09e091f5a2f5fdb960795ecc215b2973797ed5904c4d9f51670399",
+        "same_score_topk_secondary_order_stable": true,
+        "not_pre_fusion_or_historical_vector_replay": true
+      },
+      {
+        "kind": "synthetic_ordered_weighted_rrf",
+        "repetitions": 100,
+        "stable": true,
+        "output_sha256": "34bbf58fc3555f4242b9773b8d504ca8f434a9479579567bdadda436b965bb42",
+        "historical_component_rankings_available": false
+      },
+      {
+        "kind": "synthetic_repository_completion_timing",
+        "repetitions": 20,
+        "stable": true,
+        "actual_search_gather_order": [
+          "a",
+          "b",
+          "c"
+        ]
+      }
+    ],
+    "expansions": [
+      {
+        "case": "row-0434-on",
+        "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+        "rewrite": "PPT中coding time部分引入的用于训练的数据集是什么",
+        "generated_in_source_order": [
+          "PPT coding time 部分 引入 用于 训练 数据 集是 什么",
+          "PPT中coding",
+          "time部分引入的用于训练的数据集是什么"
+        ],
+        "actual_embedding_order": [
+          "PPT中coding time部分引入的用于训练的数据集是什么"
+        ],
+        "expansion_was_executed": false,
+        "generated_set_matches_actual_expansions": null,
+        "note": "Observed provider send/completion order need not equal gather result order."
+      },
+      {
+        "case": "row-0434-off",
+        "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+        "rewrite": "PPT中coding time部分介绍的训练数据集是什么",
+        "generated_in_source_order": [
+          "PPT coding time 部分 介绍 训练 数据 集是 什么",
+          "PPT中coding",
+          "time部分介绍的训练数据集是什么"
+        ],
+        "actual_embedding_order": [
+          "PPT中coding time部分介绍的训练数据集是什么"
+        ],
+        "expansion_was_executed": false,
+        "generated_set_matches_actual_expansions": null,
+        "note": "Observed provider send/completion order need not equal gather result order."
+      },
+      {
+        "case": "row-0959-on",
+        "q0": "What are used for long-distance communication as introduced in this slide?",
+        "rewrite": "What are used for long-distance communication as introduced in this slide?",
+        "generated_in_source_order": [
+          "used long distance communication introduced this slide",
+          "long-distance",
+          "communication",
+          "introduced"
+        ],
+        "actual_embedding_order": [
+          "What are used for long-distance communication as introduced in this slide?"
+        ],
+        "expansion_was_executed": false,
+        "generated_set_matches_actual_expansions": null,
+        "note": "Observed provider send/completion order need not equal gather result order."
+      },
+      {
+        "case": "row-0959-off",
+        "q0": "What are used for long-distance communication as introduced in this slide?",
+        "rewrite": "What are used for long-distance communication as introduced in this slide",
+        "generated_in_source_order": [
+          "used long distance communication introduced this slide",
+          "long-distance",
+          "communication",
+          "introduced"
+        ],
+        "actual_embedding_order": [
+          "What are used for long-distance communication as introduced in this slide"
+        ],
+        "expansion_was_executed": false,
+        "generated_set_matches_actual_expansions": null,
+        "note": "Observed provider send/completion order need not equal gather result order."
+      },
+      {
+        "case": "row-0958-on",
+        "q0": "What are two examples of reflecting surfaces?",
+        "rewrite": "什么是反射面 两个反射面的例子",
+        "generated_in_source_order": [
+          "什么 反射 反射面 两个 反射 反射面 例子",
+          "什么是反射面",
+          "两个反射面的例子",
+          "反射面 两个反射面的例子"
+        ],
+        "actual_embedding_order": [
+          "什么是反射面 两个反射面的例子",
+          "两个反射面的例子",
+          "什么 反射 反射面 两个 反射 反射面 例子",
+          "什么是反射面",
+          "反射面 两个反射面的例子"
+        ],
+        "expansion_was_executed": true,
+        "generated_set_matches_actual_expansions": true,
+        "note": "Observed provider send/completion order need not equal gather result order."
+      },
+      {
+        "case": "row-0958-off",
+        "q0": "What are two examples of reflecting surfaces?",
+        "rewrite": "What are two examples of reflecting surfaces?",
+        "generated_in_source_order": [
+          "two examples reflecting surfaces",
+          "examples",
+          "reflecting",
+          "surfaces"
+        ],
+        "actual_embedding_order": [
+          "What are two examples of reflecting surfaces?",
+          "surfaces",
+          "two examples reflecting surfaces",
+          "reflecting",
+          "examples"
+        ],
+        "expansion_was_executed": true,
+        "generated_set_matches_actual_expansions": true,
+        "note": "Observed provider send/completion order need not equal gather result order."
+      }
+    ],
+    "historical_embedding_vectors": "NOT_CAPTURED",
+    "historical_prefusion_vector_keyword_lists": "NOT_CAPTURED"
+  },
+  "sql_summary": {
+    "keyword_fixed_query_nondeterminism_reproduced": false,
+    "document_proxy_vector_nondeterminism_reproduced": false,
+    "historical_query_vector_nondeterminism_test": "NOT RUN: real historical query vectors unavailable",
+    "stable_id_secondary_order_present": false,
+    "fixed_upstream_same_sql_tie_semantics": {
+      "repository": "E:/RAG-reference/WeKnora-3e8b0bfc",
+      "commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+      "keyword_lines": [
+        208,
+        225
+      ],
+      "vector_lines": [
+        387,
+        391
+      ],
+      "verified_working_files_match_fixed_commit": true
+    },
+    "conclusion": "No backend SQL nondeterminism reproduced within bounded current-index probes. Missing ID tie ordering is a source-level gap shared with fixed Go, not a confirmed cause of P29 drift."
+  },
+  "sql_limits": {
+    "single_kb_match_count": 30,
+    "repository_pool": 150,
+    "vector_inner_limit": 200,
+    "vector_outer_limit": 150,
+    "expansion_match_count": 60,
+    "expansion_repository_pool": 300,
+    "all_scoped_rows_below_limits": true,
+    "scope_note": "Current scoped embeddings fingerprints match P29 index-after exactly. This excludes backend SQL LIMIT clipping for these 88/9-row scopes at pool150; it does not analyze downstream fusion/top30 ordering."
+  },
+  "sql_command_evidence": "sql-diagnostics.json#/commands",
+  "commands": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p30_search_stability.py",
+      "exit_code": 0,
+      "evidence": "offline-final.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_fusion.py tests/weknora_port/test_hybrid_storage.py tests/weknora_port/test_pipeline.py -k 'not faq and not images and not image and not rerank and not merge and not neighbor and not render and not web_composite and not stored_history and not html_data and not affinity' -q -p no:cacheprovider --basetemp=E:\\WK\\run\\p30-20261017\\pytest",
+      "exit_code": 0,
+      "passed": 41,
+      "deselected": 30,
+      "evidence": "pytest.stdout.txt"
+    },
+    {
+      "command": "Actual parameterized SQL and bindings in sql-diagnostics.json#/commands",
+      "exit_code": 0,
+      "keyword_conditions": 4,
+      "repeats_per_condition": 3,
+      "document_vector_proxy_repeats": 3,
+      "not_historical_query_vector": true
+    }
+  ],
+  "first_failure": {
+    "exit_code": 1,
+    "evidence": "offline-first.stdout.txt",
+    "cause": "new diagnostic script treated embedding input records as strings; fixed diagnostic extraction only"
+  },
+  "not_run": [
+    "historical_query_vector_replay: not captured",
+    "new_cloud_calls: out of default scope",
+    "full_project_regression: unnecessary"
+  ],
+  "limitations": [
+    "No raw original rewrite completion JSON",
+    "No P29 query embedding vectors or pre-fusion branch lists",
+    "SQL same-score secondary ID key absent, shared with fixed Go; nondeterminism not reproduced",
+    "Document vector probe does not replay old query embeddings",
+    "Current 1024dim HNSW index absent; no demonstrated causal relation, no index modification"
+  ],
+  "recommendation": "Validate existing Rewrite language/semantic adherence and Expansion discriminativeness with frozen positive/negative inputs before changing policy. No production optimization implemented.",
+  "evidence_dir": "docs/evaluation/evidence/p30-query-search-stability-20261017",
+  "raw_runtime": "E:/WK/run/p30-20261017",
+  "inherited_dirty_preserved": true,
+  "stop": {
+    "push": false,
+    "deploy": false,
+    "merge": false,
+    "tag": false,
+    "next_phase": false
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "schema": "p30-sql-code-notes/v1",
+  "source_report": {
+    "path": "E:\\WK\\run\\p30-20261017\\sql-diagnostics.json",
+    "sha256": "c996f82a38a92da3767edf879de82ab70a22741840c37c74928f4dda1d3b8865"
+  },
+  "execution": {
+    "new_database_queries": 0,
+    "database_writes": 0,
+    "provider_calls": 0,
+    "source_report_modified": false
+  },
+  "0959_exact_bound_queries": {
+    "on": {
+      "kind": "keyword",
+      "case_id": "row-0959-on",
+      "repeat_count": 3,
+      "sql": "SELECT paradedb.score(id) AS score, id, content, source_id, source_type, chunk_id, knowledge_id, knowledge_base_id, tag_id FROM embeddings WHERE knowledge_base_id IN (%s) AND content ||| %s AND (is_enabled IS NULL OR is_enabled = %s) ORDER BY score DESC LIMIT %s",
+      "params": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "What are used for long-distance communication as introduced in this slide?",
+        true,
+        150
+      ],
+      "method": "PostgresRetriever.keywords"
+    },
+    "off": {
+      "kind": "keyword",
+      "case_id": "row-0959-off",
+      "repeat_count": 3,
+      "sql": "SELECT paradedb.score(id) AS score, id, content, source_id, source_type, chunk_id, knowledge_id, knowledge_base_id, tag_id FROM embeddings WHERE knowledge_base_id IN (%s) AND content ||| %s AND (is_enabled IS NULL OR is_enabled = %s) ORDER BY score DESC LIMIT %s",
+      "params": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "What are used for long-distance communication as introduced in this slide",
+        true,
+        150
+      ],
+      "method": "PostgresRetriever.keywords"
+    },
+    "only_query_string_difference": "one trailing ASCII U+003F question mark",
+    "q_on_equals_q_off_plus_question_mark": true
+  },
+  "code_facts": [
+    {
+      "file": "backend/weknora_port/storage/postgres.py",
+      "lines": [
+        87,
+        92
+      ],
+      "fact": "keyword_statement appends params.query unchanged to bound values; predicate is content ||| %s, score is paradedb.score(id), ORDER BY score DESC LIMIT %s. No trim, punctuation removal, escaping-to-literal-search API, explicit query-parser mode or analyzer override occurs here."
+    },
+    {
+      "file": "backend/weknora_port/storage/hybrid.py",
+      "lines": [
+        92,
+        95
+      ],
+      "fact": "keyword engine gets params.query_text in RetrieveParams; SQL binding preserves that exact string."
+    },
+    {
+      "file": "E:/RAG-reference/WeKnora-3e8b0bfc/internal/application/repository/retriever/postgres/repository.go",
+      "fixed_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+      "lines": [
+        197,
+        225
+      ],
+      "fact": "Fixed Go uses clause.Expr SQL content ||| ? and Vars []interface{}{params.Query}, paradedb.score(id), score DESC, TopK limit. It also passes the query string without stripping trailing punctuation at this boundary. This is source comparison, not a Go engine execution."
+    },
+    {
+      "file": "backend/weknora_port/storage/migrations/001_retrieval.sql",
+      "lines": [
+        97,
+        107
+      ],
+      "fact": "Declared BM25 index uses content tokenizer chinese_lindera. This identifies index configuration; it does not establish the internal query parse tree, query token stream, wildcard treatment or scorer explanation for the question mark."
+    }
+  ],
+  "mechanism_evidence_boundary": {
+    "observed": "Under one fixed READ ONLY snapshot the only input difference is trailing ?, and 13 shared row scores plus order differ; each exact query repeats identically three times. All 88 row IDs remain present.",
+    "verified_implementation_boundary": "Raw query-string argument is preserved into the ParadeDB ||| operator; PostgreSQL parameter binding does not remove it.",
+    "query_parser_or_scorer_explanation": "NOT VERIFIED: no parse tree, analyzed query-term list, wildcard/phrase interpretation, term-frequency explanation or engine scorer trace was captured.",
+    "do_not_claim": [
+      "Question mark is definitely a wildcard.",
+      "Question mark definitely adds or removes a particular analyzed term.",
+      "This is a Python-specific punctuation bug.",
+      "Changed historical query vectors are proven.",
+      "SQL tie nondeterminism was reproduced."
+    ]
+  },
+  "reproducibility": {
+    "snapshot": "230956:230956:",
+    "transaction_isolation": "repeatable read",
+    "transaction_read_only": "on",
+    "0959_on_runs": [
+      {
+        "index": 1,
+        "rows": 88,
+        "ordered_id_score_sha256": "81c5c871d436bc5d3c23ef31ad4bc2917ff84683160dae2326d95c116bfa9146"
+      },
+      {
+        "index": 2,
+        "rows": 88,
+        "ordered_id_score_sha256": "81c5c871d436bc5d3c23ef31ad4bc2917ff84683160dae2326d95c116bfa9146"
+      },
+      {
+        "index": 3,
+        "rows": 88,
+        "ordered_id_score_sha256": "81c5c871d436bc5d3c23ef31ad4bc2917ff84683160dae2326d95c116bfa9146"
+      }
+    ],
+    "0959_off_runs": [
+      {
+        "index": 1,
+        "rows": 88,
+        "ordered_id_score_sha256": "767e23c7385c8c43210aad123e7e52f65a706ef69181bf5c1d1e593730d2e972"
+      },
+      {
+        "index": 2,
+        "rows": 88,
+        "ordered_id_score_sha256": "767e23c7385c8c43210aad123e7e52f65a706ef69181bf5c1d1e593730d2e972"
+      },
+      {
+        "index": 3,
+        "rows": 88,
+        "ordered_id_score_sha256": "767e23c7385c8c43210aad123e7e52f65a706ef69181bf5c1d1e593730d2e972"
+      }
+    ],
+    "changed_score_count": 13,
+    "fixed_input_sql_nondeterminism_reproduced": false
+  },
+  "0434_target_keyword_rank": [
+    {
+      "case_id": "row-0434-on",
+      "keyword_pool_rows": 88,
+      "target_keyword_rank_one_based": 62,
+      "target_embedding_index_id": 100327,
+      "target_chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+      "score": 0.873098,
+      "same_score_row_count": 1,
+      "repeat_count": 3,
+      "all_repeats_exact": true
+    },
+    {
+      "case_id": "row-0434-off",
+      "keyword_pool_rows": 88,
+      "target_keyword_rank_one_based": 62,
+      "target_embedding_index_id": 100327,
+      "target_chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+      "score": 0.873098,
+      "same_score_row_count": 1,
+      "repeat_count": 3,
+      "all_repeats_exact": true
+    }
+  ],
+  "document_vector_probe_limits": {
+    "label": "CURRENT_INDEX_DOCUMENT_VECTOR_PROXY_NOT_HISTORICAL_QUERY_NOT_SYNTHETIC",
+    "source_index_id": 100310,
+    "source_chunk_id": "3c362d81-e6ae-4502-8b6c-406df0cc4b92",
+    "exact_vector_sha256": "2d644c72d5ae544ae214b33a307a0aca4eb38ef6748b214a3dc9ea8427ac4923",
+    "repeat_count": 3,
+    "all_repeats_exact": true,
+    "what_it_proves": "The native vector SQL path is repeatable for this one current document-vector proxy on this fixed current index/snapshot.",
+    "what_it_does_not_prove": "It is not a P29 query vector and cannot establish historical vector equality, changed vectors, cross-query rankings or the cause of P29 candidate differences."
+  }
+}
