@@ -32,7 +32,7 @@ class GenerationRequest:
     fixed_fallback: str | None = field(default=None,repr=False)
     fallback_response: str = field(default='Sorry, I am unable to answer this question.',repr=False)
     supports_vision: bool = False
-    citations_enabled: bool = True
+    citations_enabled: bool = False
     faq_priority_enabled: bool = False
     options: ChatOptions = field(default_factory=lambda: ChatOptions(temperature=0.3, max_completion_tokens=1024))
     policy: RouterPolicy = field(default_factory=RouterPolicy)

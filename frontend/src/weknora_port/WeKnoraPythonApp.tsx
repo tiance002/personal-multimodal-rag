@@ -3,7 +3,7 @@ import { PortApiError, portApi } from "./api";
 import { resumePortChat, runPortChat } from "./sse";
 import type {
   DocumentRow, KnowledgeBase, MessageRow, ModelConfiguration, ModelRole,
-  PortRunIdentity, SessionRow, SourceChunk, WeKnoraSSEMessage,
+  PortRunIdentity, SessionRow, WeKnoraSSEMessage,
 } from "./types";
 import { KnowledgeBaseConsent } from "./KnowledgeBaseConsent";
 import { MemoryPanel } from "./MemoryPanel";
@@ -61,30 +61,80 @@ function eventLabel(event: WeKnoraSSEMessage): string {
   return text ? `${labels[event.response_type] ?? event.response_type} · ${text}` : labels[event.response_type] ?? event.response_type;
 }
 
-function extractChunkTags(text: string): { before: string; label: string; chunkId: string; after: string }[] {
-  const pattern = /<kb\b([^>]*)\/>/g;
-  const attrs = (raw: string, key: string) => raw.match(new RegExp(`\\b${key}="([^"]*)"`, "i"))?.[1];
-  const result: { before: string; label: string; chunkId: string; after: string }[] = [];
+function stripInternalReferenceMarkup(content: string): string {
+  const output: string[] = [];
   let cursor = 0;
-  for (const match of text.matchAll(pattern)) {
-    const tag = match[0];
-    const index = match.index ?? cursor;
-    const raw = match[1] ?? "";
-    const chunkId = attrs(raw, "chunk_id");
-    if (!chunkId) continue;
-    result.push({ before: text.slice(cursor, index), label: attrs(raw, "doc") ?? "查看引用", chunkId, after: "" });
-    cursor = index + tag.length;
+  let lineStart = 0;
+  let insideFence: { marker: "`" | "~"; length: number } | null = null;
+
+  while (cursor < content.length) {
+    if (cursor === lineStart) {
+      const lineEnd = content.indexOf("\n", cursor);
+      const end = lineEnd < 0 ? content.length : lineEnd + 1;
+      const line = content.slice(cursor, end);
+      const fence = line.match(/^[ \t]{0,3}(`{3,}|~{3,})[^\r\n]*(?:\r?\n|$)/);
+      const closingFence = line.match(/^[ \t]{0,3}(`{3,}|~{3,})[ \t]*(?:\r?\n|$)/);
+      if (insideFence) {
+        output.push(line);
+        if (closingFence && closingFence[1][0] === insideFence.marker && closingFence[1].length >= insideFence.length)
+          insideFence = null;
+        cursor = end;
+        lineStart = end;
+        continue;
+      }
+      if (fence) {
+        output.push(line);
+        insideFence = { marker: fence[1][0] as "`" | "~", length: fence[1].length };
+        cursor = end;
+        lineStart = end;
+        continue;
+      }
+    }
+
+    if (content[cursor] === "`") {
+      const run = content.slice(cursor).match(/^`+/)?.[0] ?? "`";
+      const close = content.indexOf(run, cursor + run.length);
+      if (close >= 0 && !content.slice(cursor + run.length, close).includes("\n")) {
+        output.push(content.slice(cursor, close + run.length));
+        cursor = close + run.length;
+        continue;
+      }
+    }
+
+    if (content[cursor] === "\n") {
+      output.push("\n");
+      cursor++;
+      lineStart = cursor;
+      continue;
+    }
+
+    const tag = content.slice(cursor).match(/^<\/?(?:ref|kb|web)\b[^>]*>/i)?.[0];
+    if (tag) {
+      cursor += tag.length;
+      continue;
+    }
+    if (content[cursor] === "<" && isIncompleteInternalTagSuffix(content.slice(cursor))) break;
+
+    output.push(content[cursor]);
+    cursor++;
   }
-  if (result.length) result[result.length - 1].after = text.slice(cursor);
-  return result;
+
+  return output.join("");
 }
 
-function MessageContent({ content, onCitation }: { content: string; onCitation: (id: string) => void }) {
-  const citations = extractChunkTags(content);
-  if (!citations.length) return <>{content}</>;
-  return <>{citations.map((citation, index) => <span key={`${citation.chunkId}-${index}`}>
-    {citation.before}<button className="wp-citation" onClick={() => onCitation(citation.chunkId)}>{citation.label}</button>{citation.after}
-  </span>)}</>;
+function isIncompleteInternalTagSuffix(value: string): boolean {
+  const body = value.startsWith("</") ? value.slice(2) : value.slice(1);
+  const name = body.match(/^[a-z]*/i)?.[0].toLowerCase() ?? "";
+  if (!name) return false;
+  const knownNames = ["ref", "kb", "web"];
+  const remainder = body.slice(name.length);
+  if (knownNames.includes(name)) return !remainder.includes(">");
+  if (remainder.length > 0) return false;
+  return knownNames.some(candidate => candidate.startsWith(name));
+}
+
+function MessageContent({ content }: { content: string }) {
+  return <>{stripInternalReferenceMarkup(content)}</>;
 }
 
 export function WeKnoraPythonApp() {
@@ -105,8 +155,6 @@ export function WeKnoraPythonApp() {
   const [newKbName, setNewKbName] = useState("");
   const [uploadKbId, setUploadKbId] = useState("");
   const [documentRefresh, setDocumentRefresh] = useState(0);
-  const [source, setSource] = useState<SourceChunk | null>(null);
-  const [sourceError, setSourceError] = useState("");
   const [familiarDocument, setFamiliarDocument] = useState<DocumentRow | null>(null);
   const [configError, setConfigError] = useState("");
   const activeAbort = useRef<AbortController | null>(null);
@@ -385,12 +433,6 @@ export function WeKnoraPythonApp() {
     // Browsing a document must not change an existing chat's saved retrieval scope.
   };
 
-  const openSource = async (chunkId: string) => {
-    setSourceError(""); setSource(null);
-    try { setSource(await portApi.source(chunkId)); }
-    catch (error) { setSourceError(`引用暂不可回读：${errorText(error)}`); }
-  };
-
   const stopGeneration = async () => {
     const identity = activeIdentity.current;
     if (!identity) { setNotice("正在确认原始运行，请稍后停止"); return; }
@@ -447,7 +489,7 @@ export function WeKnoraPythonApp() {
             <div className="wp-message-label">{message.role === "user" ? "你" : message.error ? "运行提示" : "WeKnora"}</div>
             {message.role === "user" ? <p className="wp-message-content">{message.content}</p> : <>
               {message.progress?.length ? <details className="wp-progress" open={message.status === "running"}><summary>实际执行事件 · {message.progress.length}</summary><ol>{message.progress.map((event, index) => <li key={`${event.eventId ?? event.type}-${index}`}><span>{event.type}</span><p>{event.text}</p></li>)}</ol></details> : null}
-              <div className="wp-message-content"><MessageContent content={message.content} onCitation={id => void openSource(id)} /></div>
+              <div className="wp-message-content"><MessageContent content={message.content} /></div>
               {message.status === "running" && <span className="wp-running"><i />正在接收同一运行的回答</span>}
               {message.status === "interrupted" && <div className="wp-run-actions"><span>已断开读取，服务端运行未被重发</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>继续读取原回答</button>}</div>}
               {message.status === "cancelled" && <p className="wp-run-actions">已停止生成；原始运行已保存取消状态。</p>}
@@ -470,19 +512,5 @@ export function WeKnoraPythonApp() {
     </main>
 
     {page === "library" && familiarDocument && <aside className="wp-source-drawer" aria-label="常用文档详情"><button className="wp-close" onClick={() => setFamiliarDocument(null)}>关闭文档</button><strong>{familiarDocument.filename}</strong><p>{familiarDocument.status}</p><a href={portApi.originalDocumentURL(familiarDocument.knowledge_base_id, familiarDocument.id)} target="_blank" rel="noreferrer">打开原始文件</a></aside>}
-    {(source || sourceError) && <div className="wp-source-drawer"><button className="wp-close" onClick={() => { setSource(null); setSourceError(""); }}>关闭 ×</button>{source ? <><strong>来源回读 · {source.filename}</strong><dl className="wp-source-metadata">
-      {source.knowledge_base_id && <><dt>知识库 ID</dt><dd>{source.knowledge_base_id}</dd></>}
-      <dt>文档 ID</dt><dd>{source.document_id}</dd>
-      {source.source_version && <><dt>文档版本</dt><dd>{source.source_version}</dd></>}
-      {source.chunk_type && <><dt>片段类型</dt><dd>{source.chunk_type}</dd></>}
-      {source.chunk_index !== undefined && <><dt>片段位置</dt><dd>第 {source.chunk_index} 段 · 字符 {source.start ?? "?"}–{source.end ?? "?"}{source.page_number != null ? ` · 第 ${source.page_number} 页` : ""}</dd></>}
-    </dl>{source.image_info?.map((image, index) => <section className="wp-source-image-info" key={`${image.page_number ?? "page"}-${index}`}>
-      <strong>图片信息{image.page_number != null ? ` · 第 ${image.page_number} 页` : ""}</strong>
-      {image.source_type && <p>来源类型：{image.source_type}</p>}
-      {image.ocr_status && <p>OCR：{image.ocr_status.status ?? "未知"}{image.ocr_status.error ? ` · ${image.ocr_status.error}` : ""}</p>}
-      {image.ocr_text && <p>OCR 文本：{image.ocr_text}</p>}
-      {image.caption_status && <p>图片说明：{image.caption_status.status ?? "未知"}{image.caption_status.error ? ` · ${image.caption_status.error}` : ""}</p>}
-      {image.caption && <p>图片说明文本：{image.caption}</p>}
-    </section>)}<pre>{source.text}</pre>{source.source_url && <a href={source.source_url} target="_blank" rel="noreferrer">打开原始文件</a>}</> : <p role="alert">{sourceError}</p>}</div>}
   </div>;
 }

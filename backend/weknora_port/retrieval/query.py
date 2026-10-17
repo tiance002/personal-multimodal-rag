@@ -115,7 +115,43 @@ def parse_understanding(state, output):
     return True
 
 def needs_retrieval(intent, web_search_enabled=False):
-    return web_search_enabled if intent == 'web_search' else intent in ('', 'kb_search', 'clarification', 'summarize')
+    # A model-produced unknown label must not authorize bypassing retrieval.
+    return web_search_enabled if intent == 'web_search' else intent not in ('greeting', 'chitchat', 'follow_up', 'image_only', 'doc_only')
+
+
+_KB_REQUEST = re.compile(
+    r'知识库|资料库|库中|库内|\bknowledge\s*base\b|\bKB\b|'
+    r'(?:查找|搜索|检索|寻找|列出|列举|帮我找)(?:一下|一些|所有|全部|相关|类似|其他|更多|已有|已上传|的|\s)*(?:文档|文件|资料|报告)|'
+    r'\b(?:search(?:\s+for)?|find|retrieve|look\s+up|list|browse)\s+'
+    r'(?:(?:the|some|all|related|similar|other|more|stored|uploaded|available)\s+)*(?:documents?|files?|sources?|reports?)\b', re.I)
+
+
+def resolve_intent(state):
+    """Validate bypass prerequisites using the original request, never its rewrite.
+
+    Classification is advisory. Stored-source requests always retrieve; only
+    known social intents, actual history or actual attachments can use the
+    corresponding non-retrieval paths. This is not a second intent classifier.
+    """
+    intent = state.intent
+    query = go_strip(state.query)
+    if _KB_REQUEST.search(query):
+        return 'kb_search'
+    # Attachment-only analysis remains available. The absence marker is not
+    # an attachment and cannot grant this exception.
+    if intent == 'image_only' and state.images:
+        return intent
+    if intent == 'doc_only' and go_strip(state.attachment_prompt) and '<no_document_attached' not in state.attachment_prompt:
+        return intent
+    if intent in ('greeting', 'chitchat'):
+        return intent
+    if intent == 'follow_up':
+        return intent if any(go_strip(h.answer) for h in state.history) else 'kb_search'
+    if intent in ('image_only', 'doc_only'):
+        return 'kb_search'
+    if intent in ('kb_search', 'clarification', 'summarize', 'web_search'):
+        return intent
+    return 'kb_search'
 
 async def understand_query(state, context, registry, *, history_loader=None, caption_sink=None):
     state.rewrite_query = state.query
@@ -163,6 +199,7 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
     except Exception:
         return
     parse_understanding(state, response.content)
+    state.intent = resolve_intent(state)
     if caption_sink and state.image_description and state.user_message_id:
         try:
             await caption_sink(state, context)

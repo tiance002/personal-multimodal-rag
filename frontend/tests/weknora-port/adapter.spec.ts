@@ -172,39 +172,111 @@ test("library selection reads its KB scope and upload polling exposes terminal c
   expect(uploadReads).toBeGreaterThanOrEqual(2);
 });
 
-test("citation drawer renders scoped version, chunk position and image OCR/caption metadata", async ({ page }) => {
+test("normal answers suppress citation controls and strip internal SSE markup outside code", async ({ page }) => {
   await installCatalogRoutes(page);
   await page.route("**/api/v1/sessions", async route => {
     if (route.request().method() === "POST") {
-      await route.fulfill({ json: envelope({ id: "session-cite", title: "引用", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" }) });
+      await route.fulfill({ json: envelope({ id: "session-cite", title: "回答", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" }) });
     } else await route.fulfill({ json: envelope([]) });
   });
-  const citedAnswer = '参见 <kb chunk_id="chunk-image" doc="结构图" />。';
+  const answer = '前文 <ref>E1</ref> <kb chunk_id="chunk-image" doc="结构图" /> <web url="https://example.test" /> 后文\n\n行内代码 `<ref>keep</ref>`\n\n```html\n<ref>keep</ref>\n<kb chunk_id="code-chunk" doc="样例" />\n```\n\n[链接](https://example.test/path) ![图](image.png)';
+  let chunkReads = 0;
   await page.route("**/api/v1/sessions/session-cite/messages", route => route.fulfill({
     status: 200,
     contentType: "text/event-stream",
     body: frame({ id: "request-cite", response_type: "agent_query", content: "", done: false,
       data: { request_id: "request-cite", session_id: "session-cite", assistant_message_id: "assistant-cite" } }) +
-      frame({ id: "request-cite", response_type: "answer", content: citedAnswer, done: true, data: { event_id: "answer-cite" } }) +
-      frame({ id: "request-cite", response_type: "complete", content: "", done: false, data: { final_content: citedAnswer } }),
+      frame({ id: "request-cite", response_type: "answer", content: answer, done: true, data: { event_id: "answer-cite" } }) +
+      frame({ id: "request-cite", response_type: "complete", content: "", done: false, data: { final_content: answer } }),
   }));
-  await page.route("**/api/v1/chunks/chunk-image", route => route.fulfill({ json: envelope({
-    knowledge_base_id: "kb-1", document_id: "doc-1", chunk_id: "chunk-image", filename: "结构图.pdf", text: "图中展示模块关系",
-    source_url: "/api/v1/source", source_version: "version-7", chunk_type: "image_caption", chunk_index: 4,
-    start: 120, end: 168, page_number: 3,
-    image_info: [{ page_number: 3, source_type: "embedded_image", caption: "结构依赖关系", ocr_text: "入口 服务 数据库",
-      ocr_status: { status: "completed" }, caption_status: { status: "failed", error: "CAPTION_TIMEOUT" } }],
-  }) }));
+  await page.route("**/api/v1/chunks/**", route => { chunkReads++; return route.fulfill({ json: envelope({}) }); });
 
   await page.goto("/");
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("问题");
   await page.getByRole("button", { name: "发送" }).click();
-  await page.getByRole("button", { name: "结构图" }).click();
-  await expect(page.getByText("kb-1", { exact: true })).toBeVisible();
-  await expect(page.getByText("version-7")).toBeVisible();
-  await expect(page.getByText("第 4 段 · 字符 120–168 · 第 3 页")).toBeVisible();
-  await expect(page.getByText("embedded_image")).toBeVisible();
-  await expect(page.getByText("OCR 文本：入口 服务 数据库")).toBeVisible();
-  await expect(page.getByText("图片说明：failed · CAPTION_TIMEOUT")).toBeVisible();
+  const renderedAnswer = page.locator(".wp-message.assistant .wp-message-content");
+  await expect(renderedAnswer).toContainText("前文 E1  后文");
+  await expect(renderedAnswer).toContainText("行内代码 `<ref>keep</ref>`");
+  await expect(renderedAnswer).toContainText("<ref>keep</ref>");
+  await expect(renderedAnswer).toContainText("<kb chunk_id=\"code-chunk\" doc=\"样例\" />");
+  await expect(renderedAnswer).toContainText("[链接](https://example.test/path) ![图](image.png)");
+  await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
+  expect(chunkReads).toBe(0);
+});
+
+test("old history strips internal reference markers without changing inline or fenced code", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope([
+    { id: "old-session", title: "旧回答", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+  ]) }));
+  await page.route("**/api/v1/sessions/old-session/messages", route => route.fulfill({ json: envelope([
+    { id: "old-answer", role: "assistant", request_id: "old-run", created_at: "now", is_completed: true,
+      content: '历史 <ref>原始引文</ref> <kb chunk_id="old-chunk" doc="资料" /> <kb>块文字</kb> <web id="w">网页文字</web> <reference>普通标签</reference> 末尾\n\n`<ref>code</ref>`\n\n```txt\n<ref>code</ref>\n```\n\n<ref id=' },
+  ]) }));
+
+  await page.goto("/");
+  await page.getByRole("button", { name: /旧回答/ }).click();
+  const renderedAnswer = page.locator(".wp-message.assistant .wp-message-content");
+  await expect(renderedAnswer).toContainText("历史 原始引文");
+  await expect(renderedAnswer).toContainText("块文字 网页文字 <reference>普通标签</reference> 末尾");
+  await expect(renderedAnswer).not.toContainText("<ref id=");
+  await expect(renderedAnswer).toContainText("`<ref>code</ref>`");
+  await expect(renderedAnswer).toContainText("<ref>code</ref>");
+  await expect(renderedAnswer).not.toContainText("<ref id=");
+  await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
+});
+
+test("partial SSE reference tags stay hidden until the delta is complete", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/sessions", async route => {
+    if (route.request().method() === "POST") {
+      await route.fulfill({ json: envelope({ id: "stream-session", title: "流式问题", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" }) });
+    } else await route.fulfill({ json: envelope([]) });
+  });
+  await page.addInitScript(() => {
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const requestUrl = new URL(typeof input === "string" ? input : input instanceof Request ? input.url : input.toString(), location.href);
+      if (requestUrl.pathname !== "/api/v1/sessions/stream-session/messages" || init?.method !== "POST")
+        return nativeFetch(input, init);
+      const encoder = new TextEncoder();
+      const event = (response_type: string, content: string, data: Record<string, string> = {}) =>
+        `event: message\ndata: ${JSON.stringify({ id: "stream-request", response_type, content, done: response_type === "answer", data })}\n\n`;
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(event("agent_query", "", {
+            request_id: "stream-request", session_id: "stream-session", assistant_message_id: "stream-assistant",
+          })));
+          controller.enqueue(encoder.encode(event("answer", "<re", { event_id: "answer" })));
+          setTimeout(() => controller.enqueue(encoder.encode(event("answer",
+            'f id="x">visible</ref> <reference>ordinary</reference> <kb>chunk</kb> <web>web</web> trailing </re',
+            { event_id: "answer" }))), 900);
+          setTimeout(() => {
+            controller.enqueue(encoder.encode(event("answer", "f> compare a <", { event_id: "answer" })));
+          }, 1400);
+          setTimeout(() => {
+            controller.enqueue(encoder.encode(event("complete", "", { final_content: "visible <reference>ordinary</reference> chunk web trailing  compare a <" })));
+            controller.close();
+          }, 1600);
+        },
+      });
+      return new Response(stream, { status: 200, headers: { "Content-Type": "text/event-stream" } });
+    };
+  });
+
+  await page.goto("/");
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await page.getByPlaceholder("询问当前资料…").fill("流式问题");
+  await page.getByRole("button", { name: "发送" }).click();
+  const renderedAnswer = page.locator(".wp-message.assistant .wp-message-content");
+  await expect(page.locator(".wp-running")).toBeVisible();
+  await expect(renderedAnswer).toBeEmpty();
+  await expect(renderedAnswer).toContainText("visible <reference>ordinary</reference> chunk web trailing");
+  const partialClosingText = await renderedAnswer.textContent();
+  expect(partialClosingText?.endsWith("</re")).toBe(false);
+  await expect(renderedAnswer).toContainText("compare a <");
+  await expect(renderedAnswer).not.toContainText("<ref id=");
+  await expect(renderedAnswer).not.toContainText("<kb");
+  await expect(renderedAnswer).not.toContainText("<web");
 });

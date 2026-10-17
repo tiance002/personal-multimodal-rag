@@ -1,7 +1,12 @@
 """Incremental split-tag decoder adapted from modelcontext/citations.go."""
 from __future__ import annotations
 
+import re
+
 from .registry import SourceRegistry
+
+
+_TAG_PREFIXES = ("<ref", "</ref", "<kb", "</kb", "<web", "</web")
 
 
 class CitationStreamDecoder:
@@ -29,39 +34,83 @@ class CitationStreamDecoder:
     def _feed_citations(self, chunk: str) -> str:
         data = self.pending + chunk
         self.pending = ""
-        out: list[str] = []
-        while data:
-            idx = data.find("<")
-            if idx < 0:
-                out.append(data)
-                break
-            out.append(data[:idx])
-            data = data[idx:]
-            lower = data.lower()
-            starts = ["<ref", "<kb", "<web"]
-            is_tag_start = any(lower.startswith(prefix) and (len(lower) == len(prefix) or lower[len(prefix)] in " \t\r\n>") for prefix in starts)
-            is_partial = any(len(lower) <= len(prefix) and prefix.startswith(lower) for prefix in starts)
-            if (is_tag_start or is_partial) and ">" not in data:
-                self.pending = data
-                break
-            if is_tag_start:
-                end = data.index(">")
-                tag = data[:end+1]
-                if lower.startswith("<ref"):
-                    out.append(self.registry.expand_text(tag))
-                # Public tags written by the model are output-only and dropped.
-                data = data[end+1:]
-                continue
-            out.append("<")
-            data = data[1:]
-        return "".join(out)
+        hold_from = _unclosed_code_start(data)
+        visible = data if hold_from is None else data[:hold_from]
+
+        # Keep a tag-like suffix until it is complete. Unknown HTML/text
+        # beginning with '<' is passed through unchanged.
+        lt = visible.rfind("<")
+        if lt >= 0:
+            suffix = visible[lt:].lower()
+            if any(prefix.startswith(suffix) for prefix in _TAG_PREFIXES) or any(
+                suffix.startswith(prefix) for prefix in _TAG_PREFIXES
+            ):
+                if ">" not in suffix:
+                    visible = visible[:lt]
+                    hold_from = lt if hold_from is None else min(hold_from, lt)
+
+        if hold_from is not None:
+            self.pending = data[hold_from:]
+        elif visible != data:
+            self.pending = data[len(visible):]
+        return self.registry.expand_text(visible) if visible else ""
 
     def flush(self) -> str:
         resource_tail, self.resource_pending = self.resource_pending, ""
         resource_tail = self.registry.resources.decode_text(resource_tail)
         decoded_resource_tail = self._feed_citations(resource_tail) if resource_tail else ""
         pending, self.pending = self.pending, ""
-        lower = pending.lower()
-        if any(lower.startswith(prefix) or (len(lower) <= len(prefix) and prefix.startswith(lower)) for prefix in ("<ref", "<kb", "<web")):
+        if _is_incomplete_internal_tag(pending):
             return decoded_resource_tail
-        return decoded_resource_tail + self.registry.expand_text(pending)
+        return decoded_resource_tail + self.registry.decode_output_text(pending)
+
+
+def _unclosed_code_start(text: str) -> int | None:
+    """Return the opening delimiter of a code span/block with no closer yet."""
+    i = 0
+    while i < len(text):
+        line_start = text.rfind("\n", 0, i) + 1
+        if line_start == i:
+            fence = re.match(r" {0,3}(`{3,}|~{3,})", text[i:])
+            if fence:
+                marker = fence.group(1)
+                content_start = i + fence.end()
+                close = re.search(
+                    rf"(?m)^ {{0,3}}{re.escape(marker[0])}{{{len(marker)},}}[ \t]*$",
+                    text[content_start:],
+                )
+                if close is None:
+                    return i
+                i = content_start + close.end()
+                continue
+        if text[i] == "`":
+            end = i
+            while end < len(text) and text[end] == "`":
+                end += 1
+            marker = text[i:end]
+            close = _find_exact_backtick_run(text, marker, end)
+            if close < 0:
+                return i
+            i = close + len(marker)
+            continue
+        i += 1
+    return None
+
+
+def _find_exact_backtick_run(text: str, marker: str, start: int) -> int:
+    i = start
+    while i < len(text):
+        if text[i] != "`":
+            i += 1
+            continue
+        end = i
+        while end < len(text) and text[end] == "`":
+            end += 1
+        if end - i == len(marker):
+            return i
+        i = end
+    return -1
+
+
+def _is_incomplete_internal_tag(text: str) -> bool:
+    return bool(re.fullmatch(r"</?(?:r|re|ref|k|kb|w|we|web)(?:[ \t\r\n/][^<>]*)?", text, re.I))

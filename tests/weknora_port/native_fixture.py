@@ -41,7 +41,7 @@ class IsolatedFixturePool:
 
 
 @asynccontextmanager
-async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None,expected_redis_run_id=None,redis_db=0,redis_port=56424,response_handler=None):
+async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_text=None,answer_stream_factory=None,expected_redis_run_id=None,redis_db=0,redis_port=56424,response_handler=None,citations_enabled=None):
     tree=ast.parse(inspect.getsource(fixture.test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout_no_upgrade))
     scenario=next(n for n in tree.body[0].body if isinstance(n,ast.AsyncFunctionDef) and n.name=='scenario')
     body=[]
@@ -107,6 +107,14 @@ async def isolated_mock_application(*,synthetic_monthly_limit=None,image_ocr_tex
         return previous_safe(error,fallback)
     doc_module._safe_error_code=public_fixture_diagnostic
     application,redis,wire,root,pool=await namespace['build_native_fixture']()
+    if citations_enabled is not None:
+        assert type(citations_enabled) is bool
+        original_configuration=application.ordinary.configuration
+        async def configured(turn):
+            config=await original_configuration(turn)
+            config.generation_options['citations_enabled']=citations_enabled
+            return config
+        application.ordinary.configuration=configured
     try:yield application,wire,root
     finally:
         await application.stop_background_workers()

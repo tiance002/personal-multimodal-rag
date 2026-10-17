@@ -14,7 +14,7 @@ from tests.weknora_port.test_qa_followup_fallback_pg import REDIS_ID
 
 def test_real_http_commit_and_history_preserve_source_offsets_metadata_and_legacy_missing():
     async def scenario():
-        async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15) as (runtime,wire,root):
+        async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,citations_enabled=True) as (runtime,wire,root):
             with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
             origin=f'http://127.0.0.1:{port}'
             async def principal(_):return runtime.principal

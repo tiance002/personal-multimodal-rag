@@ -262,6 +262,13 @@ def test_actual_loopback_upload_rag_upgrade_sources_history_redis_replay_timeout
             for role, provider, name in roles])
         app = create_app(runtime, resolve_principal=lambda request: principal,
                          allowed_origins=("http://127.0.0.1:56425",))
+        # P21 ordinary default is off; retain explicit citation safety coverage.
+        original_configuration=runtime.ordinary.configuration
+        async def with_citations(turn):
+            config=await original_configuration(turn)
+            config.generation_options['citations_enabled']=True
+            return config
+        runtime.ordinary.configuration=with_citations
         with socket.socket() as check:
             assert check.connect_ex(("127.0.0.1", 56425)) != 0, "fixture port already occupied"
         server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=56425,

@@ -116,3 +116,63 @@ def test_protocol_prompt_preserves_image_url_exception_and_disabled_citation_pol
     assert "relevant image URLs" in disabled
     assert '<ref id="cN"/>' not in disabled
     assert "res://NNNN" in enabled and "res://NNNN" in disabled
+
+
+def test_disabled_decoder_strips_all_transport_tags_but_preserves_markdown_literals():
+    registry = SourceRegistry(citations_enabled=False)
+    decoder = CitationStreamDecoder(registry)
+    text = (
+        'A <ref>bare</ref> <ref/> <ref id="c1"/> '
+        '<kb doc="x"/> </kb> <web url="https://bad.test"/> </web> '
+        '`literal <ref> </ref> <kb/>` and ```html\n<web/>\n``` '
+        '[link](https://example.test/a) ![image](https://example.test/i.png)'
+    )
+    expected = (
+        'A bare       `literal <ref> </ref> <kb/>` and ```html\n<web/>\n``` '
+        '[link](https://example.test/a) ![image](https://example.test/i.png)'
+    )
+    assert registry.decode_output_text(text) == expected
+    assert decoder.feed(text) + decoder.flush() == expected
+
+
+def test_internal_tag_decoding_is_consistent_at_every_chunk_split():
+    registry = SourceRegistry()
+    chunk = registry.register_chunk(ChunkReference("real-id", document_title="Real"))
+    source = (
+        f'Claim <ref id="{chunk}"/>! <ref id="c404"/> '
+        '<ref>bare</ref> <ref/> <kb/> </kb><web/> </web> '
+        '`<ref id="c404"/> </ref>` and ```text\n<kb/> </web>\n``` '
+        '[ordinary](https://example.test/path) ![img](https://example.test/i.png)'
+    )
+    expected = (
+        'Claim <kb doc="Real" chunk_id="real-id" />!  bare     '
+        '`<ref id="c404"/> </ref>` and ```text\n<kb/> </web>\n``` '
+        '[ordinary](https://example.test/path) ![img](https://example.test/i.png)'
+    )
+    assert registry.decode_output_text(source) == expected
+    for split in range(len(source) + 1):
+        decoder = CitationStreamDecoder(registry.clone_for_attempt())
+        actual = decoder.feed(source[:split]) + decoder.feed(source[split:]) + decoder.flush()
+        assert actual == expected, f"decoder changed at split {split}"
+
+
+def test_incomplete_closing_tag_is_removed_at_eof_and_across_many_chunks():
+    source = "answer </ref>tail </we"
+    expected = "answer tail "
+    registry = SourceRegistry(citations_enabled=False)
+    assert registry.decode_output_text(source) == expected
+    decoder = CitationStreamDecoder(registry)
+    actual = "".join(decoder.feed(char) for char in source) + decoder.flush()
+    assert actual == expected
+
+
+def test_unmatched_inline_backtick_does_not_hide_later_citations_or_html_text():
+    registry = SourceRegistry()
+    handle = registry.register_chunk(ChunkReference("valid"))
+    source = f"literal ` marker <ref id=\"{handle}\"/> and <reference"
+    expected = "literal ` marker <kb doc=\"\" chunk_id=\"valid\" /> and <reference"
+    assert registry.decode_output_text(source) == expected
+    for split in range(len(source) + 1):
+        decoder = CitationStreamDecoder(registry.clone_for_attempt())
+        actual = decoder.feed(source[:split]) + decoder.feed(source[split:]) + decoder.flush()
+        assert actual == expected, f"decoder changed at split {split}"

@@ -65,7 +65,7 @@ class Registry:
 def test_structured_output(output,rewrite,intent,image):
     s=state(intent='old');parse_understanding(s,output)
     assert (s.rewrite_query,s.intent,s.image_description)==(rewrite,intent,image)
-@pytest.mark.parametrize('intent,web,expected',[('',False,True),('kb_search',False,True),('clarification',False,True),('summarize',False,True),('greeting',False,False),('follow_up',False,False),('image_only',False,False),('web_search',False,False),('web_search',True,True),('unknown',False,False)])
+@pytest.mark.parametrize('intent,web,expected',[('',False,True),('kb_search',False,True),('clarification',False,True),('summarize',False,True),('greeting',False,False),('follow_up',False,False),('image_only',False,False),('web_search',False,False),('web_search',True,True),('unknown',False,True)])
 def test_intent_source(intent,web,expected):assert needs_retrieval(intent,web)==expected
 
 def test_disabled_rewrite_does_not_call_model():

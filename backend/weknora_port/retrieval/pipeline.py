@@ -91,7 +91,11 @@ class RetrievalPipeline:
         await understand_query(state, context, self.registry, history_loader=self.history_loader, caption_sink=self.caption_sink)
         await self._progress("understand", "completed")
         check_context()
+        from .query import resolve_intent
+        state.intent = resolve_intent(state)
         state.needs_retrieval = needs_retrieval(state.intent, state.web_search_enabled)
+        if state.needs_retrieval:
+            state.system_prompt_override = ''
         await self._progress("retrieval", "started")
         await search(state, context, self.repository, embedding_resolver=self.embedding_resolver, web_search=self.web_search, entity_search=self.entity_search, segmenter=self.segmenter)
         await self._progress("retrieval", "completed", candidate_count=sum(r is not None for r in state.search_results))

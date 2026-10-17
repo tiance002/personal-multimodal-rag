@@ -16,7 +16,8 @@ from backend.weknora_port.generation.coordinator import EMPTY_TRUNCATED_FALLBACK
 CTX=CallContext('run',TrustedScope('owner',('kb',)),session_id='session')
 E=Evidence('chunk-current','real source evidence','doc-current','kb',knowledge_title='Source',score=.8,source_content='real source evidence')
 def request(mode='DYNAMIC',**kw):
-    values=dict(run_id='run',session_id='session',message_id='assistant',q0='extract source',finalized=FinalizedContext('<context id="1">real source evidence</context>\nextract source','<context id="1">real source evidence</context>',(E.id,)),evidence=(E,),policy=RouterPolicy(mode=mode));values.update(kw);return GenerationRequest(**values)
+    # Explicit opt-in preserves legacy citation and router safety counterexamples.
+    values=dict(citations_enabled=True,run_id='run',session_id='session',message_id='assistant',q0='extract source',finalized=FinalizedContext('<context id="1">real source evidence</context>\nextract source','<context id="1">real source evidence</context>',(E.id,)),evidence=(E,),policy=RouterPolicy(mode=mode));values.update(kw);return GenerationRequest(**values)
 def run(awaitable):return asyncio.run(awaitable)
 def event(text='',*,done=False,finish='',usage=None,final=False,data=None,kind='answer'):return StreamResponse(kind,text,done,usage=usage,finish_reason=finish,data=data,is_final=final)
 class Model:

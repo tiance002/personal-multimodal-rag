@@ -11,10 +11,9 @@ from dataclasses import dataclass, replace
 from urllib.parse import urlsplit, urlunsplit
 
 _HANDLE = re.compile(r"(?i)^[cdbw][1-9][0-9]*$")
-_REF = re.compile(r"(?is)<ref(?:\s|$)[^>]*(?:>|$)")
+_INTERNAL_TAG = re.compile(r"(?is)</?(?:ref|kb|web)(?=[\s/>])[^>]*>")
+_INCOMPLETE_INTERNAL_TAG = re.compile(r"(?is)</?(?:r|re|ref|k|kb|w|we|web)(?:\b|(?=\s|/)|\s[^<>]*)[^<>]*$")
 _REF_VALID = re.compile(r'(?i)<ref\s+id\s*=\s*"([^"]+)"\s*/?>')
-_KB = re.compile(r"(?is)<kb(?:\s|$)[^>]*(?:>|$)")
-_WEB = re.compile(r"(?is)<web(?:\s|$)[^>]*(?:>|$)")
 _PUBLIC_KB = re.compile(r"(?is)<kb\b[^>]*>")
 _PUBLIC_WEB = re.compile(r"(?is)<web\b[^>]*>")
 _ATTR = {
@@ -277,13 +276,14 @@ class SourceRegistry:
         return _PUBLIC_WEB.sub(compact_web, _PUBLIC_KB.sub(compact_chunk, text))
 
     def expand_text(self, text: str) -> str:
-        text = _KB.sub("", text)
-        text = _WEB.sub("", text)
-        if not self.citations_enabled:
-            return _REF.sub("", text)
-
         def replace(match: re.Match) -> str:
             tag = match.group(0)
+            # Closing/public tags are transport markup and never belong in
+            # user-visible output. Only a valid opening ref can expand.
+            if not tag.lower().startswith("<ref"):
+                return ""
+            if not self.citations_enabled:
+                return ""
             parsed = _REF_VALID.fullmatch(tag)
             if not parsed:
                 self.invalid_handles.append("<malformed-ref>")
@@ -305,7 +305,12 @@ class SourceRegistry:
             self.invalid_handles.append(handle)
             return ""
 
-        return _REF.sub(replace, text)
+        def transform(segment: str) -> str:
+            segment = _INTERNAL_TAG.sub(replace, segment)
+            incomplete = _INCOMPLETE_INTERNAL_TAG.search(segment)
+            return segment[:incomplete.start()] if incomplete else segment
+
+        return _map_outside_markdown_code(text, transform)
 
     def encode_resource_text(self, text: str) -> str:
         return self.resources.encode_text(text)
@@ -315,3 +320,63 @@ class SourceRegistry:
         text = self.resources.decode_text(text)
         text = self.expand_text(text)
         return _RESOURCE_HANDLE.sub("", text)
+
+
+def _map_outside_markdown_code(text: str, transform) -> str:
+    """Apply a transform to prose while leaving inline/fenced code byte-for-byte intact."""
+    out: list[str] = []
+    i = 0
+    prose_start = 0
+    while i < len(text):
+        # Fenced code is recognized only at a Markdown line start (up to 3 spaces).
+        line_start = text.rfind("\n", 0, i) + 1
+        prefix = text[line_start:i]
+        fence = re.match(r" {0,3}(`{3,}|~{3,})", text[i:]) if not prefix else None
+        if fence:
+            marker = fence.group(1)
+            opener_end = i + fence.end()
+            close = re.search(rf"(?m)^ {{0,3}}{re.escape(marker[0])}{{{len(marker)},}}[ \t]*$", text[opener_end:])
+            if close is None:
+                out.append(transform(text[prose_start:i]))
+                out.append(text[i:])
+                return "".join(out)
+            end = opener_end + close.end()
+            out.append(transform(text[prose_start:i]))
+            out.append(text[i:end])
+            i = end
+            prose_start = i
+            continue
+
+        if text[i] == "`":
+            run_end = i
+            while run_end < len(text) and text[run_end] == "`":
+                run_end += 1
+            marker = text[i:run_end]
+            close = _find_exact_backtick_run(text, marker, run_end)
+            if close < 0:
+                i = run_end
+                continue
+            end = close + len(marker)
+            out.append(transform(text[prose_start:i]))
+            out.append(text[i:end])
+            i = end
+            prose_start = i
+            continue
+        i += 1
+    out.append(transform(text[prose_start:]))
+    return "".join(out)
+
+
+def _find_exact_backtick_run(text: str, marker: str, start: int) -> int:
+    i = start
+    while i < len(text):
+        if text[i] != "`":
+            i += 1
+            continue
+        end = i
+        while end < len(text) and text[end] == "`":
+            end += 1
+        if end - i == len(marker):
+            return i
+        i = end
+    return -1

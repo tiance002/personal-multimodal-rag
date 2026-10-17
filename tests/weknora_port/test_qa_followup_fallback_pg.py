@@ -4,6 +4,7 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 import httpx,uvicorn
 from backend.weknora_port.http_api import create_app
+from backend.weknora_port.service import KNOWLEDGE_EVIDENCE_INSUFFICIENT
 from tests.weknora_port.native_fixture import isolated_mock_application
 from tests.weknora_port.test_memory_storage_pg import actual_pg_run
 
@@ -72,7 +73,7 @@ def test_followup_and_source_fallback_through_formal_http(monkeypatch):
             text='GENERAL_FALLBACK_REPLY' if 'QA_FALLBACK' in system or 'kb_documents' in system or 'No relevant' in system else 'Blue widgets use W-17. <ref id="c1"/>'
             return stream_response(body['model'],text,'stop')
     async def scenario():
-        async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,response_handler=response) as (runtime,wire,root):
+        async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,response_handler=response,citations_enabled=True) as (runtime,wire,root):
             async with http_client(runtime) as client:
                 kbid=await kb(client,'QA source history')
                 upload=await client.post(f'/api/v1/knowledge-bases/{kbid}/documents',files={'file':('source.txt',SOURCE,'text/plain')})
@@ -100,12 +101,13 @@ def test_followup_and_source_fallback_through_formal_http(monkeypatch):
                 empty=await kb(client,'QA empty fallback')
                 original=runtime.conversation
                 rows=[]
-                cases=[('default',original,True),
-                    ('fixed',replace(original,fallback_strategy='fixed',fallback_response='FIXED_SOURCE_REPLY'),False),
-                    ('empty_prompt',replace(original,fallback_prompt='',fallback_response='EMPTY_PROMPT_FIXED'),False),
-                    ('unknown_strategy',replace(original,fallback_strategy='unknown',fallback_response='OTHER_FIXED'),False),
-                    ('model',replace(original,fallback_prompt='QA_FALLBACK {{language}} {{query}} {{kb_documents}}'),True)]
-                for name,cfg,model in cases:
+                # P21 overrides every KB-empty strategy with the fixed evidence refusal.
+                cases=[('default',original),
+                    ('fixed',replace(original,fallback_strategy='fixed',fallback_response='FIXED_SOURCE_REPLY')),
+                    ('empty_prompt',replace(original,fallback_prompt='',fallback_response='EMPTY_PROMPT_FIXED')),
+                    ('unknown_strategy',replace(original,fallback_strategy='unknown',fallback_response='OTHER_FIXED')),
+                    ('model',replace(original,fallback_prompt='QA_FALLBACK {{language}} {{query}} {{kb_documents}}'))]
+                for name,cfg in cases:
                     runtime.conversation=cfg
                     target=await session(client,empty)
                     offset=len(wire)
@@ -113,24 +115,15 @@ def test_followup_and_source_fallback_through_formal_http(monkeypatch):
                     assert message['is_completed'] and not message['turn_error_code'],reply.text
                     assert message['content'] and not message['knowledge_references'],message
                     sent=[r['body'] for r in wire[offset:] if r['body'].get('stream')]
-                    assert bool(sent)==model,(name,sent)
+                    assert not sent,(name,sent)
                     event_frames=frames(reply)
                     assert event_frames[-1]['response_type']=='complete'
                     assert sum(f['response_type']=='complete' for f in event_frames)==1
                     assert any(f.get('data',{}).get('is_fallback') for f in event_frames if f['response_type']=='answer')
-                    if model:
-                        assert sent[0].get('temperature')==.3 and sent[0].get('max_tokens',sent[0].get('max_completion_tokens'))==1024
-                        assert 'Reference materials (source data)' not in sent[0]['messages'][0]['content']
-                    else:assert message['content']==cfg.fallback_response
+                    assert message['content']==KNOWLEDGE_EVIDENCE_INSUFFICIENT
                     durable=await runtime._rows('SELECT status,error_code FROM port_turns WHERE tenant_id=%s AND subject_id=%s AND assistant_message_id=%s',
                         (runtime.principal.tenant_id,runtime.principal.subject_id,message['id']))
                     assert durable[0]['status']=='completed' and not durable[0]['error_code']
-                    if name=='model':
-                        start_followup=len(wire)
-                        followup,following,_=await ask(client,runtime,target,empty,'Explain your previous reply further.')
-                        assert following['is_completed'] and not following['turn_error_code'],followup.text
-                        followup_wire=[r['body'] for r in wire[start_followup:] if r['body'].get('stream')]
-                        assert any(m['role']=='assistant' and 'GENERAL_FALLBACK_REPLY' in m['content'] for m in followup_wire[0]['messages'])
                     rows.append({'case':name,'session':target,'assistant':message['id'],'content':message['content'],'stream_calls':len(sent),'port_status':durable[0]['status'],'events':event_frames})
                 runtime.conversation=original
                 # No fallback success may soften a private KB or failed budget authority.
@@ -175,7 +168,12 @@ def test_model_fallback_stop_and_scope_failures_remain_terminal():
         async with isolated_mock_application(expected_redis_run_id=REDIS_ID,redis_db=15,response_handler=response) as (runtime,wire,root):
             runtime.conversation=replace(runtime.conversation,fallback_prompt='QA_FALLBACK {{query}}')
             async with http_client(runtime) as client:
-                kbid=await kb(client,'QA stop empty KB');sid=await session(client,kbid)
+                kbid=await kb(client,'QA stop source KB')
+                # No-evidence KB fallback is fixed in P21; keep the actual model-stop
+                # and UNKNOWN counterexample on the evidence-backed generation path.
+                upload=await client.post(f'/api/v1/knowledge-bases/{kbid}/documents',files={'file':('stop.txt',b'Blue widgets use protocol W-17.','text/plain')})
+                assert upload.status_code==200 and upload.json()['data']['status']=='completed'
+                sid=await session(client,kbid)
                 request={'content':'What is here?','request_id':str(uuid.uuid4()),'knowledge_base_scope':[kbid]}
                 pending=asyncio.create_task(client.post(f'/api/v1/sessions/{sid}/messages',json=request))
                 try:
@@ -236,10 +234,10 @@ def test_fallback_listing_preserves_document_scope_through_http():
                         (docs[0],kbid))
                 reply,assistant,_=await ask(client,runtime,sid,kbid,'List available documents.')
                 assert assistant['is_completed'] and not assistant['turn_error_code'],reply.text
-                assert captured and 'QA_FALLBACK - selected-public (txt):' in captured[0]['messages'][0]['content']
+                assert not captured and assistant['content']==KNOWLEDGE_EVIDENCE_INSUFFICIENT
                 assert 'SIBLING_SCOPE_SENTINEL' not in json.dumps(captured)
                 output=Path('docs/weknora-port/evidence/QA_ENTRY_20261015/listing.scope.'+uuid.uuid4().hex+'.json')
                 output.write_text(json.dumps({'session':sid,'allowed_document':docs[0],'excluded_document':docs[1],
-                    'assistant':assistant['id'],'messages':captured[0]['messages'],'real_provider_calls':0,
-                    'scope':'actual PG disabled-index empty search; source direct-document recall bypasses thresholds; listing restricted to admitted document scope'},indent=2)+'\n',encoding='utf-8')
+                    'assistant':assistant['id'],'messages':captured,'fixed_refusal':assistant['content'],'real_provider_calls':0,
+                    'scope':'actual PG disabled-index empty search; P21 fixed refusal sends no document listing and preserves admitted document scope'},indent=2)+'\n',encoding='utf-8')
     actual_pg_run(scenario())
