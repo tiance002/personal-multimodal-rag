@@ -1,0 +1,362 @@
+{
+  "schema": "p24-six-dataset-wiring/v1",
+  "status": "P24_PARTIAL_OFFLINE_AUDIT_COMPLETE_REAL_CHEAP_NOT_RUN",
+  "audited_at": "2026-10-17T13:30:45+08:00",
+  "baseline": {
+    "requested_sha": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "actual_head": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "branch": "codex/weknora-python-port-integrate-image-20261014",
+    "matches": true,
+    "inherited_dirty_entries": 7,
+    "preserved": true
+  },
+  "execution": {
+    "preflight_command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p24-20261017\\preflight.py",
+    "preflight_exit_code": 0,
+    "new_provider_calls": 0,
+    "new_actual_tokens": 0,
+    "new_unknown": 0,
+    "new_uploads": 0,
+    "new_indexes": 0,
+    "real_cheap_rag": "NOT_RUN",
+    "not_run_reason": "Saved finite SiliconFlow fence headroom is zero; current selected P22 KB scope has no MML source-name hits; isolated PG and Redis were stopped. No fence change or service start.",
+    "last_saved_fence": {
+      "closed_limit": 1669727,
+      "headroom": 0,
+      "historical_unknown": 61,
+      "historical_ledger_rows": 705,
+      "new_unknown": 0
+    },
+    "current_scope": {
+      "kb_count": 2,
+      "fingerprinted_vectors": 287,
+      "unchanged": true,
+      "mml_source_name_hits": false
+    },
+    "stopped_containers": [
+      {
+        "name": "eviroute-rag-postgres",
+        "id": "89c5cb748e2ec7aca3b1e3b181dfe936a4054137ddb4de5c4e8689e86387e720",
+        "image": "paradedb/paradedb:v0.22.6-pg17",
+        "status": "exited",
+        "host_port": "127.0.0.1:56423",
+        "volume": "weknora-python-resume-pg-20261013:/var/lib/postgresql/data"
+      },
+      {
+        "name": "eviroute-rag-redis",
+        "id": "15fe772fab7d9ac5b6023ff2075ebb5e12ccee80e274f91b16fe612e8748e897",
+        "image": "redis:7.4.2",
+        "status": "exited",
+        "host_port": "127.0.0.1:56424",
+        "volume": "weknora-python-resume-redis-20261013:/data"
+      }
+    ]
+  },
+  "mml": {
+    "denominator": 8,
+    "previously_scored": {
+      "qid": "row-0687",
+      "phase": "P9",
+      "em": 0,
+      "character_f1": 0.017834394904458598
+    },
+    "remaining_audited": 7,
+    "new_live_runs": 0,
+    "source_pdfs": [
+      {
+        "name": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+        "sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "pages": 68,
+        "qids": [
+          "row-0430",
+          "row-0431",
+          "row-0434"
+        ]
+      },
+      {
+        "name": "11-21-16-Updated-Post-Election-Release.pdf",
+        "sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "pages": 45,
+        "qids": [
+          "row-0684",
+          "row-0685"
+        ]
+      },
+      {
+        "name": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+        "sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "pages": 21,
+        "qids": [
+          "row-0958",
+          "row-0959"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "qid": "row-0430",
+        "gold": [
+          "0"
+        ],
+        "evidence_pages": [],
+        "disposition": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+        "source_gold": "Full-deck tiger image count not independently confirmed.",
+        "live_status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0431",
+        "gold": [
+          "5"
+        ],
+        "evidence_pages": [
+          29,
+          30,
+          32
+        ],
+        "page_index_convention": "UNKNOWN",
+        "disposition": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+        "source_gold": "Saved text/crops do not establish diagram layer count.",
+        "live_status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0434",
+        "gold": [
+          "Cat vs Dog dataset"
+        ],
+        "evidence_pages": [
+          34
+        ],
+        "disposition": "EVIDENCE_TEXT_PRESENT_SECTION_LINK_UNVERIFIED",
+        "source_gold": "MinerU p34 has dataset text; P16 OCR saw Coding time! on p33, but P15/P16 found no reliable section link.",
+        "live_status": "NOT_RUN",
+        "historical": "P11 MinerU rerank dropped the candidate before useful Context; no final Cheap answer."
+      },
+      {
+        "qid": "row-0684",
+        "gold": [
+          "men"
+        ],
+        "evidence_pages": [
+          10
+        ],
+        "disposition": "GOLD_SOURCE_CONFIRMED_BUT_TEXT_INDEX_INSUFFICIENT",
+        "source_gold": "Original physical p10 chart: men 81%, women 78% yes; values missing from text index.",
+        "live_status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0685",
+        "gold": [
+          "Not answerable"
+        ],
+        "evidence_pages": [],
+        "disposition": "GOLD_UNANSWERABILITY_NOT_VERIFIED",
+        "source_gold": "No complete 45-page exclusion audit; evidence page unspecified.",
+        "live_status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0958",
+        "gold": [
+          "shiny object",
+          "mirror"
+        ],
+        "evidence_pages": [
+          9
+        ],
+        "disposition": "VISUAL_CAPABILITY_NOT_ESTABLISHED",
+        "source_gold": "OCR phrase shiny surface does not establish diagram examples.",
+        "live_status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0959",
+        "gold": [
+          "radiowaves",
+          "microwaves"
+        ],
+        "evidence_pages": [
+          17,
+          18
+        ],
+        "disposition": "GOLD_SOURCE_TEXT_CONFIRMED_HISTORICAL_RAG_ONLY",
+        "source_gold": "MinerU physical p17 supports both terms.",
+        "live_status": "NOT_RUN",
+        "historical": "P11 MinerU-B real RAG reached Context and Cheap; core answer matched Gold; separate configuration."
+      }
+    ],
+    "index_snapshots": {
+      "p9_native": {
+        "cat_chunks": 23,
+        "pew_chunks": 162,
+        "b3_present": false
+      },
+      "p11_native": {
+        "cat_chunks": 23,
+        "b3_chunks": 6
+      },
+      "p11_mineru_basic": {
+        "cat_chunks": 52,
+        "b3_chunks": 34
+      }
+    }
+  },
+  "omni": {
+    "pages": 24,
+    "valid_source_bindings": 24,
+    "archive_sha256": "111d1e8eff5fa7e743fec9adf72b67538981fadd72fac303a43c344d3f2d1c06",
+    "archive_matches_manifest": true,
+    "project_ned_scored_pages": 3,
+    "pages_not_scored": 21,
+    "official_metrics": "NOT_RUN",
+    "official_qa_gold": false,
+    "paired_ned": [
+      {
+        "page": "PPT_EnglishtoAmericanTransition_page_012.png",
+        "p9_tesseract": 0.12,
+        "p10_mineru_basic": 0.13333333333333333
+      },
+      {
+        "page": "PPT_lecture1_page_007.png",
+        "p9_tesseract": 0.5882352941176471,
+        "p10_mineru_basic": 0.1320754716981132
+      },
+      {
+        "page": "yanbaopptmerge_yanbaoPPT_4185.jpg",
+        "p9_tesseract": 0.6021505376344086,
+        "p10_mineru_basic": 0.053763440860215055
+      }
+    ],
+    "same_three_page_mean": {
+      "p9_tesseract": 0.4367952772506853,
+      "p10_mineru_basic": 0.10639074863055387,
+      "lower_is_better": true
+    },
+    "not_scored_reason": "Ambiguous Gold/annotation text order or required completed OCR unavailable.",
+    "historical_p12_real_rag_diagnostics": 6
+  },
+  "historical_coverage": {
+    "note": "P9/P19 remain separate phases and source revisions; selected-subset metrics are not full-corpus results.",
+    "datasets": {
+      "SciFact": {
+        "frozen": 8,
+        "p9": 4,
+        "p19": 4,
+        "recall_p9": [
+          1,
+          0.625,
+          0.5
+        ],
+        "recall_p19": [
+          1,
+          1,
+          1
+        ],
+        "answer_gold": false
+      },
+      "MIRACL-ZH": {
+        "frozen": 8,
+        "p9": 5,
+        "p19": 3,
+        "recall_p9": [
+          1,
+          1,
+          1
+        ],
+        "recall_p19": [
+          1,
+          1,
+          1
+        ],
+        "answer_gold": false
+      },
+      "LongBench-ZH": {
+        "frozen": 8,
+        "p9": 3,
+        "p19": 5,
+        "recall_p9": [
+          1,
+          1,
+          1
+        ],
+        "recall_p19": [
+          0.8,
+          1,
+          0.8
+        ],
+        "p9_answer": {
+          "DuReader_ROUGE_L": {
+            "mean": 0.2772571034792455,
+            "n": 2
+          },
+          "MultiFieldQA_F1": {
+            "mean": 0.09375,
+            "n": 1
+          }
+        },
+        "p19_answer": {
+          "DuReader_ROUGE_L": {
+            "mean": 0.33701735654957476,
+            "n": 2
+          },
+          "MultiFieldQA_F1": {
+            "mean": 0.21426861824542023,
+            "n": 3
+          }
+        }
+      },
+      "HotpotQA": {
+        "frozen": 8,
+        "p9": 3,
+        "p19": 5,
+        "recall_p9": [
+          1,
+          0.8333333333333334,
+          0.8333333333333334
+        ],
+        "recall_p19": [
+          1,
+          0.9,
+          0.9
+        ],
+        "p9_answer": {
+          "EM": 0,
+          "token_F1": 0.11426836672738312
+        },
+        "p19_answer": {
+          "EM": 0,
+          "token_F1": 0.14718530807371835
+        },
+        "support_joint": "NOT_CLAIMED"
+      },
+      "MMLongBench-Doc": {
+        "frozen": 8,
+        "p9_scored": 1,
+        "p24_new_runs": 0,
+        "p9_row_0687": {
+          "EM": 0,
+          "char_F1": 0.017834394904458598
+        },
+        "p11_results_uniform": false
+      },
+      "OmniDocBench": {
+        "parse_pages": 24,
+        "valid_bindings": 24,
+        "project_ned_pages": 3,
+        "p9_mean": 0.4367952772506853,
+        "p10_mean": 0.10639074863055387,
+        "official_qa": false
+      }
+    }
+  },
+  "revisions": {
+    "p9_api": "a2eaa8e44ca55b4d8b3856399c5c09350b6f4985",
+    "p19_runtime": "bec7c282be4c1cc4b49979e786e949082392d49b"
+  },
+  "evidence_root": "E:\\WK\\run\\p24-20261017",
+  "validation": {
+    "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B E:\\WK\\run\\p24-20261017\\validate_reports.py",
+    "exit_code": 0,
+    "stdout": "E:\\WK\\run\\p24-20261017\\validation.stdout.txt",
+    "exit_file": "E:\\WK\\run\\p24-20261017\\validation.exitcode.txt",
+    "tracked_diff_check": "git -C E:\\RAG-Worktrees\\weknora-python-port-20261013 diff --check -- progress.md",
+    "tracked_diff_check_exit_code": 0
+  }
+}
