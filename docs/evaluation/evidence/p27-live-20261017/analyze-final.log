@@ -1,0 +1,89 @@
+{
+  "status": "P27_PARTIAL",
+  "calls": {
+    "calls": 24,
+    "input": 47550,
+    "output": 2635,
+    "total": 50185,
+    "unknown": 0,
+    "unknown_held": 0
+  },
+  "cases": [
+    {
+      "qid": "row-0958",
+      "stages": {
+        "search": {
+          "count": 9,
+          "image_child_ids": [
+            "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+            "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+          ],
+          "image_parent_ids": [
+            "48e47fc7-528e-409c-94d8-5819d1ca580a"
+          ]
+        },
+        "rerank": {
+          "count": 0,
+          "image_child_ids": [],
+          "image_parent_ids": []
+        },
+        "context": {
+          "count": 0,
+          "image_child_ids": [],
+          "image_parent_ids": []
+        }
+      },
+      "full_chain": false,
+      "answer_score": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.0
+        },
+        "official_judge": "NOT_RUN"
+      }
+    },
+    {
+      "qid": "row-0684",
+      "stages": {
+        "search": {
+          "count": 30,
+          "image_child_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        },
+        "rerank": {
+          "count": 4,
+          "image_child_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        },
+        "context": {
+          "count": 2,
+          "image_child_ids": [],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        }
+      },
+      "full_chain": true,
+      "answer_score": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.012244897959183673
+        },
+        "official_judge": "NOT_RUN"
+      }
+    }
+  ],
+  "unused_revoked": 949815
+}

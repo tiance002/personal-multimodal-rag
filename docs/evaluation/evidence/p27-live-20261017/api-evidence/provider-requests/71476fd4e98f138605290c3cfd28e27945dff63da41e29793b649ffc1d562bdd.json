@@ -1,0 +1,23 @@
+{
+  "schema": "p9-actual-provider-wire/v1",
+  "request_id": "ae73ff5d-01b2-44f4-b197-b18b298e51be/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-c590b3c924c35c2f",
+  "run_id": "ae73ff5d-01b2-44f4-b197-b18b298e51be/query-embedding-63236a5c-c0d6-499d-84e5-34475564f1c0-c590b3c924c35c2f",
+  "capability": "embedding",
+  "stage": "auxiliary",
+  "provider": "siliconflow",
+  "model": "BAAI/bge-m3",
+  "boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+  "wire_sha256": "82e529363118f20c063a8829614f3c161bb281a577799cfc75f2ed2e0b51fec0",
+  "wire_bytes": 70,
+  "body": {
+    "encoding_format": "float",
+    "input": [
+      "examples"
+    ],
+    "model": "BAAI/bge-m3"
+  },
+  "finish_reason": null,
+  "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+  "headers_saved": false,
+  "status_code": 200
+}

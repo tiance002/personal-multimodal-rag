@@ -1,0 +1,43 @@
+{
+  "status": "CLOSED",
+  "accounts": {
+    "deepseek": {
+      "limit": 4324,
+      "occupied": 4324,
+      "headroom": 0
+    },
+    "siliconflow": {
+      "limit": 1739220,
+      "occupied": 1739220,
+      "headroom": 0
+    }
+  },
+  "actual_tokens": 50185,
+  "unused_revoked": 949815,
+  "history_preservation": {
+    "deepseek": {
+      "old_rows": 2,
+      "all_old_rows_unchanged": true,
+      "old_rows_sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+      "old_unknown_count": 1,
+      "old_unknown_held": 259
+    },
+    "siliconflow": {
+      "old_rows": 726,
+      "all_old_rows_unchanged": true,
+      "old_rows_sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+      "old_unknown_count": 61,
+      "old_unknown_held": 823355
+    }
+  },
+  "raw_immutable_receipts_on_E": {
+    "fence\\close-after.json": "1f34fcf711bacf4b0bfc1e2ef11cf848220a447082c9e303bc0e202e6a585401",
+    "fence\\close-before.json": "114e61071ef6c81a2a6bbbfeb161abd45aac9dbec540442e1f5bd6a7dc44b3b2",
+    "fence\\close-precommit.json": "e2363b50f6864b8d6e54874a08daf6bb3586c802b669fd685a9183ca4f390c82",
+    "fence\\intent.json": "82ede9fbfb38fb8d1b1897d449d1a4a3851f04f19336381d3e8ed5496555bd2b",
+    "fence\\open-after.json": "fbf4258a578bbe0145ab39007de6ce285c3c050d3598f9317f3e10cd9eb4c642",
+    "fence\\open-before.json": "296478400daf1d9e0bc8a3898bd77ef220302b233465ccef931945782bc465d2",
+    "fence\\open-precommit.json": "ec411461ca329e34a9adab21826c1bc14d732e4e016114bdff2c090e44e6db96"
+  },
+  "raw_export_sha256": "3397bad99e3f324d20551b593faa4e0047fc867db55eaa9da2cd2fa9f66176ac"
+}

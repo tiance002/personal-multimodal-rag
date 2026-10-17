@@ -1,6 +1,6 @@
 # P27 — Multimodal RAG Real Ingestion and Visual Evidence Loop
 
-**Status:** `P27_BLOCKED`
+**Status:** `P27_PARTIAL`
 
 **Date:** 2026-10-17 (Asia/Shanghai)
 
@@ -8,7 +8,81 @@
 
 **Branch / starting HEAD:** `codex/weknora-python-port-integrate-image-20261014` / `78d277b12ed6ea5eb82a61a73160ef41a5c7027f`
 
-## Latest continuation — historical cap incident recovered
+## 最新真实执行结论：P27_PARTIAL
+
+本轮基于 `77bd1914f895caacfc7407dfda4b0f75d9840d23` 继续；真实应用源码冻结为 **`14788b9ed37cfd82d15ac8ecbb62efcab4f14d35`**。两份冻结原PDF均通过正常HTTP上传、独立Worker完成限定页OCR/DeepSeek Caption、持久化及Child向量索引。Pew视觉派生内容进入真实最终Cheap请求；B3因现有Rerank过滤为固定拒答，未进入最终Cheap。因此为 **P27_PARTIAL**，不是P27_BLOCKED，也不将两个答案记为正确。
+
+本章为当前状态；下面较早章节保留当时的阻断和恢复事实。旧Gold、P9–P26结果、UNKNOWN和原有未提交文件不变。
+
+### 账户依据与有限围栏
+
+Owner确认实际导出为 `usage_data_2026-10-11_2026-10-17.zip`，并明确“你就看这七天的，都是这个项目在用”。原先提及的9月18日起文件不存在，没有伪造为已读取。真实七天导出SHA为 `3397bad99e3f324d20551b593faa4e0047fc867db55eaa9da2cd2fa9f66176ac`，单一Key名称 `ccswitch-deepseek`，导出中的脱敏Key模式与当前项目密钥匹配。导出具有单一计费user_id，报告只保存其SHA；Owner先前提供的UUID与导出user_id不是同一字段，不冒充已匹配UID。依据是实际导出账户、Key匹配及Owner归属说明，账本继续沿用原 `deepseek-owner-main`，没有新建空账户。
+
+七天观察用量：cache miss25,764 + cache hit10,112 + output16,920 = **52,796 Token /21次请求**。不把cache hit重复加到已含缓存的input字段；这里导出明确将hit/miss分列。账户不是技术独占，本机CCSwitch的claude/codex配置也引用相同密钥；本轮按Owner确认的七天项目使用范围核对，不宣称覆盖完整月份或技术上阻止外部调用者。原始账单zip保留在E盘，不提交含账户明细/价格的原件，也不从金额估算Token。
+
+沿用现有月锁、P22不可变receipt/CAS及ApprovedTokenAuthority：本轮静态分配 **DeepSeek750,000 + SiliconFlow250,000 =1,000,000**。DeepSeek原本地占用273（UNKNOWN259及历史错桶SF14均原样保留），临时限750,273；连同整份导出52,796保守重叠计算为803,069，不超过原1,000,000上界，未相抵释放UNKNOWN。SF原占用1,693,086，临时限1,943,086。结束后两家均关闭到实际占用，headroom均0；本轮未用 **949,815 Token** 撤回，bundle入口禁用并保留已用配置副本。
+
+### 本轮最小生产修复
+
+实际装配原先一次只能使用一个provider的授权，无法让同一图片入库流程先调用DeepSeek视觉，再调用SiliconFlow Embedding。提交 `14788b9…` 仅组合现有单provider authority，按实际provider选择原账户、模型、meter和成员配置SHA；权限、P1SendGate、预留/结算、来源及UNKNOWN规则继续复用。未新增计费表、供应商、发送器或通用预算系统。
+
+共享生产文件只有 `authority.py`、`development.py`、`entrypoint.py`。CLI可读取 `weknora-token-authority-bundle/v1` 的两个现有成员配置路径；成员必须同tenant/subject/month、approved且provider唯一。DeepSeek有限上限允许小于等于100万，100万以上仍拒绝；旧测试中999,999拒绝断言据此改为接受更低围栏，并保留零/超100万/类型错误/混用provider/合成外发反例。对应两个测试文件随提交记录。无迁移、依赖、普通Prompt、Rerank阈值、模型、路由或解析器改动。
+
+### 两题实际链路与答案
+
+| 项目 | row-0958 B3物理p9 | row-0684 Pew物理p10 |
+|---|---|---|
+| 原件 | 原SHA匹配，完整21页PDF经HTTP原文回读匹配 | 原SHA匹配，完整45页PDF经HTTP原文回读匹配 |
+| 图片任务 | attempt1 completed，只有p9一个资产 | attempt1 completed，只有p10一个渲染资产 |
+| OCR/Caption | 本地Tesseract + 1次真实DeepSeek，均completed | 本地Tesseract + 1次真实DeepSeek，均completed |
+| Child与向量 | 1 OCR +1 Caption，有真实parent/version/page；合计9 chunk/vector | 1 OCR +1 Caption，有真实parent/version/page；合计165 chunk/vector |
+| Search | 9候选，包含OCR、Caption及其parent | 30候选，包含OCR、Caption及其parent |
+| Rerank | 4条实际输入，过滤后0 | 30条实际输入，过滤后4 |
+| 最终Context | 0；无最终回答模型请求 | 2个parent文本Context；完整OCR/Caption经正常渲染进入实际Cheap请求 |
+| 最终响应 | 固定证据不足提示 | 生成回答，错误声称男女均79% |
+| 必要图像事实 | 原图可读“shiny object or mirror”，OCR损坏，Caption仅概述波现象，未提取两实例 | 原图可读男性81%、女性78%，OCR图表乱码，Caption仅约80%概述，未提取类别与数值对应 |
+| 结果 | QUALITY_FAILURE；完整视觉→最终模型链路未达成 | 完整链路达成；视觉事实提取和回答质量失败 |
+| 原件入库至完成 | 12.913s | 20.840s |
+| HTTP问答墙钟 | 4.644s | 5.779s |
+| 该题全部辅助及最终调用Token | 11,103 | 39,082 |
+
+两份DeepSeek原响应的Caption与任务持久化内容完全一致，usage与结算行一致。两个目标图像的SHA与实际DeepSeek wire内JPEG逐字节一致，原件SHA/任务snapshot/document/version/页码关联通过。实际wire分别304,741和410,465字节，均`max_tokens=5000`，没有显式thinking参数；input预留分别305,765、411,489。两次真实output840/1,161，含reasoning分项744/1,013，均在cap内；reasoning已包含在output中，没有再次相加。
+
+B3 Rerank观察器中OCR/Caption/parent分数分别0.00783876、0.01072710、0.01442671；Pew分别0.85367054、0.87352788、0.90333790。这里是既有model.rerank观察器返回值，管线还保留其既有转换/过滤；不是额外抓取的原始Rerank HTTP响应，不据此调整阈值。
+
+Pew原生段落说总体79%及男女“无显著差异”，不足以推出两个群体均79%。真实最终请求包含这段原文和有来源身份的图像派生文字，但没有可读的81%/78%类别对应。故同时记录 **CHART_VALUES_NOT_EXTRACTED** 与 **UNSUPPORTED_GROUP_PERCENTAGE_IN_ANSWER**；不能把来源可回读或Context送达当作事实充分。B3另记录 **VISUAL_DETAILS_NOT_EXTRACTED / RERANK_FILTERS_ALL_CANDIDATES**，固定拒答符合现有保护。
+
+Gold只在调用结束后参与离线评分，未进入Caption、索引或回答输入。两题项目诊断normalized EM均0；character F1分别0和0.0122449；人工目标事实正确0/2。只有1次最终Cheap生成，另1题为固定拒答。官方judge NOT_RUN，不冒充官方MML全量准确率，也不并入旧P9版本成绩。
+
+公开引用继续关闭，没有自动补引用。4个image_ocr/image_caption通过正常`GET /api/v1/chunks/{id}`回读，KB、document、source_version、物理页及文本一致；完整原PDF通过正常source API回读匹配。来源合法与答案正确分开记分。只读回查前后模型账本完全相同，新增调用0。
+
+### 真实计量和收口
+
+| 实际模型调用 | 次数 | Input | Output | Total |
+|---|---:|---:|---:|---:|
+| DeepSeek视觉 | 2 | 2,050 | 2,001 | 4,051 |
+| SiliconFlow Embedding | 15 | 24,814 | 0 | 24,814 |
+| SiliconFlow Rerank | 2 | 7,801 | 0 | 7,801 |
+| SiliconFlow Cheap聊天 | 5 | 12,885 | 634 | 13,519 |
+| **合计** | **24** | **47,550** | **2,635** | **50,185** |
+
+5次Cheap聊天是2次正常入库摘要、2次正常Query Rewrite、1次最终回答。2次Rerank均真实结算，未为计量额外请求。所有24条均settled、simulated=false，新增UNKNOWN0；原DeepSeek UNKNOWN1/259 held、SF UNKNOWN61/823,355 held不变，全部原2/726调用行逐行相同。单独供应商网络耗时未采集，标NOT_CAPTURED；上述耗时为实际入库/HTTP问答，不冒充单模型时延。
+
+环境：PG56423 / `weknora_python_port_20261013` / system7696088403504697382；Redis56424/DB15/run_id `dcff9d65a25725574ba0cfbc743d409fac211ef0`，独立前缀 `weknora-python-p27:2b810c56a34b491fa3330ef1e2b5cc92`；新tenant344、两个独立KB，所有问答`document_scope=[]`，候选全部属于对应KB/doc。最终本地月占用/限额为DeepSeek4,324、SF1,739,220（均headroom0，不代表完整供应商账单总量）。只停止本任务API/worker及只读回查API，56425/56426无监听；真实只读closeout复核两个账户无reserved、历史UNKNOWN分别1/61且关闭后的账本未再变化；原PG/Redis及其他服务保留。未Push、部署、合并、打Tag或进入P28。
+
+下一步最值得单独验证的是入库视觉证据的细粒度提取要求：能否保留图表类别—数值和图示对象标签，而非仅概述整页。该方向需要另行受控验证，本轮不修改Caption/普通Prompt或生产策略。B3低分Rerank及Cheap无依据套用总体数字分别保留为质量问题，不扩大修复。
+
+### 本轮命令与证据
+
+工作目录均为本仓库。解释器为 `E:/RAG quention/.venv/Scripts/python.exe`，全部带`-B`。完整129项离线命令保存在证据的`offline-tests/command.txt`，退出0；该组装配测试为doubles，不冒充真实服务。
+
+真实命令尾部：`E:/WK/run/p27-live-20261017/account_and_inputs.py`；`fence.py open`；`run.py configs`；`run.py start`；`run.py configure`；`run.py case row-0958`；`run.py case row-0684`；`run.py snapshot final`；`fence.py close`；`readback.py`；`analyze.py`。除下述保留的离线/本地工具失败外，最终命令均exit0。进程实际命令、操作intent、HTTP回执及源码文件hash均保存，不只依据HTTP200判断结果。
+
+保留失败：围栏脚本首轮因Windows默认GBK读UTF-8失败，发生于任何DB变更/外发前，显式UTF-8后成功；两次离线provenance断言因Context的blockquote及HTML转义而失败，修正分析器按真实渲染顺序反转这两项后成功，原失败log和断言保留。没有因此重复上传、Rerank或最终回答。首次`git diff --cached --check`对原始SSE末尾协议空行返回2；以证据目录局部`.gitattributes`保留原始字节并标注SSE为原始数据，未裁剪/改写SSE，原检查失败证据保留。随后识别原始CRLF为合法行尾，最终`git diff --cached --check`退出0；未改写原始数据。
+
+本轮仓库证据：`docs/evaluation/evidence/p27-live-20261017/`（实际wire、DeepSeek原响应、阶段、最终SSE、当前新数据快照、chunk API回读、分析与测试）；完整E盘运行目录 `E:/WK/run/p27-live-20261017/`（含原始账单zip、图片资产和不可变完整围栏收据）。manifest对保存文件绑定SHA。新报告提交只包含本任务证据，不暂存既有.serena/progress/P6等文件。
+
+## Previous continuation — historical cap incident recovered
 
 Starting source: `9d4788a6b7f47f31459fbebdf5873577a7599dac`. **P27 remains BLOCKED only on unverified account association / consumer coverage before live activation. The historical DeepSeek month block has now been explicitly recovered.** The earlier sections below retain their earlier stop state; they do not describe the current month block.
 

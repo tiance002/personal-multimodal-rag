@@ -1,0 +1,23 @@
+{
+  "schema": "p9-actual-provider-wire/v1",
+  "request_id": "bea618ab-5136-4ca8-9d83-c40dba44f17c/query-embedding-2cf0b09f-9524-4a44-810d-45542619ef74-0e5646f8398796bc",
+  "run_id": "bea618ab-5136-4ca8-9d83-c40dba44f17c/query-embedding-2cf0b09f-9524-4a44-810d-45542619ef74-0e5646f8398796bc",
+  "capability": "embedding",
+  "stage": "auxiliary",
+  "provider": "siliconflow",
+  "model": "BAAI/bge-m3",
+  "boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+  "wire_sha256": "04d47d43bf312d109f4bc59eee07efc2692fe2a07eaedc0d356d81173b0d1810",
+  "wire_bytes": 152,
+  "body": {
+    "encoding_format": "float",
+    "input": [
+      "男性和女性中，分别有多少比例的人认为女性总统会在一生中当选？"
+    ],
+    "model": "BAAI/bge-m3"
+  },
+  "finish_reason": null,
+  "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+  "headers_saved": false,
+  "status_code": 200
+}

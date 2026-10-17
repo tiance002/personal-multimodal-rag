@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "E:\WK\run\p27-live-20261017\fence.py", line 77, in <module>
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as r:r.run(run(sys.argv[1]))
+                                                                     ~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "E:\WK\run\p27-live-20261017\fence.py", line 37, in run
+    proof=json.loads((OUT/'account-proof.json').read_text())
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Drivers\python\Lib\pathlib\_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\pathlib\_abc.py", line 633, in read_text
+    return f.read()
+           ~~~~~~^^
+UnicodeDecodeError: 'gbk' codec can't decode byte 0xac in position 616: illegal multibyte sequence

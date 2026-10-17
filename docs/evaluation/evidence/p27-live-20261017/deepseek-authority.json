@@ -1,0 +1,28 @@
+{
+  "schema": "weknora-token-authority/v1",
+  "mode": "approved",
+  "tenant_id": 344,
+  "subject_id": "p27-owner-2b810c56a34b491fa3330ef1e2b5cc92",
+  "account_id": "deepseek-owner-main",
+  "provider": "deepseek",
+  "expires_at": "2026-10-17T09:43:32.978699+00:00",
+  "approval_source": "OWNER:20261015-real-egress:0f16e911c36ee71d841c7c63403bc9ec803a196c2188c4a4e12d2351db866bad",
+  "month": "2026-10-01",
+  "carry_in_tokens": 0,
+  "carry_status": "KNOWN",
+  "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+  "limit_tokens": 750273,
+  "input_limit": 500000,
+  "output_limit": 8192,
+  "allowed_models": [
+    [
+      "deepseek",
+      "deepseek-flash"
+    ]
+  ],
+  "meter": {
+    "recipe": "deepseek-inline-image-1024/v1",
+    "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\source_facts.py",
+    "sha256": "f3ce75acd53c276308818cafb5bb0104c9a022495b3e62bdc407f6b9e17b6723"
+  }
+}

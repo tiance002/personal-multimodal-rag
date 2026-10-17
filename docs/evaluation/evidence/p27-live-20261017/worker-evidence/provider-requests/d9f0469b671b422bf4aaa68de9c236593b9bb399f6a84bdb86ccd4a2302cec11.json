@@ -1,0 +1,23 @@
+{
+  "schema": "p9-actual-provider-wire/v1",
+  "request_id": "e34af609-a64d-478a-b3da-8284e3c0bca0/summary-embedding",
+  "run_id": "e34af609-a64d-478a-b3da-8284e3c0bca0/summary-embedding",
+  "capability": "embedding",
+  "stage": "auxiliary",
+  "provider": "siliconflow",
+  "model": "BAAI/bge-m3",
+  "boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+  "wire_sha256": "c27357a9c5304e6a2eb09ff8ef2a2fb0b7805b44e43989d53b92bbe59b61e54c",
+  "wire_bytes": 647,
+  "body": {
+    "encoding_format": "float",
+    "input": [
+      "# Summary\n物理学中波的三种基本现象：反射、折射与衍射的教育图解。\n\n该文档是一组关于物理学中波的三种基本现象的教育图解，涵盖反射、折射和衍射。反射定律指出入射角等于反射角；折射发生在波从一种介质进入另一种介质时，波速变化导致方向改变；衍射是波穿过缝隙或绕过障碍物时扩散的现象，当缝隙等于波长时衍射最大，缝隙小于或大于波长时衍射最小。所有波均可发生反射和折射，衍射程度取决于缝隙与波长的相对关系。"
+    ],
+    "model": "BAAI/bge-m3"
+  },
+  "finish_reason": null,
+  "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+  "headers_saved": false,
+  "status_code": 200
+}

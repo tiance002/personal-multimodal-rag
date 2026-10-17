@@ -1,0 +1,36 @@
+{
+  "schema": "weknora-token-authority/v1",
+  "mode": "approved",
+  "tenant_id": 344,
+  "subject_id": "p27-owner-2b810c56a34b491fa3330ef1e2b5cc92",
+  "account_id": "siliconflow-owner-main",
+  "provider": "siliconflow",
+  "expires_at": "2026-10-17T09:43:32.980464+00:00",
+  "approval_source": "OWNER:20261016-unrestricted-siliconflow-MVP",
+  "month": "2026-10-01",
+  "carry_in_tokens": 14,
+  "carry_status": "KNOWN",
+  "carry_source": "LEDGER:real/embedding-0:14-preserved-original-bucket",
+  "limit_tokens": 1943086,
+  "input_limit": 200000,
+  "output_limit": 8192,
+  "allowed_models": [
+    [
+      "siliconflow",
+      "BAAI/bge-m3"
+    ],
+    [
+      "siliconflow",
+      "BAAI/bge-reranker-v2-m3"
+    ],
+    [
+      "siliconflow",
+      "XingChenAGI/Xing4.0-29B"
+    ]
+  ],
+  "meter": {
+    "recipe": "provider-completion-cap/v2",
+    "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\source_facts.py",
+    "sha256": "f3ce75acd53c276308818cafb5bb0104c9a022495b3e62bdc407f6b9e17b6723"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "schema": "p9-actual-provider-wire/v1",
+  "request_id": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db/document-summary",
+  "run_id": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db/document-summary",
+  "capability": "chat",
+  "stage": "auxiliary",
+  "provider": "siliconflow",
+  "model": "XingChenAGI/Xing4.0-29B",
+  "boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+  "wire_sha256": "4ee90d65c8ffe034b0af2bf36c912fe412a3457a05c5f0fa3457b74c69e122b9",
+  "wire_bytes": 11174,
+  "body": {
+    "enable_thinking": false,
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "content": "You are a precise document profiling expert. You read the text the user supplies and describe the document STRICTLY from that text — never from a filename, title, file extension, or any other external clue.\n\n## Output\nReturn strict JSON only, no prose before or after, with exactly these fields:\n{\"summary\": \"...\", \"gist\": \"...\", \"topics\": [\"...\"], \"doc_type\": \"...\", \"typical_question\": \"...\"}\n\n- summary: 2-3 sentences (about 60-120 words) covering the document's subject, its key points and its main conclusion. Objective, third person, no preamble.\n- gist: one line (at most 25 words) stating what the document is about.\n- topics: 3-5 short topic keywords (1-4 words each) that a reader would use to find this document. Use the document's own terminology; do not pad with generic words such as \"information\" or \"document\".\n- doc_type: a short label for the kind of document, e.g. \"user manual\", \"meeting notes\", \"contract\", \"research paper\", \"FAQ\", \"policy\", \"tutorial\", \"report\".\n- typical_question: one self-contained natural-language question that this document answers well. No pronouns such as \"it\" or \"this document\".\n\n## Content Rules\n- Base every field entirely on the provided content; add nothing that is not there.\n- If the content contains \"[...content omitted...]\" markers, it is a sampled excerpt from a longer document — cover the topics that appear across the provided sections, not only the beginning.\n- For technical documents keep key terms, metrics and identifiers; for meeting notes or reports highlight decisions, action items and conclusions.\n\n## Handling Image-Derived Text\n- Text wrapped in `<image_caption>...</image_caption>` or `<image_ocr>...</image_ocr>` IS extracted document text produced by a vision model. Treat it as first-class content.\n- A document whose only text comes from those blocks is NOT empty — profile it from the captions and OCR results.\n\n## Empty or Insufficient Content\n- Only when the content is genuinely empty, holds only bare image placeholders with no caption or OCR text, or otherwise carries no substantive text, return: {\"summary\": \"No textual content was extractable from this document.\", \"gist\": \"\", \"topics\": [], \"doc_type\": \"\", \"typical_question\": \"\"}\n- Do NOT fabricate a topic and do NOT guess from any other clue. Refusing to profile absent content is correct and preferred over a plausible-sounding invention.\n\n## Language\n- Write every field in Chinese (Simplified).\n",
+        "role": "system"
+      },
+      {
+        "content": "www.pewresearch.org\nFOR RELEASE NOVEMBER 21, 2016\nFOR MEDIA OR OTHER INQUIRIES:\nCarroll Doherty, Director of Political Research\nJocelyn Kiley, Associate Director, Research\nBridget Johnson, Communications Associate\n202.419.4372\nwww.pewresearch.org\nRECOMMENDED CITATION: Pew Research Center, November, 2016, “Low Marks for Major Players in 2016 Election — Including the \nWinner”\nNUMBERS, FACTS AND TRENDS SHAPING THE WORLD\n\nwww.pewresearch.org\nAbout Pew Research Center\nPew Research Center is a nonpartisan fact tank that informs the public about the issues, attitudes \nand trends shaping America and the world. It does not take policy positions. It conducts public \nopinion polling, demographic research, content analysis and other data-driven social science \nresearch. The Center studies U.S. politics and policy; journalism and media; internet, science and \ntechnology; religion and public life; Hispanic trends; global attitudes and trends; and U.S. social \nand demographic trends. All of the Center’s reports are available at www.pewresearch.org. Pew \nResearch Center is a subsidiary of The Pew Charitable Trusts, its primary funder.\n© Pew Research Center 2017\n\nwww.pewresearch.org\nWinning \ncandidate\nLosing \ncandidate\n1992\nBush\nClinton\n1996\nDole\nClinton\n2000*\nBush\nGore\n2004\nBush\nKerry\n2008\nMcCain\nObama\n2016\nTrump \nClinton\nKerry\n1988\nBush\nDukakis\n2012\nRomney\nObama\nFor most voters, the 2016 presidential campaign was one to forget. Post-election evaluations of the \nway that the winning candidate, the parties, the press and the pollsters conducted themselves \nduring the campaign are all far more negative than after any election dating back to 1988.\nThe quadrennial postelection survey by Pew \nResearch Center, conducted \nNovember 10-14 among 1,254 \nvoters who were originally \ninterviewed before the \nelection, finds that half are \nhappy that Trump won the \nelection, while nearly as \nmany (48%) are unhappy. \nThat is little different from \ninitial reactions to the \nelection result four years ago, \nwhen 52% were happy that \nBarack Obama won.\nBut voters’ “grades” for the \nway Trump conducted \nhimself during the campaign \nare the lowest for any \nvictorious candidate in 28 \nyears. Just 30% of voters give \nTrump an A or B, 19% grade \nhim at C, 15% D, while about a third (35%) give Trump a failing grade. Four years ago, most voters \n(57%) gave Obama an A or B, and after his 2008 election, 75% gave him an A or B.\nVoters give Trump worse grades than they have for any \nwinning candidate in recent decades\n% of voters who give each candidate a grade of “A” or “B” for the way they \nconducted themselves over the course of the campaign \nNotes: Percent of “A” or “B” grades on an A, B, C, D, F scale.\n*In 2000, Bush is labeled as winning candidate, Gore as losing candidate, though at the \ntime of the survey the results of the election had not been declared.\nSource: Voter callback survey conducted Nov. 10-14, 2016.\n\nwww.pewresearch.org\n10 88\nHave serious concerns \nabout what kind of \npresident Trump will be\nConfident about the \nkind of president \nTrump will be\n39 58\nCan't see myself giving \nTrump a chance because \nof kind of person he has \nshown himself to be\nWilling to give \nTrump a chance to \nsee how he \ngoverns\nFor the first time in Pew Research Center postelection surveys, voters give the losing \ncandidate higher grades than the winner. \nAbout four-in-ten (43%) give Clinton an A or \nB, which is comparable to the share giving \nMitt Romney top letter grades in 2012 (44%) \nand 13 percentage points higher than Trump’s\n(30%).\nAfter a bitter and contentious campaign, \nvoters are deeply polarized in their reactions \nto Trump’s victory and expectations for his \npresidency. Among all voters, 56% expect \nTrump to have a successful first term, which is \nlower than the share saying that about \nObama’s first term eight years ago (67%), but \non par with expectations for Obama’s second \nterm in November 2012 (also 56%). \nVirtually all of Trump’s supporters (97%) say \nthey expect Trump’s first term to be \nsuccessful; a smaller, but still overwhelming \nmajority of Clinton supporters (76%) say \nTrump will be unsuccessful.\nTrump voters have a high degree of confidence \nin – and high expectations for – the presidentelect. Fully 88% say they are confident in the \nkind of president Trump will be, while 90% or more express at least a fair amount of confidence in \nhis ability to deal with key issues such as the economy, illegal immigration and health care.\nBy contrast, Clinton voters express little or no confidence in Trump to deal with major issues. And \nwhile a majority of Clinton voters (58%) say they are “willing to give Trump a chance and see how \nhe governs as president,” nearly four-in-ten (39%) say they can’t see themselves giving Trump a \nchance “because of the kind of person he has shown himself to be.”\nLarge share of Trump voters are \nconfide\n\n[...content omitted...]\n\nect they \nwill stay about the same. \nTrump voters are much more optimistic in \ntheir feelings about the prospect of a better \nrelationship. Nearly half of Trump voters \n(47%) feel that partisan relations will improve \ncompared with only 9% who say they will get \nworse (43% expect little change). \nAmong Clinton voters, 46% say relations will \nbe little changed in the next year, while 43% \nsay they will worsen; just 10% say they will get \nbetter.\nThere was somewhat more optimism about improved partisan relations eight years ago, after \nObama’s first victory. At that time, 37% expected relations between Republicans and Democrats to \nget better, while just 18% said they would get worse; 42% expected little change. \nTrump’s supporters are slightly less optimistic about improvements in partisan relations than \nObama voters were eight years ago (47% of Trump voters expect improvements, 55% of Obama \nvoters did in 2008). And Clinton voters are more likely than McCain voters were in 2008 to say \nrelations will get worse (43% of her voters say this today, 31% of McCain’s said this in 2008).\nWill relations between Republicans and \nDemocrats improve?\n% of voters saying Republican and Democratic relations \nin Washington will ...\nNote: Don’t know responses not shown. Q67.\nSource: Voter callback survey conducted Nov. 10-14, 2016.\n\nwww.pewresearch.org\nAll voters\nTrump voters\nClinton voters\nWork with Democrats to \nget things done, even if it \nmeans disappointing \nsupporters\nStand up to Democrats \non issues important to \nRepublicans, even if it \nmeans less gets done\nAlmost three quarters (73%) of all voters – including \n\n[...content omitted...]\n\ntion, a parameter was added to the weighting so that the \nvote results reported in the survey match the actual popular vote results. Sampling errors and \nstatistical tests of significance take into account the effect of weighting.\n\nwww.pewresearch.org\nThe following table shows the unweighted sample sizes and the error attributable to sampling that \nwould be expected at the 95% level of confidence for different groups in the survey:\nSample sizes and sampling errors for other subgroups are available upon request.\nIn addition to sampling error, one should bear in mind that question wording and practical \ndifficulties in conducting surveys can introduce error or bias into the findings of opinion polls.\nPew Research Center undertakes all polling activity, including calls to mobile telephone numbers, \nin compliance with the Telephone Consumer Protection Act and other applicable laws.\nPew Research Center is a nonprofit, tax-exempt 501(c)(3) organization and a subsidiary of The \nPew Charitable Trusts, its primary funder.\nSurvey conducted November 10-14, 2016\nGroup\nWeighted proportion \nof voting public\nUnweighted\nsample size Plus or minus …\nTotal sample 100% 1,254 3.4 percentage points\nTrump voters 47% 533 5.1 percentage points\nTrump voters half form -- 248 (min) 7.5 percentage points\nClinton voters 48% 587 4.9 percentage points\nClinton voters half form -- 275 (min) 7.2 percentage points\nRepublican/Lean Rep 47% 580 4.9 percentage points\nRepublican/Lean Rep half form -- 274 (min) 7.2 percentage points\nDemocrat/Lean Dem 48% 609 4.8 percentage points\nDemocrat/Lean Dem half form -- 288 (min) 7.0 percentage points",
+        "role": "user"
+      }
+    ],
+    "model": "XingChenAGI/Xing4.0-29B",
+    "temperature": 0.3
+  },
+  "finish_reason": "stop",
+  "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+  "headers_saved": false,
+  "status_code": 200,
+  "parsed_usage": {
+    "prompt_tokens": 2909,
+    "completion_tokens": 242,
+    "total_tokens": 3151,
+    "status": "REPORTED",
+    "cached_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "cache_miss_tokens": 0,
+    "cache_reported": false,
+    "cache_status": "unreported",
+    "provider_usage_facts": {
+      "semantics": "openai-input-inclusive/v1",
+      "fields": [
+        [
+          "input",
+          {
+            "value": 2909,
+            "present": true,
+            "valid": true,
+            "path": "prompt_tokens"
+          }
+        ],
+        [
+          "output",
+          {
+            "value": 242,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens"
+          }
+        ],
+        [
+          "total",
+          {
+            "value": 3151,
+            "present": true,
+            "valid": true,
+            "path": "total_tokens"
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "prompt_cache_hit_tokens"
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "cache_creation_input_tokens"
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "prompt_cache_miss_tokens"
+          }
+        ],
+        [
+          "reasoning",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "completion_tokens_details.reasoning_tokens"
+          }
+        ]
+      ],
+      "numeric_raw": "{\"completion_tokens\":242,\"prompt_tokens\":2909,\"total_tokens\":3151}",
+      "raw_sha256": "bb3bebec8cb8ee30f5a77ee5a5be7d670ef592848d0a8f98e68679611e755466",
+      "derived_total": 3151,
+      "simulated": false,
+      "observed_lower_bound": 0,
+      "prior_numeric_raw": []
+    }
+  }
+}
