@@ -16,6 +16,14 @@ _INCOMPLETE_INTERNAL_TAG = re.compile(r"(?is)</?(?:r|re|ref|k|kb|w|we|web)(?:\b|
 _REF_VALID = re.compile(r'(?i)<ref\s+id\s*=\s*"([^"]+)"\s*/?>')
 _PUBLIC_KB = re.compile(r"(?is)<kb\b[^>]*>")
 _PUBLIC_WEB = re.compile(r"(?is)<web\b[^>]*>")
+# Models sometimes repeat the private prompt handles as a prose attribution
+# even when public citations are disabled. Match only the observed, explicit
+# `Source: … (document dN, chunk cN)` form; never strip ordinary c1/d1 text.
+_INTERNAL_SOURCE_LINE = re.compile(
+    r"(?im)^[ \t]*(?:\*\*|__)?source:(?:\*\*|__)?[^\r\n]*"
+    r"\(\s*document\s+d[1-9][0-9]*\s*,\s*chunk\s+c[1-9][0-9]*\s*\)"
+    r"[^\r\n]*(?:\r?\n|$)"
+)
 _ATTR = {
     name: re.compile(rf'(?i)\b{re.escape(name)}\s*=\s*"([^"]*)"')
     for name in ("doc", "chunk_id", "kb_id", "url", "title")
@@ -306,6 +314,8 @@ class SourceRegistry:
             return ""
 
         def transform(segment: str) -> str:
+            if not self.citations_enabled:
+                segment = _INTERNAL_SOURCE_LINE.sub("", segment)
             segment = _INTERNAL_TAG.sub(replace, segment)
             incomplete = _INCOMPLETE_INTERNAL_TAG.search(segment)
             return segment[:incomplete.start()] if incomplete else segment

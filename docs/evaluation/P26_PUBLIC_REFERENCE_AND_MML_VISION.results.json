@@ -1,0 +1,120 @@
+{
+  "schema": "p26-public-reference-mml-visual/v1",
+  "status": "P26_COMPLETE_WITH_CAPABILITY_LIMITS",
+  "source": {
+    "baseline_head": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "branch": "codex/weknora-python-port-integrate-image-20261014",
+    "head_unchanged": true,
+    "commit_created": false
+  },
+  "public_source_handle": {
+    "qid": "row-0685",
+    "raw_line": "**Source:** *11-21-16-Updated-Post-Election-Release* (document d1, chunk c1)",
+    "root_cause": "The model generated prose echoing private prompt-local document/chunk handles. The request context contained d1/c1; the generated Source line was not part of the request or citation readback. The decoder previously removed structured transport tags but not this free-form line.",
+    "p25_answer_path": "E:\\WK\\run\\p25-20261017\\runtime\\results\\row-0685.json",
+    "provider_request_path": "E:\\WK\\run\\p25-20261017\\runtime\\provider-requests\\863aab4cd90b8612aab94e50618dcdbd55c4e59bb14aae37a0ba17d32fc66574.json",
+    "fix": "In citation-disabled mode, strip only a Source attribution line containing the explicit (document dN, chunk cN) shape, outside Markdown code. Buffer only possible Source prefixes in SSE. Apply matching safe filtering when rendering old message history; do not rewrite stored history.",
+    "test_results": {
+      "python_targeted": "PASS",
+      "frontend_history_mock": "PASS",
+      "frontend_build": "PASS"
+    },
+    "historical_database_rewritten": false
+  },
+  "visual_qa": {
+    "final_answer_calls": 0,
+    "auxiliary_provider_calls": 0,
+    "tokens": 0,
+    "new_unknown": 0,
+    "p26_fence_opened": false,
+    "p25_fence_reused": false,
+    "configured_vision_role": false,
+    "current_kb_multimodal_enabled": false,
+    "current_target_image_info_rows": 0,
+    "current_target_image_tasks": 0,
+    "samples": [
+      {
+        "qid": "row-0430",
+        "status": "NOT_RUN",
+        "reason": "Full-document visual counting evidence is absent from the current index; no vision-capable final model is configured.",
+        "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "current_chunks": 53,
+        "answer_score": null,
+        "citation_score": null
+      },
+      {
+        "qid": "row-0431",
+        "status": "NOT_RUN",
+        "reason": "Physical pages 29, 30 and 32 were located and rendered, but their diagram evidence is absent from current indexed chunks/image metadata; no vision-capable final model is configured.",
+        "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "current_chunks": 53,
+        "rendered_pages_path": "E:\\WK\\run\\p26-20261017\\cat-pages",
+        "answer_score": null,
+        "citation_score": null
+      },
+      {
+        "qid": "row-0684",
+        "status": "NOT_RUN",
+        "reason": "Current matching 81% and 78% text hits are unrelated chunks, not chart-specific evidence; multimodal processing and a vision-capable model are absent.",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "current_chunks": 163,
+        "answer_score": null,
+        "citation_score": null
+      },
+      {
+        "qid": "row-0958",
+        "status": "NOT_RUN",
+        "reason": "Two current chunks contain only the phrase shiny surface; mirror/shiny-object diagram semantics are not in indexed evidence and no vision-capable model is configured.",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "current_chunks": 35,
+        "answer_score": null,
+        "citation_score": null
+      }
+    ]
+  },
+  "environment": {
+    "postgres_database": "weknora_python_port_20261013",
+    "postgres_system_identifier": "7696088403504697382",
+    "postgres_writes": 0,
+    "redis_operations": 0,
+    "api_or_worker_started": false,
+    "uploads": 0,
+    "index_writes": 0
+  },
+  "validation": {
+    "commands": [
+      {
+        "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_references.py tests/weknora_port/test_generation.py tests/weknora_port/test_streaming.py tests/weknora_port/test_generation_protocol.py -q",
+        "exit_code": 0,
+        "result": "105 passed"
+      },
+      {
+        "command": "npm run test -- tests/weknora-port/adapter.spec.ts -g \"old history strips internal reference markers\"",
+        "working_directory": "frontend",
+        "exit_code": 0,
+        "result": "1 passed; mocked history UI test"
+      },
+      {
+        "command": "npm run build",
+        "working_directory": "frontend",
+        "exit_code": 0,
+        "result": "TypeScript and Vite build passed; 274 modules transformed"
+      }
+    ],
+    "live_browser_test": "NOT_RUN",
+    "real_rag_or_model_test": "NOT_RUN"
+  },
+  "changed_files": [
+    "backend/weknora_port/references/registry.py",
+    "backend/weknora_port/references/decoder.py",
+    "frontend/src/weknora_port/WeKnoraPythonApp.tsx",
+    "tests/weknora_port/test_references.py",
+    "frontend/tests/weknora-port/adapter.spec.ts",
+    "docs/evaluation/P26_PUBLIC_REFERENCE_AND_MML_VISION.md",
+    "docs/evaluation/P26_PUBLIC_REFERENCE_AND_MML_VISION.results.json",
+    "progress.md"
+  ],
+  "preexisting_dirty_files_preserved": true,
+  "p25_report_and_results_modified": false,
+  "push_deploy_merge_tag": false
+}

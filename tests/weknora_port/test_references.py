@@ -135,6 +135,62 @@ def test_disabled_decoder_strips_all_transport_tags_but_preserves_markdown_liter
     assert decoder.feed(text) + decoder.flush() == expected
 
 
+def test_disabled_citations_strip_only_private_source_attribution_line():
+    registry = SourceRegistry(citations_enabled=False)
+    text = (
+        "Answer keeps ordinary c1 and d1 strings.\n"
+        "Source: chapter c1 and dataset d1.\n"
+        "Source: https://example.test/c1/d1\n"
+        "\n**Source:** *Report* (document d1, chunk c1)\n"
+        "\n```text\nSource: code (document d1, chunk c1)\n```\n"
+        "`Source: inline (document d1, chunk c1)`\n"
+        "![image](https://example.test/image.png) [link](https://example.test/page)"
+    )
+    expected = (
+        "Answer keeps ordinary c1 and d1 strings.\n"
+        "Source: chapter c1 and dataset d1.\n"
+        "Source: https://example.test/c1/d1\n"
+        "\n\n```text\nSource: code (document d1, chunk c1)\n```\n"
+        "`Source: inline (document d1, chunk c1)`\n"
+        "![image](https://example.test/image.png) [link](https://example.test/page)"
+    )
+    assert registry.decode_output_text(text) == expected
+
+    enabled = SourceRegistry(citations_enabled=True)
+    assert enabled.decode_output_text("Source: Report (document d1, chunk c1)") == (
+        "Source: Report (document d1, chunk c1)"
+    )
+
+
+def test_disabled_sse_never_publishes_split_private_source_attribution():
+    source = (
+        "Answer keeps c1 and d1.\n\n"
+        "**Source:** *11-21-16-Updated-Post-Election-Release* "
+        "(document d1, chunk c1)\n"
+        "![image](https://example.test/image.png) [link](https://example.test/page)"
+    )
+    expected = SourceRegistry(citations_enabled=False).decode_output_text(source)
+    decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+    published = []
+    assert decoder.feed("Ordinary answer streams immediately") == "Ordinary answer streams immediately"
+    for char in source:
+        delta = decoder.feed(char)
+        published.append(delta)
+        assert "document d1, chunk c1" not in "".join(published)
+    published.append(decoder.flush())
+    assert "".join(published) == expected
+    assert "Answer keeps c1 and d1." in "".join(published)
+    assert "![image](https://example.test/image.png)" in "".join(published)
+    assert "[link](https://example.test/page)" in "".join(published)
+
+    # EOF without a newline still receives the same filtering as persisted text.
+    no_newline = "Answer\n\nSource: Report (document d1, chunk c1)."
+    decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+    actual = "".join(decoder.feed(char) for char in no_newline) + decoder.flush()
+    assert actual == SourceRegistry(citations_enabled=False).decode_output_text(no_newline)
+    assert "document d1, chunk c1" not in actual
+
+
 def test_internal_tag_decoding_is_consistent_at_every_chunk_split():
     registry = SourceRegistry()
     chunk = registry.register_chunk(ChunkReference("real-id", document_title="Real"))

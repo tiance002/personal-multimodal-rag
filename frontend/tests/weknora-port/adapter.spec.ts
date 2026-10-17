@@ -215,7 +215,7 @@ test("old history strips internal reference markers without changing inline or f
   ]) }));
   await page.route("**/api/v1/sessions/old-session/messages", route => route.fulfill({ json: envelope([
     { id: "old-answer", role: "assistant", request_id: "old-run", created_at: "now", is_completed: true,
-      content: '历史 <ref>原始引文</ref> <kb chunk_id="old-chunk" doc="资料" /> <kb>块文字</kb> <web id="w">网页文字</web> <reference>普通标签</reference> 末尾\n\n`<ref>code</ref>`\n\n```txt\n<ref>code</ref>\n```\n\n<ref id=' },
+      content: '历史 <ref>原始引文</ref> <kb chunk_id="old-chunk" doc="资料" /> <kb>块文字</kb> <web id="w">网页文字</web> <reference>普通标签</reference> 末尾\n\n**Source:** *11-21-16-Updated-Post-Election-Release* (document d1, chunk c1)\nSource: section c1 and dataset d1.\n\n`<ref>code</ref>`\n\n```txt\n<ref>code</ref>\nSource: code (document d1, chunk c1)\n```\n\n<ref id=' },
   ]) }));
 
   await page.goto("/");
@@ -223,6 +223,9 @@ test("old history strips internal reference markers without changing inline or f
   const renderedAnswer = page.locator(".wp-message.assistant .wp-message-content");
   await expect(renderedAnswer).toContainText("历史 原始引文");
   await expect(renderedAnswer).toContainText("块文字 网页文字 <reference>普通标签</reference> 末尾");
+  await expect(renderedAnswer.locator("p").filter({ hasText: "document d1, chunk c1" })).toHaveCount(0);
+  await expect(renderedAnswer).toContainText("Source: section c1 and dataset d1.");
+  await expect(renderedAnswer).toContainText("Source: code (document d1, chunk c1)");
   await expect(renderedAnswer).not.toContainText("<ref id=");
   await expect(renderedAnswer.locator("p > code")).toHaveText("<ref>code</ref>");
   await expect(renderedAnswer.locator("pre code")).toContainText("<ref>code</ref>");

@@ -34,6 +34,7 @@ const ROLE_NAMES: Record<ModelRole, string> = {
 const EMPTY_CONFIG: ModelConfiguration = { revision: "", roles: (Object.keys(ROLE_NAMES) as ModelRole[]).map(role => ({
   role, provider: "", model: "", base_url: "", key_configured: false, api_key: "",
 })) };
+const INTERNAL_SOURCE_ATTRIBUTION_LINE = /^[ \t]*(?:\*\*|__)?source:(?:\*\*|__)?[^\r\n]*\([ \t]*document[ \t]+d[1-9]\d*[ \t]*,[ \t]*chunk[ \t]+c[1-9]\d*[ \t]*\)[^\r\n]*(?:\r?\n|$)/i;
 
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : "请求失败";
@@ -80,6 +81,11 @@ function stripInternalReferenceMarkup(content: string): string {
         output.push(line);
         if (closingFence && closingFence[1][0] === insideFence.marker && closingFence[1].length >= insideFence.length)
           insideFence = null;
+        cursor = end;
+        lineStart = end;
+        continue;
+      }
+      if (INTERNAL_SOURCE_ATTRIBUTION_LINE.test(line)) {
         cursor = end;
         lineStart = end;
         continue;

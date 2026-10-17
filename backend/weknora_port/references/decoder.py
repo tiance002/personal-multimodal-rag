@@ -35,7 +35,8 @@ class CitationStreamDecoder:
         data = self.pending + chunk
         self.pending = ""
         hold_from = _unclosed_code_start(data)
-        visible = data if hold_from is None else data[:hold_from]
+        visible_end = len(data) if hold_from is None else hold_from
+        visible = data[:visible_end]
 
         # Keep a tag-like suffix until it is complete. Unknown HTML/text
         # beginning with '<' is passed through unchanged.
@@ -46,13 +47,19 @@ class CitationStreamDecoder:
                 suffix.startswith(prefix) for prefix in _TAG_PREFIXES
             ):
                 if ">" not in suffix:
-                    visible = visible[:lt]
-                    hold_from = lt if hold_from is None else min(hold_from, lt)
+                    visible_end = min(visible_end, lt)
+                    visible = data[:visible_end]
 
-        if hold_from is not None:
-            self.pending = data[hold_from:]
-        elif visible != data:
-            self.pending = data[len(visible):]
+        # Buffer only a possible source-attribution line. Ordinary answer
+        # text keeps streaming immediately; a split `Source:` line stays
+        # private until its handle suffix can be classified.
+        if not self.registry.citations_enabled:
+            line_start = visible.rfind("\n") + 1
+            if line_start < len(visible) and _could_be_source_attribution_prefix(visible[line_start:]):
+                visible_end = min(visible_end, line_start)
+                visible = data[:visible_end]
+
+        self.pending = data[visible_end:]
         return self.registry.expand_text(visible) if visible else ""
 
     def flush(self) -> str:
@@ -95,6 +102,14 @@ def _unclosed_code_start(text: str) -> int | None:
             continue
         i += 1
     return None
+
+
+def _could_be_source_attribution_prefix(text: str) -> bool:
+    candidate = text.lstrip(" \t").lower()
+    if not candidate:
+        return False
+    prefixes = ("source:", "**source:", "__source:")
+    return any(prefix.startswith(candidate) or candidate.startswith(prefix) for prefix in prefixes)
 
 
 def _find_exact_backtick_run(text: str, marker: str, start: int) -> int:
