@@ -183,7 +183,9 @@ def main():
     elif a.command=='offline':c.run(offline())
     elif a.command=='query':c.run(query(a.kind,a.cap))
     elif a.command=='snapshot':c.run(c.snapshot())
-    elif a.command=='stop':c.stop()
+    elif a.command=='stop':
+        c.P31_RUNNER=Path(__file__).resolve()
+        c.stop()
     elif a.command=='service':service()
     elif a.command=='summarize':c.run(summarize())
 
