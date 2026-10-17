@@ -1,0 +1,144 @@
+{
+  "schema": "p27-multimodal-rag-real-ingestion/v1",
+  "status": "P27_BLOCKED",
+  "date": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "repository": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "baseline": {
+    "actual_head": "78d277b12ed6ea5eb82a61a73160ef41a5c7027f",
+    "fixed_upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "preexisting_dirty_paths": [
+      ".serena/project.yml",
+      "progress.md",
+      "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+      "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+      "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt"
+    ],
+    "preexisting_staged_paths": [],
+    "preserved": true,
+    "p24_p26_commits": [
+      "cb07fb50874386ade91413e059f096e328c0e47b",
+      "5f949a97bd31b71b33cf51d2e9a2af3253261abc",
+      "78d277b12ed6ea5eb82a61a73160ef41a5c7027f"
+    ]
+  },
+  "blockers": [
+    "No newly approved finite P27 external-call token fence was established; the closed P25 fence was not reused.",
+    "P26 active-config audit records multimodal processing disabled, empty VLM configuration, and no configured VLM role; Cheap is not declared vision-capable.",
+    "Product Python 3.13.0 cannot import the declared optional pypdfium2==5.8.0 parser dependency.",
+    "Normal image upload/task processing has no page selector; B3 would create 21 image assets and require 21 VLM Caption calls with local Tesseract OCR or 42 VLM OCR+Caption calls, exceeding the P27 cap of four.",
+    "The current default PDF parser produced no image/vector asset for the Pew chart on physical page 10."
+  ],
+  "implementation_audit": {
+    "configuration": "backend/weknora_port/image_configuration.py: effective_image_config, _vision_binding, resolve_image_selection; KB defaults and non-empty upload overrides, separate OCR/Caption selection, registry/capability validation; no provider probe.",
+    "pdf_assets": "backend/weknora_port/ingestion/upstream_pdf_parser.py: PDFParser.parse_into_text and _route_locked.",
+    "normal_upload_and_task": "backend/weknora_port/documents.py: upload_document, _process_document, _persist_assets; backend/weknora_port/image_tasks.py; backend/weknora_port/worker.py.",
+    "ocr_caption_persistence": "backend/weknora_port/image_multimodal.py: SourceImageProcessor.process_plan; separate image_ocr/image_caption child chunks with image_info source/page/status.",
+    "retrieval": "backend/weknora_port/documents.py HybridIndexer.batch_index; backend/weknora_port/retrieval/rerank.py and context.py consume persisted caption/ocr_text.",
+    "generation": "backend/weknora_port/generation/context.py; retrieved image bytes are not forwarded as direct model images, so final RAG relies on persisted OCR/Caption text in Context."
+  },
+  "parser_preflight": {
+    "kind": "offline feasibility only; not product-runtime validation",
+    "interpreter": "E:\\WK\\mineru-env\\Scripts\\python.exe",
+    "python": "3.12.7",
+    "pypdfium2": "5.14.0",
+    "evidence_json": "E:\\WK\\run\\p27-20261017\\offline_parser_asset_inventory.json",
+    "exit_code": 0,
+    "warnings": ["PDFium emitted PdfBitmap explicit-close safety warnings after parsing."],
+    "cases": [
+      {
+        "qid": "row-0684",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "target_physical_page": 10,
+        "page_count": 45,
+        "text_pages": 45,
+        "scanned_pages": 0,
+        "embedded_images": 0,
+        "vector_figures": 0,
+        "asset_count": 0,
+        "target_asset_count": 0,
+        "status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0958",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "target_physical_page": 9,
+        "page_count": 21,
+        "text_pages": 0,
+        "scanned_pages": 21,
+        "embedded_images": 0,
+        "vector_figures": 0,
+        "asset_count": 21,
+        "target_asset_count": 1,
+        "target_asset_path": "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg",
+        "status": "NOT_RUN"
+      }
+    ]
+  },
+  "product_runtime": {
+    "interpreter": "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "python": "3.13.0",
+    "pypdfium2_spec": null,
+    "declared_optional_requirement": "pypdfium2==5.8.0",
+    "dependency_check_exit_code": 0
+  },
+  "scenarios": {
+    "row-0684": {
+      "status": "NOT_RUN",
+      "reason": "Default parser produced no page-10 image/figure asset; no active VLM configuration or P27 fence."
+    },
+    "row-0958": {
+      "status": "NOT_RUN",
+      "reason": "Target page image exists in offline parser inventory, but normal ingestion has no page filter and would exceed the four-VLM-call limit; no active VLM configuration or P27 fence."
+    }
+  },
+  "calls": {
+    "uploads": 0,
+    "worker_image_tasks": 0,
+    "ocr_model": 0,
+    "vlm": 0,
+    "embedding": 0,
+    "rerank": 0,
+    "cheap_final_answers": 0,
+    "provider_requests": 0,
+    "provider_tokens": 0,
+    "new_unknown": 0,
+    "latency_ms": null,
+    "database_or_redis_writes": 0
+  },
+  "tests": [
+    {
+      "kind": "offline unit tests",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py -q",
+      "exit_code": 0,
+      "result": "76 passed in 1.25s",
+      "evidence": "E:\\WK\\run\\p27-20261017\\image_offline_pytest.log"
+    },
+    {
+      "kind": "product parser dependency check",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -c \"import sys, importlib.util; print(sys.version.split()[0]); print('pypdfium2_spec=', importlib.util.find_spec('pypdfium2'))\"",
+      "exit_code": 0,
+      "result": "Python 3.13.0; pypdfium2_spec=None"
+    },
+    {
+      "kind": "real HTTP/API/Worker/PG/Redis/model RAG",
+      "status": "NOT_RUN",
+      "reason": "P27 blockers above; no services were started."
+    }
+  ],
+  "production_code_changed": false,
+  "new_report_files": [
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json"
+  ],
+  "external_evidence": [
+    "E:\\WK\\run\\p27-20261017\\offline_parser_asset_inventory.json",
+    "E:\\WK\\run\\p27-20261017\\image_offline_pytest.log",
+    "E:\\WK\\run\\p27-20261017\\product_runtime_dependency_check.log"
+  ],
+  "next_step": "Establish a new finite P27 token fence; configure an explicitly validated vision-capable adapter/model; make the pinned existing parser dependency available in product runtime through normal environment setup; add/use approved target-page scoping for normal upload before attempting external requests."
+}
