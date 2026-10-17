@@ -67,3 +67,32 @@ def test_normal_http_replaces_only_bad_role_preserves_ciphertext_and_isolates_fa
         assert next(r for r in roles if r.role=='expensive').api_key=='replacement-synthetic'
         assert all(r.api_key=='synthetic-secret' for r in roles if r.role!='expensive')
     asyncio.run(run())
+
+
+def test_actual_isolated_pg_credential_replacement_rolls_back_all_fixture_rows():
+    from tests.weknora_port.test_memory_storage_pg import approved_dsn,connection,actual_pg_run
+    import uuid
+    dsn=approved_dsn()
+    async def run():
+        conn,guard=await connection(dsn)
+        subject='m2-credential-fixture-'+uuid.uuid4().hex
+        try:
+            async with conn.transaction(force_rollback=True):
+                store=PostgresModelRoleStore(guard,LocalPrincipal(332,subject),Catalogue(),cipher=SecretCipher(b'a'*32))
+                await store.update(0,values())
+                before=(await store._stored())[1]
+                # Only an isolated fixture subject inside a rollback transaction.
+                damaged={**before,'vlm':{**before['vlm'],'api_key':'enc:v1:invalid'}}
+                await conn.execute('UPDATE port_model_configuration SET roles=%s::jsonb WHERE tenant_id=332 AND subject_id=%s',
+                                   (json.dumps(damaged),subject))
+                assert (await store.read_public())['roles'][-1]['credential_status']=='UNAVAILABLE'
+                update=values()
+                for row in update:row['api_key']=''
+                update[-1]['api_key']='synthetic-replacement'
+                await store.update(1,update)
+                after=(await store._stored())[1]
+                assert all(before[name]==after[name] for name in ('embedding','rerank','cheap','expensive'))
+                assert (await store.read())[1][-1].api_key=='synthetic-replacement'
+            assert not await (await conn.execute('SELECT 1 FROM port_model_configuration WHERE tenant_id=332 AND subject_id=%s',(subject,))).fetchone()
+        finally:await conn.close()
+    actual_pg_run(run())
