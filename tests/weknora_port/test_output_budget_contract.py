@@ -15,7 +15,7 @@ from backend.weknora_port.authority import (
     ApprovedTokenAuthority, load_authority_settings)
 from backend.weknora_port.models import output_contract as oc
 from backend.weknora_port.models.output_contract import (
-    CAP_CONTRACTS, FULL_COMPLETION, VISIBLE_PLUS_REASONING, OutputBudgetContract,
+    CAP_CONTRACTS, FULL_COMPLETION, VISIBLE_ONLY, VISIBLE_PLUS_REASONING, OutputBudgetContract,
     registry_cap_field, resolve_output_contract)
 from backend.weknora_port.models.types import (
     CallContext, ChatSettings, ModelConfig, ProviderError, PreparedCall, TrustedScope)
@@ -31,6 +31,12 @@ ROOT = __import__('pathlib').Path('E:/WK/run')/'output-bound-contract-20261015'
 def _deepeek_config(**chat):
     return ModelConfig(provider='deepseek', model='deepseek-flash', model_id='mid',
         base_url='https://api.deepseek.com', chat=ChatSettings(**chat))
+
+
+def _siliconflow_config():
+    return ModelConfig(provider='siliconflow', model='model', model_id='mid',
+        base_url='https://api.siliconflow.com',
+        chat=ChatSettings(max_tokens_field='max_tokens', thinking_format='enable-thinking'))
 
 
 def _facts(config, body, wire=b'{"a":1}', *, capability='chat', input_upper=None):
@@ -93,6 +99,29 @@ def test_case_d_no_verifiable_total_upper_is_refused():
         base_url='https://api.deepseek.com/anthropic', api='anthropic-messages')
     with pytest.raises(ProviderError, match='MODEL_OUTPUT_CONTRACT_UNKNOWN'):
         resolve_output_contract(anthropic, {'max_tokens': 64})
+
+
+@pytest.mark.parametrize('thinking_value', ['omitted', True, 0, 'false'])
+def test_siliconflow_visible_cap_without_literal_thinking_false_is_unknown(thinking_value):
+    config = _siliconflow_config()
+    body = {'max_tokens': 64, 'thinking_budget': 8192}
+    if thinking_value != 'omitted':
+        body['enable_thinking'] = thinking_value
+    with pytest.raises(ProviderError, match='MODEL_OUTPUT_CONTRACT_UNKNOWN'):
+        resolve_output_contract(config, body)
+
+
+def test_siliconflow_explicitly_disabled_thinking_uses_visible_cap_only():
+    contract = resolve_output_contract(_siliconflow_config(), {
+        'max_tokens': 64,
+        'enable_thinking': False,
+        'thinking_budget': 8192,
+    })
+    assert contract.cap_semantics == VISIBLE_ONLY
+    assert contract.cap_field == 'max_tokens' and contract.cap_value == 64
+    assert contract.output_upper == 64 and contract.case == 'A'
+    assert contract.thinking_mode == 'disabled'
+    assert contract.reasoning_upper == 0 and contract.reasoning_included is False
 
 
 def test_registry_drift_between_table_and_pinned_reference_is_refused(monkeypatch):

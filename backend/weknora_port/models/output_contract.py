@@ -23,9 +23,12 @@ from .types import ModelConfig, ProviderError
 #   visible+reasoning/v1  the vendor bounds visible output and reasoning as two
 #                         separate hard caps: output_upper is their sum and it is
 #                         admissible only when both caps are present on the wire.
+#   visible-output/v1     the cap excludes reasoning; admissible here only when
+#                         the provider's wire explicitly disables thinking.
 #   no-generation/v1      the capability produces no completion: upper is 0.
 FULL_COMPLETION = "full-completion/v1"
 VISIBLE_PLUS_REASONING = "visible+reasoning/v1"
+VISIBLE_ONLY = "visible-output/v1"
 NO_GENERATION = "no-generation/v1"
 
 CAP_FIELD_DRIFT = "MODEL_OUTPUT_CAP_FIELD_DRIFT"
@@ -33,7 +36,7 @@ CONTRACT_UNKNOWN = "MODEL_OUTPUT_CONTRACT_UNKNOWN"
 CONTRACT_INVALID = "MODEL_OUTPUT_CONTRACT_INVALID"
 HARD_LIMIT_DENIED = "MODEL_OUTPUT_HARD_LIMIT_DENIED"
 
-CONTRACT_VERSION = "provider-completion-cap/v2"
+CONTRACT_VERSION = "provider-completion-cap/v3"
 
 _COMPAT_NAME = {"openai-completions": "OpenAICompletions",
                 "openai-responses": "OpenAIResponses",
@@ -46,7 +49,10 @@ _COMPAT_NAME = {"openai-completions": "OpenAICompletions",
 # registry's vendor override for the same provider/protocol.
 CAP_CONTRACTS = {
     ("deepseek", "openai-completions"): ("max_tokens", FULL_COMPLETION, None),
-    ("siliconflow", "openai-completions"): ("max_tokens", FULL_COMPLETION, None),
+    # SiliconFlow documents max_tokens as excluding chain-of-thought.
+    # Only explicit non-thinking wire has a verified total output bound here.
+    # A generic thinking_budget is not a proven hard cap for every model.
+    ("siliconflow", "openai-completions"): ("max_tokens", VISIBLE_ONLY, None),
 }
 
 
@@ -119,6 +125,7 @@ def resolve_output_contract(config, body, *, capability="chat"):
     if type(value) is not int or value <= 0:
         raise ProviderError(HARD_LIMIT_DENIED)
     reasoning_upper = 0
+    reasoning_included = True
     if semantics == FULL_COMPLETION:
         # Reasoning is inside the same cap: never add a second allowance.
         output_upper, case = value, "A"
@@ -129,9 +136,17 @@ def resolve_output_contract(config, body, *, capability="chat"):
         if type(separate) is not int or separate <= 0:
             raise ProviderError(HARD_LIMIT_DENIED)
         output_upper, reasoning_upper, case = value + separate, separate, "B"
+    elif semantics == VISIBLE_ONLY:
+        # This is a provider-declared wire switch, not a model-name heuristic.
+        # An absent switch leaves the provider default unknown. Do not invent
+        # a reasoning allowance or infer a hard bound from past short answers.
+        if body.get("enable_thinking") is not False:
+            raise ProviderError(CONTRACT_UNKNOWN)
+        mode, output_upper, case = "disabled", value, "A"
+        reasoning_included = False
     else:
         # Case C/D: an unstated semantics is not a verified total upper bound.
         raise ProviderError(CONTRACT_UNKNOWN)
     return OutputBudgetContract(config.provider, config.api, capability, field, value,
-        semantics, reasoning_field, reasoning_upper, mode, effort, True, output_upper,
+        semantics, reasoning_field, reasoning_upper, mode, effort, reasoning_included, output_upper,
         CONTRACT_VERSION, case)

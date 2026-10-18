@@ -186,7 +186,7 @@ def test_observer_byte_preservation_no_headers(ledger, stream):
     from backend.weknora_port.models.types import ModelConfig
     config = ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid', custom_headers={'Authorization': 'secret'})
     async def consume():
-        async with model.transport.open(config, '/', {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50, 'api_key': 'secret', 'nested': {'Authorization': 'secret'}}, call().context, capability='chat') as handle:
+        async with model.transport.open(config, '/', {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50, 'enable_thinking': False, 'api_key': 'secret', 'nested': {'Authorization': 'secret'}}, call().context, capability='chat') as handle:
             if stream: return b''.join([chunk async for chunk in handle.response.aiter_bytes()])
             return await handle.response.aread()
     assert run(consume()) == raw
@@ -207,11 +207,32 @@ def test_observer_can_close_from_stream_cleanup_context(ledger):
     model = LocalExecution(ledger).observe_model(SimpleNamespace(transport=SimpleNamespace(open=opened)))
     async def scenario():
         manager = model.transport.open(ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid'),
-            '/', {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50}, call().context, capability='chat')
+            '/', {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50,
+                 'enable_thinking': False}, call().context, capability='chat')
         await manager.__aenter__()
         await asyncio.create_task(manager.__aexit__(None, None, None))
     run(scenario())
     assert closed == [True]
+
+
+def test_observer_refuses_siliconflow_unspecified_thinking_before_open(ledger):
+    from backend.weknora_port.models.types import ModelConfig
+    opened = []
+    @asynccontextmanager
+    async def original_open(*args, **kwargs):
+        opened.append(True)
+        yield SimpleNamespace(response=SimpleNamespace())
+    model = LocalExecution(ledger).observe_model(
+        SimpleNamespace(transport=SimpleNamespace(open=original_open)))
+    async def execute():
+        async with model.transport.open(ModelConfig('siliconflow', 'model', 'm1',
+                'https://example.invalid'), '/',
+                {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50},
+                call().context, capability='chat'):
+            pass
+    with pytest.raises(ProviderError, match='LOCAL_EXECUTION_BOUND_UNVERIFIABLE'):
+        run(execute())
+    assert opened == []
 
 
 @pytest.mark.parametrize('alter', ['negative_held', 'negative_reserve', 'duplicate', 'bad_id', 'bad_usage', 'bad_unknown_usage', 'bad_json'])
@@ -282,7 +303,8 @@ def test_actual_transport_open_bound_and_default_private(ledger, kind):
     from backend.weknora_port.models.types import ModelConfig
     config = ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid', requires_auth=False)
     capability = kind if kind in ('embedding', 'rerank') else 'chat'
-    body = {'messages': [{'role': 'user', 'content': 'private prompt'}], 'max_tokens': 50}
+    body = {'messages': [{'role': 'user', 'content': 'private prompt'}], 'max_tokens': 50,
+            'enable_thinking': False}
     if kind == 'embedding': body = {'input': ['private prompt']}
     if kind == 'rerank': body = {'query': 'private prompt', 'documents': ['private evidence']}
     if kind == 'unknown_provider': config = replace(config, provider='unknown')
@@ -354,6 +376,34 @@ def test_complete_output_upper_is_reserved_without_body_mutation(ledger, monkeyp
     run(execute())
     assert json.dumps(body, sort_keys=True) == unchanged
     assert data(ledger)['entries'][0]['reserved_tokens'] == len(sent[0]) + 250 + 1024
+
+
+def test_siliconflow_explicitly_disabled_thinking_reserves_visible_cap(ledger):
+    from backend.weknora_port.models.types import ModelConfig
+    import httpx
+    from backend.weknora_port.models.transport import AsyncHTTPTransport, configured_endpoint
+    config = ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid', requires_auth=False)
+    body = {'messages': [{'role': 'user', 'content': 'question'}], 'max_tokens': 50,
+            'enable_thinking': False}
+    unchanged = json.dumps(body, sort_keys=True)
+    change(ledger, capture_evidence=False, allowed_models=[{'provider': 'siliconflow', 'model': 'model', 'model_id': 'm1', 'capability': 'chat'}])
+    gate = LocalExecution(ledger).install_gate(Gate())
+    sent = []
+    def response(request):
+        sent.append(request.content)
+        return httpx.Response(200, json={})
+    transport = AsyncHTTPTransport(allowed_endpoints=[configured_endpoint(config)], gate=gate,
+        http_transport=httpx.MockTransport(response))
+    LocalExecution(ledger).observe_model(SimpleNamespace(transport=transport))
+    async def execute():
+        try:
+            async with transport.open(config, '/', body, call().context, capability='chat') as handle:
+                await handle.response.aread()
+                handle.observed(TokenUsage(10, 5, 15, 'REPORTED'))
+        finally: await transport.aclose()
+    run(execute())
+    assert json.dumps(body, sort_keys=True) == unchanged
+    assert data(ledger)['entries'][0]['reserved_tokens'] == len(sent[0]) + 50 + 1024
 
 
 @pytest.mark.parametrize('status,code', [('STOP', 'LOCAL_EXECUTION_UNKNOWN_STOP'), ('CLOSED', 'LOCAL_EXECUTION_CLOSED')])
