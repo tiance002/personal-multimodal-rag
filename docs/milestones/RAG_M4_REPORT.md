@@ -1,8 +1,8 @@
 # RAG-M4.0：六套统一评测首轮准备
 
-**最新状态：M4_0_AUTHORIZED_BUT_BLOCKED_TENANT332_NORMAL_API_IDENTITY。真实质量基线仍 NOT RUN。**
+**最新状态：M4_PARTIAL_STOPPED_UNKNOWN。tenant 332 正常 API 接线已完成；真实问答 1/11 完成，下一题在最终 Cheap 请求超时并留下 UNKNOWN，按授权停止后续外发。**
 
-离线准备最初收口时的状态为 `M4_0_OFFLINE_PREPARED_BLOCKED_AUTHORIZATION`；之后 Owner 已批准有限真实评测。本轮续跑检查发现，现有正式 API 只能解析日常 `local` principal（tenant 1），不能合法访问冻结的 tenant 332 知识库，因此在启动 API、打开云发送或发出 Provider 请求前停止。详细记录见本报告末尾的“授权续跑检查”。
+下文较早的准备和身份阻断内容均按发生时状态保留；tenant 332 的独立正式 API 接线及真实问答续报见本报告末尾“真实问答执行续报”。
 
 已完成所选样本、Gold、源文件、版本、向量/关键词索引与评分规则的离线冻结。离线准备收口时尚无新的云调用授权，因此未提交问答；不把历史M3/P32分数并入M4。原有8个未提交路径保留。
 
@@ -76,3 +76,20 @@ Owner 已明确批准本轮冻结 11 题：最多 132 次 Provider、600,000 Tok
 代码确认正式 `entrypoint.create_app()` 将请求 principal 解析为已启动 runtime 的 principal，正常 `development.assemble(settings)` 从 `port_local_principal` 的唯一 `slot='local'` 读取身份。随后对同一数据库执行完整只读盘点，结果只有这一个 tenant 1 principal；冻结的六个评测 KB 全部属于 tenant 332。当前 daily 配置没有 tenant 332 身份；通过 `assemble(..., principal=...)` 测试注入、修改该数据库行、改动知识库归属或启动旧实验执行器都不构成合法的正常 API 身份。本轮未采用这些方式。原始盘点输出见 `E:\WK\run\rag-m40-20261018\identity-inventory-postauth.json`，重现脚本为 `identity_inventory_postauth.py`。
 
 因此没有启动 API/Worker/UI，没有开启云发送，没有建立或变更额度文件，也没有写数据库、Redis 或知识库。M4 真实问答 0/11、Provider 0、Token 0、UNKNOWN 0；各阶段仍 `NOT RUN`。要继续，需要项目提供一种可由正式 API 解析、且不改变日常 tenant 1 principal 和现有 KB 归属的 tenant 332 身份路径；当前代码没有这类多身份入口。当前只读预检原始输出保存在 `E:\WK\run\rag-m40-20261018\preflight-authorized-identity-20261018.json`。机器记录见 [授权续跑检查结果](RAG_M4_AUTHORIZED_EXECUTION_CHECKPOINT.results.json)。
+
+## 真实问答执行续报（2026-10-18）
+
+本节更新上面的历史阻断状态。复用 M4 正式评测入口与 tenant 332 独立 API；没有修改日常 tenant 1 principal、工作台配置或六个 KB 归属。运行身份为 tenant 332（subject fingerprint `00f2fd3dad2b7419`），PostgreSQL system ID `7696088403504697382`、数据库 `weknora_python_port_20261013`，DYNAMIC，云发送在本次获批执行范围内开启；API 仅绑定 `127.0.0.1:51443`，Worker 未启动。
+
+| 冻结样本 | 状态与真实链路 | 评分解释 |
+|---|---|---|
+| SciFact `247` | 完整 FastAPI → Search 30 → Rerank → Merge/Context → Cheap → DYNAMIC 升级 → SSE/持久化。预期来源文档在 Search 排名 1、2、4；Rerank 与 Context 均保留 2 个证据块，Context 2,253 字符。Cheap `XingChenAGI/Xing4.0-29B` 以 `length` 截断，按既有升级规则由 DeepSeek `deepseek-flash` 完成，最终 `stop`。答案谨慎说明来源是 TG2 抑制剂结合结构研究，不能支持问题所述的化学损伤结论。 | Gold 是官方文档 qrels，QA 答案准确率不适用；可确认来源证据进入生成并完成端到端持久化，不报告 QA 正确率。 |
+| SciFact `339` | Search 30；Rerank 3；Merge 2；Context 2 个证据块、3,040 字符。Query Rewrite、Embedding、Rerank 已结算；Cheap `XingChenAGI/Xing4.0-29B` 请求超时 600 秒，SSE 完成事件为失败 `MODEL_CALL_TIMEOUT`，历史 assistant 消息为空且未完成。 | 没有答案可评分。Provider 已发送但未收到可确认回执，记为 `UNKNOWN`，保守占用 9,468 Token；不重发。 |
+
+实际用量为 9 次 Provider 请求，供应商报告 Token 20,640；另有 1 次 UNKNOWN，保守占用 9,468，累计保守预算占用 30,108 / 600,000。分批上限均未超出：batch-002 为 5 次、12,424 Token；batch-004 为 4 次、17,684 Token 预留/保留。批次累计账本见 `E:\WK\run\rag-m40-20261018\m4-accounting.json`。由于授权规则规定 UNKNOWN 即停止，本轮 M4 评测停止；其余 9 个冻结问题均 `NOT RUN`，不把部分 SciFact 结果称作六套统一基线。
+
+前置的 batch-001 被发送门在 Provider 前以 `LOCAL_EXECUTION_SCOPE_DENIED` 拦截（Provider 0）；batch-003 在本地 runner 导入阶段失败（HTTP 0、Provider 0）。两项均保留证据，不计入 Provider 用量。batch-004 的 API 记录已保存；外层 runner 随后因其汇总变量 `run_status` 未初始化而退出 1。该工具错误不覆盖已保存的 API 超时/UNKNOWN，不构成重试依据。
+
+证据目录为 `E:\WK\run\rag-m40-20261018\batch-002` 与 `batch-004`。批次 API、执行账本及阶段轨迹的 SHA-256 见 [机器结果](RAG_M4_REAL_EXECUTION_20261018.results.json)。API 进程状态为 stopped、退出码 1，端口 51443 无监听；没有停止或清理原有 PostgreSQL/Redis。真实 Edge 页面验收未执行。
+
+结果状态为 **`M4_PARTIAL_STOPPED_UNKNOWN`**。本轮未运行六套其余问题，也未计算 SciFact QA 准确率；如要继续，必须先由负责人决定如何处理本次 UNKNOWN 之后的评测授权与批次。未因超时改变模型、问题、Rerank、路由或索引。机器核对与累计账本见 [真实执行结果](RAG_M4_REAL_EXECUTION_20261018.results.json)。

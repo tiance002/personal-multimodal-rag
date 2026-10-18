@@ -1,0 +1,270 @@
+{
+  "schema": "rag-m4-real-execution/v1",
+  "status": "M4_PARTIAL_STOPPED_UNKNOWN",
+  "date": "2026-10-18",
+  "repository": {
+    "branch": "codex/weknora-python-port-integrate-image-20261014",
+    "source_commit": "d3ad6571f7a3ff0b4e3de707c27fb1bc49d84bfb",
+    "fixed_upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97"
+  },
+  "authorization": {
+    "status": "APPROVED_IN_CHAT",
+    "frozen_question_count": 11,
+    "provider_call_limit": 132,
+    "token_limit": 600000,
+    "per_batch_provider_call_limit": 12,
+    "per_batch_token_limit": 100000,
+    "providers": [
+      "SiliconFlow",
+      "DeepSeek"
+    ],
+    "router": "DYNAMIC",
+    "unknown_policy": "STOP_IMMEDIATELY"
+  },
+  "runtime": {
+    "tenant_id": 332,
+    "subject_fingerprint": "00f2fd3dad2b7419",
+    "postgres_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013",
+    "api_bind": "127.0.0.1:51443",
+    "redis_prefix": "weknora-python-m4-tenant332:87509c47f6d24c02b76d24d2f0b8a04c",
+    "worker_started": false,
+    "router_mode": "DYNAMIC",
+    "cloud_allowed_for_this_authorized_run": true,
+    "api_process": {
+      "status": "stopped",
+      "exit_code": 1,
+      "listener_remaining": false
+    },
+    "daily_tenant_1_configuration_changed": false
+  },
+  "totals": {
+    "frozen_questions": 11,
+    "completed_questions": 1,
+    "submitted_but_incomplete_questions": 1,
+    "not_run_questions": 9,
+    "provider_requests": 9,
+    "reported_tokens": 20640,
+    "unknown_requests": 1,
+    "unknown_conservative_tokens": 9468,
+    "conservative_budget_occupied_tokens": 30108,
+    "conservative_budget_remaining_tokens": 569892,
+    "stop_count": 1,
+    "qa_accuracy_applicable_questions": 0,
+    "note": "SciFact Gold in the completed case is document qrels, not answer Gold; the incomplete case has no answer. No SciFact QA accuracy score is reported."
+  },
+  "batches": [
+    {
+      "batch_id": "batch-001",
+      "case_id": "scifact-247",
+      "status": "BLOCKED_PRE_SEND",
+      "http_submissions": 1,
+      "provider_requests": 0,
+      "reported_tokens": 0,
+      "reason": "LOCAL_EXECUTION_SCOPE_DENIED",
+      "evidence": "E:\\WK\\run\\rag-m40-20261018\\batch-001\\api-run.json"
+    },
+    {
+      "batch_id": "batch-002",
+      "case_id": "scifact-247",
+      "status": "COMPLETED_PIPELINE_NO_ANSWER_GOLD",
+      "http_submissions": 1,
+      "provider_requests": 5,
+      "reported_tokens": 12424,
+      "unknown_requests": 0,
+      "search_candidates": 30,
+      "expected_source_search_ranks": [
+        1,
+        2,
+        4
+      ],
+      "rerank_selected_chunk_ids": [
+        "03ec1acd-37d1-5763-835a-966d9325283e",
+        "fa490391-ac34-4c22-952e-e528d8d5bda2"
+      ],
+      "context_chunk_ids": [
+        "03ec1acd-37d1-5763-835a-966d9325283e",
+        "fa490391-ac34-4c22-952e-e528d8d5bda2"
+      ],
+      "context_characters": 2253,
+      "evidence_reached_generation": true,
+      "generation": {
+        "cheap_provider": "siliconflow",
+        "cheap_model": "XingChenAGI/Xing4.0-29B",
+        "cheap_finish_reason": "length",
+        "upgrade_reason": "TRUNCATION",
+        "final_provider": "deepseek",
+        "final_model": "deepseek-flash",
+        "final_finish_reason": "stop"
+      },
+      "provider_usage": [
+        {
+          "capability": "chat",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "tokens": 2559,
+          "latency_ms": 40000
+        },
+        {
+          "capability": "embedding",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "tokens": 15,
+          "latency_ms": 0
+        },
+        {
+          "capability": "rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "tokens": 5626,
+          "latency_ms": 1000
+        },
+        {
+          "capability": "chat",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "tokens": 2441,
+          "latency_ms": 112000
+        },
+        {
+          "capability": "chat",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "tokens": 1783,
+          "latency_ms": 4000
+        }
+      ],
+      "gold_type": "official_document_qrels",
+      "answer_accuracy_applicable": false,
+      "evidence": "E:\\WK\\run\\rag-m40-20261018\\batch-002\\api-run.json"
+    },
+    {
+      "batch_id": "batch-003",
+      "case_id": "scifact-339",
+      "status": "BLOCKED_LOCAL_RUNNER_SETUP",
+      "http_submissions": 0,
+      "provider_requests": 0,
+      "reported_tokens": 0,
+      "reason": "MODULE_NOT_FOUND_BACKEND_PACKAGE",
+      "evidence": "E:\\WK\\run\\rag-m40-20261018\\batch-003\\api-run.json"
+    },
+    {
+      "batch_id": "batch-004",
+      "case_id": "scifact-339",
+      "status": "STOPPED_UNKNOWN",
+      "http_submissions": 1,
+      "provider_requests": 4,
+      "reported_tokens": 8216,
+      "reserved_or_held_tokens": 17684,
+      "unknown_requests": 1,
+      "unknown_conservative_tokens": 9468,
+      "search_candidates": 30,
+      "rerank_candidates": 3,
+      "merge_candidates": 2,
+      "context_evidence_count": 2,
+      "context_characters": 3040,
+      "generation": {
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "outcome": "UNKNOWN",
+        "latency_ms": 600000,
+        "sse_error_code": "MODEL_CALL_TIMEOUT",
+        "persisted_turn_status": "error",
+        "assistant_completed": false,
+        "answer_available": false
+      },
+      "provider_usage": [
+        {
+          "capability": "chat",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "outcome": "RESPONSE_RECEIVED",
+          "reported_tokens": 2556,
+          "latency_ms": 173000
+        },
+        {
+          "capability": "embedding",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "outcome": "RESPONSE_RECEIVED",
+          "reported_tokens": 12,
+          "latency_ms": 0
+        },
+        {
+          "capability": "rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "outcome": "RESPONSE_RECEIVED",
+          "reported_tokens": 5648,
+          "latency_ms": 1000
+        },
+        {
+          "capability": "chat",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "outcome": "UNKNOWN",
+          "reported_tokens": null,
+          "conservative_tokens": 9468,
+          "latency_ms": 600000
+        }
+      ],
+      "gold_sent": false,
+      "evidence": "E:\\WK\\run\\rag-m40-20261018\\batch-004\\api-run.json"
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\batch-002\\api-run.json",
+      "sha256": "34F02D79298F0DEDD6F23CA8E57A58E74BC1648DBD09D0D391FA23870E464821"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\batch-002\\execution.json",
+      "sha256": "A16CC35AFC18BF6F76B5E275DE1D264B8A2651C9CC37636FC2186C7A45703136"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\batch-002\\evidence\\1a7bdc8614867d9b3898755cc8c10b9b7cbd3ca5d38f47525970e06d667f90c1.stages.json",
+      "sha256": "87F13A94EBC32E557432FF6947939611453057A31A1E4980A637F2CED690874A"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\batch-004\\api-run.json",
+      "sha256": "9C4B71BDF30E6656B2DD3ACECC0F0D5254E06C2270957C422016E2CC7F8E384B"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\batch-004\\execution.json",
+      "sha256": "EF7B25CD77C443A1C7AE26DDA08F3D1DAEC3F7FC639D7F69AF1A978991213E51"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\batch-004\\evidence\\dc1686db0187e7088c863af100bb26626c14b677ee440033dfe4a924869a842c.stages.json",
+      "sha256": "6E1700EB283949FD97A16DAB40D52ECDBC65AF23E4C6F8C5EDD0DF0A8F9A5A0C"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-tenant332-api\\20261018-165703-2787db25\\process-state.json",
+      "sha256": "CBD808D0CB737015301EC683F7675A19F8D8625D3FF42594596414008DB2D389"
+    },
+    {
+      "path": "E:\\WK\\run\\rag-m40-20261018\\m4-accounting.json",
+      "sha256": "8D3D7DB7620A285BF13AA76068033D5C0FCDB30DD2A3F89653949D4F3BA6A376"
+    }
+  ],
+  "execution_notes": {
+    "batch004_outer_runner_exit_code": 1,
+    "batch004_outer_runner_error": "UnboundLocalError: local variable run_status referenced before assignment after api-run.json was persisted",
+    "api_result_preserved": true,
+    "no_retry_after_unknown": true,
+    "no_browser_ui_run": true,
+    "tenant_1_daily_runtime_unchanged": true,
+    "unknown_not_released_or_settled_as_zero": true,
+    "additional_question_ids_not_run": [
+      "miracl-91294",
+      "miracl-7049630",
+      "longbench-6770736a",
+      "longbench-51abd206",
+      "hotpot-5a7631",
+      "hotpot-5a8ad6",
+      "mml-0434",
+      "mml-0959",
+      "omni-page012"
+    ]
+  },
+  "accounting_file": "E:\\WK\\run\\rag-m40-20261018\\m4-accounting.json"
+}
