@@ -311,6 +311,7 @@ class RuntimeService:
                 if state.image_description and not state.chat_model_supports_vision:
                     prompt+='\n\n[用户上传图片内容]\n'+state.image_description
                 if state.quoted_context:prompt+='\n\n'+state.quoted_context
+            if state.attachment_prompt:query+=state.attachment_prompt
             finalized=FinalizedContext(query,'',(),prompt,state.images)
             state.merge_results=[]
         check_context(turn.context)

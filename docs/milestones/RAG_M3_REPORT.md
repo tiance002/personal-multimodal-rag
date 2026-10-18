@@ -99,3 +99,57 @@ B 在 9/10 对中更快；**配对差值**中位数 8.055 秒。A 的 Hotpot 耗
 原始真实保存的 B wire `5ae38cd2...` 中 JSON 意图为 `follow_up`，解析器忠实保留了该值；但原问题“请根据课件回答”未被既有 KB guard 识别，导致带历史时绕过检索。A/B 历史内容不同，不能据此因果归因于模型身份。使用原始 wire 和两轮真实历史的确定性离线重放显示：修复前 `follow_up`/不检索，修复后 `kb_search`/检索，改写文本保持不变。重放证据：`E:\WK\run\rag-m3-followup-20261018\saved-wire-replay.json`。
 
 定向离线测试命令 `E:\RAG quention\.venv\Scripts\python.exe -B -m pytest tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_pipeline.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m3-followup-20261018\pytest-resumed` 实际退出码 0，114 passed in 1.52s；日志 `pytest-final.log`。一次早期重定向尝试因证据目录尚未创建而未启动 Python，记为 **NOT RUN**（`pretest-path-setup.txt`）。本补充没有新增云端请求或 Token；累计仍为 73 次 Provider 调用、201,275 Token、UNKNOWN 0。真实修复后 API/浏览器验证 **NOT RUN**。状态仍为 `M3_PARTIAL`，生产默认仍为 A；本修复不构成 B 安全推广证据，Omni 的证据/答案限制仍未解决。
+
+## M3.1 来源边界与证据流转（2026-10-18）
+
+**状态：`M3_1_PARTIAL`；A 离线通过，C 保存回执回放通过，B1 `BLOCKED_AUTHORIZATION`，B2 `BLOCKED_INPUT_CONTRACT`。** 本轮基线为 `fee2229f97725df18ed2da4d4f94c87c130758c6`，生产仍用 A。历史 20 个请求、73 次 Provider、201,275 Token 与旧 UNKNOWN 保持原记录；本轮完整问答、Provider 请求、Token、新 UNKNOWN 均为 **0**。以下分数属于旧 M3 真实响应的新离线诊断，不是新增模型结果。机器结果见 `RAG_M3_1_DIAGNOSTICS.results.json`。本地提交的完整 SHA 可用 `git log -1 --format=%H -- docs/milestones/RAG_M3_REPORT.md` 查询。
+
+### 来源边界与最小修复
+
+- `query.py::resolve_intent` 仅在来源短语紧邻“不要／不用／无需／不必”等直接否定时，将该短语排除于意图护栏；不改原问题、Rewrite 或 Prompt。“不要根据课件回答，只解释一般原理”不再强制检索；句中另有正向搜索 KB／依据其他来源的要求仍检索。“不要只根据课件”也仍保留来源要求。这不是通用否定理解。
+- 对明确“根据课件／讲义／教材评价上传的方案”的双角色表达，即使内部状态有附件、模型返回 `doc_only`，也执行检索。当前附件自身总结、纯图片分析、历史第二点展开和已有 KB 约束反例保持通过。这里只依据原请求中明确的来源／评价对象关系，不推断附件文件身份。
+- `service.py::prepare_turn` 另修复了关联缺陷：SearchNothing 的 model fallback 原本丢弃当前附件。现在将其保留在最终 **user 数据内容**，不将附件放入 system 指令。正常有证据路径本已由 `context.py::into_chat_message` 保留附件。
+
+实际入口核对发现：`http_api.py::MessageCreate`、`OrdinaryTurnRequest`、React `runPortChat` 和 runtime 状态装配均没有消息级 `images/attachments` 传输；额外字段被 `extra=forbid` 拒绝。页面上传是 KB 入库，不是当前消息附件。因此带 `attachment_prompt` 的 A2 反例属于已有内部组件合同，尚不能冒充真实浏览器附件验收。内部附件对象只有名称、类型和文本，没有稳定文档 ID；对含混的“当前附件是否就是所需来源”不猜测，沿用既有 `doc_only`。所选 KB 文档仍受原 `document_scope` 限制，不为参照另一份资料擅自扩大范围。
+
+### B1／B2 的真实执行状态
+
+| 场景 | 状态与理由 | 实际 Provider／Search／Context／答案 | 本轮用量 |
+|---|---|---|---|
+| B1 真实课件追问 | `BLOCKED_AUTHORIZATION`：已请求独立于旧 M3 的本轮有限授权，收口时尚未收到确认。 | 全部 `NOT RUN`，没有推断实际模型身份。 | 0 请求、0 Token、0 新 UNKNOWN |
+| B2 浏览器图片＋课件 | `BLOCKED_INPUT_CONTRACT`，同时受授权限制：正常消息 API／UI 不接受图片附件。 | 浏览器请求、视觉 Provider、SSE／持久化比对均 `NOT RUN`。 | 0 请求、0 Token、0 新 UNKNOWN |
+
+只读预检成功：PG `127.0.0.1:56423/weknora_python_port_20261013`、system identifier `7696088403504697382`；Redis `127.0.0.1:56424/15`、run ID `dcff9d65a25725574ba0cfbc743d409fac211ef0`、PING 正常。目标课件 KB `7f1d720d-9561-446f-a8cc-6a562c339d23` 的 `cloud_allowed=true`；现有 Cheap／Embedding／Rerank／Expensive 配置有凭据记录，但未据此声称已解密或真实调用成功，VLM 角色未配置。当前普通 `LeasedSendGate` 保留运行租约、模型／KB 权限、外发许可和持久化调用保护；P31 已撤销账户 Token Authority，本轮没有恢复。旧 M3 实验限制也未复用为本轮授权。未启动 API、Worker、前端或新容器，数据库操作均只读。
+
+### Omni 精确 OCR 的首次丢失
+
+目标 OCR `51316a20-67fd-4732-b520-c049999933d0` 与同页 Summary `4427641f-3190-598a-98a2-8f8d63d55d0e` 均属于 document `dfeb8157-6bf9-4fe2-927a-f38d40b342a0`，必须按精确 chunk ID 区分。
+
+| OCR 环节 | A | B |
+|---|---|---|
+| Search | `PASS`，排名 6，score 0.014596036585365853 | `PASS`，排名 5，score 0.014427767354596622 |
+| 实际 Rerank 输入 | `PASS`，index 5（从 0 计） | `PASS`，index 4（从 0 计） |
+| `enriched_passage`／真实 wire | `PASS`，逐项一致；包含原有矩阵 OCR，文本及 SHA 在诊断 JSON | `PASS`，与 A 的目标输入文本一致 |
+| 原始模型回执 | `PASS`，排名 2，0.1673908233642578 | `PASS`，排名 2，0.27084100246429443 |
+| `filtered()` | **`DROPPED`，低于 0.3** | **`DROPPED`，低于 0.3** |
+| accepted | `DROPPED`，上一步已排除 | `DROPPED`，上一步已排除 |
+| MMR／rerank_top_k | `DROPPED`（未获输入），不是首次丢失点 | `DROPPED`（未获输入），不是首次丢失点 |
+| Merge／Context | `DROPPED`（上游缺失） | `DROPPED`（上游缺失） |
+
+Summary 是两组 index 0／排名 1，原始得分 A `0.5140959024429321`、B `0.7705795764923096`，通过 0.3 并最终保留。**0.15 只在整批无通过者时检查 Top1**；它不保护已有其他通过者时的第二名。本例首次丢失明确在阈值过滤，未发现 Python 索引映射、accepted、MMR 或 Merge 独有 Bug。回放直接调用产品 `rerank.py`，所有实际候选文本均与产品 enrichment 相同；Omni／Hotpot 四组输出匹配，0434 两组按预期触发 SearchNothing。原 capture 未单独保存 threshold/top_k，`0.3/0.15/30` 的依据为当时报告和 runtime 默认，并明确以保存输出匹配交叉验证。
+
+旧证据对照同样定位在过滤阶段：Hotpot 第二跳原文 `31417c7c-7abf-4723-956a-74bf7ee14683` 的 A/B 原始分数为 `0.002824527444317937`／`0.02049975097179413`；0434 的精确 Kaggle chunk `085643dc-5ebb-4b8a-b7f1-75427da40015` 位于 A/B 输入 index 10／9，得分 `0.001054094755090773`／`0.004162943456321955`，整批 Top1 也低于 0.15。它们与 Omni 的首次丢失阶段相同，分数和关联性表现差异很大，不能用统一降低阈值保证改善。Omni 可作为将来有限原生阈值对照的候选，必须同时保留噪声／成功样本；本轮默认配置不变，也不将 Summary 来源命中算作 OCR 数字证据命中。
+
+### 本轮实际验证与遗留
+
+使用本报告前述解释器和 `PYTHONPATH`，证据根 `E:\WK\run\rag-m31-20261018`：
+
+| 实际命令 | 退出码与证据 |
+|---|---|
+| `python -B -m pytest tests/weknora_port/test_m31_source_constraints.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m31-20261018\pytest-before` | **1**，5 failed／5 passed；`pytest-before.log`，复现否定、双来源和 fallback 丢附件 |
+| `python -B -m pytest tests/weknora_port/test_m31_source_constraints.py tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_service.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m31-20261018\pytest-final-user-data` | **0，148 passed in 2.13s**；`pytest-final-user-data.log`，离线组件／服务合同 |
+| `python -B E:\WK\run\rag-m31-20261018\replay_evidence.py` | **0**，6 组旧真实回执产品回放；`omni-evidence-flow.json`，未新增云请求 |
+| `python -B E:\WK\run\rag-m31-20261018\preflight.py` | **0**，只读资源预检；`preflight.json`／`preflight.log`。初次诊断用错 Windows Proactor loop，改用 SelectorEventLoop，未改生产代码 |
+| `git diff --check -- backend/weknora_port/retrieval/query.py backend/weknora_port/service.py tests/weknora_port/test_m31_source_constraints.py docs/milestones/RAG_M3_REPORT.md docs/milestones/RAG_M3_REPORT.results.json docs/milestones/RAG_M3_1_DIAGNOSTICS.results.json` | **0**；最终提交前执行 |
+
+剩余阻断：B1 为待 Owner 确认的新外发授权；B2 为消息级图片／附件传输功能缺失，阻断该指定验收场景，但不是本轮引入的普通文本 RAG 故障。附件身份含混表达仍属未解决合同限制。Omni／Hotpot／0434 为已定位的证据选择质量问题，本轮没有授权更改默认策略。下一步最小建议是先取得本轮 B1 授权完成一次真实追问；B2 的消息附件入口另行确定范围。原 `.serena/project.yml`、`progress.md` 和六个未跟踪交接文件保持原状。本轮仅本地提交，停止于 M3.1。

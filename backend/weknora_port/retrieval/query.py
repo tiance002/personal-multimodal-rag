@@ -129,7 +129,13 @@ _KB_REQUEST = re.compile(
 # generated answer as a substitute for retrieving that source.
 _SOURCE_SCOPED_REQUEST = re.compile(
     r'(?:根据|依据|基于|按照)(?:\s|这|那|该|上述|前述|先前|刚才|原|已有|已上传|上传的|份|篇|个|的)*'
-    r'(?:课件|讲义|教材|文档|文件|资料|报告|原文)')
+    r'(?P<source>知识库|资料库|课件|讲义|教材|文档|文件|资料|报告|原文)')
+# Only direct negation of this source clause; "不要只根据" still requests it.
+_SOURCE_NEGATION = re.compile(r'(?:不要|不必|无需|不用|不需要|别|不)(?:再)?\s*$')
+# Explicitly different roles in q0: teaching material evaluates an uploaded
+# scheme. Attachment presence alone cannot erase that reference requirement.
+_ATTACHED_SCHEME_COMPARISON = re.compile(
+    r'\s*(?:来)?(?:评价|评估|比较|对比)(?:一下)?(?:我|本次|当前)?(?:上传的|附加的)方案(?:文档|文件)?')
 
 
 def resolve_intent(state):
@@ -142,9 +148,14 @@ def resolve_intent(state):
     intent = state.intent
     query = go_strip(state.query)
     has_document = bool(go_strip(state.attachment_prompt)) and '<no_document_attached' not in state.attachment_prompt
-    if _KB_REQUEST.search(query):
+    guard_query = _SOURCE_SCOPED_REQUEST.sub(
+        lambda match: '' if _SOURCE_NEGATION.search(query[:match.start()]) else match.group(), query)
+    if _KB_REQUEST.search(guard_query):
         return 'kb_search'
-    if not has_document and _SOURCE_SCOPED_REQUEST.search(query):
+    sources = list(_SOURCE_SCOPED_REQUEST.finditer(guard_query))
+    separate_source = any(match['source'] in ('课件', '讲义', '教材') and
+                          _ATTACHED_SCHEME_COMPARISON.match(guard_query, match.end()) for match in sources)
+    if sources and (not has_document or separate_source):
         return 'kb_search'
     # Attachment-only analysis remains available. The absence marker is not
     # an attachment and cannot grant this exception.
