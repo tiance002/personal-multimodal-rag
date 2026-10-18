@@ -28,6 +28,7 @@ class DevelopmentSettings:
     mineru_extensions:tuple[str,...]=()
     cloud_allowed:bool=False
     execution_file:Path|None=None
+    source_evidence_mode:str='off'
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -41,6 +42,8 @@ class DevelopmentSettings:
         if not self.storage.is_absolute() or not self.secret_key_file.is_absolute():raise DevelopmentConfigurationError('ABSOLUTE_STORAGE_AND_KEY_PATHS_REQUIRED')
         if self.router_mode not in ('OFF','DYNAMIC','CHEAP_ONLY','EXPENSIVE_ONLY'):raise DevelopmentConfigurationError('ROUTER_MODE_INVALID')
         if self.fallback_strategy not in ('model','fixed'):raise DevelopmentConfigurationError('FALLBACK_STRATEGY_INVALID')
+        if self.source_evidence_mode not in ('off','bounded_source_v1'):
+            raise DevelopmentConfigurationError('SOURCE_EVIDENCE_MODE_INVALID')
         if self.mineru_settings is not None:
             from .ingestion.mineru import EXTENSIONS
             if not self.mineru_extensions or set(self.mineru_extensions)-set(EXTENSIONS):
@@ -62,6 +65,7 @@ class DevelopmentSettings:
             fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'),
             cloud_allowed=env.get('WEKNORA_PORT_CLOUD_ALLOWED','false').lower()=='true',
             execution_file=Path(env['WEKNORA_PORT_EXECUTION_FILE']) if env.get('WEKNORA_PORT_EXECUTION_FILE') else None,
+            source_evidence_mode=env.get('WEKNORA_PORT_SOURCE_EVIDENCE_MODE','off'),
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
@@ -154,7 +158,8 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             parser_overrides={ext:'mineru-basic' for ext in settings.mineru_extensions if ext != '.pdf'}
                 if settings.mineru_settings is not None else None,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
-            conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
+            conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy,
+                source_evidence_mode=settings.source_evidence_mode),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
             permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         runtime.authority_config_sha=None
         if settings.execution_file is not None:

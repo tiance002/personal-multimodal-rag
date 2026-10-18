@@ -103,7 +103,11 @@ async def rerank(state, context, registry, segmenter=None):
 
     async def invoke():
         response = await model.rerank(state.rewrite_query, passages, context.child('rerank'))
-        return list(response.results if hasattr(response, 'results') else response)
+        raw = list(response.results if hasattr(response, 'results') else response)
+        if getattr(state, 'source_evidence_mode', 'off') != 'off':
+            state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
+                'response': [{'index': r.index, 'score': r.score} for r in raw]})
+        return raw
 
     def filtered(raw, threshold):
         selected = [r for r in raw if r.index < len(candidates) and r.score >= threshold]
@@ -148,5 +152,8 @@ async def rerank(state, context, registry, segmenter=None):
         accepted.append(r)
         texts.append(passages[rr.index])
     state.rerank_results = mmr(accepted, texts, min(len(accepted), max(1, state.rerank_top_k)), segmenter)
+    if getattr(state, 'source_evidence_mode', 'off') != 'off':
+        state.evidence_trace.append({'stage': 'rerank_filter_mmr', 'threshold': state.rerank_threshold,
+            'accepted_ids': [r.id for r in accepted], 'mmr_ids': [r.id for r in state.rerank_results]})
     if not state.rerank_results:
         raise SearchNothing()

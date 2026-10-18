@@ -24,6 +24,16 @@ def test_fallback_strategy_keeps_model_default(tmp_path):
     assert cfg.fallback_strategy=='model'
     assert DevelopmentSettings.from_environment(development_environment(cfg)).fallback_strategy=='model'
 
+
+def test_source_units_are_explicit_startup_opt_in(tmp_path):
+    cfg=settings(tmp_path);env=development_environment(cfg)
+    assert cfg.source_evidence_mode=='off'
+    env['WEKNORA_PORT_SOURCE_EVIDENCE_MODE']='bounded_source_v1'
+    assert DevelopmentSettings.from_environment(env).source_evidence_mode=='bounded_source_v1'
+    env['WEKNORA_PORT_SOURCE_EVIDENCE_MODE']='unbounded'
+    with pytest.raises(DevelopmentConfigurationError,match='SOURCE_EVIDENCE_MODE_INVALID'):
+        DevelopmentSettings.from_environment(env)
+
 @pytest.mark.parametrize('strategy',['model','fixed'])
 def test_fallback_strategy_loads_explicit_environment(tmp_path,strategy):
     env=development_environment(settings(tmp_path))

@@ -77,6 +77,7 @@ def resolve_saved_conversation(source,session):
     saved=context.get('conversation') or {}
     if not isinstance(saved,Mapping):raise ProviderError('CONVERSATION_SETTINGS_INVALID')
     values={name:getattr(source,name) for name in ('max_rounds','embedding_top_k','vector_threshold','keyword_threshold','rerank_top_k','rerank_threshold','enable_rewrite','enable_query_expansion','enable_rerank','rewrite_prompt_system','rewrite_prompt_user','query_understand_model_id')}
+    values['source_evidence_mode'] = getattr(source, 'source_evidence_mode', 'off')
     for name in ('max_rounds','enable_rewrite','embedding_top_k','vector_threshold','keyword_threshold','rerank_top_k','rerank_threshold'):
         if session.get(name) is not None:values[name]=session[name]
     # Saved profile's nil values mean absent. Zero is tested per source field.
@@ -88,6 +89,8 @@ def resolve_saved_conversation(source,session):
     for name in ('embedding_top_k','vector_threshold','keyword_threshold','rerank_top_k'):
         if values[name] is None or values[name]<=0:values[name]=getattr(source,name)
     if saved.get('multi_turn_enabled') is False:values['max_rounds']=0
+    if values['source_evidence_mode'] not in ('off', 'bounded_source_v1'):
+        raise ProviderError('SOURCE_EVIDENCE_MODE_INVALID')
     summary=dict(source.summary)
     for overlay in (session.get('summary_parameters') or {},saved.get('summary') or {}):
         if not isinstance(overlay,Mapping):raise ProviderError('CONVERSATION_SUMMARY_INVALID')

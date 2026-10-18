@@ -82,7 +82,7 @@ def escape_attr(value):
 def is_web(row):
     return row.chunk_type.lower() == 'web_search' or row.knowledge_source.lower() == 'web_search'
 
-def knowledge_context(rows, registry):
+def knowledge_context(rows, registry, *, classify_sources=False):
     groups = {}
     ordered = []
     for row in rows:
@@ -102,7 +102,13 @@ def knowledge_context(rows, registry):
         out += '  <document' + (f' id="{escape_attr(doc)}"' if doc else '') + (f' kb="{escape_attr(kb)}"' if kb else '') + (f' title="{escape_attr(title)}"' if title else '') + '>\n'
         for row, handle in chunks:
             view = 'full' if row.content else 'match'
-            out += f'    <chunk id="{handle}" index="{row.chunk_index}" view="{view}"' + (f' type="{escape_attr(row.chunk_type)}"' if row.chunk_type else '') + '>\n'
+            kind = ''
+            if classify_sources:
+                category = {'summary':'generated_summary', 'table_summary':'generated_summary',
+                    'image_caption':'generated_caption', 'image_ocr':'derived_ocr',
+                    'table_column':'derived_table', 'text':'source_text', 'faq':'curated_qa'}.get(row.chunk_type,'source_data')
+                kind = f' evidence_kind="{category}"'
+            out += f'    <chunk id="{handle}" index="{row.chunk_index}" view="{view}"' + (f' type="{escape_attr(row.chunk_type)}"' if row.chunk_type else '') + kind + '>\n'
             if row.content:
                 out += f'      <content>{escape_text(row.content)}</content>\n'
             out += '    </chunk>\n'
@@ -158,9 +164,13 @@ def prepare_generation(request, *, now=None):
     knowledge = [e for e in ordered if not is_web(e)]
     web = [e for e in ordered if is_web(e)]
     registry.register_search_results(knowledge)
-    knowledge_part = registry.encode_resource_text(compact_known_context(knowledge_context(knowledge, registry), registry))
+    knowledge_part = registry.encode_resource_text(compact_known_context(knowledge_context(knowledge, registry,
+        classify_sources=bool(finalized.context_char_limit)), registry))
     web_part = registry.encode_resource_text(compact_known_context(web_context(web, registry), registry))
     contexts = '\n'.join((part for part in (knowledge_part, web_part) if part))
+    if finalized.context_char_limit and len(contexts) > finalized.context_char_limit:
+        from ..retrieval.source_evidence import SourceEvidenceBudgetError
+        raise SourceEvidenceBudgetError('SOURCE_CONTEXT_BUDGET_EXCEEDED')
     replaced = False
     if go_strip(contexts):
         for i in (0, len(messages) - 1):

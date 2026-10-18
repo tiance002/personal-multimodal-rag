@@ -315,12 +315,14 @@ class LocalExecution:
             self.evidence.mkdir(exist_ok=True)
             target.write_text(json.dumps(record, ensure_ascii=False, default=str), encoding='utf-8')
         async def progress(stage, status, **fields):
+            from copy import deepcopy
             entry = {'stage': stage, 'status': status, 'time': time.time(), 'fields': fields}
             if status == 'completed':
                 entry['state'] = {name: [asdict(row) if row is not None else None for row in getattr(active_state, name)]
                     for name in ('search_results', 'rerank_results', 'merge_results')}
-                entry['state'].update({name: getattr(active_state, name, None)
-                    for name in ('query', 'rewrite_query', 'intent', 'needs_retrieval', 'user_content')})
+                entry['state'].update({name: deepcopy(getattr(active_state, name, None))
+                    for name in ('query', 'rewrite_query', 'intent', 'needs_retrieval', 'user_content',
+                                 'source_evidence_mode', 'evidence_trace')})
             record['stages'].append(entry); save()
             if original_progress is not None:
                 result = original_progress(stage, status, **fields)

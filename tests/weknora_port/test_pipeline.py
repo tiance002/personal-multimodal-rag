@@ -204,7 +204,12 @@ def test_neighbors_same_document_and_850_bound():
     base=row('b','B'*10,pre_chunk_id='p',next_chunk_id='n')
     prev=row('p','P'*500);nxt=row('n','N'*500)
     repo=Repo(chunks={'b':base,'p':prev,'n':nxt});out=[deepcopy(base)]
-    run(expand_neighbors(out,state(),CTX,repo));assert len(out[0].content)==850 and out[0].sub_chunk_ids==['p','n']
+    # Phase01 intentionally replaces the old slice-to-850 behavior:
+    # assert len(out[0].content)==850 and out[0].sub_chunk_ids==['p','n']
+    # An omitted neighbor must not be represented as fully included evidence.
+    run(expand_neighbors(out,state(),CTX,repo))
+    assert out[0].content=='P'*500+'\n\n'+'B'*10 and out[0].sub_chunk_ids==['p']
+    assert len(out[0].content)<=850
     wrong=replace(nxt,knowledge_id='another');repo=Repo(chunks={'b':base,'n':wrong});out=[deepcopy(base)]
     run(expand_neighbors(out,state(),CTX,repo));assert out[0].content=='B'*10
 

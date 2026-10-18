@@ -351,6 +351,16 @@ async def expand_neighbors(results, state, context, repository):
                         next = ''
                     continue
                 seen.add(cursor)
+                # A neighbor is optional context. Never sacrifice the selected
+                # source body or split a formula/table merely to fill a window.
+                candidate_before = join_content(c.content, before) if side == 'prev' else before
+                candidate_after = join_content(after, c.content) if side == 'next' else after
+                if len(join_content(join_content(candidate_before, base.content), candidate_after)) > 850:
+                    if side == 'prev':
+                        prev = ''
+                    else:
+                        next = ''
+                    continue
                 added.append(cursor)
                 if side == 'prev':
                     before = join_content(c.content, before)
@@ -364,7 +374,7 @@ async def expand_neighbors(results, state, context, repository):
             if len(merged) >= 350:
                 break
         if base.content:
-            r.content = join_content(join_content(before, base.content), after)[:850]
+            r.content = join_content(join_content(before, base.content), after)
             r.content_rewritten = True
             r.sub_chunk_ids.extend((i for i in added if i not in r.sub_chunk_ids))
 

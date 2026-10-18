@@ -16,6 +16,7 @@ class FinalizedContext:
     result_ids: tuple[str, ...]
     system_prompt_override: str = ''
     images: tuple[str, ...] = ()
+    context_char_limit: int = 0
 
 def render_placeholders(template, values, now=None):
     now = now or datetime.now()
@@ -130,4 +131,10 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None)
                 await persist_sink(state, context)
             except Exception:
                 pass
-    return FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in state.merge_results)), state.system_prompt_override, tuple(state.images))
+    limit = 0
+    if getattr(state, 'source_evidence_mode', 'off') != 'off':
+        from .source_evidence import CONTEXT_CHARS, SourceEvidenceBudgetError
+        limit = CONTEXT_CHARS
+        if len(state.rendered_contexts) > limit:
+            raise SourceEvidenceBudgetError('SOURCE_CONTEXT_BUDGET_EXCEEDED')
+    return FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in state.merge_results)), state.system_prompt_override, tuple(state.images), limit)

@@ -11,3 +11,13 @@ Owner task: `docs/weknora-port/task/02_Codex完整执行Goal.md` and its compani
 - Root coordinates writes/commits; other workers own explicitly assigned files, do not recursively dispatch or revert others. Keep stages independently reviewable with source mapping, exact commands/exits and local commits.
 - Report SOURCE_READ, IMPLEMENTED, OFFLINE_PASS, ISOLATED_INTEGRATION_PASS, REAL_PROVIDER_PASS and CUTOVER_PASS separately. Existing31layering errors stay PREEXISTING, not PASS.
 - **未实现的命令不得报告通过。**
+
+## Active Phase 01 (Owner execution pack, 2026-10-18)
+
+`RAG_Phase_01_Execution_Pack.zip` supersedes older diagnosis-only freezes for
+local evidence selection, merging and context construction. Related bounded
+improvements and regression tests are permitted; experimental settings remain
+opt-in until review. Preserve current model bindings, DYNAMIC, MinerU-only OCR,
+tenant/source/version boundaries and all historical UNKNOWN. Old account/month
+authority mechanisms retired in P31 must not be restored. New Provider sends
+require explicit Phase 01 approval; the package's suggested envelope is not a grant.

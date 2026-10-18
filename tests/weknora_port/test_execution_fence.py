@@ -70,6 +70,26 @@ def test_pipeline_observation_preserves_state_and_result(ledger):
     assert snapshot['stages'][0]['state']['needs_retrieval'] is True
 
 
+def test_trace_snapshot_cannot_acquire_future_selection_events(ledger):
+    from dataclasses import dataclass
+    @dataclass
+    class Context:
+        user_content: str
+    state=SimpleNamespace(search_results=[],rerank_results=[],merge_results=[],evidence_trace=[])
+    pipeline=SimpleNamespace(on_progress=None)
+    async def execute(current,context):
+        await pipeline.on_progress('retrieval','completed')
+        state.evidence_trace.append({'stage':'later_source_unit'})
+        await pipeline.on_progress('context','completed')
+        return Context('text')
+    pipeline.run=execute
+    LocalExecution(ledger).observe_pipeline(pipeline,SimpleNamespace(run_id='trace',session_id='s'))
+    run(pipeline.run(state,None))
+    saved=json.loads(next((ledger.parent/'evidence').glob('*.stages.json')).read_text())
+    assert saved['stages'][0]['state']['evidence_trace']==[]
+    assert saved['stages'][1]['state']['evidence_trace']==[{'stage':'later_source_unit'}]
+
+
 def test_install_preserves_identity_and_preload(ledger):
     fence, gate = LocalExecution(ledger), Gate()
     assert fence.install_gate(gate) is gate

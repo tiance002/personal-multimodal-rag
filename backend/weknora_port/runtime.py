@@ -44,6 +44,7 @@ class ConversationSettings:
     enable_rewrite: bool = True
     enable_query_expansion: bool = True
     enable_rerank: bool = True
+    source_evidence_mode: str = 'off'
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .3, "max_completion_tokens": 1024})
 
@@ -224,7 +225,7 @@ class LeasedKnowledgeRepository:
         return result.vectors[0]
 
     def __getattr__(self, name):
-        if name not in ("hybrid_search", "get_chunks", "get_chunk_children", "get_faq_answers"):
+        if name not in ("hybrid_search", "get_chunks", "get_chunk_children", "get_faq_answers", "get_source_unit"):
             raise AttributeError(name)
 
         async def invoke(*args, **kwargs):
@@ -488,6 +489,7 @@ class ApplicationRuntime:
             embedding_top_k=effective['embedding_top_k'], vector_threshold=effective['vector_threshold'],
             keyword_threshold=effective['keyword_threshold'], rerank_top_k=effective['rerank_top_k'],
             rerank_threshold=effective['rerank_threshold'], enable_expansion=effective['enable_query_expansion'],
+            source_evidence_mode=effective['source_evidence_mode'],
             language=resolve_language(source.language_locale, turn.request.accept_language),
             rewrite_system_prompt=DEFAULT_REWRITE_SYSTEM if effective['rewrite_prompt_system'] is None else effective['rewrite_prompt_system'],
             rewrite_user_prompt=DEFAULT_REWRITE_USER if effective['rewrite_prompt_user'] is None else effective['rewrite_prompt_user'],

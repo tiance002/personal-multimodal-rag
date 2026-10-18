@@ -87,8 +87,83 @@ class ScopedKnowledgeRepository:
     async def get_chunk_children(self, parent_ids: Sequence[str], context: CallContext) -> Sequence[SearchResult]:
         return list((await self._read_chunks(parent_ids,context,children=True)).values())
 
+    async def get_source_unit(self, anchor: SearchResult, context: CallContext) -> Sequence[SearchResult]:
+        """Bounded current-source expansion, never an index/summary body as evidence.
+
+        Summary's first-child link identifies a document, not an arbitrary
+        chapter. Only a complete short document is expanded through that link.
+        A text hit may obtain at most two immediately preceding source chunks.
+        """
+        from ..retrieval.source_evidence import UNIT_CHARS, UNIT_CHUNKS
+        loaded = await self._read_chunks((anchor.id,), context, current=True)
+        source = loaded.get(anchor.id)
+        if source is None:
+            return ()
+        version = source.metadata.get('source_version')
+        if (not version or anchor.knowledge_id != source.knowledge_id or
+                anchor.knowledge_base_id != source.knowledge_base_id or
+                anchor.metadata.get('source_version') != version):
+            raise PermissionError('SOURCE_UNIT_IDENTITY_MISMATCH')
+        if source.chunk_type == 'summary':
+            if (source.chunk_metadata.get('origin') != 'model_generated_summary' or
+                    source.chunk_metadata.get('upstream_parent_link') is not True or
+                    source.chunk_metadata.get('source_version', version) != version):
+                return ()
+            parent = (await self._read_chunks((source.parent_chunk_id,), context, current=True)).get(source.parent_chunk_id)
+            if (parent is None or parent.chunk_type != 'text' or
+                    (parent.knowledge_base_id, parent.knowledge_id) !=
+                    (source.knowledge_base_id, source.knowledge_id)):
+                raise PermissionError('SOURCE_UNIT_PARENT_MISMATCH')
+            first, last = 0, 2147483647
+        elif source.chunk_type == 'text':
+            first, last = max(0, source.chunk_index - 2), source.chunk_index
+        else:
+            return ()
+        tenant = await self._tenant(context)
+        cursor = await self.retriever.connection.execute(
+            'SELECT id FROM chunks WHERE tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s '
+            "AND chunk_type='text' "
+            "AND metadata->>'source_version'=%s AND chunk_index BETWEEN %s AND %s "
+            'ORDER BY chunk_index,id LIMIT %s',
+            (tenant, source.knowledge_base_id, source.knowledge_id, version, first, last, UNIT_CHUNKS + 1))
+        ids = tuple(row['id'] for row in await cursor.fetchall())
+        if len(ids) > UNIT_CHUNKS:
+            return ()
+        rows = list((await self._read_chunks(ids, context, current=True)).values())
+        rows.sort(key=lambda row: (row.chunk_index, row.id))
+        if len(rows) != len(ids) or sum(len(row.content) for row in rows) > UNIT_CHARS:
+            return ()
+        for row in rows:
+            if (row.chunk_type != 'text' or row.chunk_metadata.get('source_version') != version or
+                    (row.knowledge_base_id, row.knowledge_id) != (source.knowledge_base_id, source.knowledge_id)):
+                raise PermissionError('SOURCE_UNIT_MEMBER_MISMATCH')
+            if (type(row.start_at) is not int or type(row.end_at) is not int or
+                    row.start_at < 0 or row.end_at < row.start_at or
+                    row.end_at - row.start_at != len(row.content)):
+                raise PermissionError('SOURCE_UNIT_LOCATOR_MISMATCH')
+        if source.chunk_type == 'summary':
+            if not rows or rows[0].id != source.parent_chunk_id:
+                raise PermissionError('SOURCE_UNIT_PARENT_MISMATCH')
+            if [row.chunk_index for row in rows] != list(range(len(rows))):
+                return ()  # Missing/filtered source members are not a whole document.
+        else:
+            # No guessed adjacency from an untrusted index or equal titles.
+            by_id = {row.id: row for row in rows}
+            chain, current = [], source
+            for _ in range(2):
+                prior = by_id.get(current.pre_chunk_id)
+                if prior is None:
+                    break
+                if prior.chunk_index + 1 != current.chunk_index or prior.next_chunk_id != current.id:
+                    raise PermissionError('SOURCE_UNIT_LOCATOR_MISMATCH')
+                chain.append(prior)
+                current = prior
+            rows = list(reversed(chain)) + [source]
+        return rows
+
     async def _read_chunks(self, ids: Sequence[str], context: CallContext, *,
-                           children: bool = False, searchable: bool = False) -> Mapping[str, SearchResult]:
+                           children: bool = False, searchable: bool = False,
+                           current: bool = False) -> Mapping[str, SearchResult]:
         self.retriever.require_verified()
         tenant = await self._tenant(context)
         if not ids:
@@ -105,6 +180,9 @@ class ScopedKnowledgeRepository:
             values.extend(scope.document_ids)
         if children or searchable:
             where.append("c.is_enabled = TRUE")
+        if current:
+            where += ["c.is_enabled = TRUE", "k.enable_status='enabled'", "k.parse_status='completed'",
+                      "(c.chunk_type='summary' OR c.metadata->>'source_version'=k.metadata->>'source_version')"]
         if searchable:
             where += ["(c.index_status IS NULL OR c.index_status NOT IN ('processing','failed'))",
                       "c.chunk_type IN ('text','summary','table_column','table_summary','faq','image_ocr','image_caption')"]
@@ -113,7 +191,8 @@ class ScopedKnowledgeRepository:
         # remains the responsibility of its upstream stage, not this loader.
         query = ("SELECT c.*, k.source AS knowledge_source, k.title AS knowledge_title, "
                  "k.file_name AS knowledge_filename, k.description AS knowledge_description, "
-                 "k.custom_metadata AS knowledge_custom_metadata, k.metadata AS knowledge_metadata FROM chunks c "
+                 "k.custom_metadata AS knowledge_custom_metadata, k.metadata AS knowledge_metadata, "
+                 "k.enable_status AS knowledge_enable_status,k.parse_status AS knowledge_parse_status FROM chunks c "
                  "JOIN knowledges k ON k.id = c.knowledge_id AND k.knowledge_base_id = c.knowledge_base_id "
                  "JOIN knowledge_bases kb ON kb.id = c.knowledge_base_id WHERE " + " AND ".join(where))
         cursor = await self.retriever.connection.execute(query, values)
@@ -134,6 +213,10 @@ class ScopedKnowledgeRepository:
                 continue
             chunk_metadata = _json_object(row.get("metadata"))
             metadata = {key:_go_sprint(value) for key,value in _json_object(row.get("knowledge_metadata")).items()}
+            if current and (row.get('deleted_at') is not None or not row.get('is_enabled') or row.get('knowledge_enable_status') != 'enabled' or
+                    row.get('knowledge_parse_status') != 'completed' or not metadata.get('source_version') or
+                    row['chunk_type'] != 'summary' and chunk_metadata.get('source_version') != metadata['source_version']):
+                continue
             result[row["id"]] = SearchResult(
                 id=row["id"],content=row["content"],score=0,
                 knowledge_id=row["knowledge_id"],knowledge_base_id=row["knowledge_base_id"],

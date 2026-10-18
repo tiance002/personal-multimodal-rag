@@ -52,6 +52,8 @@ class PipelineState(SearchState):
     faq_direct_answer_threshold: float = 0.9
     rendered_contexts: str = ''
     user_content: str = ''
+    source_evidence_mode: str = 'off'
+    evidence_trace: list[dict] = field(default_factory=list)
 
 class RetrievalPipeline:
 
@@ -110,6 +112,12 @@ class RetrievalPipeline:
         check_context()
         filter_top_k(state)
         check_context()
+        if state.source_evidence_mode != 'off':
+            from .source_evidence import expand_source_evidence
+            await self._progress('source_unit', 'started')
+            await expand_source_evidence(state, context, self.repository)
+            await self._progress('source_unit', 'completed', candidate_count=len(state.merge_results))
+            check_context()
         await self._progress("context", "started")
         result = await into_chat_message(state, context, persist_sink=self.persist_sink)
         await self._progress("context", "completed", selected_evidence_count=len(result.result_ids))
