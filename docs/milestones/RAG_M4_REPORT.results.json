@@ -1,0 +1,2032 @@
+{
+  "schema": "rag-m4-baseline/v1",
+  "status": "M4_0_OFFLINE_PREPARED_BLOCKED_AUTHORIZATION",
+  "quality_baseline_status": "NOT_RUN",
+  "baseline_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+  "preparation_implementation_sha": "ffcab7de9dce21b9692bbd7dd38cd70a96379d08",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "plan_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\milestones\\RAG_M4_0_BASELINE.plan.json",
+  "plan_sha256": "5eba07d24bde9316c2ae0436552b8eabeaad6fa454d2a766283260f5953e5c12",
+  "offline_revision": 2,
+  "new_real_provider_calls": 0,
+  "new_actual_tokens": 0,
+  "new_unknown": 0,
+  "planned_requests": 11,
+  "actual_requests_attempted": 0,
+  "completed_requests": 0,
+  "data_preflight": {
+    "schema": "rag-m4-preflight/v1",
+    "quality_result": "NOT_RUN",
+    "provider_calls": 0,
+    "real_metrics": null,
+    "offline_validation": "PASS",
+    "database": {
+      "system_id": "7696088403504697382",
+      "database": "weknora_python_port_20261013"
+    },
+    "local_principal": {
+      "tenant_id": 1,
+      "subject_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6"
+    },
+    "cases": [
+      {
+        "case_id": "scifact-247",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "222d167a-387d-4e30-8412-2cc30393fed5",
+            "source_id": "13578199",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 3,
+            "searchable_chunks": 3,
+            "index_rows": 3,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "03ec1acd-37d1-5763-835a-966d9325283e"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "scifact-339",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "9fbacd57-8ea3-4f30-978d-21be7e2f3429",
+            "source_id": "23349986",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 3,
+            "searchable_chunks": 3,
+            "index_rows": 3,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "ea326f2b-cecd-5790-9757-fb84b683d482"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "miracl-91294",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "541b3a8a-70a0-48dc-b31a-19ee96df3b94",
+            "source_id": "2145#2",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 2,
+            "searchable_chunks": 2,
+            "index_rows": 2,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "6d65929f-18e4-5478-b1f4-d19aeac6936f"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "miracl-7049630",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "57970155-c9f5-478c-aa3b-a54e333e13a1",
+            "source_id": "463#83",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 2,
+            "searchable_chunks": 2,
+            "index_rows": 2,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "65b1fe1d-9bbb-5733-a3a6-4d8885fe8977"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "longbench-6770736a",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "fa3fbf82-1af6-4c25-8177-24fbd1c002bd",
+            "source_id": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 54,
+            "searchable_chunks": 54,
+            "index_rows": 54,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "a813d164-42cc-5c47-95ee-605ed0f0572c"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "longbench-51abd206",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916",
+            "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 27,
+            "searchable_chunks": 27,
+            "index_rows": 27,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "f87c474f-1021-59d4-869a-9d3639eff675"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "hotpot-5a7631",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "source_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 5,
+            "searchable_chunks": 5,
+            "index_rows": 5,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "fee4d31b-8589-5875-992e-4630fec57b3e"
+            ]
+          },
+          {
+            "id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "source_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 2,
+            "searchable_chunks": 2,
+            "index_rows": 2,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "3966da48-dab5-5220-8594-f16bfbfdfc80"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "hotpot-5a8ad6",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "03a732df-64ad-4044-a2c6-caebf2409e7c",
+            "source_id": "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 2,
+            "searchable_chunks": 2,
+            "index_rows": 2,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "1b96786f-2f42-5552-a8d1-36dbc3868eb6"
+            ]
+          },
+          {
+            "id": "443629fe-7970-4c67-b132-e5574c771ade",
+            "source_id": "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 2,
+            "searchable_chunks": 2,
+            "index_rows": 2,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "4a0092cf-3093-56d3-84eb-4a52aa5e0617"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "mml-0434",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 53,
+            "searchable_chunks": 53,
+            "index_rows": 53,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "6713446e-404d-585b-aa1d-e2e82849d6e4"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "mml-0959",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 35,
+            "searchable_chunks": 35,
+            "index_rows": 35,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "f0471ddb-9dc3-59d9-88ac-5c78e0e30d8a"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      },
+      {
+        "case_id": "omni-page012",
+        "data_readiness": "READY",
+        "issues": [],
+        "documents": [
+          {
+            "id": "6a50b4aa-3ef4-40b3-b8f5-884f5614c61b",
+            "source_id": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+            "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+            "document_matches": true,
+            "chunks": 3,
+            "searchable_chunks": 3,
+            "index_rows": 3,
+            "dimensions": [
+              1024
+            ],
+            "index_ready": true,
+            "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+            "summary_missing_own_version_ids": [
+              "2b74a61d-551a-5797-b1aa-5810ec447da4"
+            ]
+          }
+        ],
+        "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+        "cloud_allowed": true,
+        "execution": "NOT_RUN",
+        "authorization": "BLOCKED_AUTHORIZATION",
+        "real_metrics": null
+      }
+    ],
+    "model_identity": [
+      {
+        "tenant_id": 332,
+        "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+        "roles": [
+          {
+            "role": "cheap",
+            "provider": "siliconflow",
+            "model": "XingChenAGI/Xing4.0-29B"
+          },
+          {
+            "role": "embedding",
+            "provider": "siliconflow",
+            "model": "BAAI/bge-m3"
+          },
+          {
+            "role": "expensive",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          },
+          {
+            "role": "rerank",
+            "provider": "siliconflow",
+            "model": "BAAI/bge-reranker-v2-m3"
+          },
+          {
+            "role": "vlm",
+            "provider": "",
+            "model": ""
+          }
+        ]
+      }
+    ],
+    "data_preflight_result": "PASS",
+    "preflight_result": "OFFLINE_DATA_READY_ONLY",
+    "execution_readiness": "BLOCKED_AUTHORIZATION",
+    "normal_api_scope": "BLOCKED_PRINCIPAL_MISMATCH"
+  },
+  "datasets": [
+    {
+      "dataset": "scifact",
+      "tenant_id": 332,
+      "knowledge_base_id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7",
+      "kb": {
+        "id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7",
+        "cloud_allowed": true,
+        "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "indexing_strategy": {
+          "wiki_enabled": false,
+          "graph_enabled": false,
+          "vector_enabled": true,
+          "keyword_enabled": true
+        }
+      },
+      "document_count": 11,
+      "chunk_count": 33,
+      "enabled_indexed_vector_chunks": 33,
+      "index_rows": 33,
+      "keyword": {
+        "index_rows": 33,
+        "nonempty_keyword_rows": 33
+      },
+      "dimensions": [
+        1024
+      ],
+      "metadata_sha256": "43ebe118a64654b4f45f1fc6808589720ca00973ff9670aa1939cb19a616a422",
+      "full_frozen_qid_source_coverage": [
+        {
+          "qid": "1102",
+          "positive_sources": [
+            {
+              "source_id": "3874000",
+              "document_ids": [
+                "bd584376-39c6-4e0a-8b96-be23d97d0fda"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "1304",
+          "positive_sources": [
+            {
+              "source_id": "12631697",
+              "document_ids": [
+                "19c07672-2657-49e1-bdcc-b2452ad1cb68"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "1351",
+          "positive_sources": [
+            {
+              "source_id": "28369117",
+              "document_ids": [
+                "5e63cf9f-ddc9-473f-9f93-c39b0d39cf41"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "242",
+          "positive_sources": [
+            {
+              "source_id": "10608822",
+              "document_ids": [
+                "204b0b7e-e072-4980-b77e-19980d5f8db7"
+              ]
+            },
+            {
+              "source_id": "2212067",
+              "document_ids": [
+                "f5e9e387-7472-4199-988e-e325689b1fb3"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "247",
+          "positive_sources": [
+            {
+              "source_id": "13578199",
+              "document_ids": [
+                "222d167a-387d-4e30-8412-2cc30393fed5"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "339",
+          "positive_sources": [
+            {
+              "source_id": "23349986",
+              "document_ids": [
+                "9fbacd57-8ea3-4f30-978d-21be7e2f3429"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "611",
+          "positive_sources": [
+            {
+              "source_id": "32408470",
+              "document_ids": [
+                "210f2dc2-b02c-4b45-83d2-add74d3ce941"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "621",
+          "positive_sources": [
+            {
+              "source_id": "1642727",
+              "document_ids": [
+                "b234448d-a6d1-4752-9f1e-d3e5eb9d5b93"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        }
+      ],
+      "fully_source_covered_qids": 8,
+      "available_frozen_qids": 8,
+      "parser_gold_pages": 0,
+      "selected_case_ids": [
+        "scifact-247",
+        "scifact-339"
+      ],
+      "planned": 2,
+      "attempted": 0,
+      "completed": 0,
+      "not_run": 2,
+      "gold_metrics": [
+        "subset_source_Recall@10",
+        "subset_source_MRR@10",
+        "subset_source_nDCG@10"
+      ],
+      "current_rag_metrics": null,
+      "new_quality_failure_counts": null,
+      "reason": "BLOCKED_AUTHORIZATION; current daily local principal differs from frozen index principal",
+      "scope": "selected indexed subset, not official full corpus"
+    },
+    {
+      "dataset": "miracl-zh",
+      "tenant_id": 332,
+      "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+      "kb": {
+        "id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+        "cloud_allowed": true,
+        "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "indexing_strategy": {
+          "wiki_enabled": false,
+          "graph_enabled": false,
+          "vector_enabled": true,
+          "keyword_enabled": true
+        }
+      },
+      "document_count": 13,
+      "chunk_count": 26,
+      "enabled_indexed_vector_chunks": 26,
+      "index_rows": 26,
+      "keyword": {
+        "index_rows": 26,
+        "nonempty_keyword_rows": 26
+      },
+      "dimensions": [
+        1024
+      ],
+      "metadata_sha256": "4bd17bd202e95fd68688c207136abd48d03d76ec810c0bb9382baeb10ddd00d1",
+      "full_frozen_qid_source_coverage": [
+        {
+          "qid": "277616#0",
+          "positive_sources": [
+            {
+              "source_id": "52693#24",
+              "document_ids": [
+                "8fcb7e5e-e763-4fb4-baa0-0f6f55469c65"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5704915#0",
+          "positive_sources": [
+            {
+              "source_id": "157420#0",
+              "document_ids": [
+                "99c12c20-77a2-4fd3-841e-ebd677d5c647"
+              ]
+            },
+            {
+              "source_id": "157707#0",
+              "document_ids": [
+                "079d6f4e-d102-4a76-adfa-1c72a636cc3b"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5721594#0",
+          "positive_sources": [
+            {
+              "source_id": "19538#2",
+              "document_ids": [
+                "ec59f5cd-29b1-4e57-bc8d-9902c5684a29"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "692002#0",
+          "positive_sources": [
+            {
+              "source_id": "21741#24",
+              "document_ids": [
+                "68c6a478-5f15-4284-871b-40f7e23e0389"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "704170#0",
+          "positive_sources": [
+            {
+              "source_id": "117659#15",
+              "document_ids": [
+                "11ee49e6-8701-4b3e-bdfb-fd7ee7532509"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "7049630#0",
+          "positive_sources": [
+            {
+              "source_id": "463#83",
+              "document_ids": [
+                "57970155-c9f5-478c-aa3b-a54e333e13a1"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "7696#0",
+          "positive_sources": [
+            {
+              "source_id": "10530#1",
+              "document_ids": [
+                "2122df62-3d0f-4c38-af09-97f26c2e8949"
+              ]
+            },
+            {
+              "source_id": "4150#0",
+              "document_ids": [
+                "e3827457-9f49-4651-88ab-f08e78c0e08d"
+              ]
+            },
+            {
+              "source_id": "90901#6",
+              "document_ids": [
+                "1571216a-bd3a-44c5-a8b2-7f76ddbdb3da"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "91294#0",
+          "positive_sources": [
+            {
+              "source_id": "2145#2",
+              "document_ids": [
+                "541b3a8a-70a0-48dc-b31a-19ee96df3b94"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        }
+      ],
+      "fully_source_covered_qids": 8,
+      "available_frozen_qids": 8,
+      "parser_gold_pages": 0,
+      "selected_case_ids": [
+        "miracl-91294",
+        "miracl-7049630"
+      ],
+      "planned": 2,
+      "attempted": 0,
+      "completed": 0,
+      "not_run": 2,
+      "gold_metrics": [
+        "subset_passage_Recall@10",
+        "subset_passage_MRR@10",
+        "subset_passage_nDCG@10"
+      ],
+      "current_rag_metrics": null,
+      "new_quality_failure_counts": null,
+      "reason": "BLOCKED_AUTHORIZATION; current daily local principal differs from frozen index principal",
+      "scope": "selected indexed subset, not official full corpus"
+    },
+    {
+      "dataset": "longbench-zh",
+      "tenant_id": 332,
+      "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+      "kb": {
+        "id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "cloud_allowed": true,
+        "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "indexing_strategy": {
+          "wiki_enabled": false,
+          "graph_enabled": false,
+          "vector_enabled": true,
+          "keyword_enabled": true
+        }
+      },
+      "document_count": 8,
+      "chunk_count": 281,
+      "enabled_indexed_vector_chunks": 281,
+      "index_rows": 281,
+      "keyword": {
+        "index_rows": 281,
+        "nonempty_keyword_rows": 281
+      },
+      "dimensions": [
+        1024
+      ],
+      "metadata_sha256": "aaad32cc0c9943b0e50ae0e453e5b878f658a152c23a87a11bf66d40da6dd0ce",
+      "full_frozen_qid_source_coverage": [
+        {
+          "qid": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+          "positive_sources": [
+            {
+              "source_id": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+              "document_ids": [
+                "89dade96-8e89-4758-adf3-b23b164a6edf"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+          "positive_sources": [
+            {
+              "source_id": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+              "document_ids": [
+                "d537b3f6-b999-452f-9a76-87c98793bbc8"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+          "positive_sources": [
+            {
+              "source_id": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+              "document_ids": [
+                "fa3fbf82-1af6-4c25-8177-24fbd1c002bd"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9",
+          "positive_sources": [
+            {
+              "source_id": "dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9",
+              "document_ids": [
+                "52562e44-db44-4407-8891-abadc47d220f"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+          "positive_sources": [
+            {
+              "source_id": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+              "document_ids": [
+                "92fda6c7-bde7-4974-a637-b035be5db2a2"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+          "positive_sources": [
+            {
+              "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+              "document_ids": [
+                "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05",
+          "positive_sources": [
+            {
+              "source_id": "multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05",
+              "document_ids": [
+                "017e23b8-9b4b-44b9-9ddb-60c9d7302170"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2",
+          "positive_sources": [
+            {
+              "source_id": "multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2",
+              "document_ids": [
+                "7484b0a4-79ce-42be-87e9-a5c3fbd7bdf8"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        }
+      ],
+      "fully_source_covered_qids": 8,
+      "available_frozen_qids": 8,
+      "parser_gold_pages": 0,
+      "selected_case_ids": [
+        "longbench-6770736a",
+        "longbench-51abd206"
+      ],
+      "planned": 2,
+      "attempted": 0,
+      "completed": 0,
+      "not_run": 2,
+      "gold_metrics": [
+        "task_specific_ROUGE_ZH_or_QA_F1_ZH"
+      ],
+      "current_rag_metrics": null,
+      "new_quality_failure_counts": null,
+      "reason": "BLOCKED_AUTHORIZATION; current daily local principal differs from frozen index principal",
+      "scope": "selected indexed subset, not official full corpus"
+    },
+    {
+      "dataset": "hotpotqa",
+      "tenant_id": 332,
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "kb": {
+        "id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+        "cloud_allowed": true,
+        "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "indexing_strategy": {
+          "wiki_enabled": false,
+          "graph_enabled": false,
+          "vector_enabled": true,
+          "keyword_enabled": true
+        }
+      },
+      "document_count": 24,
+      "chunk_count": 59,
+      "enabled_indexed_vector_chunks": 59,
+      "index_rows": 59,
+      "keyword": {
+        "index_rows": 59,
+        "nonempty_keyword_rows": 59
+      },
+      "dimensions": [
+        1024
+      ],
+      "metadata_sha256": "fe7768eaa67e1eaef9e3431df27e3e4ccb21c46cb1c62b5fe4348c5b8c453af1",
+      "full_frozen_qid_source_coverage": [
+        {
+          "qid": "5a8ad6805542992d82986f93",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+              "document_ids": [
+                "03a732df-64ad-4044-a2c6-caebf2409e7c"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85",
+              "document_ids": [
+                "443629fe-7970-4c67-b132-e5574c771ade"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5a745a6055429974ef308be4",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:106d7d79e61a35c353b96a86e9f52f22abeff820bdd1962a452978e426c93d51",
+              "document_ids": [
+                "73ea918d-bbdf-4a8e-ad9c-065101af492f"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:a8d9c99aa7e89f31b2f13ab98de47856491f24711b9ce1ebadbb1a051ac42616",
+              "document_ids": [
+                "35a50ce3-5f0a-449e-939c-318294480751"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5a729fe55542991f9a20c53b",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+              "document_ids": [
+                "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+              "document_ids": [
+                "4c4ac0af-303d-4ef8-8456-da62c9996153"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5ae3992d5542994393b9e722",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:2681f8efe9088c25cebcf7345848e5339bc8f02b4f63e9b9d3d707963f0ae331",
+              "document_ids": [
+                "b0a8297b-ef54-4b60-aa08-03cd2aeef630"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:8c33a54cac2958610d112f8d957ae4b940f526d1ef2163797a77b308853bcf16",
+              "document_ids": [
+                "73fe3f83-3fbc-41a1-8512-188190f13e33"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5ab672165542995eadeeffe0",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:127d56714b425ba1a5d5062faadf37e0eedf79f038d5b3b15441eb6b84b062c0",
+              "document_ids": [
+                "ca53ab83-50e4-4e33-aced-83f1e0abacbd"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:4c703b9348c45159a0282e6532795b3f5594fbd996bc6a7d95fec81d51340bf6",
+              "document_ids": [
+                "3aa31cd5-10b6-4647-9724-a415e1f9be6e"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5a8911ad554299515336129c",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:13cc55da07441beed8ab4281e9498704b24054a26ba7eb58f2cf88635050d73f",
+              "document_ids": [
+                "0819c30b-64ea-4074-81bc-09b9bf54be10"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:ab4b09ad03473bf19f3244caec8abf00ecf4ba511038494ded4c1706d64d6b29",
+              "document_ids": [
+                "7095035e-c5eb-4f9e-a2bd-46d15e00fc97"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5a7b68a75542997c3ec97153",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:46c0cdfb975e13514a984356eec4b9e0d606c7ccbc258146585c8acfc1b6e92a",
+              "document_ids": [
+                "158f44a7-5815-48df-bac7-5138a31b456d"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:a4ac70a472b41ab675e315fc55977d32fbf6ac7cf2177fdc8a03dd20b21d79c6",
+              "document_ids": [
+                "c1042286-e1f5-4727-8469-bb58f5eb9da5"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "5a7631cd5542994ccc91870c",
+          "positive_sources": [
+            {
+              "source_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+              "document_ids": [
+                "a973df4a-0b4b-43f7-ad17-55265aac1556"
+              ]
+            },
+            {
+              "source_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+              "document_ids": [
+                "3fdf4942-1265-4e9e-959d-27772f57e5dd"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        }
+      ],
+      "fully_source_covered_qids": 8,
+      "available_frozen_qids": 8,
+      "parser_gold_pages": 0,
+      "selected_case_ids": [
+        "hotpot-5a7631",
+        "hotpot-5a8ad6"
+      ],
+      "planned": 2,
+      "attempted": 0,
+      "completed": 0,
+      "not_run": 2,
+      "gold_metrics": [
+        "answer_EM",
+        "answer_token_F1",
+        "subset_source_Recall@10"
+      ],
+      "current_rag_metrics": null,
+      "new_quality_failure_counts": null,
+      "reason": "BLOCKED_AUTHORIZATION; current daily local principal differs from frozen index principal",
+      "scope": "selected indexed subset, not official full corpus"
+    },
+    {
+      "dataset": "mmlongbench-doc",
+      "tenant_id": 332,
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "kb": {
+        "id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "cloud_allowed": true,
+        "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "indexing_strategy": {
+          "wiki_enabled": false,
+          "graph_enabled": false,
+          "vector_enabled": true,
+          "keyword_enabled": true
+        }
+      },
+      "document_count": 2,
+      "chunk_count": 88,
+      "enabled_indexed_vector_chunks": 88,
+      "index_rows": 88,
+      "keyword": {
+        "index_rows": 88,
+        "nonempty_keyword_rows": 88
+      },
+      "dimensions": [
+        1024
+      ],
+      "metadata_sha256": "1464db5addc3856d3a15074622dc537f418950953d3b75120476065f7d29cd80",
+      "full_frozen_qid_source_coverage": [
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0684",
+          "positive_sources": [],
+          "missing_positive_sources": [
+            "11-21-16-Updated-Post-Election-Release.pdf"
+          ],
+          "source_coverage": "INCOMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+          "positive_sources": [],
+          "missing_positive_sources": [
+            "11-21-16-Updated-Post-Election-Release.pdf"
+          ],
+          "source_coverage": "INCOMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0685",
+          "positive_sources": [],
+          "missing_positive_sources": [
+            "11-21-16-Updated-Post-Election-Release.pdf"
+          ],
+          "source_coverage": "INCOMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0431",
+          "positive_sources": [
+            {
+              "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+              "document_ids": [
+                "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+          "positive_sources": [
+            {
+              "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+              "document_ids": [
+                "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0430",
+          "positive_sources": [
+            {
+              "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+              "document_ids": [
+                "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+          "positive_sources": [
+            {
+              "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+              "document_ids": [
+                "8fdbe2af-9cc0-4b4a-a554-352a61ca5252"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+          "positive_sources": [
+            {
+              "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+              "document_ids": [
+                "8fdbe2af-9cc0-4b4a-a554-352a61ca5252"
+              ]
+            }
+          ],
+          "missing_positive_sources": [],
+          "source_coverage": "COMPLETE",
+          "qa_executable": "NOT_PROVEN_BY_SOURCE_ID_COVERAGE"
+        }
+      ],
+      "fully_source_covered_qids": 5,
+      "available_frozen_qids": 8,
+      "parser_gold_pages": 0,
+      "selected_case_ids": [
+        "mml-0434",
+        "mml-0959"
+      ],
+      "planned": 2,
+      "attempted": 0,
+      "completed": 0,
+      "not_run": 2,
+      "gold_metrics": [
+        "project_normalized_EM",
+        "project_character_F1",
+        "source_fact_review"
+      ],
+      "current_rag_metrics": null,
+      "new_quality_failure_counts": null,
+      "reason": "BLOCKED_AUTHORIZATION; current daily local principal differs from frozen index principal",
+      "scope": "selected indexed subset, not official full corpus"
+    },
+    {
+      "dataset": "omnidocbench",
+      "tenant_id": 332,
+      "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+      "kb": {
+        "id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "cloud_allowed": true,
+        "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "indexing_strategy": {
+          "wiki_enabled": false,
+          "graph_enabled": false,
+          "vector_enabled": true,
+          "keyword_enabled": true
+        }
+      },
+      "document_count": 24,
+      "chunk_count": 66,
+      "enabled_indexed_vector_chunks": 66,
+      "index_rows": 66,
+      "keyword": {
+        "index_rows": 66,
+        "nonempty_keyword_rows": 66
+      },
+      "dimensions": [
+        1024
+      ],
+      "metadata_sha256": "98ad883d781abea4a8074dd1bc383067bb1cb8cf50544b8b8eb383d2cb2ca72a",
+      "full_frozen_qid_source_coverage": [],
+      "fully_source_covered_qids": 0,
+      "available_frozen_qids": 0,
+      "parser_gold_pages": 24,
+      "selected_case_ids": [
+        "omni-page012"
+      ],
+      "planned": 1,
+      "attempted": 0,
+      "completed": 0,
+      "not_run": 1,
+      "gold_metrics": [
+        "RAG_engineering_source_fact_review_NOT_official_QA"
+      ],
+      "current_rag_metrics": null,
+      "new_quality_failure_counts": null,
+      "reason": "BLOCKED_AUTHORIZATION; current daily local principal differs from frozen index principal",
+      "scope": "selected indexed subset, not official full corpus"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "scifact-247",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "222d167a-387d-4e30-8412-2cc30393fed5",
+          "source_id": "13578199",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 3,
+          "searchable_chunks": 3,
+          "index_rows": 3,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "03ec1acd-37d1-5763-835a-966d9325283e"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "scifact",
+      "qid": "247",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "Chemical injury represses transglutaminase 2 activity.",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "scifact-339",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "9fbacd57-8ea3-4f30-978d-21be7e2f3429",
+          "source_id": "23349986",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 3,
+          "searchable_chunks": 3,
+          "index_rows": 3,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "ea326f2b-cecd-5790-9757-fb84b683d482"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "scifact",
+      "qid": "339",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "Dexamethasone increases risk of postoperative bleeding.",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "miracl-91294",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "541b3a8a-70a0-48dc-b31a-19ee96df3b94",
+          "source_id": "2145#2",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 2,
+          "searchable_chunks": 2,
+          "index_rows": 2,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "6d65929f-18e4-5478-b1f4-d19aeac6936f"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "miracl-zh",
+      "qid": "91294#0",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "人马座有哪些临近星座？",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "miracl-7049630",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "57970155-c9f5-478c-aa3b-a54e333e13a1",
+          "source_id": "463#83",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 2,
+          "searchable_chunks": 2,
+          "index_rows": 2,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "65b1fe1d-9bbb-5733-a3a6-4d8885fe8977"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "miracl-zh",
+      "qid": "7049630#0",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "北京市有哪些国企？",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "longbench-6770736a",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "fa3fbf82-1af6-4c25-8177-24fbd1c002bd",
+          "source_id": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 54,
+          "searchable_chunks": 54,
+          "index_rows": 54,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "a813d164-42cc-5c47-95ee-605ed0f0572c"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "longbench-zh",
+      "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "美国的节日",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "longbench-51abd206",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916",
+          "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 27,
+          "searchable_chunks": 27,
+          "index_rows": 27,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "f87c474f-1021-59d4-869a-9d3639eff675"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "longbench-zh",
+      "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "2005年全市农村劳动力技能培训了多少人？",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "hotpot-5a7631",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "source_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 5,
+          "searchable_chunks": 5,
+          "index_rows": 5,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "fee4d31b-8589-5875-992e-4630fec57b3e"
+          ]
+        },
+        {
+          "id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "source_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 2,
+          "searchable_chunks": 2,
+          "index_rows": 2,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "3966da48-dab5-5220-8594-f16bfbfdfc80"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "hotpotqa",
+      "qid": "5a7631cd5542994ccc91870c",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "hotpot-5a8ad6",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "03a732df-64ad-4044-a2c6-caebf2409e7c",
+          "source_id": "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 2,
+          "searchable_chunks": 2,
+          "index_rows": 2,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "1b96786f-2f42-5552-a8d1-36dbc3868eb6"
+          ]
+        },
+        {
+          "id": "443629fe-7970-4c67-b132-e5574c771ade",
+          "source_id": "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 2,
+          "searchable_chunks": 2,
+          "index_rows": 2,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "4a0092cf-3093-56d3-84eb-4a52aa5e0617"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "hotpotqa",
+      "qid": "5a8ad6805542992d82986f93",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "Leonard Whiting played the tragic hero of Romeo and Juliet in the film version by which director?",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "mml-0434",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+          "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 53,
+          "searchable_chunks": 53,
+          "index_rows": 53,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "6713446e-404d-585b-aa1d-e2e82849d6e4"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "mml-0959",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 35,
+          "searchable_chunks": 35,
+          "index_rows": 35,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "f0471ddb-9dc3-59d9-88ac-5c78e0e30d8a"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "What are used for long-distance communication as introduced in this slide?",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    },
+    {
+      "case_id": "omni-page012",
+      "data_readiness": "READY",
+      "issues": [],
+      "documents": [
+        {
+          "id": "6a50b4aa-3ef4-40b3-b8f5-884f5614c61b",
+          "source_id": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+          "binding": "EXTERNAL_BINDING_BY_FROZEN_FILE_HASH",
+          "document_matches": true,
+          "chunks": 3,
+          "searchable_chunks": 3,
+          "index_rows": 3,
+          "dimensions": [
+            1024
+          ],
+          "index_ready": true,
+          "version_binding": "DOCUMENT_JOIN_CURRENT_VERSION",
+          "summary_missing_own_version_ids": [
+            "2b74a61d-551a-5797-b1aa-5810ec447da4"
+          ]
+        }
+      ],
+      "api_binding": "LOCAL_PRINCIPAL_MISMATCH",
+      "cloud_allowed": true,
+      "execution": "NOT_RUN",
+      "authorization": "BLOCKED_AUTHORIZATION",
+      "real_metrics": null,
+      "dataset": "omnidocbench",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+      "source_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+      "question": "In the slide Changes to English (in America), what category is Change 7 about?",
+      "stages": {
+        "Search": "NOT_RUN",
+        "Rerank": "NOT_RUN",
+        "Merge/TopK": "NOT_RUN",
+        "Context": "NOT_RUN",
+        "actual_provider_evidence": "NOT_RUN",
+        "answer": "NOT_RUN",
+        "SSE_history_consistency": "NOT_RUN"
+      },
+      "first_rag_failure": null,
+      "blocked_before": "AUTHORIZATION_AND_NORMAL_API_PRINCIPAL_BINDING",
+      "answer": null,
+      "actual_provider": null,
+      "actual_tokens": null,
+      "latency": null,
+      "unknown_outcome": "NOT_APPLICABLE_NO_SEND"
+    }
+  ],
+  "commands": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\freeze_plan.py",
+      "exit_code": 0,
+      "result": "11 frozen cases; no authorization"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_rag_m40_preflight.py -q --basetemp E:\\WK\\run\\m40-tests-frozen",
+      "exit_code": 0,
+      "result": "9 passed in 0.18s",
+      "kind": "OFFLINE_SYNTHETIC_CONNECTION"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/rag_m40_preflight.py --plan docs/milestones/RAG_M4_0_BASELINE.plan.json --config E:\\WK\\run\\p81-retirement-20261018\\local.json --output E:\\WK\\run\\rag-m40-20261018\\preflight-frozen-final.json; exit $LASTEXITCODE",
+      "exit_code": 0,
+      "result": "OFFLINE_DATA_READY_ONLY; quality NOT_RUN",
+      "kind": "REAL_READ_ONLY_PG"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\inventory_current.py",
+      "exit_code": 0,
+      "result": "82 documents/553 vector and keyword rows in six selected scopes",
+      "kind": "REAL_READ_ONLY_PG"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -c \"from pathlib import Path; from scripts.weknora_port_p19_score import official_longbench; from eval_center.metrics import ranking_metrics; from eval_center.weknora_scoring import answer_diagnostics; m,b=official_longbench(Path('E:/WK/run/p9-20261016/baseline'),Path('E:/WK/run/rag-m40-20261018/scorer-cache')); assert callable(m.rouge_zh_score) and callable(m.qa_f1_zh_score) and callable(ranking_metrics) and callable(answer_diagnostics); print('SCORER_IMPORT_ONLY_NO_ANSWER_EVALUATION',b)\"",
+      "exit_code": 0,
+      "result": "Pinned LongBench scorer and reused local metrics import; no answers scored"
+    },
+    {
+      "command": ".\\wk.ps1 check -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "result": "PG/Redis identity correct, tenant1, cloud=false, MinerU"
+    },
+    {
+      "command": ".\\wk.ps1 status -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "result": "API/worker/UI stopped; PG/Redis running"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0
+    }
+  ],
+  "overall_authorization": null,
+  "authorization_proposal_only": {
+    "status": "NOT_APPROVED",
+    "end_to_end_requests": 11,
+    "provider_calls_total": 132,
+    "token_limit_total_including_unresolved_reservations": 600000,
+    "per_batch_calls": 12,
+    "per_batch_tokens": 100000,
+    "batch_size": 1,
+    "max_minutes_per_batch": 40,
+    "unknown_policy": "STOP_NO_RETRY_NO_NEW_GRANT_FILE"
+  },
+  "runtime_state": {
+    "daily_tenant": 1,
+    "daily_subject": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+    "frozen_tenant": 332,
+    "frozen_subject": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+    "cloud_allowed": false,
+    "api_worker_ui": "STOPPED",
+    "postgres_redis": "RUNNING"
+  },
+  "metric_rules": "See hash-frozen plan.scoring_rules; all current quality scores null; old scores not merged.",
+  "initial_tool_failures": [
+    {
+      "evidence": "preflight-first.json",
+      "exit_code": 1,
+      "issue": "New preflight incorrectly required summary chunk own source_version; actual loader uses verified current document JOIN.",
+      "fix": "Diagnostic only: allow summary null through matched tenant/KB/doc/version/hash; reject explicit stale version and text/image missing version. No production/data change."
+    },
+    {
+      "issue": "P19 source catalog predates B3 import; initial MML source-coverage count3 omitted B3.",
+      "fix": "Read-only inventory adds exact already-frozen P32 source-file SHA mapping, current selected scope coverage5/8. No new source/Gold/data."
+    }
+  ],
+  "confirmed_blockers": [
+    {
+      "code": "BLOCKED_AUTHORIZATION",
+      "affected_planned_cases": 11,
+      "kind": "OWNER_AUTHORIZATION"
+    },
+    {
+      "code": "LOCAL_PRINCIPAL_MISMATCH",
+      "affected_planned_cases": 11,
+      "kind": "NORMAL_API_SCOPE_CONFIGURATION",
+      "no_automatic_principal_or_tenant_change": true
+    }
+  ],
+  "quality_priorities": "No new quality failure distribution without runs. Historical candidates only: rerank exact/multihop loss; unsupported answer claims; visual/source coverage.",
+  "production_changes": [],
+  "index_or_gold_or_ledger_writes": 0,
+  "prior_ledger_readonly": [
+    {
+      "tenant_id": 1,
+      "calls": 10,
+      "unknown_outcomes": 0,
+      "ledger_fingerprint": "2928c826d6bef298a87d6d82f79d2f3a"
+    },
+    {
+      "tenant_id": 332,
+      "calls": 233,
+      "unknown_outcomes": 0,
+      "ledger_fingerprint": "b23022b316b74440c784ab36ee9ca93c"
+    }
+  ],
+  "evidence": {
+    "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\milestones\\evidence\\m40-offline-20261018\\preparation.zip",
+    "sha256": "a9ce5fa31507cf6204b8caab4cbe9ee7e8f8a53c3afa3ab0e304219a1c82250e",
+    "files": 11,
+    "excludes": "keys, local config/environment, full model parameters, source documents"
+  },
+  "inherited_dirty_paths_preserved": 8,
+  "push_deploy_merge_tag": "NOT_RUN"
+}
