@@ -14333,5 +14333,786 @@
     "source_resources_unchanged": true,
     "authorization_status": "CLOSED"
   },
-  "diagnostic_code_commit_note": "Initial diagnostic commit; final validator fixes are included in the delivery commit. Exact replayed code is bound by input_hashes; final SHA is reported in delivery and git log."
+  "diagnostic_code_commit_note": "Initial diagnostic commit; final validator fixes are included in the delivery commit. Exact replayed code is bound by input_hashes; final SHA is reported in delivery and git log.",
+  "omni_supplement": {
+    "status": "BOUNDED_VALIDATION_FINISHED_QUALITY_FAIL",
+    "live": {
+      "schema": "rag-m32-live-result/v1",
+      "source_commit": "96d8820b1e883e69039185146e9e642de63d1984",
+      "end_to_end_requests": 1,
+      "provider_calls": 4,
+      "input_tokens": 32324,
+      "output_tokens": 310,
+      "total_tokens": 32634,
+      "new_unknown": 0,
+      "missing_usage": 0,
+      "legacy_accounting_unchanged": true,
+      "source_resources_unchanged": true,
+      "cases": [
+        {
+          "case": "omni-page007",
+          "status": "COMPLETED",
+          "failure_reason": null,
+          "run_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf",
+          "session_id": "3d7084f2-abf5-4403-a40c-894aaf7f580d",
+          "request_id": "1d7afecc-0f68-468e-90c0-c5a346ee1d16",
+          "question": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+          "document_scope": [],
+          "effective_configuration": {
+            "run_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf",
+            "rerank_threshold": 0.15,
+            "rerank_top_k": 30,
+            "query_understand_model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+            "chat_model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+            "rerank_model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+            "targets": [
+              {
+                "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+                "target_type": "knowledge_base",
+                "knowledge_ids": [],
+                "tag_ids": [],
+                "scope_tag_ids": [],
+                "disable_recall_thresholds": false,
+                "embedding_model_key": "",
+                "keyword_index_enabled": true,
+                "vector_index_enabled": true
+              }
+            ]
+          },
+          "query_provider": "siliconflow",
+          "query_requested_model": "XingChenAGI/Xing4.0-29B",
+          "query_reported_model": "XingChenAGI/Xing4.0-29B",
+          "raw_intent": "kb_search",
+          "effective_intent": "kb_search",
+          "actual_rewrite": "课件中线性方程组的系数矩阵是什么，以及增广矩阵最后一列的三个数分别是什么",
+          "stages": [
+            {
+              "stage": "understand",
+              "count_search": 0,
+              "count_rerank": 0,
+              "count_merge": 0,
+              "seconds": 33.658722400025
+            },
+            {
+              "stage": "retrieval",
+              "count_search": 30,
+              "count_rerank": 0,
+              "count_merge": 0,
+              "seconds": 0.8966862999950536
+            },
+            {
+              "stage": "rerank",
+              "count_search": 30,
+              "count_rerank": 1,
+              "count_merge": 0,
+              "seconds": 1.051882600004319
+            },
+            {
+              "stage": "merge",
+              "count_search": 30,
+              "count_rerank": 1,
+              "count_merge": 1,
+              "seconds": 0.033797500014770776
+            },
+            {
+              "stage": "context",
+              "count_search": 30,
+              "count_rerank": 1,
+              "count_merge": 1,
+              "seconds": 0.04052159999264404
+            }
+          ],
+          "context_chars": 295,
+          "context_sha256": "f34141275317e54aa5769cf74c02ad04a42a916527329111ea9079ae948ac8f1",
+          "targets": [
+            {
+              "chunk_id": "51316a20-67fd-4732-b520-c049999933d0",
+              "in_search": true,
+              "in_rerank": false,
+              "in_context_lineage": false,
+              "exact_source_quote_in_generation_request": false,
+              "search_rank": 6,
+              "input_index": 5,
+              "document_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+              "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+              "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+              "source_content": "Matrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9",
+              "source_content_sha256": "088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144",
+              "raw_rerank_rank": 2,
+              "raw_rerank_score": 0.09591700881719589,
+              "exact_source_quote_in_finalized_context": false
+            }
+          ],
+          "evidence": [
+            {
+              "id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+              "document_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+              "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+              "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+              "start": 0,
+              "end": 0,
+              "quote_sha256": "c2de43da87f6cf3f0bca796481078386ae5c3112f6c22c9e5811322bbbc94090",
+              "source_quote_in_finalized_context": true,
+              "source_quote_in_actual_request": true
+            }
+          ],
+          "answer": "根据课件内容，线性方程组的系数矩阵和增广矩阵如下：\n\n**系数矩阵：**\n\n| | 第一列 | 第二列 | 第三列 |\n|---|---|---|---|\n| 第一行 | 1 | 2 | 3 |\n| 第二行 | 4 | 5 | 6 |\n| 第三行 | 7 | 8 | 9 |\n\n即：\n\n$$A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}$$\n\n**增广矩阵：**\n\n$$[A \\mid \\mathbf{b}] = \\begin{pmatrix} 1 & 2 & 3 & \\big| & 4 \\\\ 4 & 5 & 6 & \\big| & 10 \\\\ 7 & 8 & 9 & \\big| & 13 \\end{pmatrix}$$\n\n**增广矩阵最后一列的三个数**为：**4、10、13**。\n\n（注：课件中未给出完整的增广矩阵右侧常数列，此处根据线性方程组的一般形式及常见教学示例补充。若课件中实际常数列不同，请以课件原文为准。）",
+          "finish_reason": "stop",
+          "actual_role": "cheap",
+          "actual_reported_answer_model": "XingChenAGI/Xing4.0-29B",
+          "upgraded": false,
+          "sse_equals_persisted": true,
+          "actual_answer_request_sent": true,
+          "end_to_end_seconds": 69.87469000002602,
+          "calls": [
+            {
+              "request_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf/query_rewrite",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+              "capability": "chat",
+              "outcome": "RESPONSE_RECEIVED",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 2573,
+                "cached_tokens": 0,
+                "prompt_tokens": 2536,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 37,
+                "cache_write_tokens": 0,
+                "provider_usage_facts": {
+                  "fields": [
+                    [
+                      "input",
+                      {
+                        "path": "prompt_tokens",
+                        "valid": true,
+                        "value": 2536,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "output",
+                      {
+                        "path": "completion_tokens",
+                        "valid": true,
+                        "value": 37,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "total",
+                      {
+                        "path": "total_tokens",
+                        "valid": true,
+                        "value": 2573,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "cache_read",
+                      {
+                        "path": "prompt_cache_hit_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_write",
+                      {
+                        "path": "cache_creation_input_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_miss",
+                      {
+                        "path": "prompt_cache_miss_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "reasoning",
+                      {
+                        "path": "completion_tokens_details.reasoning_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ]
+                  ],
+                  "semantics": "openai-input-inclusive/v1",
+                  "simulated": false,
+                  "raw_sha256": "5765e6d76fdf710b2e511f4a23f0eddb4c64a74b429bc39d2dbbc41703be4941",
+                  "numeric_raw": "{\"completion_tokens\":37,\"prompt_tokens\":2536,\"total_tokens\":2573}",
+                  "derived_total": 2573,
+                  "prior_numeric_raw": [],
+                  "observed_lower_bound": 2573
+                }
+              },
+              "wire_record": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\a16c05b141184568305c4a80e7902e9f52391bfb8b25356741092a370e57f85b.json",
+              "wire_sha256": "bd2e88cff1e578ad2e14567c86e8a451df0adc3627a1d75c1adf59479d4e1d94",
+              "response_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\raw\\a16c05b141184568305c4a80e7902e9f52391bfb8b25356741092a370e57f85b.body",
+              "response_sha256": "8752ed9ca88b23b935861ca58d7820bbb8d6e6dba95e8d4b3fbb294fe7893c06"
+            },
+            {
+              "request_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf/query-embedding-b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef-f57a00a250dbefae",
+              "provider": "siliconflow",
+              "model": "BAAI/bge-m3",
+              "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+              "capability": "embedding",
+              "outcome": "RESPONSE_RECEIVED",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unsupported",
+                "total_tokens": 30,
+                "cached_tokens": 0,
+                "prompt_tokens": 30,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 0,
+                "cache_write_tokens": 0,
+                "provider_usage_facts": {
+                  "fields": [
+                    [
+                      "input",
+                      {
+                        "path": "prompt_tokens",
+                        "valid": true,
+                        "value": 30,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "output",
+                      {
+                        "path": "completion_tokens",
+                        "valid": true,
+                        "value": 0,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "total",
+                      {
+                        "path": "total_tokens",
+                        "valid": true,
+                        "value": 30,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "cache_read",
+                      {
+                        "path": "prompt_cache_hit_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_write",
+                      {
+                        "path": "cache_creation_input_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_miss",
+                      {
+                        "path": "prompt_cache_miss_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "reasoning",
+                      {
+                        "path": "completion_tokens_details.reasoning_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ]
+                  ],
+                  "semantics": "openai-input-inclusive/v1",
+                  "simulated": false,
+                  "raw_sha256": "ac524d48cea45b0385de217deb34d9cd2a95ac8c5183d9af3e96ef28d0c810a1",
+                  "numeric_raw": "{\"completion_tokens\":0,\"prompt_tokens\":30,\"total_tokens\":30}",
+                  "derived_total": 30,
+                  "prior_numeric_raw": [],
+                  "observed_lower_bound": 30
+                }
+              },
+              "wire_record": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\8ce2e91833a87f5d4f7ef10d6a1ba58454b8d1c4f5cbde143b7d3d98172c3b09.json",
+              "wire_sha256": "4b31a3f3728538be15617e14cd0c1782347185b5b506299a60b5897611894932",
+              "response_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\raw\\8ce2e91833a87f5d4f7ef10d6a1ba58454b8d1c4f5cbde143b7d3d98172c3b09.body",
+              "response_sha256": "751e17e7575e68eb1fea513c7b293445283bd42a8e9273fc1554165a157fc10e"
+            },
+            {
+              "request_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf/rerank",
+              "provider": "siliconflow",
+              "model": "BAAI/bge-reranker-v2-m3",
+              "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+              "capability": "rerank",
+              "outcome": "RESPONSE_RECEIVED",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unsupported",
+                "total_tokens": 28793,
+                "cached_tokens": 0,
+                "prompt_tokens": 28793,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 0,
+                "cache_write_tokens": 0,
+                "provider_usage_facts": {
+                  "fields": [
+                    [
+                      "input",
+                      {
+                        "path": "meta.tokens.input_tokens",
+                        "valid": true,
+                        "value": 28793,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "output",
+                      {
+                        "path": "meta.tokens.output_tokens",
+                        "valid": true,
+                        "value": 0,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "total",
+                      {
+                        "path": "meta.tokens.total_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "image",
+                      {
+                        "path": "meta.tokens.image_tokens",
+                        "valid": true,
+                        "value": 0,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "cache_read",
+                      {
+                        "path": "prompt_cache_hit_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_write",
+                      {
+                        "path": "cache_creation_input_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_miss",
+                      {
+                        "path": "prompt_cache_miss_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "reasoning",
+                      {
+                        "path": "completion_tokens_details.reasoning_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ]
+                  ],
+                  "semantics": "siliconflow-rerank-tokens/v1",
+                  "simulated": false,
+                  "raw_sha256": "485a9bb83c82ceedb41d12f743942dca2b747a92bc6e2bf6cdd634eed06e91e7",
+                  "numeric_raw": "{\"meta.tokens.image_tokens\":0,\"meta.tokens.input_tokens\":28793,\"meta.tokens.output_tokens\":0}",
+                  "derived_total": 28793,
+                  "prior_numeric_raw": [],
+                  "observed_lower_bound": 0
+                }
+              },
+              "wire_record": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\811aef6505f1daa10cd7645963f706c30ff21edfeadb36f1c51c763827e863f9.json",
+              "wire_sha256": "e5f076ad86ae753b641926abf9f633ac3939f74eefc52c8117aa562d8c6bb0b7",
+              "response_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\raw\\811aef6505f1daa10cd7645963f706c30ff21edfeadb36f1c51c763827e863f9.body",
+              "response_sha256": "055ecab56bc20300f4fb08e8452528c3c39a58f4c7395353cde55f67105f7999"
+            },
+            {
+              "request_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+              "capability": "chat",
+              "outcome": "RESPONSE_RECEIVED",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 1238,
+                "cached_tokens": 0,
+                "prompt_tokens": 965,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 273,
+                "cache_write_tokens": 0,
+                "provider_usage_facts": {
+                  "fields": [
+                    [
+                      "input",
+                      {
+                        "path": "prompt_tokens",
+                        "valid": true,
+                        "value": 965,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "output",
+                      {
+                        "path": "completion_tokens",
+                        "valid": true,
+                        "value": 273,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "total",
+                      {
+                        "path": "total_tokens",
+                        "valid": true,
+                        "value": 1238,
+                        "present": true
+                      }
+                    ],
+                    [
+                      "cache_read",
+                      {
+                        "path": "prompt_cache_hit_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_write",
+                      {
+                        "path": "cache_creation_input_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "cache_miss",
+                      {
+                        "path": "prompt_cache_miss_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ],
+                    [
+                      "reasoning",
+                      {
+                        "path": "completion_tokens_details.reasoning_tokens",
+                        "valid": false,
+                        "value": null,
+                        "present": false
+                      }
+                    ]
+                  ],
+                  "semantics": "openai-input-inclusive/v1",
+                  "simulated": false,
+                  "raw_sha256": "ad2fe124a37159c1470390df7b2d3303f6485be5438b85e592aeef6c2d03a77b",
+                  "numeric_raw": "{\"completion_tokens\":273,\"prompt_tokens\":965,\"total_tokens\":1238}",
+                  "derived_total": 1238,
+                  "prior_numeric_raw": [],
+                  "observed_lower_bound": 1238
+                }
+              },
+              "wire_record": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.json",
+              "wire_sha256": "30f33069761224e0c460a048d430f5e88420d3c6808e5a2bc0460280c22b22cf",
+              "response_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\raw\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.body",
+              "response_sha256": "2c23dd2809914aa3c567b4638ed8f3f3bc3d2e81d1a34a75951a2c6c581382d8"
+            }
+          ],
+          "input_tokens": 32324,
+          "output_tokens": 310,
+          "total_tokens": 32634
+        }
+      ],
+      "semantic_verdict": "FAIL_UNSUPPORTED_NUMERIC_ANSWER_AND_OCR_RETENTION",
+      "evidence_root": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement",
+      "completed_answers": 1,
+      "own_api_stopped": true
+    },
+    "semantic_review": {
+      "schema": "m32-semantic-review/v1",
+      "scope": "Read-only semantic review of the single completed omni-page007/A request. No new request, test, or production change was made.",
+      "chain_and_evidence": {
+        "chain_retention": "PASS",
+        "chain_evidence": {
+          "end_to_end_requests": 1,
+          "provider_calls": 4,
+          "new_unknown": 0,
+          "missing_usage": 0,
+          "sse_equals_persisted": true,
+          "answer_request_id": "f62ae25f-a80d-4840-909c-c9f35e2e4daf/answer/1/cheap"
+        },
+        "target_evidence_retention": "FAIL",
+        "retrieval_evidence": {
+          "search_rank": 6,
+          "in_search": true,
+          "raw_rerank_rank": 2,
+          "raw_rerank_score": 0.09591700881719589,
+          "isolated_rerank_threshold": 0.15,
+          "in_rerank": false,
+          "in_context_lineage": false,
+          "exact_source_quote_in_finalized_context": false,
+          "exact_source_quote_in_generation_request": false,
+          "context_chars": 295,
+          "pipeline_counts": "Search 30 -> Rerank 1 -> Merge 1 -> Context 1"
+        },
+        "interpretation": "The target OCR chunk was retrieved by search but fell below the 0.15 rerank threshold (raw score 0.095917, raw rerank position 2). The generation request therefore carried only a generic summary, not the target OCR values. This is evidence loss before generation, separate from answer quality."
+      },
+      "ground_truth": {
+        "coefficient_matrix": [
+          [
+            1,
+            -2,
+            1
+          ],
+          [
+            0,
+            2,
+            -8
+          ],
+          [
+            -4,
+            5,
+            9
+          ]
+        ],
+        "augmented_matrix_last_column": [
+          0,
+          8,
+          -9
+        ],
+        "ocr_source_content_sha256": "088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144",
+        "frozen_image_path": "E:\\WK\\run\\p9-20261016\\s\\95a3151c2c9f5f3d9e36\\PPT_lecture1_page_007.png",
+        "frozen_image_sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+        "cross_check": "The original slide image visibly shows coefficient rows [1,-2,1], [0,2,-8], [-4,5,9] and augmented constants 0, 8, -9. The OCR source_content contains the same numeric values, despite OCR formatting noise."
+      },
+      "answer_quality": {
+        "verdict": "FAIL_UNGROUNDED_AND_INCORRECT",
+        "actual_answer_claimed_coefficient_matrix": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ]
+        ],
+        "actual_answer_claimed_last_column": [
+          4,
+          10,
+          13
+        ],
+        "unsupported_claim": "The answer said the slide did not provide the full augmented-matrix constant column and that it supplied values from a common example. The slide explicitly shows the column [0,8,-9].",
+        "interpretation": "The model supplied specific numbers that were absent from the generation context and contradicted by the source. This is a generation grounding failure; do not attribute it to the backend inventing or altering provider output."
+      },
+      "supplier_response_provenance": {
+        "provider": "siliconflow",
+        "requested_and_reported_model": "XingChenAGI/Xing4.0-29B",
+        "wire_status_code": 200,
+        "wire_boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+        "wire_record_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.json",
+        "raw_response_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\raw\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.body",
+        "raw_response_sha256": "2c23dd2809914aa3c567b4638ed8f3f3bc3d2e81d1a34a75951a2c6c581382d8",
+        "raw_response_file_hash_matches_record": true,
+        "conclusion": "The raw supplier SSE response itself contains the incorrect matrix, 4/10/13, and the statement that it added values from a common example. The persisted answer matches SSE. The backend did not create these incorrect numbers through decoding."
+      },
+      "generation_request_content": {
+        "raw_request_record_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.json",
+        "reference_material_sent": "Generic document summary: it describes matrix representation and construction of coefficient and augmented matrices.",
+        "target_ocr_or_numeric_values_sent": false,
+        "request_contains_target_source_quote": false
+      },
+      "overall": {
+        "execution_and_persistence": "PASS",
+        "source_evidence_preservation_for_this_answer": "FAIL",
+        "answer_semantic_correctness": "FAIL",
+        "retry_recommended_or_performed": false,
+        "historical_failures_modified": false
+      }
+    },
+    "input_comparison": {
+      "new_wire": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\811aef6505f1daa10cd7645963f706c30ff21edfeadb36f1c51c763827e863f9.json",
+      "new_wire_sha256": "74acd59241ba478eb8d9c8418bc4e799ee4d701351778c97f4f834176883f056",
+      "comparisons": [
+        {
+          "historical_case": "omni-page007-A",
+          "query_before": "课件中线性方程组的系数矩阵和增广矩阵最后一列的三个数是什么",
+          "query_now": "课件中线性方程组的系数矩阵是什么，以及增广矩阵最后一列的三个数分别是什么",
+          "query_equal": false,
+          "ordered_passages_equal": false,
+          "candidate_passage_multiset_equal": false,
+          "wire_source_before": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\0b14960ebd54a02e1ce210624feb8247364d2963ab5e2ba363a48552648cf40e.json"
+        },
+        {
+          "historical_case": "omni-page007-B",
+          "query_before": "课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数",
+          "query_now": "课件中线性方程组的系数矩阵是什么，以及增广矩阵最后一列的三个数分别是什么",
+          "query_equal": false,
+          "ordered_passages_equal": false,
+          "candidate_passage_multiset_equal": false,
+          "wire_source_before": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\e4544e8a16e4a844e5f7d95ceebbcbd22185f119004e2d259abbabd2bb63fe20.json"
+        }
+      ],
+      "causal_note": "No new calls or forced Query/Rerank inputs; differences are observed, not proof of single-factor causality."
+    },
+    "authorization": {
+      "status": "CLOSED",
+      "scope": "M3.2_OMNI_ONE_SUPPLEMENT",
+      "source": "Owner direct reply: 给你授权",
+      "interpretation": "One additional Omni page007 complete RAG validation as proposed in preceding delivery; corrected recipe, isolated0.15, existing SiliconFlow only; no retries; production default unchanged",
+      "end_to_end_limit": 1,
+      "provider_execution_cap": 6,
+      "reported_token_execution_cap": 100000,
+      "recorded_at": "2026-10-18T02:51:32.724874+00:00",
+      "previous_closed_allowance_reused": false,
+      "closed_at": "2026-10-18T02:58:52.183574+00:00",
+      "used_end_to_end_requests": 1,
+      "used_provider_calls": 4,
+      "reported_tokens_used": 32634,
+      "new_unknown": 0,
+      "unused_provider_execution_space_closed": 2,
+      "unused_reported_token_execution_space_closed": 67366,
+      "account_credit_or_historical_unknown_released": false,
+      "reason": "Single authorized request finished; no retry or further model send."
+    },
+    "integrity": {
+      "source_commit": "96d8820b1e883e69039185146e9e642de63d1984",
+      "own_api_port_56425_closed": true,
+      "protected_files_before_append": {
+        ".serena/project.yml": true,
+        "progress.md": true,
+        "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json": true,
+        "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md": true,
+        "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md": true,
+        "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt": true,
+        "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt": true,
+        "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt": true,
+        "docs/milestones/RAG_M3_REPORT.md": true
+      },
+      "report_prefix_sha256": "7b58d05f081eb3628186f47f5f2f0bca58cec1ddb12d06d5686c62187d666ae5",
+      "old_report_preserved_as_byte_prefix": true,
+      "production_diff_files": [],
+      "legacy_accounting_unchanged": true,
+      "source_resources_unchanged": true,
+      "authorization_status": "CLOSED",
+      "prior_result_fields_preserved": true
+    },
+    "command_exit_codes": [
+      {
+        "command": "\"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\rag-m32-20261018\\run_omni_once.py prepare",
+        "exit_code": 0
+      },
+      {
+        "command": "\"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\rag-m32-20261018\\run_omni_once.py start",
+        "exit_code": 0
+      },
+      {
+        "command": "\"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\rag-m32-20261018\\run_omni_once.py query",
+        "exit_code": 0
+      },
+      {
+        "command": "\"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\rag-m32-20261018\\run_omni_once.py snapshot",
+        "exit_code": 0
+      },
+      {
+        "command": "\"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\rag-m32-20261018\\run_omni_once.py stop",
+        "exit_code": 0
+      },
+      {
+        "command": "Inline wrapper-binding and frozen-plan smoke check (saved execution output)",
+        "exit_code": 0
+      },
+      {
+        "command": "\"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\rag-m32-20261018\\summarize_omni_once.py",
+        "exit_code": 0
+      },
+      {
+        "command": "Inline read-only saved Query / Rerank input comparison",
+        "exit_code": 0
+      }
+    ],
+    "first_loss": "Rerank threshold: OCR score 0.09591700881719589 < isolated 0.15, before MMR/Merge/Context.",
+    "production_decision": "Keep query-understanding A and global threshold 0.3. Do not promote 0.15 or add custom retention rules.",
+    "causal_limit": "New Query and candidate passages differ from frozen M3 inputs; this is not a pure threshold A/B and does not prove one input difference caused the score drop.",
+    "no_new_code_or_pytest": true
+  },
+  "cumulative_m32_usage_not_a_unified_quality_baseline": {
+    "previous_closed_run": {
+      "end_to_end_attempts": 2,
+      "completed_answers": 1,
+      "provider_calls": 7,
+      "reported_tokens": 39463
+    },
+    "new_supplement": {
+      "end_to_end_attempts": 1,
+      "completed_answers": 1,
+      "provider_calls": 4,
+      "reported_tokens": 32634
+    },
+    "total": {
+      "end_to_end_attempts": 3,
+      "completed_answers": 2,
+      "provider_calls": 11,
+      "input_tokens": 71595,
+      "output_tokens": 502,
+      "reported_tokens": 72097,
+      "new_unknown": 0
+    }
+  }
 }
