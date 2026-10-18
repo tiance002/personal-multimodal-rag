@@ -1,0 +1,145 @@
+{
+  "schema": "rag-m4-tenant332-api/v1",
+  "status": "IDENTITY_API_READY_ZERO_PROVIDER",
+  "repository": "tiance002/personal-multimodal-rag",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "starting_head": "7219823b70387bb6eaf342c4bd6b47243f80d5ab",
+  "commit_sha": null,
+  "commit_sha_note": "The final SHA is reported in the delivery message; embedding a commit's own SHA here would change that SHA.",
+  "identity": {
+    "tenant_id": 332,
+    "principal_source": "E:\\WK\\run\\p25-20261017\\runtime\\state.json",
+    "source_state_commit": "9fe6f853d8dad30e97314b83984633f621940a90",
+    "subject_fingerprint": "00f2fd3dad2b7419",
+    "source_verified_against_frozen_plan_and_database": true,
+    "postgres_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013",
+    "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+    "redis_db": 15,
+    "storage_marker_matches": true,
+    "secret_key_matches_historical_runtime": true,
+    "secret_material_emitted": false
+  },
+  "daily_runtime": {
+    "tenant_id": 1,
+    "subject_fingerprint": "4a8c5c959f9ffb8d",
+    "config_modified": false,
+    "cloud_allowed": false,
+    "api_running_after_test": false,
+    "worker_running_after_test": false,
+    "ui_running_after_test": false,
+    "postgres_running_after_test": true,
+    "redis_running_after_test": true
+  },
+  "knowledge_bases": [
+    {"id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2", "name": "P8 miracl-zh", "tenant_id": 332, "cloud_allowed": true, "visible": true},
+    {"id": "76770fba-17c3-4704-8663-10aa669476ce", "name": "P8 longbench-zh", "tenant_id": 332, "cloud_allowed": true, "visible": true},
+    {"id": "7f1d720d-9561-446f-a8cc-6a562c339d23", "name": "P11 REAL B mmlongbench-doc", "tenant_id": 332, "cloud_allowed": true, "visible": true},
+    {"id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479", "name": "P8 hotpotqa", "tenant_id": 332, "cloud_allowed": true, "visible": true},
+    {"id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef", "name": "P8 omnidocbench", "tenant_id": 332, "cloud_allowed": true, "visible": true},
+    {"id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7", "name": "P8 scifact", "tenant_id": 332, "cloud_allowed": true, "visible": true}
+  ],
+  "visible_frozen_documents": 13,
+  "model_roles": {
+    "cheap": {"provider": "siliconflow", "model": "XingChenAGI/Xing4.0-29B", "registry_model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799", "credential_status": "CONFIGURED", "registry_load_validation": "PASS"},
+    "embedding": {"provider": "siliconflow", "model": "BAAI/bge-m3", "registry_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779", "credential_status": "CONFIGURED", "registry_load_validation": "PASS"},
+    "rerank": {"provider": "siliconflow", "model": "BAAI/bge-reranker-v2-m3", "registry_model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3", "credential_status": "CONFIGURED", "registry_load_validation": "PASS"},
+    "expensive": {"provider": "deepseek", "model": "deepseek-flash", "registry_model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749", "credential_status": "CONFIGURED", "registry_load_validation": "PASS"}
+  },
+  "isolation": {
+    "bind_host": "127.0.0.1",
+    "verification_port": 57998,
+    "verification_api_stopped": true,
+    "worker_started": false,
+    "redis_prefix": "weknora-python-m4-tenant332:3b18cdec7f87491c821b88aabfaad8e6",
+    "bearer_ttl_seconds": 2700,
+    "bearer_persisted": false,
+    "execution_file_used": false,
+    "global_cloud_allowed": false
+  },
+  "http_checks": {
+    "missing_token_status": 401,
+    "invalid_token_status": 401,
+    "sse_recovery_missing_token_status": 401,
+    "untrusted_identity_headers_and_query_ignored": true,
+    "client_body_identity_override_status": 422,
+    "tenant1_kb_read_status": 404,
+    "tenant1_kb_session_create_status": 403,
+    "tenant1_kb_query_in_tenant332_session_status": 403,
+    "new_tenant332_session_created": true,
+    "new_session_messages": 0,
+    "new_session_kb_scope_count": 1,
+    "new_session_document_scope": []
+  },
+  "memory": {
+    "existing_tenant332_subject_sessions_before": 130,
+    "existing_memory_items_and_settings": 0,
+    "identity_test_sessions_created_this_task": 2,
+    "new_blank_test_sessions_retained": true,
+    "session_count_before_first_check": 130,
+    "session_count_before_final_check": 131
+  },
+  "provider_ledger": {
+    "historical_calls_before": 233,
+    "historical_calls_after": 233,
+    "unknown_before": 0,
+    "unknown_after": 0,
+    "calls_added": 0,
+    "tokens_added": 0,
+    "real_m4_questions_run": 0
+  },
+  "m4_controller_contract": {
+    "sequence": ["create_session", "submit_question_sse", "read_history"],
+    "tenant_and_subject_sent_by_client": false,
+    "gold_or_answer_points_sent": false,
+    "normal_fastapi_routes": true,
+    "implemented": true,
+    "real_question_invoked": false
+  },
+  "commands": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_m4_tenant332_api.py -q -p no:cacheprovider --basetemp 'E:\\WK\\run\\m4-tenant332-tests-final4'",
+      "exit_code": 0,
+      "result": "6 passed in 0.13s"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/m4_tenant332_api.py verify --config 'E:\\WK\\run\\p81-retirement-20261018\\local.json' --p25-state 'E:\\WK\\run\\p25-20261017\\runtime\\state.json' --plan 'docs\\milestones\\RAG_M4_0_BASELINE.plan.json' --output 'E:\\WK\\run\\rag-m40-tenant332-api'",
+      "exit_code": 0,
+      "result": "IDENTITY_API_READY_ZERO_PROVIDER; API port 57998; stopped after verification; body identity override 422"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/local_runtime.py --config 'E:\\WK\\run\\p81-retirement-20261018\\local.json' check",
+      "exit_code": 0,
+      "result": "daily tenant 1 principal, cloud disabled, PG/Redis identities unchanged"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/local_runtime.py --config 'E:\\WK\\run\\p81-retirement-20261018\\local.json' status",
+      "exit_code": 0,
+      "result": "API/Worker/UI stopped; PostgreSQL/Redis running"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "clean"
+    }
+  ],
+  "diagnostics": [
+    {
+      "result": "initial_identity_assertion_failed",
+      "cause": "The public /api/v1/runtime route intentionally returns implementation and api_version only; the verifier incorrectly expected PostgreSQL identifiers there.",
+      "provider_calls": 0,
+      "session_written": false,
+      "corrected": true
+    }
+  ],
+  "preexisting_dirty_paths_preserved": [
+    ".serena/project.yml",
+    "progress.md",
+    "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+    "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt"
+  ]
+}
