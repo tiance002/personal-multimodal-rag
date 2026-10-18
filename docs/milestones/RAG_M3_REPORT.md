@@ -312,3 +312,53 @@ Cheap实际收到Summary后生成了矩阵 `[1,2,3; 4,5,6; 7,8,9]` 和末列 **4
 新增证据根 `E:\WK\run\rag-m32-20261018\omni-supplement` 包含完整请求／原始SSE／阶段与Context／持久化答案／实际用量，及 `live-result.json`、`semantic-review.json`、`query-input-comparison.json`、`owner-authorization.json`、`final-integrity.json`。包装器和只读汇总器位于其父目录，哈希清单保留在证据根。机器结果追加 `omni_supplement`，此前所有字段不改写；本报告此前内容逐字节保留为前缀。
 
 **收口：M3_2_PARTIAL，有限补验已完成，优化尚不具备推广依据。** 生产默认继续0.3，不新增特殊OCR提权、不降低默认阈值。0959此前真实回归通过仍有效；Omni新请求的检索证据与答案失败均保留，Hotpot第二跳／0434问题不在本次扩展处理。下一步最小建议是用这批冻结正负候选比较现有Rerank模型或输入表达，先取得可比较证据；本次不自动执行。Owner随后明确要求由6LUNA推送，本次仅授权正常推送当前任务分支，不合并、部署、打Tag或启动下一阶段。
+
+
+## M3.3：固定正确证据生成诊断（2026-10-18）
+
+**结论：`M3_3_COMPLETE_DIAGNOSIS_GENERATION_FAILURE`。固定原始OCR确实送达，但当前Cheap仍未正确提取；按Owner指定分支停止重排候选扩展和完整问答。** 这表示本轮诊断分支已完成，不表示M3_COMPLETE或自动检索闭环通过。起始HEAD与审查基线均为 `b97bfd00b40b51143803704f3e549533e997abd5`，原有8个脏路径保留。生产A、Rerank0.3、原Cheap/Expensive及DYNAMIC均未修改。
+
+### 局部工具修复与验证
+
+仅修改 `scripts/rag_m32_threshold_replay.py::replay_verdict` 及调用处：必须存在实际REPLAYED case/threshold runs且有效基线检查数大于0，才允许有效重放PASS。无case、全无回执、零基线返回 `PARTIAL_NOT_REPLAYABLE`／退出2；真实执行且有匹配基线的 `SEARCH_NOTHING` 仍可PASS。对应定向测试 **19 passed in 0.36s，退出0**。没有扫描五档阈值、重跑75次历史重放或改变旧41项基线结论。生产检索函数没有改动。
+
+### 固定生成：实际输入与错误位置
+
+复用 `E:\WK\run\rag-m32-20261018\omni-supplement` 最新Summary-only失败请求的原问题、Xing模型、实际Prompt、历史（空）、输出参数和渲染日期。通过现有 `prepare_generation()` 精确重建旧prepared messages／prompt hash，再核对Provider构造出的旧wire body完全相同；新请求仅把证据改为原Summary＋目标真实完整OCR。OCR `51316a20-67fd-4732-b520-c049999933d0`，document `dfeb8157-6bf9-4fe2-927a-f38d40b342a0`，version `35ad1226-ec0e-4931-a87d-257e756f525c`；只读数据库回查内容和版本一致。237字符OCR保持原噪声、换行和符号，SHA256 `088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144`，在实际user消息中以原有HTML转义完整出现。图片来源offset保留0/0，不伪装普通文本span；没有注入整理好的矩阵或Gold。
+
+本次独立run `8e53d038-ce27-4ffb-9b94-e24903825bf6`，实际Provider request为其 `/answer/1/cheap`，仅调用现有SiliconFlow Adapter的Xing流式生成。`temperature=0.3`、`max_tokens=1024`、`enable_thinking=false` 等输出参数不变；保留原渲染日期 `2026-10-18 Sunday`。它是**人工选择证据的生成诊断**，不经过查询理解、Embedding、Search或Rerank，不是正常FastAPI／浏览器验收，不声称有会话答案持久化或DYNAMIC选择验收。
+
+| 核对项 | 实际结果 |
+|---|---|
+| 完整原OCR进入实际生成请求 | **PASS**；独立语义核对确认wire与preflight一致 |
+| 系数矩阵第一、二行 | 正确：`[1,-2,1]`、`[0,2,-8]` |
+| 第三行 | **FAIL**；原图／OCR是`[-4,5,9]`，回答复制为`[1,-2,1]` |
+| 增广矩阵末列 | **FAIL**；应为`0,8,-9`，回答为`0,8,9` |
+| 无依据补充／格式问题 | 补写了原文不支持的第三个方程；不是单纯排版错误，也没有诚实说明无法提取 |
+| Decoder | 原始SSE、224个decoded events及最终349字符答案一致；有`[DONE]`和`stop`，未发现解码器篡改 |
+
+矩阵原图的行列清楚，但OCR确有扁平化和符号／行边界噪声，不能假称其表达完美。本轮只能把问题收敛到生成／OCR表达一侧，不能凭一次运行确定两者各自贡献；所需`-4/5/9/-9`已在实际输入中，亦不能把错误数值视作有来源支持。未修改OCR、重新解析或增加第二次生成。
+
+### 调用、未运行分支及收口
+
+Owner另行明确授权M3.3：仅SiliconFlow，固定生成1次、直接Rerank最多4次、前置条件通过后完整问答最多1次，合计最多10次Provider／150,000Token；旧M3.2授权未复用。新发送前在**同一个durable gate对象**的authorize前增加本轮任务执行预留：UTF-8 wire字节＋原1024输出上限＋framing余量，共预留 **7,183 Token**；这是工作树外诊断工具的执行围栏，没有恢复账户/月度Token Authority。原Gate继续核对模型、Scope、外发权限和幂等身份；实际usage按原路径保存。真实请求wire SHA256 `627dd662371d0884e6de2901bfa994e2ea1ff3ace8a4b2fbbee71b359fff190f`，HTTP200，原始响应SHA256 `d3d32d769951c7912ebd609803eef6773187cda2589753b6b2eec4c1bb4dda39`。
+
+实际 **1次Provider，输入1,116＋输出223＝1,339 Token，29.080秒，新增UNKNOWN0／缺失usage0**。只读PG回查与本地预留结算一致；历史账本、原件／Chunk资源哈希及Redis实例身份前后相同。没有启动API／Worker／浏览器进程，没有任何DeepSeek调用。授权与本轮预留日志已CLOSED，剩余9次Provider／148,661Token执行空间不结转，不释放历史UNKNOWN或账户额度。
+
+Qwen3-4B仅完成官方合同和冻结输入的只读准备，没有账户／模型探针；静态目录缺4B条目，但真实可用性**未核验**，不能据此说可用或不可用。A是最新Omni的30条完整有序候选，B是成功0959的30条；C准备为原Summary加已确认不支持答案的真实片段，UNKNOWN排除，只作构造诊断。**Qwen A/B/C、BGE C四次Rerank均NOT_RUN_PRECONDITION_FIXED_GENERATION_FAILED；完整Omni问答亦NOT_RUN。** 没有候选新分数，不能作采用／拒绝该模型的质量判断。官方合同准备资料链接为 `https://docs.siliconflow.cn/docs/api/rerank-post`，不构成本轮实测。
+
+本轮没有再发Summary-only负基线；历史无依据数字回答原样保留，问题仍未修复。当前DYNAMIC只检查截断、空答案和无效引用，不能描述为已验证事实正确性。未恢复在线正则Validator、固定拒答或语义裁判。下一步最小建议是先离线检查已有OCR布局与文本表达、保留机器来源映射，再决定是否需要新的生成验证；本轮不执行。Hotpot、0434、聊天附件、全局模型推广与长尾延迟保持独立。
+
+### 实际命令与交付
+
+工作目录为 `E:\RAG-Worktrees\weknora-python-port-20261013`，以下`python`指 `E:\RAG quention\.venv\Scripts\python.exe`：
+
+| 实际命令 | 退出码／结果 |
+|---|---|
+| `python -B -m pytest -q --tb=short -p no:cacheprovider --basetemp E:\WK\run\rag-m33-20261018\pytest-replay\basetemp tests/weknora_port/test_rag_m32_replay.py` | **0，19 passed** |
+| `python -B E:\WK\run\rag-m33-20261018\run_m33.py prepare` | 最终0，原Prompt/wire精确复现；最初两次本地装配退出1（Decimal类型、tuple/list JSON比较），日志保留，均无模型发送 |
+| 同脚本 `generate` | **0，仅一次发送**；完成传输不代表答案正确 |
+| `python -B E:\WK\run\rag-m33-20261018\snapshot_m33.py` | **0**；只读身份／用量回查并关闭授权 |
+| 原OCR版本回查、完整OCR实际wire包含、raw SSE／解码逐项一致性断言 | **0**；原件／原文未改写 |
+
+新机器结果为 `docs/milestones/RAG_M3_3_FIXED_EVIDENCE.results.json`；完整输入、原始SSE、decoded events、源图核对、预留／结算、官方合同准备、未运行分支、命令日志和哈希清单位于 `E:\WK\run\rag-m33-20261018`。本次仅提交局部工具、必要测试、本报告增补和新结果JSON；此前M3报告逐字节保留为前缀，M3.2结果不改写。提交前实际执行JSON一致性及 `git diff --check`／`git diff --cached --check`，结果保留于证据根。最终完整commit SHA以本次交付及该节对应 `git log` 为准，避免自包含提交哈希。本轮不Push、合并、部署、打Tag或继续扩展。

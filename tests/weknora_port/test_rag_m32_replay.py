@@ -69,18 +69,30 @@ def test_network_connect_is_blocked(monkeypatch):
     ('PASS', {'through_top_k_ids': []}),
 ])
 def test_partial_replay_never_reports_pass(merge_status, extra):
-    cases = [{'case': 'complete-receipt', 'threshold_runs': [
+    cases = [{'case': 'complete-receipt', 'status': 'REPLAYED', 'threshold_runs': [
         {'threshold': .15, 'status': 'PASS', 'merge_status': merge_status, **extra}]}]
-    status, code, incomplete = replay_verdict(cases, True)
+    status, code, incomplete = replay_verdict(cases, True, 1)
     assert status == 'PARTIAL_NOT_REPLAYABLE'
     assert code != 0
     assert len(incomplete) == 1
 
 
-def test_pipeline_search_nothing_and_missing_receipt_are_not_partial():
-    cases = [
-        {'case': 'no-receipt', 'threshold_runs': []},
-        {'case': 'search-nothing', 'threshold_runs': [
-            {'threshold': .3, 'status': 'SEARCH_NOTHING', 'merge_status': 'NOT_RUN_PIPELINE_STOPS'}]},
-    ]
-    assert replay_verdict(cases, True) == ('PASS_OFFLINE_PRODUCT_REPLAY', 0, [])
+@pytest.mark.parametrize('cases,baseline_match,baseline_count', [
+    ([], True, 1),
+    ([{'case': 'no-receipt', 'status': 'NOT_REPLAYABLE_NO_COMPLETE_RERANK_RECEIPT',
+       'threshold_runs': []}], True, 0),
+    ([{'case': 'search-nothing', 'status': 'REPLAYED', 'threshold_runs': [
+        {'threshold': .3, 'status': 'SEARCH_NOTHING', 'merge_status': 'NOT_RUN_PIPELINE_STOPS'}]}], True, 0),
+])
+def test_missing_case_replay_or_baseline_never_reports_pass(cases, baseline_match, baseline_count):
+    status, code, incomplete = replay_verdict(cases, baseline_match, baseline_count)
+    assert status == 'PARTIAL_NOT_REPLAYABLE'
+    assert code != 0
+    assert incomplete
+
+
+def test_matched_baseline_search_nothing_is_a_valid_replay():
+    cases = [{'case': 'search-nothing', 'status': 'REPLAYED', 'threshold_runs': [
+        {'threshold': .3, 'status': 'SEARCH_NOTHING', 'merge_status': 'NOT_RUN_PIPELINE_STOPS',
+         'baseline_rerank_exact': True}]}]
+    assert replay_verdict(cases, True, 1) == ('PASS_OFFLINE_PRODUCT_REPLAY', 0, [])
