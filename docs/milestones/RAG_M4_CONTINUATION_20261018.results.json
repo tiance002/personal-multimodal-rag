@@ -1,0 +1,1721 @@
+{
+  "schema": "rag-m4-continuation/v1",
+  "status": "M4_PARTIAL_STOPPED_UNKNOWN_AND_BATCH_LIMIT",
+  "source_commit": "bf23a7f4cfd6ce2f707be4d909d7b4dbd750109e",
+  "fixed_upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "evaluation_plan_sha256": "5eba07d24bde9316c2ae0436552b8eabeaad6fa454d2a766283260f5953e5c12",
+  "authorization": {
+    "max_provider_calls": 132,
+    "max_tokens": 600000,
+    "per_batch_max_provider_calls": 12,
+    "per_batch_max_tokens": 100000,
+    "providers": [
+      "existing SiliconFlow",
+      "existing DeepSeek"
+    ],
+    "router": "DYNAMIC",
+    "unknown_policy": "STOP"
+  },
+  "totals": {
+    "provider_calls": 45,
+    "reported_tokens": 103747,
+    "unknown": 1,
+    "completed_cases": 9,
+    "remaining_provider_call_authorization": 87,
+    "remaining_token_authorization": 486785,
+    "stop_count": 2,
+    "unknown_held_tokens": 9468,
+    "conservative_budget_occupied_tokens": 113215,
+    "reconciled_from_batch_execution_ledgers": true
+  },
+  "provider_usage_by_provider_model_capability": [
+    {
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "requests": 21,
+      "reported_or_settled_tokens": 48775,
+      "unknown_requests": 1,
+      "unknown_held_tokens": 9468
+    },
+    {
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "requests": 13,
+      "reported_or_settled_tokens": 186,
+      "unknown_requests": 0,
+      "unknown_held_tokens": 0
+    },
+    {
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "requests": 10,
+      "reported_or_settled_tokens": 53003,
+      "unknown_requests": 0,
+      "unknown_held_tokens": 0
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "capability": "chat",
+      "requests": 1,
+      "reported_or_settled_tokens": 1783,
+      "unknown_requests": 0,
+      "unknown_held_tokens": 0
+    }
+  ],
+  "datasets": {
+    "scifact": {
+      "selected": 2,
+      "completed": 1,
+      "unknown": 1,
+      "partial": 0,
+      "not_run": 0,
+      "answer_metric_cases": 0,
+      "search_source_hits": 2,
+      "search_source_denominator": 2,
+      "rerank_source_hits": 2,
+      "rerank_source_denominator": 2,
+      "context_source_hits": 2,
+      "context_source_denominator": 2,
+      "cases": [
+        "scifact-247",
+        "scifact-339"
+      ]
+    },
+    "miracl-zh": {
+      "selected": 2,
+      "completed": 2,
+      "unknown": 0,
+      "partial": 0,
+      "not_run": 0,
+      "answer_metric_cases": 0,
+      "search_source_hits": 2,
+      "search_source_denominator": 2,
+      "rerank_source_hits": 2,
+      "rerank_source_denominator": 2,
+      "context_source_hits": 2,
+      "context_source_denominator": 2,
+      "cases": [
+        "miracl-91294",
+        "miracl-7049630"
+      ]
+    },
+    "longbench-zh": {
+      "selected": 2,
+      "completed": 2,
+      "unknown": 0,
+      "partial": 0,
+      "not_run": 0,
+      "answer_metric_cases": 2,
+      "search_source_hits": 2,
+      "search_source_denominator": 2,
+      "rerank_source_hits": 2,
+      "rerank_source_denominator": 2,
+      "context_source_hits": 2,
+      "context_source_denominator": 2,
+      "cases": [
+        "longbench-6770736a",
+        "longbench-51abd206"
+      ]
+    },
+    "hotpotqa": {
+      "selected": 2,
+      "completed": 2,
+      "unknown": 0,
+      "partial": 0,
+      "not_run": 0,
+      "answer_metric_cases": 2,
+      "search_source_hits": 4,
+      "search_source_denominator": 4,
+      "rerank_source_hits": 2,
+      "rerank_source_denominator": 4,
+      "context_source_hits": 2,
+      "context_source_denominator": 4,
+      "cases": [
+        "hotpot-5a7631",
+        "hotpot-5a8ad6"
+      ]
+    },
+    "mmlongbench-doc": {
+      "selected": 2,
+      "completed": 2,
+      "unknown": 0,
+      "partial": 0,
+      "not_run": 0,
+      "answer_metric_cases": 2,
+      "search_source_hits": 2,
+      "search_source_denominator": 2,
+      "rerank_source_hits": 1,
+      "rerank_source_denominator": 2,
+      "context_source_hits": 1,
+      "context_source_denominator": 2,
+      "cases": [
+        "mml-0434",
+        "mml-0959"
+      ]
+    },
+    "omnidocbench": {
+      "selected": 1,
+      "completed": 0,
+      "unknown": 0,
+      "partial": 1,
+      "not_run": 0,
+      "answer_metric_cases": 0,
+      "search_source_hits": 0,
+      "search_source_denominator": 0,
+      "rerank_source_hits": 0,
+      "rerank_source_denominator": 0,
+      "context_source_hits": 0,
+      "context_source_denominator": 0,
+      "cases": [
+        "omni-page012"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "case_id": "scifact-247",
+      "dataset": "scifact",
+      "qid": "247",
+      "status": "COMPLETED",
+      "batch_id": "batch-002",
+      "provider_calls": 5,
+      "reported_tokens": 12424,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 162.754,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": null,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 11,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 2,
+          "source_ids": [
+            "13578199"
+          ],
+          "chars": 2090,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+      "answer_metrics": {},
+      "answer_assessment": "Completed cautious response; the indexed paper does not support the queried chemical-injury claim. Official Gold is document qrels only; no answer accuracy score.",
+      "answer_sha256": "48f01e51aed2f2079f3f83efe34a99af8436838a3678aef5eb6dab1a855663c1",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-002\\api-run.json",
+          "sha256": "34f02d79298f0dedd6f23ca8e57a58e74bc1648dbd09d0d391fa23870e464821"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-002\\evidence\\1a7bdc8614867d9b3898755cc8c10b9b7cbd3ca5d38f47525970e06d667f90c1.stages.json",
+          "sha256": "87f13a94ebc32e557432ff6947939611453057a31a1e4980a637f2ced690874a"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "222d167a-387d-4e30-8412-2cc30393fed5",
+              "source_id": "13578199",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "scifact-339",
+      "dataset": "scifact",
+      "qid": "339",
+      "status": "STOPPED_UNKNOWN",
+      "batch_id": "batch-004",
+      "provider_calls": 4,
+      "reported_tokens": 8216,
+      "unknown_count": 1,
+      "unknown_held_tokens": 9468,
+      "elapsed_seconds": 779.52,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 11,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 3,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 2,
+          "source_ids": [
+            "23349986"
+          ],
+          "chars": 2876,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "NOT_RUN_NO_COMPLETED_ANSWER",
+      "answer_metrics": {},
+      "answer_assessment": "Final Cheap request timed out after send. Assistant turn incomplete; preserve 9,468-token UNKNOWN; not resent.",
+      "answer_sha256": null,
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-004\\api-run.json",
+          "sha256": "9c4b71bdf30e6656b2dd3acecc0f0d5254e06c2270957c422016e2cc7f8e384b"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-004\\evidence\\dc1686db0187e7088c863af100bb26626c14b677ee440033dfe4a924869a842c.stages.json",
+          "sha256": "6e1700eb283949fd97a16dab40d52ecdbc65af23e4c6f8c5edd0df0a8f9a5a0c"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "9fbacd57-8ea3-4f30-978d-21be7e2f3429",
+              "source_id": "23349986",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "miracl-91294",
+      "dataset": "miracl-zh",
+      "qid": "91294#0",
+      "status": "COMPLETED",
+      "batch_id": "batch-005",
+      "provider_calls": 5,
+      "reported_tokens": 7342,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 179.144,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 26,
+          "unique_docs": 13,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 1,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 1,
+          "source_ids": [
+            "2145#2"
+          ],
+          "chars": 319,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+      "answer_metrics": {},
+      "answer_assessment": "Completed. No native answer Gold; answer not scored. Passage source evidence reached Context.",
+      "answer_sha256": "389555a314105a378e21cd1506fce50bf8cb33627d477ea7fc9ff0f095bb03fd",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-005\\api-run.json",
+          "sha256": "bd4828fed6719758d5dcb31dff319da801260c454c8b0aac07144770019f1e47"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-005\\evidence\\5e002c9efbadaf99306ad5a2162cd93afe428216df83ffe8d384cec9e3bda316.stages.json",
+          "sha256": "12717715f501ec55d7b2a600e013bdf62e8b0b60cb9652608bf427f4ebbf7e56"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "541b3a8a-70a0-48dc-b31a-19ee96df3b94",
+              "source_id": "2145#2",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "miracl-7049630",
+      "dataset": "miracl-zh",
+      "qid": "7049630#0",
+      "status": "COMPLETED",
+      "batch_id": "batch-006",
+      "provider_calls": 5,
+      "reported_tokens": 7411,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 162.83,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 26,
+          "unique_docs": 13,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 1,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 1,
+          "source_ids": [
+            "463#83"
+          ],
+          "chars": 588,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+      "answer_metrics": {},
+      "answer_assessment": "Completed. No native answer Gold; answer not scored. Passage source evidence reached Context.",
+      "answer_sha256": "32aff46241fa781fbbc5e0f02119da837c77cd7667bfdef4f9269ef04e771c5b",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-006\\api-run.json",
+          "sha256": "e54a29a40178cf6484b4af9fbd90a031a8411b59c6e79485a3c89318bbe9a86e"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-006\\evidence\\49cabc3d8e7117a31af5d925d2c7be426c088dad7c56bca4e7aa7cd525282013.stages.json",
+          "sha256": "b08e7e6c81598a2a41bf848b10b3bef009a6af5edd5a7ca78865ca0f71074e05"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "57970155-c9f5-478c-aa3b-a54e333e13a1",
+              "source_id": "463#83",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "longbench-6770736a",
+      "dataset": "longbench-zh",
+      "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+      "status": "COMPLETED",
+      "batch_id": "batch-007",
+      "provider_calls": 4,
+      "reported_tokens": 19439,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 220.931,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 3,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 3
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 23,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 3,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 3,
+          "source_ids": [
+            "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40"
+          ],
+          "chars": 9776,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "COMPUTED_OFFICIAL_TASK_METRIC_ON_SMALL_SELECTED_SAMPLE",
+      "answer_metrics": {
+        "rouge_zh_score": 0.3272727233057852
+      },
+      "answer_assessment": "Official DuReader ROUGE-ZH computed on this selected item only; factual completeness not separately judged.",
+      "answer_sha256": "844ae264433c7b6df4bc5e59ae578ae232b4bbba44d9084ebc1e71cec335aff8",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-007\\api-run.json",
+          "sha256": "6e8da07ca75ba18281f239bc3b634a6163c42653d720784815cdf39665a797ad"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-007\\evidence\\e462e614aa2f66095d0a12cda300ad841d1383fbd786573d242a0b8b328108d5.stages.json",
+          "sha256": "e7925830643ffa5456650bfe95f321ef7fa264f1877b93fc25080636ef163c34"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "fa3fbf82-1af6-4c25-8177-24fbd1c002bd",
+              "source_id": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "longbench-51abd206",
+      "dataset": "longbench-zh",
+      "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+      "status": "COMPLETED",
+      "batch_id": "batch-008",
+      "provider_calls": 4,
+      "reported_tokens": 13152,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 84.123,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 3,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 3
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 1,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 1,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 1,
+          "source_ids": [
+            "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed"
+          ],
+          "chars": 767,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "COMPUTED_OFFICIAL_TASK_METRIC_ON_SMALL_SELECTED_SAMPLE",
+      "answer_metrics": {
+        "qa_f1_zh_score": 0.0909090909090909
+      },
+      "answer_assessment": "Official MultiFieldQA-ZH F1 is low; answer states 2.2万人 but incorrectly says the year is absent although the Context title identifies the 2005 report.",
+      "answer_sha256": "c20e7ce16bb33ca65f2b1cd1bd5f44f249b743785e3b7f64d4695d1d20afa3ac",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-008\\api-run.json",
+          "sha256": "d64facd3160bb6723548a44d5804099c9e1cfee225ff2e269dcf076b663a4fa7"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-008\\evidence\\b3a7a6bf49a0230652c8f10e9e2f207c1853cd1b48365e137815951b3999e7de.stages.json",
+          "sha256": "53c8a7fc79cbf0a9f79aeb25e21388f7289c7097c15984f630576efbea7acafd"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916",
+              "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "hotpot-5a7631",
+      "dataset": "hotpotqa",
+      "qid": "5a7631cd5542994ccc91870c",
+      "status": "COMPLETED",
+      "batch_id": "batch-009",
+      "provider_calls": 4,
+      "reported_tokens": 7880,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 130.538,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 14,
+          "known_relevant_doc_ranks": [
+            1,
+            3
+          ],
+          "relevant_docs_in_stage": 2,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.9197207891481876,
+            "retrieved_count_at_k": 10
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 0.5,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 0.5,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 2,
+          "source_ids": [
+            "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd"
+          ],
+          "chars": 2632,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 0.5,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "COMPUTED_ANSWER_DIAGNOSTICS",
+      "answer_metrics": {
+        "hotpot_answer_em": 0.0,
+        "hotpot_answer_token_f1": 0.04
+      },
+      "answer_assessment": "Search found both qrel sources; Rerank/Context retained one. Model abstained and did not answer Franconia; failure aligns with second-source evidence loss.",
+      "answer_sha256": "b9df8482844658769dac2dde4a9558464d173905e79b98f21f542db1f0dd82a8",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-009\\api-run.json",
+          "sha256": "43837de3c4c700021c7516d60e0325ec9874eb09e42e95f8eb7bb55ca3516b46"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-009\\evidence\\388b78d3ae6c2972692d6942dbd65709925269973cfeadd4342fadbbb1fffac7.stages.json",
+          "sha256": "34e82a8f50667a787d1ccf24d49af60b83f572a7fc5c3247105eb5e183b6e51f"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 2,
+          "expected_document_ranks": [
+            1,
+            3
+          ],
+          "target_document_present": [
+            {
+              "document_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+              "source_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+              "rank": 1
+            },
+            {
+              "document_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+              "source_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+              "rank": 3
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "hotpot-5a8ad6",
+      "dataset": "hotpotqa",
+      "qid": "5a8ad6805542992d82986f93",
+      "status": "COMPLETED",
+      "batch_id": "batch-010",
+      "provider_calls": 4,
+      "reported_tokens": 8115,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 63.429,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 14,
+          "known_relevant_doc_ranks": [
+            1,
+            2
+          ],
+          "relevant_docs_in_stage": 2,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 3,
+          "unique_docs": 2,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 0.5,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 2
+          }
+        },
+        "merge": {
+          "candidate_chunks": 3,
+          "unique_docs": 2,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 0.5,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 2
+          }
+        },
+        "context": {
+          "chunks": 3,
+          "source_ids": [
+            "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+            "non-target:73ea918d-bbdf-4a8e-ad9c-065101af492f"
+          ],
+          "chars": 2226,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 2,
+          "source_qrels@10": {
+            "recall_at_k": 0.5,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 2
+          }
+        }
+      },
+      "answer_metric_status": "COMPUTED_ANSWER_DIAGNOSTICS",
+      "answer_metrics": {
+        "hotpot_answer_em": 0.0,
+        "hotpot_answer_token_f1": 0.10526315789473684
+      },
+      "answer_assessment": "Answer contains the Gold entity Zeffirelli and Context supports it; native full-answer EM is 0 because the answer is a full sentence, token F1 is reported separately.",
+      "answer_sha256": "5b442ececd45d92d73abbd75b02fafce6727009178085d85dc2b3a0f3fc39e13",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-010\\api-run.json",
+          "sha256": "5e5eb895d31b77f443c6002c24b72038e358d5befc306665c43d18a9fa28b2ab"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-010\\evidence\\f927306a856776a04f5ece473ca7aa6f9c19296e64795916b0b321d87cc8cdc9.stages.json",
+          "sha256": "c4beaba167cd7668f065912a207a8e826c2e0a6fa795947dc942876037cc3f2a"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 2,
+          "expected_document_ranks": [
+            1,
+            2
+          ],
+          "target_document_present": [
+            {
+              "document_id": "03a732df-64ad-4044-a2c6-caebf2409e7c",
+              "source_id": "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+              "rank": 1
+            },
+            {
+              "document_id": "443629fe-7970-4c67-b132-e5574c771ade",
+              "source_id": "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85",
+              "rank": 2
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "mml-0434",
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "status": "COMPLETED",
+      "batch_id": "batch-011",
+      "provider_calls": 4,
+      "reported_tokens": 8627,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 42.703,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 2,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 2
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 0,
+          "unique_docs": 0,
+          "known_relevant_doc_ranks": [],
+          "relevant_docs_in_stage": 0,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 0.0,
+            "mrr_at_k": 0.0,
+            "ndcg_at_k": 0.0,
+            "retrieved_count_at_k": 0
+          }
+        },
+        "merge": {
+          "candidate_chunks": 0,
+          "unique_docs": 0,
+          "known_relevant_doc_ranks": [],
+          "relevant_docs_in_stage": 0,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 0.0,
+            "mrr_at_k": 0.0,
+            "ndcg_at_k": 0.0,
+            "retrieved_count_at_k": 0
+          }
+        },
+        "context": {
+          "chunks": 0,
+          "source_ids": [],
+          "chars": 0,
+          "relevant_docs_in_context": 0,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 0.0,
+            "mrr_at_k": 0.0,
+            "ndcg_at_k": 0.0,
+            "retrieved_count_at_k": 0
+          }
+        }
+      },
+      "answer_metric_status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+      "answer_metrics": {
+        "normalized_exact_match": 0,
+        "character_f1": 0.05825242718446602
+      },
+      "answer_assessment": "Search found the source document; Rerank returned no accepted evidence, Context was empty, and the model refused. No evidence-supported answer.",
+      "answer_sha256": "7f5cdd7f50fef4fc4ecf1e1df8cc0b3cc06d2af412dbbcbde0644006cf57a5d1",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-011\\api-run.json",
+          "sha256": "d02c66a9217a672150fc5a6bd5b3128bf314a3f853ffacb142d49a3b4ca77644"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-011\\evidence\\565362e7bc5e6dc57cc36ce234fcc9bd6e280452f4a95fde3f58cc35a0db64f0.stages.json",
+          "sha256": "eb62c8de00cd1eefff2acddac3fa9d89c363551aaa5c502ad036613bbf842f0b"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+              "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 0,
+          "expected_document_ranks": []
+        },
+        "merge": {
+          "expected_documents_in_stage": 0,
+          "expected_document_ranks": []
+        },
+        "context": {
+          "expected_documents_in_context": 0,
+          "expected_document_ranks": []
+        }
+      }
+    },
+    {
+      "case_id": "mml-0959",
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+      "status": "COMPLETED",
+      "batch_id": "batch-012",
+      "provider_calls": 4,
+      "reported_tokens": 8554,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 84.229,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 2,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 2
+          }
+        },
+        "rerank": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "merge": {
+          "candidate_chunks": 2,
+          "unique_docs": 1,
+          "known_relevant_doc_ranks": [
+            1
+          ],
+          "relevant_docs_in_stage": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        },
+        "context": {
+          "chunks": 2,
+          "source_ids": [
+            "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf"
+          ],
+          "chars": 1720,
+          "relevant_docs_in_context": 1,
+          "relevant_docs_total": 1,
+          "source_qrels@10": {
+            "recall_at_k": 1.0,
+            "mrr_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1
+          }
+        }
+      },
+      "answer_metric_status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+      "answer_metrics": {
+        "normalized_exact_match": 0,
+        "character_f1": 0.02
+      },
+      "answer_assessment": "Answer names radio waves and microwaves, both present in the actual Context. Typed Gold is serialized as a Python-list string, so normalized EM/character F1 are not a meaningful semantic score; official judge not run.",
+      "answer_sha256": "2f356b391e318b7a3a43966f9686cd054b300fafbc561d5fbec40695ac491714",
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-012\\api-run.json",
+          "sha256": "dc524e61aff84c8ace065331b41cb951d94321d2cd5e124f0b4962058d93c946"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-012\\evidence\\0f8cba052f3092d933dc9d31e637fdac39a57c544733f5946d6bdb49942fab86.stages.json",
+          "sha256": "a0e29351f21c6733f4bad299fec83c7418388b279bfc2ba7673b74119baea8ea"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+              "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "merge": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        },
+        "context": {
+          "expected_documents_in_context": 1,
+          "expected_document_ranks": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "omni-page012",
+      "dataset": "omnidocbench",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+      "status": "FAILED_OR_PARTIAL",
+      "batch_id": "batch-013",
+      "provider_calls": 2,
+      "reported_tokens": 2587,
+      "unknown_count": 0,
+      "unknown_held_tokens": 0,
+      "elapsed_seconds": 42.955,
+      "sse_complete_event": true,
+      "assistant_history_matches_sse": true,
+      "stage_evidence": {
+        "search": {
+          "candidate_chunks": 30,
+          "unique_docs": 17,
+          "known_relevant_doc_ranks": [],
+          "relevant_docs_in_stage": 0,
+          "relevant_docs_total": 0,
+          "source_qrels@10": null
+        },
+        "rerank": {
+          "candidate_chunks": 0,
+          "unique_docs": 0,
+          "known_relevant_doc_ranks": [],
+          "relevant_docs_in_stage": 0,
+          "relevant_docs_total": 0,
+          "source_qrels@10": null
+        },
+        "merge": {
+          "candidate_chunks": 0,
+          "unique_docs": 0,
+          "known_relevant_doc_ranks": [],
+          "relevant_docs_in_stage": 0,
+          "relevant_docs_total": 0,
+          "source_qrels@10": null
+        },
+        "context": {
+          "chunks": 0,
+          "source_ids": [],
+          "chars": 0,
+          "relevant_docs_in_context": null,
+          "relevant_docs_total": null,
+          "source_qrels@10": null
+        }
+      },
+      "answer_metric_status": "NOT_RUN_NO_COMPLETED_ANSWER",
+      "answer_metrics": {},
+      "answer_assessment": "Search found the target page source. Rerank reservation was denied before provider send; no Context or answer. No official QA Gold.",
+      "answer_sha256": null,
+      "artifacts": {
+        "api_run": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-013\\api-run.json",
+          "sha256": "0d42e518efea0736fb492609d4ac669433cc4267b58feddd859164c0071bcaeb"
+        },
+        "stage_trace": {
+          "path": "E:\\WK\\run\\rag-m40-20261018\\batch-013\\evidence\\9485c293b02b8ffb9a9b3f1d7e3c5ba26657fff38d608b2c18fb09d2cdb9ee5f.stages.json",
+          "sha256": "d01134a7e46bcfd89174fe2d241c1e7e5fd5687d644d16bb3ef3550c01ca082c"
+        }
+      },
+      "target_document_provenance": {
+        "search": {
+          "expected_documents_in_stage": 1,
+          "expected_document_ranks": [
+            1
+          ],
+          "target_document_present": [
+            {
+              "document_id": "6a50b4aa-3ef4-40b3-b8f5-884f5614c61b",
+              "source_id": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+              "rank": 1
+            }
+          ]
+        },
+        "rerank": {
+          "expected_documents_in_stage": 0,
+          "expected_document_ranks": []
+        },
+        "merge": {
+          "expected_documents_in_stage": 0,
+          "expected_document_ranks": []
+        },
+        "context": {
+          "expected_documents_in_context": 0,
+          "expected_document_ranks": []
+        }
+      }
+    }
+  ],
+  "stops": [
+    {
+      "case_id": "scifact-339",
+      "reason": "Cheap request timed out after send; UNKNOWN held at 9,468 tokens; no retry."
+    },
+    {
+      "case_id": "omni-page012",
+      "reason": "LOCAL_EXECUTION_LIMIT_DENIED before Rerank send; per-batch 100,000-token reservation limit prevented request; not retried."
+    }
+  ],
+  "result_interpretation": {
+    "source_metrics": "Frozen qrels projected from chunk results to original source/document IDs, stage by stage; small selected subset only, not full-corpus benchmark.",
+    "answer_metrics": "Only dataset/task-appropriate native metrics; answers without QA Gold are not scored. Manual factual review is explicitly separated.",
+    "omni": "No official QA Gold. Search reached target source but Rerank and answer were not run.",
+    "small_sample_scope": "Selected cases only; ranking metrics are source/document projection from this scoped index and do not estimate full benchmark corpus performance."
+  },
+  "raw_evidence_root": "E:\\WK\\run\\rag-m40-20261018",
+  "aggregate_evidence": {
+    "accounting_path": "E:\\WK\\run\\rag-m40-20261018\\m4-accounting.json",
+    "accounting_sha256": "eeed0fd0a6fd64017dbd1297dd53a6858760d9b6d8f5755b318fc33cf32682b7",
+    "frozen_plan_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\milestones\\RAG_M4_0_BASELINE.plan.json",
+    "api_commands_record": "E:\\WK\\run\\rag-m40-20261018\\commands.json"
+  },
+  "runtime_cleanup_verification": {
+    "process_states": [
+      {
+        "batch_id": "batch-002",
+        "port": 58103,
+        "pid": 904,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-004",
+        "port": 51443,
+        "pid": 48756,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-005",
+        "port": 49212,
+        "pid": 13308,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-006",
+        "port": 59436,
+        "pid": 40644,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-007",
+        "port": 54037,
+        "pid": 40556,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-008",
+        "port": 49634,
+        "pid": 17592,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-009",
+        "port": 49761,
+        "pid": 48660,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-010",
+        "port": 51425,
+        "pid": 14696,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-011",
+        "port": 54429,
+        "pid": 27436,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-012",
+        "port": 54554,
+        "pid": 38680,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      },
+      {
+        "batch_id": "batch-013",
+        "port": 60124,
+        "pid": 24392,
+        "state": null,
+        "exit_code": 1,
+        "worker_started": false
+      }
+    ],
+    "listener_check_ports": [
+      58103,
+      51443,
+      49212,
+      59436,
+      54037,
+      49634,
+      49761,
+      51425,
+      54429,
+      54554,
+      60124
+    ],
+    "listeners_found": false,
+    "processes_found": false,
+    "check_method": "Get-NetTCPConnection -State Listen for recorded ports and Win32_Process for recorded PIDs; no rows returned"
+  },
+  "execution_command_records": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py miracl-91294 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-005"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py miracl-7049630 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-006"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py longbench-6770736a --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-007"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py longbench-51abd206 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-008"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py hotpot-5a7631 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-009"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py hotpot-5a8ad6 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-010"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py mml-0434 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-011"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py mml-0959 --continue-after-prior-unknown",
+      "exit_code": 0,
+      "batch_id": "batch-012"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\run_m4_case_resume.py omni-page012 --continue-after-prior-unknown",
+      "exit_code": 3,
+      "batch_id": "batch-013",
+      "result": "LOCAL_EXECUTION_LIMIT_DENIED before Rerank Provider send"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\build_m4_continuation_results.py",
+      "exit_code": 0,
+      "result": "derived accounting and offline scorer aggregation; no Provider call"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\finalize_m4_continuation_results.py",
+      "exit_code": 0,
+      "result": "added per-stage target document ranks, process cleanup check inputs, and continuation invocation records; no Provider call"
+    }
+  ],
+  "initial_no_provider_failures": [
+    {
+      "batch_id": "batch-001",
+      "status": "BLOCKED_PRE_SEND",
+      "provider_calls": 0,
+      "evidence": "batch-001/api-run.json"
+    },
+    {
+      "batch_id": "batch-003",
+      "status": "BLOCKED_LOCAL_RUNNER_SETUP",
+      "provider_calls": 0,
+      "evidence": "batch-003/api-run.json"
+    }
+  ]
+}

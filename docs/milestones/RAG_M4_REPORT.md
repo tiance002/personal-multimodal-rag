@@ -1,6 +1,6 @@
 # RAG-M4.0：六套统一评测首轮准备
 
-**最新状态：M4_PARTIAL_STOPPED_UNKNOWN。tenant 332 正常 API 接线已完成；真实问答 1/11 完成，下一题在最终 Cheap 请求超时并留下 UNKNOWN，按授权停止后续外发。**
+**最新状态：M4_PARTIAL_STOPPED_UNKNOWN_AND_BATCH_LIMIT。tenant 332 正常 API 接线已完成；11个冻结样本均已尝试，9个完整完成、1个最终 Cheap 请求 UNKNOWN、Omni page012 在 Rerank 发送前被每批预留门禁拒绝。详见文末续跑结果。**
 
 下文较早的准备和身份阻断内容均按发生时状态保留；tenant 332 的独立正式 API 接线及真实问答续报见本报告末尾“真实问答执行续报”。
 
@@ -93,3 +93,40 @@ Owner 已明确批准本轮冻结 11 题：最多 132 次 Provider、600,000 Tok
 证据目录为 `E:\WK\run\rag-m40-20261018\batch-002` 与 `batch-004`。批次 API、执行账本及阶段轨迹的 SHA-256 见 [机器结果](RAG_M4_REAL_EXECUTION_20261018.results.json)。API 进程状态为 stopped、退出码 1，端口 51443 无监听；没有停止或清理原有 PostgreSQL/Redis。真实 Edge 页面验收未执行。
 
 结果状态为 **`M4_PARTIAL_STOPPED_UNKNOWN`**。本轮未运行六套其余问题，也未计算 SciFact QA 准确率；如要继续，必须先由负责人决定如何处理本次 UNKNOWN 之后的评测授权与批次。未因超时改变模型、问题、Rerank、路由或索引。机器核对与累计账本见 [真实执行结果](RAG_M4_REAL_EXECUTION_20261018.results.json)。
+
+## 真实问答续跑与阶段性质量基线（2026-10-18）
+
+Owner 随后指示继续本轮已授权评测。继续执行时保留 SciFact 339 的原始 UNKNOWN 及其 9,468 Token 保守占用，没有重发该问题，也没有扩大总授权或每批 12 次 Provider / 100,000 Token 限额。11个冻结样本至此均已有一次实质执行记录；9题完整结束，SciFact 339 未取得答案，Omni page012 在 Rerank 请求发送前被本地单批预留限制阻断。没有重建索引、改问题、Gold、模型、Prompt、Rerank 阈值或 DYNAMIC。
+
+### 六套样本执行结果
+
+以下来源指标均按冻结 qrels 将 chunk 排序投影到原始来源/文档后逐阶段计算，限于本轮选定的小型子集；不代表官方全语料检索分数。Context 来源命中也不等同于精确事实已被生成或答案正确。LongBench 的两个任务分开评分；SciFact 和 MIRACL 没有回答 Gold；Omni 没有官方 QA Gold。
+
+| 数据集 / QID | 完成状态 | Search 正来源 | Rerank 正来源 | Context 正来源 | 答案指标及观察 |
+|---|---|---:|---:|---:|---|
+| SciFact 247 | 完整完成 | 1/1，rank 1 | 1/1 | 1/1 | 无答案 Gold。系统基于来源说明现有文章不支持“化学损伤抑制 TG2”的断言；这不是官方答案准确率。 |
+| SciFact 339 | 生成超时，UNKNOWN | 1/1，rank 1 | 1/1 | 1/1 | 600 秒后 Cheap 请求超时；assistant 未完成。保留 UNKNOWN 9,468 Token，不重发。 |
+| MIRACL-ZH 91294 | 完整完成 | 1/1，rank 1 | 1/1 | 1/1 | 仅有 passage qrels，无答案指标；相关 passage 到达 Context。 |
+| MIRACL-ZH 7049630 | 完整完成 | 1/1，rank 1 | 1/1 | 1/1 | 仅有 passage qrels，无答案指标；相关 passage 到达 Context。 |
+| LongBench DuReader 6770736a | 完整完成 | 1/1，rank 1 | 1/1 | 1/1 | 固定官方任务 scorer ROUGE-ZH = **0.3273**。只代表该选中题。 |
+| LongBench MultiFieldQA-ZH 51abd206 | 完整完成 | 1/1，rank 1 | 1/1 | 1/1 | 固定官方任务 scorer QA F1-ZH = **0.0909**。回答包含“2.2万人”，但声称资料没有年份；实际 Context 标题明确为2005年报告，属于回答未利用已送达证据。 |
+| HotpotQA 5a7631 | 完整完成 | 2/2，rank 1、3 | 1/2 | 1/2 | EM 0、token F1 0.0400。答案拒答并建议外部搜索；第二个 Gold 来源在 Rerank 前命中、Rerank 后丢失，当前 Context 不足以答出 Franconia。 |
+| HotpotQA 5a8ad6 | 完整完成 | 2/2，rank 1、2 | 1/2 | 1/2 | EM 0、token F1 0.1053；回答句中包含 Gold 实体 “Zeffirelli”，且 Context 支持该实体。EM 受完整句子格式影响，支持事实与字符串 EM 分开看。 |
+| MMLongBench-Doc 0434 | 完整拒答 | 1/1，rank 1 | 0/1 | 0/1 | 项目诊断 EM 0、字符 F1 0.0583，官方 judge 未运行。搜索命中原 PDF，但 Rerank 无候选通过，最终 Context 为空；Cheap 明确说没有对应材料。 |
+| MMLongBench-Doc 0959 | 完整完成 | 1/1，rank 1 | 1/1 | 1/1 | 项目诊断 EM 0、字符 F1 0.0200，官方 judge 未运行。实际 Context 同时有 radiowaves 与 microwaves，回答提及两者且受来源支持；该冻结 typed Gold 是 Python list 的字符串序列化，字符串指标不能代表语义质量。 |
+| OmniDocBench page012 | 部分执行，未生成 | 目标来源在 Search rank 1 | **NOT RUN** | **NOT RUN** | 仅有解析 Gold、没有官方 QA Gold。Rerank 预留在 Provider 发送前被 `LOCAL_EXECUTION_LIMIT_DENIED` 拦截；无 Rerank、生成或答案评分。 |
+
+阶段合计：12个冻结 qrels 正来源（不含无 QA Gold 的 Omni）均进入 Search；9/12 进入 Rerank 与 Context。主要具体丢失发生在 Hotpot 两题各丢失一个多跳来源，以及 MML-0434 的正确文档在 Rerank 后没有任何候选保留。Omni 目标来源虽在 Search 首位，但其 Rerank 尚未发送，不能归因于模型过滤。
+
+### 用量、运行与解释
+
+- 累计实际 Provider 请求 **45**：SiliconFlow Xing4.0-29B 21次、BGE-M3 13次、BGE Reranker 10次；DeepSeek Flash 1次（SciFact 247 在 Cheap 返回 `length` 后由原 DYNAMIC 因 `TRUNCATION` 升级）。
+- 已结算/供应商报告 Token **103,747**；SciFact 339 的 UNKNOWN 另保守占用 **9,468**；累计保守占用 **113,215 / 600,000**。余下授权上限为87次 Provider、486,785 Token，但 UNKNOWN 本身未释放。
+- 各完整批次为4–5次 Provider；Omni page012 批次只结算 2 次前置调用、2,587 Token，之后 Rerank 预留在发送前失败，未形成 UNKNOWN，也没有最终回答。不能通过扩大单批限制或缩减 Rerank 候选来补出 PASS。
+- 完整 RAG 样本的批次墙钟耗时约 42.7–220.9 秒；SciFact 339 超时批次约 779.5 秒（其中 Cheap 等待 600 秒）。这是批次总耗时，不是逐 Provider 延迟拆分。
+- SSE/history 对 batch-005 至 batch-012 的8个完整答案有逐项一致性记录。SciFact 247 的 SSE complete 和持久化回答均存在，但该批采集器没有保存可逐字比较的 SSE 答案体，因此一致性标为未验证；SciFact 339 为错误终态且无已完成答案；Omni 的 SSE 结束事件带失败码、assistant 未完成。续跑期间的独立 API 均结束并停止，Worker 未启动。
+- 真实答案指标严格按各自 Gold 适用性报告。LongBench 分任务，Hotpot 不计算句级 supporting/joint，MML string 指标与来源事实核对分开，Omni 不报 QA 成绩。Small-sample 结果不可外推为全语料质量。
+
+结果为 **`M4_PARTIAL_STOPPED_UNKNOWN_AND_BATCH_LIMIT`**，不是统一六套基线完成。当前可指导的下一步是先解决现有机制中的精确证据丢失：Hotpot 多跳第二来源被 Rerank 丢弃、MML-0434 的正确来源 Rerank 空集；Omni page012 需在不超出本轮单批授权的情况下另行决定是否重新授权执行。MML-0959 的答案虽然有来源支持，其 Gold 序列化仍使项目字符串分数不适合作为语义准确率。
+
+复核命令与机器结果见 [续跑结果 JSON](RAG_M4_CONTINUATION_20261018.results.json)。续跑入口为 `E:\RAG quention\.venv\Scripts\python.exe -B E:\WK\run\rag-m40-20261018\run_m4_case_resume.py <frozen-case-id> --continue-after-prior-unknown`：batch-005 至 batch-012 退出码0，batch-013 退出码3（发送前门禁拒绝）；两个早期失败 batch-001/003 的 Provider 调用数均为0。离线评分/结果整理命令 `E:\RAG quention\.venv\Scripts\python.exe -B E:\WK\run\rag-m40-20261018\build_m4_continuation_results.py` 退出码0。逐题 SSE、Provider 回执和阶段快照保存在 `E:\WK\run\rag-m40-20261018\batch-002`、`batch-004` 至 `batch-013`；评分只读冻结 Gold 与已固定 LongBench scorer，没有新增云调用。API 记录端口与进程的只读检查退出码0，未发现监听器或残留 API 进程。
