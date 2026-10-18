@@ -16,7 +16,7 @@ from PIL import Image
 from backend.app.domain.models import NormalizedDocument
 from backend.weknora_port.ingestion.core import DocumentRequest, ParserRegistry, ingest_document
 from backend.weknora_port.ingestion.mineru import (
-    ENGINE, LocalMinerUParser, MinerUError, MinerUSettings, chunk_locators,
+    ENGINE, EXTENSIONS, LocalMinerUParser, MinerUError, MinerUSettings, chunk_locators,
     local_environment, normalize_archive, pending_image_assets, public_chunk_locators,
 )
 
@@ -217,15 +217,14 @@ def test_network_guard_denies_including_loopback_and_config_requires_explicit_pa
         MinerUSettings.from_environment({"WEKNORA_PORT_MINERU_ENABLED": "1"})
 
 
-def test_development_env_enables_only_explicit_extensions(tmp_path):
+def test_development_env_enabled_mineru_has_supported_defaults(tmp_path):
     from test_development_entry import settings, development_environment
     from backend.weknora_port.development import DevelopmentSettings, DevelopmentConfigurationError
     env = development_environment(settings(tmp_path))
     assert DevelopmentSettings.from_environment(env).mineru_settings is None
     env.update(WEKNORA_PORT_MINERU_ENABLED="1", WEKNORA_PORT_MINERU_PYTHON=str(tmp_path / "python.exe"),
         WEKNORA_PORT_MINERU_MODEL_ROOT=str(tmp_path / "models"), WEKNORA_PORT_MINERU_TEMP_ROOT=str(tmp_path / "temp"))
-    with pytest.raises(DevelopmentConfigurationError, match="EXPLICIT_EXTENSIONS_REQUIRED"):
-        DevelopmentSettings.from_environment(env)
+    assert set(DevelopmentSettings.from_environment(env).mineru_extensions) == set(EXTENSIONS)
     env["WEKNORA_PORT_MINERU_EXTENSIONS"] = ".png,.pdf"
     config = DevelopmentSettings.from_environment(env)
     assert config.mineru_settings.python == tmp_path / "python.exe"
@@ -311,7 +310,7 @@ def test_default_image_still_enters_existing_image_task_queue(tmp_path):
     from backend.weknora_port.documents import DocumentLifecycleService
     calls = []
     class Queue:
-        async def create(self, *args): calls.append("create")
+        async def create(self, *args, **kwargs): calls.append("create")
         async def start(self): calls.append("start")
     async def exercise():
         config = replace(fixture_settings(PRINCIPAL), image_processing_config={"enable_multimodal": True})

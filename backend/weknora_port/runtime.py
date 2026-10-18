@@ -735,7 +735,15 @@ class ApplicationRuntime:
                  'caption_model_id','description_language','custom_instructions'}
         if set(value)-allowed or ('enable_multimodal' in value and type(value['enable_multimodal']) is not bool):
             raise ValueError('IMAGE_CONFIG_INVALID')
+        if value.get('ocr_adapter') in {'tesseract','vlm'}:
+            raise ValueError('IMAGE_OCR_ADAPTER_RETIRED')
+        if value.get('ocr_model_id'):
+            raise ValueError('IMAGE_OCR_MODEL_RETIRED')
         cfg=effective_image_config(kb,value)
+        if cfg.get('ocr_adapter') == 'mineru':
+            cfg.pop('ocr_model_id',None)
+        elif not cfg.get('ocr_adapter'):
+            cfg['ocr_adapter']='mineru'
         cfg['enable_multimodal']=value.get('enable_multimodal',bool(cfg.get('enable_multimodal',False)))
         if cfg['enable_multimodal']:
             await resolve_image_selection(kb,value,self.models,self.catalogue,

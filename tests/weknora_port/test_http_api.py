@@ -212,14 +212,20 @@ def test_runtime_identity_and_read_envelopes_use_server_resolved_principal():
     asyncio.run(exercise())
 
 
-def test_upload_keeps_image_model_overrides_and_rejects_retired_page_selector():
+def test_upload_accepts_mineru_and_rejects_retired_ocr_adapters_and_page_selector():
     async def exercise():
         runtime, _, client = make_client()
         async with client:
             accepted = await client.post("/api/v1/knowledge-bases/kb-1/documents",
-                data={"process_overrides": json.dumps({"ocr_adapter": "tesseract",
+                data={"process_overrides": json.dumps({"ocr_adapter": "mineru",
                     "caption_mode": "explicit", "caption_model_id": "deepseek-config-id"})},
                 files={"file": ("b3.pdf", b"synthetic-pdf-bytes", "application/pdf")})
+            for adapter in ("tesseract", "vlm"):
+                rejected_ocr = await client.post("/api/v1/knowledge-bases/kb-1/documents",
+                    data={"process_overrides": json.dumps({"ocr_adapter": adapter})},
+                    files={"file": ("retired.pdf", b"synthetic-pdf-bytes", "application/pdf")})
+                assert rejected_ocr.status_code == 422
+                assert rejected_ocr.json()["error"]["code"] == "OCR_ADAPTER_DISABLED_USE_MINERU"
             for name, media in (("b3.pdf", "application/pdf"), ("b3.txt", "text/plain")):
                 rejected = await client.post("/api/v1/knowledge-bases/kb-1/documents",
                     data={"process_overrides": json.dumps({"image_pages": [9]})},
@@ -236,7 +242,7 @@ def test_upload_keeps_image_model_overrides_and_rejects_retired_page_selector():
                 json={"image_pages": [9]})
         assert accepted.status_code == 200
         assert runtime.upload_calls[0] == ("kb-1", "b3.pdf", "application/pdf", {
-            "ocr_adapter": "tesseract", "caption_mode": "explicit",
+            "ocr_adapter": "mineru", "caption_mode": "explicit",
             "caption_model_id": "deepseek-config-id"})
         assert config_rejected.status_code == 422
         assert config_rejected.json()["error"]["code"] == "REQUEST_INVALID"

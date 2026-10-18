@@ -520,6 +520,9 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
                 any(not isinstance(value,str) for key,value in overrides.items() if key in allowed_strings))
             if invalid:
                 raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID')
+            ocr_adapter=overrides.get('ocr_adapter')
+            if ocr_adapter not in (None,'','mineru'):
+                raise HTTPException(status_code=422,detail='OCR_ADAPTER_DISABLED_USE_MINERU')
         result = await runtime.upload_document(who, knowledge_base_id, file.filename or "upload",
                                                file.content_type or "application/octet-stream", file,overrides)
         return json_data(request, result)

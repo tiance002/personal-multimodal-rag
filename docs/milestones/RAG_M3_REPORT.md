@@ -362,3 +362,44 @@ Qwen3-4B仅完成官方合同和冻结输入的只读准备，没有账户／模
 | 原OCR版本回查、完整OCR实际wire包含、raw SSE／解码逐项一致性断言 | **0**；原件／原文未改写 |
 
 新机器结果为 `docs/milestones/RAG_M3_3_FIXED_EVIDENCE.results.json`；完整输入、原始SSE、decoded events、源图核对、预留／结算、官方合同准备、未运行分支、命令日志和哈希清单位于 `E:\WK\run\rag-m33-20261018`。本次仅提交局部工具、必要测试、本报告增补和新结果JSON；此前M3报告逐字节保留为前缀，M3.2结果不改写。提交前实际执行JSON一致性及 `git diff --check`／`git diff --cached --check`，结果保留于证据根。最终完整commit SHA以本次交付及该节对应 `git log` 为准，避免自包含提交哈希。本轮不Push、合并、部署、打Tag或继续扩展。
+
+
+## M3.4：MinerU OCR切换与矩阵布局验收（2026-10-18）
+
+**最终结论 `LAYOUT_RECOVERABLE`：新的MinerU结果可恢复完整矩阵；历史Tesseract样本仅为 `LAYOUT_PARTIAL`，两者不混为同一版本成绩。** 起始HEAD `d370ae6007394263cd2313912caf78db0345a8b3`。Owner中途明确将范围修订为统一本地MinerU4.0.12 Basic/ONNX并关闭Tesseract；本节按该最新决定交付，生产查询理解、Rerank、Cheap/Expensive和DYNAMIC没有修改。
+
+历史OCR实际登记为本地Tesseract，237字符SHA仍为 `088a9086…d3c144`。只读PG核对：23/23条line的text/start/end精确对应正文，bbox均在2667×1500原图范围内，task outcomes与chunk.image_info的layout/text一致，sanitize_ocr对本样本未改字。布局只够定位12个完整整数与4个局部水平带；`-—-2`不修成预期数字，混合文字与多行共享大框不拆成假单元格。历史数据没有布局持久化丢失，但原文渲染不使用坐标；父块图像聚合/公开回读会投影掉layout。另有sanitize改字却保留旧offset的条件性风险，本轮用合成反例证明并记录，未迁移旧资料或将其误判为本图根因。
+
+本机实测隔离Python3.12.7、MinerU4.0.12、ONNXRuntime1.31.0及本地模型可用，配置small_backend=onnx、CPU执行，runner使用Basic/ocr、image_analysis=false并拒绝所有socket连接。原检查到的启动环境未启用MinerU，所以没有把历史“代码集成”冒充正常运行。本次独立单图本地解析得到434字符派生证据、5份资产，middle_json中两个明确bmatrix分别为3×3和3×4：
+
+```text
+coefficient = [1,-2,1; 0,2,-8; -4,5,9]
+augmented   = [1,-2,1,0; 0,2,-8,8; -4,5,9,-9]
+```
+
+以上来自MinerU真实equation_inline内容的`\\`行分隔和`&`列分隔，没有将Gold或正确答案写进识别规则。每格保留原span字符区间、middle JSON pointer、页与原始块级归一化bbox；块坐标不是独立单元格像素框。独立只读诊断仅对数值空白做派生解释，原LaTeX/原图/MinerU sidecar都保留并分别标记派生来源。
+
+### 正常运行接线与验证边界
+
+已配置的MinerU现在是支持图片及纯扫描PDF的正常默认解析器；PDF存在原生文本层时仍走原提取，显式MinerU输入不支持时清楚失败。支持 `.png/.jpg/.jpeg/.bmp/.webp/.tif/.tiff` 单帧图片和纯扫描PDF；GIF/SVG、多帧图像、加密PDF及混合PDF内扫描页的自动OCR不在该路径支持范围。未注册本地MinerU时明确报错，不回退Tesseract或云OCR。
+
+新OCR配置只接受MinerU，旧Tesseract/VLM OCR新配置、上传override和旧pinned任务均被拒绝；SourceImageProcessor不再导入或调用Tesseract。其待处理图片复用现有MinerU parser，保留原始派生文字/结构映射，不经sanitize破坏locator。独立Caption的视觉模型验证/配置保留，本轮未实际调用Caption；MinerU自身未启用图像语义分析。parser_complete资源不再进入第二次图片OCR。历史Tesseract代码/记录暂存以便回查，没有大规模删除。
+
+**已实际通过正常loopback HTTP上传，不只是注册代码：** 隔离KB `9eb8b480-5c17-4833-b1f2-488dc080a8d0` 中图片document `cbb92efd-0f8b-4c31-9a02-30a6b547d8a4`、version `fab3f5df-a61d-4a6e-ab6c-9df4629cf6ed` 完成，parser=mineru-basic，Chunk `a6127d62-2252-401b-bf9f-e814f1c4ee99` 保留434字符及来源映射；正常GET `/api/v1/chunks/{id}` 回读HTTP200，source_locators/sidecar SHA/页/版本有效。上传本地解析18.871秒、HTTP19.103秒。新文本PDF对照document `382bfbe4-386e-459a-bfbf-e3bd2b73087a` 也completed，parser=pdf、没有调用MinerU。两份新文档共2条关键词索引。隔离配置为vector=false、keyword=true、无summary模型、cloud_allowed=false；没有Embedding/生成请求，也不将本次称为向量RAG问答验收。该入口本次同步处理上传，Worker未运行，不虚报Worker验收。
+
+本轮本地MinerU共2次：单图离线诊断1次＋条件满足后一个新隔离文档的正常上传1次；后者用于验证实际应用接线，不是重试选优。Tesseract执行0，云Provider0、Token0、新UNKNOWN0，Provider表前后仍245行。只创建新KB/新文档与新资产目录，原Chunk、版本、索引、历史账本和8条原有脏路径保留。自有临时API已停止，原服务未替换。
+
+### 命令、修复和限制
+
+实际解释器 `E:\RAG quention\.venv\Scripts\python.exe`，证据根 `E:\WK\run\rag-m34-20261018`：
+
+- `-B read_layout.py`：退出0，只读PG身份/布局快照。
+- `-B scripts/rag_m34_ocr_layout.py --snapshot ... --output ... --text-output ...`：退出0，旧样本PARTIAL及逐值来源文本。
+- `-B scripts/weknora_port_mineru_offline.py --source <冻结原图> --live-local-basic --python E:\WK\mineru-env\Scripts\python.exe --model-root E:\WK\run\p10-mineru\models --temp-root <本轮短路径> --output ... --save-assets`：退出0，真实本地Basic解析，不是重放。
+- `-B scripts/rag_m34_mineru_matrix.py --middle ... --derived-text ... --output ...`：退出0，两个矩阵全部数值可回查。
+- `normal_upload.py`最初退出1：图片实际已completed，工具误读DTO的parse_status而非status；保留失败且没有重传图片。`normal_readback.py`完成新的文本PDF对照后，因只读SQL误用了不存在的embeddings.tenant_id退出1；修正为tenant限定KB join。`normal_readback_only.py`退出0，仅GET/只读回查，未再上传或OCR。原失败日志保留。
+- 最终受影响7个测试文件（image_configuration/image_processing/http_api/m34_mineru_routing/mineru/development_entry/rag_m34_ocr_layout）合并命令退出0：**87 passed in 1.92s**，`pytest-delivery.log`。首轮缺basetemp父目录、旧默认预期和旧Queue fake未接受source_sha256关键字的失败记录均保留；新默认断言按Owner决定调整，新增损坏符号/错位拒绝反例保留。
+
+正常入口需明确配置 `WEKNORA_PORT_MINERU_ENABLED=1`、`WEKNORA_PORT_MINERU_PYTHON=E:/WK/mineru-env/Scripts/python.exe`、`WEKNORA_PORT_MINERU_MODEL_ROOT=E:/WK/run/p10-mineru/models`、`WEKNORA_PORT_MINERU_TEMP_ROOT=<D/E盘短路径>`。本轮隔离实例已实际使用，日常服务尚未重启/部署；下一项Owner已批准的旧入口收敛任务将把这些设置纳入唯一正式启动命令。
+
+没有证明当前Cheap收到新LaTeX后一定答对，值得下一次单独授权的有限生成验证，本轮未运行。尚存单元格像素框、混合PDF扫描页OCR、Caption真实执行等未验证项，不以矩阵正确就声称整个多模态RAG已通过。诊断JSON `RAG_M3_4_OCR_LAYOUT.results.json` 保存真实命令/回执路径、source identity和限制。原报告内容保持为前缀，仅本地提交，不Push/部署/合并/Tag。

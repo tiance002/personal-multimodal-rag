@@ -1,10 +1,10 @@
 """Bounded source image OCR/caption main-entry binding, independent of P5."""
 from __future__ import annotations
-import base64,json,re,uuid
+import asyncio,base64,json,mimetypes,re,uuid
 from pathlib import Path
 from .documents import DocumentLifecycleError,_json_object
 from .image_configuration import resolve_image_selection,validate_pinned_selection
-from .tesseract_ocr import TesseractOCR
+from .ingestion.core import DocumentRequest
 from .document_profile import language_name
 from .conversation_configuration import resolve_language
 from .models.types import CallContext,TrustedScope,Message,ProviderError
@@ -14,6 +14,45 @@ from .storage.chunks import StoredChunk,ChunkPlan
 from .storage.indexing import IndexInfo
 
 PROMPTS=json.loads((Path(__file__).with_name('profile_assets')/'vlm_ocr_prompts.json').read_text())
+
+
+async def _parse_image_ocr(app,principal,kb,scope,asset):
+    filename=Path(asset.path).name
+    if not Path(filename).suffix:
+        filename+=mimetypes.guess_extension(asset.media_type) or ''
+    if not Path(filename).suffix:
+        raise DocumentLifecycleError('IMAGE_MINERU_SOURCE_TYPE_UNSUPPORTED')
+    parsers=getattr(app.documents,'parser_registry',None)
+    if parsers is None:
+        raise DocumentLifecycleError('IMAGE_MINERU_PARSER_REQUIRED')
+    try:
+        parsers.resolve('mineru-basic',filename)
+    except Exception:
+        raise DocumentLifecycleError('IMAGE_MINERU_PARSER_REQUIRED') from None
+    request=DocumentRequest(filename=filename,data=asset.data,owner_id=principal.subject_id,
+        knowledge_base_id=kb['id'],document_id=scope.knowledge_id,
+        source_version=scope.source_version,parser_engine='mineru-basic')
+    try:
+        engine,parsed=await asyncio.to_thread(parsers.parse,request)
+    except Exception as error:
+        code=getattr(error,'code','')
+        raise DocumentLifecycleError(code or 'IMAGE_MINERU_PARSE_FAILED') from None
+    if engine!='mineru-basic':
+        raise DocumentLifecycleError('IMAGE_MINERU_PARSER_MISMATCH')
+    if parsed.failures:
+        code=parsed.failures[0].code if parsed.failures else 'IMAGE_MINERU_PARSE_FAILED'
+        raise DocumentLifecycleError(code or 'IMAGE_MINERU_PARSE_FAILED')
+    if not parsed.content.strip():
+        raise DocumentLifecycleError('IMAGE_OCR_EMPTY')
+    metadata=dict(parsed.metadata)
+    mineru_source=metadata.get('mineru_source')
+    if not isinstance(mineru_source,dict):mineru_source={}
+    source_map={'schema':'mineru-image-source-map-v1','parser_engine':engine,
+        'parser_version':mineru_source.get('parser_version',''),
+        'mineru_source':mineru_source,
+        'source_locators':metadata.get('source_locators',[]),
+        'mineru_blocks':metadata.get('mineru_blocks',[])}
+    return parsed.content,source_map
 
 
 def caption_prompt(language,instructions=''):
@@ -114,11 +153,13 @@ class SourceImageProcessor:
                         states[kind]={'status':'unavailable','error':selection.caption_error}
                         continue
                     try:
-                        if binding.adapter=='tesseract':
-                            ocr=await __import__('asyncio').to_thread(TesseractOCR().recognize,asset.data,asset.media_type)
-                            value=ocr.text;layout=ocr.layout
-                            if ocr.error:raise DocumentLifecycleError(ocr.error)
+                        if kind=='ocr_text':
+                            if binding.adapter!='mineru':
+                                raise DocumentLifecycleError('IMAGE_OCR_ADAPTER_RETIRED')
+                            value,layout=await _parse_image_ocr(app,principal,kb,scope,asset)
                         else:
+                            if binding.adapter!='vlm':
+                                raise DocumentLifecycleError('IMAGE_CAPTION_ADAPTER_INVALID')
                             # The task pins identity; authorization and current
                             # model availability are checked again per send.
                             await app.models.resolve(binding.model_id)
@@ -126,7 +167,7 @@ class SourceImageProcessor:
                             if on_before is not None:await on_before(index,kind)
                             response=await model.vision((Message('user',prompt,images=(image,)),),None,context.child(kind))
                             value=response.content if response else ''
-                        value=sanitize_ocr(value) if kind=='ocr_text' else go_strip(value)
+                            value=go_strip(value)
                         if not value:raise DocumentLifecycleError('IMAGE_'+('OCR' if kind=='ocr_text' else 'CAPTION')+'_EMPTY')
                         results[kind]=value
                         states[kind]={'status':'completed','error':'','binding':binding.public()}

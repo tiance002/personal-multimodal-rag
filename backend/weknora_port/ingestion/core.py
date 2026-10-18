@@ -473,6 +473,7 @@ class ParserRegistry:
     def __init__(self) -> None:
         self._engines: dict[str, _Engine] = {}
         self._defaults: dict[str, str] = {}
+        self.scanned_pdf_engine: str = ""
         self._register_defaults()
 
     def register(self, name: str, extensions: Sequence[str], parser: Parser, *, default: bool = False) -> None:
@@ -526,6 +527,16 @@ class ParserRegistry:
             raise ValueError("legacy OLE document renamed as .docx requires the DOC reader")
         override_engine = _effective_parser_overrides(request).get(ext.lstrip("."))
         requested = request.parser_engine or override_engine or ""
+        if not requested and ext == '.pdf' and self.scanned_pdf_engine:
+            # Native (including existing OCR-layer) PDFs keep the native path.
+            # Only a readable, wholly image-based PDF selects local Basic OCR.
+            try:
+                import fitz
+                with fitz.open(stream=request.data, filetype='pdf') as document:
+                    if not document.needs_pass and len(document) and not any(page.get_text().strip() for page in document):
+                        requested = self.scanned_pdf_engine
+            except Exception:
+                pass  # Let the existing native parser report invalid PDFs.
         engine_name = self.resolve(requested, request.filename)
         engine = self._engines[engine_name]
         try:

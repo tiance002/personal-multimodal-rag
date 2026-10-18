@@ -1,9 +1,4 @@
-"""Pinned image bindings for the owner-approved OCR/Caption split.
-
-The fixed WeKnora source has one VLM binding.  This module keeps its model
-catalogue and image wire path, while resolving the two image roles separately.
-It never probes a provider to infer image capability.
-"""
+"""Pinned local MinerU OCR and independent visual Caption bindings."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -46,11 +41,6 @@ def effective_image_config(kb: Mapping[str, Any], override: Mapping[str, Any] | 
     base.pop("image_pages", None)
     if override is not None and "image_pages" in override:
         raise DocumentLifecycleError("IMAGE_PAGES_UNSUPPORTED")
-    vlm = _json_object(kb.get("vlm_config"))
-    if vlm.get("enabled") and vlm.get("model_id") and not base.get("ocr_model_id"):
-        base["ocr_model_id"] = vlm["model_id"]
-    if not base.get("ocr_adapter") and base.get("ocr_model_id"):
-        base["ocr_adapter"] = "vlm"
     if override:
         for key in ("ocr_adapter", "ocr_model_id", "caption_mode", "caption_model_id",
                     "description_language", "custom_instructions"):
@@ -61,6 +51,8 @@ def effective_image_config(kb: Mapping[str, Any], override: Mapping[str, Any] | 
             base.pop('caption_model_id', None)
         elif override.get('caption_model_id') and not override.get('caption_mode'):
             base['caption_mode'] = 'explicit'
+    if base.get('ocr_adapter') in (None, '', 'mineru'):
+        base.pop('ocr_model_id', None)
     return base
 
 
@@ -91,17 +83,14 @@ async def _vision_binding(model_id: str, source: str, model_store: Any,
 async def resolve_image_selection(kb: Mapping[str, Any], override: Mapping[str, Any] | None,
                                   model_store: Any, catalogue: Any, context: CallContext) -> ImageSelection:
     cfg = effective_image_config(kb, override)
-    adapter = cfg.get("ocr_adapter") or ""
-    if adapter == "tesseract":
-        ocr = ImageBinding("tesseract", source="upload" if override and override.get("ocr_adapter") else "knowledge_base",
-                           capability="LOCAL_ENGINE")
-    elif adapter == "vlm":
-        model_id = cfg.get("ocr_model_id") or ""
-        ocr = await _vision_binding(model_id,
-            "upload" if override and override.get("ocr_model_id") else "knowledge_base",
-            model_store, catalogue, context)
-    else:
+    if override and override.get("ocr_model_id"):
+        raise DocumentLifecycleError("IMAGE_OCR_MODEL_RETIRED")
+    adapter = cfg.get("ocr_adapter") or "mineru"
+    if adapter in {"tesseract", "vlm"}:
+        raise DocumentLifecycleError("IMAGE_OCR_ADAPTER_RETIRED")
+    if adapter != "mineru":
         raise DocumentLifecycleError("IMAGE_OCR_ADAPTER_INVALID")
+    ocr = ImageBinding("mineru", source="local_parser", capability="LOCAL_ENGINE")
     explicit = cfg.get("caption_model_id") or ""
     mode = cfg.get("caption_mode") or ("explicit" if explicit else "follow_ocr")
     if mode not in {"explicit", "follow_ocr"}:
@@ -115,8 +104,6 @@ async def resolve_image_selection(kb: Mapping[str, Any], override: Mapping[str, 
         return ImageSelection(ocr, caption)
     if explicit:
         raise DocumentLifecycleError("IMAGE_CAPTION_MODE_CONFLICT")
-    if ocr.adapter == "vlm":
-        return ImageSelection(ocr, ImageBinding("vlm", ocr.model_id, "ocr_inherited", ocr.capability))
     return ImageSelection(ocr, None, "IMAGE_CAPTION_VISION_MODEL_REQUIRED")
 
 
@@ -126,12 +113,11 @@ async def validate_pinned_selection(snapshot: Mapping[str, Any], model_store: An
     if snapshot.get('config_version') != 1 or not isinstance(snapshot.get('ocr'),dict):
         raise DocumentLifecycleError('IMAGE_TASK_CONFIG_INVALID')
     ocr_row=snapshot['ocr']
-    if ocr_row.get('adapter') == 'tesseract':
-        ocr=ImageBinding('tesseract',source=ocr_row.get('source',''),capability='LOCAL_ENGINE')
-    elif ocr_row.get('adapter') == 'vlm':
-        ocr=await _vision_binding(ocr_row.get('model_id',''),ocr_row.get('source',''),
-                                  model_store,catalogue,context)
-    else:raise DocumentLifecycleError('IMAGE_TASK_CONFIG_INVALID')
+    if ocr_row.get('adapter') in {'tesseract', 'vlm'}:
+        raise DocumentLifecycleError('IMAGE_OCR_ADAPTER_RETIRED')
+    if ocr_row.get('adapter') != 'mineru':
+        raise DocumentLifecycleError('IMAGE_TASK_CONFIG_INVALID')
+    ocr=ImageBinding('mineru',source=ocr_row.get('source','local_parser'),capability='LOCAL_ENGINE')
     caption_row=snapshot.get('caption')
     if caption_row is None:
         caption=None

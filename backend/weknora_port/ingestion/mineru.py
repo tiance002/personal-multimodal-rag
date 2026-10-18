@@ -330,8 +330,15 @@ class LocalMinerUParser:
                 failures=(ParseFailure("parse", code, type(exc).__name__, code),))
 
 
-def register_mineru(registry: ParserRegistry, settings: MinerUSettings) -> None:
+def register_mineru(registry: ParserRegistry, settings: MinerUSettings, *, default: bool = False) -> None:
     registry.register(ENGINE, EXTENSIONS, LocalMinerUParser(settings))
+    if default:
+        # Keep explicit scan-only behavior available to saved diagnostics while
+        # normal configured uploads use MinerU for images and scan-only PDFs.
+        for extension in EXTENSIONS:
+            if extension != '.pdf':
+                registry._defaults[extension] = ENGINE
+        registry.scanned_pdf_engine = ENGINE
 
 
 def pending_image_assets(assets: tuple[ParsedAsset, ...]) -> tuple[ParsedAsset, ...]:

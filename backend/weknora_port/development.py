@@ -62,7 +62,7 @@ class DevelopmentSettings:
             cloud_allowed=env.get('WEKNORA_PORT_CLOUD_ALLOWED','false').lower()=='true',
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
-                env.get('WEKNORA_PORT_MINERU_EXTENSIONS','').split(',') if v.strip()))
+                env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
 
 
 def own_storage(settings):
@@ -146,10 +146,10 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
         parsers=ParserRegistry()
         if settings.mineru_settings is not None:
             from .ingestion.mineru import register_mineru
-            register_mineru(parsers,settings.mineru_settings)
+            register_mineru(parsers,settings.mineru_settings,default=True)
         documents=DocumentLifecycleService(leases,settings.storage,principal=principal,resolve_kb_settings=kb_settings,
             embedder_for_kb=embedder,parser_registry=parsers,
-            parser_overrides={ext:'mineru-basic' for ext in settings.mineru_extensions}
+            parser_overrides={ext:'mineru-basic' for ext in settings.mineru_extensions if ext != '.pdf'}
                 if settings.mineru_settings is not None else None,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
