@@ -326,6 +326,9 @@ class ApplicationRuntime:
         from .models.transport import validate_endpoint,endpoint_urls,AsyncHTTPTransport
         from .models.provider import ProviderModel
         effective=config
+        execution = getattr(self, 'execution', None)
+        if execution is not None:
+            execution.install_gate(gate)
         if config.source=='local':
             if self.local_service is None:raise ProviderError('MODEL_LOCAL_SERVICE_UNAVAILABLE')
             effective=local_connection_config(config,self.local_service.base_url,allow_pull=self.local_service.allow_pull)
@@ -334,6 +337,8 @@ class ApplicationRuntime:
         if getattr(getattr(model,'transport',None),'gate',None) is not gate:
             raise ProviderError('RUNTIME_DURABLE_GATE_REQUIRED')
         if getattr(model,'config',None)!=effective:raise ProviderError('MODEL_FACTORY_IDENTITY_MISMATCH')
+        if execution is not None:
+            execution.observe_model(model)
         if config.source=='local':
             if not isinstance(model,ProviderModel) or not isinstance(model.transport,AsyncHTTPTransport):
                 raise ProviderError('RUNTIME_LOCAL_PROVIDER_REQUIRED')
@@ -536,9 +541,11 @@ class ApplicationRuntime:
         repository = LeasedKnowledgeRepository(self, registry)
         async def affinity(ids):
             return await self.memory.document_affinity(turn.memory_context,ids)
-        return RetrievalPipeline(
+        pipeline = RetrievalPipeline(
             repository, registry, on_progress=progress,
             persist_sink=self._persist_context, affinity_resolver=affinity)
+        execution = getattr(self, 'execution', None)
+        return execution.observe_pipeline(pipeline, turn) if execution is not None else pipeline
 
     async def _generation(self, turn, progress, *, policy=None):
         policy=policy or self.policy

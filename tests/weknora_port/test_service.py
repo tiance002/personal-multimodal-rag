@@ -239,10 +239,10 @@ def test_memory_unknown_lineage_fails_before_pipeline_and_chat():
     run(scenario())
 
 
-def test_memory_lineage_reaches_query_pipeline_and_both_chat_attempts_without_expanding_retrieval():
+def test_in_scope_memory_lineage_reaches_query_pipeline_and_both_chat_attempts():
     async def scenario():
         service,repo,retrieval,co,c,e,store,commit,counts=runtime()
-        async def known(context,query):return MemoryBundle('derived private background','memory',('kb-private',))
+        async def known(context,query):return MemoryBundle('derived private background','memory',('kb',))
         service.memory_loader.load=known
         original=service.pipeline_factory;seen=[]
         async def factory(turn,progress):
@@ -254,10 +254,33 @@ def test_memory_lineage_reaches_query_pipeline_and_both_chat_attempts_without_ex
         accepted=await service.accept_turn(REQ,'owner');await service.drain_background()
         assert not repo.failures and len(seen)==1
         assert seen[0].scope.knowledge_base_ids==('kb',)
-        assert seen[0].required_origin_kbs==('kb-private',)
+        assert seen[0].required_origin_kbs==('kb',)
         assert accepted.context.required_origin_kbs==()
-        assert c.calls[0][2].required_origin_kbs==e.calls[0][2].required_origin_kbs==('kb-private',)
+        assert c.calls[0][2].required_origin_kbs==e.calls[0][2].required_origin_kbs==('kb',)
     run(scenario())
+
+
+def test_out_of_scope_memory_is_omitted_together_with_its_lineage():
+    async def scenario():
+        service,repo,retrieval,co,c,e,store,commit,counts=runtime()
+        async def cross_kb(context,query):return MemoryBundle('private old title','private old fact',('kb-private',))
+        service.memory_loader.load=cross_kb
+        await service.accept_turn(REQ,'owner');await service.drain_background()
+        assert not repo.failures and len(retrieval.calls)==1 and len(c.calls)==len(e.calls)==1
+        for model in (c,e):
+            assert 'private old' not in ''.join(m.content for m in model.calls[0][0])
+            assert model.calls[0][2].scope.knowledge_base_ids==('kb',)
+            assert model.calls[0][2].required_origin_kbs==()
+    run(scenario())
+
+
+def test_scoped_memory_checks_origins_before_any_recall_or_embedding():
+    class P4:
+        async def recall(self,*args):raise AssertionError('out-of-scope recall must not run')
+        async def retrieval_context(self,*args):raise AssertionError('out-of-scope titles must not load')
+    async def origins(scope):return ('kb','kb-private')
+    bundle=run(OrdinaryMemoryLoader(P4(),origins).load_scoped(MemoryContext(1,'owner'),'question',TrustedScope('owner',('kb',))))
+    assert bundle==MemoryBundle()
 
 
 def test_shared_stop_marker_cancels_original_run_without_generation_retry_or_reader():

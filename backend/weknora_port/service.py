@@ -76,6 +76,15 @@ class OrdinaryMemoryLoader:
         self.memory_service = memory_service
         self.origin_resolver = origin_resolver
 
+    async def load_scoped(self, context, query, scope):
+        # Whole-subject memory has conservative, session-wide provenance.
+        # Check it before recall can embed or render out-of-scope document titles.
+        if self.origin_resolver is not None:
+            origins = tuple(await self.origin_resolver(resolve_scope(context)))
+            if not set(origins).issubset(scope.knowledge_base_ids):
+                return MemoryBundle()
+        return await self.load(context, query)
+
     async def load(self, context, query):
         recall = await self.memory_service.recall(context, query)
         value = await self.memory_service.retrieval_context(context)
@@ -281,14 +290,19 @@ class RuntimeService:
         await progress('history','completed')
         check_context(turn.context)
         await progress('memory','started')
-        memory=await self.memory_loader.load(turn.memory_context,turn.request.content)
+        scoped_loader = getattr(self.memory_loader, 'load_scoped', None)
+        memory = await scoped_loader(turn.memory_context, turn.request.content, turn.context.scope) if scoped_loader else await self.memory_loader.load(turn.memory_context,turn.request.content)
         if not isinstance(memory,MemoryBundle):
             raise ProviderError('MEMORY_BUNDLE_REQUIRED')
         model_context = turn.context
         if memory.background or memory.prompt:
             if not isinstance(memory.origin_kbs, tuple) or not memory.origin_kbs or not all(isinstance(k, str) and k for k in memory.origin_kbs):
                 raise ProviderError('MODEL_MEMORY_ORIGIN_UNKNOWN')
-            model_context = replace(turn.context, required_origin_kbs=tuple(sorted(set(turn.context.required_origin_kbs) | set(memory.origin_kbs))))
+            if set(memory.origin_kbs).issubset(turn.context.scope.knowledge_base_ids):
+                model_context = replace(turn.context, required_origin_kbs=tuple(sorted(set(turn.context.required_origin_kbs) | set(memory.origin_kbs))))
+            else:
+                # Drop the content together with its lineage; never relabel it.
+                memory = MemoryBundle()
         state.memory_background=memory.background
         await progress('memory','completed')
         check_context(turn.context)

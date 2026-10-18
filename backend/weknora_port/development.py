@@ -27,6 +27,7 @@ class DevelopmentSettings:
     mineru_settings:object|None=None
     mineru_extensions:tuple[str,...]=()
     cloud_allowed:bool=False
+    execution_file:Path|None=None
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -60,6 +61,7 @@ class DevelopmentSettings:
             tuple(v.strip() for v in env.get('WEKNORA_PORT_ORIGINS','http://127.0.0.1:5173,http://localhost:5173').split(',') if v.strip()),
             fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'),
             cloud_allowed=env.get('WEKNORA_PORT_CLOUD_ALLOWED','false').lower()=='true',
+            execution_file=Path(env['WEKNORA_PORT_EXECUTION_FILE']) if env.get('WEKNORA_PORT_EXECUTION_FILE') else None,
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
@@ -155,6 +157,9 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
             permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         runtime.authority_config_sha=None
+        if settings.execution_file is not None:
+            from .execution import LocalExecution
+            runtime.execution = LocalExecution(settings.execution_file)
         box['runtime']=runtime
         yield runtime
     finally:
