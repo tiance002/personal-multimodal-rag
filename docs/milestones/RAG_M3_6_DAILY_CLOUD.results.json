@@ -1,0 +1,136 @@
+{
+  "task": "M3.6",
+  "date": "2026-10-18",
+  "status": "M3_6_COMPLETE_OFFLINE",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "baseline_sha": "14f290f00c047bf4f55c2346b64ecf3f9b0be78d",
+  "implementation_sha": "04cc13cb3da8f6f2c231040ba164a0add70ca500",
+  "new_real_provider_calls": 0,
+  "new_actual_tokens": 0,
+  "new_unknown": 0,
+  "tests": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_cloud_errors.py tests/weknora_port/test_daily_cloud_gate.py tests/weknora_port/test_execution_fence.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_service.py tests/weknora_port/test_http_api.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_local_runtime.py tests/weknora_port/test_generation.py -q --basetemp E:\\WK\\run\\m36-tests\\final-all",
+      "exit_code": 0,
+      "result": "303 passed in 8.37s",
+      "kind": "SYNTHETIC_OFFLINE"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_execution_fence.py tests/weknora_port/test_generation.py -q --basetemp E:\\WK\\run\\m36-tests\\stream-cleanup",
+      "exit_code": 0,
+      "result": "142 passed in 5.41s; overlapping follow-up after one new cross-context cleanup test",
+      "kind": "SYNTHETIC_OFFLINE"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm test -- --grep \"SSE cloud error code|history refresh localizes|default cloud_allowed false\"",
+      "exit_code": 0,
+      "result": "3 passed (5.1s)",
+      "kind": "BROWSER_WITH_API_MOCK"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm run build",
+      "exit_code": 0,
+      "result": "tsc --noEmit && vite build; 274 modules"
+    },
+    {
+      "command": ".\\wk.ps1 check -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "REAL_READ_ONLY"
+    },
+    {
+      "command": ".\\wk.ps1 status -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "REAL_READ_ONLY"
+    },
+    {
+      "command": ".\\wk.ps1 usage -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "REAL_READ_ONLY"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0
+    }
+  ],
+  "initial_failures": [
+    {
+      "command": ".\\wk.ps1 usage -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 1,
+      "result": "InterfaceError",
+      "cause": "Windows default Proactor incompatible with async psycopg",
+      "fix": "Reuse SelectorEventLoop; read-only retest exit0."
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_cloud_errors.py -q -k stream_denial --basetemp E:\\WK\\run\\m36-tests\\stream-first",
+      "exit_code": 1,
+      "result": "2 failed, 18 deselected; DID NOT RAISE ProviderError",
+      "cause": "LOCAL_EXECUTION stream errors after answer done treated as recoverable",
+      "fix": "Known send denials terminal; subsequent cloud_errors+generation run exit0,104passed."
+    }
+  ],
+  "findings": {
+    "ordinary_mode": "Existing wk->DevelopmentSettings/ApplicationRuntime/LeasedSendGate permits explicit global+KB consent, own active model, verified scope. No experiment executor required.",
+    "ordinary_cumulative_cap": false,
+    "bounded_mode": "Reuse existing LocalExecution: <=12 calls / <=100000 tokens per explicitly permitted file, same gate object; no monthly/account system.",
+    "exact_identity": "tenant/subject/KB/provider/model/registry model_id; wildcard prefix only permits arbitrary nonempty request IDs inside that identity.",
+    "reliable_bound_scope": "SF/DS known pure-text chat hard output contract; SF text embedding/rerank. Unknown protocol/media refused before send.",
+    "restart_unknown": "Persisted entries kept; OS process creation identity separates active shared processes from orphan INFLIGHT. UNKNOWN/unconfirmed settlement keeps reserve and STOP.",
+    "error_handling": "Safe specific HTTP/SSE/history errors; optional model fallbacks cannot swallow known denials; stream denial cannot commit success/upgrade.",
+    "business_prompt_model_threshold_router_changes": false,
+    "schema_dependency_changes": false
+  },
+  "readonly_state": {
+    "config": "E:/WK/run/p81-retirement-20261018/local.json",
+    "cloud_allowed": false,
+    "execution_file_present": false,
+    "api_port": 56425,
+    "ui_port": 56426,
+    "api_worker_ui_running": false,
+    "postgres_redis_running": true,
+    "tenant_id": 1,
+    "subject_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+    "postgres_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013",
+    "redis_db": 15,
+    "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+    "redis_prefix": "weknora-python-p81-cd49dc23e95c4cad9e2c973ddd15ebbf",
+    "existing_user_ledger": {
+      "calls": 10,
+      "reported": 10,
+      "unreported": 0,
+      "unknown_outcome": 0,
+      "total_tokens": 5766,
+      "meaning": "Historical M3.5 cumulative entries, not new M3.6 calls"
+    }
+  },
+  "retained_dirty_paths": [
+    ".serena/project.yml",
+    "progress.md",
+    "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+    "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt"
+  ],
+  "not_run": [
+    "New real Provider QA",
+    "New Omni upload/retrieval/generation/refresh",
+    "Full six-dataset evaluation",
+    "User Edge end-to-end retest"
+  ],
+  "limitations": [
+    "Ordinary mode has no cumulative application cap.",
+    "Bounded mode refuses unverifiable multimedia contracts.",
+    "UNKNOWN requires manual audit, no auto release/resend.",
+    "Usage is local principal history, not vendor account total.",
+    "Registry inventory may contain historical active rows; same name is not current role identity."
+  ],
+  "delivery": "Only local task commits; no push/deploy/merge/tag"
+}

@@ -63,6 +63,8 @@ API负责正常上传/同步解析索引、会话、SSE及源文回读；需要�
 
 常见提示：全局关闭→检查 local.json 并重启；KB 禁止→检查来源 KB 的许可；模型不可用→检查正式模型设置；限额不足→停止新增调用并核对已用/预留；UNKNOWN/结算失败→保留账本，核实原运行状态，不能重复发送不确定请求。HTTP、SSE、失败历史均显示明确错误；刷新/回读原运行不会获得新的发送许可。
 
+usage 的 registry 清单可能包含历史 active 行；登记/启用状态不表示它就是当前角色绑定，也不证明凭据已实测可用。应与正式模型设置的 source/provider/model 和实际 registry 身份核对，不按同名配置继承许可。
+
 ## 数据与旧入口
 
 现有正式依赖为 PostgreSQL `127.0.0.1:56423`（system ID `7696088403504697382`）及 Redis `127.0.0.1:56424/15`。保留 external volumes `weknora-python-resume-pg-20261013`、`weknora-python-resume-redis-20261013`。不能清空、重建或用旧服务连接这些资源。

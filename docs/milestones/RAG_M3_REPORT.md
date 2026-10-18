@@ -469,3 +469,50 @@ Owner随后明确批准**额外一次修复后浏览器提交**，仍共用原12
 本轮相关源文件仅 `development.py`、`runtime.py`、`execution.py`、`service.py` 和两个定向测试。证据与诊断见 [机器结果](RAG_M3_5_DAILY_RAG.results.json)、[63份原始证据ZIP](evidence/m35-daily-rag-20261018/evidence.zip)、[首次失败](evidence/m35-daily-rag-20261018/edge-first-failure.png)、[刷新回读](evidence/m35-daily-rag-20261018/edge-history-restored.png)。ZIP不含本地配置/环境文件/密钥，实际凭据值扫描为0。
 
 保留项：页面将LaTeX显示为Markdown源文本，未新增数学排版；保守记忆来源并集会在跨KB时省略整份记忆；公式级bbox、混合PDF扫描页、真实Caption、Hotpot/0434、全面质量与长尾优化均独立。未修改生产默认模型、阈值、路由、普通Prompt，未恢复正则Validator/语义裁判。**到此停止，不Push、合并、部署、Tag或扩展为M3_COMPLETE。**
+
+## M3.6：日常云问答配置与受限发送收口（2026-10-18）
+
+**M3_6_COMPLETE_OFFLINE**：完成正常入口配置、局部门禁/错误修复和合成验证。本轮 **真实Provider 0次、实际新增Token 0、新增UNKNOWN 0**；不重复M3.5上传/问答/刷新，不将合成测试当作新的真实模型验收，不改M3整体状态。
+
+基线：14f290f00c047bf4f55c2346b64ecf3f9b0be78d。实现提交：**04cc13cb3da8f6f2c231040ba164a0add70ca500**。本节与[机器结果](RAG_M3_6_DAILY_CLOUD.results.json)由后续独立本地文档提交交付；最终完整HEAD见交付消息或本文件所在Git提交。
+
+### 已有能力及实际缺口
+
+- 正常 wk → development.assemble → ApplicationRuntime → 原 LeasedSendGate 已支持正式角色、凭据和主链。明确开启本机全局开关、允许全部真实来源KB外发且模型/Scope有效后，即可正常调用，不需要M3.5脚本。临时围栏关闭不代表永久禁止云端；已CLOSED文件若仍挂载则明确拒绝，不能重置它来复用额度。
+- 普通模式持久化PG调用身份、结果与usage，相同操作含UNKNOWN不重发；**没有累计Token/次数上限**，不能宣称受控额度。P31账户/月度Authority仍退役。受限模式复用原独立JSON围栏，上限≤12次Provider/100,000Token，不自动续期。
+- 确认缺口：可选Rewrite/Embedding/Rerank吞掉具体门禁原因；全局与KB拒绝不区分；前端和失败历史不明确；PG用量未确认时临时围栏可能先结算；INFLIGHT装配无法区分活进程与孤立请求；未知协议/媒体缺可靠预留合同。以上作局部修复，没有改业务排序、Prompt、模型、阈值、DYNAMIC或OCR。
+
+### 修改范围
+
+| 范围 | 实际文件、函数与结果 |
+|---|---|
+| 原SendGate | runtime.py / LeasedSendGate.authorize、finish：全局关闭独立错误；UPDATE RETURNING确认持久化，返回True/False；原对象身份不变 |
+| 可选限额 | execution.py / LocalExecution：验证已知纯文本上界；原子预留；tenant/subject/KB/provider/model/registry model_id绑定；显式星号前缀支持日常UUID；PID+OS创建身份区分活Worker/孤立请求；损坏、UNKNOWN、未确认结算保留占用并拒绝新增。Python -O不移除护栏 |
+| 错误合同 | 新 models/cloud_errors.py；query/search/rerank仅让已知门禁拒绝继续上抛，普通模型故障降级保留；service/http_api和React以固定中文显示；generation/coordinator不把答案Done后的本地拒绝误记成功或升级 |
+| 用量和说明 | wk.ps1、scripts/local_runtime.py增加只读usage：PG身份/local principal校验、实际Token与缺失usage/UNKNOWN分开、安全模型ID/KB清单。[操作说明](../WEKNORA_DEVELOPMENT.md)及[默认关闭模板](../local-cloud-limit.example.json) |
+| 测试 | 两个新增门禁/错误测试文件、原execution/local_runtime测试、3项前端API mock。无Schema、迁移或依赖变更 |
+
+受限模式仅接受有现有硬上界合同的SF/DeepSeek纯文本chat、SF文本Embedding/Rerank；未知协议/媒体明确拒绝，不能冒充通用多模态预算控制。capture_evidence默认false，不额外保存完整Prompt/响应。重启保留已用和未决预留；取消/UNKNOWN不能释放。全局开关需停止/重启生效，KB撤销在下一次发送检查；在途调用不假称撤回。旧UNKNOWN不改。
+
+### 命令和验证
+
+工作树为 E:\RAG-Worktrees\weknora-python-port-20261013，Python为 E:\RAG quention\.venv\Scripts\python.exe。**完整原样命令与退出码在机器JSON**，此表简写测试文件列表。
+
+| 实际验证 | 退出码与关键结果 |
+|---|---|
+| pytest：cloud_errors、daily_cloud_gate、execution_fence、pipeline、service、http_api、development_entry、local_runtime、generation，basetemp=E:\WK\run\m36-tests\final-all | **0，303 passed in 8.37s**；合成SQL/Provider/HTTP，不是云调用 |
+| pytest：execution_fence、generation，basetemp=E:\WK\run\m36-tests\stream-cleanup | **0，142 passed in 5.41s**；追加跨Context清理回归，含重叠项，不与303相加 |
+| frontend npm test，grep限定SSE cloud error、history refresh、default cloud_allowed false | **0，3 passed**；Playwright＋API mock，非用户Edge真实RAG |
+| frontend npm run build | **0，TypeScript/Vite构建通过** |
+| wk.ps1 check / status / usage，原 p81-retirement-20261018/local.json | 最终均 **0**；真实依赖只读核对，未启动API/Worker/UI，未调用模型 |
+| git diff --check、git diff --cached --check | **0**；仅Git换行提示，无空白错误 |
+
+首次失败保留：usage用默认Windows Proactor导致InterfaceError/退出1，改用原入口SelectorEventLoop后只读通过；新增SSE反例修复前2项失败/退出1（本地拒绝出现在答案Done后未终止），最小修复后cloud_errors＋generation **104项通过/退出0**。跨Context关闭stream时ContextVar reset不再掩盖结算，相关142项通过。
+
+真实只读身份仍为tenant **1**、subject web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6；PG system 7696088403504697382、库weknora_python_port_20261013、Redis15及原前缀。日常全局**false**、无execution_file。未写模型配置、凭据、问答、索引、Gold或旧UNKNOWN。usage读出本用户历史 **10次/5,766Token、UNKNOWN0**，是已有M3.5累计，绝非本轮新增消耗；其他账户/tenant的历史UNKNOWN没有清理或并入此数字。
+
+### 操作与保留项
+
+同一wk入口启动；模型设置保留正式角色/凭据，资料库明确许可，再由用户在local.json显式开启全局并重启。受限模式挂载独立明确许可文件。关闭、超限、身份不匹配、UNKNOWN和结算未确认都有清楚提示。wk.ps1 usage查看真实用量；许可entries中的held_tokens是预留，不是实际消耗。
+
+普通模式没有累计应用上限；usage不是供应商账户总用量；受限模式不支持不可证明的图片Token上界；没有自动UNKNOWN释放/补发。模型清单可能含历史active行，同名不证明当前角色身份，不据此继承许可。新增真实日常云验收 **NOT RUN**，如需执行须另获授权。原8个未提交路径全部保留，仅本地提交，不Push、部署、合并、Tag，不进入下一阶段。
