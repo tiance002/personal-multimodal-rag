@@ -1,0 +1,3497 @@
+{
+  "inventory_type": "read_only_runtime_inventory",
+  "captured_at": "2026-10-18T12:13:37.6592924+08:00",
+  "workspace_head_expected": "28a17f12340d08cf87467aef1926edc815a685ef",
+  "scope": "Windows API/worker/node frontend processes, TCP listeners, Docker containers/Compose/volume metadata only",
+  "safety": {
+    "docker_config_env_saved": false,
+    "command_lines_redacted": true,
+    "no_process_or_container_changes": true,
+    "no_volume_contents_read": true
+  },
+  "relevant_processes": [],
+  "tcp_listeners": [
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 135,
+      "pid": 2020,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 445,
+      "pid": 4,
+      "process_name": "System",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 7680,
+      "pid": 16616,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 49664,
+      "pid": 1636,
+      "process_name": "lsass",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 49665,
+      "pid": 1528,
+      "process_name": "wininit",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 49668,
+      "pid": 2656,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 49669,
+      "pid": 3508,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 49670,
+      "pid": 4760,
+      "process_name": "spoolsv",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::",
+      "local_port": 49695,
+      "pid": 1608,
+      "process_name": "services",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::1",
+      "local_port": 5432,
+      "pid": 7888,
+      "process_name": "postgres",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::1",
+      "local_port": 42050,
+      "pid": 28016,
+      "process_name": "OneDrive.Sync.Service",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "::1",
+      "local_port": 49673,
+      "pid": 5388,
+      "process_name": "jhi_service",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 135,
+      "pid": 2020,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 5040,
+      "pid": 14272,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 49664,
+      "pid": 1636,
+      "process_name": "lsass",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 49665,
+      "pid": 1528,
+      "process_name": "wininit",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 49668,
+      "pid": 2656,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 49669,
+      "pid": 3508,
+      "process_name": "svchost",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 49670,
+      "pid": 4760,
+      "process_name": "spoolsv",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "0.0.0.0",
+      "local_port": 49695,
+      "pid": 1608,
+      "process_name": "services",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "10.126.83.0",
+      "local_port": 139,
+      "pid": 4,
+      "process_name": "System",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 4709,
+      "pid": 9120,
+      "process_name": "wpscloudsvr",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 5432,
+      "pid": 7888,
+      "process_name": "postgres",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 7897,
+      "pid": 368,
+      "process_name": "verge-mihomo",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 8085,
+      "pid": 32380,
+      "process_name": "com.docker.backend",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 9080,
+      "pid": 5492,
+      "process_name": "NahimicService",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 14013,
+      "pid": 46396,
+      "process_name": "Weixin",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 14016,
+      "pid": 46396,
+      "process_name": "Weixin",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 14019,
+      "pid": 46396,
+      "process_name": "Weixin",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 14022,
+      "pid": 46396,
+      "process_name": "Weixin",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 14023,
+      "pid": 46396,
+      "process_name": "Weixin",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 17968,
+      "pid": 5164,
+      "process_name": "core-service",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 56423,
+      "pid": 32380,
+      "process_name": "com.docker.backend",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 56424,
+      "pid": 32380,
+      "process_name": "com.docker.backend",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "127.0.0.1",
+      "local_port": 61277,
+      "pid": 24572,
+      "process_name": "clash-verge",
+      "relevant_process": null
+    },
+    {
+      "protocol": "TCP",
+      "local_address": "172.24.64.1",
+      "local_port": 139,
+      "pid": 4,
+      "process_name": "System",
+      "relevant_process": null
+    }
+  ],
+  "docker": {
+    "version": "29.8.0 / 29.8.0",
+    "error": null,
+    "compose_ls_all": [
+      {
+        "Name": "deploy",
+        "Status": "exited(1)",
+        "ConfigFiles": "E:\\RAG quention\\deploy\\compose.yml"
+      },
+      {
+        "Name": "eviroute-rag",
+        "Status": "running(2)",
+        "ConfigFiles": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docker-compose.eviroute-rag.yml"
+      },
+      {
+        "Name": "raglocalfirst0930",
+        "Status": "exited(5)",
+        "ConfigFiles": "E:\\RAG quention\\deploy\\compose.yml,E:\\RAG quention\\var\\reports\\weknora-ordinary-20261012\\fenced-service.override.yml,E:\\RAG quention\\var\\reports\\no-candidates-20261011\\ordinary-service.override.yml,C:\\Users\\22088\\.codex\\worktrees\\rag-retrieval-opt-round1\\RAG quention\\deploy\\compose.yml"
+      },
+      {
+        "Name": "ragv1final0927",
+        "Status": "exited(4)",
+        "ConfigFiles": "E:\\RAG quention\\deploy\\compose.yml"
+      },
+      {
+        "Name": "v1review0927",
+        "Status": "exited(4)",
+        "ConfigFiles": "E:\\RAG quention\\deploy\\compose.yml"
+      },
+      {
+        "Name": "v1reviewfinal0927",
+        "Status": "exited(4)",
+        "ConfigFiles": "E:\\RAG quention\\deploy\\compose.yml"
+      },
+      {
+        "Name": "weknora",
+        "Status": "exited(4), running(1)",
+        "ConfigFiles": "E:\\WeKnora\\docker-compose.yml"
+      }
+    ],
+    "volumes_metadata_only": [
+      {
+        "name": "7f9bdd54486ae4e48b9042fe37b97964602faf036ca1469864e1db4514da1464",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/7f9bdd54486ae4e48b9042fe37b97964602faf036ca1469864e1db4514da1464/_data",
+        "labels": {
+          "com.docker.volume.anonymous": ""
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "9f9106f31bd3dd7f909782830b431a27c8a9da97997cf7e0f3eaf22761d9f184",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/9f9106f31bd3dd7f909782830b431a27c8a9da97997cf7e0f3eaf22761d9f184/_data",
+        "labels": {
+          "com.docker.volume.anonymous": ""
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "c7f257b7cb2036ce42cb7c074d2aff92b5c32a551badf98c80589b1cc3ce9c53",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/c7f257b7cb2036ce42cb7c074d2aff92b5c32a551badf98c80589b1cc3ce9c53/_data",
+        "labels": {
+          "com.docker.volume.anonymous": ""
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "deploy_rag-db",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/deploy_rag-db/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "9fb95a0ea017bf4aca9017b134dfe28bcccd2611a165b128321e01d9aa2e6fb8",
+          "com.docker.compose.project": "deploy",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-db"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "deploy_rag-storage",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/deploy_rag-storage/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "a6c3ca0dda8b1ae50470950f2d45dec5391b8fc7fac447ea06ad6f0b1717f009",
+          "com.docker.compose.project": "deploy",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-storage"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "p55a-lifecycle-r1-pgdata",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/p55a-lifecycle-r1-pgdata/_data",
+        "labels": {
+          "personal-rag.task": "p5-redis-lifecycle-r1"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "rag-eval-trust0928-db-clone-20260929t091523z",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/rag-eval-trust0928-db-clone-20260929t091523z/_data",
+        "labels": {
+          "backup": "eval-pg16-cold-20260929T091523Z",
+          "purpose": "eval-index-clone-verification",
+          "source": "rag-eval-trust0928-db"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "raglocalfirst0930_rag-db",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/raglocalfirst0930_rag-db/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "ef6d97717cbb8f9bcbb2295e933ad3a54cd1ff6f58dfb4f5176ce555949b605c",
+          "com.docker.compose.project": "raglocalfirst0930",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-db"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "raglocalfirst0930_rag-redis",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/raglocalfirst0930_rag-redis/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "a60178ed3a204486c553628fb380f7ff916b68bdbe5f1fc2a0bef60a7d3329b9",
+          "com.docker.compose.project": "raglocalfirst0930",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-redis"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "raglocalfirst0930_rag-storage",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/raglocalfirst0930_rag-storage/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "7384fd8604d7b110cded3c7a7a5666eb348defbfdff297aa17fd6ae10234d817",
+          "com.docker.compose.project": "raglocalfirst0930",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-storage"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "ragv1final0927_rag-db",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/ragv1final0927_rag-db/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "0fe0ef7716419c977f35a1fa9ceb7933a5771a3a8f1be1aa112868fa088f6886",
+          "com.docker.compose.project": "ragv1final0927",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-db"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "ragv1final0927_rag-storage",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/ragv1final0927_rag-storage/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "c050bff7869cba3cacf21c63cf8b8dad25b8b75521bd54a66ce610d6cb8d55dd",
+          "com.docker.compose.project": "ragv1final0927",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-storage"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "v1review0927_rag-db",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/v1review0927_rag-db/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "feb53d73606c18c94b970224edf40c778d753202861b29e669f469edadf8c0ee",
+          "com.docker.compose.project": "v1review0927",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-db"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "v1review0927_rag-storage",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/v1review0927_rag-storage/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "ab5dce1814fb396c1a779774bc7559d0a5e4683acdf04536a3ac42fa75d30dcc",
+          "com.docker.compose.project": "v1review0927",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-storage"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "v1reviewfinal0927_rag-db",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/v1reviewfinal0927_rag-db/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "52826edc0f6d3d388f504b690eb01b04f2a2fd51a52f3b7f1a108a147c867560",
+          "com.docker.compose.project": "v1reviewfinal0927",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-db"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "v1reviewfinal0927_rag-storage",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/v1reviewfinal0927_rag-storage/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "5f2bddd51c5a6344d5223934d709b8e8cee1d6a392d1c50206c7607fabc5b760",
+          "com.docker.compose.project": "v1reviewfinal0927",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "rag-storage"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora-python-port-pg-20261013",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora-python-port-pg-20261013/_data",
+        "labels": null,
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora-python-port-redis-20261013",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora-python-port-redis-20261013/_data",
+        "labels": null,
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora-python-resume-pg-20261013",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora-python-resume-pg-20261013/_data",
+        "labels": null,
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora-python-resume-redis-20261013",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora-python-resume-redis-20261013/_data",
+        "labels": null,
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora_data-files",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora_data-files/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "99ee8fe0b7eff2d17c057d93177d7ef78785c5a7e49b0b8fa50ea776fbf8d010",
+          "com.docker.compose.project": "weknora",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "data-files"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora_docreader-tmp",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora_docreader-tmp/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "6794cfb230fa4034d8da35002873de415efe31e22eafadf8d5e1431418728751",
+          "com.docker.compose.project": "weknora",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "docreader-tmp"
+        },
+        "scope": "local",
+        "options": null
+      },
+      {
+        "name": "weknora_postgres-data",
+        "driver": "local",
+        "mountpoint": "/var/lib/docker/volumes/weknora_postgres-data/_data",
+        "labels": {
+          "com.docker.compose.config-hash": "832cce4d9db1c126de2808ba9947d8638a51623e8e9e44f32e627cc461834a1d",
+          "com.docker.compose.project": "weknora",
+          "com.docker.compose.version": "5.5.1",
+          "com.docker.compose.volume": "postgres-data"
+        },
+        "scope": "local",
+        "options": null
+      }
+    ],
+    "available": true,
+    "containers": [
+      {
+        "id": "424f06a6858cb5f9c90d5cbfc6e7e34419d5ed198634d2ee46d5cb729f4a5798",
+        "name": "friendly_chaum",
+        "image_id": "sha256:508a0857ec762b1ab1cece29193345b501fab1dd9d1228a7b617062954cecac6",
+        "image_tag": "ghcr.io/github/github-mcp-server",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 44510,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-17T08:59:01.277603345Z",
+          "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "mapped_ports": {
+          "8085/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "8085"
+            }
+          ]
+        },
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "87ad20ba861235bb7bedf7068744bd656cba6921f5a3116a78daaf7b4d00cf6f",
+            "EndpointID": "c3ad05a5586d30100cc8d7d7a44154cc46076d7eee148c4d0ec30352cc855e59",
+            "Gateway": "172.17.0.1",
+            "IPAddress": "172.17.0.2",
+            "MacAddress": "4a:31:c1:57:23:2f",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "9427fe4ad98d1953a0952cd83f3d0dbdede09e0806e5069729214684398c6719",
+        "name": "heuristic_sanderson",
+        "image_id": "sha256:d79336f4812b6547a53e735480dde67f8f8f7071b414fbd9297609ffb989abc1",
+        "image_tag": "docker/getting-started",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-15T14:12:40.546582684Z",
+          "FinishedAt": "2026-10-15T15:55:18.194279557Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "b8a54044757da62c6ca581935c296a4de964fdfb5296be5ef37840a0c875d3f8",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "89c5cb748e2ec7aca3b1e3b181dfe936a4054137ddb4de5c4e8689e86387e720",
+        "name": "eviroute-rag-postgres",
+        "image_id": "sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2",
+        "image_tag": "paradedb/paradedb:v0.22.6-pg17",
+        "compose_project": "eviroute-rag",
+        "compose_service": "postgres",
+        "compose_working_dir": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+        "compose_config_files": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docker-compose.eviroute-rag.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 809,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-17T06:03:23.837264388Z",
+          "FinishedAt": "2026-10-17T04:55:57.624019409Z",
+          "Health": {
+            "Status": "healthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-18T04:10:52.166425983Z",
+                "End": "2026-10-18T04:10:52.277864351Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:02.279025795Z",
+                "End": "2026-10-18T04:11:02.323333029Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:12.324128957Z",
+                "End": "2026-10-18T04:11:12.399097558Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:22.398622218Z",
+                "End": "2026-10-18T04:11:22.465095605Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:32.466071766Z",
+                "End": "2026-10-18T04:11:32.522151206Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {
+          "5432/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "56423"
+            }
+          ]
+        },
+        "networks": {
+          "eviroute-rag_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "eviroute-rag-postgres",
+              "postgres"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "c3bab3cf3ebf0cd03dd601ecc605ecd697f46588f0c41dc5978f55bb872a5a70",
+            "EndpointID": "3600748d4961ba772f417c1bbe981f6e006c45576228516d260293c36fb7ea77",
+            "Gateway": "172.24.0.1",
+            "IPAddress": "172.24.0.3",
+            "MacAddress": "be:27:ad:7e:2b:c7",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "eviroute-rag-postgres",
+              "postgres",
+              "89c5cb748e2e"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "weknora-python-resume-pg-20261013",
+          "Source": "/var/lib/docker/volumes/weknora-python-resume-pg-20261013/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "15fe772fab7d9ac5b6023ff2075ebb5e12ccee80e274f91b16fe612e8748e897",
+        "name": "eviroute-rag-redis",
+        "image_id": "sha256:fbdbaea47b9ae4ecc2082ecdb4e1cea81e32176ffb1dcf643d422ad07427e5d9",
+        "image_tag": "redis:7.4.2",
+        "compose_project": "eviroute-rag",
+        "compose_service": "redis",
+        "compose_working_dir": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+        "compose_config_files": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docker-compose.eviroute-rag.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 731,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-17T06:03:23.482419365Z",
+          "FinishedAt": "2026-10-17T04:55:57.699256319Z",
+          "Health": {
+            "Status": "healthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-18T04:10:48.213613626Z",
+                "End": "2026-10-18T04:10:48.240045959Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-18T04:10:58.241258661Z",
+                "End": "2026-10-18T04:10:58.266472666Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:08.267230253Z",
+                "End": "2026-10-18T04:11:08.298709178Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:18.297654033Z",
+                "End": "2026-10-18T04:11:18.325167558Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-18T04:11:28.325917383Z",
+                "End": "2026-10-18T04:11:28.36160177Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {
+          "6379/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "56424"
+            }
+          ]
+        },
+        "networks": {
+          "eviroute-rag_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "eviroute-rag-redis",
+              "redis"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "c3bab3cf3ebf0cd03dd601ecc605ecd697f46588f0c41dc5978f55bb872a5a70",
+            "EndpointID": "db7b72c293f3c5c2adf82094caaf3e9f11ec9dcbc0bbd21c9a807bc2eed68c9d",
+            "Gateway": "172.24.0.1",
+            "IPAddress": "172.24.0.2",
+            "MacAddress": "be:24:eb:3f:78:16",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "eviroute-rag-redis",
+              "redis",
+              "15fe772fab7d"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "weknora-python-resume-redis-20261013",
+          "Source": "/var/lib/docker/volumes/weknora-python-resume-redis-20261013/_data",
+          "Destination": "/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "058e883fe8841a8ad6decf6c5143a96e3748121e485532402739773f407d5b6a",
+        "name": "weknora-cpp-toolcheck-20261014",
+        "image_id": "sha256:a94a1696a6e41bd7b15b502607d4d9e605428b29ee26fb8914b2f9fdf3dcb82c",
+        "image_tag": "sha256:a94a1696a6e41bd7b15b502607d4d9e605428b29ee26fb8914b2f9fdf3dcb82c",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-14T00:59:51.218371461Z",
+          "FinishedAt": "2026-10-14T00:59:51.35232708Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "none": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "ee329aac50682db701e6d681a4a9eec40f66f33e47d64da0b0b5e05cc93ea549",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "8578e63a4ff77c22431e0eb7018b1ecdfb3815a74ec6fb21c5b926fbf5b3221b",
+        "name": "weknora-python-port-redis-20261013",
+        "image_id": "sha256:fbdbaea47b9ae4ecc2082ecdb4e1cea81e32176ffb1dcf643d422ad07427e5d9",
+        "image_tag": "redis:7.4.2",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-13T06:39:29.318434133Z",
+          "FinishedAt": "2026-10-13T15:59:52.054732032Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "af0bfb9ba8091ff2a7a10027ec6db9ddf0f56849c04047db8af30db2e97c2c7a",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "weknora-python-port-redis-20261013",
+          "Source": "/var/lib/docker/volumes/weknora-python-port-redis-20261013/_data",
+          "Destination": "/data",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "4394fba805a1d18b3e5b37b80c43c8b7d593783ba592fa638a15e4240d3e18d3",
+        "name": "weknora-python-port-pg-20261013",
+        "image_id": "sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2",
+        "image_tag": "paradedb/paradedb:v0.22.6-pg17",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-13T06:39:27.731952895Z",
+          "FinishedAt": "2026-10-13T15:59:52.170243552Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "af0bfb9ba8091ff2a7a10027ec6db9ddf0f56849c04047db8af30db2e97c2c7a",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "weknora-python-port-pg-20261013",
+          "Source": "/var/lib/docker/volumes/weknora-python-port-pg-20261013/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "5aeef69378f354ee4592912227da64cba544069b9e8bf0bd4dcd098373993400",
+        "name": "raglocalfirst0930-worker-1",
+        "image_id": "sha256:a94a1696a6e41bd7b15b502607d4d9e605428b29ee26fb8914b2f9fdf3dcb82c",
+        "image_tag": "personal-rag:weknora-unit-guard-20261013",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml,E:\\RAG quention\\var\\reports\\weknora-ordinary-20261012\\fenced-service.override.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-10-13T01:17:47.387174477Z",
+          "FinishedAt": "2026-10-13T03:33:41.270167216Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "raglocalfirst0930_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "raglocalfirst0930-worker-1",
+              "worker"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "2b066ed089a445307b58a3a5ed12e27a9316ef5f5c3751acd2610867d94f7d29",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "raglocalfirst0930-worker-1",
+              "worker",
+              "5aeef69378f3"
+            ]
+          }
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "raglocalfirst0930_rag-storage",
+            "Source": "/var/lib/docker/volumes/raglocalfirst0930_rag-storage/_data",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\model-assets",
+            "Destination": "/opt/model-assets",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "db29f9707d27d1616e74382b8e16ac4868395cad97051ea05eeb79e942cefe35",
+        "name": "raglocalfirst0930-api-1",
+        "image_id": "sha256:a94a1696a6e41bd7b15b502607d4d9e605428b29ee26fb8914b2f9fdf3dcb82c",
+        "image_tag": "personal-rag:weknora-unit-guard-20261013",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml,E:\\RAG quention\\var\\reports\\weknora-ordinary-20261012\\fenced-service.override.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-13T01:17:47.643790609Z",
+          "FinishedAt": "2026-10-13T03:33:39.417661295Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "raglocalfirst0930_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "raglocalfirst0930-api-1",
+              "api"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "2b066ed089a445307b58a3a5ed12e27a9316ef5f5c3751acd2610867d94f7d29",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "raglocalfirst0930-api-1",
+              "api",
+              "db29f9707d27"
+            ]
+          }
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "raglocalfirst0930_rag-storage",
+            "Source": "/var/lib/docker/volumes/raglocalfirst0930_rag-storage/_data",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "/run/desktop/mnt/host/e/RAG quention/var/model-assets",
+            "Destination": "/opt/model-assets",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "b7ade590c3e03677698c781f68fa1669fa329551e258b02eb933a54672c8912e",
+        "name": "raglocalfirst0930-redis-1",
+        "image_id": "sha256:fbdbaea47b9ae4ecc2082ecdb4e1cea81e32176ffb1dcf643d422ad07427e5d9",
+        "image_tag": "redis:7.4.2",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "redis",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml,E:\\RAG quention\\var\\reports\\no-candidates-20261011\\ordinary-service.override.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-12T23:59:58.105996797Z",
+          "FinishedAt": "2026-10-13T03:33:38.290109312Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-13T03:33:16.953983186Z",
+                "End": "2026-10-13T03:33:16.989460051Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:21.986507276Z",
+                "End": "2026-10-13T03:33:22.020850542Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:27.021254589Z",
+                "End": "2026-10-13T03:33:27.050579467Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:32.051444893Z",
+                "End": "2026-10-13T03:33:32.092451899Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:37.093493624Z",
+                "End": "2026-10-13T03:33:37.124709518Z",
+                "ExitCode": 0,
+                "Output": "PONG\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "raglocalfirst0930_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "raglocalfirst0930-redis-1",
+              "redis"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "2b066ed089a445307b58a3a5ed12e27a9316ef5f5c3751acd2610867d94f7d29",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "raglocalfirst0930-redis-1",
+              "redis",
+              "b7ade590c3e0"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "raglocalfirst0930_rag-redis",
+          "Source": "/var/lib/docker/volumes/raglocalfirst0930_rag-redis/_data",
+          "Destination": "/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "cdb838c5c05f0d5fa1cf3c5a290078c33dbd90a84983deffc8e3146c6b95e4bf",
+        "name": "p55a-lifecycle-r1-redis",
+        "image_id": "sha256:c9d92d840fd011c908f040592857c724ae6d877f2aba5c40ad963276507386b2",
+        "image_tag": "c9d92d840fd0",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 255,
+          "Error": "",
+          "StartedAt": "2026-10-12T03:38:27.259313981Z",
+          "FinishedAt": "2026-10-12T11:21:21.420504241Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "cb90a2790460fcbef5220fdafe8f21be2d316932a5ce2990b27224df78443d63",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "9f9106f31bd3dd7f909782830b431a27c8a9da97997cf7e0f3eaf22761d9f184",
+          "Source": "/var/lib/docker/volumes/9f9106f31bd3dd7f909782830b431a27c8a9da97997cf7e0f3eaf22761d9f184/_data",
+          "Destination": "/data",
+          "Driver": "local",
+          "Mode": "",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "4db80024010c3c48b68684bb1ff28e471f5a9e72fd90f7b460a54091e425718f",
+        "name": "p55a-lifecycle-r1-pg",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "ccc6e83d6e35",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 255,
+          "Error": "",
+          "StartedAt": "2026-10-12T03:38:27.055238606Z",
+          "FinishedAt": "2026-10-12T11:21:21.419655754Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "cb90a2790460fcbef5220fdafe8f21be2d316932a5ce2990b27224df78443d63",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "p55a-lifecycle-r1-pgdata",
+          "Source": "p55a-lifecycle-r1-pgdata",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "771f37725a715bf5b208b95779c085e133dcac79930d1c61ea3b312030a94451",
+        "name": "raglocalfirst0930-frontend-1",
+        "image_id": "sha256:1c531e501ab8c65a849cfa14decce80726790a5604561bdc10ad08dcbcd3ecd7",
+        "image_tag": "raglocalfirst0930-frontend",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "frontend",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-03T16:12:19.26541545Z",
+          "FinishedAt": "2026-10-05T16:16:12.164002589Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "raglocalfirst0930_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "raglocalfirst0930-frontend-1",
+              "frontend"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "2b066ed089a445307b58a3a5ed12e27a9316ef5f5c3751acd2610867d94f7d29",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "raglocalfirst0930-frontend-1",
+              "frontend",
+              "771f37725a71"
+            ]
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "178b93fc5b4e72a3d68e91f190d8ac4340cdd477cfeb301c161fe405e967dce6",
+        "name": "deploy-frontend-1",
+        "image_id": "sha256:1c531e501ab8c65a849cfa14decce80726790a5604561bdc10ad08dcbcd3ecd7",
+        "image_tag": "deploy-frontend",
+        "compose_project": "deploy",
+        "compose_service": "frontend",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-30T11:36:27.219124288Z",
+          "FinishedAt": "2026-10-03T15:46:15.594455275Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "deploy_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "deploy-frontend-1",
+              "frontend"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "1bd1eb3c5c218df59b2590663f34c722ae200e9b4d1fbdb474961604ae64aa9b",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "deploy-frontend-1",
+              "frontend",
+              "178b93fc5b4e"
+            ]
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "5c9a6eacb99420983bc1727e0427f6cc8b2f2adf242f6ae12b8efaa531724a43",
+        "name": "raglocalfirst0930-db-1",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "pgvector/pgvector:pg16",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "db",
+        "compose_working_dir": "C:\\Users\\22088\\.codex\\worktrees\\rag-retrieval-opt-round1\\RAG quention\\deploy",
+        "compose_config_files": "C:\\Users\\22088\\.codex\\worktrees\\rag-retrieval-opt-round1\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-12T23:59:57.890286748Z",
+          "FinishedAt": "2026-10-13T03:33:38.309629828Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-13T03:33:15.623160025Z",
+                "End": "2026-10-13T03:33:15.669443794Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:20.666539495Z",
+                "End": "2026-10-13T03:33:20.747698931Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:25.748062285Z",
+                "End": "2026-10-13T03:33:25.792028428Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:30.792800734Z",
+                "End": "2026-10-13T03:33:30.850666686Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-13T03:33:35.851557336Z",
+                "End": "2026-10-13T03:33:35.906077055Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "raglocalfirst0930_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "raglocalfirst0930-db-1",
+              "db"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "2b066ed089a445307b58a3a5ed12e27a9316ef5f5c3751acd2610867d94f7d29",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "raglocalfirst0930-db-1",
+              "db",
+              "5c9a6eacb994"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "raglocalfirst0930_rag-db",
+          "Source": "/var/lib/docker/volumes/raglocalfirst0930_rag-db/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "cb866de1e6586ad9aab53803dfdb8b243b8e01520574d147934cc5110c142215",
+        "name": "ragv1final0927-frontend-1",
+        "image_id": "sha256:632bca1d1e2b7d428ab8c004de4edaf23c3f514f1671ea0d4e55e7219c505463",
+        "image_tag": "ragv1final0927-frontend",
+        "compose_project": "ragv1final0927",
+        "compose_service": "frontend",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-30T05:51:42.776272112Z",
+          "FinishedAt": "2026-10-03T15:46:15.72455717Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "ragv1final0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ragv1final0927-frontend-1",
+              "frontend"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f81a69672a4f79574d3c8c8ae60bd998fb258000bdb1fa2dafc3d1f9d3ed90cd",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ragv1final0927-frontend-1",
+              "frontend",
+              "cb866de1e658"
+            ]
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "c788a7f9a2c3af8b4535eb046af6015dd38427dee99b9eb8929593d2ac3d3ea8",
+        "name": "ragv1final0927-api-1",
+        "image_id": "sha256:9054558102807c94a8d73ad170fd58586818508361eda6e6be7321d9f42f449d",
+        "image_tag": "ragv1final0927-api",
+        "compose_project": "ragv1final0927",
+        "compose_service": "api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-30T05:51:42.360795915Z",
+          "FinishedAt": "2026-10-03T15:46:18.491324833Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "ragv1final0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ragv1final0927-api-1",
+              "api"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f81a69672a4f79574d3c8c8ae60bd998fb258000bdb1fa2dafc3d1f9d3ed90cd",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ragv1final0927-api-1",
+              "api",
+              "c788a7f9a2c3"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "ragv1final0927_rag-storage",
+          "Source": "/var/lib/docker/volumes/ragv1final0927_rag-storage/_data",
+          "Destination": "/data/storage",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "fa1f8b0bc9f53fd1a23ad41bf94215a1649d5ff8462f1f52716cfa1b08408e47",
+        "name": "ragv1final0927-worker-1",
+        "image_id": "sha256:62fbc8dc9cd281ecef56fc0ba2c5054b1a4b521ad6219df00f3cc296ac884321",
+        "image_tag": "ragv1final0927-worker",
+        "compose_project": "ragv1final0927",
+        "compose_service": "worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-30T05:51:42.580441118Z",
+          "FinishedAt": "2026-10-03T15:46:18.47338762Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "ragv1final0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ragv1final0927-worker-1",
+              "worker"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f81a69672a4f79574d3c8c8ae60bd998fb258000bdb1fa2dafc3d1f9d3ed90cd",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ragv1final0927-worker-1",
+              "worker",
+              "fa1f8b0bc9f5"
+            ]
+          }
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "ragv1final0927_rag-storage",
+            "Source": "/var/lib/docker/volumes/ragv1final0927_rag-storage/_data",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "c705dd58ee38a637f2bddcd188a175fb98612b74c74b3d9798ac9de60daf5b54",
+        "name": "rag-eval-trust0928-db-clone-20260929t091523z",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-09T14:28:30.790245409Z",
+          "FinishedAt": "2026-10-11T15:52:42.382781941Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "acdc60d808054a5bea1167667b7d0bcdfcda8048540ff6c896608731db638f57",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "rag-eval-trust0928-db-clone-20260929t091523z",
+          "Source": "/var/lib/docker/volumes/rag-eval-trust0928-db-clone-20260929t091523z/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "e1fb28f7fd7fc969ec3e8ab3eaf1f815b59103aca11d182e8ab2b1b7b57b01e7",
+        "name": "rag-eval-trust0928-db",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "pgvector/pgvector:pg16",
+        "compose_project": null,
+        "compose_service": null,
+        "compose_working_dir": null,
+        "compose_config_files": null,
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-10T00:53:29.858841931Z",
+          "FinishedAt": "2026-10-11T15:52:42.363806758Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "bridge": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": null,
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "acdc60d808054a5bea1167667b7d0bcdfcda8048540ff6c896608731db638f57",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": null
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "c7f257b7cb2036ce42cb7c074d2aff92b5c32a551badf98c80589b1cc3ce9c53",
+          "Source": "/var/lib/docker/volumes/c7f257b7cb2036ce42cb7c074d2aff92b5c32a551badf98c80589b1cc3ce9c53/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "bfe2923ea6a7f92823446a3bc746c07c151f846c52a91a56caca33364753406f",
+        "name": "ragv1final0927-db-1",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "pgvector/pgvector:pg16",
+        "compose_project": "ragv1final0927",
+        "compose_service": "db",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-30T05:51:36.622484305Z",
+          "FinishedAt": "2026-10-03T15:46:15.631342176Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-03T15:45:54.5381145Z",
+                "End": "2026-10-03T15:45:54.599762257Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-03T15:45:59.600602626Z",
+                "End": "2026-10-03T15:45:59.646659311Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-03T15:46:04.647443588Z",
+                "End": "2026-10-03T15:46:04.726366184Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-03T15:46:09.727669032Z",
+                "End": "2026-10-03T15:46:09.785286001Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-03T15:46:14.784468536Z",
+                "End": "2026-10-03T15:46:14.832658385Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "ragv1final0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ragv1final0927-db-1",
+              "db"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f81a69672a4f79574d3c8c8ae60bd998fb258000bdb1fa2dafc3d1f9d3ed90cd",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ragv1final0927-db-1",
+              "db",
+              "bfe2923ea6a7"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "ragv1final0927_rag-db",
+          "Source": "/var/lib/docker/volumes/ragv1final0927_rag-db/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "8175fe24a247bef2c483b4dab8a774daabb7c20dae53b5ed8d88578f2ba75446",
+        "name": "v1reviewfinal0927-frontend-1",
+        "image_id": "sha256:7f8eef121c58e72215dfe3da0c176e65a5c1121db8cccbe8e3f4aa5de44d4d15",
+        "image_tag": "v1reviewfinal0927-frontend",
+        "compose_project": "v1reviewfinal0927",
+        "compose_service": "frontend",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:59:59.342117348Z",
+          "FinishedAt": "2026-09-26T17:05:25.000066189Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1reviewfinal0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1reviewfinal0927-frontend-1",
+              "frontend"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "107bd6e93e50444fccbbdea5fdfd4dd12bc8536d3a28e712c69287c2518b256d",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1reviewfinal0927-frontend-1",
+              "frontend",
+              "8175fe24a247"
+            ]
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "c00025e807fb6c71f2d4e12b4955b54030ef4bdb3955178418e5a5483a5be700",
+        "name": "v1reviewfinal0927-api-1",
+        "image_id": "sha256:1c6aef0945c5fc759c9ecd9ca65ffd982dc8a098c799d4aa0739fa4a026593c8",
+        "image_tag": "v1reviewfinal0927-api",
+        "compose_project": "v1reviewfinal0927",
+        "compose_service": "api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:59:59.105335845Z",
+          "FinishedAt": "2026-09-26T17:05:28.295237269Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1reviewfinal0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1reviewfinal0927-api-1",
+              "api"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "107bd6e93e50444fccbbdea5fdfd4dd12bc8536d3a28e712c69287c2518b256d",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1reviewfinal0927-api-1",
+              "api",
+              "c00025e807fb"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "v1reviewfinal0927_rag-storage",
+          "Source": "v1reviewfinal0927_rag-storage",
+          "Destination": "/data/storage",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "2d97164a06f142e1ba58d46d56d08de995162623430af7848b81fcf0f75abf6b",
+        "name": "v1reviewfinal0927-worker-1",
+        "image_id": "sha256:6c891bdf90cad848453fc1dc9036c702ee0241ba4873ab66b173dade88ececda",
+        "image_tag": "v1reviewfinal0927-worker",
+        "compose_project": "v1reviewfinal0927",
+        "compose_service": "worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T17:01:13.728375061Z",
+          "FinishedAt": "2026-09-26T17:05:27.93068939Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1reviewfinal0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1reviewfinal0927-worker-1",
+              "worker"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "107bd6e93e50444fccbbdea5fdfd4dd12bc8536d3a28e712c69287c2518b256d",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1reviewfinal0927-worker-1",
+              "worker",
+              "2d97164a06f1"
+            ]
+          }
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "v1reviewfinal0927_rag-storage",
+            "Source": "v1reviewfinal0927_rag-storage",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "e4ff031e96a95c8fa51800361832248756f3ce806a97a20b5725218134884c16",
+        "name": "v1reviewfinal0927-db-1",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "pgvector/pgvector:pg16",
+        "compose_project": "v1reviewfinal0927",
+        "compose_service": "db",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:45:18.09919442Z",
+          "FinishedAt": "2026-09-26T17:05:28.612102838Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-09-26T17:05:05.390385138Z",
+                "End": "2026-09-26T17:05:05.433985846Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:10.435185095Z",
+                "End": "2026-09-26T17:05:10.481850864Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:15.482851542Z",
+                "End": "2026-09-26T17:05:15.52886513Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:20.529442314Z",
+                "End": "2026-09-26T17:05:20.575906944Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:25.576486046Z",
+                "End": "2026-09-26T17:05:25.621791428Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1reviewfinal0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1reviewfinal0927-db-1",
+              "db"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "107bd6e93e50444fccbbdea5fdfd4dd12bc8536d3a28e712c69287c2518b256d",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1reviewfinal0927-db-1",
+              "db",
+              "e4ff031e96a9"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "v1reviewfinal0927_rag-db",
+          "Source": "v1reviewfinal0927_rag-db",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "e299de24aeae26dc55a537633d2643ec1a10df1dc14108919bac4b5f2d97730e",
+        "name": "v1review0927-db-1",
+        "image_id": "sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b",
+        "image_tag": "pgvector/pgvector:pg16",
+        "compose_project": "v1review0927",
+        "compose_service": "db",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:34:00.792420269Z",
+          "FinishedAt": "2026-09-26T17:05:16.535978404Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-09-26T17:04:54.59990881Z",
+                "End": "2026-09-26T17:04:54.644227622Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:04:59.643930482Z",
+                "End": "2026-09-26T17:04:59.689810904Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:04.691083911Z",
+                "End": "2026-09-26T17:05:04.735538427Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:09.736212435Z",
+                "End": "2026-09-26T17:05:09.780671266Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-09-26T17:05:14.781381404Z",
+                "End": "2026-09-26T17:05:14.825292612Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1review0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1review0927-db-1",
+              "db"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "aae3bb00745697e7ba60d81ba3be7d00825e3240679ff6248a299fb78f55af3f",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1review0927-db-1",
+              "db",
+              "e299de24aeae"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "v1review0927_rag-db",
+          "Source": "v1review0927_rag-db",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "a94fa5ee4d291751b753a8c06578ce854745580a1988717339503ea189ba0f16",
+        "name": "v1review0927-frontend-1",
+        "image_id": "sha256:1dcfbc28f518bd717af974fae7057fabfce89046ebd7a8c5e7c99c4bff65008d",
+        "image_tag": "v1review0927-frontend",
+        "compose_project": "v1review0927",
+        "compose_service": "frontend",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:34:06.911921848Z",
+          "FinishedAt": "2026-09-26T17:05:12.877287899Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1review0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1review0927-frontend-1",
+              "frontend"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "aae3bb00745697e7ba60d81ba3be7d00825e3240679ff6248a299fb78f55af3f",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1review0927-frontend-1",
+              "frontend",
+              "a94fa5ee4d29"
+            ]
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "3eaf7afb7aa65ad47cfc4b90dcc7cf1e4b07314f129e9f74509ae55977ee82e4",
+        "name": "v1review0927-api-1",
+        "image_id": "sha256:7db129a12d1d7d2e36b68c127e163d85049a46813bc6eb494c59720ac968b552",
+        "image_tag": "v1review0927-api",
+        "compose_project": "v1review0927",
+        "compose_service": "api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:34:06.540066297Z",
+          "FinishedAt": "2026-09-26T17:05:16.211061785Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1review0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1review0927-api-1",
+              "api"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "aae3bb00745697e7ba60d81ba3be7d00825e3240679ff6248a299fb78f55af3f",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1review0927-api-1",
+              "api",
+              "3eaf7afb7aa6"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "v1review0927_rag-storage",
+          "Source": "v1review0927_rag-storage",
+          "Destination": "/data/storage",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "13eb81278a26e66b81b45056dfa88d6be96471032841449ab9e4a7e6166eac03",
+        "name": "v1review0927-worker-1",
+        "image_id": "sha256:70af13151d0f8b51f5cad2149e225def195b21a76aa15afcad57c6aec7616ffc",
+        "image_tag": "v1review0927-worker",
+        "compose_project": "v1review0927",
+        "compose_service": "worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "restart_policy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:38:23.963428476Z",
+          "FinishedAt": "2026-09-26T17:05:15.811053222Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "v1review0927_default": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "v1review0927-worker-1",
+              "worker"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "aae3bb00745697e7ba60d81ba3be7d00825e3240679ff6248a299fb78f55af3f",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "v1review0927-worker-1",
+              "worker",
+              "13eb81278a26"
+            ]
+          }
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "v1review0927_rag-storage",
+            "Source": "v1review0927_rag-storage",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "a0206eb27192eab29c185ee570acd7b302bdcca161772284ce40195b79c69daf",
+        "name": "WeKnora-frontend",
+        "image_id": "sha256:83cfd9272e1219b5b5729f89d9c3f8d15a16e1b8cc17cacf638153cc0417290f",
+        "image_tag": "wechatopenai/weknora-ui:latest",
+        "compose_project": "weknora",
+        "compose_service": "frontend",
+        "compose_working_dir": "E:\\WeKnora",
+        "compose_config_files": "E:\\WeKnora\\docker-compose.yml",
+        "restart_policy": {
+          "Name": "unless-stopped",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-14T13:44:09.228667487Z",
+          "FinishedAt": "2026-10-14T13:44:33.102656146Z"
+        },
+        "mapped_ports": {},
+        "networks": {
+          "weknora_WeKnora-network": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "WeKnora-frontend",
+              "frontend"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f863a06db29d1bfeed10defabb092c00ce08f6f85f129d781a363661245f2174",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "WeKnora-frontend",
+              "frontend",
+              "a0206eb27192"
+            ]
+          }
+        },
+        "mounts": null
+      },
+      {
+        "id": "2f0a5c6c21e353f2b011f27075e10912516c5cc790be0d53f8458c1744a90f27",
+        "name": "WeKnora-app",
+        "image_id": "sha256:bc8a534799fcb54045100daf4bc5db86270b38ae45c5f761c410c50b4dcd6cdc",
+        "image_tag": "wechatopenai/weknora-app:latest",
+        "compose_project": "weknora",
+        "compose_service": "app",
+        "compose_working_dir": "E:\\WeKnora",
+        "compose_config_files": "E:\\WeKnora\\docker-compose.yml",
+        "restart_policy": {
+          "Name": "unless-stopped",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 1,
+          "Error": "",
+          "StartedAt": "2026-10-14T13:44:09.965251845Z",
+          "FinishedAt": "2026-10-14T13:44:35.173312696Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-14T04:04:40.368115304Z",
+                "End": "2026-10-14T04:04:40.42620293Z",
+                "ExitCode": 0,
+                "Output": "  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n\r  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0\r100    15  100    15    0     0  29069      0 --:--:-- --:--:-- --:--:-- 15000\n{\"status\":\"ok\"}"
+              },
+              {
+                "Start": "2026-10-14T04:05:10.424894529Z",
+                "End": "2026-10-14T04:05:10.45656892Z",
+                "ExitCode": 0,
+                "Output": "  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n\r  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0\r100    15  100    15    0     0  22488      0 --:--:-- --:--:-- --:--:-- 15000\n{\"status\":\"ok\"}"
+              },
+              {
+                "Start": "2026-10-14T04:05:40.454658887Z",
+                "End": "2026-10-14T04:05:40.489206714Z",
+                "ExitCode": 0,
+                "Output": "  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n\r  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0\r100    15  100    15    0     0  31446      0 --:--:-- --:--:-- --:--:-- 15000\n{\"status\":\"ok\"}"
+              },
+              {
+                "Start": "2026-10-14T04:06:10.488627209Z",
+                "End": "2026-10-14T04:06:10.586221724Z",
+                "ExitCode": 0,
+                "Output": "  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n\r  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0{\"status\":\"ok\"}\r100    15  100    15    0     0  16648      0 --:--:-- --:--:-- --:--:-- 15000\n"
+              },
+              {
+                "Start": "2026-10-14T13:44:15.155972245Z",
+                "End": "2026-10-14T13:44:15.277769751Z",
+                "ExitCode": 0,
+                "Output": "  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n\r  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0{\"status\":\"ok\"}\r100    15  100    15    0     0  21126      0 --:--:-- --:--:-- --:--:-- 15000\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "weknora_WeKnora-network": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "WeKnora-app",
+              "app"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f863a06db29d1bfeed10defabb092c00ce08f6f85f129d781a363661245f2174",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "WeKnora-app",
+              "app",
+              "2f0a5c6c21e3"
+            ]
+          }
+        },
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "weknora_data-files",
+            "Source": "/var/lib/docker/volumes/weknora_data-files/_data",
+            "Destination": "/data/files",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "volume",
+            "Name": "weknora_docreader-tmp",
+            "Source": "/var/lib/docker/volumes/weknora_docreader-tmp/_data",
+            "Destination": "/tmp/docreader",
+            "Driver": "local",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "/run/desktop/mnt/host/e/WeKnora/config/config.yaml",
+            "Destination": "/app/config/config.yaml",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": "rprivate"
+          }
+        ]
+      },
+      {
+        "id": "5f264fb3db5d92acee4080218d0cca5a551ed6bd3062171a6a7887fab283d17b",
+        "name": "WeKnora-docreader",
+        "image_id": "sha256:3c36e7e738ba515315523876d8041f9bb02809145a4e3b331e2550e4bff98b7a",
+        "image_tag": "wechatopenai/weknora-docreader:latest",
+        "compose_project": "weknora",
+        "compose_service": "docreader",
+        "compose_working_dir": "E:\\WeKnora",
+        "compose_config_files": "E:\\WeKnora\\docker-compose.yml",
+        "restart_policy": {
+          "Name": "unless-stopped",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 143,
+          "Error": "",
+          "StartedAt": "2026-10-14T13:44:10.340804049Z",
+          "FinishedAt": "2026-10-14T13:44:36.688957983Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-14T04:04:36.688993928Z",
+                "End": "2026-10-14T04:04:36.744767795Z",
+                "ExitCode": 0,
+                "Output": "status: SERVING\n"
+              },
+              {
+                "Start": "2026-10-14T04:05:06.743983395Z",
+                "End": "2026-10-14T04:05:06.777803766Z",
+                "ExitCode": 0,
+                "Output": "status: SERVING\n"
+              },
+              {
+                "Start": "2026-10-14T04:05:36.775991281Z",
+                "End": "2026-10-14T04:05:36.808138259Z",
+                "ExitCode": 0,
+                "Output": "status: SERVING\n"
+              },
+              {
+                "Start": "2026-10-14T04:06:06.806910091Z",
+                "End": "2026-10-14T04:06:06.845134799Z",
+                "ExitCode": 0,
+                "Output": "status: SERVING\n"
+              },
+              {
+                "Start": "2026-10-14T13:44:15.529575656Z",
+                "End": "2026-10-14T13:44:15.614684895Z",
+                "ExitCode": 0,
+                "Output": "status: SERVING\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "weknora_WeKnora-network": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "WeKnora-docreader",
+              "docreader"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f863a06db29d1bfeed10defabb092c00ce08f6f85f129d781a363661245f2174",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "WeKnora-docreader",
+              "docreader",
+              "5f264fb3db5d"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "weknora_docreader-tmp",
+          "Source": "/var/lib/docker/volumes/weknora_docreader-tmp/_data",
+          "Destination": "/tmp/docreader",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "0b31975b97e73bf9c51fa54b41aa4da97221a40d5f6e8ebb7c1c03b7522c80e9",
+        "name": "WeKnora-postgres",
+        "image_id": "sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2",
+        "image_tag": "paradedb/paradedb:v0.22.6-pg17",
+        "compose_project": "weknora",
+        "compose_service": "postgres",
+        "compose_working_dir": "E:\\WeKnora",
+        "compose_config_files": "E:\\WeKnora\\docker-compose.yml",
+        "restart_policy": {
+          "Name": "unless-stopped",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-14T13:44:10.97587351Z",
+          "FinishedAt": "2026-10-14T13:44:38.222535049Z",
+          "Health": {
+            "Status": "unhealthy",
+            "FailingStreak": 0,
+            "Log": [
+              {
+                "Start": "2026-10-14T04:06:07.751251783Z",
+                "End": "2026-10-14T04:06:07.805910063Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-14T04:06:17.805665509Z",
+                "End": "2026-10-14T04:06:17.894611988Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-14T13:44:16.173957453Z",
+                "End": "2026-10-14T13:44:16.30915499Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-14T13:44:26.309703045Z",
+                "End": "2026-10-14T13:44:26.372156148Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              },
+              {
+                "Start": "2026-10-14T13:44:36.369993668Z",
+                "End": "2026-10-14T13:44:36.433961774Z",
+                "ExitCode": 0,
+                "Output": "/var/run/postgresql:5432 - accepting connections\n"
+              }
+            ]
+          }
+        },
+        "mapped_ports": {},
+        "networks": {
+          "weknora_WeKnora-network": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "WeKnora-postgres",
+              "postgres"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f863a06db29d1bfeed10defabb092c00ce08f6f85f129d781a363661245f2174",
+            "EndpointID": "",
+            "Gateway": "",
+            "IPAddress": "",
+            "MacAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "WeKnora-postgres",
+              "postgres",
+              "0b31975b97e7"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "weknora_postgres-data",
+          "Source": "/var/lib/docker/volumes/weknora_postgres-data/_data",
+          "Destination": "/var/lib/postgresql/data",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      },
+      {
+        "id": "b70163fc3c0f6889377f4deae47d1af65c09dfb3be7013037583ad152ad4a030",
+        "name": "WeKnora-redis",
+        "image_id": "sha256:c9d92d840fd011c908f040592857c724ae6d877f2aba5c40ad963276507386b2",
+        "image_tag": "redis:7.0-alpine",
+        "compose_project": "weknora",
+        "compose_service": "redis",
+        "compose_working_dir": "E:\\WeKnora",
+        "compose_config_files": "E:\\WeKnora\\docker-compose.yml",
+        "restart_policy": {
+          "Name": "always",
+          "MaximumRetryCount": 0
+        },
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 571,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-17T06:03:12.441661284Z",
+          "FinishedAt": "2026-10-17T06:03:11.582440552Z"
+        },
+        "mapped_ports": {
+          "6379/tcp": null
+        },
+        "networks": {
+          "weknora_WeKnora-network": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "WeKnora-redis",
+              "redis"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "f863a06db29d1bfeed10defabb092c00ce08f6f85f129d781a363661245f2174",
+            "EndpointID": "68aa5cacb86ee8054fb9c8a34fb7c7f835595752056d364568c49bd7826dee0c",
+            "Gateway": "172.18.0.1",
+            "IPAddress": "172.18.0.2",
+            "MacAddress": "e2:b6:f8:64:b1:ab",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "WeKnora-redis",
+              "redis",
+              "b70163fc3c0f"
+            ]
+          }
+        },
+        "mounts": {
+          "Type": "volume",
+          "Name": "7f9bdd54486ae4e48b9042fe37b97964602faf036ca1469864e1db4514da1464",
+          "Source": "/var/lib/docker/volumes/7f9bdd54486ae4e48b9042fe37b97964602faf036ca1469864e1db4514da1464/_data",
+          "Destination": "/data",
+          "Driver": "local",
+          "Mode": "",
+          "RW": true,
+          "Propagation": ""
+        }
+      }
+    ]
+  },
+  "host_port_owners": [
+    {
+      "pid": 32380,
+      "parent_pid": 42232,
+      "name": "com.docker.backend.exe",
+      "executable_path": "E:\\Docker\\DockerDesktop\\resources\\com.docker.backend.exe",
+      "command_line": "E:\\Docker\\DockerDesktop\\resources\\com.docker.backend.exe services",
+      "raw_command_line_sha256": "d31d3af83bede9ce639fe143a044f9f3142dab403b3ecd802452765f036cc2c8",
+      "note": "Docker Desktop backend owns host-published PostgreSQL/Redis listener sockets; application service identity is in container metadata."
+    }
+  ],
+  "retirement_review": {
+    "old_api_worker_candidates": [
+      {
+        "container_id": "5aeef69378f354ee4592912227da64cba544069b9e8bf0bd4dcd098373993400",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "worker",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-10-13T01:17:47.387174477Z",
+          "FinishedAt": "2026-10-13T03:33:41.270167216Z"
+        },
+        "image_id": "sha256:a94a1696a6e41bd7b15b502607d4d9e605428b29ee26fb8914b2f9fdf3dcb82c",
+        "image_tag": "personal-rag:weknora-unit-guard-20261013",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml,E:\\RAG quention\\var\\reports\\weknora-ordinary-20261012\\fenced-service.override.yml",
+        "mapped_ports": {},
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "raglocalfirst0930_rag-storage",
+            "Source": "/var/lib/docker/volumes/raglocalfirst0930_rag-storage/_data",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\model-assets",
+            "Destination": "/opt/model-assets",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ],
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "db29f9707d27d1616e74382b8e16ac4868395cad97051ea05eeb79e942cefe35",
+        "compose_project": "raglocalfirst0930",
+        "compose_service": "api",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 0,
+          "Error": "",
+          "StartedAt": "2026-10-13T01:17:47.643790609Z",
+          "FinishedAt": "2026-10-13T03:33:39.417661295Z"
+        },
+        "image_id": "sha256:a94a1696a6e41bd7b15b502607d4d9e605428b29ee26fb8914b2f9fdf3dcb82c",
+        "image_tag": "personal-rag:weknora-unit-guard-20261013",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml,E:\\RAG quention\\var\\reports\\weknora-ordinary-20261012\\fenced-service.override.yml",
+        "mapped_ports": {},
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "raglocalfirst0930_rag-storage",
+            "Source": "/var/lib/docker/volumes/raglocalfirst0930_rag-storage/_data",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "/run/desktop/mnt/host/e/RAG quention/var/model-assets",
+            "Destination": "/opt/model-assets",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ],
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "c788a7f9a2c3af8b4535eb046af6015dd38427dee99b9eb8929593d2ac3d3ea8",
+        "compose_project": "ragv1final0927",
+        "compose_service": "api",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-30T05:51:42.360795915Z",
+          "FinishedAt": "2026-10-03T15:46:18.491324833Z"
+        },
+        "image_id": "sha256:9054558102807c94a8d73ad170fd58586818508361eda6e6be7321d9f42f449d",
+        "image_tag": "ragv1final0927-api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "mapped_ports": {},
+        "mounts": {
+          "Type": "volume",
+          "Name": "ragv1final0927_rag-storage",
+          "Source": "/var/lib/docker/volumes/ragv1final0927_rag-storage/_data",
+          "Destination": "/data/storage",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "fa1f8b0bc9f53fd1a23ad41bf94215a1649d5ff8462f1f52716cfa1b08408e47",
+        "compose_project": "ragv1final0927",
+        "compose_service": "worker",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-30T05:51:42.580441118Z",
+          "FinishedAt": "2026-10-03T15:46:18.47338762Z"
+        },
+        "image_id": "sha256:62fbc8dc9cd281ecef56fc0ba2c5054b1a4b521ad6219df00f3cc296ac884321",
+        "image_tag": "ragv1final0927-worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "mapped_ports": {},
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "ragv1final0927_rag-storage",
+            "Source": "/var/lib/docker/volumes/ragv1final0927_rag-storage/_data",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ],
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "c00025e807fb6c71f2d4e12b4955b54030ef4bdb3955178418e5a5483a5be700",
+        "compose_project": "v1reviewfinal0927",
+        "compose_service": "api",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:59:59.105335845Z",
+          "FinishedAt": "2026-09-26T17:05:28.295237269Z"
+        },
+        "image_id": "sha256:1c6aef0945c5fc759c9ecd9ca65ffd982dc8a098c799d4aa0739fa4a026593c8",
+        "image_tag": "v1reviewfinal0927-api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "mapped_ports": {},
+        "mounts": {
+          "Type": "volume",
+          "Name": "v1reviewfinal0927_rag-storage",
+          "Source": "v1reviewfinal0927_rag-storage",
+          "Destination": "/data/storage",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "2d97164a06f142e1ba58d46d56d08de995162623430af7848b81fcf0f75abf6b",
+        "compose_project": "v1reviewfinal0927",
+        "compose_service": "worker",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T17:01:13.728375061Z",
+          "FinishedAt": "2026-09-26T17:05:27.93068939Z"
+        },
+        "image_id": "sha256:6c891bdf90cad848453fc1dc9036c702ee0241ba4873ab66b173dade88ececda",
+        "image_tag": "v1reviewfinal0927-worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "mapped_ports": {},
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "v1reviewfinal0927_rag-storage",
+            "Source": "v1reviewfinal0927_rag-storage",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ],
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "3eaf7afb7aa65ad47cfc4b90dcc7cf1e4b07314f129e9f74509ae55977ee82e4",
+        "compose_project": "v1review0927",
+        "compose_service": "api",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:34:06.540066297Z",
+          "FinishedAt": "2026-09-26T17:05:16.211061785Z"
+        },
+        "image_id": "sha256:7db129a12d1d7d2e36b68c127e163d85049a46813bc6eb494c59720ac968b552",
+        "image_tag": "v1review0927-api",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "mapped_ports": {},
+        "mounts": {
+          "Type": "volume",
+          "Name": "v1review0927_rag-storage",
+          "Source": "v1review0927_rag-storage",
+          "Destination": "/data/storage",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        },
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      },
+      {
+        "container_id": "13eb81278a26e66b81b45056dfa88d6be96471032841449ab9e4a7e6166eac03",
+        "compose_project": "v1review0927",
+        "compose_service": "worker",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Paused": false,
+          "Restarting": false,
+          "OOMKilled": false,
+          "Dead": false,
+          "Pid": 0,
+          "ExitCode": 137,
+          "Error": "",
+          "StartedAt": "2026-09-26T16:38:23.963428476Z",
+          "FinishedAt": "2026-09-26T17:05:15.811053222Z"
+        },
+        "image_id": "sha256:70af13151d0f8b51f5cad2149e225def195b21a76aa15afcad57c6aec7616ffc",
+        "image_tag": "v1review0927-worker",
+        "compose_working_dir": "E:\\RAG quention\\deploy",
+        "compose_config_files": "E:\\RAG quention\\deploy\\compose.yml",
+        "mapped_ports": {},
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "v1review0927_rag-storage",
+            "Source": "v1review0927_rag-storage",
+            "Destination": "/data/storage",
+            "Driver": "local",
+            "Mode": "rw",
+            "RW": true,
+            "Propagation": ""
+          },
+          {
+            "Type": "bind",
+            "Source": "E:\\RAG quention\\var\\tessdata",
+            "Destination": "/opt/tessdata",
+            "Mode": "ro",
+            "RW": false,
+            "Propagation": "rprivate"
+          }
+        ],
+        "classification": "old_api_worker_candidate_for_root_review",
+        "evidence": "Compose project/service labels plus working_dir/config_files, image identity, state, port mapping and mounts; do not decide from name alone.",
+        "owner_confirmation_required_before_any_stop_or_delete": true
+      }
+    ],
+    "old_port_25438": {
+      "published_container_mapping_found": false,
+      "listener_found": false
+    },
+    "protected_runtime": {
+      "eviroute_postgres": {
+        "compose_project": "eviroute-rag",
+        "system_identifier_verification": "NOT VERIFIED: read-only SQL attempt using default postgres role failed because that role does not exist; no volume contents read.",
+        "container_id": "89c5cb748e2ec7aca3b1e3b181dfe936a4054137ddb4de5c4e8689e86387e720",
+        "operator_supplied_system_identifier": "7696088403504697382",
+        "volume": "weknora-python-resume-pg-20261013",
+        "service": "postgres",
+        "host_port": 56423
+      },
+      "eviroute_redis": {
+        "service": "redis",
+        "compose_project": "eviroute-rag",
+        "dbsize_readonly_result": 147,
+        "host_port": 56424,
+        "database": 15,
+        "container_id": "15fe772fab7d9ac5b6023ff2075ebb5e12ccee80e274f91b16fe612e8748e897",
+        "volume": "weknora-python-resume-redis-20261013",
+        "restart_policy": "no"
+      }
+    },
+    "preservation_rule": "Preserve both active EviRoute-mounted volumes and all other volumes during this inventory. No stops, restarts, deletes, pruning, or volume reads performed.",
+    "legacy_25438_rule": "Do not operate on port 25438.",
+    "no_config_env_content_saved": true
+  }
+}
