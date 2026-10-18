@@ -7,7 +7,7 @@ from types import SimpleNamespace as NS
 import pytest
 from scripts.rag_m32_threshold_replay import (
     SavedRepository, SearchResult, disable_network, snapshot_differences,
-    validate_raw_results,
+    validate_raw_results, replay_verdict,
 )
 
 
@@ -31,11 +31,14 @@ def test_repository_rejects_kb_and_document_scope(kbs, docs):
         asyncio.run(SavedRepository({'chunk': row()}).get_chunks(['chunk'], context(kbs, docs)))
 
 
-@pytest.mark.parametrize('field', ['knowledge_base_id', 'knowledge_id', 'chunk_type'])
+@pytest.mark.parametrize('field', ['content', 'source_version', 'knowledge_base_id', 'knowledge_id', 'chunk_type'])
 def test_historical_identity_change_is_reported(field):
     historical = row()
     current = deepcopy(historical)
-    setattr(current, field, 'changed')
+    if field == 'source_version':
+        current.chunk_metadata[field] = 'changed'
+    else:
+        setattr(current, field, 'changed')
     assert snapshot_differences(historical, current) == [field]
 
 
@@ -59,3 +62,25 @@ def test_network_connect_is_blocked(monkeypatch):
             client.connect(('127.0.0.1', 1))
         with pytest.raises(RuntimeError, match='OFFLINE_NETWORK_FORBIDDEN'):
             client.connect_ex(('127.0.0.1', 1))
+
+
+@pytest.mark.parametrize('merge_status,extra', [
+    ('NOT_REPLAYABLE_MISSING_OR_CHANGED_SOURCE_SNAPSHOT', {}),
+    ('PASS', {'through_top_k_ids': []}),
+])
+def test_partial_replay_never_reports_pass(merge_status, extra):
+    cases = [{'case': 'complete-receipt', 'threshold_runs': [
+        {'threshold': .15, 'status': 'PASS', 'merge_status': merge_status, **extra}]}]
+    status, code, incomplete = replay_verdict(cases, True)
+    assert status == 'PARTIAL_NOT_REPLAYABLE'
+    assert code != 0
+    assert len(incomplete) == 1
+
+
+def test_pipeline_search_nothing_and_missing_receipt_are_not_partial():
+    cases = [
+        {'case': 'no-receipt', 'threshold_runs': []},
+        {'case': 'search-nothing', 'threshold_runs': [
+            {'threshold': .3, 'status': 'SEARCH_NOTHING', 'merge_status': 'NOT_RUN_PIPELINE_STOPS'}]},
+    ]
+    assert replay_verdict(cases, True) == ('PASS_OFFLINE_PRODUCT_REPLAY', 0, [])

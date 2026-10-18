@@ -179,3 +179,109 @@ Cheap 回答了信号扩散、大气层折射使信号难以准确发送、信�
 实际命令 `python -B E:\WK\run\rag-m31-20261018\run_b1.py prepare`、`start`、`query`、最终 `snapshot`、`stop` 均退出 **0**；`query` 只执行一次。首次收尾 `snapshot` 退出 **1**，原因是复用诊断工具需要 case 的 `tenant_id` 而包装器漏记该字段；仅给新实验状态补上已知 tenant 332 后完成只读快照，原始请求／回执未改、问答未重发。离线 `summarize_b1.py` 最终退出 **0**；初版分析器误把排名二元组当成对象的 TypeError 保留记录，修正为读取原有 typed stage 行，没有修改产品流程或新增调用。
 
 新增证据根 `E:\WK\run\rag-m31-20261018\live-b1`：`owner-authorization.json`、`plan.json`、`history-seed.json`、`cases/b1-B/{request.json,answer.sse,result.json,messages.json}`、`evidence-332/{provider-requests,raw,stages,captures}`、`usage.json`、`summary.json`、`live-result.json`、`semantic-review.json`、`final-integrity.json` 及哈希清单。真实请求脚本和离线汇总脚本保存在同级任务证据目录中。下一步仅需单独确定 B2 正常消息附件接线范围；本次 B1 通过不能证明 B 适合全面推广，Omni 质量结论保持前节原状。
+
+
+## M3.2：精确证据保留对照（2026-10-18）
+
+**离线结论：采用已有会话级 `rerank_threshold=0.15` 作为有限验证候选；生产默认继续 0.3，不新增精确保留规则。** Omni A/B 的精确 OCR 均可通过原有 MMR、Merge、Top-K 到最终 Context；这项冻结输入收益尚不能证明全局降阈值安全，也不能直接证明新答案正确。本轮另获新授权并执行两次独立请求：Omni 因执行器错误未生成答案，0959 完成真实 Cheap 回答，整体 **`M3_2_PARTIAL`**；详见后面的真实验证。不复用 M3.1 授权，也不把部分链路成功计为完整回答通过。
+
+### 源码与重放可信范围
+
+开始时本地与 `git fetch origin` 核对的远端均为 `2d0f1c5c950c70a246039f8f1086cf6438aef08c`，分支 `codex/weknora-python-port-integrate-image-20261014`。固定上游不变。重放执行时生产源码为该 SHA；诊断脚本／测试随后独立本地提交 `cdf83444fce8d1cbf2ebad22a9da0ab122f08ec4`。本节最终交付提交以 `git log -1 --format=%H -- docs/milestones/RAG_M3_REPORT.md` 和交付消息中的完整 SHA 为准，避免文档自包含自身 Git 哈希。
+
+新增脚本 `scripts/rag_m32_threshold_replay.py` 直接调用产品 `rerank()`（内含原生筛选和 MMR）、`merge()`、`filter_top_k()`、`into_chat_message()`。没有复制筛选算法，保存模型仅返回原始回执并严格核对 Query、完整候选文本和顺序；脚本拒绝 socket 连接。原始分数、wire、Gold 和历史输出均未改写。完整 15 组 Rerank 回执各重放 0.3／0.25／0.2／0.15／0，共 **75 次离线计算、0 次真实 Rerank 请求**；不把它们计为新模型调用。其余 5 组没有完整 Rerank 回执，逐案标明 `NOT_REPLAYABLE_NO_COMPLETE_RERANK_RECEIPT`，不编造分数。
+
+Merge 使用显式 `BEGIN TRANSACTION READ ONLY` 导出的当前来源快照 **553 行**。读取前核对 PG `127.0.0.1:56423`、库 `weknora_python_port_20261013`、system identifier `7696088403504697382`；未写数据库或索引。该快照不是历史快照：历史候选与当前行的 `content/source_version/knowledge_base_id/knowledge_id/chunk_type` 五项逐一一致后才使用。0.3 下 **15 组 Rerank、13 组完整 Merge/Context、2 组正确 SearchNothing 停止**与保存结果一致，合计 **41 项基线比较全部匹配**。因此以下是产品函数的保存响应重放，不冒充新的真实 HTTP 问答。
+
+### 五档对照
+
+下表为 `MMR 选择数量 → Merge/Top-K 后 Context 块数`；每格按 A/B 分开。精确目标是否保留另行检查，不以同页 Summary 或来源 ID 命中代替。
+
+| 样本 | 0.3 | 0.25 | 0.2 | 0.15 | 0（仅诊断） |
+|---|---|---|---|---|---|
+| Omni A | 1→1 | 1→1 | 1→1 | 2→2 | 30→29 |
+| Omni B | 1→1 | 2→2 | 2→2 | 2→2 | 30→29 |
+| Hotpot A | 2→2 | 2→2 | 3→3 | 3→3 | 30→22 |
+| Hotpot B | 3→3 | 3→3 | 3→3 | 3→3 | 30→22 |
+| 0434 A | 0→0 | 0→0 | 0→0 | 0→0 | 30→14 |
+| 0434 B | 0→0 | 0→0 | 0→0 | 0→0 | 30→17 |
+| 0959 A | 2→2 | 2→2 | 2→2 | 2→2 | 30→13 |
+| 0959 B | 2→2 | 2→2 | 2→2 | 2→2 | 30→15 |
+
+LongBench、MIRACL、SciFact 及原 A 检索追问的现有完整回执也纳入这 15 组，只做离线干扰检查，没有重新运行六套数据集。逐案候选 ID、真实原分数、threshold/MMR/Merge/Top-K/Context 路径和字符数见 `RAG_M3_2_RERANK_RETENTION.results.json`。短标题偶然出现在其他段落不等同于该 Chunk 被保留；机器摘要分别保存文字出现、原候选 ID 的合并身份和精确目标文本。
+
+| 精确目标及结果 | 0.3 | 0.25 | 0.2 | 0.15 | 0 |
+|---|---|---|---|---|---|
+| Omni A OCR `51316a20…`，原分数 0.1673908234 | 阈值丢弃 | 丢弃 | 丢弃 | 全阶段保留 | 保留但噪声严重 |
+| Omni B 同一 OCR，原分数 0.2708410025 | 阈值丢弃 | 全阶段保留 | 全阶段保留 | 全阶段保留 | 保留但噪声严重 |
+| Hotpot A/B 第二跳 text `31417c7c…` | 丢弃 | 丢弃 | 丢弃 | 丢弃 | 精确文本到 Context |
+| 0434 A/B Kaggle text `085643dc…` | 丢弃 | 丢弃 | 丢弃 | 丢弃 | 精确文本到 Context |
+
+Omni Summary `4427641f…` 与 OCR 是两个独立 Chunk，0.15 下两者共存；Summary 仍只有主题说明，不能回答数字。原冻结图片 `E:\WK\run\p9-20261016\s\95a3151c2c9f5f3d9e36\PPT_lecture1_page_007.png` 已实际查看，系数矩阵为 `[1,-2,1; 0,2,-8; -4,5,9]`，增广末列为 `0,8,-9`，与有噪声的 OCR 对应。这是事后来源核对，未写入模型输入、索引或 Gold，未重跑 OCR。
+
+### 收益、干扰与工程决定
+
+- **0.25／0.2：**只能恢复 Omni B，不能恢复 A。0.2 开始让 Hotpot A 新增一段 Beaumont 诗集／人物简介，虽有人名匹配但不证明研讨会地点；Context 从 2,632 增至 3,387 字符（+755），目标第二跳仍未进入。
+- **0.15：**Omni A/B 的原文 OCR 均进入最终 Context，原问题所需数字证据由 0 个增至 1 个；每组 Context 从 **295→623 字符（+328）**，新增明确无关 OCR 为 0。0959 A/B 的 **整个 Context 均与 0.3 完全相同**，均为 2 块／1,720 字符，原无线电波、微波证据保留。15 组中仅 4 组 Context 有变化：Omni A/B、Hotpot A，以及原 M3 的 A 检索追问；后者补入地球曲率阻挡信号的原课件段落（0.1967539），Context 1,279→1,720 字符，属于相关补充。这里只重放旧 M3 回执，没有重新执行已通过的 B1。不能据此推断全量语料无副作用。
+- **0：**Omni 每组通过 30 个候选，其中内容核对为 1 个含答案的带噪 OCR、3 个仅主题相关、2 个不确定、**24 个明确无关**。Merge 后 29 个独立块中仍保留 **23 个明确无关原候选身份**；第 24 个候选文本也可能经其他块出现，另行记录，不能算成新的相关证据。Context 膨胀至 A **35,354**／B **34,251** 字符。即使 Hotpot／0434 目标也进入，仍不建议该诊断上界用于上线。
+- **负例覆盖限制：**候选相关性来自对原始文本的 agent-assisted engineering review，是可复查的工程标注，不是新增人工 Gold 或官方 precision。未知候选保持 UNKNOWN。已有 chitchat 无检索，不算拒答负例；P29 `utc-empty` 没有候选，也不能证明低阈值对有干扰候选安全。未因缺少负例额外调用模型。
+
+**选择 A 作为隔离验证候选，生产执行 C。** 现有 `context_config.conversation.rerank_threshold` 已可注入 0.15，故不必新增运行代码。拒绝新增“数字问题＋同页 Summary 就补 OCR”的规则：同源不证明相关，当前又没有经过足够负例验证的通用精确字段匹配条件；新增词表／状态机没有本轮必要证据。保留生产 0.3、0.15 top-1 floor、模型、Top-K、MMR、Merge、Prompt、查询理解 A 及动态路由不变。不实施无条件 OCR 提权。
+
+### 实际命令与验证
+
+工作目录 `E:\RAG-Worktrees\weknora-python-port-20261013`，解释器为 `E:\RAG quention\.venv\Scripts\python.exe`，下表 `python -B` 指该实际解释器。
+
+| 实际命令 | 退出码／证据 |
+|---|---|
+| `git fetch origin`；`git rev-parse HEAD`；`git rev-parse origin/codex/weknora-python-port-integrate-image-20261014` | 0；起始本地／远端均 `2d0f1c5…` |
+| `python -B E:\WK\run\rag-m32-20261018\replay_snapshot.py` | 最终 0，`SOURCE_ROWS 553`；首次因 Windows ProactorEventLoop 不兼容退出 1，改该只读工具为 SelectorEventLoop 后完成，无历史数据修改 |
+| `python -B scripts/rag_m32_threshold_replay.py --snapshot E:\WK\run\rag-m32-20261018\replay-source-snapshot.json --output E:\WK\run\rag-m32-20261018\replay-results.json` | 0；41 项全部一致。初始版本另存 `replay-results-initial.json`，随后增加输入身份与原响应格式校验后离线重跑 |
+| `python -B -m pytest tests/weknora_port/test_rag_m32_replay.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_filter_top_k.py tests/weknora_port/test_conversation_configuration.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m32-20261018\pytest-final` | **0，100 passed in 1.71s**；`pytest-final.log` |
+| `python -B E:\WK\run\rag-m32-20261018\summarize_offline.py` | 0；生成本节配套机器摘要，未调用模型 |
+| `git diff --check`／`git diff --cached --check` | 0；提交前执行 |
+| `python -B E:\WK\run\rag-m32-20261018\run_live.py prepare`／首次 `start` | 各 0；新授权、模型、Scope、资源预检通过 |
+| 同上 `query omni-page007` | **1**；202.571 秒后显式失败 SSE，3 份已报告用量，未发送最终答案，不重发 |
+| `python -B -m pytest E:\WK\run\rag-m32-20261018\test_live_send_gate.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m32-20261018\pytest-live-tool` | **0，2 passed**；实际发送限制保留 durable gate 身份并拒绝非 SiliconFlow |
+| `run_live.py confirm-tool-failure`／修正后 `start`／`query mml-0959` | 各 0；首案明确失败并保留计数后，只运行另一个未执行样本 |
+| `run_live.py snapshot`／`stop`／`python -B E:\WK\run\rag-m32-20261018\summarize_live.py` | 最终各 0；快照、完整回执和持久化核对完成，自有 API 停止 |
+
+100 项为离线定向验证，覆盖正常 Rerank／MMR、Merge／Context、Top-K、配置优先级及 Scope。新增 16 项专门防止诊断工具把缺失行、跨 KB／文档身份、非法／重复 raw index、缺失 score 或网络连接误判为有效重放；过期版本通过当前快照与历史版本严格比对拒绝，不声称离线工具代替真实生产权限验收。未改生产引用系统；空证据不会生成新的真实引用记录。
+
+### 交付和剩余问题
+
+本轮相关文件仅：`scripts/rag_m32_threshold_replay.py`、`tests/weknora_port/test_rag_m32_replay.py`、本报告增补、`docs/milestones/RAG_M3_2_RERANK_RETENTION.results.json`。详细证据在 `E:\WK\run\rag-m32-20261018`，包含原回执哈希清单、当前只读快照、完整 75 次重放、逐候选内容标注、测试日志和源图哈希；大型原始内容不加入 Git。生产模块、依赖、迁移、索引、历史账本、UNKNOWN 均未修改，用户原有 8 个未提交路径保留。离线阶段云调用为 0；新增真实消耗和失败均在下一节单列。
+
+尚未证明：0.15 对新问题和真实生成的收益、广泛无答案场景的误召回风险；Hotpot 第二跳和 0434 在 0.15 仍丢失。它们属于后续相关性／输入证据问题，不能用继续降低全局阈值一起解决。两次真实请求额度已使用，Omni 完整生成仍未验收，不能用0959通过替代。若 Owner 后续另批一次 Omni 验证，应复用已修复的执行器；本轮不补发。不重复 B1，不开发 B2，不自动扩大样本或推广默认值。本轮只本地提交，不 Push、部署、合并或打 Tag。
+
+
+### 新授权后的真实验证：2 次尝试，1 次完整回答
+
+Owner 对本轮明确确认：仅现有 SiliconFlow，最多 2 次完整问答、12 次 Provider、100,000 已报告 Token，UNKNOWN 停止；后续 UI 确认按同一授权记录，未刷新额度。保持 DYNAMIC、查询理解 A、原 Cheap、Embedding、Rerank、原问题、既有 KB 与 `document_scope=[]`。只在新会话注入阈值 0.15，运行时额外保存实际 `rerank_threshold=0.15`、Top-K=30。所有新 Provider 均为 SiliconFlow；未发送 DeepSeek、VLM 或新入库请求。
+
+| 样本 | 真实阶段与生成 | 质量及状态 | 总 Token／端到端 |
+|---|---|---|---|
+| Omni page007 | Search30→Rerank2→Merge2→Context2；目标 OCR 排名2，原分数 **0.2711016238**，623字符 Context 含完整 OCR；最终答案调用 **0** | **FAIL_NO_ANSWER_GENERATED**；执行器在生成准备阶段阻断，没有矩阵答案可评分 | 31,253／202.571秒 |
+| 0959 | Search30→Rerank2→Merge2→Context2；两段来源实际进入 Cheap 请求；`finish_reason=stop`，未升级 | **PASS_SUPPORTED_WITH_SOURCE_TERMINOLOGY_CAVEAT**；无线电波／电离层、微波卫星和附加传播问题均有课件支持；SSE=持久化 | 8,210／435.698秒 |
+
+**首案失败是本轮执行器错误，非 Rerank／Merge 缺陷。** 本轮包装器最初在 `model_factory` 构造阶段拒绝非 SiliconFlow。产品 `runtime.py::_generation()` 在 DYNAMIC 决策前会预加载 Cheap 和 Expensive，因此本地构造 DeepSeek 就触发普通 RuntimeError，被服务映射为 `ORDINARY_CHAIN_FAILED`。没有答案 HTTP 请求或不确定外发。SSE 失败与 PG `port_turns.status=error`、空错误答案已对应保存；原 wire、回执、消费和失败计数完整保留。
+
+仅修正工作树外的执行工具：供应商限制移到实际发送 gate，允许正常的角色本地预加载，仍在任何非 SiliconFlow HTTP 发送前拒绝。保持 durable gate 对象身份、原 SendGate 权限和路由不变。2 项离线工具反例通过后，已确认失败且 UNKNOWN 为0，才执行另一个样本0959；**没有重发 Omni，也没有新增第3次问答**。修正前脚本／状态、失败终态回读和恢复决定均在 `live/` 留存。此修复不涉及生产文件。
+
+Omni 真实目标仍是 `51316a20-67fd-4732-b520-c049999933d0`，document `dfeb8157-6bf9-4fe2-927a-f38d40b342a0`，version `35ad1226-ec0e-4931-a87d-257e756f525c`。原文 OCR 的定位沿用图片来源合同；它的 legacy文本offset为0/0，不能伪称拥有普通文本span定位。精确内容进入 finalized Context 已确认；**没有实际 Cheap 请求，不能声称已送达生成模型或被正确使用**。这是一次新的 Rerank 回执，不能当作恢复 M3 历史响应。
+
+0959 实际答案为“无线电波（电离层折射）和微波（卫星通信）”，附加信号扩散、大气折射和质量下降均来自 `df6098cb…` 原文。该段与 `1a4c8c0f…` 同属 document `8fdbe2af-9cc0-4b4a-a554-352a61ca5252`、version `3ff26984-be2a-4c7e-8b8f-bb8140c156f8`，真实区间分别 `[10575,11061)`／`[11437,11851)`，完整原文均在实际生成请求中。原课件相邻段对无线电波分别用 refraction/reflection；答案沿用目标段的 refraction，没有为“纠正物理知识”改写原文。这是来源支持的语义核对，不是新官方 EM/F1。公开引用继续关闭，不要求可点引用。
+
+| 实际能力 | 调用数 | 输入 Token | 输出 Token | 合计 |
+|---|---:|---:|---:|---:|
+| Xing Query Understanding | 2 | 5,067 | 65 | 5,132 |
+| BGE-M3 Embedding | 2 | 44 | 0 | 44 |
+| BGE Rerank | 2 | 32,992 | 0 | 32,992 |
+| Xing Cheap 最终生成 | 1 | 1,168 | 127 | 1,295 |
+| **合计（含失败消耗）** | **7** | **39,271** | **192** | **39,463** |
+
+7 份实际调用均已报告 usage，新增 UNKNOWN0、缺失用量0。历史账本哈希和来源文档／chunk哈希前后保持一致；原有8个用户工作树路径和159份历史输入文件哈希一致。本任务两个 API 进程已停止，56425不再监听；PG／Redis 保留原状态。授权执行空间已关闭，未用5次 Provider／60,537已报告Token空间不结转，也不是账户额度或历史UNKNOWN的释放。
+
+生产 A 本次 Query 等待分别约199.015／227.613秒，0959 Cheap传输也较慢；保留真实延迟，不以更换模型或延长超时修饰结果。模型响应与候选池均是新执行结果，不能把该两次运行当成纯阈值因果A/B；阈值因果对照来自前面的固定输入离线实验。
+
+**最终决策不变：**0.15 是 Omni精确证据保留的可复现隔离候选；0959真实回归通过，但 Omni最终回答未验证，且有主题干扰／硬负例覆盖不足，暂不修改生产全局默认。Hotpot与0434低分证据仍作为后续质量问题保留，本轮不为它们增加规则。达到本轮次数上限后停止，不 Push、部署或启动下一轮。

@@ -60,6 +60,22 @@ def validate_raw_results(raw, candidate_count):
             raise ValueError('INVALID_OR_MISSING_RAW_SCORE:' + str(index))
 
 
+def replay_verdict(cases, baseline_all_match):
+    incomplete = [
+        {'case':case['case'], 'threshold':run['threshold'],
+         'merge_status':run.get('merge_status', 'MISSING')}
+        for case in cases for run in case['threshold_runs']
+        if run['status'] != 'SEARCH_NOTHING' and
+           (run.get('merge_status') != 'PASS' or
+            'rendered_contexts' not in run or 'through_top_k_ids' not in run)
+    ]
+    if not baseline_all_match:
+        return 'FAIL_BASELINE_MISMATCH', 1, incomplete
+    if incomplete:
+        return 'PARTIAL_NOT_REPLAYABLE', 2, incomplete
+    return 'PASS_OFFLINE_PRODUCT_REPLAY', 0, incomplete
+
+
 class SavedRepository:
     def __init__(self, rows): self.rows = rows; self.requested = set()
     @staticmethod
@@ -203,13 +219,14 @@ async def main(args):
     output['input_hashes']=provenance
     baseline_checks=[(c['case'],k,v) for c in output['cases'] for r in c['threshold_runs'] if r['threshold']==.3 for k,v in r.items() if k.startswith('baseline_')]
     output['baseline_consistency']={'checks':len(baseline_checks),'all_match':all(v for _,_,v in baseline_checks),'failures':[(c,k) for c,k,v in baseline_checks if not v]}
-    output['status']='PASS_OFFLINE_PRODUCT_REPLAY' if output['baseline_consistency']['all_match'] else 'FAIL_BASELINE_MISMATCH'
+    output['status'], exit_code, output['incomplete_runs'] = replay_verdict(output['cases'], output['baseline_consistency']['all_match'])
+    output['exit_code'] = exit_code
     output['limitations']=['Current source snapshot is not historical; overlapping historical candidate content/source_version/knowledge_base_id/knowledge_id/chunk_type compared strictly. Baseline output equality additionally verifies replay at captured threshold.', 'No new answer generation or answer quality verdict. Unlabeled candidate relevance remains UNKNOWN.', 'Only cases with complete saved rerank wire and raw response replayed. No rerank receipts synthesized.']
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
     print('RESULT',args.output,'SHA256',sha(args.output))
     print('BASELINE',output['baseline_consistency'])
-    if not output['baseline_consistency']['all_match']: raise SystemExit(1)
+    if exit_code: raise SystemExit(exit_code)
 
 def asdict_list(rows):return [asdict(c) for c in rows]
 if __name__=='__main__':
