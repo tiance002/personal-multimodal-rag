@@ -403,3 +403,69 @@ augmented   = [1,-2,1,0; 0,2,-8,8; -4,5,9,-9]
 正常入口需明确配置 `WEKNORA_PORT_MINERU_ENABLED=1`、`WEKNORA_PORT_MINERU_PYTHON=E:/WK/mineru-env/Scripts/python.exe`、`WEKNORA_PORT_MINERU_MODEL_ROOT=E:/WK/run/p10-mineru/models`、`WEKNORA_PORT_MINERU_TEMP_ROOT=<D/E盘短路径>`。本轮隔离实例已实际使用，日常服务尚未重启/部署；下一项Owner已批准的旧入口收敛任务将把这些设置纳入唯一正式启动命令。
 
 没有证明当前Cheap收到新LaTeX后一定答对，值得下一次单独授权的有限生成验证，本轮未运行。尚存单元格像素框、混合PDF扫描页OCR、Caption真实执行等未验证项，不以矩阵正确就声称整个多模态RAG已通过。诊断JSON `RAG_M3_4_OCR_LAYOUT.results.json` 保存真实命令/回执路径、source identity和限制。原报告内容保持为前缀，仅本地提交，不Push/部署/合并/Tag。
+
+
+## M3.5：唯一日常入口的真实 MinerU RAG 收口（2026-10-18）
+
+**`M3_5_COMPLETE_SELECTED_SAMPLE`：同一 wk 日常入口、tenant 1 完成一次上传、真实向量问答和刷新历史回读。** 不表示 M3_COMPLETE 或六套数据集质量通过。起始 HEAD `6509af63793096e75aa8333fca8bbb82fbddc12a`；实际补验源码提交 `d69d9a429a0a8b96175789fa4df8317fb5c59f33`。原有8个脏路径逐字节保留；本节只追加，不改写历史结果。最终报告提交完整SHA见本轮交付答复及 `E:WK
+un
+ag-m35-20261018delivery-commit.json`。
+
+### 实际日常身份、配置和局部修复
+
+继续使用 `wk.ps1` 与 `E:WK
+unp81-retirement-20261018local.json`，未创建替代 API/runtime_factory/tenant。API `127.0.0.1:56425`、真实用户 Edge 中 React `56426`；PG `56423` / `weknora_python_port_20261013` / system ID `7696088403504697382`；Redis `56424/15` / prefix `weknora-python-p81-cd49dc23e95c4cad9e2c973ddd15ebbf`。存储仍为 `E:/WK/run/rag-m34-20261018/assets`。实际 local principal：tenant **1**，subject `web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6`。启动前图片任务0、该前缀memory ready/leased/jobs均0；旧pending问答不会由worker自动恢复，未重放或改写旧任务终态。
+
+实际 tenant 1 的模型配置 revision18 仍指向 `fixture.invalid`，五角色均显示 `STORED_SECRET_DECRYPT_FAILED`，是过往合成配置，不是可用生产凭据。通过正常 `PUT /api/v1/settings/model-configuration`、revision CAS，用已授权 `.env.local` 中既有凭据在内存中重新配置为 revision19；返回均 `CONFIGURED`。未输出/保存密钥明文，未复制tenant332模型记录、修改local principal或历史密文。Embedding BGE-M3、Rerank bge-reranker-v2-m3、Cheap/查询理解 Xing4.0-29B、Expensive deepseek-flash；VLM既有型号保留，未调用。查询理解A、Rerank0.3、DYNAMIC及原升级规则不变。
+
+正式装配原先缺少本轮限额入口，新增**默认关闭**的 `WEKNORA_PORT_EXECUTION_FILE`：`development.py`装配 `LocalExecution`，`runtime.py`在同一个原durable gate对象上安装任务限额及被动观察。`execution.py`只对显式本轮tenant/新KB/模型/请求身份做12次、100,000Token硬上界，跨API/worker文件锁，在发送前按wire字节＋输出上限＋余量预留；保存实际usage，UNKNOWN或异常保留占用并停止，重启遇INFLIGHT也停止。无账户/月度Token Authority、新API或模型框架。真实请求/响应只存正文和来源身份，不存headers/key。
+
+**首次浏览器失败保留，未伪装通过：** run `f694f072-9cf0-4cef-bd5e-6b2674940eaf`，全用户“常查资料”加载了旧标题 `source`，其保守来源resolver又将其他历史KB并入required_origin_kbs。本轮围栏在发送前正确拒绝；查询理解和查询Embedding实际发送均0，最终 `ORDINARY_CHAIN_FAILED`。不仅是来源字段扩大，待发送prompt确实已有旧标题，不能通过裁剪origin绕过。首次截图、console、待发送wire、SearchError阶段及持久化失败均保留。
+
+`service.py::OrdinaryMemoryLoader.load_scoped` 现在先对比真实来源范围，超出当前KB时在recall/记忆Embedding/常查标题读取前跳过整份全用户记忆；`prepare_turn`对其他loader也同时丢弃越界内容和lineage。来源未知仍拒绝，已知同scope记忆继续传入查询与两次生成；不伪造来源。旧测试中“允许kb-private记忆进入kb问答”的预期按本轮隔离要求调整，并新增跨KB不发送和前置零召回反例。现有来源resolver仍是历史session并集，所以此修复保守省略记忆，不声称已经实现逐条memory provenance。
+
+Owner随后明确批准**额外一次修复后浏览器提交**，仍共用原12次/100,000Token上限，未重传、重置计数或删除首次失败。
+
+### 新资料、真实检索和回答
+
+| 项目 | 实际证据 |
+|---|---|
+| 正常Edge上传 | 原 `PPT_lecture1_page_007.png` **1次**；SHA256 `95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601` |
+| 新身份 | KB `9d3461a5-080c-4b5e-a367-c82b79d3013c`；document `996fda57-6cc2-4045-a3ff-7416f037459a`；version `91f260da-03e3-422e-ae08-b6f818ee3b7b` |
+| MinerU | 本地4.0.12 Basic/ONNX；434字符派生正文，middle_json、Markdown、structured/model output及原图sidecar均保留hash和版本。没有Tesseract/云OCR/Caption调用。上传在正常API同步处理；wk Worker存活但本图不需要派发后台OCR |
+| 向量索引 | 正文 `96ad695f-bb32-4df9-9cfb-1e8281f2fc31`、Summary `a06e7826-577a-53ca-bd68-f53d8315a160`；两条真实BGE向量均 **1024维、embedding非NULL**；索引ID100792/100793。并非keyword-only测试 |
+| 正常回读 | 两Chunk正常HTTP GET200；原图及sidecar文件SHA匹配，derived locator/page/offset/middle pointer可回查。公式span bbox为空，父块bbox有效；不伪装单元格像素定位 |
+| 补验身份 | run `af480baa-d60c-4938-a18e-af77132cb7a7`；session `a88df883-4bad-4001-b589-374863205345`；assistant `35baef2c-ed9d-428b-b32f-1c282182190f`。同一原问题，document_scope=[]，只有新KB，无历史 |
+| 实际检索 | Query Understanding → 4次查询Embedding/扩展检索 → Search **2** → Rerank **2** → Merge/Top-K **2** → Context **2**，794字符。OCR原始relevance **0.5873205066**、Summary **0.9792719483**，均过0.3；综合score分别0.4557794007/0.6924812018，二者不能混作原始模型分数 |
+| 证据送达 | 新正文精确Chunk和全部原始LaTeX在实际Xing请求中完整出现（核对HTML转义）；实际query/final请求均无旧KB记忆来源。没有手选目标chunk、替换候选、回执或Context |
+| 实际回答 | DYNAMIC选择Cheap Xing，**无升级**；`finish_reason=stop`。系数矩阵 `[1,-2,1; 0,2,-8; -4,5,9]`，增广末列 `0,8,-9`，每个位置、行列、负号正确，无无依据补充。以上仅事后对照真实图片/middle，未放Gold进输入 |
+| SSE/持久化/刷新 | 原始Provider内容与持久化答案一致；正常SSE回放有结束事件，port_turns completed、messages.is_completed=true。Edge显示已保存；刷新后点回同session/message，渲染答案不变、running=0、引用按钮0；Provider仍10次，**刷新新增调用0** |
+
+新正文和Summary均通过真实向量/混合路径；不将“同源Summary命中”冒充精确正文命中。独立固定证据生成诊断 **NOT RUN（不需要）**，没有第二次选优或新增Qwen Rerank。正常数据资料、模型配置与版本保留，未覆盖历史Tesseract样本/索引。
+
+### 实际用量、测试和收口
+
+| SiliconFlow实际用途 | 次数 | 输入Token | 输出Token | 合计 |
+|---|---:|---:|---:|---:|
+| 文档+查询Embedding | 6 | 402 | 0 | 402 |
+| 上传摘要 | 1 | 802 | 125 | 927 |
+| 查询理解A | 1 | 2,536 | 34 | 2,570 |
+| Rerank | 1 | 348 | 0 | 348 |
+| Cheap最终回答 | 1 | 1,255 | 264 | 1,519 |
+| **合计** | **10** | **5,343** | **423** | **5,766** |
+
+全部usage为真实REPORTED，PG与本轮预留账本一致；新增UNKNOWN0，DeepSeek0。上传持久化生命周期 **25.762秒**；成功问答服务端持久化生命周期 **86.795秒**（查询理解调用37.369秒、最终生成46.169秒），不误称浏览器精确网络往返时间。首次失败问答无云消耗，上传3次1,232Token，补验7次4,534Token；没有将未完成INFLIGHT当作最终UNKNOWN或已结算0。
+
+实际命令均在工作树运行，以下 `python` 为 `E:\RAG quention\.venv\Scripts\python.exe`，OUT=`E:\WK\run\rag-m35-20261018`：
+
+- `wk.ps1 check|start|status|stop -Config E:\WK\run\p81-retirement-20261018\local.json`：实际使用原配置、原端口，均退出0（阶段对应日志在OUT）。本轮只停止自己启动的API/Worker/UI，PG/Redis保留。
+- `python -B -m pytest -q --tb=short -p no:cacheprovider tests/weknora_port/test_service.py tests/weknora_port/test_execution_fence.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_local_runtime.py --basetemp E:\WK\run\rag-m35-20261018\pytest-scope`：**退出0，72 passed in 3.21s**；离线测试，不冒充真实服务验收。
+- `python -B OUT\prepare_daily.py`、`open_execution.py`、`snapshot.py upload|completed|after-refresh`、`audit_result.py`、`close_execution.py`、`deliver.py`：最终均退出0；Provider实际发送只由正常上传/浏览器触发，snapshot/audit仅GET/只读SQL。
+- 工具首次错误保留：preflight默认Windows Proactor不兼容、dotenv缺包、设置API缺Origin、汇总工具误将message.turn_status当作成功判据；均局部修正，未重传或增加问答。正确完成合同是port_turns状态与message.is_completed，前端据此回读；旧message.turn_status仍pending，记录为冗余状态字段技术债。
+- `git diff --check`、`git diff --cached --check`：本轮提交前实际退出0；无全仓/六套数据集复测或wheel构建。
+
+本轮授权 **CLOSED**，未用2次Provider/94,234Token执行空间撤回，不结转或当作账户余额；旧245条Provider记录hash及原有8个未提交路径保持不变，旧UNKNOWN未修改。原 `local.json` 逐字节恢复 `cloud_allowed=false`，任务围栏入口移除；有效模型设置、新知识库、向量和历史答案仍在。以后仍从同一 `wk.ps1`/工作台进入；云问答需按正常权限明确开启云端，连接提示本身不代表已授权外发。
+
+本轮相关源文件仅 `development.py`、`runtime.py`、`execution.py`、`service.py` 和两个定向测试。证据与诊断见 [机器结果](RAG_M3_5_DAILY_RAG.results.json)、[63份原始证据ZIP](evidence/m35-daily-rag-20261018/evidence.zip)、[首次失败](evidence/m35-daily-rag-20261018/edge-first-failure.png)、[刷新回读](evidence/m35-daily-rag-20261018/edge-history-restored.png)。ZIP不含本地配置/环境文件/密钥，实际凭据值扫描为0。
+
+保留项：页面将LaTeX显示为Markdown源文本，未新增数学排版；保守记忆来源并集会在跨KB时省略整份记忆；公式级bbox、混合PDF扫描页、真实Caption、Hotpot/0434、全面质量与长尾优化均独立。未修改生产默认模型、阈值、路由、普通Prompt，未恢复正则Validator/语义裁判。**到此停止，不Push、合并、部署、Tag或扩展为M3_COMPLETE。**
