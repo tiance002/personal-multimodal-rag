@@ -93,3 +93,9 @@ E3、E4、E5、E6 及系数矩阵单独表达的新增真实验证均 `NOT RUN`�
 - E1 输出含 d1/c2 内部来源句柄的自然语言残留，另有 legacy message 状态投影不一致，均未在本阶段扩大修改。
 - 否定/缺答案真实反例未执行，不能推广新模式或宣称通用性能收益。
 - Owner 已要求停止外发、提交审查。本交付不包含新的发送授权，不 Push、部署或进入 S2。后续 Owner 单独要求的查询理解模型切换作为新的配置改动记录，不倒写本阶段实际模型身份。
+
+## 停止后 Owner 指定的配置调整
+
+Owner 随后要求未来查询理解/改写改用 Qwen3.5-4B。新增最小环境变量接线，将日常 tenant1 `local.json` 的 `WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID` 指向现有、同主体有效的 Qwen 模型 ID。正式 assemble 和真实 Registry 完成身份及严格凭据加载检查；只实例化 Adapter，没有调用 chat/send。334 条 Provider 记录的逐行指纹、角色版本及 principal 均未变化。云调用仍关闭，无临时 grant；tenant332 冻结配置不改。
+
+受影响的 `test_development_entry.py`＋`test_conversation_configuration.py` 实际执行35项通过、exit0；`git diff --check` exit0。首次私有检查脚本未加载 wk 配置中的隔离 PYTHONPATH，触发 `STORED_SECRET_RUNTIME_UNAVAILABLE`，修正检查脚本后通过，未更换密钥、升级依赖或修改历史密文。配置/装配结果为 `E:\WK\run\query-qwen35-20261018\result.json`。实际改写效果与新延迟 `NOT RUN`；不会因模型切换自动恢复阶段外发。

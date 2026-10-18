@@ -34,6 +34,14 @@ def test_source_units_are_explicit_startup_opt_in(tmp_path):
     with pytest.raises(DevelopmentConfigurationError,match='SOURCE_EVIDENCE_MODE_INVALID'):
         DevelopmentSettings.from_environment(env)
 
+def test_query_understand_model_id_loads_from_environment(tmp_path):
+    env=development_environment(settings(tmp_path))
+    env['WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID']='owner-model-id'
+    cfg=DevelopmentSettings.from_environment(env)
+    assert cfg.query_understand_model_id=='owner-model-id'
+    env.pop('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID')
+    assert DevelopmentSettings.from_environment(env).query_understand_model_id==''
+
 @pytest.mark.parametrize('strategy',['model','fixed'])
 def test_fallback_strategy_loads_explicit_environment(tmp_path,strategy):
     env=development_environment(settings(tmp_path))

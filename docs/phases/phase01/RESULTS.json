@@ -1515,5 +1515,47 @@
       "transaction": "READ ONLY; ROLLBACK"
     },
     "later_owner_config_change": "Separately requested query-understanding model change is not a rerun or alteration of Phase01 results."
+  },
+  "post_stop_owner_query_model_change": {
+    "request": "你先改查询理解使用qwen3.5 4B吧，之后用它查询理解，做改写",
+    "result": {
+      "status": "LOCAL_CONFIGURATION_APPLIED_ZERO_PROVIDER_SENDS",
+      "config_path": "E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "tenant_id": 1,
+      "changed_field": "WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID",
+      "before": null,
+      "after": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+      "selected_model": {
+        "id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "base_url": "https://api.siliconflow.cn/v1",
+        "key_configured": true,
+        "source": "remote",
+        "stored_source": "remote",
+        "representation": "source-provider/v2"
+      },
+      "assembly_model_identity_verified": true,
+      "strict_credential_resolution_succeeded": true,
+      "provider_rows_unchanged": 334,
+      "role_bindings_revisions_and_principal_unchanged": true,
+      "new_provider_calls": 0,
+      "new_tokens": 0,
+      "old_unknown": "PRESERVED_WITHOUT_RELEASE_OR_RETRY",
+      "cloud_allowed": false,
+      "execution_grant": "NONE",
+      "config_before_sha256": "d2a0b3088fc01ac2a1381dc30e6ec69110e2bc04c142e344d991cdbdc55ed1b1",
+      "config_after_sha256": "7c209bdb1b82e4acdbc50d1c575df6899c6d8625c9b139362f5bd71a2054750a",
+      "existing_daily_session_explicit_query_overrides": 0,
+      "scope": "Daily tenant1 startup default. Frozen tenant332 evaluation configuration not edited.",
+      "activation": "Next normal wk start; no API process was started/replaced.",
+      "image_path": "Existing vision-specific model selection is retained."
+    },
+    "actual_rewrite_cloud_validation": "NOT_RUN",
+    "test_command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest --noconftest -q -p no:cacheprovider --tb=short tests/weknora_port/test_development_entry.py tests/weknora_port/test_conversation_configuration.py",
+    "tests_passed": 35,
+    "test_exit_code": 0,
+    "private_first_attempt": "exit1 STORED_SECRET_RUNTIME_UNAVAILABLE because the checker omitted configured isolated PYTHONPATH; corrected checker, no production credential change."
   }
 }

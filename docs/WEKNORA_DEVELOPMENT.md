@@ -26,6 +26,10 @@
 
 必要变量：`WEKNORA_PORT_DATABASE_URL`、`DATABASE_NAME`、`DATABASE_SYSTEM_ID`、`REDIS_URL`、`REDIS_PREFIX`、`STORAGE_ROOT`、`SECRET_KEY_FILE`（短名均加 `WEKNORA_PORT_`）；资源身份与存储 ownership marker不匹配会拒绝。启动不会修改模型角色、业务 Schema、旧 UNKNOWN 或历史评测。
 
+文本查询理解/改写可通过 `environment.WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID` 指定**当前 tenant/subject 已登记的模型 ID**，不填时保留原有聊天模型回退。它不改变 Cheap/Expensive 角色、提示词或路由；会话中已有的显式查询模型设置仍优先，有图像时保留原视觉选择路径。修改本地配置后在下一次正常启动时加载，不会自动发送模型请求。
+
+2026-10-18 Owner 已将日常 tenant1 的该设置指向现有 SiliconFlow `Qwen/Qwen3.5-4B`，正常装配/严格凭据读取已核实，未新增云端调用。该本地模型 ID 不可直接复制给 tenant332 等其他身份。当前云端开关仍关闭，阶段 STOP/UNKNOWN 不因更换模型而解除。
+
 前端只支持显式 `VITE_WEKNORA_API_BASE`，此入口固定为配置中的新 API 地址。手动同源代理须同时显式指定 `/api/v1` 和 `VITE_API_PROXY_TARGET`。未配置或 `/api/v1/runtime` 未返回 `data.implementation=weknora-python-port` 时显示错误、拒绝业务访问，无旧8000/8080默认回退。`/healthz` 是服务存活；`/readyz` 是已完成运行资源装配，不代表模型质量验收或允许外发。
 
 ## OCR 和 Worker

@@ -29,6 +29,7 @@ class DevelopmentSettings:
     cloud_allowed:bool=False
     execution_file:Path|None=None
     source_evidence_mode:str='off'
+    query_understand_model_id:str=''
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -66,6 +67,7 @@ class DevelopmentSettings:
             cloud_allowed=env.get('WEKNORA_PORT_CLOUD_ALLOWED','false').lower()=='true',
             execution_file=Path(env['WEKNORA_PORT_EXECUTION_FILE']) if env.get('WEKNORA_PORT_EXECUTION_FILE') else None,
             source_evidence_mode=env.get('WEKNORA_PORT_SOURCE_EVIDENCE_MODE','off'),
+            query_understand_model_id=env.get('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID',''),
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
@@ -159,7 +161,8 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 if settings.mineru_settings is not None else None,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy,
-                source_evidence_mode=settings.source_evidence_mode),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
+                source_evidence_mode=settings.source_evidence_mode,
+                query_understand_model_id=settings.query_understand_model_id),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
             permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         runtime.authority_config_sha=None
         if settings.execution_file is not None:
