@@ -120,4 +120,3 @@ def test_mineru_matrix_diagnostic_never_repairs_a_damaged_sign():
         'content':[{'type':'equation_inline','content':raw}]}]}]}
     result=matrices(middle,raw)[0]
     assert result['rows'][0][0]['value']=='UNKNOWN' and not result['complete_literals']
-
