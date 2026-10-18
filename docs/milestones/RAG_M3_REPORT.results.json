@@ -259,13 +259,18 @@
     "status": "M3_1_PARTIAL",
     "diagnostics": "docs/milestones/RAG_M3_1_DIAGNOSTICS.results.json",
     "a": "PASS_OFFLINE",
-    "b1": "BLOCKED_AUTHORIZATION",
+    "b1": "PASS_REAL_SOURCE_FOLLOWUP",
     "b2": "BLOCKED_INPUT_CONTRACT",
     "c": "PASS_OFFLINE_SAVED_RESPONSES",
-    "new_provider_requests": 0,
-    "new_tokens": 0,
+    "new_provider_requests": 4,
+    "new_tokens": 8435,
     "new_unknown": 0,
-    "production_default": "A"
+    "production_default": "A",
+    "initial_b1_status": "BLOCKED_AUTHORIZATION",
+    "new_end_to_end_requests": 1,
+    "raw_intent": "follow_up",
+    "effective_intent": "kb_search",
+    "source_commit_for_real_b1": "cc131bf4123da6b1d1616effc74298b468a1d23e"
   },
   "cases": {
     "scifact-339": {

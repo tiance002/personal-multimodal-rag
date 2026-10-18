@@ -100,7 +100,7 @@ B 在 9/10 对中更快；**配对差值**中位数 8.055 秒。A 的 Hotpot 耗
 
 定向离线测试命令 `E:\RAG quention\.venv\Scripts\python.exe -B -m pytest tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_pipeline.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m3-followup-20261018\pytest-resumed` 实际退出码 0，114 passed in 1.52s；日志 `pytest-final.log`。一次早期重定向尝试因证据目录尚未创建而未启动 Python，记为 **NOT RUN**（`pretest-path-setup.txt`）。本补充没有新增云端请求或 Token；累计仍为 73 次 Provider 调用、201,275 Token、UNKNOWN 0。真实修复后 API/浏览器验证 **NOT RUN**。状态仍为 `M3_PARTIAL`，生产默认仍为 A；本修复不构成 B 安全推广证据，Omni 的证据/答案限制仍未解决。
 
-## M3.1 来源边界与证据流转（2026-10-18）
+## M3.1 来源边界与证据流转（2026-10-18，首次收口／授权前）
 
 **状态：`M3_1_PARTIAL`；A 离线通过，C 保存回执回放通过，B1 `BLOCKED_AUTHORIZATION`，B2 `BLOCKED_INPUT_CONTRACT`。** 本轮基线为 `fee2229f97725df18ed2da4d4f94c87c130758c6`，生产仍用 A。历史 20 个请求、73 次 Provider、201,275 Token 与旧 UNKNOWN 保持原记录；本轮完整问答、Provider 请求、Token、新 UNKNOWN 均为 **0**。以下分数属于旧 M3 真实响应的新离线诊断，不是新增模型结果。机器结果见 `RAG_M3_1_DIAGNOSTICS.results.json`。本地提交的完整 SHA 可用 `git log -1 --format=%H -- docs/milestones/RAG_M3_REPORT.md` 查询。
 
@@ -153,3 +153,29 @@ Summary 是两组 index 0／排名 1，原始得分 A `0.5140959024429321`、B `
 | `git diff --check -- backend/weknora_port/retrieval/query.py backend/weknora_port/service.py tests/weknora_port/test_m31_source_constraints.py docs/milestones/RAG_M3_REPORT.md docs/milestones/RAG_M3_REPORT.results.json docs/milestones/RAG_M3_1_DIAGNOSTICS.results.json` | **0**；最终提交前执行 |
 
 剩余阻断：B1 为待 Owner 确认的新外发授权；B2 为消息级图片／附件传输功能缺失，阻断该指定验收场景，但不是本轮引入的普通文本 RAG 故障。附件身份含混表达仍属未解决合同限制。Omni／Hotpot／0434 为已定位的证据选择质量问题，本轮没有授权更改默认策略。下一步最小建议是先取得本轮 B1 授权完成一次真实追问；B2 的消息附件入口另行确定范围。原 `.serena/project.yml`、`progress.md` 和六个未跟踪交接文件保持原状。本轮仅本地提交，停止于 M3.1。
+
+## M3.1 授权后 B1 真实验证（2026-10-18）
+
+Owner 随后明确确认“我确认授权进行真实问答”。本节记录新增真实验证，前节授权前的未运行状态作为历史保留。**B1 已通过真实链路验收；M3.1 仍为 `M3_1_PARTIAL`，仅 B2 的输入合同阻断尚在，生产默认仍为 A。** 本次实际源码为 `cc131bf4123da6b1d1616effc74298b468a1d23e`，未增加生产代码修改，也未重复执行已通过的离线测试。Owner 另明确授权完成后由 6luna 推送当前分支。
+
+新建隔离会话 `6d3da3ce-e15d-4f0c-926f-3fae43cc2302`，通过正常 API 建立，再仅在此新会话复制原 B 的配置和两轮真实历史；没有复制或伪造 `port_turns`。原历史四条消息的内容哈希、顺序和权限范围均核对一致；实际 Query Understanding 请求中的两轮历史与原 M3 B 请求**完全相同**。原 session／messages、旧账本、文档／切块／索引均未改写。KB 仍为 `7f1d720d-9561-446f-a8cc-6a562c339d23`，`document_scope=[]`。
+
+本次 run `c0696630-2e52-4c57-bcf4-e82b9231fc7e` 的真实 DeepSeek `deepseek-flash` 回执仍为 `intent=follow_up`，原始响应 SHA256、请求身份和回执路径在诊断 JSON 中。运行时来源护栏将其解析为有效 `kb_search`／`needs_retrieval=true`，未操纵模型输出。正常链路实际为 **Search 30 → Rerank 1 → Merge 1 → Context 1**；理解 0.746s、检索 2.127s、Rerank 0.700s、Merge 0.192s、Context 0.331s，端到端 **17.296s**。这是单次功能回归，不能作为新延迟 A/B 结论。
+
+最终 Context 为 1,279 字符，实际 Cheap 请求含证据 chunk `df6098cb-68e6-4546-b9e0-8682b4bf19e9`，document `8fdbe2af-9cc0-4b4a-a554-352a61ca5252`，source_version `3ff26984-be2a-4c7e-8b8f-bb8140c156f8`，offset `[10575,11061)`。关键原文为 `Problems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality`。只读 DB 回读确认 chunk 正文、document／KB／version 与实际请求证据一致。
+
+Cheap 回答了信号扩散、大气层折射使信号难以准确发送、信号质量下降，核心事实受到该段支持。回答中的“覆盖范围扩大”和将质量下降归因为前述因素属于解释性推论，单独标记，不当作原文逐字事实或官方 Gold 得分。实际最终角色 Cheap、`finish_reason=stop`、无升级、非 fallback；SSE 与持久化答案一致。公开引用按既定产品配置关闭，未显示可点击引用属于预期行为，不计为本次失败。
+
+| 本次实际调用 | 输入 Token | 输出 Token | 合计 Token |
+|---|---:|---:|---:|
+| DeepSeek `deepseek-flash` Query Understanding | 2,607 | 27 | 2,634 |
+| SiliconFlow `BAAI/bge-m3` Embedding | 16 | 0 | 16 |
+| SiliconFlow `BAAI/bge-reranker-v2-m3` Rerank | 4,408 | 0 | 4,408 |
+| SiliconFlow `XingChenAGI/Xing4.0-29B` Cheap | 1,272 | 105 | 1,377 |
+| **合计** | **8,303** | **132** | **8,435** |
+
+只执行 **1 次完整问答、4 次 Provider 请求**，均 HTTP 200／usage REPORTED，新增 UNKNOWN 0、usage 缺失 0。新授权上界为最多 2 次完整问答、12 次 Provider、100,000 已报告 Token，本次未使用旧 M3 围栏；执行完成后停止自有 API，并关闭本次未用执行空间。旧账户账本各表哈希和既有文档／chunk 哈希均保持一致。B2 没有发送请求；授权已具备，但正常 API／React 的消息图片入口仍缺失，不能将内部状态测试或 B1 文本请求计为 B2 浏览器验收。
+
+实际命令 `python -B E:\WK\run\rag-m31-20261018\run_b1.py prepare`、`start`、`query`、最终 `snapshot`、`stop` 均退出 **0**；`query` 只执行一次。首次收尾 `snapshot` 退出 **1**，原因是复用诊断工具需要 case 的 `tenant_id` 而包装器漏记该字段；仅给新实验状态补上已知 tenant 332 后完成只读快照，原始请求／回执未改、问答未重发。离线 `summarize_b1.py` 最终退出 **0**；初版分析器误把排名二元组当成对象的 TypeError 保留记录，修正为读取原有 typed stage 行，没有修改产品流程或新增调用。
+
+新增证据根 `E:\WK\run\rag-m31-20261018\live-b1`：`owner-authorization.json`、`plan.json`、`history-seed.json`、`cases/b1-B/{request.json,answer.sse,result.json,messages.json}`、`evidence-332/{provider-requests,raw,stages,captures}`、`usage.json`、`summary.json`、`live-result.json`、`semantic-review.json`、`final-integrity.json` 及哈希清单。真实请求脚本和离线汇总脚本保存在同级任务证据目录中。下一步仅需单独确定 B2 正常消息附件接线范围；本次 B1 通过不能证明 B 适合全面推广，Omni 质量结论保持前节原状。

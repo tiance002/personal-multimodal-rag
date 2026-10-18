@@ -13,13 +13,18 @@
   },
   "b": {
     "b1": {
-      "status": "BLOCKED_AUTHORIZATION",
-      "actual_provider": null,
-      "search": null,
-      "context": null,
-      "answer": null,
-      "token_usage": "NOT_RUN",
-      "reason": "New M3.1 finite authorization confirmation requested; no response at closeout. Historical M3 authorization not reused."
+      "status": "PASS_REAL_SOURCE_FOLLOWUP",
+      "actual_query_provider": "deepseek",
+      "actual_query_model": "deepseek-flash",
+      "raw_intent": "follow_up",
+      "effective_intent": "kb_search",
+      "search_count": 30,
+      "rerank_count": 1,
+      "merge_count": 1,
+      "context_count": 1,
+      "answer_quality": "PASS_CORE_FACTS_WITH_MINOR_INFERENCES",
+      "sse_equals_persisted": true,
+      "token_usage": 8435
     },
     "b2": {
       "status": "BLOCKED_INPUT_CONTRACT",
@@ -28,11 +33,11 @@
       "context": null,
       "answer": null,
       "token_usage": "NOT_RUN",
-      "reason": "Normal MessageCreate extra=forbid, request/service binding and React composer have no message-level images/attachments. Browser/API real image request NOT_RUN. No new transport feature added."
+      "reason": "Normal message API/React still has no image/attachment transport. New authorization is present; input contract remains the blocker. No browser question sent."
     },
-    "end_to_end_requests": 0,
-    "provider_requests": 0,
-    "reported_tokens": 0,
+    "end_to_end_requests": 1,
+    "provider_requests": 4,
+    "reported_tokens": 8435,
     "new_unknown": 0,
     "historical_unknown": "UNMODIFIED_NOT_RECONCILED"
   },
@@ -696,10 +701,682 @@
     "before_fix_result": "5 failed, 5 passed; exit1",
     "before_fix_log": "E:\\WK\\run\\rag-m31-20261018\\pytest-before.log",
     "diff_check_exit_code": 0,
-    "real_api_browser": "NOT_RUN",
+    "real_api_browser": {
+      "normal_api_b1": "PASS_REAL",
+      "browser_image_b2": "NOT_RUN_BLOCKED_INPUT_CONTRACT"
+    },
     "diagnostic_setup_errors": [
       "Read-only preflight first used Windows Proactor loop; switched diagnostic only to SelectorEventLoop.",
       "First Rerank replay omitted product segmenter; reran with pinned default_segmenter. Both failures preserved in raw evidence/diagnostic notes."
     ]
+  },
+  "initial_closeout_b": {
+    "b1": {
+      "status": "BLOCKED_AUTHORIZATION",
+      "actual_provider": null,
+      "search": null,
+      "context": null,
+      "answer": null,
+      "token_usage": "NOT_RUN",
+      "reason": "New M3.1 finite authorization confirmation requested; no response at closeout. Historical M3 authorization not reused."
+    },
+    "b2": {
+      "status": "BLOCKED_INPUT_CONTRACT",
+      "actual_provider": null,
+      "search": null,
+      "context": null,
+      "answer": null,
+      "token_usage": "NOT_RUN",
+      "reason": "Normal MessageCreate extra=forbid, request/service binding and React composer have no message-level images/attachments. Browser/API real image request NOT_RUN. No new transport feature added."
+    },
+    "end_to_end_requests": 0,
+    "provider_requests": 0,
+    "reported_tokens": 0,
+    "new_unknown": 0,
+    "historical_unknown": "UNMODIFIED_NOT_RECONCILED"
+  },
+  "post_authorization_b1": {
+    "schema": "rag-m31-live-b1-result/v1",
+    "status": "PASS_REAL_SOURCE_FOLLOWUP",
+    "source_commit": "cc131bf4123da6b1d1616effc74298b468a1d23e",
+    "session_id": "6d3da3ce-e15d-4f0c-926f-3fae43cc2302",
+    "run_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e",
+    "request_id": "90490521-e2b7-405e-9f71-b8e41cd59f7c",
+    "question": "课件还提到这些远距离通信方式可能遇到什么问题？请根据课件回答。",
+    "authorization": "NEW_OWNER_CONFIRMED_CLOSED_AFTER_ONE_REQUEST",
+    "history": {
+      "real_rounds": 2,
+      "exact_equal_to_original_B_provider_history": true,
+      "history_sha256": "bda020b4326e6240955848e55e294215c64e81454e62a9f655be4127121d738d",
+      "new_calls_for_history": 0
+    },
+    "query_understanding": {
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "reported_model": "deepseek-flash",
+      "raw_intent": "follow_up",
+      "effective_intent": "kb_search",
+      "rewrite": "课件中提到的远距离通信方式可能遇到什么问题",
+      "raw_response": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.body",
+      "raw_sha256": "5701323c8322627e417e509180887970d16e2d2719a72cf20dc806f389a63ab3"
+    },
+    "stages": [
+      {
+        "stage": "understand",
+        "fields": {},
+        "seconds": 0.7464604999986477
+      },
+      {
+        "stage": "retrieval",
+        "fields": {
+          "candidate_count": 30
+        },
+        "seconds": 2.1273382999934256
+      },
+      {
+        "stage": "rerank",
+        "fields": {
+          "candidate_count": 1
+        },
+        "seconds": 0.699608700000681
+      },
+      {
+        "stage": "merge",
+        "fields": {
+          "candidate_count": 1
+        },
+        "seconds": 0.19194210000569
+      },
+      {
+        "stage": "context",
+        "fields": {
+          "selected_evidence_count": 1
+        },
+        "seconds": 0.33092030000989325
+      }
+    ],
+    "context": {
+      "selected_chunks": 1,
+      "rendered_characters": 1279,
+      "user_content_characters": 1419,
+      "evidence_present_in_actual_generation_request": true,
+      "chunk_id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+      "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+      "offset_start": 10575,
+      "offset_end": 11061,
+      "source_quote": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality\n\n",
+      "context_sha256": "f784ae94cd889e39bf4437884c123ac8e45b24aaa662fdf6436b28e7a14f3470"
+    },
+    "answer": "## 长距离通信可能遇到的问题\n\n根据课件内容，长距离通信可能遇到以下问题：\n\n1. **信号扩散**：信号在传播过程中会扩散，导致信号覆盖范围扩大，难以精确发送信号。\n2. **大气层折射**：信号在穿过不同大气层时会发生折射，这使得信号难以准确到达目的地，增加了发送信号的难度。\n3. **信号质量下降**：由于上述因素，信号在远距离传输过程中质量会下降，影响通信效果。",
+    "finish_reason": "stop",
+    "role": "cheap",
+    "upgraded": false,
+    "sse_equals_persisted": true,
+    "end_to_end_seconds": 17.295727199991234,
+    "calls": [
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/query_rewrite",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "capability": "chat",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "hit",
+          "total_tokens": 2634,
+          "cached_tokens": 2432,
+          "prompt_tokens": 2607,
+          "cache_reported": true,
+          "cache_miss_tokens": 175,
+          "cache_read_tokens": 2432,
+          "completion_tokens": 27,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 2607,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 27,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 2634,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": true,
+                  "value": 2432,
+                  "present": true
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": true,
+                  "value": 175,
+                  "present": true
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "89fff62332b5ae0e7d3b6ec14ecf416f150487b23e46d45ba352c65a48fd2fd5",
+            "numeric_raw": "{\"completion_tokens\":27,\"prompt_cache_hit_tokens\":2432,\"prompt_cache_miss_tokens\":175,\"prompt_tokens\":2607,\"total_tokens\":2634}",
+            "derived_total": 2634,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 2634
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.json",
+        "wire_sha256": "852e317c9ea8933699ad02d50fc1162dc52261c1fb29dfd4421ba1959b8430e4",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.body",
+        "raw_body_sha256": "5701323c8322627e417e509180887970d16e2d2719a72cf20dc806f389a63ab3",
+        "model_reported": "deepseek-flash"
+      },
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-da1049646735a052",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "capability": "embedding",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unsupported",
+          "total_tokens": 16,
+          "cached_tokens": 0,
+          "prompt_tokens": 16,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 0,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 16,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 16,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "7dd7a72829554a26749da9bb6dd2b38f086c49bfb1c9ae9b29b7fdabf3672d36",
+            "numeric_raw": "{\"completion_tokens\":0,\"prompt_tokens\":16,\"total_tokens\":16}",
+            "derived_total": 16,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 16
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\c3566445b305d642ccade70d883c64d65a88a42bd28c6a714f0b04ca2f248dd8.json",
+        "wire_sha256": "da71b570fe4c9808aba5608e2725e071e367bd564c382b79a086282dad7f62a5",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\c3566445b305d642ccade70d883c64d65a88a42bd28c6a714f0b04ca2f248dd8.body",
+        "raw_body_sha256": "a3f6c67db240578ffe76d1367eb86e0cb46d4d349a4288bf6246e0a92df5080b",
+        "model_reported": "BAAI/bge-m3"
+      },
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "capability": "rerank",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unsupported",
+          "total_tokens": 4408,
+          "cached_tokens": 0,
+          "prompt_tokens": 4408,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 0,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "meta.tokens.input_tokens",
+                  "valid": true,
+                  "value": 4408,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "meta.tokens.output_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "meta.tokens.total_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "image",
+                {
+                  "path": "meta.tokens.image_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "siliconflow-rerank-tokens/v1",
+            "simulated": false,
+            "raw_sha256": "e2a0ad4e7bfd991c698740674999b3a54f06155ddbd7f91ba48459ba514b8a83",
+            "numeric_raw": "{\"meta.tokens.image_tokens\":0,\"meta.tokens.input_tokens\":4408,\"meta.tokens.output_tokens\":0}",
+            "derived_total": 4408,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 0
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\e3cb5152da83c7def2e59efcbb0cbe6497427e6fa25f67eebf7b060e55cfde0c.json",
+        "wire_sha256": "9e79a14d00f98fd46f78c921711707d6798b7318928b5e80d31cc3e0276c13c4",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\e3cb5152da83c7def2e59efcbb0cbe6497427e6fa25f67eebf7b060e55cfde0c.body",
+        "raw_body_sha256": "84925a498355cd55e87c4bb2187f5828e0e2ec5bd241f74072320df130e5f937",
+        "model_reported": "UNREPORTED"
+      },
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/answer/1/cheap",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+        "capability": "chat",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 1377,
+          "cached_tokens": 0,
+          "prompt_tokens": 1272,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 105,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 1272,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 105,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 1377,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "f9c22663e511dc28f82abaee29d19b5634e13b6c2fd8d17eb1b3f9512f44fdcc",
+            "numeric_raw": "{\"completion_tokens\":105,\"prompt_tokens\":1272,\"total_tokens\":1377}",
+            "derived_total": 1377,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 1377
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\2ebe488f012d1aceafb30d24fc7f3ac5f61839674322ee451ecbb54a2e8ac88f.json",
+        "wire_sha256": "eb01237c98fcd59ea0d8d91987eb88db4aa6d6897160d3273f5f349fae2e0f32",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\2ebe488f012d1aceafb30d24fc7f3ac5f61839674322ee451ecbb54a2e8ac88f.body",
+        "raw_body_sha256": "93e9dab94cb4a6d5b73ca2999313449da133bdccff87caa1fc760a3ca598e5bc",
+        "model_reported": "XingChenAGI/Xing4.0-29B"
+      }
+    ],
+    "provider_calls": 4,
+    "input_tokens": 8303,
+    "output_tokens": 132,
+    "total_tokens": 8435,
+    "unknown": 0,
+    "missing_usage": 0,
+    "legacy_accounting_unchanged": true,
+    "source_resources_unchanged": true,
+    "own_api_stopped": true,
+    "b2": "BLOCKED_INPUT_CONTRACT",
+    "evidence_root": "E:\\WK\\run\\rag-m31-20261018\\live-b1",
+    "semantic_review": {
+      "schema": "rag-m31-live-semantic-review/v1",
+      "run_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e",
+      "review": "PASS_CORE_FACTS_WITH_MINOR_INFERENCES",
+      "history_selection": {
+        "source_session": "f92e5f27-758c-41b0-a030-2cd95280fb88",
+        "target_session": "6d3da3ce-e15d-4f0c-926f-3fae43cc2302",
+        "selected_complete_rounds": 2,
+        "selected_run_ids": [
+          "fcd015dd-fc5d-459a-acd6-3f9ee6f8b23a",
+          "1de702fc-43cc-4ce7-9e3d-c846b287fa4f"
+        ],
+        "stage_observation": "understand.completed and every later completed pipeline stage records these exact two request_ids in this order; each query/answer content hash equals the source capture.",
+        "message_sha256": [
+          {
+            "run_id": "fcd015dd-fc5d-459a-acd6-3f9ee6f8b23a",
+            "role": "user",
+            "sha256": "faf5fb89bed56b6a7a7308f7909c9234fcf4b179eb370b5ceea6527b264cc757"
+          },
+          {
+            "run_id": "fcd015dd-fc5d-459a-acd6-3f9ee6f8b23a",
+            "role": "assistant",
+            "sha256": "4b6aa5287fc7834d793e2ca6788783014eca1d63ae67cb502ab9a7f1fc47d0cd"
+          },
+          {
+            "run_id": "1de702fc-43cc-4ce7-9e3d-c846b287fa4f",
+            "role": "user",
+            "sha256": "2c9089b861cdf4db3483b4ac7f14e91323818e713eb2692cd9ad621d7d324f74"
+          },
+          {
+            "run_id": "1de702fc-43cc-4ce7-9e3d-c846b287fa4f",
+            "role": "assistant",
+            "sha256": "8abf07c0533428ea9606cfff5a82317326293773d9de7380b6bea459719a4482"
+          }
+        ],
+        "actual_answer_request": "6 messages: system + the four exact historical messages + current user/context; all four source message texts are present byte-for-byte in the outbound provider body.",
+        "query_understanding_request": "The actual DeepSeek request system message contains all four exact historical messages; query-understanding user message contains the current B1 question."
+      },
+      "query_understanding": {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/query_rewrite",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "http_status": 200,
+        "raw_model_intent": "follow_up",
+        "raw_rewrite_query": "课件中提到的远距离通信方式可能遇到什么问题",
+        "effective_runtime_intent": "kb_search",
+        "needs_retrieval": true,
+        "ranking_counts": {
+          "search": 30,
+          "rerank": 1,
+          "context": 1
+        },
+        "follow_up_runtime_branch_exercised": false,
+        "resolution": "The source-scoped request clause '请根据课件回答' resolves effective intent to kb_search before the follow_up-specific resolver branch. The provider was not forced; raw follow_up is preserved in its actual HTTP response, while the completed understand stage records kb_search."
+      },
+      "answer_support": {
+        "context_capture": "READ_ONLY_AFTER_NORMAL_PREPARATION",
+        "selected_context_evidence_count": 1,
+        "evidence": [
+          {
+            "chunk_id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+            "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+            "chunk_index": 24,
+            "source_offsets": [
+              10575,
+              11061
+            ],
+            "quote": "Problems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality"
+          }
+        ],
+        "actual_answer_request_contains_quote": true,
+        "assessment": {
+          "supported_core_points": [
+            "signal can spread out",
+            "refraction through different atmospheric layers can make intended sending difficult",
+            "drop in signal quality"
+          ],
+          "inference_or_overstatement": "The answer expands 'signal can spread out' to say coverage expands, and attributes quality loss to the preceding factors; neither detail is explicit in the quoted chunk. These are plausible explanation, not direct source facts.",
+          "user_visible_citation": "The completed API assistant message has zero knowledge_references, so the supported source was in the actual model context but no clickable citation was persisted."
+        }
+      },
+      "provider_requests": {
+        "actual_count": 4,
+        "all_http_200": true,
+        "calls": [
+          "query_rewrite: DeepSeek deepseek-flash",
+          "query_embedding: SiliconFlow BAAI/bge-m3",
+          "rerank: SiliconFlow BAAI/bge-reranker-v2-m3",
+          "answer: SiliconFlow XingChenAGI/Xing4.0-29B"
+        ],
+        "extra_provider_calls_observed": 0
+      },
+      "evidence_files": [
+        "history-before.json",
+        "history-seed.json",
+        "cases/b1-B/messages.json",
+        "cases/b1-B/result.json",
+        "evidence-332/provider-requests/e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.json",
+        "evidence-332/raw/e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.body",
+        "evidence-332/provider-requests/2ebe488f012d1aceafb30d24fc7f3ac5f61839674322ee451ecbb54a2e8ac88f.json",
+        "evidence-332/captures/5d26057e5f186124f16f8ba6197d2f2a029062a7c4b63282d58ad65dbac1cf09.json",
+        "evidence-332/stages/5d26057e5f186124f16f8ba6197d2f2a029062a7c4b63282d58ad65dbac1cf09.json"
+      ],
+      "reviewer_initial_label": "PASS_WITH_ANSWER_CITATION_GAP",
+      "product_contract_adjudication": "Public citation display has been disabled by Owner since P21. Missing clickable citations is expected; core source support and internal identity were verified independently. Two explanatory additions remain labelled as inferences."
+    },
+    "citation_contract": "EXPECTED_DISABLED_PUBLIC_CITATIONS; not an acceptance failure",
+    "commands": {
+      "prepare": 0,
+      "start": 0,
+      "query": 0,
+      "snapshot_initial": 1,
+      "snapshot_after_factual_diagnostic_tenant_metadata_fix": 0,
+      "stop": 0
+    },
+    "diagnostic_error_note": "Initial inline summarizer treated capture ranking pairs as objects; corrected analyzer to use saved typed stage SearchResult rows. No API/model request repeated.",
+    "test_scope": "No production code changed or offline tests repeated in this authorized continuation."
+  },
+  "authorization_followup": {
+    "source": "Owner direct confirmation: 我确认授权进行真实问答",
+    "recorded_at": "2026-10-18T01:17:49.215306+00:00",
+    "scope": "M3.1 existing SiliconFlow/DeepSeek and public M3 history/index",
+    "approved_max_e2e": 2,
+    "approved_max_provider": 12,
+    "approved_reported_tokens": 100000,
+    "planned_e2e": 1,
+    "b2": "BLOCKED_INPUT_CONTRACT",
+    "unknown_policy": "STOP_NO_RETRY",
+    "status": "CLOSED_NO_FURTHER_SENDS",
+    "executed_e2e": 1,
+    "executed_provider": 4,
+    "reported_tokens": 8435,
+    "new_unknown": 0,
+    "unused_e2e_not_executed": 1,
+    "unused_reported_token_execution_headroom": 91565,
+    "note": "Own API stopped; unused local experiment execution permission closed. No account allowance/legacy ledger changes."
+  },
+  "final_integrity": {
+    "mode": "READ_ONLY",
+    "old_source_messages_unchanged": true,
+    "chunk_quote_and_document_kb_version_match_live_db": true,
+    "owned_api_port_closed": true,
+    "new_provider_requests": 0
   }
 }
