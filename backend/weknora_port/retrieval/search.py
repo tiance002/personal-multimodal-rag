@@ -5,6 +5,7 @@ import asyncio
 from dataclasses import dataclass, replace
 from typing import Protocol, Sequence, Mapping
 from ..models.types import CallContext
+from ..models.cloud_errors import raise_if_send_denied
 from .types import SearchResult
 
 @dataclass(frozen=True)
@@ -136,6 +137,7 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
         except (RetrievalScopeError, PermissionError, CallCancelled, RunDeadlineExceeded):
             raise
         except Exception as exc:
+            raise_if_send_denied(exc)
             errors.append(exc)
             return []
 
@@ -147,6 +149,7 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
             except (CallCancelled, RunDeadlineExceeded):
                 raise
             except Exception as exc:
+                raise_if_send_denied(exc)
                 errors.append(exc)
                 vector_disabled = True
                 batch = [t for t in batch if t.keyword_index_enabled]

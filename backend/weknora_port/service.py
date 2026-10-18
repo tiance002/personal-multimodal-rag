@@ -212,6 +212,7 @@ class RuntimeService:
                 StreamEvent(accepted.run_id,'complete',data={'status':status,'error_code':code,'lifecycle_completed':True}))
 
     async def publish_error(self, accepted, error):
+        from .models.cloud_errors import public_cloud_error
         self._validate(accepted)
         code=self._safe_code(error)
         if isinstance(error,(CallCancelled,asyncio.CancelledError)):
@@ -227,7 +228,7 @@ class RuntimeService:
         if receipt is not True:
             raise ProviderError('TURN_FAILURE_COMMIT_UNVERIFIED')
         await self.store.append_event(accepted.session_id,accepted.assistant_message_id,
-            StreamEvent(accepted.run_id,'error',done=True,data={'error_code':code,'status':'failed'}))
+            StreamEvent(accepted.run_id,'error',content=public_cloud_error(code),done=True,data={'error_code':code,'status':'failed'}))
         await self.store.append_event(accepted.session_id,accepted.assistant_message_id,
             StreamEvent(accepted.run_id,'complete',data={'status':'cancelled' if isinstance(error,(CallCancelled,asyncio.CancelledError)) else 'failed','error_code':code}))
 

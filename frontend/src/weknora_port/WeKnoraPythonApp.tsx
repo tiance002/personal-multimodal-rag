@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { PortApiError, portApi } from "./api";
+import { cloudErrorMessage } from "./cloudErrors";
 import { resumePortChat, runPortChat } from "./sse";
 import type {
   DocumentRow, KnowledgeBase, MessageRow, ModelConfiguration, ModelRole,
@@ -37,6 +38,10 @@ const EMPTY_CONFIG: ModelConfiguration = { revision: "", roles: (Object.keys(ROL
 const INTERNAL_SOURCE_ATTRIBUTION_LINE = /^[ \t]*(?:\*\*|__)?source:(?:\*\*|__)?[^\r\n]*\([ \t]*document[ \t]+d[1-9]\d*[ \t]*,[ \t]*chunk[ \t]+c[1-9]\d*[ \t]*\)[^\r\n]*(?:\r?\n|$)/i;
 
 function errorText(error: unknown): string {
+  if (error instanceof PortApiError) {
+    const mapped = cloudErrorMessage(error.code);
+    if (mapped) return mapped;
+  }
   return error instanceof Error ? error.message : "请求失败";
 }
 
@@ -49,7 +54,7 @@ function answerFromSegments(segments: Segment[] = []) {
 }
 
 function eventLabel(event: WeKnoraSSEMessage): string {
-  const text = event.content.trim();
+  const text = (event.response_type === "error" ? cloudErrorMessage(event.data.error_code) || event.content : event.content).trim();
   const labels: Record<string, string> = {
     agent_query: "收到问题",
     query_understand: "理解问题",
@@ -243,11 +248,14 @@ export function WeKnoraPythonApp() {
     setNotice("正在读取会话历史");
     try {
       const history = await portApi.messages(session.id);
-      setMessages(history.map(row => ({ id: row.id, role: row.role === "user" ? "user" : "assistant", content: row.content,
-        status: row.role === "user" ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.is_completed ? "completed" : row.turn_status === "error" ? "failed" : "unknown",
-        error: row.turn_status === "error",
-        progress: (row.agent_steps ?? []).filter(step => step.reasoning_content).map(step => ({ type: "thinking", text: step.reasoning_content ?? "" })),
-      })));
+      setMessages(history.map(row => {
+        const mappedError = row.turn_status === "error" ? cloudErrorMessage(row.turn_error_code) : "";
+        return { id: row.id, role: row.role === "user" ? "user" : "assistant", content: mappedError || row.content,
+          status: row.role === "user" ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.turn_status === "error" ? "failed" : row.is_completed ? "completed" : "unknown",
+          error: row.turn_status === "error",
+          progress: (row.agent_steps ?? []).filter(step => step.reasoning_content).map(step => ({ type: "thinking", text: step.reasoning_content ?? "" })),
+        };
+      }));
       setNotice("已读取保存的会话历史；实时阶段仅显示当前连接收到的事件");
     } catch (error) { setMessages([assistantBubble(`历史读取失败：${errorText(error)}`)]); }
   };
@@ -279,14 +287,14 @@ export function WeKnoraPythonApp() {
     if (event.response_type === "complete") {
       const hadTerminalError = terminalErrorMessages.current.has(messageId);
       terminalErrorMessages.current.delete(messageId);
-      setNotice(event.data.status === "cancelled"
-        ? "生成已取消，服务端已保存终态"
-        : event.data.status === "failed" || hadTerminalError ? "生成失败，服务端已保存终态" : "回答已完成并保存");
+      if (event.data.status === "cancelled") setNotice("生成已取消，服务端已保存终态");
+      else if (event.data.status === "failed" && !hadTerminalError) setNotice("生成失败，服务端已保存终态");
+      else if (!hadTerminalError) setNotice("回答已完成并保存");
     } else if (event.response_type === "error") {
       const nonTerminalStreamError = event.data.non_terminal === true && event.data.stage === "chat_completion_stream";
       if (!nonTerminalStreamError) {
         terminalErrorMessages.current.add(messageId);
-        setNotice(event.content || "运行发生错误");
+        setNotice(cloudErrorMessage(event.data.error_code) || event.content || "运行发生错误");
       }
     }
     updateMessage(messageId, previous => {
@@ -319,7 +327,7 @@ export function WeKnoraPythonApp() {
         if (event.data.non_terminal === true && event.data.stage === "chat_completion_stream") {
           return { ...previous, progress: progress.slice(-80) };
         }
-        return { ...previous, content: event.content || "运行发生错误", progress: progress.slice(-80), error: true };
+        return { ...previous, content: cloudErrorMessage(event.data.error_code) || event.content || "运行发生错误", progress: progress.slice(-80), error: true };
       }
       return { ...previous, progress: progress.slice(-80) };
     });
@@ -492,7 +500,7 @@ export function WeKnoraPythonApp() {
         <div className="wp-scope-card">
           <div className="wp-scope-heading"><div><strong>检索范围</strong><small>{documentScopeLocked ? "会话使用已保存的知识库范围；新范围请新建会话" : "先选择一个或多个知识库，再限定文档"}</small></div><span>{selectedBases.length} 个知识库 · {selectedDocuments.length} 个资料</span></div>
           <div className="wp-scope-grid">
-            <div className="wp-scope-column"><label>知识库</label>{bases.map(base => <label key={base.id} className="wp-check-row"><input type="checkbox" checked={selectedBases.includes(base.id)} disabled={documentScopeLocked || busy} onChange={() => toggleBase(base.id)} /><span><strong>{base.name}</strong><small>{base.document_count} 份资料 · {base.cloud_allowed ? "允许外发" : "仅本地"}</small></span></label>)}{!bases.length && <p className="wp-empty-small">尚无知识库，请到资料库创建</p>}</div>
+            <div className="wp-scope-column"><label>知识库</label>{bases.map(base => <label key={base.id} className="wp-check-row"><input type="checkbox" checked={selectedBases.includes(base.id)} disabled={documentScopeLocked || busy} onChange={() => toggleBase(base.id)} /><span><strong>{base.name}</strong><small>{base.document_count} 份资料 · {base.cloud_allowed ? "允许外发" : "仅本地（该库内容不外发）"}</small></span></label>)}{!bases.length && <p className="wp-empty-small">尚无知识库，请到资料库创建</p>}</div>
             <div className="wp-scope-column"><label>资料文件</label>{visibleDocuments.map(doc => <label key={doc.id} className="wp-check-row"><input type="checkbox" checked={selectedDocuments.includes(doc.id)} disabled={documentScopeLocked || busy || !selectedBases.includes(doc.knowledge_base_id)} onChange={() => toggleDocument(doc.id)} /><span><strong>{doc.filename}</strong><small>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</small></span></label>)}{selectedBases.length > 0 && visibleDocuments.length === 0 && <p className="wp-empty-small">所选知识库暂无资料</p>}</div>
           </div>
         </div>
@@ -519,7 +527,7 @@ export function WeKnoraPythonApp() {
         </div>
       </section>}
 
-      {page === "library" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>知识库</h1><p>选择资料范围并查看文件名、索引状态。</p></div></div><div className="wp-library-grid"><div className="wp-panel"><h2>知识库</h2>{bases.map(base => <button key={base.id} className="wp-library-row" onClick={() => setUploadKbId(base.id)}><strong>{base.name}</strong><span>{base.document_count} 份 · {base.cloud_allowed ? "允许外发" : "仅本地"}</span></button>)}<form className="wp-inline-form" onSubmit={event => void createKb(event)}><input value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="新知识库名称"/><button disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</button></form></div><div className="wp-panel"><h2>资料文件</h2><KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/><div className="wp-upload-row"><select value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>{visibleDocuments.map(doc => <div className="wp-library-row" key={doc.id}><strong>{doc.filename}</strong><span>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</span></div>)}{!visibleDocuments.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div></div></section>}
+      {page === "library" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>知识库</h1><p>选择资料范围并查看文件名、索引状态。</p></div></div><div className="wp-library-grid"><div className="wp-panel"><h2>知识库</h2>{bases.map(base => <button key={base.id} className="wp-library-row" onClick={() => setUploadKbId(base.id)}><strong>{base.name}</strong><span>{base.document_count} 份 · {base.cloud_allowed ? "允许外发" : "仅本地（该库内容不外发）"}</span></button>)}<form className="wp-inline-form" onSubmit={event => void createKb(event)}><input value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="新知识库名称"/><button disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</button></form></div><div className="wp-panel"><h2>资料文件</h2><KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/><div className="wp-upload-row"><select value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>{visibleDocuments.map(doc => <div className="wp-library-row" key={doc.id}><strong>{doc.filename}</strong><span>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</span></div>)}{!visibleDocuments.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div></div></section>}
 
       {page === "models" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>模型角色</h1><p>配置 embedding、rerank、cheap、expensive 和 VLM。API 密钥只写入，不会从服务端读回。</p></div></div><form className="wp-model-form" onSubmit={event => void saveConfig(event)}>{config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Source<select aria-label={`Source ${role.role}`} value={role.source ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, source: event.target.value } : row) }))}><option value="">Choose source / preserve legacy</option><option value="remote">Remote</option><option value="local">Local (calls unavailable)</option></select></label><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.credential_status === "UNAVAILABLE" ? `凭据不可用（${role.credential_error}）；可输入新密钥替换` : role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<button className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</button></form></section>}
       {page === "memory" && <MemoryPanel disabled={loading || Boolean(runtimeError)} onOpenDocument={openMemoryDocument} />}

@@ -133,6 +133,100 @@ def api_identity(port):
     return body
 
 
+async def collect_usage(cfg):
+    """Read the current local principal's provider-call ledger; never estimates absent usage."""
+    import psycopg
+    from psycopg.rows import dict_row
+
+    env = environment(cfg)
+    names = ('DATABASE_URL', 'DATABASE_SYSTEM_ID', 'DATABASE_NAME')
+    expected = {name: env.get('WEKNORA_PORT_' + name, '') for name in names}
+    require(all(expected.values()), 'EXPLICIT_POSTGRES_IDENTITY_REQUIRED')
+    conn = await psycopg.AsyncConnection.connect(
+        expected['DATABASE_URL'], autocommit=True, row_factory=dict_row, connect_timeout=5
+    )
+    try:
+        await conn.execute('BEGIN TRANSACTION READ ONLY')
+        identity = await (await conn.execute(
+            'SELECT system_identifier::text AS system_id,current_database() AS database '
+            'FROM pg_control_system()'
+        )).fetchone()
+        require(identity['system_id'] == expected['DATABASE_SYSTEM_ID'] and
+                identity['database'] == expected['DATABASE_NAME'], 'POSTGRES_PHYSICAL_IDENTITY_MISMATCH')
+        principal = await (await conn.execute(
+            "SELECT tenant_id,subject_id FROM port_local_principal WHERE slot='local'"
+        )).fetchone()
+        require(principal is not None, 'EXISTING_LOCAL_PRINCIPAL_REQUIRED')
+        rows = await (await conn.execute(
+            'SELECT provider,model,capability,outcome,usage FROM port_provider_calls '
+            'WHERE tenant_id=%s AND subject_id=%s ORDER BY created_at,call_id',
+            (principal['tenant_id'], principal['subject_id']),
+        )).fetchall()
+        models = await (await conn.execute(
+            "SELECT id,role,name,source,status,parameters->>'provider' AS provider FROM models "
+            "WHERE tenant_id=%s AND subject_id=%s AND status='active' AND deleted_at IS NULL "
+            'ORDER BY role,id',
+            (principal['tenant_id'], principal['subject_id']),
+        )).fetchall()
+        knowledge_bases = await (await conn.execute(
+            'SELECT id,name,cloud_allowed FROM knowledge_bases '
+            'WHERE tenant_id=%s AND deleted_at IS NULL ORDER BY created_at,id',
+            (principal['tenant_id'],),
+        )).fetchall()
+        await conn.execute('ROLLBACK')
+    finally:
+        await conn.close()
+
+    groups = {}
+    for row in rows:
+        key = (row['provider'], row['model'], row['capability'])
+        group = groups.setdefault(key, {
+            'provider': key[0], 'model': key[1], 'capability': key[2],
+            'calls': 0, 'reported': 0, 'unreported': 0, 'unknown_outcome': 0,
+            'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0,
+            '_split_complete': True,
+        })
+        group['calls'] += 1
+        if row['outcome'] == 'UNKNOWN':
+            group['unknown_outcome'] += 1
+        usage = row['usage']
+        valid = (isinstance(usage, dict) and usage.get('status') == 'REPORTED' and
+                 type(usage.get('total_tokens')) is int and usage['total_tokens'] >= 0)
+        has_prompt = isinstance(usage, dict) and usage.get('prompt_tokens') is not None
+        has_completion = isinstance(usage, dict) and usage.get('completion_tokens') is not None
+        split_valid = (has_prompt and has_completion and
+                       type(usage['prompt_tokens']) is int and usage['prompt_tokens'] >= 0 and
+                       type(usage['completion_tokens']) is int and usage['completion_tokens'] >= 0 and
+                       usage['prompt_tokens'] + usage['completion_tokens'] == usage.get('total_tokens'))
+        split_absent = not has_prompt and not has_completion
+        valid = valid and (split_valid or split_absent)
+        if valid:
+            group['reported'] += 1
+            group['total_tokens'] += usage['total_tokens']
+            if split_valid:
+                group['prompt_tokens'] += usage['prompt_tokens']
+                group['completion_tokens'] += usage['completion_tokens']
+            else:
+                group['_split_complete'] = False
+        else:
+            group['unreported'] += 1
+    for group in groups.values():
+        if group['reported'] == 0:
+            group['prompt_tokens'] = group['completion_tokens'] = group['total_tokens'] = None
+        elif not group['_split_complete']:
+            group['prompt_tokens'] = group['completion_tokens'] = None
+        del group['_split_complete']
+    return {
+        'postgres_system_id': identity['system_id'], 'database': identity['database'],
+        'tenant_id': principal['tenant_id'], 'subject_id': principal['subject_id'],
+        'calls': len(rows), 'reported': sum(g['reported'] for g in groups.values()),
+        'unreported': sum(g['unreported'] for g in groups.values()),
+        'unknown_outcome': sum(g['unknown_outcome'] for g in groups.values()),
+        'groups': sorted(groups.values(), key=lambda g: (g['provider'], g['model'], g['capability'])),
+        'models': models, 'knowledge_bases': knowledge_bases,
+    }
+
+
 def save(path, state):
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(state, indent=2) + '\n', encoding='utf-8')
@@ -157,13 +251,21 @@ def stop_owned(state):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('start', 'stop', 'status', 'check'))
+    parser.add_argument('action', choices=('start', 'stop', 'status', 'check', 'usage'))
     parser.add_argument('--config', required=True)
     args = parser.parse_args(argv)
     cfg = load_config(args.config)
     for directory in cfg['environment'].get('PYTHONPATH', '').split(os.pathsep):
         if directory:
             sys.path.insert(0, directory)
+    if args.action == 'usage':
+        # psycopg async connections need Selector on Windows, as check/start do.
+        loop = asyncio.SelectorEventLoop()
+        try:
+            print(json.dumps(loop.run_until_complete(collect_usage(cfg))))
+        finally:
+            loop.close()
+        return
     state_dir = Path(cfg['state_dir']);state_dir.mkdir(parents=True, exist_ok=True)
     state_path = state_dir / 'processes.json'
     state = json.loads(state_path.read_text()) if state_path.exists() else {}

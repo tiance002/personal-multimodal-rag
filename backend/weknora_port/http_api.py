@@ -219,8 +219,9 @@ def _public_model_configuration(value: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _error_response(code: str, status_code: int, request_id: str) -> JSONResponse:
+    from .models.cloud_errors import public_cloud_error
     return JSONResponse(status_code=status_code, content={
-        "error": {"code": code, "message": code},
+        "error": {"code": code, "message": public_cloud_error(code) or code},
         "meta": {"request_id": request_id},
     })
 
@@ -330,13 +331,15 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
 
     @app.exception_handler(ProviderError)
     async def provider_application_error(request: Request, exc: ProviderError):
+        from .models.cloud_errors import CLOUD_ERRORS
         code = _safe_code(exc, "REQUEST_FAILED")
         denied = {"TRUSTED_PRINCIPAL_REQUIRED", "TURN_OWNER_MISMATCH",
                   "TURN_KB_SCOPE_DENIED", "TURN_DOCUMENT_SCOPE_DENIED",
                   "TURN_RAW_SCOPE_EXPANSION_DENIED", "KNOWLEDGE_OWNER_MISMATCH", "MEMORY_OWNER_MISMATCH"}
         conflicts = {"TURN_REQUEST_PAYLOAD_CONFLICT", "TURN_FAILURE_CONFLICT",
                      "TURN_ALREADY_FAILED"}
-        status = 403 if code in denied else 409 if code in conflicts else 422
+        status = (429 if code == 'LOCAL_EXECUTION_LIMIT_DENIED' else
+                  403 if code in denied or code in CLOUD_ERRORS else 409 if code in conflicts else 422)
         return _error_response(code, status, _request_id(request))
 
     @app.exception_handler(DocumentLifecycleError)

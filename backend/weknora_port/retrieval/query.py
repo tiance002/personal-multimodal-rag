@@ -8,6 +8,7 @@ import json
 import re
 from typing import Callable, Sequence
 from ..models.types import ChatOptions, Message, CallCancelled, RunDeadlineExceeded
+from ..models.cloud_errors import raise_if_send_denied
 STOPWORDS = frozenset('的 是 在 了 和 与 或 a an the is are was were be been being have has had do does did will would could should may might must can to of in for on with at by from as into through about what how why when where which who whom whose'.split())
 
 class TokenizerUnavailable(RuntimeError):
@@ -191,7 +192,8 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
             return await registry.chat(model_id, context)
         except (CallCancelled, RunDeadlineExceeded):
             raise
-        except Exception:
+        except Exception as exc:
+            raise_if_send_denied(exc)
             return None
     if state.images:
         if state.chat_model_supports_vision:
@@ -216,7 +218,8 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
         response = await model.chat(messages, ChatOptions(temperature=0.3, max_completion_tokens=500 if use_images else 150, thinking=False), context.child('query_rewrite'))
     except (CallCancelled, RunDeadlineExceeded):
         raise
-    except Exception:
+    except Exception as exc:
+        raise_if_send_denied(exc)
         return
     parse_understanding(state, response.content)
     state.intent = resolve_intent(state)

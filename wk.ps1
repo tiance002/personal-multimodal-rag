@@ -1,6 +1,6 @@
 # Sole local application entry. Explicit configuration; never loads legacy dotenv.
 param(
- [Parameter(Position=0)][ValidateSet('start','stop','status','check')][string]$Action='status',
+ [Parameter(Position=0)][ValidateSet('start','stop','status','check','usage')][string]$Action='status',
  [Parameter(Mandatory=$true)][string]$Config
 )
 $ErrorActionPreference='Stop'

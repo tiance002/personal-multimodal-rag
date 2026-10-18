@@ -21,7 +21,7 @@ class Gate:
     async def authorize(self, call):
         self.calls += 1
         if self.fail: raise ProviderError('ORIGINAL_DENIED')
-    async def finish(self, call, **kwargs): pass
+    async def finish(self, call, **kwargs): return True
 
 
 def call(identity='run/1'):
@@ -36,8 +36,8 @@ def ledger():
     with tempfile.TemporaryDirectory(dir=root) as folder:
         path = Path(folder) / 'owner.json'
         path.write_text(json.dumps({'status': 'OPEN', 'tenant_id': 1, 'subject_id': 'owner',
-            'allowed_kbs': ['kb'], 'allowed_models': [{'provider': 'provider', 'model': 'model', 'capability': 'chat'}],
-            'allowed_request_prefixes': ['run/'], 'max_calls': 12, 'max_tokens': 100000, 'entries': []}))
+            'allowed_kbs': ['kb'], 'allowed_models': [{'provider': 'provider', 'model': 'model', 'model_id': 'm1', 'capability': 'chat'}],
+            'allowed_request_prefixes': ['run/'], 'max_calls': 12, 'max_tokens': 100000, 'capture_evidence': True, 'entries': []}))
         yield path
 
 
@@ -82,7 +82,7 @@ def test_install_preserves_identity_and_preload(ledger):
     with pytest.raises(ProviderError, match='REUSE'): run(gate.authorize(call()))
 
 
-@pytest.mark.parametrize('alter', ['tenant', 'owner', 'scope', 'origin', 'model', 'prefix', 'closed'])
+@pytest.mark.parametrize('alter', ['tenant', 'owner', 'scope', 'origin', 'model', 'model_id', 'prefix', 'closed'])
 def test_scope_before_original(ledger, alter):
     gate = LocalExecution(ledger).install_gate(Gate())
     c = call()
@@ -91,6 +91,7 @@ def test_scope_before_original(ledger, alter):
     if alter == 'scope': c = replace(c, context=replace(c.context, scope=TrustedScope('owner', ('other',))))
     if alter == 'origin': c = replace(c, context=replace(c.context, required_origin_kbs=('other',)))
     if alter == 'model': c = replace(c, model='other')
+    if alter == 'model_id': c = replace(c, model_id='different-registry-row')
     if alter == 'prefix': c = replace(c, context=replace(c.context, request_id='other/1'))
     if alter == 'closed': change(ledger, status='CLOSED')
     with pytest.raises(ProviderError): run(gate.authorize(c))
@@ -138,13 +139,13 @@ def test_reported_usage_with_unknown_outcome_stops(ledger):
     assert state['entries'][0]['usage']['total_tokens'] == 15
 
 
-def test_restart_with_inflight_stops_new_calls(ledger):
+def test_live_owner_survives_independent_assembly(ledger):
     gate = LocalExecution(ledger).install_gate(Gate())
     run(gate.authorize(call()))
     restarted = LocalExecution(ledger).install_gate(Gate())
-    assert data(ledger)['status'] == 'STOP'
-    with pytest.raises(ProviderError): run(restarted.authorize(call('run/2')))
-    assert restarted.calls == 0
+    assert data(ledger)['status'] == 'OPEN'
+    run(restarted.authorize(call('run/2')))
+    assert restarted.calls == 1
 
 
 def contend(path, number, queue):
@@ -182,9 +183,10 @@ def test_observer_byte_preservation_no_headers(ledger, stream):
     fence = LocalExecution(ledger)
     assert fence.observe_model(model) is model
     fence.observe_model(model)
-    config = SimpleNamespace(provider='provider', model='model', model_id='m1', custom_headers={'Authorization': 'secret'})
+    from backend.weknora_port.models.types import ModelConfig
+    config = ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid', custom_headers={'Authorization': 'secret'})
     async def consume():
-        async with model.transport.open(config, '/', {'prompt': 'hello', 'api_key': 'secret', 'nested': {'Authorization': 'secret'}}, call().context, capability='chat') as handle:
+        async with model.transport.open(config, '/', {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50, 'api_key': 'secret', 'nested': {'Authorization': 'secret'}}, call().context, capability='chat') as handle:
             if stream: return b''.join([chunk async for chunk in handle.response.aiter_bytes()])
             return await handle.response.aread()
     assert run(consume()) == raw
@@ -192,3 +194,255 @@ def test_observer_byte_preservation_no_headers(ledger, stream):
     request = next(fence.evidence.glob('*.request.json')).read_text()
     assert 'secret' not in request and 'Authorization' not in request
     assert json.loads(next(fence.evidence.glob('*.response.json')).read_text())['complete'] is True
+
+
+def test_observer_can_close_from_stream_cleanup_context(ledger):
+    from backend.weknora_port.models.types import ModelConfig
+    closed = []
+    @asynccontextmanager
+    async def opened(*args, **kwargs):
+        try: yield SimpleNamespace(response=SimpleNamespace())
+        finally: closed.append(True)
+    change(ledger, capture_evidence=False)
+    model = LocalExecution(ledger).observe_model(SimpleNamespace(transport=SimpleNamespace(open=opened)))
+    async def scenario():
+        manager = model.transport.open(ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid'),
+            '/', {'messages': [{'role': 'user', 'content': 'hello'}], 'max_tokens': 50}, call().context, capability='chat')
+        await manager.__aenter__()
+        await asyncio.create_task(manager.__aexit__(None, None, None))
+    run(scenario())
+    assert closed == [True]
+
+
+@pytest.mark.parametrize('alter', ['negative_held', 'negative_reserve', 'duplicate', 'bad_id', 'bad_usage', 'bad_unknown_usage', 'bad_json'])
+def test_invalid_ledger_is_never_rewritten(ledger, alter):
+    gate = LocalExecution(ledger).install_gate(Gate())
+    run(gate.authorize(call()))
+    run(gate.finish(call(), outcome='RESPONSE_RECEIVED', usage=TokenUsage(10, 5, 15, 'REPORTED')))
+    value = data(ledger)
+    row = value['entries'][0]
+    if alter == 'negative_held': row['held_tokens'] = -1
+    if alter == 'negative_reserve': row['reserved_tokens'] = -1
+    if alter == 'duplicate': value['entries'].append(dict(row))
+    if alter == 'bad_id': row['id'] = 'forged'
+    if alter == 'bad_usage': row['usage']['prompt_tokens'] = 100
+    if alter == 'bad_unknown_usage':
+        value['status'], row['status'], row['held_tokens'] = 'STOP', 'UNKNOWN', row['reserved_tokens']
+        row['usage']['total_tokens'] = -1
+    ledger.write_text('{' if alter == 'bad_json' else json.dumps(value))
+    original = ledger.read_bytes()
+    with pytest.raises(ProviderError, match='LOCAL_EXECUTION_INVALID'): LocalExecution(ledger)
+    assert ledger.read_bytes() == original
+
+
+@pytest.mark.parametrize('constructor', [False, True])
+@pytest.mark.parametrize('owner', [None, {'pid': 999999999, 'creation_token': 'gone'}, {'pid': 1, 'creation_token': 'wrong'}])
+def test_orphan_stop_is_persistent_without_releasing(ledger, constructor, owner):
+    gate = LocalExecution(ledger).install_gate(Gate())
+    run(gate.authorize(call()))
+    value = data(ledger)
+    value['entries'][0]['process_identity'] = owner
+    ledger.write_text(json.dumps(value))
+    if constructor: LocalExecution(ledger)
+    else:
+        with pytest.raises(ProviderError): run(gate.authorize(call('run/2')))
+    assert data(ledger)['status'] == 'STOP'
+    assert data(ledger)['entries'][0]['held_tokens'] == 1174
+
+
+@pytest.mark.parametrize('result', [None, False, 'error'])
+def test_original_settlement_must_explicitly_succeed(ledger, result):
+    gate = Gate()
+    async def finish(*args, **kwargs):
+        if result == 'error': raise RuntimeError('synthetic PG failure')
+        return result
+    gate.finish = finish
+    LocalExecution(ledger).install_gate(gate)
+    run(gate.authorize(call()))
+    with pytest.raises((ProviderError, RuntimeError)):
+        run(gate.finish(call(), outcome='RESPONSE_RECEIVED', usage=TokenUsage(10, 5, 15, 'REPORTED')))
+    assert data(ledger)['status'] == 'STOP'
+    assert data(ledger)['entries'][0]['held_tokens'] == 1174
+
+
+@pytest.mark.parametrize('usage', [TokenUsage(10, 6, 15, 'REPORTED'), TokenUsage(16, None, 15, 'REPORTED'),
+    TokenUsage(10, 5, 15, 'REPORTED', cached_tokens=-1)])
+def test_inconsistent_reported_usage_retains_all_occupancy(ledger, usage):
+    gate = LocalExecution(ledger).install_gate(Gate())
+    run(gate.authorize(call()))
+    run(gate.finish(call(), outcome='RESPONSE_RECEIVED', usage=usage))
+    assert data(ledger)['status'] == 'STOP'
+    assert data(ledger)['entries'][0]['held_tokens'] == 1174
+
+
+@pytest.mark.parametrize('kind', ['chat', 'embedding', 'rerank', 'unknown_provider', 'unknown_protocol', 'multimedia', 'missing_cap'])
+def test_actual_transport_open_bound_and_default_private(ledger, kind):
+    import httpx
+    from backend.weknora_port.models.transport import AsyncHTTPTransport, configured_endpoint
+    from backend.weknora_port.models.types import ModelConfig
+    config = ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid', requires_auth=False)
+    capability = kind if kind in ('embedding', 'rerank') else 'chat'
+    body = {'messages': [{'role': 'user', 'content': 'private prompt'}], 'max_tokens': 50}
+    if kind == 'embedding': body = {'input': ['private prompt']}
+    if kind == 'rerank': body = {'query': 'private prompt', 'documents': ['private evidence']}
+    if kind == 'unknown_provider': config = replace(config, provider='unknown')
+    if kind == 'unknown_protocol': config = replace(config, api='unknown')
+    if kind == 'multimedia': body['messages'][0]['content'] = [{'type': 'image_url', 'image_url': 'secret'}]
+    if kind == 'missing_cap': body.pop('max_tokens')
+    change(ledger, capture_evidence=False, allowed_models=[{'provider': config.provider, 'model': 'model', 'model_id': 'm1', 'capability': capability}])
+    gate = LocalExecution(ledger).install_gate(Gate())
+    sent = []
+    def response(request):
+        sent.append(request.content)
+        return httpx.Response(200, json={'private': 'response'})
+    transport = AsyncHTTPTransport(allowed_endpoints=[configured_endpoint(config, capability)], gate=gate,
+        http_transport=httpx.MockTransport(response))
+    LocalExecution(ledger).observe_model(SimpleNamespace(transport=transport))
+    async def execute():
+        try:
+            async with transport.open(config, '/', body, call().context, capability=capability) as handle:
+                await handle.response.aread()
+                handle.observed(TokenUsage(10, 5, 15, 'REPORTED'))
+        finally: await transport.aclose()
+    if kind in ('unknown_provider', 'unknown_protocol', 'multimedia', 'missing_cap'):
+        with pytest.raises(ProviderError, match='LOCAL_EXECUTION_BOUND_UNVERIFIABLE'): run(execute())
+        assert not sent and not data(ledger)['entries'] and gate.calls == 0
+    else:
+        run(execute())
+        assert len(sent) == 1
+        row = data(ledger)['entries'][0]
+        assert row['reserved_tokens'] == len(sent[0]) + (50 if capability == 'chat' else 0) + 1024
+        assert row['status'] == 'SETTLED'
+    assert not (ledger.parent / 'evidence').exists()
+
+
+def test_default_pipeline_does_not_capture_original_text(ledger):
+    change(ledger, capture_evidence=False)
+    async def execute(*args): return 'private response'
+    pipeline = SimpleNamespace(run=execute, on_progress=None)
+    fence = LocalExecution(ledger)
+    assert fence.observe_pipeline(pipeline, SimpleNamespace(run_id='run', session_id='session')) is pipeline
+    assert run(pipeline.run(None, None)) == 'private response'
+    assert not fence.evidence.exists()
+
+
+def test_complete_output_upper_is_reserved_without_body_mutation(ledger, monkeypatch):
+    from backend.weknora_port.models import output_contract
+    from backend.weknora_port.models.types import ModelConfig
+    import httpx
+    from backend.weknora_port.models.transport import AsyncHTTPTransport, configured_endpoint
+    monkeypatch.setitem(output_contract.CAP_CONTRACTS, ('siliconflow', 'openai-completions'),
+        ('max_tokens', output_contract.VISIBLE_PLUS_REASONING, 'reasoning_limit'))
+    config = ModelConfig('siliconflow', 'model', 'm1', 'https://example.invalid', requires_auth=False)
+    body = {'messages': [{'role': 'user', 'content': 'question'}], 'max_tokens': 50, 'reasoning_limit': 200}
+    unchanged = json.dumps(body, sort_keys=True)
+    change(ledger, capture_evidence=False, allowed_models=[{'provider': 'siliconflow', 'model': 'model', 'model_id': 'm1', 'capability': 'chat'}])
+    gate = LocalExecution(ledger).install_gate(Gate())
+    sent = []
+    def response(request):
+        sent.append(request.content)
+        return httpx.Response(200, json={})
+    transport = AsyncHTTPTransport(allowed_endpoints=[configured_endpoint(config)], gate=gate,
+        http_transport=httpx.MockTransport(response))
+    LocalExecution(ledger).observe_model(SimpleNamespace(transport=transport))
+    async def execute():
+        try:
+            async with transport.open(config, '/', body, call().context, capability='chat') as handle:
+                await handle.response.aread()
+                handle.observed(TokenUsage(10, 5, 15, 'REPORTED'))
+        finally: await transport.aclose()
+    run(execute())
+    assert json.dumps(body, sort_keys=True) == unchanged
+    assert data(ledger)['entries'][0]['reserved_tokens'] == len(sent[0]) + 250 + 1024
+
+
+@pytest.mark.parametrize('status,code', [('STOP', 'LOCAL_EXECUTION_UNKNOWN_STOP'), ('CLOSED', 'LOCAL_EXECUTION_CLOSED')])
+def test_persistent_status_has_specific_error_before_scope(ledger, status, code):
+    gate = LocalExecution(ledger).install_gate(Gate())
+    change(ledger, status=status)
+    gate.application.principal.tenant_id = 'also_invalid'
+    with pytest.raises(ProviderError, match=code): run(gate.authorize(call()))
+    assert gate.calls == 0
+
+
+def test_optimized_python_retains_ledger_and_bound_guards(ledger):
+    import subprocess
+    import sys
+    script = r"""
+import asyncio, json, sys
+from contextlib import asynccontextmanager
+from pathlib import Path
+from types import SimpleNamespace
+from backend.weknora_port.execution import LocalExecution
+from backend.weknora_port.models.types import ModelConfig, ProviderError
+path = Path(sys.argv[1])
+original = path.read_bytes()
+value = json.loads(original)
+value['max_calls'] = -1
+path.write_text(json.dumps(value))
+broken = path.read_bytes()
+try:
+    LocalExecution(path)
+except ProviderError as error:
+    if error.code != 'LOCAL_EXECUTION_INVALID': raise
+else: raise RuntimeError('optimized mode accepted corrupt ledger')
+if path.read_bytes() != broken: raise RuntimeError('corrupt ledger was rewritten')
+path.write_bytes(original)
+@asynccontextmanager
+async def forbidden(*args, **kwargs):
+    raise RuntimeError('unknown bound reached transport')
+    yield
+model = SimpleNamespace(transport=SimpleNamespace(open=forbidden))
+LocalExecution(path).observe_model(model)
+config = ModelConfig('unknown', 'model', 'm1', 'https://example.invalid')
+async def execute():
+    try:
+        async with model.transport.open(config, '/', {'messages': [{'content': 'text'}], 'max_tokens': 50},
+                None, capability='chat'): pass
+    except ProviderError as error:
+        if error.code != 'LOCAL_EXECUTION_BOUND_UNVERIFIABLE': raise
+    else: raise RuntimeError('optimized mode accepted unknown bound')
+asyncio.run(execute())
+print('optimized guards rejected corrupt ledger and unknown bound')
+"""
+    result = subprocess.run([sys.executable, '-O', '-c', script, str(ledger)],
+        cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True, timeout=20)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'optimized guards rejected' in result.stdout
+
+
+@pytest.mark.parametrize('status', ['OPEN', 'STOP', 'CLOSED'])
+def test_legacy_model_permission_without_registry_id_is_read_only(ledger, status):
+    gate = LocalExecution(ledger).install_gate(Gate())
+    run(gate.authorize(call()))
+    assert data(ledger)['entries'][0]['model_id'] == 'm1'
+    run(gate.finish(call(), outcome='RESPONSE_RECEIVED', usage=TokenUsage(10, 5, 15, 'REPORTED')))
+    value = data(ledger)
+    value['status'] = status
+    value['allowed_models'][0].pop('model_id')
+    value['entries'][0].pop('model_id')
+    ledger.write_text(json.dumps(value))
+    original = ledger.read_bytes()
+    if status == 'OPEN':
+        with pytest.raises(ProviderError, match='LOCAL_EXECUTION_INVALID'): LocalExecution(ledger)
+        assert ledger.read_bytes() == original
+    else:
+        LocalExecution(ledger)
+        assert data(ledger) == value
+        assert 'model_id' not in data(ledger)['allowed_models'][0]
+
+
+
+def test_wildcard_request_permission_accepts_uuid_but_keeps_scope(ledger):
+    import uuid
+    change(ledger, allowed_request_prefixes=['*'])
+    gate = LocalExecution(ledger).install_gate(Gate())
+    valid = call(str(uuid.uuid4()))
+    run(gate.authorize(valid))
+    assert gate.calls == 1
+    assert data(ledger)['entries'][0]['request_id'] == valid.context.request_id
+    invalid = replace(call(str(uuid.uuid4())),
+        context=CallContext(str(uuid.uuid4()), TrustedScope('owner', ('other-kb',))))
+    with pytest.raises(ProviderError, match='LOCAL_EXECUTION_SCOPE_DENIED'): run(gate.authorize(invalid))
+    with pytest.raises(ProviderError, match='LOCAL_EXECUTION_SCOPE_DENIED'): run(gate.authorize(call('')))
+    assert gate.calls == 1 and len(data(ledger)['entries']) == 1

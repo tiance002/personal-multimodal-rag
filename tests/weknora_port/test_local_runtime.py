@@ -5,8 +5,10 @@ All process and HTTP interactions are mocked; these tests never contact services
 from __future__ import annotations
 
 import contextlib
+import asyncio
 import io
 import json
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -163,3 +165,93 @@ def test_environment_discards_inherited_runtime_overrides_and_sets_new_ui_api(mo
     assert "VITE_OLD_FRONTEND_FLAG" not in env
     assert "WEKNORA_PORT_OLD_REDIS_URL" not in env
     assert env["PYTHONDONTWRITEBYTECODE"] == "1"
+
+
+def test_collect_usage_is_read_only_scoped_and_keeps_malformed_usage_unreported(monkeypatch):
+    statements = []
+    rows = [
+        {"provider": "local", "model": "qwen", "capability": "cheap", "outcome": "RESPONSE_RECEIVED",
+         "usage": {"status": "REPORTED", "prompt_tokens": 10, "completion_tokens": 4, "total_tokens": 14}},
+        {"provider": "local", "model": "qwen", "capability": "cheap", "outcome": "UNKNOWN", "usage": None},
+        {"provider": "local", "model": "qwen", "capability": "cheap", "outcome": "RESPONSE_RECEIVED",
+         "usage": {"status": "REPORTED", "prompt_tokens": -1, "completion_tokens": 1, "total_tokens": 0}},
+        {"provider": "local", "model": "qwen", "capability": "cheap", "outcome": "RESPONSE_RECEIVED",
+         "usage": {"status": "REPORTED", "prompt_tokens": None, "completion_tokens": None, "total_tokens": 7}},
+        {"provider": "other", "model": "unknown", "capability": "embedding", "outcome": "UNKNOWN", "usage": {}},
+    ]
+
+    class Cursor:
+        def __init__(self, value):
+            self.value = value
+
+        async def fetchone(self):
+            return self.value
+
+        async def fetchall(self):
+            return self.value
+
+    class Connection:
+        async def execute(self, sql, params=None):
+            statements.append((sql, params))
+            if sql.startswith("SELECT system_identifier"):
+                return Cursor({"system_id": "12345", "database": "weknora_local"})
+            if sql.startswith("SELECT tenant_id,subject_id"):
+                return Cursor({"tenant_id": 42, "subject_id": "local-user"})
+            if sql.startswith("SELECT provider"):
+                return Cursor(rows)
+            if sql.startswith("SELECT id,role,name,source,status,parameters"):
+                return Cursor([{"id": "m1", "role": "cheap", "name": "Local Qwen",
+                                "source": "local", "status": "active", "provider": "ollama"}])
+            if sql.startswith("SELECT id,name,cloud_allowed"):
+                return Cursor([{"id": "kb1", "name": "Notes", "cloud_allowed": False}])
+            return Cursor(None)
+
+        async def close(self):
+            pass
+
+    async def connect(*args, **kwargs):
+        assert args == ("postgresql://127.0.0.1/test",)
+        assert kwargs["autocommit"] is True
+        return Connection()
+
+    psycopg = SimpleNamespace(AsyncConnection=SimpleNamespace(connect=connect))
+    rows_module = SimpleNamespace(dict_row=object())
+    monkeypatch.setitem(sys.modules, "psycopg", psycopg)
+    monkeypatch.setitem(sys.modules, "psycopg.rows", rows_module)
+    cfg = _runtime_config(environment={
+        "WEKNORA_PORT_MINERU_ENABLED": "true",
+        "WEKNORA_PORT_DATABASE_URL": "postgresql://127.0.0.1/test",
+        "WEKNORA_PORT_DATABASE_SYSTEM_ID": "12345",
+        "WEKNORA_PORT_DATABASE_NAME": "weknora_local",
+    })
+
+    report = asyncio.run(local_runtime.collect_usage(cfg))
+
+    assert report["calls"] == 5
+    assert report["reported"] == 2
+    assert report["unreported"] == 3
+    assert report["unknown_outcome"] == 2
+    assert report["groups"][0]["prompt_tokens"] is None
+    assert report["groups"][0]["completion_tokens"] is None
+    assert report["groups"][0]["total_tokens"] == 21
+    assert report["groups"][1]["prompt_tokens"] is None
+    assert report["groups"][1]["completion_tokens"] is None
+    assert report["groups"][1]["total_tokens"] is None
+    assert report["models"] == [{"id": "m1", "role": "cheap", "name": "Local Qwen",
+                                 "source": "local", "status": "active", "provider": "ollama"}]
+    assert report["knowledge_bases"] == [{"id": "kb1", "name": "Notes", "cloud_allowed": False}]
+    query, scope = next(item for item in statements if item[0].startswith("SELECT provider"))
+    assert "WHERE tenant_id=%s AND subject_id=%s" in query
+    assert scope == (42, "local-user")
+    model_query, model_scope = next(item for item in statements if item[0].startswith("SELECT id,role,name,source"))
+    assert "WHERE tenant_id=%s AND subject_id=%s AND status='active' AND deleted_at IS NULL" in model_query
+    assert "parameters->>'provider' AS provider" in model_query
+    assert "parameters FROM" not in model_query
+    assert model_scope == (42, "local-user")
+    kb_query, kb_scope = next(item for item in statements if item[0].startswith("SELECT id,name,cloud_allowed"))
+    assert "WHERE tenant_id=%s AND deleted_at IS NULL" in kb_query
+    assert kb_scope == (42,)
+    assert statements[0][0] == "BEGIN TRANSACTION READ ONLY"
+    assert statements[-1][0] == "ROLLBACK"
+    assert all(not sql.lstrip().upper().startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "ALTER"))
+               for sql, _ in statements)

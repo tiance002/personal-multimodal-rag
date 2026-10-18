@@ -1,0 +1,17 @@
+{
+  "status": "CLOSED",
+  "tenant_id": "<actual-local-tenant>",
+  "subject_id": "<actual-local-subject>",
+  "allowed_kbs": ["<explicitly-permitted-kb-id>"],
+  "allowed_models": [
+    {"provider": "siliconflow", "model": "BAAI/bge-m3", "model_id": "<actual-embedding-registry-id>", "capability": "embedding"},
+    {"provider": "siliconflow", "model": "BAAI/bge-reranker-v2-m3", "model_id": "<actual-rerank-registry-id>", "capability": "rerank"},
+    {"provider": "siliconflow", "model": "XingChenAGI/Xing4.0-29B", "model_id": "<actual-cheap-registry-id>", "capability": "chat"},
+    {"provider": "deepseek", "model": "deepseek-flash", "model_id": "<actual-expensive-registry-id>", "capability": "chat"}
+  ],
+  "allowed_request_prefixes": ["*"],
+  "max_calls": 12,
+  "max_tokens": 100000,
+  "capture_evidence": false,
+  "entries": []
+}

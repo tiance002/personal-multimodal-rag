@@ -10,6 +10,7 @@
 .\wk.ps1 check  -Config E:\WK\run\p81-retirement-20261018\local.json
 .\wk.ps1 start  -Config E:\WK\run\p81-retirement-20261018\local.json
 .\wk.ps1 status -Config E:\WK\run\p81-retirement-20261018\local.json
+.\wk.ps1 usage  -Config E:\WK\run\p81-retirement-20261018\local.json
 .\wk.ps1 stop   -Config E:\WK\run\p81-retirement-20261018\local.json
 ```
 
@@ -34,6 +35,33 @@
 API负责正常上传/同步解析索引、会话、SSE及源文回读；需要后台图像任务时持久化后由 Worker 消费。Worker入口为 `python -B -m backend.weknora_port.worker`，只领取同一已有本地 principal的图片任务和同 Redis前缀的记忆任务。MinerU已完成解析的图片不会重复派给Tesseract。
 
 云端外发仍取决于全局及KB许可、已配置模型身份和现有实际发送 Gate；本入口不恢复已退役的 ApprovedTokenAuthority/月度账户预留系统，也不自行开启云端开关。
+
+## 日常云问答：明确许可后启用
+
+默认 `WEKNORA_PORT_CLOUD_ALLOWED` 为 `false`。启动、检查和打开页面都不会自动调用模型。使用现有正式模型设置和同一个日常 principal，不需要 M3.5 实验执行器。
+
+1. 在工作台“模型设置”检查已有 embedding、rerank、cheap、expensive、VLM 配置和凭据状态。留空密钥保留现有凭据，不复制数据库密文、不将密钥放入 local.json。DYNAMIC 可能使用 Expensive，许可必须覆盖实际可能发送的角色；未覆盖时门禁拒绝，不偷偷换模型。
+2. 在“资料库”选择需要的知识库，明确勾选“允许使用云端模型”。这许可问题、检索片段、图片及派生内容外发。选择多个 KB 或使用附带来源的历史/记忆时，每个真实来源均须可读且允许外发；许可不会扩大检索范围。
+3. 明确同意云端处理后，在 D/E 盘**本机** local.json 的 `environment` 设置 `"WEKNORA_PORT_CLOUD_ALLOWED": "true"`，按下文选择普通模式或受限模式，然后执行 `wk.ps1 stop`、`wk.ps1 check`、`wk.ps1 start`。编辑磁盘文件不会改变已启动进程；不要同时启动第二套 API/Worker。`check` 输出 `cloud_allowed`，仍不发送模型请求。
+4. 通过同一工作台提问。上传、摘要、Embedding、记忆抽取、Rewrite、Rerank、最终生成都受发送门禁约束，并且可能分别产生调用。开启云端后 Worker 也可能处理当前身份/前缀内的待办；若许可只覆盖指定任务，须使用受限模式的 KB、模型、请求前缀范围，不应把普通模式当成任务白名单。
+
+**普通模式**：不设置 `WEKNORA_PORT_EXECUTION_FILE`。原 SendGate 验证全局开关、全部来源 KB 许可、当前租户/用户的有效模型、文档权限、取消状态和持久化调用身份。PG `port_provider_calls` 记录真实 usage，重复操作（包括 UNKNOWN）不重发。**普通模式没有应用累计 Token／次数上限，也不保证账户总消费上限**；只有明确接受此模式时才开启。供应商账户限制、其他程序的用量由其自身负责，不能假设只有本应用消费。
+
+**可选受限模式**：继续复用 `LocalExecution`，通过 `WEKNORA_PORT_EXECUTION_FILE` 指向 D/E 盘的独立本机许可 JSON；API 和 Worker 使用同一文件，保留原 SendGate 对象。参考 [默认关闭的许可模板](local-cloud-limit.example.json)，填入 `wk.ps1 usage` 输出的真实 tenant、subject、KB 与 registry model ID，以及明确许可的 provider/model/capability；确认后才将模板副本的 `status` 从 `CLOSED` 改为 `OPEN`。模板不是授权，也不会自动安装或启用。
+
+- 单个文件最多 12 次 Provider、100,000 Token，可设更低上限。每次发送先原子保留“实际请求 UTF-8 字节数＋完整输出硬上限＋1024”，完成后只按已报告且成功持久化的真实 Token 结算；预留值不是实际消耗。所有角色/辅助调用/失败都占用，不按用户提问次数计算。
+- 受限模式仅接受当前有硬输出合同的 SiliconFlow/DeepSeek 纯文本 chat，以及 SiliconFlow 文本 Embedding/Rerank；图片、未知协议、未知输出上界等返回 `LOCAL_EXECUTION_BOUND_UNVERIFIABLE`，在发送前拒绝。普通模式的既有能力未变，不能将受限模式宣称为所有多模态请求的可靠限额器。
+- `allowed_request_prefixes: ["*"]` 明确允许该许可范围内任意非空 request ID，适用于日常 UI 的随机 UUID；需要限定任务时填写已知前缀。无论前缀如何，租户、用户、KB、provider/model 和 registry model ID 都须匹配。更换模型配置产生新 ID 时不自动继承许可。
+- 重启保留已用次数、真实 Token 和未决预留，不自动充值。活的 API/Worker 的 INFLIGHT 不会因另一进程装配误停；孤立/未知进程、UNKNOWN、usage 无法确认、账本损坏或结算异常均拒绝新增发送。取消不能证明供应商未执行，不能退还不确定占用。
+- `capture_evidence` 默认 `false`，不额外保存完整 Prompt/回答；PG 仍保留正常用量记录。不要清空 `entries`、删除旧 UNKNOWN、将 STOP 直接改 OPEN 或复用已关闭的 M3.5 文件。新的额度需要新的明确许可，旧账本完整保留；没有自动异常释放功能。
+
+## 关闭、额度与用量
+
+关闭某个 KB：在资料库取消其云许可，后续发送重新检查，立即拒绝新发送。关闭全局：先在应用内取消正在运行的任务，空闲后 `wk.ps1 stop`，把本机开关改回 `false`，再 `start`。已有在途请求不因撤销许可而被宣称未执行；必要时保留 UNKNOWN。受限许可改为 `CLOSED` 后也会拒绝新增发送；不会删除历史占用。
+
+`wk.ps1 usage -Config ...` 是只读命令：核对 PG system ID/库名和本地 principal，查询该 tenant/subject 的 `port_provider_calls`，按模型/能力显示已报告的实际输入、输出和总 Token；只报告 total 的回执不伪造输入/输出拆分。UNKNOWN outcome 与缺失/异常 usage 单列，不能当作免费。该命令同时列出当前用户可用的 registry 模型 ID、KB 和云许可，不返回密钥。它可在 API/Worker 停止时执行，不连接模型或启动容器；数字是当前用户的历史累计，**不是本轮新增消耗**。受限模式的预留另外保存在许可文件的 `entries[].held_tokens`，与实际 Token 分开查看。
+
+常见提示：全局关闭→检查 local.json 并重启；KB 禁止→检查来源 KB 的许可；模型不可用→检查正式模型设置；限额不足→停止新增调用并核对已用/预留；UNKNOWN/结算失败→保留账本，核实原运行状态，不能重复发送不确定请求。HTTP、SSE、失败历史均显示明确错误；刷新/回读原运行不会获得新的发送许可。
 
 ## 数据与旧入口
 

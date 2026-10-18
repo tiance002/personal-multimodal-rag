@@ -6,6 +6,7 @@ import re
 from .query import simple_tokens, jaccard
 from .search import SearchNothing
 from ..models.types import CallCancelled, RunDeadlineExceeded
+from ..models.cloud_errors import raise_if_send_denied
 
 def clean_passage(text):
     substitutions = [('(?s)```[^\\r\\n]*\\r?\\n(.*?)\\r?\\n?```', '\\1'), ('(?s)\\$\\$(.*?)\\$\\$', '\\1'), ('</?[a-zA-Z][^>]*>', ''), ('\\[(!\\[[^\\]]*\\]\\([^)]*\\))\\]\\([^)]*\\)', '\\1'), ('!\\[[^\\]]*\\]\\((?:[^()]|\\([^()]*\\))*\\)', ''), ('\\[([^\\]]*)\\]\\((?:[^()]|\\([^()]*\\))*\\)', '\\1'), ('https?://[^\\s)\\]>]+', ''), ('(?m)^[ \\t]*\\|[ \\t:|-]+\\|[ \\t]*$', '')]
@@ -85,7 +86,8 @@ async def rerank(state, context, registry, segmenter=None):
         model = await registry.rerank(state.rerank_model_id, context)
     except (CallCancelled, RunDeadlineExceeded):
         raise
-    except Exception:
+    except Exception as exc:
+        raise_if_send_denied(exc)
         raise RuntimeError('GET_RERANK_MODEL_FAILED') from None
     candidates = []
     passages = []
@@ -113,7 +115,8 @@ async def rerank(state, context, registry, segmenter=None):
         raw = await invoke()
     except (CallCancelled, RunDeadlineExceeded):
         raise
-    except Exception:
+    except Exception as exc:
+        raise_if_send_denied(exc)
         state.search_results = candidates
         return
     selected = filtered(raw, state.rerank_threshold)
@@ -122,7 +125,8 @@ async def rerank(state, context, registry, segmenter=None):
             selected = filtered(await invoke(), max(state.rerank_threshold * 0.7, 0.3))
         except (CallCancelled, RunDeadlineExceeded):
             raise
-        except Exception:
+        except Exception as exc:
+            raise_if_send_denied(exc)
             state.search_results = candidates
             return
     accepted = []

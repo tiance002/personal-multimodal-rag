@@ -4,6 +4,7 @@ import asyncio, hashlib, json, re
 from dataclasses import asdict, replace
 from ..models.types import CallCancelled, ModelCallTimeout, ProviderError, RunDeadlineExceeded, TokenUsage
 from ..models.usage import accumulate_usage
+from ..models.cloud_errors import CLOUD_ERRORS
 from ..references.decoder import CitationStreamDecoder
 from ..streaming.events import StreamEvent
 from ..streaming.replay import FinalCommit, finalize_turn
@@ -172,7 +173,7 @@ class GenerationCoordinator:
                         code = code if isinstance(code, str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,79}', code) else 'PROVIDER_STREAM_FAILED'
                         # Source OnEvent emits errors and continues the SAME channel.
                         # Security/identity/settlement denials are never recoverable.
-                        if code.startswith(('MODEL_', 'SCOPE_', 'TURN_', 'GENERATION_')) or code == 'PROVIDER_MODEL_IDENTITY_MISMATCH':
+                        if code.startswith(('MODEL_', 'SCOPE_', 'TURN_', 'GENERATION_')) or code in CLOUD_ERRORS or code == 'PROVIDER_MODEL_IDENTITY_MISMATCH':
                             raise GenerationError(code, sent=True)
                         if request.is_fallback:
                             if data.get('error_class')!='ProviderError':raise GenerationError(code,sent=True)

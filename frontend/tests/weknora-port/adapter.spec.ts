@@ -381,3 +381,51 @@ test("partial SSE reference tags stay hidden until the delta is complete", async
   await expect(renderedAnswer).not.toContainText("<kb");
   await expect(renderedAnswer).not.toContainText("<web");
 });
+
+test("SSE cloud error code stays specific after a failed complete event", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/sessions", async route => {
+    if (route.request().method() === "POST") await route.fulfill({ json: envelope({ id: "cloud-session", title: "云端权限", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" }) });
+    else await route.fulfill({ json: envelope([]) });
+  });
+  await page.route("**/api/v1/sessions/cloud-session/messages", route => route.fulfill({
+    status: 200,
+    contentType: "text/event-stream",
+    body: frame({ id: "run-cloud", response_type: "agent_query", content: "", done: false,
+      data: { request_id: "run-cloud", session_id: "cloud-session", assistant_message_id: "assistant-cloud" } }) +
+      frame({ id: "run-cloud", response_type: "error", content: "不安全的后端异常文本", done: false,
+        data: { error_code: "MODEL_CLOUD_DISABLED" } }) +
+      frame({ id: "run-cloud", response_type: "complete", content: "", done: false, data: { status: "failed" } }),
+  }));
+
+  await page.goto("/");
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await page.getByPlaceholder("询问当前资料…").fill("请回答");
+  await page.getByRole("button", { name: "发送" }).click();
+  const localized = "全局云端调用已关闭。请在 local.json 中明确授权后重启 wk，再重试。";
+  await expect(page.locator(".wp-message.assistant.error .wp-message-content")).toContainText(localized);
+  await expect(page.getByRole("status")).toContainText(localized);
+  await expect(page.locator(".wp-message.assistant.error")).not.toContainText("不安全的后端异常文本");
+});
+
+test("history refresh localizes a saved turn error code even when content is empty", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope([
+    { id: "history-error", title: "外发受限", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+  ]) }));
+  await page.route("**/api/v1/sessions/history-error/messages", route => route.fulfill({ json: envelope([
+    { id: "saved-error", role: "assistant", request_id: "saved-run", created_at: "now", is_completed: false,
+      turn_status: "error", turn_error_code: "MODEL_ORIGIN_KB_EGRESS_DENIED", content: "" },
+  ]) }));
+
+  await page.goto("/");
+  await page.getByRole("button", { name: /外发受限/ }).click();
+  await expect(page.locator(".wp-message.assistant.error .wp-message-content")).toContainText("当前知识库不允许向云端外发内容。");
+});
+
+test("default cloud_allowed false is described as keeping KB contents local", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.goto("/");
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await expect(page.getByText("1 份资料 · 仅本地（该库内容不外发）", { exact: true })).toBeVisible();
+});

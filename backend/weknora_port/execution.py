@@ -2,6 +2,7 @@
 from __future__ import annotations
 from contextlib import contextmanager, asynccontextmanager
 from dataclasses import asdict
+from contextvars import ContextVar
 import hashlib
 import json
 import os
@@ -13,6 +14,105 @@ import uuid
 from .models.types import ProviderError
 
 _LOCK = threading.RLock()
+_OUTPUT_BOUND = ContextVar('local_execution_output_bound', default=None)
+
+
+def _process_token(pid):
+    """OS creation identity; failure/permission denial is deliberately unknown."""
+    try:
+        if type(pid) is not int or pid <= 0: return None
+        if os.name == 'nt':
+            import ctypes
+            from ctypes import wintypes
+            kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+            kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+            kernel.OpenProcess.restype = wintypes.HANDLE
+            kernel.GetProcessTimes.argtypes = [wintypes.HANDLE] + [ctypes.POINTER(wintypes.FILETIME)] * 4
+            kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+            handle = kernel.OpenProcess(0x1000, False, pid)
+            if not handle: return None
+            try:
+                stamps = [wintypes.FILETIME() for _ in range(4)]
+                if not kernel.GetProcessTimes(handle, *(ctypes.byref(t) for t in stamps)): return None
+                return str((stamps[0].dwHighDateTime << 32) | stamps[0].dwLowDateTime)
+            finally: kernel.CloseHandle(handle)
+        raw = Path(f'/proc/{pid}/stat').read_text()
+        return Path('/proc/sys/kernel/random/boot_id').read_text().strip() + ':' + raw.rsplit(')', 1)[1].split()[19]
+    except (OSError, ValueError, IndexError): return None
+
+
+def _usage_valid(usage, reserve):
+    if not isinstance(usage, dict) or usage.get('status') != 'REPORTED': return False
+    total = usage.get('total_tokens')
+    parts = [usage.get(k) for k in ('prompt_tokens', 'completion_tokens')]
+    return (type(total) is int and 0 <= total <= reserve
+        and all(v is None or type(v) is int and 0 <= v <= total for v in parts)
+        and (None in parts or sum(parts) == total)
+        and all(type(usage.get(k, 0)) is int and 0 <= usage.get(k, 0) <= total
+            for k in ('cached_tokens', 'cache_read_tokens', 'cache_write_tokens', 'cache_miss_tokens')))
+
+
+def _require(condition):
+    if not condition: raise ValueError('LOCAL_EXECUTION_CHECK_FAILED')
+
+
+def _validate_ledger(data):
+    try:
+        _require(isinstance(data, dict) and data['status'] in ('OPEN', 'STOP', 'CLOSED'))
+        _require(type(data['max_calls']) is int and 0 < data['max_calls'] <= 12)
+        _require(type(data['max_tokens']) is int and 0 < data['max_tokens'] <= 100000)
+        _require(str(data['tenant_id']) and isinstance(data['subject_id'], str) and data['subject_id'])
+        for field in ('allowed_kbs', 'allowed_request_prefixes'):
+            values = data[field]
+            _require(isinstance(values, list) and values and all(isinstance(v, str) and v for v in values))
+            _require(len(values) == len(set(values)))
+        models = data['allowed_models']
+        _require(isinstance(models, list) and models)
+        model_fields = {'provider', 'model', 'model_id', 'capability'}
+        permitted_fields = (model_fields,) if data['status'] == 'OPEN' else (model_fields, model_fields - {'model_id'})
+        _require(all(isinstance(m, dict) and set(m) in permitted_fields
+            and all(isinstance(v, str) and v for v in m.values()) for m in models))
+        _require(len({json.dumps(m, sort_keys=True) for m in models}) == len(models))
+        _require(type(data.get('capture_evidence', False)) is bool)
+        entries = data['entries']
+        _require(isinstance(entries, list) and len(entries) <= data['max_calls'])
+        seen = set()
+        for row in entries:
+            _require(isinstance(row, dict))
+            identity = hashlib.sha256(json.dumps([row['request_id'], row['capability']]).encode()).hexdigest()
+            _require(row['id'] == identity and identity not in seen)
+            seen.add(identity)
+            _require(isinstance(row['request_id'], str) and bool(row['request_id'])
+                and any(p == '*' or row['request_id'].startswith(p) for p in data['allowed_request_prefixes']))
+            row_model = {k: row[k] for k in ('provider', 'model', 'capability')}
+            if 'model_id' in row: row_model['model_id'] = row['model_id']
+            _require(row_model in models)
+            _require(isinstance(row['wire_sha256'], str) and len(row['wire_sha256']) == 64)
+            int(row['wire_sha256'], 16)
+            reserved, held = row['reserved_tokens'], row['held_tokens']
+            _require(type(reserved) is int and reserved >= 1024 and type(held) is int and 0 <= held <= reserved)
+            _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
+                'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
+            if row.get('usage') is not None: _require(_usage_valid(row['usage'], reserved))
+            if row['status'] == 'SETTLED':
+                _require(row.get('outcome') == 'RESPONSE_RECEIVED' and _usage_valid(row.get('usage'), reserved))
+                _require(held == row['usage']['total_tokens'])
+            else:
+                _require(held == reserved)
+                if row['status'] != 'INFLIGHT': _require(data['status'] != 'OPEN')
+        _require(sum(row['held_tokens'] for row in entries) <= data['max_tokens'])
+    except (KeyError, TypeError, ValueError):
+        raise ProviderError('LOCAL_EXECUTION_INVALID') from None
+
+
+def _stop_orphans(data):
+    for row in data['entries']:
+        if row['status'] == 'INFLIGHT':
+            owner = row.get('process_identity', {})
+            token = _process_token(owner.get('pid')) if isinstance(owner, dict) else None
+            if token is None or token != owner.get('creation_token'):
+                data['status'] = 'STOP'
+
 
 
 def _safe_body(value):
@@ -32,8 +132,8 @@ class LocalExecution:
         with self._ledger() as data:
             if Path(data.get('evidence_dir', self.evidence)).resolve() != self.evidence.resolve():
                 raise ValueError('EXECUTION_EVIDENCE_PATH_INVALID')
-            if any(row['status'] == 'INFLIGHT' for row in data['entries']):
-                data['status'] = 'STOP'
+            self.capture_evidence = data.get('capture_evidence', False)
+            _stop_orphans(data)
 
     @contextmanager
     def _ledger(self):
@@ -49,8 +149,11 @@ class LocalExecution:
                 import fcntl
                 fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
-                data = json.loads(self.path.read_text(encoding='utf-8'))
+                try: data = json.loads(self.path.read_text(encoding='utf-8'))
+                except (OSError, ValueError): raise ProviderError('LOCAL_EXECUTION_INVALID') from None
+                _validate_ledger(data)
                 yield data
+                _validate_ledger(data)
                 tmp = self.path.with_name(self.path.name + '.' + uuid.uuid4().hex + '.tmp')
                 try:
                     with tmp.open('x', encoding='utf-8') as output:
@@ -70,19 +173,26 @@ class LocalExecution:
 
     def _reserve(self, gate, call):
         with self._ledger() as data:
+            _stop_orphans(data)
+        with self._ledger() as data:
+            if data['status'] == 'STOP': raise ProviderError('LOCAL_EXECUTION_UNKNOWN_STOP')
+            if data['status'] == 'CLOSED': raise ProviderError('LOCAL_EXECUTION_CLOSED')
             principal, context = gate.application.principal, call.context
             kbs = set(context.scope.knowledge_base_ids) | set(context.required_origin_kbs)
-            allowed = {'provider': call.provider, 'model': call.model, 'capability': call.capability}
-            valid = (data['status'] == 'OPEN' and str(data['tenant_id']) == str(principal.tenant_id)
+            allowed = {'provider': call.provider, 'model': call.model, 'model_id': call.model_id, 'capability': call.capability}
+            valid = (str(data['tenant_id']) == str(principal.tenant_id)
                 and str(data['subject_id']) == str(principal.subject_id) == str(context.scope.owner_id)
                 and bool(kbs) and kbs <= set(data['allowed_kbs'])
                 and allowed in data['allowed_models']
-                and any(context.request_id.startswith(p) for p in data['allowed_request_prefixes'] if p))
+                and isinstance(context.request_id, str) and bool(context.request_id)
+                and any(p == '*' or context.request_id.startswith(p) for p in data['allowed_request_prefixes']))
             if not valid: raise ProviderError('LOCAL_EXECUTION_SCOPE_DENIED')
             if (type(call.wire_bytes) is not int or call.wire_bytes <= 0 or
                     (call.output_budget is not None and (type(call.output_budget) is not int or call.output_budget < 0))):
                 raise ProviderError('LOCAL_EXECUTION_BOUND_INVALID')
-            reserve = call.wire_bytes + (call.output_budget or 0) + 1024
+            bound = _OUTPUT_BOUND.get()
+            output_upper = bound if bound is not None else (call.output_budget or 0)
+            reserve = call.wire_bytes + output_upper + 1024
             entries = data['entries']
             if any(e['id'] == self._key(call) for e in entries):
                 raise ProviderError('LOCAL_EXECUTION_REUSE_DENIED')
@@ -92,7 +202,8 @@ class LocalExecution:
                 raise ProviderError('LOCAL_EXECUTION_LIMIT_DENIED')
             entries.append({'id': self._key(call), 'request_id': context.request_id,
                 **allowed, 'wire_sha256': call.wire_sha256, 'reserved_tokens': reserve,
-                'held_tokens': reserve, 'status': 'INFLIGHT'})
+                'held_tokens': reserve, 'status': 'INFLIGHT',
+                'process_identity': {'pid': os.getpid(), 'creation_token': _process_token(os.getpid())}})
 
     def _finish(self, call, usage=None, failure='', outcome='UNKNOWN'):
         with self._ledger() as data:
@@ -103,9 +214,10 @@ class LocalExecution:
             row = rows[0]
             row['outcome'] = outcome
             row['usage'] = asdict(usage) if usage is not None else None
-            valid = (not failure and outcome == 'RESPONSE_RECEIVED' and usage.status == 'REPORTED' and
-                type(usage.total_tokens) is int and 0 <= usage.total_tokens <= row['reserved_tokens'] and
-                all(v is None or (type(v) is int and v >= 0) for v in (usage.prompt_tokens, usage.completion_tokens)))
+            reported_valid = _usage_valid(row['usage'], row['reserved_tokens'])
+            if row['usage'] is not None and not reported_valid:
+                row['usage'], row['usage_invalid'] = None, True
+            valid = not failure and outcome == 'RESPONSE_RECEIVED' and reported_valid
             row['status'] = 'SETTLED' if valid else failure or 'UNKNOWN'
             if valid: row['held_tokens'] = usage.total_tokens
             else: data['status'] = 'STOP'
@@ -123,11 +235,16 @@ class LocalExecution:
                 self._finish(call, failure='LOCAL_ADMISSION_FAILED_STOP')
                 raise
         async def finish(call, *, outcome, usage):
-            try: await original_finish(call, outcome=outcome, usage=usage)
-            except BaseException:
+            try: accepted = await original_finish(call, outcome=outcome, usage=usage)
+            except BaseException as error:
                 self._finish(call, failure='LOCAL_SETTLEMENT_FAILED_STOP')
+                if isinstance(error, Exception): raise ProviderError('LOCAL_EXECUTION_SETTLEMENT_FAILED') from None
                 raise
+            if accepted is not True:
+                self._finish(call, usage, failure='LOCAL_SETTLEMENT_UNCONFIRMED_STOP', outcome=outcome)
+                raise ProviderError('LOCAL_EXECUTION_SETTLEMENT_FAILED')
             self._finish(call, usage, outcome=outcome)
+            return True
         gate.authorize, gate.finish, gate._local_execution = authorize, finish, self
         return gate
 
@@ -137,23 +254,59 @@ class LocalExecution:
         original = transport.open
         @asynccontextmanager
         async def observed(config, path, body, context, **kwargs):
-            self.evidence.mkdir(exist_ok=True)
-            prefix = self.evidence / uuid.uuid4().hex
-            record = {'provider': config.provider, 'model': config.model, 'model_id': config.model_id,
-                'capability': kwargs['capability'], 'request_id': context.request_id,
-                'scope': asdict(context.scope), 'required_origin_kbs': context.required_origin_kbs,
-                'body': _safe_body(body), 'headers_saved': False}
-            prefix.with_suffix('.request.json').write_text(json.dumps(record, ensure_ascii=False), encoding='utf-8')
-            async with original(config, path, body, context, **kwargs) as handle:
-                proxy = _RawResponse(handle.response, prefix)
-                handle.response = proxy
-                try: yield handle
-                finally: proxy.finish()
+            from .models.output_contract import resolve_output_contract
+            try:
+                capability = kwargs['capability']
+                _require(config.provider in ('siliconflow', 'deepseek') and isinstance(body, dict))
+                if capability == 'chat':
+                    _require(config.api == 'openai-completions')
+                    _require(isinstance(body.get('messages'), list) and body['messages'])
+                    _require(all(isinstance(m, dict) and isinstance(m.get('content'), str)
+                        and not any(k in m for k in ('audio', 'images', 'input_audio')) for m in body['messages']))
+                    _require(not any(k in body for k in ('audio', 'modalities', 'images', 'input_audio')))
+                elif capability == 'embedding':
+                    _require(config.provider == 'siliconflow' and config.embedding_api == 'openai-embeddings')
+                    value = body.get('input')
+                    _require(isinstance(value, str) or isinstance(value, list) and value and all(isinstance(v, str) for v in value))
+                elif capability == 'rerank':
+                    _require(config.provider == 'siliconflow' and config.rerank_api == 'cohere-rerank')
+                    _require(isinstance(body.get('query'), str) and isinstance(body.get('documents'), list))
+                    _require(body['documents'] and all(isinstance(v, str) for v in body['documents']))
+                else: raise ValueError('UNSUPPORTED_CAPABILITY')
+                contract = resolve_output_contract(config, body, capability=capability)
+            except (ValueError, TypeError, AttributeError, KeyError, ProviderError):
+                raise ProviderError('LOCAL_EXECUTION_BOUND_UNVERIFIABLE') from None
+            token = _OUTPUT_BOUND.set(contract.output_upper)
+            try:
+                prefix = None
+                if self.capture_evidence:
+                    self.evidence.mkdir(exist_ok=True)
+                    prefix = self.evidence / uuid.uuid4().hex
+                    record = {'provider': config.provider, 'model': config.model, 'model_id': config.model_id,
+                        'capability': capability, 'request_id': context.request_id,
+                        'scope': asdict(context.scope), 'required_origin_kbs': context.required_origin_kbs,
+                        'body': _safe_body(body), 'headers_saved': False}
+                    prefix.with_suffix('.request.json').write_text(json.dumps(record, ensure_ascii=False), encoding='utf-8')
+                async with original(config, path, body, context, **kwargs) as handle:
+                    if prefix is None:
+                        yield handle
+                    else:
+                        proxy = _RawResponse(handle.response, prefix)
+                        handle.response = proxy
+                        try: yield handle
+                        finally: proxy.finish()
+            finally:
+                try: _OUTPUT_BOUND.reset(token)
+                except ValueError:
+                    # Stream cancellation may close the generator in a copied
+                    # cleanup context. Never mask its durable settlement.
+                    pass
         transport.open, transport._local_execution_observed = observed, True
         return model
 
     def observe_pipeline(self, pipeline, turn):
         """Passive snapshots of the same normal pipeline, without replacing evidence."""
+        if not self.capture_evidence: return pipeline
         original_run, original_progress = pipeline.run, pipeline.on_progress
         target = self.evidence / (hashlib.sha256(turn.run_id.encode()).hexdigest() + '.stages.json')
         record = {'run_id': turn.run_id, 'session_id': turn.session_id, 'stages': []}

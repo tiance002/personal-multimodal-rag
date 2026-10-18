@@ -126,8 +126,11 @@ class LeasedSendGate:
                     (app.principal.tenant_id, app.principal.subject_id, call.model_id))).fetchall()
                 if len(models) != 1:
                     raise ProviderError('MODEL_NOT_FOUND')
-                if models[0]['source'] != 'local' and (not app.cloud_allowed or not all(r['cloud_allowed'] for r in rows)):
-                    raise ProviderError('MODEL_ORIGIN_KB_EGRESS_DENIED')
+                if models[0]['source'] != 'local':
+                    if not app.cloud_allowed:
+                        raise ProviderError('MODEL_CLOUD_DISABLED')
+                    if not all(r['cloud_allowed'] for r in rows):
+                        raise ProviderError('MODEL_ORIGIN_KB_EGRESS_DENIED')
                 if scope.document_ids:
                     docs = await (await guard.connection.execute(
                         'SELECT id FROM knowledges WHERE tenant_id=%s AND id=ANY(%s) AND knowledge_base_id=ANY(%s) AND deleted_at IS NULL',
@@ -160,19 +163,21 @@ class LeasedSendGate:
         try:
             async with asyncio.timeout(10):
                 async with app.leases.lease() as guard:
-                    await guard.connection.execute(
+                    rows = await (await guard.connection.execute(
                         'UPDATE port_provider_calls SET outcome=%s,usage=%s::jsonb,finished_at=now() '
-                        'WHERE tenant_id=%s AND subject_id=%s AND request_id=%s AND capability=%s AND wire_sha256=%s AND finished_at IS NULL',
+                        'WHERE tenant_id=%s AND subject_id=%s AND request_id=%s AND capability=%s AND wire_sha256=%s AND finished_at IS NULL RETURNING request_id',
                         (outcome, json.dumps(asdict(usage)), app.principal.tenant_id,
-                         call.context.scope.owner_id, call.context.request_id, call.capability, call.wire_sha256))
+                         call.context.scope.owner_id, call.context.request_id, call.capability, call.wire_sha256))).fetchall()
+                    return len(rows) == 1
         except asyncio.CancelledError:
             raise
         except Exception as exc:
             # Preserve the durable UNKNOWN claim and the successful answer.
-            # Usage persistence is observable but no longer a settlement gate.
+            # Ordinary mode preserves the answer; bounded mode requires True.
             import logging
             logging.getLogger(__name__).error('PROVIDER_USAGE_RECORD_FAILED request_id=%s error=%s',
                                              call.context.request_id, type(exc).__name__)
+            return False
 
 
 class LeasedLifecycle:

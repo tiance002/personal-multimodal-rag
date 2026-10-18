@@ -323,7 +323,9 @@ class SendGate(Protocol):
     """
 
     async def authorize(self, call: PreparedCall) -> None: ...
-    async def finish(self, call: PreparedCall, *, outcome: str, usage: TokenUsage) -> None: ...
+    # True acknowledges durable persistence. Legacy gates may return None;
+    # bounded local execution must refuse to settle without explicit True.
+    async def finish(self, call: PreparedCall, *, outcome: str, usage: TokenUsage) -> bool | None: ...
 
 
 class ChatModel(Protocol):
