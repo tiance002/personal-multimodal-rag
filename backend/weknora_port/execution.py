@@ -287,11 +287,12 @@ class LocalExecution:
                         'scope': asdict(context.scope), 'required_origin_kbs': context.required_origin_kbs,
                         'body': _safe_body(body), 'headers_saved': False}
                     prefix.with_suffix('.request.json').write_text(json.dumps(record, ensure_ascii=False), encoding='utf-8')
+                transport_started = time.monotonic()
                 async with original(config, path, body, context, **kwargs) as handle:
                     if prefix is None:
                         yield handle
                     else:
-                        proxy = _RawResponse(handle.response, prefix)
+                        proxy = _RawResponse(handle.response, prefix, transport_started=transport_started)
                         handle.response = proxy
                         try: yield handle
                         finally: proxy.finish()
@@ -342,13 +343,21 @@ class LocalExecution:
 
 
 class _RawResponse:
-    def __init__(self, original, prefix):
+    def __init__(self, original, prefix, *, transport_started=None):
         self.original, self.prefix = original, prefix
         self.file = prefix.with_suffix('.response.body').open('xb')
         self.complete = False
+        self.timing = {'transport_open_started_monotonic': transport_started,
+                       'response_headers_observed_monotonic': time.monotonic(),
+                       'first_raw_byte_monotonic': None,
+                       'meaning': 'transport open includes normal gate admission; no separate DNS/TCP/TLS/queue timing'}
     def __getattr__(self, name): return getattr(self.original, name)
     def append(self, raw):
-        self.file.write(raw); self.file.flush(); os.fsync(self.file.fileno())
+        if raw and self.timing['first_raw_byte_monotonic'] is None:
+            self.timing['first_raw_byte_monotonic'] = time.monotonic()
+        # Passive evidence is buffered. Durable authorization/settlement writes
+        # retain their own locking/fsync; no per-delta fsync delays generation.
+        self.file.write(raw)
     async def aread(self):
         try:
             raw = await self.original.aread(); self.append(raw); self.complete = True
@@ -364,5 +373,7 @@ class _RawResponse:
     def finish(self):
         if self.file.closed: return
         self.file.close()
+        self.timing['read_finished_monotonic'] = time.monotonic()
+        self.prefix.with_suffix('.timing.json').write_text(json.dumps(self.timing), encoding='utf-8')
         self.prefix.with_suffix('.response.json').write_text(json.dumps({'complete': self.complete,
             'headers_saved': False, 'status_code': self.original.status_code}), encoding='utf-8')
