@@ -33,6 +33,8 @@ class SearchResult:
     matched_content: str = ""
     seq: int = 0
     knowledge_channel: str = ""
+    # Persisted source breadcrumb; never infer it from matched/indexed text.
+    context_header: str = ""
 
 
 @dataclass

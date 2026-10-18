@@ -53,6 +53,7 @@ class PipelineState(SearchState):
     rendered_contexts: str = ''
     user_content: str = ''
     source_evidence_mode: str = 'off'
+    rerank_context_enabled: bool = False
     evidence_trace: list[dict] = field(default_factory=list)
 
 class RetrievalPipeline:

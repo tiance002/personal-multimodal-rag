@@ -46,11 +46,21 @@ def image_infos(raw):
     except (ValueError, TypeError):
         return []
 
-def enriched_passage(result):
+def enriched_passage(result, *, deduplicate_images=False):
     base = clean_passage(result.content)
     extra = []
+    seen = {go_strip(result.content)} if deduplicate_images else set()
     for img in image_infos(result.image_info):
-        extra.extend((img[k] for k in ('caption', 'ocr_text') if isinstance(img.get(k), str) and img[k]))
+        for key in ('caption', 'ocr_text'):
+            value = img.get(key)
+            if not isinstance(value, str) or not value:
+                continue
+            if deduplicate_images:
+                exact = go_strip(value)
+                if not exact or exact in seen:
+                    continue
+                seen.add(exact)
+            extra.append(value)
     metadata = result.chunk_metadata
     if isinstance(metadata, (bytes, str)):
         try:
@@ -63,6 +73,19 @@ def enriched_passage(result):
     if questions:
         extra.append('; '.join(questions))
     return base + ('\n\n' if base and extra else '') + '\n'.join(extra)
+
+
+def model_passage(result, *, passage=None):
+    """v0.8.3 ModelPassage: trusted title/breadcrumb plus the enriched body.
+
+    The indexed matched_content may contain generated/expanded text; it is not
+    substituted for source content. These prefixes do not alter source quotes.
+    """
+    passage = enriched_passage(result, deduplicate_images=True) if passage is None else passage
+    if not go_strip(passage) or result.chunk_type == 'faq':
+        return passage
+    prefixes = [go_strip(result.knowledge_title), go_strip(result.context_header)]
+    return '\n\n'.join([p for p in prefixes if p] + [passage])
 
 def mmr(candidates, passages, k, segmenter=None):
     tokens = [simple_tokens(text, segmenter) for text in passages]
@@ -91,18 +114,22 @@ async def rerank(state, context, registry, segmenter=None):
         raise RuntimeError('GET_RERANK_MODEL_FAILED') from None
     candidates = []
     passages = []
+    model_passages = []
+    with_context = getattr(state, 'rerank_context_enabled', False)
     for r in state.search_results:
         if r is None:
             continue
-        passage = enriched_passage(r)
+        passage = enriched_passage(r, deduplicate_images=with_context)
         if go_strip(passage):
             candidates.append(r)
             passages.append(passage)
+            model_passages.append(model_passage(r, passage=passage) if with_context else passage)
     if not passages:
         return
 
     async def invoke():
-        response = await model.rerank(state.rewrite_query, passages, context.child('rerank'))
+        # Provider still enforces document/request limits and stable batch indices.
+        response = await model.rerank(state.rewrite_query, model_passages, context.child('rerank'))
         raw = list(response.results if hasattr(response, 'results') else response)
         if getattr(state, 'source_evidence_mode', 'off') != 'off':
             state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],

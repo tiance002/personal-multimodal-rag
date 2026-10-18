@@ -227,6 +227,7 @@ class ScopedKnowledgeRepository:
                 metadata=metadata,chunk_metadata=chunk_metadata,
                 knowledge_source=row.get("knowledge_source") or "",
                 knowledge_title=row.get("knowledge_title") or "",
+                context_header=row.get("context_header") or "",
                 knowledge_filename=row.get("knowledge_filename") or "",
                 knowledge_description=row.get("knowledge_description") or "",
                 knowledge_custom_metadata=custom_metadata_text(row.get("knowledge_custom_metadata")),

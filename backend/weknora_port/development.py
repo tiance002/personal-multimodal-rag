@@ -30,6 +30,7 @@ class DevelopmentSettings:
     execution_file:Path|None=None
     source_evidence_mode:str='off'
     query_understand_model_id:str=''
+    rerank_context_enabled:bool=False
 
     def __post_init__(self):
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
@@ -45,6 +46,8 @@ class DevelopmentSettings:
         if self.fallback_strategy not in ('model','fixed'):raise DevelopmentConfigurationError('FALLBACK_STRATEGY_INVALID')
         if self.source_evidence_mode not in ('off','bounded_source_v1'):
             raise DevelopmentConfigurationError('SOURCE_EVIDENCE_MODE_INVALID')
+        if type(self.rerank_context_enabled) is not bool:
+            raise DevelopmentConfigurationError('RERANK_CONTEXT_SETTING_INVALID')
         if self.mineru_settings is not None:
             from .ingestion.mineru import EXTENSIONS
             if not self.mineru_extensions or set(self.mineru_extensions)-set(EXTENSIONS):
@@ -68,6 +71,7 @@ class DevelopmentSettings:
             execution_file=Path(env['WEKNORA_PORT_EXECUTION_FILE']) if env.get('WEKNORA_PORT_EXECUTION_FILE') else None,
             source_evidence_mode=env.get('WEKNORA_PORT_SOURCE_EVIDENCE_MODE','off'),
             query_understand_model_id=env.get('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID',''),
+            rerank_context_enabled=env.get('WEKNORA_PORT_RERANK_CONTEXT_ENABLED','false').lower()=='true',
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
@@ -162,6 +166,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy,
                 source_evidence_mode=settings.source_evidence_mode,
+                rerank_context_enabled=settings.rerank_context_enabled,
                 query_understand_model_id=settings.query_understand_model_id),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
             permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         runtime.authority_config_sha=None

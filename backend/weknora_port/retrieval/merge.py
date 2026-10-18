@@ -378,11 +378,29 @@ async def expand_neighbors(results, state, context, repository):
             r.content_rewritten = True
             r.sub_chunk_ids.extend((i for i in added if i not in r.sub_chunk_ids))
 
+
+def _deduplicate_origins(results, segmenter=None, *, overlap=False):
+    """A generated Summary cannot replace a source body, even with identical text."""
+    unique = {}
+    for result in results:
+        unique.setdefault(result.id, result)
+    results = list(unique.values())
+    retained = set()
+    for summary in (False, True):
+        group = deduplicate([r for r in results if (r.chunk_type == 'summary') == summary])
+        if overlap:
+            group = partial_overlap(group, segmenter)
+        retained.update(id(r) for r in group)
+    return [r for r in results if id(r) in retained]
+
+
 async def merge(state, context, repository, segmenter=None):
     if not state.needs_retrieval:
         return
     results = deepcopy(state.rerank_results or sorted(state.search_results, key=lambda r: r.score, reverse=True))
-    results = deduplicate(inject_history(deduplicate(results), state, segmenter))
+    preserve_sources = getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1'
+    dedup = _deduplicate_origins if preserve_sources else deduplicate
+    results = dedup(inject_history(dedup(results), state, segmenter))
     validate_results([r for r in results if r.match_type != 'web_search'], state.targets, context)
     if repository:
         results = await resolve_parents(results, state, context, repository)
@@ -390,4 +408,5 @@ async def merge(state, context, repository, segmenter=None):
     if repository:
         await populate_faq(results, state, context, repository)
         await expand_neighbors(results, state, context, repository)
-    state.merge_results = partial_overlap(deduplicate(sequential(results)), segmenter)
+    state.merge_results = (_deduplicate_origins(sequential(results), segmenter, overlap=True)
+                           if preserve_sources else partial_overlap(deduplicate(sequential(results)), segmenter))
