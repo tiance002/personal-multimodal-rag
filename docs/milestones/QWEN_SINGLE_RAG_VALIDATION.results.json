@@ -1,0 +1,439 @@
+{
+  "status": "BLOCKED_OUTPUT_BOUND_UNVERIFIABLE",
+  "before": {
+    "database": {
+      "system_id": "7696088403504697382",
+      "database": "weknora_python_port_20261013"
+    },
+    "tenant_id": 1,
+    "subject_sha256": "4a8c5c959f9ffb8d0f621c5bfc29030ebd17f565b2512a920bbe61058451ff15",
+    "knowledge_base": {
+      "id": "9d3461a5-080c-4b5e-a367-c82b79d3013c",
+      "tenant_id": 1,
+      "name": "M3.5 日常 MinerU 矩阵验收 20261018",
+      "cloud_allowed": true,
+      "embedding_model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+      "rerank_model_id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+      "summary_model_id": "mdl243ef6c62adf02818f0e969b323048bae37ce165c32310eed73e36a93239f"
+    },
+    "document": {
+      "id": "996fda57-6cc2-4045-a3ff-7416f037459a",
+      "tenant_id": 1,
+      "knowledge_base_id": "9d3461a5-080c-4b5e-a367-c82b79d3013c",
+      "file_path": "E:\\WK\\run\\rag-m34-20261018\\assets\\1\\9d3461a5-080c-4b5e-a367-c82b79d3013c\\996fda57-6cc2-4045-a3ff-7416f037459a\\91f260da-03e3-422e-ae08-b6f818ee3b7b\\original\\PPT_lecture1_page_007.png",
+      "file_hash": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+      "parse_status": "completed"
+    },
+    "source_version": "91f260da-03e3-422e-ae08-b6f818ee3b7b",
+    "vectors": [
+      {
+        "chunk_id": "96ad695f-bb32-4df9-9cfb-1e8281f2fc31",
+        "dimension": 1024,
+        "has_vector": true,
+        "is_enabled": true
+      },
+      {
+        "chunk_id": "a06e7826-577a-53ca-bd68-f53d8315a160",
+        "dimension": 1024,
+        "has_vector": true,
+        "is_enabled": true
+      }
+    ],
+    "model_configuration": {
+      "revision": 20,
+      "cheap": "Qwen/Qwen3.5-4B",
+      "expensive": "deepseek-flash"
+    },
+    "models": [
+      {
+        "id": "mdl243ef6c62adf02818f0e969b323048bae37ce165c32310eed73e36a93239f",
+        "name": "XingChenAGI/Xing4.0-29B",
+        "role": "cheap",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+        "name": "deepseek-flash",
+        "role": "expensive",
+        "source": "remote",
+        "status": "active",
+        "provider": "deepseek",
+        "base_url": "https://api.deepseek.com"
+      },
+      {
+        "id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+        "name": "BAAI/bge-reranker-v2-m3",
+        "role": "rerank",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "name": "Qwen/Qwen3.5-4B",
+        "role": "cheap",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdlb9cb9c0a01cdd84449ad50711f91d4ae8afdf2b538c0c149bd0e879e334e5",
+        "name": "Qwen/Qwen2.5-VL-72B-Instruct",
+        "role": "vlm",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "name": "BAAI/bge-m3",
+        "role": "embedding",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      }
+    ],
+    "old_unknown": {
+      "call_id": "6facdac17affa62c84427fab25e8debf26bf6f294855010d0b5833d3cc532c0d",
+      "request_id": "34448ac6-ef09-476e-b9df-b4ce1bf5d8fc/answer/1/cheap",
+      "model": "Qwen/Qwen3.5-4B",
+      "outcome": "UNKNOWN",
+      "usage": null,
+      "finished_at": null,
+      "fingerprint": "0e17fafbef3f6eccf4c8efee4eec9e23"
+    },
+    "provider_calls": 30,
+    "protected_db_hashes": {
+      "models": [
+        {
+          "row_hash": "0b2232a0503736a94489c8994624d772"
+        },
+        {
+          "row_hash": "97e63a909bf98daff1fca546b7905dc6"
+        },
+        {
+          "row_hash": "b29b021364862eb5efcbb3243a99c773"
+        },
+        {
+          "row_hash": "d61b140fbf4762e0e0f2f262a95d2cb0"
+        }
+      ],
+      "port_model_configuration": [
+        {
+          "row_hash": "96ba08a9e0349e87b0eb1b877b815e0c"
+        }
+      ],
+      "chunks": [
+        {
+          "row_hash": "c1bfd2be935591b09bebaebaa78d861d"
+        },
+        {
+          "row_hash": "f9ad839c09eb1e63cffe9a35dcd9bd11"
+        }
+      ],
+      "embeddings": [
+        {
+          "row_hash": "b24ccdb4500c811145c0d08991f503ed"
+        },
+        {
+          "row_hash": "dd15d0d275b7d9f1aa336bc0af73e230"
+        }
+      ]
+    },
+    "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+    "redis_db": 15,
+    "redis_prefix": "weknora-python-p81-cd49dc23e95c4cad9e2c973ddd15ebbf",
+    "daily_config_sha256": "d2a0b3088fc01ac2a1381dc30e6ec69110e2bc04c142e344d991cdbdc55ed1b1",
+    "daily_cloud_allowed": "false",
+    "daily_execution_file": null
+  },
+  "after": {
+    "database": {
+      "system_id": "7696088403504697382",
+      "database": "weknora_python_port_20261013"
+    },
+    "tenant_id": 1,
+    "subject_sha256": "4a8c5c959f9ffb8d0f621c5bfc29030ebd17f565b2512a920bbe61058451ff15",
+    "knowledge_base": {
+      "id": "9d3461a5-080c-4b5e-a367-c82b79d3013c",
+      "tenant_id": 1,
+      "name": "M3.5 日常 MinerU 矩阵验收 20261018",
+      "cloud_allowed": true,
+      "embedding_model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+      "rerank_model_id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+      "summary_model_id": "mdl243ef6c62adf02818f0e969b323048bae37ce165c32310eed73e36a93239f"
+    },
+    "document": {
+      "id": "996fda57-6cc2-4045-a3ff-7416f037459a",
+      "tenant_id": 1,
+      "knowledge_base_id": "9d3461a5-080c-4b5e-a367-c82b79d3013c",
+      "file_path": "E:\\WK\\run\\rag-m34-20261018\\assets\\1\\9d3461a5-080c-4b5e-a367-c82b79d3013c\\996fda57-6cc2-4045-a3ff-7416f037459a\\91f260da-03e3-422e-ae08-b6f818ee3b7b\\original\\PPT_lecture1_page_007.png",
+      "file_hash": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+      "parse_status": "completed"
+    },
+    "source_version": "91f260da-03e3-422e-ae08-b6f818ee3b7b",
+    "vectors": [
+      {
+        "chunk_id": "96ad695f-bb32-4df9-9cfb-1e8281f2fc31",
+        "dimension": 1024,
+        "has_vector": true,
+        "is_enabled": true
+      },
+      {
+        "chunk_id": "a06e7826-577a-53ca-bd68-f53d8315a160",
+        "dimension": 1024,
+        "has_vector": true,
+        "is_enabled": true
+      }
+    ],
+    "model_configuration": {
+      "revision": 20,
+      "cheap": "Qwen/Qwen3.5-4B",
+      "expensive": "deepseek-flash"
+    },
+    "models": [
+      {
+        "id": "mdl243ef6c62adf02818f0e969b323048bae37ce165c32310eed73e36a93239f",
+        "name": "XingChenAGI/Xing4.0-29B",
+        "role": "cheap",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+        "name": "deepseek-flash",
+        "role": "expensive",
+        "source": "remote",
+        "status": "active",
+        "provider": "deepseek",
+        "base_url": "https://api.deepseek.com"
+      },
+      {
+        "id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+        "name": "BAAI/bge-reranker-v2-m3",
+        "role": "rerank",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "name": "Qwen/Qwen3.5-4B",
+        "role": "cheap",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdlb9cb9c0a01cdd84449ad50711f91d4ae8afdf2b538c0c149bd0e879e334e5",
+        "name": "Qwen/Qwen2.5-VL-72B-Instruct",
+        "role": "vlm",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      },
+      {
+        "id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "name": "BAAI/bge-m3",
+        "role": "embedding",
+        "source": "remote",
+        "status": "active",
+        "provider": "siliconflow",
+        "base_url": "https://api.siliconflow.cn/v1"
+      }
+    ],
+    "old_unknown": {
+      "call_id": "6facdac17affa62c84427fab25e8debf26bf6f294855010d0b5833d3cc532c0d",
+      "request_id": "34448ac6-ef09-476e-b9df-b4ce1bf5d8fc/answer/1/cheap",
+      "model": "Qwen/Qwen3.5-4B",
+      "outcome": "UNKNOWN",
+      "usage": null,
+      "finished_at": null,
+      "fingerprint": "0e17fafbef3f6eccf4c8efee4eec9e23"
+    },
+    "provider_calls": 30,
+    "protected_db_hashes": {
+      "models": [
+        {
+          "row_hash": "0b2232a0503736a94489c8994624d772"
+        },
+        {
+          "row_hash": "97e63a909bf98daff1fca546b7905dc6"
+        },
+        {
+          "row_hash": "b29b021364862eb5efcbb3243a99c773"
+        },
+        {
+          "row_hash": "d61b140fbf4762e0e0f2f262a95d2cb0"
+        }
+      ],
+      "port_model_configuration": [
+        {
+          "row_hash": "96ba08a9e0349e87b0eb1b877b815e0c"
+        }
+      ],
+      "chunks": [
+        {
+          "row_hash": "c1bfd2be935591b09bebaebaa78d861d"
+        },
+        {
+          "row_hash": "f9ad839c09eb1e63cffe9a35dcd9bd11"
+        }
+      ],
+      "embeddings": [
+        {
+          "row_hash": "b24ccdb4500c811145c0d08991f503ed"
+        },
+        {
+          "row_hash": "dd15d0d275b7d9f1aa336bc0af73e230"
+        }
+      ]
+    },
+    "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+    "redis_db": 15,
+    "redis_prefix": "weknora-python-p81-cd49dc23e95c4cad9e2c973ddd15ebbf",
+    "daily_config_sha256": "d2a0b3088fc01ac2a1381dc30e6ec69110e2bc04c142e344d991cdbdc55ed1b1",
+    "daily_cloud_allowed": "false",
+    "daily_execution_file": null
+  },
+  "request_body_offline_only": {
+    "model": "Qwen/Qwen3.5-4B",
+    "messages": [
+      {
+        "role": "user",
+        "content": "offline pre-send validation"
+      }
+    ],
+    "stream": true,
+    "stream_options": {
+      "include_usage": true
+    },
+    "temperature": 0.3,
+    "max_tokens": 1024
+  },
+  "existing_coded_contract": {
+    "provider": "siliconflow",
+    "api": "openai-completions",
+    "capability": "chat",
+    "cap_field": "max_tokens",
+    "cap_value": 1024,
+    "cap_semantics": "full-completion/v1",
+    "reasoning_field": null,
+    "reasoning_upper": 0,
+    "thinking_mode": "unspecified",
+    "reasoning_effort": "",
+    "reasoning_included": true,
+    "output_upper": 1024,
+    "upper_source": "provider-completion-cap/v2",
+    "case": "A"
+  },
+  "provider_contract": {
+    "max_tokens_semantics": "visible answer cap, excluding chain-of-thought",
+    "thinking_budget": "not sent",
+    "reasoning_upper": null,
+    "qwen_4b_specific_hard_cap_support": "UNVERIFIED",
+    "sources": [
+      "https://docs.siliconflow.cn/docs/api/chat-completions-post",
+      "https://docs.siliconflow.cn/docs/userguide/capabilities/reasoning"
+    ]
+  },
+  "protected_files": [
+    {
+      "path": ".serena/project.yml",
+      "sha256": "51e48d867c3084972718681dc8bc13c43445e4bd28c3f96b678d2a50ca53f907"
+    },
+    {
+      "path": "progress.md",
+      "sha256": "fd590677562963d0a5cc9516410886ecdff303cadffb8d46dfc917cdfe4098d7"
+    },
+    {
+      "path": "scripts/m4_tenant332_api.py",
+      "sha256": "08dfdf67c2f1e5cb8663cc4e395785197240043cf4ce782b697f06438cbbfa4d"
+    },
+    {
+      "path": "tests/weknora_port/test_m4_tenant332_api.py",
+      "sha256": "72e81048f7e9e809e803e3f59c3a24cbb82f903a36b78e6187defccad6554bee"
+    },
+    {
+      "path": "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+      "sha256": "331e7232bb31da9766fe992f0461092039f69f1e9ed06822351d5ab7d6c0e087"
+    },
+    {
+      "path": "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+      "sha256": "3bd81bfbdf2ccb5900e70d57301a95cec06535cc431ed7aea118dc6f1d82c31b"
+    },
+    {
+      "path": "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+      "sha256": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350"
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+      "sha256": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a"
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt",
+      "sha256": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+    }
+  ],
+  "new_provider_calls": 0,
+  "new_tokens": 0,
+  "question_submissions": 0,
+  "api_started": false,
+  "execution_fence_opened": false,
+  "elapsed_seconds": 0.768,
+  "authorization": {
+    "status": "AUTHORIZED_NOT_ACTIVATED",
+    "trusted_origin": "Owner reply in this chat explicitly approved the described single validation",
+    "approved_scope": "tenant1 original M3.5 KB; one question; existing SiliconFlow and original DYNAMIC DeepSeek Expensive",
+    "max_complete_questions": 1,
+    "max_provider_calls": 6,
+    "max_tokens": 100000,
+    "old_unknown_policy": "preserve existing record; never retry/release",
+    "new_unknown_policy": "stop",
+    "execution_fence_opened": false,
+    "provider_sends": 0
+  },
+  "question": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+  "source_head": "d0c57389f602739780d096ccd9f2c0461de1320f",
+  "source_evidence": {
+    "path": "E:\\WK\\run\\qwen-single-rag-20261018\\preflight.json",
+    "sha256": "8b1b335856d67bf6a6a25ce7117c1a32d120775eda6cf2a0e162e8590e5207e9"
+  },
+  "commands": [
+    {
+      "command": "& \"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\qwen-single-rag-20261018\\preflight.py",
+      "exit_code": 0,
+      "meaning": "read-only preflight correctly refused send; no model call"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "final_verification": {
+    "unchanged_snapshot": true,
+    "old_unknown_unchanged": true,
+    "tenant332_models_unchanged": true,
+    "source_index_unchanged": true,
+    "daily_config_unchanged": true,
+    "inherited_paths_unchanged": 10,
+    "new_provider_calls": 0,
+    "execution_fence_opened": false
+  }
+}
