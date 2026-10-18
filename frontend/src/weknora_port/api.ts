@@ -6,7 +6,7 @@ import type {
 const configured = import.meta.env.VITE_WEKNORA_API_BASE?.trim().replace(/\/$/, "");
 const API = configured
   ? configured.endsWith("/api/v1") ? configured : `${configured}/api/v1`
-  : "/api/v1";
+  : "";
 const EXPECTED_IMPLEMENTATION = "weknora-python-port";
 
 export class PortApiError extends Error {
@@ -14,6 +14,9 @@ export class PortApiError extends Error {
 }
 
 async function jsonRequest<T>(path: string, init: RequestInit = {}, allowEmpty = false, includeEnvelope = false): Promise<T> {
+  if (!API) {
+    throw new PortApiError("未配置前端 API 地址。请设置 VITE_WEKNORA_API_BASE（例如 http://127.0.0.1:56425）；使用同源 /api/v1 地址时，再设置 VITE_API_PROXY_TARGET。", 0, "API_BASE_NOT_CONFIGURED");
+  }
   let response: Response;
   try {
     response = await fetch(`${API}${path}`, {
@@ -38,9 +41,19 @@ async function jsonRequest<T>(path: string, init: RequestInit = {}, allowEmpty =
 }
 
 export async function assertPortRuntime(): Promise<RuntimeIdentity> {
-  const runtime = await jsonRequest<RuntimeIdentity>("/runtime");
+  let runtime: RuntimeIdentity;
+  try {
+    runtime = await jsonRequest<RuntimeIdentity>("/runtime");
+  } catch (error) {
+    if (error instanceof PortApiError && error.code === "API_BASE_NOT_CONFIGURED") throw error;
+    const detail = error instanceof Error ? error.message : "未知响应";
+    throw new PortApiError(`无法确认 WeKnora Python API 身份，已拒绝继续访问：${detail}`, error instanceof PortApiError ? error.status : 0, "RUNTIME_IDENTITY_UNAVAILABLE");
+  }
+  if (!runtime || typeof runtime.implementation !== "string") {
+    throw new PortApiError("API 身份验证失败：/api/v1/runtime 未返回有效 implementation，已拒绝继续访问。", 502, "RUNTIME_IDENTITY_UNAVAILABLE");
+  }
   if (runtime.implementation !== EXPECTED_IMPLEMENTATION) {
-    throw new PortApiError("当前 API 实例身份不匹配；已阻止访问和修改，未切换到旧服务", 409, "RUNTIME_IDENTITY_MISMATCH");
+    throw new PortApiError(`API 身份不匹配：期望 ${EXPECTED_IMPLEMENTATION}，实际 ${runtime.implementation || "未提供身份"}。已拒绝访问，未回退到旧服务。`, 409, "RUNTIME_IDENTITY_MISMATCH");
   }
   return runtime;
 }
@@ -118,6 +131,7 @@ export const portApi = {
 };
 
 export function apiBaseForStream(path: string): string {
+  if (!API) throw new PortApiError("未配置前端 API 地址，无法连接 Python 服务。请设置 VITE_WEKNORA_API_BASE。", 0, "API_BASE_NOT_CONFIGURED");
   return `${API}${path}`;
 }
 

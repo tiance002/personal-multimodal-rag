@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 import subprocess
+import sys
 import zipfile
 from dataclasses import replace
 from pathlib import Path
@@ -13,8 +14,8 @@ import fitz
 import pytest
 from PIL import Image
 
-from backend.app.domain.models import NormalizedDocument
 from backend.weknora_port.ingestion.core import DocumentRequest, ParserRegistry, ingest_document
+from backend.weknora_port.ingestion.types import NormalizedDocument
 from backend.weknora_port.ingestion.mineru import (
     ENGINE, EXTENSIONS, LocalMinerUParser, MinerUError, MinerUSettings, chunk_locators,
     local_environment, normalize_archive, pending_image_assets, public_chunk_locators,
@@ -107,6 +108,21 @@ def test_normalized_model_bridge_nested_table_empty_chart_and_exact_sidecars():
                for asset in result.parsed.assets)
     assert pending_image_assets(result.parsed.assets) == ()
     assert all(result.parsed.content[loc.start:loc.end] == loc.quote for loc in result.normalized.source_locators)
+
+
+def test_legacy_domain_module_reexports_the_neutral_ingestion_dtos():
+    from backend.app.domain.models import NormalizedDocument as LegacyNormalizedDocument
+
+    assert LegacyNormalizedDocument is NormalizedDocument
+
+
+def test_mineru_import_does_not_load_the_legacy_app_package():
+    project_root = Path(__file__).resolve().parents[2]
+    code = (
+        "import sys; import backend.weknora_port.ingestion.mineru; "
+        "assert 'backend.app' not in sys.modules"
+    )
+    subprocess.run([sys.executable, "-c", code], cwd=project_root, check=True)
 
 
 def test_unchanged_splitter_metadata_intersections_and_parent_child_readback():

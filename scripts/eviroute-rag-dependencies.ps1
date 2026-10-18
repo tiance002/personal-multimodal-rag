@@ -29,7 +29,8 @@ if ($Action -eq 'start') {
         }
     }
 
-    & docker compose --project-name $projectName --file $composeFile up --detach postgres redis
+    # Maintenance only. Existing containers must be present; never recreate them.
+    & docker compose --project-name $projectName --file $composeFile start postgres redis
     if ($LASTEXITCODE -ne 0) {
         throw "docker compose start failed with exit code $LASTEXITCODE."
     }

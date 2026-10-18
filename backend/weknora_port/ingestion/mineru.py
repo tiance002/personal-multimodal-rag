@@ -19,9 +19,8 @@ from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 
-from backend.app.domain.models import DocumentAsset, NormalizedDocument, SourceLocator
-
 from .core import DocumentRequest, ParsedAsset, ParsedDocument, ParseFailure, ParserRegistry
+from .types import DocumentAsset, NormalizedDocument, SourceLocator
 
 ENGINE = "mineru-basic"
 VERSION = "4.0.12"

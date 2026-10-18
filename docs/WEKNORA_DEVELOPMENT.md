@@ -1,39 +1,44 @@
-# New Python development entry and package
+# EviRoute RAG — 唯一本机运行入口
 
-These are source-development defaults, not a replacement of any running container or accepted production image. No service launch, model request or migration is authorized merely by reading this file.
+正式主链只有：**React `WeKnoraPythonApp` → `backend.weknora_port` FastAPI → 同模块 Worker → 已核实的 PostgreSQL/Redis**。固定 WeKnora 提交与业务模型、检索参数保持原样。API、Worker、React 当前运行在 Windows 主机；Docker 分组 `eviroute-rag` 仅包含现有数据依赖。
 
-## Explicit settings
+## 启动、检查、停止
 
-The API and worker require WEKNORA_PORT_DATABASE_URL (postgresql://, never the old RAG_DATABASE_URL fallback), DATABASE_NAME (weknora_*), DATABASE_SYSTEM_ID, REDIS_URL (dedicated DB1–15), REDIS_RUN_ID, REDIS_PREFIX (weknora-python-*), STORAGE_ROOT (absolute, new empty directory or matching ownership marker), SECRET_KEY_FILE (absolute file containing exactly32 binary bytes). Prefix every short name in this paragraph with WEKNORA_PORT_. Neither secret bytes nor database credentials are logged. Known old physical PG identities are denied.
+在工作树根目录运行：
 
-Optional: WEKNORA_PORT_TOKENIZER_ASSET (local hash-pinned cl100k_base file), ROUTER_MODE (DYNAMIC by default; fixed0.35 and escalation switches unchanged), OLLAMA_URL (explicit local service; allow_pull=false), ORIGINS (comma-separated browser origins). No daemon startup/model pull. Missing tokenizer preserves UNKNOWN input load, never zero. The HTML renderer remains the explicit hash-bound WEKNORA_HTML_CODEC_PATH / WEKNORA_HTML_CODEC_SHA256 dependency; missing renderer fails its relevant format path rather than using a different algorithm.
+```powershell
+.\wk.ps1 check  -Config E:\WK\run\p81-retirement-20261018\local.json
+.\wk.ps1 start  -Config E:\WK\run\p81-retirement-20261018\local.json
+.\wk.ps1 status -Config E:\WK\run\p81-retirement-20261018\local.json
+.\wk.ps1 stop   -Config E:\WK\run\p81-retirement-20261018\local.json
+```
 
-## Startup and tasks
+`check` 只读核实容器归属、镜像、卷、绑定端口、PG system ID、数据库名称、Redis 当前 run ID、已有本地 principal、密钥文件长度和 MinerU 路径，不调用模型。`start` 启动该配置固定的已有 PG/Redis 容器（如已停止），随后启动 API、Worker 和 React；不运行 Compose `up`、迁移、模型下载或旧 dotenv。端口占用直接拒绝，不替换已有服务。Redis 重启后 run ID 会变化：从固定容器 ID、Compose 标签、外部卷、端口匹配的实例重新读取，再共同传给 API/Worker，不盲目复用旧 run ID。
 
-Install with python -m pip install '.[weknora-port]'. Run weknora-python-api and, separately, weknora-python-worker. Python module equivalents are backend.weknora_port.entrypoint and backend.weknora_port.worker. Imports open no connections. Console entrypoints use a SelectorEventLoop for psycopg on Windows.
+`status` 输出由此入口管理的进程身份及新 API 身份。`stop` 仅停止状态文件记录且 PID、可执行文件、创建时间、命令哈希均匹配的三个主机进程；保留 PG/Redis 及全部卷。请在上传和问答空闲后停止；Windows Stop-Process 不是应用级优雅排空协议，处理中断仍按现有持久化/UNKNOWN 合同恢复。进程身份不匹配时拒绝操作，不按端口杀进程。
 
-API: source bytes/upload, ordinary text parsing+indexing inline, session/RAG/SSE/reference and settings routes. Image-bearing uploads persist image tasks and return pending; the new development API does not start a hidden consumer.
+本轮实际配置 `cloud_allowed=false`，日志/临时文件在 `E:\WK\run\p81-retirement-20261018\application`；页面为 `http://127.0.0.1:56426`，API 为 `http://127.0.0.1:56425`。本地配置含数据库连接凭据，仅保存在 E 盘，不提交到 Git。
 
-Worker: actual ImageTaskQueue and RedisMemoryExtractionQueue consumers. Image task continues parse/OCR/caption/chunk/index/profile ingestion. Memory task uses the bound ExtractionWorker. No legacy backend.app.workers.ingestion polling or placeholder loop. --once runs one due task in each actual queue and reports their outcomes; normal mode continuously polls both persisted queues, including jobs arriving after an idle period. Separate API/worker instances share physically verified resources and local principal; claim fencing/UNKNOWN remain unchanged.
+## 配置
 
-Schema is never migrated by API startup. Only an explicitly approved EMPTY new database can run weknora-python-init --empty-new-database; it verifies physical identity and emptiness before the existing hash-checked001–011 migrations. It refuses an existing populated database. This batch does not invoke that initializer on business data.
+参考 [无密钥模板](local-runtime.example.json)，将绝对路径、现有容器完整 ID、镜像、外部卷、数据地址与当前机器事实核对后，另存 D/E 盘本地 JSON。`python`、`node` 必须为现有运行文件；依赖先正常安装完成，入口不自动安装。状态和缓存目录必须在 D/E 盘。`environment` 明确指定新链变量，不能回退旧 `RAG_DATABASE_URL`。不要复制或打印 API Key；模型凭据继续由已有正式模型配置接口加密保存，`SECRET_KEY_FILE` 只保存其原有文件路径。
 
-## Model authorization boundary
+必要变量：`WEKNORA_PORT_DATABASE_URL`、`DATABASE_NAME`、`DATABASE_SYSTEM_ID`、`REDIS_URL`、`REDIS_PREFIX`、`STORAGE_ROOT`、`SECRET_KEY_FILE`（短名均加 `WEKNORA_PORT_`）；资源身份与存储 ownership marker不匹配会拒绝。启动不会修改模型角色、业务 Schema、旧 UNKNOWN 或历史评测。
 
-The default assembly supplies no fabricated send authority, carry-in grant or price. P1SendGate therefore rejects all model sends until an approved server-side permission/cost authority is bound. /healthz identifies the local API; /readyz returns503 DENY_UNCONFIGURED in that state. Model configuration/read-only UI is not proof of real-provider readiness. Injected synthetic authorities in isolated tests do not authorize real calls. A reviewed deployment adapter must bind real authorities before any separately authorized provider/Local acceptance run; no env-specified arbitrary Python factory is loaded.
+前端只支持显式 `VITE_WEKNORA_API_BASE`，此入口固定为配置中的新 API 地址。手动同源代理须同时显式指定 `/api/v1` 和 `VITE_API_PROXY_TARGET`。未配置或 `/api/v1/runtime` 未返回 `data.implementation=weknora-python-port` 时显示错误、拒绝业务访问，无旧8000/8080默认回退。`/healthz` 是服务存活；`/readyz` 是已完成运行资源装配，不代表模型质量验收或允许外发。
 
-## Compose and rollback
+## OCR 和 Worker
 
-The new candidate project is weknora-python-dev, with separate dev DB/Redis/storage volumes and ports18000/14173. deploy/compose.data.yml describes only new data services so an owner-approved shadow setup can inspect new IDs before configuring API/worker. deploy/compose.yml requires explicit IDs, host key file and tokenizer asset mount. Do not reuse old volumes, old database identities or passwords. All actual docker compose up, container replacement and production configuration remain separately approved actions; none is executed in this batch.
+`WEKNORA_PORT_MINERU_ENABLED=1` 及显式 MinerU Python、ONNX 模型根目录、临时目录为正式入口必需。图片和纯扫描 PDF 使用本地 MinerU 4.0.12 Basic；普通文字 PDF保留原生提取，混合 PDF 中扫描页自动 OCR仍不支持。独立 Caption配置保留，是否运行仍受具体资源流程及外发权限约束；Tesseract不再是默认、备用或失败回退。
 
-Rollback source with Git; old actual services/images/volumes remain unchanged. Previous source config is under deploy/legacy and previous README under docs/history. Do not point old images at new schema or new code at old DB to simulate rollback. See LEGACY_ENTRYPOINTS.md. P8 old-code deletion is a later exact-file reviewed commit after functional/cutover acceptance.
+API负责正常上传/同步解析索引、会话、SSE及源文回读；需要后台图像任务时持久化后由 Worker 消费。Worker入口为 `python -B -m backend.weknora_port.worker`，只领取同一已有本地 principal的图片任务和同 Redis前缀的记忆任务。MinerU已完成解析的图片不会重复派给Tesseract。
 
-## Local operations — start / stop / containers / volumes / logs / backup / rollback (2026-10-15)
+云端外发仍取决于全局及KB许可、已配置模型身份和现有实际发送 Gate；本入口不恢复已退役的 ApprovedTokenAuthority/月度账户预留系统，也不自行开启云端开关。
 
-- **Containers (purpose).** Only two shared dependency containers are grouped: Compose project `eviroute-rag` → `eviroute-rag-postgres` (`127.0.0.1:56423`, image `paradedb/paradedb:v0.22.6-pg17`) and `eviroute-rag-redis` (`127.0.0.1:56424`, image `redis:7.4.2`), both `pull_policy: never`. The API and React frontend still run as host processes and are intentionally not containerized. Details: `docs/weknora-port/EVIRoute_RAG_CONTAINERS_20261015.md`.
-- **Data volumes (external named; never re-created empty).** `weknora-python-resume-pg-20261013` and `weknora-python-resume-redis-20261013`. The helper script refuses to start if either is missing rather than creating an empty replacement.
-- **Start.** Dependencies: `.\scripts\eviroute-rag-dependencies.ps1 start` (checks both volumes first). API/worker (host processes): `weknora-python-api` (module `backend.weknora_port.entrypoint`) and `weknora-python-worker` (module `backend.weknora_port.worker`). Task 1 added an optional `--authority-config <absolute D/E-drive JSON>` to both; `mode=synthetic` shares one authority assembly across API and worker, while `mode=approved` currently raises `APPROVED_METER_UNIMPLEMENTED`, so real sends stay refused and `/readyz` returns 503 `DENY_UNCONFIGURED`.
-- **Status / stop.** `.\scripts\eviroute-rag-dependencies.ps1 status`; `… stop` stops only those two Compose services (no `down`, no container/volume deletion). API/worker are ordinary host processes: terminate the process (uvicorn performs a normal shutdown).
-- **Logs.** Containers: `docker logs <container>`. API/worker: their host stdout/stderr.
-- **Backup.** `scripts/backup.ps1` / `scripts/backup_manifest.py`; the 2026-10-15 migration kept pre-switch PG dump `approved-database.dump` and `redis-before.rdb` (with SHA-256) under `E:\WK\run\browser-accept-20261015\docker-migration\`.
-- **Rollback.** Roll source back with Git; old services/images/volumes stay untouched. Never point old images at the new schema or new code at the old databases to simulate a rollback. Unknown/ledger/Gold/original-source evidence must not be released or deleted.
+## 数据与旧入口
+
+现有正式依赖为 PostgreSQL `127.0.0.1:56423`（system ID `7696088403504697382`）及 Redis `127.0.0.1:56424/15`。保留 external volumes `weknora-python-resume-pg-20261013`、`weknora-python-resume-redis-20261013`。不能清空、重建或用旧服务连接这些资源。
+
+`scripts/start_backend.py` 已改为退役提示并以非零退出；正常入口不再选择 legacy React。旧 Compose、旧 backend.app 服务及旧运行报告仅作历史/回滚材料，不参与正式启动。`scripts/eviroute-rag-dependencies.ps1` 为数据服务维护工具，start仅执行已有Compose容器的start，不创建替代容器；日常仍使用 `wk.ps1`。
+
+容器删除、卷删除、旧库清理均未执行，也不由上述命令授权。详见 [本轮退役结果](milestones/P8_1_ENTRYPOINT_RETIREMENT.md)。历史 [旧入口说明](LEGACY_ENTRYPOINTS.md) 保留其历史事实，已失效操作以本页最新入口为准。
