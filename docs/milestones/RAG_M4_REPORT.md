@@ -73,6 +73,6 @@ Owner 已明确批准本轮冻结 11 题：最多 132 次 Provider、600,000 Tok
 
 实际日常 `wk.ps1 check` 返回 PostgreSQL system ID `7696088403504697382`、数据库 `weknora_python_port_20261013`，principal 为 tenant 1 / `web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6`，`cloud_allowed=false`。Owner 的 M4 授权已收到，但尚未写入/打开本地执行围栏。用同一正式配置再次运行只读 M4 预检（退出码 0）确认 11/11 数据绑定 READY，API scope 仍为 `LOCAL_PRINCIPAL_MISMATCH`；预检 Provider calls 为 0。M4 冻结知识库所有者为 tenant 332 / `p8-real-3de2eca0bea340babcde75ce60c9a366`。
 
-代码确认正式 `entrypoint.create_app()` 将请求 principal 解析为已启动 runtime 的 principal，正常 `development.assemble(settings)` 从 `port_local_principal` 的唯一 `slot='local'` 读取身份。当前 daily 配置没有 tenant 332 身份；通过 `assemble(..., principal=...)` 测试注入、修改该数据库行、改动知识库归属或启动旧实验执行器都不构成合法的正常 API 身份。本轮未采用这些方式。
+代码确认正式 `entrypoint.create_app()` 将请求 principal 解析为已启动 runtime 的 principal，正常 `development.assemble(settings)` 从 `port_local_principal` 的唯一 `slot='local'` 读取身份。随后对同一数据库执行完整只读盘点，结果只有这一个 tenant 1 principal；冻结的六个评测 KB 全部属于 tenant 332。当前 daily 配置没有 tenant 332 身份；通过 `assemble(..., principal=...)` 测试注入、修改该数据库行、改动知识库归属或启动旧实验执行器都不构成合法的正常 API 身份。本轮未采用这些方式。原始盘点输出见 `E:\WK\run\rag-m40-20261018\identity-inventory-postauth.json`，重现脚本为 `identity_inventory_postauth.py`。
 
 因此没有启动 API/Worker/UI，没有开启云发送，没有建立或变更额度文件，也没有写数据库、Redis 或知识库。M4 真实问答 0/11、Provider 0、Token 0、UNKNOWN 0；各阶段仍 `NOT RUN`。要继续，需要项目提供一种可由正式 API 解析、且不改变日常 tenant 1 principal 和现有 KB 归属的 tenant 332 身份路径；当前代码没有这类多身份入口。当前只读预检原始输出保存在 `E:\WK\run\rag-m40-20261018\preflight-authorized-identity-20261018.json`。机器记录见 [授权续跑检查结果](RAG_M4_AUTHORIZED_EXECUTION_CHECKPOINT.results.json)。
