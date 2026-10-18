@@ -1,8 +1,10 @@
 # RAG-M4.0：六套统一评测首轮准备
 
-**状态：M4_0_OFFLINE_PREPARED_BLOCKED_AUTHORIZATION。当前版本真实质量基线 NOT RUN。**
+**最新状态：M4_0_AUTHORIZED_BUT_BLOCKED_TENANT332_NORMAL_API_IDENTITY。真实质量基线仍 NOT RUN。**
 
-已完成所选样本、Gold、源文件、版本、向量/关键词索引与评分规则的离线冻结。新云调用授权不存在，未提交任何问答，不把历史M3/P32分数并入M4。原有8个未提交路径保留。
+离线准备最初收口时的状态为 `M4_0_OFFLINE_PREPARED_BLOCKED_AUTHORIZATION`；之后 Owner 已批准有限真实评测。本轮续跑检查发现，现有正式 API 只能解析日常 `local` principal（tenant 1），不能合法访问冻结的 tenant 332 知识库，因此在启动 API、打开云发送或发出 Provider 请求前停止。详细记录见本报告末尾的“授权续跑检查”。
+
+已完成所选样本、Gold、源文件、版本、向量/关键词索引与评分规则的离线冻结。离线准备收口时尚无新的云调用授权，因此未提交问答；不把历史M3/P32分数并入M4。原有8个未提交路径保留。
 
 开始HEAD：5099efe5aae1de1bc5849c7db2f081c32fe22d5c。准备代码提交：ffcab7de9dce21b9692bbd7dd38cd70a96379d08；最终报告提交以本文件所在提交/交付消息为准。固定WeKnora：3e8b0bfc80b845b2d4b2ed683994748741450a97。
 
@@ -33,7 +35,7 @@ Omni只冻结已有page012问题，不复测M3.5 page007矩阵上传、检索、
 
 分开记录Search、Rerank、Merge/Top-K、Context、实际Provider证据送达、答案、SSE/历史一致性。来源ID命中和精确事实Chunk命中分开；原文、OCR/Caption、Summary身份分开。对格式差异、来源自身矛盾、错误推理、无依据补充无独立证据时保留UNDETERMINED。当前各题所有运行阶段均NOT RUN、指标null、首次RAG失败为null；授权/身份问题发生在运行前，不伪装为模型质量失败。
 
-## 当前阻断
+## 离线准备阶段的阻断（后续状态见文末续跑检查）
 
 1. **BLOCKED_AUTHORIZATION**：M4指令明确不授权新云发送。旧M3.5许可已关闭；全局仍false，无新许可文件，未启动API/Worker/UI。
 2. **LOCAL_PRINCIPAL_MISMATCH**：所选六套统一索引属于tenant332 / p8-real-3de2eca0bea340babcde75ce60c9a366，日常wk为tenant1。当前日常API不能借身份检索这些KB。未改port_local_principal、未改tenant、未复制模型或资料。需要先确定正常API的合法统一评测身份，不自动注入实验principal。
@@ -61,6 +63,16 @@ Omni只冻结已有page012问题，不复测M3.5 page007矩阵上传、检索、
 
 ## 后续三个优先点与停止
 
-先取得M4范围的新授权并确定合法API身份，再用这11题得到当前版本数据。没有新运行，不能声称得到新的前三类质量失败分布；历史待验证候选仍是：①Rerank精确/多跳证据丢失，②证据不足时的无依据生成，③视觉及来源覆盖不足。本轮不据此调整阈值、Prompt、OCR或路由。
+本轮M4授权已取得；待确定合法API身份后，再用这11题得到当前版本数据。没有新运行，不能声称得到新的前三类质量失败分布；历史待验证候选仍是：①Rerank精确/多跳证据丢失，②证据不足时的无依据生成，③视觉及来源覆盖不足。本轮不据此调整阈值、Prompt、OCR或路由。
 
-原始只读证据及复现脚本见[准备证据ZIP](evidence/m40-offline-20261018/preparation.zip)，本地根E:\WK\run\rag-m40-20261018。ZIP不含密钥、本机配置、完整模型参数或源文档。完成无授权分支后停止；仅本地提交，不Push、部署、合并或Tag。
+原始只读证据及复现脚本见[准备证据ZIP](evidence/m40-offline-20261018/preparation.zip)，本地根E:\WK\run\rag-m40-20261018。ZIP不含密钥、本机配置、完整模型参数或源文档。初始离线准备按无授权分支停止；续跑状态见下文。仅本地提交，不Push、部署、合并或Tag。
+
+## 授权续跑检查（2026-10-18）
+
+Owner 已明确批准本轮冻结 11 题：最多 132 次 Provider、600,000 Token；每批最多 12 次 Provider、100,000 Token；仅现有 SiliconFlow/DeepSeek 与原 DYNAMIC。该授权不改变模型与数据权限，也不授权绕过正常 API 身份。
+
+实际日常 `wk.ps1 check` 返回 PostgreSQL system ID `7696088403504697382`、数据库 `weknora_python_port_20261013`，principal 为 tenant 1 / `web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6`，`cloud_allowed=false`。Owner 的 M4 授权已收到，但尚未写入/打开本地执行围栏。用同一正式配置再次运行只读 M4 预检（退出码 0）确认 11/11 数据绑定 READY，API scope 仍为 `LOCAL_PRINCIPAL_MISMATCH`；预检 Provider calls 为 0。M4 冻结知识库所有者为 tenant 332 / `p8-real-3de2eca0bea340babcde75ce60c9a366`。
+
+代码确认正式 `entrypoint.create_app()` 将请求 principal 解析为已启动 runtime 的 principal，正常 `development.assemble(settings)` 从 `port_local_principal` 的唯一 `slot='local'` 读取身份。当前 daily 配置没有 tenant 332 身份；通过 `assemble(..., principal=...)` 测试注入、修改该数据库行、改动知识库归属或启动旧实验执行器都不构成合法的正常 API 身份。本轮未采用这些方式。
+
+因此没有启动 API/Worker/UI，没有开启云发送，没有建立或变更额度文件，也没有写数据库、Redis 或知识库。M4 真实问答 0/11、Provider 0、Token 0、UNKNOWN 0；各阶段仍 `NOT RUN`。要继续，需要项目提供一种可由正式 API 解析、且不改变日常 tenant 1 principal 和现有 KB 归属的 tenant 332 身份路径；当前代码没有这类多身份入口。当前只读预检原始输出保存在 `E:\WK\run\rag-m40-20261018\preflight-authorized-identity-20261018.json`。机器记录见 [授权续跑检查结果](RAG_M4_AUTHORIZED_EXECUTION_CHECKPOINT.results.json)。
