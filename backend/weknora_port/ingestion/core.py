@@ -594,6 +594,10 @@ def ingest_document(request: DocumentRequest, registry: ParserRegistry | None = 
     config = resolve_chunk_config(request.kb_chunking_config, request.process_chunking_override, request.upload_chunking_override)
     if parsed.failures or not parsed.content:
         return IngestResult(parsed, (), config, engine)
+    if "mineru_sections" in parsed.metadata and parsed.metadata["mineru_sections"] != []:
+        from .sections import ingest_section_rows
+        rows = ingest_section_rows(parsed, request, config)
+        return IngestResult(parsed, _annotate_parser_locators(parsed, rows), config, engine)
     if config.enable_parent_child:
         parent_child = split_parent_child(parsed.content, config)
         rows: list[ChunkRecord] = []

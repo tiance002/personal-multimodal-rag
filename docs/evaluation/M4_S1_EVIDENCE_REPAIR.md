@@ -73,7 +73,7 @@ P=已核对的原文事实存在，部分=关系/组成项不完整，缺失=所
 - `merge._deduplicate_origins` 仅在已有 `bounded_source_v1` 下分开处理生成Summary与原文，避免跨类型重叠误删；仍全局ID唯一。不补回未过Rerank的候选，不改分数或索引。
 - 本库101,488个有效chunk的非空ContextHeader实际为0；真实A/B验证的是已有文档标题传递。非空Header的数据行映射及最终wire分别由合成repository行fixture和合成HTTP测试覆盖，真实PG非空Header链路NOT_RUN，**没有把历史章节恢复写成已发生**。Hotpot标题是哈希，0434无可靠跨页章节，本轮不补造。
 
-真实例：0434原wire只有“...Kaggle's Cat vs Dog dataset...”；增强wire前置数据库标题`B3`，没有“Coding time”章节。Omni原wire把相同OCR正文又从image_info追加一次；增强wire保留原始噪声正文一次并前置真实页面标题。具体完整文本、顺序、模型参数及SHA见inputs.json与真实request回执。
+真实例：0434原wire只有“...Kaggle's Cat vs Dog dataset...”；增强wire前置数据库文档名`catvsdogdlpycon15se-150512122612-lva1-app6891_95`，没有“Coding time”章节。**2026-10-19更正：初版此处误记为B3；原始inputs.json及回执从未包含这一误记，分数不变。** Omni原wire把相同OCR正文又从image_info追加一次；增强wire保留原始噪声正文一次并前置真实页面标题。具体完整文本、顺序、模型参数及SHA见inputs.json与真实request回执。
 
 ## 4. 离线与真实对照
 

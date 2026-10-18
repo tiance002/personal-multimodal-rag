@@ -20,7 +20,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 
 from .core import DocumentRequest, ParsedAsset, ParsedDocument, ParseFailure, ParserRegistry
-from .types import DocumentAsset, NormalizedDocument, SourceLocator
+from .types import DocumentAsset, DocumentSection, NormalizedDocument, SourceLocator
 
 ENGINE = "mineru-basic"
 VERSION = "4.0.12"
@@ -145,7 +145,8 @@ def normalize_archive(request: DocumentRequest, archive: bytes, receipt: Mapping
     if "middle_json.json" not in files:
         _fail("MINERU_MIDDLE_MISSING")
     middle_bytes = files["middle_json.json"]
-    middle = json.loads(middle_bytes)
+    from .mineru_image_ocr import apply_image_ocr
+    middle, image_projection = apply_image_ocr(files, digest)
     if middle.get("schema") != SCHEMA or middle.get("schema_version") != SCHEMA_VERSION:
         _fail("MINERU_SCHEMA_UNSUPPORTED")
     producer = middle.get("metadata", {}).get("producer")
@@ -167,12 +168,15 @@ def normalize_archive(request: DocumentRequest, archive: bytes, receipt: Mapping
     if not full and not allow_partial:
         _fail("MINERU_PARTIAL_DOCUMENT_UNSUPPORTED")
 
-    middle_ref = {"logical_path": "mineru/middle_json.json", "sha256": _sha(middle_bytes)}
+    middle_ref = {k: image_projection[k] for k in ('logical_path', 'sha256')} if image_projection else {
+        "logical_path": "mineru/middle_json.json", "sha256": _sha(middle_bytes)}
     identity = {"source_sha256": digest, "source_version": request.source_version,
                 "document_id": request.document_id, "parser_engine": ENGINE, "parser_version": VERSION,
                 "schema": SCHEMA, "schema_version": SCHEMA_VERSION, "producer": producer,
                 "offset_space": "derived_unicode_codepoints", "middle": middle_ref,
                 "page_indices": indices, "is_full_document": full, "source_page_count": count}
+    if image_projection:
+        identity['image_ocr_projection'] = image_projection
     assets: list[ParsedAsset] = []
     # Keep exact sidecar bytes. Their logical paths, not temporary absolute paths,
     # are carried by source locators and the lifecycle's immutable asset manifest.
@@ -215,6 +219,12 @@ def normalize_archive(request: DocumentRequest, archive: bytes, receipt: Mapping
             "block_type": kind, "bbox": bbox, "coordinate_space": "normalized_0_1",
             "page_dimensions": dimensions.get(page_idx, {}), "middle": middle_ref,
             "source_sha256": digest, "offset_space": "derived_unicode_codepoints"}
+        if 'image_ocr' in block:
+            proof['image_ocr'] = block['image_ocr']
+        if kind in ('doc_title', 'paragraph_title'):
+            level = block.get('level')
+            if type(level) is int and 1 <= level <= 9:
+                proof['heading_level'] = level
         image_path = block.get("image_path")
         if block.get("image_url") or block.get("image_base64"):
             _fail("MINERU_EXTERNAL_ASSET_UNSUPPORTED")
@@ -272,6 +282,21 @@ def normalize_archive(request: DocumentRequest, archive: bytes, receipt: Mapping
                 _fail("MINERU_BLOCK_INVALID")
             emit(block, f"/pages/{page_position}/blocks/{block_position}", page["page_idx"])
     text = "".join(text_parts)
+    # Only actual SDK top-level heading blocks, scoped to the same physical
+    # page. OCR image lines never become invented chapter titles.
+    sections = []
+    for page in pages:
+        local = [p for p in block_manifest if p['page_idx'] == page['page_idx'] and 'derived_block_end' in p]
+        headings = [p for p in local if p.get('heading_level') and p['block_path'].count('/') == 4]
+        for offset, proof in enumerate(headings):
+            start, title_end = proof['derived_block_start'], proof['derived_block_end']
+            end = headings[offset + 1]['derived_block_start'] if offset + 1 < len(headings) else max(p['derived_block_end'] for p in local)
+            heading = text[start:title_end]
+            sections.append({'start': start, 'end': end, 'heading': heading, 'heading_path': [heading],
+                'level': proof['heading_level'], 'page_start': page['page_idx'] + 1, 'page_end': page['page_idx'] + 1,
+                'heading_start': start, 'heading_end': title_end, 'block_path': proof['block_path'],
+                'bbox': proof['bbox'], 'middle': middle_ref, 'source_sha256': digest,
+                'source_version': request.source_version})
     identity["derived_text_sha256"] = _sha(text.encode("utf-8"))
     assets = [replace(asset, page_number=asset_locations[asset.path][0]["page_idx"] + 1,
                       metadata={**asset.metadata, "locations": asset_locations[asset.path]})
@@ -290,10 +315,14 @@ def normalize_archive(request: DocumentRequest, archive: bytes, receipt: Mapping
                             "offset_space": "derived_unicode_codepoints"},
         parse_status="complete" if full else "partial",
         parse_warnings=() if full else ("MINERU_PARTIAL_PAGES",))
+    normalized = normalized.model_copy(update={'sections': [DocumentSection(
+        section_id=f"mineru:{s['block_path']}", heading=s['heading'], heading_path=tuple(s['heading_path']),
+        level=s['level'], start=s['start'], end=s['end'], page_start=s['page_start'], page_end=s['page_end'])
+        for s in sections]})
     parsed = ParsedDocument(normalized.markdown_content, tuple(assets),
         {"normalization_model": "NormalizedDocument", "mineru_source": identity,
          "source_locators": [locator.model_dump(mode="json") for locator in normalized.source_locators],
-         "mineru_blocks": block_manifest, "asset_processing": "parser_complete"})
+         "mineru_blocks": block_manifest, "mineru_sections": sections, "asset_processing": "parser_complete"})
     return MinerUNormalization(normalized, parsed)
 
 
@@ -424,6 +453,16 @@ def public_chunk_locators(metadata: Mapping[str, Any], document_metadata: Mappin
         clean_proof["middle"] = middle
         if "asset" in proof:
             clean_proof["asset"] = reference(proof["asset"])
+        if "image_ocr" in proof:
+            supplement = proof['image_ocr']
+            if (not isinstance(supplement, dict) or supplement.get('origin') != 'local_mineru_image_text'
+                    or supplement.get('coordinate_space') != 'asset_pixels'
+                    or supplement.get('asset_sha256') != clean_proof.get('asset', {}).get('sha256')):
+                raise LookupError('SOURCE_CHUNK_UNAVAILABLE')
+            clean_proof['image_ocr'] = {**supplement, 'sidecar': reference(supplement.get('sidecar')),
+                                      'text_offset_space': 'image_ocr_body_unicode'}
+            clean_proof['derived_block_start'] = proof['derived_block_start']
+            clean_proof['derived_block_end'] = proof['derived_block_end']
         public.append({key: locator[key] for key in ("kind", "page", "start", "end", "bbox", "quote")
                        if key in locator} | {"raw_evidence": clean_proof})
     return {"source_locators": public, "parser_evidence": {
