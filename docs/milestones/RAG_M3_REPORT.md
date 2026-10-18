@@ -1,6 +1,6 @@
 # RAG-M3 — 延迟、查询理解模型 A/B 与质量回归
 
-**结论：`M3_PARTIAL`，2026-10-18（Asia/Shanghai）。** 真实瓶颈已定位，10 组冻结问题的 20 次 A/B 均经正常 FastAPI、PG/pgvector、Redis 和真实 Provider 完成；DeepSeek 查询理解在本样本显著缩短等待，但出现明确的知识库追问绕检索回归。因此保留现有 Xing 查询理解默认值，不把 B 推广为产品开关，也不为凑里程碑修改检索或路由。无新生产代码；仅交付可复用的有限验收执行器、离线评分器和定向测试。
+**结论：`M3_PARTIAL`，2026-10-18（Asia/Shanghai）。** 真实瓶颈已定位，10 组冻结问题的 20 次 A/B 均经正常 FastAPI、PG/pgvector、Redis 和真实 Provider 完成；DeepSeek 查询理解在本样本显著缩短等待，但出现明确的知识库追问绕检索回归。因此保留现有 Xing 查询理解默认值，不把 B 推广为产品开关，也不为凑里程碑修改检索或路由。原 A/B 批次未改生产路径；续作修复来源限定追问护栏，见补充；另交付可复用的有限验收执行器、离线评分器和定向测试。
 
 ## 版本、范围和数据流
 
@@ -91,3 +91,11 @@ B 在 9/10 对中更快；**配对差值**中位数 8.055 秒。A 的 Hotpot 耗
 ## 风险与下一步候选
 
 `M3_PARTIAL` 的剩余条件是**没有可安全采用的提速配置**，并非测试没跑通。B 的意图错误会直接损害 KB 限定问答；A 的长尾仍影响交互。P2/P3 体验问题及是否延期由 Owner 决定。最值得下一里程碑先处理的是：①用受控反例校正已有 Query Understanding 对显式 KB 追问的意图合同，再评估 DeepSeek 是否可选；②检查 Rerank 对 Hotpot 第二跳、Omni 精确 OCR 和 0434 目标片段的共性证据损失；③在保留 DYNAMIC 缓冲语义下研究 Cheap 生成尾延迟。三项均**未在本轮自动实施**，也不改变当前默认策略。
+
+## 后续补充（2026-10-18）
+
+在基线 HEAD `cf646e46cd42ef909acc51ed8214305fdf69c16b` 上，修正了 `query.py` 的来源限定请求意图校验：显式“根据/依据/基于/按照 + 文档来源名词”的请求，在没有当前实际文档时优先走 `kb_search`，避免图片/历史绕过路径覆盖检索意图。当前附件 `doc_only`、实际 image-only 与仅追问历史细节仍保留原行为；混合图片与课件请求受保护。Prompt、模型、阈值和路由配置未改。
+
+原始真实保存的 B wire `5ae38cd2...` 中 JSON 意图为 `follow_up`，解析器忠实保留了该值；但原问题“请根据课件回答”未被既有 KB guard 识别，导致带历史时绕过检索。A/B 历史内容不同，不能据此因果归因于模型身份。使用原始 wire 和两轮真实历史的确定性离线重放显示：修复前 `follow_up`/不检索，修复后 `kb_search`/检索，改写文本保持不变。重放证据：`E:\WK\run\rag-m3-followup-20261018\saved-wire-replay.json`。
+
+定向离线测试命令 `E:\RAG quention\.venv\Scripts\python.exe -B -m pytest tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_pipeline.py -q -p no:cacheprovider --basetemp E:\WK\run\rag-m3-followup-20261018\pytest-resumed` 实际退出码 0，114 passed in 1.52s；日志 `pytest-final.log`。一次早期重定向尝试因证据目录尚未创建而未启动 Python，记为 **NOT RUN**（`pretest-path-setup.txt`）。本补充没有新增云端请求或 Token；累计仍为 73 次 Provider 调用、201,275 Token、UNKNOWN 0。真实修复后 API/浏览器验证 **NOT RUN**。状态仍为 `M3_PARTIAL`，生产默认仍为 A；本修复不构成 B 安全推广证据，Omni 的证据/答案限制仍未解决。

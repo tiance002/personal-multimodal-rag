@@ -125,6 +125,12 @@ _KB_REQUEST = re.compile(
     r'\b(?:search(?:\s+for)?|find|retrieve|look\s+up|list|browse)\s+'
     r'(?:(?:the|some|all|related|similar|other|more|stored|uploaded|available)\s+)*(?:documents?|files?|sources?|reports?)\b', re.I)
 
+# Source-grounded requests without a current document must not use a prior
+# generated answer as a substitute for retrieving that source.
+_SOURCE_SCOPED_REQUEST = re.compile(
+    r'(?:根据|依据|基于|按照)(?:\s|这|那|该|上述|前述|先前|刚才|原|已有|已上传|上传的|份|篇|个|的)*'
+    r'(?:课件|讲义|教材|文档|文件|资料|报告|原文)')
+
 
 def resolve_intent(state):
     """Validate bypass prerequisites using the original request, never its rewrite.
@@ -135,13 +141,16 @@ def resolve_intent(state):
     """
     intent = state.intent
     query = go_strip(state.query)
+    has_document = bool(go_strip(state.attachment_prompt)) and '<no_document_attached' not in state.attachment_prompt
     if _KB_REQUEST.search(query):
+        return 'kb_search'
+    if not has_document and _SOURCE_SCOPED_REQUEST.search(query):
         return 'kb_search'
     # Attachment-only analysis remains available. The absence marker is not
     # an attachment and cannot grant this exception.
     if intent == 'image_only' and state.images:
         return intent
-    if intent == 'doc_only' and go_strip(state.attachment_prompt) and '<no_document_attached' not in state.attachment_prompt:
+    if intent == 'doc_only' and has_document:
         return intent
     if intent in ('greeting', 'chitchat'):
         return intent

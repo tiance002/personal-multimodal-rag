@@ -35,6 +35,43 @@ def test_original_explicit_kb_request_overrides_wrong_classification(intent):
     assert resolve_intent(s) == 'kb_search'
 
 
+def test_source_scoped_followup_with_history_still_retrieves_when_model_says_follow_up():
+    async def scenario():
+        question = '课件还提到这些远距离通信方式可能遇到什么问题？请根据课件回答。'
+        history = [SimpleNamespace(query='课件介绍了哪些远距离通信方式？', answer='课件提到了几种远距离通信方式。')]
+        s = state(query=question, intent='', history=history, enable_rewrite=True,
+                  chat_model_id='cheap')
+        model = Model(['{"rewrite_query":"课件中提到的远距离通信方式可能遇到什么问题","intent":"follow_up","image_description":""}'])
+        repo = Repo([row(content='远距离通信可能受到信号衰减和干扰。')])
+        await RetrievalPipeline(repo, Registry(model)).run(s, CTX)
+        assert s.intent == 'kb_search' and s.needs_retrieval
+        assert len(repo.calls) == 1 and s.search_results
+        assert repo.calls[0][1].query_text == '课件中提到的远距离通信方式可能遇到什么问题'
+
+    run(scenario())
+
+
+def test_history_only_followup_and_attached_document_question_keep_bypass_intents():
+    history_only = state(query='上面第二点展开讲讲', intent='follow_up',
+                         history=[SimpleNamespace(answer='第二点的内容')])
+    attached_doc = state(query='根据文档总结一下', intent='doc_only',
+                         attachment_prompt='actual attached document content')
+    absent_doc = state(query='请根据课件回答', intent='follow_up',
+                       history=[SimpleNamespace(answer='earlier answer')],
+                       attachment_prompt='<no_document_attached />')
+    assert resolve_intent(history_only) == 'follow_up'
+    assert resolve_intent(attached_doc) == 'doc_only'
+    assert resolve_intent(absent_doc) == 'kb_search'
+
+
+@pytest.mark.parametrize('intent', ['follow_up', 'image_only', 'chitchat'])
+def test_image_does_not_replace_explicit_courseware_source(intent):
+    s = state(query='这张图里的方案与课件相比有什么优缺点？请根据课件回答。',
+              intent=intent, images=('real-image',),
+              history=[SimpleNamespace(answer='earlier courseware answer')])
+    assert resolve_intent(s) == 'kb_search'
+
+
 @pytest.mark.parametrize('intent,question,history,images,attachment', [
     ('greeting', '你好！', [], (), ''),
     ('chitchat', '你是谁？', [], (), ''),

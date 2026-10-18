@@ -208,6 +208,53 @@
       }
     }
   },
+  "followup_2026_10_18": {
+    "baseline_head": "cf646e46cd42ef909acc51ed8214305fdf69c16b",
+    "change": "In query.py resolve_intent, explicit Chinese source-grounded requests using 根据/依据/基于/按照 plus document-source nouns now select kb_search before image/history bypasses when no current actual document is attached.",
+    "preserved_behavior": [
+      "Current attached doc_only requests retain original behavior.",
+      "Actual image-only requests retain original behavior.",
+      "History-only detail follow-ups retain original behavior.",
+      "Mixed image plus courseware requests are guarded."
+    ],
+    "unchanged": ["Prompt", "model", "threshold", "route configuration"],
+    "saved_wire": {
+      "identity": "5ae38cd2cf6775669db5539256e4c868d0b7a25b695c87fcae00423a92bd6e7e",
+      "json_intent": "follow_up",
+      "parser_behavior": "faithful",
+      "original_question": "课件还提到这些远距离通信方式可能遇到什么问题？请根据课件回答。",
+      "finding": "The existing KB guard did not recognize the explicit source-grounded request, allowing history to bypass retrieval.",
+      "causal_limit": "A/B history contents differed, so model identity cannot be isolated causally."
+    },
+    "offline_replay": {
+      "method": "Deterministic replay of actual saved wire and two actual history rounds.",
+      "before": {"intent": "follow_up", "retrieval": false},
+      "after": {"intent": "kb_search", "retrieval": true},
+      "rewrite_retained": true,
+      "evidence": "E:\\WK\\run\\rag-m3-followup-20261018\\saved-wire-replay.json"
+    },
+    "verification": {
+      "command": "E:\\RAG quention\\.venv\\Scripts\\python.exe -B -m pytest tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_pipeline.py -q -p no:cacheprovider --basetemp E:\\WK\\run\\rag-m3-followup-20261018\\pytest-resumed",
+      "exit_code": 0,
+      "result": "114 passed in 1.52s",
+      "log": "E:\\WK\\run\\rag-m3-followup-20261018\\pytest-final.log",
+      "initial_attempt": {
+        "status": "NOT_RUN",
+        "reason": "Evidence directory did not exist, so Python never started.",
+        "note": "E:\\WK\\run\\rag-m3-followup-20261018\\pretest-path-setup.txt"
+      },
+      "real_post_fix_api_browser": "NOT_RUN"
+    },
+    "new_cloud_requests": 0,
+    "new_tokens": 0,
+    "cumulative_provider_calls": 73,
+    "cumulative_tokens": 201275,
+    "unknown_outcomes": 0,
+    "status": "M3_PARTIAL",
+    "production_default": "A",
+    "b_safe_rollout_established": false,
+    "remaining_limitation": "Omni evidence/answer limitation remains; no new real quality or performance validation."
+  },
   "cases": {
     "scifact-339": {
       "dataset": "scifact",
