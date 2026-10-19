@@ -11,6 +11,7 @@ import json
 import re
 
 from .types import GraphBatch, GraphEdge, GraphNode, GraphSource, stable_id
+from .script_boundaries import exact_surface_occurrences
 
 
 MAX_SOURCE_CHARS = 16_384
@@ -61,18 +62,8 @@ def _text(value: object, limit: int, *, empty: bool = False) -> bool:
 
 
 def _occurrences(text: str, surface: str) -> list[tuple[int, int]]:
-    """Exact, case-sensitive surface matches, with Unicode word boundaries."""
-    if not surface:
-        return []
-    result = []
-    for match in re.finditer(re.escape(surface), text):
-        start, end = match.span()
-        if surface[0].isalnum() and start and (text[start - 1].isalnum() or text[start - 1] in "_-'’"):
-            continue
-        if surface[-1].isalnum() and end < len(text) and (text[end].isalnum() or text[end] in "_-'’"):
-            continue
-        result.append((start, end))
-    return result
+    """Original-text spans with script-aware literal/identifier boundaries."""
+    return exact_surface_occurrences(text, surface)
 
 
 def _surrounding_statement(source_text: str, start: int, end: int) -> str:

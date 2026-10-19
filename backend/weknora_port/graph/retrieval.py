@@ -8,8 +8,9 @@ from __future__ import annotations
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
-import re
 import unicodedata
+
+from .script_boundaries import exact_surface_occurrences
 
 
 class GraphRetrievalError(PermissionError):
@@ -22,6 +23,9 @@ class GraphPath:
     edges: tuple
     sources: tuple
     reference_links: tuple[tuple[str, str], ...] = ()
+    # Local token overlap for bounded selection, never a model confidence score
+    # or a verdict that the full path entails an answer.
+    query_relevance: tuple[float, float] = (0.0, 0.0)
 
 
 def normalized(value):
@@ -37,11 +41,15 @@ def mentioned(query, label):
     query, label = normalized(query), normalized(label)
     if len(label) < 2:
         return False
-    return any((not label[0].isascii() or not label[0].isalnum() or match.start() == 0 or
-                not query[match.start() - 1].isalnum()) and
-               (not label[-1].isascii() or not label[-1].isalnum() or match.end() == len(query) or
-                not query[match.end()].isalnum())
-               for match in re.finditer(re.escape(label), query))
+    return bool(exact_surface_occurrences(query, label))
+
+
+def _terms(value):
+    """Reuse the ordinary query tokenizer/dictionary, without a new NLP stack."""
+    from ..retrieval.query import STOPWORDS, default_segmenter, is_han, tokenize
+    value = normalized(value)
+    segmenter = default_segmenter() if any(map(is_han, value)) else None
+    return {token for token in tokenize(value, segmenter) if token not in STOPWORDS}
 
 
 def find_paths(query, batches, context, *, tenant_id, max_hops=2, max_paths=3):
@@ -102,26 +110,49 @@ def find_paths(query, batches, context, *, tenant_id, max_hops=2, max_paths=3):
             seen_seed_names.add(key)
         if len(seeds) == 3:
             break
+    # The seed name occurs in every outgoing quote and cannot distinguish its
+    # relations. Rank the remaining literal query terms against predicate first
+    # and source quote second, before either bounded cut can discard a branch.
+    seed_terms = set().union(*(_terms(name) for seed in seeds for name in names(nodes[seed])))
+    query_terms = _terms(query) - seed_terms
+    edge_scores = {}
+
+    def edge_score(edge):
+        from ..retrieval.query import jaccard
+        if edge.id not in edge_scores:
+            edge_scores[edge.id] = (
+                jaccard(query_terms, _terms(edge.predicate) - seed_terms),
+                jaccard(query_terms, _terms(edge.quote) - seed_terms))
+        return edge_scores[edge.id]
+
+    def path_score(edges):
+        scores = [edge_score(edge) for edge in edges]
+        return (max(score[0] for score in scores), sum(score[1] for score in scores))
+
     found = []
 
     def visit(current, path_nodes, path_edges, path_sources, links):
         if len(path_edges) >= max_hops:
             return
-        for edge, source in sorted(outgoing[current], key=lambda row: row[0].id)[:12]:
+        for edge, source in sorted(outgoing[current],
+                key=lambda row: (*(-v for v in edge_score(row[0])), row[0].id))[:12]:
             if edge.target_id in path_nodes:
                 continue
             target = reference(edge.target_id)
             extra = ((edge.target_id, target),) if target != edge.target_id else ()
             new = GraphPath(path_nodes + (edge.target_id,), path_edges + (edge,),
-                            path_sources + (source,), links + extra)
+                            path_sources + (source,), links + extra,
+                            path_score(path_edges + (edge,)))
             found.append(new)
             if target not in path_nodes:
                 visit(target, new.node_ids + ((target,) if extra else ()), new.edges, new.sources, new.reference_links)
     for seed in seeds:
         visit(seed, (seed,), (), (), ())
-    # Prefer actual multi-document two-hop paths over isolated edges. No BGE
-    # relevance score is invented or copied to a graph source.
-    found.sort(key=lambda p: (-len({s.document_id for s in p.sources}), -len(p.edges), tuple(e.id for e in p.edges)))
+    # Literal relation relevance precedes path length; source diversity and
+    # stable IDs only settle equal textual scores. Synonym/temporal entailment
+    # is not inferred by this local selector. No BGE score is invented.
+    found.sort(key=lambda p: (*(-v for v in p.query_relevance),
+        -len({s.document_id for s in p.sources}), -len(p.edges), tuple(e.id for e in p.edges)))
     output, seen = [], set()
     for path in found:
         key = tuple(e.id for e in path.edges)
@@ -131,6 +162,36 @@ def find_paths(query, batches, context, *, tenant_id, max_hops=2, max_paths=3):
         if len(output) >= max_paths:
             break
     return tuple(output)
+
+
+def _coverage(source_row, retained):
+    """A literal body is covered only by a mapped raw source of this version.
+
+    sub_chunk_ids are the normal Merge/neighbor ancestry mapping, not proof on
+    their own: the complete re-read original must also survive in its body.
+    A generated representation can never acquire original provenance by copying
+    the text, the source ID or an ancestry list.
+    """
+    version = source_row.metadata.get('source_version')
+    if (retained.chunk_type not in ('text', 'image_ocr', 'parent_text') or
+            not getattr(retained, 'is_enabled', True) or not version or
+            retained.knowledge_base_id != source_row.knowledge_base_id or
+            retained.knowledge_id != source_row.knowledge_id or
+            retained.metadata.get('source_version') != version or
+            retained.chunk_metadata.get('source_version', version) != version or
+            not source_row.content or source_row.content not in retained.content):
+        return None
+    if retained.id == source_row.id:
+        basis = 'CURRENT_RAW_SOURCE_ID'
+    elif source_row.id in retained.sub_chunk_ids:
+        basis = 'MERGED_RAW_SUBCHUNK_AND_COMPLETE_BODY'
+    elif (retained.chunk_type == 'parent_text' and source_row.parent_chunk_id and
+          source_row.parent_chunk_id == retained.id):
+        basis = 'CURRENT_RAW_PARENT_AND_COMPLETE_BODY'
+    else:
+        return None
+    return {'source_chunk_id': source_row.id, 'retained_chunk_id': retained.id,
+            'source_version': version, 'basis': basis}
 
 
 async def fuse_paths(state, context, repository, paths, *, added_chars=4096, total_chars=14000, max_chunks=4):
@@ -166,17 +227,28 @@ async def fuse_paths(state, context, repository, paths, *, added_chars=4096, tot
         for identifier, source in source_by_id.items():
             row = rows[identifier]
             if (row.knowledge_id != source.document_id or row.knowledge_base_id != source.knowledge_base_id or
-                    row.metadata.get('source_version') != source.source_version or row.content != source.content):
+                    row.metadata.get('source_version') != source.source_version or row.content != source.content or
+                    row.chunk_type not in ('text', 'image_ocr') or not getattr(row, 'is_enabled', True) or
+                    row.chunk_metadata.get('source_version', source.source_version) != source.source_version):
                 raise GraphRetrievalError('GRAPH_SOURCE_IDENTITY_CHANGED')
-        needed = [row for row in rows.values() if not any(row.knowledge_id == old.knowledge_id and
-                  row.content in old.content for old in current)]
+        needed, covered = [], []
+        for row in rows.values():
+            proof = next((proof for old in current if (proof := _coverage(row, old))), None)
+            if proof:
+                covered.append(proof)
+            else:
+                needed.append(row)
         chars = sum(len(row.content) for row in needed)
         trace = {'edge_ids': [e.id for e in path.edges], 'source_chunk_ids': list(source_by_id),
                  'source_versions': [s.source_version for s in path.sources],
                  'reference_links': [list(v) for v in path.reference_links],
-                 'hops': len(path.edges), 'verification': 'QUOTE_CHECKED_DERIVED_PATH_NOT_ANSWER_ENTAILMENT'}
+                 'hops': len(path.edges), 'verification': 'QUOTE_CHECKED_DERIVED_PATH_NOT_ANSWER_ENTAILMENT',
+                 'selection': 'QUERY_TOKEN_JACCARD_NOT_SEMANTIC_ENTAILMENT',
+                 'query_relevance': list(path.query_relevance), 'covered_sources': covered,
+                 'added_source_chunk_ids': [], 'budget_dropped_source_chunk_ids': []}
         if added + chars > added_chars or used + chars > total_chars or accepted + len(needed) > max_chunks:
-            trace['status'] = 'BUDGET_DROPPED'
+            trace.update(status='BUDGET_DROPPED',
+                         budget_dropped_source_chunk_ids=[row.id for row in needed])
             state.graph_trace.append(trace)
             continue
         for original in needed:
@@ -186,7 +258,8 @@ async def fuse_paths(state, context, repository, paths, *, added_chars=4096, tot
                                       graph_verification=trace['verification'])
             current.append(row)
         added, used, accepted = added + chars, used + chars, accepted + len(needed)
-        trace.update(status='SOURCE_RETAINED', added_chunks=len(needed), added_chars=chars)
+        trace.update(status='SOURCE_RETAINED', added_chunks=len(needed), added_chars=chars,
+                     added_source_chunk_ids=[row.id for row in needed])
         state.graph_trace.append(trace)
     state.merge_results = current
     # Headroom for real source filenames/markup. The existing final renderer
