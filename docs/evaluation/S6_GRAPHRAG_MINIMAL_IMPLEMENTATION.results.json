@@ -1,0 +1,318 @@
+{
+  "schema": "s6-graphrag-minimal/v1",
+  "status": "PARTIAL",
+  "stop_reason": "BLOCKED_AUTHORIZATION_FOR_REAL_EXTRACTION_AND_API",
+  "scope": "S6 text source-bound graph only; PPT progressive-display solution deferred by Owner latest instruction",
+  "baseline_commit": "78bf9839d2030749f715a9395ce355209d8f52ff",
+  "implementation_commit": "df271a98b01ac2f63e0a315f30f4ada8097daab0",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "remote_read_sha": "2c21bbcc68384224b5d4a29d1300adf404c1f9b2",
+  "validation": {
+    "SOURCE_READ": "PASS",
+    "IMPLEMENTED": "PASS",
+    "OFFLINE_PASS": "PASS",
+    "ISOLATED_INTEGRATION_PASS": "PASS_REAL_PG_SYNTHETIC_GRAPH_ROLLBACK",
+    "REAL_PROVIDER_PASS": "NOT_RUN",
+    "CUTOVER_PASS": "NOT_RUN"
+  },
+  "repositories": [
+    {
+      "name": "HippoRAG",
+      "url": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "sha": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "license": "MIT",
+      "examined": [
+        "src/hipporag/information_extraction/openie_openai.py",
+        "src/hipporag/HippoRAG.py",
+        "src/hipporag/utils/misc_utils.py"
+      ],
+      "selected": "bounded OpenIE/source passage concepts",
+      "not_selected": "global undirected personalized PageRank, fuzzy synonym merges, additional embeddings/recognition-memory calls"
+    },
+    {
+      "name": "LightRAG",
+      "url": "https://github.com/HKUDS/LightRAG",
+      "sha": "aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a",
+      "license": "MIT",
+      "examined": [
+        "lightrag/operate.py",
+        "lightrag/kg/postgres_impl.py",
+        "lightrag/lightrag.py"
+      ],
+      "selected": "source contributions and current-version invalidation; raw chunk recovery",
+      "not_selected": "AGE/Cypher PGGraphStorage, generated graph descriptions as factual evidence, whole framework migration"
+    },
+    {
+      "name": "RAG-Anything",
+      "url": "https://github.com/HKUDS/RAG-Anything",
+      "sha": "da6e2d87a7d3f2746c4541f59953b8764213f6a2",
+      "license": "MIT",
+      "examined": [
+        "raganything/utils.py",
+        "raganything/processor.py",
+        "raganything/modalprocessors.py"
+      ],
+      "selected": "explicit source/page identity concept",
+      "not_selected": "caption-derived nodes as verified originals; duplicate multimodal ingestion"
+    },
+    {
+      "name": "SlideRAG",
+      "url": "https://github.com/iLearn-Lab/SlideRAG",
+      "sha": "6eb788d13bdbbd5604745bea37d64878ea7b2db7",
+      "license": "MIT",
+      "examined": [
+        "raganything/processor.py",
+        "raganything/config.py"
+      ],
+      "selected": null,
+      "not_selected": "topic cosine similarity cannot prove progressive-display continuity; PPT work now deferred"
+    }
+  ],
+  "design": {
+    "storage": "plain PostgreSQL, independent evidence/nodes/edges tables",
+    "default_enabled": false,
+    "switch": "WEKNORA_PORT_GRAPH_ENABLED=true",
+    "build": "explicit graph_cli index of all current original child chunks for one document",
+    "ordinary_upload_graph_fanout": false,
+    "old_kb_graph_flag": "retired placeholder remains false; not the S6 switch",
+    "source_types": [
+      "text",
+      "image_ocr"
+    ],
+    "generated_summary_or_caption_is_original": false,
+    "limits": {
+      "document_chunks": 12,
+      "document_source_chars": 32768,
+      "chunk_chars": 16384,
+      "max_hops": 2,
+      "paths": 3,
+      "outgoing_per_hop": 12,
+      "graph_added_chunks": 4,
+      "graph_added_chars": 4096,
+      "combined_raw_chars": 14000,
+      "rendered_context_chars": 16000
+    },
+    "fusion": "after ordinary Rerank/MMR/Merge/TopK; independently verified graph paths recover only raw current chunks; graph score 0 is not a BGE relevance score",
+    "proof_semantics": "exact source quotes, direction/order, temporal and negation checks; NOT semantic entailment judgment",
+    "entity_linking": "exact typed literal/grounded alias to a unique current document-subject anchor in same KB; no fuzzy merge or ungrounded pronoun expansion"
+  },
+  "migration": {
+    "schema": "s6-explicit-graph-migration/v1",
+    "status": "APPLIED",
+    "migration": "016_graph",
+    "sha256": "77168a6b90480afab61944647004b15f56b3b8bbe27c044a2c50936e3347d132",
+    "provider_calls": 0,
+    "postgres_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013"
+  },
+  "identity": {
+    "tenant_id": 1,
+    "subject_sha256": "4a8c5c959f9ffb8d0f621c5bfc29030ebd17f565b2512a920bbe61058451ff15",
+    "identity": {
+      "postgres_system_id": "7696088403504697382",
+      "database": "weknora_python_port_20261013",
+      "redis_run_id": "4c5d8c6990f72ba7ac4060d59a6e7cb7b5625ab6",
+      "redis_db": "15",
+      "redis_prefix": "weknora-python-s4-a82fed51eb174980b29aec84ba35d5f7",
+      "tenant_id": 1,
+      "cloud_allowed": false,
+      "ocr": "mineru-basic"
+    },
+    "models": [
+      {
+        "role": "embedding",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3"
+      },
+      {
+        "role": "rerank",
+        "model_id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3"
+      },
+      {
+        "role": "cheap",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B"
+      },
+      {
+        "role": "expensive",
+        "model_id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+        "provider": "deepseek",
+        "model": "deepseek-flash"
+      },
+      {
+        "role": "vlm",
+        "model_id": "mdlb9cb9c0a01cdd84449ad50711f91d4ae8afdf2b538c0c149bd0e879e334e5",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen2.5-VL-72B-Instruct"
+      }
+    ]
+  },
+  "isolated_kb": {
+    "id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+    "name": "S6 sourced two-hop engineering diagnostic 20261019",
+    "cloud_allowed": false,
+    "document_count": 0
+  },
+  "source_manifest_sha256": "108ca3ca54114ff05fcd0d185d5ee42e6783aec23bdd2713090a3696e9696e4b",
+  "prepared_sources": [
+    {
+      "sha256": "b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8",
+      "bytes": 502,
+      "characters": 500,
+      "original_path": "E:\\WK\\run\\p8-20261016\\s\\hotpotqa\\b6cc805398afebfa8327.txt",
+      "historical_source_id": "hotpotqa-context:0f94a2d0a92bd4a9f9e3672bba1af95e35b3f0ff0de86ca8c80a71d78f38936f",
+      "engineering_not_official_qa": true
+    },
+    {
+      "sha256": "decbe8d51474b802a881e06db02901c98b31e03bd88b0dcd254b043c9eb7f00a",
+      "bytes": 429,
+      "characters": 429,
+      "original_path": "E:\\WK\\run\\p8-20261016\\s\\hotpotqa\\decbe8d51474b802a881.txt",
+      "historical_source_id": "hotpotqa-context:1c5fa1db320d59cba389daa592d258d7cd237eca31134a4f70efd152d7d06f4f",
+      "engineering_not_official_qa": true
+    }
+  ],
+  "intended_question": "Franklin bells 配合使用的装置储存的是什么电？请依据知识库回答。",
+  "real_build": {
+    "status": "NOT_RUN",
+    "documents_uploaded": 0,
+    "chunks_extracted": 0,
+    "nodes": 0,
+    "edges": 0,
+    "source_proof_success": null,
+    "source_proof_failure": null,
+    "graph_on_api": "NOT_RUN",
+    "answer": "NOT_RUN"
+  },
+  "tests": [
+    {
+      "kind": "OFFLINE_SYNTHETIC_AND_REGRESSION",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_extraction.py tests/weknora_port/test_graph_retrieval.py tests/weknora_port/test_graph_service.py tests/weknora_port/test_graph_storage_pg.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_evidence_capture.py tests/weknora_port/test_filter_top_k.py tests/weknora_port/test_merge_source_retention.py",
+      "passed": 220,
+      "skipped": 1,
+      "seconds": 2.87,
+      "exit_code": 0,
+      "skip": "real PostgreSQL DSN intentionally absent from this invocation; independently executed below"
+    },
+    {
+      "kind": "REAL_POSTGRES_SYNTHETIC_SOURCE_ROLLBACK",
+      "command": "python -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_storage_pg.py::test_actual_pg_graph_source_lifecycle_and_scope_rollback",
+      "passed": 1,
+      "seconds": 0.82,
+      "exit_code": 0,
+      "artifact": "E:/WK/run/s6-graphrag-20261019/graph-pg-test.txt",
+      "dsn_printed": false
+    },
+    {
+      "kind": "CLI_SMOKE",
+      "command": "python -m backend.weknora_port.graph_cli --help",
+      "exit_code": 0
+    },
+    {
+      "kind": "WHITESPACE",
+      "command": "git diff --cached --check",
+      "exit_code": 0
+    },
+    {
+      "kind": "ACCEPTANCE_EXECUTOR_SYNTHETIC_CONTRACT",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_s6_graph_acceptance.py",
+      "passed": 21,
+      "seconds": 0.36,
+      "exit_code": 0
+    },
+    {
+      "kind": "ZERO_SEND_NORMAL_ASSEMBLY_PREFLIGHT",
+      "command": "python -B scripts/s6_graph_acceptance.py prepare --config E:/WK/run/s4-quality-20261019/local.json --authorization E:/WK/run/s6-graphrag-20261019/owner-authorization.json --manifest E:/WK/run/s6-graphrag-20261019/text-sources.json --output E:/WK/run/s6-graphrag-20261019/acceptance",
+      "exit_code": 0,
+      "status": "ZERO_SEND_PREPARED",
+      "authorization": "BLOCKED_AUTHORIZATION_NO_SEND",
+      "provider_calls": 0
+    }
+  ],
+  "fixed_test_failures": [
+    {
+      "issue": "incorrect test_development.py target",
+      "exit_code": 4,
+      "resolution": "correct actual file test_development_entry.py; no tests passed on failed command"
+    },
+    {
+      "issue": "new proof-replay error message differed from storage assertion",
+      "exit_code": 1,
+      "resolution": "stable SOURCE_PROOF error code; did not weaken validation"
+    },
+    {
+      "issue": "forged quote accepted by fusion helper",
+      "exit_code": 1,
+      "resolution": "fusion now independently rechecks path/source/quote, test unchanged and passes"
+    }
+  ],
+  "usage": {
+    "new_provider_calls": 0,
+    "new_prompt_tokens": 0,
+    "new_completion_tokens": 0,
+    "new_total_reported_tokens": 0,
+    "new_unknown": 0,
+    "historical_unknown_provider_count": 8,
+    "historical_unknown_usage": "UNCHANGED_NOT_ASSUMED_ZERO",
+    "provider_latency_seconds": null
+  },
+  "integrity": {
+    "historical_calls_unchanged": true,
+    "model_configuration_unchanged": true,
+    "historical_unknown_provider_count": 8,
+    "graph_counts": {
+      "sources": 0,
+      "nodes": 0,
+      "edges": 0
+    },
+    "new_provider_calls": 0
+  },
+  "remaining": [
+    {
+      "id": "REAL_ACCEPTANCE",
+      "severity": "STAGE_BLOCKER",
+      "state": "BLOCKED_AUTHORIZATION",
+      "detail": "fresh limited S6 approval requested, old S5 CLOSED; no graph extraction or new full API question sent"
+    },
+    {
+      "id": "PPT_PROGRESSIVE",
+      "state": "DEFERRED_BY_OWNER",
+      "detail": "no solution implementation; pre-existing finite read-only observations do not establish semantic continuity"
+    },
+    {
+      "id": "FROST_SEMINAR_IDENTITY",
+      "state": "QUALITY_GAP",
+      "detail": "current sources do not prove Advanced Seminar belongs to Frost Place; no fuzzy bridge"
+    },
+    {
+      "id": "OPENIE_SEMANTICS",
+      "state": "LIMITATION",
+      "detail": "literal quote checks are not semantic truth; pronouns, passive/reversed relations, implicit and ambiguous identities can be rejected or missed"
+    },
+    {
+      "id": "LARGE_GRAPH",
+      "state": "LIMITATION",
+      "detail": "explicit bounded build/load; no automatic full corpus graph or graph management UI"
+    }
+  ],
+  "next": "execute prepared public sources and exactly one graph-on normal API after fresh Owner authorization; no PPT implementation, S7/S8, Push/deploy/tag",
+  "acceptance_executor": {
+    "script": "scripts/s6_graph_acceptance.py",
+    "prepare": "PASS_ZERO_SEND",
+    "run": "NOT_RUN",
+    "starts_worker": false,
+    "runtime_factory": false,
+    "existing_entrypoint": true,
+    "owner_grant_created_by_executor": false
+  },
+  "evidence_archive": {
+    "path": "docs/evaluation/evidence/s6-graphrag-20261019/zero-send-evidence.zip",
+    "sha256": "d438bd3a8dd4df3be5aea3740daed5e53661f8bfdb1bc112f24489d0368f3920",
+    "secrets_or_config_included": false,
+    "ppt_solution_included": false
+  }
+}
