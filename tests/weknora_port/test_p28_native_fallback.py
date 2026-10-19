@@ -46,7 +46,9 @@ def test_native_rerank_empty_short_circuits_merge_and_respects_fallback(strategy
     async def scenario():
         cfg = configuration(strategy, rerank_model_id='reranker')
         service, repo, retrieval, co, cheap, expensive, store, commit, counts = runtime(configuration=lambda _: cfg)
-        model = Model([[RerankResult(index=0, score=.002)]])
+        # A successful low score is now Top1 evidence in this experiment;
+        # an actually empty response still preserves the native fallback.
+        model = Model([[]])
         def pipeline(turn, progress):
             return RetrievalPipeline(retrieval, Registry(model), on_progress=progress)
         service.pipeline_factory = pipeline

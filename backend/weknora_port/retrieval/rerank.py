@@ -2,11 +2,31 @@
 from __future__ import annotations
 from .query import go_strip, go_fields
 import json
+import math
 import re
 from .query import simple_tokens, jaccard
 from .search import SearchNothing
 from ..models.types import CallCancelled, RunDeadlineExceeded
 from ..models.cloud_errors import raise_if_send_denied
+
+
+class InvalidRerankResponse(ValueError):
+    """Malformed responses cannot supply a fallback source or synthetic score."""
+
+
+def _validate_raw_results(raw, candidate_count):
+    seen = set()
+    for result in raw:
+        index, score = getattr(result, 'index', None), getattr(result, 'score', None)
+        try:
+            finite_score = type(score) in (int, float) and math.isfinite(score)
+        except (OverflowError, ValueError):
+            finite_score = False
+        if (type(index) is not int or not 0 <= index < candidate_count or index in seen or
+                not finite_score):
+            raise InvalidRerankResponse('RERANK_RESPONSE_INVALID')
+        seen.add(index)
+    return raw
 
 def clean_passage(text):
     substitutions = [('(?s)```[^\\r\\n]*\\r?\\n(.*?)\\r?\\n?```', '\\1'), ('(?s)\\$\\$(.*?)\\$\\$', '\\1'), ('</?[a-zA-Z][^>]*>', ''), ('\\[(!\\[[^\\]]*\\]\\([^)]*\\))\\]\\([^)]*\\)', '\\1'), ('!\\[[^\\]]*\\]\\((?:[^()]|\\([^()]*\\))*\\)', ''), ('\\[([^\\]]*)\\]\\((?:[^()]|\\([^()]*\\))*\\)', '\\1'), ('https?://[^\\s)\\]>]+', ''), ('(?m)^[ \\t]*\\|[ \\t:|-]+\\|[ \\t]*$', '')]
@@ -130,21 +150,28 @@ async def rerank(state, context, registry, segmenter=None):
     async def invoke():
         # Provider still enforces document/request limits and stable batch indices.
         response = await model.rerank(state.rewrite_query, model_passages, context.child('rerank'))
-        raw = list(response.results if hasattr(response, 'results') else response)
+        try:
+            raw = list(response.results if hasattr(response, 'results') else response)
+        except TypeError:
+            raise InvalidRerankResponse('RERANK_RESPONSE_INVALID') from None
+        _validate_raw_results(raw, len(candidates))
         if getattr(state, 'source_evidence_mode', 'off') != 'off':
             state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
                 'response': [{'index': r.index, 'score': r.score} for r in raw]})
         return raw
 
     def filtered(raw, threshold):
-        selected = [r for r in raw if r.index < len(candidates) and r.score >= threshold]
-        floor = 0 if any((t.disable_recall_thresholds for t in state.targets)) else 0.15
-        if not selected and raw and (raw[0].score >= floor):
-            selected = [raw[0]]
+        selected = [r for r in raw if r.score >= threshold]
+        # Experimental branch only: retain one highest-scoring legal candidate
+        # when absolute-score filtering is empty, without a second score floor.
+        if not selected and raw:
+            selected = [max(raw, key=lambda r: r.score)]
         return selected
     try:
         raw = await invoke()
     except (CallCancelled, RunDeadlineExceeded):
+        raise
+    except InvalidRerankResponse:
         raise
     except Exception as exc:
         raise_if_send_denied(exc)
@@ -155,6 +182,8 @@ async def rerank(state, context, registry, segmenter=None):
         try:
             selected = filtered(await invoke(), max(state.rerank_threshold * 0.7, 0.3))
         except (CallCancelled, RunDeadlineExceeded):
+            raise
+        except InvalidRerankResponse:
             raise
         except Exception as exc:
             raise_if_send_denied(exc)

@@ -149,17 +149,17 @@ def test_dedup_and_overlap_shorter_high_score_survives():
     short=row('short','specific content evidence',.9);long=row('long','prefix specific content evidence suffix',.8)
     assert [r.id for r in partial_overlap([short,long])]==['short']
 
-@pytest.mark.parametrize('score,accepted',[(.149,False),(.15,True),(.3,True)])
-def test_rerank_top_one_floor(score,accepted):
+@pytest.mark.parametrize('score,accepted',[(.149,True),(.15,True),(.3,True)])
+def test_rerank_top_one_has_no_experimental_floor(score,accepted):
     s=state(rerank_model_id='rerank');s.search_results=[row()];m=Model([[RerankResult(0,score)]])
     if accepted:run(rerank(s,CTX,Registry(m)));assert s.rerank_results
     else:
         with pytest.raises(SearchNothing):run(rerank(s,CTX,Registry(m)))
 
-def test_rerank_retry_restores_threshold_and_override_floor():
+def test_rerank_top_one_retains_threshold_without_unnecessary_retry():
     s=state(rerank_model_id='r',rerank_threshold=.8);s.search_results=[row()]
     m=Model([[RerankResult(0,.1)],[RerankResult(0,.4)]])
-    run(rerank(s,CTX,Registry(m)));assert len(m.calls)==2 and s.rerank_threshold==.8
+    run(rerank(s,CTX,Registry(m)));assert len(m.calls)==1 and s.rerank_threshold==.8
     s=state(rerank_model_id='r');s.search_results=[row()];s.targets=(replace(TARGET,disable_recall_thresholds=True),)
     run(rerank(s,CTX,Registry(Model([[RerankResult(0,0.)]]))));assert s.rerank_results
 
