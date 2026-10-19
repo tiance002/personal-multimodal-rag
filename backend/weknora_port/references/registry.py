@@ -64,10 +64,7 @@ Some source image URLs are represented by request-local res://NNNN handles. Copy
 '''
 
 _CITATION_DISABLED_PROMPT = '''
-- Source citations are disabled for this answer. Do not add <ref>, <kb>, <web>, or source attribution links. Use the filenames-only Sources line and relevant image URLs described below; these are not citation markup.
-- For an ordinary prose answer based on the reference materials, end with a short Sources line listing only the exact supplied filenames that support the answer. Do not use a document title to guess a filename or extension. If no filename is supplied, omit that line. Do not break a requested JSON schema or code-only format to add it.
-- Relevant image URLs remain allowed: include the source image when the answer uses its OCR or caption, unless the user explicitly requests text-only or an exact format that cannot contain images.
-- These rules supersede earlier, saved, or custom prompt instructions about source citation syntax.
+Source citations are disabled. For prose, end with a short Sources line listing only the exact supplied filenames that support the answer. Do not use a document title to guess a filename or extension. Omit the line if no filename is supplied or the user requires a strict JSON/code-only format. Do not output citation tags, private IDs or attribution links. This filenames-only policy does not disable relevant image URLs.
 '''
 
 
@@ -146,9 +143,9 @@ class SourceRegistry:
     @property
     def protocol_prompt(self) -> str:
         """One active protocol for ordinary RAG; no unrelated tool instructions."""
-        return ('\n' + _SOURCE_PROTOCOL_COMMON
-                + (_CITATION_ENABLED_PROMPT if self.citations_enabled else _CITATION_DISABLED_PROMPT)
-                + _RESOURCE_PROTOCOL_PROMPT)
+        sources = ('\n' + _SOURCE_PROTOCOL_COMMON + _CITATION_ENABLED_PROMPT if self.citations_enabled
+                   else '\n\n## Source handling protocol (system-owned)\n' + _CITATION_DISABLED_PROMPT)
+        return sources + _RESOURCE_PROTOCOL_PROMPT
 
     def snapshot(self) -> RegistrySnapshot:
         return RegistrySnapshot(

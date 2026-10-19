@@ -37,12 +37,13 @@ def test_language_has_single_explicit_priority_and_no_self_check_loop_instructio
     assert 'Default response language:' not in DEFAULT_SYSTEM_PROMPT
     assert 'requested language' not in SOURCED_ANSWER_OUTPUT
     assert 'Before finishing' not in system and 'silently verify' not in system
-    assert 'Do not narrate planning or instruction checks' in system
+    assert 'Return the final answer directly' in system
 
 
 def test_filename_is_supplied_separately_without_inventing_extension():
     wire = prepared(image_evidence()).messages[-1].content
     assert 'title="Service brief" filename="service_brief.pptx"' in wire
+    assert ' id="c' not in wire and ' id="d' not in wire and ' kb="b' not in wire
     no_filename = prepared(image_evidence(knowledge_filename='')).messages[-1].content
     assert 'title="Service brief"' in no_filename and 'filename=' not in no_filename
 

@@ -19,5 +19,5 @@ def test_enabled_and_disabled_attribution_are_separate_and_support_images():
     assert '<ref id="cN"/>' in enabled and '<ref id="cN"/>' not in disabled
     assert 'exact supplied filenames that support the answer' in disabled
     assert 'Do not use a document title to guess a filename or extension' in disabled
-    assert 'include the source image when the answer uses its OCR or caption' in disabled
-    assert 'Do not break a requested JSON schema or code-only format' in disabled
+    assert 'does not disable relevant image URLs' in disabled
+    assert 'strict JSON/code-only format' in disabled
