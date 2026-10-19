@@ -141,3 +141,13 @@ S8独立评测树仅增加默认关闭的Top1实验开关及其传递，Graph与
 - 优先顺序：①ECS当前端口运行库/身份与依赖；②保留现有向量和版本的定向迁入及来源回读；③远端零云验收后申请S8.1，再逐批S8.2。Omni新MinerU索引、官方评分映射与完整语料缺口单列，不静默抹掉。
 
 **本次在S8.0收口。ECS准备/迁移及真实测评尚未执行，不复活旧授权，不自动进入S8.1。**
+
+## 2026-10-20 夜间接管进度（后续新授权，非 S8.0 历史结果）
+
+Owner 后续批准 ECS 部署、限定迁移及缺失689份资料的 BGE-M3 入库：最多745次请求、5,200,000 Token；未授权真实问答。部署代码为 `50f61d1e5494951fdc96f9a9845ff7f43633a7f4`。前端和完整部署文档按最新指令留到明天。
+
+- 已迁入 tenant332 的7KB/84文档/739条真实1024向量及288资产，原Provider500条含2UNKNOWN保留。原PG16、Evaluation Center、本机tenant1未改；新PG17/Redis/API/Worker独立且仅回环监听。
+- 首次后台启动遇到数据包目录缺少容器挂载，在发送前失败，Provider0。保留原现场并证明对应文档尚未建立、全部新账本无entry后，审计恢复同一授权；未修改UNKNOWN或补发已发送操作。
+- 远端 `rag-s8-ingestion-20261020.service` 于00:55:25 CST启动；关闭启动SSH后，两次全新SSH仍见同一PID868620及进度增加。00:56:58快照：188新增已索引、36复用，244次调用全部结算、430,530实际Token，新增UNKNOWN0；Hotpot49份、Omni24页、LongBench40份新增已完成，MIRACL正在运行。此为运行中快照，不是全批完成成绩。
+- 所有镜像、源码、六ZIP、密钥、授权、MinerU回执和检查点都在ECS，任务不依赖Windows。持久化状态命令：`python3 /opt/rag-s8/state/status.py`；详细检查点 `/opt/rag-s8/state/checkpoints/ingestion-20261020/checkpoint.json`。正常结束撤回剩余额度，新UNKNOWN保留占用并停止发送。
+- 实测迁移/身份/索引/新SSH接管命令均退出0。实现与定向验证详见当前规划进度；完整构建和首次错误日志保留在 `E:/WK/run/s8-overnight-20261020` 及远端 `/opt/rag-s8`。机器快照见 `evidence/s8-overnight-20261020/handoff-live-proof.json`。当前不宣称S8全量问答完成。

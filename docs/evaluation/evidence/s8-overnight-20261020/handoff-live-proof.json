@@ -1,0 +1,104 @@
+{
+  "at_utc": "2026-10-19T16:56:58.743545+00:00",
+  "service": "MainPID=868620\nExecMainStatus=0\nActiveState=active\nSubState=running\nActiveEnterTimestamp=Tue 2026-10-20 00:55:25 CST",
+  "single_ingestion_container": true,
+  "mounts": [
+    {
+      "source": "/opt/rag-p7-r1/incoming/v6-attempt3-ocr-layout-setup-r3",
+      "destination": "/opt/rag-p7-r1/incoming/v6-attempt3-ocr-layout-setup-r3",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/packages",
+      "destination": "/opt/rag-s8/packages",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/secrets/api_token",
+      "destination": "/run/secrets/api_token",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/storage",
+      "destination": "/var/lib/eviroute/storage",
+      "rw": true
+    },
+    {
+      "source": "/opt/rag-s8/config/assets",
+      "destination": "/opt/assets",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/logs",
+      "destination": "/data/logs",
+      "rw": true
+    },
+    {
+      "source": "/opt/rag-s8/state",
+      "destination": "/opt/rag-s8/state",
+      "rw": true
+    },
+    {
+      "source": "/opt/rag-s8/secrets/database_password",
+      "destination": "/run/secrets/database_password",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/secrets/model_key",
+      "destination": "/run/secrets/model_key",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/secrets/principal.json",
+      "destination": "/run/secrets/principal.json",
+      "rw": false
+    },
+    {
+      "source": "/opt/rag-s8/config",
+      "destination": "/opt/rag-s8/config",
+      "rw": false
+    }
+  ],
+  "windows_filesystem_or_ssh_tunnel_required": false,
+  "provider": {
+    "entries": 244,
+    "states": {
+      "SETTLED": 244
+    },
+    "reported_tokens": 430530,
+    "held_tokens": 430530,
+    "limits": {
+      "calls": 745,
+      "tokens": 5200000
+    }
+  },
+  "documents": {
+    "seen": 224,
+    "states": {
+      "INDEXED": 188,
+      "REUSED_INDEXED": 36
+    },
+    "datasets": {
+      "hotpotqa": {
+        "INDEXED": 49,
+        "REUSED_INDEXED": 24
+      },
+      "longbench-zh": {
+        "INDEXED": 40,
+        "REUSED_INDEXED": 8
+      },
+      "miracl-zh": {
+        "REUSED_INDEXED": 4,
+        "INDEXED": 75
+      },
+      "omnidocbench": {
+        "INDEXED": 24
+      }
+    }
+  },
+  "db_counts_raw": "BEGIN\n2246\n2\n0\nCOMMIT",
+  "old_services": "active\nactive",
+  "listeners": "State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess\nLISTEN 0      4096      127.0.0.54:53         0.0.0.0:*          \nLISTEN 0      5          127.0.0.1:8787       0.0.0.0:*          \nLISTEN 0      4096         0.0.0.0:22         0.0.0.0:*          \nLISTEN 0      4096   127.0.0.53%lo:53         0.0.0.0:*          \nLISTEN 0      4096       127.0.0.1:18800      0.0.0.0:*          \nLISTEN 0      4096       127.0.0.1:16379      0.0.0.0:*          \nLISTEN 0      200        127.0.0.1:5432       0.0.0.0:*          \nLISTEN 0      200        127.0.1.1:5432       0.0.0.0:*          \nLISTEN 0      4096       127.0.0.1:35927      0.0.0.0:*          \nLISTEN 0      4096       127.0.0.1:15432      0.0.0.0:*          \nLISTEN 0      4096            [::]:22            [::]:*",
+  "model_scope": "Existing SiliconFlow BAAI/bge-m3 only; no QA/Summary/Caption/Graph sends",
+  "handoff": "PASS_REMOTE_PROCESS_CONTINUES_ACROSS_FRESH_SSH_CONNECTION"
+}
