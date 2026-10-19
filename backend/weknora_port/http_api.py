@@ -588,7 +588,17 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
 
     @app.get("/api/v1/sessions/{session_id}/messages")
     async def messages(session_id: str, request: Request):
-        return json_data(request, await runtime.list_messages(await principal(request), session_id))
+        rows = await runtime.list_messages(await principal(request), session_id)
+        history = []
+        for row in rows:
+            item = dict(row)
+            # turn_status is failure metadata in storage. Successful completion
+            # is represented by is_completed, except cancellation, which is
+            # completed for persistence but remains a distinct public outcome.
+            if item.get("turn_status") not in ("error", "cancelled") and item.get("is_completed") is True:
+                item["turn_status"] = "completed"
+            history.append(item)
+        return json_data(request, history)
 
     @app.post("/api/v1/sessions/{session_id}/messages")
     async def create_message(session_id: str, body: MessageCreate, request: Request):

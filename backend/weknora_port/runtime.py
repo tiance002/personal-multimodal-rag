@@ -429,10 +429,19 @@ class ApplicationRuntime:
         async with self.leases.lease() as guard:
             await self.turns._session(guard, session_id, principal)
             return await (await guard.connection.execute(
-                "SELECT id,request_id,role,content,created_at,knowledge_references,agent_steps,is_completed,turn_status,"
-                "turn_error_code,knowledge_base_scope,document_scope FROM messages WHERE "
-                "tenant_id=%s AND subject_id=%s AND session_id=%s AND deleted_at IS NULL "
-                "ORDER BY created_at,id", (principal.tenant_id, principal.subject_id, session_id))).fetchall()
+                "SELECT m.id,m.request_id,m.role,m.content,m.created_at,m.knowledge_references,m.agent_steps,m.is_completed,m.turn_status,"
+                "m.turn_error_code,m.knowledge_base_scope,m.document_scope,"
+                "g.finish_reason,COALESCE(g.objective,'[]'::jsonb) AS generation_issues FROM messages m "
+                "LEFT JOIN LATERAL (SELECT a.finish_reason,a.objective FROM port_turns t "
+                "JOIN generation_runs r ON r.run_id=t.run_id AND r.tenant_id=t.tenant_id "
+                "AND r.subject_id=t.subject_id AND r.session_id=t.session_id AND r.message_id=t.assistant_message_id "
+                "JOIN generation_attempts a ON a.run_id=r.run_id AND a.tenant_id=r.tenant_id AND a.subject_id=r.subject_id "
+                "WHERE t.tenant_id=m.tenant_id AND t.subject_id=m.subject_id AND t.session_id=m.session_id "
+                "AND t.run_id=m.request_id AND t.assistant_message_id=m.id AND t.status='completed' "
+                "AND m.role='assistant' AND m.is_completed=true AND m.turn_status NOT IN ('error','cancelled') "
+                "AND a.status IN ('COMPLETED','TRUNCATED') ORDER BY a.ordinal DESC LIMIT 1) g ON true "
+                "WHERE m.tenant_id=%s AND m.subject_id=%s AND m.session_id=%s AND m.deleted_at IS NULL "
+                "ORDER BY m.created_at,m.id", (principal.tenant_id, principal.subject_id, session_id))).fetchall()
 
     async def _snapshot(self, guard):
         configuration = PostgresModelRoleStore(

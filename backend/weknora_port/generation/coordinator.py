@@ -398,6 +398,7 @@ class GenerationCoordinator:
         result = GenerationResult(answer, thinking, references, record.role, record.attempt_id, tuple(attempts), route, total_usage, record.finish_reason, is_length(record.finish_reason), len(attempts) > 1, prepared.prompt_sha256, prepared.context_sha256)
         check_context(context)
         metadata = {'is_fallback':request.is_fallback, 'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
+        metadata['generation_issues'] = list(record.objective)
         buffered = record.role == 'cheap' and request.policy.mode == 'DYNAMIC'
         if buffered:
             for notice in error_events:

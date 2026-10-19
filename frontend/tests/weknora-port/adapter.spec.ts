@@ -22,6 +22,65 @@ function frame(event: Record<string, unknown>) {
   return `event: message\ndata: ${JSON.stringify(event)}\n\n`;
 }
 
+for (const scenario of [
+  { name: "truncated", text: "保留尚未写完的回答", finish_reason: "length", generation_issues: ["TRUNCATED"], label: "输出被截断；已有内容已保存，未重新生成。" },
+  { name: "empty", text: "", finish_reason: "stop", generation_issues: ["EMPTY"], label: "模型未返回可用答案；运行终态已保存，未重新生成。" },
+  { name: "selected-final", text: "升级后完整回答", finish_reason: "stop", generation_issues: [], label: "回答已由服务端完成并保存" },
+]) {
+  test(`live ${scenario.name} shows final output status without retry`, async ({ page }) => {
+    await installCatalogRoutes(page);
+    let posts = 0;
+    let resumes = 0;
+    await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope(route.request().method() === "POST"
+      ? { id: "status-session", title: "状态测试", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" } : []) }));
+    await page.route("**/api/v1/sessions/status-session/messages", async route => {
+      if (route.request().method() !== "POST") return route.fulfill({ json: envelope([]) });
+      posts++;
+      const body = frame({ id: "status-run", response_type: "agent_query", content: "", done: false,
+        data: { request_id: "status-run", session_id: "status-session", assistant_message_id: "status-answer" } }) +
+        frame({ id: "status-run", response_type: "answer", content: scenario.text, done: true, data: { event_id: "final-answer" } }) +
+        frame({ id: "status-run", response_type: "complete", content: "", done: false,
+          data: { finish_reason: scenario.finish_reason, generation_issues: scenario.generation_issues,
+            truncated: scenario.name === "truncated", final_content: scenario.text,
+            attempts: [{ objective: ["TRUNCATED"] }, { objective: scenario.generation_issues }] } });
+      return route.fulfill({ status: 200, contentType: "text/event-stream", body });
+    });
+    await page.route("**/api/v1/sessions/continue-stream/**", route => { resumes++; return route.fulfill({ status: 500 }); });
+    await page.goto("/");
+    await page.getByText("课程资料", { exact: true }).first().click();
+    await page.getByPlaceholder("询问当前资料…").fill("状态测试");
+    await page.getByRole("button", { name: "发送" }).click();
+    const bubble = page.locator(".wp-message.assistant");
+    await expect(bubble.getByText(scenario.label, { exact: true })).toBeVisible();
+    await expect(bubble.locator(".wp-message-content")).toHaveText(scenario.text);
+    if (scenario.name !== "selected-final") await expect(bubble.getByText("回答已由服务端完成并保存", { exact: true })).toHaveCount(0);
+    expect(posts).toBe(1);
+    expect(resumes).toBe(0);
+  });
+
+  test(`history ${scenario.name} restores persisted final output status`, async ({ page }) => {
+    await installCatalogRoutes(page);
+    let mutations = 0;
+    await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope([
+      { id: "status-history", title: "保存的状态", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+    ]) }));
+    await page.route("**/api/v1/sessions/status-history/messages", route => {
+      if (route.request().method() !== "GET") mutations++;
+      return route.fulfill({ json: envelope([
+        { id: "saved-status", role: "assistant", content: scenario.text, request_id: "saved-status-run", created_at: "now",
+          is_completed: true, turn_status: "completed", finish_reason: scenario.finish_reason, generation_issues: scenario.generation_issues },
+      ]) });
+    });
+    await page.goto("/");
+    await page.getByRole("button", { name: /保存的状态/ }).click();
+    const bubble = page.locator(".wp-message.assistant");
+    await expect(bubble.getByText(scenario.label, { exact: true })).toBeVisible();
+    await expect(bubble.locator(".wp-message-content")).toHaveText(scenario.text);
+    if (scenario.name !== "selected-final") await expect(bubble.getByText("回答已由服务端完成并保存", { exact: true })).toHaveCount(0);
+    expect(mutations).toBe(0);
+  });
+}
+
 test("port adapter loads visible scope and five masked model roles without old app fallback", async ({ page }) => {
   await installCatalogRoutes(page);
   await page.goto("/");

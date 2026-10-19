@@ -31,6 +31,7 @@ class FakeRuntime:
         self.release_run = asyncio.Event()
         self.fail_run = False
         self.accepted = {}
+        self.message_rows = []
 
     def _record_principal(self, principal):
         assert principal is PRINCIPAL
@@ -86,7 +87,7 @@ class FakeRuntime:
 
     async def list_messages(self, principal, session_id):
         self._record_principal(principal)
-        return []
+        return self.message_rows
 
     async def accept_turn(self, request, principal):
         self._record_principal(principal)
@@ -208,6 +209,34 @@ def test_runtime_identity_and_read_envelopes_use_server_resolved_principal():
         assert bases.json()["data"][0]["id"] == "kb-1"
         assert identity.json()["meta"]["request_id"]
         assert len(runtime.principals) == 2
+
+    asyncio.run(exercise())
+
+
+def test_history_api_projects_completed_status_and_preserves_failure_outcomes():
+    async def exercise():
+        runtime, _, client = make_client()
+        runtime.message_rows = [
+            {"id": "user-1", "role": "user", "is_completed": True, "turn_status": "pending"},
+            {"id": "assistant-success", "role": "assistant", "is_completed": True,
+             "turn_status": "pending", "usage": {"status": "UNKNOWN"}},
+            {"id": "assistant-error", "role": "assistant", "is_completed": False,
+             "turn_status": "error", "turn_error_code": "MODEL_CALL_TIMEOUT"},
+            {"id": "assistant-cancelled", "role": "assistant", "is_completed": True,
+             "turn_status": "cancelled", "turn_error_code": "MODEL_CALL_CANCELLED"},
+            {"id": "assistant-pending", "role": "assistant", "is_completed": False,
+             "turn_status": "pending"},
+        ]
+        async with client:
+            response = await client.get("/api/v1/sessions/session-1/messages")
+
+        assert response.status_code == 200
+        history = response.json()["data"]
+        assert [row["turn_status"] for row in history] == [
+            "completed", "completed", "error", "cancelled", "pending"
+        ]
+        assert history[1]["usage"] == {"status": "UNKNOWN"}
+        assert runtime.principals == [PRINCIPAL]
 
     asyncio.run(exercise())
 

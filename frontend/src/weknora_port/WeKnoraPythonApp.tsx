@@ -20,7 +20,7 @@ type ChatLine = {
   content: string;
   segments?: Segment[];
   progress?: TimelineEvent[];
-  status?: "running" | "completed" | "interrupted" | "failed" | "cancelled" | "unknown";
+  status?: "running" | "completed" | "truncated" | "empty" | "interrupted" | "failed" | "cancelled" | "unknown";
   error?: boolean;
   identity?: PortRunIdentity;
 };
@@ -53,7 +53,19 @@ function answerFromSegments(segments: Segment[] = []) {
   return segments.map(segment => segment.text).join("");
 }
 
+function generationStatus(data: { truncated?: unknown; finish_reason?: unknown; generation_issues?: unknown }): "completed" | "truncated" | "empty" {
+  const issues = Array.isArray(data.generation_issues) ? data.generation_issues : [];
+  const finish = typeof data.finish_reason === "string" ? data.finish_reason.trim().toLowerCase() : "";
+  if (data.truncated === true || issues.includes("TRUNCATED") || ["length", "max_tokens", "max_output_tokens"].includes(finish)) return "truncated";
+  return issues.includes("EMPTY") ? "empty" : "completed";
+}
+
 function eventLabel(event: WeKnoraSSEMessage): string {
+  if (event.response_type === "complete" && event.data.status !== "failed" && event.data.status !== "cancelled") {
+    const status = generationStatus(event.data);
+    if (status === "truncated") return "输出被截断";
+    if (status === "empty") return "模型未返回可用答案";
+  }
   const text = (event.response_type === "error" ? cloudErrorMessage(event.data.error_code) || event.content : event.content).trim();
   const labels: Record<string, string> = {
     agent_query: "收到问题",
@@ -251,7 +263,7 @@ export function WeKnoraPythonApp() {
       setMessages(history.map(row => {
         const mappedError = row.turn_status === "error" ? cloudErrorMessage(row.turn_error_code) : "";
         return { id: row.id, role: row.role === "user" ? "user" : "assistant", content: mappedError || row.content,
-          status: row.role === "user" ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.turn_status === "error" ? "failed" : row.is_completed ? "completed" : "unknown",
+          status: row.role === "user" ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.turn_status === "error" ? "failed" : row.is_completed ? generationStatus(row) : "unknown",
           error: row.turn_status === "error",
           progress: (row.agent_steps ?? []).filter(step => step.reasoning_content).map(step => ({ type: "thinking", text: step.reasoning_content ?? "" })),
         };
@@ -289,6 +301,8 @@ export function WeKnoraPythonApp() {
       terminalErrorMessages.current.delete(messageId);
       if (event.data.status === "cancelled") setNotice("生成已取消，服务端已保存终态");
       else if (event.data.status === "failed" && !hadTerminalError) setNotice("生成失败，服务端已保存终态");
+      else if (!hadTerminalError && generationStatus(event.data) === "truncated") setNotice("输出被截断，已有内容已保存");
+      else if (!hadTerminalError && generationStatus(event.data) === "empty") setNotice("模型未返回可用答案，运行终态已保存");
       else if (!hadTerminalError) setNotice("回答已完成并保存");
     } else if (event.response_type === "error") {
       const nonTerminalStreamError = event.data.non_terminal === true && event.data.stage === "chat_completion_stream";
@@ -321,7 +335,7 @@ export function WeKnoraPythonApp() {
           return { ...previous, progress, status: "failed", error: true };
         }
         const finalContent = typeof event.data.final_content === "string" ? event.data.final_content : answerFromSegments(previous.segments);
-        return { ...previous, content: finalContent, progress, status: "completed" };
+        return { ...previous, content: finalContent, progress, status: generationStatus(event.data) };
       }
       if (event.response_type === "error") {
         if (event.data.non_terminal === true && event.data.stage === "chat_completion_stream") {
@@ -350,11 +364,11 @@ export function WeKnoraPythonApp() {
         onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], status: "running" })),
         onMessage: event => applyEvent(line.id, event),
       });
-      if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
-      else updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
+      if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "truncated", "empty", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
+      else updateMessage(line.id, previous => ["completed", "truncated", "empty", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
       await refreshSessions();
     } catch (error) {
-      if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
+      if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "truncated", "empty", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
       else updateMessage(line.id, previous => ({ ...previous, status: "unknown", error: true,
         content: previous.content || errorText(error),
         progress: [...(previous.progress ?? []), { type: "error", text: errorText(error) }] }));
@@ -403,7 +417,7 @@ export function WeKnoraPythonApp() {
         onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], status: "running" })),
         onMessage: event => applyEvent(line.id, event),
       });
-      if (!controller.signal.aborted) updateMessage(line.id, previous => ["completed", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
+      if (!controller.signal.aborted) updateMessage(line.id, previous => ["completed", "truncated", "empty", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
     } catch (error) {
       updateMessage(line.id, previous => ({ ...previous, status: controller.signal.aborted ? "interrupted" : "unknown", error: true,
         content: previous.content || errorText(error),
@@ -516,6 +530,8 @@ export function WeKnoraPythonApp() {
               {message.status === "interrupted" && <div className="wp-run-actions"><span>已断开读取，服务端运行未被重发</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>继续读取原回答</button>}</div>}
               {message.status === "cancelled" && <p className="wp-run-actions">已停止生成；原始运行已保存取消状态。</p>}
               {message.status === "failed" && <p className="wp-run-actions">生成失败；原始运行的错误已保存。</p>}
+              {message.status === "truncated" && <p className="wp-run-actions">输出被截断；已有内容已保存，未重新生成。</p>}
+              {message.status === "empty" && <p className="wp-run-actions">模型未返回可用答案；运行终态已保存，未重新生成。</p>}
               {message.status === "unknown" && <div className="wp-run-actions"><span>尚未收到 complete，结果状态待确认；没有重新生成。</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>GET 续读原回答</button>}</div>}
               {message.role === "assistant" && message.status === "completed" && <small className="wp-complete">回答已由服务端完成并保存</small>}
             </>}
