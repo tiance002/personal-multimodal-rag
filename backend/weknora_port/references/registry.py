@@ -32,6 +32,15 @@ _INTERNAL_CHINESE_ATTRIBUTION = re.compile(
     r"[ \t]*上述数据直接来源于文档[ \t]*`d[1-9][0-9]*`[ \t]*中的第[ \t]*[0-9]+[ \t]*段"
     r"[（(]chunk[ \t]*`c[1-9][0-9]*`[）)][^\r\n]*(?:\r?\n|$)"
 )
+# Additional exact source contexts observed in the frozen S2 answers. These
+# annotations may contain inline-code handles, so match them before skipping
+# Markdown code spans; ordinary prose and examples inside code stay intact.
+_INLINE_SOURCE_ATTRIBUTION = re.compile(
+    r"(?P<context>根据提供的课件内容)[（(]文档[ \t]*`d[1-9][0-9]*`(?:[）)]|$)"
+    r"|(?P<fragment>提供的文档片段)[（(]`d[1-9][0-9]*`(?:[）)]|$)"
+    r"|\(source:[ \t]*d[1-9][0-9]*[ \t]*,[ \t]*c[1-9][0-9]*[ \t]*(?:\)|$)",
+    re.I,
+)
 _ATTR = {
     name: re.compile(rf'(?i)\b{re.escape(name)}\s*=\s*"([^"]*)"')
     for name in ("doc", "chunk_id", "kb_id", "url", "title")
@@ -325,7 +334,7 @@ class SourceRegistry:
 
         if not self.citations_enabled:
             text = _strip_chinese_attribution_outside_fences(text)
-        return _map_outside_markdown_code(text, transform)
+        return _map_outside_markdown_code(text, transform, strip_private_attributions=not self.citations_enabled)
 
     def encode_resource_text(self, text: str) -> str:
         return self.resources.encode_text(text)
@@ -337,7 +346,7 @@ class SourceRegistry:
         return _RESOURCE_HANDLE.sub("", text)
 
 
-def _map_outside_markdown_code(text: str, transform) -> str:
+def _map_outside_markdown_code(text: str, transform, *, strip_private_attributions: bool = False) -> str:
     """Apply a transform to prose while leaving inline/fenced code byte-for-byte intact."""
     out: list[str] = []
     i = 0
@@ -361,6 +370,15 @@ def _map_outside_markdown_code(text: str, transform) -> str:
             i = end
             prose_start = i
             continue
+
+        if strip_private_attributions:
+            attribution = _INLINE_SOURCE_ATTRIBUTION.match(text, i)
+            if attribution:
+                out.append(transform(text[prose_start:i]))
+                out.append(attribution.group("context") or attribution.group("fragment") or "")
+                i = attribution.end()
+                prose_start = i
+                continue
 
         if text[i] == "`":
             run_end = i

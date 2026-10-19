@@ -1,4 +1,6 @@
 """Fixed-source citation registry/decoder behavior; no provider or DB calls."""
+import pytest
+
 from backend.weknora_port.references import ChunkReference, CitationStreamDecoder, SourceRegistry
 
 
@@ -282,3 +284,61 @@ def test_s2_real_attribution_spacing_and_each_split_is_hidden():
         first = decoder.feed(text[:split])
         assert "`d1`" not in first and "`c2`" not in first
         assert first + decoder.feed(text[split:]) + decoder.flush() == expected
+
+
+@pytest.mark.parametrize(("text", "expected"), [
+    (
+        "根据提供的课件内容（文档 `d1`），针对给定的线性方程组：",
+        "根据提供的课件内容，针对给定的线性方程组：",
+    ),
+    (
+        "提供的文档片段（`d1`）仅是对线性方程组矩阵表示方法的**总结性介绍**。",
+        "提供的文档片段仅是对线性方程组矩阵表示方法的**总结性介绍**。",
+    ),
+    (
+        "**The Wind in the Willows** was first published in **1908** (source: d2, c2).",
+        "**The Wind in the Willows** was first published in **1908** .",
+    ),
+    ("答案 (source: d1, c2", "答案 "),
+    ("根据提供的课件内容（文档 `d1`", "根据提供的课件内容"),
+])
+def test_s2_real_inline_source_annotations_are_hidden_at_every_split(text, expected):
+    # Exact observed forms: S2_MODEL_ROUTING_ANSWER_STABILITY.results.json,
+    # s1-omni-matrix-positive/A, m32-omni-summary-only-no-evidence/A and
+    # hotpot-5a745a-success/A. Only the explicit source annotation is removed.
+    registry = SourceRegistry(citations_enabled=False)
+    assert registry.decode_output_text(text) == expected
+    for split in range(len(text) + 1):
+        decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+        first = decoder.feed(text[:split])
+        assert "`d1`" not in first and "d2, c2" not in first
+        assert first + decoder.feed(text[split:]) + decoder.flush() == expected
+    decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+    published = ""
+    for char in text:
+        published += decoder.feed(char)
+        assert "`d1`" not in published and "d2, c2" not in published
+    assert published + decoder.flush() == expected
+
+    enabled = SourceRegistry(citations_enabled=True)
+    handle = enabled.register_chunk(ChunkReference("valid-source", document_title="Real"))
+    assert enabled.decode_output_text(text + f'<ref id="{handle}"/>') == (
+        text + '<kb doc="Real" chunk_id="valid-source" />'
+    )
+
+
+def test_inline_source_filter_preserves_body_identifiers_and_code_examples():
+    text = (
+        "变量 d1 和 c2；文档 d1 的第2段包含 chunk c2。\n"
+        "Source: section c2 and dataset d1.\n"
+        "普通括号 (d1, c2) 和（文档 `d1`）保留。\n"
+        "普通未闭括号 (source: supporting details\n"
+        "根据提供的课件内容（文档尚未提供\n"
+        "`根据提供的课件内容（文档 d1），正文。`\n"
+        "`(source: d2, c2)`\n"
+        "```text\n根据提供的课件内容（文档 `d1`），正文。\n"
+        "提供的文档片段（`d1`）是说明。\n(source: d2, c2)\n```"
+    )
+    assert SourceRegistry(citations_enabled=False).decode_output_text(text) == text
+    decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+    assert "".join(decoder.feed(char) for char in text) + decoder.flush() == text

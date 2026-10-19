@@ -55,6 +55,9 @@ class CitationStreamDecoder:
         # heading/sentence template stays private until it can be classified.
         if not self.registry.citations_enabled:
             attribution_start = _possible_private_attribution_start(visible)
+            inline_start = _possible_inline_source_attribution_start(visible)
+            if inline_start is not None:
+                attribution_start = inline_start if attribution_start is None else min(attribution_start, inline_start)
             source_start = visible.rfind("\n") + 1
             if source_start < len(visible) and _could_be_source_attribution_prefix(visible[source_start:]):
                 attribution_start = source_start if attribution_start is None else min(attribution_start, source_start)
@@ -120,6 +123,23 @@ _CHINESE_ATTRIBUTION_HEADINGS = (
     "依据说明：", "依据说明:",
 )
 _CHINESE_ATTRIBUTION_SENTENCE_PREFIX = "上述数据直接来源于文档"
+_INLINE_SOURCE_PREFIXES = (
+    "(source:", "根据提供的课件内容（", "根据提供的课件内容(",
+    "提供的文档片段（", "提供的文档片段(",
+)
+
+
+def _possible_inline_source_attribution_start(text: str) -> int | None:
+    """Keep only an unfinished observed source context until its closing bracket."""
+    start = text.rfind("\n") + 1
+    for index in range(start, len(text)):
+        if text[index] not in "(根提":
+            continue
+        suffix = text[index:].lower()
+        if any(prefix.startswith(suffix) or suffix.startswith(prefix) for prefix in _INLINE_SOURCE_PREFIXES):
+            if ")" not in suffix and "）" not in suffix:
+                return index
+    return None
 
 
 def _possible_private_attribution_start(text: str) -> int | None:

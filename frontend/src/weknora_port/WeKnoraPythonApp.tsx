@@ -49,6 +49,7 @@ function savedAnswerLanguage(): string {
 }
 const INTERNAL_SOURCE_ATTRIBUTION_LINE = /^[ \t]*(?:\*\*|__)?source:(?:\*\*|__)?[^\r\n]*\([ \t]*document[ \t]+d[1-9]\d*[ \t]*,[ \t]*chunk[ \t]+c[1-9]\d*[ \t]*\)[^\r\n]*(?:\r?\n|$)/i;
 const INTERNAL_CHINESE_ATTRIBUTION = /^[ \t]*(?:\*\*|__)?依据说明(?:：|:)(?:\*\*|__)?[ \t]*\r?\n[ \t]*上述数据直接来源于文档[ \t]*`d[1-9]\d*`[ \t]*中的第[ \t]*\d+[ \t]*段[（(]chunk[ \t]*`c[1-9]\d*`[）)][^\r\n]*(?:\r?\n|$)/i;
+const INLINE_SOURCE_ATTRIBUTION = /^(?:(根据提供的课件内容)[（(]文档[ \t]*`d[1-9]\d*`(?:[）)]|$)|(提供的文档片段)[（(]`d[1-9]\d*`(?:[）)]|$)|\(source:[ \t]*d[1-9]\d*[ \t]*,[ \t]*c[1-9]\d*[ \t]*(?:\)|$))/i;
 
 function errorText(error: unknown): string {
   if (error instanceof PortApiError) {
@@ -129,6 +130,13 @@ function stripInternalReferenceMarkup(content: string): string {
         lineStart = end;
         continue;
       }
+    }
+
+    const inlineAttribution = content.slice(cursor).match(INLINE_SOURCE_ATTRIBUTION);
+    if (inlineAttribution) {
+      output.push(inlineAttribution[1] ?? inlineAttribution[2] ?? "");
+      cursor += inlineAttribution[0].length;
+      continue;
     }
 
     if (content[cursor] === "`") {

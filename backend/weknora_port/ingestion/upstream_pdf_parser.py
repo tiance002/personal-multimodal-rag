@@ -25,6 +25,7 @@ import base64
 from contextlib import contextmanager
 import io
 import logging
+import math
 import os
 import re
 import statistics
@@ -701,7 +702,18 @@ def _page_chars(textpage, page, raw) -> tuple:
                 continue  # off-page glyph
             if invisible and _point_in_boxes((x0 + x1) / 2, (y0 + y1) / 2, invisible):
                 continue  # covered by an invisible text object
-        chars.append({"x0": x0, "y0": y0, "x1": x1, "y1": y1, "ch": ch})
+        char = {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "ch": ch}
+        # Tight boxes describe ink, not the font's occupied horizontal cell.
+        # A narrow glyph (e.g. "1") can otherwise create an invented word gap.
+        # Keep tight geometry for layout; use valid font bounds only for spacing.
+        try:
+            cell_left, _, cell_right, _ = textpage.get_charbox(i, loose=True)
+            if (math.isfinite(cell_left) and math.isfinite(cell_right)
+                    and cell_right > cell_left):
+                char.update(spacing_x0=cell_left, spacing_x1=cell_right)
+        except Exception:
+            pass  # Preserve the existing geometric fallback if bounds are absent.
+        chars.append(char)
     return chars, width
 
 
@@ -838,7 +850,8 @@ def _join_line_glyphs(ln_sorted: list) -> str:
             if not ch.isspace() or (parts and not parts[-1].endswith(" ")):
                 parts.append(ch)
             continue
-        if cur["x0"] - prev["x1"] > gap_threshold:
+        gap = cur.get("spacing_x0", cur["x0"]) - prev.get("spacing_x1", prev["x1"])
+        if gap > gap_threshold:
             parts.append(" ")
         parts.append(ch)
     return "".join(parts).strip()

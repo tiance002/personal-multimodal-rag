@@ -352,6 +352,59 @@ test("old history strips internal reference markers without changing inline or f
   await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
 });
 
+for (const truncatedSource of ["答案 (source: d1, c2", "根据提供的课件内容（文档 `d1`"]) {
+test(`observed S2 inline source handles are hidden consistently in history and live answers (${truncatedSource.startsWith("答案") ? "English" : "Chinese"} EOF)`, async ({ page }) => {
+  await installCatalogRoutes(page);
+  const content = [
+    "根据提供的课件内容（文档 `d1`），针对给定的线性方程组：",
+    "提供的文档片段（`d1`）仅是对线性方程组矩阵表示方法的**总结性介绍**。",
+    "**The Wind in the Willows** was first published in **1908** (source: d2, c2).",
+    "普通正文 d1 与 c2；普通括号 (d1, c2)。",
+    "```text\n根据提供的课件内容（文档 `d1`），代码。\n(source: d2, c2)\n```",
+    "`d1/c2`",
+    truncatedSource,
+  ].join("\n\n");
+  const session = { id: "s2-inline-handles", title: "S2 来源回放", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" };
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope([session]) }));
+  let posts = 0;
+  let chunkReads = 0;
+  await page.route("**/api/v1/chunks/**", route => { chunkReads++; return route.fulfill({ json: envelope({}) }); });
+  await page.route("**/api/v1/sessions/s2-inline-handles/messages", route => {
+    if (route.request().method() !== "POST") return route.fulfill({ json: envelope([
+      { id: "s2-inline-old", role: "assistant", request_id: "old-s2-inline-run", created_at: "now", is_completed: true, content },
+    ]) });
+    posts++;
+    return route.fulfill({ status: 200, contentType: "text/event-stream", body:
+      frame({ id: "s2-inline-run", response_type: "agent_query", content: "", done: false,
+        data: { request_id: "s2-inline-run", session_id: session.id, assistant_message_id: "s2-inline-live" } }) +
+      frame({ id: "s2-inline-run", response_type: "answer", content, done: true, data: { event_id: "s2-inline-answer" } }) +
+      frame({ id: "s2-inline-run", response_type: "complete", content: "", done: false, data: { final_content: content } }),
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: /S2 来源回放/ }).click();
+  const history = page.locator(".wp-message.assistant .wp-message-content").first();
+  await expect(history.locator("p").filter({ hasText: "根据提供的课件内容，针对" })).toHaveCount(1);
+  await expect(history.locator("p").filter({ hasText: "提供的文档片段仅是" })).toHaveCount(1);
+  await expect(history.locator("p").filter({ hasText: "source: d2" })).toHaveCount(0);
+  await expect(history.locator("p").filter({ hasText: "source: d1" })).toHaveCount(0);
+  await expect(history.locator("p").filter({ hasText: "（文档" })).toHaveCount(0);
+  await expect(history).toContainText("普通正文 d1 与 c2；普通括号 (d1, c2)。");
+  await expect(history.locator("pre code")).toContainText("根据提供的课件内容（文档 `d1`），代码。");
+  await expect(history.locator("pre code")).toContainText("(source: d2, c2)");
+  await expect(history.locator("p > code")).toHaveText("d1/c2");
+  const restoredText = await history.innerText();
+  await page.getByPlaceholder("询问当前资料…").fill("离线回放，不发送模型请求");
+  await page.getByRole("button", { name: "发送" }).click();
+  const live = page.locator(".wp-message.assistant .wp-message-content").last();
+  await expect(live).toHaveText(await history.textContent() ?? "");
+  expect(await live.innerText()).toBe(restoredText);
+  await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
+  expect(posts).toBe(1);
+  expect(chunkReads).toBe(0);
+});
+}
+
 test("history titles stay inside the sidebar and remain selectable by mouse and Enter", async ({ page }) => {
   await installCatalogRoutes(page);
   const longChinese = "关于视觉检索与正文引用关系的历史会话标题".repeat(8);
