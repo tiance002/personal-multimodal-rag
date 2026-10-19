@@ -47,6 +47,7 @@ for (const scenario of [
     });
     await page.route("**/api/v1/sessions/continue-stream/**", route => { resumes++; return route.fulfill({ status: 500 }); });
     await page.goto("/");
+    await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
     await page.getByText("课程资料", { exact: true }).first().click();
     await page.getByPlaceholder("询问当前资料…").fill("状态测试");
     await page.getByRole("button", { name: "发送" }).click();
@@ -87,6 +88,8 @@ test("port adapter loads visible scope and five masked model roles without old a
   await expect(page.getByRole("heading", { name: "从你的资料中寻找答案" })).toBeVisible();
   await expect(page.getByText("选择检索范围，快速问答会显示实际检索与回答进度。")).toBeVisible();
   await expect(page.getByText("选择检索范围，快速问答会显示服务端实际发送的执行事件与引用。")).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "选择知识库和文件" })).toHaveCount(0);
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await expect(page.getByText("课程资料", { exact: true }).first()).toBeVisible();
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("教材 第三章.pdf")).toBeVisible();
@@ -133,6 +136,7 @@ test("POST once and recover by offset-zero GET of the same assistant message wit
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("What does chapter three explain?");
   await page.getByRole("button", { name: "发送" }).click();
@@ -153,7 +157,7 @@ test("runtime identity mismatch blocks mutations and remains visibly isolated fr
   });
   await page.goto("/");
   await expect(page.getByRole("alert").getByText(/身份不匹配/)).toBeVisible();
-  await expect(page.getByPlaceholder("先从上方选择知识库")).toBeDisabled();
+  await expect(page.getByPlaceholder("选择知识库后提问…")).toBeDisabled();
   expect(postCount).toBe(0);
 });
 
@@ -176,6 +180,7 @@ test("runtime mismatch during a run is shown in its assistant bubble and never s
     await route.fulfill({ status: 409, json: { error: { code: "RUNTIME_IDENTITY_MISMATCH", message: "身份不匹配" } } });
   });
   await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("Question");
   await page.getByRole("button", { name: "发送" }).click();
@@ -220,6 +225,7 @@ test("library selection reads its KB scope and upload polling exposes terminal c
   await page.getByRole("button", { name: "资料库" }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("chapter.pdf", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "查看原文件" })).toHaveAttribute("href", /knowledge-bases\/kb-1\/documents\/doc-1\/source$/);
   await page.getByRole("button", { name: /^图片资料/ }).click();
   await expect(page.getByText("chapter.pdf", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("combobox")).toHaveValue("kb-2");
@@ -253,6 +259,7 @@ test("normal answers suppress citation controls and strip internal SSE markup ou
   await page.route("**/api/v1/chunks/**", route => { chunkReads++; return route.fulfill({ json: envelope({}) }); });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("问题");
   await page.getByRole("button", { name: "发送" }).click();
@@ -274,7 +281,7 @@ test("old history strips internal reference markers without changing inline or f
   ]) }));
   await page.route("**/api/v1/sessions/old-session/messages", route => route.fulfill({ json: envelope([
     { id: "old-answer", role: "assistant", request_id: "old-run", created_at: "now", is_completed: true,
-      content: '历史 <ref>原始引文</ref> <kb chunk_id="old-chunk" doc="资料" /> <kb>块文字</kb> <web id="w">网页文字</web> <reference>普通标签</reference> 末尾\n\n**Source:** *11-21-16-Updated-Post-Election-Release* (document d1, chunk c1)\nSource: section c1 and dataset d1.\n\n`<ref>code</ref>`\n\n```txt\n<ref>code</ref>\nSource: code (document d1, chunk c1)\n```\n\n<ref id=' },
+      content: '历史 <ref>原始引文</ref> <kb chunk_id="old-chunk" doc="资料" /> <kb>块文字</kb> <web id="w">网页文字</web> <reference>普通标签</reference> 末尾\n\n**Source:** *11-21-16-Updated-Post-Election-Release* (document d1, chunk c1)\nSource: section c1 and dataset d1.\n\n**依据说明：**\n上述数据直接来源于文档 `d1` 中的第2段（chunk `c2`），该段明确列出了对应线性方程组的系数矩阵和增广矩阵。\n\n普通正文提到 d1 与 c2。\n\n**依据说明：**\n这里是普通解释，提到 c1/d1 但不符合来源句式。\n\n```text\n依据说明：\n上述数据直接来源于文档 `d1` 中的第2段（chunk `c2`）\n```\n\n`<ref>code</ref>`\n\n```txt\n<ref>code</ref>\nSource: code (document d1, chunk c1)\n```\n\n<ref id=' },
   ]) }));
 
   await page.goto("/");
@@ -283,11 +290,15 @@ test("old history strips internal reference markers without changing inline or f
   await expect(renderedAnswer).toContainText("历史 原始引文");
   await expect(renderedAnswer).toContainText("块文字 网页文字 <reference>普通标签</reference> 末尾");
   await expect(renderedAnswer.locator("p").filter({ hasText: "document d1, chunk c1" })).toHaveCount(0);
+  await expect(renderedAnswer.locator("p").filter({ hasText: "上述数据直接来源于文档" })).toHaveCount(0);
+  await expect(renderedAnswer).toContainText("普通正文提到 d1 与 c2。");
+  await expect(renderedAnswer).toContainText("这里是普通解释，提到 c1/d1 但不符合来源句式。");
+  await expect(renderedAnswer.locator("pre code").filter({ hasText: "上述数据直接来源于文档" })).toContainText("上述数据直接来源于文档 `d1` 中的第2段（chunk `c2`）");
   await expect(renderedAnswer).toContainText("Source: section c1 and dataset d1.");
   await expect(renderedAnswer).toContainText("Source: code (document d1, chunk c1)");
   await expect(renderedAnswer).not.toContainText("<ref id=");
   await expect(renderedAnswer.locator("p > code")).toHaveText("<ref>code</ref>");
-  await expect(renderedAnswer.locator("pre code")).toContainText("<ref>code</ref>");
+  await expect(renderedAnswer.locator("pre code").filter({ hasText: "Source: code" })).toContainText("<ref>code</ref>");
   await expect(renderedAnswer).toContainText("<ref>code</ref>");
   await expect(renderedAnswer).not.toContainText("<ref id=");
   await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
@@ -303,6 +314,7 @@ test("history titles stay inside the sidebar and remain selectable by mouse and 
     { id: "english", title: longEnglish, knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
     { id: "continuous", title: continuous, knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
     { id: "ordinary", title: "普通会话", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" },
+    ...Array.from({ length: 48 }, (_, index) => ({ id: `extra-${index}`, title: `第${index}个中文历史会话 Mixed English title`, knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" })),
   ];
   await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope(sessions) }));
   await page.route("**/api/v1/sessions/*/messages", route => {
@@ -315,16 +327,30 @@ test("history titles stay inside the sidebar and remain selectable by mouse and 
   await page.goto("/");
   const sidebar = page.locator(".wp-sidebar");
   const historyButtons = page.locator(".wp-history-list button");
-  await expect(historyButtons).toHaveCount(4);
+  await expect(historyButtons).toHaveCount(52);
   for (const button of await historyButtons.all()) {
     const dimensions = await button.evaluate(element => ({
       buttonWidth: element.getBoundingClientRect().width,
       sidebarWidth: element.closest(".wp-sidebar")!.getBoundingClientRect().width,
       titleWidth: element.querySelector("strong")!.clientWidth,
       titleScrollWidth: element.querySelector("strong")!.scrollWidth,
+      buttonHeight: element.getBoundingClientRect().height,
+      titleHeight: element.querySelector("strong")!.getBoundingClientRect().height,
+      titleLineHeight: parseFloat(getComputedStyle(element.querySelector("strong")!).lineHeight),
+      titleFontSize: parseFloat(getComputedStyle(element.querySelector("strong")!).fontSize),
+      titleWhiteSpace: getComputedStyle(element.querySelector("strong")!).whiteSpace,
+      titleOverflow: getComputedStyle(element.querySelector("strong")!).textOverflow,
+      subtitleHeight: element.querySelector("small")!.getBoundingClientRect().height,
     }));
     expect(dimensions.buttonWidth).toBeLessThanOrEqual(dimensions.sidebarWidth);
     expect(dimensions.titleWidth).toBeGreaterThan(0);
+    expect(dimensions.buttonHeight).toBeGreaterThanOrEqual(56);
+    expect(dimensions.titleLineHeight).toBeGreaterThanOrEqual(dimensions.titleFontSize * 1.4);
+    expect(dimensions.titleHeight).toBeGreaterThanOrEqual(dimensions.titleLineHeight);
+    expect(dimensions.subtitleHeight).toBeGreaterThanOrEqual(14);
+    expect(dimensions.buttonHeight).toBeGreaterThanOrEqual(dimensions.titleHeight + dimensions.subtitleHeight + 18);
+    expect(dimensions.titleWhiteSpace).toBe("nowrap");
+    expect(dimensions.titleOverflow).toBe("ellipsis");
   }
   expect(await historyButtons.nth(0).locator("strong").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
   expect(await historyButtons.nth(1).locator("strong").evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
@@ -337,6 +363,8 @@ test("history titles stay inside the sidebar and remain selectable by mouse and 
   await expect(page.getByText("历史会话 ordinary", { exact: true })).toBeVisible();
   await expect(historyButtons.nth(3)).toHaveClass(/selected/);
   await expect(sidebar).toBeVisible();
+  expect(await page.locator(".wp-history-list").evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+  await page.screenshot({ path: test.info().outputPath("ui-restoration-history.png"), fullPage: true });
 });
 
 test("history Markdown renders safely without leaking internal reference tags", async ({ page }) => {
@@ -426,6 +454,7 @@ test("partial SSE reference tags stay hidden until the delta is complete", async
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("流式问题");
   await page.getByRole("button", { name: "发送" }).click();
@@ -458,6 +487,7 @@ test("SSE cloud error code stays specific after a failed complete event", async 
   }));
 
   await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("请回答");
   await page.getByRole("button", { name: "发送" }).click();
@@ -485,6 +515,152 @@ test("history refresh localizes a saved turn error code even when content is emp
 test("default cloud_allowed false is described as keeping KB contents local", async ({ page }) => {
   await installCatalogRoutes(page);
   await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("1 份资料 · 仅本地（该库内容不外发）", { exact: true })).toBeVisible();
+});
+
+
+test("composer scope picker defaults closed, filters multiple KBs and keeps saved session locked", async ({ page }) => {
+  await installCatalogRoutes(page);
+  await page.route("**/api/v1/knowledge-bases", route => route.fulfill({ json: envelope([
+    { id: "kb-1", name: "课程资料", cloud_allowed: false, document_count: 1 },
+    { id: "kb-2", name: "图片资料", cloud_allowed: false, document_count: 1 },
+  ]) }));
+  await page.route("**/api/v1/knowledge-bases/kb-2/documents", route => route.fulfill({ json: envelope([
+    { id: "doc-2", knowledge_base_id: "kb-2", filename: "产品图.png", status: "ready" },
+  ]) }));
+  let sessionBody: Record<string, unknown> | undefined;
+  let messageBody: Record<string, unknown> | undefined;
+  await page.route("**/api/v1/sessions", route => {
+    if (route.request().method() === "POST") {
+      sessionBody = route.request().postDataJSON();
+      return route.fulfill({ json: envelope({ id: "scope-session", title: "范围测试", knowledge_base_scope: ["kb-2", "kb-1"], document_scope: ["doc-1", "doc-2"], updated_at: "now" }) });
+    }
+    return route.fulfill({ json: envelope([]) });
+  });
+  await page.route("**/api/v1/sessions/scope-session/messages", route => {
+    messageBody = route.request().postDataJSON();
+    return route.fulfill({ contentType: "text/event-stream", body: frame({ id: "scope-run", response_type: "answer", content: "范围已确认", done: true, data: { event_id: "scope-answer" } }) + frame({ id: "scope-run", response_type: "complete", content: "", done: false, data: { final_content: "范围已确认" } }) });
+  });
+  await page.goto("/");
+  const trigger = page.getByRole("button", { name: "选择知识库和文件", exact: true });
+  const dialog = page.getByRole("dialog", { name: "选择知识库和文件", exact: true });
+  await expect(page.locator(".wp-composer").getByRole("button", { name: "选择知识库和文件" })).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator(".wp-chat-page > .wp-scope-card")).toHaveCount(0);
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await dialog.getByRole("checkbox", { name: /课程资料/ }).check();
+  await dialog.getByRole("checkbox", { name: /教材 第三章/ }).check();
+  await dialog.getByRole("checkbox", { name: /图片资料/ }).check();
+  await expect(dialog.getByRole("checkbox", { name: /教材 第三章/ })).not.toBeChecked();
+  await expect(dialog.getByRole("checkbox", { name: /产品图/ })).toBeVisible();
+  await dialog.getByRole("checkbox", { name: /课程资料/ }).uncheck();
+  await expect(dialog.getByRole("checkbox", { name: /教材 第三章/ })).toHaveCount(0);
+  await dialog.getByRole("checkbox", { name: /课程资料/ }).check();
+  await dialog.getByRole("checkbox", { name: /教材 第三章/ }).check();
+  await dialog.getByRole("checkbox", { name: /产品图/ }).check();
+  await page.screenshot({ path: test.info().outputPath("ui-restoration-scope.png"), fullPage: true });
+  await dialog.getByRole("button", { name: "完成选择" }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator(".wp-composer-scope")).toContainText("2 个文件");
+  await page.getByPlaceholder("询问当前资料…").fill("范围测试");
+  await page.getByRole("button", { name: "发送" }).click();
+  await expect(page.getByText("范围已确认", { exact: true })).toBeVisible();
+  expect(sessionBody?.knowledge_base_scope).toEqual(["kb-2", "kb-1"]);
+  expect(sessionBody?.document_scope).toEqual(["doc-1", "doc-2"]);
+  expect(messageBody?.knowledge_base_scope).toEqual(["kb-2", "kb-1"]);
+  expect(messageBody?.document_scope).toEqual(["doc-1", "doc-2"]);
+  await trigger.click();
+  await expect(dialog.getByText("会话使用已保存的知识库范围；新范围请新建会话")).toBeVisible();
+  for (const checkbox of await dialog.getByRole("checkbox").all()) await expect(checkbox).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
+
+test("library keeps upload and readable filenames in view with 50 KBs and independent document scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 968, height: 728 });
+  await installCatalogRoutes(page);
+  const kbRows = Array.from({ length: 50 }, (_, index) => ({
+    id: `many-kb-${index + 1}`, name: `第${index + 1}个知识库 · 项目现场长期归档资料`,
+    cloud_allowed: false, document_count: index === 49 ? 35 : 0,
+  }));
+  const documents = Array.from({ length: 35 }, (_, index) => ({
+    id: `long-document-${index + 1}`, knowledge_base_id: "many-kb-50",
+    filename: `第${index + 1}份现场巡检报告_北码头设备维护与原始扫描记录_Long_document_filename_2026.pdf`, status: "ready",
+  }));
+  const documentReads: string[] = [];
+  await page.route("**/api/v1/knowledge-bases", route => route.fulfill({ json: envelope(kbRows) }));
+  await page.route("**/api/v1/knowledge-bases/*/documents", route => {
+    const path = new URL(route.request().url()).pathname;
+    documentReads.push(path);
+    return route.fulfill({ json: envelope(path.endsWith("/many-kb-50/documents") ? documents : []) });
+  });
+  let originalReads = 0;
+  await page.context().route("**/api/v1/knowledge-bases/many-kb-50/documents/long-document-35/source", route => {
+    originalReads++;
+    return route.fulfill({ contentType: "text/plain; charset=utf-8", body: "原始文件 mock source — document 35" });
+  });
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "资料库", exact: true }).click();
+  const library = page.locator("section.wp-library-page");
+  const heading = library.getByRole("heading", { name: "知识库", exact: true, level: 1 });
+  const kbList = library.locator(".wp-kb-list");
+  const docList = library.locator(".wp-library-documents");
+  const upload = library.locator(".wp-upload-row");
+  await expect(kbList.getByRole("button")).toHaveCount(50);
+  const lastBase = kbList.getByRole("button").last();
+  await lastBase.click();
+  await expect(lastBase).toHaveAttribute("aria-pressed", "true");
+  await expect(library.getByRole("combobox")).toHaveValue("many-kb-50");
+  await expect(docList.locator(".wp-document-row")).toHaveCount(35);
+  await expect(heading).toBeInViewport({ ratio: 1 });
+  await expect(upload).toBeInViewport({ ratio: 1 });
+  await expect(upload.locator('input[type="file"]')).toBeEnabled();
+  const uploadTop = (await upload.boundingBox())!.y;
+  const kbScrollTop = await kbList.evaluate(element => element.scrollTop);
+  expect(kbScrollTop).toBeGreaterThan(0);
+  for (const list of [kbList, docList]) {
+    expect(await list.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+    expect(await list.evaluate(element => ["auto", "scroll"].includes(getComputedStyle(element).overflowY))).toBe(true);
+  }
+  const firstTitle = docList.locator(".wp-document-row").first().locator("strong");
+  await expect(firstTitle).toHaveText(documents[0].filename);
+  const titleSpace = await firstTitle.evaluate(element => ({
+    width: element.getBoundingClientRect().width,
+    height: element.getBoundingClientRect().height,
+    lineHeight: parseFloat(getComputedStyle(element).lineHeight),
+    fontSize: parseFloat(getComputedStyle(element).fontSize),
+  }));
+  expect(titleSpace.width).toBeGreaterThanOrEqual(180);
+  expect(titleSpace.height).toBeGreaterThanOrEqual(titleSpace.fontSize * 1.3);
+  if (Number.isFinite(titleSpace.lineHeight)) expect(titleSpace.height).toBeGreaterThanOrEqual(titleSpace.lineHeight);
+
+  const lastDocument = docList.locator(".wp-document-row").last();
+  await lastDocument.scrollIntoViewIfNeeded();
+  expect(await docList.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+  expect(await kbList.evaluate(element => element.scrollTop)).toBe(kbScrollTop);
+  await expect(heading).toBeInViewport({ ratio: 1 });
+  await expect(upload).toBeInViewport({ ratio: 1 });
+  expect(Math.abs((await upload.boundingBox())!.y - uploadTop)).toBeLessThanOrEqual(1);
+  await expect(library.getByRole("combobox")).toHaveValue("many-kb-50");
+  await expect(lastBase).toHaveAttribute("aria-pressed", "true");
+  const overflow = await page.locator("main").evaluate(element => ({ scroll: element.scrollWidth, client: element.clientWidth }));
+  expect(overflow.scroll).toBeLessThanOrEqual(overflow.client + 1);
+  await page.screenshot({ path: test.info().outputPath("library-50-kbs-35-long-documents.png"), fullPage: true });
+
+  const original = lastDocument.getByRole("link", { name: "查看原文件", exact: true });
+  await expect(original).toHaveAttribute("href", /knowledge-bases\/many-kb-50\/documents\/long-document-35\/source$/);
+  const popupOpened = page.waitForEvent("popup");
+  await original.click();
+  const popup = await popupOpened;
+  await expect(popup.getByText("原始文件 mock source — document 35", { exact: true })).toBeVisible();
+  await popup.close();
+  expect(originalReads).toBe(1);
+  expect(documentReads.at(-1)).toBe("/api/v1/knowledge-bases/many-kb-50/documents");
 });
