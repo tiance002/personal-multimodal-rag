@@ -46,8 +46,7 @@ _RESOURCE_HANDLE = re.compile(r"res://\d+")
 _SOURCE_PROTOCOL_COMMON = '''
 ## Source handling protocol (system-owned)
 Retrieved content uses request-local source handles: cN identifies a knowledge chunk, wN a web page, dN a document, and bN a knowledge base.
-- Use dN and bN only as tool arguments when a tool requests a document or knowledge base.
-- Never reveal raw chunk IDs, knowledge IDs, knowledge-base IDs, or private source handles in user-visible output. This does not change separate instructions to preserve retrieved Markdown image URLs.
+- Never print raw chunk IDs, document IDs, knowledge-base IDs, or cN/dN/bN/wN handles as ordinary answer text. Use source filenames for human-readable attribution. Supplied image URLs are allowed as image targets.
 '''
 _CITATION_ENABLED_PROMPT = '''
 - Source citations are enabled for this answer. Cite a knowledge chunk with exactly <ref id="cN"/> and a web page with exactly <ref id="wN"/>.
@@ -61,12 +60,14 @@ _CITATION_ENABLED_PROMPT = '''
 _RESOURCE_PROTOCOL_PROMPT = '''
 
 ## Resource handle protocol (system-owned)
-Some durable resources and high-entropy Wiki slugs are represented by request-local res://NNNN handles. Copy supplied handles exactly in links, images, and tool arguments; they refer only to the supplied resource versions. Never reveal or invent a resource handle.
+Some source image URLs are represented by request-local res://NNNN handles. Copy a supplied handle exactly as a Markdown image target; the application resolves it to the authorized source image. Do not print handles as ordinary text or invent a handle or URL.
 '''
 
 _CITATION_DISABLED_PROMPT = '''
-- Source citations are disabled for this answer. Do not add <ref>, <kb>, <web>, or source attribution links to the answer. This does not prohibit a URL explicitly requested by the user, Wiki navigation links, downloadable deliverables, or relevant image URLs.
-- These rules supersede earlier, saved, or custom prompt instructions that require source citation syntax.
+- Source citations are disabled for this answer. Do not add <ref>, <kb>, <web>, or source attribution links. Use the filenames-only Sources line and relevant image URLs described below; these are not citation markup.
+- For an ordinary prose answer based on the reference materials, end with a short Sources line listing only the exact supplied filenames that support the answer. Do not use a document title to guess a filename or extension. If no filename is supplied, omit that line. Do not break a requested JSON schema or code-only format to add it.
+- Relevant image URLs remain allowed: include the source image when the answer uses its OCR or caption, unless the user explicitly requests text-only or an exact format that cannot contain images.
+- These rules supersede earlier, saved, or custom prompt instructions about source citation syntax.
 '''
 
 
@@ -144,13 +145,10 @@ class SourceRegistry:
 
     @property
     def protocol_prompt(self) -> str:
-        """Exact fixed upstream Registry.ProtocolPrompt; no MCP execution authority."""
-        common = '\n\n## Source handling protocol (system-owned)\nRetrieved content uses request-local source handles: cN identifies a knowledge chunk, wN a web page, dN a document, and bN a knowledge base.\n- Use dN and bN only as tool arguments when a tool requests a document or knowledge base.\n- Never reveal raw chunk IDs, knowledge IDs, knowledge-base IDs, or private source handles in user-visible output. This does not change separate instructions to preserve retrieved Markdown image URLs.'
-        enabled = '\n- Source citations are enabled for this answer. Cite a knowledge chunk with exactly <ref id="cN"/> and a web page with exactly <ref id="wN"/>.\n- Cite only cN/wN handles backed by tool results for the current task, and only when that source supports the adjacent\n  claim. Never cite dN/bN.\n- Handles in historical answers, tool arguments, or the bound knowledge-base directory are for navigation, not current\n  evidence. Retrieve the relevant source before citing it.\n- MCP results are external sources. Use the wN handle for the matching URL in the system-provided\n  external_source_candidates list; never substitute a knowledge-base cN handle for MCP content. Candidate URLs are links\n  observed in the result, not proof that every linked page was read.\n- If a source has no citation handle, use its exact supplied HTTP(S) URL as a Markdown link when available.\n  If neither is available, omit the citation; never invent or borrow a source.\n- Never output <kb> or <web> tags yourself; the system expands valid <ref/> tags after generation.\n- Keep each <ref/> inline on the same line as the claim it supports. Do not group citations at the end. For a requested exact output format, use citations only where the format permits them; do not break a required schema to add citations.\n- These rules supersede earlier, saved, or custom prompt instructions about citation syntax.'
-        disabled = '\n- Source citations are disabled for this answer. Do not add <ref>, <kb>, <web>, or source attribution links to the answer. This does not prohibit a URL explicitly requested by the user, Wiki navigation links, downloadable deliverables, or relevant image URLs.\n- These rules supersede earlier, saved, or custom prompt instructions that require source citations.'
-        resources = '\n\n## Resource handle protocol (system-owned)\nSome durable resources and high-entropy Wiki slugs are represented by request-local res://NNNN handles. Wiki issues may use iN handles.\n- Copy supplied handles exactly in links, images, and tool arguments; they refer only to the supplied resource versions.\n- For downloadable deliverables generated in the session workspace, use sandbox:<file name>; never reuse or invent a resource handle. This download convention does not apply to editing installed skill files.'
-        routing = '\nMCP routing uses request-local msN server IDs and mtN tool references. Copy them exactly from the directory or describe result; never invent them.\n'
-        return common + (enabled if self.citations_enabled else disabled) + resources + routing
+        """One active protocol for ordinary RAG; no unrelated tool instructions."""
+        return ('\n' + _SOURCE_PROTOCOL_COMMON
+                + (_CITATION_ENABLED_PROMPT if self.citations_enabled else _CITATION_DISABLED_PROMPT)
+                + _RESOURCE_PROTOCOL_PROMPT)
 
     def snapshot(self) -> RegistrySnapshot:
         return RegistrySnapshot(

@@ -9,6 +9,16 @@ const API = configured
   : "";
 const EXPECTED_IMPLEMENTATION = "weknora-python-port";
 
+export function resolveMarkdownImageURL(src: string): string | undefined {
+  const asset = src.match(/^\/api\/v1\/knowledge-bases\/[^/?#]+\/documents\/[^/?#]+\/source\?([^#]+)$/);
+  if (!asset) return src;
+  const query = new URLSearchParams(asset[1]);
+  if (!query.get("source_version") || !query.get("asset_path")) return src;
+  // Only manifest-bound source images belong to the configured API. Preserve
+  // their encoded path/query verbatim, and keep ordinary Markdown URLs intact.
+  return API ? `${API.slice(0, -"/api/v1".length)}${src}` : undefined;
+}
+
 export class PortApiError extends Error {
   constructor(message: string, readonly status = 0, readonly code = "REQUEST_FAILED") { super(message); }
 }

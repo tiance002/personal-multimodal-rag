@@ -818,6 +818,11 @@ class ApplicationRuntime:
         self._owner(principal)
         return await self.documents.read_document(principal,knowledge_base_id,document_id)
 
+    async def read_document_asset(self,principal,knowledge_base_id,document_id,*,asset_path,source_version):
+        self._owner(principal)
+        return await self.documents.read_document_asset(principal,knowledge_base_id,document_id,
+            asset_path=asset_path,source_version=source_version)
+
     async def read_source_chunk(self, principal, chunk_id):
         self._owner(principal)
         return await self.documents.read_source_chunk(principal, chunk_id)

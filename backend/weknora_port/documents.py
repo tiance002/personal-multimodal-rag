@@ -40,6 +40,8 @@ _SUPPORTED_MEDIA = {
 _IMAGE_BEARING_EXTENSIONS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".bmp",
     ".tif", ".tiff", ".webp", ".pdf", ".docx", ".doc", ".pptx", ".ppt"})
 _SAFE_CODE = re.compile(r"^[A-Z][A-Z0-9_]{0,79}$")
+_SAFE_ASSET_MEDIA = frozenset({"image/png", "image/jpeg", "image/gif", "image/webp",
+                               "image/bmp", "image/tiff"})
 
 
 class DocumentLifecycleError(RuntimeError):
@@ -684,6 +686,57 @@ class DocumentLifecycleService:
             raise DocumentLifecycleError('DOCUMENT_SOURCE_SIZE_MISMATCH')
         return DocumentBytes(row.get("file_name") or path.name,
                              _SUPPORTED_MEDIA.get(extension, "application/octet-stream"),raw)
+
+    async def read_document_asset(self, principal: LocalPrincipal, knowledge_base_id: str,
+                                  document_id: str, *, asset_path: str,
+                                  source_version: str) -> DocumentBytes:
+        """Read an exact, version-bound manifest image; never resolve a caller path."""
+        await self._kb(principal, knowledge_base_id)
+        logical = PurePosixPath(asset_path)
+        if (not asset_path or logical.is_absolute() or logical.as_posix() != asset_path
+                or ".." in logical.parts or "\\" in asset_path or ":" in asset_path
+                or any(ord(char) < 32 for char in asset_path)):
+            raise DocumentLifecycleError("DOCUMENT_ASSET_PATH_INVALID")
+        if not source_version:
+            raise DocumentLifecycleError("DOCUMENT_ASSET_VERSION_REQUIRED")
+        rows = await self._rows(
+            "SELECT metadata,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s "
+            "AND knowledge_base_id=%s AND deleted_at IS NULL",
+            (document_id, principal.tenant_id, knowledge_base_id))
+        if not rows:
+            raise LookupError("DOCUMENT_NOT_FOUND")
+        row = rows[0]
+        metadata = _json_object(row.get("metadata"))
+        if row.get("parse_status") != "completed" or metadata.get("source_version") != source_version:
+            raise LookupError("DOCUMENT_ASSET_UNAVAILABLE")
+        assets = metadata.get("assets")
+        matches = [item for item in assets if isinstance(item, Mapping)
+                   and item.get("logical_path") == asset_path] if isinstance(assets, list) else []
+        if not matches:
+            raise LookupError("DOCUMENT_ASSET_NOT_FOUND")
+        if len(matches) != 1:
+            raise DocumentLifecycleError("DOCUMENT_ASSET_MANIFEST_AMBIGUOUS")
+        asset = matches[0]
+        media_type = asset.get("media_type")
+        digest, size, stored_path = asset.get("sha256"), asset.get("size"), asset.get("path")
+        if (media_type not in _SAFE_ASSET_MEDIA or not isinstance(digest, str)
+                or not re.fullmatch(r"[0-9a-f]{64}", digest)
+                or type(size) is not int or not 0 <= size <= self.max_upload_bytes
+                or not isinstance(stored_path, str) or not stored_path):
+            raise DocumentLifecycleError("DOCUMENT_ASSET_MANIFEST_INVALID")
+        asset_root = _under_root(self.storage_root, self.storage_root / str(principal.tenant_id)
+                                / knowledge_base_id / document_id / source_version / "assets")
+        # Only the persisted immutable storage path is resolved, then confined to
+        # this exact document/version, including after symlink resolution.
+        path = _native_io_path(_under_root(asset_root, self.storage_root / stored_path))
+        if not path.is_file():
+            raise LookupError("DOCUMENT_ASSET_UNAVAILABLE")
+        if path.stat().st_size != size:
+            raise DocumentLifecycleError("DOCUMENT_ASSET_SIZE_MISMATCH")
+        raw = path.read_bytes()
+        if len(raw) != size or hashlib.sha256(raw).hexdigest() != digest:
+            raise DocumentLifecycleError("DOCUMENT_ASSET_HASH_MISMATCH")
+        return DocumentBytes(logical.name, media_type, raw)
 
     async def read_source_chunk(self, principal: LocalPrincipal, chunk_id: str) -> dict[str, Any]:
         self._authorize(principal)

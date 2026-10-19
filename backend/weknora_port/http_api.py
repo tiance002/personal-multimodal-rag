@@ -542,10 +542,19 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
             body.vision_user_declared,body.source))
 
     @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/source')
-    async def original_document(knowledge_base_id: str,document_id: str,request: Request):
-        source=await runtime.read_document(await principal(request),knowledge_base_id,document_id)
+    async def original_document(knowledge_base_id: str,document_id: str,request: Request,
+                                asset_path: str | None = None,source_version: str | None = None):
+        who=await principal(request)
+        is_asset=asset_path is not None or source_version is not None
+        if is_asset:
+            if not asset_path or not source_version:
+                raise HTTPException(status_code=422,detail='DOCUMENT_ASSET_PATH_AND_VERSION_REQUIRED')
+            source=await runtime.read_document_asset(who,knowledge_base_id,document_id,
+                asset_path=asset_path,source_version=source_version)
+        else:
+            source=await runtime.read_document(who,knowledge_base_id,document_id)
         return Response(source.content,media_type=source.media_type,headers={
-            'Content-Disposition':"attachment; filename*=UTF-8''"+quote(source.filename,safe=''),
+            'Content-Disposition':("inline" if is_asset else "attachment")+"; filename*=UTF-8''"+quote(source.filename,safe=''),
             'X-Content-Type-Options':'nosniff'})
 
     @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/image-task')

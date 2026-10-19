@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { PortApiError, portApi } from "./api";
+import { PortApiError, portApi, resolveMarkdownImageURL } from "./api";
 import { cloudErrorMessage } from "./cloudErrors";
 import { resumePortChat, runPortChat } from "./sse";
 import type {
@@ -162,7 +162,8 @@ function isIncompleteInternalTagSuffix(value: string): boolean {
 }
 
 function MarkdownImage({ src, alt }: { src?: string; alt?: string }) {
-  return src ? <img src={src} alt={alt ?? ""} /> : null;
+  const resolved = src ? resolveMarkdownImageURL(src) : undefined;
+  return resolved ? <img src={resolved} alt={alt ?? ""} /> : null;
 }
 
 function MessageContent({ content }: { content: string }) {

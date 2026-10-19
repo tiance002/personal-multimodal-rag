@@ -415,6 +415,65 @@ test("history Markdown renders safely without leaking internal reference tags", 
   await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
 });
 
+test("source asset images keep version and path in live answers and restored history", async ({ page }) => {
+  await installCatalogRoutes(page);
+  const asset = "/api/v1/knowledge-bases/kb-1/documents/doc-1/source?source_version=version-2&asset_path=images%2Fslide%201%2Bcard.png";
+  const ordinary = "https://example.test/original.png?size=1";
+  const markdown = `Card reading: 37.\n\n来源文件：service brief.pptx\n\n![来源图片](${asset})\n\n![普通图片](${ordinary})\n\n普通 c1/d1；代码 \`c1/d1\`。`;
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADUlEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC", "base64");
+  const assetRequests: string[] = [];
+  let apiOrigin = "";
+  page.on("request", request => {
+    const url = new URL(request.url());
+    if (url.pathname === "/api/v1/runtime") apiOrigin = url.origin;
+  });
+  let posts = 0;
+  await page.route("**/api/v1/knowledge-bases/kb-1/documents/doc-1/source?**", route => {
+    const url = new URL(route.request().url());
+    assetRequests.push(`${url.pathname}${url.search}`);
+    return route.fulfill({ contentType: "image/png", body: png });
+  });
+  await page.route(ordinary, route => route.fulfill({ contentType: "image/png", body: png }));
+  const session = { id: "asset-session", title: "图片来源测试", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" };
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope(route.request().method() === "POST" ? session : posts ? [session] : []) }));
+  await page.route("**/api/v1/sessions/asset-session/messages", route => {
+    if (route.request().method() !== "POST") return route.fulfill({ json: envelope([
+      { id: "asset-answer", role: "assistant", content: markdown, request_id: "asset-run", created_at: "now", is_completed: true, turn_status: "completed" },
+    ]) });
+    posts++;
+    return route.fulfill({ contentType: "text/event-stream", body:
+      frame({ id: "asset-run", response_type: "agent_query", content: "", done: false,
+        data: { request_id: "asset-run", session_id: "asset-session", assistant_message_id: "asset-answer" } }) +
+      frame({ id: "asset-run", response_type: "answer", content: markdown, done: true, data: { event_id: "asset-final" } }) +
+      frame({ id: "asset-run", response_type: "complete", content: "", done: false, data: { final_content: markdown, finish_reason: "stop" } }),
+    });
+  });
+  const checkImages = async () => {
+    const answer = page.locator(".wp-message.assistant .wp-message-content");
+    expect(apiOrigin).not.toBe("");
+    await expect(answer.locator("img[alt='来源图片']")).toHaveJSProperty("src", `${apiOrigin}${asset}`);
+    await expect(answer.locator("img[alt='来源图片']")).toHaveJSProperty("naturalWidth", 1);
+    await expect(answer.locator("img[alt='普通图片']")).toHaveAttribute("src", ordinary);
+    await expect(answer.locator("img[alt='普通图片']")).toHaveJSProperty("naturalWidth", 1);
+    await expect(answer).toContainText("来源文件：service brief.pptx");
+    await expect(answer).toContainText("普通 c1/d1");
+    await expect(answer.locator("code")).toHaveText("c1/d1");
+    await expect(page.locator(".wp-citation, .wp-source-drawer")).toHaveCount(0);
+  };
+  await page.goto("/");
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await page.getByPlaceholder("询问当前资料…").fill("What is on this card?");
+  await page.getByRole("button", { name: "发送" }).click();
+  await checkImages();
+  await page.reload();
+  await page.getByRole("button", { name: /图片来源测试/ }).click();
+  await checkImages();
+  expect(posts).toBe(1);
+  expect(assetRequests.length).toBeGreaterThanOrEqual(2);
+  expect(assetRequests.every(url => url === asset)).toBe(true);
+});
+
 test("partial SSE reference tags stay hidden until the delta is complete", async ({ page }) => {
   await installCatalogRoutes(page);
   await page.route("**/api/v1/sessions", async route => {
