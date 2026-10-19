@@ -161,7 +161,7 @@ def web_context(rows, registry):
         handle = registry.register_web(row.id, row.knowledge_title or row.knowledge_filename)
         out += f'  <page id="{handle}" title="{escape_attr(row.knowledge_title or row.knowledge_filename)}">\n'
         out += '    <evidence type="search_summary" verified="false" />\n'
-        out += f'    <domain>{escape_text(urlsplit(row.id).hostname or '')}</domain>\n'
+        out += f"    <domain>{escape_text(urlsplit(row.id).hostname or '')}</domain>\n"
         if row.content:
             encoded_content = row.content
             value = encoded_content[:limit]
