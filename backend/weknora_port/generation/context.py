@@ -194,7 +194,18 @@ def prepare_generation(request, *, now=None):
     messages = [Message('system', system)]
     for h in request.history:
         messages.extend((Message('user', h.query), Message('assistant', h.answer)))
-    messages.append(Message('user', finalized.user_content, images=finalized.images if request.supports_vision else ()))
+    # Render the configured preference in its own language next to the current
+    # request; English source/question text must not silently select the answer
+    # language. The original q0 and source evidence remain unchanged.
+    language_instruction = {
+        'Chinese (Simplified)': '请用简体中文回答。',
+        'Chinese (Traditional)': '請用繁體中文回答。',
+        'English': 'Answer in English.',
+        'Japanese': '日本語で回答してください。',
+        'Korean': '한국어로 답변하세요.',
+    }.get(request.language, 'Answer in ' + request.language + '.')
+    user_content = finalized.user_content + '\n\n## Configured answer language\n' + language_instruction
+    messages.append(Message('user', user_content, images=finalized.images if request.supports_vision else ()))
     ordered = list(request.evidence)
     if request.faq_priority_enabled:
         ordered = [e for e in ordered if e.chunk_type == 'faq'] + [e for e in ordered if e.chunk_type != 'faq']

@@ -52,6 +52,13 @@ def test_selected_answer_language_is_rendered_without_a_question_language_rule()
     system=prepare_generation(request).messages[0].content
     assert 'Answer language: English' in system
     assert 'Chinese' not in system and 'explicit language request' not in system
+    assert prepare_generation(request).messages[-1].content.endswith('Answer in English.')
+
+
+def test_english_question_preserves_q0_but_receives_configured_chinese_instruction():
+    result=prepared(image_evidence())
+    assert result.messages[-1].content.endswith('请用简体中文回答。')
+    assert 'SITE: North Pier; READING: 37' in result.messages[-1].content
 
 
 def test_filename_is_supplied_separately_without_inventing_extension():

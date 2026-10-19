@@ -237,7 +237,7 @@ def test_source_encoder_does_not_rewrite_known_ids_in_user_prose():
     req=request(q0='question about doc-current')
     req=replace(req,finalized=replace(req.finalized,user_content=req.finalized.rendered_contexts+'\nquestion about doc-current'))
     prepared=prepare_generation(req)
-    assert prepared.messages[-1].content.endswith('question about doc-current')
+    assert prepared.messages[-1].content.split('\n\n## Configured answer language',1)[0].endswith('question about doc-current')
 
 @pytest.mark.parametrize("mode", ["DYNAMIC", "CHEAP_ONLY", "EXPENSIVE_ONLY", "OFF"])
 def test_configurable_role_provider_model_endpoint_uses_uniform_interface(mode):
