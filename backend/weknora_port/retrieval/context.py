@@ -137,4 +137,9 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None)
         limit = CONTEXT_CHARS
         if len(state.rendered_contexts) > limit:
             raise SourceEvidenceBudgetError('SOURCE_CONTEXT_BUDGET_EXCEEDED')
+    if getattr(state, 'graph_context_char_limit', 0):
+        from .source_evidence import SourceEvidenceBudgetError
+        limit = state.graph_context_char_limit
+        if len(state.rendered_contexts) > limit:
+            raise SourceEvidenceBudgetError('GRAPH_CONTEXT_BUDGET_EXCEEDED')
     return FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in state.merge_results)), state.system_prompt_override, tuple(state.images), limit)

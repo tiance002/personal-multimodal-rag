@@ -55,6 +55,9 @@ class PipelineState(SearchState):
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
     evidence_trace: list[dict] = field(default_factory=list)
+    graph_enabled: bool = False
+    graph_trace: list[dict] = field(default_factory=list)
+    graph_context_char_limit: int = 0
 
 class RetrievalPipeline:
 
@@ -97,27 +100,64 @@ class RetrievalPipeline:
         state.needs_retrieval = needs_retrieval(state.intent, state.web_search_enabled)
         if state.needs_retrieval:
             state.system_prompt_override = ''
+        graph_paths = ()
+        if state.graph_enabled and state.needs_retrieval:
+            from .search import validate_targets
+            from ..graph.retrieval import find_paths
+            validate_targets(state.targets, context)
+            await self._progress('graph', 'started')
+            batches = await self.repository.get_graph_batches(context)
+            graph_paths = find_paths(state.query + '\n' + state.rewrite_query, batches, context,
+                                     tenant_id=self.repository.tenant_id)
+            await self._progress('graph', 'completed', path_count=len(graph_paths))
+            check_context()
+        from .search import SearchNothing
+        ordinary_empty = False
         await self._progress("retrieval", "started")
-        await search(state, context, self.repository, embedding_resolver=self.embedding_resolver, web_search=self.web_search, entity_search=self.entity_search, segmenter=self.segmenter)
+        try:
+            await search(state, context, self.repository, embedding_resolver=self.embedding_resolver, web_search=self.web_search, entity_search=self.entity_search, segmenter=self.segmenter)
+        except SearchNothing:
+            if not graph_paths:
+                raise
+            ordinary_empty = True
         await self._progress("retrieval", "completed", candidate_count=sum(r is not None for r in state.search_results))
         check_context()
         await self._progress("rerank", "started")
-        await rerank(state, context, self.registry, self.segmenter)
+        try:
+            if not ordinary_empty:
+                await rerank(state, context, self.registry, self.segmenter)
+        except SearchNothing:
+            if not graph_paths:
+                raise
+            ordinary_empty = True
         from .memory_affinity import apply_memory_affinity
         await apply_memory_affinity(state, context, self.affinity_resolver)
         await self._progress("rerank", "completed", candidate_count=sum(r is not None for r in state.rerank_results))
         check_context()
         await self._progress("merge", "started")
-        await merge(state, context, self.repository, self.segmenter)
+        if ordinary_empty:
+            # A graph rescue must not resurrect all threshold-rejected Search rows.
+            state.merge_results = []
+        else:
+            await merge(state, context, self.repository, self.segmenter)
         await self._progress("merge", "completed", candidate_count=sum(r is not None for r in state.merge_results))
         check_context()
-        filter_top_k(state)
+        if not ordinary_empty:
+            filter_top_k(state)
         check_context()
-        if state.source_evidence_mode != 'off':
+        if state.source_evidence_mode != 'off' and not ordinary_empty:
             from .source_evidence import expand_source_evidence
             await self._progress('source_unit', 'started')
             await expand_source_evidence(state, context, self.repository)
             await self._progress('source_unit', 'completed', candidate_count=len(state.merge_results))
+            check_context()
+        if graph_paths:
+            from ..graph.retrieval import fuse_paths
+            await self._progress('graph_fusion', 'started')
+            added = await fuse_paths(state, context, self.repository, graph_paths)
+            await self._progress('graph_fusion', 'completed', added_chunks=added)
+            if ordinary_empty and not state.merge_results:
+                raise SearchNothing()
             check_context()
         await self._progress("context", "started")
         result = await into_chat_message(state, context, persist_sink=self.persist_sink)

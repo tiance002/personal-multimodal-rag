@@ -203,11 +203,23 @@ class LeasedLifecycle:
 class LeasedKnowledgeRepository:
     def __init__(self, application, registry):
         self.app, self.registry = application, registry
+        self.tenant_id = application.principal.tenant_id
 
     async def _tenant(self, owner):
         if owner != self.app.principal.subject_id:
             raise ProviderError("KNOWLEDGE_OWNER_MISMATCH")
         return self.app.principal.tenant_id
+
+    async def get_graph_batches(self, context):
+        from .storage.graph import PostgresGraphRepository
+        async with self.app.leases.lease() as guard:
+            repo = PostgresGraphRepository(guard, self._tenant)
+            return await repo.load_graph(context)
+
+    async def get_graph_chunks(self, ids, context):
+        async with self.app.leases.lease() as guard:
+            repo = PostgresKnowledgeRepository(guard, self._tenant)
+            return await repo._read_chunks(ids, context, current=True)
 
     async def _embed(self, knowledge_base_id, query, context):
         if knowledge_base_id not in context.scope.knowledge_base_ids:
@@ -280,6 +292,7 @@ class ApplicationRuntime:
         self.model_factory, self.permissions, self.costs = model_factory, permissions, costs
         self.token_authority=None  # P31: legacy argument never controls production sends
         self.cloud_allowed=cloud_allowed
+        self.graph_enabled=False  # Explicit development setting only; never inferred from old graph placeholders.
         self.local_service=local_service
         self.conversation = conversation or ConversationSettings()
         self.policy = policy or RouterPolicy()
@@ -504,6 +517,7 @@ class ApplicationRuntime:
             rerank_threshold=effective['rerank_threshold'], enable_expansion=effective['enable_query_expansion'],
             source_evidence_mode=effective['source_evidence_mode'],
             rerank_context_enabled=effective['rerank_context_enabled'],
+            graph_enabled=self.graph_enabled,
             language=resolve_language(source.language_locale, turn.request.accept_language),
             rewrite_system_prompt=DEFAULT_REWRITE_SYSTEM if effective['rewrite_prompt_system'] is None else effective['rewrite_prompt_system'],
             rewrite_user_prompt=DEFAULT_REWRITE_USER if effective['rewrite_prompt_user'] is None else effective['rewrite_prompt_user'],

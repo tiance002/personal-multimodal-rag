@@ -98,7 +98,7 @@ def observe_pipeline_capture(self, pipeline, turn):
                 for name in ('search_results', 'rerank_results', 'merge_results')}
             entry['state'].update({name: deepcopy(getattr(active_state, name, None))
                 for name in ('query', 'rewrite_query', 'intent', 'needs_retrieval', 'user_content',
-                             'source_evidence_mode', 'evidence_trace')})
+                             'source_evidence_mode', 'evidence_trace', 'graph_enabled', 'graph_trace')})
         record['stages'].append(entry); save()
         if original_progress is not None:
             result = original_progress(stage, status, **fields)
