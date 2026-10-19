@@ -34,11 +34,14 @@ def response_summary(path, warnings):
         return {"status": "IN_PROGRESS", "reason": type(error).__name__}
     text = raw.decode("utf-8", errors="replace")
     packets, parse_errors = [], 0
+    provider_done_marker_seen = False
     if text.lstrip().startswith("data:") or "\ndata:" in text:
         for line in text.splitlines():
             if not line.startswith("data:"): continue
             data = line[5:].strip()
-            if data == "[DONE]": continue
+            if data == "[DONE]":
+                provider_done_marker_seen = True
+                continue
             try: packets.append(json.loads(data))
             except ValueError: parse_errors += 1
     elif text.strip():
@@ -66,6 +69,7 @@ def response_summary(path, warnings):
             "response_models": models, "finish_reasons": finishes, "usage": usage,
             "answer": "".join(pieces), "answer_content_characters": sum(map(len, pieces)),
             "reasoning_content_characters": reasoning_characters, "reasoning_delta_count": reasoning_deltas,
+            "provider_done_marker_seen": provider_done_marker_seen,
             "finish_reason": finishes[-1] if finishes else None, "parse_status": "UNVERIFIED" if parse_errors else "PARSED" if packets else "IN_PROGRESS"}
 
 
@@ -94,10 +98,15 @@ def call_summary(path, request, db_calls, warnings):
     finished = bool(ledger and ledger.get("finished_at"))
     terminal_unknown = finished and ledger.get("outcome") == "UNKNOWN"
     settled = finished and ledger.get("outcome") == "RESPONSE_RECEIVED"
+    protocol_complete = bool(settled and response.get("provider_done_marker_seen")
+                             and response.get("parse_status") == "PARSED"
+                             and response.get("finish_reason") in
+                             ("stop", "length", "content_filter", "tool_calls", "function_call", "max_tokens", "max_output_tokens"))
     usage = compact_usage(ledger.get("usage")) if ledger else None
     return {"request_file": str(path), **{key: request.get(key) for key in
                 ("request_id", "provider", "model", "model_id", "capability", "wire_sha256", "wire_bytes")},
             "capture_complete": metadata.get("complete") if metadata else None,
+            "protocol_complete": protocol_complete,
             "http_status": metadata.get("status_code") if metadata else None,
             "transport_seconds": duration, "timing": timing,
             "ledger_outcome_at_snapshot": ledger.get("outcome") if ledger else None,
@@ -171,7 +180,10 @@ def summarize(root):
         terminal = turn.get("status") in ("completed", "failed", "cancelled", "error") or bool(persisted and persisted.get("is_completed"))
         cancelled = turn.get("error_code") == "MODEL_CALL_CANCELLED" or bool(persisted and persisted.get("turn_status") == "cancelled")
         terminal_unknown = any(row["ledger_completion_state"] == "TERMINAL_UNKNOWN" for row in local_calls)
-        complete = bool(chosen and chosen.get("capture_complete") is True)
+        # The adapter may stop reading after [DONE], before transport EOF. Keep
+        # capture_complete unchanged; protocol completion also requires the
+        # matching durable ledger to confirm a finished, settled response.
+        complete = bool(chosen and chosen.get("protocol_complete") is True)
         match = bool(matched_call) if persisted is not None and answer is not None and (complete or terminal) else None
         if cancelled:
             status = "TERMINAL_CANCELLED_UNKNOWN" if terminal_unknown else "TERMINAL_CANCELLED"
