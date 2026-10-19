@@ -6,7 +6,7 @@ from contextvars import ContextVar
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import threading
 import time
 import uuid
@@ -15,6 +15,40 @@ from .models.types import ProviderError
 
 _LOCK = threading.RLock()
 _OUTPUT_BOUND = ContextVar('local_execution_output_bound', default=None)
+_LINUX_EXECUTION_ROOT = '/opt/rag-s8/state/executions'
+
+
+def _linux_execution_location(path, approved_root):
+    """Server-only opt-in to one fixed private Linux root, never a client field."""
+    raw = os.fspath(path)
+    if (approved_root != _LINUX_EXECUTION_ROOT or not isinstance(raw, str) or not raw
+            or not raw.startswith('/') or raw.startswith('//') or '\\' in raw or ':' in raw
+            or '\x00' in raw or any(part in ('.', '..') for part in raw.split('/'))):
+        raise ValueError('EXECUTION_APPROVED_LINUX_ROOT_REQUIRED')
+    candidate, root = PurePosixPath(raw), PurePosixPath(_LINUX_EXECUTION_ROOT)
+    if root not in candidate.parents:
+        raise ValueError('EXECUTION_APPROVED_LINUX_ROOT_REQUIRED')
+    return candidate
+
+
+def _resolve_linux_execution_path(path, approved_root):
+    candidate = _linux_execution_location(path, approved_root)
+    try:
+        root = Path(_LINUX_EXECUTION_ROOT)
+        # Even an approved root/ancestor must not redirect into another tree.
+        if root.resolve(strict=True) != root:
+            raise ValueError('EXECUTION_LINUX_PATH_INVALID')
+        resolved = Path(str(candidate)).resolve(strict=True)
+        _linux_execution_location(str(resolved), approved_root)
+        if not resolved.is_file():
+            raise ValueError('EXECUTION_LINUX_PATH_INVALID')
+        lock = resolved.with_suffix(resolved.suffix + '.lock')
+        if lock.is_symlink():
+            raise ValueError('EXECUTION_LINUX_PATH_INVALID')
+        _linux_execution_location(str((resolved.parent / 'evidence').resolve()), approved_root)
+        return resolved
+    except (OSError, ValueError):
+        raise ValueError('EXECUTION_LINUX_PATH_INVALID') from None
 
 
 def _process_token(pid):
@@ -125,9 +159,12 @@ def _safe_body(value):
 
 class LocalExecution:
     def __init__(self, path):
-        self.path = Path(path)
-        if not self.path.is_absolute() or self.path.drive.upper() not in ('D:', 'E:'):
-            raise ValueError('EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED')
+        if os.name == 'nt':
+            self.path = Path(path)
+            if not self.path.is_absolute() or self.path.drive.upper() not in ('D:', 'E:'):
+                raise ValueError('EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED')
+        else:
+            self.path = _resolve_linux_execution_path(path, os.environ.get('WEKNORA_PORT_EXECUTION_ROOT'))
         self.evidence = self.path.parent / 'evidence'
         with self._ledger() as data:
             if Path(data.get('evidence_dir', self.evidence)).resolve() != self.evidence.resolve():
