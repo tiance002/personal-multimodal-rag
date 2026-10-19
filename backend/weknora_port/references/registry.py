@@ -24,6 +24,14 @@ _INTERNAL_SOURCE_LINE = re.compile(
     r"\(\s*document\s+d[1-9][0-9]*\s*,\s*chunk\s+c[1-9][0-9]*\s*\)"
     r"[^\r\n]*(?:\r?\n|$)"
 )
+# A bounded Chinese attribution template observed in disabled-citation output.
+# Require its heading and the exact sentence structure with inline-code handles;
+# ordinary prose mentioning c1/d1 remains untouched.
+_INTERNAL_CHINESE_ATTRIBUTION = re.compile(
+    r"(?im)^[ \t]*(?:\*\*|__)?依据说明(?:：|:)(?:\*\*|__)?[ \t]*\r?\n"
+    r"[ \t]*上述数据直接来源于文档[ \t]*`d[1-9][0-9]*`[ \t]*中的第[ \t]*[0-9]+[ \t]*段"
+    r"[（(]chunk[ \t]*`c[1-9][0-9]*`[）)][^\r\n]*(?:\r?\n|$)"
+)
 _ATTR = {
     name: re.compile(rf'(?i)\b{re.escape(name)}\s*=\s*"([^"]*)"')
     for name in ("doc", "chunk_id", "kb_id", "url", "title")
@@ -320,6 +328,8 @@ class SourceRegistry:
             incomplete = _INCOMPLETE_INTERNAL_TAG.search(segment)
             return segment[:incomplete.start()] if incomplete else segment
 
+        if not self.citations_enabled:
+            text = _strip_chinese_attribution_outside_fences(text)
         return _map_outside_markdown_code(text, transform)
 
     def encode_resource_text(self, text: str) -> str:
@@ -374,6 +384,38 @@ def _map_outside_markdown_code(text: str, transform) -> str:
             continue
         i += 1
     out.append(transform(text[prose_start:]))
+    return "".join(out)
+
+
+def _strip_chinese_attribution_outside_fences(text: str) -> str:
+    """Strip only the observed two-line attribution while preserving fenced code."""
+    out: list[str] = []
+    cursor = 0
+    inside_fence: tuple[str, int] | None = None
+    while cursor < len(text):
+        line_end = text.find("\n", cursor)
+        end = len(text) if line_end < 0 else line_end + 1
+        line = text[cursor:end]
+        if inside_fence is not None:
+            out.append(line)
+            closing = re.match(r"^ {0,3}(`{3,}|~{3,})[ \t]*(?:\r?\n|$)", line)
+            if closing and closing.group(1)[0] == inside_fence[0] and len(closing.group(1)) >= inside_fence[1]:
+                inside_fence = None
+            cursor = end
+            continue
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if opening:
+            marker = opening.group(1)
+            inside_fence = (marker[0], len(marker))
+            out.append(line)
+            cursor = end
+            continue
+        attribution = _INTERNAL_CHINESE_ATTRIBUTION.match(text, cursor)
+        if attribution:
+            cursor = attribution.end()
+            continue
+        out.append(line)
+        cursor = end
     return "".join(out)
 
 

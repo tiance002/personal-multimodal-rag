@@ -346,6 +346,9 @@ class ApplicationRuntime:
         if getattr(model,'config',None)!=effective:raise ProviderError('MODEL_FACTORY_IDENTITY_MISMATCH')
         if execution is not None:
             execution.observe_model(model)
+        capture = getattr(self, 'evidence_capture', None)
+        if capture is not None:
+            capture.observe_model(model)
         if config.source=='local':
             if not isinstance(model,ProviderModel) or not isinstance(model.transport,AsyncHTTPTransport):
                 raise ProviderError('RUNTIME_LOCAL_PROVIDER_REQUIRED')
@@ -563,7 +566,9 @@ class ApplicationRuntime:
             repository, registry, on_progress=progress,
             persist_sink=self._persist_context, affinity_resolver=affinity)
         execution = getattr(self, 'execution', None)
-        return execution.observe_pipeline(pipeline, turn) if execution is not None else pipeline
+        if execution is not None: return execution.observe_pipeline(pipeline, turn)
+        capture = getattr(self, 'evidence_capture', None)
+        return capture.observe_pipeline(pipeline, turn) if capture is not None else pipeline
 
     async def _generation(self, turn, progress, *, policy=None):
         policy=policy or self.policy

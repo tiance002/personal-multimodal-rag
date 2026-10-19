@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-from .registry import SourceRegistry
+from .registry import SourceRegistry, _INTERNAL_CHINESE_ATTRIBUTION
 
 
 _TAG_PREFIXES = ("<ref", "</ref", "<kb", "</kb", "<web", "</web")
@@ -50,13 +50,16 @@ class CitationStreamDecoder:
                     visible_end = min(visible_end, lt)
                     visible = data[:visible_end]
 
-        # Buffer only a possible source-attribution line. Ordinary answer
-        # text keeps streaming immediately; a split `Source:` line stays
-        # private until its handle suffix can be classified.
+        # Buffer only a possible private attribution paragraph. Ordinary
+        # answer text keeps streaming immediately; the bounded Chinese
+        # heading/sentence template stays private until it can be classified.
         if not self.registry.citations_enabled:
-            line_start = visible.rfind("\n") + 1
-            if line_start < len(visible) and _could_be_source_attribution_prefix(visible[line_start:]):
-                visible_end = min(visible_end, line_start)
+            attribution_start = _possible_private_attribution_start(visible)
+            source_start = visible.rfind("\n") + 1
+            if source_start < len(visible) and _could_be_source_attribution_prefix(visible[source_start:]):
+                attribution_start = source_start if attribution_start is None else min(attribution_start, source_start)
+            if attribution_start is not None:
+                visible_end = min(visible_end, attribution_start)
                 visible = data[:visible_end]
 
         self.pending = data[visible_end:]
@@ -110,6 +113,57 @@ def _could_be_source_attribution_prefix(text: str) -> bool:
         return False
     prefixes = ("source:", "**source:", "__source:")
     return any(prefix.startswith(candidate) or candidate.startswith(prefix) for prefix in prefixes)
+
+
+_CHINESE_ATTRIBUTION_HEADINGS = (
+    "**依据说明：**", "**依据说明:**", "__依据说明：__", "__依据说明:__",
+    "依据说明：", "依据说明:",
+)
+_CHINESE_ATTRIBUTION_SENTENCE_PREFIX = "上述数据直接来源于文档"
+
+
+def _possible_private_attribution_start(text: str) -> int | None:
+    """Find a bounded candidate heading/sentence suffix to keep private."""
+    line_starts = [0]
+    line_starts.extend(index + 1 for index, char in enumerate(text) if char == "\n")
+    inside_fence: tuple[str, int] | None = None
+    for start in line_starts:
+        line_end = text.find("\n", start)
+        line = text[start:] if line_end < 0 else text[start:line_end]
+        if inside_fence is not None:
+            closing = re.match(r"^ {0,3}(`{3,}|~{3,})[ \t]*\r?$", line)
+            if closing and closing.group(1)[0] == inside_fence[0] and len(closing.group(1)) >= inside_fence[1]:
+                inside_fence = None
+            continue
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if opening:
+            marker = opening.group(1)
+            inside_fence = (marker[0], len(marker))
+            continue
+        candidate = text[start:]
+        if not candidate:
+            continue
+        candidate = candidate.lstrip(" \t")
+        first_line, separator, rest = candidate.partition("\n")
+        first_line = first_line.rstrip("\r")
+        if not separator:
+            if any(heading.startswith(first_line) or first_line.startswith(heading)
+                   for heading in _CHINESE_ATTRIBUTION_HEADINGS):
+                return start
+            continue
+        if first_line not in _CHINESE_ATTRIBUTION_HEADINGS:
+            continue
+        if _INTERNAL_CHINESE_ATTRIBUTION.match(candidate):
+            # A matching prefix is still incomplete until its attribution line
+            # ends; releasing it early would leak the remaining sentence.
+            if "\n" in rest:
+                continue
+            return start
+        second_line = rest.split("\n", 1)[0].rstrip("\r")
+        if (_CHINESE_ATTRIBUTION_SENTENCE_PREFIX.startswith(second_line)
+                or second_line.startswith(_CHINESE_ATTRIBUTION_SENTENCE_PREFIX)):
+            return start
+    return None
 
 
 def _find_exact_backtick_run(text: str, marker: str, start: int) -> int:

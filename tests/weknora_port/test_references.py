@@ -191,6 +191,46 @@ def test_disabled_sse_never_publishes_split_private_source_attribution():
     assert "document d1, chunk c1" not in actual
 
 
+def test_disabled_decoder_withholds_observed_chinese_attribution_without_buffering_normal_answer():
+    attribution = (
+        "**依据说明：**\n"
+        "上述数据直接来源于文档 `d1` 中的第2段（chunk `c2`），"
+        "该段明确列出了对应线性方程组的系数矩阵和增广矩阵。"
+    )
+    source = (
+        "普通答案先即时输出，提到 c1 和 d1 也保留。\n\n"
+        f"{attribution}\n\n"
+        "另有普通正文：文档 d1 的第2段包含 chunk c2。\n"
+        "**依据说明：**\n这里是用户可见解释，包含 c1/d1，但不符合来源句式。\n"
+        "```text\n**依据说明：** 上述数据直接来源于文档 `d1` 中的第2段（chunk `c2`）\n```\n"
+        "![原图](https://example.test/image.png) [页面](https://example.test/page)"
+    )
+    expected = (
+        "普通答案先即时输出，提到 c1 和 d1 也保留。\n\n\n"
+        "另有普通正文：文档 d1 的第2段包含 chunk c2。\n"
+        "**依据说明：**\n这里是用户可见解释，包含 c1/d1，但不符合来源句式。\n"
+        "```text\n**依据说明：** 上述数据直接来源于文档 `d1` 中的第2段（chunk `c2`）\n```\n"
+        "![原图](https://example.test/image.png) [页面](https://example.test/page)"
+    )
+    registry = SourceRegistry(citations_enabled=False)
+    assert registry.decode_output_text(source) == expected
+
+    decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+    assert decoder.feed("普通答案先即时输出，提到 c1 和 d1 也保留。") == "普通答案先即时输出，提到 c1 和 d1 也保留。"
+    published = []
+    for index, char in enumerate(source):
+        published.append(decoder.feed(char))
+        current = "".join(published)
+        if index < source.index("```text"):
+            assert "`d1`" not in current
+            assert "chunk `c2`" not in current
+    published.append(decoder.flush())
+    assert "".join(published) == expected
+
+    # Citations-enabled answers keep the attribution text unchanged.
+    assert SourceRegistry(citations_enabled=True).decode_output_text(attribution) == attribution
+
+
 def test_internal_tag_decoding_is_consistent_at_every_chunk_split():
     registry = SourceRegistry()
     chunk = registry.register_chunk(ChunkReference("real-id", document_title="Real"))
@@ -232,3 +272,13 @@ def test_unmatched_inline_backtick_does_not_hide_later_citations_or_html_text():
         decoder = CitationStreamDecoder(registry.clone_for_attempt())
         actual = decoder.feed(source[:split]) + decoder.feed(source[split:]) + decoder.flush()
         assert actual == expected, f"decoder changed at split {split}"
+
+
+def test_s2_real_attribution_spacing_and_each_split_is_hidden():
+    text = "答案。\n\n**依据说明：**\n上述数据直接来源于文档 `d1` 中的第 2 段（chunk `c2`），该段明确列出了对应线性方程组的系数矩阵和增广矩阵。"
+    expected = "答案。\n\n"
+    for split in range(len(text) + 1):
+        decoder = CitationStreamDecoder(SourceRegistry(citations_enabled=False))
+        first = decoder.feed(text[:split])
+        assert "`d1`" not in first and "`c2`" not in first
+        assert first + decoder.feed(text[split:]) + decoder.flush() == expected

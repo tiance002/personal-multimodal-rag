@@ -82,3 +82,17 @@ def test_new_package_and_frontend_default_selectors():
     main=Path('frontend/src/main.tsx').read_text(encoding='utf-8')
     assert 'WeKnoraPythonApp' in main
     assert 'VITE_RAG_IMPLEMENTATION' not in main and './app/App' not in main
+
+
+def test_passive_evidence_opt_in_and_execution_conflict(tmp_path):
+    env=development_environment(settings(tmp_path))
+    assert DevelopmentSettings.from_environment(env).evidence_dir is None
+    env['WEKNORA_PORT_EVIDENCE_DIR']='E:/WK/run/s3-product-20261019/evidence'
+    assert DevelopmentSettings.from_environment(env).evidence_dir==Path(env['WEKNORA_PORT_EVIDENCE_DIR'])
+    env['WEKNORA_PORT_EXECUTION_FILE']='E:/WK/run/execution.json'
+    with pytest.raises(DevelopmentConfigurationError,match='EXECUTION_AND_PASSIVE_EVIDENCE_CONFLICT'):
+        DevelopmentSettings.from_environment(env)
+    env.pop('WEKNORA_PORT_EXECUTION_FILE')
+    env['WEKNORA_PORT_EVIDENCE_DIR']='C:/evidence'
+    with pytest.raises(DevelopmentConfigurationError,match='EVIDENCE_ABSOLUTE_D_E_PATH_REQUIRED'):
+        DevelopmentSettings.from_environment(env)

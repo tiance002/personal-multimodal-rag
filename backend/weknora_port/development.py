@@ -31,8 +31,15 @@ class DevelopmentSettings:
     source_evidence_mode:str='off'
     query_understand_model_id:str=''
     rerank_context_enabled:bool=False
+    evidence_dir:Path|None=None
 
     def __post_init__(self):
+        if self.evidence_dir is not None:
+            if self.execution_file is not None:
+                raise DevelopmentConfigurationError('EXECUTION_AND_PASSIVE_EVIDENCE_CONFLICT')
+            from .evidence_capture import validate_evidence_directory
+            try: validate_evidence_directory(self.evidence_dir)
+            except ValueError as error: raise DevelopmentConfigurationError(str(error)) from None
         db=urlsplit(self.database_url);redis=urlsplit(self.redis_url)
         if db.scheme not in ('postgres','postgresql') or not db.hostname or db.path!='/'+self.database or not self.database.startswith('weknora_'):
             raise DevelopmentConfigurationError('EXPLICIT_NEW_POSTGRES_TARGET_REQUIRED')
@@ -69,6 +76,7 @@ class DevelopmentSettings:
             fallback_strategy=env.get('WEKNORA_PORT_FALLBACK_STRATEGY','model'),
             cloud_allowed=env.get('WEKNORA_PORT_CLOUD_ALLOWED','false').lower()=='true',
             execution_file=Path(env['WEKNORA_PORT_EXECUTION_FILE']) if env.get('WEKNORA_PORT_EXECUTION_FILE') else None,
+            evidence_dir=Path(env['WEKNORA_PORT_EVIDENCE_DIR']) if env.get('WEKNORA_PORT_EVIDENCE_DIR') else None,
             source_evidence_mode=env.get('WEKNORA_PORT_SOURCE_EVIDENCE_MODE','off'),
             query_understand_model_id=env.get('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID',''),
             rerank_context_enabled=env.get('WEKNORA_PORT_RERANK_CONTEXT_ENABLED','false').lower()=='true',
@@ -173,6 +181,9 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
         if settings.execution_file is not None:
             from .execution import LocalExecution
             runtime.execution = LocalExecution(settings.execution_file)
+        if settings.evidence_dir is not None:
+            from .evidence_capture import PassiveEvidenceCapture
+            runtime.evidence_capture = PassiveEvidenceCapture(settings.evidence_dir)
         box['runtime']=runtime
         yield runtime
     finally:

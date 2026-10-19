@@ -306,40 +306,8 @@ class LocalExecution:
         return model
 
     def observe_pipeline(self, pipeline, turn):
-        """Passive snapshots of the same normal pipeline, without replacing evidence."""
-        if not self.capture_evidence: return pipeline
-        original_run, original_progress = pipeline.run, pipeline.on_progress
-        target = self.evidence / (hashlib.sha256(turn.run_id.encode()).hexdigest() + '.stages.json')
-        record = {'run_id': turn.run_id, 'session_id': turn.session_id, 'stages': []}
-        active_state = None
-        def save():
-            self.evidence.mkdir(exist_ok=True)
-            target.write_text(json.dumps(record, ensure_ascii=False, default=str), encoding='utf-8')
-        async def progress(stage, status, **fields):
-            from copy import deepcopy
-            entry = {'stage': stage, 'status': status, 'time': time.time(), 'fields': fields}
-            if status == 'completed':
-                entry['state'] = {name: [asdict(row) if row is not None else None for row in getattr(active_state, name)]
-                    for name in ('search_results', 'rerank_results', 'merge_results')}
-                entry['state'].update({name: deepcopy(getattr(active_state, name, None))
-                    for name in ('query', 'rewrite_query', 'intent', 'needs_retrieval', 'user_content',
-                                 'source_evidence_mode', 'evidence_trace')})
-            record['stages'].append(entry); save()
-            if original_progress is not None:
-                result = original_progress(stage, status, **fields)
-                if hasattr(result, '__await__'): await result
-        async def run(state, context):
-            nonlocal active_state
-            active_state = state
-            try:
-                result = await original_run(state, context)
-                record['finalized_context'] = asdict(result); save()
-                return result
-            except BaseException as error:
-                record['error_type'] = type(error).__name__; save()
-                raise
-        pipeline.on_progress, pipeline.run = progress, run
-        return pipeline
+        from .evidence_capture import observe_pipeline_capture
+        return observe_pipeline_capture(self, pipeline, turn)
 
 
 class _RawResponse:
