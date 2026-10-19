@@ -46,6 +46,7 @@ class ConversationSettings:
     enable_rerank: bool = True
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
+    rerank_top1_floorless: bool = False  # S8 isolated opt-in; no public session override.
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .3, "max_completion_tokens": 1024})
 
@@ -517,6 +518,7 @@ class ApplicationRuntime:
             rerank_threshold=effective['rerank_threshold'], enable_expansion=effective['enable_query_expansion'],
             source_evidence_mode=effective['source_evidence_mode'],
             rerank_context_enabled=effective['rerank_context_enabled'],
+            rerank_top1_floorless=source.rerank_top1_floorless,
             graph_enabled=self.graph_enabled,
             language=resolve_language(source.language_locale, turn.request.accept_language),
             rewrite_system_prompt=DEFAULT_REWRITE_SYSTEM if effective['rewrite_prompt_system'] is None else effective['rewrite_prompt_system'],

@@ -2,11 +2,30 @@
 from __future__ import annotations
 from .query import go_strip, go_fields
 import json
+import math
 import re
 from .query import simple_tokens, jaccard
 from .search import SearchNothing
 from ..models.types import CallCancelled, RunDeadlineExceeded
 from ..models.cloud_errors import raise_if_send_denied
+
+
+class InvalidRerankResponse(ValueError):
+    """Shared safety check, separate from the opt-in Top1 policy experiment."""
+
+
+def _validate_raw_results(raw, candidate_count):
+    seen = set()
+    for result in raw:
+        index, score = getattr(result, 'index', None), getattr(result, 'score', None)
+        try:
+            finite = type(score) in (int, float) and math.isfinite(score)
+        except (OverflowError, ValueError):
+            finite = False
+        if type(index) is not int or not 0 <= index < candidate_count or index in seen or not finite:
+            raise InvalidRerankResponse('RERANK_RESPONSE_INVALID')
+        seen.add(index)
+    return raw
 
 def clean_passage(text):
     substitutions = [('(?s)```[^\\r\\n]*\\r?\\n(.*?)\\r?\\n?```', '\\1'), ('(?s)\\$\\$(.*?)\\$\\$', '\\1'), ('</?[a-zA-Z][^>]*>', ''), ('\\[(!\\[[^\\]]*\\]\\([^)]*\\))\\]\\([^)]*\\)', '\\1'), ('!\\[[^\\]]*\\]\\((?:[^()]|\\([^()]*\\))*\\)', ''), ('\\[([^\\]]*)\\]\\((?:[^()]|\\([^()]*\\))*\\)', '\\1'), ('https?://[^\\s)\\]>]+', ''), ('(?m)^[ \\t]*\\|[ \\t:|-]+\\|[ \\t]*$', '')]
@@ -103,6 +122,11 @@ def mmr(candidates, passages, k, segmenter=None):
     return [candidates[i] for i in chosen]
 
 async def rerank(state, context, registry, segmenter=None):
+    floorless = getattr(state, 'rerank_top1_floorless', False)
+    if type(floorless) is not bool:
+        raise ValueError('RERANK_TOP1_SETTING_INVALID')
+    if floorless and getattr(state, 'graph_enabled', False):
+        raise ValueError('GRAPH_TOP1_EXPERIMENT_CONFLICT')
     if not state.needs_retrieval or not state.search_results or (not state.rerank_model_id):
         return
     try:
@@ -130,7 +154,11 @@ async def rerank(state, context, registry, segmenter=None):
     async def invoke():
         # Provider still enforces document/request limits and stable batch indices.
         response = await model.rerank(state.rewrite_query, model_passages, context.child('rerank'))
-        raw = list(response.results if hasattr(response, 'results') else response)
+        try:
+            raw = list(response.results if hasattr(response, 'results') else response)
+        except TypeError:
+            raise InvalidRerankResponse('RERANK_RESPONSE_INVALID') from None
+        _validate_raw_results(raw, len(candidates))
         if getattr(state, 'source_evidence_mode', 'off') != 'off':
             state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
                 'response': [{'index': r.index, 'score': r.score} for r in raw]})
@@ -138,6 +166,10 @@ async def rerank(state, context, registry, segmenter=None):
 
     def filtered(raw, threshold):
         selected = [r for r in raw if r.index < len(candidates) and r.score >= threshold]
+        if floorless:
+            if not selected and raw:
+                selected = [max(raw, key=lambda r: r.score)]
+            return selected
         floor = 0 if any((t.disable_recall_thresholds for t in state.targets)) else 0.15
         if not selected and raw and (raw[0].score >= floor):
             selected = [raw[0]]
@@ -145,6 +177,8 @@ async def rerank(state, context, registry, segmenter=None):
     try:
         raw = await invoke()
     except (CallCancelled, RunDeadlineExceeded):
+        raise
+    except InvalidRerankResponse:
         raise
     except Exception as exc:
         raise_if_send_denied(exc)
@@ -155,6 +189,8 @@ async def rerank(state, context, registry, segmenter=None):
         try:
             selected = filtered(await invoke(), max(state.rerank_threshold * 0.7, 0.3))
         except (CallCancelled, RunDeadlineExceeded):
+            raise
+        except InvalidRerankResponse:
             raise
         except Exception as exc:
             raise_if_send_denied(exc)

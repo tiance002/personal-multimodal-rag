@@ -54,6 +54,7 @@ class PipelineState(SearchState):
     user_content: str = ''
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
+    rerank_top1_floorless: bool = False
     evidence_trace: list[dict] = field(default_factory=list)
     graph_enabled: bool = False
     graph_trace: list[dict] = field(default_factory=list)
@@ -84,6 +85,10 @@ class RetrievalPipeline:
     async def run(self, state, context):
         import asyncio
         from ..models.types import CallCancelled, RunDeadlineExceeded
+        if type(state.rerank_top1_floorless) is not bool:
+            raise ValueError('RERANK_TOP1_SETTING_INVALID')
+        if state.graph_enabled and state.rerank_top1_floorless:
+            raise ValueError('GRAPH_TOP1_EXPERIMENT_CONFLICT')
 
         def check_context():
             if context.cancelled and context.cancelled.is_set():
