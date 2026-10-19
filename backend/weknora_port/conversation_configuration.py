@@ -8,13 +8,6 @@ from .models.types import ChatOptions,ProviderError
 from .retrieval.query import go_strip
 
 
-# A separate reasoning allowance: max_completion_tokens controls the visible
-# answer on SiliconFlow, so it cannot bound a reasoning-enabled conversation.
-# This project's configurable allowance, not a default supplied by WeKnora or
-# a promise that every provider/model will enforce the field as a hard cap.
-DEFAULT_THINKING_BUDGET_TOKENS = 8192
-
-
 @lru_cache(maxsize=1)
 def source_prompt_templates():
     import yaml
@@ -120,11 +113,6 @@ def resolve_saved_conversation(source,session):
 
 def resolved_chat_options(summary,request_effort):
     options={k:v for k,v in summary.items() if k in ChatOptions.__dataclass_fields__ and v is not None}
-    # Older saved sessions predate this option. Zero retains its existing
-    # "unspecified" meaning, but ordinary conversations now supply a bound.
-    budget=options.get('thinking_budget_tokens',0)
-    if type(budget) is int and budget==0:
-        options['thinking_budget_tokens']=DEFAULT_THINKING_BUDGET_TOKENS
     effort=reasoning_override(request_effort)
     if effort:options.update(reasoning_effort=effort,thinking=effort!='off')
     return ChatOptions(**options)

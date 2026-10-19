@@ -76,39 +76,6 @@ def test_empty_new_options_preserve_historical_payload_hash_and_changes_conflict
     assert repo._payload(replace(request,reasoning_effort='off'),snapshot)!=original
 
 
-@pytest.mark.parametrize('summary,effort,enabled,budget',[
-    ({},'auto',True,8192),
-    ({'thinking':True},'',True,8192),
-    ({'thinking':True,'thinking_budget_tokens':2048},'',True,2048),
-    ({'thinking':True,'thinking_budget_tokens':4096},'',True,4096),
-    ({'thinking_budget_tokens':128},'auto',True,128),
-    ({'thinking_budget_tokens':32768},'auto',True,32768),
-    ({'thinking_budget_tokens':0},'auto',True,8192),
-    ({'thinking':True},'off',False,None),
-    ({'thinking':False,'thinking_budget_tokens':4096},'',False,None),
-])
-def test_ordinary_reasoning_budget_reaches_siliconflow_wire_without_changing_thinking(summary,effort,enabled,budget):
-    from backend.weknora_port.conversation_configuration import resolved_chat_options
-    from backend.weknora_port.models import Message,provider_config,build_chat_body
-    original=dict(summary)
-    options=resolved_chat_options({'max_completion_tokens':1024,**summary},effort)
-    body=build_chat_body(provider_config('siliconflow','Qwen/Qwen3.5-4B'),
-        (Message('user','question'),),options,stream=True)
-    assert body['enable_thinking'] is enabled
-    assert body.get('thinking_budget')==budget and body['max_tokens']==1024
-    assert summary==original
-
-
-def test_ordinary_budget_default_survives_old_saved_and_partial_startup_configuration():
-    from backend.weknora_port.conversation_configuration import resolve_saved_conversation,resolved_chat_options
-    assert ConversationSettings().summary['thinking_budget_tokens']==8192
-    source=ConversationSettings.from_mapping({'conversation':{'summary':{'temperature':.1}}},prompt_templates={})
-    session={'summary_parameters':{'max_completion_tokens':1024,'thinking':True}}
-    saved=resolve_saved_conversation(source,session)
-    assert resolved_chat_options(saved['summary'],'').thinking_budget_tokens==8192
-    assert 'thinking_budget_tokens' not in session['summary_parameters']
-
-
 def test_exact_go_configuration_function_rows():
     import json,asyncio
     from pathlib import Path

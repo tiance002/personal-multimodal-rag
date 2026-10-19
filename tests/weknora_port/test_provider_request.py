@@ -114,27 +114,6 @@ def test_always_on_and_nonstream_disable_budget_exclusion_and_invalid_reasoning(
     assert build_chat_body(c,CONVERSATION,ChatOptions(reasoning_effort="hgih",thinking=False))["enable_thinking"] is False
 
 
-@pytest.mark.parametrize('budget',[127,32769,-1,True,False,2048.0,'2048',None])
-def test_siliconflow_rejects_invalid_reasoning_budget_before_transport(budget):
-    c=config('siliconflow','Qwen/Qwen3.5-4B')
-    with pytest.raises(ProviderError,match='MODEL_THINKING_BUDGET_INVALID'):
-        build_chat_body(c,CONVERSATION,ChatOptions(thinking=True,thinking_budget_tokens=budget),stream=True)
-
-
-def test_reasoning_budget_validation_does_not_change_off_or_other_provider_contracts():
-    opts=ChatOptions(thinking=False,thinking_budget_tokens=1)
-    body=build_chat_body(config('siliconflow','Qwen/Qwen3.5-4B'),CONVERSATION,opts,stream=True)
-    assert body['enable_thinking'] is False and 'thinking_budget' not in body
-    # Direct ChatOptions zero remains the historical unspecified value; normal
-    # conversation resolution supplies its separate default before this layer.
-    legacy=build_chat_body(config('siliconflow','Qwen/Qwen3.5-4B'),CONVERSATION,
-        ChatOptions(thinking=True),stream=True)
-    assert legacy['enable_thinking'] is True and 'thinking_budget' not in legacy
-    deep=build_chat_body(config('deepseek','deepseek-flash'),CONVERSATION,
-        ChatOptions(thinking=True,thinking_budget_tokens=1),stream=True)
-    assert deep['thinking']=={'type':'enabled'} and 'thinking_budget' not in deep
-
-
 def test_multicontent_flattening_special_tokens_and_opaque_metadata_copy():
     meta = {"extra_content":{"signature":"opaque"}}
     messages = (Message("user","[INST]",images=("data:image/png;base64,AA==",)),

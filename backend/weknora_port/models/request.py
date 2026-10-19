@@ -116,9 +116,6 @@ def apply_thinking(body, config, opts, stream):
         return
     effort = (levels.get(level, level) or "") if enabled and level in LADDER and s.supports_reasoning_effort else ""
     budget = opts.thinking_budget_tokens if enabled and opts is not None and s.thinking_budget_field else 0
-    if (enabled and config.provider == "siliconflow" and s.thinking_budget_field == "thinking_budget"
-            and (type(budget) is not int or (budget != 0 and not 128 <= budget <= 32768))):
-        raise ProviderError("MODEL_THINKING_BUDGET_INVALID")
     if effort and s.thinking_budget_excludes_effort:
         budget = 0
     if budget > 0:
