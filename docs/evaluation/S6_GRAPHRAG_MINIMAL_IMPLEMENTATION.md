@@ -2,15 +2,13 @@
 
 ## 当前结论
 
-**PARTIAL，等待本轮新外发授权。** 已实现正常 RAG 主链中的默认关闭图增强、来源绑定 PostgreSQL 存储、真实模型抽取入口及有界两跳检索。离线测试及真实 PostgreSQL 隔离合同已通过；尚未发送真实建图或 Graph-on 问答，不能宣布 S6 PASS。
+**PASS（限两份真实公开原文及一个正常 FastAPI 两跳样本）。** 正常上传、真实抽取、来源绑定 PG 图存储、有界两跳、原文回取、Context、Cheap、SSE 与历史回读均完成。失败的 Qwen 抽取、DeepSeek 不完整 quote 和两次零发送工具错误全部保留，未通过重复问答选优。
 
-Owner 最新决定：**暂不处理 PPT 渐进式展示的解决方案**。本轮不开发页面视觉关联，不将该项作为文本图闭环的前置条件。此前有限只读观察不能证明跨页语义关联。
-
-- 起点：`78bf9839d2030749f715a9395ce355209d8f52ff`。
-- 实现提交：`df271a98b01ac2f63e0a315f30f4ada8097daab0`。
-- 分支：`codex/weknora-python-port-integrate-image-20261014`。
-- 只读远端：`2c21bbcc68384224b5d4a29d1300adf404c1f9b2`，比本地起点旧；没有回退、合并或推送。
-- 原有 18 个未提交路径逐个 SHA-256 核对保持一致；未混入提交。
+- S5 起点：`78bf9839d2030749f715a9395ce355209d8f52ff`。
+- 初始实现：`df271a98b01ac2f63e0a315f30f4ada8097daab0`；已实测代码：`030f0e3d65fe0cd5b667ef2b1ba4a94e3e3d8f47`。
+- 分支：`codex/weknora-python-port-integrate-image-20261014`；最终报告提交 SHA 由 `git rev-parse HEAD` 及交付回复提供，避免自引用 SHA。
+- 原有18个未提交路径逐个 SHA 验证不变。Graph 默认关闭、日常 cloud=false、模型角色与检索参数不变。
+- Owner 明确排除 PPT 渐进展示；未实施、不以该项阻断文本图闭环。不自动进入 S7/S8。
 
 ## 1. 官方源码考察及选择
 
@@ -68,102 +66,86 @@ flowchart LR
 - Graph 关闭不读图表、不增加模型调用。图表未安装／无图结果可继续普通 RAG；权限、来源 SHA／版本错误必须失败，不能用普通 fallback 隐藏。
 - 文档禁用、删除或换版本后，旧图贡献不参与当前检索。旧版本行仍保留；当前原文被修改但 SHA 不符时拒绝。
 
-## 4. 实际实现与必要修复
+## 4. 真实建图与最小修复
 
-主要新增：`graph/types.py`、`extraction.py`、`service.py`、`retrieval.py`，`storage/graph.py`、`graph_migrate.py`、`migrations/016_graph.sql`、`graph_cli.py`。
+tenant1 新 KB：`63266207-95cf-42a6-8e5b-6b3ae18f0819`。PG `weknora_python_port_20261013` / system ID `7696088403504697382`；Redis DB15；principal 未改。迁移 `016_graph` 显式执行退出0，SHA `77168a6b90480afab61944647004b15f56b3b8bbe27c044a2c50936e3347d132`。
 
-局部接线：`development.py`、`runtime.py`、`retrieval/pipeline.py`、`retrieval/context.py`、`evidence_capture.py`。不改 Query Rewrite、生成 Prompt、模型角色、路由评分、OCR 或全局检索配置。
-
-测试暴露并已修复：
-
-1. 直接传入融合函数的伪 quote 原来未独立复核；现重新校验路径、scope、来源和 quote，保留原负例并通过。
-2. 真实发送后本地结算异常可能带 `sent=False`，建图工具原统计可能误报 0；现标为需正式账本回查，无法确定时为 null，不释放或修改历史占用。
-3. 现有 serializer 会省略 `temperature=0`。建图工具记录 requested options，并明确实际 wire 待被动回执核对；不声称温度 0 已发送，不为此修改全局 serializer。
-
-另新增一次性 `scripts/s6_graph_acceptance.py` 及其合同测试：prepare 无授权也能零发送准备；run 必须取得匹配本轮来源 manifest 的新 Owner 授权。复用现有两个 LocalExecution 文件，串行总上限 20／200000，不自动续额、不覆盖 claim、不启动 Worker；只启动正式 entrypoint，不使用 runtime_factory。
-
-## 5. 实际资源与数据库验证
-
-- PG：`weknora_python_port_20261013`，system ID `7696088403504697382`。
-- 日常 principal：tenant 1，subject SHA `4a8c5c959f9ffb8d0f621c5bfc29030ebd17f565b2512a920bbe61058451ff15`，未修改。
-- Redis 实例通过正式 `verify_resources` 核对，DB 15；原来源存储不变。
-- 显式应用 `016_graph`，SHA `77168a6b90480afab61944647004b15f56b3b8bbe27c044a2c50936e3347d132`，退出码 0。没有启动时自动 DDL。
-- 实际 PG 测试使用合成来源／合成抽取，事务结束 ROLLBACK；验证写入、回读、跨 Scope、禁用、删除、换版本及 SHA 拒绝。**1 passed，exit 0**，不是模型真实建图。
-- 当前真实图表计数：来源 0、节点 0、边 0，不能将已回滚的测试行当生产图。
-
-## 6. 已冻结的真实验收材料（尚未发送）
-
-新隔离 KB：`63266207-95cf-42a6-8e5b-6b3ae18f0819`，tenant 1，云许可 false、文档 0。正常 API 创建，没有移动或复制历史 KB。
-
-两份完整原件来自已有 P19 HotpotQA 公开素材，原件 SHA 均与旧来源记录一致：
-
-| 原件 | SHA-256 | 当前纯切块预计 |
+| 正常上传原文 | document / source_version | 实际原文 Child / 向量 |
 | --- | --- | --- |
-| `b6cc805398afebfa8327.txt`，Franklin bells | `b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8` | 1 Parent、2 Child |
-| `decbe8d51474b802a881.txt`，Leyden jar | `decbe8d51474b802a881e06db02901c98b31e03bd88b0dcd254b043c9eb7f00a` | 1 Parent、2 Child |
+| Franklin bells，SHA `b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8` | `4d35e306-4a19-470b-bf68-93731539439d` / `9bce2280-59e7-4d9d-97d5-98820b8adfb3` | 500字，1原文Child＋1Summary，各1024维 |
+| Leyden jar，SHA `decbe8d51474b802a881e06db02901c98b31e03bd88b0dcd254b043c9eb7f00a` | `734d37f7-40bc-4b75-a44b-e7ce30562c0f` / `bc43d6be-015b-4f86-b333-8dcbe356136b` | 429字，1原文Child＋1Summary，各1024维 |
 
-原文存在 `Franklin bells ... designed to work with a Leyden jar` 与 `A Leyden jar ... "stores" static electricity`。拟用新问题：`Franklin bells 配合使用的装置储存的是什么电？请依据知识库回答。`
+冻结前纯切块预估每份2 Child；正常产品实际每份1原文Child，以实际持久化为准。两份各上传1次，不重传、不复制历史索引。
 
-这是两个公开原文的**工程两跳诊断**，不是官方 Hotpot QA 分数；源记录没有单独标题或上游 URL，不补造。整份原件正常上传，不注入 Gold、指定目标 Chunk 或人工边。
+四次真实图抽取：Qwen两次均拒绝（原文字面不符／JSON结构和端点错误），没有放宽校验。Owner另行批准DeepSeek用途后，两份分别抽取1次：9节点5边、7节点3边；12个关系建议中8个通过、4个拒绝。实际wire为 `thinking:{type:disabled}`、`max_tokens:2048`。serializer未发送temperature=0，不把requested=0当成实际参数。
 
-TXT 经正常 API 的文本处理流程，不触发 OCR/Caption。正式 entrypoint 不自动启动后台 Worker；真实阶段也不启动 Worker，以免混入其他租户的旧图片任务。云开关及默认角色保持原状。
+DeepSeek关键关系的短quote缺少主语：`electric charge designed to work with a Leyden jar`。新增 `graph/quote_completion.py` 仅对已验证文档主题anchor、唯一原文quote、同一短句、恰缺一个端点的情况做有界原文回取，再通过原严格解析器复验。禁止跨句、含否定／不确定／时间、错误方向等补全，不改实体／predicate／模型原回执。producer保存原回执SHA、原quote `[95,145)` 和派生原句 `[0,145)`，标记 `SOURCE_SENTENCE_EXTENSION_NOT_LLM_QUOTE`。
 
-## 7. 实际测试与退出码
+复用这两份已结算真实响应离线重放，新增1条有原文证明的边；**不是新增模型抽取**。实际PG回读：2贡献、16节点、9边、3路径。关键路径为 Franklin bells → Leyden jar → static electricity；跨文档仅用精确同名同类型到唯一已验证文档anchor的引用，不合并模糊同名实体。
+
+## 5. 正常 FastAPI 真实验收
+
+原问题：**Franklin bells 配合使用的装置储存的是什么电？请依据知识库回答。** 这是公开来源工程诊断，不是官方Hotpot题目准确率。
+
+- session：`dff86ebf-6dda-46cd-af9f-4cff8c40f5ab`。
+- run：`15ced6a3-fc3e-4c6a-810e-311b4965b08b`；client request：`bcdf8310-b0df-4f44-91ac-ed713a621913`。
+- 正式 `entrypoint`、正式principal／Registry／SendGate／限额与PG，非runtime_factory，不启动评测Worker。
+
+| 阶段 | 真实结果 |
+| --- | --- |
+| Query Understanding | SiliconFlow Qwen3.5-4B，kb_search，实际改写和4个查询Embedding均保留 |
+| Search | 4候选，命中两文档 |
+| Rerank / Merge | 保留2项：Franklin原文＋Summary；Leyden原文模型分数0.0038456118而被过滤 |
+| Graph / 融合 | 3条可追溯路径，回取Leyden 429字原文，added_chunks=1 |
+| Context / 实际生成wire | 3项，两份500／429字原文逐字完整送达，来源版本一致 |
+| DYNAMIC / 模型 | Cheap Qwen3.5-4B一次，enable_thinking=false、temp0.3、max_tokens1024；无升级／fallback／截断，finish_reason=stop |
+| 答案事实 | 回答“莱顿瓶储存静电（静态电荷）”，且电极说明有原文支持；来源为实际两文件名，无内部句柄 |
+| SSE / PG / 历史 | Provider原答案＝SSE最终答案＝PG答案；两次GET只读data相等，未新增调用 |
+
+Graph-on中普通分支到图融合的前后快照，直接显示必要第二来源由图路径补回。**没有另跑Graph-off真实问答**，关闭开关的无图读／无新增调用由离线回归验证，不能把两者混为真实A/B。
+
+## 6. 调用、Token、耗时及授权关闭
+
+| 操作 | Provider次数 | 输入Token | 输出Token | 总Token |
+| --- | ---: | ---: | ---: | ---: |
+| 两次上传＋两次失败Qwen图抽取 | 8 | 3083 | 401 | 3484 |
+| 两次DeepSeek图抽取 | 2 | 1203 | 1032 | 2235 |
+| 正常API问答 | 7 | 3682 | 152 | 3834 |
+| **本轮新增合计** | **17** | **7968** | **1585** | **9553** |
+
+实际模型共8次BGE-M3、1次BGE Rerank、6次Qwen、2次DeepSeek。API整次44.7141秒；其中查询理解2348入／42出，transport完整25.6487秒；最终生成834入／110出，headers11.4929秒、完整读取15.3024秒。记录包含Gate／网络／模型等待，不能拆分DNS/TCP/TLS或供应商排队。不估算现金费用；cash cost未定不等于Provider UNKNOWN。
+
+17次均SETTLED，新增UNKNOWN0；历史8项UNKNOWN及其未知用量原样保留，不作0结算。两次Owner批准共同20次／200000 Token上限，所有失败消耗计入。授权及各执行文件均CLOSED、临时KB外发关闭、未用临时空间撤回。日常wk按原local.json恢复，cloud=false、Graph默认false；API／Worker／UI及PG／Redis运行正常。
+
+## 7. 工具缺陷与实际测试
+
+两次发送前失败完整保留：首次工具无Origin导致consent PATCH403，Provider0；随后client request_id45字超过正式repo36字限制导致POST422，port_turns／messages均空、Provider0。修工具后才进行唯一一次被接纳的问答，不重发UNKNOWN、不增加总授权。另修历史比较只对data，避免每次GET的meta.request_id不同造成误报。生产鉴权／Turn接口未放宽。
 
 ```powershell
-& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_extraction.py tests/weknora_port/test_graph_retrieval.py tests/weknora_port/test_graph_service.py tests/weknora_port/test_graph_storage_pg.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_evidence_capture.py tests/weknora_port/test_filter_top_k.py tests/weknora_port/test_merge_source_retention.py
+& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_quote_completion.py tests/weknora_port/test_graph_service.py tests/weknora_port/test_graph_extraction.py tests/weknora_port/test_graph_retrieval.py tests/weknora_port/test_graph_storage_pg.py tests/weknora_port/test_s6_graph_acceptance.py
 ```
 
-**220 passed、1 skipped，2.87s，exit 0**。该命令未提供真实 PG DSN，所以 PG 项明确跳过。独立命令在内部加载已核实 DSN、不打印密码后真实执行：
+**173 passed、1 skipped，2.23s，exit0**。此调用没设置真实PG DSN，故显式跳过；此前真实PG事务回滚测试1 passed／0.82s／exit0独立保留。原实现相关回归220 passed／1 skipped／exit0未冒充本次新增结果。方向、同名异实体、缺第二跳、伪quote、版本失效、跨tenant／KB、预算及Graph关闭回归均有对应离线合同。
 
-```text
-python -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_storage_pg.py::test_actual_pg_graph_source_lifecycle_and_scope_rollback
-```
-
-**1 passed，0.82s，exit 0**。日志 `E:/WK/run/s6-graphrag-20261019/graph-pg-test.txt`。
-
-```text
-python -m backend.weknora_port.graph_cli --help
+```powershell
+& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/s6-graphrag-20261019/api_once_fixed.py
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File wk.ps1 start -Config E:/WK/run/s4-quality-20261019/local.json
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File wk.ps1 status -Config E:/WK/run/s4-quality-20261019/local.json
+git diff --check
 git diff --cached --check
 ```
 
-均 exit 0。CLI 的 migrate/index 命令真实存在。开发期间一次错误 pytest 文件名导致 exit4（无测试），以及两次定向失败均保留为调试记录，没有算成通过。
+均实际exit0。首次失败的工具run exit2／POST422等保留，未计通过。正常API用新执行文件，但累计先前10次／5719 Token；未续额。输入、回执、完整阶段、SSE、PG回读、授权关闭及独立审查可在机器结果及同目录 `evidence/s6-graphrag-20261019/real-acceptance-evidence.zip` 核对，ZIP SHA见JSON；不含local.json、DSN、密码或API Key。
 
-覆盖的负例：同名不同实体、方向、类型／qualifier 冲突、缺少第二跳、伪 quote、跨租户／owner／KB／文档范围、旧版本、原文变化、整路径预算、原流程关闭回归。上述多为合成离线合同，不能替代真实模型和 API。
+主要新增实现：`graph/{types,extraction,quote_completion,service,retrieval}.py`、`storage/graph.py`、迁移016、`graph_cli.py`；局部接线development/runtime/pipeline/context/evidence_capture及一次性验收工具。最后局部修复为source句子证明映射及工具Origin／requestID／history比较；无全局Rerank、模型、Prompt、DYNAMIC或OCR改动。
 
-执行器合同另测：
+## 8. 限制、使用及停止
 
-```text
-python -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_s6_graph_acceptance.py
-python -B scripts/s6_graph_acceptance.py prepare --config E:/WK/run/s4-quality-20261019/local.json --authorization E:/WK/run/s6-graphrag-20261019/owner-authorization.json --manifest E:/WK/run/s6-graphrag-20261019/text-sources.json --output E:/WK/run/s6-graphrag-20261019/acceptance
-```
+显式 `python -m backend.weknora_port.graph_cli --help` 命令已执行exit0。先经授权配置运行 `graph_cli ... migrate`、`index --kb <真实KB> --document <真实文档> --model-id <已有模型ID> --request-id <新操作ID>`；仅在需要时设置 `WEKNORA_PORT_GRAPH_ENABLED=true`，不得沿用已关闭验收授权。普通上传不自动建图，旧KB graph占位开关不启用。
 
-分别 **21 passed／0.36s／exit0**、**ZERO_SEND_PREPARED／BLOCKED_AUTHORIZATION_NO_SEND／Provider0／exit0**。没有为了 prepare 创建 Owner 批准文件，也没有执行 run。
+- Qwen两份图抽取失败保留，DeepSeek仍有拒绝关系；不能宣称抽取质量全面通过。
+- quote／方向检查是来源证明，不是语义事实裁判；隐含关系、代词、同名冲突可被保守拒绝；该样本不证明所有多跳可用。
+- Frost Seminar关系、PPT渐进展示、批量图管理／全局PPR、S5事实扩展等保持独立问题；不自动展开。
+- 独立Top1实验从S5另建worktree和分支；其修改／结论不会合入当前S6，也不影响本次真实回执。
 
-可复核零云证据包：`docs/evaluation/evidence/s6-graphrag-20261019/zero-send-evidence.zip`，SHA 见同名 results JSON。包含迁移、实际 PG 测试、公开原件 manifest、源码固定提交、原文件 SHA 清单及测试命令，不包含 local.json、密钥或密码。
-
-## 8. 使用方式与待授权项
-
-```powershell
-python -m backend.weknora_port.graph_cli --config E:/approved/local.json --output E:/new/graph-migration.json migrate
-python -m backend.weknora_port.graph_cli --config E:/approved/local.json --output E:/new/graph-index.json index --kb <真实KB> --document <真实文档> --model-id <已有RegistryID> --request-id <新的获授权操作ID>
-```
-
-输出文件必须为 D/E 盘新绝对路径；不得覆盖首次结果。index 使用正常 Registry、Provider Adapter、原 Gate 和可选 LocalExecution，不自签授权、不启云、不自动重发。模型图抽取以 `enable_thinking=false`、wire 输出上界 2048 通过现有合同。
-
-旧 S5 外发授权 CLOSED。本轮已提出一次有限授权申请：两份正常上传、最多 4 次 Qwen 图抽取、最多 1 次正常 Graph-on 问答；所有辅助及失败合计最多 20 Provider／200000 Token，分批遵守现有每份 LocalExecution ≤12／100000，UNKNOWN 即停。不新增账户／月度预算系统，不以历史许可替代本轮批准。
-
-**本轮新增 Provider=0、报告 Token=0、新 UNKNOWN=0；历史 UNKNOWN=8，原记录与未知用量保持不变，不按零结算。** Provider 延迟、真实边校验数量、真实两跳路径、实际 Context／答案／SSE／历史回读均 **NOT RUN**。
-
-## 9. 未解决问题与停止边界
-
-| 项目 | 状态 | 处理 |
-| --- | --- | --- |
-| 真实建图及 Graph-on FastAPI 闭环 | BLOCKED_AUTHORIZATION | 新授权到位后执行已冻结小样本；未取得前不外发、不宣称 PASS。 |
-| Frost Place Advanced Seminar 与机构身份 | 质量缺口 | 现有原文未证明所属关系，不以名称相似补边；不重发历史问题。 |
-| OpenIE 语义及隐含／代词关系 | 实现局限 | 精确 quote 只能证明来源，不证明推断必然成立；保守拒绝可能降低召回。 |
-| PPT 渐进式展示 | Owner 已排除 | 不再处理，不注入 Coding time 标题或视觉关系。 |
-| 大语料图谱、管理 UI、PPR、图质量 A/B | 不属 S6 | 保持有界构建／读取，留待后续单独决定，不自动进入 S7/S8。 |
-| S5 Summary 扩展、Site/Unit 混淆 | 原有技术债 | 不声称由图谱解决。 |
-
-本次只本地提交；不 Push、合并、部署或打 Tag。待授权步骤完成后才可根据真实回执更新 S6 结论。
+本轮到此停止，只本地提交；不Push、合并、部署、打Tag或进入S7/S8。
