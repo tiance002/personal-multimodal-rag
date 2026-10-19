@@ -80,6 +80,7 @@ def prepare_chunks(scope: DocumentScope, parsed: Sequence[ParsedChunk], *,
         raise ValueError("UNSUPPORTED_PARSED_CHUNK_ROLE")
     ids = {row.source_id:new_id() for row in [*parents,*children]}
     parent_ids = {row.source_id:ids[row.source_id] for row in parents}
+    standalone_ids = {ids[row.source_id] for row in children if not row.parent_source_id}
     output: list[StoredChunk] = []
     for rows, kind in ((parents,"parent_text"),(children,"text")):
         current: list[StoredChunk] = []
@@ -88,14 +89,20 @@ def prepare_chunks(scope: DocumentScope, parsed: Sequence[ParsedChunk], *,
             current.append(StoredChunk(ids[row.source_id],scope,row.content,row.seq,row.start,row.end,
                 kind,"",row.context_header,parent_id,metadata={**row.metadata,
                 "source_version":scope.source_version,"parsed_source_id":row.source_id}))
-        # Parent rows always link sequentially; children only do so outside
-        # parent-child mode, including otherwise-standalone children in that mode.
+        # Preserve the parent chain and the ordinary text-only chain. In a
+        # mixed plan, link consecutive standalone children without jumping over
+        # a parent-backed child or changing that child's parent semantics.
         if kind == "text":
             current.sort(key=lambda row: row.chunk_index)
         if kind == "parent_text" or not parents:
             for index, chunk in enumerate(current):
                 chunk.pre_chunk_id = current[index-1].id if index else ""
                 chunk.next_chunk_id = current[index+1].id if index+1 < len(current) else ""
+        else:
+            for left, right in zip(current, current[1:]):
+                if left.id in standalone_ids and right.id in standalone_ids:
+                    left.next_chunk_id = right.id
+                    right.pre_chunk_id = left.id
         output.extend(current)
     output.sort(key=lambda row: row.chunk_index)
     title = title.strip()
