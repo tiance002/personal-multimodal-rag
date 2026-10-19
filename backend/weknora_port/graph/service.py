@@ -12,7 +12,8 @@ from ..models.types import ChatOptions, Message, ProviderError
 from ..storage.graph import PostgresGraphRepository
 from ..storage.knowledge import ScopedKnowledgeRepository, _json_object
 from .types import GraphSource
-from .extraction import build_extraction_messages, parse_extraction, MAX_SOURCE_CHARS
+from .extraction import build_extraction_messages, MAX_SOURCE_CHARS
+from .quote_completion import parse_with_quote_completion
 
 MAX_DOCUMENT_CHUNKS = 12
 MAX_DOCUMENT_CHARS = 32768
@@ -149,10 +150,13 @@ class GraphIndexer:
                         raise ProviderError('GRAPH_EXTRACTION_RESPONSE_MODEL_MISMATCH', sent=True)
                     if response.finish_reason != 'stop':
                         raise ProviderError('GRAPH_EXTRACTION_NOT_COMPLETE', sent=True)
-                    batch = parse_extraction(source, response.content, operation.request_id)
+                    batch, quote_completions = parse_with_quote_completion(source, response.content, operation.request_id)
+                    response_sha = hashlib.sha256(response.content.encode('utf-8')).hexdigest()
+                    record.update(raw_response_sha256=response_sha, quote_completions=list(quote_completions))
                     producer = json.dumps({'status': 'completed', 'model_id': model_id,
                         'provider': config.provider, 'model': config.model, 'prompt_sha256': record['prompt_sha256'],
-                        'request_id': operation.request_id, 'finish_reason': response.finish_reason},
+                        'request_id': operation.request_id, 'finish_reason': response.finish_reason,
+                        'raw_response_sha256': response_sha, 'quote_completions': list(quote_completions)},
                         ensure_ascii=False, sort_keys=True, separators=(',', ':'))
                     async with self.app.leases.lease(writable_knowledge_base_ids=frozenset({kb_id})) as guard:
                         persisted = await PostgresGraphRepository(guard, self._tenant).replace_chunk(batch, operation, producer)

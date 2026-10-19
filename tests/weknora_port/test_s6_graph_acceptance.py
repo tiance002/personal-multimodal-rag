@@ -171,3 +171,118 @@ def test_arguments_require_explicit_external_files_and_no_auto_enable_switch():
                                  '--manifest', 'sources.json', '--output', 'output'])
     assert args.command == 'prepare'
     assert not hasattr(args, 'approve') and not hasattr(args, 'unlimited')
+
+
+def test_history_readback_compares_business_data_not_each_get_correlation_id():
+    data = [{'id': 'message', 'is_completed': True, 'content': 'source-supported answer'}]
+    assert acceptance.same_history({'data': data, 'meta': {'request_id': 'get-1'}},
+                                   {'data': data, 'meta': {'request_id': 'get-2'}})
+    assert not acceptance.same_history({'data': data}, {'data': [dict(data[0], content='changed')]})
+    assert not acceptance.same_history({'error': {'code': 'FAILED'}}, {'error': {'code': 'FAILED'}})
+
+
+def test_business_origin_passes_real_api_write_guard_and_missing_origin_is_denied():
+    import httpx
+    from backend.weknora_port.http_api import create_app
+
+    principal = object()
+    calls = []
+
+    class Runtime:
+        async def update_knowledge_base_consent(self, who, knowledge_base_id, cloud_allowed):
+            assert who is principal
+            calls.append((knowledge_base_id, cloud_allowed))
+            return {'id': knowledge_base_id, 'cloud_allowed': cloud_allowed}
+
+    async def exercise():
+        cfg = {'ui_port': 56426}
+        headers = acceptance.business_headers(cfg)
+        app = create_app(Runtime(), resolve_principal=lambda _: principal,
+                         allowed_origins=(headers['Origin'],), manage_background_workers=False)
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),
+                                     base_url='http://127.0.0.1:56425') as client:
+            denied = await client.patch(f'/api/v1/knowledge-bases/{acceptance.KB}/external-processing',
+                                        json={'cloud_allowed': True})
+            assert denied.status_code == 403
+            assert denied.json()['error']['code'] == 'ORIGIN_NOT_ALLOWED'
+            assert not calls
+            allowed = await client.patch(f'/api/v1/knowledge-bases/{acceptance.KB}/external-processing',
+                                         json={'cloud_allowed': True}, headers=headers)
+            assert allowed.status_code == 200
+            assert allowed.json()['data']['cloud_allowed'] is True
+            revoked = await client.patch(f'/api/v1/knowledge-bases/{acceptance.KB}/external-processing',
+                                         json={'cloud_allowed': False}, headers=headers)
+            assert revoked.status_code == 200
+        assert calls == [(acceptance.KB, True), (acceptance.KB, False)]
+
+    asyncio.run(exercise())
+
+
+async def offline_message_admission_probe(body):
+    """Actual DTO/API/repository guards; stop at the first lease boundary."""
+    import httpx
+    from backend.weknora_port.http_api import AcceptedTurn, MessageCreate, create_app
+    from backend.weknora_port.service import OrdinaryTurnRequest
+    from backend.weknora_port.storage.history import LocalPrincipal
+    from backend.weknora_port.storage.turns import PostgresTurnRepository
+    from backend.weknora_port.streaming.events import StreamEvent
+
+    parsed = MessageCreate.model_validate(body)
+    turn = OrdinaryTurnRequest('dff86ebf-6dda-46cd-af9f-4cff8c40f5ab', parsed.content, parsed.request_id,
+                               parsed.mode, tuple(parsed.knowledge_base_scope), tuple(parsed.document_scope),
+                               parsed.summary_model_id or '', parsed.reasoning_effort or '')
+    principal = LocalPrincipal(1, 's6-offline-test-subject')
+
+    class LeaseBoundaryReached(Exception):
+        pass
+
+    class NoDatabase:
+        lease_entries = 0
+
+        def lease(self):
+            self.lease_entries += 1
+            raise LeaseBoundaryReached
+
+    leases = NoDatabase()
+    repository = PostgresTurnRepository(leases, principal)
+
+    class Runtime:
+        async def accept_turn(self, request, who):
+            try:
+                return await repository.accept(request, who)
+            except LeaseBoundaryReached:
+                return AcceptedTurn(request.request_id, request.session_id, 'offline-user', 'offline-assistant')
+
+        async def replay(self, accepted, who):
+            yield StreamEvent('1', 'complete', '', True, '2026-10-19T00:00:00Z', {})
+
+    app = create_app(Runtime(), resolve_principal=lambda _: principal,
+                     allowed_origins=('http://127.0.0.1:56426',), manage_background_workers=False)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://127.0.0.1:56425',
+                                 headers=acceptance.business_headers({'ui_port': 56426})) as client:
+        response = await client.post(f'/api/v1/sessions/{turn.session_id}/messages', json=body)
+    return {'http_status': response.status_code,
+            'error_code': response.json()['error']['code'] if response.status_code != 200 else None,
+            'message_create': 'PASS', 'ordinary_turn_request': 'PASS',
+            'client_request_id_length': len(body['request_id']), 'lease_boundary_entries': leases.lease_entries,
+            'database_operations': 0, 'provider_calls': 0}
+
+
+def test_real_45_character_claim_fails_at_durable_admission_not_uuid_or_effort_dto():
+    body = acceptance.question_body() | {'request_id': 's6-final-api-50e5e288232745b0906c78861b46f5bc'}
+    result = asyncio.run(offline_message_admission_probe(body))
+    assert result == {'http_status': 422, 'error_code': 'TURN_REQUEST_ID_OR_CONTENT_INVALID',
+                      'message_create': 'PASS', 'ordinary_turn_request': 'PASS',
+                      'client_request_id_length': 45, 'lease_boundary_entries': 0,
+                      'database_operations': 0, 'provider_calls': 0}
+
+
+def test_generated_question_identity_passes_actual_admission_prefix_guards():
+    import uuid
+    body = acceptance.question_body()
+    assert str(uuid.UUID(body['request_id'])) == body['request_id']
+    result = asyncio.run(offline_message_admission_probe(body))
+    assert result['http_status'] == 200
+    assert result['client_request_id_length'] == 36
+    assert result['lease_boundary_entries'] == 1
+    assert result['provider_calls'] == result['database_operations'] == 0

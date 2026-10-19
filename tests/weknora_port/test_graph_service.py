@@ -124,6 +124,28 @@ def test_index_uses_registry_existing_gate_and_current_full_source_then_persists
     asyncio.run(run())
 
 
+def test_index_records_original_model_quote_and_derived_source_mapping_without_extra_call():
+    async def run():
+        raw = json.loads(model_text())
+        raw['relations'][0]['quote'] = 'operates at Birch Campus'
+        text = json.dumps(raw)
+        response = ChatResponse(text, finish_reason='stop',
+            usage=TokenUsage(100, 30, 130, 'REPORTED'), model='synthetic-chat')
+        batch, connection, model, _, indexer, context = await fixture(response)
+        result = await index(indexer, batch, context)
+        assert result['edges'] == 1 and len(model.requests) == result['provider_calls'] == 1
+        record = result['chunks'][0]
+        assert record['raw_response'] == text
+        mapping, = record['quote_completions']
+        assert mapping['original_quote'] == 'operates at Birch Campus'
+        assert mapping['kind'] == 'SOURCE_SENTENCE_EXTENSION_NOT_LLM_QUOTE'
+        assert batch.source.content[mapping['derived_quote_start']:mapping['derived_quote_end']] == mapping['derived_quote']
+        producer = json.loads(next(iter(connection.evidence.values()))['producer'])
+        assert producer['quote_completions'] == [mapping]
+        assert producer['raw_response_sha256'] == record['raw_response_sha256']
+    asyncio.run(run())
+
+
 @pytest.mark.parametrize('scope_change', [('knowledge_base_ids', ('other',)), ('document_ids', ()),
                                           ('owner_id', 'other')])
 def test_index_rejects_borrowed_scope_before_registry(scope_change):

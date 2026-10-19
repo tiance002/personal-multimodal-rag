@@ -113,6 +113,25 @@ def port_is_free():
     return True
 
 
+def business_headers(cfg):
+    """Use the existing wk UI origin for normal API write admission."""
+    return {'Origin': f"http://127.0.0.1:{cfg['ui_port']}"}
+
+
+def question_body():
+    # Ordinary durable admission limits client request IDs to 36 characters.
+    # This identity is distinct from the server-generated Provider run IDs.
+    return {'content': QUESTION, 'request_id': str(uuid.uuid4()), 'mode': 'quick',
+            'knowledge_base_scope': [KB], 'document_scope': [], 'reasoning_effort': 'off'}
+
+
+def same_history(left, right):
+    # Correlation IDs belong to each GET, not to the persisted message data.
+    return (isinstance(left, dict) and isinstance(right, dict)
+            and isinstance(left.get('data'), list) and isinstance(right.get('data'), list)
+            and left['data'] == right['data'])
+
+
 def make_ledger(principal, models, phase):
     max_calls, max_tokens = PHASE_LIMITS[phase - 1]
     return {'status': 'OPEN', 'scope': SCOPE, 'tenant_id': principal.tenant_id,
@@ -305,7 +324,8 @@ async def run(args, prepared, cfg, env, principal, sources):
             ledgers.append(ledger)
             phase_env = phase_environment(cfg, env, ledger, phase_dir / 'local.json')
             process = await start_api(args, phase_env, phase)
-            async with httpx.AsyncClient(timeout=httpx.Timeout(600, connect=5), trust_env=False) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(600, connect=5), trust_env=False,
+                                         headers=business_headers(cfg)) as client:
                 response = await client.get(base + '/api/v1/knowledge-bases')
                 response.raise_for_status()
                 require(any(row['id'] == KB for row in response.json()['data']), 'S6_HTTP_KB_NOT_VISIBLE')
@@ -345,8 +365,8 @@ async def run(args, prepared, cfg, env, principal, sources):
                     session = await client.post(base + '/api/v1/sessions', json={'title': 'S6 Graph two-hop source acceptance', 'knowledge_base_scope': [KB], 'document_scope': []})
                     session.raise_for_status()
                     sid = session.json()['data']['id']
-                    request_id = 's6-answer-' + uuid.uuid4().hex
-                    body = {'content': QUESTION, 'request_id': request_id, 'mode': 'quick', 'knowledge_base_scope': [KB], 'document_scope': [], 'reasoning_effort': 'off'}
+                    body = question_body()
+                    request_id = body['request_id']
                     write_new(args.output / 'question.claim.json', {'session_id': sid, 'body': body})
                     started = time.monotonic()
                     with (args.output / 'question.sse').open('xb') as handle:
@@ -363,7 +383,7 @@ async def run(args, prepared, cfg, env, principal, sources):
                         history.raise_for_status()
                         histories.append(history.json())
                         write_new(args.output / f'history-{index}.json', histories[-1])
-                    require(histories[0] == histories[1], 'S6_HISTORY_READBACK_CHANGED')
+                    require(same_history(histories[0], histories[1]), 'S6_HISTORY_READBACK_CHANGED')
                     require(ledger_summary(ledgers)['calls'] == before_history, 'S6_HISTORY_CAUSED_PROVIDER_CALL')
                     result.update(session_id=sid, request_id=request_id, question_seconds=time.monotonic() - started,
                                   history_readback_equal=True)
@@ -403,7 +423,7 @@ async def run(args, prepared, cfg, env, principal, sources):
                 stop_admission(ledger)
         if result['documents'] and not (args.output / 'consent-closed.json').exists():
             try:
-                async with httpx.AsyncClient(timeout=5, trust_env=False) as client:
+                async with httpx.AsyncClient(timeout=5, trust_env=False, headers=business_headers(cfg)) as client:
                     closed = await client.patch(base + f'/api/v1/knowledge-bases/{KB}/external-processing', json={'cloud_allowed': False})
                     closed.raise_for_status()
                     save(args.output / 'consent-closed.json', closed.json())
