@@ -5,6 +5,7 @@ from dataclasses import dataclass,field
 from pathlib import Path
 from urllib.parse import urlsplit
 import os,re,json,uuid
+from .conversation_configuration import DEFAULT_THINKING_BUDGET_TOKENS
 
 PROHIBITED=frozenset({'7691227493754040358','7689510505384681511','7696038373595934758'})
 class DevelopmentConfigurationError(RuntimeError):pass
@@ -32,8 +33,11 @@ class DevelopmentSettings:
     query_understand_model_id:str=''
     rerank_context_enabled:bool=False
     evidence_dir:Path|None=None
+    thinking_budget_tokens:int=DEFAULT_THINKING_BUDGET_TOKENS
 
     def __post_init__(self):
+        if type(self.thinking_budget_tokens) is not int or not 128 <= self.thinking_budget_tokens <= 32768:
+            raise DevelopmentConfigurationError('THINKING_BUDGET_TOKENS_INVALID')
         if self.evidence_dir is not None:
             if self.execution_file is not None:
                 raise DevelopmentConfigurationError('EXECUTION_AND_PASSIVE_EVIDENCE_CONFLICT')
@@ -68,6 +72,10 @@ class DevelopmentSettings:
             if not value:raise DevelopmentConfigurationError('WEKNORA_PORT_'+name+'_REQUIRED')
             return value
         from .ingestion.mineru import MinerUSettings
+        try:
+            thinking_budget=int(env.get('WEKNORA_PORT_THINKING_BUDGET_TOKENS',str(DEFAULT_THINKING_BUDGET_TOKENS)))
+        except (TypeError,ValueError):
+            raise DevelopmentConfigurationError('THINKING_BUDGET_TOKENS_INVALID') from None
         return cls(required('DATABASE_URL'),required('DATABASE_SYSTEM_ID'),required('DATABASE_NAME'),
             required('REDIS_URL'),required('REDIS_RUN_ID'),required('REDIS_PREFIX'),Path(required('STORAGE_ROOT')),
             Path(required('SECRET_KEY_FILE')),Path(env['WEKNORA_PORT_TOKENIZER_ASSET']) if env.get('WEKNORA_PORT_TOKENIZER_ASSET') else None,
@@ -80,6 +88,7 @@ class DevelopmentSettings:
             source_evidence_mode=env.get('WEKNORA_PORT_SOURCE_EVIDENCE_MODE','off'),
             query_understand_model_id=env.get('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID',''),
             rerank_context_enabled=env.get('WEKNORA_PORT_RERANK_CONTEXT_ENABLED','false').lower()=='true',
+            thinking_budget_tokens=thinking_budget,
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
@@ -173,6 +182,7 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 if settings.mineru_settings is not None else None,start_image_worker_on_upload=False)
         runtime=ApplicationRuntime(leases,principal,store,documents,model_factory=model_factory,cipher=SecretCipher(key),
             conversation=ConversationSettings(fallback_strategy=settings.fallback_strategy,
+                summary={**ConversationSettings().summary,'thinking_budget_tokens':settings.thinking_budget_tokens},
                 source_evidence_mode=settings.source_evidence_mode,
                 rerank_context_enabled=settings.rerank_context_enabled,
                 query_understand_model_id=settings.query_understand_model_id),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,

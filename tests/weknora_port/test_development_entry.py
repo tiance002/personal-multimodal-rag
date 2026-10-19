@@ -42,6 +42,58 @@ def test_query_understand_model_id_loads_from_environment(tmp_path):
     env.pop('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID')
     assert DevelopmentSettings.from_environment(env).query_understand_model_id==''
 
+
+@pytest.mark.parametrize('value',['0','127','32769','-1','1.5','True',''])
+def test_thinking_budget_rejects_invalid_environment_before_assembly(tmp_path,value):
+    env=development_environment(settings(tmp_path))
+    env['WEKNORA_PORT_THINKING_BUDGET_TOKENS']=value
+    with pytest.raises(DevelopmentConfigurationError,match='THINKING_BUDGET_TOKENS_INVALID'):
+        DevelopmentSettings.from_environment(env)
+
+
+def test_thinking_budget_environment_reaches_real_assembly_options(tmp_path,monkeypatch):
+    import asyncio
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+    from unittest.mock import AsyncMock
+    import backend.weknora_port.runtime as runtime_module
+    from backend.weknora_port.development import assemble
+    from backend.weknora_port.conversation_configuration import resolved_chat_options
+    from backend.weknora_port.models import Message,provider_config,build_chat_body
+    from backend.weknora_port.storage.history import LocalPrincipal
+    import backend.weknora_port.storage.connections as connections
+    from redis.asyncio import Redis
+
+    env=development_environment(settings(tmp_path))
+    assert DevelopmentSettings.from_environment(env).thinking_budget_tokens==8192
+    env['WEKNORA_PORT_THINKING_BUDGET_TOKENS']='4096'
+    cfg=DevelopmentSettings.from_environment(env)
+    guard=SimpleNamespace(connection=SimpleNamespace(execute=AsyncMock(return_value=
+        SimpleNamespace(fetchone=AsyncMock(return_value={'principal':'present','image':'present','calls':'present'})))))
+    class Leases:
+        def __init__(self,*_args,**_kwargs):pass
+        @asynccontextmanager
+        async def lease(self,**_kwargs):yield guard
+    redis=SimpleNamespace(info=AsyncMock(return_value={'run_id':cfg.redis_run_id}),aclose=AsyncMock())
+    class Runtime:
+        def __init__(self,*_args,**kwargs):self.conversation=kwargs['conversation']
+        async def stop_background_workers(self):pass
+    monkeypatch.setattr(connections,'IsolatedConnectionFactory',Leases)
+    monkeypatch.setattr(Redis,'from_url',lambda *_args,**_kwargs:redis)
+    monkeypatch.setattr(runtime_module,'ApplicationRuntime',Runtime)
+
+    async def exercise():
+        async with assemble(cfg,principal=LocalPrincipal(81013,'synthetic-owner')) as app:
+            summary=app.conversation.summary
+            assert summary['temperature']==.3 and summary['max_completion_tokens']==1024
+            assert summary['thinking_budget_tokens']==4096
+            options=resolved_chat_options(summary,'auto')
+            body=build_chat_body(provider_config('siliconflow','Qwen/Qwen3.5-4B'),
+                (Message('user','question'),),options,stream=True)
+            assert body['enable_thinking'] is True and body['thinking_budget']==4096
+            assert body['max_tokens']==1024
+    asyncio.run(exercise())
+
 @pytest.mark.parametrize('strategy',['model','fixed'])
 def test_fallback_strategy_loads_explicit_environment(tmp_path,strategy):
     env=development_environment(settings(tmp_path))

@@ -106,6 +106,7 @@ test("POST once and recover by offset-zero GET of the same assistant message wit
   let posts = 0;
   let gets = 0;
   let postBody: Record<string, unknown> | undefined;
+  let answerLanguage = "";
   await page.route("**/api/v1/sessions", async route => {
     if (route.request().method() === "POST") {
       await route.fulfill({ json: envelope({ id: "session-1", title: "测试问题", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" }) });
@@ -117,6 +118,7 @@ test("POST once and recover by offset-zero GET of the same assistant message wit
     if (route.request().method() === "POST") {
       posts++;
       postBody = route.request().postDataJSON() as Record<string, unknown>;
+      answerLanguage = route.request().headers()["accept-language"];
       const body = frame({ id: "request-1", response_type: "agent_query", content: "", done: false,
         data: { request_id: "request-1", session_id: "session-1", assistant_message_id: "assistant-1" } }) +
         frame({ id: "request-1", response_type: "answer", content: "Hello", done: false, data: { event_id: "answer-1" } });
@@ -145,7 +147,53 @@ test("POST once and recover by offset-zero GET of the same assistant message wit
   expect(posts).toBe(1);
   expect(gets).toBe(1);
   expect(postBody?.mode).toBe("quick");
+  expect(postBody?.reasoning_effort).toBe("off");
+  expect(postBody).not.toHaveProperty("accept_language");
+  expect(answerLanguage).toBe("zh-CN");
   expect(postBody?.knowledge_base_scope).toEqual(["kb-1"]);
+});
+
+test("answer language defaults to Simplified Chinese and persists an explicit selection for normal submissions", async ({ page }) => {
+  await installCatalogRoutes(page);
+  let posts = 0;
+  let postBody: Record<string, unknown> | undefined;
+  let answerLanguage = "";
+  await page.route("**/api/v1/sessions", route => route.fulfill({ json: envelope(route.request().method() === "POST"
+    ? { id: "language-session", title: "语言设置", knowledge_base_scope: ["kb-1"], document_scope: [], updated_at: "now" } : []) }));
+  await page.route("**/api/v1/sessions/language-session/messages", route => {
+    if (route.request().method() !== "POST") return route.fulfill({ json: envelope([]) });
+    posts++;
+    postBody = route.request().postDataJSON() as Record<string, unknown>;
+    answerLanguage = route.request().headers()["accept-language"];
+    return route.fulfill({ contentType: "text/event-stream", body:
+      frame({ id: "language-run", response_type: "agent_query", content: "", done: false,
+        data: { request_id: "language-run", session_id: "language-session", assistant_message_id: "language-answer" } }) +
+      frame({ id: "language-run", response_type: "answer", content: "The card reading is 37.", done: true, data: { event_id: "language-final" } }) +
+      frame({ id: "language-run", response_type: "complete", content: "", done: false, data: { final_content: "The card reading is 37.", finish_reason: "stop" } }),
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "模型设置" }).click();
+  const language = page.getByRole("combobox", { name: "回答语言", exact: true });
+  await expect(language).toHaveValue("zh-CN");
+  await expect(language.locator("option")).toHaveText(["简体中文", "繁體中文", "English", "日本語", "한국어"]);
+  await language.selectOption("en-US");
+  await expect(page.getByText("回答语言已更新，仅保存在此浏览器。", { exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "模型设置" }).click();
+  await expect(language).toHaveValue("en-US");
+  await page.getByRole("button", { name: "问答", exact: true }).click();
+  await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
+  await page.getByText("课程资料", { exact: true }).first().click();
+  await page.getByPlaceholder("询问当前资料…").fill("卡片中的读数是多少？");
+  await page.getByRole("button", { name: "发送" }).click();
+  await expect(page.getByText("The card reading is 37.", { exact: true })).toBeVisible();
+  expect(posts).toBe(1);
+  expect(answerLanguage).toBe("en-US");
+  expect(postBody?.reasoning_effort).toBe("off");
+  expect(postBody?.knowledge_base_scope).toEqual(["kb-1"]);
+  expect(postBody?.content).toBe("卡片中的读数是多少？");
+  expect(postBody).not.toHaveProperty("accept_language");
 });
 
 test("runtime identity mismatch blocks mutations and remains visibly isolated from the existing backend", async ({ page }) => {

@@ -25,6 +25,7 @@ from .storage.turns import PostgresTurnRepository
 from .storage.generation import PostgresGenerationLifecycle
 from .storage.memory import PostgresMemoryRepository
 from .storage.hybrid import PostgresKnowledgeRepository
+from .conversation_configuration import DEFAULT_THINKING_BUDGET_TOKENS
 
 
 @dataclass(frozen=True)
@@ -47,7 +48,8 @@ class ConversationSettings:
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
     summary: Mapping[str, Any] = field(default_factory=lambda: {
-        "temperature": .3, "max_completion_tokens": 1024})
+        "temperature": .3, "max_completion_tokens": 1024,
+        "thinking_budget_tokens": DEFAULT_THINKING_BUDGET_TOKENS})
 
     fallback_strategy: str = 'model'
     fallback_response: str = 'Sorry, I am unable to answer this question.'

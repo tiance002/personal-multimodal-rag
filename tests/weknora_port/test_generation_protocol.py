@@ -9,8 +9,8 @@ def test_protocol_has_one_active_source_and_resource_policy():
         assert value.count('## Source handling protocol') == 1
         assert value.count('## Resource handle protocol') == 1
         assert 'MCP' not in value and 'Wiki' not in value and 'sandbox:' not in value
-        assert 'application resolves it to the authorized source image' in value
-        assert 'Do not print handles as ordinary text' in value
+        assert 'Do not embed retrieved images or reproduce these asset links' in value
+        assert 'Use OCR and caption facts as textual evidence' in value
 
 
 def test_enabled_and_disabled_attribution_are_separate_and_support_images():
@@ -19,5 +19,6 @@ def test_enabled_and_disabled_attribution_are_separate_and_support_images():
     assert '<ref id="cN"/>' in enabled and '<ref id="cN"/>' not in disabled
     assert 'exact supplied filenames that support the answer' in disabled
     assert 'Do not use a document title to guess a filename or extension' in disabled
-    assert 'does not disable relevant image URLs' in disabled
+    assert 'Do not embed retrieved images' in disabled
+    assert 'Source citations are disabled' not in disabled
     assert 'strict JSON/code-only format' in disabled

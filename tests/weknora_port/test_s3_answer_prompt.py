@@ -30,14 +30,28 @@ def image_evidence(**changes):
 
 def test_language_has_single_explicit_priority_and_no_self_check_loop_instruction():
     system = prepared(image_evidence()).messages[0].content
-    assert 'obey an explicit language request first' in system
-    assert 'answer an English question in English and a Chinese question in Chinese' in system
-    assert 'use Chinese (Simplified)' in system
-    assert 'language of retrieved materials does not determine' in system
+    assert system.startswith('你是 EviRoute RAG，面向个人用户的知识库问答助手。')
+    assert 'Answer language: Chinese (Simplified)' in system
+    assert 'regardless of the language of the question or reference materials' in system
+    assert 'Use the language of the current user question' not in system
+    assert 'Do not embed retrieved images' in system
+    assert 'Copy a supplied handle' not in system
+    assert 'Source citations are disabled' not in system
+    assert '<ref' not in system
     assert 'Default response language:' not in DEFAULT_SYSTEM_PROMPT
     assert 'requested language' not in SOURCED_ANSWER_OUTPUT
     assert 'Before finishing' not in system and 'silently verify' not in system
     assert 'Return the final answer directly' in system
+
+
+def test_selected_answer_language_is_rendered_without_a_question_language_rule():
+    source=image_evidence()
+    request=GenerationRequest(run_id='run',session_id='session',message_id='message',
+        q0='请用资料回答',language='English',citations_enabled=False,
+        finalized=FinalizedContext('Evidence\n'+source.content,source.content,(source.id,)),evidence=(source,))
+    system=prepare_generation(request).messages[0].content
+    assert 'Answer language: English' in system
+    assert 'Chinese' not in system and 'explicit language request' not in system
 
 
 def test_filename_is_supplied_separately_without_inventing_extension():

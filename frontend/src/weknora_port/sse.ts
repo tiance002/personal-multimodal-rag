@@ -112,16 +112,19 @@ async function continuePortRun(identity: PortRunIdentity, callbacks: RunCallback
 export async function runPortChat(sessionId: string, requestBody: {
   content: string; request_id: string; mode: "quick" | "smart";
   knowledge_base_scope: string[]; document_scope: string[];
+  reasoning_effort?: string;
+  accept_language?: string;
 }, callbacks: RunCallbacks): Promise<void> {
   await assertPortRuntime();
+  const { accept_language, ...body } = requestBody;
   let identity: PortRunIdentity | null = null;
   let requestId = "";
   let postFailure: unknown;
   try {
     const postResponse = await fetch(apiBaseForStream(`/sessions/${encodeURIComponent(sessionId)}/messages`), {
       method: "POST", credentials: "same-origin", signal: callbacks.signal,
-      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-      body: JSON.stringify(requestBody),
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream", ...(accept_language ? { "Accept-Language": accept_language } : {}) },
+      body: JSON.stringify(body),
     });
     for await (const event of readMessages(postResponse)) {
       if (!requestId) requestId = event.id;

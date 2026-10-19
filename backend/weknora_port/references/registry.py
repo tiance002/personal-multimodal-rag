@@ -46,7 +46,7 @@ _RESOURCE_HANDLE = re.compile(r"res://\d+")
 _SOURCE_PROTOCOL_COMMON = '''
 ## Source handling protocol (system-owned)
 Retrieved content uses request-local source handles: cN identifies a knowledge chunk, wN a web page, dN a document, and bN a knowledge base.
-- Never print raw chunk IDs, document IDs, knowledge-base IDs, or cN/dN/bN/wN handles as ordinary answer text. Use source filenames for human-readable attribution. Supplied image URLs are allowed as image targets.
+- Never print raw chunk IDs, document IDs, knowledge-base IDs, or cN/dN/bN/wN handles as ordinary answer text. Use source filenames for human-readable attribution.
 '''
 _CITATION_ENABLED_PROMPT = '''
 - Source citations are enabled for this answer. Cite a knowledge chunk with exactly <ref id="cN"/> and a web page with exactly <ref id="wN"/>.
@@ -60,11 +60,11 @@ _CITATION_ENABLED_PROMPT = '''
 _RESOURCE_PROTOCOL_PROMPT = '''
 
 ## Resource handle protocol (system-owned)
-Some source image URLs are represented by request-local res://NNNN handles. Copy a supplied handle exactly as a Markdown image target; the application resolves it to the authorized source image. Do not print handles as ordinary text or invent a handle or URL.
+Source image links and request-local res://NNNN handles belong to the reference materials. Do not embed retrieved images or reproduce these asset links in the answer. Use OCR and caption facts as textual evidence.
 '''
 
 _CITATION_DISABLED_PROMPT = '''
-Source citations are disabled. For prose, end with a short Sources line listing only the exact supplied filenames that support the answer. Do not use a document title to guess a filename or extension. Omit the line if no filename is supplied or the user requires a strict JSON/code-only format. Do not output citation tags, private IDs or attribution links. This filenames-only policy does not disable relevant image URLs.
+For prose, end with a short Sources line listing only the exact supplied filenames that support the answer, as plain text. Do not use a document title to guess a filename or extension. Omit the line if no filename is supplied or the user requires a strict JSON/code-only format.
 '''
 
 

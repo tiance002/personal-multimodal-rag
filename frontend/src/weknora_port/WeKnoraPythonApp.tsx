@@ -35,6 +35,18 @@ const ROLE_NAMES: Record<ModelRole, string> = {
 const EMPTY_CONFIG: ModelConfiguration = { revision: "", roles: (Object.keys(ROLE_NAMES) as ModelRole[]).map(role => ({
   role, provider: "", model: "", base_url: "", key_configured: false, api_key: "",
 })) };
+const ANSWER_LANGUAGE_KEY = "weknora-python-answer-language";
+const ANSWER_LANGUAGES = [
+  ["zh-CN", "简体中文"], ["zh-TW", "繁體中文"], ["en-US", "English"],
+  ["ja-JP", "日本語"], ["ko-KR", "한국어"],
+] as const;
+
+function savedAnswerLanguage(): string {
+  try {
+    const saved = localStorage.getItem(ANSWER_LANGUAGE_KEY);
+    return ANSWER_LANGUAGES.some(([locale]) => locale === saved) ? saved! : "zh-CN";
+  } catch { return "zh-CN"; }
+}
 const INTERNAL_SOURCE_ATTRIBUTION_LINE = /^[ \t]*(?:\*\*|__)?source:(?:\*\*|__)?[^\r\n]*\([ \t]*document[ \t]+d[1-9]\d*[ \t]*,[ \t]*chunk[ \t]+c[1-9]\d*[ \t]*\)[^\r\n]*(?:\r?\n|$)/i;
 const INTERNAL_CHINESE_ATTRIBUTION = /^[ \t]*(?:\*\*|__)?依据说明(?:：|:)(?:\*\*|__)?[ \t]*\r?\n[ \t]*上述数据直接来源于文档[ \t]*`d[1-9]\d*`[ \t]*中的第[ \t]*\d+[ \t]*段[（(]chunk[ \t]*`c[1-9]\d*`[）)][^\r\n]*(?:\r?\n|$)/i;
 
@@ -186,6 +198,7 @@ export function WeKnoraPythonApp() {
   const [scopeOpen, setScopeOpen] = useState(false);
   const scopeControl = useRef<HTMLDivElement | null>(null);
   const [config, setConfig] = useState<ModelConfiguration>(EMPTY_CONFIG);
+  const [answerLanguage, setAnswerLanguage] = useState(savedAnswerLanguage);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("正在确认 Python 服务身份");
   const [query, setQuery] = useState("");
@@ -380,7 +393,8 @@ export function WeKnoraPythonApp() {
     setBusy(true);
     try {
       await runPortChat(sessionId, {
-        content, request_id: requestId, mode: "quick",
+        content, request_id: requestId, mode: "quick", reasoning_effort: "off",
+        accept_language: answerLanguage,
         knowledge_base_scope: selectedBases, document_scope: selectedDocuments,
       }, {
         signal: controller.signal,
@@ -601,7 +615,16 @@ export function WeKnoraPythonApp() {
         </div>
       </section>}
 
-      {page === "models" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>模型角色</h1><p>配置 embedding、rerank、cheap、expensive 和 VLM。API 密钥只写入，不会从服务端读回。</p></div></div><form className="wp-model-form" onSubmit={event => void saveConfig(event)}>{config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Source<select aria-label={`Source ${role.role}`} value={role.source ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, source: event.target.value } : row) }))}><option value="">Choose source / preserve legacy</option><option value="remote">Remote</option><option value="local">Local (calls unavailable)</option></select></label><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.credential_status === "UNAVAILABLE" ? `凭据不可用（${role.credential_error}）；可输入新密钥替换` : role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<button className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</button></form></section>}
+      {page === "models" && <section className="wp-page-content"><div className="wp-page-heading"><div><h1>模型角色</h1><p>配置 embedding、rerank、cheap、expensive 和 VLM。API 密钥只写入，不会从服务端读回。</p></div></div><form className="wp-model-form" onSubmit={event => void saveConfig(event)}>
+        <fieldset className="wp-role-card"><legend>回答设置</legend><div className="wp-role-grid"><label className="wide">回答语言<select aria-label="回答语言" value={answerLanguage} disabled={busy} onChange={event => {
+          const locale = event.target.value;
+          setAnswerLanguage(locale);
+          try {
+            localStorage.setItem(ANSWER_LANGUAGE_KEY, locale);
+            setNotice("回答语言已更新，仅保存在此浏览器。");
+          } catch { setNotice("回答语言已更新，但浏览器不允许保存；刷新后恢复简体中文。"); }
+        }}>{ANSWER_LANGUAGES.map(([locale, label]) => <option key={locale} value={locale}>{label}</option>)}</select><small>即刻生效，无需保存模型设置。回答使用所选语言，不随提问语言切换。</small></label></div></fieldset>
+        {config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Source<select aria-label={`Source ${role.role}`} value={role.source ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, source: event.target.value } : row) }))}><option value="">Choose source / preserve legacy</option><option value="remote">Remote</option><option value="local">Local (calls unavailable)</option></select></label><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.credential_status === "UNAVAILABLE" ? `凭据不可用（${role.credential_error}）；可输入新密钥替换` : role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<button className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</button></form></section>}
       {page === "memory" && <MemoryPanel disabled={loading || Boolean(runtimeError)} onOpenDocument={openMemoryDocument} />}
     </main>
 

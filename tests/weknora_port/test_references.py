@@ -113,7 +113,7 @@ def test_resource_mask_roundtrips_markdown_images_and_clones_per_attempt():
 def test_protocol_prompt_preserves_image_url_exception_and_disabled_citation_policy():
     enabled = SourceRegistry().protocol_prompt
     disabled = SourceRegistry(citations_enabled=False).protocol_prompt
-    assert "relevant image URLs" in disabled
+    assert "Do not embed retrieved images" in disabled
     assert '<ref id="cN"/>' not in disabled
     assert "res://NNNN" in enabled and "res://NNNN" in disabled
 
