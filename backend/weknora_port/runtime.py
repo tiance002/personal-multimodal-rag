@@ -47,6 +47,7 @@ class ConversationSettings:
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
     rerank_top1_floorless: bool = False  # S8 isolated opt-in; no public session override.
+    bridge_rescue_mode: str = 'off'  # Server-only experiment, no saved-session override.
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .7, "max_completion_tokens": 0})
 
@@ -62,6 +63,10 @@ class ConversationSettings:
     rewrite_prompt_user: str | None = None
     query_understand_model_id: str = ''
     intent_system_prompts: Mapping[str, str] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if type(self.bridge_rescue_mode) is not str or self.bridge_rescue_mode not in ('off', 'cheap_bridge_v1'):
+            raise ValueError('BRIDGE_RESCUE_MODE_INVALID')
 
     @classmethod
     def from_mapping(cls, configuration, *, prompt_templates=None):
@@ -522,6 +527,8 @@ class ApplicationRuntime:
             source_evidence_mode=effective['source_evidence_mode'],
             rerank_context_enabled=effective['rerank_context_enabled'],
             rerank_top1_floorless=source.rerank_top1_floorless,
+            bridge_rescue_mode=source.bridge_rescue_mode,
+            bridge_cheap_model_id=snapshot.model_id('cheap') if source.bridge_rescue_mode != 'off' else '',
             graph_enabled=self.graph_enabled,
             language=resolve_language(source.language_locale, turn.request.accept_language),
             rewrite_system_prompt=DEFAULT_REWRITE_SYSTEM if effective['rewrite_prompt_system'] is None else effective['rewrite_prompt_system'],

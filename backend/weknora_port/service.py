@@ -335,8 +335,10 @@ class RuntimeService:
             if state.attachment_prompt:query+=state.attachment_prompt
             finalized=FinalizedContext(query,'',(),prompt,state.images)
             state.merge_results=[]
+            state.rescue_evidence=[]
         check_context(turn.context)
-        evidence=tuple(Evidence.from_result(r) for r in state.merge_results if r is not None)
+        from .retrieval.types import context_results
+        evidence=tuple(Evidence.from_result(r) for r in context_results(state) if r is not None)
         # Existing query-understand validation supplies the rewrite; P5
         # retains q0 and computes max features, without another model call.
         understanding=ValidatedRewrite(turn.request.content,state.rewrite_query) if state.rewrite_query else None
@@ -354,7 +356,23 @@ class RuntimeService:
             raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
         request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
             evidence=evidence,history=history,memory_prompt='' if fallback is not None else memory.prompt,understanding=understanding,**options)
-        stages=[('search',state.search_results),('rerank',state.rerank_results),('context',state.merge_results)]
+        if getattr(state, 'rescue_evidence', ()):
+            from .generation.context import prepare_generation
+            from .retrieval.source_evidence import SourceEvidenceBudgetError
+            try:
+                prepare_generation(request)
+            except SourceEvidenceBudgetError:
+                # The final source encoder can be larger than retrieval markup.
+                # Preserve every normal source and drop only the optional addition.
+                from .retrieval.context import into_chat_message
+                state.rescue_evidence=[]
+                state.bridge_trace.append({'decision':'SKIPPED','reason':'BRIDGE_GENERATION_CONTEXT_BUDGET_EXCEEDED'})
+                finalized=await into_chat_message(state,model_context,persist_sink=getattr(pipeline,'persist_sink',None))
+                evidence=tuple(Evidence.from_result(r) for r in context_results(state) if r is not None)
+                request=replace(request,finalized=finalized,evidence=evidence)
+                if hasattr(pipeline,'_progress'):
+                    await pipeline._progress('context','completed',selected_evidence_count=len(evidence),bridge_budget_skipped=True)
+        stages=[('search',state.search_results),('rerank',state.rerank_results),('context',context_results(state))]
         rankings=tuple((name,tuple((r.id,r.knowledge_base_id,r.knowledge_id) for r in rows if r is not None)) for name,rows in stages)
         return PreparedOrdinaryTurn(request,model_context,rankings)
 

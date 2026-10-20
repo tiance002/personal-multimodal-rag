@@ -95,10 +95,13 @@ def observe_pipeline_capture(self, pipeline, turn):
         entry = {'stage': stage, 'status': status, 'time': time.time(), 'fields': fields}
         if status == 'completed':
             entry['state'] = {name: [asdict(row) if row is not None else None for row in getattr(active_state, name)]
-                for name in ('search_results', 'rerank_results', 'merge_results')}
+                for name in ('search_results', 'rerank_results', 'merge_results', 'rescue_evidence')}
             entry['state'].update({name: deepcopy(getattr(active_state, name, None))
                 for name in ('query', 'rewrite_query', 'intent', 'needs_retrieval', 'user_content',
-                             'source_evidence_mode', 'evidence_trace', 'graph_enabled', 'graph_trace')})
+                             'source_evidence_mode', 'evidence_trace', 'graph_enabled', 'graph_trace',
+                             'bridge_rescue_mode', 'bridge_trace')})
+            if stage == 'context' and getattr(active_state, '_finalized_context', None) is not None:
+                record['finalized_context'] = asdict(active_state._finalized_context)
         record['stages'].append(entry); save()
         if original_progress is not None:
             result = original_progress(stage, status, **fields)

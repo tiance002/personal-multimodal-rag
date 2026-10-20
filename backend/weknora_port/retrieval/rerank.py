@@ -159,7 +159,7 @@ async def rerank(state, context, registry, segmenter=None):
         except TypeError:
             raise InvalidRerankResponse('RERANK_RESPONSE_INVALID') from None
         _validate_raw_results(raw, len(candidates))
-        if getattr(state, 'source_evidence_mode', 'off') != 'off':
+        if getattr(state, 'source_evidence_mode', 'off') != 'off' or getattr(state, 'bridge_rescue_mode', 'off') != 'off':
             state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
                 'response': [{'index': r.index, 'score': r.score} for r in raw]})
         return raw
@@ -215,7 +215,7 @@ async def rerank(state, context, registry, segmenter=None):
         accepted.append(r)
         texts.append(passages[rr.index])
     state.rerank_results = mmr(accepted, texts, min(len(accepted), max(1, state.rerank_top_k)), segmenter)
-    if getattr(state, 'source_evidence_mode', 'off') != 'off':
+    if getattr(state, 'source_evidence_mode', 'off') != 'off' or getattr(state, 'bridge_rescue_mode', 'off') != 'off':
         state.evidence_trace.append({'stage': 'rerank_filter_mmr', 'threshold': state.rerank_threshold,
             'accepted_ids': [r.id for r in accepted], 'mmr_ids': [r.id for r in state.rerank_results]})
     if not state.rerank_results:

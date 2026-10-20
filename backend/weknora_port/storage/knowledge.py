@@ -84,6 +84,10 @@ class ScopedKnowledgeRepository:
     async def get_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
         return await self._read_chunks(ids,context)
 
+    async def get_current_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
+        """Read current enabled/index-eligible source rows without widening scope."""
+        return await self._read_chunks(ids, context, current=True, searchable=True)
+
     async def get_chunk_children(self, parent_ids: Sequence[str], context: CallContext) -> Sequence[SearchResult]:
         return list((await self._read_chunks(parent_ids,context,children=True)).values())
 

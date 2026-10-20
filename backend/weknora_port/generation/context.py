@@ -144,6 +144,8 @@ def knowledge_context(rows, registry, *, classify_sources=False):
                     'image_caption':'generated_caption', 'image_ocr':'derived_ocr',
                     'table_column':'derived_table', 'text':'source_text', 'faq':'curated_qa'}.get(row.chunk_type,'source_data')
                 kind = f' evidence_kind="{category}"'
+            if (row.metadata or {}).get('bridge_rescue'):
+                kind += ' role="bridge_supplement" supports="institution_location_only" seminar_venue="unverified"'
             identifier = f' id="{handle}"' if registry.citations_enabled else ''
             out += f'    <chunk{identifier} index="{row.chunk_index}" view="{view}"' + (f' type="{escape_attr(row.chunk_type)}"' if row.chunk_type else '') + kind + '>\n'
             if row.content:

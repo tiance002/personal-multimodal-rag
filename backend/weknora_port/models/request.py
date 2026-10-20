@@ -172,7 +172,7 @@ def build_chat_body(config: ModelConfig, messages: Sequence[Message], options: C
             else:
                 for name in ("temperature", "top_p", "frequency_penalty", "presence_penalty"):
                     value = getattr(opts, name)
-                    if value > 0:
+                    if value > 0 or (name == "temperature" and opts.send_temperature and value == 0):
                         body[name] = value
                 if opts.seed > 0 and s.supports_seed:
                     body["seed"] = opts.seed

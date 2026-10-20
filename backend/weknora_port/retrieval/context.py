@@ -1,6 +1,7 @@
 """Final answer-ready context rendering, before any P5 role selection."""
 from __future__ import annotations
 from .query import go_strip, go_fields
+from .types import context_results
 from datetime import datetime, timedelta
 import html
 import re
@@ -106,7 +107,7 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None)
         state.rendered_contexts = ''
         state.user_content = rendered
     else:
-        results = state.merge_results
+        results = context_results(state)
         faq = [r for r in results if r.chunk_type == 'faq'] if state.faq_priority_enabled else []
         docs = [r for r in results if r.chunk_type != 'faq'] if faq else results
         header = document_header(faq + docs if faq else results)
@@ -142,4 +143,12 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None)
         limit = state.graph_context_char_limit
         if len(state.rendered_contexts) > limit:
             raise SourceEvidenceBudgetError('GRAPH_CONTEXT_BUDGET_EXCEEDED')
-    return FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in state.merge_results)), state.system_prompt_override, tuple(state.images), limit)
+    if getattr(state, 'rescue_evidence', ()):
+        from .source_evidence import SourceEvidenceBudgetError
+        bridge_limit = state.bridge_context_char_limit
+        if len(state.rendered_contexts) > bridge_limit:
+            raise SourceEvidenceBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
+        limit = min(limit or bridge_limit, bridge_limit)
+    result = FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in context_results(state))), state.system_prompt_override, tuple(state.images), limit)
+    state._finalized_context = result
+    return result

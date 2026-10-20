@@ -87,6 +87,18 @@ def test_sampling_matches_actual_greater_than_zero_behavior():
     assert "temperature" not in disabled and "seed" not in disabled
 
 
+def test_internal_call_can_explicitly_send_zero_temperature_without_changing_defaults():
+    c = config()
+    omitted = build_chat_body(c, (Message("user", "hi"),), ChatOptions(temperature=0))
+    explicit = build_chat_body(c, (Message("user", "hi"),),
+                               ChatOptions(temperature=0, send_temperature=True))
+    unsupported = build_chat_body(replace(c, chat=replace(c.chat, supports_temperature=False)),
+        (Message("user", "hi"),), ChatOptions(temperature=0, send_temperature=True))
+    assert "temperature" not in omitted
+    assert explicit["temperature"] == 0
+    assert "temperature" not in unsupported
+
+
 @pytest.mark.parametrize("format,want", [
     ("openai",{"reasoning_effort":"high"}), ("thinking-type",{"thinking":{"type":"enabled"},"reasoning_effort":"high"}),
     ("enable-thinking",{"enable_thinking":True,"reasoning_effort":"high"}),

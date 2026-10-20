@@ -59,6 +59,11 @@ class PipelineState(SearchState):
     graph_enabled: bool = False
     graph_trace: list[dict] = field(default_factory=list)
     graph_context_char_limit: int = 0
+    bridge_rescue_mode: str = 'off'
+    bridge_cheap_model_id: str = ''
+    rescue_evidence: list[Any] = field(default_factory=list)
+    bridge_trace: list[dict] = field(default_factory=list)
+    bridge_context_char_limit: int = 16000
 
 class RetrievalPipeline:
 
@@ -85,6 +90,12 @@ class RetrievalPipeline:
     async def run(self, state, context):
         import asyncio
         from ..models.types import CallCancelled, RunDeadlineExceeded
+        if type(state.bridge_rescue_mode) is not str or state.bridge_rescue_mode not in ('off', 'cheap_bridge_v1'):
+            raise ValueError('BRIDGE_RESCUE_MODE_INVALID')
+        if state.bridge_rescue_mode != 'off' and (state.graph_enabled or state.rerank_top1_floorless):
+            raise ValueError('BRIDGE_EXPERIMENT_CONFLICT')
+        if type(state.bridge_context_char_limit) is not int or not 1 <= state.bridge_context_char_limit <= 16000:
+            raise ValueError('BRIDGE_CONTEXT_BUDGET_INVALID')
         if type(state.rerank_top1_floorless) is not bool:
             raise ValueError('RERANK_TOP1_SETTING_INVALID')
         if state.graph_enabled and state.rerank_top1_floorless:
@@ -168,6 +179,20 @@ class RetrievalPipeline:
             if ordinary_empty and not state.merge_results:
                 raise SearchNothing()
             check_context()
+        if state.bridge_rescue_mode != 'off' and not ordinary_empty:
+            from copy import copy
+            from .bridge_rescue import rescue_bridge
+            from .source_evidence import SourceEvidenceBudgetError
+            await self._progress('bridge', 'started')
+            await rescue_bridge(state, context, self.repository, self.registry)
+            check_context()
+            if state.rescue_evidence:
+                try:
+                    await into_chat_message(copy(state), context)
+                except SourceEvidenceBudgetError:
+                    state.rescue_evidence = []
+                    state.bridge_trace.append({'decision': 'SKIPPED', 'reason': 'BRIDGE_CONTEXT_BUDGET_EXCEEDED'})
+            await self._progress('bridge', 'completed', added_chunks=len(state.rescue_evidence))
         await self._progress("context", "started")
         result = await into_chat_message(state, context, persist_sink=self.persist_sink)
         await self._progress("context", "completed", selected_evidence_count=len(result.result_ids))

@@ -112,6 +112,10 @@ class ChatOptions:
     format: str = ""
     prompt_cache_key: str = ""
     cache_retention: str = ""
+    # Some internal calls (for example bounded extraction) require an explicit
+    # deterministic temperature on the provider wire. Default calls retain the
+    # upstream-compatible behavior that omits zero-valued sampling fields.
+    send_temperature: bool = False
 
     def completion_budget(self) -> int:
         return self.max_completion_tokens if self.max_completion_tokens > 0 else self.max_tokens

@@ -150,7 +150,10 @@ class ProviderModel:
             return await self._local_chat(messages, options, context, _capability=_capability)
         options = self._options(options, context)
         async with call_lifetime(context, DEFAULT_CHAT_TIMEOUT) as lifetime:
-            for retry in ((False,) if _capability == "vision" else (False, True)):
+            image_fallback = _capability != "vision" and any(
+                m.images or any(p.get("type") == "image_url" and p.get("image_url") for p in m.multi_content)
+                for m in messages)
+            for retry in ((False, True) if image_fallback else (False,)):
                 body = self.build_request_body(strip_images(messages) if retry else messages, options)
                 call_context = context.child("image-fallback") if retry else context
                 try:
@@ -182,7 +185,7 @@ class ProviderModel:
                         handle.observed(response.usage)
                         return response
                 except ProviderError as error:
-                    if _capability != "vision" and not retry and getattr(error, "multimodal_unsupported", False):
+                    if image_fallback and not retry and getattr(error, "multimodal_unsupported", False):
                         continue
                     raise
 

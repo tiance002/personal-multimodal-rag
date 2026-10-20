@@ -37,6 +37,21 @@ class SearchResult:
     context_header: str = ""
 
 
+def context_results(state):
+    """Original normal order followed by independent, verified supplements."""
+    normal = state.merge_results
+    rescue = getattr(state, "rescue_evidence", ())
+    if not rescue:
+        return normal
+    if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
+        raise ValueError("BRIDGE_EVIDENCE_MODE_MISMATCH")
+    rows = [*normal, *rescue]
+    ids = [row.id for row in rows if row is not None]
+    if len(ids) != len(set(ids)):
+        raise ValueError("BRIDGE_EVIDENCE_DUPLICATE")
+    return rows
+
+
 @dataclass
 class SearchState:
     needs_retrieval: bool = True

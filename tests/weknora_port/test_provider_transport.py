@@ -335,3 +335,19 @@ def test_settlement_deadline_is_never_an_upgradeable_provider_timeout():
         finally:
             await transport.aclose()
     asyncio.run(run())
+
+
+def test_text_only_multimodal_error_cannot_resend_bridge_extraction():
+    async def run():
+        sent=[]
+        model,transport,gate=setup(lambda req: sent.append(req) or httpx.Response(400,text='image unsupported'))
+        try:
+            with pytest.raises(ProviderError):
+                await model.chat((Message('user','extract JSON from original text'),),
+                    ChatOptions(temperature=0,max_tokens=256,thinking=False,format='json'),
+                    context('bridge-extract'))
+            assert len(sent)==len(gate.calls)==len(gate.finishes)==1
+            assert gate.calls[0].context.request_id=='bridge-extract'
+        finally:
+            await transport.aclose()
+    asyncio.run(run())

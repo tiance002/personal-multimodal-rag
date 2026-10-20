@@ -38,6 +38,9 @@ class RetrievalRepository(Protocol):
     async def get_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
         ...
 
+    async def get_current_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
+        ...
+
     async def get_chunk_children(self, parent_ids: Sequence[str], context: CallContext) -> Sequence[SearchResult]:
         ...
 

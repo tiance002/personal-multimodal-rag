@@ -1,5 +1,6 @@
 """Normal configuration counterexample: first KB model differs from saved Cheap."""
 import asyncio
+import pytest
 from types import SimpleNamespace
 from contextlib import asynccontextmanager
 from backend.weknora_port.runtime import ApplicationRuntime,ConversationSettings
@@ -10,7 +11,8 @@ from backend.weknora_port.models.types import CallContext,TrustedScope
 from backend.weknora_port.service import OrdinaryTurnRequest
 
 
-def test_configuration_uses_first_requested_kb_not_legacy_session_cheap():
+@pytest.mark.parametrize("bridge_mode",["off","cheap_bridge_v1"])
+def test_configuration_uses_first_requested_kb_not_legacy_session_cheap(bridge_mode):
     async def scenario():
         roles={'cheap':ConfiguredRole('cheap','siliconflow','XingChenAGI/Xing4.0-29B','http://fixture.invalid/v1','synthetic'), 'expensive':ConfiguredRole('expensive','deepseek','deepseek-flash','http://fixture.invalid/v1','synthetic')}
         app=object.__new__(ApplicationRuntime)
@@ -21,7 +23,8 @@ def test_configuration_uses_first_requested_kb_not_legacy_session_cheap():
             async def resolve(self,id):return roles[id]
             async def _load(self,id):return {'id':id,'type':'KnowledgeQA','source':roles[id].provider},{},roles[id]
         app.leases=Leases();app.principal=SimpleNamespace(tenant_id=1,subject_id='owner');app.models=Models();app.catalogue=SourceCatalogue()
-        app.conversation=ConversationSettings();app.policy=RouterPolicy(mode='OFF');app._runs={}
+        app.graph_enabled=False
+        app.conversation=ConversationSettings(bridge_rescue_mode=bridge_mode);app.policy=RouterPolicy(mode='OFF');app._runs={}
         app.model_factory=lambda config,key,gate:SimpleNamespace(config=config,transport=SimpleNamespace(gate=gate))
         async def session(*args):return {'summary_model_id':'cheap','max_rounds':5,'enable_rewrite':True,'embedding_top_k':30,'vector_threshold':.2,'keyword_threshold':.3,'rerank_top_k':30,'rerank_threshold':.3}
         app.turns=SimpleNamespace(_session=session)
@@ -35,6 +38,8 @@ def test_configuration_uses_first_requested_kb_not_legacy_session_cheap():
         turn=SimpleNamespace(session_id='session',run_id='run',request=request,context=CallContext('run',TrustedScope('owner',('first','second'))))
         config=await app._configuration(turn)
         assert config.pipeline_state.chat_model_id=='expensive'
+        assert config.pipeline_state.bridge_cheap_model_id==('cheap' if bridge_mode!='off' else '')
+        assert config.pipeline_state.bridge_rescue_mode==bridge_mode
     asyncio.run(scenario())
 
 
