@@ -29,7 +29,8 @@ x-app: &app
   cap_drop: [ALL]
   security_opt: [no-new-privileges:true]
   pids_limit: 128
-  mem_limit: 512m
+  mem_limit: 1g
+  memswap_limit: 1g
   cpus: 0.75
   stop_grace_period: 30s
   volumes:

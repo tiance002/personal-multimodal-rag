@@ -1,0 +1,167 @@
+{
+  "schema": "s8-1-scoring-fact-criteria/v1",
+  "gold_sha256": "3b3c4b4c6f0c8eafe42509ca1252fda09ddf5c69d64330f1807dffd38c8c4874",
+  "source_archive_sha256": "d9aecf103b3f82c82b94d963e713ee34f24ebe2e8bcc6451fd38c1dc5487861e",
+  "cases": [
+    {
+      "case_id": "scifact-1304",
+      "dataset": "scifact",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "qrel=1只表示文档相关；不得据此生成SUPPORT/REFUTE标签或官方立场准确率。"
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "miracl-zh-5704915#0",
+      "dataset": "miracl-zh",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "本题qrels仅相关性；如审答案，需实际Context明确香山在北京海淀区的地点关系。grade0不作正例。"
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "dataset": "longbench-zh",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "DSM卫星影像星下点分辨率优于5m；优于、不劣于、等于和数值方向分别核查。"
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+      "dataset": "longbench-zh",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "按冻结Gold分别核查饮酒、病毒性肝炎、肝硬化/肝癌、胆道疾病、药物/化学中毒、心脏疾病及其他感染。",
+        "只对实际Context支持的项目计事实充分；额外医学主张另标无依据；此项是数据集事实审查而非医疗建议。"
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "dataset": "hotpotqa",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "Tribometer invention attribution to Pieter van Musschenbroek.",
+        "Same person credited for Leyden jar, preserving whether the source says 1745/1746."
+      ],
+      "supporting_sentences": [
+        {
+          "document_id": "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+          "sentence_index_zero_based": 1,
+          "title": "Tribometer",
+          "text": " It was invented by the 18th century Dutch scientist Musschenbroek",
+          "verified_original_sha256": "29baf81935dc55110ab75f4711c4502f91e9beda98a4ff12c35b4d728c10fd16",
+          "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+          "archive_member": "objects/29baf81935dc55110ab75f4711c4502f91e9beda98a4ff12c35b4d728c10fd16",
+          "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+          "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+        },
+        {
+          "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+          "sentence_index_zero_based": 0,
+          "title": "Pieter van Musschenbroek",
+          "text": "Pieter van Musschenbroek (14 March 1692 – 19 September 1761) was a Dutch scientist.",
+          "verified_original_sha256": "45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+          "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+          "archive_member": "objects/45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+          "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+          "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+        },
+        {
+          "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+          "sentence_index_zero_based": 2,
+          "title": "Pieter van Musschenbroek",
+          "text": " He is credited with the invention of the first capacitor in 1746: the Leyden jar.",
+          "verified_original_sha256": "45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+          "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+          "archive_member": "objects/45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+          "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+          "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+        }
+      ],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "hotpotqa-5a7631cd5542994ccc91870c",
+      "dataset": "hotpotqa",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "Jeanne Marie Beaumont directed the Frost Place poetry seminar during 2007–2010.",
+        "The Frost Place is in Franconia, New Hampshire; both relationship and location must reach model."
+      ],
+      "supporting_sentences": [
+        {
+          "document_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+          "sentence_index_zero_based": 9,
+          "title": "Jeanne Marie Beaumont",
+          "text": " She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+          "verified_original_sha256": "f43886e7f9b452c786e071701ce14871456ec95342cb132e7a212c397458eb9e",
+          "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+          "archive_member": "objects/f43886e7f9b452c786e071701ce14871456ec95342cb132e7a212c397458eb9e",
+          "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+          "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+        },
+        {
+          "document_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+          "sentence_index_zero_based": 0,
+          "title": "The Frost Place",
+          "text": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+          "verified_original_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+          "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+          "archive_member": "objects/9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+          "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+          "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+        }
+      ],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "dataset": "mmlongbench-doc",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "Cat vs Dog dataset must be associated with the Coding time section; unrelated dataset/code text alone is insufficient."
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "dataset": "mmlongbench-doc",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "Question asks median campaign grade; Gold names Clinton. Average grade, percentage or chart labels must not be substituted for median."
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+      "dataset": "mmlongbench-doc",
+      "use": "POST_RUN_SCORING_ONLY_NEVER_MODEL_INPUT",
+      "facts": [
+        "Gold list is shiny object and mirror; verify source-bound figure evidence actually reaches Context.",
+        "If figure-derived fact is absent from actual Context, evaluate evidence-insufficient refusal separately from answer similarity."
+      ],
+      "supporting_sentences": [],
+      "current_fact_support": "UNVERIFIED_NO_NEW_RECEIPT",
+      "mml_page_policy": "Native page base UNKNOWN; report raw page labels and source-bound facts separately, no invented page recall."
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "schema": "s8-1-final-directed-test-results/v1",
+  "scope": "Offline documentary consolidation only; no test rerun, source edits, ECS operation, grant or Provider request",
+  "source_of_evidence": "Actual commands and outputs recorded in this worker conversation; existing tool results are summarized without rerunning",
+  "environment": {
+    "cwd": "E:/RAG-Worktrees/s8-six-dataset-evaluation",
+    "shell": "powershell",
+    "interpreter_command": "python",
+    "interpreter_observed_path": "D:/Drivers/python/python.exe",
+    "interpreter_observed_version": "3.13.150 (Get-Command display, not independently recorded full Python version)",
+    "final_pytest_environment": {
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "final_pytest_flags": [
+      "-q",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "dependency_install": "NOT RUN; existing interpreter and dependencies used",
+    "real_services_in_tests": false,
+    "database_writes_in_tests": false,
+    "live_authorizations_in_tests": false,
+    "provider_requests_in_tests": 0
+  },
+  "count_interpretation": {
+    "latest_combined_passed_output": 61,
+    "files": {
+      "tests/weknora_port/test_conversation_configuration.py": 43,
+      "tests/weknora_port/test_s8_1_ecs_acceptance.py": 18
+    },
+    "includes_prior_18_tool_tests": true,
+    "sum_61_plus_18_forbidden": true,
+    "explanation": "The final 61-case invocation selected both files and already included the 18 acceptance-tool cases. Earlier 7/10/15/18/58/60 runs overlap and must not be added as unique coverage."
+  },
+  "final_combined_invocation": {
+    "command": "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'\npython -m pytest tests/weknora_port/test_conversation_configuration.py tests/weknora_port/test_s8_1_ecs_acceptance.py -q -p no:cacheprovider --basetemp 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/pytest-runtime-sentinel-4'",
+    "output": ".............................................................            [100%]\n61 passed in 1.61s",
+    "result": "61_PASSED_OUTPUT_OBSERVED",
+    "pytest_exit_code_captured_independently": false,
+    "pytest_exit_code": null,
+    "whole_tool_command_batch_exit_code": 1,
+    "whole_tool_command_batch_tail": "Get-FileHash -LiteralPath 'E:/RAG quention/backend/weknora_port/conversation_configuration.py','E:/RAG quention/backend/weknora_port/runtime.py' -Algorithm SHA256",
+    "batch_exit_explanation": "The same PowerShell tool call then attempted hashes at paths not present in E:/RAG quention and reported two Get-FileHash path errors. The tool returned 1 for that complete batch. The pytest command emitted its normal final 61-passed summary, but its numeric exit was not separately persisted before those later commands. This report does not relabel the complete batch as exit 0.",
+    "tool_evidence_chunk_id": "9e0002",
+    "latest_previous_combined_exit_0": {
+      "command": "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'\npython -m pytest tests/weknora_port/test_conversation_configuration.py tests/weknora_port/test_s8_1_ecs_acceptance.py -q -p no:cacheprovider --basetemp 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/pytest-runtime-sentinel-3'\ngit diff -- backend/weknora_port/conversation_configuration.py backend/weknora_port/runtime.py tests/weknora_port/test_conversation_configuration.py\ngit diff --check",
+      "batch_exit_code": 0,
+      "key_output": "60 passed in 1.41s",
+      "evidence_chunk_id": "1ad945",
+      "difference_from_61": "The subsequent 61st case directly exercised formal create_session with synthetic dependencies and checked persisted summary JSON remains temperature .7 / max_completion_tokens 0."
+    }
+  },
+  "final_tools_18_invocation": {
+    "command": "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'\npython -m pytest tests/weknora_port/test_s8_1_ecs_acceptance.py -q -p no:cacheprovider --basetemp 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/pytest-alignment-json-1'\nCopy-Item -LiteralPath 'E:/RAG-Worktrees/s8-six-dataset-evaluation/scripts/s8_1_ecs_acceptance.py' -Destination 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/s8_1_ecs_acceptance.py'\nGet-FileHash -LiteralPath 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/s8_1_ecs_acceptance.py' -Algorithm SHA256",
+    "command_batch_exit_code": 0,
+    "key_output": "..................                                                       [100%]\n18 passed in 0.98s",
+    "tool_sha256_at_this_run": "e8f30ea310b669bc8fd208810acf4f87b39f23a769de59c9c1f51a8b27fde63c",
+    "evidence_chunk_id": "e8d5e6",
+    "coverage": [
+      "Closed-cloud/no-execution inspection precondition and no report overwrite",
+      "Real request builder/output contract for supplied options; unknown thinking contract and absent cap refusal",
+      "Public configuration excludes credential slots",
+      "Instance settings preserve original environment and separate approved experiment arms",
+      "Retrieval observer calls originals and preserves returned objects/order; hooks restore on exit",
+      "B requires healthy A without adding an unapproved low-score threshold",
+      "Cross-tenant comparison ignores model IDs but compares provider/model/source/API/parameter hashes",
+      "Template/router/effective generation drift is refused",
+      "QU must reference the current tenant's explicit Cheap identity",
+      "Empty and nonempty tools list/tuple JSON equivalence; changed cap and nested tool parameter still refused"
+    ]
+  },
+  "parameter_coverage": [
+    "Configuration sentinel 0 survives resolve_saved_conversation without mutating source/session",
+    "Quick sentinel resolves to 2048 and smart pure resolver to 4096",
+    "Temperature .7 reaches real Qwen request builder",
+    "Thinking remains false, no independent thinking budget introduced",
+    "Qwen final wire has max_tokens positive2048/4096 and enable_thinking false with verified output contract",
+    "Explicit positive historical1024 and positive legacy max_tokens caps retain semantics",
+    "Negative/noninteger/string/null direct limit and bool limits are refused; unknown mode is refused",
+    "Formal runtime._configuration normal and fallback options both resolve positive quick2048; explicit historical1024 remains1024",
+    "Formal create_session persists temperature .7 and max_completion_tokens0",
+    "QU-specific identity/configuration is preserved; original QU implementation not modified",
+    "Smart API remains HTTP501; the smart4096 test is a pure default/options/builder test, not a Smart chain execution"
+  ],
+  "failure_history": [
+    {
+      "kind": "Initial offline acceptance test environment failure",
+      "command": "python -m pytest tests/weknora_port/test_s8_1_ecs_acceptance.py -q -p no:cacheprovider",
+      "exit_code": 1,
+      "evidence_chunk_id": "734f5f",
+      "output": "4 passed, 3 setup errors; default sandbox Temp could not create pytest numbered directory; globally autoloaded pytest_html_reporter also raised PermissionError writing output.json in worktree root",
+      "correction": "Disabled global pytest plugin autoload and used explicit controller report basetemp; later 7/10/15/18 case invocations completed with exit0. No production fix or Provider request.",
+      "production_defect": false
+    },
+    {
+      "kind": "Sandbox retry interrupted",
+      "command": "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'\npython -m pytest tests/weknora_port/test_s8_1_ecs_acceptance.py -q -p no:cacheprovider --basetemp 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/pytest-inspection-1'",
+      "exit_code": 1,
+      "result": "Interrupted after partial output; not a passing validation",
+      "correction": "Used scoped escalated execution for authorized worktree reads/temp operations; next pytest-inspection-2 returned 7 passed in0.47s / exit0"
+    },
+    {
+      "kind": "Real zero-cloud alignment inspection tool comparison defect",
+      "evidence_file": "E:/RAG quention/var/reports/s8-1-ecs-20261020/alignment-diff.stdout",
+      "observed_error": "S8_1_LOCAL_ALIGNMENT_MISMATCH:effective_generation_options",
+      "cause": "Python asdict(ChatOptions).tools tuple() versus JSON-loaded [] had equal JSON meaning but direct Python equality failed",
+      "correction": "Compare complete generation DTO JSON using sorted keys, compact separators and allow_nan=False. No fields dropped; no scalar/string coercion. Added sequence equivalence and actual-difference refusal tests.",
+      "historical_failed_inspection_retained": true,
+      "provider_requests": 0,
+      "result_after_correction": "Root reported aligned actual role/QU/parameter/template/router readback succeeded before later parameter-default revision",
+      "production_parameter_change_to_hide_failure": false
+    },
+    {
+      "kind": "New test fixture used wrong TurnConfiguration field names",
+      "command": "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'\npython -m pytest tests/weknora_port/test_conversation_configuration.py -q -p no:cacheprovider --basetemp 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/pytest-runtime-sentinel-2'",
+      "exit_code": 1,
+      "evidence_chunk_id": "8c11a7",
+      "key_output": "2 failed, 40 passed in 1.30s",
+      "cause": "New test referred to result.generation/result.state; actual DTO fields are generation_options/pipeline_state",
+      "correction": "Corrected test references; no production change needed for this failure",
+      "corrected_validation": "pytest-runtime-sentinel-3:60 passed in1.41s / exit0; subsequent61-passed output as recorded above",
+      "production_defect": false
+    }
+  ],
+  "additional_nonadditive_checks": {
+    "driver": {
+      "command": "python 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/test_ecs_case_driver.py'",
+      "exit_code": 0,
+      "output": "{\"status\":\"PASS\",\"synthetic_checks\":5,\"provider_requests\":0,\"real_children_created\":0}",
+      "scope": "Synthetic dry-run/parent-boundary guards only; not real Docker/API acceptance",
+      "evidence_chunk_id": "70e0a9"
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "scope": "Parameter-change tracked diff; LF/CRLF advisory warning is not a failed check",
+      "evidence_chunk_id": "3906a8"
+    }
+  },
+  "implementation_files_at_parameter_handoff": [
+    {
+      "path": "backend/weknora_port/conversation_configuration.py",
+      "sha256": "f05fd68b5844872a60b6b16c4dff7a51104ba6c3467f0c7f0cf403d710099915"
+    },
+    {
+      "path": "backend/weknora_port/runtime.py",
+      "sha256": "78aa92beeca93ce9c62d35eb21b5a78cb8a58b2189e1c9de2c12b585cb59e0c6"
+    },
+    {
+      "path": "tests/weknora_port/test_conversation_configuration.py",
+      "sha256": "bdae44d1ace9f54871be6d65629d021ab50250359dcf6a631cd092bdcdd53af9"
+    }
+  ],
+  "root_reported_later_evidence": {
+    "attribution": "Reported directly by root in latest task; this worker did not independently rerun or query ECS",
+    "implementation_commit": "4eace2ef64d8f395e511d84f1ac8267e15be1806",
+    "local_main": "Only two precise parameter-file changes; old18 protected files unchanged",
+    "ecs_actual_wire": "New temperature .7 / configuration0 resolves to actual quick2048, verified by root",
+    "first_normal_api_question": "4 SETTLED Provider calls /15227 actual Tokens; full normal API completed",
+    "smart_real_call": "NOT RUN",
+    "worker_action_after_root_started_A": "No code/tool edits, service operations, tests or model calls; report creation only"
+  },
+  "constraints": {
+    "test_counts_not_benchmark_scores": true,
+    "pure_smart_resolver_not_smart_implementation": true,
+    "no_commit_push_tag_by_worker": true,
+    "required_sentence": "未实现的命令不得报告通过。"
+  },
+  "independent_exit_capture_addendum": {
+    "status": "PASS",
+    "attribution": "Root independently reran the final two-file directed suite after the original report; no rerun by this worker during archival",
+    "receipt_path": "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\controller\\final-pytest.receipt.json",
+    "receipt_sha256": "f2751586811ef9f576a6ee89408f1c93597b35fc57cc7cce03b25949d3e41564",
+    "argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/weknora_port/test_conversation_configuration.py",
+      "tests/weknora_port/test_s8_1_ecs_acceptance.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\controller\\pytest-final-captured"
+    ],
+    "exit_code": 0,
+    "stdout": ".............................................................            [100%]\r\n61 passed in 1.38s\r\n",
+    "stderr": "",
+    "scope": "directed offline/synthetic only; no Provider",
+    "count": 61,
+    "includes_tool_18": true,
+    "not_additive": true,
+    "original_failure_history": "Preserved in this record; addendum supplies the previously missing independent numeric pytest exit evidence",
+    "implementation_commit": "4eace2ef64d8f395e511d84f1ac8267e15be1806"
+  }
+}
