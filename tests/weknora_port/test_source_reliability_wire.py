@@ -214,3 +214,29 @@ def test_materialized_subchunk_requires_exact_identity_version_and_locator(chang
         with pytest.raises((PermissionError, ValueError, RetrievalScopeError)):
             await expand_source_evidence(state([hit]), CTX, Repo())
     asyncio.run(run())
+
+
+@pytest.mark.parametrize('change', [
+    {'chunk_metadata':{'source_version':'old'}}, {'is_enabled':False},
+])
+def test_selected_original_cannot_borrow_current_source_identity(change):
+    async def run():
+        source, _ = pair(); hit = result(source)
+        for key, value in change.items(): setattr(hit, key, value)
+        with pytest.raises((PermissionError, RetrievalScopeError)):
+            await expand_source_evidence(state([hit]), CTX, repository([source]))
+    asyncio.run(run())
+
+
+def test_unmaterialized_projection_outside_group_budget_is_not_a_quote():
+    async def run():
+        originals = [result(row(f'raw{i}', f'Original source {i}', knowledge_id=f'doc{i}')) for i in range(4)]
+        originals[-1].content += ' expanded without exact locator'
+        originals[-1].content_rewritten = True
+        class Repo:
+            async def get_source_unit(self, anchor, context):
+                return [r for r in originals[:3] if r.id == anchor.id]
+        s = state(originals); await expand_source_evidence(s, CTX, Repo())
+        assert [r.id for r in s.merge_results] == ['raw0', 'raw1', 'raw2']
+        assert s.evidence_trace[-1]['reason'] == 'UNMATERIALIZED_SELECTED_PROJECTION'
+    asyncio.run(run())

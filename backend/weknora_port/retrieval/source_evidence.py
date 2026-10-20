@@ -152,6 +152,28 @@ async def expand_source_evidence(state, context, repository):
     # not verify every summary claim (e.g. mistranslation or reversed causality).
     # Keep the independently identified originals, not the conflicting paraphrase.
     originals = [r for r in selected if r.chunk_type not in ('summary', 'table_summary')]
+    # Every retained original still needs consistent provenance, including
+    # rows beyond the optional expansion groups. Unmaterialized composite
+    # offsets are never a proof just because no further lookup was budgeted.
+    verified = []
+    for row in originals:
+        if row.chunk_type in ('text', 'parent_text'):
+            version = row.metadata.get('source_version')
+            if (not version or row.chunk_metadata.get('source_version') != version or
+                    not row.is_enabled):
+                raise RetrievalScopeError()
+            if (row.content_rewritten or row.content_revision or
+                    type(row.start_at) is not int or type(row.end_at) is not int or
+                    row.start_at < 0 or row.end_at - row.start_at != len(row.content)):
+                # Optional expansion is bounded to a few source groups. A
+                # composite outside that budget cannot borrow a quote locator;
+                # preserve the insufficiency instead of discarding valid hits.
+                state.evidence_trace.append({'stage':'source_projection', 'anchor':row.id,
+                    'decision':'INSUFFICIENT_SOURCE', 'reason':'UNMATERIALIZED_SELECTED_PROJECTION',
+                    'source_ids':[]})
+                continue
+        verified.append(row)
+    originals = verified
     for hint in selected:
         if hint.chunk_type not in ('summary', 'table_summary'):
             continue
