@@ -151,3 +151,14 @@ Owner 后续批准 ECS 部署、限定迁移及缺失689份资料的 BGE-M3 入�
 - 远端 `rag-s8-ingestion-20261020.service` 于00:55:25 CST启动；关闭启动SSH后，两次全新SSH仍见同一PID868620及进度增加。00:56:58快照：188新增已索引、36复用，244次调用全部结算、430,530实际Token，新增UNKNOWN0；Hotpot49份、Omni24页、LongBench40份新增已完成，MIRACL正在运行。此为运行中快照，不是全批完成成绩。
 - 所有镜像、源码、六ZIP、密钥、授权、MinerU回执和检查点都在ECS，任务不依赖Windows。持久化状态命令：`python3 /opt/rag-s8/state/status.py`；详细检查点 `/opt/rag-s8/state/checkpoints/ingestion-20261020/checkpoint.json`。正常结束撤回剩余额度，新UNKNOWN保留占用并停止发送。
 - 实测迁移/身份/索引/新SSH接管命令均退出0。实现与定向验证详见当前规划进度；完整构建和首次错误日志保留在 `E:/WK/run/s8-overnight-20261020` 及远端 `/opt/rag-s8`。机器快照见 `evidence/s8-overnight-20261020/handoff-live-proof.json`。当前不宣称S8全量问答完成。
+
+
+## 2026-10-20 全语料补齐终态（Owner后续澄清，非问答评测）
+
+**当前状态：BASELINE_READY / INDEX_PREPARATION_COMPLETE。** 保留已经达标的748源，仅新增其余10935源；六套prepared池合计11683，不是所有上游官方语料。新任务2026-10-20 03:58:02 CST退出0，全部INDEXED；11332次请求全部SETTLED、实际5934546 Token，新UNKNOWN0。两轮累计12077次／6491636 Token。两个父及全部子账本CLOSED，完成单次服务已disabled，不重开授权或重发。
+
+最终物理库11708文档／28000非空1024向量，其中当前11683源覆盖27881向量；额外25历史文档／119向量保留且不混入评测分母。全部新增10935原件SHA、版本、KB、Child／向量关联校验通过；6套实际BM25／HNSW／Hybrid-RRF／Merge／Context／来源GET探针完成，无新模型请求。实际HNSW EXPLAIN证明使用1024索引，不只依据DDL。
+
+报告：[S8_ECS_OVERNIGHT_DEPLOYMENT.md](S8_ECS_OVERNIGHT_DEPLOYMENT.md)；机器结果同名results.json；逐源证明在`evidence/s8-ecs-full-corpus-20261020/`压缩包及ECS检查点。原S8.0机器结果逐字语义保留于v2结果的historical_S8_0_snapshot，不把旧739向量盘点数冒充当前全量。
+
+API/Worker/PG/Redis在ECS继续运行，cloud关闭、Graph关闭、原Top1／DYNAMIC／模型角色未改，旧PG16／Evaluation Center及原18未提交路径保留。Windows关机不影响数据或服务。前端由Owner延期，本Goal未部署；S8.1／S8.2／S8.3及真实问答仍NOT_RUN，需另行授权。不能把索引准备完成写成六套问答质量完成。
