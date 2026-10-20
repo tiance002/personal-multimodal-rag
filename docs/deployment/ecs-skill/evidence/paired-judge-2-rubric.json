@@ -1,0 +1,88 @@
+{
+  "artifact_type": "BLINDED_PAIRED_RUBRIC_CORRECTION",
+  "judge_id": "paired-judge-2",
+  "preferred": "pine",
+  "margin": "slight",
+  "comparison_basis": "Relative paired comparison only, using the exact nine dimension names and weights supplied in the follow-up. No absolute scores or weighted means assigned.",
+  "correction_note": "The prior paired-judge-2.json used generic dimension labels rather than the installed Darwin rubric names. This report corrects that mismatch and is the authoritative follow-up judgment; the prior file is preserved unchanged.",
+  "paired_dimensions": [
+    {
+      "dimension": "1 Frontmatter quality",
+      "weight": 7,
+      "paired_result": "tie",
+      "evidence": "The name and description are identical in both variants and accurately describe ECS incremental deployment and troubleshooting scope."
+    },
+    {
+      "dimension": "2 Workflow clarity",
+      "weight": 12,
+      "paired_result": "oak",
+      "evidence": "Oak adds an explicit shared-directory procedure: verify branch and write ownership, recheck frozen branch/HEAD before staging or packaging, and continue in an independent worktree after parallel changes."
+    },
+    {
+      "dimension": "3 Failure-mode encoding",
+      "weight": 12,
+      "paired_result": "oak",
+      "evidence": "The concurrent branch/HEAD drift case has an explicit trigger and response in Oak's skill text. Pine's general dirty-path and identity stop rules are safe, but do not encode this particular shared-worktree recovery path as directly."
+    },
+    {
+      "dimension": "4 Checkpoint design",
+      "weight": 6,
+      "paired_result": "oak",
+      "evidence": "Oak adds a concrete pre-mutation checkpoint for branch/HEAD and write ownership. Both variants retain Owner approval gates for deployment, data operations, and other scope changes."
+    },
+    {
+      "dimension": "5 Executable specificity",
+      "weight": 18,
+      "paired_result": "pine",
+      "evidence": "Pine's T4 behavior output supplies six exact read-only Git commands for branch, HEAD, dirty paths, worktree inventory, commit discovery, and reflog inspection. Oak's T4 output gives the right checks and isolation plan but no exact command set."
+    },
+    {
+      "dimension": "6 Resource integration",
+      "weight": 4,
+      "paired_result": "tie",
+      "evidence": "Both preserve the same runbook, incident-log, and evolution reference integration; Oak adds no new resource dependency."
+    },
+    {
+      "dimension": "7 Overall architecture/nonredundancy",
+      "weight": 12,
+      "paired_result": "oak",
+      "evidence": "Oak's additional concurrency rule is a compact, distinct safeguard at the workspace boundary and complements the existing deployment gates. No material duplication or unrelated scope expansion is introduced."
+    },
+    {
+      "dimension": "8 Observed test behavior",
+      "weight": 23,
+      "paired_result": "pine",
+      "evidence": "Both generated outputs pass all four tasks and respect the simulated/no-operation boundary. There is no correctness or scope-control gain for Oak. Pine's T4 output is more operationally actionable because it includes exact read-only commands and more explicit decision gates; Oak remains substantively safe and correct."
+    },
+    {
+      "dimension": "9 Counterexamples/blacklist",
+      "weight": 6,
+      "paired_result": "oak",
+      "evidence": "Oak explicitly lists no switch-back, reset, stash, or inclusion of another task's files in its new concurrent-work rule. Pine's T4 output also forbids these actions, but the skill text itself makes the scenario-specific counterexamples less explicit."
+    }
+  ],
+  "task_grades": {
+    "pine": [
+      {"task": "T1-application-only", "grade": "PASS", "evidence": "Selects API only despite the shared image, preserves other service state, treats 71 passed as fixture evidence, and leaves deployment and real QA not run."},
+      {"task": "T2-healthy-old-code", "grade": "PASS", "evidence": "Finds the old read-only bind mount as the earliest supported cause from the runtime SHA mismatch, scopes the proposed fix to API configuration, preserves storage, and does not claim repair."},
+      {"task": "T3-incident-evolution", "grade": "PASS", "evidence": "Records the simulated masked failure and correctly keeps the existing command-exit/semantic-status rule instead of asserting an unsupported main-skill change; real deployment is not claimed."},
+      {"task": "T4-concurrent-worktree", "grade": "PASS", "evidence": "Stops shared-directory mutation, protects the other task's dirty files, does not treat fixture labels as real SHAs, and plans isolated worktree use only after authorization. Includes concrete read-only commands."}
+    ],
+    "oak": [
+      {"task": "T1-application-only", "grade": "PASS", "evidence": "Selects API only despite the shared image, preserves other service state, treats 71 passed as fixture evidence, and leaves deployment and real QA not run."},
+      {"task": "T2-healthy-old-code", "grade": "PASS", "evidence": "Finds the old read-only bind mount as the earliest supported cause from the runtime SHA mismatch, scopes the proposed fix to API configuration, preserves storage, and does not claim repair."},
+      {"task": "T3-incident-evolution", "grade": "PASS", "evidence": "Records the simulated masked failure and correctly keeps the existing command-exit/semantic-status rule instead of asserting an unsupported main-skill change; real deployment is not claimed."},
+      {"task": "T4-concurrent-worktree", "grade": "PASS", "evidence": "Stops shared-directory mutation, protects the other task's dirty files, does not treat fixture labels as real SHAs, and plans isolated worktree use only after authorization. It is less command-specific than Pine."}
+    ]
+  },
+  "behavioral_conclusion": {
+    "correctness": "No demonstrated improvement: both variants pass all four tasks, including T4.",
+    "scope_control": "No demonstrated improvement: both keep T1 API-only, T2 limited to the affected API mount/configuration, T3 simulated and within the existing rule, and T4 plan-only with no Git or remote writes.",
+    "actionability": "Pine is stronger in the observed T4 output because it gives exact read-only commands. Oak's added skill wording makes the concurrent-workflow policy clearer, but the artifacts do not demonstrate a better task result.",
+    "overall_reason": "The slight Pine preference reflects the high-weight executable-specificity and observed-test-behavior dimensions: Pine produced a more directly actionable T4 plan while preserving equal correctness and safety. Oak has real wording-level strengths in workflow clarity, failure-mode encoding, checkpointing, architecture, and counterexamples. No correctness, scope, or safety improvement was observed from Oak's new rule."
+  },
+  "safety_and_limitations": {
+    "safety": ["Both sets of outputs are simulated and report operational actions as NOT RUN.", "Neither variant authorizes or claims Git writes, ECS/SSH/Docker operations, Provider calls, or remote writes."],
+    "limitations": ["The named parentbehavior-fixtures.json was unavailable in the prior inspection; shared behavior-fixtures.json and behavior-t4-fixture.json were the available fixture sources.", "The judgment is based only on the two variants and their paired four-task behavior artifacts; no other judges or review artifacts were consulted."]
+  }
+}

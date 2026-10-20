@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output_bytes": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "output_bytes": 0
+    }
+  ],
+  "staged_raw_artifact_hashes_matched": 32,
+  "initial_raw_whitespace_failure_preserved": true,
+  "target_branch": "codex/ecs-deploy-skill-20261020-isolated"
+}

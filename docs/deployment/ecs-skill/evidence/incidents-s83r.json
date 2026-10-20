@@ -1,0 +1,224 @@
+{
+  "schema": "ecs-skill-incidents/v1",
+  "source_scope": {
+    "review": "S8.3-R only; selected local execution receipts",
+    "repo_head_requested": "86d42a7",
+    "source_access": "S8 worktree content readable; git status/rev-parse denied by filesystem permission; historical version taken from S8.3-R report/results JSON",
+    "no_network_ssh_docker_model_calls": true,
+    "excluded": "Cloud RAG answer/retrieval quality issues are not deployment or diagnostic incidents and are omitted."
+  },
+  "incidents": [
+    {
+      "id": "S83R-PREFLIGHT-001",
+      "kind": "confirmed_tooling_fault",
+      "phase": "remote preflight",
+      "symptom": "Preflight exited 1 before any provider send; stdout was empty and the wrapper received JSONDecodeError while decoding a command result.",
+      "cause": "The preflight interpreted the silent runtime-check command output as JSON. The captured traceback confirms JSONDecodeError; the report identifies this as a silent runtime check parsed as JSON.",
+      "cause_confidence": "high",
+      "failed_attempt": {
+        "exit_code": 1,
+        "provider_calls": 0
+      },
+      "verified_fix": "Use the authenticated /readyz endpoint for runtime identity and readiness. The repaired preflight completed with READY_ZERO_SEND and preserved baseline DB/service checks.",
+      "evidence": [
+        {
+          "path": "var/reports/s8-3-r-20261020/preflight.receipt.json",
+          "sha256": "031A0BC6A0D706EB4DB4CE50364D811359D9375CA11CE4D96E733E793E3A0C66",
+          "note": "exit 1, empty stdout, 601-byte stderr"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/preflight.stderr.log",
+          "sha256": "AE529DAF9D4719B4784EACBC1AEC11100BF39969BDDCC8F5C4E7D207572152D6",
+          "note": "JSONDecodeError traceback"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/preflight-fixed.receipt.json",
+          "sha256": "F245EB575932DF1A17AF9C3DE620BA28CF9C6DF840A03B6615FE3558191778C4",
+          "note": "exit 0, READY_ZERO_SEND"
+        }
+      ],
+      "future": {
+        "trigger": "A readiness or identity helper returns empty output, plain text, or a different schema.",
+        "readonly_check": "Inspect command exit code and stdout shape; call the authenticated readiness endpoint and confirm provider-call counter remains unchanged.",
+        "preferred_fix": "Treat readiness as an explicit structured contract; never parse an unchecked command as JSON.",
+        "next_branch": "diagnostic-tool-contract",
+        "stop": "Stop before staging or sending requests if identity/readiness cannot be parsed and baseline state cannot be confirmed."
+      }
+    },
+    {
+      "id": "S83R-TRANSFER-002",
+      "kind": "confirmed_deployment_transfer_fault",
+      "phase": "image transfer",
+      "symptom": "Full Linux image archive transfer hit the 180-second SCP timeout; a partial archive was retained, so the full image was not used for remote deployment.",
+      "cause": "Large full-image SCP was too slow for the bounded transfer window; exact network/root cause was not measured.",
+      "cause_confidence": "high for timeout; low for underlying transport cause",
+      "failed_attempt": {
+        "operation": "SCP full image archive",
+        "timeout_seconds": 180,
+        "provider_calls": 0
+      },
+      "verified_fix": "Transfer only the two changed source files plus image-export and source-manifest, then build an offline delta image from the existing remote base image. Each delta transfer exited 0; remote file hashes and dependencies were checked.",
+      "evidence": [
+        {
+          "path": "var/reports/s8-3-r-20261020/S8_3_R_REAL_AB.md",
+          "note": "Section 4 records full-image SCP timeout and retained partial file; no hash recorded for this prose evidence"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/root_transfer_release.py",
+          "note": "180-second transfer limit in script; source hash not collected"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/transfer-delta.json",
+          "sha256": "E0D26CEEE9556982DFC64CDC1D62A044D5951930B5466C97D8DF3CFA98EA5C73",
+          "note": "all four delta transfers exit 0; provider_calls 0"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/remote-image.receipt.json",
+          "sha256": "011305AA8517878B68992C5506E42AC5BF3CA7FE424A7F0F14E1579657E97879",
+          "note": "remote delta image verified; provider calls 0"
+        }
+      ],
+      "future": {
+        "trigger": "A large immutable image must cross the same constrained remote link.",
+        "readonly_check": "Check archive size/hash, prior base image identity, transfer exit code and remote target size/hash; do not treat a partial SCP artifact as usable.",
+        "preferred_fix": "Prefer source-manifest-verified delta transfer and offline build atop a verified existing base when dependency parity is proven.",
+        "next_branch": "deployment-artifact-transfer",
+        "stop": "Stop rollout if any transferred file hash, source manifest, dependency set, or build verification differs."
+      }
+    },
+    {
+      "id": "S83R-VERSION-003",
+      "kind": "partial_compatibility_mechanism",
+      "phase": "image identity/version parity",
+      "symptom": "Local Linux image ID sha256:786a6a… differed from ECS image ID sha256:80e2f2… despite the same source commit.",
+      "cause": "Report attributes ID difference to build metadata; 508 packaged file hashes and dependency versions matched. This is not evidence of runtime incompatibility, but the ID difference leaves image-level identity non-equivalence.",
+      "cause_confidence": "partial: file/dependency parity verified; metadata explanation reported, low-level cause not independently isolated",
+      "failed_attempt": "Local image ID equality was not achieved; deployment proceeded with manifest/package verification.",
+      "verified_fix": "Verify every packaged application file hash and installed dependency version, and record both image IDs. ECS rollout receipt confirms source commit 29ecf2f5d3037eed99a4de783546dee272a761bd, application update PASS, no provider calls, and DB/Redis unchanged.",
+      "evidence": [
+        {
+          "path": "var/reports/s8-3-r-20261020/image-release.json",
+          "note": "local Linux image ID, 508 files and dependency parity"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/remote-image.receipt.json",
+          "sha256": "011305AA8517878B68992C5506E42AC5BF3CA7FE424A7F0F14E1579657E97879",
+          "note": "remote image ID and source/dependency verification"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/application-update.receipt.json",
+          "sha256": "7E4D4FA56D41A76EBBEE48C9FDBF8E584846B1D7BC553172BF052559B04B3133",
+          "note": "update PASS, commit and zero provider calls"
+        }
+      ],
+      "future": {
+        "trigger": "Local and remote builds produce different image IDs or toolchains/build metadata change.",
+        "readonly_check": "Compare platform, source commit, all packaged file hashes, dependency inventory and base-image identity before service replacement.",
+        "preferred_fix": "Use a reproducible build or attest the content manifest; keep local/remote image IDs explicitly distinct until parity evidence supports equivalence.",
+        "next_branch": "release-image-reproducibility",
+        "stop": "Stop if source/dependency/base-image parity cannot be established; image-tag equality alone is insufficient."
+      }
+    },
+    {
+      "id": "S83R-SSE-004",
+      "kind": "confirmed_diagnostic_false_failure",
+      "phase": "first normal API question diagnostic",
+      "symptom": "First MIRACL A POST returned HTTP 200, completed SSE, settled four provider calls with matching usage and finish_reason stop, but controller recorded STEP_NORMAL_API_QUESTION_POST_EXIT_1 / S8_3_WIRE_RESPONSE_INCOMPLETE.",
+      "cause": "Stream parser treated the terminal [DONE] frame as sufficient to stop reading and then falsely required transport EOF; it did not wait for EOF after a complete SSE response.",
+      "cause_confidence": "high; confirmed by completed saved HTTP/SSE/provider evidence and explicit report",
+      "failed_attempt": {
+        "reported_status": "FAIL",
+        "question_post_claimed": true,
+        "new_post_on_recovery": 0
+      },
+      "verified_fix": "Strictly require HTTP 200, SETTLED ledger, matching actual usage, finish_reason stop, and final DONE; recover the same run using read-only history/source/DB/wire retrieval. No second question POST or provider call occurred.",
+      "evidence": [
+        {
+          "path": "var/reports/s8-3-r-20261020/reviewer-result-firstA.json",
+          "sha256": "3C45A7E532A4ACC9582B3633D1BBE908C667C697E9CDEA9B48C13A715D55801A",
+          "note": "HTTP/SSE completion and STOP_NO_RESEND evidence"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/first-diagnosis.stdout.json",
+          "sha256": "3D93BD190912E975B815060E54151215C4AB8BCF571E141AD03FF60F11264B4C",
+          "note": "saved first-run diagnostics"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/first-recovery.receipt.json",
+          "note": "read-only recovery completed, provider_calls 0; hash not collected"
+        }
+      ],
+      "future": {
+        "trigger": "SSE response contains terminal DONE but client transport remains open or parser reports incomplete wire.",
+        "readonly_check": "Reconcile raw SSE, HTTP status, terminal event, history/source readback, provider ledger settle state, usage and finish reason for the original request ID.",
+        "preferred_fix": "Parse protocol completion independently from socket EOF; keep idempotent no-resend recovery on ambiguous post outcomes.",
+        "next_branch": "sse-client-diagnostics",
+        "stop": "Never repost after POST claim until ledger proves no provider request was sent; preserve response and STOP_NO_RESEND on ambiguity."
+      }
+    },
+    {
+      "id": "S83R-WRAPPER-005",
+      "kind": "confirmed_zero_send_wrapper_fault",
+      "phase": "resume/stop-state handling",
+      "symptom": "A stopped retained container was misclassified as active by docker ps -a; subsequent wrapper output filename collision produced a zero-POST tool failure.",
+      "cause": "Container existence in all-state listing was conflated with active execution, and wrapper output reused a non-unique filename.",
+      "cause_confidence": "high; explicitly identified in report",
+      "failed_attempt": {
+        "provider_calls": 0,
+        "result": "zero-POST failure preserved"
+      },
+      "verified_fix": "Preserve the failed zero-POST artifact under a unique zero-post-tool-failures path and continue only unsubmitted cases. Do not repeat any already executed B arm.",
+      "evidence": [
+        {
+          "path": "var/reports/s8-3-r-20261020/zero-post-wrapper-preserved.stdout.json",
+          "sha256": "215494AD7789B6B1AF1C6532B33B145F2EE3D7EE21A913409C4BB0BC667377D7",
+          "note": "ZERO_POST_WRAPPER_PRESERVED, new_provider_calls 0"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/zero-post-wrapper-preserved.receipt.json",
+          "note": "preservation operation exit 0; hash not collected"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/S8_3_R_REAL_AB.md",
+          "note": "Section 4 documents docker ps -a active misclassification and output filename conflict; no hash recorded"
+        }
+      ],
+      "future": {
+        "trigger": "Resume logic sees an existing container or reuses an execution output path.",
+        "readonly_check": "Inspect container State.Running and execution/POST ledger independently; verify output path is absent or uniquely allocated before starting.",
+        "preferred_fix": "Use running-state inspection and collision-resistant per-attempt paths; preserve zero-send failures as immutable evidence.",
+        "next_branch": "execution-wrapper-resume",
+        "stop": "Stop without sending if execution state or output-path ownership is ambiguous; never retry completed arms."
+      }
+    },
+    {
+      "id": "S83R-MEM-006",
+      "kind": "confirmed_observability_gap_partial_root_cause",
+      "phase": "historical candidate memory sampling",
+      "symptom": "All 12 candidate runs lack saved host available-memory minima and container memory peaks; candidate snapshot does not contain OOMKilled evidence.",
+      "cause": "The missing measurement is confirmed. Old helper buffered samples in RAM and wrote memory.json only in outer serve finally; Uvicorn 0.35.0 signal handling offers a plausible SIGTERM-before-finally mechanism, but historical signal delivery per container was not recorded.",
+      "cause_confidence": "high for NOT_RECORDED gap; partial/inferred for exact loss mechanism",
+      "failed_attempt": "Historical minima/peaks unavailable and cannot be backfilled; do not infer no OOM from daily API/Worker status.",
+      "verified_fix": "Later diagnostic helper now writes periodic fsynced checkpoints plus atomic snapshots and preserves prior artifacts; offline verification reports 11 tests OK. This fix was not used during the historical real runs.",
+      "evidence": [
+        {
+          "path": "var/reports/s8-3-r-20261020/tools-offline-verification-memory-checkpoint.json",
+          "sha256": "790F49146AE13982021EC4F2EAE413C4BB1BF9952BBB01DB5A0C8651BD3705F5",
+          "note": "12/12 missing; inferred signal mechanism; offline fix evidence"
+        },
+        {
+          "path": "var/reports/s8-3-r-20261020/s8_3_r_ecs_acceptance.py",
+          "sha256": "FE010FCD7FD1C9412D285F114D3A9D24158E823E69FDC98EDE730A03ACDAA6E0",
+          "note": "diagnostic tool hash also recorded in results JSON"
+        }
+      ],
+      "future": {
+        "trigger": "Long-running candidate execution is terminated, interrupted, or run under a memory cap.",
+        "readonly_check": "Before launch inspect sampler version and output location; during/after run confirm per-case checkpoint journal/snapshot presence and observed timestamps.",
+        "preferred_fix": "Keep durable periodic samples while process is alive; report NOT_RECORDED when samples are missing and keep OOM status separate.",
+        "next_branch": "candidate-resource-observability",
+        "stop": "Stop interpreting memory or OOM status if historical samples/inspected exit evidence are absent; do not rerun closed authorization to backfill."
+      }
+    }
+  ]
+}

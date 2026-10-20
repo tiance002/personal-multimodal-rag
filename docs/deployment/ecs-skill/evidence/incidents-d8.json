@@ -1,0 +1,93 @@
+{
+  "schema": "ecs-deployment-skill-incident-inventory/v1",
+  "review_scope": "Bounded D8 and immediate pre-D8 history review; no network, SSH, Docker, model calls, or repository edits performed by reviewer.",
+  "repository": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation",
+  "head_supplied_by_parent": "86d42a7",
+  "head_independently_verified": false,
+  "head_check_limitation": "Read-only git rev-parse HEAD failed: fatal: cannot change to repository path: Permission denied. This is a reviewer filesystem check failure, not an ECS deployment failure.",
+  "historical_runtime_source_commit": "965776bd7672fa37839306c6c47537c5414775cd",
+  "current_live_state": "NOT_CHECKED",
+  "coverage_limit": "Only two distinct incidents meet the requested direct evidence threshold in these bounded materials. No completeness claim for earlier deployments or S8.3-R execution incidents.",
+  "incidents": [
+    {
+      "id": "D8-BUILD-DEPENDENCY-DRIFT",
+      "evidence_status": "VERIFIED",
+      "classification": "Actual build artifact drift caught before deployment; not an ECS outage",
+      "phase": "Local image build and artifact acceptance",
+      "symptom": "Original Dockerfile build exited 0, but artifact comparison reported BLOCKED_ARTIFACT_DIFFERENCE: certifi changed from 2026.10.18 to 2026.10.19.",
+      "direct_cause": "Package installation resolved a newer transitive certifi version during the application image build.",
+      "root_cause": "The original build did not preserve all deployed transitive dependency versions; build success alone did not establish dependency identity.",
+      "failed_attempt": "The initial docker build completed successfully (exit 0, 70.363 seconds) and its image verification subprocess also exited 0, while the verification status correctly blocked artifact acceptance. The first image was not deployed and was retained under the -dependency-drift tag.",
+      "verified_fix": "A build-only Dockerfile layered FROM the retained drift image and ran RUN pip install --no-cache-dir --no-deps certifi==2026.10.18. Rebuild exited 0 (5.662 seconds); stable verification reported LOCAL_VERIFIED, empty dependency_differences, source_manifest_matches=true. Repository requirements were not modified.",
+      "recognition_condition": "Compare actual image package versions to the old deployed package manifest and inspect semantic verification status even when process exit_code=0; non-empty dependency_differences blocks transfer/cutover.",
+      "prevention": "For application-only updates, retain old dependency identity evidence, diff the full actual package manifest before transfer, and explicitly block any unexplained drift. Preserve the first failed artifact and result; do not overwrite evidence with a passing rebuild.",
+      "sources": [
+        {"path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.md", "line": 29},
+        {"path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.results.json", "field": "$.images.dependency_note; $.images.new; $.local_verification"},
+        {"path": "E:\\RAG quention\\var\\reports\\d8-ecs-incremental-update-20261020\\local-image-verification.json", "field": "$.status=BLOCKED_ARTIFACT_DIFFERENCE; $.exit_code=0; $.dependency_differences.certifi"},
+        {"path": "E:\\RAG quention\\var\\reports\\d8-ecs-incremental-update-20261020\\local-image-stable-verification.json", "field": "$.status=LOCAL_VERIFIED; $.dependency_differences={}; $.source_manifest_matches=true"},
+        {"path": "E:\\RAG quention\\var\\reports\\d8-ecs-incremental-update-20261020\\Dockerfile.api.preserve-dependencies", "line": 2}
+      ]
+    },
+    {
+      "id": "D8-PREFLIGHT-STALE-DATA-REFERENCE",
+      "evidence_status": "VERIFIED",
+      "classification": "Actual read-only preflight acceptance error; not data loss or deployment-induced database failure",
+      "phase": "Pre-cutover read-only database protection snapshot",
+      "symptom": "remote_data_before.py exited 2 with REVIEW_REQUIRED; physical_documents, physical_chunks, physical_vectors, and prepared_ready_documents checks were false while physical prepared-pool totals, read-only isolation, scope, and indexes passed.",
+      "direct_cause": "The check compared post-alignment database state to older physical-count and prepared-ready reference values.",
+      "root_cause": "Historical frozen prepared-pool identity and current enabled versions were treated as interchangeable. Prior source alignment added 28 documents/657 vectors and disabled 52 old versions/474 vectors without deleting payloads; 27 disabled documents/355 vectors belonged to the original prepared pool.",
+      "failed_attempt": "The initial historical-reference probe returned REVIEW_REQUIRED and was preserved. It was not rewritten to PASS or presented as an application outage.",
+      "verified_fix": "Local ID/version evidence reconciliation explained 11708+28=11736 documents, 28000+657=28657 vectors, and prepared_ready=11683-27=11656. D8 acceptance then compared its actual frozen pre-cutover snapshot with the post-cutover snapshot; all 14 data protection checks passed. Reconciliation itself made no remote query; optional exact-ID SQL remained NOT_RUN.",
+      "recognition_condition": "When preflight count checks fail after approved source-version replacement, compare physical rows, historical prepared-pool membership, and enabled/current versions separately. Check exact mapped replacement IDs and preserved prior evidence before attributing the mismatch to the new deployment.",
+      "prevention": "Version data baselines with source-alignment provenance. Freeze a current read-only before snapshot for same-release before/after protection and retain original failed receipts. Do not silently alter old thresholds or call physical retention proof of old-version enablement.",
+      "sources": [
+        {"path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.md", "line": 60},
+        {"path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.md", "line": 89},
+        {"path": "E:\\RAG quention\\var\\reports\\d8-ecs-incremental-update-20261020\\data-before.receipt.json", "field": "$.script=remote_data_before.py; $.exit_code=2"},
+        {"path": "E:\\RAG quention\\var\\reports\\d8-ecs-incremental-update-20261020\\data-before.stdout.json", "field": "$.status; $.checks; $.physical_totals; $.prepared_totals; $.limitations"},
+        {"path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.results.json", "field": "$.data_protection.checks; $.data_protection.historical_reference_reconciliation.explanation; $.data_protection.historical_reference_reconciliation.arithmetic; $.data_protection.historical_reference_reconciliation.optional_sql.status"}
+      ]
+    }
+  ],
+  "confirmed_boundaries_not_promoted_to_deployment_incidents": [
+    {
+      "topic": "Per-session source evidence mode selector absent",
+      "status": "CONFIRMED_GAP_UNFIXED",
+      "reason": "S8_3_R_PLAN_v2.json formal_configuration_gap.status=BLOCKED_PER_SESSION_CONFIGURATION and http_session_selector=NOT_AVAILABLE. Process startup setting exists, but this is a future A/B configuration prerequisite; plan execution=NOT_RUN and status=PLAN_ONLY_NOT_AUTHORIZED. No attempted D8 HTTP selector failure or verified fix is evidenced.",
+      "source": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\S8_3_R_PLAN_v2.json: $.formal_configuration_gap"
+    },
+    {
+      "topic": "Four source projections remain unmaterialized",
+      "status": "PARTIAL_FUNCTIONAL_PROOF_NOT_DEPLOYMENT_FAILURE",
+      "reason": "D8 documents INSUFFICIENT_SOURCE / UNMATERIALIZED_SELECTED_PROJECTION with real stored anchors but no selected-projection lineage proof under unchanged budget. This belongs to source-evidence behavior; no claim of deleted source files, irrelevant evidence, or solved QA quality.",
+      "source": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.md: E; $.unresolved in same-name results JSON"
+    },
+    {
+      "topic": "Historical OOM pending turn and CPU CFS compatibility",
+      "status": "HISTORICAL_CONTEXT_ONLY",
+      "reason": "D8 preserves an earlier OOM pending turn and pre-existing CPU CFS compatibility override. These bounded receipts do not prove the original failure sequence and fix, so neither is promoted to a new incident. Historical pending alone was explicitly not proof of active execution.",
+      "source": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.md:42,91; data-before.stdout.json: $.limitations, $.idle_assessment"
+    }
+  ],
+  "verified_historical_operating_materials": {
+    "not_a_current_live_assertion": true,
+    "compose_identity": "docker compose -p rag-s8 --env-file /opt/rag-s8/config/runtime.env -f /opt/rag-s8/current/deploy/s8/compose.yml -f /opt/rag-s8/config/loaded-images.json",
+    "actual_cutover_commands": [
+      "docker compose -p rag-s8 --env-file /opt/rag-s8/config/runtime.env -f /opt/rag-s8/current/deploy/s8/compose.yml -f /opt/rag-s8/config/loaded-images.json config --quiet",
+      "docker compose -p rag-s8 --env-file /opt/rag-s8/config/runtime.env -f /opt/rag-s8/current/deploy/s8/compose.yml -f /opt/rag-s8/config/loaded-images.json up -d --no-deps --pull never --no-build api",
+      "docker compose -p rag-s8 --env-file /opt/rag-s8/config/runtime.env -f /opt/rag-s8/current/deploy/s8/compose.yml -f /opt/rag-s8/config/loaded-images.json up -d --no-deps --pull never --no-build worker"
+    ],
+    "cutover_evidence": "ECS_INCREMENTAL_UPDATE.results.json: $.compose.cutover.steps[*].exit_code=0; $.compose.cutover.ready_after_api_update=true; $.compose.cutover.idle_before; $.compose.cutover.idle_before_worker_update",
+    "runtime_readiness_entry": "python -B -m scripts.s8_ecs_runtime check",
+    "service_scope": "API and Worker updated separately; Worker was already running. DB and Redis identities unchanged. Frontend container was absent and was not created.",
+    "rollback_directory": "/opt/rag-s8/state/d8-incremental-20261020/rollback/",
+    "rollback_files": ["compose.yml", "loaded-images.json", "runtime.env"],
+    "rollback_evidence": "ECS_INCREMENTAL_UPDATE.results.json: $.rollback.checks; $.rollback.rollback_config_exit_code=0; $.rollback.old_image; $.rollback.old_source_overlays",
+    "rollback_execution": "NOT_TRIGGERED",
+    "backup_path": "/opt/rag-s8/backups/weknora_s8-pre-s8-1-20261020T004041Z.dump",
+    "backup_limitation": "D8 checked file existence, 145042978 bytes and mode 0600; reused earlier content proof. Rehash and database restore NOT_RUN.",
+    "source_overlay_boundary": "Only runtime.py and conversation_configuration.py bind mounts were removed after byte equality to current Git was verified; host files retained. Existing /opt/rag-s8/current Compose still resolves to old release directory and is not proof of new running source identity.",
+    "safety_and_evidence_limit": "D8 added zero Provider calls, tokens, or UNKNOWN. Two historical UNKNOWN rows preserved. Actual ECS A/B quality, steady-state resource behavior, rollback execution and database restoration were not proved by D8. All recorded commands are historical evidence, not instructions executed by this review."
+  }
+}

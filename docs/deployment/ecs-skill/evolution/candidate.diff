@@ -1,0 +1,11 @@
+--- baseline/SKILL.md
++++ candidate/SKILL.md
+@@ -10,6 +10,8 @@
+ ## 1. 先确定最小范围
+ 
+ 读取项目 `AGENTS.md`、`AGENTS.override.md` 和当前任务相关进度；核对实际 HEAD、dirty 路径、目标提交及已有验证。已证明同源码/配置的定向验证直接复用，相关输入变化才补测。
++
++多任务共享目录时先确认分支和写入归属；暂存、提交或打包前重新核对冻结的branch/HEAD。若并行任务已切换分支或增加合法改动，保留该目录，转到独立worktree继续自己的提交；不切回、reset、stash或把其他任务的文件纳入发布。
+ 
+ 部署时先读 [deployment-runbook.md](references/deployment-runbook.md) 的身份/差异与阶段表。只读确认主机、Compose 项目及**全部有效配置文件**、API/Worker 的镜像与挂载、PG物理身份、Redis DB/前缀、存储和旧版本，再形成：
+ 

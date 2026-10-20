@@ -1,0 +1,109 @@
+{
+  "status": "PASS",
+  "scope": "Local file/metadata/real native skills-list receipts only; noECS, noDocker, noRAGProvider",
+  "checks": [
+    {
+      "name": "installed_creator_frontmatter_validator",
+      "exit_code": 0,
+      "stdout": "Skill is valid!",
+      "pass": true
+    },
+    {
+      "name": "all_local_reference_links_within_repo_exist",
+      "pass": true,
+      "links": [
+        {
+          "from": ".agents\\skills\\ecs-incremental-deploy\\SKILL.md",
+          "target": ".agents\\skills\\ecs-incremental-deploy\\references\\deployment-runbook.md",
+          "exists": true
+        },
+        {
+          "from": ".agents\\skills\\ecs-incremental-deploy\\SKILL.md",
+          "target": ".agents\\skills\\ecs-incremental-deploy\\references\\incident-log.md",
+          "exists": true
+        },
+        {
+          "from": ".agents\\skills\\ecs-incremental-deploy\\SKILL.md",
+          "target": ".agents\\skills\\ecs-incremental-deploy\\references\\evolution.md",
+          "exists": true
+        },
+        {
+          "from": ".agents\\skills\\ecs-incremental-deploy\\references\\incident-log.md",
+          "target": "docs\\deployment\\ECS_INCREMENTAL_UPDATE.md",
+          "exists": true
+        },
+        {
+          "from": ".agents\\skills\\ecs-incremental-deploy\\references\\incident-log.md",
+          "target": "docs\\evaluation\\S8_3_R_REAL_AB.md",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "name": "native_metadata_valid_implicit_enabled",
+      "pass": true
+    },
+    {
+      "name": "frozen_test_contract_complete",
+      "pass": true,
+      "count": 4
+    },
+    {
+      "name": "actual_installed_native_project_discovery",
+      "pass": true,
+      "record": "E:\\RAG quention\\var\\reports\\ecs-skill-20261020\\native-discovery.json",
+      "scope": "repo",
+      "probe_model_turns": 0,
+      "baseline_skill_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+      "note": "Discovery probe was at baseline; final file revalidation independent from automatic UI selection."
+    },
+    {
+      "name": "no_runtime_or_deployment_source_changes",
+      "pass": true,
+      "git_diff_exit_code": 0
+    },
+    {
+      "name": "skill_credentials_pattern_scan",
+      "pass": true,
+      "note": "Pattern scan only, not proof of all possible secret forms; source prose reviewed independently."
+    }
+  ],
+  "skill_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+  "files": [
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\.gitattributes",
+      "sha256": "a79691a93b46e49ce460c26ef22afcc03d6eca1e63bf2edbc20e96159510f6c9",
+      "bytes": 14
+    },
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\SKILL.md",
+      "sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+      "bytes": 6133
+    },
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\test-prompts.json",
+      "sha256": "f87a06eaae4913c40863af3096afe9ef17fda6bea07c9bf5f9e81492a423fdc1",
+      "bytes": 6705
+    },
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\agents\\openai.yaml",
+      "sha256": "d8e4e6803ace03236aa73c31baf40e6aeb20bff6b9a6a2765eac0ffefbd9911b",
+      "bytes": 313
+    },
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\references\\deployment-runbook.md",
+      "sha256": "67b7525e5b2c6dadf694fd9a4c7acace1950ea88da0f7746d2a98351caf2a701",
+      "bytes": 11648
+    },
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\references\\evolution.md",
+      "sha256": "7b2cfe4728f499267d0138de38aa5061d45319c9a257c6fdd5ccdbf5f7493aa1",
+      "bytes": 3471
+    },
+    {
+      "path": ".agents\\skills\\ecs-incremental-deploy\\references\\incident-log.md",
+      "sha256": "c3f1e7d947f8133cf6039ab151422718a15a1c4a28642147b46e4f199b26951e",
+      "bytes": 8495
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "ECS 增量部署"
+  short_description: "复用真实故障、版本与回滚证据，完成 EviRoute RAG 的最小 ECS 更新"
+  default_prompt: "使用 $ecs-incremental-deploy 核对本次 EviRoute RAG 的 ECS 增量更新范围和验收。"
+policy:
+  allow_implicit_invocation: true

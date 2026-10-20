@@ -1,0 +1,116 @@
+{
+  "artifact_type": "BLINDED_PAIRED_JUDGE_RESULT_RUBRIC_CORRECTION",
+  "judge_id": "paired-judge-3",
+  "correction_note": "This follow-up replaces the prior generic criterion labels and absolute 0-5 scoring with the installed Darwin paired rubric. The earlier file paired-judge-3.json is preserved unchanged. No author-intent inference was used.",
+  "comparison": {
+    "preferred": "oak",
+    "margin": "slight",
+    "basis": "The variants are identical except oak adds a shared-workspace drift rule in section 1: recheck frozen branch/HEAD before staging, committing, or packaging; preserve the changed shared directory and continue in an independent worktree; do not switch back, reset, stash, or include another task's changes. This is a targeted safety/actionability improvement for T4. The behavior outputs reach safe simulated outcomes on all four tasks for both candidates; no broad or live behavior gain is established."
+  },
+  "darwin_9_relative_preferences": [
+    {
+      "criterion": "Frontmatter quality",
+      "weight": 7,
+      "preference": "tie",
+      "reason": "Name and description are identical; the added rule does not alter frontmatter." 
+    },
+    {
+      "criterion": "Workflow clarity",
+      "weight": 12,
+      "preference": "oak",
+      "margin": "slight",
+      "reason": "Oak gives a concrete next branch when another task changes the shared branch or adds legitimate work, while keeping the original verification and deployment sequence intact."
+    },
+    {
+      "criterion": "Failure-mode encoding",
+      "weight": 12,
+      "preference": "oak",
+      "margin": "slight",
+      "reason": "Oak explicitly encodes concurrent branch/dirty drift as a stop-and-isolate case and names unsafe responses to avoid. T4 outputs from both candidates recognize the simulated drift and stop current-directory packaging."
+    },
+    {
+      "criterion": "Checkpoint design",
+      "weight": 6,
+      "preference": "oak",
+      "margin": "slight",
+      "reason": "Oak places the branch/HEAD recheck at the consequential staging, commit, and packaging checkpoint. Both outputs keep worktree creation and Git writes unperformed under plan-only authorization."
+    },
+    {
+      "criterion": "Executable specificity",
+      "weight": 18,
+      "preference": "tie",
+      "reason": "Pine's T1 plan gives a concrete single-service Compose operation as a semantic example; oak gives equally detailed build, identity, and evidence gates. Both mark operations proposed and not run, and neither authorizes copying fixture paths into execution."
+    },
+    {
+      "criterion": "Resource integration",
+      "weight": 4,
+      "preference": "tie",
+      "reason": "Both keep shared-image API/Worker behavior, databases, storage, and worker state within the same bounded deployment plan; no resource integration difference is evident."
+    },
+    {
+      "criterion": "Overall architecture/nonredundancy",
+      "weight": 12,
+      "preference": "tie",
+      "reason": "The common structure and scope boundaries are the same. Oak's added shared-workspace instruction overlaps somewhat with existing dirty-file and reset safeguards, but adds a distinct worktree response; neither variant changes the architecture."
+    },
+    {
+      "criterion": "Observed test behavior",
+      "weight": 23,
+      "preference": "tie",
+      "reason": "All four supplied task outputs are simulated. Both candidates correctly bound T1 to API, diagnose T2's old bind mount, keep T3 simulated and avoid an unnecessary main-rule change, and stop T4 packaging. No real tests or operations ran, so the outputs do not establish a measured behavioral difference."
+    },
+    {
+      "criterion": "Counterexamples/blacklist",
+      "weight": 6,
+      "preference": "oak",
+      "margin": "slight",
+      "reason": "Oak explicitly covers T4's unsafe counterexamples: switching back, reset, stash, or absorbing another task's files. Pine's skill omits this specific blacklist, though its T4 output itself proposes safe handling."
+    }
+  ],
+  "task_results": [
+    {
+      "task": "T1-application-only",
+      "oak": "PASS",
+      "pine": "PASS",
+      "reason": "Both limit the planned switch to API, preserve Worker and data services, gate on identity/configuration and rollback evidence, and label deployment and real QA NOT RUN. The 71-passed result is correctly treated as fixture evidence, not a test run in this evaluation."
+    },
+    {
+      "task": "T2-healthy-old-code",
+      "oak": "PASS",
+      "pine": "PASS",
+      "reason": "Both identify the read-only old-source bind mount as the earliest supported cause, distinguish image contents from the mounted runtime file, preserve storage, and defer repair until authorized checks."
+    },
+    {
+      "task": "T3-incident-evolution",
+      "oak": "PASS",
+      "pine": "PASS",
+      "reason": "Both preserve the simulated command failure and wrapper-success mismatch, recognize the existing rule already covers the issue, avoid claiming real tests/deployment, and keep additional comparison work proposed or NOT RUN."
+    },
+    {
+      "task": "T4-concurrent-worktree",
+      "oak": "PASS",
+      "pine": "PASS",
+      "reason": "Both stop staging/committing/packaging in the drifted shared directory, preserve the other task's dirty files, require identifying the own commit, and do not create a worktree or perform Git writes under plan-only authorization. Oak's behavior artifact adds more explicit per-step gates; the shared skill addition is the only demonstrated difference relevant to future reuse."
+    }
+  ],
+  "new_risks": [
+    {
+      "candidate": "oak",
+      "risk": "The instruction to continue in an independent worktree could be read as an immediate action. The T4 output mitigates this by requiring later execution authorization and explicitly not creating a worktree under plan-only authorization. Preserve that gate in future use."
+    },
+    {
+      "candidate": "pine",
+      "risk": "The shared-workspace rule does not explicitly prohibit switching back, stashing, or packaging another task's files; safe behavior currently relies on general safeguards and the detailed T4 plan."
+    }
+  ],
+  "evidence_boundary": {
+    "read_artifacts": [
+      "blind-pair/variant-oak.md",
+      "blind-pair/variant-pine.md",
+      "blind-pair/oak-behavior.json",
+      "blind-pair/pine-behavior.json"
+    ],
+    "execution": "Read-only artifact comparison. No ECS, network, model, Git, build, or deployment operations were run.",
+    "limitations": "Behavior is assessed only from supplied simulated task outputs. This judge's result is a relative paired preference, not an absolute upgrade claim or evidence of live operations."
+  }
+}

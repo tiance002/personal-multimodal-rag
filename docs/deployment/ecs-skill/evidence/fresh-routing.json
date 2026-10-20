@@ -1,0 +1,41 @@
+{
+  "task": "ECS API incremental update planning only; no ECS connection",
+  "generated_at": "2026-10-20",
+  "project_root": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020",
+  "files_read": [
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\AGENTS.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\AGENTS.override.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\progress.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\.agents\\skills\\ecs-incremental-deploy\\SKILL.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\.agents\\skills\\ecs-incremental-deploy\\references\\deployment-runbook.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\docs\\deployment\\ECS_INCREMENTAL_UPDATE.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\docs\\adr\\README.md",
+    "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\contracts\\README.md"
+  ],
+  "applicable_workflow": [
+    "AGENTS.md session start: read project instructions/progress/relevant design, inspect Git dirty state and actual code; minimize change scope and give verifiable command/status evidence.",
+    "AGENTS.md ECS skill trigger: ECS deploy/update task requires project ECS skill and runbook; skill does not authorize remote writes/model sends.",
+    "AGENTS.override.md active isolated migration: offline implementation only; do not wire new formal chain to running old service; no real provider request, old service replacement, DB mutation/migration, UNKNOWN release, Push/Tag/Release absent new owner approval; preserve old runtime/data/history/evaluation; report source-read/implementation/offline/integration/provider/cutover stages separately.",
+    "ECS skill: derive target commit → changed files → affected services/contracts → validation → image/config rollback materials; API and Worker shared image does not imply both need update; frontend/database/index excluded when unaffected; prove runtime identity and effective Compose before any deployment.",
+    "Runbook: reuse only same-input validation evidence; inspect target diff and service mapping; if deployment later becomes authorized, verify actual host/Compose/config chain, image/mount, data identities and old version; build and update only proven affected services, one at a time; retain rollback materials and distinguish zero-cloud checks from real QA."
+  ],
+  "triggering_basis": "User asked to incrementally update local EviRoute RAG API changes to ECS, which triggers the ECS deployment skill under project AGENTS.md. Current instruction explicitly limits this turn to offline planning, so no remote operation is authorized or attempted.",
+  "git_evidence": [
+    "Attempted git -C E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020 status --short, rev-parse HEAD, diff --name-status, and diff --cached --name-status; each returned fatal: cannot change to ... Permission denied.",
+    "Consequently current HEAD, target commit, staged/unstaged paths, and local validation evidence applicable to this exact worktree are UNKNOWN; no historical snapshot is substituted as current state."
+  ],
+  "minimal_next_steps": [
+    "With read access to the worktree Git metadata, capture actual repo root/HEAD/status and staged/unstaged diff without modifying files.",
+    "Map each changed API source/config/contract/migration file to shared runtime modules, HTTP/OpenAPI/SSE contracts, DB/index effects, and API/Worker/frontend service consumers; identify whether migration or data changes exist.",
+    "Read only design/ADR sections implicated by the actual diff and verify existing tests/evaluation evidence match the changed inputs; run only affected local contract/tests if this planning task is later authorized to proceed beyond plan.",
+    "When deployment is separately authorized: verify current ECS host/app identity, entire effective Compose file chain, API/Worker running states and in-flight work, image/mount/revision/module SHA, PG/Redis/storage identities, provider/UNKNOWN state, plus old image/config rollback materials; then select only affected service(s), build/test minimal image, switch one service at a time and verify API contract/runtime source/data protection.",
+    "Keep real provider QA NOT RUN unless separately authorized; never reuse historical grant or treat prior deployment report as current server state."
+  ],
+  "validation_limits": [
+    "This turn remained offline and plan-only: no SSH/ECS, Docker, network, provider request, old-service start/replacement, DB operation, or model send.",
+    "Git commands were attempted read-only but blocked by Permission denied, so actual code delta and current target version are unknown.",
+    "No tests/build/contract checks were run; no PASS is claimed.",
+    "Do not read ecs-skilltestoutputs/oracles; avoid treating historical deployment snapshots as current identity or authorization."
+  ],
+  "result": "PLAN_ONLY; scope selection BLOCKED_PENDING_READABLE_GIT_METADATA; remote deployment NOT RUN"
+}

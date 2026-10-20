@@ -1,0 +1,372 @@
+{
+  "schema": "ecs-project-skill-delivery/v1",
+  "status": "OFFLINE_SKILL_READY",
+  "worktree": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020",
+  "branch": "codex/ecs-deploy-skill-20261020-isolated",
+  "source_baseline": "86d42a7374f738c996e7804a067b0052291ec997",
+  "initial_skill_commit": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+  "delivery_commit_resolution": "git log -1 --format=%H -- docs/deployment/ECS_INCREMENTAL_DEPLOY_SKILL.md",
+  "scope": {
+    "ecs_connections": 0,
+    "ecs_mutations": 0,
+    "docker_commands_executed": 0,
+    "rag_provider_calls": 0,
+    "rag_provider_tokens": 0,
+    "new_dependencies": 0,
+    "global_skills_modified": false,
+    "runtime_code_changed": false,
+    "push": false
+  },
+  "incident_inventory": {
+    "real_historical_fault_groups": 7,
+    "groups_with_real_scope_recovery_evidence": 6,
+    "historical_memory_gap_with_offline_fix_only": 1,
+    "image_id_mismatch_observation_not_counted_as_fault": 1,
+    "extra_local_authoring_event_not_ecs_outage": 1,
+    "coverage_limit": "Bounded D8 and S8.3-R relevant historical evidence; not an exhaustive audit of all ECS history."
+  },
+  "historical_evidence": [
+    "docs/deployment/ECS_INCREMENTAL_UPDATE.md",
+    "docs/deployment/ECS_INCREMENTAL_UPDATE.results.json",
+    "docs/deployment/S8_3_R_PLAN_v2.json",
+    "docs/evaluation/S8_3_R_REAL_AB.md",
+    "docs/evaluation/S8_3_R_REAL_AB.results.json",
+    "deploy/s8/compose.yml",
+    "deploy/s8/Dockerfile.api",
+    "scripts/s8_ecs_runtime.py",
+    "README.md",
+    "AGENTS.md",
+    "AGENTS.override.md",
+    "progress.md",
+    "docs/adr/README.md"
+  ],
+  "discovery": {
+    "native": "PASS: actual installed codex-cli0.159.2 app-server initialize+skills/list, scope=repo enabled=true;0modelturns,isolated CODEX_HOME",
+    "native_record": "evidence/native-discovery.json",
+    "fresh_context": "PASS_PROJECT_AGENTS_ROUTING; Git metadata access blocked inside that subagent and correctly reported. Root separately verified actual branch/HEAD.",
+    "current_chat_ui_auto_reload": "NOT_RUN; system catalog belongs to a different cwd and is not proof of live UI reload",
+    "cwd_boundary": "Repository skills apply when launched in that project root or its subdirectories. E:/RAG quention does not automatically discover a sibling worktree; open the actual repo or explicitly read its Skill path.",
+    "official_docs": "https://learn.chatgpt.com/docs/build-skills"
+  },
+  "tests": {
+    "creator_validator": {
+      "command": "E:/RAG quention/.venv/Scripts/python.exe -X utf8 C:/Users/22088/.codex/skills/.system/skill-creator/scripts/quick_validate.py <projectSkill>",
+      "exit_code": 0
+    },
+    "local_artifacts": {
+      "command": "E:/RAG quention/.venv/Scripts/python.exe -B var/reports/ecs-skill-20261020/validate_local_artifacts.py",
+      "exit_code": 0,
+      "checks": 7,
+      "local_reference_links": 6,
+      "final_fixture_count": 4,
+      "final_record": "ecs-skill/evidence/artifact-validation-final.json",
+      "delivery_record": "ecs-skill/evidence/artifact-validation-delivery.json"
+    },
+    "native_discovery": {
+      "command": "E:/RAG quention/.venv/Scripts/python.exe -B var/reports/ecs-skill-20261020/probe_native_discovery.py",
+      "exit_code": 0
+    },
+    "behavior_tests": {
+      "method": "Fresh independent agents actually completed supplied offline task artifacts. This is Darwin full_test of the instruction workflow and SIMULATED deployment, not real ECS execution.",
+      "without_skill_tasks": 3,
+      "baseline_tasks": 4,
+      "candidate_tasks": 4,
+      "initial_three_pass_without": 3,
+      "initial_three_pass_with": 3,
+      "candidate_four_pass": 4,
+      "agent_artifact_json_parse_exits": 0
+    },
+    "render": {
+      "command": "E:/RAG quention/.venv/Scripts/python.exe -B var/reports/ecs-skill-20261020/render_result_card.py",
+      "exit_code": 0,
+      "network_requests": 0,
+      "png_visually_inspected": true
+    },
+    "ecs_deploy": "NOT_RUN_BY_DESIGN",
+    "real_qa_or_rollback": "NOT_RUN_BY_DESIGN",
+    "git_checks": {
+      "git_diff_check_exit_code": 0,
+      "git_cached_diff_check_exit_code": 0,
+      "record": "ecs-skill/evidence/git-checks-final.json",
+      "note": "Final stagedchecks repeatedafterdeliveryrecordwrites beforecommit."
+    }
+  },
+  "darwin": {
+    "installed": {
+      "path": "C:\\Users\\22088\\.codex\\skills\\darwin-skill\\SKILL.md",
+      "declared_version": "v2.1 2026-06-10",
+      "sha256": "3d57422079687a3aa641cb0c6c78ea8a5c6fa0c8645a37dfbcde4fdb870f7150",
+      "global_modified": false
+    },
+    "baseline_triage_total": 91.3,
+    "baseline_dimension_scores": [
+      10,
+      9,
+      9,
+      10,
+      9,
+      9,
+      9,
+      9,
+      9
+    ],
+    "actual_rubric_names": [
+      "Frontmatterquality",
+      "Workflowclarity",
+      "Failuremodeencoding",
+      "Checkpointdesign",
+      "Executablespecificity",
+      "Resourceintegration",
+      "Overallarchitecture",
+      "Observedtestbehavior",
+      "Counterexamples/blacklist"
+    ],
+    "weights": [
+      7,
+      12,
+      12,
+      6,
+      18,
+      4,
+      12,
+      23,
+      6
+    ],
+    "valid_paired_judges": 3,
+    "votes": {
+      "candidate_better": 1,
+      "candidate_worse": 1,
+      "tie": 1,
+      "all_margins": "slight"
+    },
+    "rounds": 1,
+    "decision": {
+      "status": "RETAIN_BASELINE_REJECT_CANDIDATE",
+      "trigger": "AUTHORING-WORKTREE-001",
+      "baseline_commit": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+      "baseline_skill_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+      "candidate_skill_sha256": "3eb97fd9e1f669531a31adef55db385409ae370cc1906e2a6e34e0cd5bb65e3c",
+      "blind_mapping": {
+        "pine": "baseline",
+        "oak": "candidate"
+      },
+      "valid_paired_votes": {
+        "candidate_better": 1,
+        "candidate_worse": 1,
+        "tie": 1,
+        "all_margins": "slight"
+      },
+      "observed_tests": {
+        "original_three_without_skill": "3/3PASS",
+        "original_three_baseline": "3/3PASS",
+        "original_three_candidate": "3/3PASS",
+        "new_parallel_case": "bothPASS"
+      },
+      "reason": "Three correct paired assessments do not establish a behavioral outcome gain; no forced expansion. Preserve the new regression and candidate as evidence, keep active SKILL at initial verified version.",
+      "score_policy": "91.3 absolute baseline is triage only; candidate absolute score and delta are NOT_SCORED. First misnamed-rubric judgments preserved and SUPERSEDED, not used for decision.",
+      "adaptation": "Validation-gated no-benefit rejection is stricter than Darwin non-worse keep rule, per Owner requirement to retain actual improvements only. Finite task approval covers initial creation/offline tests; significant operational-policy/rights changes retain explicit Owner checkpoint.",
+      "runtime_effect": "No production or cloud action. Candidate never replaced active Skill; no active rollback needed. Candidate snapshot is versioned as documentation only."
+    },
+    "all_simulated_ecs": true,
+    "first_judge_results_status": "SUPERSEDED: weights-only prompts caused wrong/missing dimension names and one numeric scale; corrected against exact installed9criteria, originals retained.",
+    "candidate_growth_ratio": 1.049567911299527,
+    "further_rounds": "NOT_RUN: no demonstrated outcome gain, no forced rewrite or 5judge expansion to seek a winner",
+    "human_checkpoint": "Initial local creation/offline testing approved in task. This delivery ends at Owner review; future important permission/data/operational-policy changes require new checkpoint. No independent background optimizer or scheduler.",
+    "case_only_reference_update": "SIM-COMMAND-EXIT-001 explicitly archived under incident-log simulated section, excluded from7realgroups; coreSKILL.md unchanged."
+  },
+  "concurrency": {
+    "initial_commit_branch_changed_by_parallel_task": true,
+    "own_commit_only_skill_and_agents": true,
+    "protected_shared_dirty_changes_not_staged_or_reverted": true,
+    "safe_followup_worktree": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020",
+    "original_shared_branch_left_intact": true,
+    "evidence": "evidence/parallel-worktree-observation.json",
+    "note": "No reset/clean/overwriting checkout, no Cherry-pick or merge. Initial own commit remains in the concurrently selected branch; independent worktree preserves both histories."
+  },
+  "retained_active_skill_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+  "artifacts": [
+    {
+      "path": "docs/deployment/ecs-skill/evidence/installed-darwin-identity.json",
+      "sha256": "9e707067fddc748298592d3fe287d87e4c754062065cf955ec0d84cf8689e3f7",
+      "bytes": 226
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/incidents-d8.json",
+      "sha256": "ae4bbf3bca501ec912f7a0132fe32d97254749d31e55778b3cc022bce0e86158",
+      "bytes": 11409
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/incidents-s83r.json",
+      "sha256": "316eae0abe5961ef0cd70c9dc2b7a024ff3895a459a9e436ad7fed0c3bd0737f",
+      "bytes": 14752
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/native-discovery.json",
+      "sha256": "a4a275e4bc70b9c336b1aef75d55103c9eb1393422c286a02b94bcba73c16261",
+      "bytes": 2083
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/fresh-routing.json",
+      "sha256": "7260fed3e0b4eb41fb610a1df4f127b3a5476c46decf01f85633baa9ed049097",
+      "bytes": 5067
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/behavior-fixtures.json",
+      "sha256": "e11ff11f8576bf69329493df08c0e010366aa9a7da13800a9a21ab053cfc3492",
+      "bytes": 4296
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/behavior-without.json",
+      "sha256": "c5f8205e252596d48b3f660687946453e906d4c5d19c4fdae8f5f1c2c462c2cb",
+      "bytes": 17421
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/behavior-v1.json",
+      "sha256": "10ebd792cd66a481ac2e3ffd51e1e99a233e947288df19a80e14f6e9ca219a90",
+      "bytes": 23781
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/behavior-t4-fixture.json",
+      "sha256": "6af1dfa1aa152b953404f42c3742180bd2518350e16f543d29c90a7e66c8ad86",
+      "bytes": 1158
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/behavior-t4-v1.json",
+      "sha256": "a9280de55d323eabf88403364c0a3d2b9ecb67800bd64dde1ad655ca22551098",
+      "bytes": 7847
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/behavior-v2.json",
+      "sha256": "ed6a65e5c042878198cf08c58e5ec5f6c9268d50e992f0047eef1d5c85389cfc",
+      "bytes": 21886
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/baseline-triage.json",
+      "sha256": "e45b16b333e67b278a278e9dc7fd9e8f04a05b060491f2d2f96a75e63c649384",
+      "bytes": 11032
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/candidate-proposal.json",
+      "sha256": "8af93c11e7909d2254dca6285e9885b268b6d58ba5cf06748bd8bc0fd86f626c",
+      "bytes": 868
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/new-authoring-incident.json",
+      "sha256": "805c9eaa838d5a1874279919edb397d3f70b1ff2f27a1177cc37b4985434611d",
+      "bytes": 1643
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/parallel-worktree-observation.json",
+      "sha256": "062355f1955c3ca6fec94c1c840ca143d5326722eaac571fdc0c8b2de7639afa",
+      "bytes": 1643
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/paired-judge-1.json",
+      "sha256": "f82015d7291e9e51997930103bec2ab7b381238c5f67232f27c5be322717bc7f",
+      "bytes": 5061
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/paired-judge-2.json",
+      "sha256": "9c2a19e89184d8349abe466a3664cab94fde756d0bf855319874458035ada979",
+      "bytes": 7161
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/paired-judge-3.json",
+      "sha256": "c24cd74080f6b5ead615326fed0c602af8ffea6e63095273ad920e65df8c86ae",
+      "bytes": 6314
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/paired-judge-1-rubric.json",
+      "sha256": "54bf8449b64d575b4ed80653b629aa2a5c9a4cbbeb3af50122127ac07c1ee33f",
+      "bytes": 6489
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/paired-judge-2-rubric.json",
+      "sha256": "52257e7d18118ee1f43ce98a29475466e06ca3e79b5476fff8d8333d97bb1fec",
+      "bytes": 7423
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/paired-judge-3-rubric.json",
+      "sha256": "a3a5d19121f71438f489878f31a720a377e54d1940e0bd998c670d3ae490f6c5",
+      "bytes": 6696
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/evolution-decision.json",
+      "sha256": "a978a79d719ee9fa3ed0c3d2045cffe27ecbde38ddd5af9c3a274a0f6ecf64db",
+      "bytes": 1622
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/artifact-validation.json",
+      "sha256": "cd2e516b48932a807fad69e0e5d03bb6b3af40977baf8ea033026c2c1d0de959",
+      "bytes": 3970
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/result-card.html",
+      "sha256": "00cf834328883f5fb256d6c4b5b5af8a43ce3f258206253b03b6c0fabaf1e5fd",
+      "bytes": 12621
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/result-card.png",
+      "sha256": "82e23b54ae6d83f203a404cc575f0189362575d5365cfa8c29227ceea90e440c",
+      "bytes": 191184
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/result-card-receipt.json",
+      "sha256": "d2a70d20c283e32d8d550f94d21f9cf88396f1d89f4777ee9502e2ed49c0e89b",
+      "bytes": 668
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/probe_native_discovery.py",
+      "sha256": "53310e6b6c9124f680dab66568424744faba2f1809a4e7418eeb6fd449f3fad5",
+      "bytes": 3210
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/validate_local_artifacts.py",
+      "sha256": "1b89f58879c6661be7b3a43f7620e8acaac515d41fd9764b1b82a14c40ba4bc9",
+      "bytes": 4636
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/render_result_card.py",
+      "sha256": "6ea43b4025e06f193f7a4cbe228a2997c9a6729aaf5853a0d127d2a5bfd9d536",
+      "bytes": 4672
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/artifact-validation-final.json",
+      "sha256": "92f2ab255dc78784e20d68ea51de33a19f2d3e3ee2120405d35a3d8f32db65b3",
+      "bytes": 3970
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/delivery-structural-check.json",
+      "sha256": "8f3050afc08dc3cf56934920f80428d49a7f4a37c5e938a11a650889ddf26242",
+      "bytes": 323
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/delivery-review.json",
+      "sha256": "9f19b0a5bff88f02e8710183f705e4937e935b2ace067461b55ad406328ae49b",
+      "bytes": 3571
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/artifact-validation-delivery.json",
+      "sha256": "1c02637436ff925c270e7f0ba168125fe0a64ce4af8372319cbdf3a1df5cd5b0",
+      "bytes": 4190
+    },
+    {
+      "path": "docs/deployment/ecs-skill/evidence/git-checks-final.json",
+      "sha256": "9e05e13bc236a32e181eab9bea19c54c21f6b89eeed6d76703dee58aa54aa6ec",
+      "bytes": 419
+    }
+  ],
+  "known_limits": [
+    "No new live ECS deployment or rollback proved; historical addresses/counts/versions need current revalidation when used.",
+    "Fresh routing agent lacked Git permissions; it stopped rather than guessing.",
+    "No measured deployment speedup from simulated plans; score is triage only.",
+    "Future automatic summary is an agent instruction triggered on ECS tasks, not a permanently running daemon.",
+    "Some raw research notes use old paths that were corrected in the curated incident-log; they are research provenance, not executable commands."
+  ],
+  "delivery_review": "PASS: narrow independent6Lunareview; noECS/network/tests",
+  "initial_whitespace_check": {
+    "command": "git diff --cached --check",
+    "exit_code": 2,
+    "cause": "Original raw judge3JSON has trailing/EOFwhitespace; archived unchanged, binary artifact attributes preserve raw bytes; firstcheckreceipt retained."
+  }
+}

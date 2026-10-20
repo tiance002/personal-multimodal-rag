@@ -1,0 +1,45 @@
+{
+  "status": "PASS",
+  "type": "NATIVE_LOCAL_SKILLS_LIST",
+  "command": [
+    "C:\\Users\\22088\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\bin\\codex.exe",
+    "app-server",
+    "--stdio",
+    "-c",
+    "analytics.enabled=false"
+  ],
+  "cwd": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020",
+  "isolated_codex_home": "E:\\RAG quention\\var\\reports\\ecs-skill-20261020\\native-discovery-home",
+  "model_turns": 0,
+  "ssh_calls": 0,
+  "docker_calls": 0,
+  "global_config_or_skills_modified": false,
+  "project_skill": {
+    "name": "ecs-incremental-deploy",
+    "description": "EviRoute RAG 的 Windows→阿里云 ECS Docker/Compose 增量部署、API/Worker 更新故障、运行版本核验与回滚；按真实历史证据缩小更新范围，并在故障解决后验证 Skill 改进。用于 ECS 发布或部署排障，不用于日常检索调优、全量入库或其他项目部署。",
+    "interface": {
+      "displayName": "ECS 增量部署",
+      "shortDescription": "复用真实故障、版本与回滚证据，完成 EviRoute RAG 的最小 ECS 更新",
+      "iconSmall": null,
+      "iconLarge": null,
+      "iconSmallUrl": null,
+      "iconLargeUrl": null,
+      "brandColor": null,
+      "defaultPrompt": "使用 $ecs-incremental-deploy 核对本次 EviRoute RAG 的 ECS 增量更新范围和验收。"
+    },
+    "path": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020\\.agents\\skills\\ecs-incremental-deploy\\SKILL.md",
+    "scope": "repo",
+    "enabled": true,
+    "pluginId": null
+  },
+  "init_response": {
+    "id": 1,
+    "result": {
+      "userAgent": "Codex Desktop/0.159.2 (Windows 10.0.26200; x86_64) dumb (ecs-skill-offline-discovery; 1.0.0)",
+      "codexHome": "E:\\RAG quention\\var\\reports\\ecs-skill-20261020\\native-discovery-home",
+      "platformFamily": "windows",
+      "platformOs": "windows"
+    }
+  },
+  "skill_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f"
+}

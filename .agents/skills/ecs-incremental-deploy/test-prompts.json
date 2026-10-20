@@ -1,0 +1,183 @@
+[
+  {
+    "id": "T1-application-only",
+    "kind": "SIMULATED_DEPLOYMENT_PLAN",
+    "prompt": "本次只有FastAPI上传参数校验改动。请依据给定快照给出最小ECS增量更新计划和停止条件，不执行部署。",
+    "fixture": {
+      "changed_files": [
+        "backend/weknora_port/http_api.py",
+        "tests/weknora_port/test_http_api.py"
+      ],
+      "unchanged": [
+        "shared_runtime",
+        "queue_payload_contract",
+        "worker_consumers",
+        "frontend",
+        "schema",
+        "indexes",
+        "models"
+      ],
+      "tests": {
+        "same_commit_targeted": true,
+        "exit_code": 0,
+        "result": "71passed"
+      },
+      "current": {
+        "compose_project": "rag-s8",
+        "services": {
+          "api": "running",
+          "worker": "running",
+          "db": "running",
+          "redis": "running",
+          "frontend": "absent"
+        },
+        "api_worker_share_image": true,
+        "runtime_code_mounts": false,
+        "resource_limits_unchanged": true
+      },
+      "rollback": {
+        "old_image_id_verified": true,
+        "old_config_bytes_and_hash_saved": true
+      },
+      "authorization": {
+        "deployment_plan_only": true,
+        "remote_writes": false,
+        "provider": false
+      }
+    },
+    "expected": [
+      "共享镜像本身不构成同时重启Worker的理由；依据不变的消费合同，仅API需要更新。",
+      "PG/Redis/前端/索引/Embedding不操作，同目标定向测试复用。",
+      "核对实际运行源码、Ready与回滚；未获模型许可时真实问答NOT_RUN。"
+    ]
+  },
+  {
+    "id": "T2-healthy-old-code",
+    "kind": "SIMULATED_INCIDENT_DIAGNOSIS",
+    "prompt": "ECS容器healthy且镜像标签已更新，但问答API仍显示旧行为。根据模拟快照定位最早可确认的问题并给出下一步，不连接服务器。",
+    "fixture": {
+      "target": {
+        "revision": "target-new",
+        "http_api_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "image": {
+        "id": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "revision": "target-new",
+        "module_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "running": {
+        "same_image_id": true,
+        "health": "healthy",
+        "module_file": "/app/backend/weknora_port/http_api.py",
+        "module_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mounts": [
+          {
+            "source": "/srv/release-old/http_api.py",
+            "destination": "/app/backend/weknora_port/http_api.py",
+            "readonly": true
+          },
+          {
+            "source": "/srv/storage",
+            "destination": "/var/lib/eviroute/storage",
+            "readonly": false
+          }
+        ]
+      },
+      "effective_compose_files": [
+        "/srv/current/compose.yml",
+        "/srv/config/loaded-images.json"
+      ],
+      "rollback": {
+        "old_image_available": true,
+        "config_snapshot_available": true
+      },
+      "authorization": {
+        "remote_writes": false,
+        "provider": false
+      }
+    },
+    "expected": [
+      "同Image ID但加载SHA不同，且存在精确代码bind mount，确认先排覆盖层。",
+      "不误判为旧镜像，不默认重建/删除全部挂载。",
+      "核对有效Compose后才申请局部映射修复，保护来源存储。"
+    ]
+  },
+  {
+    "id": "T3-incident-evolution",
+    "kind": "SIMULATED_NEW_INCIDENT_AND_RULE_REVIEW",
+    "prompt": "一次部署工具修好后，请把给定合成事件写成故障记录，并给出是否需要修改Skill以及怎样比较、保留或回退；不能把模拟成功写成真实部署。",
+    "fixture": {
+      "id": "SIM-COMMAND-EXIT-001",
+      "real": false,
+      "powershell_steps": [
+        {
+          "command": "python verify_manifest.py",
+          "exit_code": 1,
+          "semantic_status": "SOURCE_HASH_MISMATCH"
+        },
+        {
+          "command": "git status --short",
+          "exit_code": 0
+        }
+      ],
+      "wrapper_exit_code": 0,
+      "failed_attempt": "Wrapper final exit alone was used as acceptance.",
+      "fix": "Capture each criticalcommandexit immediately and propagate any failure;keep firstfailure.",
+      "verified_by_offline_fixture": {
+        "wrong_manifest_exit": 1,
+        "matching_manifest_exit": 0,
+        "provider_calls": 0,
+        "remote_writes": 0
+      },
+      "existing_rule": "Check each command exit and semanticstatus;do not mask failure.",
+      "authorization": {
+        "project_skill_and_offline_tests": true,
+        "new_remote_actions": false
+      }
+    },
+    "expected": [
+      "合成事件明确标识，根因是后续成功掩盖中间退出码，不称应用修复。",
+      "已有规则覆盖只补案例；新规则只做单因素候选，不预设收益。",
+      "3名独立配对评估、相同fixture和输出；更差/无行为收益拒绝；重要变更Owner审查，不reset或写全局。"
+    ]
+  },
+  {
+    "id": "T4-concurrent-worktree",
+    "kind": "SIMULATED_REPLAY_OF_REAL_AUTHORING_INCIDENT",
+    "prompt": "你准备打包并提交一个ECS应用更新。初始化时确认的分支/HEAD与现在不同，当前目录还有其他任务的未提交后端文件。根据给定证据完成安全的下一步方案，不执行Git写入或远端操作。",
+    "fixture": {
+      "initial": {
+        "branch": "codex/deploy-review",
+        "head": "initial-sha",
+        "dirty": []
+      },
+      "now": {
+        "branch": "codex/fallback-repair",
+        "head": "parallel-sha",
+        "dirty": [
+          "backend/weknora_port/runtime.py",
+          "tests/weknora_port/test_fallback_evidence_contract.py"
+        ]
+      },
+      "authorized_own_files": [
+        ".agents/skills/ecs-incremental-deploy/SKILL.md",
+        "AGENTS.md"
+      ],
+      "own_changes_already_committed": true,
+      "own_commit_only_contains_own_files": true,
+      "active_other_task": true,
+      "independent_worktree_path_exists": false,
+      "authorization": {
+        "plan_only": true,
+        "reset_or_overwrite": false,
+        "push": false,
+        "remote_deploy": false
+      }
+    },
+    "expected": [
+      "发现并发分支/HEAD变化时停止共享目录暂存、提交和打包，不能切回或reset其他任务。",
+      "保留已有仅含本任务文件的提交，按授权改用唯一独立worktree；不纳入另一个任务dirty文件。",
+      "计划不等于实际执行；不能以本次模拟说明远端部署或完整恢复已通过。"
+    ]
+  }
+]

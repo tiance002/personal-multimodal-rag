@@ -1,0 +1,236 @@
+{
+  "artifact_type": "OFFLINE_BEHAVIOR_TASK_OUTPUT",
+  "mode": "SIMULATED",
+  "language": "zh-CN",
+  "operational_execution": "NOT RUN",
+  "ecs_operations": 0,
+  "provider_calls": 0,
+  "remote_writes": 0,
+  "input_scope": [
+    "E:/RAG quention/var/reports/ecs-skill-20261020/behavior-fixtures.json",
+    "E:/RAG-Worktrees/s8-six-dataset-evaluation/.agents/skills/ecs-incremental-deploy/SKILL.md",
+    "E:/RAG-Worktrees/s8-six-dataset-evaluation/.agents/skills/ecs-incremental-deploy/references/deployment-runbook.md",
+    "E:/RAG-Worktrees/s8-six-dataset-evaluation/.agents/skills/ecs-incremental-deploy/references/incident-log.md",
+    "E:/RAG-Worktrees/s8-six-dataset-evaluation/.agents/skills/ecs-incremental-deploy/references/evolution.md"
+  ],
+  "evidence_boundary": "以下为对给定合成快照实际完成的离线计划、诊断和事件记录。快照字段是模拟输入，不代表本轮读取过ECS；所有未来命令均为拟议操作，未执行。没有真实部署、真实问答、回滚或服务验收通过的结论。",
+  "tasks": [
+    {
+      "id": "T1-application-only",
+      "mode": "SIMULATED",
+      "deliverable": "FastAPI上传参数校验最小增量更新计划",
+      "diagnosis": {
+        "conclusion": "本次应用切换范围为api。api与worker共用镜像，但共同运行模块、队列payload合同和worker消费者均未变化，现有证据不要求更新worker。构建一个后端目标镜像后，仅让api采用该镜像。",
+        "evidence": [
+          {"path": "fixture.changed_files", "value": ["backend/weknora_port/http_api.py", "tests/weknora_port/test_http_api.py"]},
+          {"path": "fixture.unchanged", "value": ["shared_runtime", "queue_payload_contract", "worker_consumers", "frontend", "schema", "indexes", "models"]},
+          {"path": "fixture.tests", "value": {"same_commit_targeted": true, "exit_code": 0, "result": "71passed"}},
+          {"path": "fixture.current", "value": {"compose_project": "rag-s8", "api_worker_share_image": true, "runtime_code_mounts": false, "resource_limits_unchanged": true}},
+          {"path": "fixture.rollback", "value": {"old_image_id_verified": true, "old_config_bytes_and_hash_saved": true}}
+        ],
+        "unknowns": ["目标commit SHA和合法dirty路径未给出。", "现有71passed对应的原始测试命令、收据路径和源码/配置摘要未给出。", "主机身份、完整有效Compose文件链、PG物理身份、Redis DB/前缀、来源和索引before快照、在途任务状态未给出。"],
+        "verification_level": "SIMULATED_FIXTURE_REASONING；71passed为输入已有证据，非本轮测试结果。"
+      },
+      "scope": {
+        "build": ["后端目标镜像，按目标源码和既有依赖构建一次"],
+        "switch": ["api"],
+        "preserve_service_state": {"worker": "保持现有运行容器及原镜像", "db": "保持运行", "redis": "保持运行", "frontend": "保持absent"},
+        "data_actions": "无Schema转换、数据迁移、索引重建或重Embedding。",
+        "cloud_actions": "无；真实问答REAL_QA_NOT_RUN。"
+      },
+      "ordered_plan": [
+        {
+          "order": 1,
+          "action": "冻结目标与复用定向验证",
+          "checks": "确认实际仓库、HEAD、目标commit、dirty归属及两文件差异；核对71passed确属同一目标源码/配置并保存原命令、exit0和语义结果。证据适用时直接复用，无输入变化不重跑。",
+          "evidence_to_save": ["目标commit与变更清单", "已有定向测试原收据"],
+          "stop": "目标不明、dirty冲突、测试证据不适用或失败时停止发布准备，先修最早问题。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 2,
+          "action": "形成只读发布前快照",
+          "checks": "获得独立远端只读授权后核对主机、rag-s8及容器标签中的全部有效Compose文件和env文件；分别记录api/worker实际Image ID、revision、状态、挂载、资源限制、PG物理身份、Redis DB/前缀、来源版本、索引和账本/UNKNOWN before。核实旧镜像仍可用和旧配置原字节/SHA属于本次状态。",
+          "evidence_to_save": ["完整有效配置链及允许展示字段的差异", "身份和数据before快照", "单次唯一目录中的回滚材料"],
+          "stop": "身份无法核实、数据异常、配置包含未批准变更、旧镜像或旧配置不可用、出现新UNKNOWN时停止相关切换/发送。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 3,
+          "action": "仅构建并验证后端目标镜像",
+          "checks": "基础镜像/依赖确定后按linux/amd64及目标revision构建；核对实际包版本、目标源码manifest、正式模块import及镜像内密钥/临时资产排除。逐条保留退出码和语义状态；exit0不能覆盖manifest或依赖拒绝。",
+          "evidence_to_save": ["目标Image ID、OCI revision、源码与依赖manifest", "构建与import的命令/exit/语义结果"],
+          "stop": "架构或包版本不符、manifest不符、import失败或凭据进入镜像时停止传输和切换。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 4,
+          "action": "经部署授权后传输不可变工件并暂存",
+          "checks": "传输前后记录归档大小/SHA，不加载不完整包；传输失败保留原件并标不可用。只有底座、依赖和目标文件一致已证明时才考虑manifest增量构建，并独立记录两地Image ID。暂存有效配置差异仅包含api镜像指向；worker、资源限制及其他服务状态保持快照。",
+          "evidence_to_save": ["两端大小/SHA与镜像身份", "仅api镜像变化的有效配置差异"],
+          "stop": "固定主机身份不符、传输校验失败或共享配置将连带更新worker时停止，先缩小映射。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 5,
+          "action": "检查空闲后单独切换api",
+          "checks": "确认无在途发送/任务及并发合法发布；使用本次已核实的完整Compose文件链，仅对api执行单服务应用更新，语义相当于up -d --no-deps --pull never --no-build api。此处不是本轮执行命令，也不能直接复制历史路径。",
+          "evidence_to_save": ["本次授权范围", "切换命令、exit和服务状态"],
+          "stop": "当前仅deployment_plan_only=true、remote_writes=false，故本轮到计划交付为止；没有执行授权不得开始切换。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 6,
+          "action": "零云运行与业务验收",
+          "checks": "核对api实际Image ID→OCI revision→正式模块__file__/SHA→无源码遮蔽挂载；正式鉴权Ready成功按真实exit/协议判断，不强制静默CLI输出JSON。覆盖本次无效上传参数的拒绝语义与合法参数兼容路径；核对API/Worker任务合同仍兼容、worker仍运行原版本、来源可回读、索引及历史/数据before-after与本次变更一致。涉及写入的业务验证须处于明确批准的测试范围。",
+          "evidence_to_save": ["运行身份链", "参数校验及合同收据", "数据/来源/索引/账本保护结果"],
+          "stop": "运行版本不符、Ready或业务合同失败、数据差异无法解释、新UNKNOWN时停止验收并进入应用/配置回滚分支。",
+          "status": "PROPOSED_NOT_RUN"
+        }
+      ],
+      "rollback_plan": {
+        "fixture_material_state": "SIMULATED_AVAILABLE",
+        "execution": "NOT_TRIGGERED",
+        "procedure": "在本次部署授权覆盖的回滚范围内，先确认无在途任务/发送及无并发合法更新；使用已验证旧Image ID与原配置字节恢复api映射，沿同一有效Compose文件链仅重建api；重新核对旧运行模块SHA、鉴权Ready、任务合同和数据/UNKNOWN保护。",
+        "limits": "出现并发配置变更先停盲恢复；应用镜像回滚不等于Git回退或数据库恢复。没有数据变更，不引入数据库恢复动作。"
+      },
+      "approval_and_stop": {
+        "current_authorization": "只允许给出部署计划；本轮不进行远端读写、构建、传输、切换或Provider调用。",
+        "approval_needed_before_execution": "Owner明确批准本次目标主机、版本、api切换与回滚范围；远端只读盘点也不在本轮实际执行。",
+        "new_scope_checkpoint": "若后续发现Schema、数据转换、索引重建、不可逆操作或新的服务合同影响，应重新提交必要性、影响和独立恢复方案，不能沿用api更新授权。"
+      },
+      "result": {"offline_artifact": "COMPLETED_SIMULATED", "real_deployment": "NOT RUN", "real_acceptance": "NOT RUN", "real_qa": "REAL_QA_NOT_RUN", "command_results": "本轮未运行该任务中的测试/部署命令；原测试命令NOT_RECORDED，fixture提供exit0和71passed。"}
+    },
+    {
+      "id": "T2-healthy-old-code",
+      "mode": "SIMULATED",
+      "deliverable": "旧行为最早可确认问题的诊断记录及定点修复方案",
+      "diagnosis": {
+        "confirmed_problem": "镜像源码与目标一致，但运行容器看到的http_api.py被旧宿主机文件的只读bind mount遮蔽，运行文件SHA与目标不同。这是该快照中最早可确认的运行身份偏差。healthy和更新后的标签没有证明目标代码被运行。",
+        "evidence_chain": [
+          {"order": 1, "field": "fixture.target", "observation": "目标revision=target-new；http_api_sha256为64个a。"},
+          {"order": 2, "field": "fixture.image", "observation": "镜像id为sha256:1111111111111111111111111111111111111111111111111111111111111111，revision=target-new，module_sha256为64个a，与目标一致。"},
+          {"order": 3, "field": "fixture.running.same_image_id / health", "observation": "运行容器使用同一Image ID且healthy；因此已有快照未显示旧镜像或旧容器映射问题。"},
+          {"order": 4, "field": "fixture.running.module_file / module_sha256", "observation": "/app/backend/weknora_port/http_api.py实际SHA为64个b，与目标/镜像不一致。"},
+          {"order": 5, "field": "fixture.running.mounts[0]", "observation": "/srv/release-old/http_api.py只读挂载到同一模块路径，能够遮蔽镜像内文件；readonly只限制写入，不消除覆盖效果。"}
+        ],
+        "inference_limits": "以上确认文件可见性和来源映射错误。仍需在有授权时用正式import的__file__/SHA核对实际加载位置，并复测旧行为；仅凭快照不声称已修好或已证明进程缓存的完整执行路径。",
+        "verification_level": "SIMULATED_FIXTURE_DIAGNOSIS；未连接服务器。"
+      },
+      "scope": {
+        "target": "受该模块遮蔽影响的api配置与容器",
+        "config_chain": ["/srv/current/compose.yml", "/srv/config/loaded-images.json"],
+        "mount_to_review": "/srv/release-old/http_api.py -> /app/backend/weknora_port/http_api.py",
+        "storage_mount_to_preserve": "/srv/storage -> /var/lib/eviroute/storage",
+        "worker": "先只读检查是否存在相同遮蔽与合同影响；没有证据不更新worker。",
+        "image_build": "镜像身份及模块SHA在快照中已匹配；当前修复方案无需重建镜像。"
+      },
+      "ordered_next_steps": [
+        {
+          "order": 1,
+          "action": "保留当前诊断链与原始配置",
+          "check": "经授权后核实容器Compose标签仍指向给定完整文件链，保存这两份原字节/SHA、实际Image ID/revision、Mounts和正式模块__file__/SHA；只展示允许字段，避免输出全环境、token或DSN。",
+          "branch": "若文件链或身份变化，暂停修复并重建当前证据；不套用runbook的历史/opt路径。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 2,
+          "action": "定位覆盖来源并制作最小配置差异",
+          "check": "沿/srv/current/compose.yml和/srv/config/loaded-images.json的完整有效配置追踪旧模块bind mount由哪层声明；拟去除这个已证明错误的源码覆盖，使api采用镜像内目标文件。保留/srv/storage业务来源挂载以及有效资源和其他配置。",
+          "branch": "若该挂载是仍需保留的合法运行合同，先与Owner确定映射目标；不把删除某个旧源码挂载推广成删除全部挂载。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 3,
+          "action": "经批准只重建受影响api",
+          "check": "比对有效配置差异只含该挂载修正、镜像仍为已验证目标；确认回滚材料、在途任务、数据/账本快照及无并发合法更新。使用本次同一Compose文件链，仅对api应用无依赖重建；重启同一错误配置无法解决遮蔽。",
+          "branch": "remote_writes=false，本轮不执行。没有Owner本次配置/服务变更授权不得切换。",
+          "status": "PROPOSED_NOT_RUN"
+        },
+        {
+          "order": 4,
+          "action": "复核修复效果与保护项",
+          "check": "检查实际Image ID、target-new revision、正式模块路径及64个a的SHA；确认旧源码挂载不再遮蔽且存储挂载仍存在。正式鉴权Ready后走受影响API行为的零云定向验证，核对任务合同、来源回读、索引/历史和数据保护。",
+          "branch": "身份已匹配而旧行为仍存在时，再沿实际路由/进程加载/配置检查下一层，不盲目重复重启或改模型。",
+          "status": "PROPOSED_NOT_RUN"
+        }
+      ],
+      "stop_and_approval": {
+        "stop_conditions": ["主机/Compose链/模块身份不明", "原配置或旧镜像不可用", "修复差异包含未批准数据/服务变化", "在途任务未澄清、数据异常或新Provider UNKNOWN"],
+        "approval": "本轮仅离线诊断。后续远端检查和写入需相应任务授权；挂载修改和api重建须Owner明确批准。Provider无授权，REAL_QA_NOT_RUN。",
+        "rollback": "fixture提供旧镜像及配置快照可用。若批准后修复失败，确认没有并发合法配置变更和在途任务，再仅恢复本次api配置/镜像，复核旧运行身份及数据保护；本轮未触发。"
+      },
+      "result": {"offline_artifact": "COMPLETED_SIMULATED", "root_cause_scope": "合成快照中确认源码bind mount遮蔽目标模块；真实运行结论NOT RUN。", "remote_checks": "NOT RUN", "repair": "NOT RUN", "rollback": "NOT_TRIGGERED", "real_qa": "REAL_QA_NOT_RUN"}
+    },
+    {
+      "id": "T3-incident-evolution",
+      "mode": "SIMULATED",
+      "deliverable": "已填写的模拟故障记录与Skill进化决策",
+      "incident_entry": {
+        "ID": "SIM-COMMAND-EXIT-001",
+        "REAL_or_SIMULATED": "SIMULATED",
+        "phase": "部署工具的本地工件验证与包装器验收",
+        "symptom": "python verify_manifest.py返回exit1及SOURCE_HASH_MISMATCH，后续git status --short返回exit0；包装器最终exit0，使最早失败被错误地当成验收成功。",
+        "direct_cause": "验收仅读取包装器最终退出码，后续成功命令掩盖前序关键验证命令失败。",
+        "root_cause": "包装器未立即捕获每条关键命令退出码并将首个失败向外传播，未联合检查退出码与语义status；已有正确规则未被工具实现落实。",
+        "confidence": "VERIFIED_IN_SIMULATED_FIXTURE；不表示真实事故或真实工具已由本轮运行验证。",
+        "failed_attempt": "Wrapper final exit alone was used as acceptance.",
+        "effective_fix": "每条关键命令结束立即保存其exit和语义status；一旦失败保留首个失败，阻止部署后续步骤，并使包装器非零退出；必要诊断命令可以继续但不得覆盖首个失败。SOURCE_HASH_MISMATCH即便外层进程exit0也应拒绝验收。",
+        "fix_verification_level": "输入提供的离线fixture结果；wrong_manifest_exit=1，matching_manifest_exit=0，provider_calls=0，remote_writes=0。本轮未运行验证脚本。",
+        "recognition_condition": "命令序列中任一关键步骤exit非零或语义status拒绝，但外层包装器显示成功；尤其是验证失败后执行只读诊断命令成功的序列。",
+        "prevention": "为每一步记录command、exit、semantic_status及first_failure；验收从全部关键步骤汇总，拒绝只看最后一条命令。脱敏保留最早失败原义，不覆写失败收据。",
+        "command_evidence": [
+          {"command": "python verify_manifest.py", "exit_code": 1, "semantic_status": "SOURCE_HASH_MISMATCH", "evidence_level": "SIMULATED_INPUT"},
+          {"command": "git status --short", "exit_code": 0, "semantic_status": "NOT_RECORDED", "evidence_level": "SIMULATED_INPUT"},
+          {"command": "包装器，原始命令未提供", "exit_code": 0, "semantic_status": "错误验收", "evidence_level": "SIMULATED_INPUT"}
+        ],
+        "evidence_path_and_fields": "E:/RAG quention/var/reports/ecs-skill-20261020/behavior-fixtures.json：T3.fixture.powershell_steps、wrapper_exit_code、failed_attempt、fix、verified_by_offline_fixture。原始执行日志与实现SHA未提供，NOT_RECORDED。",
+        "existing_rule": "Check each command exit and semanticstatus;do not mask failure.",
+        "related_project_rule": "SKILL.md第2节要求每步保留命令、退出码、语义结果和下一分支；构建exit0也要检查语义status。",
+        "rule_change_needed": false,
+        "incident_status": "离线fixture支持该修复模式；真实工具/真实部署修复验证NOT RUN。",
+        "history_classification": "新增独立SIM案例，不混入ECS-001至ECS-007真实历史计数。"
+      },
+      "ordered_actions": [
+        {"order": 1, "action": "保存原始失败链及fixture中的修复验证结果", "status": "COMPLETED_SIMULATED_ENTRY_ABOVE", "scope": "本交付JSON中的incident_entry"},
+        {"order": 2, "action": "判断已有规则是否缺失", "status": "COMPLETED_OFFLINE_REVIEW", "finding": "已有规则准确覆盖该失败。问题在工具执行退出合同，不需要扩大SKILL.md主文件。"},
+        {"order": 3, "action": "在本项目故障库补SIM案例，并将关键命令退出传播纳入工具离线验证", "status": "PROPOSED_NOT_RUN", "scope": "本任务仅准写当前JSON；未修改incident-log.md、脚本或任何全局Skill。当前JSON已提供可直接归档的完整条目。"},
+        {"order": 4, "action": "按有限对照方案判断是否保留未来改动", "status": "PROPOSED_NOT_RUN", "scope": "仅本项目、离线、无Provider/远端写入；具体比较见evolution_plan。"}
+      ],
+      "evolution_decision": {
+        "decision": "保留当前主规则，仅补必要SIM案例与执行工具的离线回归证据。",
+        "reason": "已有规则正确；一次包装器实现缺陷不能证明主文件规则需要增加或重写。输入的离线正反例也不足以宣称Skill改版产生行为收益。",
+        "change_applied_here": "仅写本交付中的事故条目与计划；SKILL.md和reference未修改。",
+        "authorization": "fixture授权项目Skill和离线测试，未授权新远端动作。本轮限定只写behavior-v1.json。",
+        "verification_level": "OFFLINE_DOCUMENT_DECISION；独立行为对照、Darwin评分及judge投票均NOT RUN。"
+      },
+      "evolution_plan": {
+        "baseline": "未来实施前冻结当前已提交SKILL、references及其commit/SHA，冻结相同任务fixture和行为预期，保存本次独立差异；不伪造未给出的SHA。",
+        "single_factor": "若确需进一步验证，候选仅补本SIM案例或一条精确退出传播示例；不同时改触发范围、部署权限或其他规则。当前无主文件改动提案。",
+        "offline_checks": [
+          {"case": "关键manifest验证失败后诊断成功", "input": "verify_manifest exit1/SOURCE_HASH_MISMATCH；git status exit0", "acceptance": "包装器exit非零，first_failure仍指manifest，后续部署阶段未进入。", "execution": "NOT RUN"},
+          {"case": "manifest一致", "input": "verify_manifest exit0且语义通过", "acceptance": "无其他关键失败才允许包装器exit0；不误拒绝正常路径。", "execution": "NOT RUN"},
+          {"case": "进程exit0但语义拒绝", "input": "关键验证exit0/SOURCE_HASH_MISMATCH", "acceptance": "包装器拒绝验收并保留语义失败，不因进程exit0放行。", "execution": "NOT RUN"},
+          {"case": "多个关键失败", "input": "第一关键验证失败后另一关键步骤失败", "acceptance": "两条证据保留，first_failure保持最早原因。", "execution": "NOT RUN"}
+        ],
+        "behavior_comparison": "仅在需要改规则时，先读取实际安装Darwin规范。用独立新上下文完成相同离线任务并保存具体输出，分别比较未带Skill与带Skill行为，以及当前版与单因素候选；不得把主代理推演标full_test。当前仅是方案，不声称已创建代理或完成对照。",
+        "paired_review": "规则候选须经3名独立judge在同一次评估内以随机/交错顺序读取两版及同任务输出，依据Darwin九维标准给better/worse/tie、clear/slight及理由；以同judge配对多数决定，绝对分仅用于定位问题，不以字数证明收益。本轮未读取评分材料、未调用judge。",
+        "keep": "离线行为测试满足、存在明确行为收益且没有新增风险，并满足Owner审查点时才保留候选；已有规则正确时保留案例即可，不强求改主文件。",
+        "reject_or_stop": "多数更差、无明确行为收益或出现新风险则拒绝推广；每轮单因素、最多3轮，达成目标、连续2轮slight/tie或两次无实质收益时停止。",
+        "rollback": "保留当前版/候选、commit/SHA、diff及原输出；仅对本次独立优化提交用git revert，不reset、不自动stash、不覆盖dirty或他人变更。冲突时停该回退并报告。Git回退不会回滚ECS。",
+        "record": "未来实际实施记录故障ID、旧新SHA/commit、单因素diff、相同Prompt/fixture、独立行为输出、原judge结论、真实命令/exit、保留拒绝理由，写本项目docs/deployment/ecs-skill/evolution/results.tsv。当前未写该文件。",
+        "checkpoint": "新增权限、数据操作、重要规则变化或探索性重写先交Owner确认。禁止全局Skill修改、自动Push、自动新Goal、云调用或后台监控承诺。"
+      },
+      "result": {"offline_artifact": "COMPLETED_SIMULATED", "incident_entry": "已在本JSON中填写", "tool_tests_this_turn": "NOT RUN", "skill_change": "NO_MAIN_RULE_CHANGE", "actual_deployment": "NOT RUN", "actual_recovery": "NOT RUN"}
+    }
+  ],
+  "execution_report": {
+    "actual_file_reads": "通过本地Get-Content -Raw -LiteralPath读取input_scope列出的5个文件；每次exit0。",
+    "actual_file_write": "仅创建本behavior-v1.json。",
+    "operational_commands": "NOT RUN；未运行Git、Docker、SSH、manifest验证器、Provider或ECS命令。",
+    "real_service_validation": "NOT RUN",
+    "risk_and_remaining": "所有远端身份、实际服务行为、业务保护、回滚及未来对照评估尚未执行。不得以这些离线交付宣称真实部署通过。",
+    "commit": "NOT CREATED",
+    "acceptance": "未请求或声称Owner里程碑验收，未打Tag。"
+  }
+}

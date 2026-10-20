@@ -1,0 +1,173 @@
+{
+  "status": "SIMULATED",
+  "source": "behavior-fixtures.json",
+  "verification_level": "仅对给定离线快照作分析和编制交付物；未执行部署、故障修复或离线测试，未连接真实 ECS。",
+  "remote_writes": 0,
+  "provider_calls": 0,
+  "tasks": [
+    {
+      "id": "T1-application-only",
+      "artifact_type": "SIMULATED_DEPLOYMENT_PLAN",
+      "goal": "为 FastAPI 上传参数校验提供仅更新 api 的最小增量部署方案；本次交付止于计划。",
+      "diagnosis": "给定变更仅涉及 HTTP API 和关联测试，运行时无代码挂载，未发现 worker 或基础设施需要更新的证据。api 与 worker 共享镜像并不意味着必须重建 worker 容器。",
+      "evidence": [
+        "变更文件：backend/weknora_port/http_api.py、tests/weknora_port/test_http_api.py。",
+        "shared_runtime、queue_payload_contract、worker_consumers、frontend、schema、indexes、models 均声明未变。",
+        "快照声明同一 commit 的定向测试退出码 0，结果 71passed；这是输入证据，本次未重新执行。",
+        "Compose project 为 rag-s8，api/worker/db/redis 正在运行，frontend 不存在。",
+        "api_worker_share_image=true，runtime_code_mounts=false，资源限制未变。",
+        "旧镜像 ID 已核实，旧配置原始字节与 hash 已保存。"
+      ],
+      "scope": {
+        "allowed_plan": ["构建并验证目标 API 镜像", "仅重建 rag-s8 的 api 容器", "API 上传验证与引用链路最小冒烟", "失败时仅回滚 api 及本次必要的 API 镜像配置"],
+        "excluded": ["worker 重启或重建", "db/redis 重建", "创建 frontend", "数据库迁移", "重建索引", "模型更换", "资源配置调整", "provider 操作"]
+      },
+      "ordered_actions": [
+        {
+          "order": 1,
+          "action": "补齐执行所需的确定值，并核对同一发布源。",
+          "checks": ["记录目标 commit SHA、目标源码 hash、实际 Compose 文件的完整有序列表、api 容器 ID、worker/db/redis 容器 ID 与镜像 ID。", "记录旧 API 镜像 ID 和旧配置快照位置、原始字节 hash。", "核对已通过的 71passed 确实属于将要构建的 commit。"],
+          "stop": "上述值当前快照未完整提供；不猜测服务器路径、镜像标签或 commit。执行前任何一项无法确定即停止。"
+        },
+        {
+          "order": 2,
+          "action": "渲染当前有效 Compose 配置并核对服务、挂载和资源。",
+          "proposed_command": "docker compose -p rag-s8 -f <已确认的主文件> <按实际顺序重复的-f参数> config",
+          "checks": ["只选择 api，确认 api/worker 共享 image 定义及 build 目标。", "确认没有源代码挂载，数据挂载保留。", "确认渲染结果没有隐含迁移命令、资源变化、worker 服务变化或 frontend 创建。"],
+          "stop": "有效配置与快照不符，或无法分辨共享 image 配置会影响哪些服务时，停止并重新界定计划。"
+        },
+        {
+          "order": 3,
+          "action": "在后续获准执行后，仅为 api 构建或载入目标不可变镜像，记录目标 image ID 与源码 hash。",
+          "proposed_command": "docker compose -p rag-s8 -f <已确认的主文件> <其余已确认-f参数> build api",
+          "checks": ["先确认 build api 存在且将使用已核实的 commit；如当前为离线镜像导入流程，沿用已确认的导入步骤，不直接执行本命令。", "将构建产物固定为不可变 image ID 或独立发布标签；必要时增加仅含 services.api.image 的最小 override。", "在不接入生产数据及网络的镜像检查中核对模块 hash 与目标源码，不能只核对标签。"],
+          "stop": "构建失败、来源不一致、hash 不一致或旧镜像不可恢复时停止，保留首次失败退出码。"
+        },
+        {
+          "order": 4,
+          "action": "核对最终渲染配置后，仅替换 api 容器。",
+          "proposed_command": "docker compose -p rag-s8 -f <已确认的主文件> <其余已确认-f参数及仅API镜像override> up -d --no-deps --no-build --force-recreate api",
+          "checks": ["命令前确认 api.image 指向已验证目标镜像；worker 的当前容器不因共享标签而隐式升级。", "本任务不执行该命令；后续执行需要有效远程写入授权。"],
+          "stop": "发生 api 以外的服务重建，或启动失败、健康超时、实际 image ID 不一致时立即停止后续动作。"
+        },
+        {
+          "order": 5,
+          "action": "验证运行中的 API 版本及变更行为。",
+          "checks": ["记录 api 容器实际 image ID、实际导入模块路径与 hash，核对目标值。", "使用专用测试资料验证非法上传参数被接口契约规定的错误码和响应拒绝；有效参数仍能走既有上传入口。", "如可用，使用已有专用测试知识库进行检索、回答、引用可回读的最小冒烟；任何新增数据写入须包含在后续执行授权中。", "核对 worker/db/redis 容器 ID 和启动时间与步骤 1 一致，且无 frontend 容器。"],
+          "stop": "验证无法完成则标记 NOT RUN 或 BLOCKED；健康状态和标签一致不足以判定部署成功。"
+        },
+        {
+          "order": 6,
+          "action": "如果变更验证失败，按已保存配置和旧 API image ID 恢复 api，执行同样的运行版本与旧行为检查。",
+          "proposed_command": "docker compose -p rag-s8 -f <按原字节恢复的已确认配置文件> <仅API旧image-ID的已确认override> up -d --no-deps --no-build --force-recreate api",
+          "checks": ["不使用 down、删除卷、清理旧镜像或全栈重启。", "回滚本身失败时保留现场和日志并升级处理，不重复扩大变更。"]
+        }
+      ],
+      "approval_boundary": "当前仅授权计划，remote_writes=false、provider=false；所有远程命令与行为验证均为提案，未执行。后续部署及回滚须有覆盖相应写入的有效授权。",
+      "verification": {"input_test_evidence": "71passed，exit_code=0，快照提供", "deployment": "NOT RUN", "runtime_behavior": "NOT RUN", "acceptance": "未验收"}
+    },
+    {
+      "id": "T2-healthy-old-code",
+      "artifact_type": "SIMULATED_INCIDENT_DIAGNOSIS",
+      "diagnosis": "最早可确认的问题在运行容器的有效代码层：镜像包含目标模块，但容器同一路径的模块 hash 不同，并被 /srv/release-old/http_api.py 的只读 bind mount 覆盖。该挂载足以解释镜像已更新、healthy 但旧行为持续的现象。尚未从快照核实 Python 进程实际已导入的内存模块。",
+      "evidence": [
+        "目标 revision=target-new，http_api_sha256 为 64 个 a。",
+        "镜像 revision=target-new，module_sha256 同为 64 个 a；运行容器 same_image_id=true。",
+        "运行模块路径 /app/backend/weknora_port/http_api.py 的 hash 为 64 个 b，与目标不同。",
+        "挂载 /srv/release-old/http_api.py -> /app/backend/weknora_port/http_api.py，readonly=true，准确覆盖该模块路径。",
+        "另一个 /srv/storage -> /var/lib/eviroute/storage 是可写数据挂载，未提供其导致代码异常的证据。",
+        "healthy 证明健康探针通过，不证明业务代码或新参数校验生效。"
+      ],
+      "scope": {"target": "只定位并提出修复覆盖 API 模块的代码挂载", "preserve": ["/srv/storage 数据挂载", "旧镜像", "配置快照", "其他服务"], "provider": false},
+      "ordered_actions": [
+        {
+          "order": 1,
+          "action": "冻结为诊断结论并保留快照证据；下一次获准只读检查时先复核实际配置来源。",
+          "checks": ["保存容器 image ID、mount 列表、磁盘模块 hash、进程启动命令及实际导入模块路径。", "对 /srv/current/compose.yml 与 /srv/config/loaded-images.json 分别核实用途、格式和生效方式；不能因它出现在 effective_compose_files 中就未经确认作为合法 -f 文件执行。", "追踪造成 /srv/release-old/http_api.py 挂载的具体配置项，包括 override；记录原始字节和 hash。"],
+          "proposed_commands_after_read_authorization": ["docker inspect <已确认的API容器ID>", "docker compose -p <已确认项目名> <经格式和顺序核实的-f参数> config"],
+          "stop": "配置来源或项目名未确定，不生成可直接执行的修改命令；本次不连接服务器。"
+        },
+        {
+          "order": 2,
+          "action": "形成只删除目标代码挂载的最小配置补丁，并渲染检查。",
+          "checks": ["补丁必须删除或替换实际生效源中的 /app/backend/weknora_port/http_api.py 挂载；避免 Compose 合并后旧挂载仍保留。", "渲染结果须保留 /srv/storage 数据挂载和其他服务配置。", "目标镜像 ID 保持为已验证镜像，记录补丁前后配置 diff。"],
+          "stop": "渲染结果仍含覆盖目标模块的挂载，或出现数据卷和其他服务变化时停止。"
+        },
+        {
+          "order": 3,
+          "action": "获得配置写入及 API 重建授权后，应用补丁并仅重建 API。",
+          "proposed_command": "docker compose -p <已确认项目名> <已确认修复后-f参数> up -d --no-deps --no-build --force-recreate <已确认API服务名>",
+          "checks": ["旧镜像和旧配置快照均可用后才执行。", "普通容器 restart 不会更改挂载定义，必须用修复后的有效配置重建容器。"],
+          "stop": "无远程写入授权则不执行；启动、版本或健康检查失败则停止并按授权恢复已保存配置与旧镜像。"
+        },
+        {
+          "order": 4,
+          "action": "核实修复效果并记录证据链。",
+          "checks": ["实际 image ID 与目标一致，模块路径 hash 等于目标的 64 个 a。", "实际 mount 列表不再覆盖目标代码文件，数据挂载仍存在。", "核实进程导入路径，触发新行为的专用业务请求并记录预期与实际响应。", "再次记录健康状态及其他服务未变化。"],
+          "stop": "若代码一致但业务仍旧，保留新证据并进一步检查请求路由、旧副本或业务配置；当前不把这些未证实可能性作为已确认根因。"
+        }
+      ],
+      "approval_boundary": "remote_writes=false、provider=false；本次只交付离线诊断和修复提案，禁止实际 SSH、Docker、云端调用与配置修改。",
+      "verification": {"snapshot_diagnosis": "SIMULATED：挂载覆盖与 hash 不一致由输入直接支持", "live_import_and_request_path": "NOT RUN", "repair": "NOT RUN", "real_ecs_acceptance": "NOT RUN"}
+    },
+    {
+      "id": "T3-incident-evolution",
+      "artifact_type": "SIMULATED_NEW_INCIDENT_AND_RULE_REVIEW",
+      "diagnosis": "关键校验命令失败后，包装脚本用最后一个成功命令的退出码覆盖了首次失败，造成错误验收。已有规则明确要求逐条检查退出码与语义状态；给定证据支持修复执行实现并补充回归样例，不足以证明必须修改 Skill 规则。",
+      "incident_entry": {
+        "id": "SIM-COMMAND-EXIT-001",
+        "status": "SIMULATED",
+        "real": false,
+        "title": "包装脚本掩盖 manifest 校验失败",
+        "trigger": "先执行失败的 manifest 校验，再执行成功的 git 状态查询，最终仅用包装脚本退出码作验收。",
+        "observations": [
+          {"command": "python verify_manifest.py", "exit_code": 1, "semantic_status": "SOURCE_HASH_MISMATCH"},
+          {"command": "git status --short", "exit_code": 0},
+          {"wrapper_exit_code": 0}
+        ],
+        "failed_attempt": "Wrapper final exit alone was used as acceptance.",
+        "cause": "未在关键命令结束后立即保存其退出码并传递失败；后续成功命令导致最终状态失真。SOURCE_HASH_MISMATCH 也未被验收门正确拦截。",
+        "impact": "可能将来源 hash 不符的产物错误标为校验通过并推进发布。该事件为合成案例，未证明发生真实部署、数据损失或云端写入。",
+        "proposed_priority": "若进入真实发布路径，建议 P1：发布校验失效；此条仅为合成记录，不登记为已发生的真实生产事故。",
+        "repair": "每个关键命令执行后立即捕获退出码；同时检查语义状态。保留首个失败并让包装层返回失败，后续诊断成功不得清除失败。关键校验失败时禁止进入部署步骤。",
+        "fixture_evidence": {"wrong_manifest_exit": 1, "matching_manifest_exit": 0, "provider_calls": 0, "remote_writes": 0},
+        "evidence_origin": "以上修复后结果均来自给定离线 fixture，本次没有重新运行测试。",
+        "resolution_status": "已有离线修复证据；真实部署验证 NOT RUN。"
+      },
+      "scope": {"allowed": ["项目内故障记录提案", "包装脚本修复提案", "离线回归测试与规则演化计划"], "excluded": ["新远程动作", "真实部署成功声明", "未读取的 Skill 内容断言"]},
+      "ordered_actions": [
+        {
+          "order": 1,
+          "action": "将 incident_entry 作为待写入项目故障记录的完整正文，保留 SIMULATED、原始命令和逐条退出码。",
+          "stop": "本子任务仅拥有 behavior-without.json，因此不修改其他故障记录文件。"
+        },
+        {
+          "order": 2,
+          "action": "在包装器中立即捕获每步 native command 的 $LASTEXITCODE，单独保存首个失败；PowerShell 异常和语义失败也进入同一失败状态。",
+          "checks": ["对 python verify_manifest.py 保存失败后，可以继续运行获准的诊断命令，但不能继续部署。", "最终退出码取首个关键失败；仅当所有关键命令及其语义状态都通过才返回 0。", "异常、无法解析的语义结果、缺失必须输出不得当作成功。"]
+        },
+        {
+          "order": 3,
+          "action": "建立并执行无网络离线回归对比，保留修复前后原始日志和退出码。",
+          "proposed_cases": [
+            {"case": "错误 manifest 后跟成功状态查询", "expected": "首步 1、后步 0，包装器返回 1，禁止推进部署"},
+            {"case": "匹配 manifest 后跟成功状态查询", "expected": "所有语义通过，包装器返回 0"},
+            {"case": "命令退出 0 但语义状态 SOURCE_HASH_MISMATCH", "expected": "包装器返回非零并阻止部署"},
+            {"case": "首个关键命令失败 1 后又出现另一个失败 2", "expected": "保存两步日志，最终保留首次失败 1"},
+            {"case": "关键命令抛异常或必要语义输出缺失", "expected": "包装器返回非零并阻止部署"}
+          ],
+          "checks": ["用本地假命令记录部署分支是否被调用，不能真实调用部署。", "所有样例的 provider_calls=0、remote_writes=0。", "比较使用同一输入、同一环境和同一预期，不用包装器最后输出代替逐命令证据。"],
+          "stop": "任何失败路径仍返回 0、抹除首次失败或进入部署分支，即拒绝保留该修复；不得推进远程验证。"
+        },
+        {
+          "order": 4,
+          "action": "完成规则演化决策并按证据保留或回退。",
+          "checks": ["依据 fixture 的 existing_rule，当前决策为暂不修改 Skill 规则，优先修复包装实现和加入离线回归。", "如果后续对比发现原规则在具体执行语境下仍反复被误解，再提出仅补充立即捕获、首错保留及语义门的最小措辞候选。", "如比较 Skill 候选，用同一组正常、失败、混合退出码及语义失败任务分别运行原版和候选版，保留逐项行为与证据；不以文案更长作为改进。", "候选须拦截所有已知失败且不阻断合法成功，并保持零远程动作，方可建议保留。若没有可测收益、扩大权限或引入回归，恢复原版 Skill。", "代码修复回归时回退候选代码到已保存版本，但仍将校验状态标为失败并关闭发布推进，不能恢复为错误的成功验收。"]
+        }
+      ],
+      "evolution_decision": {"skill_rule_change": "当前不需要；仅根据给定 existing_rule 作此判断，未检查实际 Skill 文件", "implementation_change": "需要立即保存关键命令退出码、检查语义并保留首次失败", "regression_change": "加入失败被后续成功掩盖等离线样例", "retain_gate": "同输入对比证明失败正确阻断、成功正常通过、无远程动作", "revert_gate": "出现错误成功、合法成功回归、权限扩大或无可测改进"},
+      "approval_boundary": "fixture 授权项目 Skill 与离线测试，但本子任务的实际写入范围仅为本输出 JSON；后续实施只限项目内获准范围，任何远程动作需单独有效授权。",
+      "verification": {"fixture_report": "SIMULATED：wrong_manifest_exit=1、matching_manifest_exit=0", "new_regressions_execution": "NOT RUN", "skill_comparison_execution": "NOT RUN", "real_deployment": "NOT RUN"}
+    }
+  ]
+}

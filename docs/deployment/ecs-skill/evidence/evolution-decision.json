@@ -1,0 +1,27 @@
+{
+  "status": "RETAIN_BASELINE_REJECT_CANDIDATE",
+  "trigger": "AUTHORING-WORKTREE-001",
+  "baseline_commit": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+  "baseline_skill_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+  "candidate_skill_sha256": "3eb97fd9e1f669531a31adef55db385409ae370cc1906e2a6e34e0cd5bb65e3c",
+  "blind_mapping": {
+    "pine": "baseline",
+    "oak": "candidate"
+  },
+  "valid_paired_votes": {
+    "candidate_better": 1,
+    "candidate_worse": 1,
+    "tie": 1,
+    "all_margins": "slight"
+  },
+  "observed_tests": {
+    "original_three_without_skill": "3/3PASS",
+    "original_three_baseline": "3/3PASS",
+    "original_three_candidate": "3/3PASS",
+    "new_parallel_case": "bothPASS"
+  },
+  "reason": "Three correct paired assessments do not establish a behavioral outcome gain; no forced expansion. Preserve the new regression and candidate as evidence, keep active SKILL at initial verified version.",
+  "score_policy": "91.3 absolute baseline is triage only; candidate absolute score and delta are NOT_SCORED. First misnamed-rubric judgments preserved and SUPERSEDED, not used for decision.",
+  "adaptation": "Validation-gated no-benefit rejection is stricter than Darwin non-worse keep rule, per Owner requirement to retain actual improvements only. Finite task approval covers initial creation/offline tests; significant operational-policy/rights changes retain explicit Owner checkpoint.",
+  "runtime_effect": "No production or cloud action. Candidate never replaced active Skill; no active rollback needed. Candidate snapshot is versioned as documentation only."
+}

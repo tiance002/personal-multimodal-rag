@@ -1,0 +1,69 @@
+{
+  "schema": "ecs-skill-delivery-review/v1",
+  "status": "PASS",
+  "scope": "Read-only final delivery cross-check; no repository edits, historical audit, ECS/model/network operations, or tests",
+  "reviewed_worktree": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020",
+  "artifacts": [
+    "docs/deployment/ECS_INCREMENTAL_DEPLOY_SKILL.md",
+    "docs/deployment/ECS_INCREMENTAL_DEPLOY_SKILL.results.json",
+    "docs/deployment/ecs-skill/evidence/baseline-triage.json",
+    "docs/deployment/ecs-skill/evidence/paired-judge-1-rubric.json",
+    "docs/deployment/ecs-skill/evidence/paired-judge-2-rubric.json",
+    "docs/deployment/ecs-skill/evidence/paired-judge-3-rubric.json",
+    "docs/deployment/ecs-skill/evidence/native-discovery.json",
+    "docs/deployment/ecs-skill/evidence/fresh-routing.json",
+    "docs/deployment/ecs-skill/evidence/evolution-decision.json",
+    ".agents/skills/ecs-incremental-deploy/SKILL.md"
+  ],
+  "checks": [
+    {
+      "check": "Darwin rubric",
+      "result": "PASS",
+      "evidence": "Results JSON darwin.actual_rubric_names and all three paired-judge *-rubric.json files use the installed nine named criteria."
+    },
+    {
+      "check": "Votes and selection",
+      "result": "PASS",
+      "evidence": "Results JSON and evolution-decision.json: oak=candidate, pine=baseline; candidate better=1, worse=1, tie=1; all slight; retain baseline/reject candidate."
+    },
+    {
+      "check": "Active Skill version",
+      "result": "PASS",
+      "evidence": "Retained SHA 3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f matches native-discovery.json skill_sha256; decision records candidate never replaced active Skill."
+    },
+    {
+      "check": "Simulation versus live ECS",
+      "result": "PASS",
+      "evidence": "Results JSON marks four baseline and four candidate task outputs, all SIMULATED/offline; ECS deploy and real QA/rollback NOT RUN. Delivery report lines 24, 61, 82."
+    },
+    {
+      "check": "Historical fault accounting",
+      "result": "PASS",
+      "evidence": "Results JSON inventory and delivery report lines 44, 107 agree: 7 fault groups; 6 with real-scope recovery evidence; 1 memory-gap case with offline fix only; bounded evidence scope."
+    },
+    {
+      "check": "Performance claims",
+      "result": "PASS",
+      "evidence": "Delivery report lines 7, 60, 107 does not claim measured speed or operational benefit; explicitly says evidence does not establish faster deployment."
+    },
+    {
+      "check": "Credentials",
+      "result": "PASS",
+      "evidence": "Pattern scan of active Skill, delivery report, results JSON, and specified evidence artifacts found no plaintext credential assignment; Skill lines 25 and 56 limit credential handling to exclusion/redacted references."
+    },
+    {
+      "check": "Local links",
+      "result": "PASS",
+      "evidence": "All three active Skill reference links exist; evidence directory and machine results JSON exist."
+    },
+    {
+      "check": "Discovery evidence",
+      "result": "PASS",
+      "evidence": "native-discovery.json reports actual app-server skills/list repo discovery, enabled=true, model_turns=0; fresh-routing.json reports routing PASS while honestly preserving Git metadata permission denial and NOT RUN remote work."
+    }
+  ],
+  "material_findings": [],
+  "limitations": [
+    "This review checked only the specified copied evidence and claims; it is not a historical audit or independent rerun of deployment/behavior checks."
+  ]
+}

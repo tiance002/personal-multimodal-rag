@@ -1,0 +1,28 @@
+{
+  "id": "AUTHORING-WORKTREE-001",
+  "kind": "REAL_SKILL_AUTHORING_NOT_ECS_OUTAGE",
+  "phenomenon": "Initial project Skill commit landed on a branch switched concurrently by another task in the shared worktree.",
+  "cause": "Branch checked only at task start; no exclusive worktree ownership/recheck immediately before staging and commit.",
+  "confidence": "VERIFIED_FOR_LOCAL_BRANCH_CHANGE_AND_COMMIT_CONTENTS",
+  "own_commit": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+  "own_commit_paths": [
+    ".agents/skills/ecs-incremental-deploy/.gitattributes",
+    ".agents/skills/ecs-incremental-deploy/SKILL.md",
+    ".agents/skills/ecs-incremental-deploy/agents/openai.yaml",
+    ".agents/skills/ecs-incremental-deploy/references/deployment-runbook.md",
+    ".agents/skills/ecs-incremental-deploy/references/evolution.md",
+    ".agents/skills/ecs-incremental-deploy/references/incident-log.md",
+    ".agents/skills/ecs-incremental-deploy/test-prompts.json",
+    "AGENTS.md",
+    "AGENTS.override.md"
+  ],
+  "preserved_other_task": "No other backend dirty changes staged/reverted; parallel branch left in place; independent new worktree created from own committed snapshot.",
+  "actual_recovery_worktree": "E:\\RAG-Worktrees\\ecs-incremental-deploy-skill-20261020",
+  "actual_recovery_branch": "codex/ecs-deploy-skill-20261020-isolated",
+  "evidence": [
+    "parallel-worktree-observation.json",
+    "actual git worktree add exit0",
+    "git show ea20815 --name-only"
+  ],
+  "scope": "Add a narrowly scoped source/worktree revalidation guard; no ECS mutation or extra approval layer for unchanged verified tasks."
+}
