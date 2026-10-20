@@ -1,0 +1,102 @@
+{
+  "schema": "s84a-bridge-evaluation/v1",
+  "overall_status": "BLOCKED_AUTHORIZATION",
+  "offline_status": "OFFLINE_BRIDGE_PARTIAL",
+  "real_feasibility_status": "BLOCKED_AUTHORIZATION",
+  "baseline": {
+    "stage": "S8.3-F",
+    "commit": "15c8777bdaaf0cfd3e6eb5995bd88c2d6f53b709",
+    "includes_s8_3_r_fixes": true
+  },
+  "implementation": {
+    "commit": "b10e2a07585ad51c65473ef6b02fc42dee51b16d",
+    "branch": "codex/s8-4-bridge-extraction-20261020",
+    "default_mode": "off",
+    "schema_or_public_api_change": false,
+    "production_configuration_changed": false,
+    "deployment_performed": false,
+    "push_or_merge_performed": false
+  },
+  "upstream_failure": {
+    "saved_search_candidate_count_per_frost_arm": 30,
+    "first_rerank_threshold": 0.3,
+    "second_hop_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+    "first_rerank_score": {
+      "A": 0.00799383781850338,
+      "B": 0.017354240640997887
+    },
+    "drop_stage": "first-rerank threshold, before MMR/Merge",
+    "raw_request_index_chunk_bindings_frozen": true
+  },
+  "offline": {
+    "status": "PASS",
+    "command": "python -m pytest -q -p no:reporter tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_s8_4_bridge_ecs.py tests/weknora_port/test_bridge_rescue.py tests/weknora_port/test_bridge_pipeline.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_source_evidence.py tests/weknora_port/test_service.py tests/weknora_port/test_kb_model_selection.py tests/weknora_port/test_generation.py",
+    "exit_code": 0,
+    "passed": 384,
+    "elapsed_seconds": 7.52,
+    "receipt_stdout": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\offline-tests.stdout.txt",
+    "receipt_exit_code": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\offline-tests.exit-code.txt",
+    "frost_real_sample_semantics": "UNVERIFIED_PRONOUN_AND_RELATION; no Q1 or second rerank",
+    "generic_positive_path": "Mock Cheap -> program Q1 -> Mock BGE -> raw supplemental source in final Context",
+    "saved_negative_controls": [
+      "leyden-negative",
+      "postcode-negative",
+      "scifact-611-negative",
+      "mml-0687-negative"
+    ],
+    "gold_or_historical_answers_in_runtime_input": false,
+    "real_provider_calls": 0,
+    "actual_tokens": 0
+  },
+  "authorized_real_test": {
+    "owner_explicitly_authorized": true,
+    "max_provider_calls": 8,
+    "max_total_tokens": 30000,
+    "planned_exact_operations": 4,
+    "planned_capabilities": {
+      "chat": 2,
+      "rerank": 2
+    },
+    "frozen_case_count": 6,
+    "actual_provider_calls": 0,
+    "actual_tokens": 0,
+    "new_unknown": 0,
+    "zero_send_preflight": "NOT RUN",
+    "cheap_calls": "NOT RUN",
+    "bge_calls": "NOT RUN",
+    "final_answer_generation_calls": 0,
+    "embedding_calls": 0,
+    "historical_grants_reused": false
+  },
+  "ecs_inventory": {
+    "status": "READ_ONLY_INVENTORY",
+    "api_container": "rag-s8-api-1",
+    "worker_container": "rag-s8-worker-1",
+    "database_container": "rag-s8-db-1",
+    "redis_container": "rag-s8-redis-1",
+    "api_image": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "api_revision": "29ecf2f5d3037eed99a4de783546dee272a761bd",
+    "worker_changed_or_restarted": false,
+    "production_configuration_changed": false,
+    "remote_empty_private_stage_created": "/opt/rag-s8/state/s8-4-bridge-20261021-bcb00a6d3ee94e47",
+    "remote_source_or_input_transfer": "NOT RUN"
+  },
+  "transfer_review": {
+    "decision": "REJECTED",
+    "action": "SCP local code bundle plus six frozen case inputs to the specified ECS stage path",
+    "tool_execution": "NOT RUN",
+    "reason": "Automatic review determined that general real-test authorization did not specifically authorize this destination and source/corpus payload; it required destination- and payload-level authorization.",
+    "bundle_bytes": 2844989,
+    "bundle_sha256": "e71e588cef13e10cc9f19dd1d558a53729f6b02a0bd8ab345330935cf8cdd7df",
+    "bundle_contents": [
+      "Committed backend/weknora_port source package",
+      "scripts/s8_ecs_runtime.py and scripts/s8_4_bridge_ecs.py",
+      "Six frozen source-only cases: Frost A/B, Leyden, postcode, SciFact 611, MML 0687",
+      "Fresh owner-authorization.json capped at 8 calls and 30000 tokens"
+    ],
+    "contains_credentials": false,
+    "contains_gold_or_historical_answers": false,
+    "destination": "root@120.55.115.162:/opt/rag-s8/state/s8-4-bridge-20261021-bcb00a6d3ee94e47/transfer_bundle.zip"
+  },
+  "next_step": "Obtain explicit approval for the listed code and frozen input payload to the exact ECS destination; then use a fresh bounded zero-send preflight and stop on any UNKNOWN."
+}
