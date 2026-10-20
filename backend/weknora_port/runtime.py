@@ -421,16 +421,19 @@ class ApplicationRuntime:
                 await self.turns._resources(guard, kbs, docs)
                 defaults = self.conversation
                 roles = await self._snapshot(guard)
+                context_config = {}
+                if request.source_evidence_mode is not None:
+                    context_config = {"conversation": {"source_evidence_mode": request.source_evidence_mode}}
                 await guard.connection.execute(
                     "INSERT INTO sessions(id,tenant_id,subject_id,title,knowledge_base_scope,"
                     "document_scope,max_rounds,enable_rewrite,embedding_top_k,vector_threshold,"
                     "keyword_threshold,rerank_top_k,rerank_threshold,summary_model_id,rerank_model_id,"
-                    "summary_parameters) VALUES(%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb)",
+                    "context_config,summary_parameters) VALUES(%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb)",
                     (session, principal.tenant_id, principal.subject_id, request.title,
                      json.dumps(kbs), json.dumps(docs), defaults.max_rounds, defaults.enable_rewrite,
                      defaults.embedding_top_k, defaults.vector_threshold, defaults.keyword_threshold,
                      defaults.rerank_top_k, defaults.rerank_threshold, roles.model_id("cheap"),
-                     dict(roles.model_ids).get("rerank", ""), json.dumps(dict(defaults.summary))))
+                     dict(roles.model_ids).get("rerank", ""), json.dumps(context_config), json.dumps(dict(defaults.summary))))
         return {"id": session, "title": request.title, "knowledge_base_scope": list(kbs),
                 "document_scope": list(docs)}
 

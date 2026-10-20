@@ -482,3 +482,44 @@ def test_cross_site_origin_is_rejected_before_any_mutation_but_allowlisted_shado
         assert allowed_runtime.principals == [PRINCIPAL]
 
     asyncio.run(exercise())
+
+
+@pytest.mark.parametrize('setting', ['off', 'bounded_source_v1', None])
+def test_session_source_evidence_mode_http_accepts_only_explicit_setting(setting):
+    async def exercise():
+        runtime, _, client = make_client()
+        requests = []
+        original = runtime.create_session
+        async def capture(principal, request):
+            requests.append(request)
+            return await original(principal, request)
+        runtime.create_session = capture
+        body = {'knowledge_base_scope': ['kb-1'], 'document_scope': ['doc-1']}
+        if setting is not None:
+            body['source_evidence_mode'] = setting
+        async with client:
+            response = await client.post('/api/v1/sessions', json=body)
+        assert response.status_code == 200
+        assert requests[0].source_evidence_mode == setting
+        assert requests[0].knowledge_base_scope == ['kb-1']
+        assert requests[0].document_scope == ['doc-1']
+        assert runtime.principals == [PRINCIPAL]
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize('extra', [
+    {'source_evidence_mode': 'bounded_source_v2'},
+    {'source_evidence_mode': ''}, {'source_evidence_mode': True},
+    {'source_evidence_mode': 1}, {'source_evidence_mode': {}},
+    {'source_evidence_mode': 'bounded_source_v1', 'tenant_id': 999},
+    {'source_evidence_mode': 'bounded_source_v1', 'subject_id': 'attacker'},
+    {'source_evidence_mode': 'bounded_source_v1', 'context_config': {'conversation': {'model_id': 'attacker'}}},
+])
+def test_session_source_evidence_mode_http_rejects_invalid_or_privileged_fields(extra):
+    async def exercise():
+        runtime, _, client = make_client()
+        async with client:
+            response = await client.post('/api/v1/sessions', json={'knowledge_base_scope': ['kb-1'], **extra})
+        assert response.status_code == 422
+        assert runtime.principals == []
+    asyncio.run(exercise())

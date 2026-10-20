@@ -236,3 +236,66 @@ def test_formal_fresh_session_persists_zero_sentinel_without_resolving_it():
     asyncio.run(runtime.create_session(runtime.principal,SessionCreate(knowledge_base_scope=['kb'])))
     assert len(inserted)==1 and 'INSERT INTO sessions' in inserted[0][0]
     assert json.loads(inserted[0][1][-1])=={'temperature':.7,'max_completion_tokens':0}
+
+
+@pytest.mark.parametrize('setting,startup,expected', [
+    ('bounded_source_v1', 'off', 'bounded_source_v1'),
+    ('off', 'bounded_source_v1', 'off'),
+    (None, 'off', 'off'),
+    (None, 'bounded_source_v1', 'bounded_source_v1'),
+])
+def test_formal_session_source_evidence_roundtrip_to_actual_configuration(monkeypatch, setting, startup, expected):
+    import asyncio, json, re
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+    import backend.weknora_port.runtime as module
+    from backend.weknora_port.http_api import SessionCreate
+    from backend.weknora_port.models.types import CallContext, TrustedScope
+    from backend.weknora_port.generation import RouterPolicy
+    stored = {}
+    resource_checks = []
+    class Registry:
+        def __init__(self, *args, **kwargs): pass
+        async def chat(self, *args):
+            return SimpleNamespace(config=SimpleNamespace(supports_vision=False))
+    monkeypatch.setattr(module, 'NeutralModelRegistry', Registry)
+    @asynccontextmanager
+    async def transaction(): yield
+    async def execute(sql, params):
+        columns = re.search(r'INSERT INTO sessions\((.*?)\) VALUES', sql).group(1).split(',')
+        stored.update(zip(columns, params))
+        for name in ('context_config', 'summary_parameters', 'knowledge_base_scope', 'document_scope'):
+            if name in stored: stored[name] = json.loads(stored[name])
+    @asynccontextmanager
+    async def lease():
+        yield SimpleNamespace(connection=SimpleNamespace(transaction=transaction, execute=execute))
+    async def resources(guard, kbs, docs): resource_checks.append((kbs, docs))
+    async def session(*args): return stored
+    async def snapshot(*args):
+        return SimpleNamespace(model_id=lambda role: 'cheap-id', model_ids=(('cheap', 'cheap-id'), ('rerank', 'rerank-id')))
+    async def rows(*args): return [{'id': 'kb', 'summary_model_id': 'cheap-id'}]
+    async def load(*args): return ({'id': 'cheap-id', 'type': 'KnowledgeQA', 'source': 'remote'}, None, None)
+    runtime = object.__new__(module.ApplicationRuntime)
+    runtime.principal = SimpleNamespace(tenant_id=332, subject_id='synthetic-subject')
+    runtime.leases = SimpleNamespace(lease=lease)
+    runtime.turns = SimpleNamespace(_resources=resources, _session=session)
+    runtime._snapshot = snapshot; runtime._rows = rows; runtime._runs = {}
+    runtime.models = SimpleNamespace(_load=load); runtime.catalogue = None
+    runtime.conversation = ConversationSettings(source_evidence_mode=startup)
+    runtime.policy = RouterPolicy(mode='DYNAMIC'); runtime.graph_enabled = False
+    body = {'knowledge_base_scope': ['kb', 'kb'], 'document_scope': ['doc', 'doc']}
+    if setting is not None: body['source_evidence_mode'] = setting
+    created = asyncio.run(runtime.create_session(runtime.principal, SessionCreate(**body)))
+    assert stored.get('context_config', {}) == ({'conversation': {'source_evidence_mode': setting}} if setting is not None else {})
+    assert stored['tenant_id'] == 332 and stored['subject_id'] == 'synthetic-subject'
+    assert resource_checks == [(('kb',), ('doc',))]
+    assert created['knowledge_base_scope'] == ['kb'] and created['document_scope'] == ['doc']
+    turn = SimpleNamespace(session_id=created['id'], run_id='run',
+        context=CallContext('run', TrustedScope('synthetic-subject', ('kb',), ('doc',))),
+        request=SimpleNamespace(summary_model_id='', reasoning_effort='off', accept_language='zh-CN', knowledge_base_scope=('kb',)))
+    configuration = asyncio.run(runtime._configuration(turn))
+    assert configuration.pipeline_state.source_evidence_mode == expected
+    assert configuration.pipeline_state.graph_enabled is False
+    assert configuration.pipeline_state.rerank_top1_floorless is False
+    assert configuration.pipeline_state.chat_model_id == 'cheap-id'
+    assert runtime.conversation.source_evidence_mode == startup

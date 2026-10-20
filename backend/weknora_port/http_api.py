@@ -12,7 +12,7 @@ import json
 import re
 import uuid
 from dataclasses import dataclass
-from typing import Any, AsyncIterator, Awaitable, Callable, Mapping, Protocol, Sequence
+from typing import Any, AsyncIterator, Awaitable, Callable, Literal, Mapping, Protocol, Sequence
 from urllib.parse import urlsplit,quote
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
@@ -85,6 +85,7 @@ class VisionModelCreate(ApiModel):
 
 
 class SessionCreate(ApiModel):
+    source_evidence_mode: Literal["off", "bounded_source_v1"] | None = None
     knowledge_base_scope: list[str] = Field(min_length=1)
     document_scope: list[str] = Field(default_factory=list)
     title: str = Field(default="新对话", max_length=200)
