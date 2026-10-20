@@ -99,7 +99,8 @@ def resolve_saved_conversation(source,session):
         if not isinstance(overlay,Mapping):raise ProviderError('CONVERSATION_SUMMARY_INVALID')
         for name,value in overlay.items():
             if value is None:continue
-            if name in ('max_completion_tokens','max_tokens') and value<=0:continue
+            if name in ('max_completion_tokens','max_tokens'):
+                validate_completion_limit(value)
             if name=='temperature' and value<0:continue
             if name in ('prompt','context_template') and value=='':continue
             summary[name]=value
@@ -111,8 +112,31 @@ def resolve_saved_conversation(source,session):
     return values
 
 
-def resolved_chat_options(summary,request_effort):
+def validate_completion_limit(value):
+    # bool is an int subclass but is never a valid Token configuration.
+    if type(value) is not int or value < 0:
+        raise ProviderError('CONVERSATION_COMPLETION_LIMIT_INVALID')
+    return value
+
+
+def resolve_completion_limit(summary, *, mode='quick'):
+    """Resolve configuration sentinel zero immediately before request building.
+
+    Explicit positive completion/legacy caps retain their original semantics.
+    This pure smart default is not an implementation of the Smart API runtime.
+    """
+    if mode not in ('quick', 'smart'):
+        raise ProviderError('CONVERSATION_EXECUTION_MODE_INVALID')
+    completion = validate_completion_limit(summary.get('max_completion_tokens', 0))
+    legacy = validate_completion_limit(summary.get('max_tokens', 0))
+    if completion > 0 or legacy > 0:
+        return completion, legacy
+    return (2048 if mode == 'quick' else 4096), legacy
+
+
+def resolved_chat_options(summary,request_effort, *, mode='quick'):
     options={k:v for k,v in summary.items() if k in ChatOptions.__dataclass_fields__ and v is not None}
+    options['max_completion_tokens'], options['max_tokens'] = resolve_completion_limit(summary, mode=mode)
     effort=reasoning_override(request_effort)
     if effort:options.update(reasoning_effort=effort,thinking=effort!='off')
     return ChatOptions(**options)

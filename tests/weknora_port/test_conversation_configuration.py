@@ -34,7 +34,7 @@ def test_saved_null_zero_and_false_resolve_per_field_without_mutation():
     assert out['embedding_top_k']==30 and out['vector_threshold']==.2 and out['rerank_threshold']==0
     assert out['enable_rewrite'] is False and out['enable_query_expansion'] is False and out['max_rounds']==0
     options=resolved_chat_options(out['summary'],'off')
-    assert options.temperature==0 and options.max_completion_tokens==1024 and options.thinking is False and options.reasoning_effort=='off'
+    assert options.temperature==0 and options.max_completion_tokens==2048 and options.thinking is False and options.reasoning_effort=='off'
     assert source.summary['thinking'] is True and session['summary_parameters']['max_completion_tokens']==0
 
 
@@ -128,3 +128,111 @@ def test_bundled_fixed_templates_resolve_and_explicit_request_null_is_unset():
     assert settings.intent_system_prompts['greeting']
     request=MessageCreate(content='q',request_id='r',knowledge_base_scope=['kb'],summary_model_id=None,reasoning_effort=None)
     assert request.summary_model_id is None and request.reasoning_effort is None
+
+
+@pytest.mark.parametrize('mode,limit', [('quick',2048),('smart',4096)])
+def test_runtime_completion_zero_sentinel_kept_in_config_and_bounded_on_wire(mode,limit):
+    from backend.weknora_port.conversation_configuration import resolved_chat_options,resolve_saved_conversation
+    from backend.weknora_port.models.catalog import resolve_model_config
+    from backend.weknora_port.models.provider import ProviderModel
+    from backend.weknora_port.models.types import Message
+    from backend.weknora_port.models.output_contract import resolve_output_contract
+    source=ConversationSettings()
+    assert source.summary=={'temperature':.7,'max_completion_tokens':0}
+    session={'summary_parameters':dict(source.summary)}
+    effective=resolve_saved_conversation(source,session)
+    assert effective['summary']['max_completion_tokens']==0
+    options=resolved_chat_options(effective['summary'],'off',mode=mode)
+    assert options.max_completion_tokens==limit and options.temperature==.7
+    assert options.thinking is False and options.thinking_budget_tokens==0
+    config=resolve_model_config('siliconflow','Qwen/Qwen3.5-4B',base_url='https://api.siliconflow.cn/v1',model_id='synthetic-sentinel')
+    wire=ProviderModel(config,None).build_request_body((Message('user','offline sentinel check'),),options,stream=True)
+    assert wire['max_tokens']==limit and wire['temperature']==.7 and wire['enable_thinking'] is False
+    assert resolve_output_contract(config,wire).output_upper==limit
+    assert source.summary['max_completion_tokens']==session['summary_parameters']['max_completion_tokens']==0
+
+
+@pytest.mark.parametrize('mode', ['quick','smart'])
+@pytest.mark.parametrize('parameters,expected', [({'max_completion_tokens':1024},1024),({'max_tokens':777},777),({'max_completion_tokens':0,'max_tokens':777},777)])
+def test_runtime_completion_explicit_positive_historical_caps_preserved(mode,parameters,expected):
+    from backend.weknora_port.conversation_configuration import resolved_chat_options
+    assert resolved_chat_options(parameters,'off',mode=mode).completion_budget()==expected
+
+
+@pytest.mark.parametrize('field', ['max_completion_tokens','max_tokens'])
+@pytest.mark.parametrize('value', [-1,True,False,1.5,'2048',None])
+def test_runtime_completion_rejects_illegal_values(field,value):
+    from backend.weknora_port.conversation_configuration import resolved_chat_options,resolve_saved_conversation
+    from backend.weknora_port.models.types import ProviderError
+    with pytest.raises(ProviderError,match='CONVERSATION_COMPLETION_LIMIT_INVALID'):
+        resolved_chat_options({field:value},'off')
+    if value is not None:
+        with pytest.raises(ProviderError,match='CONVERSATION_COMPLETION_LIMIT_INVALID'):
+            resolve_saved_conversation(ConversationSettings(),{'summary_parameters':{field:value}})
+
+
+def test_runtime_completion_rejects_unknown_mode():
+    from backend.weknora_port.conversation_configuration import resolved_chat_options
+    from backend.weknora_port.models.types import ProviderError
+    with pytest.raises(ProviderError,match='CONVERSATION_EXECUTION_MODE_INVALID'):
+        resolved_chat_options({'max_completion_tokens':0},'off',mode='agent')
+
+@pytest.mark.parametrize('stored_cap,expected', [(0,2048),(1024,1024)])
+def test_formal_runtime_normal_and_fallback_resolve_same_positive_limit(monkeypatch,stored_cap,expected):
+    import asyncio
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+    import backend.weknora_port.runtime as module
+    from backend.weknora_port.models.types import CallContext,TrustedScope
+    from backend.weknora_port.generation import RouterPolicy
+    class Registry:
+        def __init__(self,*args,**kwargs):pass
+        async def chat(self,*args):return SimpleNamespace(config=SimpleNamespace(supports_vision=False))
+    monkeypatch.setattr(module,'NeutralModelRegistry',Registry)
+    @asynccontextmanager
+    async def lease():yield SimpleNamespace()
+    session={'summary_parameters':{'temperature':.7,'max_completion_tokens':stored_cap}}
+    async def get_session(*args):return session
+    async def snapshot(*args):return SimpleNamespace(model_ids=(('cheap','cheap-id'),('rerank','rerank-id')))
+    async def rows(*args):return [{'id':'kb','summary_model_id':'cheap-id'}]
+    async def load(*args):return ({'id':'cheap-id','type':'KnowledgeQA','source':'remote'},None,None)
+    runtime=object.__new__(module.ApplicationRuntime)
+    runtime.leases=SimpleNamespace(lease=lease)
+    runtime.turns=SimpleNamespace(_session=get_session)
+    runtime._snapshot=snapshot;runtime._rows=rows;runtime._runs={}
+    runtime.models=SimpleNamespace(_load=load);runtime.catalogue=None
+    runtime.principal=SimpleNamespace(tenant_id=332,subject_id='synthetic-subject')
+    runtime.conversation=ConversationSettings(query_understand_model_id='unchanged-qu-id')
+    runtime.policy=RouterPolicy(mode='DYNAMIC');runtime.graph_enabled=False
+    turn=SimpleNamespace(session_id='session',run_id='run',context=CallContext('run',TrustedScope('synthetic-subject',('kb',))),
+        request=SimpleNamespace(summary_model_id='',reasoning_effort='off',accept_language='zh-CN',knowledge_base_scope=('kb',)))
+    result=asyncio.run(runtime._configuration(turn))
+    assert result.generation_options['options'].completion_budget()==expected
+    assert result.fallback['options'].completion_budget()==expected
+    assert result.fallback['options'].thinking is False
+    assert result.fallback['options'].temperature==.7
+    assert result.pipeline_state.query_understand_model_id=='unchanged-qu-id'
+    assert session['summary_parameters']['max_completion_tokens']==stored_cap
+
+
+def test_formal_fresh_session_persists_zero_sentinel_without_resolving_it():
+    import asyncio,json
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+    from backend.weknora_port.runtime import ApplicationRuntime
+    from backend.weknora_port.http_api import SessionCreate
+    inserted=[]
+    @asynccontextmanager
+    async def transaction():yield
+    async def execute(sql,params):inserted.append((sql,params))
+    @asynccontextmanager
+    async def lease():yield SimpleNamespace(connection=SimpleNamespace(transaction=transaction,execute=execute))
+    async def resources(*args):pass
+    async def snapshot(*args):return SimpleNamespace(model_id=lambda role:'cheap-id',model_ids=(('rerank','rerank-id'),))
+    runtime=object.__new__(ApplicationRuntime)
+    runtime.principal=SimpleNamespace(tenant_id=332,subject_id='synthetic-subject')
+    runtime.leases=SimpleNamespace(lease=lease);runtime.turns=SimpleNamespace(_resources=resources)
+    runtime._snapshot=snapshot;runtime.conversation=ConversationSettings()
+    asyncio.run(runtime.create_session(runtime.principal,SessionCreate(knowledge_base_scope=['kb'])))
+    assert len(inserted)==1 and 'INSERT INTO sessions' in inserted[0][0]
+    assert json.loads(inserted[0][1][-1])=={'temperature':.7,'max_completion_tokens':0}

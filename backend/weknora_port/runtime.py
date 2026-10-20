@@ -48,7 +48,7 @@ class ConversationSettings:
     rerank_context_enabled: bool = False
     rerank_top1_floorless: bool = False  # S8 isolated opt-in; no public session override.
     summary: Mapping[str, Any] = field(default_factory=lambda: {
-        "temperature": .3, "max_completion_tokens": 1024})
+        "temperature": .7, "max_completion_tokens": 0})
 
     fallback_strategy: str = 'model'
     fallback_response: str = 'Sorry, I am unable to answer this question.'
@@ -531,8 +531,7 @@ class ApplicationRuntime:
             "options": resolved_chat_options(summary, turn.request.reasoning_effort)},
             fallback={"strategy":source.fallback_strategy,"response":source.fallback_response,
                 "prompt":self._fallback_prompt(),"documents":lambda:self._fallback_documents(turn),
-                "options":ChatOptions(temperature=summary.get('temperature',0),
-                    max_completion_tokens=summary.get('max_completion_tokens',0),thinking=False)})
+                "options":resolved_chat_options(summary, 'off')})
 
     def _fallback_prompt(self):
         if self.conversation.fallback_prompt is not None:return self.conversation.fallback_prompt
