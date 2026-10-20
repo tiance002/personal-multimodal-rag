@@ -162,3 +162,11 @@ Owner 后续批准 ECS 部署、限定迁移及缺失689份资料的 BGE-M3 入�
 报告：[S8_ECS_OVERNIGHT_DEPLOYMENT.md](S8_ECS_OVERNIGHT_DEPLOYMENT.md)；机器结果同名results.json；逐源证明在`evidence/s8-ecs-full-corpus-20261020/`压缩包及ECS检查点。原S8.0机器结果逐字语义保留于v2结果的historical_S8_0_snapshot，不把旧739向量盘点数冒充当前全量。
 
 API/Worker/PG/Redis在ECS继续运行，cloud关闭、Graph关闭、原Top1／DYNAMIC／模型角色未改，旧PG16／Evaluation Center及原18未提交路径保留。Windows关机不影响数据或服务。前端由Owner延期，本Goal未部署；S8.1／S8.2／S8.3及真实问答仍NOT_RUN，需另行授权。不能把索引准备完成写成六套问答质量完成。
+
+## 2026-10-20 对齐资料后的剩余冻结题终态
+
+这是本轮后续新授权实测，不改写S8.0、历史结果及旧UNKNOWN：沿用已对齐资料、Graph关闭、ModelPassage增强及Top1无下限，原9题不重跑。新增29道原冻结题＋10道已映射SciFact＋1工程反例，共40次正常API问答，40/40终态完成，160次Provider全SETTLED、466,668实际Token、新UNKNOWN0。旧ECS两条UNKNOWN及其保护题未重发。
+
+39正式题的全文事实人工审查为12 PASS／17 PARTIAL／10 FAIL，工程反例另为PARTIAL；这不是跨六数据集的官方准确率。40/40 Context绑定真实wire，1984次来源HTTP回读无失败，SSE/PG/历史一致。可用内存采样谷值1.7497GiB，API cgroup峰值988.35MiB、限制1GiB、无OOM。原40题累计38/40完成；计入额外10题后48/50正式题完成，余2题保留历史UNKNOWN。Omni24页沿用既有解析/来源对齐，不算24道新增QA。
+
+逐题q0/Rewrite、证据首次丢失、完整答案、Token/时间/内存和模型身份见 [剩余冻结题报告](S8_ECS_REMAINING_TOP1_EVALUATION.md) 与 [完整机器结果](S8_ECS_REMAINING_TOP1_EVALUATION.results.json)。本轮不调优、不改默认，执行范围CLOSED、原API healthy且默认cloud关闭。S8整体仍PARTIAL：未完成Graph及全部实验臂的可比较评测，不据当前单臂结果推广策略。
