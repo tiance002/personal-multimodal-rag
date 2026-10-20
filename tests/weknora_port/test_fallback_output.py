@@ -80,7 +80,10 @@ def test_nonvision_fallback_image_context_uses_source_label():
         assert prepared.request.finalized.system_prompt_override==expected
         assert expected in messages[0].content
         assert '[用户上传图片描述]' not in messages[0].content
-        assert messages[-1].content=='rewritten question' and not messages[-1].images
+        # The source fallback query is unchanged; the established workbench
+        # language preference is appended by normal generation preparation.
+        assert messages[-1].content=='rewritten question\n\n## Configured answer language\nAnswer in English.'
+        assert not messages[-1].images
     run(scenario())
 
 

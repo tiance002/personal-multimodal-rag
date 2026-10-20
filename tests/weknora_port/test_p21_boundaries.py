@@ -101,7 +101,9 @@ def test_disabled_default_keeps_internal_evidence_and_source_identity():
                             FinalizedContext('question', '', (E.id,)), evidence=(E,))
     assert req.citations_enabled is False
     prepared = prepare_generation(req)
-    assert 'Source citations are disabled' in prepared.messages[0].content
+    # Public citations remain disabled; S3/S4 use supplied filenames rather
+    # than the retired P21 prose marker. Internal identity is still registered.
+    assert 'only the exact supplied filenames that support the answer' in prepared.messages[0].content
     assert 'Cite a knowledge chunk with exactly' not in prepared.messages[0].content
     assert E.content in prepared.messages[-1].content
     assert prepared.registry.snapshot().chunks[0][1][:3] == (E.id, E.knowledge_id, E.knowledge_base_id)

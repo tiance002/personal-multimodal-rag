@@ -76,14 +76,16 @@ def test_normal_hit_does_not_use_fallback_even_when_configured_fixed():
 
 @pytest.mark.parametrize('failure', [PermissionError('private'), RetrievalScopeError(),
     ProviderError('SOURCE_EVIDENCE_UNAVAILABLE'), ProviderError('SOURCE_VERSION_MISMATCH')])
-def test_source_failure_is_terminal_not_native_fallback(failure):
+def test_source_failure_is_terminal_not_native_fallback(failure, monkeypatch):
     async def scenario():
         service, repo, retrieval, co, cheap, expensive, store, commit, counts = runtime(
-            configuration=lambda _: configuration())
-        async def project(state, context):
+            configuration=lambda _: configuration(source_evidence_mode='bounded_source_v1'))
+        async def project(state, context, repository):
             raise failure
+        # Exercise the current opt-in projection hook, not a removed constructor seam.
+        monkeypatch.setattr('backend.weknora_port.retrieval.source_evidence.expand_source_evidence', project)
         service.pipeline_factory = lambda turn, progress: RetrievalPipeline(
-            retrieval, Registry(), on_progress=progress, final_evidence_projection=project)
+            retrieval, Registry(), on_progress=progress)
         turn = await repo.accept(REQ, 'owner')
         with pytest.raises(type(failure)):
             await service.prepare_turn(turn)

@@ -548,7 +548,7 @@ class ApplicationRuntime:
         async with self.leases.lease() as guard:
             await self.turns._session(guard,turn.session_id,self.principal)
             rows=await (await guard.connection.execute(
-                "SELECT title,file_name,file_type,description FROM knowledges WHERE tenant_id=%s "
+                "SELECT title,file_name,file_type FROM knowledges WHERE tenant_id=%s "
                 "AND knowledge_base_id=ANY(%s) AND deleted_at IS NULL AND enable_status='enabled' "
                 "AND (COALESCE(title,'')<>'' OR COALESCE(file_name,'')<>'') "
                 "AND (%s::boolean OR id=ANY(%s)) LIMIT 50",
@@ -558,13 +558,13 @@ class ApplicationRuntime:
         for row in rows:
             title=row['title'] or row['file_name']
             if not title:continue
-            line='- '+title
-            if row['file_type']:line+=' ('+row['file_type']+')'
-            description=row['description'] or ''
-            if description:line+=': '+description[:100]+('...' if len(description)>100 else '')
-            lines.append(line+'\n')
+            # Titles and file types are catalog data, never read source facts.
+            # JSON quoting keeps embedded newlines from becoming evidence lines.
+            lines.append('- '+json.dumps({'title':title,'file_type':row['file_type'] or ''},
+                ensure_ascii=False)+'\n')
+        if not lines:return ''
         if len(lines)>=50:lines.append('... (showing first 50 documents)\n')
-        return ''.join(lines)
+        return 'Document catalog metadata only (titles and file types; contents not read):\n'+''.join(lines)
 
     async def _persist_context(self, state, context):
         async with self.leases.lease() as guard:
