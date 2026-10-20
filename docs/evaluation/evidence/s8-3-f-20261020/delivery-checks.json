@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "artifact_hashes": 17,
+  "new_delivery_json_valid": true,
+  "sensitive_pattern_matches": 0,
+  "implementation_commit": "a5f85562b6aa11e4ec9a988c0c3fbde6fc856665",
+  "checks": [
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output_bytes": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "output_bytes": 0
+    }
+  ],
+  "real_provider_calls": 0,
+  "model_fallback_quality": "NOT_RUN",
+  "real_pg_redis_integration": "NOT_RUN",
+  "existing_default_modes": "model/off",
+  "concurrent_commit_preserved": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+  "staged_evidence_hash_matches": 17,
+  "committed_asset_manifest_match": true
+}

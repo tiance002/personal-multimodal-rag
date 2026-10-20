@@ -1,0 +1,40 @@
+........................................................F............... [ 30%]
+.......................................F................................ [ 60%]
+........s............................................................... [ 90%]
+......................                                                   [100%]
+================================== FAILURES ===================================
+___________ test_nonvision_fallback_image_context_uses_source_label ___________
+tests\weknora_port\test_fallback_output.py:84: in test_nonvision_fallback_image_context_uses_source_label
+    run(scenario())
+tests\weknora_port\test_generation.py:21: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_fallback_output.py:83: in scenario
+    assert messages[-1].content=='rewritten question' and not messages[-1].images
+E   AssertionError: assert ('rewritten qu...r in English.' == 'rewritten question'
+E     
+E     - rewritten question
+E     + rewritten question
+E     ?                   +
+E     + 
+E     + ## Configured answer language
+E     + Answer in English.)
+______ test_disabled_default_keeps_internal_evidence_and_source_identity ______
+tests\weknora_port\test_p21_boundaries.py:104: in test_disabled_default_keeps_internal_evidence_and_source_identity
+    assert 'Source citations are disabled' in prepared.messages[0].content
+E   assert 'Source citations are disabled' in '你是 EviRoute RAG，面向个人用户的知识库问答助手。请依据本次请求提供的资料回答用户问题；不要编造资料中没有的事实。 If a value is missing, contradictory or ambiguous, qu... embed retrieved images or reproduce these asset links in the answer. Use OCR and caption facts as textual evidence.\n'
+E    +  where '你是 EviRoute RAG，面向个人用户的知识库问答助手。请依据本次请求提供的资料回答用户问题；不要编造资料中没有的事实。 If a value is missing, contradictory or ambiguous, qu... embed retrieved images or reproduce these asset links in the answer. Use OCR and caption facts as textual evidence.\n' = Message(role='system', content="你是 EviRoute RAG，面向个人用户的知识库问答助手。请依据本次请求提供的资料回答用户问题；不要编造资料中没有的事实。 If a value is missing,...e.\n", multi_content=(), images=(), name='', tool_call_id='', tool_calls=(), reasoning_content='', kind='', turn_id='').content
+=========================== short test summary info ===========================
+SKIPPED [1] tests\weknora_port\test_memory_storage_pg.py:27: Explicit isolated PostgreSQL DSN not supplied
+FAILED tests/weknora_port/test_fallback_output.py::test_nonvision_fallback_image_context_uses_source_label
+FAILED tests/weknora_port/test_p21_boundaries.py::test_disabled_default_keeps_internal_evidence_and_source_identity
+2 failed, 235 passed, 1 skipped in 4.05s
