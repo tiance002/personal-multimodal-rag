@@ -86,3 +86,8 @@ git diff --cached --check
 输入manifest在 `E:/RAG quention/var/reports/s8-3-evidence-reliability/replay/final-v6/planned-six-case-ecs-ab.json`。每请求现有软件围栏≤12Provider/100000Token，12请求的保守软件外界为144次/1200000Token；这**不是Owner授权**，不通过新建文件续额。观察到的历史相似请求通常每题4次，不以此替代发送前真实上界检查。开始前需Owner批准独立ECS候选部署/执行范围及总额度，并核验每批≤40分钟、资源身份/模型/旧UNKNOWN保护与总量共享。新UNKNOWN即停相关发送，不重发。
 
 新回执需记录原文实际wire、Summary冲突、事实覆盖、无依据断言、HTTP来源回读、SSE/PG/历史一致性及实际usage/延迟/内存谷值。如果两臂Rewrite/Search不同，标注混杂因素，不把回答差异都归因候选。没有新授权，本轮在离线工程交付处停止，不Push或进入下一阶段。
+
+
+## 2026-10-20 S8.3-R 后续真实验收
+
+此前“新增真实问答NOT_RUN”为当时离线交付状态，原记录保留。本轮已补齐正式每会话配置，并完成既定6题×A/B两批12次，48次Provider/106,570Token/新UNKNOWN0；工程与实际API终态通过，质量混合且12次内存采样均缺失，整体PARTIAL，不推广默认。详见 [S8_3_R_REAL_AB.md](S8_3_R_REAL_AB.md) 及同名机器结果。没有重跑此前383项或D8本机三题。

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "scope": "Offline delivery only, no rerun/cloud",
+  "json_parsing_and_artifact_hashes": "PASS",
+  "reviewed_files": 16,
+  "credential_pattern_matches": 0,
+  "git_diff_check_exit_code": 0,
+  "narrow_independent_delivery_review": "PASS",
+  "provider_calls": 48,
+  "actual_tokens": 106570,
+  "new_unknown": 0,
+  "memory": "NOT_RECORDED_12_OF_12",
+  "delivery_commit_resolution": "git log -1 --format=%H -- docs/evaluation/S8_3_R_REAL_AB.md",
+  "git_checks": [
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output_bytes": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "output_bytes": 0
+    }
+  ],
+  "receipt_eol_preservation": "Exact evidence bytes preserved via local -text/cr-at-eol and binary attributes for raw pytest logs; initial whitespace checkexit2 on CRLF and preserved traceback whitespace, local receipts retained; corrected checkexit0."
+}
