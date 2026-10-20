@@ -21,3 +21,8 @@ opt-in until review. Preserve current model bindings, DYNAMIC, MinerU-only OCR,
 tenant/source/version boundaries and all historical UNKNOWN. Old account/month
 authority mechanisms retired in P31 must not be restored. New Provider sends
 require explicit Phase 01 approval; the package's suggested envelope is not a grant.
+
+
+## Project deployment skill routing
+
+ECS deployment/update/rollback/incident tasks must also read the project-level ECS Skill trigger in `AGENTS.md` and `.agents/skills/ecs-incremental-deploy/SKILL.md`; this adds no egress or production authorization.

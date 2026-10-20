@@ -75,3 +75,10 @@ DYNAMIC-ROUTE-01 的固定路径、旧次数和试点执行合同已原文归档
 保留通用边界：明确读写范围、协调单一写入者、不得递归派发或覆盖其他会话修改；
 请求路由不是实际模型身份的证明；旧评测 grant、失败证据和 UNKNOWN 账本不得重置或伪造。
 新服务调用仍必须符合本文件隐私、Scope、费用与证据规则及有效负责人授权。
+
+
+## ECS 增量部署 Skill（项目级）
+
+当任务涉及本地RAG代码更新到ECS、Docker/Compose增量更新、API/Worker启动或版本异常、发布后业务验收、回滚或部署故障经验沉淀，先读取 `.agents/skills/ecs-incremental-deploy/SKILL.md`。按其入口读取runbook；出现匹配症状再按ID读incident-log。先完成部署/故障恢复，再登记真实证据；只有现有规则有缺陷才按evolution参考进入Darwin有限验证，不因每次部署都扩写Skill。
+
+Skill发现不代表批准远端写入或模型发送；遵守本次Owner范围和既有数据/UNKNOWN保护。日常检索调优及其他项目不触发此部署Skill。项目之外启动的会话若未发现，切到本项目目录或显式读取该路径，不复制为全局Skill。
