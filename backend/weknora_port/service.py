@@ -131,7 +131,7 @@ class RuntimeService:
         self.pipeline_factory,self.generation_factory=pipeline_factory,generation_factory
         self.poll_seconds=poll_seconds
         self._tasks: dict[tuple[str,str,str], asyncio.Task] = {}
-        self._active: set[tuple[str,str,str]] = set()
+        self._active: dict[tuple[str,str,str], asyncio.Task] = {}
         self.background_errors: dict[tuple[str,str,str], str] = {}
 
     @staticmethod
@@ -167,10 +167,16 @@ class RuntimeService:
                 task=asyncio.create_task(self.run_turn(turn),name='ordinary:'+turn.run_id)
                 self._tasks[key]=task
                 def completed(done):
+                    # An older callback must not release a replacement task.
+                    if self._tasks.get(key) is done:
+                        self._tasks.pop(key)
                     try:
                         done.result()
                     except BaseException as exc:
                         self.background_errors[key]=self._safe_code(exc)
+                        # Keep diagnostic codes only, with bounded process memory.
+                        while len(self.background_errors)>128:
+                            self.background_errors.pop(next(iter(self.background_errors)))
                 task.add_done_callback(completed)
         return turn
 
@@ -359,7 +365,8 @@ class RuntimeService:
         key=self._key(turn)
         if key in self._active:
             return None
-        self._active.add(key)
+        owner=asyncio.current_task()
+        self._active[key]=owner
         stop_watch=asyncio.create_task(self._watch_stop(turn),name='stop-watch:'+turn.run_id)
         async def progress(stage,status,**fields):
             await self._progress(turn,stage,status,**fields)
@@ -373,6 +380,11 @@ class RuntimeService:
         except (Exception,asyncio.CancelledError) as exc:
             await self.publish_error(turn,exc)
             return None
+        finally:
+            if self._active.get(key) is owner:
+                self._active.pop(key)
+            stop_watch.cancel()
+            await asyncio.gather(stop_watch,return_exceptions=True)
 
     async def replay(self, accepted, principal):
         authorized=await self.validate_run(accepted.session_id,accepted.assistant_message_id,principal)

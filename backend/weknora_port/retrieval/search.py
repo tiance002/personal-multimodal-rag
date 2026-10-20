@@ -88,19 +88,42 @@ def content_signature(text):
     from .query import go_lower
     return ' '.join(go_fields(go_lower(text)))
 
-def deduplicate(results):
+def source_domain(result):
+    """Keep both persisted version breadcrumbs; disagreement is never equivalent."""
+    version = result.metadata.get('source_version')
+    chunk_version = result.chunk_metadata.get('source_version')
+    verified = bool(result.knowledge_base_id and result.knowledge_id and
+                    version and version == chunk_version)
+    return (result.knowledge_base_id, result.knowledge_id, version, chunk_version,
+            None if verified else result.id)
+
+
+def deduplicate(results, *, preserve_sources=False):
     ids, texts, out = (set(), set(), [])
+    domains = {}
     for r in results:
-        sig = content_signature(r.content)
-        if r.id in ids or (sig and sig in texts):
+        sig = r.content if preserve_sources else content_signature(r.content)
+        if preserve_sources:
+            domain = source_domain(r)
+            if r.id in domains and domains[r.id] != domain:
+                raise RetrievalScopeError()
+            domains[r.id] = domain
+        identity = r.id
+        text_key = (domain, r.chunk_type, sig) if preserve_sources else sig
+        if identity in ids or (sig and text_key in texts):
             continue
-        ids.add(r.id)
+        ids.add(identity)
         if sig:
-            texts.add(sig)
+            texts.add(text_key)
         out.append(r)
     return out
 
-def partial_overlap(results, segmenter=None, threshold=0.85):
+def partial_overlap(results, segmenter=None, threshold=0.85, *, preserve_sources=False):
+    if preserve_sources:
+        # A bag of tokens cannot prove two source claims equivalent. Even a
+        # substring may add a date, amount or negation. Only exact raw
+        # bodies within the same immutable source/origin domain may collapse.
+        return deduplicate(results, preserve_sources=True)
     from .query import simple_tokens
     removed = set()
     normalized = [content_signature(r.content) for r in results]
@@ -218,7 +241,8 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
             except BaseException:
                 entity_task.cancel()
                 raise
-        state.search_results = deduplicate(results)
+        state.search_results = deduplicate(results, preserve_sources=
+            getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1')
         if not state.search_results:
             if chunk_failed:
                 raise SearchError('SEARCH_FAILED') from None

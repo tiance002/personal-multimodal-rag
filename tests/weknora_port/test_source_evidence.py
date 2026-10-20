@@ -85,8 +85,8 @@ def test_summary_recovers_intact_real_body_with_independent_identity_and_score()
     async def run():
         source,hint=summary_case(); s=state([result(hint)])
         await expand_source_evidence(s,CTX,repository([source,hint]))
-        assert [r.id for r in s.merge_results]==['hint','raw']
-        recovered=s.merge_results[1]
+        assert [r.id for r in s.merge_results]==['raw']
+        recovered=s.merge_results[0]
         assert recovered.content==source['content'] and recovered.score==0
         assert recovered.start_at==0 and recovered.end_at==len(source['content'])
         assert recovered.metadata['source_anchor_score']==.9
@@ -94,7 +94,7 @@ def test_summary_recovers_intact_real_body_with_independent_identity_and_score()
         req=GenerationRequest('r','s','m',s.query,final,tuple(Evidence.from_result(r) for r in s.merge_results))
         actual=prepare_generation(req)
         assert 'evidence_kind="source_text"' in actual.messages[-1].content
-        assert 'evidence_kind="generated_summary"' in actual.messages[-1].content
+        assert 'evidence_kind="generated_summary"' not in actual.messages[-1].content
         assert '\\begin{bmatrix}' in actual.messages[-1].content
         assert '&amp; -3' in actual.messages[-1].content
     asyncio.run(run())
@@ -133,7 +133,7 @@ def test_forged_or_missing_summary_link_is_not_a_source_unit(metadata):
     async def run():
         source,hint=summary_case(); hint['metadata']=metadata
         s=state([result(hint)]); await expand_source_evidence(s,CTX,repository([source,hint]))
-        assert len(s.merge_results)==1
+        assert len(s.merge_results)==0
     asyncio.run(run())
 
 
@@ -141,7 +141,7 @@ def test_long_document_is_not_truncated_into_a_fake_complete_short_source():
     async def run():
         source,hint=summary_case(); source['content']='x'*2049
         s=state([result(hint)]); await expand_source_evidence(s,CTX,repository([source,hint]))
-        assert [r.id for r in s.merge_results]==['hint']
+        assert [r.id for r in s.merge_results]==[]
     asyncio.run(run())
 
 
@@ -149,7 +149,7 @@ def test_disabled_source_member_prevents_fake_complete_short_document():
     async def run():
         source,hint=summary_case(); disabled=row('disabled','Unreleased source',1,is_enabled=False)
         s=state([result(hint)]);await expand_source_evidence(s,CTX,repository([source,hint,disabled]))
-        assert [r.id for r in s.merge_results]==['hint']
+        assert [r.id for r in s.merge_results]==[]
     asyncio.run(run())
 
 
@@ -167,7 +167,7 @@ def test_unrelated_later_neighbor_is_not_loaded_and_duplicate_anchors_do_not_dup
         source,hint=summary_case()
         s=state([result(source), result(hint)])
         await expand_source_evidence(s,CTX,repository([source,hint,row('later','Unrelated next chapter',8)]))
-        assert [r.id for r in s.merge_results]==['raw','hint']
+        assert [r.id for r in s.merge_results]==['raw']
     asyncio.run(run())
 
 

@@ -4,7 +4,7 @@ from .query import go_strip, go_fields
 from copy import deepcopy
 import json
 import re
-from .search import deduplicate, partial_overlap, validate_results, RetrievalScopeError
+from .search import deduplicate, partial_overlap, source_domain, validate_results, RetrievalScopeError
 from .query import simple_tokens, jaccard
 from .rerank import image_infos
 from ..models.types import CallCancelled, RunDeadlineExceeded
@@ -51,10 +51,11 @@ def merge_images(target, source):
     if out:
         target.image_info = json.dumps(out, ensure_ascii=False, separators=(',', ':'))
 
-def sequential(results):
+def sequential(results, *, preserve_sources=False):
     groups = {}
     for r in results:
-        groups.setdefault((r.knowledge_id, r.chunk_type), []).append(r)
+        key = (source_domain(r), r.chunk_type) if preserve_sources else (r.knowledge_id, r.chunk_type)
+        groups.setdefault(key, []).append(r)
     output = []
     for key, chunks in groups.items():
         chunks.sort(key=lambda r: (r.chunk_index, r.id))
@@ -381,17 +382,8 @@ async def expand_neighbors(results, state, context, repository):
 
 def _deduplicate_origins(results, segmenter=None, *, overlap=False):
     """A generated Summary cannot replace a source body, even with identical text."""
-    unique = {}
-    for result in results:
-        unique.setdefault(result.id, result)
-    results = list(unique.values())
-    retained = set()
-    for summary in (False, True):
-        group = deduplicate([r for r in results if (r.chunk_type == 'summary') == summary])
-        if overlap:
-            group = partial_overlap(group, segmenter)
-        retained.update(id(r) for r in group)
-    return [r for r in results if id(r) in retained]
+    results = deduplicate(results, preserve_sources=True)
+    return partial_overlap(results, segmenter, preserve_sources=True) if overlap else results
 
 
 async def merge(state, context, repository, segmenter=None):
@@ -399,14 +391,17 @@ async def merge(state, context, repository, segmenter=None):
         return
     results = deepcopy(state.rerank_results or sorted(state.search_results, key=lambda r: r.score, reverse=True))
     preserve_sources = getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1'
+    if preserve_sources:
+        # Validate before content/identity dedup can hide an invalid candidate.
+        validate_results([r for r in results if r.match_type != 'web_search'], state.targets, context)
     dedup = _deduplicate_origins if preserve_sources else deduplicate
     results = dedup(inject_history(dedup(results), state, segmenter))
     validate_results([r for r in results if r.match_type != 'web_search'], state.targets, context)
     if repository:
         results = await resolve_parents(results, state, context, repository)
-    results = sequential(results)
+    results = sequential(results, preserve_sources=preserve_sources)
     if repository:
         await populate_faq(results, state, context, repository)
         await expand_neighbors(results, state, context, repository)
-    state.merge_results = (_deduplicate_origins(sequential(results), segmenter, overlap=True)
+    state.merge_results = (_deduplicate_origins(sequential(results, preserve_sources=True), segmenter, overlap=True)
                            if preserve_sources else partial_overlap(deduplicate(sequential(results)), segmenter))

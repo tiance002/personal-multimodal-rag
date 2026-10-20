@@ -52,14 +52,13 @@ def test_exact_text_across_origins_retains_both_independent_ids(reverse):
     assert len(merged(rows, 'off')) == 1
 
 
-def test_source_only_exact_and_partial_deduplication_stays_unchanged():
+def test_source_only_deduplication_preserves_independent_document_domains():
     rows = [row('a', 'alpha beta gamma', .9, doc='one'),
             row('exact', 'alpha beta gamma', .8, doc='two'),
             row('overlap', 'alpha beta gamma delta', .7, doc='three'),
             row('distinct', 'other independent evidence', .6, doc='four')]
-    assert [(r.id, r.content, r.score) for r in merged(rows)] == [
-        (r.id, r.content, r.score) for r in merged(rows, 'off')]
-    assert [r.id for r in merged(rows)] == ['a', 'distinct']
+    assert [r.id for r in merged(rows)] == ['a', 'exact', 'overlap', 'distinct']
+    assert [r.id for r in merged(rows, 'off')] == ['a', 'distinct']
 
 
 def test_one_identity_cannot_survive_twice_by_claiming_different_origins():

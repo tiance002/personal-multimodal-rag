@@ -156,6 +156,10 @@ class RetrievalPipeline:
             await expand_source_evidence(state, context, self.repository)
             await self._progress('source_unit', 'completed', candidate_count=len(state.merge_results))
             check_context()
+            if not state.merge_results and not graph_paths:
+                # A Summary locator with no verifiable source is not a KB fact.
+                # Use the existing explicit SearchNothing/fallback contract.
+                raise SearchNothing()
         if graph_paths:
             from ..graph.retrieval import fuse_paths
             await self._progress('graph_fusion', 'started')
