@@ -1,15 +1,16 @@
 # S8.5 多轮对话检索与受控多跳检索
 
-状态：阶段 0–4 的实现与离线对照完成；已取得精确授权并在 ECS 执行一次 Frost A 真实测评。Cheap 返回的 `subject_resolution` 为空，校验器按合同拒绝，真实分支以 **`S85_REAL_STOP`** 结束。没有重试或执行 BGE；不能宣称真实多跳链路通过。
+阶段 0–4 的实现、分阶段提交及本轮测评已完成。多轮问题补全、事实追问重新检索，以及显式开启的第一跳验证/已有池第二跳补救均有真实执行证据。Frost 现有原文只能证明机构所在地，不能证明研讨会举办地；最终问答不能认定完整正确。负责人里程碑验收、生产发布与 GitHub 推送不包含在本交付中。
 
-| 能力 | 实现与离线验证 | 本轮真实验证 |
+| 能力 | 离线及记录重放 | 真实验证与限制 |
 |---|---|---|
-| Session 完成历史、指代改写、事实追问重新检索 | 已实现；检查实际 Embedding/关键词/Rerank 实参及隔离/回退/回放 | 真实多轮模型效果、PG 历史和浏览器恢复 NOT RUN |
-| 句子 ID、原文对象/时间/身份保护、有界候选补救 | 已实现；Frost A/B 与 4 个负控制有独立轨迹 | 当前原文与三前驱读取通过；1 次 Cheap 收到正常响应，但字段合同失败 |
-| 第二跳 BGE、Context 补充 | Mock 路径通过；缺池停止通过 | 因 Cheap 字段失败，NOT RUN |
-| 事件地点与最终答案支持 | 能拒绝将机构所在地当作研讨会举办地 | 未生成答案；最终答案仍未验证/不具备充分证据 |
+| 当前授权 Session 的完成历史、有限指代改写 | 隔离、完成筛选、q0/条件保护、失败回退已验证 | C3 第二/第三轮正确补全 Beaumont，Search/Embedding/关键词/Rerank 使用有效查询；真实 PG 历史、异用户拒绝/空 Session、7 轮 SSE 回放无重复调用 |
+| 纯格式转换/要求原文依据 | 前者免检索；事实/来源及未知意图重新检索 | C3 T6 无 Search/Embedding/Rerank；T7 重新检索并回读 Leyden jar 原文引用。T6 转换的是旧 T5 错误回答，不能计为事实正确 |
+| 歧义与未完成响应保护 | 原始 C3 T5、T1/T3 经当前代码重放通过；保留全部旧失败结果 | 最后两处保护未再次跑完整 7 轮云端对话；不能把旧源 C3 全部完成写成回答质量全部合格 |
+| 第一跳/身份/Q1/有界 BGE/原文 Context | 句子 ID、3 前驱、2400 字符、对象/时间/地点反例、账本唯一性已验证 | A2/B3 均真实通过；B 身份链验证通过，但最终 Context 缺完整姓名锚点 |
+| 最终多跳答案 | 机构地点与事件地点保持不同状态 | GA3/GB3 是已结算真实输出的当前原文投影 + 新 Cheap 生成；不是新检索端到端。最终问题支持状态保持 UNVERIFIED，引用及语义结果见后文 |
 
-离线轨迹：[S8_5_IMPLEMENTATION_REPORT.results.json](S8_5_IMPLEMENTATION_REPORT.results.json)。独立真实结果：[S8_5_REAL_EVALUATION.results.json](S8_5_REAL_EVALUATION.results.json)。两类记录分开保存，旧离线结果及 S8.4 冻结结果未覆盖。
+主要机器证据：[继续执行结果与逐请求轨迹](S8_5_CONTINUATION.results.json)。早期离线轨迹和首次受限真实 STOP 分别保留在 [离线结果](S8_5_IMPLEMENTATION_REPORT.results.json)、[首次真实结果](S8_5_REAL_EVALUATION.results.json)，均未以新成功覆盖。
 
 ## 基线与阶段 0
 
@@ -33,6 +34,8 @@
 阶段 0 只读检查的相关模块包括 service、conversation/history/types/configuration、retrieval/query/search/rerank/pipeline/merge/bridge_rescue/context、generation/context 和 storage/memory/turns/history。未重构或新增主链。
 
 ## 阶段记录
+
+以下阶段 1–3 和“首次”阶段 4 保留当时的执行记录；历史 NOT RUN 与初始 STOP 不代表后续批次未执行。当前结论以“阶段 4 继续执行”及报告开头为准。
 
 后续逐阶段记录修改、RED→GREEN、命令退出码、离线与真实结果。未实现的命令不得报告通过。
 
@@ -92,7 +95,9 @@ python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/tes
 
 **271 passed，exit 0，1.90 秒**，`var/reports/s8-5/stage3/final-green.txt/.exit`。身份独立验证 63 passed，输出位于 `stage3-identity/green.*`；重复子集不累加。活动工程测试跟随新合同迁移，冻结 S8.4 输入/Gold/收据/真实结果未改。
 
-### 阶段 4：离线对照与真实测评（OFFLINE_PASS / REAL STOP）
+### 阶段 4：首次离线对照与受限真实 STOP（历史记录）
+
+本节保留最初 f5b0f6e 代码的结果；后续修复、真实多轮及 A/B 结果见“阶段 4 继续执行”。本节的 NOT RUN 不代表后续批次未执行。
 
 一次跨阶段关联回归 **629 passed，exit 0，5.16 秒**，未把子集/重复运行累加。命令：
 
@@ -171,11 +176,92 @@ docker exec -i -e PYTHONPATH=/opt/rag-s8/state/s8-5-bridge-20261021-6c5bee354104
 
 原始证据保留在本地 `var/reports/s8-5/stage4/downloaded-final/` 以及 ECS 新诊断目录；不保存请求头/密钥。源码/输入包 SHA-256 `1fb0d487aa3cc3b535559114fc88c3e3f71b6d19d14c4c348ebe628fb9a91a8a`。收据包 **58,013 字节**，SHA-256 `310b7ea37aa227ab2cb6a8e5a7805a0246605f731eab4a1ba764df5630e247a1`。请求 wire SHA-256 `769a6982ba0a4ae12885741dbc7c78a6fe497adad4501ac4b66b9e13b5107642`；原始响应 SHA-256 `17896bd212d20509eb68d27d435bd29a03f3a5103cb484cc25e3bf90a657c71c`。模型身份依据为注册表、实际请求和 Provider 响应的模型字符串，未独立验证模型权重。
 
+### 阶段 4 继续执行：真实反馈修复与效果分层
+
+负责人后续明确授权自行解决非权限问题并继续 S8.5。精确批次见 [继续执行计划](S8_5_CONTINUATION_PLAN.md)。实际云端调用在既有 ECS `rag-s8-api-1` 内，以独立目录和 `PYTHONPATH` 执行一次性进程；本机运行离线测试和原始记录重放。容器镜像保持 `sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36`，API/Worker 未部署或重启。
+
+#### 真实发现与对应修复
+
+| 可复现问题 | 文件/函数与最小修复 | RED → GREEN / 结果 |
+|---|---|---|
+| Cheap subject_resolution 为空 | bridge_rescue 抽取提示显式枚举，不补写模型字段 | 2 RED → 86 GREEN；A1 第一跳/身份/Q1 真实通过 |
+| 完整研讨会对象无法词面匹配机构 Chunk | bridge_rescue 有界字面前缀仅作搜索线索；不作为别名 | 4 RED → 151 GREEN；A2 真实补回机构来源，活动地点仍不验证 |
+| B 对象误含 from 2007–2010 | 提示区分对象与相邻关系日期；程序关系边界不放宽 | 时间/普通机构提示组合 255 GREEN；B1 原响应继续拒绝，B3 新响应通过 |
+| 普通 snapshot 反复重写 model 行 | PostgresModelStore.persist 比较解密值；相同模型不重新加密/更新 | 初始 4 RED → 22 GREEN，嵌套已加密输入 1 RED → 23 GREEN；旧模型/角色指纹保持 |
+| 改写模型翻译/关键词化/丢标点 | query._REWRITE_GUARD_PROMPT 明确字面替换优先级，校验器不放宽 | 3 RED → 127 GREEN；C3 T2/T3 有效查询真实正确 |
+| memory=False 导致失败落库误报所有者 | turns._accepted_owner 区分身份和策略位；保留真实 tenant/user/owner 拒绝 | 5 RED → 111 GREEN（包含诊断 fallback 输出上限修复）；C2 旧错误不改 |
+| Provider 原始 Jean/[DONE] 无正常结束却标完成 | GenerationCoordinator 拒绝显式 provider_answer_done=False | 6 RED → 174 GREEN；实际原始字节 T1/T3 重放均 FAILED、不提交成功答案，真实 Token 结算不变 |
+| 歧义 q0 未改写但 fallback 擅自选择实体 | query 保留 AMBIGUOUS_REFERENCE；RuntimeService.prepare_turn 在 Search/Rerank 后走固定澄清、清空事实和历史；保护其格式后续 | 8 RED → 174 关联 GREEN；实际 T5 记录重放固定澄清，catalog/生成调用均 0 |
+| 诊断预检 JSON 元组变列表 | 整份规范 JSON 比较；restore_finalized_context 仅恢复声明的元组字段 | 6 RED → 33 GREEN；原 GA2 preclaim 拒绝、0 模型调用；新 GA3/GB3 使用修复版 |
+
+当前源码一次完整受影响回归：**922 passed in 12.92s，exit 0**。原样 argv、源码版本和输出在 `var/reports/s8-5/continuation/final-verified.command.json/.stdout.txt`；执行入口 `python -X utf8 -B var/reports/s8-5/continuation/run_final_scoped.py`。测试只覆盖受影响模块，重复运行/子集没有累加为独立数量。四个 S8.4 冻结文件 SHA 均未变化。未实现的命令不得报告通过。
+
+#### C3 七轮的实际效果
+
+| 轮次 | 实际检索行为 | 回答/证据结论 |
+|---|---|---|
+| T1 Who is Jeanne Marie Beaumont? | q0 保持；当轮检索 | 原始流虽有 [DONE]，但缺 choice.finish_reason、provider_answer_done=false；不能计完整回答通过；当前原字节重放拒绝成功提交 |
+| T2 What did she direct from 2007–2010? | What did Jeanne Marie Beaumont direct from 2007–2010?；Embedding/关键词/Rerank 均一致 | 回答 Director of The Frost Place Advanced Seminar，引用 ec07a1fd… 可回读；这一轮有原文支持 |
+| T3 Which poetry collections has she written? | Which poetry collections has Jeanne Marie Beaumont written?；正确连续补全并重新检索 | 原始 Provider 仅输出 Jean，虽有 [DONE] 但缺 choice.finish_reason；检索改写通过，回答失败；当前重放已阻止成功落库 |
+| T4 Compare a Leyden jar and Franklin bells. | 新话题原样检索，无跨题人物补全 | 有当前原文的设备说明，模型未输出引用；不是引用完整通过 |
+| T5 What is it used for? | 歧义保留 q0，真实 Search/Rerank 后无 Context | 旧 fallback 错选 Franklin bells，FAIL；当前代码保留歧义并固定澄清，真实输出重放通过，非再次云端测评 |
+| T6 Format the previous answer as a table. | follow_up，无 Search/Embedding/Rerank | 纯转换路径通过；旧运行把错误 T5 制成表格，不能当成事实成功；当前保护该歧义后续 |
+| T7 Which original document… Leyden jar? | 明确出处要求，重新检索；q0 保持 | 引用 e8a751ff…，原文证明静电储存及早期 capacitor 用途；当前来源/版本/偏移回读通过 |
+
+C3 共 26 次已结算响应、40965 个报告 Token；7 轮均有真实 PG 历史/异用户拒绝/空 Session 和 SSE 回放零新增模型操作检查。这些合同通过与答案事实/完整性分开记录。C2 的 19 次/27517 Token 失败诊断另存，不替换为 C3 的结果。
+
+#### Frost 七层证据与新生成
+
+A2/B3 都完成：真实 Cheap 第一跳 → 原文身份/时间/关系核验 → 程序 Q1 `Where is The Frost Place Advanced Seminar located?` → 初始拒绝池最多 8 候选的一次 BGE → 原文 `31417c7c-7abf-4723-956a-74bf7ee14683` 地点关系 → Context。第一轮阈值/RRF/TopK 未改，没有新增全库 Search/Embedding。机构地点被找到，但 `ENTITY_BRIDGE_VERIFIED` 和 `FINAL_ANSWER_SUPPORTED` 仍为未验证；B 最终 Context 还缺完整姓名锚点。
+
+GA3/GB3 不重新执行前面的抽取/检索/Rerank；程序回放不改动的已结算真实输出，读取当前同版本原文，去掉生成的 Summary/描述，只保留已选来源或声明祖先，然后各做一次新 Cheap 生成。缓存 Token 不计入新账本。两次最终答案的原文逐项审查在继续结果 JSON 的 `post_real_fixes.generation_manual_reviews`；模型正常结束或引用能回读都不等于完整问题得到支持。
+
+GA3 的审查为 **PARTIAL**：两句事实分别有原文，但没有说明研讨会地点仍未验证，且 `references=[]`。`institution_event_boundary_checked=true` 只表示已审查；边界表达状态为 INCOMPLETE、引用状态 MISSING、完整问题支持为 false。GB3 同为 **PARTIAL**：有 2 个可回读引用，机构所在地陈述受支持，但最终 Context 缺完整人物姓名锚点，且未明确说明活动地点仍不确定；两个有效引用不能证明完整问题的语义支持。两次都不得认定为完整多跳问答通过。原始流均观察到 stop 和 [DONE]，收据的迭代器 `complete=false` 另行原样保留，不改写为 true。
+
+#### 调用与账本
+
+继续批次实际尝试 **54** 次，其中 **53** 次已结算，**1** 次 UNKNOWN；已报告实际 Token **77200**。另有 UNKNOWN 占用 **6365**，不代表已测得实际消耗或费用；由于 UNKNOWN，完整实际总量为 null。原先首次受限 STOP 的 1237 Token 单列，包含它的已报告小计为 **78437**。
+
+新旧继续批次的实际占用 **83565 / 200000**、操作 **54 / 56**。B2 UNKNOWN 的 6365 保留，旧收据/授权/历史不重置。GA2 的 JSON 预检失败发生于创建 Session、run.claim 和模型账本之前，0 模型发送；与本机仅构包未上传的 G1/GA 一同另记，不计成真实模型操作。
+
+每条 request ID、模型、输入/输出 Token、HTTP/响应状态、wire/raw SHA、授权/原文/档案位置均可在继续结果 JSON 查询；原始文件保留本机 `var/reports/s8-5/continuation/` 与对应 ECS `/opt/rag-s8/state/s8-5-*` 目录。各批 `stage-prepare/run/collect` 原样命令及退出码见 `orchestrate-*.py`、`ecs-*.exit/stdout/stderr` 和下载的 `stage/*command.json`。初始首轮及 GA2 的非零退出码保留，不因后续修复改成 PASS。
+
+#### 实际执行与记录重放的流程
+
+```mermaid
+flowchart TD
+  A[C3: 新真实 Session / 7次正式准入] --> B[授权完成历史 / q0保留]
+  B --> C[真实 Cheap Query Understand]
+  C --> D[程序校验 / 有效查询]
+  D --> E{纯格式?}
+  E -- 否 --> F[真实 Embedding / PG Hybrid Search / BGE]
+  E -- 是 --> G[历史文本格式转换]
+  F --> H[当前原文 Context / Generation / 引用]
+  G --> H
+  H --> I[PG持久化 / SSE恢复零重复调用]
+  H --> J[T1/T3未完成流 与 T5歧义错误原样保存]
+  J --> K[当前代码原记录重放: 失败保护 / 固定澄清]
+  K --> L[0新增云端调用 / 不冒充新鲜端到端]
+```
+
+```mermaid
+flowchart TD
+  A[S8.4冻结首轮Search/Rerank输入池] --> B[ECS当前原文与最多3前驱]
+  B --> C[A2/B3真实Cheap选句 / 程序第一跳与身份验证]
+  C --> D[已验证完整对象程序Q1]
+  D --> E[原始候选池 / 各一次真实BGE]
+  E --> F[机构地点原文 / 限定Context]
+  F --> G[活动地点与实体桥接 UNVERIFIED]
+  F --> H[GA3/GB3: 缓存真实输出重放 / 当前已选原文投影]
+  H --> I[各一次新Cheap最终生成 / 独立新收据]
+  I --> J[逐句原文与引用审查 / 不计为完整多跳正确]
+```
+
 ### 阶段 5：仅评估
 
 Frost 必需第二跳已在首轮 30 候选中，因此没有依据增加第二次全库 Search。当前主要缺口是事件与机构地点的关系，以及 B 的完整身份 Context。缺池反例已可执行记录 `SECOND_HOP_SOURCE_NOT_IN_POOL`。后续如在真实新样本中证明缺池，另行提出一次受限 Hybrid Search 的延迟/Embedding/Rerank 上限方案；本轮不实现。
 
-## 执行流程（实际代码路径，离线模型为 Mock）
+## 初始实现流程（保留离线与首次 STOP 轨迹）
 
 ```mermaid
 flowchart TD
@@ -217,7 +303,7 @@ flowchart TD
   L -- 是 --> M[FINAL_ANSWER_SUPPORTED 的证据前提]
 ```
 
-以上两图对应当前实际代码调用点与离线实参轨迹；本轮真实执行的子链如下。`FINAL_ANSWER_SUPPORTED` 只描述证据前提，不能代替对实际生成答案的验证。
+以上两图对应当前实际代码调用点与离线实参轨迹；首次受限批次真实执行的子链如下。`FINAL_ANSWER_SUPPORTED` 只描述证据前提，不能代替对实际生成答案的验证。
 
 ```mermaid
 flowchart TD
@@ -232,10 +318,11 @@ flowchart TD
 
 ## 未解决项与下一步最小建议
 
-1. **真实抽取合同未通过**：空 `subject_resolution` 已被安全拒绝，Bridge 默认仍 off，普通检索继续可用。建议下次只强化该枚举字段的明确输出示例并先做离线回归；不得修补此次原响应。重新真实调用需要新的一次性范围与授权，本轮额度已关闭。
-2. **真实多轮效果仍未验证**：离线已证明参数传递、隔离、保守检索与 SSE 幂等；窄改写合同可能使真实模型的自由改写回退 q0。后续最小验证是固定三轮历史的独立评测，不与 Frost 重试混用。
-3. **Frost 语义证据不足**：现有第二跳只证明机构所在地，不能证明 Advanced Seminar 的举办地；B 的最终普通 Context 也缺完整姓名锚点。这些限制在 Mock 成功路径仍成立，不能靠放宽阈值或追加模型调用消除。
-4. **未验收范围**：真实 PG 多用户/跨 Session 历史测试、真实浏览器/Redis SSE 恢复、真实 BGE/最终生成均 NOT RUN。未批准延期或建立里程碑 Tag；本报告交付实现与可核查证据，不代表项目负责人已验收全部能力。
+1. **Frost 原文缺研讨会举办地桥接**：机构地点证据不能回答完整问题；B 最终 Context 的完整身份锚点也不足。保持 UNVERIFIED，不扩检、不放宽全局阈值、不填 Gold。
+2. **Cheap 引用/完整回答质量不稳定**：C3 T1/T3 原始流缺 choice.finish_reason，虽有 [DONE] 仍不能确认回答完成；T4、GA3 等模型漏引。已修复明确未完成流的成功落库错误，原始记录重放验证通过；不把读取到来源当成全部句子被引用或答案完整。
+3. **最后两项安全修复的验证方式**：当前残缺流与歧义保护通过离线测试和不可变真实输出重放；没有在最后修复后再次执行完整 7 轮云端链。新 GA3/GB3 使用当前代码，但只验证生成及原文投影，不代替该全链回归。浏览器真实刷新未运行；真实 durable SSE 恢复已运行。
+4. **UNKNOWN 未解决**：B2 实际用量未知，6365 占用保留；后续 B3 成功没有结算它。停止该旧请求，不重试，不伪造实际总消耗。
+5. **下一步最小范围**：如继续效果工作，优先独立验证最后修复后的多轮整链、Cheap 引用/结束合同和语义边界表达；现有 Frost 第二跳就在原池，尚无依据自动实施阶段 5 的第二次全库检索。本轮不建立 Tag，也不代替负责人宣布里程碑验收。
 
 ## 分阶段版本
 
@@ -251,3 +338,8 @@ flowchart TD
 | 4 离线/运行器 | `f5b0f6e732c7951cae5b993c45b3b92f5a0b785e` | 离线对照、真实运行器与精确计划；真实执行源码基线 |
 
 真实 STOP 结果及本报告作为后续独立文档提交保存；其最终 SHA 以交付时的 `git log -1` 为准，避免在提交正文内自引用尚不存在的 SHA。
+
+
+继续实现的生产源码与最后诊断版本：`f9e8723b374e78de6a1a2ec9a44207035ad0d044`。关键补充提交：`600a379` 改写合同、`e9d9642` 身份/诊断输出、`0419030` 未完成流保护、`c3c7e6e` 歧义固定澄清、`f9e8723` 诊断 JSON 边界。报告提交 SHA 在交付消息中给出，避免正文自引用。
+
+本轮发送已结束；未使用的 2 次操作及 116435 Token 会话上限空间已关闭。该关闭只撤销本轮未用授权，不修改月度预算，不释放 B2 UNKNOWN 的 6365 占用。关闭记录及 SHA 见继续结果 JSON 的 closeout。
