@@ -1,0 +1,1884 @@
+{
+  "schema": "s8.6.1-api-acceptance/v1",
+  "created_at_utc": "2026-10-21T15:02:15.070501+00:00",
+  "goal": "S8.6.1 minimal review fixes and formal API acceptance wiring",
+  "status": "BLOCKED_RESERVATION_BUDGET",
+  "baseline": "0c496c230add039283c80635d4e7d4776a4e373b",
+  "branch": "codex/s8-6-adaptive-retrieval-20261021",
+  "worktree": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+  "source_fix_commit": "f39d347ccefd8441c2b56dbaa4f5f455776ed77f",
+  "last_source_commit": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+  "delivery_commit": "Resolve with git log -1 --format=%H -- docs/evaluation/S8_6_1_API_ACCEPTANCE.results.json",
+  "git_ancestry_checked": true,
+  "initial_worktree_clean": true,
+  "main_worktree_preexisting_dirty_file_preserved": ".serena/project.yml",
+  "gates": {
+    "minimal_source_integration": "PASS",
+    "review_fixes": "OFFLINE_PASS",
+    "ASGI_profile_and_session_persistence_mock_sql": "OFFLINE_PASS",
+    "budget_computation": "EXECUTED_EXIT_0",
+    "provider_budget_fit": "BLOCKED",
+    "latest_formal_API_real_acceptance": "NOT_RUN",
+    "new_image": "NOT_BUILT",
+    "real_SSE_PG_Redis_registry_SendGate_joint_acceptance": "NOT_RUN",
+    "real_second_authorized_principal": "BLOCKED_NO_SECOND_LEGITIMATE_PRINCIPAL",
+    "production_readiness": "NOT_CLAIMED"
+  },
+  "changes": [
+    {
+      "file": "backend/weknora_port/retrieval/pipeline.py",
+      "function": "RetrievalPipeline.run",
+      "problem": "A candidate-only local SearchNothing/SearchError import makes SearchNothing unbound in mode off when graph paths exist, ordinary retrieval is EMPTY, and fusion adds no raw source.",
+      "repair": "Move the existing import unconditionally to run entry and remove only its candidate-branch occurrence.",
+      "regression_node": "tests/weknora_port/test_s861_review_fixes.py::test_off_graph_path_without_admissible_original_raises_native_search_nothing"
+    },
+    {
+      "file": "backend/weknora_port/retrieval/strategy.py",
+      "function": "try_rule_compare",
+      "problem": "English branch produces mechanically phrased What are <object> <dimension>? queries.",
+      "repair": "Use exactly What is known about {name} regarding {dimension}?; object/dimension span calculation and CN rule remain unchanged.",
+      "regression_node": "tests/weknora_port/test_s861_review_fixes.py::test_english_comparison_uses_neutral_template_without_changing_source_spans_or_q0"
+    },
+    {
+      "file": "tests/weknora_port/test_s86_strategy.py",
+      "function": "test_closed_english_compare_keeps_dimension",
+      "repair": "Update only the two literal expected English query strings to the authorized template."
+    },
+    {
+      "file": "scripts/s8_6_1_api_acceptance.py",
+      "function": "compose_configuration/install_profile/create_application",
+      "purpose": "test-only normal RuntimeService dependency composition, citations and exactB; saved Session mode remains authoritative"
+    },
+    {
+      "file": "scripts/s8_6_1_api_acceptance.py",
+      "function": "dry_run_inventory/_approved/claim_batch/collect_http",
+      "purpose": "zero-send complete physical-call reservation preflight; fresh scoped authorization bound to current preflight; one-use HTTP collection and replay checks"
+    }
+  ],
+  "tests": {
+    "source_fix_RED": {
+      "failed": 2,
+      "exit_code": 1
+    },
+    "source_fix_final": {
+      "passed": 67,
+      "exit_code": 0
+    },
+    "latest_profile_preflight": {
+      "passed": 76,
+      "exit_code": 0,
+      "includes_ASGI_profile_cases": 13,
+      "includes_preflight_cases": 63
+    },
+    "not_sum_repeated_runs": true,
+    "repair_exact_runs": [
+      {
+        "argv": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/weknora_port/test_s861_review_fixes.py"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 1,
+        "elapsed_seconds": 3.2042509999591857,
+        "baseline": "0c496c230add039283c80635d4e7d4776a4e373b",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "mode": "OFFLINE_MOCK_ONLY",
+        "source_files": [
+          {
+            "path": "backend/weknora_port/retrieval/pipeline.py",
+            "sha256": "48b6547c0dfefd06d6c310df351da7d7d76ce6a0798cdc3716755fab23a8f290"
+          },
+          {
+            "path": "backend/weknora_port/retrieval/strategy.py",
+            "sha256": "662b4097254675afebb84b14a53f5148fa9776012581f98aeadbc9be66ff927d"
+          },
+          {
+            "path": "tests/weknora_port/test_s861_review_fixes.py",
+            "sha256": "9ca6983101d84341459b037a251f93c90a207f0cbc3175c6b5a43274b389ae3d"
+          },
+          {
+            "path": "tests/weknora_port/test_s86_strategy.py",
+            "sha256": "cadaf70841c154c4ce1444a0c7078fbb3dc43f6eafe5bd31d68046aeed0f6717"
+          }
+        ],
+        "stdout_sha256": "e7d5b6f95e69094aaddba56f227c5aeca008b3f7803f1f03d72b433e8d8ca0f6",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "argv": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/weknora_port/test_s861_review_fixes.py"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "elapsed_seconds": 2.7969553999137133,
+        "baseline": "0c496c230add039283c80635d4e7d4776a4e373b",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "mode": "OFFLINE_MOCK_ONLY",
+        "source_files": [
+          {
+            "path": "backend/weknora_port/retrieval/pipeline.py",
+            "sha256": "e86f9ff6be73e7264859e18565c906984ff116ae9b5139bb2d542de75cc2e8e3"
+          },
+          {
+            "path": "backend/weknora_port/retrieval/strategy.py",
+            "sha256": "cd4c71e812e4c2048c68c50b09daacd610ffa9744ac969110f24d91e46ede66d"
+          },
+          {
+            "path": "tests/weknora_port/test_s861_review_fixes.py",
+            "sha256": "9ca6983101d84341459b037a251f93c90a207f0cbc3175c6b5a43274b389ae3d"
+          },
+          {
+            "path": "tests/weknora_port/test_s86_strategy.py",
+            "sha256": "1bedec1fe602c3da00368e4e6afb0ff3ec5d52e9a03670eb0a2538aa8c249b83"
+          }
+        ],
+        "stdout_sha256": "56f2d9fd8a94de165c1848f85eddc9e7924bbe8dae044be76b3720c5db0f8d88",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "argv": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/weknora_port/test_s861_review_fixes.py",
+          "tests/weknora_port/test_s86_strategy.py",
+          "tests/weknora_port/test_s86_pipeline_integration.py",
+          "tests/weknora_port/test_s86_b_pipeline.py",
+          "tests/weknora_port/test_graph_retrieval.py::test_graph_disabled_never_reads_graph_or_adds_model_calls",
+          "tests/weknora_port/test_graph_retrieval.py::test_rejected_rerank_search_can_be_rescued_without_reviving_low_score_noise",
+          "tests/weknora_port/test_graph_retrieval.py::test_empty_graph_preserves_ordinary_rag_output_and_model_call_count",
+          "tests/weknora_port/test_graph_retrieval.py::test_empty_graph_and_no_source_still_signal_native_search_nothing"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "elapsed_seconds": 3.779009999940172,
+        "baseline": "0c496c230add039283c80635d4e7d4776a4e373b",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "mode": "OFFLINE_MOCK_ONLY",
+        "source_files": [
+          {
+            "path": "backend/weknora_port/retrieval/pipeline.py",
+            "sha256": "e86f9ff6be73e7264859e18565c906984ff116ae9b5139bb2d542de75cc2e8e3"
+          },
+          {
+            "path": "backend/weknora_port/retrieval/strategy.py",
+            "sha256": "cd4c71e812e4c2048c68c50b09daacd610ffa9744ac969110f24d91e46ede66d"
+          },
+          {
+            "path": "tests/weknora_port/test_s861_review_fixes.py",
+            "sha256": "9ca6983101d84341459b037a251f93c90a207f0cbc3175c6b5a43274b389ae3d"
+          },
+          {
+            "path": "tests/weknora_port/test_s86_strategy.py",
+            "sha256": "1bedec1fe602c3da00368e4e6afb0ff3ec5d52e9a03670eb0a2538aa8c249b83"
+          }
+        ],
+        "stdout_sha256": "e25738f10bcc3a109e08b5e6d7730371f343a29885166accfb71b2a42be23598",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "profile_preflight_exact_run": {
+      "argv": [
+        "E:/RAG quention/.venv/Scripts/python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/weknora_port/test_s861_api_acceptance.py",
+        "tests/weknora_port/test_s861_preflight.py",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=E:/RAG quention/var/reports/s8-6-1/root/temp-final-profile-v2"
+      ],
+      "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+      "exit_code": 0,
+      "seconds": 5.0061781000113115,
+      "head": "f39d347ccefd8441c2b56dbaa4f5f455776ed77f",
+      "stdout_sha256": "821cf592bd0c55e54258449e1c5e2de5608cbce8cc662d4f07e1fb94eac5dc79",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_actual_provider_calls": 0,
+      "new_actual_tokens": 0
+    },
+    "saved_other_RED": [
+      "missing profile module collection error",
+      "10pass3fail fixture closure identity comparison",
+      "15fail29pass ignored config drift and Decimal digest",
+      "1fail direct Decimal manifest regression",
+      "15fail3pass missing prompt/history budget guards"
+    ],
+    "known_preexisting_failures": {
+      "status": "REPRODUCED_ON_FULL_08ebd90_WORKTREE",
+      "expected_exit_code": 1,
+      "failed": 2,
+      "nodes": [
+        "tests/weknora_port/test_conversation_configuration.py::test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried",
+        "tests/weknora_port/test_conversation_configuration.py::test_exact_go_configuration_function_rows"
+      ],
+      "reason": "Legacy Go-oracle expectations conflict with preexisting q0 intent safety protections; no fixture or intent algorithm changed to force green.",
+      "evidence": "root/full-baseline-preexisting.stdout.txt"
+    },
+    "preexisting_failures_run_this_goal": false,
+    "historical_922_suite": "NOT_RUN"
+  },
+  "read_only_ECS_inventory": {
+    "status": "READ_ONLY_INVENTORY",
+    "sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f",
+    "command": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "E:\\RAG quention\\var\\reports\\s8-6-1\\budget-audit\\current_inventory.py",
+      "--run-readonly",
+      "--output",
+      "E:\\RAG quention\\var\\reports\\s8-6-1\\budget-audit\\current-inventory.json"
+    ],
+    "exit_code": 0,
+    "remote_operations": "one pinned SSH inventory: Docker inspect and read-only PG SELECT; no new service or Provider",
+    "transaction_read_only": true,
+    "running_image": {
+      "architecture": "amd64",
+      "id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+      "os": "linux",
+      "revision": "29ecf2f5d3037eed99a4de783546dee272a761bd"
+    },
+    "current_scope_searchable_rows": 11,
+    "current_original_text_chunks": 7,
+    "current_original_chars": 2605,
+    "scope": {
+      "document_ids": [
+        "a973df4a-0b4b-43f7-ad17-55265aac1556",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd"
+      ],
+      "knowledge_base_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ]
+    },
+    "models": {
+      "cheap": {
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "physical_key": "221e064809e1e326aa7c554020ca7265c789a2885cf1eec4ef274b55d48e787b"
+      },
+      "embedding": {
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "physical_key": "c180c584f1d914a221271c606a76b2237e5b5be869ef2759d230ec44778ddaf3"
+      },
+      "expensive": {
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "physical_key": "0fbcf561ab4f322c9d1b33abaee5b75c3e83d36096c9150f43512b1713315cad"
+      },
+      "rerank": {
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "physical_key": "eafd471554f1f53e872dc6288d198c593647874d1c269d02d8c7e3168afb8c39"
+      }
+    },
+    "remote_PG_receipts_at_snapshot": {
+      "rows": 13041,
+      "UNKNOWN": 3,
+      "unfinished": 0,
+      "fingerprint": "8afa8c2067de684920b3ff73361dcfde"
+    },
+    "after_snapshot_remote_ledger_fingerprint": "NOT_REMEASURED; this Goal performed SELECT only"
+  },
+  "profile": {
+    "profile": "s8.6.1-formal-api-prompt-b/v1",
+    "baseline": "0c496c230add039283c80635d4e7d4776a4e373b",
+    "test_only": true,
+    "question_inputs": {
+      "compare": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+      "dependent": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?"
+    },
+    "modes": [
+      "off",
+      "query_structure_v1"
+    ],
+    "session_fields": {
+      "source_evidence_mode": "bounded_source_v1"
+    },
+    "knowledge_base_ids": [
+      "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+    ],
+    "document_ids": [
+      "a973df4a-0b4b-43f7-ad17-55265aac1556",
+      "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+      "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+      "3fdf4942-1265-4e9e-959d-27772f57e5dd"
+    ],
+    "accept_language": "en-US",
+    "reasoning_effort": "off",
+    "prompt_b_suffix": "When the supplied evidence contains sufficient information, perform the necessary verifiable calculation or logical inference instead of refusing solely because the result is not stated verbatim.\nDistinguish derived conclusions from directly stated facts. Do not invent missing inputs, entities, dates, locations, or relationships. If the evidence does not support a required relation, explicitly state the uncertainty.",
+    "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+    "default_original_system_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+    "default_profile_system_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+    "approved_budget_template_sha256": {
+      "rewrite_system_prompt": "1a7520b2d41de3af2c96898754facb5413f813443e337dc0a822f469ad78f8bc",
+      "rewrite_user_prompt": "7940c8dd9e1fa182357debf747be3e728cf4817d587fbad5077989d6e764393e",
+      "context_template": "d9780ecc6d5acccc09afe530d89f7423f4db8e6ed6c2f617cc454a898598e813"
+    },
+    "approved_fresh_context_required": true,
+    "resolved_custom_system_prompt": "preserved before same suffix; per-run actual wire hash authoritative",
+    "citations_enabled": true,
+    "enable_expansion_both_arms": false,
+    "router_policy_unchanged": {
+      "mode": "DYNAMIC",
+      "threshold": "0.35",
+      "quality_escalation": true,
+      "truncated_escalation": true,
+      "abstention_escalation": false,
+      "provider_fallback": false
+    },
+    "production_defaults_unchanged": {
+      "strategy": "off",
+      "bridge": "off",
+      "expansion": true
+    },
+    "evaluations": {
+      "primary": "final_answer_correct",
+      "separate": [
+        "evidence_support",
+        "presentation_consistency",
+        "citation_ownership",
+        "new_recall_gain"
+      ],
+      "no_automatic_gold_substring_score": true,
+      "internal_final_answer_supported_is_not_answer_correctness": true
+    },
+    "new_actual_provider_calls": 0,
+    "authorization": "NONE"
+  },
+  "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+  "new_actual_results": [
+    {
+      "case": "compare",
+      "mode": "off",
+      "question": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+      "status": "NOT_RUN",
+      "query_type": "NOT_RUN",
+      "rule": "NOT_RUN",
+      "queries_and_sources": "NOT_RUN",
+      "final_model_input": "NOT_RUN",
+      "SSE_PG_history": "NOT_RUN",
+      "citation_readback": "NOT_RUN",
+      "final_answer_correct": "NOT_RUN",
+      "evidence_support": "NOT_RUN",
+      "presentation_consistency": "NOT_RUN",
+      "citation_ownership": "NOT_RUN",
+      "new_recall_gain": "NOT_RUN"
+    },
+    {
+      "case": "compare",
+      "mode": "query_structure_v1",
+      "question": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+      "status": "NOT_RUN",
+      "query_type": "NOT_RUN",
+      "rule": "NOT_RUN",
+      "queries_and_sources": "NOT_RUN",
+      "final_model_input": "NOT_RUN",
+      "SSE_PG_history": "NOT_RUN",
+      "citation_readback": "NOT_RUN",
+      "final_answer_correct": "NOT_RUN",
+      "evidence_support": "NOT_RUN",
+      "presentation_consistency": "NOT_RUN",
+      "citation_ownership": "NOT_RUN",
+      "new_recall_gain": "NOT_RUN"
+    },
+    {
+      "case": "dependent",
+      "mode": "off",
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "status": "NOT_RUN",
+      "query_type": "NOT_RUN",
+      "rule": "NOT_RUN",
+      "queries_and_sources": "NOT_RUN",
+      "final_model_input": "NOT_RUN",
+      "SSE_PG_history": "NOT_RUN",
+      "citation_readback": "NOT_RUN",
+      "final_answer_correct": "NOT_RUN",
+      "evidence_support": "NOT_RUN",
+      "presentation_consistency": "NOT_RUN",
+      "citation_ownership": "NOT_RUN",
+      "new_recall_gain": "NOT_RUN"
+    },
+    {
+      "case": "dependent",
+      "mode": "query_structure_v1",
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "status": "NOT_RUN",
+      "query_type": "NOT_RUN",
+      "rule": "NOT_RUN",
+      "queries_and_sources": "NOT_RUN",
+      "final_model_input": "NOT_RUN",
+      "SSE_PG_history": "NOT_RUN",
+      "citation_readback": "NOT_RUN",
+      "final_answer_correct": "NOT_RUN",
+      "evidence_support": "NOT_RUN",
+      "presentation_consistency": "NOT_RUN",
+      "citation_ownership": "NOT_RUN",
+      "new_recall_gain": "NOT_RUN"
+    }
+  ],
+  "dry_run": {
+    "schema": "s861-reservation-dryrun/v2",
+    "status": "BLOCKED_RESERVATION_BUDGET",
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "implementation_sha256_LF": "f8392f282127f5e0c8184dfe9ef45592734d79da466fa11d3e643170a211ea2c",
+    "inventory_sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f",
+    "frozen_source_sha256": "e3dbf7ee2f280b4b2f7b4438b89f2691faefb7e103649acc661e3d0a700b1135",
+    "originals_hash_matched_to_current_inventory": 7,
+    "all_searchable_rows_matched": 11,
+    "physical_embedding_groups": 1,
+    "memory_calls": 0,
+    "memory_reason": "existing origin-KB guard excludes scoped recall",
+    "rerank_batches_per_nonempty_pool": 1,
+    "rerank_threshold": 0.3,
+    "automatic_threshold_retry_calls": 0,
+    "query_expansion": false,
+    "records": {
+      "compare:off:QU": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 13117,
+        "output_upper": 150,
+        "reserved_tokens_upper": 14291,
+        "body_sha256": "edbc341c55b6b2f2ccdacdbd5779085e4828682016ec4e9d2f5f964ffc8c0079",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "EXACT_BODY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 150,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 150,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "compare:query_structure_v1:QU": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 3464,
+        "output_upper": 256,
+        "reserved_tokens_upper": 4744,
+        "body_sha256": "7ab265368f69efbcce88a5f8bdf9b11fc59a3dafa4e241f97b68f64f42e9a57e",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "EXACT_BODY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 256,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 256,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "dependent:off:QU": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 13110,
+        "output_upper": 150,
+        "reserved_tokens_upper": 14284,
+        "body_sha256": "553630471a23f0a62fd85db954d89d5db91320b38894b19cdf93a5acfa714eec",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "EXACT_BODY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 150,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 150,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "dependent:query_structure_v1:QU": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 3457,
+        "output_upper": 256,
+        "reserved_tokens_upper": 4737,
+        "body_sha256": "b903fb04bebe4658c088ff12eb8effeba7483c22280a292bd28deebb97e6097c",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "EXACT_BODY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 256,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 256,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "embedding:initial": {
+        "role": "embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "capability": "embedding",
+        "wire_bytes_upper": 12350,
+        "output_upper": 0,
+        "reserved_tokens_upper": 13374,
+        "body_sha256": "4508aeb4a07447200f638084ec9ed0de507c47fc3c2b927ca4a4adbee2b6f3a7",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "JSON_LENGTH_ENVELOPE_NOT_ACTUAL_QUERY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "embedding",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "rerank:initial": {
+        "role": "rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "capability": "rerank",
+        "wire_bytes_upper": 17050,
+        "output_upper": 0,
+        "reserved_tokens_upper": 18074,
+        "body_sha256": "3f9b1224253efdaa39866236f65a776fce08b660223d18d3f09b60cf4223374b",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "ALL_CURRENT_PASSAGES_AND_QUERY_LENGTH_ENVELOPE",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "rerank",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "embedding:compare-child": {
+        "role": "embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "capability": "embedding",
+        "wire_bytes_upper": 12542,
+        "output_upper": 0,
+        "reserved_tokens_upper": 13566,
+        "body_sha256": "173d7b71fb52bf72719aa3e38dcf7cc278674bf6418cea73dad3cd3c8507e9fa",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "JSON_LENGTH_ENVELOPE_NOT_ACTUAL_QUERY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "embedding",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "rerank:compare-child": {
+        "role": "rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "capability": "rerank",
+        "wire_bytes_upper": 17242,
+        "output_upper": 0,
+        "reserved_tokens_upper": 18266,
+        "body_sha256": "a3ab1ff6e04ad40cd0d400d7cfecbfbd23f448b7dfa722e763695ac18f1c0878",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "ALL_CURRENT_PASSAGES_AND_QUERY_LENGTH_ENVELOPE",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "rerank",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "embedding:Q1": {
+        "role": "embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "capability": "embedding",
+        "wire_bytes_upper": 1214,
+        "output_upper": 0,
+        "reserved_tokens_upper": 2238,
+        "body_sha256": "000a00d488675e0391d8b7b9474963402e5bd3c1e71c86426253d1ebec4bead3",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "JSON_LENGTH_ENVELOPE_NOT_ACTUAL_QUERY",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "embedding",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "rerank:Q1": {
+        "role": "rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "capability": "rerank",
+        "wire_bytes_upper": 5914,
+        "output_upper": 0,
+        "reserved_tokens_upper": 6938,
+        "body_sha256": "1a60674c967d1c8c50467689c66f972326c2ba589042589ac1fc8eafa2a25db8",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "ALL_CURRENT_PASSAGES_AND_QUERY_LENGTH_ENVELOPE",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "rerank",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "old-pool": {
+        "role": "rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "capability": "rerank",
+        "wire_bytes_upper": 3880,
+        "output_upper": 0,
+        "reserved_tokens_upper": 4904,
+        "body_sha256": "af74fd04cf3bef342f06a557d35a1e7c8d827ac0b539f4443d0da1cb6a1d51d6",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "ALL_POSSIBLE_ORIGINAL_POOL_STRINGS_AND_Q1_ENVELOPE",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "rerank",
+          "cap_field": "",
+          "cap_value": 0,
+          "cap_semantics": "no-generation/v1",
+          "reasoning_field": "",
+          "reasoning_upper": 0,
+          "thinking_mode": "unspecified",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 0,
+          "upper_source": "non-generative-capability/v1",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "extract": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 21225,
+        "output_upper": 256,
+        "reserved_tokens_upper": 22505,
+        "body_sha256": "9d1c5477e74643d25ebddfddd94ee7565858aa0bb4db2f56394221d79559bb62",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "ALL_ORIGINAL_SENTENCES_SUPERSET_NOT_A_SENT_PAYLOAD",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 256,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 256,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "compare:final:cheap": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 9078,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 12150,
+        "body_sha256": "3ed8253759b80f9cb27d2b486c428ba0c50464d82994098700876656ffcf8b7d",
+        "extra_wire_bytes_upper": 896,
+        "meaning": "ALL_ORIGINALS_PLUS_QUERY_ENVELOPE_AND_MAX_CONSTANT_BRIDGE_QUALIFIER_UPPER",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "compare:final:expensive": {
+        "role": "expensive",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "capability": "chat",
+        "wire_bytes_upper": 9084,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 12156,
+        "body_sha256": "370627b45b84e9b3eedf3006893b275ab34f8b89a08086517ce56729d4d73180",
+        "extra_wire_bytes_upper": 896,
+        "meaning": "ALL_ORIGINALS_PLUS_QUERY_ENVELOPE_AND_MAX_CONSTANT_BRIDGE_QUALIFIER_UPPER",
+        "contract": {
+          "provider": "deepseek",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "full-completion/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": true,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "dependent:final:cheap": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 9071,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 12143,
+        "body_sha256": "cdea9639d60700b8054eb63929da7d3d6dc1f1b0c52cd2121e8a7502c9004308",
+        "extra_wire_bytes_upper": 896,
+        "meaning": "ALL_ORIGINALS_PLUS_QUERY_ENVELOPE_AND_MAX_CONSTANT_BRIDGE_QUALIFIER_UPPER",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "dependent:final:expensive": {
+        "role": "expensive",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "capability": "chat",
+        "wire_bytes_upper": 9077,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 12149,
+        "body_sha256": "db12b5de03a2cb68bdda7a3c06b89bc85e410df226786b8de6e6edc323c7aae4",
+        "extra_wire_bytes_upper": 896,
+        "meaning": "ALL_ORIGINALS_PLUS_QUERY_ENVELOPE_AND_MAX_CONSTANT_BRIDGE_QUALIFIER_UPPER",
+        "contract": {
+          "provider": "deepseek",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "full-completion/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": true,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "compare:fallback:cheap": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 28958,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 32030,
+        "body_sha256": "c9dea472ab9f96572f397e6fb9456cade49233b484f6ae71f197b4ef02d5124a",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "NORMAL_NO_SOURCE_FALLBACK_WITH_CURRENT_CATALOG_AND_QUERY_ENVELOPE",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "compare:fallback:expensive": {
+        "role": "expensive",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "capability": "chat",
+        "wire_bytes_upper": 28964,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 32036,
+        "body_sha256": "716bce8d135af96da4903decf1d4de0328b78060c988e7d668704227a2f05697",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "NORMAL_NO_SOURCE_FALLBACK_WITH_CURRENT_CATALOG_AND_QUERY_ENVELOPE",
+        "contract": {
+          "provider": "deepseek",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "full-completion/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": true,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "dependent:fallback:cheap": {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "capability": "chat",
+        "wire_bytes_upper": 28958,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 32030,
+        "body_sha256": "c9dea472ab9f96572f397e6fb9456cade49233b484f6ae71f197b4ef02d5124a",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "NORMAL_NO_SOURCE_FALLBACK_WITH_CURRENT_CATALOG_AND_QUERY_ENVELOPE",
+        "contract": {
+          "provider": "siliconflow",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "visible-output/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": false,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      },
+      "dependent:fallback:expensive": {
+        "role": "expensive",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "capability": "chat",
+        "wire_bytes_upper": 28964,
+        "output_upper": 2048,
+        "reserved_tokens_upper": 32036,
+        "body_sha256": "716bce8d135af96da4903decf1d4de0328b78060c988e7d668704227a2f05697",
+        "extra_wire_bytes_upper": 0,
+        "meaning": "NORMAL_NO_SOURCE_FALLBACK_WITH_CURRENT_CATALOG_AND_QUERY_ENVELOPE",
+        "contract": {
+          "provider": "deepseek",
+          "api": "openai-completions",
+          "capability": "chat",
+          "cap_field": "max_tokens",
+          "cap_value": 2048,
+          "cap_semantics": "full-completion/v1",
+          "reasoning_field": null,
+          "reasoning_upper": 0,
+          "thinking_mode": "disabled",
+          "reasoning_effort": "",
+          "reasoning_included": true,
+          "output_upper": 2048,
+          "upper_source": "provider-completion-cap/v3",
+          "case": "A"
+        },
+        "sent": false
+      }
+    },
+    "submission_bounds": {
+      "compare:off": {
+        "max_calls": 5,
+        "reservation_tokens_upper": 109805,
+        "physical_call_records": [
+          "compare:off:QU",
+          "embedding:initial",
+          "rerank:initial",
+          "compare:fallback:cheap",
+          "compare:fallback:expensive"
+        ],
+        "actual_usage": "NOT_RUN",
+        "final_generation_reserve_included": true
+      },
+      "compare:query_structure_v1": {
+        "max_calls": 7,
+        "reservation_tokens_upper": 132474,
+        "physical_call_records": [
+          "compare:query_structure_v1:QU",
+          "embedding:compare-child",
+          "rerank:compare-child",
+          "embedding:compare-child",
+          "rerank:compare-child",
+          "compare:fallback:cheap",
+          "compare:fallback:expensive"
+        ],
+        "actual_usage": "NOT_RUN",
+        "final_generation_reserve_included": true
+      },
+      "dependent:off": {
+        "max_calls": 5,
+        "reservation_tokens_upper": 109798,
+        "physical_call_records": [
+          "dependent:off:QU",
+          "embedding:initial",
+          "rerank:initial",
+          "dependent:fallback:cheap",
+          "dependent:fallback:expensive"
+        ],
+        "actual_usage": "NOT_RUN",
+        "final_generation_reserve_included": true
+      },
+      "dependent:query_structure_v1": {
+        "max_calls": 9,
+        "reservation_tokens_upper": 136836,
+        "physical_call_records": [
+          "dependent:query_structure_v1:QU",
+          "embedding:initial",
+          "rerank:initial",
+          "extract",
+          "old-pool",
+          "embedding:Q1",
+          "rerank:Q1",
+          "dependent:fallback:cheap",
+          "dependent:fallback:expensive"
+        ],
+        "actual_usage": "NOT_RUN",
+        "final_generation_reserve_included": true
+      }
+    },
+    "requested_batches": {
+      "compare": {
+        "submissions": [
+          "compare:off",
+          "compare:query_structure_v1"
+        ],
+        "max_calls": 12,
+        "reservation_tokens_upper": 242279,
+        "fits_existing_ledger": false
+      },
+      "dependent": {
+        "submissions": [
+          "dependent:off",
+          "dependent:query_structure_v1"
+        ],
+        "max_calls": 14,
+        "reservation_tokens_upper": 246634,
+        "fits_existing_ledger": false
+      }
+    },
+    "candidate_scopes_not_authorized": {
+      "compare": {
+        "submissions": [
+          "compare:query_structure_v1"
+        ],
+        "max_calls": 7,
+        "reservation_tokens_upper": 132474,
+        "physical_call_records": [
+          "compare:query_structure_v1:QU",
+          "embedding:compare-child",
+          "rerank:compare-child",
+          "embedding:compare-child",
+          "rerank:compare-child",
+          "compare:fallback:cheap",
+          "compare:fallback:expensive"
+        ],
+        "actual_usage": "NOT_RUN",
+        "final_generation_reserve_included": true,
+        "fits_existing_ledger": false
+      },
+      "dependent": {
+        "submissions": [
+          "dependent:query_structure_v1"
+        ],
+        "max_calls": 9,
+        "reservation_tokens_upper": 136836,
+        "physical_call_records": [
+          "dependent:query_structure_v1:QU",
+          "embedding:initial",
+          "rerank:initial",
+          "extract",
+          "old-pool",
+          "embedding:Q1",
+          "rerank:Q1",
+          "dependent:fallback:cheap",
+          "dependent:fallback:expensive"
+        ],
+        "actual_usage": "NOT_RUN",
+        "final_generation_reserve_included": true,
+        "fits_existing_ledger": false
+      }
+    },
+    "fallback_included": true,
+    "budget_block_reason": "Even one candidate submission exceeds the existing100000 reservation ledger cap; no Provider batch recommended",
+    "requested_full_calls": 26,
+    "recommended_batches_not_authorized": {},
+    "recommended_max_calls": 0,
+    "recommended_reservation_upper": 0,
+    "output_caps": {
+      "QU_off": 150,
+      "QU_on": 256,
+      "extract": 256,
+      "final_each_role": 2048
+    },
+    "metric": "wire_bytes + verified_output_upper +1024 per physical call; conservative reservation, never actual Token usage",
+    "classification_quality": "NOT_RUN; synthetic UNKNOWN used only to capture exact QU request",
+    "new_actual_provider_calls": 0,
+    "actual_tokens": 0,
+    "authorization": "NONE"
+  },
+  "dry_run_command": {
+    "argv": [
+      "E:/RAG quention/.venv/Scripts/python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "scripts.s8_6_1_api_acceptance",
+      "dry-run",
+      "--inventory",
+      "E:/RAG quention/var/reports/s8-6-1/budget-audit/current-inventory.json",
+      "--sources",
+      "tests/weknora_port/fixtures/s8_4_bridge/inputs.json",
+      "--output",
+      "E:/RAG quention/var/reports/s8-6-1/root/budget-preflight.json"
+    ],
+    "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+    "exit_code": 0,
+    "seconds": 0.8486206999514252,
+    "head": "f39d347ccefd8441c2b56dbaa4f5f455776ed77f",
+    "stdout_sha256": "293738b21bc597efcbd570e60f58880f4e487d8aedc1976fed747a79ca5e5588",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "new_actual_provider_calls": 0,
+    "new_actual_tokens": 0
+  },
+  "superseded_preflights": {
+    "paths": [
+      "root/actual-budget-dry-run.json",
+      "root/actual-budget-final.json"
+    ],
+    "status": "SUPERSEDED_UNDERBOUND_DO_NOT_AUTHORIZE",
+    "reason": "no-source normal fallback final request omitted; complete v2 now rejects every proposed candidate ledger"
+  },
+  "real_usage": {
+    "attempts": 0,
+    "settled": 0,
+    "UNKNOWN": 0,
+    "held_tokens": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "fee_estimate": "NOT_COMPUTED"
+  },
+  "protection": {
+    "status": "PASS",
+    "source_contracts_unchanged": 37,
+    "extra_unchanged_files": 54,
+    "old_evidence_files_unchanged": 476,
+    "old_S86_reports_unchanged": 3,
+    "old_unknown": {
+      "label": "B2",
+      "entries": 1,
+      "held_tokens": 6365,
+      "status": "UNKNOWN"
+    },
+    "provider_calls": 0,
+    "actual_tokens": 0,
+    "new_unknown": 0
+  },
+  "source_manifest": [
+    {
+      "path": "backend/weknora_port/retrieval/pipeline.py",
+      "sha256_LF": "432889654a87ab61e097f95bac913753d5aca0974df856f5b00dfc8f49c5943d"
+    },
+    {
+      "path": "backend/weknora_port/retrieval/strategy.py",
+      "sha256_LF": "2dec2d5e99df612c869bbf0068c0c31e6f0abb5d98b6f5bdbe3d9ff250d19f08"
+    },
+    {
+      "path": "tests/weknora_port/test_s86_strategy.py",
+      "sha256_LF": "5be834fe6c9645cbd1271bf7aedababaf7e9a8b2ff776f4a83181cb905bad65c"
+    },
+    {
+      "path": "tests/weknora_port/test_s861_review_fixes.py",
+      "sha256_LF": "21731b093c2e0ab1d59e0a6706690678a88789d0e8763e1bac194693e4841a1f"
+    },
+    {
+      "path": "scripts/s8_6_1_api_acceptance.py",
+      "sha256_LF": "f8392f282127f5e0c8184dfe9ef45592734d79da466fa11d3e643170a211ea2c"
+    },
+    {
+      "path": "tests/weknora_port/fixtures/s861_api_inventory.json",
+      "sha256_LF": "44454c96c56837ebc2f02280da4e0263f3e63ec22450f2eea1ad984c4e90f6fe"
+    },
+    {
+      "path": "tests/weknora_port/test_s861_api_acceptance.py",
+      "sha256_LF": "50d22609a7b346287177321520761da3e5320e3820e7fd481b77a8db0a6bbbff"
+    },
+    {
+      "path": "tests/weknora_port/test_s861_preflight.py",
+      "sha256_LF": "98b8e7d604912a9dd7020f5c616d4b5c9e4b6b11074d5c8f2e7e46544b657951"
+    }
+  ],
+  "raw_evidence_manifest": [
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\affected-green.command.json",
+      "bytes": 2002,
+      "sha256": "06ab939c85b744abd271e51f446f6da0c676de7cc8c5dbf8cf28173f01dd9c2b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\affected-green.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\affected-green.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\affected-green.stdout.txt",
+      "bytes": 101,
+      "sha256": "e25738f10bcc3a109e08b5e6d7730371f343a29885166accfb71b2a42be23598"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\diff-check.command.json",
+      "bytes": 385,
+      "sha256": "b3729cc2ad5efdd00268fa89d1b70e899bd9d8753faeb6c305ff8dd34221a3d1"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\diff-check.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\diff-check.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\focused-green.command.json",
+      "bytes": 1369,
+      "sha256": "001acf50143099a4b7ad40ca5e8931690bb54a5f36c1e072032f0c88c5dcc9c6"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\focused-green.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\focused-green.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\focused-green.stdout.txt",
+      "bytes": 100,
+      "sha256": "56f2d9fd8a94de165c1848f85eddc9e7924bbe8dae044be76b3720c5db0f8d88"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\red.command.json",
+      "bytes": 1369,
+      "sha256": "2dd7137b780d82eb06ba643faa844465237ec7731b6e0b08ff9f40c20e05d1ec"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\red.exit.txt",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\red.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\red.stdout.txt",
+      "bytes": 11217,
+      "sha256": "e7d5b6f95e69094aaddba56f227c5aeca008b3f7803f1f03d72b433e8d8ca0f6"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\review-fixes.diff.patch",
+      "bytes": 2917,
+      "sha256": "2bdb47767456d71597119a92c7c7a045e4a1e9ab7eb21e1090330f95e963534b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\review-fixes\\review-fixes.results.json",
+      "bytes": 8972,
+      "sha256": "25c36f3c652a79b8227c91b5bfb722a670577a2eb4f199acb83ae65c4e0aca87"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\api-profile.results.json",
+      "bytes": 5527,
+      "sha256": "6f155a3d52bb773227147158bde372c2eb60e86a404796ff7d4eb84ba3fc8765"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green-final.command.json",
+      "bytes": 651,
+      "sha256": "8e4317e00dd730e9615f2cd9a92b2e15ff3bce3ba7c0842a6f417b397ffe5b3b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green-final.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green-final.stdout.txt",
+      "bytes": 101,
+      "sha256": "15039d5350fee8b2c667106a255040f6bd0d33a9b90dc5a1fa257cd1f42eba4c"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green.command.json",
+      "bytes": 651,
+      "sha256": "8387680479c303b478c1438e218319d9b8babb95a64ccd4133969096756a3b32"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green.exit.txt",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\green.stdout.txt",
+      "bytes": 12313,
+      "sha256": "e255e7ce9f15400559a5dc7d463deede519417f9444c155b2f747174f6b43a91"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\red.command.json",
+      "bytes": 651,
+      "sha256": "483ea094362cfb49964f54cf827b2659f9f0a5d786eeabc204fcfd8b9181166c"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\red.exit.txt",
+      "bytes": 1,
+      "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\red.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\api-profile\\red.stdout.txt",
+      "bytes": 1052,
+      "sha256": "80090a142e5dddecfa023b5b3f6edc74360d57cebaf6a19351e186fbcfea91ef"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\green.command.txt",
+      "bytes": 258,
+      "sha256": "108a029f598b09034acc9c33ad1c3c510ef6105630e05d6e13ab8c7672e77ef4"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\green.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\green.stdout.txt",
+      "bytes": 101,
+      "sha256": "1e8d31066acd0698fb2cd80abaa7db4258636492d13a306499614e24926cb84d"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\invocations.json",
+      "bytes": 3129,
+      "sha256": "08f35e87df61b1183eed462bd79c1da022836e7a6b63c9d4c3afc102013f4d00"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\manifest-red.command.txt",
+      "bytes": 322,
+      "sha256": "d071600b5ec9e8f9ea82f767315320921ee6e0ff9db184983e75d8480d4f2564"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\manifest-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\manifest-red.stdout.txt",
+      "bytes": 2550,
+      "sha256": "21670b7adb36bdb582abdd6b61fcf70acc5ffd1b4008dae7d8df17fa384b7b83"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\prompt-guard-green.command.txt",
+      "bytes": 400,
+      "sha256": "7346c74e98ff1f59021e43c7970fac07b657c55ce156504f8a8f7ed7b0fadf13"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\prompt-guard-green.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\prompt-guard-green.stdout.txt",
+      "bytes": 116,
+      "sha256": "af859e0fc75abea034c479d289a619a24de7eed6b92c6004fdeb7b6cafe0f403"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\prompt-guard-red.command.txt",
+      "bytes": 347,
+      "sha256": "5e9ea4aaa9fc04c155382d60692c0fe73bf18bdbc3ea83e28cc23f78cd1f0994"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\prompt-guard-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\prompt-guard-red.stdout.txt",
+      "bytes": 28823,
+      "sha256": "28cd1acb1ffa83c0fe7b75e0daa1c85a7711cabd28f9377312003cbea8a7d2ef"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\red.command.txt",
+      "bytes": 250,
+      "sha256": "fa554f861d7918cbfab1191383bff711719ab32ed85d16d29ba2a9631221e070"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\preflight-tests\\red.stdout.txt",
+      "bytes": 53773,
+      "sha256": "76978ad9116af039c85a729396b0756a35cfb7620e35b0e2d007190bfb12d445"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\budget-audit\\budget-findings.json",
+      "bytes": 12788,
+      "sha256": "1682aa979558316d273fef10cd65f473a90915c28c5d9a2a74a4e70eec34a68b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\budget-audit\\current-inventory.json",
+      "bytes": 40762,
+      "sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-budget-dry-run.json",
+      "bytes": 21886,
+      "sha256": "d4f45c3ca5d831c7ddfafef807f0e89d83b11d418db425dbcbe33eda34483d6e"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-budget-final.json",
+      "bytes": 21886,
+      "sha256": "d4f45c3ca5d831c7ddfafef807f0e89d83b11d418db425dbcbe33eda34483d6e"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-budget-v2.json",
+      "bytes": 26708,
+      "sha256": "afd477aabb53ade533b2953c9b3d017b29a9a2047b8ba3ec153f2209218e7740"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-1.command.json",
+      "bytes": 873,
+      "sha256": "647e69bdcc11925a7dd6c749733431d850d73b58d14c8749ee62d46338a84420"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-1.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-1.stdout.txt",
+      "bytes": 176,
+      "sha256": "fe7b53140494f22eb9fe34960fbd6c09624e63160be03c14fb028cb13e887bdb"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-2.command.json",
+      "bytes": 871,
+      "sha256": "1cf321d602cc7684f0291730f5d5754e7a1fdf35b9456eff9bef2e0831eb135b"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-2.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-2.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-2.stdout.txt",
+      "bytes": 176,
+      "sha256": "fe7b53140494f22eb9fe34960fbd6c09624e63160be03c14fb028cb13e887bdb"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-3.command.json",
+      "bytes": 868,
+      "sha256": "abc3eef10a53878762f8ad2139b09918181fd29b1f4de687c8430287d7eff7f1"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-3.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-3.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-3.stdout.txt",
+      "bytes": 166,
+      "sha256": "293738b21bc597efcbd570e60f58880f4e487d8aedc1976fed747a79ca5e5588"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-4.command.json",
+      "bytes": 868,
+      "sha256": "74932c4942228c32dbb386974666eeafd0d7c1998ec8c7a17f2b48f22c506a02"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-4.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-4.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\actual-dry-run-4.stdout.txt",
+      "bytes": 166,
+      "sha256": "293738b21bc597efcbd570e60f58880f4e487d8aedc1976fed747a79ca5e5588"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\budget-preflight.json",
+      "bytes": 26896,
+      "sha256": "4d7be90e271f79a8e7759cb1d4292c8197a4291d7c1257ccabefd9003c47e885"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-manifest.command.json",
+      "bytes": 691,
+      "sha256": "caedf7d00b7b953ea45c3ae0e70cdd25734d4904243bfb2a3228954df338d6f5"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-manifest.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-manifest.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-manifest.stdout.txt",
+      "bytes": 250,
+      "sha256": "1b0ac9efaa398b7961ab32b444a2419c283a070d1699794fa756380b2d588bfe"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-tests.command.json",
+      "bytes": 794,
+      "sha256": "27c5e061dd1108e9ea54bcc9d712975ee3c3da7ce6282c5f0189097ee6cb361f"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-tests.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-tests.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-tests.stdout.txt",
+      "bytes": 101,
+      "sha256": "302f49465cb1e7469e157ce75013457d4683c0d34f394a5a1d1df4d7ca269d3d"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-v2-tests.command.json",
+      "bytes": 798,
+      "sha256": "793b225d669d03973ce098a910ad6a6e5a505f1b3d1d48e083e00661fdf5ae65"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-v2-tests.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-v2-tests.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\final-profile-preflight-v2-tests.stdout.txt",
+      "bytes": 182,
+      "sha256": "821cf592bd0c55e54258449e1c5e2de5608cbce8cc662d4f07e1fb94eac5dc79"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\profile-final.json",
+      "bytes": 2872,
+      "sha256": "87f6067624a75b8d0b44d94efdb6138894da6b23d3e46076787fe5dc62797041"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\profile-manifest-v2.command.json",
+      "bytes": 687,
+      "sha256": "0670aeb9c45a41d25f20434a6226454c4819bf56fc721952247232c8c8ec9fa4"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\profile-manifest-v2.exit.txt",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\profile-manifest-v2.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\profile-manifest-v2.stdout.txt",
+      "bytes": 250,
+      "sha256": "c555f6f4df8da62d125ab561c17d1862f0c649fb009e18c28aead6d03451c0b7"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\profile-manifest.json",
+      "bytes": 2496,
+      "sha256": "4998faeff9870f51792f3a0e4f737e2685ba2353b16bf1c65be88bb3ff5c3d53"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\protected-after.json",
+      "bytes": 352,
+      "sha256": "c6d4a97d9e721294ec1d7459a72fdc8b70c65a2bdfcd4f0e6337e4feef8b9c1a"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-1\\root\\protected-before.json",
+      "bytes": 352,
+      "sha256": "c6d4a97d9e721294ec1d7459a72fdc8b70c65a2bdfcd4f0e6337e4feef8b9c1a"
+    }
+  ],
+  "pending_authorization_application": {
+    "status": "NOT_AUTHORIZED_ZERO_PROVIDER_ISOLATION_ONLY",
+    "reason": "Owner Goal section5 requires fresh authorization for new ECS writes/real acceptance; completed model budget is blocked.",
+    "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "base_image_id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "target_image_id": "NOT_BUILT",
+    "owner_approved": false,
+    "expires_at": null,
+    "requested_operations": [
+      "copy exact source archive into a fresh ECS diagnostic directory",
+      "build a new isolated image from the verified existing image without dependency changes",
+      "start one separate temporary API-only service with cloud_allowed=false and unique Redis prefix",
+      "authenticate readyz and configuration identity only; preserve new logs and stop the temporary API"
+    ],
+    "provider_calls": 0,
+    "provider_actual_tokens": 0,
+    "real_QA_submissions": 0,
+    "no_production_api_worker_replace": true,
+    "no_index_or_ingestion": true,
+    "real_model_authorization": "BLOCKED_RESERVATION_BUDGET; no executable Provider grant proposed",
+    "stop_conditions": [
+      "permission or identity mismatch",
+      "UNKNOWN or uncertain send",
+      "existing service/image/config mutation required",
+      "cannot prove source/image/import identity"
+    ],
+    "deferred_requested_four_submissions": [
+      {
+        "case": "compare",
+        "mode": "off",
+        "question": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+        "status": "NOT_RUN",
+        "query_type": "NOT_RUN",
+        "rule": "NOT_RUN",
+        "queries_and_sources": "NOT_RUN",
+        "final_model_input": "NOT_RUN",
+        "SSE_PG_history": "NOT_RUN",
+        "citation_readback": "NOT_RUN",
+        "final_answer_correct": "NOT_RUN",
+        "evidence_support": "NOT_RUN",
+        "presentation_consistency": "NOT_RUN",
+        "citation_ownership": "NOT_RUN",
+        "new_recall_gain": "NOT_RUN"
+      },
+      {
+        "case": "compare",
+        "mode": "query_structure_v1",
+        "question": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+        "status": "NOT_RUN",
+        "query_type": "NOT_RUN",
+        "rule": "NOT_RUN",
+        "queries_and_sources": "NOT_RUN",
+        "final_model_input": "NOT_RUN",
+        "SSE_PG_history": "NOT_RUN",
+        "citation_readback": "NOT_RUN",
+        "final_answer_correct": "NOT_RUN",
+        "evidence_support": "NOT_RUN",
+        "presentation_consistency": "NOT_RUN",
+        "citation_ownership": "NOT_RUN",
+        "new_recall_gain": "NOT_RUN"
+      },
+      {
+        "case": "dependent",
+        "mode": "off",
+        "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+        "status": "NOT_RUN",
+        "query_type": "NOT_RUN",
+        "rule": "NOT_RUN",
+        "queries_and_sources": "NOT_RUN",
+        "final_model_input": "NOT_RUN",
+        "SSE_PG_history": "NOT_RUN",
+        "citation_readback": "NOT_RUN",
+        "final_answer_correct": "NOT_RUN",
+        "evidence_support": "NOT_RUN",
+        "presentation_consistency": "NOT_RUN",
+        "citation_ownership": "NOT_RUN",
+        "new_recall_gain": "NOT_RUN"
+      },
+      {
+        "case": "dependent",
+        "mode": "query_structure_v1",
+        "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+        "status": "NOT_RUN",
+        "query_type": "NOT_RUN",
+        "rule": "NOT_RUN",
+        "queries_and_sources": "NOT_RUN",
+        "final_model_input": "NOT_RUN",
+        "SSE_PG_history": "NOT_RUN",
+        "citation_readback": "NOT_RUN",
+        "final_answer_correct": "NOT_RUN",
+        "evidence_support": "NOT_RUN",
+        "presentation_consistency": "NOT_RUN",
+        "citation_ownership": "NOT_RUN",
+        "new_recall_gain": "NOT_RUN"
+      }
+    ],
+    "deferred_current_full_bound": {
+      "calls": 26,
+      "reservation_upper": 488913,
+      "existing_per_ledger_caps": {
+        "calls": 12,
+        "reservation_upper": 100000
+      },
+      "fits": false
+    }
+  },
+  "limitations": [
+    "No real QU classification, retrieval quality, final answer or citation ownership result this Goal.",
+    "ASGI uses mocked SQL/Registry; offline tests do not prove real PG/Redis/SSE/Provider joint execution.",
+    "HTTP collector is implemented and parser/admission tested; full real HTTP collection has NOT_RUN.",
+    "Fallback may replace PromptB; actual existing raw Provider request must establish suffix delivery.",
+    "Memory0 bound assumes current origin-KB exclusion; fresh preflight must recheck immediately before activation.",
+    "All four and even smallest candidate plans fail conservative reservation fit; suggested Owner count24 is not a grant.",
+    "Independent second-user session test cannot be substituted with wrong-Bearer401.",
+    "Frost EVENT_VENUE_UNVERIFIED internal evidence status unchanged; future answer correctness scored separately."
+  ],
+  "next_minimum_recommendation": "Owner may separately choose a bounded test-only input-rejection profile or a proved tighter QU serialization bound; then repeat this same Goal preflight and obtain a fresh grant. No algorithm/P5/cap change implemented.",
+  "not_run": [
+    "new Provider/model calls",
+    "new image build",
+    "temporary API deployment",
+    "four real answer submissions",
+    "real SSE recovery",
+    "real citation readback",
+    "legitimate second-user isolation",
+    "Push",
+    "Tag",
+    "C",
+    "HyDE",
+    "production deployment",
+    "reindex"
+  ]
+}

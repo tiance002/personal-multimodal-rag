@@ -587,3 +587,13 @@ Baseline cb7f08cde32bd41bb56e6e56b4f96d6f0428ecf1; branch codex/s8-5-conversatio
 ## 2026-10-21 S8.6 A/B offline delivery
 
 Legal baseline08ebd90; independent branch codex/s8-6-adaptive-retrieval-20261021. A commit dc093c05b4b22b6c4ed92656f633cda20cd6fcd1: opt-in QUv2/query_type, closed comparison, serial retrieval-only executor/source aggregation/configuration. B: structured validated firsthop bridge, at most one scoped newHybrid, direct relation assessment, original identity/source preservation and actual final-message delivery. A/B IMPLEMENTED/OFFLINE_PASS; combined374 preceded final bounded compatibility repairs; affected97 then Graph/Pipeline134 passed exit0, counts overlap. Two old Go-oracle intent assertions reproduced as FAIL on full08ebd90 baseline and retained. FrozenB3/GB3 original name+institution delivered to Mock final model; RELATED_ONLY, EVENT_VENUE_UNVERIFIED, historicalPARTIAL preserved. Actual Provider/settled/UNKNOWN and input/output/totalTokens all0;37protectedsourcecontracts/476oldfiles unchanged. RealQUquality/newrecallbenefit/formalAPI/PGRedis NOT_RUN; complexplanner/HyDE NOT_IMPLEMENTED. Reports docs/design/S8_6_ADAPTIVE_RETRIEVAL_V1.md and docs/evaluation/S8_6_OFFLINE_IMPLEMENTATION.md/.results.json. Defaultoff, P5/bindings/generationPrompt/threshold/RRF/TopK/schema/index preserved; noPush/deploy/build/Tag/oldgrant. Stop after local A/B delivery.
+
+
+## 2026-10-21 S8.6.1 minimal review / API preflight
+
+- Source fix f39d347; test-only profile/source 8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f. Two requested production fixes only.
+- Offline: affected source tests67 pass; final profile/preflight76 pass, exit0. No922 rerun.
+- Current read-only ECS inventory done; old API/Worker image80e2 remains. Provider attempts/Tokens/UNKNOWN0.
+- Complete no-source fallback budget blocks every proposed single ledger:5/109805,7/132474,5/109798,9/136836. No Provider batch recommended; earlier underbounds retained/superseded.
+- Formal API real acceptance NOT_RUN; new image NOT_BUILT; independent second principal BLOCKED.
+- Delivery: docs/evaluation/S8_6_1_API_ACCEPTANCE.md and .results.json. Pending freshOwner zero-Provider isolated preparation request only; noPush/Tag/production deploy.
