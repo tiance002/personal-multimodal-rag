@@ -1,5 +1,6 @@
 """Neutral pipeline data, ported from WeKnora types/chat_manage/search types."""
 from dataclasses import dataclass, field
+from copy import deepcopy
 from typing import Any
 
 
@@ -41,6 +42,27 @@ def context_results(state):
     """Original normal order followed by independent, verified supplements."""
     normal = state.merge_results
     rescue = getattr(state, "rescue_evidence", ())
+    qualifications = getattr(state, "bridge_normal_qualifications", {})
+    if qualifications:
+        if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
+            raise ValueError("BRIDGE_EVIDENCE_MODE_MISMATCH")
+        views = []
+        for row in normal:
+            matching = next((details for source_id, details in qualifications.items()
+                if row is not None and row.chunk_type == 'text' and row.is_enabled and
+                source_id in (row.id, *row.sub_chunk_ids) and
+                row.knowledge_id == details.get('knowledge_id') and
+                row.knowledge_base_id == details.get('knowledge_base_id') and
+                row.metadata.get('source_version') == details.get('source_version') and
+                row.chunk_metadata.get('source_version') == details.get('source_version') and
+                details.get('quote') and details['quote'] in row.content), None)
+            if matching is not None:
+                view = deepcopy(row)
+                view.metadata['bridge_normal_qualification'] = deepcopy(matching)
+                views.append(view)
+            else:
+                views.append(row)
+        normal = views
     if not rescue:
         return normal
     if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
@@ -56,7 +78,13 @@ def bridge_context_attributes(row):
     """Program evidence qualifications shared by both Context encoders."""
     details = (row.metadata or {}).get('bridge_rescue')
     if not isinstance(details, dict) or not details:
-        return ''
+        normal = (row.metadata or {}).get('bridge_normal_qualification')
+        if not isinstance(normal, dict) or not normal:
+            return ''
+        # A shortened-name fact already present in normal evidence is still
+        # only an institution hint, never an admitted event/entity alias.
+        return (' role="bridge_location_hint" supports="institution_location_only"'
+                ' seminar_venue="unverified" final_answer_supported="false"')
     exact = details.get('entity_bridge_verified') is True
     supported = details.get('final_answer_supported') is True
     return (' role="bridge_supplement" supports="' +

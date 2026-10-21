@@ -39,6 +39,7 @@ SYSTEM = '''Extract one first-hop relation for a location question from the supp
 Return ONLY one JSON object. If there is no suitable relation return {"status":"NO_FIRST_HOP"}.
 Otherwise use exactly these keys: status="FIRST_HOP_CANDIDATE", sentence_id, subject, subject_resolution, predicate, object, time, target_attribute="location", bridge_search_phrases.
 Select the sentence_id of one complete factual sentence with role main. Do not compute offsets or output a quote or chunk ID. Copy subject, predicate, the complete object and its own time verbatim from that sentence; use an empty time only when absent.
+The object is the complete entity name, excluding attached temporal modifiers. If the direct relation includes an adjacent year/date clause, copy its date/year span verbatim into time; time must be empty only when that relation has no date/year span. For the hypothetical sentence "Ada Rowan directed the Orchard Arts Seminar from 2011–2014.", field examples are {"object":"Orchard Arts Seminar","time":"2011–2014"}. This is a formatting example, not source evidence. Never move a later clause's dates into time or strip numbers within the entity name.
 subject_resolution is mandatory and must match this JSON schema: {"type":"string","enum":["EXPLICIT","UNVERIFIED"]}. It must never be empty, null, omitted, or any other value. A named subject is EXPLICIT only when copied from that same selected sentence; every pronoun (including I/We/You) is UNVERIFIED, even if preceding sentences identify the person.
 Field examples only: {"subject":"She","subject_resolution":"UNVERIFIED"}; {"subject":"Ada Rowan","subject_resolution":"EXPLICIT"}. These illustrate enum values, not source facts; never copy an example subject unless it occurs in the selected input sentence.
 Never fill a name or date from the question or a preceding sentence. Program code separately checks identity. bridge_search_phrases contains one to three verbatim whole phrases within the object; shortened phrases are search clues, not proven entity aliases. Do not add confidence, answers, facts, or extra keys.'''
@@ -453,6 +454,44 @@ def _literal_prefix_search_clues(object):
     return tuple(clues)
 
 
+def _normal_location_evidence(state, originals, phrases, object, *, reason=None):
+    """Qualify shortened-name facts without editing normal source results."""
+    found = []
+    for source in originals:
+        for fact in _location_facts(source, phrases):
+            # An ancestry ID is not proof that this original sentence survived
+            # Merge. Qualify only a current normal view containing the quote.
+            if any(row is not None and row.chunk_type == 'text' and
+                   source.id in (row.id, *row.sub_chunk_ids) and
+                   _domain(row) == _domain(source) and fact['quote'] in row.content
+                   for row in state.merge_results):
+                found.append((source, fact))
+    if not found:
+        return False
+    if any(fact['phrase'] == object for _, fact in found):
+        _trace(state, 'NORMAL_EVIDENCE_ALREADY_COMPLETE')
+        return True
+    qualifications = dict(getattr(state, 'bridge_normal_qualifications', {}))
+    for source, fact in found:
+        qualifications[source.id] = {
+            'source_chunk_id':source.id, 'knowledge_id':source.knowledge_id,
+            'knowledge_base_id':source.knowledge_base_id,
+            'source_version':source.metadata.get('source_version'),
+            'quote':fact['quote'], 'quote_start':fact['quote_start'], 'quote_end':fact['quote_end'],
+            'object':object, 'matched_phrase':fact['phrase'], 'location_fact':deepcopy(fact),
+            'entity_bridge_verified':False, 'final_answer_supported':False,
+            'relation_status':'INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED'}
+    state.bridge_normal_qualifications = qualifications
+    source_ids = list(dict.fromkeys(source.id for source, _ in found))
+    _trace(state, 'NORMAL_INSTITUTION_LOCATION_PRESENT', source_ids=source_ids,
+           object=object, matched_phrases=list(dict.fromkeys(fact['phrase'] for _, fact in found)),
+           reason=reason or 'SHORTENED_NAME_LOCATION_ALREADY_PRESENT',
+           entity_bridge_verified=False, final_answer_supported=False)
+    _trace(state, 'ENTITY_BRIDGE_UNVERIFIED', source_ids=source_ids,
+           relation_status='INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED')
+    return True
+
+
 def _round_one(state):
     raw = next((x for x in reversed(state.evidence_trace) if x.get('stage') == 'rerank_raw'), None)
     filtered = next((x for x in reversed(state.evidence_trace) if x.get('stage') == 'rerank_filter_mmr'), None)
@@ -577,17 +616,14 @@ async def rescue_bridge(state, context, repository, registry):
             return
         _trace(state, 'FIRST_HOP_VERIFIED', extraction=data, identity_proof=asdict(proof))
         phrases = list(dict.fromkeys([data['object'], *data['bridge_search_phrases']]))
-        if any(_location_facts(row, phrases) for row in originals):
-            _trace(state, 'NORMAL_EVIDENCE_ALREADY_COMPLETE')
+        if _normal_location_evidence(state, originals, phrases, data['object']):
             return
         # Read back only the normal originals required to establish complementarity.
         normal_search = [r for r in state.search_results if r is not None and r.id in final_ids
                          and r.chunk_type == 'text' and r.id not in {x.id for x in originals}]
         normal_originals = await _read_originals(normal_search, state, context, repository)
-        for row in normal_originals:
-            if _location_facts(row, phrases):
-                _trace(state, 'NORMAL_EVIDENCE_ALREADY_COMPLETE')
-                return
+        if _normal_location_evidence(state, normal_originals, phrases, data['object']):
+            return
         q1 = f"Where is {data['object']} located?"
         if len(q1) > 192:
             raise ValueError('BRIDGE_QUERY_TOO_LONG')
@@ -608,9 +644,8 @@ async def rescue_bridge(state, context, repository, registry):
                 # grammatical subject of a direct original locative fact.
                 # Existing exact/model-clue pools are deliberately unchanged.
                 phrases = list(dict.fromkeys([*phrases, *prefix_clues]))
-                if any(_location_facts(row, prefix_clues) for row in [*originals, *normal_originals]):
-                    _trace(state, 'NORMAL_EVIDENCE_ALREADY_COMPLETE',
-                           reason='LITERAL_PREFIX_LOCATION_ALREADY_PRESENT')
+                if _normal_location_evidence(state, [*originals, *normal_originals], prefix_clues,
+                                             data['object'], reason='LITERAL_PREFIX_LOCATION_ALREADY_PRESENT'):
                     return
                 pool = [r for r in rejected if
                         any(any(_phrase_positions(r.content, phrase)) for phrase in prefix_clues)]

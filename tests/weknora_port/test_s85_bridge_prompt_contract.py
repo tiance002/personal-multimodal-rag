@@ -29,6 +29,18 @@ SAVED_INVALID_OUTPUT = '''{
   ]
 }'''
 SAVED_CONTENT_SHA256 = '9a2b8eaaa28631d5e92f9d9958bf97e3c4cc86b176186c5c8a4eb15d3ed68920'
+SAVED_B1_OUTPUT = '''{
+  "status": "FIRST_HOP_CANDIDATE",
+  "sentence_id": "s-c9a81754f7673886cbb035bf",
+  "subject": "She",
+  "subject_resolution": "UNVERIFIED",
+  "predicate": "served as the Director of",
+  "object": "The Frost Place Advanced Seminar from 2007–2010",
+  "time": "",
+  "target_attribute": "location",
+  "bridge_search_phrases": ["The Frost Place Advanced Seminar"]
+}'''
+SAVED_B1_SHA256 = '756442eae897221d4bddf904c4cf0e8b4478eec7fae62b9ddf2dbd868403c4a5'
 FIXTURE = Path(__file__).parent / 'fixtures' / 's8_4_bridge' / 'inputs.json'
 
 
@@ -77,6 +89,15 @@ def test_prompt_preserves_sentence_id_and_original_source_boundaries():
     assert 'Do not answer' in SYSTEM and 'do not generate a search query' in SYSTEM
 
 
+def test_prompt_separates_attached_relation_dates_from_complete_entity_name():
+    assert re.search(r'object.*complete entity name, excluding attached temporal modifiers', SYSTEM, re.I)
+    assert re.search(r'adjacent year/date clause.*copy.*verbatim into time', SYSTEM, re.I)
+    assert re.search(r'time must be empty only when.*no date/year span', SYSTEM, re.I)
+    assert {'object':'Orchard Arts Seminar', 'time':'2011–2014'} in prompt_objects()
+    assert "Never move a later clause's dates into time" in SYSTEM
+    assert 'strip numbers within the entity name' in SYSTEM
+
+
 def test_exact_saved_real_empty_resolution_output_remains_rejected():
     assert hashlib.sha256(SAVED_INVALID_OUTPUT.encode('utf-8')).hexdigest() == SAVED_CONTENT_SHA256
     before = json.loads(SAVED_INVALID_OUTPUT)
@@ -85,6 +106,18 @@ def test_exact_saved_real_empty_resolution_output_remains_rejected():
         validate_extraction(SAVED_INVALID_OUTPUT, fact_windows(source), {source.id: source}, case['query'])
     assert before['subject_resolution'] == ''
     assert json.loads(SAVED_INVALID_OUTPUT) == before
+
+
+def test_exact_saved_b1_temporal_object_contamination_stays_unverified():
+    assert hashlib.sha256(SAVED_B1_OUTPUT.encode('utf-8')).hexdigest() == SAVED_B1_SHA256
+    original = json.loads(SAVED_B1_OUTPUT)
+    case, source = frozen_source()
+    result = validate_extraction(SAVED_B1_OUTPUT, fact_windows(source), {source.id:source}, case['query'])
+    assert result['span_verified'] is True
+    assert result['relation_form_verified'] is False and result['relation_verified'] is False
+    assert result['object'] == original['object']
+    assert result['time'] == original['time'] == ''
+    assert json.loads(SAVED_B1_OUTPUT) == original
 
 
 @pytest.mark.parametrize('invalid', ['', None, 'unverified', 'VERIFIED', 'UNKNOWN'])

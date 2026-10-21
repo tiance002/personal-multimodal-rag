@@ -64,6 +64,7 @@ class PipelineState(SearchState):
     bridge_rescue_mode: str = 'off'
     bridge_cheap_model_id: str = ''
     rescue_evidence: list[Any] = field(default_factory=list)
+    bridge_normal_qualifications: dict[str, dict[str, Any]] = field(default_factory=dict)
     bridge_trace: list[dict] = field(default_factory=list)
     bridge_context_char_limit: int = 16000
 

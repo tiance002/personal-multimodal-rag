@@ -150,11 +150,20 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None,
             raise SourceEvidenceBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
         limit = min(limit or bridge_limit, bridge_limit)
     result = FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in context_results(state))), state.system_prompt_override, tuple(state.images), limit)
-    if record_bridge and getattr(state, 'rescue_evidence', ()):
-        state.bridge_trace.append({'stage':'bridge_context', 'decision':'CONTEXT_ADMITTED',
-            'source_ids':[r.id for r in state.rescue_evidence], 'result_ids':list(result.result_ids)})
-        supported = all(r.metadata['bridge_rescue'].get('final_answer_supported') is True
-                        for r in state.rescue_evidence)
+    normal_hints = [r for r in context_results(state) if r is not None and
+                    (r.metadata or {}).get('bridge_normal_qualification')]
+    if record_bridge and (getattr(state, 'rescue_evidence', ()) or normal_hints):
+        if getattr(state, 'rescue_evidence', ()):
+            state.bridge_trace.append({'stage':'bridge_context', 'decision':'CONTEXT_ADMITTED',
+                'source_ids':[r.id for r in state.rescue_evidence], 'result_ids':list(result.result_ids)})
+        if normal_hints:
+            state.bridge_trace.append({'stage':'bridge_context',
+                'decision':'NORMAL_LOCATION_HINT_CONTEXT_ADMITTED',
+                'source_ids':[r.metadata['bridge_normal_qualification']['source_chunk_id'] for r in normal_hints],
+                'result_ids':list(result.result_ids)})
+        supported = not normal_hints and all(
+            r.metadata['bridge_rescue'].get('final_answer_supported') is True
+            for r in getattr(state, 'rescue_evidence', ()))
         state.bridge_trace.append({'stage':'bridge_context',
             'decision':'FINAL_ANSWER_SUPPORTED' if supported else 'FINAL_ANSWER_UNVERIFIED',
             'evidence_chain_supported':supported, 'generated_answer_verified':False})
