@@ -457,10 +457,11 @@ async def prepare(root,*,write=True):
     from backend.weknora_port.development import assemble
     from backend.weknora_port.storage.configuration import PostgresModelRoleStore
     from backend.weknora_port.models.types import CallContext,TrustedScope,ChatOptions
-    from backend.weknora_port.generation.context import Evidence,prepare_generation
+    from backend.weknora_port.generation.context import Evidence,prepare_generation,DEFAULT_SYSTEM_PROMPT
     from backend.weknora_port.generation.types import GenerationRequest
     from backend.weknora_port.generation.router import RouterPolicy
     from backend.weknora_port.models.request import build_chat_body
+    from backend.weknora_port.conversation_configuration import resolved_chat_options
     raw = (root/'payload/inputs.json').read_bytes(); owner = read(root/'payload/owner-authorization.json')
     prefix = validate_owner(owner,raw); validate_root(root,owner['stage_id'])
     records = load_bridge_records(owner,raw); answers = load_answer_records(owner,raw)
@@ -498,10 +499,13 @@ async def prepare(root,*,write=True):
             state,finalized,rows,replay = await replay_context(app,registry,record,case,configs,context)
         finally: await registry.close()
         rendered = datetime.now()
+        system_prompt = app.conversation.summary.get('prompt',DEFAULT_SYSTEM_PROMPT)
+        options = replace(resolved_chat_options(app.conversation.summary,'off'),max_tokens=0,
+            max_completion_tokens=1024,thinking=False,prompt_cache_key=context.session_id)
         request = GenerationRequest(context.request_id,context.session_id,str(uuid.UUID(int=2,version=4)),case['query'],finalized,
             evidence=tuple(Evidence.from_result(row) for row in rows),history=(),memory_prompt='',language='English',
             citations_enabled=True,policy=RouterPolicy(mode='CHEAP_ONLY'),rendered_at=rendered,
-            options=ChatOptions(max_completion_tokens=1024,thinking=False,prompt_cache_key=context.session_id))
+            options=options,system_prompt=system_prompt)
         body = build_chat_body(config,prepare_generation(request).messages,request.options,stream=True)
         reserve = bridge.reservation(config,body,'chat')
         require(reserve <= 10000,'S85G_ACTUAL_GENERATION_WIRE_TOO_LARGE')
@@ -514,7 +518,7 @@ async def prepare(root,*,write=True):
         'model_config_sha256':sha(canonical(asdict(config))),'role_revision':revision,
         'replay':replay,'source_results':[asdict(row) for row in rows],
         'document_versions':{row.knowledge_id:row.metadata['source_version'] for row in rows},
-        'generation_options':asdict(request.options),'rendered_at':rendered.isoformat(),
+        'generation_options':asdict(request.options),'system_prompt':system_prompt,'rendered_at':rendered.isoformat(),
         'placeholder_wire':body,'reservation_tokens':reserve,'new_provider_calls':0,'new_actual_tokens':0}
     # UUIDs have fixed wire lengths; keep preparation deterministic for run equality.
     result['rendered_at'] = rendered.strftime('%Y-%m-%dT00:00:00')
@@ -570,7 +574,7 @@ async def run(root):
             request = GenerationRequest(accepted.run_id,accepted.session_id,accepted.assistant_message_id,case['query'],
                 FinalizedContext(**pre['replay']['finalized_context']),evidence=tuple(Evidence.from_result(row) for row in rows),
                 history=(),memory_prompt='',language='English',citations_enabled=True,policy=app.policy,
-                options=options,rendered_at=datetime.fromisoformat(pre['rendered_at']))
+                options=options,system_prompt=pre['system_prompt'],rendered_at=datetime.fromisoformat(pre['rendered_at']))
             loaded = await app.models.resolve(pre['registry_role']['model_id']); config = app.catalogue.resolve(loaded,pre['registry_role']['model_id'])
             require(sha(canonical(asdict(config))) == pre['model_config_sha256'],'S85G_MODEL_CONFIG_CHANGED')
             body = build_chat_body(config,prepare_generation(request).messages,request.options,stream=True)
@@ -583,7 +587,9 @@ async def run(root):
                 require(await conversation.protected_snapshot(app,sessions,runs) == pre['before'],'S85G_OLD_HISTORY_OR_SOURCE_MUTATION')
             holder['fence'] = GenerationFence(accepted.context,config,body,audit)
             app.model_factory = factory
-            await app._configuration(accepted)
+            ordinary_config = await app._configuration(accepted)
+            require(ordinary_config.generation_options['system_prompt'] == request.system_prompt
+                and ordinary_config.generation_options['policy'].mode == 'CHEAP_ONLY', 'S85G_ORDINARY_GENERATION_CONFIG_CHANGED')
             final['source_readback'] = await conversation.source_readback(app,request,accepted.context,pre['document_versions'])
             async def progress(*args,**kwargs): return None
             coordinator = await app._generation(accepted,progress)
