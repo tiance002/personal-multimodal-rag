@@ -1,7 +1,7 @@
 """S8.5 source-entailment regressions; fixed originals, no model or network.
 
-These initial tests intentionally use the S8.4 offset extraction contract so
-their RED evidence isolates semantic validation from the sentence-ID change.
+Initial Stage 2 RED evidence used the old offset contract. The tests now use
+the single active sentence-ID contract; the same source counterexamples remain.
 """
 import json
 from pathlib import Path
@@ -10,16 +10,20 @@ from types import SimpleNamespace
 import pytest
 
 from backend.weknora_port.retrieval.bridge_rescue import (
-    _location_facts, fact_windows, sentence_spans, validate_extraction,
+    _location_facts, fact_windows, sentence_spans, sentence_table, validate_extraction,
 )
 
 
 def relation(quote, *, subject='Alice Bennett', predicate='directed',
              object='Arbor Poetry Seminar', time='2011–2014', question=None):
     source = SimpleNamespace(id='original', content=quote)
+    source.metadata = {'source_version':'v1'}
+    source.knowledge_base_id, source.knowledge_id = 'kb', 'doc'
+    source.start_at, source.end_at = 0, len(quote)
+    selected = next(item for item in sentence_table(fact_windows(source), {source.id: source}).values()
+                    if item.text == quote)
     data = {
-        'status': 'FIRST_HOP_CANDIDATE', 'source_chunk_id': source.id,
-        'quote_start': 0, 'quote_end': len(quote), 'quote': quote,
+        'status': 'FIRST_HOP_CANDIDATE', 'sentence_id': selected.sentence_id,
         'subject': subject, 'subject_resolution': 'EXPLICIT',
         'predicate': predicate, 'object': object, 'time': time,
         'target_attribute': 'location', 'bridge_search_phrases': [object],

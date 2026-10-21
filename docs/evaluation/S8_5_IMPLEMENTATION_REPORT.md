@@ -1,6 +1,6 @@
 # S8.5 多轮对话检索与受控多跳检索
 
-状态：阶段 0 源码核对完成，阶段 1–4 实施中。真实模型/ECS 本轮尚未执行。
+状态：阶段 0–3 源码与离线实现完成，阶段 4 对照与真实计划准备中。真实模型/ECS 本轮尚未执行。
 
 ## 基线与阶段 0
 
@@ -61,7 +61,27 @@ python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/tes
 
 证据：`var/reports/s8-5/stage2/{red,green}.stdout.txt/.stderr.txt/.exit-code.txt/.command.json`。阶段 2 使用旧偏移合同隔离复现语义缺陷；阶段 3 随活动合同迁移工程测试，旧冻结 JSON 和真实响应保持原样。
 
-## 执行流程（由实际调用点核对，后续以离线轨迹验收）
+### 阶段 3：句子 ID 与有界身份/第二跳（OFFLINE_PASS）
+
+`bridge_rescue.py` 的活动合同统一改为 **`sentence-id/v2`**：程序从当前原文切句，建立稳定 ID、原始 Chunk/版本/Unicode 起止位置/逐字正文映射；Cheap 只返回选中 ID 和候选关系字段，程序派生偏移。旧偏移/quote/chunk ID 作为额外模型字段拒绝。切句保护 B.A./M.F.A./Ltd. 等源文缩写；重叠原文须逐字一致才去重。主来源仍最多 2 个，代词来源沿真实 pre 指针最多回溯 3 步，验证当前版本/Scope/连续 index/双向指针；去重后的句子正文总计 ≤2400 字符。
+
+新增窄范围 `bridge_identity.py:prove_identity`，从原文明确姓名、唯一姓氏的句首重建与连续第三人称句式证明身份。第一/第二人称、同姓歧义、其他人物/引语/关系从句、缺链/版本或重叠冲突不准入。姓名只在问题中出现不能成为原文身份证据。不引入通用 NLP。身份证据在源文存在、以及原句在最终普通 Context 存在，分开校验；没有将缺失姓名原句拼进另一个文档或自动扩充第二跳配额。
+
+程序继续仅从经过验证的 object/target_attribute 构造一个 Q1，重用首轮阈值淘汰池，最多 8 候选/一次 BGE/1 个 ≤1600 字符补充；无匹配候选记录 `SECOND_HOP_SOURCE_NOT_IN_POOL`，不增加全库 Search。首轮分数与三组普通排名数组不变。`retrieval/context.py` 与 `generation/context.py` 共用补充证据限定属性。预算预检不记录虚假的 Context 准入；生成编码超预算撤回补充并记录最终未验证。
+
+独立审查补充了真实离线反例：time 字段吞入 `but not in 2012`、after/before 条件被年份集合忽略、Paris or Rome/画中/小说地点、headed for 的方向含义、机构 location 被当作活动 held 关系。均保存 RED 后修复为支持明确年月日/年份范围、直接对象语法和物理地点尾语；最终支持仅限少量可核实的字面 location 问法，陌生举办/建筑/地址等请求仍未验证。
+
+Frost A/B 离线新合同均能证明姓名与首跳，Q1 为 `Where is The Frost Place Advanced Seminar located?`，初始池确有第二跳，Mock BGE 可补入原文。A 的姓名链在最终普通 Context 内完整，B 缺完整姓名原句。两臂第二跳都是 **机构所在地线索**；`ENTITY_BRIDGE_VERIFIED=false`、`FINAL_ANSWER_SUPPORTED=false`。这是程序/Mock 合同验证，不是本轮真实 Cheap/BGE 成功，也没有生成最终答案。
+
+RED：句子 ID 初始 13 failed；身份模块最初缺模块 collection error 单独标注，不能算功能失败；随后身份反例 6 failed/57 passed；关系审查补充 4+3+2 个失败反例。最终一次关联命令：
+
+```powershell
+python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s85_bridge_sentence_ids.py tests/weknora_port/test_s85_bridge_identity.py tests/weknora_port/test_s85_bridge_semantics.py tests/weknora_port/test_bridge_rescue.py tests/weknora_port/test_bridge_pipeline.py tests/weknora_port/test_s8_4_bridge_ecs.py
+```
+
+**271 passed，exit 0，1.90 秒**，`var/reports/s8-5/stage3/final-green.txt/.exit`。身份独立验证 63 passed，输出位于 `stage3-identity/green.*`；重复子集不累加。活动工程测试跟随新合同迁移，冻结 S8.4 输入/Gold/收据/真实结果未改。
+
+## 执行流程（实际代码路径，离线模型为 Mock）
 
 ```mermaid
 flowchart TD
@@ -103,4 +123,4 @@ flowchart TD
   L -- 是 --> M[FINAL_ANSWER_SUPPORTED 的证据前提]
 ```
 
-第二图是阶段 3 的实施目标；尚未执行的节点不视为真实模型通过。`FINAL_ANSWER_SUPPORTED` 还不能代替对实际生成答案的验证。
+两图对应当前实际代码调用点与离线实参轨迹。真实模型尚未执行；`FINAL_ANSWER_SUPPORTED` 只描述证据前提，不能代替对实际生成答案的验证。

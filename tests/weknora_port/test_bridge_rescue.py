@@ -11,7 +11,7 @@ from backend.weknora_port.models.types import (CallCancelled, CallContext, ChatR
     ModelCallTimeout, ProviderError, RerankResponse, RerankResult, RerankSettings,
     RunDeadlineExceeded, TokenUsage, TrustedScope)
 from backend.weknora_port.retrieval.bridge_rescue import (MODE, fact_windows,
-    rescue_bridge, sentence_spans, validate_extraction)
+    rescue_bridge, sentence_spans, sentence_table, validate_extraction)
 from backend.weknora_port.retrieval.search import RetrievalScopeError, SearchTarget
 from backend.weknora_port.retrieval.types import SearchResult
 
@@ -31,10 +31,10 @@ def row(id, content, *, document='doc', version='v1', kind='text', score=.2, **f
     return result
 
 
-def extraction(main, **fields):
-    start = main.content.index(QUOTE)
-    data = dict(status='FIRST_HOP_CANDIDATE', source_chunk_id=main.id,
-        quote_start=start, quote_end=start+len(QUOTE), quote=QUOTE,
+def extraction(main, *, sentence_text=QUOTE, **fields):
+    selected = next(item for item in sentence_table(fact_windows(main), {main.id: main}).values()
+                    if item.text == sentence_text and item.role == 'main')
+    data = dict(status='FIRST_HOP_CANDIDATE', sentence_id=selected.sentence_id,
         subject='Alice Bennett', subject_resolution='EXPLICIT', predicate='directed',
         object='Arbor Poetry Seminar', time='2011–2014', target_attribute='location',
         bridge_search_phrases=['Arbor Poetry Seminar'])
@@ -139,7 +139,9 @@ def test_explicit_relation_rescues_intact_source_without_mutating_normal_ranking
     assert options.format=='json' and child.request_id=='run/bridge-extract'
     assert child.scope is CTX.scope
     payload=json.loads(messages[-1].content)
-    assert payload['question']==QUESTION and all('text' in w for w in payload['windows'])
+    assert payload['question']==QUESTION and payload['contract_version']=='sentence-id/v2'
+    assert all(set(s)=={'sentence_id','text','role'} for s in payload['sentences'])
+    assert 'windows' not in payload
     assert models.rerank_calls[0][0]=='Where is Arbor Poetry Seminar located?'
     assert models.rerank_calls[0][1]==(repository.rows['second'].content,)
     assert models.rerank_calls[0][2].request_id=='run/bridge-rerank'
@@ -161,7 +163,8 @@ def test_unicode_window_offsets_are_original_character_offsets():
 @pytest.mark.parametrize('changes',[
     {'quote_start':True}, {'quote_start':'4'}, {'quote_end':99999}, {'quote':'fabricated'},
     {'subject':'Jeanne Marie Beaumont'}, {'object':'Imagined Seminar'}, {'time':'2019'},
-    {'source_chunk_id':'not-admitted'}, {'target_attribute':'postcode'},
+    {'source_chunk_id':'not-admitted'}, {'sentence_id':'unknown-source-sentence'},
+    {'sentence_id':True}, {'target_attribute':'postcode'},
     {'bridge_search_phrases':['Poetry Sem']}, {'bridge_search_phrases':['The']},
     {'bridge_search_phrases':['Arbor Poetry Seminar invented alias']},
     {'confidence':.99}, {'subject_resolution':'VERIFIED'}])
@@ -186,12 +189,12 @@ def test_literal_subject_elsewhere_in_sentence_is_not_relation_proof():
     quote='Alice Bennett denied that Bob Smith directed the Arbor Poetry Seminar from 2011–2014.'
     main=row('first',quote)
     state,repository,models=case(main=main)
-    models.content=json.dumps(dict(status='FIRST_HOP_CANDIDATE',source_chunk_id='first',
-        quote_start=0,quote_end=len(quote),quote=quote,subject='Alice Bennett',
-        subject_resolution='EXPLICIT',predicate='directed',object='Arbor Poetry Seminar',
-        time='2011–2014',target_attribute='location',bridge_search_phrases=['Arbor Poetry Seminar']))
+    models.content=json.dumps(extraction(main, sentence_text=quote))
     run(state,repository,models)
-    assert not models.rerank_calls and last_decision(state)['reason']=='RELATION_UNVERIFIED'
+    assert not models.rerank_calls
+    span=next(x['extraction'] for x in state.bridge_trace if x.get('decision')=='FIRST_HOP_SPAN_VERIFIED')
+    assert span['relation_form_verified'] is False and span['relation_verified'] is False
+    assert last_decision(state)['reason'] in ('RELATION_UNVERIFIED','SUBJECT_IDENTITY_UNVERIFIED')
 
 
 def test_chunk_ancestry_does_not_prove_fact_survived_final_merge():
@@ -218,21 +221,20 @@ def test_truncated_extraction_does_not_use_partial_json_or_retry():
     assert len(models.chat_calls)==1 and not models.rerank_calls
 
 
-def test_pronoun_remains_unverified_despite_preceding_name_and_question_name():
+def test_pronoun_remains_unverified_when_previous_source_has_multiple_people():
     quote='She directed the Arbor Poetry Seminar from 2011–2014.'
-    main=row('first',quote,pre_chunk_id='previous',chunk_index=2)
-    previous=row('previous','Alice Bennett is a poet.',chunk_index=1,next_chunk_id='first')
+    previous=row('previous','Alice Bennett met Mary Clark.',chunk_index=1,next_chunk_id='first', start_at=0)
+    previous.end_at=len(previous.content)
+    main=row('first',quote,pre_chunk_id='previous',chunk_index=2,
+             start_at=previous.end_at,end_at=previous.end_at+len(quote))
     state,repository,models=case(main=main)
     repository.rows[previous.id]=previous
-    models.content=json.dumps(dict(status='FIRST_HOP_CANDIDATE',source_chunk_id=main.id,
-        quote_start=0,quote_end=len(quote),quote=quote,subject='She',
-        subject_resolution='UNVERIFIED',predicate='directed',object='Arbor Poetry Seminar',
-        time='2011–2014',target_attribute='location',bridge_search_phrases=['Arbor Poetry Seminar']))
+    models.content=json.dumps(extraction(main,sentence_text=quote,subject='She',subject_resolution='UNVERIFIED'))
     run(state,repository,models)
     assert len(models.chat_calls)==1 and not models.rerank_calls and not state.rescue_evidence
     assert last_decision(state)['reason']=='SUBJECT_IDENTITY_UNVERIFIED'
     assert last_decision(state)['span_verified'] and not last_decision(state)['subject_verified']
-    assert any(x['role']=='preceding' for x in json.loads(models.chat_calls[0][0][-1].content)['windows'])
+    assert any(x['role']=='preceding' for x in json.loads(models.chat_calls[0][0][-1].content)['sentences'])
 
 
 @pytest.mark.parametrize('index,next_id',[(0,'first'),(1,'other'),(3,'first')])
@@ -264,10 +266,8 @@ def test_short_phrase_is_only_institution_location_clue_not_event_venue_equivale
     repository.rows['second'].content='The Arbor Center is a poetry institution located in Harbor City, Canada.'
     repository.rows['second'].end_at=100+len(repository.rows['second'].content)
     state.search_results[1]=deepcopy(repository.rows['second'])
-    models.content=json.dumps(dict(status='FIRST_HOP_CANDIDATE',source_chunk_id='first',
-        quote_start=0,quote_end=len(quote),quote=quote,subject='Alice Bennett',
-        subject_resolution='EXPLICIT',predicate='directed',object=full,time='2011–2014',
-        target_attribute='location',bridge_search_phrases=[full,'The Arbor Center']))
+    models.content=json.dumps(extraction(main,sentence_text=quote,object=full,
+        bridge_search_phrases=[full,'The Arbor Center']))
     run(state,repository,models)
     assert len(state.rescue_evidence)==1
     assert state.rescue_evidence[0].metadata['bridge_rescue']['relation_status']=='INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED'
@@ -413,10 +413,7 @@ def test_no_source_slicing_to_force_second_chunk_budget():
 def test_different_requested_time_or_multiple_relation_objects_remain_unverified(suffix,time):
     quote='Alice Bennett directed the Arbor Poetry Seminar'+suffix
     state,repository,models=case(main=row('first',quote))
-    data=dict(status='FIRST_HOP_CANDIDATE',source_chunk_id='first',quote_start=0,
-        quote_end=len(quote),quote=quote,subject='Alice Bennett',subject_resolution='EXPLICIT',
-        predicate='directed',object='Arbor Poetry Seminar',time=time,target_attribute='location',
-        bridge_search_phrases=['Arbor Poetry Seminar'])
+    data=extraction(state.search_results[0],sentence_text=quote,time=time)
     models.content=json.dumps(data)
     run(state,repository,models)
     assert not models.rerank_calls and last_decision(state)['reason']=='RELATION_UNVERIFIED'

@@ -192,7 +192,7 @@ class RetrievalPipeline:
             check_context()
             if state.rescue_evidence:
                 try:
-                    await into_chat_message(copy(state), context)
+                    await into_chat_message(copy(state), context, record_bridge=False)
                 except SourceEvidenceBudgetError:
                     state.rescue_evidence = []
                     state.bridge_trace.append({'decision': 'SKIPPED', 'reason': 'BRIDGE_CONTEXT_BUDGET_EXCEEDED'})

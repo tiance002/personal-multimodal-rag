@@ -401,6 +401,9 @@ class RuntimeService:
                 from .retrieval.context import into_chat_message
                 state.rescue_evidence=[]
                 state.bridge_trace.append({'decision':'SKIPPED','reason':'BRIDGE_GENERATION_CONTEXT_BUDGET_EXCEEDED'})
+                state.bridge_trace.append({'stage':'bridge_context','decision':'FINAL_ANSWER_UNVERIFIED',
+                    'evidence_chain_supported':False,'generated_answer_verified':False,
+                    'reason':'BRIDGE_GENERATION_CONTEXT_BUDGET_EXCEEDED'})
                 finalized=await into_chat_message(state,model_context,persist_sink=getattr(pipeline,'persist_sink',None))
                 evidence=tuple(Evidence.from_result(r) for r in context_results(state) if r is not None)
                 request=replace(request,finalized=finalized,evidence=evidence)

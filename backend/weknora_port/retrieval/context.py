@@ -1,7 +1,7 @@
 """Final answer-ready context rendering, before any P5 role selection."""
 from __future__ import annotations
 from .query import go_strip, go_fields
-from .types import context_results
+from .types import context_results, bridge_context_attributes
 from datetime import datetime, timedelta
 import html
 import re
@@ -87,7 +87,7 @@ def enriched_chat_passage(r):
         content = content[:pos] + text + content[pos:]
     return content
 
-async def into_chat_message(state, context=None, *, persist_sink=None, now=None):
+async def into_chat_message(state, context=None, *, persist_sink=None, now=None, record_bridge=True):
     query = validate_input(state.query)
 
     def supplements(content):
@@ -117,14 +117,14 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None)
             contexts += '<source type="faq" priority="high">\n'
             for i, r in enumerate(faq):
                 exact = ' match="exact"' if high and i == 0 else ''
-                contexts += f'<context id="FAQ-{i + 1}"{exact}>{enriched_chat_passage(r)}</context>\n'
+                contexts += f'<context id="FAQ-{i + 1}"{exact}{bridge_context_attributes(r)}>{enriched_chat_passage(r)}</context>\n'
             contexts += '</source>\n'
             if docs:
                 contexts += '<source type="document" priority="supplementary">\n'
-                contexts += ''.join((f'<context id="DOC-{i + 1}">{enriched_chat_passage(r)}</context>\n' for i, r in enumerate(docs)))
+                contexts += ''.join((f'<context id="DOC-{i + 1}"{bridge_context_attributes(r)}>{enriched_chat_passage(r)}</context>\n' for i, r in enumerate(docs)))
                 contexts += '</source>'
         else:
-            contexts += '\n'.join((f'<context id="{i + 1}">{enriched_chat_passage(r)}</context>' for i, r in enumerate(results)))
+            contexts += '\n'.join((f'<context id="{i + 1}"{bridge_context_attributes(r)}>{enriched_chat_passage(r)}</context>' for i, r in enumerate(results)))
         state.rendered_contexts = contexts
         state.user_content = supplements(render_placeholders(state.context_template, {'query': query, 'contexts': contexts, 'language': state.language}, now))
         if persist_sink and state.user_message_id and state.user_content and (state.user_content != state.query):
@@ -150,5 +150,13 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None)
             raise SourceEvidenceBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
         limit = min(limit or bridge_limit, bridge_limit)
     result = FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in context_results(state))), state.system_prompt_override, tuple(state.images), limit)
+    if record_bridge and getattr(state, 'rescue_evidence', ()):
+        state.bridge_trace.append({'stage':'bridge_context', 'decision':'CONTEXT_ADMITTED',
+            'source_ids':[r.id for r in state.rescue_evidence], 'result_ids':list(result.result_ids)})
+        supported = all(r.metadata['bridge_rescue'].get('final_answer_supported') is True
+                        for r in state.rescue_evidence)
+        state.bridge_trace.append({'stage':'bridge_context',
+            'decision':'FINAL_ANSWER_SUPPORTED' if supported else 'FINAL_ANSWER_UNVERIFIED',
+            'evidence_chain_supported':supported, 'generated_answer_verified':False})
     state._finalized_context = result
     return result

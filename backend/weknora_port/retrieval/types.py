@@ -52,6 +52,19 @@ def context_results(state):
     return rows
 
 
+def bridge_context_attributes(row):
+    """Program evidence qualifications shared by both Context encoders."""
+    details = (row.metadata or {}).get('bridge_rescue')
+    if not isinstance(details, dict) or not details:
+        return ''
+    exact = details.get('entity_bridge_verified') is True
+    supported = details.get('final_answer_supported') is True
+    return (' role="bridge_supplement" supports="' +
+            ('entity_location' if exact else 'institution_location_only') +
+            '" seminar_venue="' + ('supported' if exact and supported else 'unverified') +
+            '" final_answer_supported="' + ('true' if supported else 'false') + '"')
+
+
 @dataclass
 class SearchState:
     needs_retrieval: bool = True

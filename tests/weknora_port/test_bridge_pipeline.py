@@ -1,4 +1,4 @@
-"""Pipeline/source-registration contracts plus unmodified saved R replay."""
+"""Mock pipeline/source contracts and frozen-input S8.5 sentence-ID replay."""
 import asyncio
 from copy import deepcopy
 from dataclasses import replace
@@ -8,7 +8,8 @@ from types import SimpleNamespace
 
 import pytest
 from backend.weknora_port.models.types import CallContext, TrustedScope, RerankResponse, RerankResult
-from backend.weknora_port.retrieval.bridge_rescue import rescue_bridge
+from backend.weknora_port.retrieval.bridge_rescue import (rescue_bridge,
+    original_windows, sentence_table)
 from backend.weknora_port.retrieval.pipeline import PipelineState, RetrievalPipeline
 from backend.weknora_port.retrieval.search import SearchTarget
 from backend.weknora_port.retrieval.rerank import rerank, enriched_passage, model_passage
@@ -76,8 +77,9 @@ def test_full_mock_chain_delivers_only_original_second_hop_to_generation():
         assert evidence[1].start_at==repo.rows["second"].start_at
         prepared=prepare_generation(GenerationRequest("run","session","message",QUESTION,finalized,evidence=evidence))
         wire=prepared.full_prompt
+        prompt_text='\n'.join(message['content'] for message in json.loads(wire))
         assert repo.rows["second"].content in wire
-        assert 'institution_location_only' in wire and 'seminar_venue' in wire
+        assert 'supports="entity_location"' in prompt_text and 'final_answer_supported="true"' in prompt_text
         assert '"subject_resolution"' not in wire
         assert 'Where is Arbor Poetry Seminar located?' not in wire
         assert state.rescue_evidence[0].score==repo.rows["second"].score
@@ -129,50 +131,75 @@ def test_generation_context_budget_rechecks_final_source_encoder_before_routing(
         prepare_generation(prepared.request)
     asyncio.run(scenario())
 
+async def build_frozen_bridge_trace(saved):
+    """Replay real frozen first ranks with simulated sentence choice/BGE only.
+
+    This does not reuse or alter the historical actual Cheap output, and cannot
+    establish actual S8.5 model effectiveness. Returned state retains every
+    program proof and source needed by the new offline evidence report.
+    """
+    rows=[SearchResult(**r) if r else None for r in saved["search_results"]]
+    state=PipelineState(query=saved["query"],rewrite_query=saved["rewrite_query"],
+        targets=tuple(SearchTarget(k) for k in saved["knowledge_base_ids"]),
+        enable_rewrite=False,enable_expansion=False,rerank_model_id="bge",
+        bridge_rescue_mode="cheap_bridge_v1",bridge_cheap_model_id="cheap",
+        search_results=deepcopy(rows))
+    ctx=CallContext(saved["case_id"],TrustedScope("owner",tuple(saved["knowledge_base_ids"])))
+    raw=saved["evidence_trace"][0]["response"]
+    class Initial:
+        async def rerank(self,*args):
+            return RerankResponse(tuple(RerankResult(x["index"],x["score"]) for x in raw))
+    class RankRegistry:
+        async def rerank(self,*args): return Initial()
+    await rerank(state,ctx,RankRegistry(),lambda text:text.split())
+    proof=next(x for x in PROOF["cases"] if x["case_id"]==saved["case_id"])
+    assert len(rows)==30
+    assert {r.id for r in state.rerank_results}==set(proof["accepted_before_mmr"])
+    second=next(r for r in rows if r and r.id=="31417c7c-7abf-4723-956a-74bf7ee14683")
+    assert second.id not in {r.id for r in state.rerank_results}
+    assert next(x["score"] for x in raw if rows[x["index"]].id==second.id)<.3
+    # Retain the saved normal source projection and its actual A/B difference.
+    state.merge_results=[SearchResult(**r) for r in saved["merge_results"]]
+    first=next(r for r in rows if r and r.id=="ec07a1fd-8a8e-4f23-a7d6-65d385d2343b")
+    repository=Repository([SearchResult(**r) for r in saved["source_rows"]])
+    windows,sources,_=await original_windows([first],state,ctx,repository)
+    selected=next(item for item in sentence_table(windows,sources).values()
+                  if item.source_chunk_id==first.id and item.text.startswith("She served as the Director"))
+    data=dict(status="FIRST_HOP_CANDIDATE",sentence_id=selected.sentence_id,
+        subject="She",subject_resolution="UNVERIFIED",predicate="served as the Director of",
+        object="The Frost Place Advanced Seminar",time="2007–2010",target_attribute="location",
+        bridge_search_phrases=["The Frost Place Advanced Seminar","The Frost Place"])
+    models=Models(json.dumps(data,ensure_ascii=False))
+    before=deepcopy((state.search_results,state.rerank_results,state.merge_results))
+    await rescue_bridge(state,ctx,repository,models)
+    assert before==(state.search_results,state.rerank_results,state.merge_results)
+    return state,ctx,models,repository,first,second
+
+
 @pytest.mark.parametrize("saved",[c for c in INPUTS["cases"] if c["case_id"].startswith("frost-")],ids=lambda c:c["case_id"])
-def test_saved_frost_first_rerank_loss_and_unverified_pronoun_are_not_forced_to_pass(saved):
+def test_saved_frost_simulated_sentence_id_bridge_preserves_unsupported_event_venue(saved):
     async def scenario():
-        rows=[SearchResult(**r) if r else None for r in saved["search_results"]]
-        state=PipelineState(query=saved["query"],rewrite_query=saved["rewrite_query"],
-            targets=tuple(SearchTarget(k) for k in saved["knowledge_base_ids"]),
-            enable_rewrite=False,enable_expansion=False,rerank_model_id="bge",
-            bridge_rescue_mode="cheap_bridge_v1",bridge_cheap_model_id="cheap",
-            search_results=deepcopy(rows))
-        ctx=CallContext(saved["case_id"],TrustedScope("owner",tuple(saved["knowledge_base_ids"])))
-        raw=saved["evidence_trace"][0]["response"]
-        class Initial:
-            async def rerank(self,*args):
-                return RerankResponse(tuple(RerankResult(x["index"],x["score"]) for x in raw))
-        class RankRegistry:
-            async def rerank(self,*args): return Initial()
-        await rerank(state,ctx,RankRegistry(),lambda text:text.split())
-        proof=next(x for x in PROOF["cases"] if x["case_id"]==saved["case_id"])
-        assert len(rows)==30
-        assert {r.id for r in state.rerank_results}==set(proof["accepted_before_mmr"])
-        second=next(r for r in rows if r and r.id=="31417c7c-7abf-4723-956a-74bf7ee14683")
-        assert second.id not in {r.id for r in state.rerank_results}
-        score=next(x["score"] for x in raw if rows[x["index"]].id==second.id)
-        assert score<.3
-        # Replay the already verified S8.3 normal source projection; do not
-        # replace it with an idealized source or insert the missing hop.
-        state.merge_results=[SearchResult(**r) for r in saved["merge_results"]]
-        first=next(r for r in rows if r and r.id=="ec07a1fd-8a8e-4f23-a7d6-65d385d2343b")
-        quote=first.content[155:311]
-        assert quote.startswith("She served as the Director") and quote.endswith("Writing.")
-        data=dict(status="FIRST_HOP_CANDIDATE",source_chunk_id=first.id,quote_start=155,quote_end=311,
-            quote=quote,subject="She",subject_resolution="UNVERIFIED",predicate="served as the Director of",
-            object="The Frost Place Advanced Seminar",time="2007–2010",target_attribute="location",
-            bridge_search_phrases=["The Frost Place Advanced Seminar","The Frost Place"])
-        models=Models(json.dumps(data,ensure_ascii=False))
-        repository=Repository([SearchResult(**r) for r in saved["source_rows"]])
-        before=deepcopy((state.search_results,state.rerank_results,state.merge_results))
-        await rescue_bridge(state,ctx,repository,models)
-        assert before==(state.search_results,state.rerank_results,state.merge_results)
-        assert len(models.chat_calls)==1 and not models.rerank_calls and not state.rescue_evidence
-        assert any(x.get("decision")=="FIRST_HOP_SPAN_VERIFIED" for x in state.bridge_trace)
-        assert state.bridge_trace[-1]["reason"]=="SUBJECT_IDENTITY_UNVERIFIED"
+        state,ctx,models,repository,first,second=await build_frozen_bridge_trace(saved)
+        assert len(models.chat_calls)==len(models.rerank_calls)==1
+        assert len(state.rescue_evidence)==1 and state.rescue_evidence[0].id==second.id
+        decisions={x.get("decision") for x in state.bridge_trace}
+        assert {'FIRST_HOP_VERIFIED','BRIDGE_QUERY_VERIFIED',
+                'SECOND_HOP_LOCATION_FOUND','ENTITY_BRIDGE_UNVERIFIED'} <= decisions
+        details=state.rescue_evidence[0].metadata['bridge_rescue']
+        assert details['q1']=='Where is The Frost Place Advanced Seminar located?'
+        assert details['contract_version']=='sentence-id/v2'
+        assert details['relation_status']=='INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED'
+        assert details['entity_bridge_verified'] is False
+        assert details['final_answer_supported'] is False
+        assert details['identity_proof']['verified'] is True
+        assert details['identity_proof']['resolved_name']=='Jeanne Marie Beaumont'
+        assert details['identity_proof']['final_context_identity_supported'] is (saved['arm']=='A')
+        assert first.content[details['quote_start']:details['quote_end']]==details['first_hop_quote']
         finalized=await into_chat_message(state,ctx)
-        assert second.id not in finalized.result_ids and second.content not in finalized.rendered_contexts
+        assert second.id in finalized.result_ids and second.content in finalized.rendered_contexts
+        assert 'supports="institution_location_only"' in finalized.rendered_contexts
+        assert 'seminar_venue="unverified"' in finalized.rendered_contexts
+        assert 'final_answer_supported="false"' in finalized.rendered_contexts
     asyncio.run(scenario())
 
 @pytest.mark.parametrize("saved",[c for c in INPUTS["cases"] if not c["case_id"].startswith("frost-")],ids=lambda c:c["case_id"])
