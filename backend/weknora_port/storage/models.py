@@ -85,7 +85,6 @@ class PostgresModelStore:
 
     async def persist(self, role: ConfiguredRole) -> str:
         model_id, identity_hash, physical_hash, parameters = self._identity(role)
-        stored = {key: self.cipher.encrypt(value) if key in SECRET_FIELDS else value for key, value in parameters.items()}
         async with self.leases.lease() as guard:
             async with guard.connection.transaction():
                 await guard.connection.execute('SELECT pg_advisory_xact_lock(hashtext(%s))', ('port-model:' + model_id,))
@@ -96,11 +95,25 @@ class PostgresModelStore:
                                         (model_id, self.principal.tenant_id, self.principal.subject_id))
                 if rows:
                     self._check(rows[0], role, identity_hash, physical_hash, parameters)
-                    # Preserve source parameters/identity; only known credential fields change.
-                    await guard.connection.execute('UPDATE models SET parameters=%s::jsonb,updated_at=now() WHERE id=%s AND tenant_id=%s AND subject_id=%s',
-                        (_json(stored), model_id, self.principal.tenant_id, self.principal.subject_id))
+                    previous = rows[0]['parameters']
+                    if isinstance(previous, str):
+                        previous = json.loads(previous)
+                    # Session/turn snapshots call persist too. Decrypted equality
+                    # must preserve the original ciphertext and updated_at; a
+                    # randomized encryption is not a credential change.
+                    previous_secrets = {name: self.cipher.decrypt(previous.get(name, ''), strict=True)
+                                        for name in SECRET_FIELDS}
+                    if any(previous_secrets[name] != parameters.get(name, '') for name in SECRET_FIELDS):
+                        stored = {key: (previous.get(key, '') if previous_secrets[key] == value
+                                       else self.cipher.encrypt(value)) if key in SECRET_FIELDS else value
+                                  for key, value in parameters.items()}
+                        # Only known credential changes may update a pinned row.
+                        await guard.connection.execute('UPDATE models SET parameters=%s::jsonb,updated_at=now() WHERE id=%s AND tenant_id=%s AND subject_id=%s',
+                            (_json(stored), model_id, self.principal.tenant_id, self.principal.subject_id))
                 else:
                     if not role.source:raise ModelConfigurationError('MODEL_SOURCE_REQUIRED')
+                    stored = {key: self.cipher.encrypt(value) if key in SECRET_FIELDS else value
+                              for key, value in parameters.items()}
                     inserted = await self._rows(guard, 'INSERT INTO models(id,tenant_id,subject_id,name,type,source,parameters,role,identity_sha256,physical_sha256) '
                         'VALUES(%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s) ON CONFLICT(id) DO NOTHING RETURNING id',
                         (model_id, self.principal.tenant_id, self.principal.subject_id, role.model, MODEL_TYPES[role.role], role.source,
