@@ -189,6 +189,36 @@ def _literal(value):
     return re.sub(r'\s+', '', value, flags=re.UNICODE).casefold()
 
 
+def _ambiguous_user_reference(query, history):
+    if not isinstance(query,str) or not _REFERENCE.search(query) or _HISTORY_TRANSFORM.fullmatch(go_strip(query)):
+        return False
+    # Authorized user questions establish antecedents. Assistant prose cannot
+    # select one item from a comparison, even when the rewrite copies q0.
+    for previous in reversed(history):
+        question = getattr(previous,'query','')
+        if not isinstance(question,str) or not go_strip(question):
+            continue
+        if not _REFERENCE.search(question):
+            return bool(_AMBIGUOUS_HISTORY.search(question))
+    return False
+
+
+def known_ambiguous_reference(state):
+    if state.images or (go_strip(state.attachment_prompt) and '<no_document_attached' not in state.attachment_prompt):
+        return False  # A new attachment can establish a different referent.
+    return _ambiguous_user_reference(state.query,state.history)
+
+
+def requires_ambiguity_clarification(state):
+    if known_ambiguous_reference(state):
+        return True
+    if _HISTORY_TRANSFORM.fullmatch(go_strip(state.query)) and state.history:
+        # Legacy completed answers may already have guessed an ambiguous item.
+        # A format request must not promote that unsupported answer into facts.
+        return _ambiguous_user_reference(getattr(state.history[-1],'query',''),state.history[:-1])
+    return False
+
+
 def validate_rewrite(state, candidate):
     """Conservative literal coreference contract, not a semantic classifier.
 
@@ -197,6 +227,8 @@ def validate_rewrite(state, candidate):
     q0. This intentionally trades rewrite coverage for preserving constraints.
     """
     q0 = state.query
+    if known_ambiguous_reference(state):
+        return 'AMBIGUOUS_REFERENCE'
     if not isinstance(candidate, str) or not go_strip(candidate):
         return 'REWRITE_EMPTY'
     if len(candidate) > max(2048, len(q0) + 256):
@@ -242,6 +274,8 @@ def validate_rewrite(state, candidate):
 
 
 def _record_rewrite(state, reason=''):
+    if known_ambiguous_reference(state):
+        reason = 'AMBIGUOUS_REFERENCE'
     state.rewrite_fallback_reason = reason
     if reason:
         state.rewrite_query = state.query
@@ -262,6 +296,8 @@ def resolve_intent(state):
     """
     intent = state.intent
     query = go_strip(state.query)
+    if known_ambiguous_reference(state):
+        return 'kb_search'  # Still run Search/Rerank before fixed clarification.
     has_document = bool(go_strip(state.attachment_prompt)) and '<no_document_attached' not in state.attachment_prompt
     guard_query = _SOURCE_SCOPED_REQUEST.sub(
         lambda match: '' if _SOURCE_NEGATION.search(query[:match.start()]) else match.group(), query)

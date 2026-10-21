@@ -95,7 +95,7 @@ def test_ambiguous_reference_never_selects_a_single_model_suggestion():
     q0 = 'What is it used for?'
     current = state(query=q0, history=[history('Compare the Rowan method and the Cedar method.')])
     assert validate_rewrite(current, 'What is the Rowan method used for?') == 'AMBIGUOUS_REFERENCE'
-    assert validate_rewrite(current, q0) == ''
+    assert validate_rewrite(current, q0) == 'AMBIGUOUS_REFERENCE'
 
 
 def test_independent_q0_keeps_terminal_punctuation_and_original_language():

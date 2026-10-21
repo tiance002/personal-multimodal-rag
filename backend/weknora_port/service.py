@@ -348,28 +348,49 @@ class RuntimeService:
         await progress('memory','completed')
         check_context(turn.context)
         pipeline=await _resolve(self.pipeline_factory(turn,progress))
+        from .retrieval.query import requires_ambiguity_clarification
         fallback=None
         try:
             finalized=await pipeline.run(state,model_context)
         except SearchNothing:
-            if config.fallback is None:raise
             from .retrieval.context import FinalizedContext,render_placeholders
             from .retrieval.query import go_strip
             check_context(model_context)
-            fallback=dict(config.fallback)
-            query=go_strip(state.rewrite_query) or state.query
-            prompt=fallback['prompt']
-            if fallback['strategy']=='model' and prompt!='':
-                listing=await _resolve(fallback['documents']())
-                check_context(model_context)
-                prompt=render_placeholders(prompt,{'query':query,'language':state.language,'kb_documents':listing})
-                if state.image_description and not state.chat_model_supports_vision:
-                    prompt+='\n\n[用户上传图片内容]\n'+state.image_description
-                if state.quoted_context:prompt+='\n\n'+state.quoted_context
-            if state.attachment_prompt:query+=state.attachment_prompt
-            finalized=FinalizedContext(query,'',(),prompt,state.images)
+            if requires_ambiguity_clarification(state):
+                finalized=FinalizedContext(state.query,'',())
+            else:
+                if config.fallback is None:raise
+                fallback=dict(config.fallback)
+                query=go_strip(state.rewrite_query) or state.query
+                prompt=fallback['prompt']
+                if fallback['strategy']=='model' and prompt!='':
+                    listing=await _resolve(fallback['documents']())
+                    check_context(model_context)
+                    prompt=render_placeholders(prompt,{'query':query,'language':state.language,'kb_documents':listing})
+                    if state.image_description and not state.chat_model_supports_vision:
+                        prompt+='\n\n[用户上传图片内容]\n'+state.image_description
+                    if state.quoted_context:prompt+='\n\n'+state.quoted_context
+                if state.attachment_prompt:query+=state.attachment_prompt
+                finalized=FinalizedContext(query,'',(),prompt,state.images)
             state.merge_results=[]
             state.rescue_evidence=[]
+        ambiguity_clarification=requires_ambiguity_clarification(state)
+        if ambiguity_clarification:
+            from .retrieval.context import FinalizedContext
+            # Retrieval remains real, but candidates cannot choose the user's
+            # intended entity. The existing fixed path performs no answer call.
+            finalized=FinalizedContext(state.query,'',())
+            state.merge_results=[]
+            state.rescue_evidence=[]
+            state.rendered_contexts=''
+            state.user_content=state.query
+            state._finalized_context=finalized
+            state.query_trace.append({'stage':'clarification','decision':'FIXED_CLARIFICATION',
+                                      'reason':'AMBIGUOUS_REFERENCE','facts_admitted':0})
+            history=()
+            fallback=None
+            if hasattr(pipeline,'_progress'):
+                await pipeline._progress('context','completed',selected_evidence_count=0)
         check_context(turn.context)
         from .retrieval.types import context_results
         evidence=tuple(Evidence.from_result(r) for r in context_results(state) if r is not None)
@@ -381,6 +402,10 @@ class RuntimeService:
         if fallback is not None:
             options.update(is_fallback=True,fallback_response=fallback['response'],options=fallback['options'],system_prompt=finalized.system_prompt_override)
             if fallback['strategy']!='model' or fallback['prompt']=='':options['fixed_fallback']=fallback['response']
+        if ambiguity_clarification:
+            text=('Which item do you mean? Please specify its name so I can search for the right document evidence.'
+                  if state.language.startswith('English') else '你指的是哪一个对象？请明确名称，我再检索对应的文档依据。')
+            options.update(is_fallback=True,fixed_fallback=text,fallback_response=text)
         options.setdefault('rendered_at',datetime.now())
         options.setdefault('language',state.language)
         options.setdefault('supports_vision',state.chat_model_supports_vision)
@@ -389,7 +414,7 @@ class RuntimeService:
         if forbidden:
             raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
         request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
-            evidence=evidence,history=history,memory_prompt='' if fallback is not None else memory.prompt,understanding=understanding,**options)
+            evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,**options)
         if getattr(state, 'rescue_evidence', ()):
             from .generation.context import prepare_generation
             from .retrieval.source_evidence import SourceEvidenceBudgetError
