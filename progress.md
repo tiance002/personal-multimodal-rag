@@ -597,3 +597,11 @@ Legal baseline08ebd90; independent branch codex/s8-6-adaptive-retrieval-20261021
 - Complete no-source fallback budget blocks every proposed single ledger:5/109805,7/132474,5/109798,9/136836. No Provider batch recommended; earlier underbounds retained/superseded.
 - Formal API real acceptance NOT_RUN; new image NOT_BUILT; independent second principal BLOCKED.
 - Delivery: docs/evaluation/S8_6_1_API_ACCEPTANCE.md and .results.json. Pending freshOwner zero-Provider isolated preparation request only; noPush/Tag/production deploy.
+
+
+## 2026-10-21 S8.6.1 approved zero-Provider isolation
+
+- Owner批准0Provider/0Token/0QA；source8ba0fca/profileead97已构建新镜像sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43.
+- Real authenticatedreadyz200/check0, PG/Redisidentity,520sourceassets/21pins/13loadedmodules verified. Both temporary candidates stopped; successfulcandidate SIGTERMexit143 explained by installedUvicorn source, rawwrapperFAIL preserved/read-onlyrecovered.
+- ProductionAPI/Worker IDs/images/restarts/configSHA, ledger13041/UNKNOWN3/fingerprint, counts87indexes/scopedsourceSHA unchanged. Newcalls/Tokens/UNKNOWN0.
+- Report docs/evaluation/S8_6_1_ZERO_PROVIDER_PREPARATION.md/.results.json. FormalrealQA NOT_RUN; budgetBLOCKED retained. Authorization consumed/closed; noPush/Tag/productiondeploy.

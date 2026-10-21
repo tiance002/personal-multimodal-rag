@@ -19,10 +19,11 @@
     "budget_computation": "EXECUTED_EXIT_0",
     "provider_budget_fit": "BLOCKED",
     "latest_formal_API_real_acceptance": "NOT_RUN",
-    "new_image": "NOT_BUILT",
+    "new_image": "BUILT_VERIFIED_ZERO_PROVIDER_ONLY",
     "real_SSE_PG_Redis_registry_SendGate_joint_acceptance": "NOT_RUN",
     "real_second_authorized_principal": "BLOCKED_NO_SECOND_LEGITIMATE_PRINCIPAL",
-    "production_readiness": "NOT_CLAIMED"
+    "production_readiness": "NOT_CLAIMED",
+    "ISOLATED_ZERO_PROVIDER_API_STARTUP_AND_READY": "PASS"
   },
   "changes": [
     {
@@ -1749,13 +1750,13 @@
     }
   ],
   "pending_authorization_application": {
-    "status": "NOT_AUTHORIZED_ZERO_PROVIDER_ISOLATION_ONLY",
+    "status": "OWNER_APPROVED_EXECUTED_ZERO_PROVIDER_ONLY_CLOSED",
     "reason": "Owner Goal section5 requires fresh authorization for new ECS writes/real acceptance; completed model budget is blocked.",
     "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
     "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
     "base_image_id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
-    "target_image_id": "NOT_BUILT",
-    "owner_approved": false,
+    "target_image_id": "sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43",
+    "owner_approved": true,
     "expires_at": null,
     "requested_operations": [
       "copy exact source archive into a fresh ECS diagnostic directory",
@@ -1880,5 +1881,19 @@
     "HyDE",
     "production deployment",
     "reindex"
-  ]
+  ],
+  "zero_provider_preparation": {
+    "status": "PASS",
+    "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+    "image_id": "sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43",
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "temporary_api_stopped": true,
+    "new_provider_attempts": 0,
+    "actual_tokens": 0,
+    "report": "docs/evaluation/S8_6_1_ZERO_PROVIDER_PREPARATION.md",
+    "results": "docs/evaluation/S8_6_1_ZERO_PROVIDER_PREPARATION.results.json",
+    "evidence_directory": "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33",
+    "formal_real_QA": "NOT_RUN",
+    "authorization_closed": true
+  }
 }

@@ -154,3 +154,15 @@ collector设计保留原始SSE、server run/client IDs、HTTP history、恢复�
 原四轮真实验收范围、四个模型、必要外发内容（冻结问题、经正常权限读取的四文档范围原文、验证Q1、实际最终Context）、次数和保守Token预算已完整列于第5–6节，但该部分申请状态 **BLOCKED_RESERVATION_BUDGET，不申请激活Provider额度**。当前Grant模板不会生成或签发；没有新Owner批准时不执行构建或临时API创建。此项授权需要来自Owner本Goal第5节，旧外发授权不适用。
 
 完成交付后停止；本地提交，无Push、Tag或生产部署。
+
+
+## 10. Owner批准后的零调用隔离准备实际结果
+
+第7节和第9节的NOT_BUILT/未批准描述是首次预检时快照，现由本补充更新：Owner已明确批准仅零调用隔离准备，范围已完成并关闭。
+
+- 精确源码 `8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f`，新镜像 `sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43`，profile不变。
+- 正常真实API鉴权readyz HTTP200/check exit0，13模块来源及520源码/资产、21依赖pin通过；临时API已停止。
+- 两次工具失败、停止143的实际Uvicorn信号源码解释、只读恢复及前后完整账本/范围/索引保护证据均见新报告。
+- Provider/Token/问答提交均0；正式四轮模型验收仍NOT_RUN，预算BLOCKED_RESERVATION_BUDGET保持。
+
+详见 `S8_6_1_ZERO_PROVIDER_PREPARATION.md` 及其 `.results.json`。没有Push、Tag或生产服务更新。

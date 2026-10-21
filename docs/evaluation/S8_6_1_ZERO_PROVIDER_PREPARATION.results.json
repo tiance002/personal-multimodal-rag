@@ -1,0 +1,1528 @@
+{
+  "schema": "s8.6.1-zero-provider-preparation/v1",
+  "created_at_utc": "2026-10-21T15:28:29.162459+00:00",
+  "status": "ZERO_PROVIDER_PREPARATION_PASS",
+  "authorization": {
+    "goal": "S8.6.1",
+    "kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+    "owner_approved": true,
+    "owner_response": "批准仅零调用隔离准备",
+    "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "base_image_id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "batch": "s861-zero-20261021t151200z-e20abf33",
+    "approved_max_provider_calls": 0,
+    "approved_max_tokens": 0,
+    "approved_max_QA_submissions": 0,
+    "temporary_api_must_stop": true,
+    "production_api_worker_must_not_change": true,
+    "created_at_utc": "2026-10-21T15:12:01.454092+00:00",
+    "remote_directory": "/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33",
+    "local_directory": "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33",
+    "archive_sha256": "3ee854c453a5a850a32a17ad148c4fce977fbfa0e792c3e4f77a97048d5ed234",
+    "archive_bytes": 11591680,
+    "manifest_sha256": "46c0114de9da3eb12a34b7861368de4504694430b38ee9ad0d10516d8841c02a",
+    "git_HEAD": "d282dbbf7e7b926681cb1db0c772e964e50a4a89",
+    "requirements_same_as_running_revision": true
+  },
+  "authorization_consumed_and_closed": true,
+  "scope": "exact approved image/profile build and cloud=false temporary API readiness; zero Provider and zero QA",
+  "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+  "base_image_id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+  "new_image_id": "sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43",
+  "new_image_tag": "rag-s861-api:s861-zero-20261021t151200z-e20abf33",
+  "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+  "source_archive_sha256": "3ee854c453a5a850a32a17ad148c4fce977fbfa0e792c3e4f77a97048d5ed234",
+  "source_archive_bytes": 11591680,
+  "manifest_sha256": "46c0114de9da3eb12a34b7861368de4504694430b38ee9ad0d10516d8841c02a",
+  "remote_directory": "/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33",
+  "local_evidence_directory": "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33",
+  "image_build": {
+    "archive_sha256": "3ee854c453a5a850a32a17ad148c4fce977fbfa0e792c3e4f77a97048d5ed234",
+    "base_image_id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "build_exit_code": 0,
+    "build_stderr_sha256": "ec34a09e033b515c85951f12dbaa17dc3090601dd78ed912c6b4548ce882034a",
+    "build_stdout_sha256": "67b9695118e937ca0211bc8a7fce8f6fab6087cdf6f69e21089b0fc53cf79611",
+    "image_id": "sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43",
+    "image_tag": "rag-s861-api:s861-zero-20261021t151200z-e20abf33",
+    "labels": {
+      "org.opencontainers.image.revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+      "s861.base.image.id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+      "s861.profile.sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+      "s861.provider.calls.limit": "0",
+      "s861.source.manifest.sha256": "46c0114de9da3eb12a34b7861368de4504694430b38ee9ad0d10516d8841c02a"
+    },
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "provider_calls": 0,
+    "source_files_verified": 520,
+    "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+    "status": "ISOLATED_IMAGE_BUILT"
+  },
+  "ready": {
+    "attempts": 2,
+    "http_status": 200,
+    "ready": {
+      "cloud_allowed": false,
+      "database": "weknora_s8",
+      "graph_enabled": false,
+      "implementation": "weknora-python-port",
+      "model_requests_at_startup": 0,
+      "models": {
+        "cheap": {
+          "model": "Qwen/Qwen3.5-4B",
+          "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+          "provider": "siliconflow"
+        },
+        "embedding": {
+          "model": "BAAI/bge-m3",
+          "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+          "provider": "siliconflow"
+        },
+        "expensive": {
+          "model": "deepseek-flash",
+          "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+          "provider": "deepseek"
+        },
+        "rerank": {
+          "model": "BAAI/bge-reranker-v2-m3",
+          "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+          "provider": "siliconflow"
+        }
+      },
+      "postgres_system_id": "7698420805889187877",
+      "redis_prefix": "weknora-python-s8:s861:s861-zero-20261021t151200z-e20abf33:",
+      "redis_run_id": "268d42dec48542084b1478eea849ecfb7d3f9b83",
+      "rerank_top1_floorless": false,
+      "status": "ready",
+      "storage_root": "/var/lib/eviroute/storage",
+      "subject_sha256": "00f2fd3dad2b741924376adab7fd29c12a93bc7a1fe4e8e1f0f97cacd418fa83",
+      "tenant_id": 332,
+      "worker_in_api": false
+    },
+    "status": "AUTHENTICATED_READY",
+    "wrong_or_missing_bearer_status": 401
+  },
+  "loaded_source": {
+    "conversation_template_groups": [
+      "context_template",
+      "fallback",
+      "generate_summary",
+      "intent_prompts",
+      "rewrite",
+      "system_prompt"
+    ],
+    "modules": {
+      "backend.weknora_port.conversation.history": {
+        "path": "/opt/s861/app/backend/weknora_port/conversation/history.py",
+        "sha256": "69e58603416f92de6ab260fba61076e3b34fc8205ca658ab02d8e14bc1c5064b"
+      },
+      "backend.weknora_port.entrypoint": {
+        "path": "/opt/s861/app/backend/weknora_port/entrypoint.py",
+        "sha256": "1b0a2eb7ab7281d7e0fa260caaab2c26b3daa0e3f4899aa2030d77ee7baa99af"
+      },
+      "backend.weknora_port.generation.coordinator": {
+        "path": "/opt/s861/app/backend/weknora_port/generation/coordinator.py",
+        "sha256": "147de2abf48137d3c7c428410e3b264dc282e7327140f11ea5976041254063d2"
+      },
+      "backend.weknora_port.http_api": {
+        "path": "/opt/s861/app/backend/weknora_port/http_api.py",
+        "sha256": "d1316cf5fd90b621ebb99a6dd97c0c1e1ae61be1ddccb59fb25ee68da4bba41a"
+      },
+      "backend.weknora_port.models.provider": {
+        "path": "/opt/s861/app/backend/weknora_port/models/provider.py",
+        "sha256": "0ecc90c0e94443ed3a24ccaf35ffc873927cbe161ef1e4d12cc683e249618204"
+      },
+      "backend.weknora_port.retrieval.bridge_rescue": {
+        "path": "/opt/s861/app/backend/weknora_port/retrieval/bridge_rescue.py",
+        "sha256": "f68cacab1fd4205f87c3d8c4d3bb4f2423855e7ebc2a68c31a7660946416aae9"
+      },
+      "backend.weknora_port.retrieval.context": {
+        "path": "/opt/s861/app/backend/weknora_port/retrieval/context.py",
+        "sha256": "649d5c08dfb0a8c68d0d69f85a54f3869ffc2865144269a0d76d12467b7bb915"
+      },
+      "backend.weknora_port.retrieval.pipeline": {
+        "path": "/opt/s861/app/backend/weknora_port/retrieval/pipeline.py",
+        "sha256": "e86f9ff6be73e7264859e18565c906984ff116ae9b5139bb2d542de75cc2e8e3"
+      },
+      "backend.weknora_port.retrieval.query": {
+        "path": "/opt/s861/app/backend/weknora_port/retrieval/query.py",
+        "sha256": "9916573ee8c381d0b5b7a116d2e51670f91cf382b8feaa2cbe487e1096432185"
+      },
+      "backend.weknora_port.retrieval.strategy": {
+        "path": "/opt/s861/app/backend/weknora_port/retrieval/strategy.py",
+        "sha256": "cd4c71e812e4c2048c68c50b09daacd610ffa9744ac969110f24d91e46ede66d"
+      },
+      "backend.weknora_port.runtime": {
+        "path": "/opt/s861/app/backend/weknora_port/runtime.py",
+        "sha256": "3986df844be04c94e97710c20704f18be97775115cc5a2fd6ef0991db256c98c"
+      },
+      "scripts.s8_6_1_api_acceptance": {
+        "path": "/opt/s861/app/scripts/s8_6_1_api_acceptance.py",
+        "sha256": "b142d154f46ff252b2253fa104171254eb39aa40d008f16a5f057cb2d2d6e290"
+      },
+      "scripts.s8_ecs_runtime": {
+        "path": "/opt/s861/app/scripts/s8_ecs_runtime.py",
+        "sha256": "8acd01cac9393ee41927de5fb96b11d8f7e73a91c3a8a99aa33fa2af9e7156e3"
+      }
+    },
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "provider_calls": 0,
+    "requirement_packages": {
+      "Pillow": "12.3.0",
+      "PyMuPDF": "1.26.4",
+      "PyYAML": "6.0.3",
+      "beautifulsoup4": "4.14.3",
+      "cryptography": "46.0.3",
+      "fastapi": "0.141.1",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "idna": "3.20",
+      "lxml": "6.1.3",
+      "numpy": "2.3.4",
+      "pgvector": "0.4.1",
+      "psycopg": "3.2.10",
+      "pydantic": "2.13.5",
+      "pypdfium2": "5.8.0",
+      "python-multipart": "0.0.20",
+      "redis": "5.2.1",
+      "soupsieve": "2.10",
+      "tiktoken": "0.14.0",
+      "tokenizers": "0.23.2",
+      "uvicorn": "0.35.0"
+    },
+    "segmenter_type": "CppJiebaSegmenter",
+    "source_files_verified": 520,
+    "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+    "status": "IMAGE_SOURCE_IMPORTS_ASSETS_VERIFIED",
+    "sys_path": [
+      "/opt/s861",
+      "/opt/s861/app",
+      "/usr/local/lib/python311.zip",
+      "/usr/local/lib/python3.11",
+      "/usr/local/lib/python3.11/lib-dynload",
+      "/usr/local/lib/python3.11/site-packages"
+    ]
+  },
+  "candidate_container_id": "beac60b73c6499f5939ffb71784eb7020fc9b9efb2f523a7be95555477148899",
+  "candidate_ports": {
+    "8000/tcp": [
+      {
+        "HostIp": "127.0.0.1",
+        "HostPort": "18861"
+      }
+    ]
+  },
+  "candidate_processes": "PID                 COMMAND\n2209185             /sbin/docker-init -- python -B -m scripts.s8_6_1_api_acceptance api --port 8000\n2209241             python -B -m scripts.s8_6_1_api_acceptance api --port 8000\n",
+  "candidate_mounts": [
+    {
+      "destination": "/var/lib/eviroute/storage",
+      "rw": false,
+      "source": "/opt/rag-s8/storage"
+    },
+    {
+      "destination": "/run/secrets/model_key",
+      "rw": false,
+      "source": "/opt/rag-s8/secrets/model_key"
+    },
+    {
+      "destination": "/opt/assets",
+      "rw": false,
+      "source": "/opt/rag-s8/config/assets"
+    },
+    {
+      "destination": "/data/logs",
+      "rw": true,
+      "source": "/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/logs-v2"
+    },
+    {
+      "destination": "/run/secrets/database_password",
+      "rw": false,
+      "source": "/opt/rag-s8/secrets/database_password"
+    },
+    {
+      "destination": "/run/secrets/api_token",
+      "rw": false,
+      "source": "/opt/rag-s8/secrets/api_token"
+    },
+    {
+      "destination": "/run/secrets/principal.json",
+      "rw": false,
+      "source": "/opt/rag-s8/secrets/principal.json"
+    }
+  ],
+  "candidate_readonly_rootfs": true,
+  "candidate_redis_prefix": "weknora-python-s8:s861:s861-zero-20261021t151200z-e20abf33:",
+  "candidate_redis_prefix_keys_after": 0,
+  "provider_cloud_allowed": false,
+  "graph_enabled": false,
+  "router_policy": "DYNAMIC",
+  "worker_started": false,
+  "execution_file": null,
+  "provider_grant_instantiated": false,
+  "candidate_shutdown": {
+    "OOMKilled": false,
+    "capture_signals_source": "    def capture_signals(self) -> Generator[None, None, None]:\n        # Signals can only be listened to from the main thread.\n        if threading.current_thread() is not threading.main_thread():\n            yield\n            return\n        # always use signal.signal, even if loop.add_signal_handler is available\n        # this allows to restore previous signal handlers later on\n        original_handlers = {sig: signal.signal(sig, self.handle_exit) for sig in HANDLED_SIGNALS}\n        try:\n            yield\n        finally:\n            for sig, handler in original_handlers.items():\n                signal.signal(sig, handler)\n        # If we did gracefully shut down due to a signal, try to\n        # trigger the expected behaviour now; multiple signals would be\n        # done LIFO, see https://stackoverflow.com/questions/48434964\n        for captured_signal in reversed(self._captured_signals):\n            signal.raise_signal(captured_signal)\n",
+    "exit_code": 143,
+    "expected_http_work_completed_before_stop": true,
+    "installed_server_sha256": "dc0285339d166d99309ea8d917149df302c154891cc598e6bcff203d97fde7fb",
+    "interpretation": "SIGTERM128+15 after readiness; installed uvicorn0.35 capture_signals re-raises captured signals after serving",
+    "no_API_relaunch": true,
+    "restarts": 0,
+    "running": false
+  },
+  "candidate_stopped": true,
+  "startup_reports": [
+    {
+      "name": "api-startup-1792596106769739150.json",
+      "sha256": "3bb2a6eeae37478c026bb4a234334652b530ae65b368ac8ecce9abd245ec6b08",
+      "value": {
+        "cloud_allowed": false,
+        "database": "weknora_s8",
+        "graph_enabled": false,
+        "model_requests_at_startup": 0,
+        "models": {
+          "cheap": {
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "provider": "siliconflow"
+          },
+          "embedding": {
+            "model": "BAAI/bge-m3",
+            "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+            "provider": "siliconflow"
+          },
+          "expensive": {
+            "model": "deepseek-flash",
+            "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+            "provider": "deepseek"
+          },
+          "rerank": {
+            "model": "BAAI/bge-reranker-v2-m3",
+            "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+            "provider": "siliconflow"
+          }
+        },
+        "postgres_system_id": "7698420805889187877",
+        "redis_prefix": "weknora-python-s8:s861:s861-zero-20261021t151200z-e20abf33:",
+        "redis_run_id": "268d42dec48542084b1478eea849ecfb7d3f9b83",
+        "rerank_top1_floorless": false,
+        "storage_root": "/var/lib/eviroute/storage",
+        "subject_sha256": "00f2fd3dad2b741924376adab7fd29c12a93bc7a1fe4e8e1f0f97cacd418fa83",
+        "tenant_id": 332,
+        "worker_in_api": false
+      }
+    }
+  ],
+  "protection": {
+    "status": "ZERO_PROVIDER_PREPARATION_PASS",
+    "batch": "s861-zero-20261021t151200z-e20abf33",
+    "owner_approval_scope": "ZERO_PROVIDER_ISOLATION_ONLY",
+    "source_revision": "8ba0fcaf0ab665b28a04c006267e05ab10fd7e8f",
+    "profile_sha256": "ead97b230a9bf5a5a7b42976a9d9f2a2cac961fef5a9f49fb052d17fb871fbc8",
+    "base_image_id": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "new_image_id": "sha256:c9b5c4b9c1d4f87d94e3109a22def827ea157c44e6800ac277a590a6544f0d43",
+    "production_and_data_equal_fields": [
+      "api_image",
+      "containers",
+      "config_file_hashes",
+      "identity",
+      "tenant_id",
+      "subject_sha256",
+      "registry_revision",
+      "models",
+      "knowledge_base_bindings",
+      "documents",
+      "current_searchable_chunk_stats",
+      "memory",
+      "provider_ledger",
+      "module_hashes",
+      "safe_environment"
+    ],
+    "global_table_counts": {
+      "chunks": 28657,
+      "knowledge_bases": 7,
+      "knowledges": 11736,
+      "memory_doc_affinity": 0,
+      "memory_extract_jobs": 0,
+      "memory_extraction_sessions": 0,
+      "memory_item_embeddings": 0,
+      "memory_items": 0,
+      "memory_operations": 0,
+      "memory_subjects": 0,
+      "memory_tombstones": 0,
+      "memory_topic_stats": 0,
+      "messages": 524,
+      "port_call_slots": 0,
+      "port_graph_edges": 28,
+      "port_graph_evidence": 19,
+      "port_graph_nodes": 120,
+      "port_image_tasks": 0,
+      "port_local_principal": 1,
+      "port_model_configuration": 1,
+      "port_provider_calls": 13041,
+      "port_schema_migrations": 14,
+      "port_token_budget_months": 0,
+      "port_token_calls": 0,
+      "port_turns": 260,
+      "sessions": 248
+    },
+    "index_definition_count": 87,
+    "index_definitions_sha256": "5967e0ec24813531534722466a660eb662b3cf49fc890dadbfbe350d640dc481",
+    "provider_ledger_before": {
+      "calls": 13041,
+      "fingerprint": "8afa8c2067de684920b3ff73361dcfde",
+      "unfinished": 0,
+      "unknown": 3
+    },
+    "provider_ledger_after": {
+      "calls": 13041,
+      "fingerprint": "8afa8c2067de684920b3ff73361dcfde",
+      "unfinished": 0,
+      "unknown": 3
+    },
+    "provider_attempt_delta": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "actual_total_tokens": 0,
+    "new_unknown": 0,
+    "new_held_tokens": 0,
+    "qa_submissions": 0,
+    "startup_attempts": 2,
+    "first_attempt": "tool IndentationError, stopped; failure retained",
+    "second_attempt": "ready/check/import succeeded; wrapper falsely required exit0; read-only recovery, no relaunch",
+    "candidate_stopped": true,
+    "candidate_shutdown_exit": 143,
+    "SIGTERM_source_explanation": {
+      "OOMKilled": false,
+      "capture_signals_source": "    def capture_signals(self) -> Generator[None, None, None]:\n        # Signals can only be listened to from the main thread.\n        if threading.current_thread() is not threading.main_thread():\n            yield\n            return\n        # always use signal.signal, even if loop.add_signal_handler is available\n        # this allows to restore previous signal handlers later on\n        original_handlers = {sig: signal.signal(sig, self.handle_exit) for sig in HANDLED_SIGNALS}\n        try:\n            yield\n        finally:\n            for sig, handler in original_handlers.items():\n                signal.signal(sig, handler)\n        # If we did gracefully shut down due to a signal, try to\n        # trigger the expected behaviour now; multiple signals would be\n        # done LIFO, see https://stackoverflow.com/questions/48434964\n        for captured_signal in reversed(self._captured_signals):\n            signal.raise_signal(captured_signal)\n",
+      "exit_code": 143,
+      "expected_http_work_completed_before_stop": true,
+      "installed_server_sha256": "dc0285339d166d99309ea8d917149df302c154891cc598e6bcff203d97fde7fb",
+      "interpretation": "SIGTERM128+15 after readiness; installed uvicorn0.35 capture_signals re-raises captured signals after serving",
+      "no_API_relaunch": true,
+      "restarts": 0,
+      "running": false
+    },
+    "real_API_QA": "NOT_RUN",
+    "model_budget": "BLOCKED_RESERVATION_BUDGET",
+    "raw_manifest": [
+      {
+        "path": "after-inventory.json",
+        "bytes": 40762,
+        "sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f"
+      },
+      {
+        "path": "after-recovered.command.json",
+        "bytes": 689,
+        "sha256": "1e1215bc40da8c8b8591dd8043d61c51c0831ccd2ee9ebc4a7828b05fcc51d46"
+      },
+      {
+        "path": "after-recovered.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "after-recovered.json",
+        "bytes": 4812,
+        "sha256": "7bbb1944282f3cc571adcf9a259efde9ddfc8817d10511fec77165cd218d245a"
+      },
+      {
+        "path": "after-recovered.remote.py",
+        "bytes": 101598,
+        "sha256": "0ee66444b80825af1f961ef08ec8092f390b602535b0119d6dfc2d3fe4aebbd7"
+      },
+      {
+        "path": "after-recovered.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "after-recovered.stdout",
+        "bytes": 4126,
+        "sha256": "d1047f074f7d19cb89ea60ecc89e1d02f10d9311e86cee417cafeaecfaaf2beb"
+      },
+      {
+        "path": "authorization.json",
+        "bytes": 1203,
+        "sha256": "bf22bbb2cd052d4636e43dcdffc3bc865282efddbb83bd3df2370ec43d367def"
+      },
+      {
+        "path": "before-inventory.json",
+        "bytes": 40762,
+        "sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f"
+      },
+      {
+        "path": "before.command.json",
+        "bytes": 679,
+        "sha256": "86896f1e1dbc9d887342c41cb1970da163447b50c0d40df78ebc948000bba83a"
+      },
+      {
+        "path": "before.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "before.json",
+        "bytes": 3971,
+        "sha256": "65998826b044d8d51767409332bd8af91a1aa895efb840e6bd82fd3fa17c3df7"
+      },
+      {
+        "path": "before.remote.py",
+        "bytes": 102135,
+        "sha256": "661debbe34b60f0da8a8414eb6682b34854c7323de14bb10a3eec61f62f95e2e"
+      },
+      {
+        "path": "before.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "before.stdout",
+        "bytes": 3344,
+        "sha256": "0cd321544c159c1d9b81e843b6a2b75aced8c04eb42e890eec8bc185ff051abb"
+      },
+      {
+        "path": "build.command.json",
+        "bytes": 679,
+        "sha256": "64c41985e34f9bc21a7d6e0c41214257d68e5e4c91801827e89c06e22d92e7c5"
+      },
+      {
+        "path": "build.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "build.json",
+        "bytes": 1254,
+        "sha256": "348e426d1a66c5cb9f269afbb36c7c9b26cdb6d16c6468d9bf99fc0ba1a35a52"
+      },
+      {
+        "path": "build.remote.py",
+        "bytes": 103927,
+        "sha256": "d50da4ad10b4cdb8f7a875ef288e866bf22203e0d8058ad7b3bc42473e15ea98"
+      },
+      {
+        "path": "build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "build.stdout",
+        "bytes": 1183,
+        "sha256": "e9e43b4f257e9272be89402276fc305beaf72dbd3e39839245385f4a5dacddb7"
+      },
+      {
+        "path": "diagnose-v2.command.json",
+        "bytes": 685,
+        "sha256": "ff0d623a81b7f290e571eba456236b7f7987c79493440531353b653c0c096581"
+      },
+      {
+        "path": "diagnose-v2.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "diagnose-v2.json",
+        "bytes": 12253,
+        "sha256": "cc0a97bbbdcf661820ffcb4770c2793d00ef84227daf80ad004f9091eee412f2"
+      },
+      {
+        "path": "diagnose-v2.remote.py",
+        "bytes": 101118,
+        "sha256": "517fb1c9384638089498cf40088079c93122a052cdc848b909ecbe0fecc0373e"
+      },
+      {
+        "path": "diagnose-v2.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "diagnose-v2.stdout",
+        "bytes": 9617,
+        "sha256": "e9acf26ca8703fef80ec7d6135f5569de6162fc9414eb1927c0bb8c39b7de042"
+      },
+      {
+        "path": "diagnose.command.json",
+        "bytes": 682,
+        "sha256": "63361e16ef263228132bc923963e8464c3b301e6dd0bbc5f3f068d9f8a2039a3"
+      },
+      {
+        "path": "diagnose.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "diagnose.json",
+        "bytes": 1173,
+        "sha256": "d6ca106ef616d878e79bc30c9be901559508fb9a1749db5dd496616ae24755db"
+      },
+      {
+        "path": "diagnose.remote.py",
+        "bytes": 101040,
+        "sha256": "178b01160b2a4c2da19833896224e9cee6bb1f0282dea3ae11c3676523ade6e3"
+      },
+      {
+        "path": "diagnose.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "diagnose.stdout",
+        "bytes": 1003,
+        "sha256": "131af27b5335d0720320b5030094277236278c8fc28896db4f7f0be940796af7"
+      },
+      {
+        "path": "recover.command.json",
+        "bytes": 681,
+        "sha256": "36d9e8acf65048eae0a2cb7daac126f771f735f47d04eeb258f61405dd8e0318"
+      },
+      {
+        "path": "recover.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "recover.json",
+        "bytes": 14723,
+        "sha256": "78b94dccc291eb5c5f4e76db6ba89d64b94fa85304e9202b961b6ac0178ef0f5"
+      },
+      {
+        "path": "recover.remote.py",
+        "bytes": 102227,
+        "sha256": "d739ed18f2bba47f0cf6334f4312c9db450b23e022a526496687bbd2cb0c5609"
+      },
+      {
+        "path": "recover.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "recover.stdout",
+        "bytes": 11592,
+        "sha256": "a6043d5a3a1a44401e12a3d0d78ea329c785522aa6678045047a8c8ccdf4db25"
+      },
+      {
+        "path": "remote-artifacts\\.dockerignore",
+        "bytes": 67,
+        "sha256": "0c727c33579bf491deb9e0f099df4c510d66e1f4f87131d8b1bc7a9b37e143c2"
+      },
+      {
+        "path": "remote-artifacts\\after-v2.json",
+        "bytes": 4697,
+        "sha256": "b744b806a3bae0b9ca8184acfd672b65a933b5a20389e274155b6ce5f1a1b18a"
+      },
+      {
+        "path": "remote-artifacts\\build.stderr",
+        "bytes": 209,
+        "sha256": "ec34a09e033b515c85951f12dbaa17dc3090601dd78ed912c6b4548ce882034a"
+      },
+      {
+        "path": "remote-artifacts\\build.stdout",
+        "bytes": 5557,
+        "sha256": "67b9695118e937ca0211bc8a7fce8f6fab6087cdf6f69e21089b0fc53cf79611"
+      },
+      {
+        "path": "remote-artifacts\\candidate-v2.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "remote-artifacts\\candidate.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "remote-artifacts\\Dockerfile",
+        "bytes": 399,
+        "sha256": "3c4046af8dcffc3ddc341ca89bf79850ba04cf408e5fa8d6c104b691d2f7fe93"
+      },
+      {
+        "path": "remote-artifacts\\loaded-source-v2.json",
+        "bytes": 3933,
+        "sha256": "b7255eb48f044844306560dd952236e273ed19bc681cdae3c33ffa443f4df976"
+      },
+      {
+        "path": "remote-artifacts\\ready-v2.json",
+        "bytes": 1512,
+        "sha256": "5ed49d001dd74de8d6fe8ff3072cacb3a060c98f99fbaa90a0276a8c303e651b"
+      },
+      {
+        "path": "remote-artifacts\\run-finally-v2.json",
+        "bytes": 10521,
+        "sha256": "3bc6680c365a0f86ec24f29eb25c440fd4eef34975775b577effe4152d73dac6"
+      },
+      {
+        "path": "remote-artifacts\\run-finally.json",
+        "bytes": 290,
+        "sha256": "7188cac42b74524359677ab43677f09764a58113e88d7197810b9120947d947d"
+      },
+      {
+        "path": "remote-artifacts\\run-v2-recovered.json",
+        "bytes": 13597,
+        "sha256": "22076e7205f6ea0c2da4476e98a54397ee8c71b894d2822f8aabe92da9ab7b58"
+      },
+      {
+        "path": "remote-artifacts\\uvicorn-server.py",
+        "bytes": 12998,
+        "sha256": "dc0285339d166d99309ea8d917149df302c154891cc598e6bcff203d97fde7fb"
+      },
+      {
+        "path": "run-v2.command.json",
+        "bytes": 679,
+        "sha256": "d937d0011e1a36e006dac64449b77f183b16e74047493b50b31cecd23814210c"
+      },
+      {
+        "path": "run-v2.exit",
+        "bytes": 1,
+        "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+      },
+      {
+        "path": "run-v2.json",
+        "bytes": 163,
+        "sha256": "c32de8a3c4378ca50e75cc14987183b0b6160b920434441e2962dfc4579acbb0"
+      },
+      {
+        "path": "run-v2.remote.py",
+        "bytes": 107817,
+        "sha256": "de487353529e1f688729d91587d4591a269493a34bcf6ce71bd12bba11b1ceac"
+      },
+      {
+        "path": "run-v2.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "run-v2.stdout",
+        "bytes": 146,
+        "sha256": "8ffa2c2a362bfc51c050dd375ecc27fdbfddd99ff20b001923cb9ccca82314b7"
+      },
+      {
+        "path": "run.command.json",
+        "bytes": 677,
+        "sha256": "410bc1ab70af9b39252dcee97dec32a8a79ec0f5059224545bf9551150622a88"
+      },
+      {
+        "path": "run.exit",
+        "bytes": 1,
+        "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+      },
+      {
+        "path": "run.json",
+        "bytes": 154,
+        "sha256": "259605cf8de03708f0ecc65a15972e139b03f4c1a3194fd0258be9ba781177e0"
+      },
+      {
+        "path": "run.remote.py",
+        "bytes": 107091,
+        "sha256": "ee69c89a4026e1226134b28cc6e6220b161565884bc4c668ab6faff7fa5308cc"
+      },
+      {
+        "path": "run.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "run.stdout",
+        "bytes": 137,
+        "sha256": "53c88845ce0769ba10b6bd76a0d69a133e78a3bbdadb10d491699d2454dfcbc8"
+      },
+      {
+        "path": "source-manifest.json",
+        "bytes": 90508,
+        "sha256": "46c0114de9da3eb12a34b7861368de4504694430b38ee9ad0d10516d8841c02a"
+      },
+      {
+        "path": "source.tar",
+        "bytes": 11591680,
+        "sha256": "3ee854c453a5a850a32a17ad148c4fce977fbfa0e792c3e4f77a97048d5ed234"
+      },
+      {
+        "path": "transfer.command.json",
+        "bytes": 991,
+        "sha256": "222a148b06123e06f8dc33af05c0963a8a3094c10dbde348a97b1b1f174f31d9"
+      },
+      {
+        "path": "transfer.exit",
+        "bytes": 1,
+        "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      {
+        "path": "transfer.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "transfer.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "verify_image.py",
+        "bytes": 2376,
+        "sha256": "f51870504baacf6811d1aa9121c11ecd2194f782d41dae2e272ee5952be0ad80"
+      }
+    ]
+  },
+  "new_usage": {
+    "attempts": 0,
+    "settled": 0,
+    "UNKNOWN": 0,
+    "held_tokens": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "qa_submissions": 0
+  },
+  "preexisting_PG_provider_calls": {
+    "calls": 13041,
+    "fingerprint": "8afa8c2067de684920b3ff73361dcfde",
+    "unfinished": 0,
+    "unknown": 3
+  },
+  "post_PG_provider_calls": {
+    "calls": 13041,
+    "fingerprint": "8afa8c2067de684920b3ff73361dcfde",
+    "unfinished": 0,
+    "unknown": 3
+  },
+  "failures_retained": [
+    {
+      "command": "run",
+      "exit_code": 1,
+      "failure": "remote verifier transport indented a triple-quoted Python body, causing IndentationError",
+      "container": "s861-zero-20261021t151200z-e20abf33-api",
+      "container_stopped": true,
+      "change": "fix only local/remote operator script quoting; retain first stopped container and logs"
+    },
+    {
+      "command": "run-v2",
+      "exit_code": 1,
+      "failure": "wrapper required exit0 after docker stop; actual Ready200/check0/modules verified and process stopped143",
+      "change": "read stopped container installed uvicorn0.35 source capture_signals; recover existing result without another startup/HTTP/Provider send"
+    },
+    {
+      "change": "correct temporary Redis namespace from s861-zero... to required s861:s861-zero... before successful startup",
+      "production_or_source_modified": false
+    }
+  ],
+  "commands": [
+    {
+      "action": "before",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 0,
+      "seconds": 1.660099899978377,
+      "stdout_sha256": "0cd321544c159c1d9b81e843b6a2b75aced8c04eb42e890eec8bc185ff051abb",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "transfer",
+      "argv": [
+        "scp.exe",
+        "-q",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33\\source.tar",
+        "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33\\source-manifest.json",
+        "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33\\verify_image.py",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/"
+      ],
+      "exit_code": 0,
+      "seconds": 2.5878500000108033,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "build",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 0,
+      "seconds": 12.978307800018229,
+      "stdout_sha256": "e9e43b4f257e9272be89402276fc305beaf72dbd3e39839245385f4a5dacddb7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "run",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 1,
+      "seconds": 1.8616254000226036,
+      "stdout_sha256": "53c88845ce0769ba10b6bd76a0d69a133e78a3bbdadb10d491699d2454dfcbc8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "diagnose",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7785596000030637,
+      "stdout_sha256": "131af27b5335d0720320b5030094277236278c8fc28896db4f7f0be940796af7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "run-v2",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 1,
+      "seconds": 5.551768200006336,
+      "stdout_sha256": "8ffa2c2a362bfc51c050dd375ecc27fdbfddd99ff20b001923cb9ccca82314b7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "diagnose-v2",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0473897999618202,
+      "stdout_sha256": "e9acf26ca8703fef80ec7d6135f5569de6162fc9414eb1927c0bb8c39b7de042",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "recover",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0955069999909028,
+      "stdout_sha256": "a6043d5a3a1a44401e12a3d0d78ea329c785522aa6678045047a8c8ccdf4db25",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "after-recovered",
+      "argv": [
+        "ssh.exe",
+        "-T",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "ConnectTimeout=15",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162",
+        "python3 -"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6825953999068588,
+      "stdout_sha256": "d1047f074f7d19cb89ea60ecc89e1d02f10d9311e86cee417cafeaecfaaf2beb",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    },
+    {
+      "action": "fetch",
+      "argv": [
+        "scp.exe",
+        "-q",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "IdentitiesOnly=yes",
+        "-i",
+        "C:/Users/22088/Downloads/study-plan-dev.pem",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/build.stdout",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/build.stderr",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/Dockerfile",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/.dockerignore",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/candidate.log",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/candidate-v2.log",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/uvicorn-server.py",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/ready-v2.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/loaded-source-v2.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/run-finally.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/run-finally-v2.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/run-v2-recovered.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/after-v2.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/candidate-id.json",
+        "root@120.55.115.162:/opt/rag-s8/diagnostics/s861-zero-20261021t151200z-e20abf33/candidate-id-v2.json",
+        "E:\\RAG quention\\var\\reports\\s8-6-1\\s861-zero-20261021t151200z-e20abf33\\remote-artifacts"
+      ],
+      "exit_code": 0,
+      "seconds": 13.574277500039898,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "owner_approval_kind": "ZERO_PROVIDER_ISOLATION_ONLY",
+      "provider_calls_limit": 0,
+      "qa_submissions_limit": 0
+    }
+  ],
+  "evidence_manifest": [
+    {
+      "path": "after-inventory.json",
+      "bytes": 40762,
+      "sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f"
+    },
+    {
+      "path": "after-recovered.command.json",
+      "bytes": 689,
+      "sha256": "1e1215bc40da8c8b8591dd8043d61c51c0831ccd2ee9ebc4a7828b05fcc51d46"
+    },
+    {
+      "path": "after-recovered.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "after-recovered.json",
+      "bytes": 4812,
+      "sha256": "7bbb1944282f3cc571adcf9a259efde9ddfc8817d10511fec77165cd218d245a"
+    },
+    {
+      "path": "after-recovered.remote.py",
+      "bytes": 101598,
+      "sha256": "0ee66444b80825af1f961ef08ec8092f390b602535b0119d6dfc2d3fe4aebbd7"
+    },
+    {
+      "path": "after-recovered.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "after-recovered.stdout",
+      "bytes": 4126,
+      "sha256": "d1047f074f7d19cb89ea60ecc89e1d02f10d9311e86cee417cafeaecfaaf2beb"
+    },
+    {
+      "path": "authorization.json",
+      "bytes": 1203,
+      "sha256": "bf22bbb2cd052d4636e43dcdffc3bc865282efddbb83bd3df2370ec43d367def"
+    },
+    {
+      "path": "before-inventory.json",
+      "bytes": 40762,
+      "sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f"
+    },
+    {
+      "path": "before.command.json",
+      "bytes": 679,
+      "sha256": "86896f1e1dbc9d887342c41cb1970da163447b50c0d40df78ebc948000bba83a"
+    },
+    {
+      "path": "before.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "before.json",
+      "bytes": 3971,
+      "sha256": "65998826b044d8d51767409332bd8af91a1aa895efb840e6bd82fd3fa17c3df7"
+    },
+    {
+      "path": "before.remote.py",
+      "bytes": 102135,
+      "sha256": "661debbe34b60f0da8a8414eb6682b34854c7323de14bb10a3eec61f62f95e2e"
+    },
+    {
+      "path": "before.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "before.stdout",
+      "bytes": 3344,
+      "sha256": "0cd321544c159c1d9b81e843b6a2b75aced8c04eb42e890eec8bc185ff051abb"
+    },
+    {
+      "path": "build.command.json",
+      "bytes": 679,
+      "sha256": "64c41985e34f9bc21a7d6e0c41214257d68e5e4c91801827e89c06e22d92e7c5"
+    },
+    {
+      "path": "build.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "build.json",
+      "bytes": 1254,
+      "sha256": "348e426d1a66c5cb9f269afbb36c7c9b26cdb6d16c6468d9bf99fc0ba1a35a52"
+    },
+    {
+      "path": "build.remote.py",
+      "bytes": 103927,
+      "sha256": "d50da4ad10b4cdb8f7a875ef288e866bf22203e0d8058ad7b3bc42473e15ea98"
+    },
+    {
+      "path": "build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build.stdout",
+      "bytes": 1183,
+      "sha256": "e9e43b4f257e9272be89402276fc305beaf72dbd3e39839245385f4a5dacddb7"
+    },
+    {
+      "path": "diagnose-v2.command.json",
+      "bytes": 685,
+      "sha256": "ff0d623a81b7f290e571eba456236b7f7987c79493440531353b653c0c096581"
+    },
+    {
+      "path": "diagnose-v2.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "diagnose-v2.json",
+      "bytes": 12253,
+      "sha256": "cc0a97bbbdcf661820ffcb4770c2793d00ef84227daf80ad004f9091eee412f2"
+    },
+    {
+      "path": "diagnose-v2.remote.py",
+      "bytes": 101118,
+      "sha256": "517fb1c9384638089498cf40088079c93122a052cdc848b909ecbe0fecc0373e"
+    },
+    {
+      "path": "diagnose-v2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnose-v2.stdout",
+      "bytes": 9617,
+      "sha256": "e9acf26ca8703fef80ec7d6135f5569de6162fc9414eb1927c0bb8c39b7de042"
+    },
+    {
+      "path": "diagnose.command.json",
+      "bytes": 682,
+      "sha256": "63361e16ef263228132bc923963e8464c3b301e6dd0bbc5f3f068d9f8a2039a3"
+    },
+    {
+      "path": "diagnose.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "diagnose.json",
+      "bytes": 1173,
+      "sha256": "d6ca106ef616d878e79bc30c9be901559508fb9a1749db5dd496616ae24755db"
+    },
+    {
+      "path": "diagnose.remote.py",
+      "bytes": 101040,
+      "sha256": "178b01160b2a4c2da19833896224e9cee6bb1f0282dea3ae11c3676523ade6e3"
+    },
+    {
+      "path": "diagnose.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnose.stdout",
+      "bytes": 1003,
+      "sha256": "131af27b5335d0720320b5030094277236278c8fc28896db4f7f0be940796af7"
+    },
+    {
+      "path": "fetch.command.json",
+      "bytes": 2266,
+      "sha256": "56afb28231c03ae2564939b72cf821dfa52b918a0761b993fe9949e204b504f2"
+    },
+    {
+      "path": "fetch.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "fetch.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "fetch.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "recover.command.json",
+      "bytes": 681,
+      "sha256": "36d9e8acf65048eae0a2cb7daac126f771f735f47d04eeb258f61405dd8e0318"
+    },
+    {
+      "path": "recover.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "recover.json",
+      "bytes": 14723,
+      "sha256": "78b94dccc291eb5c5f4e76db6ba89d64b94fa85304e9202b961b6ac0178ef0f5"
+    },
+    {
+      "path": "recover.remote.py",
+      "bytes": 102227,
+      "sha256": "d739ed18f2bba47f0cf6334f4312c9db450b23e022a526496687bbd2cb0c5609"
+    },
+    {
+      "path": "recover.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "recover.stdout",
+      "bytes": 11592,
+      "sha256": "a6043d5a3a1a44401e12a3d0d78ea329c785522aa6678045047a8c8ccdf4db25"
+    },
+    {
+      "path": "remote-artifacts\\.dockerignore",
+      "bytes": 67,
+      "sha256": "0c727c33579bf491deb9e0f099df4c510d66e1f4f87131d8b1bc7a9b37e143c2"
+    },
+    {
+      "path": "remote-artifacts\\after-v2.json",
+      "bytes": 4697,
+      "sha256": "b744b806a3bae0b9ca8184acfd672b65a933b5a20389e274155b6ce5f1a1b18a"
+    },
+    {
+      "path": "remote-artifacts\\build.stderr",
+      "bytes": 209,
+      "sha256": "ec34a09e033b515c85951f12dbaa17dc3090601dd78ed912c6b4548ce882034a"
+    },
+    {
+      "path": "remote-artifacts\\build.stdout",
+      "bytes": 5557,
+      "sha256": "67b9695118e937ca0211bc8a7fce8f6fab6087cdf6f69e21089b0fc53cf79611"
+    },
+    {
+      "path": "remote-artifacts\\candidate-id-v2.json",
+      "bytes": 233,
+      "sha256": "91e3565312e8ffebad0bd3c76fc44c153b31a3c34cfa76c1eb989253c9eebe2c"
+    },
+    {
+      "path": "remote-artifacts\\candidate-id.json",
+      "bytes": 230,
+      "sha256": "69a2256a36d2fc2a371a320e54d4e43961126b0eb464a6101a431a3f14817c13"
+    },
+    {
+      "path": "remote-artifacts\\candidate-v2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "remote-artifacts\\candidate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "remote-artifacts\\Dockerfile",
+      "bytes": 399,
+      "sha256": "3c4046af8dcffc3ddc341ca89bf79850ba04cf408e5fa8d6c104b691d2f7fe93"
+    },
+    {
+      "path": "remote-artifacts\\loaded-source-v2.json",
+      "bytes": 3933,
+      "sha256": "b7255eb48f044844306560dd952236e273ed19bc681cdae3c33ffa443f4df976"
+    },
+    {
+      "path": "remote-artifacts\\ready-v2.json",
+      "bytes": 1512,
+      "sha256": "5ed49d001dd74de8d6fe8ff3072cacb3a060c98f99fbaa90a0276a8c303e651b"
+    },
+    {
+      "path": "remote-artifacts\\run-finally-v2.json",
+      "bytes": 10521,
+      "sha256": "3bc6680c365a0f86ec24f29eb25c440fd4eef34975775b577effe4152d73dac6"
+    },
+    {
+      "path": "remote-artifacts\\run-finally.json",
+      "bytes": 290,
+      "sha256": "7188cac42b74524359677ab43677f09764a58113e88d7197810b9120947d947d"
+    },
+    {
+      "path": "remote-artifacts\\run-v2-recovered.json",
+      "bytes": 13597,
+      "sha256": "22076e7205f6ea0c2da4476e98a54397ee8c71b894d2822f8aabe92da9ab7b58"
+    },
+    {
+      "path": "remote-artifacts\\uvicorn-server.py",
+      "bytes": 12998,
+      "sha256": "dc0285339d166d99309ea8d917149df302c154891cc598e6bcff203d97fde7fb"
+    },
+    {
+      "path": "run-v2.command.json",
+      "bytes": 679,
+      "sha256": "d937d0011e1a36e006dac64449b77f183b16e74047493b50b31cecd23814210c"
+    },
+    {
+      "path": "run-v2.exit",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+    },
+    {
+      "path": "run-v2.json",
+      "bytes": 163,
+      "sha256": "c32de8a3c4378ca50e75cc14987183b0b6160b920434441e2962dfc4579acbb0"
+    },
+    {
+      "path": "run-v2.remote.py",
+      "bytes": 107817,
+      "sha256": "de487353529e1f688729d91587d4591a269493a34bcf6ce71bd12bba11b1ceac"
+    },
+    {
+      "path": "run-v2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run-v2.stdout",
+      "bytes": 146,
+      "sha256": "8ffa2c2a362bfc51c050dd375ecc27fdbfddd99ff20b001923cb9ccca82314b7"
+    },
+    {
+      "path": "run.command.json",
+      "bytes": 677,
+      "sha256": "410bc1ab70af9b39252dcee97dec32a8a79ec0f5059224545bf9551150622a88"
+    },
+    {
+      "path": "run.exit",
+      "bytes": 1,
+      "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+    },
+    {
+      "path": "run.json",
+      "bytes": 154,
+      "sha256": "259605cf8de03708f0ecc65a15972e139b03f4c1a3194fd0258be9ba781177e0"
+    },
+    {
+      "path": "run.remote.py",
+      "bytes": 107091,
+      "sha256": "ee69c89a4026e1226134b28cc6e6220b161565884bc4c668ab6faff7fa5308cc"
+    },
+    {
+      "path": "run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run.stdout",
+      "bytes": 137,
+      "sha256": "53c88845ce0769ba10b6bd76a0d69a133e78a3bbdadb10d491699d2454dfcbc8"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 90508,
+      "sha256": "46c0114de9da3eb12a34b7861368de4504694430b38ee9ad0d10516d8841c02a"
+    },
+    {
+      "path": "source.tar",
+      "bytes": 11591680,
+      "sha256": "3ee854c453a5a850a32a17ad148c4fce977fbfa0e792c3e4f77a97048d5ed234"
+    },
+    {
+      "path": "transfer.command.json",
+      "bytes": 991,
+      "sha256": "222a148b06123e06f8dc33af05c0963a8a3094c10dbde348a97b1b1f174f31d9"
+    },
+    {
+      "path": "transfer.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "transfer.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "transfer.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 15384,
+      "sha256": "976d0ca56c334e7d7ea76c91a917f2ca57894935ae36111372c36a30bfc44d80"
+    },
+    {
+      "path": "verify_image.py",
+      "bytes": 2376,
+      "sha256": "f51870504baacf6811d1aa9121c11ecd2194f782d41dae2e272ee5952be0ad80"
+    }
+  ],
+  "gates": {
+    "SOURCE_READ": "PASS",
+    "SOURCE_IMAGE_MANIFEST": "PASS",
+    "INSTALLED_DEPENDENCIES_21_PINS": "PASS",
+    "ZERO_PROVIDER_FORMAL_API_STARTUP_AND_READY": "PASS",
+    "PG_REDIS_READ_IDENTITY": "PASS",
+    "SOURCE_ASSET_IMPORTS": "PASS",
+    "ORIGINAL_PRODUCTION_AND_LEDGER_PRESERVATION": "PASS",
+    "REAL_API_QA": "NOT_RUN",
+    "REAL_QU_OR_RETRIEVAL_QUALITY": "NOT_RUN",
+    "REAL_CITATIONS_SSE_HISTORY": "NOT_RUN",
+    "NEW_MODEL_BUDGET": "BLOCKED_RESERVATION_BUDGET",
+    "SECOND_LEGITIMATE_USER": "BLOCKED",
+    "PRODUCTION_CUTOVER": "NOT_RUN"
+  },
+  "rollback": "existing production unchanged; only new isolated candidates stopped; new image/logs retained; no database/Redis restore",
+  "not_run": [
+    "question submissions",
+    "session creation",
+    "Provider sends",
+    "embedding",
+    "rerank",
+    "bridge",
+    "generation",
+    "SSE recovery",
+    "citation readback",
+    "reindex",
+    "production deployment",
+    "Push",
+    "Tag"
+  ],
+  "scope_limit": "This is real API startup/Ready on existing PG/Redis; it is not formal real-model question-answer acceptance.",
+  "loaded_module_proof_boundary": "Same running container, separate zero-network verification Python process; API entrypoint/image/cwd/PYTHONPATH/mounts checked. No inspection of in-process Python module objects.",
+  "local_frozen_history_protection": {
+    "status": "PASS",
+    "source_contracts_unchanged": 37,
+    "extra_unchanged_files": 54,
+    "old_evidence_files_unchanged": 476,
+    "old_S86_reports_unchanged": 3,
+    "old_unknown": {
+      "label": "B2",
+      "entries": 1,
+      "held_tokens": 6365,
+      "status": "UNKNOWN"
+    },
+    "provider_calls": 0,
+    "actual_tokens": 0,
+    "new_unknown": 0
+  },
+  "independent_evidence_review": {
+    "status": "PASS",
+    "scope": "local record/documentation only; no ECS or model operations",
+    "conclusion": "No material claim or authorization drift; readiness and QA boundaries preserved"
+  }
+}
