@@ -1,0 +1,1622 @@
+{
+  "schema_version": "s862-closed-rule-cases/v1",
+  "case_set_version": "2026-10-21-v2",
+  "scope": "Finite offline closed-grammar examples; no claim about real retrieval or answer accuracy.",
+  "provenance_note": "Owner literals/constraints were relayed by root; all expectations manually selected before registry integration. Agent review is not Owner human approval.",
+  "owner_review": "NOT_RUN",
+  "span_convention": "Python Unicode codepoint offsets [start,end) into q0, excluding syntactic wrappers and terminal punctuation.",
+  "classification_note": "expected_match controls production plan promotion. parse_rule(q0,None) is diagnostic-only; a local hit must not override a non-simple/invalid query_type.",
+  "cases": [
+    {
+      "id": "P01",
+      "q0": "比较A和B在安全性方面的区别",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "安全性",
+      "expected_object_spans": [
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "expected_dimension_span": [
+        6,
+        9
+      ],
+      "category": "modifier_ownership",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P02",
+      "q0": "比较A和B的X",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "expected_dimension_span": [
+        6,
+        7
+      ],
+      "category": "zh_two_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P03",
+      "q0": "A与B在X方面有何区别",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "expected_dimension_span": [
+        4,
+        5
+      ],
+      "category": "zh_aspect_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P04",
+      "q0": "比较A、B、C的X",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B",
+        "C"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      "expected_dimension_span": [
+        8,
+        9
+      ],
+      "category": "zh_three_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P05",
+      "q0": "Compare A and B in terms of X",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        29
+      ],
+      "category": "en_two_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P06",
+      "q0": "Compare A with B on X",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          15,
+          16
+        ]
+      ],
+      "expected_dimension_span": [
+        20,
+        21
+      ],
+      "category": "en_with_on_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P07",
+      "q0": "Compare A, B, and C in terms of X",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B",
+        "C"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          18,
+          19
+        ]
+      ],
+      "expected_dimension_span": [
+        32,
+        33
+      ],
+      "category": "en_three_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P08",
+      "q0": "比较PostgreSQL和Redis的持久化与并发能力",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "expected_dimension": "持久化与并发能力",
+      "expected_object_spans": [
+        [
+          2,
+          12
+        ],
+        [
+          13,
+          18
+        ]
+      ],
+      "expected_dimension_span": [
+        19,
+        27
+      ],
+      "category": "whole_common_dimension",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P09",
+      "q0": "PostgreSQL与Redis在并发能力方面有何区别",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "expected_dimension": "并发能力",
+      "expected_object_spans": [
+        [
+          0,
+          10
+        ],
+        [
+          11,
+          16
+        ]
+      ],
+      "expected_dimension_span": [
+        17,
+        21
+      ],
+      "category": "zh_aspect_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P10",
+      "q0": "Compare PostgreSQL and Redis in terms of persistence and concurrency",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "expected_dimension": "persistence and concurrency",
+      "expected_object_spans": [
+        [
+          8,
+          18
+        ],
+        [
+          23,
+          28
+        ]
+      ],
+      "expected_dimension_span": [
+        41,
+        68
+      ],
+      "category": "whole_common_dimension",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P11",
+      "q0": "Compare Qwen3.5-4B with Gemma3-4B on latency",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "Qwen3.5-4B",
+        "Gemma3-4B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          18
+        ],
+        [
+          24,
+          33
+        ]
+      ],
+      "expected_dimension_span": [
+        37,
+        44
+      ],
+      "category": "model_digits",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P12",
+      "q0": "比较Qwen3.5-4B和Gemma3-4B的上下文长度",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "Qwen3.5-4B",
+        "Gemma3-4B"
+      ],
+      "expected_dimension": "上下文长度",
+      "expected_object_spans": [
+        [
+          2,
+          12
+        ],
+        [
+          13,
+          22
+        ]
+      ],
+      "expected_dimension_span": [
+        23,
+        28
+      ],
+      "category": "model_digits",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P13",
+      "q0": "比较Alpha、Beta、Gamma的许可证",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "Alpha",
+        "Beta",
+        "Gamma"
+      ],
+      "expected_dimension": "许可证",
+      "expected_object_spans": [
+        [
+          2,
+          7
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          13,
+          18
+        ]
+      ],
+      "expected_dimension_span": [
+        19,
+        22
+      ],
+      "category": "zh_three_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P14",
+      "q0": "Compare Alpha, Beta, and Gamma in terms of throughput",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "Alpha",
+        "Beta",
+        "Gamma"
+      ],
+      "expected_dimension": "throughput",
+      "expected_object_spans": [
+        [
+          8,
+          13
+        ],
+        [
+          15,
+          19
+        ],
+        [
+          25,
+          30
+        ]
+      ],
+      "expected_dimension_span": [
+        43,
+        53
+      ],
+      "category": "en_three_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P15",
+      "q0": "比较Alpha和Beta在延迟方面的区别",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "Alpha",
+        "Beta"
+      ],
+      "expected_dimension": "延迟",
+      "expected_object_spans": [
+        [
+          2,
+          7
+        ],
+        [
+          8,
+          12
+        ]
+      ],
+      "expected_dimension_span": [
+        13,
+        15
+      ],
+      "category": "modifier_ownership",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P16",
+      "q0": "分别介绍A和B的X",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      "expected_dimension_span": [
+        8,
+        9
+      ],
+      "category": "parallel_introduce",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P17",
+      "q0": "A和B各自的X是什么",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "expected_dimension_span": [
+        6,
+        7
+      ],
+      "category": "parallel_each",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P18",
+      "q0": "分别说明A、B、C的X",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "A",
+        "B",
+        "C"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          8,
+          9
+        ]
+      ],
+      "expected_dimension_span": [
+        10,
+        11
+      ],
+      "category": "parallel_three",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P19",
+      "q0": "分别查询A和B的X",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "X",
+      "expected_object_spans": [
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      "expected_dimension_span": [
+        8,
+        9
+      ],
+      "category": "parallel_query",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P20",
+      "q0": "分别介绍PostgreSQL和Redis的持久化与并发能力",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "expected_dimension": "持久化与并发能力",
+      "expected_object_spans": [
+        [
+          4,
+          14
+        ],
+        [
+          15,
+          20
+        ]
+      ],
+      "expected_dimension_span": [
+        21,
+        29
+      ],
+      "category": "whole_common_dimension",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P21",
+      "q0": "Qwen3.5-4B和Gemma3-4B各自的上下文长度是什么",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "Qwen3.5-4B",
+        "Gemma3-4B"
+      ],
+      "expected_dimension": "上下文长度",
+      "expected_object_spans": [
+        [
+          0,
+          10
+        ],
+        [
+          11,
+          20
+        ]
+      ],
+      "expected_dimension_span": [
+        23,
+        28
+      ],
+      "category": "model_digits",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P22",
+      "q0": "分别说明Alpha、Beta、Gamma的吞吐量",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "Alpha",
+        "Beta",
+        "Gamma"
+      ],
+      "expected_dimension": "吞吐量",
+      "expected_object_spans": [
+        [
+          4,
+          9
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          15,
+          20
+        ]
+      ],
+      "expected_dimension_span": [
+        21,
+        24
+      ],
+      "category": "parallel_three",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P23",
+      "q0": "分别查询Alpha和Beta的部署方式",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "Alpha",
+        "Beta"
+      ],
+      "expected_dimension": "部署方式",
+      "expected_object_spans": [
+        [
+          4,
+          9
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "expected_dimension_span": [
+        15,
+        19
+      ],
+      "category": "parallel_query",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "P24",
+      "q0": "A与B在安全性方面有何区别？",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": true,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "安全性",
+      "expected_object_spans": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "expected_dimension_span": [
+        4,
+        7
+      ],
+      "category": "zh_aspect_compare",
+      "reason": "Closed two/three-object grammar with one complete shared dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N01",
+      "q0": "比较A、B、C、D的安全性",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "four_objects",
+      "reason": "Four objects exceed the three-unit bound.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N02",
+      "q0": "Compare A, B, C, and D in terms of latency",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "four_objects",
+      "reason": "Four objects exceed the three-unit bound.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N03",
+      "q0": "分别说明A、B、C、D的性能",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "four_objects",
+      "reason": "Four parallel objects exceed the three-unit bound.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N04",
+      "q0": "同时满足A和B",
+      "query_type": "JOINT",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "joint_and",
+      "reason": "Joint AND constraints must remain one query.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N05",
+      "q0": "同时满足A和B的安全性要求",
+      "query_type": "JOINT",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "joint_and",
+      "reason": "Joint satisfaction is not independent object lookup.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N06",
+      "q0": "比较A和B的安全性且同时满足离线部署条件",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "joint_condition",
+      "reason": "A joint condition has no safe per-object binding.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N07",
+      "q0": "比较A和B的安全性，不包含测试版本",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "negation",
+      "reason": "Negation cannot be silently removed during rendering.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N08",
+      "q0": "Compare A and B in terms of latency without caching",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "negation",
+      "reason": "The without constraint must survive; this closed rule declines it.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N09",
+      "q0": "比较A和B在2025年的价格",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "time_constraint",
+      "reason": "The year is an unbound temporal constraint, not a model identifier.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N10",
+      "q0": "Compare A and B in terms of price during 2025",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "time_constraint",
+      "reason": "The time window is outside the supported closed dimension grammar.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N11",
+      "q0": "比较A和B的价格，仅使用文档甲",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "source_constraint",
+      "reason": "A source restriction cannot be discarded.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N12",
+      "q0": "Compare A and B in terms of price from source Alpha",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "source_constraint",
+      "reason": "The source clause has no complete rule-owned binding.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N13",
+      "q0": "仅比较A和B的公开资料价格",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "permission_constraint",
+      "reason": "The permitted-source qualifier is outside the closed rule.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N14",
+      "q0": "比较A和B的价格，只访问我有权限的资料",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "permission_constraint",
+      "reason": "A permission clause must not disappear during decomposition.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N15",
+      "q0": "比较A和B的价格差是多少",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "numerical_difference",
+      "reason": "A requested numeric difference is a relation, not two independent answers.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N16",
+      "q0": "Compare A and B in terms of the difference in annual cost",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "numerical_difference",
+      "reason": "A numeric difference needs relation reasoning outside the rule.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N17",
+      "q0": "比较A和B的前3项性能指标",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "quantity_constraint",
+      "reason": "A requested count is a query constraint rather than a model-name digit.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N18",
+      "q0": "比较A和B",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "bare_comparison",
+      "reason": "No explicit shared dimension is present.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N19",
+      "q0": "Compare A and B",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "bare_comparison",
+      "reason": "No explicit shared dimension is present.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N20",
+      "q0": "比较A和B哪个更好",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "subjective_comparison",
+      "reason": "Subjective better has no explicit common dimension.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N21",
+      "q0": "比较研发和运营和财务的预算",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "embedded_chinese_connector",
+      "reason": "Unquoted connector ownership is ambiguous; three-object support requires explicit list syntax.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N22",
+      "q0": "比较研发和运营与Beta的预算",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "embedded_chinese_connector",
+      "reason": "The name may contain 和; the parser must not guess its object boundaries.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N23",
+      "q0": "比较A和A的延迟",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "same_name_ambiguity",
+      "reason": "Identical names do not establish distinct objects.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N24",
+      "q0": "Compare Alpha with alpha on latency",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "same_name_ambiguity",
+      "reason": "Case-only differences do not establish distinct objects.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N25",
+      "q0": "比较A的客户和B的客户的价格",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "complex_nesting",
+      "reason": "Nested possessives require unsupported relationship ownership.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N26",
+      "q0": "某人主持的会议地点",
+      "query_type": "DEPENDENT",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "dependent_venue",
+      "reason": "A conference venue requires a dependent first-hop identity.",
+      "provenance": "OWNER_SPEC_LITERAL",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N27",
+      "q0": "比较A和B所主持会议的举办地点",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "dependent_venue",
+      "reason": "The requested venue depends on first identifying each person's conference.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N28",
+      "q0": "它们各自的价格是什么",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "history_pronoun",
+      "reason": "A rule must not resolve the history pronoun 它们.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N29",
+      "q0": "比较它和B的价格",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "history_pronoun",
+      "reason": "A rule must not infer an object identity for 它.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N30",
+      "q0": "分别介绍A和它的价格",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "history_pronoun",
+      "reason": "Parallel syntax does not resolve 它.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "N31",
+      "q0": "比较Qwen3.5-4B和2025的价格",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": false,
+      "expected_rule": null,
+      "expected_objects": [],
+      "expected_dimension": null,
+      "expected_object_spans": [],
+      "expected_dimension_span": null,
+      "category": "unbound_year_object",
+      "reason": "A standalone year is not an explicitly bound model name.",
+      "provenance": "OWNER_SPEC_INSTANTIATION",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C01",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "DIRECT",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C02",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "JOINT",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C03",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "PARALLEL",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C04",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "DEPENDENT",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C05",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "MIXED",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C06",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "UNKNOWN",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C07",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": "UNRECOGNIZED",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C08",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": null,
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C09",
+      "q0": "Compare A and B in terms of latency",
+      "query_type": 17,
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "latency",
+      "expected_object_spans": [
+        [
+          8,
+          9
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "expected_dimension_span": [
+        28,
+        35
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local syntax matches but the supplied non-simple or invalid classification must not promote a rule plan.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C10",
+      "q0": "分别介绍A和B的价格",
+      "query_type": "SIMPLE_COMPARE",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "PARALLEL_ATTRIBUTE",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "价格",
+      "expected_object_spans": [
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      "expected_dimension_span": [
+        8,
+        10
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local rule family differs from the supplied simple classification; no extra query is allowed.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    },
+    {
+      "id": "C11",
+      "q0": "比较A和B的价格",
+      "query_type": "SIMPLE_PARALLEL",
+      "expected_match": false,
+      "expected_local_match": true,
+      "expected_rule": "COMPARE_SHARED",
+      "expected_objects": [
+        "A",
+        "B"
+      ],
+      "expected_dimension": "价格",
+      "expected_object_spans": [
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "expected_dimension_span": [
+        6,
+        8
+      ],
+      "category": "classification_mismatch",
+      "reason": "The local rule family differs from the supplied simple classification; no extra query is allowed.",
+      "provenance": "AGENT_CURATED_NOT_OWNER_REVIEWED",
+      "owner_review": "NOT_RUN"
+    }
+  ]
+}

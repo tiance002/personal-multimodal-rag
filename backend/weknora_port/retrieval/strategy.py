@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-import re
 
 
 MODE = 'query_structure_v1'
@@ -12,6 +11,7 @@ MODE = 'query_structure_v1'
 class QueryType(str, Enum):
     DIRECT = 'DIRECT'
     SIMPLE_COMPARE = 'SIMPLE_COMPARE'
+    SIMPLE_PARALLEL = 'SIMPLE_PARALLEL'
     JOINT = 'JOINT'
     PARALLEL = 'PARALLEL'
     DEPENDENT = 'DEPENDENT'
@@ -38,6 +38,11 @@ class QueryPlan:
     subqueries: tuple[SubQuery, ...]
     constraints: tuple[str, ...]
     reason: str
+    rule_id: str = field(default='', kw_only=True)
+    rule_version: str = field(default='', kw_only=True)
+    rule_status: str = field(default='NOT_EVALUATED', kw_only=True)
+    reject_reason: str = field(default='', kw_only=True)
+    rule_full_match: bool = field(default=False, kw_only=True)
 
 
 def validate_strategy_mode(mode, source_evidence_mode):
@@ -56,76 +61,42 @@ def strategy_applicable(state):
         getattr(state, 'graph_enabled', False))
 
 
-# These expressions parse only the explicitly admitted SIMPLE_COMPARE grammar.
-# They never assign a model query type or extract an entity from history.
-_CN = re.compile(r'(?:比较|对比)(?P<a>[^和与的，。！？；：、（）()\[\]{}<>\n\r]+)(?:和|与)'
-    r'(?P<b>[^和与的，。！？；：、（）()\[\]{}<>\n\r]+)的'
-    r'(?P<dimension>[^的，。！？；：、（）()\[\]{}<>\n\r]+)[。？]?')
-_EN = re.compile(r'Compare (?P<a>[A-Za-z][A-Za-z0-9 .+#_-]{0,79}?) and '
-    r'(?P<b>[A-Za-z][A-Za-z0-9 .+#_-]{0,79}?) in terms of '
-    r'(?P<dimension>[A-Za-z][A-Za-z0-9 /+#_-]*(?: [A-Za-z][A-Za-z0-9 /+#_-]*)*)[.?]?', re.I)
-_UNSAFE_EN = re.compile(r"\b(?:not|no|non|neither|nor|never|without|except|excluding|or|if|when|unless|while|"
-    r"before|after|during|since|until|between|from|to|only|document|source|file|report|"
-    r"according|provided|where|whose|which|that|with|within|under|over|year|years|"
-    r"today|yesterday|current|latest|previous|historical|past|future|of|for|"
-    r"explain|describe|provide|include|output|format|table|list|write|answer|show)\b|['’]s\b", re.I)
-_UNSAFE_CN = re.compile(r'不|无|非|未|除|仅|只|或者|或|如果|若|当|条件|期间|之前|之后|以来|'
-    r'截至|从|至|到|年|月|日|今天|昨天|当前|最新|过去|历史|未来|文档|文件|来源|原文|依据|根据|报告|且|同时|并且|请|说明|解释|输出|表格|给出|展示|回答|要求|限制')
+def _subqueries(match):
+    if not match.matched:
+        return None
+    queries = match.render_queries()
+    if not 2 <= len(match.objects) <= 3 or len(queries) != len(match.objects):
+        raise ValueError('RULE_RESULT_CONTRACT_INVALID')
+    return tuple(SubQuery('sq-' + str(i), query, (name, match.dimension),
+        object_span=span, dimension_span=match.dimension_span)
+        for i, (name, span, query) in enumerate(zip(match.objects, match.object_spans, queries), 1))
 
 
 def try_rule_compare(effective_query):
-    """Return exactly two queries and original spans, or decline the whole rule.
-
-    The deliberately small grammar refuses dates, conditions and nested
-    possessives rather than claim semantic equivalence for unparsed text.
-    """
-    if not isinstance(effective_query, str) or effective_query != effective_query.strip():
-        return None
-    if not effective_query or len(effective_query) > 400 or re.search(r'\d', effective_query):
-        return None
-    match = _CN.fullmatch(effective_query)
-    language = 'cn'
-    if match:
-        if _UNSAFE_CN.search(effective_query) or _UNSAFE_EN.search(effective_query):
-            return None
-    else:
-        language = 'en'
-        match = _EN.fullmatch(effective_query)
-        if not match or _UNSAFE_EN.search(effective_query.replace(' in terms of ', ' ', 1)):
-            return None
-    a, b, dimension = (match[group].strip() for group in ('a', 'b', 'dimension'))
-    if not a or not b or not dimension or a.casefold() == b.casefold():
-        return None
-    if language == 'en' and any(re.search(r'\b(?:and|in|terms)\b', x, re.I) for x in (a, b)):
-        return None
-    # Whitespace within an entity is allowed, but no unexplained syntactic tail.
-    if any(len(value) > limit for value, limit in ((a, 80), (b, 80), (dimension, 160))):
-        return None
-    dstart, dend = match.span('dimension')
-    draw = effective_query[dstart:dend]
-    dimension_span = (dstart + len(draw) - len(draw.lstrip()),
-                      dend - len(draw) + len(draw.rstrip()))
-    rows = []
-    for number, name, group in ((1, a, 'a'), (2, b, 'b')):
-        question = name + '的' + dimension + '是什么？' if language == 'cn' else 'What is known about ' + name + ' regarding ' + dimension + '?'
-        start, end = match.span(group)
-        raw = effective_query[start:end]
-        start += len(raw) - len(raw.lstrip())
-        end -= len(raw) - len(raw.rstrip())
-        rows.append(SubQuery('sq-' + str(number), question, (name, dimension),
-            object_span=(start, end), dimension_span=dimension_span))
-    return tuple(rows)
+    """Compatibility wrapper over the versioned closed comparison registry."""
+    from .rule_registry import parse_rule
+    return _subqueries(parse_rule(effective_query, QueryType.SIMPLE_COMPARE.value))
 
 
 def plan_query(q0, effective_query, query_type):
     try:
         kind = QueryType(query_type).value
+        reject_reason = 'QUERY_TYPE_NOT_RULE_ELIGIBLE'
     except (TypeError, ValueError):
         kind = QueryType.UNKNOWN.value
-    if kind == QueryType.SIMPLE_COMPARE.value:
-        rows = try_rule_compare(effective_query)
+        reject_reason = 'INVALID_QUERY_TYPE'
+    metadata = {'reject_reason': reject_reason}
+    if kind in (QueryType.SIMPLE_COMPARE.value, QueryType.SIMPLE_PARALLEL.value):
+        from .rule_registry import parse_rule
+        match = parse_rule(effective_query, kind)
+        metadata = dict(rule_id=match.rule_id, rule_version=match.rule_version,
+            rule_status=match.status, reject_reason=match.reject_reason,
+            rule_full_match=bool(match.full_match))
+        rows = _subqueries(match)
         if rows:
-            return QueryPlan(q0, effective_query, kind, 'RULE_COMPARE', rows, (), 'CLOSED_COMPARE_RULE')
+            strategy = 'RULE_COMPARE' if kind == QueryType.SIMPLE_COMPARE.value else 'RULE_PARALLEL'
+            reason = 'CLOSED_COMPARE_RULE' if kind == QueryType.SIMPLE_COMPARE.value else 'CLOSED_PARALLEL_RULE'
+            return QueryPlan(q0, effective_query, kind, strategy, rows, (), reason, **metadata)
         reason = 'RULE_NOT_APPLICABLE'
     elif kind in (QueryType.PARALLEL.value, QueryType.MIXED.value):
         reason = 'MODEL_PLAN_NOT_ENABLED'
@@ -133,5 +104,22 @@ def plan_query(q0, effective_query, query_type):
         reason = 'DEPENDENT_FIRST_ROUND'
     else:
         reason = 'SINGLE_QUERY'
+    # Other model labels are never locally promoted. Potential rule matches
+    # for those labels are measured only by the separate offline evaluation.
     return QueryPlan(q0, effective_query, kind, 'PLAIN',
-        (SubQuery('sq-1', effective_query, (effective_query,)),), (), reason)
+        (SubQuery('sq-1', effective_query, (effective_query,)),), (), reason, **metadata)
+
+
+def plan_rule_trace(plan):
+    """Finite private planning metadata; no user text in the strategy trace."""
+    import hashlib
+    return {'stage': 'strategy_rule', 'rule_id': plan.rule_id,
+        'rule_version': plan.rule_version, 'rule_status': plan.rule_status,
+        'reject_reason': plan.reject_reason,
+        'subquery_count': len(plan.subqueries) if plan.rule_status == 'MATCHED' else 0,
+        'retrieval_units_planned': len(plan.subqueries), 'full_match': plan.rule_full_match,
+        'object_spans': [list(sub.object_span) for sub in plan.subqueries if sub.object_span is not None],
+        'dimension_span': next((list(sub.dimension_span) for sub in plan.subqueries
+                                if sub.dimension_span is not None), None),
+        'effective_query_sha256': hashlib.sha256(plan.effective_query.encode('utf8')).hexdigest(),
+        'q0_sha256': hashlib.sha256(plan.q0.encode('utf8')).hexdigest()}

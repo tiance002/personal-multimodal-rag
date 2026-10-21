@@ -213,10 +213,11 @@ class RetrievalPipeline:
         if state.retrieval_strategy_mode != 'off' and not candidate:
             state.strategy_trace.append({'stage':'strategy','decision':'STRATEGY_NOT_APPLICABLE'})
         if candidate and state.needs_retrieval:
-            from .strategy import plan_query
+            from .strategy import plan_query, plan_rule_trace
             from .strategy_executor import execute_plan, apply_strategy_result, fit_context_budget
             plan = plan_query(state.query, state.rewrite_query or state.query, state.query_type)
             state.strategy_plan = plan
+            state.strategy_trace.append(plan_rule_trace(plan))
             result = await execute_plan(state, context, plan, self.retrieve_once)
             apply_strategy_result(state, result)
             if not state.merge_results:
