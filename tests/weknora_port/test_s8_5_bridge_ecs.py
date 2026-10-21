@@ -13,7 +13,7 @@ import pytest
 from scripts import s8_5_bridge_ecs as runner
 from backend.weknora_port.models import provider_config
 from backend.weknora_port.models.request import build_rerank_body
-from backend.weknora_port.models.types import CallCancelled, CallContext, TrustedScope
+from backend.weknora_port.models.types import CallCancelled, CallContext, TrustedScope, ProviderError
 from backend.weknora_port.retrieval.bridge_rescue import original_windows, extraction_payload
 from backend.weknora_port.retrieval.types import SearchResult
 
@@ -331,6 +331,39 @@ def test_installed_fence_preserves_typed_cancellation_when_audit_also_fails(wire
     asyncio.run(scenario())
 
 
+@pytest.mark.parametrize('status', [None, 503])
+def test_original_transport_failure_survives_secondary_audit_error_without_unsafe_details(wire,status):
+    original=ProviderError('PROVIDER_TRANSPORT_ERROR',sent=True,status_code=status)
+    class Transport:
+        @asynccontextmanager
+        async def open(self,*args,**kwargs):
+            raise original
+            yield
+    async def audit(): raise PermissionError('S85_UNKNOWN_OR_UNFINISHED_STOP')
+    wire.fence.audit=audit
+    model=wire.fence.install(SimpleNamespace(transport=Transport()))
+    async def scenario():
+        with pytest.raises(ProviderError) as caught:
+            async with model.transport.open(wire.cfg['cheap'],'/chat/completions',wire.body,
+                    wire.ctx.child('bridge-extract'),capability='chat'): pass
+        assert caught.value is original
+    asyncio.run(scenario())
+    assert wire.fence.last_failure=={'request_id':RID,'capability':'chat',
+        'type':'ProviderError','code':'PROVIDER_TRANSPORT_ERROR','sent':True,'http_status':status}
+    assert wire.fence.last_audit_failure['code']=='S85_UNKNOWN_OR_UNFINISHED_STOP'
+    assert wire.fence.stopped and not wire.fence.completed
+
+
+def test_safe_failure_does_not_log_message_headers_keys_or_invent_send_state():
+    error=RuntimeError('sk-proj-private authorization: secret header=private')
+    error.headers={'Authorization':'secret'}
+    error.code='sk-proj-private'
+    error.status_code=999
+    captured=runner.safe_failure(error)
+    assert captured=={'type':'RuntimeError','code':None,'sent':None,'http_status':None}
+    assert 'private' not in json.dumps(captured) and 'headers' not in captured
+
+
 def test_stage_receipts_exclude_headers_and_have_stable_hashes(tmp_path):
     evidence=tmp_path/'evidence'; evidence.mkdir()
     raw=evidence/'op.request.json'
@@ -483,6 +516,30 @@ def test_v2_unknown_prior_keeps_full_exposure_and_requires_diagnosis_for_fresh_r
     result=runner.validate_continuation(value,[record],implementation,RAW)
     assert result['prior_held_token_exposure']==10000 and result['prior_possibly_sent_unknown']==1
     assert record==before and record['closure']['status']=='STOP' and entry['held_tokens']==10000
+
+
+def test_v2_fresh_unknown_diagnostic_can_keep_implementation_after_explicit_diagnosis():
+    record=successful_session_a()
+    entry=record['final']['execution_entries'][0]
+    entry.update(status='UNKNOWN',outcome='UNKNOWN',usage=None,reserved_tokens=6365,held_tokens=6365)
+    record['final']['execution_entries']=[entry]
+    summary=runner.execution_summary([entry])
+    record['final'].update(summary,status='S85_REAL_STOP',ledger_status='STOP',error='S85_UNKNOWN_OR_UNFINISHED_STOP')
+    record['closure'].update(summary,status='STOP')
+    before=deepcopy(record)
+    value=session_owner(index=2,references=[prior_reference()],stage='20261021-'+'b'*32)
+    unchanged={'backend/weknora_port/retrieval/bridge_rescue.py':'a'*64}
+    with pytest.raises(ValueError,match='STOP_DIAGNOSIS'):
+        runner.validate_continuation(value,[record],unchanged,RAW)
+    value['prior_stop_diagnosis']='Prior affected request isolated with no response; UNKNOWN6365 held; fresh independent request, no old request retry.'
+    result=runner.validate_continuation(value,[record],unchanged,RAW)
+    assert result['continuation_mode']=='FRESH_TRANSPORT_DIAGNOSTIC'
+    assert result['prior_held_token_exposure']==6365 and result['prior_possibly_sent_unknown']==1
+    assert record==before
+    # The diagnosed transport uncertainty cannot bypass the separate B gate.
+    value['case_id']='frost-B'; value['envelope']=runner.attempt_envelope(value)
+    with pytest.raises(ValueError,match='CONDITIONAL_B'):
+        runner.validate_continuation(value,[record],unchanged,RAW)
 
 
 def test_prior_receipt_loader_reads_only_pinned_files_and_rejects_mutated_hash(tmp_path,monkeypatch):

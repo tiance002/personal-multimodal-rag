@@ -274,9 +274,15 @@ def validate_continuation(owner, records, current_implementation, raw):
         require(isinstance(owner.get('prior_stop_diagnosis'), str) and owner['prior_stop_diagnosis'].strip(),
                 'S85_PRIOR_STOP_DIAGNOSIS_REQUIRED')
     previous_same_case = [record for record in records if attempt_case(record['authorization']) == attempt_case(owner)]
+    fresh_transport_diagnostic = False
     if previous_same_case:
-        old = previous_same_case[-1]['preflight'].get('implementation_sha256', {})
-        require(any(path != 'scripts/s8_5_bridge_ecs.py' and path in old and old[path] != value
+        latest = previous_same_case[-1]
+        fresh_transport_diagnostic = bool(execution_summary(latest['final']['execution_entries'])[
+            'possibly_sent_unknown_operations'] and isinstance(owner.get('prior_stop_diagnosis'), str)
+            and owner['prior_stop_diagnosis'].strip())
+        old = latest['preflight'].get('implementation_sha256', {})
+        require(fresh_transport_diagnostic or any(
+                    path != 'scripts/s8_5_bridge_ecs.py' and path in old and old[path] != value
                     for path, value in current_implementation.items()), 'S85_REPAIR_IMPLEMENTATION_CHANGE_REQUIRED')
     if attempt_case(owner) == 'frost-B':
         require(any(_verified_a(record) for record in records), 'S85_CONDITIONAL_B_REQUIRES_VERIFIED_A')
@@ -286,6 +292,7 @@ def validate_continuation(owner, records, current_implementation, raw):
             'prior_attempts': len(records), 'prior_attempted_operations': operations,
             'prior_held_token_exposure': exposure, 'prior_possibly_sent_unknown': unknown,
             'prior_permission_stops': permission_stops, 'prior_ledgers_modified': False,
+            'continuation_mode': 'FRESH_TRANSPORT_DIAGNOSTIC' if fresh_transport_diagnostic else 'NEW_CASE_OR_IMPLEMENTATION_REPAIR',
             'next_case_id': attempt_case(owner), 'next_attempt_index': owner['attempt_index']}
 
 
@@ -389,6 +396,22 @@ def validate_settlements(rows, entries, plan, roles):
     return totals
 
 
+def safe_failure(error):
+    """Capture typed metadata only; sent is reported, never proof of no send."""
+    name = type(error).__name__
+    if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,79}', name):
+        name = 'Exception'
+    code = getattr(error, 'code', None)
+    if code is None and isinstance(error, (PermissionError, ValueError)) and len(error.args) == 1:
+        code = error.args[0]
+    if not isinstance(code, str) or not re.fullmatch(
+            r'(?:S85_|LOCAL_EXECUTION_|MODEL_|PROVIDER_|RUN_DEADLINE_)[A-Z0-9_]{1,100}', code):
+        code = None
+    sent, status = getattr(error, 'sent', None), getattr(error, 'status_code', None)
+    return {'type': name, 'code': code, 'sent': sent if type(sent) is bool else None,
+            'http_status': status if type(status) is int and 100 <= status <= 599 else None}
+
+
 class RequestFence:
     """Exact operation, scope, current sentence mapping and final wire fence."""
     def __init__(self, plan, roles, config_hashes, *, audit=None, held_tokens=lambda: 0):
@@ -403,6 +426,7 @@ class RequestFence:
         self.plan, self.roles, self.config_hashes = dict(plan), deepcopy(roles), dict(config_hashes)
         self.audit, self.held_tokens = audit, held_tokens
         self.seen, self.completed, self.bound, self.stopped = set(), set(), None, False
+        self.last_failure, self.last_audit_failure = None, None
 
     def bind(self, context, state, prepared):
         require(context.request_id + '/bridge-extract' in self.plan
@@ -475,6 +499,8 @@ class RequestFence:
                     yield handle
             except BaseException as exc:
                 failure, fence.stopped = exc, True
+                fence.last_failure = {'request_id': context.request_id,
+                                      'capability': kwargs.get('capability'), **safe_failure(exc)}
                 raise
             finally:
                 try:
@@ -482,10 +508,13 @@ class RequestFence:
                         await asyncio.shield(fence.audit())
                     if failure is None:
                         fence.completed.add(context.request_id)
-                except BaseException:
+                except BaseException as exc:
                     fence.stopped = True
-                    from backend.weknora_port.models.types import CallCancelled, RunDeadlineExceeded
-                    if not isinstance(failure, (CallCancelled, RunDeadlineExceeded, asyncio.CancelledError)):
+                    fence.last_audit_failure = safe_failure(exc)
+                    # Keep the original transport/deadline failure authoritative.
+                    # Audit uncertainty is separately recorded and never permits
+                    # a retry, reservation release or an unsent inference.
+                    if failure is None:
                         raise
         transport.open, transport._s85_fence = opened, self
         return model
@@ -580,7 +609,7 @@ async def run(root):
         'stage_prefix': prefix, 'exact_request_plan': pre['exact_request_plan']})
     settings, principal = runtime_settings(owner['stage_id'], cloud=True, ledger=ledger)
     success, error, result, totals = False, None, {'case_id': case['case_id'], 'status': 'NOT_STARTED'}, None
-    after, current_after, rows = None, None, []
+    after, current_after, rows, fence = None, None, [], None
     try:
         async with assemble(settings, principal=principal) as app:
             registry = app.registry_for_context()
@@ -626,7 +655,8 @@ async def run(root):
                 result.update(status='STOP', error=historical.safe_error(exc))
                 raise
             finally:
-                result.update(trace=state.bridge_trace, elapsed_seconds=time.monotonic()-started)
+                result.update(trace=state.bridge_trace, elapsed_seconds=time.monotonic()-started,
+                              transport_failure=fence.last_failure, post_transport_audit_failure=fence.last_audit_failure)
                 write_new(root / 'cases' / (case['case_id'] + '.json'), result)
                 await registry.close()
     except BaseException as exc:
@@ -652,6 +682,8 @@ async def run(root):
         summary = execution_summary(entries)
         final = {'status': 'S85_REAL_DIAGNOSTIC_COMPLETE' if success and preserved else 'S85_REAL_STOP',
                  'error': error, 'case': result, 'envelope': envelope, 'provider_rows': rows,
+                 'transport_failure': fence.last_failure if fence is not None else None,
+                 'post_transport_audit_failure': fence.last_audit_failure if fence is not None else None,
                  'execution_entries': entries, 'usage_by_capability': totals,
                  **summary, 'provider_receipt_count': len(rows),
                  'old_history_roles_models_source_counts_preserved': preserved,
