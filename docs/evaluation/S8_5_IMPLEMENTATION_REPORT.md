@@ -1,6 +1,6 @@
 # S8.5 多轮对话检索与受控多跳检索
 
-状态：阶段 0–3 源码与离线实现完成，阶段 4 对照与真实计划准备中。真实模型/ECS 本轮尚未执行。
+状态：阶段 0–4 的离线实现与对照完成，真实计划可审查。真实模型/ECS 本轮尚未执行，等待阶段 4.3 的精确范围授权。
 
 ## 基线与阶段 0
 
@@ -80,6 +80,42 @@ python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/tes
 ```
 
 **271 passed，exit 0，1.90 秒**，`var/reports/s8-5/stage3/final-green.txt/.exit`。身份独立验证 63 passed，输出位于 `stage3-identity/green.*`；重复子集不累加。活动工程测试跟随新合同迁移，冻结 S8.4 输入/Gold/收据/真实结果未改。
+
+### 阶段 4：离线对照与真实运行器（OFFLINE_PASS / REAL NOT RUN）
+
+一次跨阶段关联回归 **629 passed，exit 0，5.16 秒**，未把子集/重复运行累加。命令：
+
+```powershell
+python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s8_5_conversation.py tests/weknora_port/test_conversation.py tests/weknora_port/test_memory_storage.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_m31_source_constraints.py tests/weknora_port/test_service.py tests/weknora_port/test_fallback_evidence_contract.py tests/weknora_port/test_s85_generation_history_boundary.py tests/weknora_port/test_generation.py tests/weknora_port/test_s85_bridge_sentence_ids.py tests/weknora_port/test_s85_bridge_identity.py tests/weknora_port/test_s85_bridge_semantics.py tests/weknora_port/test_bridge_rescue.py tests/weknora_port/test_bridge_pipeline.py tests/weknora_port/test_s8_4_bridge_ecs.py
+```
+
+输出与退出码：`var/reports/s8-5/stage4/affected-offline.txt/.exit`。额外缺池分支 **1 passed，exit 0**：`python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s85_bridge_missing_pool.py`，证明已验证 Q1 没有初始候选时停止，不运行第二次 Hybrid/Embedding。
+
+可复现审计命令：
+
+```powershell
+python -B scripts/s8_5_offline_audit.py --output docs/evaluation/S8_5_IMPLEMENTATION_REPORT.results.json
+```
+
+**exit 0**，状态 `OFFLINE_CONTRACTS_PASS_FROST_FINAL_UNSUPPORTED`，产出 5 个多轮实参轨迹和 6 个冻结案例的独立 S8.5 轨迹。工具使用当前真实 Python 路径与 Mock 模型/存储，未调用数据库/云端/ECS，Mock usage 不计作真实 Token。4 个负控制均 0 Cheap/BGE/补充；Frost 两臂各 1 Mock Cheap/1 Mock BGE，均无最终活动地点支持。
+
+| 离线多轮场景 | 实际验证 |
+|---|---|
+| 首轮 → 第二轮代词 → 第三轮代词 | 检查 Embedding/Hybrid 关键词/Rerank 的实际实参均为经过校验的独立问题 |
+| 切换到逻辑回归后追问 | 使用新话题；不回扫越过新的独立问题 |
+| 多实体比较、只在旧回答出现的指代 | 回退 q0；重新检索，不任意选择 |
+| 格式转换/翻译、要求原文依据 | 前者严格免检索；事实与来源请求检索 |
+| Tenant/user/Session、KB/document、完成/取消/当前轮 | 通过字段/SQL 录制与真实服务组合 Mock 检验隔离；真实 PG 历史仍 NOT RUN |
+| 改写失败/空值/部分响应/条件改变 | q0 回退 + 固定原因/hash |
+| 刷新/SSE/重启回放 | 同一 durable fixture 运行只调用一次改写/生成；浏览器与真实 Redis 仍 NOT RUN |
+
+新运行器 `scripts/s8_5_bridge_ecs.py` 专用于本轮精确 Frost A 计划；复用正式 Registry/Gate/LocalExecution，不复用旧授权/fence/次数。58 个运行器安全测试通过，exit 0，1.47 秒：`python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s8_5_bridge_ecs.py`。独立审查发现“本地准入拒绝被算成实际调用/UNKNOWN”的报告缺陷，RED 8 failed 后修复；现在分别记录尝试、明确未发送、已结算和可能已发送未知，保留 STOP 与占用。证据 `runner-summary-{red,green}.*`。
+
+真实计划见 [S8_5_REAL_EVALUATION_PLAN.md](S8_5_REAL_EVALUATION_PLAN.md)。用户已允许真实测评；尚未执行任何本轮模型调用或 ECS 操作，当前真实 Token 为 0。只有取得该精确 envelope 的授权才运行。
+
+### 阶段 5：仅评估
+
+Frost 必需第二跳已在首轮 30 候选中，因此没有依据增加第二次全库 Search。当前主要缺口是事件与机构地点的关系，以及 B 的完整身份 Context。缺池反例已可执行记录 `SECOND_HOP_SOURCE_NOT_IN_POOL`。后续如在真实新样本中证明缺池，另行提出一次受限 Hybrid Search 的延迟/Embedding/Rerank 上限方案；本轮不实现。
 
 ## 执行流程（实际代码路径，离线模型为 Mock）
 

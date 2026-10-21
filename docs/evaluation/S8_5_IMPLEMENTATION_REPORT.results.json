@@ -1,0 +1,1041 @@
+{
+  "schema": "s85-offline-audit/v1",
+  "status": "OFFLINE_CONTRACTS_PASS_FROST_FINAL_UNSUPPORTED",
+  "source_head": "e4f011e17ca016c22b502b210749f98d12d7a34a",
+  "extraction_contract": "sentence-id/v2",
+  "frozen_s84_input_sha256": "e3dbf7ee2f280b4b2f7b4438b89f2691faefb7e103649acc661e3d0a700b1135",
+  "real_provider_calls": 0,
+  "real_actual_tokens": 0,
+  "synthetic_usage_omitted": true,
+  "database_calls": 0,
+  "ecs_operations": 0,
+  "multi_turn": [
+    {
+      "q0": "朴素贝叶斯分类有什么优点？",
+      "rewrite_query": "朴素贝叶斯分类有什么优点？",
+      "embedding_query": "朴素贝叶斯分类有什么优点？",
+      "keyword_query": "朴素贝叶斯分类有什么优点？",
+      "rerank_query": "朴素贝叶斯分类有什么优点？",
+      "context_ids": [
+        "current-0"
+      ],
+      "query_trace": [
+        {
+          "stage": "query_understand",
+          "decision": "ACCEPTED",
+          "reason": "",
+          "q0_sha256": "80db1395c02d065067e79dfd6d1923f3642c69cb06ffc05a32f2af2239e2234d",
+          "rewrite_sha256": "80db1395c02d065067e79dfd6d1923f3642c69cb06ffc05a32f2af2239e2234d",
+          "history_rounds": 0
+        }
+      ]
+    },
+    {
+      "q0": "它对特征有什么要求？",
+      "rewrite_query": "朴素贝叶斯分类对特征有什么要求？",
+      "embedding_query": "朴素贝叶斯分类对特征有什么要求？",
+      "keyword_query": "朴素贝叶斯分类对特征有什么要求？",
+      "rerank_query": "朴素贝叶斯分类对特征有什么要求？",
+      "context_ids": [
+        "current-1"
+      ],
+      "query_trace": [
+        {
+          "stage": "query_understand",
+          "decision": "ACCEPTED",
+          "reason": "",
+          "q0_sha256": "464231f5d44f879bcbf87435660a9a54e1d4bef25bf75ac008c018bd059bae3b",
+          "rewrite_sha256": "74d309e404cfcac3213d4b378ef1eaca7823f60187716880116733d77e66bb79",
+          "history_rounds": 1
+        }
+      ]
+    },
+    {
+      "q0": "它有什么缺点？",
+      "rewrite_query": "朴素贝叶斯分类有什么缺点？",
+      "embedding_query": "朴素贝叶斯分类有什么缺点？",
+      "keyword_query": "朴素贝叶斯分类有什么缺点？",
+      "rerank_query": "朴素贝叶斯分类有什么缺点？",
+      "context_ids": [
+        "current-2"
+      ],
+      "query_trace": [
+        {
+          "stage": "query_understand",
+          "decision": "ACCEPTED",
+          "reason": "",
+          "q0_sha256": "0c2df32ea77b50fcbcd181808fec34ca369043ef2909fa809d18430d6f72855b",
+          "rewrite_sha256": "5adc3e6ff3e434c89524cbe9d625da3810a431eb5a2c89f2c3778d187b1565d4",
+          "history_rounds": 2
+        }
+      ]
+    },
+    {
+      "q0": "逻辑回归的适用条件是什么？",
+      "rewrite_query": "逻辑回归的适用条件是什么？",
+      "embedding_query": "逻辑回归的适用条件是什么？",
+      "keyword_query": "逻辑回归的适用条件是什么？",
+      "rerank_query": "逻辑回归的适用条件是什么？",
+      "context_ids": [
+        "current-3"
+      ],
+      "query_trace": [
+        {
+          "stage": "query_understand",
+          "decision": "ACCEPTED",
+          "reason": "",
+          "q0_sha256": "15e9cdf2f4ad7e5a9969e7c532e4ea8f556d681f7fd86d1194485c1c38c3728e",
+          "rewrite_sha256": "15e9cdf2f4ad7e5a9969e7c532e4ea8f556d681f7fd86d1194485c1c38c3728e",
+          "history_rounds": 3
+        }
+      ]
+    },
+    {
+      "q0": "它有什么缺点？",
+      "rewrite_query": "逻辑回归有什么缺点？",
+      "embedding_query": "逻辑回归有什么缺点？",
+      "keyword_query": "逻辑回归有什么缺点？",
+      "rerank_query": "逻辑回归有什么缺点？",
+      "context_ids": [
+        "current-4"
+      ],
+      "query_trace": [
+        {
+          "stage": "query_understand",
+          "decision": "ACCEPTED",
+          "reason": "",
+          "q0_sha256": "0c2df32ea77b50fcbcd181808fec34ca369043ef2909fa809d18430d6f72855b",
+          "rewrite_sha256": "face25b03650099f89973eea0f3d526b6cb090f18891cc5fb27da89b6d0cdb79",
+          "history_rounds": 4
+        }
+      ]
+    }
+  ],
+  "multi_hop": [
+    {
+      "case_id": "frost-A",
+      "execution": "DETERMINISTIC_MOCK",
+      "q0": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "rewrite_query": "Where is the seminar directed by Jeanne Marie Beaumont located in 2007-2010?",
+      "first_hop_relation_verified": true,
+      "identity_verified": true,
+      "final_context_identity_supported": true,
+      "q1": "Where is The Frost Place Advanced Seminar located?",
+      "initial_search_candidate_count": 30,
+      "second_hop_source_in_pool": true,
+      "second_rerank_called": true,
+      "second_rerank_passed": true,
+      "second_hop_location_found": true,
+      "entity_bridge_verified": false,
+      "final_answer_supported": false,
+      "generated_answer_verified": null,
+      "generation_status": "NOT_RUN",
+      "mock_cheap_calls": 1,
+      "mock_bge_calls": 1,
+      "context_result_ids": [
+        "fee4d31b-8589-5875-992e-4630fec57b3e",
+        "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+        "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+        "31417c7c-7abf-4723-956a-74bf7ee14683"
+      ],
+      "context_sha256": "cc18552347f71adfce0b36d12c7e06c8a20714fb5b01e1b9f9642c1fe56596e1",
+      "generation_prompt_sha256": "9dd080e0846aa36a974b4abf887887ffc26cd191004bc891d53e518caf222e34",
+      "supplement_source_ids": [
+        "31417c7c-7abf-4723-956a-74bf7ee14683"
+      ],
+      "first_hop": {
+        "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+        "quote_start": 155,
+        "quote_end": 311,
+        "quote": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+        "source_version": "de3ec8ca-5496-4ecf-abcb-3b65423d1fe9"
+      },
+      "identity_proof": {
+        "verified": true,
+        "resolved_name": "Jeanne Marie Beaumont",
+        "anchor_quotes": [
+          {
+            "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+            "quote_start": 0,
+            "quote_end": 283,
+            "quote": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997)."
+          },
+          {
+            "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+            "quote_start": 174,
+            "quote_end": 250,
+            "quote": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000."
+          }
+        ],
+        "final_context_identity_supported": true,
+        "reason": "BOUNDED_SOURCE_IDENTITY_VERIFIED"
+      },
+      "second_hop": {
+        "phrase": "The Frost Place",
+        "quote": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+        "quote_start": 0,
+        "quote_end": 153,
+        "location_description": "Robert Frost's former home in Franconia, New Hampshire, United States"
+      },
+      "bridge_trace": [
+        {
+          "stage": "bridge_start",
+          "mode": "cheap_bridge_v1",
+          "contract_version": "sentence-id/v2"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "EXTRACTION_INPUT",
+          "windows": [
+            {
+              "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+              "start": 73,
+              "end": 311,
+              "text": "She has taught at Rutgers University and regularly teaches at the 92nd Street Y.\n She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+              "role": "main"
+            },
+            {
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 1,
+              "end": 485,
+              "text": "The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010.\n Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000.\n She was judge for the 2011 Cider Press Review Book Award.\n She grew up in the suburban Philadelphia area and moved to New York City in 1983.\n She earned her B.A. from Eastern College and an M.F.A. in Writing from Columbia University.",
+              "role": "preceding"
+            },
+            {
+              "source_chunk_id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "start": 1,
+              "end": 441,
+              "text": "Her work has appeared in \"Boston Review, Barrow Street, Colorado Review, Court Green, Harper’s, Harvard Review, Manhattan Review, The Nation, New American Writing, Ploughshares, Poetry Northwest, Witness,\" and \"World Literature Today,\" and she has had poems featured on \"The Writer's Almanac with Garrison Keillor.\"\n In 2006, San Francisco film-maker Jay Rosenblatt made a film based on her poem \"Afraid So\" as narrated by Garrison Keillor.",
+              "role": "preceding"
+            },
+            {
+              "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+              "start": 0,
+              "end": 283,
+              "text": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997).",
+              "role": "preceding"
+            }
+          ],
+          "sentences": [
+            {
+              "sentence_id": "s-984a18a6bbfe34f8ad7559c4",
+              "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+              "start": 0,
+              "end": 283,
+              "text": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997).",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-28982712e0f5464efb59a1fe",
+              "source_chunk_id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "start": 1,
+              "end": 316,
+              "text": "Her work has appeared in \"Boston Review, Barrow Street, Colorado Review, Court Green, Harper’s, Harvard Review, Manhattan Review, The Nation, New American Writing, Ploughshares, Poetry Northwest, Witness,\" and \"World Literature Today,\" and she has had poems featured on \"The Writer's Almanac with Garrison Keillor.\"",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-b135c696c77211fbf90b7d11",
+              "source_chunk_id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "start": 318,
+              "end": 441,
+              "text": "In 2006, San Francisco film-maker Jay Rosenblatt made a film based on her poem \"Afraid So\" as narrated by Garrison Keillor.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-93d6088e291a516a9f5b3d5d",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 1,
+              "end": 172,
+              "text": "The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-35ac67f70d453c0a66e69cd4",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 174,
+              "end": 250,
+              "text": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-4b571e5ce9f1e61f8aefc0c2",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 252,
+              "end": 309,
+              "text": "She was judge for the 2011 Cider Press Review Book Award.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-063843b6d350a19d4cc0420d",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 311,
+              "end": 392,
+              "text": "She grew up in the suburban Philadelphia area and moved to New York City in 1983.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-61864913eb0bc89f253e8e53",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 394,
+              "end": 485,
+              "text": "She earned her B.A. from Eastern College and an M.F.A. in Writing from Columbia University.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-23e91c50503691003a2ee6c8",
+              "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+              "start": 73,
+              "end": 153,
+              "text": "She has taught at Rutgers University and regularly teaches at the 92nd Street Y.",
+              "role": "main"
+            },
+            {
+              "sentence_id": "s-c9a81754f7673886cbb035bf",
+              "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+              "start": 155,
+              "end": 311,
+              "text": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+              "role": "main"
+            }
+          ],
+          "predecessor_chains": {
+            "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b": [
+              "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+              "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ]
+          },
+          "contract_version": "sentence-id/v2",
+          "q0_sha256": "fae83d6fa7be239093c8799b21edff07bad606b4539007816d08d0d0aea70046",
+          "model_id": "cheap"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "EXTRACTION_OUTPUT",
+          "content": "{\"status\": \"FIRST_HOP_CANDIDATE\", \"sentence_id\": \"s-c9a81754f7673886cbb035bf\", \"subject\": \"She\", \"subject_resolution\": \"UNVERIFIED\", \"predicate\": \"served as the Director of\", \"object\": \"The Frost Place Advanced Seminar\", \"time\": \"2007–2010\", \"target_attribute\": \"location\", \"bridge_search_phrases\": [\"The Frost Place Advanced Seminar\", \"The Frost Place\"]}",
+          "finish_reason": "stop"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "FIRST_HOP_SPAN_VERIFIED",
+          "extraction": {
+            "status": "FIRST_HOP_CANDIDATE",
+            "sentence_id": "s-c9a81754f7673886cbb035bf",
+            "subject": "She",
+            "subject_resolution": "UNVERIFIED",
+            "predicate": "served as the Director of",
+            "object": "The Frost Place Advanced Seminar",
+            "time": "2007–2010",
+            "target_attribute": "location",
+            "bridge_search_phrases": [
+              "The Frost Place Advanced Seminar",
+              "The Frost Place"
+            ],
+            "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "quote_start": 155,
+            "quote_end": 311,
+            "quote": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+            "contract_version": "sentence-id/v2",
+            "span_verified": true,
+            "subject_verified": false,
+            "relation_form_verified": true,
+            "relation_verified": false
+          }
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "FIRST_HOP_VERIFIED",
+          "extraction": {
+            "status": "FIRST_HOP_CANDIDATE",
+            "sentence_id": "s-c9a81754f7673886cbb035bf",
+            "subject": "She",
+            "subject_resolution": "UNVERIFIED",
+            "predicate": "served as the Director of",
+            "object": "The Frost Place Advanced Seminar",
+            "time": "2007–2010",
+            "target_attribute": "location",
+            "bridge_search_phrases": [
+              "The Frost Place Advanced Seminar",
+              "The Frost Place"
+            ],
+            "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "quote_start": 155,
+            "quote_end": 311,
+            "quote": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+            "contract_version": "sentence-id/v2",
+            "span_verified": true,
+            "subject_verified": true,
+            "relation_form_verified": true,
+            "relation_verified": true,
+            "identity_proof": {
+              "verified": true,
+              "resolved_name": "Jeanne Marie Beaumont",
+              "anchor_quotes": [
+                {
+                  "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+                  "quote_start": 0,
+                  "quote_end": 283,
+                  "quote": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997)."
+                },
+                {
+                  "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+                  "quote_start": 174,
+                  "quote_end": 250,
+                  "quote": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000."
+                }
+              ],
+              "final_context_identity_supported": true,
+              "reason": "BOUNDED_SOURCE_IDENTITY_VERIFIED"
+            }
+          },
+          "identity_proof": {
+            "verified": true,
+            "resolved_name": "Jeanne Marie Beaumont",
+            "anchor_quotes": [
+              {
+                "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+                "quote_start": 0,
+                "quote_end": 283,
+                "quote": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997)."
+              },
+              {
+                "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+                "quote_start": 174,
+                "quote_end": 250,
+                "quote": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000."
+              }
+            ],
+            "final_context_identity_supported": true,
+            "reason": "BOUNDED_SOURCE_IDENTITY_VERIFIED"
+          }
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "BRIDGE_QUERY_VERIFIED",
+          "q1": "Where is The Frost Place Advanced Seminar located?",
+          "object": "The Frost Place Advanced Seminar",
+          "target_attribute": "location"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SECOND_RERANK_INPUT",
+          "q1": "Where is The Frost Place Advanced Seminar located?",
+          "q1_source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "object": "The Frost Place Advanced Seminar",
+          "candidate_ids": [
+            "31417c7c-7abf-4723-956a-74bf7ee14683"
+          ],
+          "first_scores": {
+            "31417c7c-7abf-4723-956a-74bf7ee14683": 0.00799383781850338
+          },
+          "threshold": 0.3,
+          "threshold_status": "EXPERIMENTAL_NOT_CALIBRATED"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SECOND_RERANK_OUTPUT",
+          "scores": [
+            {
+              "id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+              "score": 0.91
+            }
+          ]
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SECOND_HOP_LOCATION_FOUND",
+          "source_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "fact": {
+            "phrase": "The Frost Place",
+            "quote": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+            "quote_start": 0,
+            "quote_end": 153,
+            "location_description": "Robert Frost's former home in Franconia, New Hampshire, United States"
+          },
+          "second_rerank_score": 0.91
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "ENTITY_BRIDGE_UNVERIFIED",
+          "relation_status": "INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SUPPLEMENT_ACCEPTED",
+          "source_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "original_score": 0.013192488262910796,
+          "relation_status": "INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED"
+        },
+        {
+          "stage": "bridge_context",
+          "decision": "CONTEXT_ADMITTED",
+          "source_ids": [
+            "31417c7c-7abf-4723-956a-74bf7ee14683"
+          ],
+          "result_ids": [
+            "fee4d31b-8589-5875-992e-4630fec57b3e",
+            "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+            "31417c7c-7abf-4723-956a-74bf7ee14683"
+          ]
+        },
+        {
+          "stage": "bridge_context",
+          "decision": "FINAL_ANSWER_UNVERIFIED",
+          "evidence_chain_supported": false,
+          "generated_answer_verified": false
+        }
+      ]
+    },
+    {
+      "case_id": "frost-B",
+      "execution": "DETERMINISTIC_MOCK",
+      "q0": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "rewrite_query": "Where is the seminar directed by Jeanne Marie Beaumont located that took place between 2007 and 2010?",
+      "first_hop_relation_verified": true,
+      "identity_verified": true,
+      "final_context_identity_supported": false,
+      "q1": "Where is The Frost Place Advanced Seminar located?",
+      "initial_search_candidate_count": 30,
+      "second_hop_source_in_pool": true,
+      "second_rerank_called": true,
+      "second_rerank_passed": true,
+      "second_hop_location_found": true,
+      "entity_bridge_verified": false,
+      "final_answer_supported": false,
+      "generated_answer_verified": null,
+      "generation_status": "NOT_RUN",
+      "mock_cheap_calls": 1,
+      "mock_bge_calls": 1,
+      "context_result_ids": [
+        "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+        "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+        "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+        "31417c7c-7abf-4723-956a-74bf7ee14683"
+      ],
+      "context_sha256": "14e192f53e81b6d9a5be8dd369718871abc59dc81a1d8457cd30720cfa6e8080",
+      "generation_prompt_sha256": "1188c9ba6d36521f75320ba9b6f6f362d6b2c97a170dfc92f65220bc97d86ecc",
+      "supplement_source_ids": [
+        "31417c7c-7abf-4723-956a-74bf7ee14683"
+      ],
+      "first_hop": {
+        "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+        "quote_start": 155,
+        "quote_end": 311,
+        "quote": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+        "source_version": "de3ec8ca-5496-4ecf-abcb-3b65423d1fe9"
+      },
+      "identity_proof": {
+        "verified": true,
+        "resolved_name": "Jeanne Marie Beaumont",
+        "anchor_quotes": [
+          {
+            "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+            "quote_start": 0,
+            "quote_end": 283,
+            "quote": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997)."
+          },
+          {
+            "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+            "quote_start": 174,
+            "quote_end": 250,
+            "quote": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000."
+          }
+        ],
+        "final_context_identity_supported": false,
+        "reason": "BOUNDED_SOURCE_IDENTITY_VERIFIED"
+      },
+      "second_hop": {
+        "phrase": "The Frost Place",
+        "quote": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+        "quote_start": 0,
+        "quote_end": 153,
+        "location_description": "Robert Frost's former home in Franconia, New Hampshire, United States"
+      },
+      "bridge_trace": [
+        {
+          "stage": "bridge_start",
+          "mode": "cheap_bridge_v1",
+          "contract_version": "sentence-id/v2"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "EXTRACTION_INPUT",
+          "windows": [
+            {
+              "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+              "start": 73,
+              "end": 311,
+              "text": "She has taught at Rutgers University and regularly teaches at the 92nd Street Y.\n She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+              "role": "main"
+            },
+            {
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 1,
+              "end": 485,
+              "text": "The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010.\n Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000.\n She was judge for the 2011 Cider Press Review Book Award.\n She grew up in the suburban Philadelphia area and moved to New York City in 1983.\n She earned her B.A. from Eastern College and an M.F.A. in Writing from Columbia University.",
+              "role": "preceding"
+            },
+            {
+              "source_chunk_id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "start": 1,
+              "end": 441,
+              "text": "Her work has appeared in \"Boston Review, Barrow Street, Colorado Review, Court Green, Harper’s, Harvard Review, Manhattan Review, The Nation, New American Writing, Ploughshares, Poetry Northwest, Witness,\" and \"World Literature Today,\" and she has had poems featured on \"The Writer's Almanac with Garrison Keillor.\"\n In 2006, San Francisco film-maker Jay Rosenblatt made a film based on her poem \"Afraid So\" as narrated by Garrison Keillor.",
+              "role": "preceding"
+            },
+            {
+              "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+              "start": 0,
+              "end": 283,
+              "text": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997).",
+              "role": "preceding"
+            }
+          ],
+          "sentences": [
+            {
+              "sentence_id": "s-984a18a6bbfe34f8ad7559c4",
+              "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+              "start": 0,
+              "end": 283,
+              "text": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997).",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-28982712e0f5464efb59a1fe",
+              "source_chunk_id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "start": 1,
+              "end": 316,
+              "text": "Her work has appeared in \"Boston Review, Barrow Street, Colorado Review, Court Green, Harper’s, Harvard Review, Manhattan Review, The Nation, New American Writing, Ploughshares, Poetry Northwest, Witness,\" and \"World Literature Today,\" and she has had poems featured on \"The Writer's Almanac with Garrison Keillor.\"",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-b135c696c77211fbf90b7d11",
+              "source_chunk_id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "start": 318,
+              "end": 441,
+              "text": "In 2006, San Francisco film-maker Jay Rosenblatt made a film based on her poem \"Afraid So\" as narrated by Garrison Keillor.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-93d6088e291a516a9f5b3d5d",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 1,
+              "end": 172,
+              "text": "The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-35ac67f70d453c0a66e69cd4",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 174,
+              "end": 250,
+              "text": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-4b571e5ce9f1e61f8aefc0c2",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 252,
+              "end": 309,
+              "text": "She was judge for the 2011 Cider Press Review Book Award.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-063843b6d350a19d4cc0420d",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 311,
+              "end": 392,
+              "text": "She grew up in the suburban Philadelphia area and moved to New York City in 1983.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-61864913eb0bc89f253e8e53",
+              "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "start": 394,
+              "end": 485,
+              "text": "She earned her B.A. from Eastern College and an M.F.A. in Writing from Columbia University.",
+              "role": "preceding"
+            },
+            {
+              "sentence_id": "s-23e91c50503691003a2ee6c8",
+              "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+              "start": 73,
+              "end": 153,
+              "text": "She has taught at Rutgers University and regularly teaches at the 92nd Street Y.",
+              "role": "main"
+            },
+            {
+              "sentence_id": "s-c9a81754f7673886cbb035bf",
+              "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+              "start": 155,
+              "end": 311,
+              "text": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+              "role": "main"
+            }
+          ],
+          "predecessor_chains": {
+            "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b": [
+              "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+              "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+              "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ]
+          },
+          "contract_version": "sentence-id/v2",
+          "q0_sha256": "fae83d6fa7be239093c8799b21edff07bad606b4539007816d08d0d0aea70046",
+          "model_id": "cheap"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "EXTRACTION_OUTPUT",
+          "content": "{\"status\": \"FIRST_HOP_CANDIDATE\", \"sentence_id\": \"s-c9a81754f7673886cbb035bf\", \"subject\": \"She\", \"subject_resolution\": \"UNVERIFIED\", \"predicate\": \"served as the Director of\", \"object\": \"The Frost Place Advanced Seminar\", \"time\": \"2007–2010\", \"target_attribute\": \"location\", \"bridge_search_phrases\": [\"The Frost Place Advanced Seminar\", \"The Frost Place\"]}",
+          "finish_reason": "stop"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "FIRST_HOP_SPAN_VERIFIED",
+          "extraction": {
+            "status": "FIRST_HOP_CANDIDATE",
+            "sentence_id": "s-c9a81754f7673886cbb035bf",
+            "subject": "She",
+            "subject_resolution": "UNVERIFIED",
+            "predicate": "served as the Director of",
+            "object": "The Frost Place Advanced Seminar",
+            "time": "2007–2010",
+            "target_attribute": "location",
+            "bridge_search_phrases": [
+              "The Frost Place Advanced Seminar",
+              "The Frost Place"
+            ],
+            "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "quote_start": 155,
+            "quote_end": 311,
+            "quote": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+            "contract_version": "sentence-id/v2",
+            "span_verified": true,
+            "subject_verified": false,
+            "relation_form_verified": true,
+            "relation_verified": false
+          }
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "FIRST_HOP_VERIFIED",
+          "extraction": {
+            "status": "FIRST_HOP_CANDIDATE",
+            "sentence_id": "s-c9a81754f7673886cbb035bf",
+            "subject": "She",
+            "subject_resolution": "UNVERIFIED",
+            "predicate": "served as the Director of",
+            "object": "The Frost Place Advanced Seminar",
+            "time": "2007–2010",
+            "target_attribute": "location",
+            "bridge_search_phrases": [
+              "The Frost Place Advanced Seminar",
+              "The Frost Place"
+            ],
+            "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "quote_start": 155,
+            "quote_end": 311,
+            "quote": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+            "contract_version": "sentence-id/v2",
+            "span_verified": true,
+            "subject_verified": true,
+            "relation_form_verified": true,
+            "relation_verified": true,
+            "identity_proof": {
+              "verified": true,
+              "resolved_name": "Jeanne Marie Beaumont",
+              "anchor_quotes": [
+                {
+                  "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+                  "quote_start": 0,
+                  "quote_end": 283,
+                  "quote": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997)."
+                },
+                {
+                  "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+                  "quote_start": 174,
+                  "quote_end": 250,
+                  "quote": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000."
+                }
+              ],
+              "final_context_identity_supported": false,
+              "reason": "BOUNDED_SOURCE_IDENTITY_VERIFIED"
+            }
+          },
+          "identity_proof": {
+            "verified": true,
+            "resolved_name": "Jeanne Marie Beaumont",
+            "anchor_quotes": [
+              {
+                "source_chunk_id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+                "quote_start": 0,
+                "quote_end": 283,
+                "quote": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997)."
+              },
+              {
+                "source_chunk_id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+                "quote_start": 174,
+                "quote_end": 250,
+                "quote": "Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000."
+              }
+            ],
+            "final_context_identity_supported": false,
+            "reason": "BOUNDED_SOURCE_IDENTITY_VERIFIED"
+          }
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "BRIDGE_QUERY_VERIFIED",
+          "q1": "Where is The Frost Place Advanced Seminar located?",
+          "object": "The Frost Place Advanced Seminar",
+          "target_attribute": "location"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SECOND_RERANK_INPUT",
+          "q1": "Where is The Frost Place Advanced Seminar located?",
+          "q1_source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "object": "The Frost Place Advanced Seminar",
+          "candidate_ids": [
+            "31417c7c-7abf-4723-956a-74bf7ee14683"
+          ],
+          "first_scores": {
+            "31417c7c-7abf-4723-956a-74bf7ee14683": 0.017354240640997887
+          },
+          "threshold": 0.3,
+          "threshold_status": "EXPERIMENTAL_NOT_CALIBRATED"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SECOND_RERANK_OUTPUT",
+          "scores": [
+            {
+              "id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+              "score": 0.91
+            }
+          ]
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SECOND_HOP_LOCATION_FOUND",
+          "source_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "fact": {
+            "phrase": "The Frost Place",
+            "quote": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+            "quote_start": 0,
+            "quote_end": 153,
+            "location_description": "Robert Frost's former home in Franconia, New Hampshire, United States"
+          },
+          "second_rerank_score": 0.91
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "ENTITY_BRIDGE_UNVERIFIED",
+          "relation_status": "INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "SUPPLEMENT_ACCEPTED",
+          "source_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "original_score": 0.013038277511961722,
+          "relation_status": "INSTITUTION_LOCATION_ONLY_EVENT_VENUE_UNVERIFIED"
+        },
+        {
+          "stage": "bridge_context",
+          "decision": "CONTEXT_ADMITTED",
+          "source_ids": [
+            "31417c7c-7abf-4723-956a-74bf7ee14683"
+          ],
+          "result_ids": [
+            "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+            "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+            "31417c7c-7abf-4723-956a-74bf7ee14683"
+          ]
+        },
+        {
+          "stage": "bridge_context",
+          "decision": "FINAL_ANSWER_UNVERIFIED",
+          "evidence_chain_supported": false,
+          "generated_answer_verified": false
+        }
+      ]
+    },
+    {
+      "case_id": "leyden-negative",
+      "execution": "DETERMINISTIC_MOCK",
+      "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "rewrite_query": "Who is credited with inventing both the Leyden jar and the tribometer?",
+      "first_hop_relation_verified": false,
+      "identity_verified": false,
+      "final_context_identity_supported": false,
+      "q1": null,
+      "initial_search_candidate_count": 30,
+      "second_hop_source_in_pool": false,
+      "second_rerank_called": false,
+      "second_rerank_passed": false,
+      "second_hop_location_found": false,
+      "entity_bridge_verified": false,
+      "final_answer_supported": false,
+      "generated_answer_verified": null,
+      "generation_status": "NOT_RUN",
+      "mock_cheap_calls": 0,
+      "mock_bge_calls": 0,
+      "context_result_ids": [
+        "c7df42db-cc48-4c54-beb1-75adcba4dd4b",
+        "e8a751ff-032c-4c8c-bb31-4eddc73b3a86",
+        "2a95d110-78f3-49e3-ad76-1f6582b7496c",
+        "41295870-5f65-458c-b045-85280c1184a3"
+      ],
+      "context_sha256": "8daeff15f3341c4ebb9c7dea7db31b2b74d8e19e8af26c3ce57b3737b10da085",
+      "generation_prompt_sha256": "e560e50dafbe29b10dceee8c14add9d5af1c8672f95b38f98c9f503d5da1b7f8",
+      "supplement_source_ids": [],
+      "first_hop": null,
+      "identity_proof": null,
+      "second_hop": null,
+      "bridge_trace": [
+        {
+          "stage": "bridge_start",
+          "mode": "cheap_bridge_v1",
+          "contract_version": "sentence-id/v2"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "NOT_APPLICABLE",
+          "reason": "LOCATION_RELATION_ONLY"
+        }
+      ]
+    },
+    {
+      "case_id": "postcode-negative",
+      "execution": "DETERMINISTIC_MOCK",
+      "q0": "According to this courseware, what is the conference venue's postal code?",
+      "rewrite_query": "According to this courseware, what is the conference venue's postal code?",
+      "first_hop_relation_verified": false,
+      "identity_verified": false,
+      "final_context_identity_supported": false,
+      "q1": null,
+      "initial_search_candidate_count": 30,
+      "second_hop_source_in_pool": false,
+      "second_rerank_called": false,
+      "second_rerank_passed": false,
+      "second_hop_location_found": false,
+      "entity_bridge_verified": false,
+      "final_answer_supported": false,
+      "generated_answer_verified": null,
+      "generation_status": "NOT_RUN",
+      "mock_cheap_calls": 0,
+      "mock_bge_calls": 0,
+      "context_result_ids": [],
+      "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "generation_prompt_sha256": "ce958dc5fcbe7e95218e4f915692c56b27432799b0e3ec0dbe9dca1dfa901485",
+      "supplement_source_ids": [],
+      "first_hop": null,
+      "identity_proof": null,
+      "second_hop": null,
+      "bridge_trace": [
+        {
+          "stage": "bridge_start",
+          "mode": "cheap_bridge_v1",
+          "contract_version": "sentence-id/v2"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "NOT_APPLICABLE",
+          "reason": "LOCATION_RELATION_ONLY"
+        }
+      ]
+    },
+    {
+      "case_id": "scifact-611-negative",
+      "execution": "DETERMINISTIC_MOCK",
+      "q0": "Increased lipolysis leads to higher P38 phosphorylation in adipose tissue.",
+      "rewrite_query": "Increased lipolysis leads to higher P38 phosphorylation in adipose tissue.",
+      "first_hop_relation_verified": false,
+      "identity_verified": false,
+      "final_context_identity_supported": false,
+      "q1": null,
+      "initial_search_candidate_count": 1,
+      "second_hop_source_in_pool": false,
+      "second_rerank_called": false,
+      "second_rerank_passed": false,
+      "second_hop_location_found": false,
+      "entity_bridge_verified": false,
+      "final_answer_supported": false,
+      "generated_answer_verified": null,
+      "generation_status": "NOT_RUN",
+      "mock_cheap_calls": 0,
+      "mock_bge_calls": 0,
+      "context_result_ids": [
+        "d5638a70-ec8f-4307-821e-73a21ab7118d"
+      ],
+      "context_sha256": "9ce45a8c0635246b126b900e6780c144cf4b5c94a63162591927a4f264203ae1",
+      "generation_prompt_sha256": "8072f979fd455449799414ab4a967c63f80401a90c859073bfe48f1318e6a0b5",
+      "supplement_source_ids": [],
+      "first_hop": null,
+      "identity_proof": null,
+      "second_hop": null,
+      "bridge_trace": [
+        {
+          "stage": "bridge_start",
+          "mode": "cheap_bridge_v1",
+          "contract_version": "sentence-id/v2"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "NOT_APPLICABLE",
+          "reason": "LOCATION_RELATION_ONLY"
+        }
+      ]
+    },
+    {
+      "case_id": "mml-0687-negative",
+      "execution": "DETERMINISTIC_MOCK",
+      "q0": "Who has a higher median campaign grade? Trump or Clinton?",
+      "rewrite_query": "Who has a higher median campaign grade? Trump or Clinton?",
+      "first_hop_relation_verified": false,
+      "identity_verified": false,
+      "final_context_identity_supported": false,
+      "q1": null,
+      "initial_search_candidate_count": 2,
+      "second_hop_source_in_pool": false,
+      "second_rerank_called": false,
+      "second_rerank_passed": false,
+      "second_hop_location_found": false,
+      "entity_bridge_verified": false,
+      "final_answer_supported": false,
+      "generated_answer_verified": null,
+      "generation_status": "NOT_RUN",
+      "mock_cheap_calls": 0,
+      "mock_bge_calls": 0,
+      "context_result_ids": [
+        "834f3910-246d-4c81-8285-87afb311005b",
+        "f96f9f89-1b47-4a04-872a-53faa3a3e793"
+      ],
+      "context_sha256": "71927c45d23ec49380a708fd3a452cd8e9dbe832feeda4173d0d25b8526f620a",
+      "generation_prompt_sha256": "8a4c63ca4f1f24b406de4812e9dfb69e8193821eaec4d8b1fb2b8bf97709bf1f",
+      "supplement_source_ids": [],
+      "first_hop": null,
+      "identity_proof": null,
+      "second_hop": null,
+      "bridge_trace": [
+        {
+          "stage": "bridge_start",
+          "mode": "cheap_bridge_v1",
+          "contract_version": "sentence-id/v2"
+        },
+        {
+          "stage": "bridge_rescue",
+          "decision": "NOT_APPLICABLE",
+          "reason": "LOCATION_RELATION_ONLY"
+        }
+      ]
+    }
+  ],
+  "scope_validation": "Mock repository invariants; no live permission assertion",
+  "answer_accuracy": "NOT_MEASURED; no final model answer generated",
+  "stage5": "NOT_REQUIRED_FOR_FROST; second hop exists in original pool; no new Search implemented"
+}
