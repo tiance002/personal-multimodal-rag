@@ -382,6 +382,7 @@ class RuntimeService:
             finalized=FinalizedContext(state.query,'',())
             state.merge_results=[]
             state.rescue_evidence=[]
+            state.bridge_identity_evidence=[]
             state.rendered_contexts=''
             state.user_content=state.query
             state._finalized_context=finalized

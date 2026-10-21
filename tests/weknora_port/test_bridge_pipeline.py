@@ -193,7 +193,11 @@ def test_saved_frost_simulated_sentence_id_bridge_preserves_unsupported_event_ve
         assert details['final_answer_supported'] is False
         assert details['identity_proof']['verified'] is True
         assert details['identity_proof']['resolved_name']=='Jeanne Marie Beaumont'
-        assert details['identity_proof']['final_context_identity_supported'] is (saved['arm']=='A')
+        initial=next(row for row in state.bridge_trace if row.get('decision')=='FIRST_HOP_VERIFIED')
+        # Frozen B initially lacks the full-name anchor; S8.5.1 now admits its
+        # independently re-read original without changing the frozen input.
+        assert initial['identity_proof']['final_context_identity_supported'] is (saved['arm']=='A')
+        assert details['identity_proof']['final_context_identity_supported'] is True
         assert first.content[details['quote_start']:details['quote_end']]==details['first_hop_quote']
         finalized=await into_chat_message(state,ctx)
         assert second.id in finalized.result_ids and second.content in finalized.rendered_contexts

@@ -6,7 +6,7 @@ The caller authorizes each source through the scoped current-source reader.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import re
 
 from .search import RetrievalScopeError
@@ -230,3 +230,75 @@ def prove_identity(question, sources, *, selected_chunk_id, quote_start, quote_e
     supported = all(_present_in_normal(quote, originals[quote.source_chunk_id], normal_results)
                     for quote in required)
     return IdentityProof(True, name, anchors, supported, 'BOUNDED_SOURCE_IDENTITY_VERIFIED')
+
+
+async def admit_identity_context(state, context, repository, data, chain, proof):
+    """Admit only missing proven original anchors after an accepted location hop.
+
+    The historical extraction proof is not changed. This is a separate current
+    source projection with both existing Context encoders' budgets enforced.
+    """
+    if not proof.verified or proof.final_context_identity_supported:
+        return
+    from copy import copy, deepcopy
+    from .bridge_rescue import _check, _read_originals, _trace
+    from .context import into_chat_message
+    from .source_evidence import SourceEvidenceBudgetError
+    from .types import context_results
+    from ..generation.context import Evidence, prepare_generation
+    from ..generation.types import GenerationRequest
+
+    _check(context)
+    current = await _read_originals(chain, state, context, repository)
+    _check(context)
+    fresh = prove_identity(state.rewrite_query or state.query, current,
+        selected_chunk_id=data['source_chunk_id'], quote_start=data['quote_start'],
+        quote_end=data['quote_end'], normal_results=state.merge_results)
+    if fresh != proof:
+        raise RetrievalScopeError()
+    originals = {row.id:row for row in current}
+    missing = [anchor for anchor in fresh.anchor_quotes
+               if not _present_in_normal(anchor, originals[anchor.source_chunk_id], state.merge_results)]
+    additions = []
+    for anchor in missing:
+        row = originals[anchor.source_chunk_id]
+        if any(existing.id == row.id for existing in context_results(state)):
+            raise RetrievalScopeError()
+        if row.id not in {item.id for item in additions}:
+            raw = deepcopy(row)
+            raw.knowledge_description = raw.knowledge_custom_metadata = raw.context_header = ''
+            raw.metadata['bridge_identity'] = {'first_hop_chunk_id':data['source_chunk_id'],
+                'source_chunk_id':row.id, 'quote_start':anchor.quote_start,
+                'quote_end':anchor.quote_end, 'quote':anchor.quote}
+            additions.append(raw)
+    admitted = prove_identity(state.rewrite_query or state.query, current,
+        selected_chunk_id=data['source_chunk_id'], quote_start=data['quote_start'],
+        quote_end=data['quote_end'], normal_results=[*state.merge_results,*additions])
+    if not additions or not admitted.final_context_identity_supported:
+        _trace(state,'IDENTITY_CONTEXT_SKIPPED',reason='IDENTITY_ANCHOR_NOT_ADMISSIBLE',
+               final_context_identity_supported=False)
+        return
+    trial = copy(state)
+    trial.bridge_identity_evidence = additions
+    try:
+        finalized = await into_chat_message(trial,context,record_bridge=False)
+        # The final encoder adds handles and source wrappers. It is the same
+        # encoder used before real generation, not a raw text length estimate.
+        prepare_generation(GenerationRequest(context.request_id,context.session_id or 'identity-context-preview',
+            'identity-context-preview',state.query,finalized,
+            evidence=tuple(Evidence.from_result(row) for row in context_results(trial)),
+            language=state.language,citations_enabled=True))
+    except SourceEvidenceBudgetError:
+        _trace(state,'IDENTITY_CONTEXT_SKIPPED',reason='IDENTITY_CONTEXT_BUDGET_EXCEEDED',
+               source_ids=[row.id for row in additions],final_context_identity_supported=False)
+        return
+    _check(context)
+    state.bridge_identity_evidence = additions
+    for row in state.rescue_evidence:
+        details = row.metadata.get('bridge_rescue',{})
+        if details.get('first_hop_chunk_id') == data['source_chunk_id']:
+            details['identity_proof'] = asdict(admitted)
+            details['identity_context_admission'] = 'CURRENT_ORIGINAL_ANCHOR_ADMITTED'
+    _trace(state,'IDENTITY_CONTEXT_ADMITTED',source_ids=[row.id for row in additions],
+        initial_final_context_identity_supported=proof.final_context_identity_supported,
+        final_context_identity_supported=True,identity_proof=asdict(admitted))

@@ -724,5 +724,8 @@ async def rescue_bridge(state, context, repository, registry):
         state.rescue_evidence.append(result)
         _trace(state, 'SUPPLEMENT_ACCEPTED', source_chunk_id=source.id,
                original_score=source.score, relation_status=result.metadata['bridge_rescue']['relation_status'])
+        from .bridge_identity import admit_identity_context
+        await admit_identity_context(state, context, repository, data,
+                                     chains[data['source_chunk_id']], proof)
     except Exception as error:
         _optional_error(state, error, 'VALIDATION_OR_OPTIONAL_MODEL_FAILURE')

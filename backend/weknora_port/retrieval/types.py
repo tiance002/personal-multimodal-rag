@@ -42,6 +42,7 @@ def context_results(state):
     """Original normal order followed by independent, verified supplements."""
     normal = state.merge_results
     rescue = getattr(state, "rescue_evidence", ())
+    identity = getattr(state, "bridge_identity_evidence", ())
     qualifications = getattr(state, "bridge_normal_qualifications", {})
     if qualifications:
         if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
@@ -63,11 +64,11 @@ def context_results(state):
             else:
                 views.append(row)
         normal = views
-    if not rescue:
+    if not rescue and not identity:
         return normal
     if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
         raise ValueError("BRIDGE_EVIDENCE_MODE_MISMATCH")
-    rows = [*normal, *rescue]
+    rows = [*normal, *identity, *rescue]
     ids = [row.id for row in rows if row is not None]
     if len(ids) != len(set(ids)):
         raise ValueError("BRIDGE_EVIDENCE_DUPLICATE")
@@ -76,6 +77,8 @@ def context_results(state):
 
 def bridge_context_attributes(row):
     """Program evidence qualifications shared by both Context encoders."""
+    if (row.metadata or {}).get('bridge_identity'):
+        return ' role="bridge_identity" supports="subject_identity"'
     details = (row.metadata or {}).get('bridge_rescue')
     if not isinstance(details, dict) or not details:
         normal = (row.metadata or {}).get('bridge_normal_qualification')
@@ -100,3 +103,4 @@ class SearchState:
     search_results: list[SearchResult | None] = field(default_factory=list)
     rerank_results: list[SearchResult | None] = field(default_factory=list)
     merge_results: list[SearchResult | None] = field(default_factory=list)
+    bridge_identity_evidence: list[SearchResult] = field(default_factory=list, kw_only=True)
