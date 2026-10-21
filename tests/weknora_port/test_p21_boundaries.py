@@ -46,12 +46,13 @@ def test_source_scoped_followup_with_history_still_retrieves_when_model_says_fol
         await RetrievalPipeline(repo, Registry(model)).run(s, CTX)
         assert s.intent == 'kb_search' and s.needs_retrieval
         assert len(repo.calls) == 1 and s.search_results
-        assert repo.calls[0][1].query_text == '课件中提到的远距离通信方式可能遇到什么问题'
+        # The proposed free paraphrase drops q0's explicit source condition.
+        assert repo.calls[0][1].query_text == question and s.rewrite_fallback_reason
 
     run(scenario())
 
 
-def test_history_only_followup_and_attached_document_question_keep_bypass_intents():
+def test_factual_history_followup_retrieves_but_attached_document_stays_supported():
     history_only = state(query='上面第二点展开讲讲', intent='follow_up',
                          history=[SimpleNamespace(answer='第二点的内容')])
     attached_doc = state(query='根据文档总结一下', intent='doc_only',
@@ -59,7 +60,7 @@ def test_history_only_followup_and_attached_document_question_keep_bypass_intent
     absent_doc = state(query='请根据课件回答', intent='follow_up',
                        history=[SimpleNamespace(answer='earlier answer')],
                        attachment_prompt='<no_document_attached />')
-    assert resolve_intent(history_only) == 'follow_up'
+    assert resolve_intent(history_only) == 'kb_search'
     assert resolve_intent(attached_doc) == 'doc_only'
     assert resolve_intent(absent_doc) == 'kb_search'
 
@@ -78,7 +79,7 @@ def test_image_does_not_replace_explicit_courseware_source(intent):
     ('chitchat', '讲个笑话', [], (), ''),
     ('chitchat', 'Tell me a funny story about a cat.', [], (), ''),
     ('greeting', '你好，今天过得怎么样？', [], (), ''),
-    ('follow_up', '上面第二点展开讲讲', [SimpleNamespace(answer='prior answer')], (), ''),
+    ('follow_up', '把上一条回答改成表格', [SimpleNamespace(answer='prior answer')], (), ''),
     ('image_only', '这张图是什么意思', [], ('real-image',), ''),
     ('doc_only', '根据文档总结一下', [], (), 'real document content'),
 ])

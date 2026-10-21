@@ -17,6 +17,8 @@ DEFAULT_CONTEXT_TEMPLATE = '## Reference materials (source data)\n{{contexts}}\n
 class PipelineState(SearchState):
     query: str = ''
     rewrite_query: str = ''
+    rewrite_fallback_reason: str = ''
+    query_trace: list[dict] = field(default_factory=list)
     intent: str = ''
     targets: tuple[SearchTarget, ...] = ()
     embedding_top_k: int = 30
@@ -109,7 +111,9 @@ class RetrievalPipeline:
         check_context()
         await self._progress("understand", "started")
         await understand_query(state, context, self.registry, history_loader=self.history_loader, caption_sink=self.caption_sink)
-        await self._progress("understand", "completed")
+        query_audit = state.query_trace[-1] if state.query_trace else {}
+        await self._progress("understand", "completed", rewrite_reason=query_audit.get('reason',''),
+                             q0_sha256=query_audit.get('q0_sha256',''), rewrite_sha256=query_audit.get('rewrite_sha256',''))
         check_context()
         from .query import resolve_intent
         state.intent = resolve_intent(state)

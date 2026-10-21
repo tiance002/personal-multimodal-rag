@@ -210,7 +210,9 @@ def test_history_disabled_fetch_error_and_trusted_scope_only():
         assert repo.calls[-1] == ("history", SCOPE, "session", 20)
         repo.fail.add("history")
         assert await loader.load(CONTEXT, "session", 2) == ()
-        assert await loader.load(MemoryContext(0, ""), "session", 2) == ()
+        # S8.5: missing authority cannot degrade as an optional fetch failure.
+        with pytest.raises(MemoryScopeError):
+            await loader.load(MemoryContext(0, ""), "session", 2)
         with pytest.raises(MemoryScopeError): resolve_scope({"tenant_id": 1, "principal_storage_id": "spoofed"})
     asyncio.run(run())
 

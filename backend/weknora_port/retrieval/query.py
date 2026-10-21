@@ -6,8 +6,10 @@ English whitespace approximation. Python jieba alone is not GoJieba parity.
 from __future__ import annotations
 import json
 import re
+import hashlib
 from typing import Callable, Sequence
-from ..models.types import ChatOptions, Message, CallCancelled, RunDeadlineExceeded
+from ..models.types import ChatOptions, Message, CallCancelled, RunDeadlineExceeded, ModelCallTimeout
+from ..conversation.types import MemoryScopeError
 from ..models.cloud_errors import raise_if_send_denied
 STOPWORDS = frozenset('的 是 在 了 和 与 或 a an the is are was were be been being have has had do does did will would could should may might must can to of in for on with at by from as into through about what how why when where which who whom whose'.split())
 
@@ -87,6 +89,8 @@ def expand_queries(rewrite: str, original: str, segmenter=None):
     return out[:5]
 
 def parse_understanding(state, output):
+    if not isinstance(output, str):
+        return False
     raw = go_strip(output)
     try:
         data = json.loads(raw)
@@ -107,6 +111,8 @@ def parse_understanding(state, output):
     rewrite = first(('rewrite_query', 'rewritten_query', 'query', 'question'))
     if go_strip(rewrite):
         state.rewrite_query = go_strip(rewrite)
+    else:
+        state.rewrite_fallback_reason = 'REWRITE_EMPTY'
     state.intent = go_strip(data.get('intent', '')) if isinstance(data.get('intent', ''), str) else ''
     desc = go_strip(first(('image_description', 'image_desc', 'image_text', 'image_ocr_text', 'description')))
     ocr = go_strip(first(('ocr_text', 'ocr', 'full_ocr', 'image_ocr', 'ocr_content')))
@@ -138,6 +144,98 @@ _SOURCE_NEGATION = re.compile(r'(?:不要|不必|无需|不用|不需要|别|不
 _ATTACHED_SCHEME_COMPARISON = re.compile(
     r'\s*(?:来)?(?:评价|评估|比较|对比)(?:一下)?(?:我|本次|当前)?(?:上传的|附加的)方案(?:文档|文件)?')
 
+# A small allowlist of complete operations on the previous answer. Anything
+# outside it needs fresh evidence, regardless of a model-produced intent label.
+_HISTORY_TRANSFORM = re.compile(
+    r'(?:请)?(?:把|将)?(?:上一条回答|上一个回答|刚才的回答|上面的回答|上一条的回答|上条回答)'
+    r'(?:改成表格|转换成表格|整理成表格|翻译成(?:英文|中文|英语|汉语|日语|法语)|换一种说法|重新措辞|改写)'
+    r'[。.!！]?|'
+    r'(?:please\s+)?(?:translate\s+(?:the\s+)?(?:previous|last)\s+answer\s+into\s+(?:English|Chinese|French|Japanese)|'
+    r'(?:rephrase|reword)\s+(?:the\s+)?(?:previous|last)\s+answer|'
+    r'(?:format|convert)\s+(?:the\s+)?(?:previous|last)\s+answer\s+as\s+a\s+table)[.!]?', re.I)
+_GREETING = re.compile(r'(?:你好|您好|谢谢|再见|你好[，,]今天过得怎么样|hello|hi|thanks|thank you|bye)[。.!！?？]*', re.I)
+_SMALLTALK = re.compile(r'(?:你是谁|讲个笑话|tell me (?:a )?(?:funny )?(?:story|joke)(?: about a [a-z]+)?)[。.!！?？]*', re.I)
+_REFERENCE = re.compile(r'它们|他们|她们|它|他|她|这个|那个|上述|该(?:方法|算法|模型|技术)|\b(?:it|its|they|them|their|he|his|she|her|this|that)\b', re.I)
+_AMBIGUOUS_HISTORY = re.compile(r'比较|对比|相比|与|和|或者|还是|、|\b(?:and|or|versus|vs)\b', re.I)
+_PROTECTED_NUMBERS = re.compile(r'\d+(?:[./:–—-]\d+)*%?|第[一二三四五六七八九十百零\d]+[点章节条项]')
+_PROTECTED_MARKERS = re.compile(r'不要|不得|不能|不超过|不少于|不低于|不|未|无|非|仅限|仅|只|至少|至多|必须|之前|之后|以前|以后|\b(?:not|no|never|without|only|before|after|at least|at most)\b', re.I)
+_REWRITE_GUARD_PROMPT = (
+    '\nRuntime query contract: preserve q0 and every explicit number, time, negation, comparison and restriction. '
+    'Only replace an unambiguous reference with a literal entity from the authorized conversation. '
+    'Do not invent relations, answer the question, or add facts. If ambiguous, keep q0. '
+    'Factual follow-ups and requests for sources require kb_search. '
+    'follow_up is only for pure formatting, translation or rephrasing of a previous answer.')
+
+
+def _literal(value):
+    # Minus signs, identifier hyphens, quotes and comparison punctuation carry
+    # meaning. Only whitespace/case are cosmetic for the literal contract.
+    return re.sub(r'\s+', '', value, flags=re.UNICODE).casefold()
+
+
+def validate_rewrite(state, candidate):
+    """Conservative literal coreference contract, not a semantic classifier.
+
+    Free paraphrases cannot be proven safe locally. Accept unchanged q0 or one
+    source-grounded reference replacement; unsupported/ambiguous forms retain
+    q0. This intentionally trades rewrite coverage for preserving constraints.
+    """
+    q0 = state.query
+    if not isinstance(candidate, str) or not go_strip(candidate):
+        return 'REWRITE_EMPTY'
+    if len(candidate) > max(2048, len(q0) + 256):
+        return 'REWRITE_TOO_LONG'
+    if _PROTECTED_NUMBERS.findall(q0) != _PROTECTED_NUMBERS.findall(candidate):
+        return 'EXPLICIT_NUMBER_OR_TIME_CHANGED'
+    if [m.casefold() for m in _PROTECTED_MARKERS.findall(q0)] != [m.casefold() for m in _PROTECTED_MARKERS.findall(candidate)]:
+        return 'EXPLICIT_RESTRICTION_CHANGED'
+    if _literal(candidate) == _literal(q0):
+        return ''
+    references = list(_REFERENCE.finditer(q0))
+    if len(references) != 1:
+        return 'REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION'
+    anchor = None
+    # Carry an explicit antecedent through consecutive pronoun questions. The
+    # first intervening independent topic ends the search; never scan past it.
+    for previous in reversed(state.history):
+        previous_query = getattr(previous, 'query', '')
+        if _REFERENCE.search(previous_query) and _AMBIGUOUS_HISTORY.search(previous_query):
+            return 'AMBIGUOUS_REFERENCE'
+        if not _REFERENCE.search(previous_query):
+            anchor = previous
+            break
+    if anchor is None:
+        return 'REFERENCE_SOURCE_UNAVAILABLE'
+    if _AMBIGUOUS_HISTORY.search(anchor.query):
+        return 'AMBIGUOUS_REFERENCE'
+    reference = references[0]
+    prefix, suffix = _literal(q0[:reference.start()]), _literal(q0[reference.end():])
+    matched = re.fullmatch(re.escape(prefix) + r'(.{2,160}?)' + re.escape(suffix), _literal(candidate))
+    if not matched:
+        return 'CURRENT_QUESTION_CHANGED'
+    replacement = matched[1]
+    if _REFERENCE.fullmatch(replacement):
+        return 'REFERENCE_NOT_RESOLVED'
+    # Literal grounding is necessary; same-document or generated model output
+    # alone never establishes a new relationship. Reject multi-subject history.
+    if replacement not in _literal(anchor.query):
+        # Answers may mention several entities without a detectable conjunction.
+        # v1 cannot prove a unique answer-only antecedent; retain q0 instead.
+        return 'REFERENCE_NOT_GROUNDED'
+    return ''
+
+
+def _record_rewrite(state, reason=''):
+    state.rewrite_fallback_reason = reason
+    if reason:
+        state.rewrite_query = state.query
+    # Raw q0/rewrite remain request-local in their existing fields. Diagnostics
+    # carry identities/reasons, not private transcript bodies.
+    state.query_trace.append({'stage':'query_understand', 'decision':'FALLBACK' if reason else 'ACCEPTED',
+        'reason':reason, 'q0_sha256':hashlib.sha256(state.query.encode('utf-8')).hexdigest(),
+        'rewrite_sha256':hashlib.sha256(state.rewrite_query.encode('utf-8')).hexdigest(),
+        'history_rounds':len(state.history)})
+
 
 def resolve_intent(state):
     """Validate bypass prerequisites using the original request, never its rewrite.
@@ -164,10 +262,14 @@ def resolve_intent(state):
         return intent
     if intent == 'doc_only' and has_document:
         return intent
-    if intent in ('greeting', 'chitchat'):
+    if any(go_strip(h.answer) for h in state.history) and _HISTORY_TRANSFORM.fullmatch(query):
+        return 'follow_up'
+    if intent == 'greeting' and _GREETING.fullmatch(query):
         return intent
-    if intent == 'follow_up':
-        return intent if any(go_strip(h.answer) for h in state.history) else 'kb_search'
+    if intent == 'chitchat' and _SMALLTALK.fullmatch(query):
+        return intent
+    if intent in ('greeting', 'chitchat', 'follow_up'):
+        return 'kb_search'
     if intent in ('image_only', 'doc_only'):
         return 'kb_search'
     if intent in ('kb_search', 'clarification', 'summarize', 'web_search'):
@@ -176,13 +278,20 @@ def resolve_intent(state):
 
 async def understand_query(state, context, registry, *, history_loader=None, caption_sink=None):
     state.rewrite_query = state.query
+    state.rewrite_fallback_reason = ''
+    state.query_trace = []
+    state.history = list(state.history[-state.max_rounds:]) if state.max_rounds > 0 else []
     if not state.enable_rewrite and (not state.images):
+        _record_rewrite(state, 'REWRITE_DISABLED')
         return
     if not state.history and state.max_rounds > 0 and history_loader:
         try:
             state.history = list(await history_loader(state, context))
-        except Exception:
-            pass
+        except (PermissionError, MemoryScopeError, CallCancelled, RunDeadlineExceeded, ModelCallTimeout, TimeoutError):
+            raise
+        except Exception as exc:
+            raise_if_send_denied(exc)
+    state.history = list(state.history[-state.max_rounds:]) if state.max_rounds > 0 else []
     model, use_images = (None, False)
 
     async def get(model_id):
@@ -190,7 +299,7 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
             return None
         try:
             return await registry.chat(model_id, context)
-        except (CallCancelled, RunDeadlineExceeded):
+        except (PermissionError, CallCancelled, RunDeadlineExceeded):
             raise
         except Exception as exc:
             raise_if_send_denied(exc)
@@ -206,6 +315,7 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
         if model is None and state.query_understand_model_id and state.query_understand_model_id != state.chat_model_id:
             model = await get(state.chat_model_id)
     if model is None:
+        _record_rewrite(state, 'MODEL_UNAVAILABLE')
         return
     from .context import render_placeholders
     history = ''.join((f'------BEGIN------\nUser question: {h.query}\nAssistant answer: {h.answer}\n------END------\n' for h in state.history))
@@ -213,15 +323,23 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
     q += state.attachment_prompt or '\n<no_document_attached />'
     q += state.memory_background
     values = {'conversation': history, 'query': q, 'language': state.language}
-    messages = (Message('system', render_placeholders(state.rewrite_system_prompt, values)), Message('user', render_placeholders(state.rewrite_user_prompt, values), images=tuple(state.images) if use_images else ()))
+    messages = (Message('system', render_placeholders(state.rewrite_system_prompt, values) + _REWRITE_GUARD_PROMPT), Message('user', render_placeholders(state.rewrite_user_prompt, values), images=tuple(state.images) if use_images else ()))
     try:
         response = await model.chat(messages, ChatOptions(temperature=0.3, max_completion_tokens=500 if use_images else 150, thinking=False), context.child('query_rewrite'))
-    except (CallCancelled, RunDeadlineExceeded):
+    except (PermissionError, CallCancelled, RunDeadlineExceeded):
         raise
     except Exception as exc:
         raise_if_send_denied(exc)
+        _record_rewrite(state, 'MODEL_CALL_FAILED')
         return
-    parse_understanding(state, response.content)
+    if getattr(response, 'finish_reason', '') in ('length', 'tool_calls', 'content_filter'):
+        _record_rewrite(state, 'REWRITE_RESPONSE_INCOMPLETE')
+        state.intent = resolve_intent(state)
+        return
+    parsed = parse_understanding(state, getattr(response, 'content', None))
+    reason = ('REWRITE_PARSE_FAILED' if not parsed else state.rewrite_fallback_reason
+              or validate_rewrite(state, state.rewrite_query))
+    _record_rewrite(state, reason)
     state.intent = resolve_intent(state)
     if caption_sink and state.image_description and state.user_message_id:
         try:

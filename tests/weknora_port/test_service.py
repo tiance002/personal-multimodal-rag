@@ -38,8 +38,8 @@ class DurableRepository:
         self.failures.append((turn.assistant_message_id,'MODEL_CALL_CANCELLED'));self.trace.append('CANCEL_COMMIT');return True
 class History:
     def __init__(self):self.calls=[]
-    async def load(self,context,session,max_rounds):
-        self.calls.append((context,session,max_rounds));return (SimpleNamespace(query='historic question',answer='historic answer'),)
+    async def load(self,context,session,max_rounds,*,exclude_request_id=''):
+        self.calls.append((context,session,max_rounds));return (SimpleNamespace(query='historic question',answer='historic answer',knowledge_base_scope=('kb',),document_scope=()),)
 class Memory:
     def __init__(self):self.calls=[]
     async def load(self,context,query):self.calls.append((context,query));return MemoryBundle('background','memory prompt',('kb',))

@@ -395,7 +395,9 @@ async def merge(state, context, repository, segmenter=None):
         # Validate before content/identity dedup can hide an invalid candidate.
         validate_results([r for r in results if r.match_type != 'web_search'], state.targets, context)
     dedup = _deduplicate_origins if preserve_sources else deduplicate
-    results = dedup(inject_history(dedup(results), state, segmenter))
+    # Old answers/citations aid reference understanding, never replace current
+    # Search and Rerank with stored source bodies or stale versions.
+    results = dedup(results)
     validate_results([r for r in results if r.match_type != 'web_search'], state.targets, context)
     if repository:
         results = await resolve_parents(results, state, context, repository)

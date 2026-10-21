@@ -21,9 +21,10 @@ from test_service import REQ, runtime
     '不用依据课件回答，只解释一般原理。',
     '不要根据知识库回答，只展开上面第二点。',
 ])
-def test_negated_source_does_not_force_history_followup_to_retrieve(question):
+def test_negated_source_does_not_authorize_new_facts_from_history(question):
     s = state(query=question, intent='follow_up', history=[SimpleNamespace(answer='prior answer')])
-    assert resolve_intent(s) == 'follow_up'
+    # S8.5: explaining principles is not a pure history-only transformation.
+    assert resolve_intent(s) == 'kb_search'
 
 
 @pytest.mark.parametrize('question', [

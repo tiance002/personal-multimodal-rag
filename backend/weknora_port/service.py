@@ -240,6 +240,20 @@ class RuntimeService:
 
     async def _progress(self, turn, stage, status, **fields):
         safe={k:v for k,v in fields.items() if k in ('candidate_count','selected_evidence_count') and type(v) is int and v>=0}
+        if stage == 'understand':
+            for key in ('q0_sha256', 'rewrite_sha256'):
+                if isinstance(fields.get(key),str) and re.fullmatch('[0-9a-f]{64}',fields[key]):
+                    safe[key] = fields[key]
+            reason = fields.get('rewrite_reason')
+            if isinstance(reason,str) and re.fullmatch('[A-Z_]{0,64}',reason):
+                safe['rewrite_reason'] = reason
+        if stage == 'history':
+            count = fields.get('history_origin_dropped')
+            if type(count) is int and count >= 0:
+                safe['history_origin_dropped'] = count
+            reasons = fields.get('history_origin_reasons')
+            if isinstance(reasons,list) and all(value in ('HISTORY_ORIGIN_UNKNOWN','HISTORY_SCOPE_OUTSIDE_CURRENT','HISTORY_REFERENCE_SCOPE_MISMATCH') for value in reasons):
+                safe['history_origin_reasons'] = reasons
         if fields.get('role') in ('cheap','expensive','baseline'):
             safe['role']=fields['role']
         attempt=fields.get('attempt_id')
@@ -291,10 +305,30 @@ class RuntimeService:
         state.query=turn.request.content
         state.user_message_id=turn.user_message_id
         await progress('history','started')
-        rounds=tuple(await self.history_service.load(turn.memory_context,turn.session_id,state.max_rounds))
+        rounds=tuple(h for h in await self.history_service.load(turn.memory_context,turn.session_id,state.max_rounds,
+                     exclude_request_id=turn.run_id) if getattr(h,'request_id',None) != turn.run_id)
+        admitted, origin_reasons = [], set()
+        for h in rounds:
+            kbs, documents = getattr(h,'knowledge_base_scope',None), getattr(h,'document_scope',None)
+            if (not isinstance(kbs,tuple) or not kbs or not isinstance(documents,tuple)
+                    or any(not isinstance(v,str) or not v for v in (*kbs,*documents))):
+                origin_reasons.add('HISTORY_ORIGIN_UNKNOWN')
+                continue
+            if (not set(kbs).issubset(turn.context.scope.knowledge_base_ids)
+                    or turn.context.scope.document_ids and (not documents or not set(documents).issubset(turn.context.scope.document_ids))):
+                origin_reasons.add('HISTORY_SCOPE_OUTSIDE_CURRENT')
+                continue
+            refs = getattr(h,'knowledge_references',())
+            if any(not isinstance(r,dict) or r.get('knowledge_base_id') not in kbs
+                   or not r.get('knowledge_id') or documents and r.get('knowledge_id') not in documents for r in refs):
+                origin_reasons.add('HISTORY_REFERENCE_SCOPE_MISMATCH')
+                continue
+            admitted.append(h)
+        dropped = len(rounds) - len(admitted)
+        rounds = tuple(admitted)
         history=tuple(History(h.query,h.answer) for h in rounds)
         state.history=list(rounds)
-        await progress('history','completed')
+        await progress('history','completed',history_origin_dropped=dropped,history_origin_reasons=sorted(origin_reasons))
         check_context(turn.context)
         await progress('memory','started')
         scoped_loader = getattr(self.memory_loader, 'load_scoped', None)

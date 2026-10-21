@@ -516,10 +516,19 @@ class PostgresMemoryRepository:
 
     def _message(self, row):
         attachments = tuple(Attachment(**value) for value in decode_json(row.get("attachments"), []))
-        return StoredMessage(row["id"], row.get("request_id") or "", row["session_id"], row["tenant_id"], row["subject_id"], row["role"], row.get("content") or "", row["created_at"], row.get("rendered_content") or "", tuple(decode_json(row.get("image_captions"), [])), attachments, tuple(decode_json(row.get("knowledge_references"), [])))
+        def snapshot(name):
+            if row.get(name) is None:
+                return None
+            value = decode_json(row[name], [])
+            if not isinstance(value,(list,tuple)) or any(not isinstance(v,str) or not v for v in value):
+                raise MemoryScopeError()
+            return tuple(value)
+        return StoredMessage(row["id"], row.get("request_id") or "", row["session_id"], row["tenant_id"], row["subject_id"], row["role"], row.get("content") or "", row["created_at"], row.get("rendered_content") or "", tuple(decode_json(row.get("image_captions"), [])), attachments, tuple(decode_json(row.get("knowledge_references"), [])), row.get('is_completed', False), row.get('turn_status') or 'pending', snapshot('knowledge_base_scope'), snapshot('document_scope'))
 
     async def recent_messages(self, scope, session_id, limit):
-        rows = await self._rows("SELECT * FROM (SELECT * FROM messages WHERE " + SCOPE_SQL + " AND session_id=%s AND deleted_at IS NULL ORDER BY created_at DESC,id DESC LIMIT %s) recent ORDER BY created_at ASC,id ASC", (*self._scope(scope), session_id, limit))
+        # Filter successful completed pairs before LIMIT; incomplete/cancelled
+        # turns must not crowd out the bounded history or become past answers.
+        rows = await self._rows("SELECT * FROM (SELECT * FROM messages m WHERE " + SCOPE_SQL + " AND session_id=%s AND deleted_at IS NULL AND is_completed=true AND turn_status NOT IN ('error','cancelled') AND EXISTS (SELECT 1 FROM messages a WHERE a.tenant_id=m.tenant_id AND a.subject_id=m.subject_id AND a.session_id=m.session_id AND a.request_id=m.request_id AND a.role='assistant' AND a.is_completed=true AND a.turn_status NOT IN ('error','cancelled') AND a.deleted_at IS NULL) ORDER BY created_at DESC,id DESC LIMIT %s) recent ORDER BY created_at ASC,id ASC", (*self._scope(scope), session_id, limit))
         return tuple(map(self._message, rows))
 
     async def messages_after_cursor(self, scope, session_id, cursor, limit):

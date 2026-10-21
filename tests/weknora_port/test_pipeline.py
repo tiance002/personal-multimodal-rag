@@ -261,12 +261,14 @@ def test_image_child_collection_two_levels_disabled_and_merge_by_url():
     assert len(json.loads(result['parent']))==1
     assert json.loads(result['parent'])[0]['url']=='u' and json.loads(result['parent'])[0]['ocr_text']=='recognized' and json.loads(result['parent'])[0]['caption']=='caption'
 
-def test_stored_history_json_references_are_injected_and_scoped():
+def test_legacy_history_helper_is_preserved_but_active_merge_ignores_it():
     from dataclasses import asdict
     s=state(history=[SimpleNamespace(knowledge_references=[asdict(row('history','question evidence',1.))])])
     assert inject_history([],s)[0].score==.6
     s.history[0].knowledge_references[0]['knowledge_base_id']='other'
-    with pytest.raises(RetrievalScopeError):run(merge(s,CTX,None))
+    # S8.5: historical source rows never enter the current evidence chain.
+    run(merge(s,CTX,None))
+    assert s.merge_results == []
 
 def test_global_cancel_and_deadline_are_not_model_timeouts():
     from backend.weknora_port.models.types import CallCancelled,RunDeadlineExceeded

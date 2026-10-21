@@ -64,6 +64,12 @@ class StoredMessage:
     image_captions: tuple[str, ...] = ()
     attachments: tuple[Attachment, ...] = ()
     knowledge_references: tuple[Mapping[str, Any], ...] = ()
+    # Existing messages already persist these fields. Legacy in-memory callers
+    # represent complete rows; the DB adapter always supplies the stored values.
+    is_completed: bool = True
+    turn_status: str = 'pending'
+    knowledge_base_scope: tuple[str, ...] | None = None
+    document_scope: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -73,6 +79,8 @@ class HistoryRound:
     answer: str = field(repr=False)
     created_at: datetime
     knowledge_references: tuple[Mapping[str, Any], ...] = ()
+    knowledge_base_scope: tuple[str, ...] | None = None
+    document_scope: tuple[str, ...] | None = None
 
 
 class HistoryRepository(Protocol):

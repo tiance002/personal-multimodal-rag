@@ -24,3 +24,69 @@
 ## 阶段记录
 
 后续逐阶段记录修改、RED→GREEN、命令退出码、离线与真实结果。未实现的命令不得报告通过。
+
+### 阶段 1：多轮对话最小修复（OFFLINE_PASS）
+
+修改 `conversation/history.py:process_history/load`、`conversation/types.py:StoredMessage`、`storage/memory.py:_message/recent_messages`、`service.py:prepare_turn`：复用原存储的完成/终态字段，筛选完整成功轮次，明确排除本轮 request，保留 tenant/subject/session 过滤和时间顺序。权限、Scope、取消、运行超时和读取超时传播；普通可选读取错误保留原降级合同。没有新增表。
+
+修改 `retrieval/query.py` 与 `PipelineState`：保留 q0，只接受可核实的字面指代替换，保护当前问题的其余条件；未知/歧义/空值/解析或调用失败回到 q0。追问的模型 intent 仅作建议；完整匹配少量“上一条回答转表格/翻译/换说法”操作才免检索，其余事实性追问保守检索。请求内保留 q0/rewrite，诊断轨迹仅保存 hash、原因和历史轮次数，避免公开日志保存历史正文。
+
+修改 `retrieval/merge.py:merge`，从活动链去掉 `inject_history` 调用；既有辅助函数保留，历史引用不再绕过当前 Search/Rerank 进入 Context。`generation/context.py` 增加历史回答的证据边界提示。Embedding/关键词/Rerank 原有有效查询传递逻辑未重写；离线验证检查实际实参。
+
+改写有意采用窄合同：任意同义改写和只在历史回答中出现、无法唯一确认的先行词都保守回退；不宣称通用语义指代解析能力。需要真实模型验证其实际改写接受率。
+
+同一 Session 的历史还须检查当轮原有 `knowledge_base_scope/document_scope`。双方消息快照不一致时抛出权限错误；缺失来源、跨当前 KB、当前限制文档而历史未限文档、或引用与原快照冲突的历史整轮排除，SSE 只记录排除数量和固定原因。当前门控继续检查当前 KB 的外发权限，不扩大 Scope。旧记录若没有可核查快照，将失去多轮补全能力并回退当前问题检索，这是保守的兼容限制。
+
+RED：初始多轮新增套件 33 failed / 4 passed，exit 1（其中 SQL 测试初稿缺 identity-guard，不能计为实现缺陷；已另用实际基线方法 AST 做正确 RED）；补充符号/编号/歧义/部分响应/SSE 反例 7 failed；关闭历史反例 1 failed；历史外发来源反例 9 failed，均 exit 1。初始测试 import 拼写错误 exit 2 单独保存，不算功能 RED。
+
+最终关联 GREEN 命令：
+
+```powershell
+python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s8_5_conversation.py tests/weknora_port/test_conversation.py tests/weknora_port/test_memory_storage.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_m31_source_constraints.py tests/weknora_port/test_service.py tests/weknora_port/test_fallback_evidence_contract.py
+```
+
+**273 passed，exit 0，3.24 秒**，`var/reports/s8-5/stage1/history-origin-green.txt/.exit`。生成边界另行 RED 1 failed → GREEN **85 passed，exit 0**：`python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s85_generation_history_boundary.py tests/weknora_port/test_generation.py`，证据 `generation-{red,green}.txt/.exit`。重复过渡运行不累加为测试总量。
+
+## 执行流程（由实际调用点核对，后续以离线轨迹验收）
+
+```mermaid
+flowchart TD
+  A[授权用户 + Session + client_request_id] --> B{已有运行?}
+  B -- 是 --> R[SSE / 持久化事件回放]
+  B -- 否 --> C[prepare_turn: 当前 Session 已完成历史]
+  C --> D[understand_query: q0 + 有限历史]
+  D --> E{改写程序校验}
+  E -- 接受 --> F[有效查询 rewrite_query]
+  E -- 拒绝或失败 --> G[有效查询 q0 + 回退原因]
+  F --> H{原始问题意图保护}
+  G --> H
+  H -- 明确的历史格式转换 --> T[历史回答转换]
+  H -- 事实或不确定 --> I[Embedding + Hybrid Search]
+  I --> J[同一有效查询 Rerank]
+  J --> K[Merge + TopK + 当前原文证据]
+  K --> L[Context + Generation]
+  T --> L
+  L --> M[当前来源引用 + 持久化 + SSE]
+```
+
+```mermaid
+flowchart TD
+  A[当前 Search / 第一轮 Rerank / Merge] --> B{Bridge 显式启用?}
+  B -- 否 --> N[普通 Context]
+  B -- 是 --> C[当前版本原文回读 + 最多3前驱 + 2400字符]
+  C --> D[程序切句 / sentence_id 映射]
+  D --> E[一次 Cheap 选择句子与候选字段]
+  E --> F[原文 / 完整对象 / 时间归属 / 身份链核验]
+  F -- 不足 --> U[UNVERIFIED + 原因]
+  F -- 通过 --> G[程序构造 Q1]
+  G --> H{初始阈值拒绝池存在候选?}
+  H -- 否 --> X[SECOND_HOP_SOURCE_NOT_IN_POOL]
+  H -- 是 --> I[最多8候选 / 一次 BGE]
+  I --> J[原文直接地点谓词校验]
+  J --> K[最多1原文补充进入 Context]
+  K --> L{实体桥接与最终问题均有原文支持?}
+  L -- 否 --> U
+  L -- 是 --> M[FINAL_ANSWER_SUPPORTED 的证据前提]
+```
+
+第二图是阶段 3 的实施目标；尚未执行的节点不视为真实模型通过。`FINAL_ANSWER_SUPPORTED` 还不能代替对实际生成答案的验证。
