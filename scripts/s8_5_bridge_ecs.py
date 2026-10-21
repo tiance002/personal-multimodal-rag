@@ -1,4 +1,4 @@
-"""Fresh S8.5 Frost-A-only diagnostic. Importing this module never connects.
+"""Fresh bounded S8.5 diagnostic. Importing this module never connects.
 
 Prepare reads current authorized originals with cloud disabled. Run requires a
 new exact owner grant, one-use stage and the ordinary runtime/LocalExecution
@@ -32,28 +32,58 @@ ENVELOPE = {'case_ids': ['frost-A'], 'max_calls': MAX_CALLS, 'max_tokens': MAX_T
             'capability_limits': {'chat': 1, 'rerank': 1}, 'cheap_max_output_tokens': CHEAP_OUTPUT,
             'contract_version': CONTRACT, 'provider': 'siliconflow', 'models': MODELS,
             'embedding_calls': 0, 'generation_calls': 0, 'retries': 0}
+SESSION_ID = 's85-continuation-20261021'
+SESSION_ENVELOPE = {'max_calls': 40, 'max_tokens': 200000,
+                    'max_bridge_attempts': 6, 'max_conversation_turns': 7}
+BRIDGE_SESSION_CALLS = 12
+BRIDGE_SESSION_TOKENS = 60000
 
 require, canonical, sha = historical.require, historical.canonical, historical.sha
 read, write_new, safe_write = historical.read, historical.write_new, historical.safe_write
 
 
-def validate_inputs(raw):
+def validate_inputs(raw, case_id='frost-A'):
     require(isinstance(raw, bytes) and sha(raw) == FROZEN_SHA256, 'S85_FROZEN_INPUT_BYTES_CHANGED')
     payload = json.loads(raw.decode('utf-8-sig'))
     require(sha(canonical(payload)) == CANONICAL_SHA256, 'S85_FROZEN_CANONICAL_INPUT_CHANGED')
     cases = historical.validate_payload(payload)
-    selected = [case for case in cases if case['case_id'] == 'frost-A']
-    require(len(selected) == 1 and selected[0].get('arm') == 'A', 'S85_EXACT_FROST_A_REQUIRED')
+    require(case_id in ('frost-A', 'frost-B'), 'S85_FROST_CASE_REQUIRED')
+    selected = [case for case in cases if case['case_id'] == case_id]
+    require(len(selected) == 1 and selected[0].get('arm') == case_id[-1], 'S85_EXACT_FROST_CASE_REQUIRED')
     return deepcopy(selected[0])
 
 
+def attempt_case(owner):
+    return owner.get('case_id') if owner.get('schema') == 's85-real-authorization/v2' else 'frost-A'
+
+
+def attempt_envelope(owner):
+    envelope = deepcopy(ENVELOPE)
+    envelope['case_ids'] = [attempt_case(owner)]
+    return envelope
+
+
 def validate_owner(owner, raw):
-    validate_inputs(raw)
-    require(isinstance(owner, dict) and owner.get('schema') == 's85-real-authorization/v1'
-            and owner.get('approval_source') == 'Owner explicit current messages'
+    require(isinstance(owner, dict), 'S85_NEW_EXPLICIT_OWNER_APPROVAL_REQUIRED')
+    schema = owner.get('schema')
+    validate_inputs(raw, attempt_case(owner))
+    require(schema in ('s85-real-authorization/v1', 's85-real-authorization/v2')
+            and isinstance(owner.get('approval_source'), str) and owner['approval_source'].strip()
             and isinstance(owner.get('owner_message'), str) and owner['owner_message'].strip()
             and owner.get('approved') is True, 'S85_NEW_EXPLICIT_OWNER_APPROVAL_REQUIRED')
-    require(owner.get('envelope') == ENVELOPE, 'S85_APPROVED_ENVELOPE_CHANGED')
+    if schema == 's85-real-authorization/v1':
+        require(owner['approval_source'] == 'Owner explicit current messages', 'S85_NEW_EXPLICIT_OWNER_APPROVAL_REQUIRED')
+    else:
+        require(owner.get('authorization_basis') == 'current-owner-continuation'
+                and owner.get('session_id') == SESSION_ID and owner.get('session_envelope') == SESSION_ENVELOPE,
+                'S85_CONTINUATION_SESSION_REQUIRED')
+        index = owner.get('attempt_index')
+        require(type(index) is int and 1 <= index <= SESSION_ENVELOPE['max_bridge_attempts']
+                and isinstance(owner.get('prior_receipts'), list)
+                and len(owner['prior_receipts']) == index-1, 'S85_CONTINUATION_INDEX_REQUIRED')
+        require(isinstance(owner.get('continuation_reason'), str) and owner['continuation_reason'].strip(),
+                'S85_CONTINUATION_REASON_REQUIRED')
+    require(owner.get('envelope') == attempt_envelope(owner), 'S85_APPROVED_ENVELOPE_CHANGED')
     require(owner.get('source_inputs_sha256') == FROZEN_SHA256
             and owner.get('canonical_inputs_sha256') == CANONICAL_SHA256,
             'S85_APPROVED_INPUT_CHANGED')
@@ -71,10 +101,11 @@ def validate_root(root, stage):
             and '..' not in candidate.parts and '\\' not in value, 'S85_PRIVATE_STAGE_ROOT_REQUIRED')
 
 
-def request_plan(prefix):
+def request_plan(prefix, case_id='frost-A'):
     require(isinstance(prefix, str) and re.fullmatch(r's85-[0-9]{8}-[0-9a-f]{32}/', prefix),
             'S85_EXACT_REQUEST_PREFIX_REQUIRED')
-    return {prefix + 'frost-A/bridge-extract': 'chat', prefix + 'frost-A/bridge-rerank': 'rerank'}
+    require(case_id in ('frost-A', 'frost-B'), 'S85_FROST_CASE_REQUIRED')
+    return {prefix + case_id + '/bridge-extract': 'chat', prefix + case_id + '/bridge-rerank': 'rerank'}
 
 
 def validate_roles(roles):
@@ -128,7 +159,7 @@ async def current_case(app, registry, case, prefix, principal, roles):
         historical.verify_source_pair(frozen[key], source)
     payload = extraction_payload(state.rewrite_query or state.query, windows, sources)
     require(payload['contract_version'] == CONTRACT, 'S85_CONTRACT_VERSION_CHANGED')
-    return {'case_id': 'frost-A', 'payload': payload, 'payload_sha256': sha(canonical(payload)),
+    return {'case_id': case['case_id'], 'payload': payload, 'payload_sha256': sha(canonical(payload)),
             'sources': {key: asdict(value) for key, value in sorted(loaded.items())},
             'windows': [asdict(window) for window in windows],
             'predecessor_chains': {key: [row.id for row in chain] for key, chain in chains.items()}}
@@ -148,15 +179,127 @@ def reservation(config, body, capability):
     return len(canonical(body).encode('utf-8')) + upper + 1024
 
 
+def load_prior_receipts(owner):
+    """Read immutable receipts at fixed prior stage paths; never open ledgers."""
+    records = []
+    files = {'final': 'final.json', 'closure': 'authorization-closure.json',
+             'preflight': 'preflight.json', 'authorization': 'payload/owner-authorization.json'}
+    for reference in owner.get('prior_receipts', []):
+        require(isinstance(reference, dict) and set(reference) ==
+                {'stage_id', *(name + '_sha256' for name in files)}, 'S85_PRIOR_RECEIPT_REFERENCE_INVALID')
+        stage = reference['stage_id']
+        require(isinstance(stage, str) and re.fullmatch(r'[0-9]{8}-[0-9a-f]{32}', stage),
+                'S85_PRIOR_STAGE_REQUIRED')
+        prior_root = Path(ROOT_PREFIX + stage)
+        validate_root(prior_root, stage)
+        require(prior_root.resolve() == prior_root, 'S85_PRIOR_STAGE_REDIRECT_DENIED')
+        record = {'stage_id': stage}
+        for name, relative in files.items():
+            path = prior_root / relative
+            require(path.is_file() and not path.is_symlink() and prior_root in path.resolve().parents,
+                    'S85_PRIOR_RECEIPT_MISSING')
+            raw = path.read_bytes()
+            require(sha(raw) == reference[name + '_sha256'], 'S85_PRIOR_RECEIPT_HASH_CHANGED')
+            record[name] = json.loads(raw.decode('utf-8-sig'))
+        records.append(record)
+    return records
+
+
+def _verified_a(record):
+    final = record['final']
+    summary = execution_summary(final['execution_entries'])
+    trace = final.get('case', {}).get('trace', [])
+    decisions = {item.get('decision') for item in trace}
+    return bool(final.get('status') == 'S85_REAL_DIAGNOSTIC_COMPLETE'
+                and final.get('ledger_status') == 'CLOSED'
+                and final.get('case', {}).get('case_id') == 'frost-A'
+                and summary['new_unknown'] == 0 and summary['settled_response_count'] == 2
+                and {entry['capability'] for entry in final['execution_entries']} == {'chat', 'rerank'}
+                and {'FIRST_HOP_VERIFIED', 'BRIDGE_QUERY_VERIFIED', 'SECOND_HOP_LOCATION_FOUND',
+                     'CONTEXT_ADMITTED'} <= decisions
+                and any(item.get('decision') == 'FIRST_HOP_VERIFIED'
+                        and item.get('extraction', {}).get('relation_verified') is True
+                        and item.get('identity_proof', {}).get('verified') is True for item in trace)
+                and record['preflight'].get('current_case', {}).get('payload', {}).get('contract_version') == CONTRACT)
+
+
+def validate_continuation(owner, records, current_implementation, raw):
+    """Account only fresh session receipts; unknown exposure remains held."""
+    if owner.get('schema') != 's85-real-authorization/v2':
+        return None
+    validate_owner(owner, raw)
+    require(len(records) == owner['attempt_index'] - 1, 'S85_PRIOR_RECEIPT_COUNT_CHANGED')
+    stages, exposure, operations, unknown, permission_stops = set(), 0, 0, 0, []
+    for index, record in enumerate(records, 1):
+        reference = owner['prior_receipts'][index-1]
+        previous = record['authorization']
+        prefix = validate_owner(previous, raw)
+        require(record['stage_id'] == reference['stage_id'] == previous['stage_id']
+                and record['stage_id'] != owner['stage_id'] and record['stage_id'] not in stages,
+                'S85_PRIOR_STAGE_REUSE_DENIED')
+        stages.add(record['stage_id'])
+        require(previous.get('session_id') == SESSION_ID and previous.get('session_envelope') == SESSION_ENVELOPE
+                and previous.get('attempt_index') == index
+                and previous.get('prior_receipts') == owner['prior_receipts'][:index-1],
+                'S85_PRIOR_SESSION_CHAIN_CHANGED')
+        final, closure, preflight = record['final'], record['closure'], record['preflight']
+        require(final.get('status') in ('S85_REAL_DIAGNOSTIC_COMPLETE', 'S85_REAL_STOP')
+                and final.get('ledger_status') in ('CLOSED', 'STOP')
+                and final.get('final_answer_generation_calls') == 0 and final.get('embedding_calls') == 0
+                and closure.get('status') == final['ledger_status']
+                and closure.get('historical_authorizations_reused') is False
+                and preflight.get('owner_authorization_sha256') == sha(canonical(previous))
+                and preflight.get('source_inputs_sha256') == FROZEN_SHA256
+                and final.get('envelope') == attempt_envelope(previous), 'S85_PRIOR_RECEIPT_CONTRACT_CHANGED')
+        entries = final.get('execution_entries')
+        require(isinstance(entries, list) and len(entries) <= MAX_CALLS, 'S85_PRIOR_ENTRIES_INVALID')
+        plan = request_plan(prefix, attempt_case(previous))
+        keys = [(entry['request_id'], entry['capability']) for entry in entries]
+        require(len(keys) == len(set(keys)) and all(plan.get(rid) == capability for rid, capability in keys),
+                'S85_PRIOR_OPERATION_ID_CHANGED')
+        summary = execution_summary(entries)
+        require(all(final.get(key) == value and closure.get(key) == value for key, value in summary.items())
+                and summary['held_tokens_total'] is not None
+                and summary['held_tokens_total'] <= MAX_TOKENS, 'S85_PRIOR_ACCOUNTING_CHANGED')
+        operations += summary['attempted_operations']
+        exposure += summary['held_tokens_total']
+        unknown += summary['possibly_sent_unknown_operations']
+        code = final.get('error') or ''
+        if code in {'MODEL_ORIGIN_KB_ACCESS_DENIED', 'MODEL_ORIGIN_KB_EGRESS_DENIED', 'MODEL_CLOUD_DISABLED',
+                    'MODEL_DOCUMENT_ACCESS_DENIED', 'MODEL_OWNER_MISMATCH', 'LOCAL_EXECUTION_SCOPE_DENIED'}:
+            permission_stops.append({'stage_id': record['stage_id'], 'error': code})
+    require(operations + MAX_CALLS <= BRIDGE_SESSION_CALLS
+            and exposure + MAX_TOKENS <= BRIDGE_SESSION_TOKENS, 'S85_BRIDGE_SESSION_BOUND_EXCEEDED')
+    if unknown or permission_stops:
+        require(isinstance(owner.get('prior_stop_diagnosis'), str) and owner['prior_stop_diagnosis'].strip(),
+                'S85_PRIOR_STOP_DIAGNOSIS_REQUIRED')
+    previous_same_case = [record for record in records if attempt_case(record['authorization']) == attempt_case(owner)]
+    if previous_same_case:
+        old = previous_same_case[-1]['preflight'].get('implementation_sha256', {})
+        require(any(path != 'scripts/s8_5_bridge_ecs.py' and path in old and old[path] != value
+                    for path, value in current_implementation.items()), 'S85_REPAIR_IMPLEMENTATION_CHANGE_REQUIRED')
+    if attempt_case(owner) == 'frost-B':
+        require(any(_verified_a(record) for record in records), 'S85_CONDITIONAL_B_REQUIRES_VERIFIED_A')
+    return {'session_id': SESSION_ID, 'session_envelope': SESSION_ENVELOPE,
+            'bridge_subbudget': {'max_calls': BRIDGE_SESSION_CALLS, 'max_tokens': BRIDGE_SESSION_TOKENS,
+                                 'max_attempts': SESSION_ENVELOPE['max_bridge_attempts']},
+            'prior_attempts': len(records), 'prior_attempted_operations': operations,
+            'prior_held_token_exposure': exposure, 'prior_possibly_sent_unknown': unknown,
+            'prior_permission_stops': permission_stops, 'prior_ledgers_modified': False,
+            'next_case_id': attempt_case(owner), 'next_attempt_index': owner['attempt_index']}
+
+
 async def prepare(root, *, write=True):
     from backend.weknora_port.development import assemble
     from backend.weknora_port.storage.configuration import PostgresModelRoleStore
     raw = (root / 'payload/inputs.json').read_bytes()
-    case = validate_inputs(raw)
     owner = read(root / 'payload/owner-authorization.json')
     prefix = validate_owner(owner, raw)
+    case = validate_inputs(raw, attempt_case(owner))
     validate_root(root, owner['stage_id'])
-    plan = request_plan(prefix)
+    plan = request_plan(prefix, case['case_id'])
+    implementation = implementation_hashes()
+    continuation = validate_continuation(owner, load_prior_receipts(owner), implementation, raw)
     settings, principal = runtime_settings(owner['stage_id'])
     roles_out, config_hashes = {}, {}
     async with assemble(settings, principal=principal) as app:
@@ -189,15 +332,17 @@ async def prepare(root, *, write=True):
         reserve = reservation(configs['cheap'], cheap_body, 'chat')
         require(reserve <= MAX_TOKENS, 'S85_PREPARE_RESERVATION_BOUND_EXCEEDED')
         require(await historical.history_snapshot(app) == before, 'S85_ZERO_SEND_MUTATION')
-    result = {'status': 'S85_READY_ZERO_SEND', 'envelope': ENVELOPE,
+    result = {'status': 'S85_READY_ZERO_SEND', 'envelope': attempt_envelope(owner),
               'source_inputs_sha256': sha(raw), 'canonical_inputs_sha256': CANONICAL_SHA256,
               'owner_authorization_sha256': sha(canonical(owner)), 'stage_prefix': prefix,
               'exact_request_plan': plan, 'registry_roles': roles_out, 'role_revision': revision,
-              'model_config_sha256': config_hashes, 'implementation_sha256': implementation_hashes(),
+              'model_config_sha256': config_hashes, 'implementation_sha256': implementation,
               'identity': identity, 'subject_sha256': sha(principal.subject_id),
               'storage_marker': historical.storage_marker_identity(settings),
               'before': before, 'current_case': current, 'cheap_reservation_tokens': reserve,
               'new_provider_calls': 0, 'actual_tokens_added': 0}
+    if continuation is not None:
+        result['continuation'] = continuation
     if write:
         write_new(root / 'preflight.json', result)
     return result
@@ -248,15 +393,20 @@ class RequestFence:
     """Exact operation, scope, current sentence mapping and final wire fence."""
     def __init__(self, plan, roles, config_hashes, *, audit=None, held_tokens=lambda: 0):
         validate_roles(roles)
-        prefixes = {rid.rsplit('frost-A/', 1)[0] for rid in plan}
-        require(len(prefixes) == 1 and plan == request_plan(next(iter(prefixes))), 'S85_EXACT_PLAN_REQUIRED')
+        identities = [re.fullmatch(r'(s85-[0-9]{8}-[0-9a-f]{32}/)(frost-[AB])/(bridge-extract|bridge-rerank)', rid)
+                      for rid in plan]
+        require(identities and all(identities), 'S85_EXACT_PLAN_REQUIRED')
+        cases = {(match[1], match[2]) for match in identities}
+        require(len(cases) == 1, 'S85_EXACT_PLAN_REQUIRED')
+        prefix, self.case_id = next(iter(cases))
+        require(plan == request_plan(prefix, self.case_id), 'S85_EXACT_PLAN_REQUIRED')
         self.plan, self.roles, self.config_hashes = dict(plan), deepcopy(roles), dict(config_hashes)
         self.audit, self.held_tokens = audit, held_tokens
         self.seen, self.completed, self.bound, self.stopped = set(), set(), None, False
 
     def bind(self, context, state, prepared):
         require(context.request_id + '/bridge-extract' in self.plan
-                and prepared['case_id'] == 'frost-A', 'S85_BOUND_CASE_REQUIRED')
+                and prepared['case_id'] == self.case_id, 'S85_BOUND_CASE_REQUIRED')
         self.bound = context.scope, state, deepcopy(prepared)
 
     def validate(self, config, body, context, capability):
@@ -355,7 +505,7 @@ class FencedRegistry:
 
 
 def ledger_spec(principal, case, pre):
-    return {'status': 'OPEN', 'scope': 'S8_5_FROST_A_NEW_OWNER', 'tenant_id': principal.tenant_id,
+    return {'status': 'OPEN', 'scope': 'S8_5_' + case['case_id'].upper().replace('-', '_') + '_NEW_OWNER', 'tenant_id': principal.tenant_id,
             'subject_id': principal.subject_id, 'allowed_kbs': case['knowledge_base_ids'],
             'allowed_models': list(pre['registry_roles'].values()),
             'allowed_request_prefixes': sorted(pre['exact_request_plan']),
@@ -412,22 +562,24 @@ async def run(root):
     from backend.weknora_port.retrieval.context import into_chat_message
     from backend.weknora_port.retrieval.types import context_results
     raw = (root / 'payload/inputs.json').read_bytes()
-    case, owner = validate_inputs(raw), read(root / 'payload/owner-authorization.json')
+    owner = read(root / 'payload/owner-authorization.json')
     prefix = validate_owner(owner, raw)
+    case = validate_inputs(raw, attempt_case(owner))
+    envelope = attempt_envelope(owner)
     validate_root(root, owner['stage_id'])
     pre = read(root / 'preflight.json')
     require(pre == await prepare(root, write=False), 'S85_PREFLIGHT_CHANGED_BEFORE_RUN')
-    write_new(root / 'run.claim', {'stage_prefix': prefix, 'envelope': ENVELOPE, 'time': time.time()})
+    write_new(root / 'run.claim', {'stage_prefix': prefix, 'envelope': envelope, 'time': time.time()})
     execution_dir = Path(EXECUTION_ROOT) / ('s85-' + owner['stage_id'])
     require(not execution_dir.exists(), 'S85_EXISTING_EXECUTION_NO_RESET')
     execution_dir.mkdir(parents=True, mode=0o700)
     ledger = execution_dir / 'execution.json'
     _, principal = runtime_settings(owner['stage_id'])
     write_new(ledger, ledger_spec(principal, case, pre))
-    write_new(root / 'bounded-execution.json', {'path': str(ledger), 'envelope': ENVELOPE,
+    write_new(root / 'bounded-execution.json', {'path': str(ledger), 'envelope': envelope,
         'stage_prefix': prefix, 'exact_request_plan': pre['exact_request_plan']})
     settings, principal = runtime_settings(owner['stage_id'], cloud=True, ledger=ledger)
-    success, error, result, totals = False, None, {'case_id': 'frost-A', 'status': 'NOT_STARTED'}, None
+    success, error, result, totals = False, None, {'case_id': case['case_id'], 'status': 'NOT_STARTED'}, None
     after, current_after, rows = None, None, []
     try:
         async with assemble(settings, principal=principal) as app:
@@ -461,7 +613,13 @@ async def run(root):
                 require(tuple(row.id for row in context_results(state)) == finalized.result_ids,
                         'S85_CONTEXT_SOURCE_MAPPING_MISMATCH')
                 result.update(status='DIAGNOSTIC_COMPLETE', rescue_ids=[row.id for row in state.rescue_evidence],
-                              finalized_context=asdict(finalized), generation_called=False)
+                              finalized_context=asdict(finalized), generation_called=False,
+                              first_hop_verified=any(item.get('decision') == 'FIRST_HOP_VERIFIED' for item in state.bridge_trace),
+                              entity_bridge_verified=any(row.metadata['bridge_rescue'].get('entity_bridge_verified') is True
+                                                         for row in state.rescue_evidence),
+                              final_answer_supported=any(row.metadata['bridge_rescue'].get('final_answer_supported') is True
+                                                         for row in state.rescue_evidence),
+                              generated_answer_verified=False)
                 totals = await audit()
                 success = True
             except BaseException as exc:
@@ -469,7 +627,7 @@ async def run(root):
                 raise
             finally:
                 result.update(trace=state.bridge_trace, elapsed_seconds=time.monotonic()-started)
-                write_new(root / 'cases/frost-A.json', result)
+                write_new(root / 'cases' / (case['case_id'] + '.json'), result)
                 await registry.close()
     except BaseException as exc:
         error = historical.safe_error(exc)
@@ -493,13 +651,14 @@ async def run(root):
         entries = read(ledger)['entries']
         summary = execution_summary(entries)
         final = {'status': 'S85_REAL_DIAGNOSTIC_COMPLETE' if success and preserved else 'S85_REAL_STOP',
-                 'error': error, 'case': result, 'envelope': ENVELOPE, 'provider_rows': rows,
+                 'error': error, 'case': result, 'envelope': envelope, 'provider_rows': rows,
                  'execution_entries': entries, 'usage_by_capability': totals,
                  **summary, 'provider_receipt_count': len(rows),
                  'old_history_roles_models_source_counts_preserved': preserved,
                  'before': pre['before'], 'after_excluding_new': after, 'current_sources_after': current_after,
                  'ledger_status': read(ledger)['status'], 'receipt_files': receipt_manifest(execution_dir),
-                 'final_answer_generation_calls': 0, 'embedding_calls': 0, 'frost_B_calls': 0,
+                 'final_answer_generation_calls': 0, 'embedding_calls': 0,
+                 'frost_B_calls': summary['actual_calls'] if case['case_id'] == 'frost-B' else 0,
                  'production_configuration_changed': False, 'deployment_performed': False,
                  'generated_answer_verified': False, 'headers_saved': False}
         write_new(root / 'final.json', final)
@@ -510,7 +669,7 @@ async def run(root):
             'unused_operation_allowance_revoked': MAX_CALLS-summary['attempted_operations'],
             'unheld_token_allowance_revoked': MAX_TOKENS-summary['held_tokens_total'] if summary['held_tokens_total'] is not None else None,
             'held_reservations_released': False,
-            'historical_authorizations_reused': False, 'frost_B_authorized': False})
+            'historical_authorizations_reused': False, 'frost_B_authorized': case['case_id'] == 'frost-B'})
         print(canonical({key: final[key] for key in ('status', 'all_actual_tokens', 'new_unknown', 'ledger_status')}), flush=True)
     return final['status'] == 'S85_REAL_DIAGNOSTIC_COMPLETE'
 

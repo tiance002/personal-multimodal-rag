@@ -346,3 +346,158 @@ def test_exclusive_writes_refuse_to_replace_a_prior_stage_claim(tmp_path):
     runner.write_new(claim,{'grant_id':'s85-'+STAGE})
     with pytest.raises(FileExistsError): runner.write_new(claim,{'grant_id':'other'})
     assert runner.read(claim)=={'grant_id':'s85-'+STAGE}
+
+
+def session_owner(case_id='frost-A', *, index=1, references=(), stage=None):
+    value=owner()
+    value.update(schema='s85-real-authorization/v2',
+        approval_source='Latest owner continuing authorization, preserved verbatim below',
+        authorization_basis='current-owner-continuation', session_id=runner.SESSION_ID,
+        session_envelope=deepcopy(runner.SESSION_ENVELOPE), case_id=case_id,
+        attempt_index=index, prior_receipts=deepcopy(list(references)),
+        continuation_reason='Fresh bounded diagnostic after reviewed implementation change.')
+    if stage is not None:
+        value['stage_id']=stage; value['grant_id']='s85-'+stage
+    value['envelope']=runner.attempt_envelope(value)
+    return value
+
+
+def prior_reference(stage=STAGE):
+    return {'stage_id':stage, **{name+'_sha256':'0'*64 for name in ('final','closure','preflight','authorization')}}
+
+
+def successful_session_a():
+    previous=owner()
+    previous.update(session_id=runner.SESSION_ID, session_envelope=deepcopy(runner.SESSION_ENVELOPE),
+                    case_id='frost-A', attempt_index=1, prior_receipts=[])
+    row,entry=settlement(); rr,re=settlement(RRID,'rerank')
+    entries=[entry,re]
+    summary=runner.execution_summary(entries)
+    trace=[{'decision':'FIRST_HOP_VERIFIED','extraction':{'relation_verified':True},
+            'identity_proof':{'verified':True}}, {'decision':'BRIDGE_QUERY_VERIFIED'},
+           {'decision':'SECOND_HOP_LOCATION_FOUND'}, {'decision':'ENTITY_BRIDGE_UNVERIFIED'},
+           {'decision':'CONTEXT_ADMITTED'}, {'decision':'FINAL_ANSWER_UNVERIFIED'}]
+    final={'status':'S85_REAL_DIAGNOSTIC_COMPLETE','ledger_status':'CLOSED',
+           'case':{'case_id':'frost-A','trace':trace,'final_answer_supported':False},
+           'envelope':deepcopy(runner.ENVELOPE), 'execution_entries':entries,
+           'final_answer_generation_calls':0,'embedding_calls':0, **summary}
+    closure={'status':'CLOSED','historical_authorizations_reused':False, **summary}
+    preflight={'source_inputs_sha256':runner.FROZEN_SHA256,
+               'owner_authorization_sha256':runner.sha(runner.canonical(previous)),
+               'implementation_sha256':{'backend/weknora_port/retrieval/bridge_rescue.py':'a'*64},
+               'current_case':{'payload':{'contract_version':runner.CONTRACT}}}
+    return {'stage_id':STAGE,'authorization':previous,'final':final,'closure':closure,'preflight':preflight}
+
+
+def test_v2_latest_owner_wording_and_partitioned_session_bounds_preserve_v1():
+    value=session_owner()
+    assert runner.validate_owner(value,RAW)==PREFIX
+    assert runner.validate_owner(owner(),RAW)==PREFIX
+    summary=runner.validate_continuation(value,[],{},RAW)
+    assert summary['session_envelope']=={'max_calls':40,'max_tokens':200000,'max_bridge_attempts':6,'max_conversation_turns':7}
+    assert summary['bridge_subbudget']=={'max_calls':12,'max_tokens':60000,'max_attempts':6}
+    assert summary['prior_ledgers_modified'] is False
+    assert runner.BRIDGE_SESSION_CALLS+28==40 and runner.BRIDGE_SESSION_TOKENS+140000==200000
+
+
+@pytest.mark.parametrize('change',['session_id','session_cap','index','history_count','empty_reason','envelope','basis'])
+def test_v2_rejects_session_budget_history_and_authorization_widening(change):
+    value=session_owner()
+    if change=='session_id': value['session_id']='historical-session'
+    elif change=='session_cap': value['session_envelope']['max_tokens']=200001
+    elif change=='index': value['attempt_index']=7
+    elif change=='history_count': value['prior_receipts']=[prior_reference()]
+    elif change=='empty_reason': value['continuation_reason']=''
+    elif change=='envelope': value['envelope']['max_calls']=3
+    else: value['authorization_basis']='historical-grant-reuse'
+    with pytest.raises(ValueError): runner.validate_owner(value,RAW)
+
+
+def test_v2_b_requires_prior_full_a_chain_but_not_false_event_venue_support():
+    record=successful_session_a(); value=session_owner('frost-B',index=2,
+        references=[prior_reference()],stage='20261021-'+'b'*32)
+    assert runner.validate_inputs(RAW,'frost-B')['arm']=='B'
+    summary=runner.validate_continuation(value,[record],{},RAW)
+    assert summary['next_case_id']=='frost-B' and summary['prior_attempted_operations']==2
+    assert record['final']['case']['final_answer_supported'] is False
+    fence=runner.RequestFence(runner.request_plan('s85-'+value['stage_id']+'/','frost-B'),ROLES,{})
+    assert fence.case_id=='frost-B'
+
+
+@pytest.mark.parametrize('change',['no_a','missing_rerank','missing_identity','missing_context','generation'])
+def test_v2_b_rejects_incomplete_or_out_of_contract_a(change):
+    record=successful_session_a()
+    if change=='no_a':
+        value=session_owner('frost-B')
+        with pytest.raises(ValueError,match='CONDITIONAL_B'): runner.validate_continuation(value,[],{},RAW)
+        return
+    if change=='missing_rerank':
+        record['final']['execution_entries']=record['final']['execution_entries'][:1]
+        summary=runner.execution_summary(record['final']['execution_entries'])
+        record['final'].update(summary); record['closure'].update(summary)
+    elif change=='missing_identity': record['final']['case']['trace'][0]['identity_proof']['verified']=False
+    elif change=='missing_context': record['final']['case']['trace']=[item for item in record['final']['case']['trace'] if item['decision']!='CONTEXT_ADMITTED']
+    else: record['final']['final_answer_generation_calls']=1
+    value=session_owner('frost-B',index=2,references=[prior_reference()],stage='20261021-'+'b'*32)
+    with pytest.raises(ValueError): runner.validate_continuation(value,[record],{},RAW)
+
+
+def test_v2_same_case_requires_a_real_nonrunner_implementation_change():
+    record=successful_session_a(); value=session_owner(index=2,references=[prior_reference()],stage='20261021-'+'b'*32)
+    with pytest.raises(ValueError,match='IMPLEMENTATION_CHANGE'):
+        runner.validate_continuation(value,[record],{'scripts/s8_5_bridge_ecs.py':'new-runner-only'},RAW)
+    result=runner.validate_continuation(value,[record],{'backend/weknora_port/retrieval/bridge_rescue.py':'b'*64},RAW)
+    assert result['next_attempt_index']==2 and result['prior_ledgers_modified'] is False
+
+
+def test_v2_a_repair_after_known_cheap_only_pool_miss_needs_changed_implementation():
+    record=successful_session_a()
+    record['final']['execution_entries']=record['final']['execution_entries'][:1]
+    record['final']['case']['trace']=[item for item in record['final']['case']['trace']
+                                    if item['decision'] not in ('SECOND_HOP_LOCATION_FOUND','CONTEXT_ADMITTED')]
+    record['final']['case']['trace'].append({'decision':'BRIDGE_EXTRACTION_UNVERIFIED',
+                                            'reason':'SECOND_HOP_SOURCE_NOT_IN_POOL'})
+    summary=runner.execution_summary(record['final']['execution_entries'])
+    record['final'].update(summary); record['closure'].update(summary)
+    before=deepcopy(record)
+    value=session_owner(index=2,references=[prior_reference()],stage='20261021-'+'b'*32)
+    result=runner.validate_continuation(value,[record],
+        {'backend/weknora_port/retrieval/bridge_rescue.py':'fixed-prefix-matching'},RAW)
+    assert result['next_case_id']=='frost-A' and result['prior_attempted_operations']==1
+    assert result['prior_possibly_sent_unknown']==0 and record==before
+
+
+def test_v2_unknown_prior_keeps_full_exposure_and_requires_diagnosis_for_fresh_repair():
+    record=successful_session_a()
+    entry=record['final']['execution_entries'][0]
+    entry.update(status='UNKNOWN',outcome='UNKNOWN',usage=None,reserved_tokens=10000,held_tokens=10000)
+    record['final']['execution_entries']=[entry]
+    summary=runner.execution_summary([entry])
+    record['final'].update(summary,status='S85_REAL_STOP',ledger_status='STOP',error='MODEL_PROVIDER_CONNECTION_FAILED')
+    record['closure'].update(summary,status='STOP')
+    before=deepcopy(record)
+    value=session_owner(index=2,references=[prior_reference()],stage='20261021-'+'b'*32)
+    implementation={'backend/weknora_port/retrieval/bridge_rescue.py':'b'*64}
+    with pytest.raises(ValueError,match='STOP_DIAGNOSIS'): runner.validate_continuation(value,[record],implementation,RAW)
+    value['prior_stop_diagnosis']='Affected request isolated; raw UNKNOWN and reservation retained, new implementation reviewed.'
+    result=runner.validate_continuation(value,[record],implementation,RAW)
+    assert result['prior_held_token_exposure']==10000 and result['prior_possibly_sent_unknown']==1
+    assert record==before and record['closure']['status']=='STOP' and entry['held_tokens']==10000
+
+
+def test_prior_receipt_loader_reads_only_pinned_files_and_rejects_mutated_hash(tmp_path,monkeypatch):
+    prefix=str(tmp_path/'s8-5-bridge-')
+    monkeypatch.setattr(runner,'ROOT_PREFIX',prefix)
+    monkeypatch.setattr(runner,'validate_root',lambda root,stage: runner.require(str(root)==prefix+stage,'TEST_ROOT_CHANGED'))
+    record=successful_session_a(); root=Path(prefix+STAGE)
+    files={'final':'final.json','closure':'authorization-closure.json','preflight':'preflight.json',
+           'authorization':'payload/owner-authorization.json'}
+    reference={'stage_id':STAGE}
+    for name,relative in files.items():
+        path=root/relative; path.parent.mkdir(parents=True,exist_ok=True)
+        path.write_text(json.dumps(record[name]),encoding='utf-8')
+        reference[name+'_sha256']=runner.sha(path.read_bytes())
+    value=session_owner('frost-B',index=2,references=[reference],stage='20261021-'+'b'*32)
+    assert runner.load_prior_receipts(value)==[record]
+    (root/'final.json').write_text('{}',encoding='utf-8')
+    with pytest.raises(ValueError,match='HASH_CHANGED'): runner.load_prior_receipts(value)
