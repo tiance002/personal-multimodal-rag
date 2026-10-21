@@ -526,6 +526,19 @@ async def prepare(root,*,write=True):
     return result
 
 
+def restore_finalized_context(value):
+    """Restore only the declared tuple fields after the JSON receipt boundary."""
+    from backend.weknora_port.retrieval.context import FinalizedContext
+    require(isinstance(value,dict),'S85G_FINALIZED_CONTEXT_INVALID')
+    restored = dict(value)
+    for name in ('result_ids','images'):
+        items = restored.get(name,() if name == 'images' else None)
+        require(type(items) in (list,tuple) and all(type(item) is str for item in items),
+                'S85G_FINALIZED_CONTEXT_SEQUENCE_INVALID')
+        restored[name] = tuple(items)
+    return FinalizedContext(**restored)
+
+
 async def run(root):
     from backend.weknora_port.development import assemble
     from backend.weknora_port.execution import LocalExecution
@@ -538,7 +551,9 @@ async def run(root):
     raw = (root/'payload/inputs.json').read_bytes(); owner = read(root/'payload/owner-authorization.json')
     prefix = validate_owner(owner,raw); validate_root(root,owner['stage_id'])
     pre = read(root/'preflight.json')
-    require(pre == await prepare(root,write=False),'S85G_PREFLIGHT_CHANGED')
+    # Compare the complete serialized contract: JSON arrays deserialize as lists,
+    # while dataclass snapshots can contain tuples. No fields are excluded.
+    require(canonical(pre) == canonical(await prepare(root,write=False)),'S85G_PREFLIGHT_CHANGED')
     write_new(root/'run.claim',{'stage_prefix':prefix,'envelope':ENVELOPE})
     folder = Path(EXECUTION_ROOT)/prefix
     require(not folder.exists(),'S85G_EXECUTION_REUSE_DENIED'); folder.mkdir(mode=0o700,parents=True)
@@ -567,12 +582,11 @@ async def run(root):
                 model = original_factory(config,key,gate); model = await model if inspect.isawaitable(model) else model
                 return holder['fence'].install(model)
             # Build the exact request before creating any model in _configuration.
-            from backend.weknora_port.retrieval.context import FinalizedContext
             from backend.weknora_port.retrieval.types import SearchResult
             rows = tuple(SearchResult(**row) for row in pre['source_results'])
             options = ChatOptions(**pre['generation_options']); options = replace(options,prompt_cache_key=accepted.session_id)
             request = GenerationRequest(accepted.run_id,accepted.session_id,accepted.assistant_message_id,case['query'],
-                FinalizedContext(**pre['replay']['finalized_context']),evidence=tuple(Evidence.from_result(row) for row in rows),
+                restore_finalized_context(pre['replay']['finalized_context']),evidence=tuple(Evidence.from_result(row) for row in rows),
                 history=(),memory_prompt='',language='English',citations_enabled=True,policy=app.policy,
                 options=options,system_prompt=pre['system_prompt'],rendered_at=datetime.fromisoformat(pre['rendered_at']))
             loaded = await app.models.resolve(pre['registry_role']['model_id']); config = app.catalogue.resolve(loaded,pre['registry_role']['model_id'])

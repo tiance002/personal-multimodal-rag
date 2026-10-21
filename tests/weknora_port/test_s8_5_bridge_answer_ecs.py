@@ -269,3 +269,81 @@ def test_raw_receipt_files_are_complete_hash_bound_and_usage_reconciled(tmp_path
     (folder/(stem+'.response.body')).write_bytes(b'{}')
     with pytest.raises(ValueError,match='RAW_RECEIPT_HASH_CHANGED'):
         runner.load_cached(record,{'chat':cheap,'rerank':rerank})
+
+
+def preflight_with_native_tuples():
+    """The production dataclass shape that GA2 serialized before run()."""
+    return {'owner_authorization_sha256':'owner', 'model_config_sha256':'model',
+        'document_ids':['document'], 'document_versions':{'document':'current-version'},
+        'before':{'history_sha256':'unchanged-history'},
+        'generation_options':{'tools':()},
+        'placeholder_wire':{'messages':[{'role':'user','content':'Original question and exact original quote'}]},
+        'replay':{'finalized_context':{'user_content':'Original question', 'rendered_contexts':'Original quote',
+            'result_ids':('chunk',), 'images':()},
+            'trace':[{'identity_proof':{'anchor_quotes':('Original identity quote',)}}]}}
+
+
+def probe_preflight_boundary(tmp_path,monkeypatch,current):
+    """Stop at the claim boundary; no application, Session or ledger is opened."""
+    (tmp_path/'payload').mkdir(exist_ok=True)
+    (tmp_path/'payload/inputs.json').write_bytes(RAW)
+    saved = json.loads(runner.canonical(preflight_with_native_tuples()))
+    monkeypatch.setattr(runner,'read',lambda path: saved if Path(path).name=='preflight.json' else owner())
+    monkeypatch.setattr(runner,'validate_owner',lambda *args:'synthetic-stage')
+    monkeypatch.setattr(runner,'validate_root',lambda *args:None)
+    async def prepared(*args,**kwargs):
+        assert kwargs=={'write':False}
+        return current
+    monkeypatch.setattr(runner,'prepare',prepared)
+    class ClaimBoundary(RuntimeError): pass
+    def claim(path,value):
+        assert Path(path).name=='run.claim'
+        raise ClaimBoundary('No admission or external IO')
+    monkeypatch.setattr(runner,'write_new',claim)
+    return ClaimBoundary
+
+
+def test_run_preflight_accepts_exact_JSON_roundtrip_without_dropping_fields(tmp_path,monkeypatch):
+    native = preflight_with_native_tuples()
+    assert json.loads(runner.canonical(native)) != native  # GA2's old direct comparison.
+    boundary = probe_preflight_boundary(tmp_path,monkeypatch,native)
+    with pytest.raises(boundary): asyncio.run(runner.run(tmp_path))
+
+
+@pytest.mark.parametrize('field',['scope','source','model','wire','history','identity_quote','rendered_at'])
+def test_run_preflight_rejects_authoritative_or_time_changes(tmp_path,monkeypatch,field):
+    current = preflight_with_native_tuples()
+    if field=='scope': current['document_ids']=['other-document']
+    if field=='source': current['document_versions']['document']='other-version'
+    if field=='model': current['model_config_sha256']='other-model'
+    if field=='wire': current['placeholder_wire']['messages'][0]['content']='Altered question or quote'
+    if field=='history': current['before']['history_sha256']='changed-history'
+    if field=='identity_quote': current['replay']['trace'][0]['identity_proof']['anchor_quotes']=('Altered identity quote',)
+    if field=='rendered_at': current['rendered_at']='2026-10-22T00:00:00'
+    probe_preflight_boundary(tmp_path,monkeypatch,current)
+    with pytest.raises(ValueError,match='S85G_PREFLIGHT_CHANGED'):
+        asyncio.run(runner.run(tmp_path))
+
+
+def test_roundtripped_finalized_context_can_prepare_exact_original_evidence():
+    from backend.weknora_port.generation.context import Evidence,prepare_generation
+    from backend.weknora_port.generation.types import GenerationRequest
+    from backend.weknora_port.retrieval.context import FinalizedContext
+    row = SearchResult('chunk','Exact original quote',1,knowledge_id='doc',knowledge_base_id='kb')
+    original = FinalizedContext('Original question','Exact original quote',('chunk',),images=())
+    saved = json.loads(runner.canonical(asdict(original)))
+    restored = runner.restore_finalized_context(saved)
+    assert restored==original and runner.canonical(asdict(restored))==runner.canonical(saved)
+    request = GenerationRequest(RUN,'session','assistant','Original question',restored,
+        evidence=(Evidence.from_result(row),),language='English')
+    prepared = prepare_generation(request)
+    assert prepared.messages[-1].role=='user'
+
+
+@pytest.mark.parametrize('field,value',[('result_ids','chunk'),('result_ids',[1]),('images','image'),('images',[None])])
+def test_restore_finalized_context_rejects_untyped_sequence_coercion(field,value):
+    from backend.weknora_port.retrieval.context import FinalizedContext
+    saved = asdict(FinalizedContext('Original question','Original quote',('chunk',)))
+    saved[field]=value
+    with pytest.raises(ValueError,match='S85G_FINALIZED_CONTEXT_SEQUENCE_INVALID'):
+        runner.restore_finalized_context(saved)
