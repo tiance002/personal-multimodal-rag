@@ -11,6 +11,8 @@ from backend.weknora_port.storage.history import LocalPrincipal
 from backend.weknora_port.storage.turns import PostgresTurnRepository,ScopeSnapshot
 from backend.weknora_port.storage.local_principal import LocalPrincipalStore
 from backend.weknora_port.storage.postgres import PostgresRetriever,IsolationPolicy
+from backend.weknora_port.conversation.types import MemoryContext
+from backend.weknora_port.models.types import TrustedScope
 
 PRINCIPAL=LocalPrincipal(7,'local-owner');POLICY=IsolationPolicy('new',frozenset({'old'}))
 
@@ -127,4 +129,44 @@ def test_principal_bootstrap_returns_existing_singleton_never_picks_other_tenant
         principal=await store.bootstrap();assert principal==LocalPrincipal(7,'sole-owner')
         assert not any(sql.startswith('INSERT INTO tenants') for sql,_ in db.calls)
         assert any("p.slot='local' AND t.deleted_at IS NULL" in sql for sql,_ in db.calls)
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('method',['failure','cancelled'])
+@pytest.mark.parametrize('memory_allowed',[True,False])
+def test_s85_terminal_commit_uses_principal_identity_not_memory_policy(method,memory_allowed):
+    async def run():
+        row=stored(); db=DB([[row],[dict(is_completed=False,agent_steps=[])]])
+        repo=PostgresTurnRepository(Leases(db),PRINCIPAL)
+        accepted=repo._accepted(row,new=True)
+        accepted=replace(accepted,memory_context=replace(accepted.memory_context,agent_memory_allowed=memory_allowed))
+        if method=='failure':
+            assert await repo.commit_failure(accepted,'S85C_OUTPUT_CONTRACT_STOP') is True
+            updates=[(sql,args) for sql,args in db.calls if sql.startswith('UPDATE')]
+            assert any('S85C_OUTPUT_CONTRACT_STOP' in args for _,args in updates)
+        else:
+            assert await repo.commit_cancelled(accepted,'partial','',[]) is True
+        assert accepted.memory_context.agent_memory_allowed is memory_allowed
+        assert db.tx==['BEGIN','COMMIT']
+        assert all(PRINCIPAL.subject_id in args for sql,args in db.calls if sql.startswith('UPDATE'))
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('method',['failure','cancelled'])
+@pytest.mark.parametrize('change',['tenant','subject','tenant_string','tenant_bool','scope_owner','untyped_memory'])
+def test_s85_terminal_commit_still_denies_foreign_or_untyped_principal_before_sql(method,change):
+    async def run():
+        db=DB(); repo=PostgresTurnRepository(Leases(db),PRINCIPAL)
+        accepted=repo._accepted(stored(),new=True)
+        replacements={'tenant':MemoryContext(8,PRINCIPAL.subject_id),
+            'subject':MemoryContext(7,'other'), 'tenant_string':MemoryContext('7',PRINCIPAL.subject_id),
+            'tenant_bool':MemoryContext(True,PRINCIPAL.subject_id),
+            'untyped_memory':SimpleNamespace(tenant_id=7,principal_storage_id=PRINCIPAL.subject_id,agent_memory_allowed=True)}
+        if change=='scope_owner':
+            accepted=replace(accepted,context=replace(accepted.context,scope=TrustedScope('other',('kb',))))
+        else: accepted=replace(accepted,memory_context=replacements[change])
+        with pytest.raises(ProviderError,match='TURN_OWNER_MISMATCH'):
+            if method=='failure': await repo.commit_failure(accepted,'S85C_OUTPUT_CONTRACT_STOP')
+            else: await repo.commit_cancelled(accepted,'partial','',[])
+        assert db.calls==[]
     asyncio.run(run())

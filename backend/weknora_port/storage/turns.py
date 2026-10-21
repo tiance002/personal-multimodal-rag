@@ -36,6 +36,18 @@ class PostgresTurnRepository:
         if not isinstance(principal,LocalPrincipal) or principal!=self.principal:raise ProviderError('TURN_OWNER_MISMATCH')
         return principal.tenant_id,principal.subject_id
 
+    def _accepted_owner(self,accepted):
+        # Memory enablement is a server policy, not part of principal identity.
+        # A disabled-memory turn still needs durable failure/cancel cleanup.
+        if (not isinstance(accepted,AcceptedTurn) or not isinstance(accepted.memory_context,MemoryContext)
+                or type(accepted.memory_context.tenant_id) is not int
+                or accepted.memory_context.tenant_id != self.principal.tenant_id
+                or accepted.memory_context.principal_storage_id != self.principal.subject_id
+                or type(accepted.memory_context.agent_memory_allowed) is not bool
+                or not isinstance(accepted.context,CallContext) or not isinstance(accepted.context.scope,TrustedScope)
+                or accepted.context.scope.owner_id != self.principal.subject_id):
+            raise ProviderError('TURN_OWNER_MISMATCH')
+
     async def _rows(self,guard,sql,params=()):
         guard.require_verified();return await (await guard.connection.execute(sql,params)).fetchall()
 
@@ -150,7 +162,7 @@ class PostgresTurnRepository:
                 return self._accepted(row)
 
     async def commit_failure(self,accepted,safe_code) -> bool:
-        if not isinstance(accepted,AcceptedTurn) or accepted.memory_context!=MemoryContext(self.principal.tenant_id,self.principal.subject_id):raise ProviderError('TURN_OWNER_MISMATCH')
+        self._accepted_owner(accepted)
         if not re.fullmatch('[A-Z][A-Z0-9_]{0,127}',safe_code):raise ProviderError('TURN_FAILURE_CODE_INVALID')
         async with self.leases.lease() as guard:
             async with guard.connection.transaction():
@@ -168,7 +180,7 @@ class PostgresTurnRepository:
                 return True
 
     async def commit_cancelled(self,accepted,answer,thinking,references) -> bool:
-        if not isinstance(accepted,AcceptedTurn) or accepted.memory_context!=MemoryContext(self.principal.tenant_id,self.principal.subject_id):raise ProviderError('TURN_OWNER_MISMATCH')
+        self._accepted_owner(accepted)
         if not isinstance(answer,str) or not isinstance(thinking,str):raise ProviderError('TURN_CANCELLED_CONTENT_INVALID')
         encoded=_json(references)
         async with self.leases.lease() as guard:

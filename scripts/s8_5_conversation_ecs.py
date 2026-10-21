@@ -29,6 +29,12 @@ FROZEN_SHA256 = bridge.FROZEN_SHA256
 ROOT_PREFIX = '/opt/rag-s8/state/s8-5-conversation-'
 EXECUTION_ROOT = historical.EXECUTION_ROOT
 SESSION_ID, SESSION_ENVELOPE = bridge.SESSION_ID, deepcopy(bridge.SESSION_ENVELOPE)
+REPAIR_SESSION_ID = 's85-repair-20261021'
+REPAIR_SESSION_ENVELOPE = {'max_calls': 56, 'max_tokens': 200000,
+    'max_conversation_turns': 7, 'max_generation_only_calls': 2}
+REPAIR_PRIOR_ACCOUNTING = {'attempted_operations': 26, 'reported_tokens': 33114,
+    'possibly_sent_unknown_held_tokens': 6365, 'held_token_exposure': 39479}
+REPAIR_GENERATION_ALLOWANCE = {'max_calls': 2, 'max_tokens': 20000}
 KB_ID = '96a9eebd-ffb2-4bc6-9bea-3ed015845479'
 DOCUMENT_IDS = (
     'a973df4a-0b4b-43f7-ad17-55265aac1556',  # Jeanne Marie Beaumont
@@ -82,7 +88,8 @@ def validate_inputs(raw):
 
 def validate_owner(owner, raw):
     validate_inputs(raw)
-    require(isinstance(owner, dict) and owner.get('schema') == 's85-conversation-authorization/v1'
+    require(isinstance(owner, dict) and owner.get('schema') in (
+        's85-conversation-authorization/v1', 's85-conversation-repair-authorization/v1')
         and owner.get('approved') is True
         and isinstance(owner.get('approval_source'), str) and owner['approval_source'].strip()
         and isinstance(owner.get('owner_message'), str) and owner['owner_message'].strip(),
@@ -90,10 +97,64 @@ def validate_owner(owner, raw):
     stage = owner.get('stage_id')
     require(isinstance(stage, str) and re.fullmatch(r'[0-9]{8}-[0-9a-f]{32}', stage)
         and owner.get('grant_id') == 's85c-' + stage, 'S85C_FRESH_STAGE_AND_GRANT_REQUIRED')
-    require(owner.get('session_id') == SESSION_ID and owner.get('session_envelope') == SESSION_ENVELOPE
-        and owner.get('envelope') == ENVELOPE, 'S85C_EXACT_CONTINUATION_ENVELOPE_REQUIRED')
+    if owner['schema'] == 's85-conversation-repair-authorization/v1':
+        require(owner.get('session_id') == REPAIR_SESSION_ID
+            and owner.get('session_envelope') == REPAIR_SESSION_ENVELOPE
+            and owner.get('prior_accounting') == REPAIR_PRIOR_ACCOUNTING
+            and owner.get('generation_only_allowance') == REPAIR_GENERATION_ALLOWANCE,
+            'S85C_EXACT_REPAIR_SESSION_REQUIRED')
+        prior=owner.get('prior_c2')
+        require(isinstance(prior,dict) and set(prior)=={'stage_id','final_sha256','authorization_sha256'}
+            and isinstance(prior['stage_id'],str) and re.fullmatch(r'[0-9]{8}-[0-9a-f]{32}',prior['stage_id'])
+            and prior['stage_id'] != stage and all(isinstance(prior[key],str)
+                and re.fullmatch(r'[0-9a-f]{64}',prior[key]) for key in ('final_sha256','authorization_sha256')),
+            'S85C_PRIOR_C2_BINDING_REQUIRED')
+        require(REPAIR_PRIOR_ACCOUNTING['attempted_operations'] + ENVELOPE['max_calls']
+            + REPAIR_GENERATION_ALLOWANCE['max_calls'] <= REPAIR_SESSION_ENVELOPE['max_calls']
+            and REPAIR_PRIOR_ACCOUNTING['held_token_exposure'] + ENVELOPE['max_tokens']
+            + REPAIR_GENERATION_ALLOWANCE['max_tokens'] <= REPAIR_SESSION_ENVELOPE['max_tokens'],
+            'S85C_REPAIR_AGGREGATE_BOUND_EXCEEDED')
+    else:
+        require(owner.get('session_id') == SESSION_ID and owner.get('session_envelope') == SESSION_ENVELOPE,
+                'S85C_EXACT_CONTINUATION_ENVELOPE_REQUIRED')
+    require(owner.get('envelope') == ENVELOPE, 'S85C_EXACT_CONTINUATION_ENVELOPE_REQUIRED')
     require(owner.get('source_inputs_sha256') == FROZEN_SHA256, 'S85C_APPROVED_INPUT_CHANGED')
     return 's85c-' + stage
+
+
+def repair_prior_receipt(owner):
+    """Read old C2 receipts only; a fresh repair creates new ordinary Sessions."""
+    if owner['schema'] != 's85-conversation-repair-authorization/v1':
+        return None
+    prior=owner['prior_c2']; root=Path(ROOT_PREFIX+prior['stage_id'])
+    validate_root(root,prior['stage_id'])
+    require(root.resolve()==root, 'S85C_PRIOR_C2_PATH_REDIRECT_DENIED')
+    values={}
+    for name,relative in (('final','final.json'),('authorization','payload/owner-authorization.json')):
+        path=root/relative
+        require(path.is_file() and not path.is_symlink() and root in path.resolve().parents,
+                'S85C_PRIOR_C2_RECEIPT_REQUIRED')
+        raw=path.read_bytes()
+        require(sha(raw)==prior[name+'_sha256'], 'S85C_PRIOR_C2_RECEIPT_CHANGED')
+        values[name]=json.loads(raw.decode('utf-8-sig'))
+    final,authorization=values['final'],values['authorization']
+    require(final.get('status')=='S85C_STOP' and final.get('error')=='TURN_OWNER_MISMATCH'
+        and final.get('stage_prefix')=='s85c-'+prior['stage_id']
+        and final.get('old_history_and_sources_unchanged') is True
+        and authorization.get('stage_id')==prior['stage_id'] and authorization.get('envelope')==ENVELOPE
+        and type(final.get('attempted_operations')) is int
+        and final['attempted_operations'] <= REPAIR_PRIOR_ACCOUNTING['attempted_operations']
+        and type(final.get('actual_reported_tokens_subtotal')) is int
+        and final['actual_reported_tokens_subtotal'] <= REPAIR_PRIOR_ACCOUNTING['reported_tokens'],
+        'S85C_PRIOR_C2_CONTRACT_CHANGED')
+    return {'prior_stage_id':prior['stage_id'],'prior_final_sha256':prior['final_sha256'],
+        'prior_authorization_sha256':prior['authorization_sha256'],
+        'verified_c2_attempted_operations':final['attempted_operations'],
+        'verified_c2_reported_tokens':final['actual_reported_tokens_subtotal'],
+        'owner_declared_prior_aggregate':deepcopy(REPAIR_PRIOR_ACCOUNTING),
+        'maximum_aggregate_token_exposure':REPAIR_PRIOR_ACCOUNTING['held_token_exposure']
+            + ENVELOPE['max_tokens'] + REPAIR_GENERATION_ALLOWANCE['max_tokens'],
+        'prior_sessions_reused':False,'prior_receipts_modified':False}
 
 
 def validate_root(root, stage):
@@ -142,6 +203,22 @@ def generation_contract(config):
     return asdict(contract)
 
 
+def bounded_turn_configuration(config):
+    """Apply this diagnostic's cap to both ordinary and model-fallback paths."""
+    from backend.weknora_port.models.types import ChatOptions
+    generation = dict(config.generation_options)
+    generation['citations_enabled'] = True
+    options = generation.get('options', ChatOptions())
+    require(isinstance(options, ChatOptions), 'S85C_GENERATION_OPTIONS_REQUIRED')
+    generation['options'] = replace(options, max_tokens=0, max_completion_tokens=GENERATION_OUTPUT, thinking=False)
+    fallback = dict(config.fallback) if config.fallback is not None else None
+    if fallback is not None:
+        options = fallback.get('options', ChatOptions())
+        require(isinstance(options, ChatOptions), 'S85C_FALLBACK_OPTIONS_REQUIRED')
+        fallback['options'] = replace(options, max_tokens=0, max_completion_tokens=GENERATION_OUTPUT, thinking=False)
+    return replace(config, generation_options=generation, fallback=fallback)
+
+
 async def protected_snapshot(app, sessions=(), runs=()):
     """Fingerprint old rows, excluding only this run's genuinely new identities."""
     base = await historical.history_snapshot(app)
@@ -187,6 +264,7 @@ async def prepare(root, *, write=True):
     owner = read(root / 'payload/owner-authorization.json')
     stage_prefix = validate_owner(owner, raw)
     validate_root(root, owner['stage_id'])
+    repair = repair_prior_receipt(owner)
     sources, versions = validate_inputs(raw)
     settings, principal = runtime_settings(owner['stage_id'])
     roles, configs, formal_ids = {}, {}, {}
@@ -233,6 +311,8 @@ async def prepare(root, *, write=True):
         'subject_sha256': sha(principal.subject_id), 'storage_marker': historical.storage_marker_identity(settings),
         'implementation_sha256': implementation_hashes(), 'before': before,
         'new_provider_calls': 0, 'actual_tokens_added': 0}
+    if repair is not None:
+        result['repair_authorization'] = repair
     if write:
         write_new(root / 'preflight.json', result)
     return result
@@ -476,6 +556,22 @@ async def isolation_checks(app, principal, main_session, empty_session, *, compl
     return result
 
 
+async def close_run_registries(app):
+    """Close only this one-off runtime's clients; cleanup cannot mask a failure."""
+    seen,failures=set(),[]
+    for data in getattr(app,'_runs',{}).values():
+        registry=data.get('registry')
+        close=getattr(registry,'close',None)
+        if not callable(close) or id(registry) in seen:
+            continue
+        seen.add(id(registry))
+        try:
+            await asyncio.wait_for(close(),5)
+        except BaseException as exc:
+            failures.append(bridge.safe_failure(exc))
+    return {'unique_registries_closed_or_attempted':len(seen),'cleanup_failures':failures}
+
+
 def citation_readback(result, proofs):
     """Citable provenance only; this does not prove every prose claim is true."""
     by_id = {row['chunk_id']: row for row in proofs}
@@ -571,11 +667,7 @@ async def run(root):
                     state = config.pipeline_state
                     require(state.bridge_rescue_mode == 'off' and not state.enable_expansion
                         and state.source_evidence_mode == 'bounded_source_v1', 'S85C_CONFIGURATION_CHANGED')
-                    config.generation_options['citations_enabled'] = True
-                    options = config.generation_options.get('options', ChatOptions())
-                    config.generation_options['options'] = replace(options, max_tokens=0,
-                        max_completion_tokens=GENERATION_OUTPUT, thinking=False)
-                    return config
+                    return bounded_turn_configuration(config)
 
                 async def pipeline_factory(turn, progress):
                     pipeline = await original_pipeline(turn, progress)
@@ -631,6 +723,7 @@ async def run(root):
                 record['usage_by_capability'] = validate_settlements(pg, data['entries'], accepted.run_id, pre['registry_roles'])
                 state = await app.turns.status(accepted.session_id, accepted.assistant_message_id)
                 record['turn_status'] = asdict(state)
+                record['ordinary_error_code'] = state.error_code or None
                 require(state.status == 'completed' and result is not None and not state.error_code,
                         'S85C_ORDINARY_TURN_FAILED')
                 record['citation_readback'] = citation_readback(result, record['source_readback'])
@@ -677,6 +770,7 @@ async def run(root):
             if isinstance(exc, asyncio.CancelledError): final['cancelled'] = True
         finally:
             app.cloud_allowed = False
+            final['registry_cleanup'] = await close_run_registries(app)
             final['after'] = await protected_snapshot(app, sessions, run_ids)
             final['old_history_and_sources_unchanged'] = final['after'] == pre['before']
             final['execution_summaries'] = [record['execution_summary'] for record in records if 'execution_summary' in record]

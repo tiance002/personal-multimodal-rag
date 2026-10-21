@@ -83,6 +83,117 @@ def test_generation_output_contract_is_real_and_bounded():
     assert contract['output_upper'] == 1024 and contract['thinking_mode'] == 'disabled'
 
 
+def test_fallback_configuration_uses_same_real_1024_wire_bound_as_ordinary_generation():
+    from backend.weknora_port.service import TurnConfiguration
+    from backend.weknora_port.models.types import ChatOptions
+    from backend.weknora_port.models.request import build_chat_body
+    from backend.weknora_port.models.output_contract import resolve_output_contract
+    from backend.weknora_port.models.types import Message
+    _,configs,_,_=setup_fence()
+    original=TurnConfiguration(PipelineState(),{'options':ChatOptions(max_completion_tokens=2048,thinking=False)},
+        {'strategy':'model','response':'unchanged fallback','prompt':'source gap',
+         'documents':lambda:'metadata only','options':ChatOptions(max_completion_tokens=2048,thinking=False)})
+    bounded=runner.bounded_turn_configuration(original)
+    for options in (bounded.generation_options['options'],bounded.fallback['options']):
+        body=build_chat_body(configs['cheap'],(Message('user','no evidence; ask clarification'),),options,stream=True)
+        contract=resolve_output_contract(configs['cheap'],body,capability='chat')
+        assert contract.output_upper==1024 and contract.thinking_mode=='disabled'
+    assert bounded.fallback['strategy']==original.fallback['strategy']=='model'
+    assert bounded.fallback['documents'] is original.fallback['documents']
+    assert original.fallback['options'].max_completion_tokens==2048
+
+
+def test_real_service_searchnothing_fallback_keeps_diagnostic_completion_cap():
+    from dataclasses import replace
+    from test_service import runtime,REQ
+    from backend.weknora_port.service import TurnConfiguration,MemoryBundle
+    from backend.weknora_port.models.types import ChatOptions
+    from backend.weknora_port.retrieval.search import SearchNothing
+    from backend.weknora_port.generation import RouterPolicy
+    async def scenario():
+        config=runner.bounded_turn_configuration(TurnConfiguration(PipelineState(),
+            {'policy':RouterPolicy(mode='CHEAP_ONLY'),'options':ChatOptions(max_completion_tokens=2048)},
+            {'strategy':'model','response':'insufficient evidence','prompt':'No source evidence for {{query}}.',
+             'documents':lambda:'metadata only','options':ChatOptions(max_completion_tokens=2048)}))
+        service,repo,*_=runtime(configuration=lambda turn:config)
+        class NoMemory:
+            async def load(self,*args): return MemoryBundle()
+        service.memory_loader=NoMemory()
+        async def pipeline_factory(*args):
+            async def no_results(*args): raise SearchNothing()
+            return SimpleNamespace(run=no_results)
+        service.pipeline_factory=pipeline_factory
+        accepted=await repo.accept(replace(REQ,content=runner.TURNS[4]['q0']),'owner')
+        accepted=replace(accepted,memory_context=replace(accepted.memory_context,agent_memory_allowed=False))
+        prepared=await service.prepare_turn(accepted)
+        assert prepared.request.is_fallback and not prepared.request.evidence
+        assert prepared.request.options.max_completion_tokens==1024
+        assert prepared.request.options.max_tokens==0 and prepared.request.options.thinking is False
+        assert prepared.request.policy.mode=='CHEAP_ONLY'
+    asyncio.run(scenario())
+
+
+def repair_owner():
+    value=owner()
+    value.update(schema='s85-conversation-repair-authorization/v1',session_id=runner.REPAIR_SESSION_ID,
+        session_envelope=deepcopy(runner.REPAIR_SESSION_ENVELOPE),
+        prior_accounting=deepcopy(runner.REPAIR_PRIOR_ACCOUNTING),
+        generation_only_allowance=deepcopy(runner.REPAIR_GENERATION_ALLOWANCE),
+        prior_c2={'stage_id':'20261021-'+'b'*32,'final_sha256':'0'*64,'authorization_sha256':'1'*64})
+    return value
+
+
+def test_repair_authorization_preserves_old_grant_and_reserves_aggregate_exposure():
+    assert runner.validate_owner(owner(),RAW)=='s85c-'+STAGE
+    assert runner.validate_owner(repair_owner(),RAW)=='s85c-'+STAGE
+    assert runner.REPAIR_PRIOR_ACCOUNTING['attempted_operations']+runner.ENVELOPE['max_calls']+2==56
+    assert runner.REPAIR_PRIOR_ACCOUNTING['held_token_exposure']+runner.ENVELOPE['max_tokens']+20000==199479
+
+
+@pytest.mark.parametrize('field',['session_id','session_envelope','prior_accounting','generation_only_allowance','prior_c2'])
+def test_repair_authorization_rejects_unbound_or_widened_metadata(field):
+    value=repair_owner();value[field]='invalid'
+    with pytest.raises(ValueError): runner.validate_owner(value,RAW)
+
+
+def test_repair_prior_receipts_are_hash_bound_and_read_only(tmp_path,monkeypatch):
+    import json
+    prefix=str(tmp_path/'s8-5-conversation-')
+    monkeypatch.setattr(runner,'ROOT_PREFIX',prefix)
+    monkeypatch.setattr(runner,'validate_root',lambda path,stage: runner.require(str(path)==prefix+stage,'TEST_PATH_CHANGED'))
+    value=repair_owner();prior=value['prior_c2'];root=Path(prefix+prior['stage_id'])
+    (root/'payload').mkdir(parents=True)
+    original=owner();original['stage_id']=prior['stage_id'];original['grant_id']='s85c-'+prior['stage_id']
+    final={'status':'S85C_STOP','error':'TURN_OWNER_MISMATCH','stage_prefix':'s85c-'+prior['stage_id'],
+        'old_history_and_sources_unchanged':True,'attempted_operations':19,'actual_reported_tokens_subtotal':27517}
+    (root/'final.json').write_text(json.dumps(final),encoding='utf-8')
+    (root/'payload/owner-authorization.json').write_text(json.dumps(original),encoding='utf-8')
+    before={path:path.read_bytes() for path in root.rglob('*') if path.is_file()}
+    prior['final_sha256']=runner.sha((root/'final.json').read_bytes())
+    prior['authorization_sha256']=runner.sha((root/'payload/owner-authorization.json').read_bytes())
+    result=runner.repair_prior_receipt(value)
+    assert result['verified_c2_reported_tokens']==27517 and result['maximum_aggregate_token_exposure']==199479
+    assert result['prior_sessions_reused'] is result['prior_receipts_modified'] is False
+    assert all(path.read_bytes()==raw for path,raw in before.items())
+    value['prior_c2']['final_sha256']='f'*64
+    with pytest.raises(ValueError,match='RECEIPT_CHANGED'): runner.repair_prior_receipt(value)
+
+
+def test_oneoff_registry_cleanup_closes_unique_clients_without_masking_original_failure():
+    from backend.weknora_port.models.types import ProviderError
+    calls=[]
+    class Closed:
+        async def close(self): calls.append('closed')
+    class Broken:
+        async def close(self):
+            calls.append('broken');raise ProviderError('PROVIDER_TRANSPORT_ERROR',sent=True)
+    shared=Closed()
+    app=SimpleNamespace(_runs={'one':{'registry':shared},'two':{'registry':shared},'three':{'registry':Broken()}})
+    result=asyncio.run(runner.close_run_registries(app))
+    assert calls==['closed','broken'] and result['unique_registries_closed_or_attempted']==2
+    assert result['cleanup_failures']==[{'type':'ProviderError','code':'PROVIDER_TRANSPORT_ERROR','sent':True,'http_status':None}]
+
+
 def test_fence_accepts_actual_effective_embedding_then_rerank_query():
     from backend.weknora_port.models.request import build_embedding_body, build_rerank_body
     fence, cfg, ctx, state = setup_fence()
