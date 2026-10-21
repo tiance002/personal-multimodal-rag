@@ -64,6 +64,18 @@ def test_explicit_credential_rotation_keeps_physical_identity_and_other_cipherte
     asyncio.run(run())
 
 
+def test_unchanged_nested_encrypted_secret_from_role_snapshot_is_idempotent():
+    async def run():
+        cipher = CountingCipher()
+        db, repo, row = existing(cipher)
+        role = replace(ROLE, parameters={**ROLE.parameters, 'app_secret': row['parameters']['app_secret']})
+        db.answers = [[row]]
+        assert await repo.persist(role) == row['id']
+        assert not any(sql.startswith(('INSERT INTO models', 'UPDATE models')) for sql, _ in db.calls)
+        assert cipher.encryptions == 0
+    asyncio.run(run())
+
+
 def test_unreadable_old_secret_never_silently_repaired_by_snapshot():
     async def run():
         cipher = CountingCipher()

@@ -103,8 +103,12 @@ class PostgresModelStore:
                     # randomized encryption is not a credential change.
                     previous_secrets = {name: self.cipher.decrypt(previous.get(name, ''), strict=True)
                                         for name in SECRET_FIELDS}
-                    if any(previous_secrets[name] != parameters.get(name, '') for name in SECRET_FIELDS):
-                        stored = {key: (previous.get(key, '') if previous_secrets[key] == value
+                    # Role snapshots decrypt api_key, while a nested app_secret
+                    # may retain the established encrypted representation.
+                    incoming_secrets = {name: self.cipher.decrypt(parameters.get(name, ''), strict=True)
+                                        for name in SECRET_FIELDS}
+                    if any(previous_secrets[name] != incoming_secrets[name] for name in SECRET_FIELDS):
+                        stored = {key: (previous.get(key, '') if previous_secrets[key] == incoming_secrets[key]
                                        else self.cipher.encrypt(value)) if key in SECRET_FIELDS else value
                                   for key, value in parameters.items()}
                         # Only known credential changes may update a pinned row.
