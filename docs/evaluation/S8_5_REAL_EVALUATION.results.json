@@ -1,0 +1,201 @@
+{
+  "schema": "s85-real-evaluation/v1",
+  "status": "S85_REAL_STOP",
+  "case_id": "frost-A",
+  "source_head": "f5b0f6e732c7951cae5b993c45b3b92f5a0b785e",
+  "branch": "codex/s8-5-conversation-bridge-20261021",
+  "contract_version": "sentence-id/v2",
+  "environment": "ECS rag-s8-api-1 one-off diagnostic Python process with staged PYTHONPATH",
+  "production_deployment": false,
+  "scope": "Fresh approved Frost A Bridge-only replay of frozen Search/Rerank input; current originals read from ECS DB",
+  "authorization": {
+    "owner_reply": "批准此精确范围并执行",
+    "approval_question_id": "call_77e140469d2c4edaa53239bf4adc979b:0",
+    "stage_id": "20261021-6c5bee3541044d649d70629ac0514b20",
+    "grant_id": "s85-20261021-6c5bee3541044d649d70629ac0514b20",
+    "max_operations": 2,
+    "max_tokens": 10000,
+    "cheap_max_output_tokens": 256,
+    "closed_status": "STOP",
+    "unused_operation_allowance_revoked": 1,
+    "historical_authorizations_reused": false
+  },
+  "frozen_input_sha256": "e3dbf7ee2f280b4b2f7b4438b89f2691faefb7e103649acc661e3d0a700b1135",
+  "four_frozen_files_unchanged": true,
+  "actual_calls": 1,
+  "actual_input_tokens": 1103,
+  "actual_output_tokens": 134,
+  "actual_total_tokens": 1237,
+  "token_evidence": "Provider raw response equals PG provider row equals execution entry; reservations are excluded",
+  "new_unknown": 0,
+  "calls": [
+    {
+      "request_id": "s85-20261021-6c5bee3541044d649d70629ac0514b20/frost-A/bridge-extract",
+      "provider_response_id": "01a15c9b47c3ec3f909ac902c1c9ace1",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "model_identity_evidence": "Registry, actual request and provider response model strings; no independent weights identity claim",
+      "capability": "chat",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "settlement_status": "SETTLED",
+      "provider_outcome": "RESPONSE_RECEIVED",
+      "input_tokens": 1103,
+      "output_tokens": 134,
+      "total_tokens": 1237,
+      "wire_sha256": "769a6982ba0a4ae12885741dbc7c78a6fe497adad4501ac4b66b9e13b5107642",
+      "finished_at_pg_utc": "2026-10-21 03:58:05.503931+00:00"
+    }
+  ],
+  "trace": {
+    "q0": "Where is the seminar directed by Jeanne Marie Beaumont located in 2007-2010?",
+    "rewrite_query": null,
+    "rewrite_status": "NOT RUN: Bridge-only frozen-input trial, not a multi-turn rewrite evaluation",
+    "initial_search_rerank": "Frozen S8.4 input reused; no new Embedding, Hybrid Search or first Rerank",
+    "sentences_sent": 10,
+    "original_characters_sent": 1433,
+    "selected_sentence": {
+      "sentence_id": "s-c9a81754f7673886cbb035bf",
+      "source_chunk_id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+      "start": 155,
+      "end": 311,
+      "text": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+      "role": "main"
+    },
+    "raw_model_content": "{\n  \"status\": \"FIRST_HOP_CANDIDATE\",\n  \"sentence_id\": \"s-c9a81754f7673886cbb035bf\",\n  \"subject\": \"She\",\n  \"subject_resolution\": \"\",\n  \"predicate\": \"served as the Director of\",\n  \"object\": \"The Frost Place Advanced Seminar\",\n  \"time\": \"2007–2010\",\n  \"target_attribute\": \"location\",\n  \"bridge_search_phrases\": [\n    \"The Frost Place Advanced Seminar\"\n  ]\n}",
+    "validation": {
+      "result": "REJECTED",
+      "field": "subject_resolution",
+      "actual": "",
+      "required_for_pronoun": "UNVERIFIED",
+      "validator_error": "BRIDGE_JSON_FIELD_INVALID",
+      "live_trace": "BRIDGE_EXTRACTION_UNVERIFIED / ValueError / VALIDATION_OR_OPTIONAL_MODEL_FAILURE",
+      "runner_stop": "S85_EXTRACTION_OR_RESPONSE_CONTRACT_STOP",
+      "raw_output_modified": false
+    },
+    "first_hop_candidate": "Selected original sentence and literal subject/predicate/object/time; structured contract rejected",
+    "first_hop_verified": false,
+    "subject_identity": "NOT RUN after structure rejection",
+    "program_q1": null,
+    "q1_status": "NOT RUN after structure rejection",
+    "second_hop_pool_status": "NOT REACHED in live run; frozen-pool availability separately validated offline",
+    "second_hop_rerank": "NOT RUN",
+    "supplement_entered_context": false,
+    "entity_bridge": "UNVERIFIED",
+    "final_answer_supported": false,
+    "generated_answer_verified": false
+  },
+  "zero_call_capabilities": {
+    "rerank": 0,
+    "embedding": 0,
+    "final_generation": 0,
+    "expensive": 0,
+    "frost_B": 0,
+    "retries": 0
+  },
+  "accounting_audit": {
+    "pg_unique_keys": true,
+    "execution_unique_keys": true,
+    "exact_keysets_equal": true,
+    "wire_and_usage_equal": true,
+    "old_history_roles_models_source_counts_preserved": true,
+    "container_image_preserved": true,
+    "usage_by_capability_in_error_final": null,
+    "usage_summary_method": "Derived directly from sole raw response and matching PG/execution receipts; no aggregate fabricated"
+  },
+  "commands": [
+    {
+      "command": "python -B var/reports/s8-5/stage4/live_orchestrate.py stage-prepare",
+      "exit_code": 0,
+      "remote_exit_code": 0
+    },
+    {
+      "command": "python -B var/reports/s8-5/stage4/live_orchestrate.py run",
+      "exit_code": 1,
+      "remote_exit_code": 2,
+      "meaning": "Local helper signals remote semantic contract STOP; not transport or token settlement failure"
+    },
+    {
+      "command": "python -B var/reports/s8-5/stage4/live_orchestrate.py collect",
+      "exit_code": 0,
+      "remote_exit_code": 0
+    }
+  ],
+  "receipt_archive": {
+    "action": "collect",
+    "archive": "/opt/rag-s8/state/s8-5-bridge-20261021-6c5bee3541044d649d70629ac0514b20/receipt-bundle.zip",
+    "bytes": 58013,
+    "receipt_files": 22,
+    "sha256": "310b7ea37aa227ab2cb6a8e5a7805a0246605f731eab4a1ba764df5630e247a1"
+  },
+  "independent_audit": {
+    "status": "PASS_INDEPENDENT_RECEIPT_SOURCE_AND_USAGE_AUDIT",
+    "command": "python -B var/reports/s8-5/stage4/independent_audit.py var/reports/s8-5/stage4/downloaded-final",
+    "exit_code": 0,
+    "scope": "Local immutable receipt/source/mapping/usage reconciliation; no ECS or model call"
+  },
+  "evidence": [
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/execution/evidence/5c3dd835e0ea46eaafcf381254b5bb38.request.json",
+      "bytes": 4442,
+      "sha256": "34aec0e052b69a8878c003db9f5a1ef0cab51d4d0fb1bba5a847d8063b06e40c"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/execution/evidence/5c3dd835e0ea46eaafcf381254b5bb38.response.body",
+      "bytes": 880,
+      "sha256": "17896bd212d20509eb68d27d435bd29a03f3a5103cb484cc25e3bf90a657c71c"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/execution/evidence/5c3dd835e0ea46eaafcf381254b5bb38.response.json",
+      "bytes": 62,
+      "sha256": "8d443710e186e36a1ea9594c6e0aef1f1d4877895a8b7e249890edda0ecfacb3"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/execution/execution.json",
+      "bytes": 4146,
+      "sha256": "d51085960f7d392744c57763e3fbe9cd71bb4111de0714a1ae674d8dac52900f"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/stage/final.json",
+      "bytes": 94361,
+      "sha256": "e8b67ad7ea8eefeecc41a91d9d86be3aec8e1920bf9010e7e1e2a8b3701752db"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/stage/cases/frost-A.json",
+      "bytes": 7736,
+      "sha256": "10f459b305b0ee730dec52c1cd00e27ee1eaa417625ce1534527bd2c2797330f"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/stage/authorization-closure.json",
+      "bytes": 633,
+      "sha256": "9a5210a9989dfd2222da51dbba34cac6637d6c2684dcdc59fd6628641df44a5b"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/stage/prepare.command.json",
+      "bytes": 391,
+      "sha256": "6e737f9e7054ca082587c3afcddc38c79de18ff126c6ed45e7c9f96aa4e78cca"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/stage/run.command.json",
+      "bytes": 387,
+      "sha256": "bf5f718d79302f3dd9be820e16bd436e89d315de5569e3e46c41ff03c4767de6"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/downloaded-final/stage/payload/owner-authorization.json",
+      "bytes": 1008,
+      "sha256": "79d0107332bb963b56b27e0a7feb4fc6b4a953fd9e5e3003d8abd9d50c9fe4aa"
+    },
+    {
+      "local_path": "var/reports/s8-5/stage4/independent-audit-result.json",
+      "bytes": 1942,
+      "sha256": "553d06aba4b2f64e3870532d2644c7029cad818e0aa0bfc8423ee31798f1af17"
+    }
+  ],
+  "limitations": [
+    "Real multi-turn rewrite and real PG history/SSE browser behavior not evaluated by this grant",
+    "No actual BGE, second-hop Context or final generated-answer success established",
+    "Offline Frost evidence distinguishes institution location from seminar event venue; final answer remains unsupported",
+    "No model output repair or automatic retry; another live trial requires a fresh bounded plan and owner authorization"
+  ]
+}

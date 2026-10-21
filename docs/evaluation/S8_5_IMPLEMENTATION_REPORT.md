@@ -1,12 +1,23 @@
 # S8.5 多轮对话检索与受控多跳检索
 
-状态：阶段 0–4 的离线实现与对照完成，真实计划可审查。真实模型/ECS 本轮尚未执行，等待阶段 4.3 的精确范围授权。
+状态：阶段 0–4 的实现与离线对照完成；已取得精确授权并在 ECS 执行一次 Frost A 真实测评。Cheap 返回的 `subject_resolution` 为空，校验器按合同拒绝，真实分支以 **`S85_REAL_STOP`** 结束。没有重试或执行 BGE；不能宣称真实多跳链路通过。
+
+| 能力 | 实现与离线验证 | 本轮真实验证 |
+|---|---|---|
+| Session 完成历史、指代改写、事实追问重新检索 | 已实现；检查实际 Embedding/关键词/Rerank 实参及隔离/回退/回放 | 真实多轮模型效果、PG 历史和浏览器恢复 NOT RUN |
+| 句子 ID、原文对象/时间/身份保护、有界候选补救 | 已实现；Frost A/B 与 4 个负控制有独立轨迹 | 当前原文与三前驱读取通过；1 次 Cheap 收到正常响应，但字段合同失败 |
+| 第二跳 BGE、Context 补充 | Mock 路径通过；缺池停止通过 | 因 Cheap 字段失败，NOT RUN |
+| 事件地点与最终答案支持 | 能拒绝将机构所在地当作研讨会举办地 | 未生成答案；最终答案仍未验证/不具备充分证据 |
+
+离线轨迹：[S8_5_IMPLEMENTATION_REPORT.results.json](S8_5_IMPLEMENTATION_REPORT.results.json)。独立真实结果：[S8_5_REAL_EVALUATION.results.json](S8_5_REAL_EVALUATION.results.json)。两类记录分开保存，旧离线结果及 S8.4 冻结结果未覆盖。
 
 ## 基线与阶段 0
 
 实际初始 HEAD 为 `main@0606063`，其尚不包含 `backend/weknora_port`。隔离分支 `codex/s8-5-conversation-bridge-20261021` 从它建立，合入已提交 S8.4 分支 `9931ffe`，集成提交 `7e5fb4a`。两个 ECS skill add/add 冲突保留当前 main 的增补案例；未改历史 S8.4 输入、Gold、收据、报告。主工作区原有 `.serena/project.yml` 保留。
 
 实际调用链：服务端准入 → `prepare_turn()` 读取历史/记忆 → `understand_query()` → `resolve_intent()` → Search → Rerank → Merge → TopK → 可选来源扩展/Bridge → Context → Generation → 引用注册/持久化/SSE。恢复请求回放已有运行，跳过 `prepare_turn()`。
+
+下表保留阶段 0 开始时的只读审查快照；其中的缺陷和“待执行”状态在后续阶段逐项处理，当前结果以上方能力表与阶段记录为准。
 
 | 检查点 | 已实现 | 缺陷 | 缺少验证 |
 |---|---|---|---|
@@ -81,7 +92,7 @@ python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/tes
 
 **271 passed，exit 0，1.90 秒**，`var/reports/s8-5/stage3/final-green.txt/.exit`。身份独立验证 63 passed，输出位于 `stage3-identity/green.*`；重复子集不累加。活动工程测试跟随新合同迁移，冻结 S8.4 输入/Gold/收据/真实结果未改。
 
-### 阶段 4：离线对照与真实运行器（OFFLINE_PASS / REAL NOT RUN）
+### 阶段 4：离线对照与真实测评（OFFLINE_PASS / REAL STOP）
 
 一次跨阶段关联回归 **629 passed，exit 0，5.16 秒**，未把子集/重复运行累加。命令：
 
@@ -111,7 +122,54 @@ python -B scripts/s8_5_offline_audit.py --output docs/evaluation/S8_5_IMPLEMENTA
 
 新运行器 `scripts/s8_5_bridge_ecs.py` 专用于本轮精确 Frost A 计划；复用正式 Registry/Gate/LocalExecution，不复用旧授权/fence/次数。58 个运行器安全测试通过，exit 0，1.47 秒：`python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s8_5_bridge_ecs.py`。独立审查发现“本地准入拒绝被算成实际调用/UNKNOWN”的报告缺陷，RED 8 failed 后修复；现在分别记录尝试、明确未发送、已结算和可能已发送未知，保留 STOP 与占用。证据 `runner-summary-{red,green}.*`。
 
-真实计划见 [S8_5_REAL_EVALUATION_PLAN.md](S8_5_REAL_EVALUATION_PLAN.md)。用户已允许真实测评；尚未执行任何本轮模型调用或 ECS 操作，当前真实 Token 为 0。只有取得该精确 envelope 的授权才运行。
+真实计划见 [S8_5_REAL_EVALUATION_PLAN.md](S8_5_REAL_EVALUATION_PLAN.md)。精确范围批准原句为“批准此精确范围并执行”，对应 `call_77e140469d2c4edaa53239bf4adc979b:0`。源代码基线 `f5b0f6e732c7951cae5b993c45b3b92f5a0b785e`，在已有 ECS 容器 `rag-s8-api-1` 内使用新目录 `PYTHONPATH` 执行一次性诊断进程；没有部署 API/Worker。真实试验复用冻结 Search/首轮 Rerank 输入并回读当前原文，仅测 Bridge，不是完整线上 RAG 或多轮评测。
+
+#### 4.3 实际真实调用与停止结果
+
+Stage：`20261021-6c5bee3541044d649d70629ac0514b20`。请求公共前缀：`s85-20261021-6c5bee3541044d649d70629ac0514b20/frost-A/`。
+
+| 请求后缀 | 模型 | 实际次数 | 输入 Token | 输出 Token | 合计 Token | 状态 |
+|---|---|---:|---:|---:|---:|---|
+| `bridge-extract` | SiliconFlow / `Qwen/Qwen3.5-4B` | 1 | 1103 | 134 | 1237 | HTTP 200；`finish_reason=stop`；`SETTLED`；字段校验失败 |
+| `bridge-rerank` | SiliconFlow / `BAAI/bge-reranker-v2-m3` | 0 | NOT RUN | NOT RUN | 0 | 未准入 |
+
+原始 Provider 响应、PG 收据与执行账本的 `(request_id, capability)` 唯一、键集合完全一致，wire hash 与 Token 完全相同。错误分支 `final.usage_by_capability` 原值为 null，以上用量直接由三份原始记录核对得出，没有补造聚合值。**实际总量仅 1,237 Token**；5,248 是门控预占，不能当作实际消耗。没有费用估算。
+
+模型确实选中 `s-c9a81754f7673886cbb035bf`，程序映射到原始 Chunk `ec07a1fd-8a8e-4f23-a7d6-65d385d2343b` 的 Unicode 区间 `[155,311)`：
+
+> She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.
+
+候选返回 subject=`She`、object=`The Frost Place Advanced Seminar`、time=`2007–2010`，但 **`subject_resolution=""`**。提示要求代词为 `UNVERIFIED`；`validate_extraction()` 在结构字段校验阶段抛出 `BRIDGE_JSON_FIELD_INVALID`，尚未运行关系/身份准入。原始输出未修改，也没有将“选中正确句子”报告为 `FIRST_HOP_VERIFIED`。
+
+| 多跳检查层 | 真实结果 |
+|---|---|
+| 第一跳关系候选 | 选中了正确原文，但结构字段无效，验证未通过 |
+| 身份指代验证 | 未执行；前驱原文链回读完整不等同于身份准入 |
+| 程序 Q1 | 未构造 |
+| 第二跳候选 | 本次执行未到候选筛选；冻池中存在来源由离线对照证明 |
+| 第二跳 BGE | NOT RUN |
+| 补充进入最终 Context | 否 |
+| 生成答案及证据支持 | 未生成；`FINAL_ANSWER_SUPPORTED=false`、`generated_answer_verified=false` |
+
+最终状态 `S85_REAL_STOP / S85_EXTRACTION_OR_RESPONSE_CONTRACT_STOP`。新 UNKNOWN=0，重试=0，Frost B/Embedding/最终生成/Expensive=0。账本和授权关闭记录均为 STOP；未用 1 次操作与 8,763 未占用 Token 额度已撤销，历史占用未释放或重置。原有收据、角色/模型配置、来源和容器版本的前后快照一致。
+
+#### 命令、退出码与证据
+
+| 实际命令 | 退出码 | 结果/证据 |
+|---|---:|---|
+| `python -B var/reports/s8-5/stage4/live_orchestrate.py stage-prepare` | 0 | 远端 prepare exit 0；205 文件哈希验证；10 句/1433 原文字符/3 前驱；0 次模型发送 |
+| `python -B var/reports/s8-5/stage4/live_orchestrate.py run` | 1 | 远端 runner exit **2**，表示合同 STOP；`ecs-real-run.*` 和 `downloaded-final/stage/run.command.json` |
+| `python -B var/reports/s8-5/stage4/live_orchestrate.py collect` | 0 | 22 个收据文件下载并通过逐文件清单验证 |
+| `python -B var/reports/s8-5/stage4/independent_audit.py var/reports/s8-5/stage4/downloaded-final` | 0 | 独立原文/用量/账本审计通过；原响应重放仍抛出 `BRIDGE_JSON_FIELD_INVALID` |
+| `python -X utf8 -B var/reports/s8-5/stage4/finalize_report.py` | 0 | 根据原始收据生成独立真实结果 JSON；再次核对 4 个冻结文件未改 |
+
+远端实际 run 命令：
+
+```sh
+docker exec -i -e PYTHONPATH=/opt/rag-s8/state/s8-5-bridge-20261021-6c5bee3541044d649d70629ac0514b20/source:/app rag-s8-api-1 python -B /opt/rag-s8/state/s8-5-bridge-20261021-6c5bee3541044d649d70629ac0514b20/source/scripts/s8_5_bridge_ecs.py run --root /opt/rag-s8/state/s8-5-bridge-20261021-6c5bee3541044d649d70629ac0514b20
+```
+
+原始证据保留在本地 `var/reports/s8-5/stage4/downloaded-final/` 以及 ECS 新诊断目录；不保存请求头/密钥。源码/输入包 SHA-256 `1fb0d487aa3cc3b535559114fc88c3e3f71b6d19d14c4c348ebe628fb9a91a8a`。收据包 **58,013 字节**，SHA-256 `310b7ea37aa227ab2cb6a8e5a7805a0246605f731eab4a1ba764df5630e247a1`。请求 wire SHA-256 `769a6982ba0a4ae12885741dbc7c78a6fe497adad4501ac4b66b9e13b5107642`；原始响应 SHA-256 `17896bd212d20509eb68d27d435bd29a03f3a5103cb484cc25e3bf90a657c71c`。模型身份依据为注册表、实际请求和 Provider 响应的模型字符串，未独立验证模型权重。
 
 ### 阶段 5：仅评估
 
@@ -159,4 +217,37 @@ flowchart TD
   L -- 是 --> M[FINAL_ANSWER_SUPPORTED 的证据前提]
 ```
 
-两图对应当前实际代码调用点与离线实参轨迹。真实模型尚未执行；`FINAL_ANSWER_SUPPORTED` 只描述证据前提，不能代替对实际生成答案的验证。
+以上两图对应当前实际代码调用点与离线实参轨迹；本轮真实执行的子链如下。`FINAL_ANSWER_SUPPORTED` 只描述证据前提，不能代替对实际生成答案的验证。
+
+```mermaid
+flowchart TD
+  A[Frost A 冻结 Search / 首轮 Rerank 输入] --> B[ECS 当前原文与3前驱回读]
+  B --> C[10个句子ID / 1433原文字符]
+  C --> D[真实 Qwen3.5-4B 1次 / 1103+134 Token]
+  D --> E[选中正确关系句 / subject_resolution为空]
+  E --> F[BRIDGE_JSON_FIELD_INVALID]
+  F --> G[STOP / 收据结算与授权关闭]
+  G --> H[Q1与BGE未执行 / 无补充Context / 未生成答案]
+```
+
+## 未解决项与下一步最小建议
+
+1. **真实抽取合同未通过**：空 `subject_resolution` 已被安全拒绝，Bridge 默认仍 off，普通检索继续可用。建议下次只强化该枚举字段的明确输出示例并先做离线回归；不得修补此次原响应。重新真实调用需要新的一次性范围与授权，本轮额度已关闭。
+2. **真实多轮效果仍未验证**：离线已证明参数传递、隔离、保守检索与 SSE 幂等；窄改写合同可能使真实模型的自由改写回退 q0。后续最小验证是固定三轮历史的独立评测，不与 Frost 重试混用。
+3. **Frost 语义证据不足**：现有第二跳只证明机构所在地，不能证明 Advanced Seminar 的举办地；B 的最终普通 Context 也缺完整姓名锚点。这些限制在 Mock 成功路径仍成立，不能靠放宽阈值或追加模型调用消除。
+4. **未验收范围**：真实 PG 多用户/跨 Session 历史测试、真实浏览器/Redis SSE 恢复、真实 BGE/最终生成均 NOT RUN。未批准延期或建立里程碑 Tag；本报告交付实现与可核查证据，不代表项目负责人已验收全部能力。
+
+## 分阶段版本
+
+分支：`codex/s8-5-conversation-bridge-20261021`。本轮未推送、合并或打 Tag。
+
+| 阶段 | Commit | 内容 |
+|---|---|---|
+| 参考依赖集成 | `7e5fb4a1c584a3fe672b9342cd5ff8e99dd74803` | 当前 main 合入已提交 S8.4 代码 |
+| 0 | `f577963425f78ef90979446bec6ebcfac931a2b1` | 实际链路与缺陷基线 |
+| 1 | `e55f39d` | 历史来源隔离、改写校验与事实追问检索 |
+| 2 | `8ed00d6` | 关系/地点保护与双侧唯一收据 |
+| 3 | `e4f011e17ca016c22b502b210749f98d12d7a34a` | 句子 ID、有界身份与第二跳证据 |
+| 4 离线/运行器 | `f5b0f6e732c7951cae5b993c45b3b92f5a0b785e` | 离线对照、真实运行器与精确计划；真实执行源码基线 |
+
+真实 STOP 结果及本报告作为后续独立文档提交保存；其最终 SHA 以交付时的 `git log -1` 为准，避免在提交正文内自引用尚不存在的 SHA。

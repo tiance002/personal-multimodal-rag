@@ -1,6 +1,6 @@
 # S8.5 首次真实测评计划：仅 Frost A
 
-当前：离线验收完成；此计划尚未执行真实模型或 ECS 操作。用户已表示“允许做真实测评”；根据本轮任务阶段 4.3，仍须在具体次数、Token 与 ECS/外发范围列明后取得该范围授权。旧 S8.4 CLOSED 账本及其剩余额度不复用。
+当前：已取得用户对以下精确范围的批准，并执行一次 Frost A；结果为 **`S85_REAL_STOP`**。Cheap 的 `subject_resolution=""` 不符合合同，执行到此停止，BGE 未运行。以下保留原计划范围与调用前标记；实际结果附在文末。旧 S8.4 CLOSED 账本及其剩余额度未复用。
 
 ## 唯一调用范围
 
@@ -42,3 +42,13 @@
 - 发现需要更多调用、Frost B、生产更新、第二次全库 Search 或其他范围扩展。
 
 若只证明 The Frost Place 机构所在地，即使 BGE 高分且进入 Context，也须保留 `ENTITY_BRIDGE_UNVERIFIED` / `FINAL_ANSWER_UNVERIFIED`。本轮不生成最终答案，不能据此报告真实多跳问答准确率。
+
+## 实际授权与关闭
+
+- 精确批准原句：“批准此精确范围并执行”；对应 `call_77e140469d2c4edaa53239bf4adc979b:0`。未使用此前宽泛允许或旧额度替代本轮精确批准。
+- 源码基线 `f5b0f6e732c7951cae5b993c45b3b92f5a0b785e`；新目录 205 文件校验完成，prepare 0 次发送，10 句/1433 原文字符/3 个前驱。没有生产部署。
+- 唯一实际调用：`.../frost-A/bridge-extract`，`Qwen/Qwen3.5-4B`，HTTP 200，finish stop，**输入 1103 / 输出 134 / 合计 1237 Token**。原始响应与 PG/执行双侧收据完全一致。
+- 虽选中正确关系句，`subject_resolution` 空值被 `BRIDGE_JSON_FIELD_INVALID` 拒绝；未运行身份准入、Q1、BGE、补充 Context 或最终生成。未修补原响应，未重试，新增 UNKNOWN=0。
+- 运行器 exit 2，外层编排 exit 1，状态 `S85_EXTRACTION_OR_RESPONSE_CONTRACT_STOP`。新账本与授权均 STOP；未用 1 次操作与 8763 未占用 Token 额度撤销，既有占用和历史记录保留。
+- 原始收据包 58,013 字节，SHA-256 `310b7ea37aa227ab2cb6a8e5a7805a0246605f731eab4a1ba764df5630e247a1`，22 文件清单校验通过。
+- 完整逐层结论、实际命令/退出码与收据位置见 [实施报告](S8_5_IMPLEMENTATION_REPORT.md) 和 [独立真实结果](S8_5_REAL_EVALUATION.results.json)。本授权已关闭，不能用于追加或重试。
