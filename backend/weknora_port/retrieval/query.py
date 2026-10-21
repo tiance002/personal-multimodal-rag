@@ -198,6 +198,8 @@ def _ambiguous_user_reference(query, history):
         question = getattr(previous,'query','')
         if not isinstance(question,str) or not go_strip(question):
             continue
+        if _HISTORY_TRANSFORM.fullmatch(go_strip(question)):
+            continue  # A pure answer transform establishes no new subject.
         if not _REFERENCE.search(question):
             return bool(_AMBIGUOUS_HISTORY.search(question))
     return False
@@ -215,7 +217,11 @@ def requires_ambiguity_clarification(state):
     if _HISTORY_TRANSFORM.fullmatch(go_strip(state.query)) and state.history:
         # Legacy completed answers may already have guessed an ambiguous item.
         # A format request must not promote that unsupported answer into facts.
-        return _ambiguous_user_reference(getattr(state.history[-1],'query',''),state.history[:-1])
+        history = state.history
+        while history and _HISTORY_TRANSFORM.fullmatch(go_strip(getattr(history[-1],'query',''))):
+            history = history[:-1]
+        if history:
+            return _ambiguous_user_reference(getattr(history[-1],'query',''),history[:-1])
     return False
 
 
@@ -247,6 +253,8 @@ def validate_rewrite(state, candidate):
     # first intervening independent topic ends the search; never scan past it.
     for previous in reversed(state.history):
         previous_query = getattr(previous, 'query', '')
+        if _HISTORY_TRANSFORM.fullmatch(go_strip(previous_query)):
+            continue  # Keep the latest independent user topic across transforms.
         if _REFERENCE.search(previous_query) and _AMBIGUOUS_HISTORY.search(previous_query):
             return 'AMBIGUOUS_REFERENCE'
         if not _REFERENCE.search(previous_query):
