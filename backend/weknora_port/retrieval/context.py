@@ -164,8 +164,12 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None,
         supported = not normal_hints and all(
             r.metadata['bridge_rescue'].get('final_answer_supported') is True
             for r in getattr(state, 'rescue_evidence', ()))
-        state.bridge_trace.append({'stage':'bridge_context',
-            'decision':'FINAL_ANSWER_SUPPORTED' if supported else 'FINAL_ANSWER_UNVERIFIED',
-            'evidence_chain_supported':supported, 'generated_answer_verified':False})
+        if getattr(state, 'retrieval_strategy_mode', 'off') == 'query_structure_v1':
+            state.bridge_trace.append({'stage':'bridge_context','decision':'STRATEGY_CONTEXT_READY',
+                'delivery':'PENDING_ACTUAL_GENERATION_MESSAGES','generated_answer_verified':False})
+        else:
+            state.bridge_trace.append({'stage':'bridge_context',
+                'decision':'FINAL_ANSWER_SUPPORTED' if supported else 'FINAL_ANSWER_UNVERIFIED',
+                'evidence_chain_supported':supported, 'generated_answer_verified':False})
     state._finalized_context = result
     return result

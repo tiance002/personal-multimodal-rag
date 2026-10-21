@@ -539,19 +539,39 @@ def _optional_error(state, error, phase):
     _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason=phase, error_type=type(error).__name__)
 
 
-async def rescue_bridge(state, context, repository, registry):
-    """Append at most one independently readable source, never normal rankings."""
-    validate_bridge_mode(state.bridge_rescue_mode)
-    if state.bridge_rescue_mode == 'off' or not state.needs_retrieval:
-        return
-    if any(item.get('stage') == 'bridge_start' for item in state.bridge_trace):
-        return
-    state.bridge_trace.append({'stage': 'bridge_start', 'mode': MODE, 'contract_version':CONTRACT_VERSION})
+@dataclass(frozen=True)
+class BridgeRejected:
+    reason: str
+
+
+@dataclass(frozen=True)
+class BridgePlan:
+    """One program-verified first hop; model text never becomes a source."""
+    q0: str
+    effective_query: str
+    object: str
+    target_attribute: str
+    q1: str
+    extraction: dict
+    identity_proof: object
+    predecessor_chain: tuple
+    originals: tuple
+    targets: tuple
+    authorization_scope: object
+
+
+async def prepare_verified_bridge(state, context, repository, registry):
+    """Read originals, select sentence ID once and prove relation/identity.
+
+    Kept separate from pool ranking and recall so a second retrieval cannot
+    accidentally call the extractor again. The legacy wrapper retains its
+    original start guard, errors, trace and single-pool admission policy.
+    """
     _check(context)
     question = getattr(state, 'rewrite_query', '') or state.query
     if not _location_question(question):
         _trace(state, 'NOT_APPLICABLE', reason='LOCATION_RELATION_ONLY')
-        return
+        return BridgeRejected('LOCATION_RELATION_ONLY')
     validate_targets(state.targets, context)
     final_ids = {value for r in state.merge_results for value in (r.id, *r.sub_chunk_ids)}
     original_by_id = {r.id: r for r in state.search_results if r is not None}
@@ -561,60 +581,80 @@ async def rescue_bridge(state, context, repository, registry):
              RELATION.search(original_by_id[r.id].content)][:2]
     if not mains or not state.bridge_cheap_model_id:
         _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='FIRST_HOP_OR_CHEAP_ROLE_MISSING')
+        return BridgeRejected('FIRST_HOP_OR_CHEAP_ROLE_MISSING')
+    originals = await _read_originals(mains, state, context, repository)
+    windows, sources, chains = await original_windows(originals, state, context, repository)
+    payload = extraction_payload(question, windows, sources)
+    _trace(state, 'EXTRACTION_INPUT', windows=[asdict(w) for w in windows],
+           sentences=[asdict(s) for s in sentence_table(windows, sources).values()],
+           predecessor_chains={key:[r.id for r in chain] for key,chain in chains.items()},
+           contract_version=CONTRACT_VERSION, q0_sha256=hashlib.sha256(state.query.encode()).hexdigest(),
+           model_id=state.bridge_cheap_model_id)
+    child = context.child('bridge-extract')
+    model = await registry.chat(state.bridge_cheap_model_id, child)
+    _check(context)
+    response = await model.chat((Message('system', SYSTEM), Message('user', json.dumps(
+        payload, ensure_ascii=False))),
+        ChatOptions(temperature=0, thinking=False, max_tokens=256, format='json',
+                    send_temperature=True), child)
+    _require_known_usage(response)
+    _check(context)
+    _trace(state, 'EXTRACTION_OUTPUT', content=response.content,
+           finish_reason=response.finish_reason)
+    if response.finish_reason != 'stop' or response.tool_calls:
+        raise ValueError('BRIDGE_EXTRACTION_NOT_COMPLETE')
+    data = validate_extraction(response.content, windows, sources, question)
+    if data is None:
+        _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='NO_FIRST_HOP')
+        return BridgeRejected('NO_FIRST_HOP')
+    _trace(state, 'FIRST_HOP_SPAN_VERIFIED', extraction=data)
+    if not any(r.chunk_type == 'text' and data['source_chunk_id'] in (r.id, *r.sub_chunk_ids)
+               and data['quote'] in r.content for r in state.merge_results):
+        # Ancestor IDs alone do not show that a quote survived Merge.
+        # Presence here checks survival only; the offset proof above came
+        # exclusively from the independently read-back original Chunk.
+        _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='FIRST_HOP_QUOTE_NOT_IN_FINAL_EVIDENCE')
+        return BridgeRejected('FIRST_HOP_QUOTE_NOT_IN_FINAL_EVIDENCE')
+    from .bridge_identity import prove_identity
+    proof = prove_identity(question, chains[data['source_chunk_id']],
+        selected_chunk_id=data['source_chunk_id'], quote_start=data['quote_start'],
+        quote_end=data['quote_end'], normal_results=state.merge_results)
+    data['identity_proof'] = asdict(proof)
+    # A pronoun's model EXPLICIT label never authorizes identity resolution.
+    identity = proof.verified and (not PRONOUN.fullmatch(data['subject']) or
+                                  data['subject_resolution'] == 'UNVERIFIED')
+    data['subject_verified'] = bool(identity)
+    data['relation_verified'] = bool(identity and data['relation_form_verified'])
+    if not identity:
+        _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='SUBJECT_IDENTITY_UNVERIFIED',
+               span_verified=True, subject_verified=False, identity_proof=asdict(proof))
+        return BridgeRejected('SUBJECT_IDENTITY_UNVERIFIED')
+    if not data['relation_verified']:
+        _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='RELATION_UNVERIFIED',
+               span_verified=True, subject_verified=True, relation_verified=False)
+        return BridgeRejected('RELATION_UNVERIFIED')
+    _trace(state, 'FIRST_HOP_VERIFIED', extraction=data, identity_proof=asdict(proof))
+    return BridgePlan(state.query, question, data['object'], 'location',
+        f"Where is {data['object']} located?", data, proof,
+        chains[data['source_chunk_id']], tuple(originals), tuple(state.targets), context.scope)
+
+
+async def rescue_bridge(state, context, repository, registry):
+    """Append at most one independently readable source, never normal rankings."""
+    validate_bridge_mode(state.bridge_rescue_mode)
+    if state.bridge_rescue_mode == 'off' or not state.needs_retrieval:
         return
+    if any(item.get('stage') == 'bridge_start' for item in state.bridge_trace):
+        return
+    state.bridge_trace.append({'stage': 'bridge_start', 'mode': MODE, 'contract_version':CONTRACT_VERSION})
     try:
-        originals = await _read_originals(mains, state, context, repository)
-        windows, sources, chains = await original_windows(originals, state, context, repository)
-        payload = extraction_payload(question, windows, sources)
-        _trace(state, 'EXTRACTION_INPUT', windows=[asdict(w) for w in windows],
-               sentences=[asdict(s) for s in sentence_table(windows, sources).values()],
-               predecessor_chains={key:[r.id for r in chain] for key,chain in chains.items()},
-               contract_version=CONTRACT_VERSION, q0_sha256=hashlib.sha256(state.query.encode()).hexdigest(),
-               model_id=state.bridge_cheap_model_id)
-        child = context.child('bridge-extract')
-        model = await registry.chat(state.bridge_cheap_model_id, child)
-        _check(context)
-        response = await model.chat((Message('system', SYSTEM), Message('user', json.dumps(
-            payload, ensure_ascii=False))),
-            ChatOptions(temperature=0, thinking=False, max_tokens=256, format='json',
-                        send_temperature=True), child)
-        _require_known_usage(response)
-        _check(context)
-        _trace(state, 'EXTRACTION_OUTPUT', content=response.content,
-               finish_reason=response.finish_reason)
-        if response.finish_reason != 'stop' or response.tool_calls:
-            raise ValueError('BRIDGE_EXTRACTION_NOT_COMPLETE')
-        data = validate_extraction(response.content, windows, sources, question)
-        if data is None:
-            _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='NO_FIRST_HOP')
+        plan = await prepare_verified_bridge(state, context, repository, registry)
+        if isinstance(plan, BridgeRejected):
             return
-        _trace(state, 'FIRST_HOP_SPAN_VERIFIED', extraction=data)
-        if not any(r.chunk_type == 'text' and data['source_chunk_id'] in (r.id, *r.sub_chunk_ids)
-                   and data['quote'] in r.content for r in state.merge_results):
-            # Ancestor IDs alone do not show that a quote survived Merge.
-            # Presence here checks survival only; the offset proof above came
-            # exclusively from the independently read-back original Chunk.
-            _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='FIRST_HOP_QUOTE_NOT_IN_FINAL_EVIDENCE')
-            return
-        from .bridge_identity import prove_identity
-        proof = prove_identity(question, chains[data['source_chunk_id']],
-            selected_chunk_id=data['source_chunk_id'], quote_start=data['quote_start'],
-            quote_end=data['quote_end'], normal_results=state.merge_results)
-        data['identity_proof'] = asdict(proof)
-        # A pronoun's model EXPLICIT label never authorizes identity resolution.
-        identity = proof.verified and (not PRONOUN.fullmatch(data['subject']) or
-                                      data['subject_resolution'] == 'UNVERIFIED')
-        data['subject_verified'] = bool(identity)
-        data['relation_verified'] = bool(identity and data['relation_form_verified'])
-        if not identity:
-            _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='SUBJECT_IDENTITY_UNVERIFIED',
-                   span_verified=True, subject_verified=False, identity_proof=asdict(proof))
-            return
-        if not data['relation_verified']:
-            _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='RELATION_UNVERIFIED',
-                   span_verified=True, subject_verified=True, relation_verified=False)
-            return
-        _trace(state, 'FIRST_HOP_VERIFIED', extraction=data, identity_proof=asdict(proof))
+        data, proof, question = plan.extraction, plan.identity_proof, plan.effective_query
+        originals = list(plan.originals)
+        chains = {data['source_chunk_id']:plan.predecessor_chain}
+        final_ids = {value for r in state.merge_results for value in (r.id, *r.sub_chunk_ids)}
         phrases = list(dict.fromkeys([data['object'], *data['bridge_search_phrases']]))
         if _normal_location_evidence(state, originals, phrases, data['object']):
             return

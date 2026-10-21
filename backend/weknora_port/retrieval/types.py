@@ -45,7 +45,9 @@ def context_results(state):
     identity = getattr(state, "bridge_identity_evidence", ())
     qualifications = getattr(state, "bridge_normal_qualifications", {})
     if qualifications:
-        if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
+        if (getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1" and not
+                (getattr(state, "retrieval_strategy_mode", "off") == "query_structure_v1" and
+                 getattr(state, "source_evidence_mode", "off") == "bounded_source_v1")):
             raise ValueError("BRIDGE_EVIDENCE_MODE_MISMATCH")
         views = []
         for row in normal:
@@ -66,7 +68,9 @@ def context_results(state):
         normal = views
     if not rescue and not identity:
         return normal
-    if getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1":
+    if (getattr(state, "bridge_rescue_mode", "off") != "cheap_bridge_v1" and not
+                (getattr(state, "retrieval_strategy_mode", "off") == "query_structure_v1" and
+                 getattr(state, "source_evidence_mode", "off") == "bounded_source_v1")):
         raise ValueError("BRIDGE_EVIDENCE_MODE_MISMATCH")
     rows = [*normal, *identity, *rescue]
     ids = [row.id for row in rows if row is not None]
@@ -91,7 +95,7 @@ def bridge_context_attributes(row):
     exact = details.get('entity_bridge_verified') is True
     supported = details.get('final_answer_supported') is True
     return (' role="bridge_supplement" supports="' +
-            ('entity_location' if exact else 'institution_location_only') +
+            (('event_venue' if details.get('target_attribute') == 'event_venue' else 'entity_location') if exact else 'institution_location_only') +
             '" seminar_venue="' + ('supported' if exact and supported else 'unverified') +
             '" final_answer_supported="' + ('true' if supported else 'false') + '"')
 

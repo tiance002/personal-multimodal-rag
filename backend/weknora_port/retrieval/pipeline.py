@@ -156,7 +156,6 @@ class RetrievalPipeline:
                 if not state.merge_results:
                     if not empty_allowed:
                         raise SearchNothing()
-                    ordinary_empty = True
         except SearchNothing:
             if not getattr(state, '_strategy_serial', False):
                 raise
@@ -227,6 +226,35 @@ class RetrievalPipeline:
             await fit_context_budget(state, context)
             if not state.merge_results:
                 raise SearchNothing()
+            if plan.query_type == 'DEPENDENT':
+                from .bridge_strategy import rescue_strategy_bridge
+                from .strategy_executor import isolated_state, RoundResult, MAX_RETRIEVAL_UNITS
+                from ..models.types import ProviderError
+                async def recall_bridge(q1, child_context):
+                    check_context()
+                    key = ' '.join(q1.split()).casefold()
+                    sub = isolated_state(state, q1)
+                    if key in state.strategy_queries_seen:
+                        return RoundResult(sub, 'BUDGET_OMITTED', 'DUPLICATE_QUERY')
+                    if state.strategy_units_used >= MAX_RETRIEVAL_UNITS:
+                        return RoundResult(sub, 'BUDGET_OMITTED', 'RETRIEVAL_UNIT_LIMIT')
+                    state.strategy_units_used += 1
+                    state.strategy_queries_seen.add(key)
+                    try:
+                        unit = await self.retrieve_once(sub, child_context)
+                    except ProviderError as error:
+                        if error.code != 'LOCAL_EXECUTION_LIMIT_DENIED' or error.sent:
+                            raise
+                        unit = RoundResult(sub, 'BUDGET_OMITTED', error.code)
+                    state.strategy_rounds.append(unit)
+                    state.strategy_trace.append({'stage':'strategy_round', 'subquery_id':'round-1',
+                        'request_id':child_context.request_id,'status':unit.status,'reason':unit.reason})
+                    return unit
+                assessment = await rescue_strategy_bridge(state, context, self.repository,
+                                                          self.registry, recall_bridge)
+                state.strategy_trace.append({'stage':'strategy_bridge','status':assessment.status.value,
+                    'reason':assessment.reason,'source_validity':assessment.source_validity,
+                    'semantic_support':assessment.semantic_support,'new_recall':assessment.new_recall})
             await self._progress('context', 'started')
             finalized = await into_chat_message(state, context, persist_sink=self.persist_sink)
             await self._progress('context','completed',selected_evidence_count=len(finalized.result_ids))

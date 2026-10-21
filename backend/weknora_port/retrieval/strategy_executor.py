@@ -165,7 +165,7 @@ async def execute_plan(state, context, plan, retrieve_once):
                 labels = target.metadata['strategy_subquery_ids']
                 if sub_id not in labels: labels.append(sub_id)
                 continue
-            if len(selected) >= top_k or chars + len(row.content) > CONTEXT_CHARS:
+            if (top_k > 0 and len(selected) >= top_k) or chars + len(row.content) > CONTEXT_CHARS:
                 continue
             copied = deepcopy(row)
             copied.metadata['strategy_subquery_ids'] = [sub_id]
@@ -260,7 +260,8 @@ def record_delivered_coverage(state, prepared):
     current = '\n'.join(message.content for i, message in enumerate(prepared.messages)
         if i == 0 or i == len(prepared.messages) - 1)
     delivered = []
-    for row in state.merge_results:
+    from .types import context_results
+    for row in context_results(state):
         matched = references.get(row.id)
         if not matched or matched[1][1:3] != (row.knowledge_id, row.knowledge_base_id): continue
         registry = prepared.registry.clone_for_attempt()
@@ -273,6 +274,22 @@ def record_delivered_coverage(state, prepared):
         if entry['candidate_ids']:
             entry['delivery'] = 'DELIVERED' if entry['delivered_ids'] else 'BUDGET_OMITTED'
             if not entry['delivered_ids']: entry['reason'] = 'FINAL_CONTEXT_NOT_DELIVERED'
+    assessment = getattr(state, '_strategy_bridge_assessment', None)
+    if assessment is not None:
+        from dataclasses import replace
+        from .bridge_strategy import BridgeStatus
+        required = set(assessment.required_source_ids)
+        actual = {row.id for row in delivered}
+        complete_delivery = bool(required and required <= actual and assessment.context_admitted)
+        supported = bool(complete_delivery and assessment.status == BridgeStatus.COMPLETE
+                         and assessment.source_chain_supported)
+        state._strategy_bridge_assessment = replace(assessment,
+            delivered=complete_delivery, final_answer_supported=supported)
+        state.strategy_trace.append({'stage':'strategy_bridge',
+            'decision':'ACTUAL_MESSAGES_DELIVERED' if complete_delivery else 'FINAL_CONTEXT_NOT_DELIVERED',
+            'required_source_ids':sorted(required),'delivered_ids':sorted(required & actual),
+            'source_validity':assessment.source_validity,'semantic_support':assessment.semantic_support,
+            'final_answer_supported':supported,'prompt_sha256':prepared.prompt_sha256})
     state.strategy_trace.append({'stage':'strategy_context', 'decision':'ACTUAL_MESSAGES_PREPARED',
         'delivered_ids':[row.id for row in delivered], 'semantic_support':'NOT_CHECKED',
         'prompt_sha256':prepared.prompt_sha256})
