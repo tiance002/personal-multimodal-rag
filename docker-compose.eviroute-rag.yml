@@ -1,0 +1,41 @@
+name: eviroute-rag
+
+services:
+  postgres:
+    image: paradedb/paradedb:v0.22.6-pg17
+    pull_policy: never
+    container_name: eviroute-rag-postgres
+    restart: "no"
+    ports:
+      - "127.0.0.1:56423:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U port_fixture -d weknora_python_port_20261013"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  redis:
+    image: redis:7.4.2
+    pull_policy: never
+    container_name: eviroute-rag-redis
+    restart: "no"
+    command: ["redis-server"]
+    ports:
+      - "127.0.0.1:56424:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+volumes:
+  postgres_data:
+    external: true
+    name: weknora-python-resume-pg-20261013
+  redis_data:
+    external: true
+    name: weknora-python-resume-redis-20261013

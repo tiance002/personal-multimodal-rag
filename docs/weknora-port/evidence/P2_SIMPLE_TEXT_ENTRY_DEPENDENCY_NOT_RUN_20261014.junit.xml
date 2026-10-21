@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="1.268" timestamp="2026-10-14T08:34:01.383571+08:00" hostname="天策"><testcase classname="" name="tests.weknora_port.test_ingest" time="0.000"><error message="collection failure">ImportError while importing test module 'E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_ingest.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+D:\Drivers\python\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_ingest.py:19: in &lt;module&gt;
+    from pptx import Presentation
+E   ModuleNotFoundError: No module named 'pptx'</error></testcase></testsuite></testsuites>

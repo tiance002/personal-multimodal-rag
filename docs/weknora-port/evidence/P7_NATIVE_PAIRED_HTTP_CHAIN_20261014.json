@@ -1,0 +1,936 @@
+{
+  "kind": "ACTUAL_LOOPBACK_HTTP_PG_REDIS_MOCK_PROVIDER",
+  "system_identifier": "7696088403504697382",
+  "redis_run_id": "ad8c707ba74a8b29f84792928bc7da01bc796bf6",
+  "redis_prefix": "weknora-resume:20261013:9bedd448-9594-45b0-b5d6-80e2f5127239",
+  "knowledge_base": "a7d46700-92ac-4377-9299-c91f62bc7b3f",
+  "document": "13d46fbc-9011-4ba2-a37d-0bb132954097",
+  "session": "e289d92b-dfb0-4780-9018-f3d5716ca29f",
+  "assistant": "db26f0e8-95cf-4005-88ef-e154118a0894",
+  "client_request_id": "29e3644d-65c4-4317-93f1-0e4ba9d936da",
+  "server_run_id": "1d507888-0517-48ac-b76e-4a44c356eab0",
+  "attempts": [
+    {
+      "role": "cheap",
+      "status": "TRUNCATED",
+      "error_code": null,
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "role": "expensive",
+      "status": "COMPLETED",
+      "error_code": null,
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "role": "cheap",
+      "status": "FAILED",
+      "error_code": "MODEL_CALL_TIMEOUT",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unreported",
+        "total_tokens": null,
+        "cached_tokens": 0,
+        "prompt_tokens": null,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    }
+  ],
+  "ledger": [
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "vision",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "vision",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "vision",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "vision",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "rerank",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": null,
+        "cached_tokens": 0,
+        "prompt_tokens": null,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "embedding",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "rerank",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": null,
+        "cached_tokens": 0,
+        "prompt_tokens": null,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    },
+    {
+      "capability": "chat",
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unreported",
+        "total_tokens": null,
+        "cached_tokens": 0,
+        "prompt_tokens": null,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0
+      }
+    }
+  ],
+  "mock_wire_count": 46,
+  "real_provider_calls": 0,
+  "assertions": "PASS",
+  "cross_tenant_and_wrong_kb_index_activation": [
+    {
+      "source_id": "0b67e76d-0495-43c5-a91f-ae9d8039642f",
+      "is_enabled": false
+    },
+    {
+      "source_id": "41369dd5-6603-4384-98a5-725a7eb5a26e",
+      "is_enabled": false
+    }
+  ],
+  "foreign_kb_http": 403,
+  "profile_postprocessor": "SOURCE_TEXT_ADAPTER_WITH_MOCK_PROVIDER_GO_ORACLE_NOT_RUN",
+  "p7_native_paired": {
+    "capture_sha256": "3e61a4cca537306c074d50a3d63128df5c4c07c0cdca2e4de9dfc56906eb8f83",
+    "prompt_sha256": "06545b19892ae024ba8c173458817e7b78054f6794ffb505f15c743c1f7dc1c0",
+    "context_sha256": "5a27b29be83ca13ccca25040499bba4a2d2d40bd9cdae66c81cfacf4f49a4d46",
+    "preparations": 1,
+    "outcomes": [
+      {
+        "mode": "OFF",
+        "run_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35",
+        "role": "baseline",
+        "upgraded": false,
+        "generation_seconds": 0.18398600001819432,
+        "model_calls": [
+          {
+            "request_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35/answer/1/baseline",
+            "provider": "siliconflow",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "capability": "chat",
+            "state": "settled",
+            "usage": {
+              "status": "REPORTED",
+              "cache_status": "unreported",
+              "total_tokens": 110,
+              "cached_tokens": 0,
+              "prompt_tokens": 100,
+              "cache_reported": false,
+              "cache_miss_tokens": 0,
+              "cache_read_tokens": 0,
+              "completion_tokens": 10,
+              "cache_write_tokens": 0
+            },
+            "reserved_microunits": 100,
+            "actual_microunits": 10,
+            "price_source": "SYNTHETIC-NOT-BILLING"
+          }
+        ]
+      },
+      {
+        "mode": "CHEAP_ONLY",
+        "run_id": "a5c89e75-e887-4253-9d34-2ea5aa5720fb",
+        "role": "cheap",
+        "upgraded": false,
+        "generation_seconds": 0.2065587000688538,
+        "model_calls": [
+          {
+            "request_id": "a5c89e75-e887-4253-9d34-2ea5aa5720fb/answer/1/cheap",
+            "provider": "siliconflow",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "capability": "chat",
+            "state": "settled",
+            "usage": {
+              "status": "REPORTED",
+              "cache_status": "unreported",
+              "total_tokens": 110,
+              "cached_tokens": 0,
+              "prompt_tokens": 100,
+              "cache_reported": false,
+              "cache_miss_tokens": 0,
+              "cache_read_tokens": 0,
+              "completion_tokens": 10,
+              "cache_write_tokens": 0
+            },
+            "reserved_microunits": 100,
+            "actual_microunits": 10,
+            "price_source": "SYNTHETIC-NOT-BILLING"
+          }
+        ]
+      },
+      {
+        "mode": "EXPENSIVE_ONLY",
+        "run_id": "462f7504-1745-44b2-91a8-a288b8690a14",
+        "role": "expensive",
+        "upgraded": false,
+        "generation_seconds": 0.15823990001808852,
+        "model_calls": [
+          {
+            "request_id": "462f7504-1745-44b2-91a8-a288b8690a14/answer/1/expensive",
+            "provider": "deepseek",
+            "model": "deepseek-flash",
+            "capability": "chat",
+            "state": "settled",
+            "usage": {
+              "status": "REPORTED",
+              "cache_status": "unreported",
+              "total_tokens": 110,
+              "cached_tokens": 0,
+              "prompt_tokens": 100,
+              "cache_reported": false,
+              "cache_miss_tokens": 0,
+              "cache_read_tokens": 0,
+              "completion_tokens": 10,
+              "cache_write_tokens": 0
+            },
+            "reserved_microunits": 100,
+            "actual_microunits": 10,
+            "price_source": "SYNTHETIC-NOT-BILLING"
+          }
+        ]
+      },
+      {
+        "mode": "DYNAMIC",
+        "run_id": "75c47a5b-a7a1-4fb3-911d-45e93ef1a0f1",
+        "role": "expensive",
+        "upgraded": true,
+        "generation_seconds": 0.34021509997546673,
+        "model_calls": [
+          {
+            "request_id": "75c47a5b-a7a1-4fb3-911d-45e93ef1a0f1/answer/1/cheap",
+            "provider": "siliconflow",
+            "model": "XingChenAGI/Xing4.0-29B",
+            "capability": "chat",
+            "state": "settled",
+            "usage": {
+              "status": "REPORTED",
+              "cache_status": "unreported",
+              "total_tokens": 110,
+              "cached_tokens": 0,
+              "prompt_tokens": 100,
+              "cache_reported": false,
+              "cache_miss_tokens": 0,
+              "cache_read_tokens": 0,
+              "completion_tokens": 10,
+              "cache_write_tokens": 0
+            },
+            "reserved_microunits": 100,
+            "actual_microunits": 10,
+            "price_source": "SYNTHETIC-NOT-BILLING"
+          },
+          {
+            "request_id": "75c47a5b-a7a1-4fb3-911d-45e93ef1a0f1/answer/2/expensive",
+            "provider": "deepseek",
+            "model": "deepseek-flash",
+            "capability": "chat",
+            "state": "settled",
+            "usage": {
+              "status": "REPORTED",
+              "cache_status": "unreported",
+              "total_tokens": 110,
+              "cached_tokens": 0,
+              "prompt_tokens": 100,
+              "cache_reported": false,
+              "cache_miss_tokens": 0,
+              "cache_read_tokens": 0,
+              "completion_tokens": 10,
+              "cache_write_tokens": 0
+            },
+            "reserved_microunits": 100,
+            "actual_microunits": 10,
+            "price_source": "SYNTHETIC-NOT-BILLING"
+          }
+        ]
+      }
+    ],
+    "auxiliary_calls": [
+      {
+        "request_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35/query-embedding-a7d46700-92ac-4377-9299-c91f62bc7b3f-08c07051187ca5d4",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "capability": "embedding",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unsupported",
+          "total_tokens": 10,
+          "cached_tokens": 0,
+          "prompt_tokens": 10,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        },
+        "reserved_microunits": 100,
+        "actual_microunits": null,
+        "price_source": "SYNTHETIC-NOT-BILLING"
+      },
+      {
+        "request_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35/query-embedding-a7d46700-92ac-4377-9299-c91f62bc7b3f-2ea88c7a30351b12",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "capability": "embedding",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unsupported",
+          "total_tokens": 10,
+          "cached_tokens": 0,
+          "prompt_tokens": 10,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        },
+        "reserved_microunits": 100,
+        "actual_microunits": null,
+        "price_source": "SYNTHETIC-NOT-BILLING"
+      },
+      {
+        "request_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35/query-embedding-a7d46700-92ac-4377-9299-c91f62bc7b3f-98134dca8ff1c117",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "capability": "embedding",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unsupported",
+          "total_tokens": 10,
+          "cached_tokens": 0,
+          "prompt_tokens": 10,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        },
+        "reserved_microunits": 100,
+        "actual_microunits": null,
+        "price_source": "SYNTHETIC-NOT-BILLING"
+      },
+      {
+        "request_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35/query_rewrite",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "capability": "chat",
+        "state": "settled",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 30,
+          "cached_tokens": 0,
+          "prompt_tokens": 20,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 10,
+          "cache_write_tokens": 0
+        },
+        "reserved_microunits": 100,
+        "actual_microunits": 10,
+        "price_source": "SYNTHETIC-NOT-BILLING"
+      },
+      {
+        "request_id": "6dac5cd6-8384-44ff-86f4-49b16aa71e35/rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "capability": "rerank",
+        "state": "unknown",
+        "usage": {
+          "status": "UNKNOWN",
+          "cache_status": "unsupported",
+          "total_tokens": null,
+          "cached_tokens": 0,
+          "prompt_tokens": null,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": null,
+          "cache_write_tokens": 0
+        },
+        "reserved_microunits": 100,
+        "actual_microunits": null,
+        "price_source": "SYNTHETIC-NOT-BILLING"
+      }
+    ],
+    "preparation_seconds": 0.8858717000111938,
+    "model_quality": "NOT_RUN_SIMULATED_MODELS",
+    "real_provider_calls": 0,
+    "persisted_assistants": 4,
+    "same_messages_all5streams": true
+  },
+  "p2_native_image_documents": [
+    {
+      "id": "d9a3c3fa-2a3a-459d-bc66-2a71330e6b35",
+      "knowledge_base_id": "a58dc78e-c5ea-4d60-a2e0-ca0ebfd9a1cd",
+      "filename": "fixture-scan.pdf",
+      "status": "completed",
+      "error_code": "",
+      "fixture_image_rows": [
+        {
+          "id": "95633d4a-dfaf-4126-a07f-8a3846232e15",
+          "chunk_type": "image_caption",
+          "content": "A blue widget protocol sheet.",
+          "parent_chunk_id": "5c34d399-63f9-481a-b8af-981c221e7f18",
+          "image_info": "[{\"url\": \"images/fixture-scan_page_2.jpg\", \"original_url\": \"images/fixture-scan_page_2.jpg\", \"start_pos\": 0, \"end_pos\": 0, \"caption\": \"A blue widget protocol sheet.\", \"ocr_text\": \"Extracted scan: Blue widgets use protocol W-17.\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "de356fe5-feb6-43f6-bb31-776735925e27",
+          "chunk_type": "image_ocr",
+          "content": "Extracted scan: Blue widgets use protocol W-17.",
+          "parent_chunk_id": "5c34d399-63f9-481a-b8af-981c221e7f18",
+          "image_info": "[{\"url\": \"images/fixture-scan_page_2.jpg\", \"original_url\": \"images/fixture-scan_page_2.jpg\", \"start_pos\": 0, \"end_pos\": 0, \"caption\": \"A blue widget protocol sheet.\", \"ocr_text\": \"Extracted scan: Blue widgets use protocol W-17.\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "95981deb-5bbb-5d5a-ab6b-488f9ac96601",
+          "chunk_type": "summary",
+          "content": "# Summary\nBlue widget protocol\n\nThe source handbook says blue widgets use protocol W-17. Keep the widgets dry.",
+          "parent_chunk_id": "5c34d399-63f9-481a-b8af-981c221e7f18",
+          "image_info": "",
+          "is_enabled": true
+        },
+        {
+          "id": "5c34d399-63f9-481a-b8af-981c221e7f18",
+          "chunk_type": "text",
+          "content": "A source text page about protocol W-1 7.\n\n![fixture-scan_page_2.jpg](images/fixture-scan_page_2.jpg)",
+          "parent_chunk_id": null,
+          "image_info": "",
+          "is_enabled": true
+        }
+      ],
+      "fixture_parser_metadata": {
+        "pages": [
+          {
+            "route": "text_layer",
+            "asset_paths": [],
+            "page_number": 1
+          },
+          {
+            "route": "scanned_image",
+            "asset_paths": [
+              "images/fixture-scan_page_2.jpg"
+            ],
+            "page_number": 2
+          }
+        ],
+        "status": "parsed",
+        "filename": "fixture-scan.pdf",
+        "owner_id": "fixture-owner:abcd9ae1-1c5a-428e-b0b3-aab62a077048",
+        "file_type": ".pdf",
+        "ocr_status": "NOT_RUN",
+        "page_count": 2,
+        "document_id": "d9a3c3fa-2a3a-459d-bc66-2a71330e6b35",
+        "input_bytes": 1204017,
+        "parser_engine": "pdf",
+        "source_version": "8a74d1c7-9932-4c5f-bb52-e7e322567474",
+        "source_metadata": {
+          "page_count": 2,
+          "text_page_count": 1,
+          "image_source_type": "scanned_pdf",
+          "scanned_page_count": 1,
+          "vector_figure_count": 0,
+          "embedded_image_count": 0
+        },
+        "text_page_count": 1,
+        "image_source_type": "scanned_pdf",
+        "knowledge_base_id": "a58dc78e-c5ea-4d60-a2e0-ca0ebfd9a1cd",
+        "scanned_page_count": 1,
+        "vector_figure_count": 0,
+        "embedded_image_count": 0
+      }
+    },
+    {
+      "id": "aa1f1265-cc54-4cae-b8e5-c2dfb0882026",
+      "knowledge_base_id": "a58dc78e-c5ea-4d60-a2e0-ca0ebfd9a1cd",
+      "filename": "fixture-image.png",
+      "status": "completed",
+      "error_code": "",
+      "fixture_image_rows": [
+        {
+          "id": "3e73efe5-a1df-48a9-b478-a6827fdcf88f",
+          "chunk_type": "image_caption",
+          "content": "A blue widget protocol sheet.",
+          "parent_chunk_id": "2e239b49-6ae3-4016-a1e0-c97be846b46a",
+          "image_info": "[{\"url\": \"images/fixture-image.png\", \"original_url\": \"images/fixture-image.png\", \"start_pos\": 0, \"end_pos\": 0, \"caption\": \"A blue widget protocol sheet.\", \"ocr_text\": \"Extracted scan: Blue widgets use protocol W-17.\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "39093a95-7887-422e-938c-c8c60dc02e36",
+          "chunk_type": "image_ocr",
+          "content": "Extracted scan: Blue widgets use protocol W-17.",
+          "parent_chunk_id": "2e239b49-6ae3-4016-a1e0-c97be846b46a",
+          "image_info": "[{\"url\": \"images/fixture-image.png\", \"original_url\": \"images/fixture-image.png\", \"start_pos\": 0, \"end_pos\": 0, \"caption\": \"A blue widget protocol sheet.\", \"ocr_text\": \"Extracted scan: Blue widgets use protocol W-17.\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "59acd80a-47bd-59e5-bc84-0328c8ecddd9",
+          "chunk_type": "summary",
+          "content": "# Summary\nBlue widget protocol\n\nThe source handbook says blue widgets use protocol W-17. Keep the widgets dry.",
+          "parent_chunk_id": "2e239b49-6ae3-4016-a1e0-c97be846b46a",
+          "image_info": "",
+          "is_enabled": true
+        },
+        {
+          "id": "2e239b49-6ae3-4016-a1e0-c97be846b46a",
+          "chunk_type": "text",
+          "content": "![fixture-image.png](images/fixture-image.png)",
+          "parent_chunk_id": null,
+          "image_info": "",
+          "is_enabled": true
+        }
+      ],
+      "fixture_parser_metadata": {
+        "status": "parsed",
+        "filename": "fixture-image.png",
+        "owner_id": "fixture-owner:abcd9ae1-1c5a-428e-b0b3-aab62a077048",
+        "file_type": ".png",
+        "document_id": "aa1f1265-cc54-4cae-b8e5-c2dfb0882026",
+        "input_bytes": 4153,
+        "parser_engine": "image",
+        "source_version": "35b1504b-bafd-469a-8392-2a6a5d4f5e67",
+        "image_source_type": "standalone_image",
+        "knowledge_base_id": "a58dc78e-c5ea-4d60-a2e0-ca0ebfd9a1cd",
+        "embedded_image_count": 1
+      }
+    }
+  ],
+  "ordinary_memory_origin_gate": {
+    "private_origin": "95391946-f194-4363-a948-8d6118662c4a",
+    "retrieval_kb": "a7d46700-92ac-4377-9299-c91f62bc7b3f",
+    "wire_before": 46,
+    "wire_after": 46,
+    "mandatory_origins": [
+      "95391946-f194-4363-a948-8d6118662c4a",
+      "a7d46700-92ac-4377-9299-c91f62bc7b3f"
+    ],
+    "gate_error": "MODEL_ORIGIN_KB_EGRESS_DENIED",
+    "http_error": "ORDINARY_CHAIN_FAILED",
+    "retrieval_scope_unchanged": true
+  },
+  "automatic_memory": {
+    "queued_actual_redis": true,
+    "actual_pg_saved": [
+      {
+        "id": "d7c2b65d-45ee-48a6-8419-8af011cadd10",
+        "source_session_id": "e289d92b-dfb0-4780-9018-f3d5716ca29f",
+        "source_message_id": "119e3e47-4340-453e-8bef-0f099ce2b859"
+      }
+    ],
+    "recalled_before_forget": true,
+    "absent_after_forget": true,
+    "embedding_residual": 0,
+    "private_origin_denies_wire": true,
+    "foreign_subject_denies_wire": true,
+    "delete_http": 200
+  },
+  "retained": "synthetic source + UNKNOWN fixture; old DB untouched"
+}

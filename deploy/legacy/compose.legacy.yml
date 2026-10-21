@@ -1,0 +1,118 @@
+# LEGACY: previous source configuration, explicit invocation only; no running service was changed.
+x-model-environment: &model-environment
+  RAG_CLOUD_ENABLED: ${RAG_CLOUD_ENABLED:-false}
+  RAG_MODEL_REGISTRY_JSON: ${RAG_MODEL_REGISTRY_JSON:-}
+  RAG_SERVICE_MODEL_POLICY_JSON: ${RAG_SERVICE_MODEL_POLICY_JSON:-}
+  RAG_SERVICE_CHAT_TIMEOUT_SECONDS: ${RAG_SERVICE_CHAT_TIMEOUT_SECONDS:-90}
+  RAG_EMBEDDING_BACKEND: ${RAG_EMBEDDING_BACKEND:-siliconflow}
+  RAG_EMBEDDING_TOKENIZER_PATH: ${RAG_EMBEDDING_TOKENIZER_PATH:-}
+  RAG_XING_CAPACITY_RESOURCES: ${RAG_XING_CAPACITY_RESOURCES:-}
+  RAG_DEEPSEEK_TOKENIZER_PATH: ${RAG_DEEPSEEK_TOKENIZER_PATH:-}
+  RAG_OUTPUT_CAPABILITY_FILE: ${RAG_OUTPUT_CAPABILITY_FILE:-}
+  RAG_OUTPUT_CAPABILITY_SHA256: ${RAG_OUTPUT_CAPABILITY_SHA256:-}
+  RAG_EMBEDDING_EGRESS_ENABLED: ${RAG_EMBEDDING_EGRESS_ENABLED:-false}
+  RAG_CHAT_EGRESS_ENABLED: ${RAG_CHAT_EGRESS_ENABLED:-false}
+  RAG_RERANK_EGRESS_ENABLED: ${RAG_RERANK_EGRESS_ENABLED:-false}
+  RAG_VISION_EGRESS_ENABLED: ${RAG_VISION_EGRESS_ENABLED:-false}
+  RAG_RULE_ROUTER_ENABLED: ${RAG_RULE_ROUTER_ENABLED:-false}
+  RAG_PREFER_CLOUD: ${RAG_PREFER_CLOUD:-false}
+  RAG_REDIS_URL: ${RAG_REDIS_URL:-}
+  RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS: ${RAG_MONTHLY_CLOUD_BUDGET_MICROUNITS:-0}
+  RAG_MAX_CHUNK_CHARS: ${RAG_MAX_CHUNK_CHARS:-512}
+  RAG_CHUNK_OVERLAP: ${RAG_CHUNK_OVERLAP:-80}
+  SILICONFLOW_API_KEY: ${SILICONFLOW_API_KEY:-}
+  DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+
+services:
+  redis:
+    image: redis:7.4.2
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - rag-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rag}
+      POSTGRES_USER: ${POSTGRES_USER:-rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - rag-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/legacy/Dockerfile.api.legacy
+    environment:
+      <<: *model-environment
+      RAG_DATABASE_URL: postgresql+psycopg://rag:rag@db:5432/rag
+      RAG_STORAGE_ROOT: /data/storage
+      RAG_LANGFUSE_ENABLED: ${RAG_LANGFUSE_ENABLED:-false}
+      RAG_LANGFUSE_CAPTURE_CONTENT: ${RAG_LANGFUSE_CAPTURE_CONTENT:-false}
+      RAG_INLINE_INGESTION: "false"
+      OLLAMA_BASE_URL: ${COMPOSE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3.5:4b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:latest}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://us.cloud.langfuse.com}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_AUTHORIZATION: ${LANGFUSE_AUTHORIZATION:-}
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    volumes:
+      - rag-storage:/data/storage
+      - ../../var/model-assets:/opt/model-assets:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: deploy/legacy/Dockerfile.worker.legacy
+    environment:
+      <<: *model-environment
+      RAG_DATABASE_URL: postgresql+psycopg://rag:rag@db:5432/rag
+      RAG_STORAGE_ROOT: /data/storage
+      RAG_TESSDATA_DIR: /opt/tessdata
+      OLLAMA_BASE_URL: ${COMPOSE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3.5:4b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3:latest}
+    volumes:
+      - rag-storage:/data/storage
+      - ../../var/model-assets:/opt/model-assets:ro
+      - ../../var/tessdata:/opt/tessdata:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: deploy/legacy/Dockerfile.frontend.legacy
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-4173}:80"
+    depends_on:
+      - api
+
+volumes:
+  rag-db:
+  rag-storage:
+  rag-redis:

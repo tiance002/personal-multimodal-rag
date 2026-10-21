@@ -1,0 +1,126 @@
+F..F                                                                     [100%]
+================================== FAILURES ===================================
+___ test_docx_preserves_heading_table_headers_long_rows_and_embedded_image ____
+
+    def test_docx_preserves_heading_table_headers_long_rows_and_embedded_image() -> None:
+        payload = _docx_bytes()
+>       expected_content, expected_images = _upstream_markitdown("report.docx", payload)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_ingest.py:359: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_ingest.py:131: in _upstream_markitdown
+    with _upstream_module("docreader.parser.markitdown_parser", source_path, stubbed) as source:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+tests\weknora_port\test_ingest.py:42: in _upstream_module
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1022: in exec_module
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E:\RAG-reference\WeKnora-3e8b0bfc\docreader\parser\markitdown_parser.py:4: in <module>
+    from markitdown import MarkItDown
+E:\WK\deps\reader\markitdown\__init__.py:6: in <module>
+    from ._markitdown import (
+E:\WK\deps\reader\markitdown\_markitdown.py:15: in <module>
+    import magika
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    # Copyright 2024 Google LLC
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #     http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    
+    # ruff: noqa: D104
+    
+    
+    __version__ = "0.6.3"
+    
+    
+>   import dotenv
+E   ModuleNotFoundError: No module named 'dotenv'
+
+E:\WK\deps\reader\magika\__init__.py:21: ModuleNotFoundError
+_ test_markitdown_registry_route_matches_fixed_wrapper_and_markdown_pipeline __
+
+    def test_markitdown_registry_route_matches_fixed_wrapper_and_markdown_pipeline() -> None:
+        payload = b"Name,Count\nAlice,3\nBob,5\n"
+>       expected_content, expected_images = _upstream_markitdown("people.csv", payload)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_ingest.py:430: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_ingest.py:131: in _upstream_markitdown
+    with _upstream_module("docreader.parser.markitdown_parser", source_path, stubbed) as source:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+tests\weknora_port\test_ingest.py:42: in _upstream_module
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1022: in exec_module
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E:\RAG-reference\WeKnora-3e8b0bfc\docreader\parser\markitdown_parser.py:4: in <module>
+    from markitdown import MarkItDown
+E:\WK\deps\reader\markitdown\__init__.py:6: in <module>
+    from ._markitdown import (
+E:\WK\deps\reader\markitdown\_markitdown.py:15: in <module>
+    import magika
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    # Copyright 2024 Google LLC
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #     http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    
+    # ruff: noqa: D104
+    
+    
+    __version__ = "0.6.3"
+    
+    
+>   import dotenv
+E   ModuleNotFoundError: No module named 'dotenv'
+
+E:\WK\deps\reader\magika\__init__.py:21: ModuleNotFoundError
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_ingest.py::test_docx_preserves_heading_table_headers_long_rows_and_embedded_image
+FAILED tests/weknora_port/test_ingest.py::test_markitdown_registry_route_matches_fixed_wrapper_and_markdown_pipeline
+2 failed, 2 passed, 7 deselected, 5 warnings in 6.28s
+<sys>:0: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

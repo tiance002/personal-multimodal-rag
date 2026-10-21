@@ -1,0 +1,538 @@
+{
+  "schema_version": "s5-model-fact-reliability-v1",
+  "status": "COMPLETE_WITH_UNRESOLVED",
+  "acceptance_scope": "Bounded offline and newly authorized real fixed-context diagnostics complete; not all model errors fixed or production integrated.",
+  "generated_at": "2026-10-19T09:23:30.451753+00:00",
+  "initial_head": "ab969e5185ef1ae2e23083d48a60dd454d847377",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "production_changed": false,
+  "default_model_prompt_rerank_dynamic_unchanged": true,
+  "source_identity": [
+    {
+      "document_id": "fce4db0b-c790-49ad-b2a4-441769da3b94",
+      "source_version": "9df714d2-5fa4-47ff-a06b-1405059acbec",
+      "knowledge_base_id": "d683c1b1-7268-45c2-8a05-23c94f4d5db0",
+      "tenant_id": 1,
+      "sha256": "382670af50e0e5c7247efaad9ba23dcd0f42db5aec195bbadb74aa766fb62419",
+      "file_name": "north_pier_service_brief.pptx"
+    },
+    {
+      "document_id": "3b2870ce-81d3-4cbf-b14f-24cc1088f96a",
+      "source_version": "18ff1d62-d644-4376-b82c-76743fb1d0e7",
+      "knowledge_base_id": "d683c1b1-7268-45c2-8a05-23c94f4d5db0",
+      "tenant_id": 1,
+      "sha256": "8791281e99941b5624acf3f40ef26fad81851cbaee3f2391daa9d834a4b7da04",
+      "file_name": "site_readings.xlsx"
+    }
+  ],
+  "confirmed_first_errors": {
+    "summary": "Real Summary generation adds unsupported subtype; raw input has only unit NP-204. Parser/profile storage accepts semantic output. Internal model cause unproven.",
+    "table": "Final model generation misbinds correct Site/Unit facts already delivered; final request has raw table only, no Summary. Internal model cause unproven."
+  },
+  "case_pack": {
+    "path": "docs/evaluation/evidence/S5_FACT_RELIABILITY_CASES_20261019.json",
+    "sha256": "f5ed9c5e09bd858c88806bc9fe463169679fccd6285ead615efbd4875a7a5eaf",
+    "cases": 8
+  },
+  "candidates": [
+    {
+      "id": "summary_identifier_constraint",
+      "factor": "Append identifier-bound source name/type constraint to isolated Summary system, keep all user evidence/options/schema/model fixed",
+      "cost": "Small appendix; exactly +93 reported input tokens per comparison",
+      "result": "PASS in 4 bounded candidate cases",
+      "decision": "PROMISING_ISOLATED_ONLY_NOT_PRODUCTION_DEFAULT",
+      "limits": "Two saved non-contemporaneous baselines; temperature .3 randomness; no downstream answer validation or general elimination guarantee. Unit is still translated as 单位/单元, not verbatim preservation of all labels; domain terminology accuracy not proven."
+    },
+    {
+      "id": "literal_excerpt",
+      "factor": "Bounded exact source-input spans, distinguish OCR, exclude generated Caption, no translation",
+      "cost": "Local deterministic mapping; zero Provider",
+      "result": "4/4 exact offset/source mappings; NOT model quality",
+      "decision": "DO_NOT_REPLACE_SUMMARY",
+      "limits": "Not equivalent to profile summary/schema, loses synthesis and useful image semantics; no generation arm."
+    },
+    {
+      "id": "existing_excel_explicit_header",
+      "factor": "Reuse xlsx_first_row_as_header; original first-row header validated, cells mapped to derived offsets",
+      "cost": "No new model; source expression170→190 chars, original/correct input Token -1",
+      "result": {
+        "PASS": 2,
+        "PARTIAL": 1,
+        "FAIL": 1
+      },
+      "decision": "NOT_SUFFICIENT_FOR_FACT_RELIABILITY_DO_NOT_INTEGRATE",
+      "limits": "Primary error remains; no explicit missing-Unit admission. Normal upload does not forward this existing internal option; no API/Schema change made."
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "summary_failure",
+      "type": "KNOWN_FAILURE",
+      "baseline_status": "FAIL",
+      "candidate_status": "PASS",
+      "human_review": "旧摘要首次增加“204号机组”；新摘要使用“单位 NP-204”，读数37、审查2026-10-20保留。",
+      "baseline": {
+        "kind": "HISTORICAL_NON_CONTEMPORANEOUS",
+        "answer": "{\"summary\": \"该文档是一份关于北码头（North Pier）204号机组（NP-204）的维护简报。简报指出维护团队已对该机组进行检查，现场检查卡记录的读数为37，并计划于2026年10月20日进行下一次审查。\", \"gist\": \"北码头204号机组维护检查简报及下次审查日期。\", \"topics\": [\"北码头\", \"NP-204\", \"维护检查\", \"现场读数\", \"审查计划\"], \"doc_type\": \"维护简报\", \"typical_question\": \"北码头204号机组的维护检查读数是多少？\"}",
+        "usage": {
+          "prompt_tokens": 770,
+          "completion_tokens": 141,
+          "total_tokens": 911,
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 770
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "transport_seconds": 6.2579478999832645,
+        "response_sha256": "9e81ed6275568bdbec42cc61bb6677cbb62cb73678c13beb479a0f5af4b68faa"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/summary_failure/candidate",
+        "answer": "{\"summary\": \"该文件是关于北码头（North Pier）维护团队的简短简报，记录了他们对单位 NP-204 的检查情况。检查卡片显示该单位的读数为 37，并计划于 2026 年 10 月 20 日进行下一次审查。\", \"gist\": \"北码头维护团队对单位 NP-204 的检查简报及下次审查日期。\", \"topics\": [\"北码头\", \"NP-204\", \"维护检查\", \"现场检查卡\", \"审查计划\"], \"doc_type\": \"简报\", \"typical_question\": \"北码头单位 NP-204 的维护检查读数是多少？\"}",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 863,
+          "completion_tokens": 146,
+          "total_tokens": 1009
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 13.591929900052492,
+        "wire_sha256": "b152be2d737367df949ee82bf3088ab4c820e2a755adbca9eefbb7ed00bc8a74",
+        "call_id": "51d5ba2b598e806d12014e4db011d6b6d9069b7e94999658d0fd89a8d89877ac"
+      }
+    },
+    {
+      "id": "summary_correct",
+      "type": "KNOWN_CORRECT_CONTROL",
+      "baseline_status": "PASS",
+      "candidate_status": "PASS",
+      "human_review": "保留站点、编号、读数、CheckedOn类别，未新增设备子类型；摘要不要求逐项复述单元格。",
+      "baseline": {
+        "kind": "HISTORICAL_NON_CONTEMPORANEOUS",
+        "answer": "{\"summary\": \"该文档是一份包含三个站点检查记录的清单，列出了每个站点的名称、单位编号、读数数值及检查日期。记录显示北码头、东大门和西院三个区域分别在2026年10月12日至13日期间完成了检查，并记录了相应的单位代码和测量数值。\", \"gist\": \"一份包含三个站点检查记录、读数及日期的清单。\", \"topics\": [\"站点检查\", \"读数记录\", \"检查日期\", \"单位编号\", \"现场数据\"], \"doc_type\": \"检查记录\", \"typical_question\": \"北码头、东大门和西院的检查读数及日期分别是什么？\"}",
+        "usage": {
+          "prompt_tokens": 679,
+          "completion_tokens": 139,
+          "total_tokens": 818,
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 679
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "transport_seconds": 2.800366199982818,
+        "response_sha256": "024064f62a4c9bd7026521768182eea50e6d11d33e1b9f39b4235f48657fd6f7"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/summary_correct/candidate",
+        "answer": "{\"summary\": \"该文档记录了三个地点的读数数据，包括北码头、东门和西院。每个条目包含站点名称、单位代码、读数数值及检查日期，所有数据均标注为2026年10月12日至13日。\", \"gist\": \"记录三个站点在2026年10月的读数与检查日期。\", \"topics\": [\"站点读数\", \"检查日期\", \"单位代码\"], \"doc_type\": \"数据记录\", \"typical_question\": \"北码头、东门和西院在2026年10月的读数分别是多少？\"}",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 772,
+          "completion_tokens": 128,
+          "total_tokens": 900
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 6.171830800012685,
+        "wire_sha256": "c070728c71f27e31a496d6f479d982684c0239587eaabaffa574ecd9125c88bb",
+        "call_id": "862cc76649ff759fc30fb1940cf1df2010b0f169e4c9c68ec709e43d8cc7de96"
+      }
+    },
+    {
+      "id": "summary_missing_identity",
+      "type": "CONSTRUCTED_MISSING_EVIDENCE",
+      "baseline_status": "PASS",
+      "candidate_status": "PASS",
+      "human_review": "删除所有包含NP-204的原文/Caption/OCR行，双方均未恢复编号或设备类型。",
+      "baseline": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/summary_missing_identity/baseline",
+        "answer": "{\"summary\": \"该文档为北码头服务简报，包含一张显示站点名称和读数数据的现场检查卡图片，以及关于下次审查日期为2026年10月20日的访问摘要。文档主要提供了北码头项目的现场检查数据及后续计划安排。\", \"gist\": \"北码头服务简报包含现场检查数据与下次审查日期。\", \"topics\": [\"北码头\", \"现场检查卡\", \"访问摘要\", \"服务简报\", \"2026年审查\"], \"doc_type\": \"服务简报\", \"typical_question\": \"北码头项目的下次审查日期是什么时候？\"}",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 739,
+          "completion_tokens": 129,
+          "total_tokens": 868
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 3.7248589000082575,
+        "wire_sha256": "8ed148b8fd6de79fad4567414be937f52b658b178a725208d51b37e968269d1c",
+        "call_id": "91b1937a1b90cc339f69460bd6b9f9b170a9995a9d2abebd7b2db6f2bde4026a"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/summary_missing_identity/candidate",
+        "answer": "{\"summary\": \"该文件是关于北码头服务的简报，包含一张显示站点名称为'NORTH PIER'且读数为'37'的现场检查卡图片。文件还记录了下一次审查的预定日期为2026年10月20日。\", \"gist\": \"北码头服务简报，包含现场检查卡数据和下次审查日期。\", \"topics\": [\"北码头\", \"现场检查卡\", \"服务审查\", \"2026年10月20日\"], \"doc_type\": \"服务简报\", \"typical_question\": \"北码头服务的下一次审查日期是什么时候？\"}",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 832,
+          "completion_tokens": 130,
+          "total_tokens": 962
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 8.044957299949601,
+        "wire_sha256": "0b8123553b83e887fd4dec13379ecb14296978bc71aef8f309b12a0312cb79c9",
+        "call_id": "82a8d3060984f5bad1078e4551f7b20ca6181414e2b3d872e3b48bb1c138ce45"
+      }
+    },
+    {
+      "id": "summary_distractor",
+      "type": "CONSTRUCTED_MULTI_RECORD_DISTRACTOR",
+      "baseline_status": "PARTIAL",
+      "candidate_status": "PASS",
+      "human_review": "原版把西院也归入同一天10月12日；候选保留12日至13日范围，未错误绑定编号。",
+      "baseline": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/summary_distractor/baseline",
+        "answer": "{\"summary\": \"该文档是一份关于北码头（North Pier）NP-204 单元维护检查的服务简报，记录了 2026 年 10 月 12 日检查时的读数为 37。文档还列出了同一天其他站点（如东大门 EG-118 和西院 WY-309）的检查数据，并指出下一次审查计划安排在 2026 年 10 月 20 日。\", \"gist\": \"一份关于北码头 NP-204 单元维护检查记录及服务计划的简报。\", \"topics\": [\"北码头\", \"NP-204\", \"维护检查\", \"服务简报\", \"检查读数\"], \"doc_type\": \"服务简报\", \"typical_question\": \"北码头 NP-204 单元的维护检查读数是多少？\"}",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 893,
+          "completion_tokens": 185,
+          "total_tokens": 1078
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 8.338220900041051,
+        "wire_sha256": "3b24ed7d8093d7c3d6a42fa7493e35542c16f9675778c631dfa120ac05ab4911",
+        "call_id": "6f3d3af4e7a4c185ff94f0af0dec813c2be12bb2a7b8a46da0cb987391d3cdd4"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/summary_distractor/candidate",
+        "answer": "{\"summary\": \"该文档是一份关于北码头（North Pier）维护团队对单元 NP-204 的检查简报。检查结果显示读数为 37，下一次审查计划定于 2026 年 10 月 20 日进行。文档还列出了其他站点（如东大门和西院）在 2026 年 10 月 12 日至 13 日的检查记录。\", \"gist\": \"北码头 NP-204 单元维护检查简报及后续审查计划。\", \"topics\": [\"北码头\", \"NP-204\", \"维护检查\", \"现场检查卡\", \"审查计划\"], \"doc_type\": \"检查简报\", \"typical_question\": \"北码头 NP-204 单元的维护检查读数是多少？\"}",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 986,
+          "completion_tokens": 176,
+          "total_tokens": 1162
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 4.475810200034175,
+        "wire_sha256": "68aeac33b68f899ba4e8413bc0743528b4fa12c65b35a0b941f5c4ce5450ce73",
+        "call_id": "108c65066688b66c461e49c0890d4a123e57b4e47f68545b4a09c87e453b39a9"
+      }
+    },
+    {
+      "id": "table_failure",
+      "type": "KNOWN_FAILURE",
+      "baseline_status": "FAIL",
+      "candidate_status": "FAIL",
+      "human_review": "候选仍回答“单元是 West Yard (WY-309)”。ID正确不能替代Site/Unit关系正确。",
+      "baseline": {
+        "kind": "HISTORICAL_NON_CONTEMPORANEOUS",
+        "answer": "根据资料，读数为 51 的单元是 **West Yard**（编号 WY-309）。\n\n该数据记录于 2026-10-13，检查日期为 2026-10-13。\n\nSources: site_readings.xlsx",
+        "usage": {
+          "prompt_tokens": 510,
+          "completion_tokens": 64,
+          "total_tokens": 574,
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 510
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "transport_seconds": 2.053522200032603,
+        "response_sha256": "15d256b4bcbb9fa3367ca9334723c685f9e6d6e32e0134f25eead79e2e826d3f"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/table_failure/candidate",
+        "answer": "根据提供的资料，读数为 51 的单元是 **West Yard (WY-309)**。\n\n来源：site_readings.xlsx",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 509,
+          "completion_tokens": 32,
+          "total_tokens": 541
+        },
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 1.1777257999638095,
+        "wire_sha256": "d100d3769e9273090a24ae8a594d689ca7bb8d2f6875b5ca85750a97a574b0f4",
+        "call_id": "e77d98e078d8b0ab31fefce962e11df0db9ce47a27a92a7105a29f3d3174be83"
+      }
+    },
+    {
+      "id": "table_correct",
+      "type": "KNOWN_CORRECT_CONTROL",
+      "baseline_status": "PASS",
+      "candidate_status": "PASS",
+      "human_review": "East Gate读数24保持正确。",
+      "baseline": {
+        "kind": "HISTORICAL_NON_CONTEMPORANEOUS",
+        "answer": "根据提供的资料，East Gate（东大门）的读数为 **24**。\n\n该数据来源于文件 `site_readings.xlsx` 中的记录：\n> A: East Gate, B: EG-118, C: 24, D: 2026-10-12\n\nSources: site_readings.xlsx",
+        "usage": {
+          "prompt_tokens": 653,
+          "completion_tokens": 73,
+          "total_tokens": 726,
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 653
+        },
+        "finish_reason": [
+          "stop"
+        ],
+        "transport_seconds": 1.2510805999627337,
+        "response_sha256": "39a6595030a046cc82a62b27f7a46926bbded9365fa37c57cd9b6e1c61b0fd4b"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/table_correct/candidate",
+        "answer": "根据资料，East Gate 的读数为 24。\n\n来源：site_readings.xlsx",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 652,
+          "completion_tokens": 20,
+          "total_tokens": 672
+        },
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 17.270896000030916,
+        "wire_sha256": "f71ceada7e73342ec153f79692808936e3859c775197853369c790b44ec4f4ec",
+        "call_id": "cb3949947426ba887c66f5231327e5104340cda2c71d7b1c4bd5855594752f78"
+      }
+    },
+    {
+      "id": "table_missing_unit",
+      "type": "CONSTRUCTED_MISSING_EVIDENCE",
+      "baseline_status": "FAIL",
+      "candidate_status": "PARTIAL",
+      "human_review": "原版把West Yard当单位；候选只说West Yard读数51，受证据支持但未明确单位未知、未完成任务。",
+      "baseline": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/table_missing_unit/baseline",
+        "answer": "根据提供的资料，读数为51的单位是**West Yard**。\n\nSources: site_readings.xlsx",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 485,
+          "completion_tokens": 21,
+          "total_tokens": 506
+        },
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 0.6826011000084691,
+        "wire_sha256": "5ab8cd0c5ba8f58fcd32b4366ea9b3da5c1c9aa3b2984d13af311c605a9abf49",
+        "call_id": "b34139774281fd86877c731cfb3f40bd78002c7abcb3835840100cd155c01907"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/table_missing_unit/candidate",
+        "answer": "根据资料，**West Yard** 的读数为 51。\n\n来源：site_readings.xlsx",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 484,
+          "completion_tokens": 22,
+          "total_tokens": 506
+        },
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 10.29448169999523,
+        "wire_sha256": "67ae822f3053555f9be401143634705780276040b70022619c5569005036bd5e",
+        "call_id": "cf812641008067b634287e1e05520f318e84eee287e475ba66c072e37f6aadf4"
+      }
+    },
+    {
+      "id": "table_column_distractor",
+      "type": "CONSTRUCTED_REORDERED_COLUMNS",
+      "baseline_status": "PASS",
+      "candidate_status": "PASS",
+      "human_review": "双方正确回答WY-309。列重排不改变单元格值，候选不再额外改善。",
+      "baseline": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/table_column_distractor/baseline",
+        "answer": "根据提供的资料，读数为 51 的单元是 **WY-309**。\n\n来源：site_readings.xlsx",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 510,
+          "completion_tokens": 28,
+          "total_tokens": 538
+        },
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 20.189417299989145,
+        "wire_sha256": "ee7d8829611dae0987e426cbb23d00c96ee5ed1e61b626e059946dbf205f0201",
+        "call_id": "8435c22c7748909f701975c88babd79bbe2a749faf1e4e4866946fd929e47b0b"
+      },
+      "candidate": {
+        "kind": "NEW_REAL_FIXED_CONTEXT",
+        "request_id": "s5-facts-6b032011ca9a4b1caeeb82eadd1a8f4a/table_column_distractor/candidate",
+        "answer": "根据提供的资料，读数为 51 的单元是 **WY-309**。\n\n来源：site_readings.xlsx",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 509,
+          "completion_tokens": 28,
+          "total_tokens": 537
+        },
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "adapter_and_receipt_seconds": 1.6045579999918118,
+        "wire_sha256": "4e7038e40dd638e3e45de2b0beff0563221be02ec56437b0c215f13ad869d02a",
+        "call_id": "70a84ad0280259304593e70a8631204cf97722dfca8f97bd00ac2f147874a786"
+      }
+    }
+  ],
+  "comparison_method": "Manual source-to-output review, not official Gold metric or automated semantic judge. Historical controls clearly labeled, not resent.",
+  "new_usage": {
+    "provider_calls": 12,
+    "provider": "siliconflow",
+    "model": "Qwen/Qwen3.5-4B",
+    "thinking": false,
+    "reasoning_tokens_reported": 0,
+    "max_tokens": 1024,
+    "usage": {
+      "prompt_tokens": 8234,
+      "completion_tokens": 1045,
+      "total_tokens": 9279
+    },
+    "settled": 12,
+    "unknown": 0,
+    "sum_adapter_receipt_seconds": 95.56728790007764,
+    "latency_note": "Sum of per-call model/adapter/evidence-file/PG receipt intervals, not an end-to-end RAG latency or pure model compute time; raw timings do not separate DNS/TCP/TLS/queue.",
+    "historical_calls_reused_not_new": 4
+  },
+  "authorization": {
+    "owner_reply": "call_0f1b917fa7ca4c0ab7d8afe1f1119629: 批准上述 S5 有限实测",
+    "max_calls": 12,
+    "max_tokens": 65000,
+    "reservation_upper_sum": 60069,
+    "mechanism": "Existing LocalExecution, original SendGate and durable Provider ledger",
+    "owner_status": "CLOSED",
+    "execution_status": "CLOSED",
+    "unused_temporary_tokens_withdrawn": 55721,
+    "old_grants_not_reopened": true
+  },
+  "invariants": {
+    "12_raw_wires_equal_frozen_plan": true,
+    "model_identity_all_match": true,
+    "old_provider_rows_unchanged": true,
+    "default_role_configuration_unchanged": true,
+    "old_dirty_files_count": 18,
+    "old_dirty_files_hashes_unchanged": true,
+    "daily_cloud_after": false,
+    "old_unknown_not_changed_or_resent": true,
+    "no_upload_embedding_rerank_reindex": true
+  },
+  "archive": {
+    "path": "docs/evaluation/evidence/S5_FACT_RELIABILITY_REAL_20261019.zip",
+    "sha256": "4d924bff47ba262f22198714c301e649a93536f0d104273d20928eae57f9528b",
+    "files": 53
+  },
+  "historical_archive": {
+    "path": "docs/evaluation/evidence/S3_PRODUCT_E2E_20261019.zip",
+    "sha256": "014fa7c26bb3a7e80e036368b069ec2d43d9688e71ffc79c02df11cd95d10780",
+    "four_controls_match_local_raw_captures": true
+  },
+  "tests": [
+    {
+      "command": "$env:PYTHONPATH='E:/WK/deps/reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps'; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q tests/weknora_port/test_s5_fact_reliability.py tests/weknora_port/test_document_profile.py --tb=short",
+      "exit_code": 0,
+      "result": "30 passed in2.22s; offline real parser/tool tests, no model quality simulation"
+    },
+    {
+      "command": "scripts/s5_fact_reliability.py --source-root E:/WK/run/s3-product-20261019 --output docs/evaluation/evidence/S5_FACT_RELIABILITY_CASES_20261019.json",
+      "exit_code": 0,
+      "result": "8 frozen cases, zero sends"
+    },
+    {
+      "command": "scripts/s5_fact_validation.py prepare --config E:/WK/run/s4-quality-20261019/local.json --authorization E:/WK/run/s5-facts-20261019/owner-authorization.json --manifest docs/evaluation/evidence/S5_FACT_RELIABILITY_CASES_20261019.json --output E:/WK/run/s5-facts-20261019",
+      "exit_code": 0,
+      "result": "ZERO_SEND_PREPARED; reservation60069"
+    },
+    {
+      "command": "scripts/s5_fact_validation.py run [same arguments as prepare]",
+      "exit_code": 0,
+      "result": "12 SETTLED/CLOSED, no repeats"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "No whitespace error; pre-existing CRLF warnings"
+    }
+  ],
+  "tool_errors_retained": [
+    "Bare venv missing pandas exit1; reused existing product PYTHONPATH, no install.",
+    "Initial freezer SHA canonicalization omitted sort_keys; pre-send hash check rejected exit1. Corrected source SHA transcription before any sending.",
+    "Exploratory rg literal-glob path arguments rejected; corrected actual paths.",
+    "Delivery first assumed LocalExecution raw request capture includes wire_sha256; exit1. Recomputed canonical body hash against PG receipt instead; no model resend.",
+    "First staged diff check exit2: new blank line at EOF in new test file; trimmed only that file and final staged check passed exit0."
+  ],
+  "unresolved": [
+    {
+      "id": "table_semantic_binding",
+      "status": "UNRESOLVED_MODEL_QUALITY",
+      "priority": 1,
+      "reason": "Correct header-bound input still yields Site as Unit; missing evidence answer partial. No supported safe automatic answer correction."
+    },
+    {
+      "id": "summary_generalization",
+      "status": "UNVERIFIED_BEYOND_SMALL_CASES",
+      "priority": 2,
+      "reason": "No production default promotion or unsupported-subtype detector; limited evidence, semantic hallucination remains possible."
+    },
+    {
+      "id": "normal_upload_header_configuration",
+      "status": "NOT_RUN_NOT_CHANGED",
+      "priority": 2,
+      "reason": "Explicit user header selection/provenance needed if later exposed; not justified as current fix."
+    }
+  ],
+  "not_run": [
+    "Normal API full RAG acceptance",
+    "New final-answer test with regenerated Summary",
+    "Literal-excerpt model generation comparison",
+    "Full six-dataset re-evaluation",
+    "Production default change",
+    "Push/deploy"
+  ],
+  "commit_note": "Implementation SHA in report after code commit; report SHA resolves with git log -1 --format=%H -- docs/evaluation/S5_MODEL_FACT_RELIABILITY.md",
+  "implementation_commit": "b704bbad47318809e30784d93701585053b7c125"
+}

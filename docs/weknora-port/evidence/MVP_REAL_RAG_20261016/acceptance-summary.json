@@ -1,0 +1,130 @@
+{
+  "result": "MVP_REAL_RAG_PASS_LIMITED_CASES",
+  "provider": "siliconflow",
+  "real_calls": 62,
+  "real_deepseek_calls": 0,
+  "mock_calls": 0,
+  "states": {
+    "settled": 54,
+    "unknown": 8
+  },
+  "capabilities": {
+    "embedding": 38,
+    "rerank": 8,
+    "chat": 16
+  },
+  "provider_reported_input": 39983,
+  "provider_reported_output": 2654,
+  "provider_reported_total": 42637,
+  "settled_actual_total": 42637,
+  "unknown_held": 74497,
+  "unknown_is_not_free": true,
+  "deepseek_history_unchanged": true,
+  "document": {
+    "id": "79a20804-ae02-4036-b952-ba3e060a07b3",
+    "parse_status": "completed",
+    "metadata": {
+      "assets": [],
+      "sha256": "b6869c8984701701bc2e6973b6ffc750d497f845cc1a65a106e9301590a13ab0",
+      "media_type": "text/plain",
+      "chunk_count": 10,
+      "processed_at": "2026-10-15T23:39:36.438586+00:00",
+      "index_enabled": true,
+      "indexed_count": 10,
+      "parser_engine": "plain",
+      "source_version": "9683c549-a4a3-4a67-8e24-9ef6a0fd67ce",
+      "parser_metadata": {
+        "status": "parsed",
+        "filename": "rfc2606.txt",
+        "owner_id": "mvp-public-63b69a81a7844e91afaee254878cc10d",
+        "file_type": ".txt",
+        "document_id": "79a20804-ae02-4036-b952-ba3e060a07b3",
+        "input_bytes": 8008,
+        "parser_engine": "plain",
+        "source_version": "9683c549-a4a3-4a67-8e24-9ef6a0fd67ce",
+        "knowledge_base_id": "761cc140-5657-42f3-9bb5-608e701225d6"
+      }
+    }
+  },
+  "vectors": {
+    "n": 11,
+    "min_dimensions": 1024,
+    "max_dimensions": 1024
+  },
+  "keys_encrypted": {
+    "n": 3,
+    "all_encrypted": true
+  },
+  "cases": [
+    {
+      "case": 4,
+      "result": "PASS",
+      "run_id": "a64d1e96-6b49-41a5-846b-dc3aec751908",
+      "answer_provider_calls": 1,
+      "citation_count": 1,
+      "citations_exact_original_readback": true
+    },
+    {
+      "case": 2,
+      "result": "PASS",
+      "run_id": "ca764d52-5394-427b-8cd4-ded94924bd6d",
+      "answer_provider_calls": 1,
+      "citation_count": 2,
+      "citations_exact_original_readback": true
+    },
+    {
+      "case": 3,
+      "result": "PASS",
+      "run_id": "b9e653ba-0212-465d-ad4c-abd949de65c3",
+      "answer_provider_calls": 0,
+      "citation_count": 0,
+      "citations_exact_original_readback": true
+    }
+  ],
+  "turns": [
+    {
+      "run_id": "27879460-1670-477d-98b2-8a5ca3c98536",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "4e36937f-eebf-4e38-a4e5-852097018b51",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "f6233751-22c7-4b63-9001-9de28385dc60",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "d020db77-808b-4abd-b095-5b738a9fc35f",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "e874e13b-b4f0-4f37-9d4c-e25f509d58ea",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "ca764d52-5394-427b-8cd4-ded94924bd6d",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "b9e653ba-0212-465d-ad4c-abd949de65c3",
+      "status": "completed",
+      "error_code": ""
+    },
+    {
+      "run_id": "a64d1e96-6b49-41a5-846b-dc3aec751908",
+      "status": "completed",
+      "error_code": ""
+    }
+  ],
+  "default_reasoning_truncation": "FAIL retained final-question-1",
+  "original_four_tlds_answer": "FAIL retained verified-question-1",
+  "six_datasets_evaluation": "NOT_RUN",
+  "source_sha": "2999323ffd8a0a5e136d8c516d39557649ce4890"
+}

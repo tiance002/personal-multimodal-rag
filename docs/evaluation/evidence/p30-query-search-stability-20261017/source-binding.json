@@ -1,0 +1,21 @@
+{
+  "schema": "p30-source-binding/v1",
+  "baseline_sha": "a974736d6a26e07969a110975224e490d9ca461e",
+  "fixed_upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "input_files": {
+    "docs/evaluation/P29_RERANK_REAL_AB.md": "0540158c01975b1e112c5554305c5a03fc71a3d859059a82e246269e9f3a0072",
+    "docs/evaluation/P29_RERANK_REAL_AB.results.json": "2162ed3478c0714ac5026e316f569a1a494ae52291ee29aac30976a1d22542b2",
+    "docs/evaluation/evidence/p29-rerank-real-ab-20261017/metrics.json": "319c116ba07d3df8123d1ba29abf71acac32d51d1fe1cd4faa0f18be9b1e8f87",
+    "docs/evaluation/evidence/p29-rerank-real-ab-20261017/raw-evidence.zip": "7079ef2b162f096aafba04d2fd62b48a51351c2bff9229cd5cf768b8f99da58d"
+  },
+  "source_files": {
+    "backend/weknora_port/retrieval/query.py": "3c2c44c83cd097f495f0153d3c1f4aec23e97fe8eb5bb65d589af35ed71d8e6f",
+    "backend/weknora_port/retrieval/search.py": "edee1bbc3439926a4f0b1fd039204439dbe280ccdcb8181840daa274e96f2696",
+    "backend/weknora_port/retrieval/fusion.py": "44d1a98e601bb69977ca2b197c145b300e104c419bbbfddb8a46ab7dac78700d",
+    "backend/weknora_port/retrieval/filter_top_k.py": "7d95798bfb8630453c041d12333b60fadbd0ef97dc90593d52f857b4421c93eb",
+    "backend/weknora_port/storage/hybrid.py": "49789246535a67b19be7083d964451ad32a9b3ab5b223979876211193caf8a9a",
+    "backend/weknora_port/storage/postgres.py": "892a9a58eefd9cdc2dc613ad0c4bd620e33a3a20200e580ad6ec79ea904c190e",
+    "scripts/p30_search_stability.py": "06537cffe73085c9781308c8ecc9c04598156d70b18e1b81dfbfcd4ad7368c5f"
+  },
+  "note": "Historical P29 files unchanged; no production source changes. Null snapshot source_version is not reconstructed."
+}

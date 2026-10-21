@@ -1,0 +1,35 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+________ test_normal_pipeline_consumes_familiar_document_after_rerank _________
+tests\weknora_port\test_affinity_pipeline.py:15: in test_normal_pipeline_consumes_familiar_document_after_rerank
+    pipe=RetrievalPipeline(Repo(rows),Registry(model),affinity_resolver=affinity)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'affinity_resolver'
+__________ test_affinity_does_not_add_a_lane_when_rerank_is_disabled __________
+tests\weknora_port\test_affinity_pipeline.py:24: in test_affinity_does_not_add_a_lane_when_rerank_is_disabled
+    s=state();pipe=RetrievalPipeline(Repo([row()]),Registry(),affinity_resolver=affinity)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'affinity_resolver'
+_____ test_configuration_uses_first_requested_kb_not_legacy_session_cheap _____
+tests\weknora_port\test_kb_model_selection.py:38: in test_configuration_uses_first_requested_kb_not_legacy_session_cheap
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_kb_model_selection.py:37: in scenario
+    assert config.pipeline_state.chat_model_id=='expensive'
+E   AssertionError: assert 'cheap' == 'expensive'
+E     
+E     - expensive
+E     + cheap
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_affinity_pipeline.py::test_normal_pipeline_consumes_familiar_document_after_rerank
+FAILED tests/weknora_port/test_affinity_pipeline.py::test_affinity_does_not_add_a_lane_when_rerank_is_disabled
+FAILED tests/weknora_port/test_kb_model_selection.py::test_configuration_uses_first_requested_kb_not_legacy_session_cheap
+3 failed in 0.87s

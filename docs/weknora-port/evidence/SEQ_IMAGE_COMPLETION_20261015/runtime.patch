@@ -1,0 +1,120 @@
+diff --git a/backend/weknora_port/retrieval/merge.py b/backend/weknora_port/retrieval/merge.py
+index 63eb17a..d0986cd 100644
+--- a/backend/weknora_port/retrieval/merge.py
++++ b/backend/weknora_port/retrieval/merge.py
+@@ -106,7 +106,7 @@ def prune_images(content, raw):
+     allowed = {v for img in image_infos(raw) for v in (img.get('url'), img.get('original_url')) if v}
+     return go_strip(re.sub('\\n{3,}', '\n\n', IMAGE.sub(lambda m: m[0] if m[2] in allowed else '', content)))
+ 
+-async def collect_image_info(ids, state, context, repository):
++async def collect_image_info(ids, state, context, repository, *, source_chunks=None):
+     """Source two-level enabled-child aggregation. Order of URLs is unspecified upstream."""
+     ids = tuple(dict.fromkeys((i for i in ids if i)))
+     if not ids:
+@@ -114,12 +114,30 @@ async def collect_image_info(ids, state, context, repository):
+     if not hasattr(repository, 'get_chunk_children'):
+         raise RuntimeError('IMAGE_CHILD_COLLECTION_UNIMPLEMENTED')
+ 
++    # New parent aggregation must stay anchored to the actual source document
++    # and immutable version, even if several documents are allowed by the query.
++    # Legacy callers without source rows retain the existing scoped collector.
++    sources = dict(source_chunks or {})
++
++    def domain(row):
++        return (row.knowledge_base_id, row.knowledge_id,
++                row.chunk_metadata.get('source_version'))
++
+     async def children(parent_ids):
+         try:
+             rows = list(await repository.get_chunk_children(parent_ids, context))
+             if any((r.parent_chunk_id not in parent_ids for r in rows)):
+                 raise RetrievalScopeError()
+-            return validate_results(rows, state.targets, context)
++            rows = validate_results(rows, state.targets, context)
++            if source_chunks is not None:
++                for row in rows:
++                    if (not getattr(row, 'is_enabled', True) or
++                            row.chunk_type not in ('text', 'image_ocr', 'image_caption')):
++                        continue
++                    parent = sources.get(row.parent_chunk_id)
++                    if parent is None or domain(row) != domain(parent):
++                        raise RetrievalScopeError()
++            return rows
+         except (RetrievalScopeError, PermissionError, CallCancelled, RunDeadlineExceeded):
+             raise
+         except Exception:
+@@ -133,7 +151,8 @@ async def collect_image_info(ids, state, context, repository):
+                 continue
+             agg = aggs.setdefault(target, {})
+             if key not in agg:
+-                agg[key] = deepcopy(info)
++                agg[key] = {field: info[field] for field in
++                            ('url', 'original_url', 'start_pos', 'end_pos', 'caption', 'ocr_text')}
+             else:
+                 for field in ('ocr_text', 'caption'):
+                     if info.get(field):
+@@ -146,6 +165,7 @@ async def collect_image_info(ids, state, context, repository):
+             add(child.parent_chunk_id, child)
+         elif child.chunk_type == 'text':
+             text_to_parent[child.id] = child.parent_chunk_id
++            sources[child.id] = child
+     if text_to_parent:
+         for child in await children(tuple(text_to_parent)):
+             if getattr(child, 'is_enabled', True) and child.chunk_type in ('image_ocr', 'image_caption'):
+@@ -158,7 +178,8 @@ async def resolve_parents(results, state, context, repository):
+         return results
+     parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
+     child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
+-    scoped = await collect_image_info(child_ids, state, context, repository)
++    scoped = await collect_image_info(child_ids, state, context, repository,
++        source_chunks={**parents, **{r.id: r for r in results}})
+     for r in results:
+         parent = parents.get(r.parent_chunk_id)
+         if not parent or not parent.content:
+diff --git a/backend/weknora_port/storage/hybrid.py b/backend/weknora_port/storage/hybrid.py
+index fa7cac8..dac3aad 100644
+--- a/backend/weknora_port/storage/hybrid.py
++++ b/backend/weknora_port/storage/hybrid.py
+@@ -7,12 +7,14 @@ from __future__ import annotations
+ 
+ import asyncio
+ from dataclasses import replace
++from types import SimpleNamespace
+ from typing import Awaitable, Callable, Mapping, Sequence
+ 
+ from ..models.types import CallContext, CallCancelled, RunDeadlineExceeded
+ from ..retrieval.fusion import Hit, RetrievalConfig, fuse_or_deduplicate
+ from ..retrieval.search import SearchParams, SearchTarget, validate_targets, validate_results
+ from ..retrieval.types import SearchResult
++from ..retrieval.merge import collect_image_info
+ from .knowledge import ScopedKnowledgeRepository, _json_object
+ from .postgres import RetrieveParams
+ 
+@@ -115,6 +117,14 @@ class PostgresKnowledgeRepository(ScopedKnowledgeRepository):
+             if source is None:
+                 continue
+             results.append(replace(source,score=hit.score,match_type=hit.metadata['match_type'],matched_content=hit.content))
++        # Fixed processSearchResults enriches empty ImageInfo unconditionally,
++        # including the formal RAG path that skips standalone context enrichment.
++        empty_ids = [row.id for row in results if row.image_info == '']
++        if empty_ids:
++            images = await collect_image_info(empty_ids, SimpleNamespace(targets=targets),
++                context, self, source_chunks={row.id: row for row in results})
++            results = [replace(row, image_info=images[row.id])
++                       if row.image_info == '' and row.id in images else row for row in results]
+         if not params.skip_context_enrichment:
+             # Formal RAG explicitly asks for skip=true and handles this in merge.
+             # Standalone enriched search is a separate required adapter, not a
+diff --git a/backend/weknora_port/storage/knowledge.py b/backend/weknora_port/storage/knowledge.py
+index e5948a1..771e548 100644
+--- a/backend/weknora_port/storage/knowledge.py
++++ b/backend/weknora_port/storage/knowledge.py
+@@ -137,7 +137,7 @@ class ScopedKnowledgeRepository:
+             result[row["id"]] = SearchResult(
+                 id=row["id"],content=row["content"],score=0,
+                 knowledge_id=row["knowledge_id"],knowledge_base_id=row["knowledge_base_id"],
+-                chunk_type=row["chunk_type"],chunk_index=row["chunk_index"],
++                chunk_type=row["chunk_type"],chunk_index=row["chunk_index"],seq=row["chunk_index"],
+                 start_at=row["start_at"],end_at=row["end_at"],
+                 parent_chunk_id=row.get("parent_chunk_id") or "",
+                 pre_chunk_id=row.get("pre_chunk_id") or "",next_chunk_id=row.get("next_chunk_id") or "",

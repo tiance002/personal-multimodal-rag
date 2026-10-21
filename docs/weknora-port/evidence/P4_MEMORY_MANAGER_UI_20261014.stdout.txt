@@ -1,0 +1,30 @@
+{
+  "kind": "ACTUAL_NATIVE_MEMORY_MANAGER_BROWSER_HTTP_PG",
+  "tenant": 111,
+  "profile": "E:\\WK\\run\\memory-ui-d4e465323342",
+  "create": true,
+  "edit": true,
+  "reload": true,
+  "export_count": 2,
+  "export_metadata_preserved": true,
+  "cancel_clear_no_write": true,
+  "confirmed_clear_persisted": true,
+  "runtime_identity_denied_no_write": true,
+  "mutations": [
+    {
+      "method": "POST",
+      "path": "/api/v1/memory/items"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/memory/items/5eceaf87-c923-4326-a69e-adf82c905881"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/memory/items"
+    }
+  ],
+  "real_provider_calls": 0,
+  "backend_scope_invariants": "prior b502055 evidence reused; no foreign-owner mutation",
+  "full_goal_pass": "NOT_CLAIMED"
+}

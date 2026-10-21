@@ -1,0 +1,19 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: {"error":{"code":"ORIGIN_NOT_ALLOWED","message":"ORIGIN_NOT_ALLOWED"},"meta":{"request_id":"018c2a24-2206-4759-a3b6-87588c8791d8"}}
+
+403 !== 200
+
+    at data (file:///E:/RAG-Worktrees/weknora-python-port-20261013/scripts/weknora_port_cancel_memory_browser.mjs:11:38)
+    at async file:///E:/RAG-Worktrees/weknora-python-port-20261013/scripts/weknora_port_cancel_memory_browser.mjs:12:11 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 403,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0

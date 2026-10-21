@@ -1,0 +1,494 @@
+{
+  "kind": "REAL_GO126_STANDARD_PROXY_DECISIONS_AND_IN_MEMORY_TRANSPORT_CONNECT_WITH_SOURCE_EXTRACTED_ENV_SHIM",
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "go_version": "go1.26.0",
+  "files": {
+    "E:\\RAG-reference\\WeKnora-3e8b0bfc\\internal\\models\\api\\transport.go": "acb62d082622bec9ba549f83b17f9b1d2cf4f3f58786f2d38ef70bbdc18f9c74",
+    "E:\\RAG-reference\\WeKnora-3e8b0bfc\\internal\\utils\\security.go": "abf70b9376151a741fe7e0f0055369299f5c8ea68e9a0fb2536ddcf59bc7c2e0",
+    "E:\\RAG-reference\\toolchains\\go1.26.0\\go\\src\\net\\http\\transport.go": "1c170ec3581321bd19ccd1b15863f46b16dc749ac6d54d00f5e97f7ffa2ccb5f",
+    "E:\\RAG-reference\\toolchains\\go1.26.0\\go\\src\\net\\url\\url.go": "885b19c91e48707401abea0b727fb3f66c31d03df600f3560c3759db46afdbed",
+    "E:\\RAG-reference\\toolchains\\go1.26.0\\go\\src\\vendor\\golang.org\\x\\net\\http\\httpproxy\\proxy.go": "e1cde07b566be558b32a4a54cd1e8d9c36ce7d0579706c9495537154f8c1041e",
+    "E:\\RAG-Worktrees\\weknora-python-port-20261013\\tests\\weknora_port\\fixtures\\proxy_connect_oracle_test.go": "d0bfa467a260c6bf6cf36d0559db1129c3fbb148d89ee19884f8727602f276bd"
+  },
+  "source_function_sha256": "9f98a30c7dc5a86446a337e451ffbd13884141b29c7efbd85135346bd41ace7f",
+  "generated_go_sha256": "03cdd7c3a09946829d7fd89d00df6afef43d3c7debb2398876df3753573fc00f",
+  "cases": [
+    {
+      "input": {
+        "name": "mapped-cidr-v6",
+        "url": "https://[::ffff:8.8.8.8]/",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080",
+          "NO_PROXY": "::ffff:8.8.0.0/112"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "mapped-cidr-v4",
+        "url": "https://8.8.8.8/",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080",
+          "NO_PROXY": "::ffff:8.8.0.0/112"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "https-upper",
+        "url": "https://api.example/v1",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "https-lower",
+        "url": "https://api.example/v1",
+        "env": {
+          "https_proxy": "http://proxy.example:8080"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "http-upper",
+        "url": "http://api.example/v1",
+        "env": {
+          "HTTP_PROXY": "http://proxy.example:8080"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "http-lower",
+        "url": "http://api.example/v1",
+        "env": {
+          "http_proxy": "http://proxy.example:8080"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "legacy-ignored",
+        "url": "https://api.example/v1",
+        "env": {
+          "https": "http://proxy.example:8080",
+          "no": "*"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "all-ignored",
+        "url": "https://api.example/v1",
+        "env": {
+          "ALL_PROXY": "http://proxy.example:8080"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "cgi-before-no-proxy",
+        "url": "http://api.example/v1",
+        "env": {
+          "HTTP_PROXY": "http://proxy.example:8080",
+          "REQUEST_METHOD": "GET",
+          "NO_PROXY": "*"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": true,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "cgi-before-localhost",
+        "url": "http://localhost/v1",
+        "env": {
+          "HTTP_PROXY": "http://proxy.example:8080",
+          "REQUEST_METHOD": "GET"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": true,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "cgi-https-allowed",
+        "url": "https://api.example/v1",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080",
+          "REQUEST_METHOD": "GET"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "idna-unicode-rule",
+        "url": "https://xn--fa-hia.example/v1",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080",
+          "NO_PROXY": "faß.example"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "idna-unicode-url",
+        "url": "https://faß.example/v1",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080",
+          "NO_PROXY": "xn--fa-hia.example"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "cache-empty-first",
+        "url": "https://api.example/v1",
+        "env": {},
+        "after": {
+          "HTTPS_PROXY": "http://changed.example:8080"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        },
+        "second": {
+          "error": false,
+          "proxy": null
+        }
+      }
+    },
+    {
+      "input": {
+        "name": "cache-original-first",
+        "url": "https://api.example/v1",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080"
+        },
+        "after": {
+          "HTTPS_PROXY": "http://changed.example:8080",
+          "NO_PROXY": "*"
+        }
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        },
+        "second": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        }
+      }
+    }
+  ],
+  "trust": [
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        },
+        "system_proxy": true
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "proxy.example:8080"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example"
+        },
+        "address": "proxy.example:80"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example"
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://Proxy.example:8080"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://Proxy.example:8080"
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://u:p@proxy.example:8080"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://u:p@proxy.example:8080"
+        },
+        "system_proxy": true
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080"
+        },
+        "address": "8.8.8.8:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://proxy.example:8080"
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://proxy.example:8080\n"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": " http://proxy.example:8080"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": null
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://proxy|bad.example:8080"
+        },
+        "address": "proxy|bad.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://http://proxy%7Cbad.example:8080"
+        },
+        "system_proxy": false
+      }
+    },
+    {
+      "input": {
+        "url": "https://api.example",
+        "env": {
+          "HTTPS_PROXY": "http://u space:p@proxy.example:8080"
+        },
+        "address": "proxy.example:8080"
+      },
+      "observed": {
+        "first": {
+          "error": false,
+          "proxy": "http://http://u%20space:p@proxy.example:8080"
+        },
+        "system_proxy": false
+      }
+    }
+  ],
+  "connect": [
+    {
+      "callback_after_complete_headers": false,
+      "case": "write-block",
+      "elapsed_seconds": 60,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "headers-block",
+      "elapsed_seconds": 60,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "trickle",
+      "elapsed_seconds": 60,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "short-parent",
+      "elapsed_seconds": 12,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "long-parent",
+      "elapsed_seconds": 60,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "malformed",
+      "elapsed_seconds": 0,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": true,
+      "case": "complete",
+      "elapsed_seconds": 0,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "non200-lf-201",
+      "elapsed_seconds": 0,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    },
+    {
+      "callback_after_complete_headers": false,
+      "case": "non200-lf-299",
+      "elapsed_seconds": 0,
+      "real_network_calls": 0,
+      "request_failed_before_target_tls": true
+    }
+  ],
+  "real_network_calls": 0,
+  "cache_root": "E:\\WK\\run\\proxy-boundary-20261015",
+  "windows_case_insensitive_environment_limit": "Simultaneous differing-case variables are SOURCE_READ only; separate standard-key cases executed."
+}

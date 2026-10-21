@@ -1,0 +1,319 @@
+{
+  "status": "M3_5_COMPLETE_SELECTED_SAMPLE",
+  "source_commit": "d69d9a429a0a8b96175789fa4df8317fb5c59f33",
+  "run_id": "af480baa-d60c-4938-a18e-af77132cb7a7",
+  "session_id": "a88df883-4bad-4001-b589-374863205345",
+  "message_id": "35baef2c-ed9d-428b-b32f-1c282182190f",
+  "provider_receipts": [
+    {
+      "request_id": "91f260da-03e3-422e-ae08-b6f818ee3b7b/source-embedding",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "input_tokens": 213,
+      "output_tokens": 0,
+      "total_tokens": 213,
+      "seconds": 0.286188,
+      "wire_sha256": "6afa2716b02bdfbff411648ec76442eda9cb2cff8429022f1163faa6bf4a456f"
+    },
+    {
+      "request_id": "91f260da-03e3-422e-ae08-b6f818ee3b7b/document-summary",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "input_tokens": 802,
+      "output_tokens": 125,
+      "total_tokens": 927,
+      "seconds": 3.838293,
+      "wire_sha256": "73ee4705fd8a48b2a45075c1cb7915f35de258379df93b20c0756732a1a95353"
+    },
+    {
+      "request_id": "91f260da-03e3-422e-ae08-b6f818ee3b7b/summary-embedding",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "input_tokens": 92,
+      "output_tokens": 0,
+      "total_tokens": 92,
+      "seconds": 0.2969,
+      "wire_sha256": "f09f8d516b06d0d564ebf83d2476ebda600741df2c416be6c460c6036db70f1c"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/query_rewrite",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "input_tokens": 2536,
+      "output_tokens": 34,
+      "total_tokens": 2570,
+      "seconds": 37.369054,
+      "wire_sha256": "bd2e88cff1e578ad2e14567c86e8a451df0adc3627a1d75c1adf59479d4e1d94"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/query-embedding-9d3461a5-080c-4b5e-a367-c82b79d3013c-39500e393b70f2e1",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "input_tokens": 27,
+      "output_tokens": 0,
+      "total_tokens": 27,
+      "seconds": 0.272542,
+      "wire_sha256": "257b7aaaf8cf65b5c0e6e85710306d79b97da8e5300e19e99517d5aaec16303a"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/query-embedding-9d3461a5-080c-4b5e-a367-c82b79d3013c-9f3ca7a36493c0a6",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "input_tokens": 41,
+      "output_tokens": 0,
+      "total_tokens": 41,
+      "seconds": 0.175641,
+      "wire_sha256": "824c4a3a915c31c164f19b7bccaa14cfa6a86ccaaf4358acacd77ade56971cbd"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/query-embedding-9d3461a5-080c-4b5e-a367-c82b79d3013c-cc39ac3d0747bc0f",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "input_tokens": 16,
+      "output_tokens": 0,
+      "total_tokens": 16,
+      "seconds": 0.257893,
+      "wire_sha256": "4ce3aaa81451d656d4aa773f5d7bd35215229b29826b52b91dc06d412c72f185"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/query-embedding-9d3461a5-080c-4b5e-a367-c82b79d3013c-3e6814b743fe8449",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "input_tokens": 13,
+      "output_tokens": 0,
+      "total_tokens": 13,
+      "seconds": 0.30041,
+      "wire_sha256": "6a3d2ee1cafc0d6ee7df833f9b61cc467d8f6041d492b88980a55916b369f9a7"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/rerank",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "input_tokens": 348,
+      "output_tokens": 0,
+      "total_tokens": 348,
+      "seconds": 0.267414,
+      "wire_sha256": "892d90cef68c8274df19c399271bf3635b7c5190f1f89512d27839831e073af3"
+    },
+    {
+      "request_id": "af480baa-d60c-4938-a18e-af77132cb7a7/answer/1/cheap",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "input_tokens": 1255,
+      "output_tokens": 264,
+      "total_tokens": 1519,
+      "seconds": 46.168521,
+      "wire_sha256": "c32786fb13625e2a149cdc5118ad2e5fad42800f1783a649887c6c21082ce180"
+    }
+  ],
+  "total_calls": 10,
+  "total_tokens": 5766,
+  "new_unknown": 0,
+  "answer": "课件中给出的线性方程组为：\n\n$$\n\\left\\{\n\\begin{matrix}\nx_{1} - 2x_{2} + x_{3} = 0 \\\\\n2x_{2} - 8x_{3} = 8 \\\\\n-4x_{1} + 5x_{2} + 9x_{3} = -9\n\\end{matrix}\n\\right.\n$$\n\n**系数矩阵**为：\n\n$$\n\\begin{bmatrix}\n1 & -2 & 1 \\\\\n0 & 2 & -8 \\\\\n-4 & 5 & 9\n\\end{bmatrix}\n$$\n\n**增广矩阵最后一列的三个数**依次为：\n\n$$\n0,\\quad 8,\\quad -9\n$$\n\n即对应方程组右侧常数项的依次取值为 $0$、$8$、$-9$。",
+  "finish_reason": [
+    "stop"
+  ],
+  "provider_equals_persisted": true,
+  "exact_new_ocr_in_actual_wire": true,
+  "old_memory_omitted": true,
+  "context_ids": [
+    "a06e7826-577a-53ca-bd68-f53d8315a160",
+    "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+  ],
+  "context_chars": 794,
+  "first_failed_request": {
+    "run_id": "f694f072-9cf0-4cef-bd5e-6b2674940eaf",
+    "qa_provider_calls": 0,
+    "status": "ERROR_BEFORE_SEND_PRESERVED"
+  },
+  "interpretation": "Single selected sample only; does not prove general model quality or M3_COMPLETE",
+  "fixed_evidence_diagnostic": "NOT_RUN_NOT_NEEDED",
+  "base_commit": "6509af63793096e75aa8333fca8bbb82fbddc12a",
+  "daily_identity": {
+    "tenant_id": 1,
+    "subject_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+    "api": "http://127.0.0.1:56425",
+    "ui": "http://127.0.0.1:56426",
+    "pg_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013",
+    "redis_db": 15,
+    "redis_prefix": "weknora-python-p81-cd49dc23e95c4cad9e2c973ddd15ebbf",
+    "storage": "E:/WK/run/rag-m34-20261018/assets",
+    "local_config": "E:/WK/run/p81-retirement-20261018/local.json",
+    "model_configuration_revision": 19
+  },
+  "source": {
+    "knowledge_base_id": "9d3461a5-080c-4b5e-a367-c82b79d3013c",
+    "document_id": "996fda57-6cc2-4045-a3ff-7416f037459a",
+    "source_version": "91f260da-03e3-422e-ae08-b6f818ee3b7b",
+    "sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+    "text_chunk_id": "96ad695f-bb32-4df9-9cfb-1e8281f2fc31",
+    "parser": "mineru-basic",
+    "derived_text_chars": 434,
+    "vectors": [
+      {
+        "id": 100792,
+        "source_id": "96ad695f-bb32-4df9-9cfb-1e8281f2fc31",
+        "source_type": 0,
+        "chunk_id": "96ad695f-bb32-4df9-9cfb-1e8281f2fc31",
+        "knowledge_id": "996fda57-6cc2-4045-a3ff-7416f037459a",
+        "dimension": 1024,
+        "has_embedding": true
+      },
+      {
+        "id": 100793,
+        "source_id": "a06e7826-577a-53ca-bd68-f53d8315a160",
+        "source_type": 0,
+        "chunk_id": "a06e7826-577a-53ca-bd68-f53d8315a160",
+        "knowledge_id": "996fda57-6cc2-4045-a3ff-7416f037459a",
+        "dimension": 1024,
+        "has_embedding": true
+      }
+    ],
+    "source_readback_status": 200,
+    "uploads": 1
+  },
+  "retrieval": {
+    "search": 2,
+    "rerank": 2,
+    "merge": 2,
+    "context": 2,
+    "threshold": 0.3,
+    "ocr_provider_input_index": 1,
+    "ocr_raw_relevance_score": 0.5873205065727234,
+    "summary_raw_relevance_score": 0.9792719483375549,
+    "ocr_composite_score": 0.4557794007178275,
+    "summary_composite_score": 0.6924812017894182
+  },
+  "semantic_review": {
+    "basis": "post-run source image, actual middle_json and complete derived text; not supplied as Gold",
+    "coefficient_matrix": [
+      [
+        1,
+        -2,
+        1
+      ],
+      [
+        0,
+        2,
+        -8
+      ],
+      [
+        -4,
+        5,
+        9
+      ]
+    ],
+    "augmented_last_column": [
+      0,
+      8,
+      -9
+    ],
+    "all_positions_and_signs_correct": true,
+    "unsupported_additions": false,
+    "reviewer": "root; source independently checked by read-only subagent"
+  },
+  "refresh": {
+    "browser_performed": true,
+    "same_rendered_answer": true,
+    "same_session_id": "a88df883-4bad-4001-b589-374863205345",
+    "same_message_id": "35baef2c-ed9d-428b-b32f-1c282182190f",
+    "new_provider_calls": 0,
+    "public_citation_buttons": 0,
+    "running_indicator": 0
+  },
+  "usage_by_purpose": {
+    "embedding": {
+      "calls": 6,
+      "input_tokens": 402,
+      "output_tokens": 0,
+      "total_tokens": 402
+    },
+    "summary": {
+      "calls": 1,
+      "input_tokens": 802,
+      "output_tokens": 125,
+      "total_tokens": 927
+    },
+    "query_understanding": {
+      "calls": 1,
+      "input_tokens": 2536,
+      "output_tokens": 34,
+      "total_tokens": 2570
+    },
+    "rerank": {
+      "calls": 1,
+      "input_tokens": 348,
+      "output_tokens": 0,
+      "total_tokens": 348
+    },
+    "final_cheap": {
+      "calls": 1,
+      "input_tokens": 1255,
+      "output_tokens": 264,
+      "total_tokens": 1519
+    }
+  },
+  "input_tokens": 5343,
+  "output_tokens": 423,
+  "server_turn_seconds": 86.794763,
+  "upload_lifecycle_seconds": 25.762201,
+  "durable_completion": {
+    "port_turns_status": "completed",
+    "messages_is_completed": true,
+    "message_legacy_turn_status": "pending",
+    "notes": "Normal frontend uses is_completed and server run status; legacy message turn_status remains pending."
+  },
+  "close_receipt": {
+    "status": "CLOSED",
+    "calls": 10,
+    "input_tokens": 5343,
+    "output_tokens": 423,
+    "total_tokens": 5766,
+    "new_unknown": 0,
+    "refresh_new_calls": 0,
+    "old_provider_rows_unchanged": true,
+    "inherited_eight_paths_unchanged": true,
+    "daily_config_restored_sha256": "d2a0b3088fc01ac2a1381dc30e6ec69110e2bc04c142e344d991cdbdc55ed1b1",
+    "global_cloud_allowed": false,
+    "models_and_new_document_retained": true,
+    "unused_calls_revoked": 2,
+    "unused_tokens_revoked": 94234,
+    "account_balance_or_historical_unknown_changed": false
+  },
+  "deepseek_calls": 0,
+  "tesseract_calls": 0,
+  "tests": {
+    "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q --tb=short -p no:cacheprovider tests/weknora_port/test_service.py tests/weknora_port/test_execution_fence.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_local_runtime.py --basetemp E:\\WK\\run\\rag-m35-20261018\\pytest-scope",
+    "exit_code": 0,
+    "passed": 72
+  },
+  "limitations": [
+    "Single selected source only; not M3_COMPLETE or six-dataset quality acceptance",
+    "Global memory source resolver remains conservative session union; cross-scope bundle is omitted, not relabelled",
+    "LaTeX is displayed as Markdown source, not typeset math; formula span bbox missing, parent block bbox retained",
+    "Daily config restored cloud_allowed=false after finite authorization CLOSED; normal roles/document persist",
+    "No wheel build, mixed PDF OCR, cloud Caption, Qwen rerank, Hotpot/0434 or model rollout tested"
+  ],
+  "evidence_root": "E:\\WK\\run\\rag-m35-20261018",
+  "inherited_dirty_paths": [
+    ".serena/project.yml",
+    "progress.md",
+    "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+    "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt"
+  ]
+}

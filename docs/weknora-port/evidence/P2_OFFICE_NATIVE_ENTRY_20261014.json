@@ -1,0 +1,49 @@
+{
+  "kind": "REAL_OFFICE_PYTHON_LIBRARIES_FIXED_SOURCE_FIXTURE_PLUS_NATIVE_PG_ENTRY",
+  "reader_root": "E:/WK/deps/reader",
+  "versions": {
+    "mammoth": "1.11.0",
+    "markitdown": "0.1.3",
+    "python-pptx": "1.0.2",
+    "pandas": "2.3.3",
+    "numpy": "2.3.4"
+  },
+  "cases": [
+    {
+      "format": "office.docx",
+      "parser_engine": "docx",
+      "document": "2970c9d7-5926-46b0-bb2d-fc8364bd85b8",
+      "raw_sha256": "df5b43b6c42aff16abeee7fd1f15ff978740e2c8bbfcebf01ccc78be238d56cc",
+      "source_text_sha256": "d3c7d6d9bd410538c6bdb079c5594c88e37fdb6f431581b0804df51cf1fec2de",
+      "active_indices": 2,
+      "original_readback_equal": true,
+      "source_text_equal": true
+    },
+    {
+      "format": "slides.pptx",
+      "parser_engine": "markitdown",
+      "document": "c03967d6-0db8-4c4b-8b5c-8fa1061e93d9",
+      "raw_sha256": "1e4febb4a8def931b9298226fc723c88b7fb85e97caa08e63338f10a0091dbab",
+      "source_text_sha256": "5d909654db292e3771669bf50244e8ffa6e3af7eb4259bb2f33b9f6378a4e0c2",
+      "active_indices": 2,
+      "original_readback_equal": true,
+      "source_text_equal": true
+    },
+    {
+      "format": "table.csv",
+      "parser_engine": "markitdown",
+      "document": "89e5e2f7-5b06-47ba-bf25-0fd16f2dae79",
+      "raw_sha256": "ad24884271df24163013ad968a2310dba9457b09b7a4cb47d9bf1d33249788bb",
+      "source_text_sha256": "57f3890bf3d7f0c86a15afb983a03bc4d65cf8cb86d7113cec6bc20a79d37c0c",
+      "active_indices": 2,
+      "original_readback_equal": true,
+      "source_text_equal": true
+    }
+  ],
+  "storage_root": "E:\\WK\\run\\50565b61df80",
+  "mock_calls": 9,
+  "real_provider_calls": 0,
+  "docreader_service_started": false,
+  "old_environment_modified": false,
+  "scope": "Simple DOCX/PPTX/CSV source text fixtures; complex PPTX media attachment/legacy DOC/PPT conversion/full format parity not claimed"
+}

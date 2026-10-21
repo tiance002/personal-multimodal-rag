@@ -1,0 +1,40 @@
+{
+  "task": "S8.3-F fixed/model fallback service contract",
+  "baseline_head_from_parent": "86d42a7",
+  "source_file": "E:/RAG-Worktrees/s8-six-dataset-evaluation/tests/weknora_port/test_fallback_evidence_contract.py",
+  "source_sha256": "ede80143181dda83779acd2cf655efb4d3a71ea6b3d9ba328c4a475097f651ed",
+  "source_read": "PASS",
+  "implemented": "PASS",
+  "offline_pass": "PASS",
+  "isolated_integration_pass": "NOT RUN",
+  "real_provider_pass": "NOT RUN",
+  "cutover_pass": "NOT RUN",
+  "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q --tb=short -p no:cacheprovider tests/weknora_port/test_fallback_evidence_contract.py",
+  "working_directory": "E:/RAG-Worktrees/s8-six-dataset-evaluation",
+  "sandbox_permissions": "require_escalated",
+  "exit_code": 0,
+  "key_output": "14 passed in 1.19s",
+  "log": "pytest-new-final.log",
+  "command_history": "commands.txt",
+  "initial_test_run": {"exit_code": 1, "key_output": "2 failed, 12 passed in 2.05s", "log": "pytest-new-initial.log", "cause": "Fixture used obsolete synthetic MODEL_EGRESS_DENIED; corrected to real transport-gate MODEL_ORIGIN_KB_EGRESS_DENIED."},
+  "coverage": [
+    "off and bounded_source_v1: Search returns 30; actual ProviderModel rerank returns all scores 0.1; formal pipeline raises SearchNothing and service enters no-evidence fallback",
+    "fixed strategy: exactly three preceding QU/embedding/rerank calls; no final answer Provider send; all three reported usage records preserved in injected gate",
+    "model strategy: exactly one final fallback stream and no rejected Search candidate in final generation messages",
+    "exact final text across SSE, commit callback, ordinary history and completed replay; empty references for no-evidence fallback",
+    "UNKNOWN final model transport: one failed UNKNOWN attempt; fixed response; replay sends no additional Provider request and preserves UNKNOWN",
+    "actual rerank HTTP 503 follows existing search degradation without being labelled no-evidence; malformed duplicate-index response and actual gate egress denial fail without fallback",
+    "normal admitted evidence: one final answer call; persisted real chunk reference; off and bounded modes both work"
+  ],
+  "limitations": [
+    "ProviderModel, RetrievalPipeline, RuntimeService, GenerationCoordinator, ordinary history processing and replay are production implementations. HTTP wire uses httpx.MockTransport; admission, persistence and usage gate reuse in-memory test doubles.",
+    "No real PostgreSQL/Redis/HTTP socket or hosted Provider was used. SQL durability, HTTP API history DTO and formal metadata aggregation are not independently established by this module.",
+    "The prior QU/embedding/rerank usage check asserts injected gate records remain available. GenerationResult and FinalCommit usage remain generation-attempt-only; formal run metadata aggregation is covered by the root-owned metadata tests.",
+    "Existing test_fallback_output_pg.py and test_qa_followup_fallback_pg.py were read as references and NOT RUN, because this subtask is offline-only.",
+    "Initial sandbox pytest launch stalled with no output and was interrupted using its tracked session; exit 1. The result is not claimed as a test pass. Escalated local test process completed normally."
+  ],
+  "production_edits": [],
+  "new_dependencies": [],
+  "commit": null,
+  "tag": null
+}

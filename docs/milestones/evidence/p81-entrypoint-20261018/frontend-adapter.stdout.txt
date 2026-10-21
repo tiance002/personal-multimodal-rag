@@ -1,0 +1,25 @@
+
+> personal-rag-workbench@1.0.0 test
+> playwright test --config=playwright.config.ts tests/weknora-port/adapter.spec.ts --reporter=line
+
+
+[WebServer] (node:39620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+
+(node:20260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/10] tests\weknora-port\adapter.spec.ts:25:1 › port adapter loads visible scope and five masked model roles without old app fallback
+[2/10] tests\weknora-port\adapter.spec.ts:42:1 › POST once and recover by offset-zero GET of the same assistant message without duplicate answer text
+[3/10] tests\weknora-port\adapter.spec.ts:88:1 › runtime identity mismatch blocks mutations and remains visibly isolated from the existing backend
+[4/10] tests\weknora-port\adapter.spec.ts:101:1 › runtime mismatch during a run is shown in its assistant bubble and never starts generation
+[5/10] tests\weknora-port\adapter.spec.ts:127:1 › library selection reads its KB scope and upload polling exposes terminal completion and error codes
+[6/10] tests\weknora-port\adapter.spec.ts:177:1 › normal answers suppress citation controls and strip internal SSE markup outside code
+[7/10] tests\weknora-port\adapter.spec.ts:211:1 › old history strips internal reference markers without changing inline or fenced code
+[8/10] tests\weknora-port\adapter.spec.ts:237:1 › history titles stay inside the sidebar and remain selectable by mouse and Enter
+[9/10] tests\weknora-port\adapter.spec.ts:283:1 › history Markdown renders safely without leaking internal reference tags
+[10/10] tests\weknora-port\adapter.spec.ts:331:1 › partial SSE reference tags stay hidden until the delta is complete
+  10 passed (12.4s)

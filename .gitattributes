@@ -5,3 +5,7 @@
 /evaluations/results/public-benchmark-m4-first25-qwen-20260929.json text eol=lf
 /evaluations/results/public-benchmark-m4-first25-qwen-20260929-hashes.json text eol=lf
 /docs/history/dynamic-route-01-execution-contract-20261001.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve fixed tokenizer resource bytes for manifest verification on Windows.
+backend/weknora_port/retrieval/tokenizer_assets/*.utf8 -text
+backend/weknora_port/conversation_assets/*.yaml text eol=lf

@@ -1,0 +1,328 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.0, pytest-9.1.1, pluggy-1.6.0
+rootdir: E:\RAG-Worktrees\s8-six-dataset-evaluation
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.14.4
+collected 71 items / 56 deselected / 15 selected
+
+tests\weknora_port\test_conversation_configuration.py FF..               [ 26%]
+tests\weknora_port\test_http_api.py FFF........                          [100%]
+
+================================== FAILURES ===================================
+_ test_formal_session_source_evidence_roundtrip_to_actual_configuration[bounded_source_v1-off-bounded_source_v1] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001669FE18B00>
+setting = 'bounded_source_v1', startup = 'off', expected = 'bounded_source_v1'
+
+    @pytest.mark.parametrize('setting,startup,expected', [
+        ('bounded_source_v1', 'off', 'bounded_source_v1'),
+        ('off', 'bounded_source_v1', 'off'),
+        (None, 'off', 'off'),
+        (None, 'bounded_source_v1', 'bounded_source_v1'),
+    ])
+    def test_formal_session_source_evidence_roundtrip_to_actual_configuration(monkeypatch, setting, startup, expected):
+        import asyncio, json, re
+        from contextlib import asynccontextmanager
+        from types import SimpleNamespace
+        import backend.weknora_port.runtime as module
+        from backend.weknora_port.http_api import SessionCreate
+        from backend.weknora_port.models.types import CallContext, TrustedScope
+        from backend.weknora_port.generation import RouterPolicy
+        stored = {}
+        resource_checks = []
+        class Registry:
+            def __init__(self, *args, **kwargs): pass
+            async def chat(self, *args):
+                return SimpleNamespace(config=SimpleNamespace(supports_vision=False))
+        monkeypatch.setattr(module, 'NeutralModelRegistry', Registry)
+        @asynccontextmanager
+        async def transaction(): yield
+        async def execute(sql, params):
+            columns = re.search(r'INSERT INTO sessions\((.*?)\) VALUES', sql).group(1).split(',')
+            stored.update(zip(columns, params))
+            for name in ('context_config', 'summary_parameters', 'knowledge_base_scope', 'document_scope'):
+                if name in stored: stored[name] = json.loads(stored[name])
+        @asynccontextmanager
+        async def lease():
+            yield SimpleNamespace(connection=SimpleNamespace(transaction=transaction, execute=execute))
+        async def resources(guard, kbs, docs): resource_checks.append((kbs, docs))
+        async def session(*args): return stored
+        async def snapshot(*args):
+            return SimpleNamespace(model_id=lambda role: 'cheap-id', model_ids=(('cheap', 'cheap-id'), ('rerank', 'rerank-id')))
+        async def rows(*args): return [{'id': 'kb', 'summary_model_id': 'cheap-id'}]
+        async def load(*args): return ({'id': 'cheap-id', 'type': 'KnowledgeQA', 'source': 'remote'}, None, None)
+        runtime = object.__new__(module.ApplicationRuntime)
+        runtime.principal = SimpleNamespace(tenant_id=332, subject_id='synthetic-subject')
+        runtime.leases = SimpleNamespace(lease=lease)
+        runtime.turns = SimpleNamespace(_resources=resources, _session=session)
+        runtime._snapshot = snapshot; runtime._rows = rows; runtime._runs = {}
+        runtime.models = SimpleNamespace(_load=load); runtime.catalogue = None
+        runtime.conversation = ConversationSettings(source_evidence_mode=startup)
+        runtime.policy = RouterPolicy(mode='DYNAMIC'); runtime.graph_enabled = False
+        body = {'knowledge_base_scope': ['kb', 'kb'], 'document_scope': ['doc', 'doc']}
+        if setting is not None: body['source_evidence_mode'] = setting
+>       created = asyncio.run(runtime.create_session(runtime.principal, SessionCreate(**body)))
+                                                                        ^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SessionCreate
+E       source_evidence_mode
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='bounded_source_v1', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+tests\weknora_port\test_conversation_configuration.py:288: ValidationError
+_ test_formal_session_source_evidence_roundtrip_to_actual_configuration[off-bounded_source_v1-off] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000166A17948A0>
+setting = 'off', startup = 'bounded_source_v1', expected = 'off'
+
+    @pytest.mark.parametrize('setting,startup,expected', [
+        ('bounded_source_v1', 'off', 'bounded_source_v1'),
+        ('off', 'bounded_source_v1', 'off'),
+        (None, 'off', 'off'),
+        (None, 'bounded_source_v1', 'bounded_source_v1'),
+    ])
+    def test_formal_session_source_evidence_roundtrip_to_actual_configuration(monkeypatch, setting, startup, expected):
+        import asyncio, json, re
+        from contextlib import asynccontextmanager
+        from types import SimpleNamespace
+        import backend.weknora_port.runtime as module
+        from backend.weknora_port.http_api import SessionCreate
+        from backend.weknora_port.models.types import CallContext, TrustedScope
+        from backend.weknora_port.generation import RouterPolicy
+        stored = {}
+        resource_checks = []
+        class Registry:
+            def __init__(self, *args, **kwargs): pass
+            async def chat(self, *args):
+                return SimpleNamespace(config=SimpleNamespace(supports_vision=False))
+        monkeypatch.setattr(module, 'NeutralModelRegistry', Registry)
+        @asynccontextmanager
+        async def transaction(): yield
+        async def execute(sql, params):
+            columns = re.search(r'INSERT INTO sessions\((.*?)\) VALUES', sql).group(1).split(',')
+            stored.update(zip(columns, params))
+            for name in ('context_config', 'summary_parameters', 'knowledge_base_scope', 'document_scope'):
+                if name in stored: stored[name] = json.loads(stored[name])
+        @asynccontextmanager
+        async def lease():
+            yield SimpleNamespace(connection=SimpleNamespace(transaction=transaction, execute=execute))
+        async def resources(guard, kbs, docs): resource_checks.append((kbs, docs))
+        async def session(*args): return stored
+        async def snapshot(*args):
+            return SimpleNamespace(model_id=lambda role: 'cheap-id', model_ids=(('cheap', 'cheap-id'), ('rerank', 'rerank-id')))
+        async def rows(*args): return [{'id': 'kb', 'summary_model_id': 'cheap-id'}]
+        async def load(*args): return ({'id': 'cheap-id', 'type': 'KnowledgeQA', 'source': 'remote'}, None, None)
+        runtime = object.__new__(module.ApplicationRuntime)
+        runtime.principal = SimpleNamespace(tenant_id=332, subject_id='synthetic-subject')
+        runtime.leases = SimpleNamespace(lease=lease)
+        runtime.turns = SimpleNamespace(_resources=resources, _session=session)
+        runtime._snapshot = snapshot; runtime._rows = rows; runtime._runs = {}
+        runtime.models = SimpleNamespace(_load=load); runtime.catalogue = None
+        runtime.conversation = ConversationSettings(source_evidence_mode=startup)
+        runtime.policy = RouterPolicy(mode='DYNAMIC'); runtime.graph_enabled = False
+        body = {'knowledge_base_scope': ['kb', 'kb'], 'document_scope': ['doc', 'doc']}
+        if setting is not None: body['source_evidence_mode'] = setting
+>       created = asyncio.run(runtime.create_session(runtime.principal, SessionCreate(**body)))
+                                                                        ^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SessionCreate
+E       source_evidence_mode
+E         Extra inputs are not permitted [type=extra_forbidden, input_value='off', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+
+tests\weknora_port\test_conversation_configuration.py:288: ValidationError
+__ test_session_source_evidence_mode_http_accepts_only_explicit_setting[off] __
+
+setting = 'off'
+
+    @pytest.mark.parametrize('setting', ['off', 'bounded_source_v1', None])
+    def test_session_source_evidence_mode_http_accepts_only_explicit_setting(setting):
+        async def exercise():
+            runtime, _, client = make_client()
+            requests = []
+            original = runtime.create_session
+            async def capture(principal, request):
+                requests.append(request)
+                return await original(principal, request)
+            runtime.create_session = capture
+            body = {'knowledge_base_scope': ['kb-1'], 'document_scope': ['doc-1']}
+            if setting is not None:
+                body['source_evidence_mode'] = setting
+            async with client:
+                response = await client.post('/api/v1/sessions', json=body)
+            assert response.status_code == 200
+            assert requests[0].source_evidence_mode == setting
+            assert requests[0].knowledge_base_scope == ['kb-1']
+            assert requests[0].document_scope == ['doc-1']
+            assert runtime.principals == [PRINCIPAL]
+>       asyncio.run(exercise())
+
+tests\weknora_port\test_http_api.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def exercise():
+        runtime, _, client = make_client()
+        requests = []
+        original = runtime.create_session
+        async def capture(principal, request):
+            requests.append(request)
+            return await original(principal, request)
+        runtime.create_session = capture
+        body = {'knowledge_base_scope': ['kb-1'], 'document_scope': ['doc-1']}
+        if setting is not None:
+            body['source_evidence_mode'] = setting
+        async with client:
+            response = await client.post('/api/v1/sessions', json=body)
+>       assert response.status_code == 200
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tests\weknora_port\test_http_api.py:502: AssertionError
+_ test_session_source_evidence_mode_http_accepts_only_explicit_setting[bounded_source_v1] _
+
+setting = 'bounded_source_v1'
+
+    @pytest.mark.parametrize('setting', ['off', 'bounded_source_v1', None])
+    def test_session_source_evidence_mode_http_accepts_only_explicit_setting(setting):
+        async def exercise():
+            runtime, _, client = make_client()
+            requests = []
+            original = runtime.create_session
+            async def capture(principal, request):
+                requests.append(request)
+                return await original(principal, request)
+            runtime.create_session = capture
+            body = {'knowledge_base_scope': ['kb-1'], 'document_scope': ['doc-1']}
+            if setting is not None:
+                body['source_evidence_mode'] = setting
+            async with client:
+                response = await client.post('/api/v1/sessions', json=body)
+            assert response.status_code == 200
+            assert requests[0].source_evidence_mode == setting
+            assert requests[0].knowledge_base_scope == ['kb-1']
+            assert requests[0].document_scope == ['doc-1']
+            assert runtime.principals == [PRINCIPAL]
+>       asyncio.run(exercise())
+
+tests\weknora_port\test_http_api.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def exercise():
+        runtime, _, client = make_client()
+        requests = []
+        original = runtime.create_session
+        async def capture(principal, request):
+            requests.append(request)
+            return await original(principal, request)
+        runtime.create_session = capture
+        body = {'knowledge_base_scope': ['kb-1'], 'document_scope': ['doc-1']}
+        if setting is not None:
+            body['source_evidence_mode'] = setting
+        async with client:
+            response = await client.post('/api/v1/sessions', json=body)
+>       assert response.status_code == 200
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+
+tests\weknora_port\test_http_api.py:502: AssertionError
+_ test_session_source_evidence_mode_http_accepts_only_explicit_setting[None] __
+
+setting = None
+
+    @pytest.mark.parametrize('setting', ['off', 'bounded_source_v1', None])
+    def test_session_source_evidence_mode_http_accepts_only_explicit_setting(setting):
+        async def exercise():
+            runtime, _, client = make_client()
+            requests = []
+            original = runtime.create_session
+            async def capture(principal, request):
+                requests.append(request)
+                return await original(principal, request)
+            runtime.create_session = capture
+            body = {'knowledge_base_scope': ['kb-1'], 'document_scope': ['doc-1']}
+            if setting is not None:
+                body['source_evidence_mode'] = setting
+            async with client:
+                response = await client.post('/api/v1/sessions', json=body)
+            assert response.status_code == 200
+            assert requests[0].source_evidence_mode == setting
+            assert requests[0].knowledge_base_scope == ['kb-1']
+            assert requests[0].document_scope == ['doc-1']
+            assert runtime.principals == [PRINCIPAL]
+>       asyncio.run(exercise())
+
+tests\weknora_port\test_http_api.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_http_api.py:503: in exercise
+    assert requests[0].source_evidence_mode == setting
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SessionCreate(knowledge_base_scope=['kb-1'], document_scope=['doc-1'], title='�¶Ի�')
+item = 'source_evidence_mode'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'SessionCreate' object has no attribute 'source_evidence_mode'
+
+E:\RAG quention\.venv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_conversation_configuration.py::test_formal_session_source_evidence_roundtrip_to_actual_configuration[bounded_source_v1-off-bounded_source_v1]
+FAILED tests/weknora_port/test_conversation_configuration.py::test_formal_session_source_evidence_roundtrip_to_actual_configuration[off-bounded_source_v1-off]
+FAILED tests/weknora_port/test_http_api.py::test_session_source_evidence_mode_http_accepts_only_explicit_setting[off]
+FAILED tests/weknora_port/test_http_api.py::test_session_source_evidence_mode_http_accepts_only_explicit_setting[bounded_source_v1]
+FAILED tests/weknora_port/test_http_api.py::test_session_source_evidence_mode_http_accepts_only_explicit_setting[None]
+================= 5 failed, 10 passed, 56 deselected in 1.77s =================

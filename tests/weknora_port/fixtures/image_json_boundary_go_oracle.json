@@ -1,0 +1,158 @@
+{
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "oracle_program_sha256": "2cafbd47675952cc31d78f5a5ceb84a33b1c197c464dff315d0dfc0ab58a7527",
+  "scope": "existing source-extracted collector/enrich/type; actual Go encoding/json",
+  "exit_code": 0,
+  "cases": [
+    {
+      "name": "uppercase",
+      "raw": "[{\"URL\":\"images/a.png\",\"Caption\":\"Uppercase caption\",\"OCR_Text\":\"Uppercase OCR\"}]",
+      "expected_parent": "[{\"url\":\"images/a.png\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"Uppercase caption\",\"ocr_text\":\"Uppercase OCR\"}]"
+    },
+    {
+      "name": "all-mixed-fields",
+      "raw": "[{\"uRl\":\"a\",\"ORIGINAL_URL\":\"o\",\"StArT_PoS\":-3,\"END_POS\":8,\"cApTiOn\":\"C\",\"OcR_TeXt\":\"O\"}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"o\",\"start_pos\":-3,\"end_pos\":8,\"caption\":\"C\",\"ocr_text\":\"O\"}]"
+    },
+    {
+      "name": "case-later-wins",
+      "raw": "[{\"url\":\"first\",\"URL\":\"last\"}]",
+      "expected_parent": "[{\"url\":\"last\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "exact-later-wins",
+      "raw": "[{\"URL\":\"first\",\"url\":\"last\"}]",
+      "expected_parent": "[{\"url\":\"last\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "repeated-exact-order",
+      "raw": "[{\"url\":\"first\",\"URL\":\"middle\",\"url\":\"last\"}]",
+      "expected_parent": "[{\"url\":\"last\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "repeated-case-order",
+      "raw": "[{\"URL\":\"first\",\"url\":\"middle\",\"URL\":\"last\"}]",
+      "expected_parent": "[{\"url\":\"last\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "null-keeps-primitives",
+      "raw": "[{\"url\":\"a\",\"URL\":null,\"caption\":\"keep\",\"Caption\":null,\"start_pos\":7,\"START_POS\":null}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":7,\"end_pos\":0,\"caption\":\"keep\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "null-before-values",
+      "raw": "[{\"URL\":null,\"url\":\"a\",\"start_pos\":null,\"Start_Pos\":0}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "int-0",
+      "raw": "[{\"url\": \"a\", \"start_pos\": 0, \"end_pos\": 0}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "int--1",
+      "raw": "[{\"url\": \"a\", \"start_pos\": -1, \"end_pos\": -1}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":-1,\"end_pos\":-1,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "int--9223372036854775808",
+      "raw": "[{\"url\": \"a\", \"start_pos\": -9223372036854775808, \"end_pos\": -9223372036854775808}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":-9223372036854775808,\"end_pos\":-9223372036854775808,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "int-9223372036854775807",
+      "raw": "[{\"url\": \"a\", \"start_pos\": 9223372036854775807, \"end_pos\": 9223372036854775807}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":9223372036854775807,\"end_pos\":9223372036854775807,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "int--9223372036854775809",
+      "raw": "[{\"url\": \"a\", \"start_pos\": -9223372036854775809, \"end_pos\": -9223372036854775809}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "int-9223372036854775808",
+      "raw": "[{\"url\": \"a\", \"start_pos\": 9223372036854775808, \"end_pos\": 9223372036854775808}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "wrong-then-valid-still-rejected",
+      "raw": "[{\"url\":\"a\",\"start_pos\":false,\"START_POS\":0}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "valid-then-wrong-rejected",
+      "raw": "[{\"url\":\"a\",\"start_pos\":0,\"Start_Pos\":\"1\"}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "wrong-string-then-valid",
+      "raw": "[{\"URL\":false,\"url\":\"a\"}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "bad-second-item-invalidates-array",
+      "raw": "[{\"url\":\"a\"},{\"URL\":\"b\",\"END_POS\":9223372036854775808}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "fraction-not-int",
+      "raw": "[{\"URL\":\"a\",\"Start_Pos\":1.0}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "exponent-not-int",
+      "raw": "[{\"url\":\"a\",\"start_pos\":0e0}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "bool-not-int",
+      "raw": "[{\"url\":\"a\",\"start_pos\":true}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "object-not-string",
+      "raw": "[{\"url\":\"a\",\"CAPTION\":{}}]",
+      "expected_parent": ""
+    },
+    {
+      "name": "null-array-item",
+      "raw": "[null,{\"URL\":\"a\",\"Caption\":null,\"end_pos\":null}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "unknown-fields-ignored",
+      "raw": "[{\"URL\":\"a\",\"page_number\":9223372036854775808,\"binding\":{\"URL\":false}}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "root-null",
+      "raw": "null",
+      "expected_parent": ""
+    },
+    {
+      "name": "root-object",
+      "raw": "{\"URL\":\"a\"}",
+      "expected_parent": ""
+    },
+    {
+      "name": "root-empty-array",
+      "raw": "[]",
+      "expected_parent": ""
+    },
+    {
+      "name": "array-scalar",
+      "raw": "[{\"URL\":\"a\"},false]",
+      "expected_parent": ""
+    },
+    {
+      "name": "unicode-simple-fold-s",
+      "raw": "[{\"URL\":\"a\",\"ſtart_poſ\":9}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":9,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    },
+    {
+      "name": "no-unicode-full-casefold-expansion",
+      "raw": "[{\"URL\":\"a\",\"ﬆart_pos\":9}]",
+      "expected_parent": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+    }
+  ]
+}

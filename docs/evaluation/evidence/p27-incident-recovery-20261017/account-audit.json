@@ -1,0 +1,283 @@
+{
+  "at": "2026-10-17T07:55:13.340530+00:00",
+  "access": "read-only",
+  "real_provider_requests": 0,
+  "postgres_identity": {
+    "database": "weknora_python_port_20261013",
+    "system_identifier": "7696088403504697382"
+  },
+  "months": [
+    {
+      "account_id": "deepseek-owner-main",
+      "provider": "deepseek",
+      "month": "2026-10-01",
+      "limit_tokens": 1000000,
+      "carry_in_tokens": 0,
+      "carry_status": "KNOWN",
+      "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+      "approval_source": "OWNER:20261015-real-egress:0f16e911c36ee71d841c7c63403bc9ec803a196c2188c4a4e12d2351db866bad",
+      "blocked_reason": "USAGE_EXCEEDS_RESERVATION"
+    },
+    {
+      "account_id": "siliconflow-owner-main",
+      "provider": "siliconflow",
+      "month": "2026-10-01",
+      "limit_tokens": 1693086,
+      "carry_in_tokens": 14,
+      "carry_status": "KNOWN",
+      "carry_source": "LEDGER:real/embedding-0:14-preserved-original-bucket",
+      "approval_source": "OWNER:20261016-unrestricted-siliconflow-MVP",
+      "blocked_reason": ""
+    }
+  ],
+  "token_calls": [
+    {
+      "account_id": "deepseek-owner-main",
+      "budget_provider": "deepseek",
+      "provider": "deepseek",
+      "month": "2026-10-01",
+      "model": "deepseek-flash",
+      "capability": "chat",
+      "state": "unknown",
+      "rows": 1,
+      "reserved_input": "195",
+      "reserved_output": "64",
+      "held_tokens": "259",
+      "actual_total": null,
+      "known_lower_bound": "221"
+    },
+    {
+      "account_id": "deepseek-owner-main",
+      "budget_provider": "deepseek",
+      "provider": "siliconflow",
+      "month": "2026-10-01",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "state": "settled",
+      "rows": 1,
+      "reserved_input": "85",
+      "reserved_output": "0",
+      "held_tokens": "14",
+      "actual_total": "14",
+      "known_lower_bound": "14"
+    },
+    {
+      "account_id": "siliconflow-owner-main",
+      "budget_provider": "siliconflow",
+      "provider": "siliconflow",
+      "month": "2026-10-01",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "state": "settled",
+      "rows": 395,
+      "reserved_input": "758979",
+      "reserved_output": "0",
+      "held_tokens": "202980",
+      "actual_total": "202980",
+      "known_lower_bound": "202980"
+    },
+    {
+      "account_id": "siliconflow-owner-main",
+      "budget_provider": "siliconflow",
+      "provider": "siliconflow",
+      "month": "2026-10-01",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "state": "settled",
+      "rows": 23,
+      "reserved_input": "424535",
+      "reserved_output": "0",
+      "held_tokens": "115504",
+      "actual_total": "115504",
+      "known_lower_bound": "115504"
+    },
+    {
+      "account_id": "siliconflow-owner-main",
+      "budget_provider": "siliconflow",
+      "provider": "siliconflow",
+      "month": "2026-10-01",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "state": "unknown",
+      "rows": 61,
+      "reserved_input": "823355",
+      "reserved_output": "0",
+      "held_tokens": "823355",
+      "actual_total": null,
+      "known_lower_bound": "0"
+    },
+    {
+      "account_id": "siliconflow-owner-main",
+      "budget_provider": "siliconflow",
+      "provider": "siliconflow",
+      "month": "2026-10-01",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "state": "settled",
+      "rows": 247,
+      "reserved_input": "2141801",
+      "reserved_output": "193548",
+      "held_tokens": "551233",
+      "actual_total": "551233",
+      "known_lower_bound": "551233"
+    }
+  ],
+  "preservation_hashes": {
+    "deepseek-owner-main": {
+      "rows": 2,
+      "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30"
+    },
+    "siliconflow-owner-main": {
+      "rows": 726,
+      "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a"
+    }
+  },
+  "monetary_history_schema": [
+    {
+      "table_name": "send_budget_months",
+      "column_name": "account_id"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "month"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "budget_microunits"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "carry_in_microunits"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "carry_in_status"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "carry_in_source"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "approval_source"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "blocked_reason"
+    },
+    {
+      "table_name": "send_budget_months",
+      "column_name": "created_at"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "request_id"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "tenant_id"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "subject_id"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "session_id"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "account_id"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "budget_month"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "provider"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "model"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "model_id"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "capability"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "endpoint"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "wire_sha256"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "wire_bytes"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "output_budget"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "retrieval_kbs"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "retrieval_documents"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "origin_kbs"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "permission_source"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "price_source"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "estimator_source"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "reserved_microunits"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "actual_microunits"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "state"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "outcome"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "usage"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "created_at"
+    },
+    {
+      "table_name": "send_calls",
+      "column_name": "finished_at"
+    }
+  ],
+  "monetary_send_groups": [],
+  "shared_account_consumers": "NOT_VERIFIED: local ledger cannot establish provider-account-wide external consumers"
+}

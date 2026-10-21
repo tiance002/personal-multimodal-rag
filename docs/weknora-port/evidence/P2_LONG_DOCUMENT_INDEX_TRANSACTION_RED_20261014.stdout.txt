@@ -1,0 +1,57 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_actual_longbench_source_crosses_parallel_batch_boundary _________
+
+    def test_actual_longbench_source_crosses_parallel_batch_boundary():
+        async def scenario():
+            frozen=load_frozen_gold('E:/RAG quention/var/reports/v6-full40-evaluation-entry-r4-r17/frozen-local/source_manifest_40.json','05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d')
+            dataset=next(d for d in frozen.datasets if d.name=='longbench-zh');source=dataset.documents[0]
+            raw=(source.title+'\n'+source.text).encode('utf-8')
+            async with isolated_mock_application() as (runtime,wire,root):
+                kb=(await runtime.create_knowledge_base(runtime.principal,'LongBench source index boundary'))['id']
+                await prepare_public_fixture(runtime,kb,'longbench-zh')
+                document=await runtime.upload_document(runtime.principal,kb,'longbench-source.txt','text/plain',raw)
+                assert document['status']=='completed',document
+                async with runtime.leases.lease() as guard:
+                    chunks=(await (await guard.connection.execute('SELECT count(*) AS n FROM chunks WHERE tenant_id=%s AND knowledge_id=%s AND deleted_at IS NULL',(runtime.principal.tenant_id,document['id']))).fetchone())['n']
+                    indices=(await (await guard.connection.execute('SELECT count(*) AS n FROM embeddings WHERE knowledge_id=%s AND is_enabled=true',(document['id'],))).fetchone())['n']
+                assert chunks>40 and indices==chunks
+                original=await runtime.read_document(runtime.principal,kb,document['id']);assert original.content==raw
+                Path('docs/weknora-port/evidence/P2_LONG_DOCUMENT_INDEX_20261014.json').write_text(json.dumps({'kind':'ACTUAL_FROZEN_LONG_SOURCE_INDEX_BOUNDARY','source_id':source.doc_id,'source_sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'native_document':document['id'],'knowledge_base':kb,'chunks':chunks,'active_indices':indices,'original_hash_verified':True,'model_transport':'CLOSED_MOCK','real_provider_calls':0},indent=2),encoding='utf-8')
+>       actual_pg_run(scenario())
+
+tests\weknora_port\test_long_document_index_pg.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        frozen=load_frozen_gold('E:/RAG quention/var/reports/v6-full40-evaluation-entry-r4-r17/frozen-local/source_manifest_40.json','05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d')
+        dataset=next(d for d in frozen.datasets if d.name=='longbench-zh');source=dataset.documents[0]
+        raw=(source.title+'\n'+source.text).encode('utf-8')
+        async with isolated_mock_application() as (runtime,wire,root):
+            kb=(await runtime.create_knowledge_base(runtime.principal,'LongBench source index boundary'))['id']
+            await prepare_public_fixture(runtime,kb,'longbench-zh')
+            document=await runtime.upload_document(runtime.principal,kb,'longbench-source.txt','text/plain',raw)
+>           assert document['status']=='completed',document
+E           AssertionError: {'id': '22476340-ec87-44b1-bdab-5a63d922c84d', 'knowledge_base_id': 'c4773256-9f8d-472a-94fe-4078e4eab436', 'filename': 'longbench-source.txt', 'status': 'failed', ...}
+E           assert 'failed' == 'completed'
+E             
+E             - completed
+E             + failed
+
+tests\weknora_port\test_long_document_index_pg.py:19: AssertionError
+---------------------------- Captured stdout call -----------------------------
+PUBLIC_FULL_CORPUS_ERROR OutOfOrderTransactionNesting transaction commit at the wrong nesting level: <psycopg.AsyncTransaction (active) [INTRANS] (host=127.0.0.1 port=56423 user=port_fixture database=weknora_python_port_20261013) at 0x24bf3b674a0> [('E:\\RAG quention\\.venv\\Lib\\site-packages\\psycopg\\transaction.py', 282, '__aexit__'), ('E:\\RAG quention\\.venv\\Lib\\site-packages\\psycopg\\connection_async.py', 487, 'wait'), ('E:\\RAG quention\\.venv\\Lib\\site-packages\\psycopg\\waiting.py', 131, 'wait_async'), ('E:\\RAG quention\\.venv\\Lib\\site-packages\\psycopg\\transaction.py', 105, '_exit_gen'), ('E:\\RAG quention\\.venv\\Lib\\site-packages\\psycopg\\transaction.py', 127, '_commit_gen')]
+PUBLIC_FULL_CORPUS_ERROR ExceptionGroup unhandled errors in a TaskGroup (1 sub-exception) [('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\documents.py', 349, 'upload_document'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\storage\\indexing.py', 103, 'batch_index'), ('D:\\Drivers\\python\\Lib\\asyncio\\taskgroups.py', 154, '__aexit__')]
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_long_document_index_pg.py::test_actual_longbench_source_crosses_parallel_batch_boundary
+1 failed in 2.58s

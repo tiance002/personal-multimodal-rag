@@ -1,0 +1,16 @@
+
+=================================== ERRORS ====================================
+_____ ERROR collecting tests/weknora_port/test_qa_followup_fallback_pg.py _____
+ImportError while importing test module 'E:\WK\qa-entry\tests\weknora_port\test_qa_followup_fallback_pg.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+D:\Drivers\python\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_followup_fallback_pg.py:7: in <module>
+    from .native_fixture import isolated_mock_application
+E   ImportError: attempted relative import with no known parent package
+=========================== short test summary info ===========================
+ERROR tests/weknora_port/test_qa_followup_fallback_pg.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 1.11s

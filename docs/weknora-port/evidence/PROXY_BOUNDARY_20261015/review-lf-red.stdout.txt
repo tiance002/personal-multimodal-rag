@@ -1,0 +1,38 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______ test_lf_only_non200_connect_cannot_reach_target_tls_or_body[201] _______
+tests\weknora_port\test_proxy_boundary.py:241: in test_lf_only_non200_connect_cannot_reach_target_tls_or_body
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:239: in run
+    with pytest.raises(httpx.ProxyError):await client.post("https://api.example/v1",content=b"MODEL_BODY")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProxyError
+______ test_lf_only_non200_connect_cannot_reach_target_tls_or_body[299] _______
+tests\weknora_port\test_proxy_boundary.py:241: in test_lf_only_non200_connect_cannot_reach_target_tls_or_body
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:239: in run
+    with pytest.raises(httpx.ProxyError):await client.post("https://api.example/v1",content=b"MODEL_BODY")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProxyError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_proxy_boundary.py::test_lf_only_non200_connect_cannot_reach_target_tls_or_body[201]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_lf_only_non200_connect_cannot_reach_target_tls_or_body[299]
+2 failed, 31 deselected in 0.75s

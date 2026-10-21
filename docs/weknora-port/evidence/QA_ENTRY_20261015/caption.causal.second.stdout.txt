@@ -1,0 +1,35 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_caption_language_assertion_task_and_send_ledger_causal_comparison ____
+tests\weknora_port\test_qa_caption_causal_pg.py:67: in test_caption_language_assertion_task_and_send_ledger_causal_comparison
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_caption_causal_pg.py:40: in scenario
+    assert asyncio.get_running_loop().time()<deadline,tasks
+E   AssertionError: [{'id': '8b6af3fd-4880-4335-a935-4b33b1b44fae', 'state': 'retry', 'error_code': 'IMAGE_TASK_PROCESSING_FAILED', 'outcomes': {'0': {'caption': {'status': 'sending'}, 'ocr_text': {'status': 'sending'}}}, ...}]
+E   assert 5912.7873497 < 5912.7873312
+E    +  where 5912.7873497 = time()
+E    +    where time = <_WindowsSelectorEventLoop running=True closed=False debug=False>.time
+E    +      where <_WindowsSelectorEventLoop running=True closed=False debug=False> = <built-in function get_running_loop>()
+E    +        where <built-in function get_running_loop> = asyncio.get_running_loop
+============================== warnings summary ===============================
+tests/weknora_port/test_qa_caption_causal_pg.py::test_caption_language_assertion_task_and_send_ledger_causal_comparison
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_qa_caption_causal_pg.py::test_caption_language_assertion_task_and_send_ledger_causal_comparison
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_qa_caption_causal_pg.py::test_caption_language_assertion_task_and_send_ledger_causal_comparison
+1 failed, 2 warnings in 38.31s

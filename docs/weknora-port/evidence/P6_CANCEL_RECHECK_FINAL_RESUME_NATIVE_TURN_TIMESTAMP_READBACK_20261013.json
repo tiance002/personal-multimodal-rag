@@ -1,0 +1,87 @@
+{
+  "kind": "actual-isolated-pg-synthetic-records",
+  "system_identifier": "7696088403504697382",
+  "database": "weknora_python_port_20261013",
+  "model_calls": 0,
+  "old_database_writes": 0,
+  "cases": {
+    "concurrent_restart": {
+      "migration_sha256": "ff212d6db2cd21a8823019d47aae4b34aad3b6a2b6df7f39ed3286c7ccf7bf3d",
+      "tenant_id": 1,
+      "session_id": "efb4ee71-0011-4b62-b908-871271d2940e",
+      "client_request_id": "04788126-015e-46e7-94cc-8cf51e8d6d8e",
+      "run_id": "a8578fe8-1f1a-4bb5-b332-edae9faecb62",
+      "messages": [
+        {
+          "id": "37b10d91-143a-4932-a4a2-3bf0c1ea54ac",
+          "role": "assistant",
+          "request_id": "a8578fe8-1f1a-4bb5-b332-edae9faecb62"
+        },
+        {
+          "id": "08f32e03-ba99-4f01-863a-0fc382dd68c7",
+          "role": "user",
+          "request_id": "a8578fe8-1f1a-4bb5-b332-edae9faecb62"
+        }
+      ],
+      "concurrent_new_count": 1,
+      "restart_replay_only": true,
+      "changed_payload_denied": true
+    },
+    "scope_deletion": {
+      "session_id": "89b81824-37c3-4e76-a388-6fb864c3a65a",
+      "other_session_id": "887c4cc1-4ca7-4640-874e-de819de4f584",
+      "client_request_id": "9dc8dbd6-4c1d-4bc0-8746-88d5c93d8e8e",
+      "run_ids": [
+        "c7f854e9-8264-4267-96b9-5288173312bc",
+        "2f1f970a-2d47-4497-8dd7-7a3ba736ee28"
+      ],
+      "scope_expansion_denied": true,
+      "changed_session_scope_denied": true,
+      "deleted_document_denied": true,
+      "deleted_session_denied": true,
+      "long_client_id_denied": true
+    },
+    "failure_final": {
+      "session_id": "b87ec2fe-796c-4871-b506-bb7b92d0352f",
+      "failed_run_id": "df88663c-49ab-4652-850d-7b2f386381c0",
+      "successful_run_id": "bcfb3e4c-2608-444e-96eb-3ec0c3c05ccd",
+      "messages": [
+        {
+          "id": "25e26c0c-6e5f-4a67-b7b0-d238d05ef3f1",
+          "role": "assistant",
+          "content": "fixture committed answer",
+          "is_completed": true,
+          "turn_status": "pending",
+          "turn_error_code": ""
+        },
+        {
+          "id": "91c85284-b9bf-46fc-a9da-0108014b3a63",
+          "role": "assistant",
+          "content": "",
+          "is_completed": false,
+          "turn_status": "error",
+          "turn_error_code": "MODEL_USAGE_UNKNOWN"
+        },
+        {
+          "id": "9f2cef94-fbf7-4f3f-b38a-9b60260b71b3",
+          "role": "user",
+          "content": "fixture final question",
+          "is_completed": true,
+          "turn_status": "pending",
+          "turn_error_code": ""
+        },
+        {
+          "id": "ec553a47-c93b-466e-a410-e675adfc4d58",
+          "role": "user",
+          "content": "fixture failure question",
+          "is_completed": true,
+          "turn_status": "pending",
+          "turn_error_code": ""
+        }
+      ],
+      "late_failure_receipt": false,
+      "late_final_after_failure_denied": true,
+      "budget_ledger_operations": 0
+    }
+  }
+}

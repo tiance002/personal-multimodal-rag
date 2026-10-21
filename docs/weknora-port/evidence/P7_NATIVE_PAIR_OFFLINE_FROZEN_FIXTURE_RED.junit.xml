@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="0.750" timestamp="2026-10-14T07:53:12.244369+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_native_paired" name="test_native_roles_share_one_preparation_and_original_baseline_binding" time="0.003"><failure message="dataclasses.FrozenInstanceError: cannot assign to field 'endpoint_url'">def test_native_roles_share_one_preparation_and_original_baseline_binding():
+        async def scenario():
+            service,repo,retrieval,co,cheap,expensive,store,committer,counts=runtime()
+            cheap.config.endpoint_url='';expensive.config.endpoint_url=''
+            class Registry:
+                closed=0
+                async def get(self,key,context):return cheap if key=='cheap-id' else expensive
+                async def chat(self,key,context):return await self.get(key,context)
+                async def close(self):self.closed+=1
+            registry=Registry();runs={};original_config=service.configuration
+            async def config(turn):
+                runs[turn.run_id]={'registry':registry,'snapshot':SimpleNamespace(model_ids=(('cheap','cheap-id'),('expensive','expensive-id'))),'chat_id':'cheap-id'}
+                return original_config(turn)
+            service.configuration=config
+            app=SimpleNamespace(ordinary=service,_runs=runs,principal=SimpleNamespace(tenant_id=1,subject_id='owner'),policy=co.policy if hasattr(co,'policy') else None,store=store,turns=repo,estimator=None)
+            async def rows(*args):return []
+            app._rows=rows
+            async def generation(turn,progress,policy=None):
+                result=await ApplicationRuntime._generation(app,turn,progress,policy=policy)
+                result.lifecycle=Lifecycle();result.committer=Committer(store)
+                return result
+            app._generation=generation
+            turns=tuple([await repo.accept(replace(REQ,request_id='paired-'+mode),'owner') for mode in MODES])
+            result=await execute_native_pair(app,turns,execution_kind='ISOLATED_MOCK')
+            assert counts['pipeline']==1 and len(retrieval.calls)==1
+            assert [r['result'].selected_role for r in result.outcomes]==['baseline','cheap','expensive','expensive']
+            assert [r['result'].upgraded for r in result.outcomes]==[False,False,False,True]
+            assert len(cheap.calls)==3 and len(expensive.calls)==2
+            messages=[row[0] for row in cheap.calls+expensive.calls]
+            assert all(row==messages[0] for row in messages)
+            assert all(r['result'].prompt_sha256==result.prompt_sha256 and r['result'].context_sha256==result.context_sha256 for r in result.outcomes)
+            assert result.model_quality_status=='NOT_RUN_SIMULATED_MODELS'
+            assert registry.closed==1 and not runs
+&gt;       asyncio.run(scenario())
+
+tests\weknora_port\test_native_paired.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_native_paired.py:16: in scenario
+    cheap.config.endpoint_url='';expensive.config.endpoint_url=''
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = ModelConfig(provider='siliconflow', model='XingChenAGI/Xing4.0-29B', model_id='XingChenAGI/Xing4.0-29B', base_url='htt...gh': 32768}, 'thinking_mode': 'budget'}}, cataloged=False, model_type='KnowledgeQA', supports_dimension_override=False)
+name = 'endpoint_url', value = ''
+
+&gt;   ???
+E   dataclasses.FrozenInstanceError: cannot assign to field 'endpoint_url'
+
+&lt;string&gt;:41: FrozenInstanceError</failure></testcase><testcase classname="tests.weknora_port.test_native_paired" name="test_pair_rejects_scope_or_query_change_before_preparation" time="0.002" /></testsuite></testsuites>

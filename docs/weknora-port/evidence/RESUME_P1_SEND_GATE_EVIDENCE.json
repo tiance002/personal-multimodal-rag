@@ -1,0 +1,236 @@
+{
+  "kind": "actual-isolated-pg-synthetic-send-gate",
+  "model_calls": 0,
+  "http_sends": 0,
+  "old_database_writes": 0,
+  "cases": {
+    "ledger_states": {
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382",
+      "migration_sha256": "93281549bfc22978f8e47d86aaf6c0e62584ad685a1d72f14e15f9b3bc3df6d1",
+      "account_id": "fixture-send-gate-3a64fe95-a131-4d7c-9935-6ad4cc19a41f",
+      "carry_in": 10,
+      "used_with_carry": 82,
+      "records": [
+        {
+          "request_id": "fixture-de2bb2a7-e90b-4e98-a6af-bb7920bedea9",
+          "tenant_id": 2000000002,
+          "subject_id": "owner",
+          "session_id": "session",
+          "account_id": "fixture-send-gate-3a64fe95-a131-4d7c-9935-6ad4cc19a41f",
+          "budget_month": "2026-10-01",
+          "provider": "provider",
+          "model": "model",
+          "model_id": "model-id",
+          "capability": "chat",
+          "endpoint": "https://fixture.invalid/chat",
+          "wire_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "wire_bytes": 100,
+          "output_budget": 32,
+          "retrieval_kbs": [
+            "kb"
+          ],
+          "retrieval_documents": [],
+          "origin_kbs": [
+            "kb"
+          ],
+          "permission_source": "fixture-only-no-http",
+          "price_source": "fixture-price-v1",
+          "estimator_source": "fixture-upper-bound",
+          "reserved_microunits": 30,
+          "actual_microunits": null,
+          "state": "unknown",
+          "outcome": "UNKNOWN",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unreported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "created_at": "2026-10-13 10:03:55.599646+00:00",
+          "finished_at": "2026-10-13 10:03:55.620203+00:00"
+        },
+        {
+          "request_id": "fixture-ace60bdf-6819-4101-84fc-7a1ff2215c93",
+          "tenant_id": 2000000002,
+          "subject_id": "owner",
+          "session_id": "session",
+          "account_id": "fixture-send-gate-3a64fe95-a131-4d7c-9935-6ad4cc19a41f",
+          "budget_month": "2026-10-01",
+          "provider": "provider",
+          "model": "model",
+          "model_id": "model-id",
+          "capability": "chat",
+          "endpoint": "https://fixture.invalid/chat",
+          "wire_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "wire_bytes": 100,
+          "output_budget": 32,
+          "retrieval_kbs": [
+            "kb"
+          ],
+          "retrieval_documents": [],
+          "origin_kbs": [
+            "kb"
+          ],
+          "permission_source": "fixture-only-no-http",
+          "price_source": "fixture-price-v1",
+          "estimator_source": "fixture-upper-bound",
+          "reserved_microunits": 30,
+          "actual_microunits": 12,
+          "state": "settled",
+          "outcome": "RESPONSE_RECEIVED",
+          "usage": {
+            "status": "REPORTED",
+            "cache_status": "unreported",
+            "total_tokens": 2,
+            "cached_tokens": 0,
+            "prompt_tokens": 1,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": 1,
+            "cache_write_tokens": 0
+          },
+          "created_at": "2026-10-13 10:03:55.634553+00:00",
+          "finished_at": "2026-10-13 10:03:55.650014+00:00"
+        },
+        {
+          "request_id": "fixture-2c3a1df0-dcbd-4866-aa10-1d7e51ac5030",
+          "tenant_id": 2000000002,
+          "subject_id": "owner",
+          "session_id": "session",
+          "account_id": "fixture-send-gate-3a64fe95-a131-4d7c-9935-6ad4cc19a41f",
+          "budget_month": "2026-10-01",
+          "provider": "provider",
+          "model": "model",
+          "model_id": "model-id",
+          "capability": "chat",
+          "endpoint": "https://fixture.invalid/chat",
+          "wire_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "wire_bytes": 100,
+          "output_budget": 32,
+          "retrieval_kbs": [
+            "kb"
+          ],
+          "retrieval_documents": [],
+          "origin_kbs": [
+            "kb"
+          ],
+          "permission_source": "fixture-only-no-http",
+          "price_source": "fixture-price-v1",
+          "estimator_source": "fixture-upper-bound",
+          "reserved_microunits": 30,
+          "actual_microunits": null,
+          "state": "released",
+          "outcome": "NOT_SENT",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unreported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "created_at": "2026-10-13 10:03:55.662377+00:00",
+          "finished_at": "2026-10-13 10:03:55.680618+00:00"
+        },
+        {
+          "request_id": "fixture-d2fdf26a-493a-46d2-a068-9b971d3c419a",
+          "tenant_id": 2000000002,
+          "subject_id": "owner",
+          "session_id": "session",
+          "account_id": "fixture-send-gate-3a64fe95-a131-4d7c-9935-6ad4cc19a41f",
+          "budget_month": "2026-10-01",
+          "provider": "provider",
+          "model": "model",
+          "model_id": "model-id",
+          "capability": "chat",
+          "endpoint": "https://fixture.invalid/chat",
+          "wire_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "wire_bytes": 100,
+          "output_budget": 32,
+          "retrieval_kbs": [
+            "kb"
+          ],
+          "retrieval_documents": [],
+          "origin_kbs": [
+            "kb"
+          ],
+          "permission_source": "fixture-only-no-http",
+          "price_source": "fixture-price-v1",
+          "estimator_source": "fixture-upper-bound",
+          "reserved_microunits": 30,
+          "actual_microunits": null,
+          "state": "reserved",
+          "outcome": "UNKNOWN",
+          "usage": null,
+          "created_at": "2026-10-13 10:03:55.690987+00:00",
+          "finished_at": null
+        }
+      ],
+      "duplicate_authorize": "denied",
+      "unknown_release": "denied",
+      "next_call_exceeds_budget": "denied",
+      "assertions": "PASS",
+      "retained": "synthetic UNKNOWN records in new DB; no model/HTTP send"
+    },
+    "overrun_block": {
+      "system_identifier": "7696088403504697382",
+      "account_id": "fixture-send-gate-06b9b79e-e124-4b17-ac67-8ed838b053d0",
+      "request_id": "fixture-5d39f660-d148-477e-90be-b60165c93212",
+      "record": {
+        "state": "unknown",
+        "reserved_microunits": 30,
+        "actual_microunits": null
+      },
+      "budget": {
+        "account_id": "fixture-send-gate-06b9b79e-e124-4b17-ac67-8ed838b053d0",
+        "month": "2026-10-01",
+        "budget_microunits": 100,
+        "carry_in_microunits": 10,
+        "carry_in_status": "KNOWN",
+        "carry_in_source": "explicit-isolated-fixture-carry",
+        "approval_source": "fixture-monthly-no-http",
+        "blocked_reason": "ACTUAL_COST_EXCEEDS_RESERVATION",
+        "created_at": "2026-10-13 10:03:55.799886+00:00"
+      },
+      "assertions": "PASS",
+      "retained": "synthetic fixture; no model/HTTP call"
+    },
+    "month_lock_two_connections": {
+      "system_identifier": "7696088403504697382",
+      "account_id": "fixture-send-gate-51137527-56bc-41f0-ab38-13e4940a980a",
+      "budget": 50,
+      "carry_in": 10,
+      "each_reservation": 30,
+      "actual_reserved_rows": 1,
+      "admitted": 1,
+      "denied": 1,
+      "assertions": "PASS",
+      "http_sends": 0
+    }
+  },
+  "verification": {
+    "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m pytest --noconftest tests/weknora_port/test_send_gate.py tests/weknora_port/test_send_gate_pg.py -q --tb=short",
+    "exit_code": 0,
+    "sql_double_cases": 24,
+    "actual_pg_cases": 3,
+    "total_passed": 27,
+    "duration_seconds": 0.64,
+    "dsn_source": "WEKNORA_PORT_TEST_DSN; approved isolated fixture; credentials not stored",
+    "loop_factory": "asyncio.SelectorEventLoop",
+    "http_sends": 0,
+    "provider_calls": 0,
+    "old_database_writes": 0
+  }
+}

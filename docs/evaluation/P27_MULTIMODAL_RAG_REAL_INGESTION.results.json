@@ -1,0 +1,2175 @@
+{
+  "schema": "p27-multimodal-rag-real-ingestion/v1",
+  "status": "P27_PARTIAL",
+  "date": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "repository": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "baseline": {
+    "actual_head": "78d277b12ed6ea5eb82a61a73160ef41a5c7027f",
+    "fixed_upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "preexisting_dirty_paths": [
+      ".serena/project.yml",
+      "progress.md",
+      "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+      "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+      "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt"
+    ],
+    "preexisting_staged_paths": [],
+    "preserved": true,
+    "p24_p26_commits": [
+      "cb07fb50874386ade91413e059f096e328c0e47b",
+      "5f949a97bd31b71b33cf51d2e9a2af3253261abc",
+      "78d277b12ed6ea5eb82a61a73160ef41a5c7027f"
+    ]
+  },
+  "blockers": [],
+  "implementation_audit": {
+    "configuration": "backend/weknora_port/image_configuration.py: effective_image_config, _vision_binding, resolve_image_selection; KB defaults and non-empty upload overrides, separate OCR/Caption selection, registry/capability validation; no provider probe.",
+    "pdf_assets": "backend/weknora_port/ingestion/upstream_pdf_parser.py: PDFParser.parse_into_text and _route_locked.",
+    "normal_upload_and_task": "backend/weknora_port/documents.py: upload_document, _process_document, _persist_assets; backend/weknora_port/image_tasks.py; backend/weknora_port/worker.py.",
+    "ocr_caption_persistence": "backend/weknora_port/image_multimodal.py: SourceImageProcessor.process_plan; separate image_ocr/image_caption child chunks with image_info source/page/status.",
+    "retrieval": "backend/weknora_port/documents.py HybridIndexer.batch_index; backend/weknora_port/retrieval/rerank.py and context.py consume persisted caption/ocr_text.",
+    "generation": "backend/weknora_port/generation/context.py; retrieved image bytes are not forwarded as direct model images, so final RAG relies on persisted OCR/Caption text in Context."
+  },
+  "parser_preflight": {
+    "kind": "offline feasibility only; not product-runtime validation",
+    "interpreter": "E:\\WK\\mineru-env\\Scripts\\python.exe",
+    "python": "3.12.7",
+    "pypdfium2": "5.14.0",
+    "evidence_json": "E:\\WK\\run\\p27-20261017\\offline_parser_asset_inventory.json",
+    "exit_code": 0,
+    "warnings": [
+      "PDFium emitted PdfBitmap explicit-close safety warnings after parsing."
+    ],
+    "cases": [
+      {
+        "qid": "row-0684",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "target_physical_page": 10,
+        "page_count": 45,
+        "text_pages": 45,
+        "scanned_pages": 0,
+        "embedded_images": 0,
+        "vector_figures": 0,
+        "asset_count": 0,
+        "target_asset_count": 0,
+        "status": "NOT_RUN"
+      },
+      {
+        "qid": "row-0958",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "target_physical_page": 9,
+        "page_count": 21,
+        "text_pages": 0,
+        "scanned_pages": 21,
+        "embedded_images": 0,
+        "vector_figures": 0,
+        "asset_count": 21,
+        "target_asset_count": 1,
+        "target_asset_path": "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg",
+        "status": "NOT_RUN"
+      }
+    ]
+  },
+  "product_runtime": {
+    "interpreter": "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "python": "3.13.0",
+    "pypdfium2_spec": "5.8.0",
+    "declared_optional_requirement": "pypdfium2==5.8.0",
+    "dependency_check_exit_code": 0,
+    "pypdfium2_import_exit_code": 0,
+    "dependency_fixed_in_local_venv_only": true
+  },
+  "scenarios": {
+    "row-0958": {
+      "qid": "row-0958",
+      "question": "What are two examples of reflecting surfaces?",
+      "gold": [
+        "['shiny object', 'mirror']"
+      ],
+      "kb": "63236a5c-c0d6-499d-84e5-34475564f1c0",
+      "document_id": "3afe479e-723d-42a9-9c80-a7fc8b2eda79",
+      "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+      "source_version": "e34af609-a64d-478a-b3da-8284e3c0bca0",
+      "physical_page": 9,
+      "original_http_readback": {
+        "sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "bytes": 1906963,
+        "matches": true
+      },
+      "task_id": "919ec78c-036a-4651-885b-c186227d9034",
+      "task_state": "completed",
+      "task_attempt": 1,
+      "ocr_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "tesseract",
+          "model_id": "",
+          "capability": "LOCAL_ENGINE"
+        }
+      },
+      "caption_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "vlm",
+          "model_id": "mdl3fc917e2fa4a9429ed45c96ea06cb1feeceb1c19c574aeefd52985a7e7eeb",
+          "capability": "CATALOG_DECLARED"
+        }
+      },
+      "ocr": "Bends the wave when\n[7\nbecause the\nSpreads the wave out\nentering/leaving a\nMWY\nsubstancewould\nwhen going througha\nsubstance to another\nUP\nbe a different\ngap or barrier\n<A仁=\ndensity toanother\nREFLECTION:\nsubstance.\ni?ae\nBounces the wave back\nre x ty Se\ntowards where it came\nPic:\nfp pg gare RN\nky\nfrom\nCs\n一\n°\na\na\na\n——\noe\nRefraction,\nDiffraction\nMaximum diffraction occurs\nwhen: the gap is equal to the\nwave.\nBS:\nAll wave can be reflected and refracted\nMinimum diffraction occurs\n\\/\nwhen: the gap is smaller or\nLaw of Reflection:\nlarger than the wave.\nReflecting surtace, eg shinyet Angle of incidence = Angle of Reflection",
+      "caption": "这张图片是一张关于物理学中**波的特性**的教育图解，主要介绍和解释了波的三种基本现象：**反射（Reflection）**、**折射（Refraction）**和**衍射（Diffraction）**。\n\n图中结合了文字定义和直观的示意图，说明了波在不同介质交界处的反弹与弯曲，以及波穿过缝隙时的扩散规律（如反射定律、波速变化导致折射、缝隙与波长的关系对衍射的影响等）。",
+      "asset_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "actual_vision_wire_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "actual_vision_wire_bytes": 304741,
+      "actual_cap": 5000,
+      "actual_thinking_parameter": null,
+      "vision_usage": {
+        "calls": 1,
+        "input": 1018,
+        "output": 840,
+        "total": 1858,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "input_reservation": 305765,
+      "output_reservation": 5000,
+      "chunk_types": {
+        "text": 6,
+        "summary": 1,
+        "image_ocr": 1,
+        "image_caption": 1
+      },
+      "vector_count": 9,
+      "derived_chunk_ids": [
+        "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+        "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+      ],
+      "parent_chunk_ids": [
+        "48e47fc7-528e-409c-94d8-5819d1ca580a"
+      ],
+      "stages": {
+        "search": {
+          "count": 9,
+          "image_child_ids": [
+            "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+            "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+          ],
+          "image_parent_ids": [
+            "48e47fc7-528e-409c-94d8-5819d1ca580a"
+          ]
+        },
+        "rerank": {
+          "count": 0,
+          "image_child_ids": [],
+          "image_parent_ids": []
+        },
+        "context": {
+          "count": 0,
+          "image_child_ids": [],
+          "image_parent_ids": []
+        }
+      },
+      "caption_in_final_context": false,
+      "ocr_in_final_context": false,
+      "caption_in_actual_final_request": false,
+      "ocr_in_actual_final_request": false,
+      "final_answer_calls": 0,
+      "fixed_refusal": true,
+      "answer": "当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。",
+      "answer_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.0
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "official_judge": "NOT_RUN",
+      "ingestion_seconds": 12.912922,
+      "qa_seconds": 4.644237400003476,
+      "provider_latency_ms": "NOT_CAPTURED_SEPARATELY",
+      "usage": {
+        "calls": 11,
+        "input": 10050,
+        "output": 1053,
+        "total": 11103,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "public_citations_enabled": false,
+      "source_chunk_readback": "PASS: four derived chunks read through ordinary HTTP and checked for page/version/text identity",
+      "full_visual_to_final_chain": false,
+      "status": "QUALITY_FAILURE",
+      "failure_categories": [
+        "VISUAL_DETAILS_NOT_EXTRACTED",
+        "RERANK_FILTERS_ALL_CANDIDATES",
+        "FIXED_EVIDENCE_INSUFFICIENT"
+      ],
+      "manual_answer_correct": false,
+      "necessary_gold_facts_in_derived_text": false,
+      "manual_basis": "Original target image visibly labels shiny object or mirror; OCR corrupts it and Caption only summarizes wave phenomena. No final model call occurred.",
+      "rerank_observer_scores": {
+        "image_ocr": 0.007838763296604156,
+        "image_caption": 0.010727103799581528,
+        "image_parent": 0.014426711946725845
+      },
+      "rerank_input_count": 4,
+      "rerank_output_count": 4,
+      "rerank_score_evidence": "Existing RerankRegistryObserver records model.rerank return; not claiming an additional raw HTTP response capture."
+    },
+    "row-0684": {
+      "qid": "row-0684",
+      "question": "Do more men or women (in %) think a female president will be elected in a lifetime?",
+      "gold": [
+        "men"
+      ],
+      "kb": "2cf0b09f-9524-4a44-810d-45542619ef74",
+      "document_id": "7bf79dd9-f45a-4783-84e1-bc914a484195",
+      "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+      "source_version": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db",
+      "physical_page": 10,
+      "original_http_readback": {
+        "sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "bytes": 5924004,
+        "matches": true
+      },
+      "task_id": "3692d8a9-7771-4b76-9fd8-80216a464832",
+      "task_state": "completed",
+      "task_attempt": 1,
+      "ocr_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "tesseract",
+          "model_id": "",
+          "capability": "LOCAL_ENGINE"
+        }
+      },
+      "caption_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "vlm",
+          "model_id": "mdl3fc917e2fa4a9429ed45c96ea06cb1feeceb1c19c574aeefd52985a7e7eeb",
+          "capability": "CATALOG_DECLARED"
+        }
+      },
+      "ocr": "8\nPEW RESEARCH CENTER\nOther important findings\nVoters pessimistic on how Trump will impact race relations. Nearly half ofvoters (46%) say\nTrump’s election will lead to worse race relations, while only about half as many (25%) expect race\nrelations to improve; 26% say his election won’t make a difference. Among Clinton voters, 84%\nexpect race relations to worsen under Trump. Among Trump supporters, half expect\nimprovement, while 38% say his election won’t makea difference.\nPost-victory, most Trump backers confident in an accurate vote count. ID August, just 38% of\nregistered voters who supported Trump were very confident that their vote would be counted\naccurately. But in the aftermath ofTrump’s\nvictory, 75% expressed confidence that their cs\nvotes were counted accurately. The views of\nWill the country elect a female\nClinton supporters showed no change: After\npresident in your lifetime?\nthe election 67% were confident that their\n% ofvoters who say ...\nvotes were counted accurately.\nNo\nmYes\nAll voters\n17 ol\nMost expect woman president, eventually.\nFollowing Clinton’s defeat, a sizable majority\n—|\nof voters (79%) still expect there will be a\nfemale president “in their lifetime.” There are\nWomen | 48 (ZS\nno significant differences in these opinions\namong men and women, or Clinton supporters\nTrump voters\n47) ETE\nand Trump backers.\nClinton voters\naly [ee\nVoters say press has too much influence.\nNote: Don’t know responses not shown. Q46bb.\nVoters grade the press very negatively, and\nSource: Voter callback survey conducted Nov. 10-14, 2016.\nmost (57%) say it had too much influence on\nPRESSS SEs\nthe outcome of the election. Just 27% say the CT\npress had the right amount of influence on the election, while 13% say it had too little influence.\nAbout six-in-ten Trump voters (62%) say the press had too much influence, as do 50% of Clinton\nvoters.\nwww.pewresearch.org",
+      "caption": "这张图片是**皮尤研究中心（Pew Research Center）**一份关于**2016年美国大选后选民态度**的调查报告页面。\n\n主要内容概括如下：\n*   **左侧文本**：列出了几项重要调查发现，包括选民对特朗普执政后**种族关系**的悲观预期、对**计票准确性**的信心变化、对**女性总统**的预期，以及认为**新闻媒体对选举影响力过大**的看法。\n*   **右侧图表**：是一个条形图，展示了不同群体（所有选民、男女、特朗普和克林顿支持者）对“**有生之年国家是否会选出女总统**”的预测。数据显示，绝大多数选民（约80%）对此持肯定态度。",
+      "asset_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "actual_vision_wire_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "actual_vision_wire_bytes": 410465,
+      "actual_cap": 5000,
+      "actual_thinking_parameter": null,
+      "vision_usage": {
+        "calls": 1,
+        "input": 1032,
+        "output": 1161,
+        "total": 2193,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "input_reservation": 411489,
+      "output_reservation": 5000,
+      "chunk_types": {
+        "text": 162,
+        "image_ocr": 1,
+        "image_caption": 1,
+        "summary": 1
+      },
+      "vector_count": 165,
+      "derived_chunk_ids": [
+        "1580bcd9-8f38-4465-bb30-1162cce13061",
+        "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+      ],
+      "parent_chunk_ids": [
+        "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+      ],
+      "stages": {
+        "search": {
+          "count": 30,
+          "image_child_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        },
+        "rerank": {
+          "count": 4,
+          "image_child_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        },
+        "context": {
+          "count": 2,
+          "image_child_ids": [],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        }
+      },
+      "caption_in_final_context": true,
+      "ocr_in_final_context": true,
+      "caption_in_actual_final_request": true,
+      "ocr_in_actual_final_request": true,
+      "final_answer_calls": 1,
+      "fixed_refusal": false,
+      "answer": "## Answer\n\nAccording to the Pew Research Center survey conducted November 10–14, 2016, **both men and women** expect a female president will be elected in their lifetime, with **no significant differences** between the two groups.\n\n- **Women**: 79% expect a female president in their lifetime\n- **Men**: 79% expect a female president in their lifetime\n\nThe survey found that 79% of all voters (across gender lines) still expected a female president \"in their lifetime\" following Clinton's defeat, and there were no significant differences in these opinions among men and women, or among Clinton supporters and Trump backers.",
+      "answer_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.012244897959183673
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "official_judge": "NOT_RUN",
+      "ingestion_seconds": 20.839759,
+      "qa_seconds": 5.779336700012209,
+      "provider_latency_ms": "NOT_CAPTURED_SEPARATELY",
+      "usage": {
+        "calls": 13,
+        "input": 37500,
+        "output": 1582,
+        "total": 39082,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "public_citations_enabled": false,
+      "source_chunk_readback": "PASS: four derived chunks read through ordinary HTTP and checked for page/version/text identity",
+      "full_visual_to_final_chain": true,
+      "status": "QUALITY_FAILURE",
+      "failure_categories": [
+        "CHART_VALUES_NOT_EXTRACTED",
+        "UNSUPPORTED_GROUP_PERCENTAGE_IN_ANSWER"
+      ],
+      "manual_answer_correct": false,
+      "necessary_gold_facts_in_derived_text": false,
+      "manual_basis": "Original chart visibly shows men81%, women78%. OCR garbles bars and Caption says about80% without exact group values. Cheap receives the real derived content but invents both groups79% from overall79% prose.",
+      "rerank_observer_scores": {
+        "image_ocr": 0.8536705374717712,
+        "image_caption": 0.8735278844833374,
+        "image_parent": 0.9033378958702087
+      },
+      "rerank_input_count": 30,
+      "rerank_output_count": 30,
+      "rerank_score_evidence": "Existing RerankRegistryObserver records model.rerank return; not claiming an additional raw HTTP response capture."
+    }
+  },
+  "calls": {
+    "uploads": 2,
+    "worker_image_tasks": 2,
+    "local_ocr": 2,
+    "ocr_model": 0,
+    "vlm": 2,
+    "embedding": 15,
+    "rerank": 2,
+    "cheap_document_summary": 2,
+    "cheap_query_rewrite": 2,
+    "cheap_final_answers": 1,
+    "question_attempts": 2,
+    "fixed_refusals": 1,
+    "provider_tokens": 50185,
+    "provider_input_tokens": 47550,
+    "provider_output_tokens": 2635,
+    "new_unknown": 0,
+    "prior_read_only_metadata_requests": 2,
+    "real_model_requests": 24,
+    "provider_requests": 24,
+    "generative_model_requests": 7
+  },
+  "tests": [
+    {
+      "kind": "offline unit tests",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py -q",
+      "exit_code": 0,
+      "result": "76 passed in 1.25s",
+      "evidence": "E:\\WK\\run\\p27-20261017\\image_offline_pytest.log"
+    },
+    {
+      "kind": "product parser dependency check",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -c \"import sys, importlib.util; print(sys.version.split()[0]); print('pypdfium2_spec=', importlib.util.find_spec('pypdfium2'))\"",
+      "exit_code": 0,
+      "result": "Python 3.13.0; pypdfium2_spec=None"
+    },
+    {
+      "kind": "real HTTP/API/Worker/PG/Redis/model RAG",
+      "status": "NOT_RUN",
+      "reason": "P27 blockers above; no services were started."
+    },
+    {
+      "kind": "offline targeted suite (no provider traffic)",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_page_scoped_vision.py tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_catalog.py tests/weknora_port/test_documents.py tests/weknora_port/test_http_api.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27r1",
+      "exit_code": 0,
+      "result": "491 passed in 3.44s",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\focused-suite.log"
+    },
+    {
+      "kind": "focused upstream ingestion module collection",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_ingest.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27-ingest-blocked",
+      "exit_code": 2,
+      "result": "ERROR during collection: ModuleNotFoundError: No module named 'pptx'",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\test-ingest-collection-failure.log"
+    },
+    {
+      "kind": "local synthetic Tesseract smoke",
+      "command": "Product Python 3.13.0; TesseractOCR(r'E:/WK/deps/tessdata') on generated PNG reading LOCAL OCR PAGE 9",
+      "exit_code": 0,
+      "result": "recognized expected text; image-ocr-layout-v1",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\local-tesseract-smoke.log"
+    },
+    {
+      "kind": "frozen source product-runtime scoped parser",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope-final.py",
+      "exit_code": 0,
+      "result": "row-0958 p9 and row-0684 p10 source SHA, selected image asset, and parent Markdown reference verified",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.json"
+    },
+    {
+      "kind": "first frozen source script attempt (preserved failure)",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.py",
+      "exit_code": 1,
+      "result": "repository package was not on sys.path when launching a script from E drive; corrected in final script",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.log"
+    },
+    {
+      "kind": "final offline targeted suite (includes actual upload endpoint page-scope contract)",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_page_scoped_vision.py tests/weknora_port/test_image_configuration.py tests/weknora_port/test_image_multimodal.py tests/weknora_port/test_image_processing.py tests/weknora_port/test_image_json_boundary.py tests/weknora_port/test_search_image_completion.py tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_catalog.py tests/weknora_port/test_documents.py tests/weknora_port/test_http_api.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27r3",
+      "exit_code": 0,
+      "result": "492 passed in 3.61s",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.log"
+    },
+    {
+      "kind": "first page-scope HTTP assertion attempt (preserved test failure)",
+      "exit_code": 1,
+      "result": "The test expected a detail field; the API error envelope uses error.code. The test assertion was corrected; production behavior was unchanged.",
+      "evidence": "Observed in the initial focused suite output; final 492-test run passed."
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-final",
+      "exit_code": 0,
+      "result": "113 passed in 1.82s",
+      "kind": "offline contracts only; no provider or DB fixture writes",
+      "log": "E:\\WK\\run\\p27-gate-20261017\\meter-tests-final.log"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-verified",
+      "exit_code": 0,
+      "result": "116 passed in 1.78s",
+      "kind": "offline contracts only; no provider or DB fixture writes",
+      "log": "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
+    },
+    {
+      "kind": "offline provider-authority composition and regressions",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest tests/weknora_port/test_p27_authority_bundle.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_development_entry.py --basetemp=E:/WK/run/p27-authority-bundle-20261017-02/pytest-temp --junitxml=E:/WK/run/p27-authority-bundle-20261017-02/pytest.xml -q --tb=short -p no:cacheprovider",
+      "exit_code": 0,
+      "passed": 129,
+      "evidence": "docs/evaluation/evidence/p27-live-20261017/offline-tests/"
+    },
+    {
+      "kind": "real HTTP PGvector Redis provider integration, bounded cases",
+      "commands": [
+        "run.py case row-0958",
+        "run.py case row-0684",
+        "readback.py",
+        "closeout_verify.py"
+      ],
+      "interpreter": "E:/RAG quention/.venv/Scripts/python.exe -B",
+      "working_directory": "E:/RAG-Worktrees/weknora-python-port-20261013",
+      "script_directory": "E:\\WK\\run\\p27-live-20261017",
+      "exit_code": 0,
+      "quality_status": "P27_PARTIAL; both answers fail target facts",
+      "evidence": "docs/evaluation/evidence/p27-live-20261017/"
+    }
+  ],
+  "production_code_changed": true,
+  "new_report_files": [
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json"
+  ],
+  "external_evidence": [
+    "E:\\WK\\run\\p27-20261017\\offline_parser_asset_inventory.json",
+    "E:\\WK\\run\\p27-20261017\\image_offline_pytest.log",
+    "E:\\WK\\run\\p27-20261017\\product_runtime_dependency_check.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite.exitcode.txt",
+    "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.json",
+    "E:\\WK\\run\\p27-resume-20261017\\local-tesseract-smoke.log",
+    "E:\\WK\\run\\p27-resume-20261017\\test-ingest-collection-failure.log",
+    "E:\\WK\\run\\p27-resume-20261017\\pypdfium-install.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.log",
+    "E:\\WK\\run\\p27-resume-20261017\\focused-suite-final.exitcode.txt",
+    "E:\\WK\\run\\p27-resume-20261017\\pypdfium-product-version.log",
+    "E:\\WK\\run\\p27-resume-20261017\\diff-check.log",
+    "E:\\WK\\run\\p27-gate-20261017\\account-audit.json",
+    "E:\\WK\\run\\p27-gate-20261017\\deepseek-block.json",
+    "E:\\WK\\run\\p27-gate-20261017\\history-preservation.json",
+    "E:\\WK\\run\\p27-gate-20261017\\meter-tests-final.log",
+    "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
+  ],
+  "next_step": "Stop P27. If separately authorized later, validate fine-grained visual evidence extraction before changing retrieval or Cheap strategy. No automatic P28.",
+  "prior_blockers_at_initial_p27_run": [
+    "No newly approved finite P27 external-call token fence was established; the closed P25 fence was not reused.",
+    "P26 active-config audit records multimodal processing disabled, empty VLM configuration, and no configured VLM role; Cheap is not declared vision-capable.",
+    "Product Python 3.13.0 cannot import the declared optional pypdfium2==5.8.0 parser dependency.",
+    "Normal image upload/task processing has no page selector; B3 would create 21 image assets and require 21 VLM Caption calls with local Tesseract OCR or 42 VLM OCR+Caption calls, exceeding the P27 cap of four.",
+    "The current default PDF parser produced no image/vector asset for the Pew chart on physical page 10."
+  ],
+  "continuation_start_head": "e3945f94575a91000335f99f70b9a73b73e20d6e",
+  "continuation": {
+    "date": "2026-10-17",
+    "owner_authorization": {
+      "new_max_tokens": 1000000,
+      "vision_provider": "deepseek",
+      "vision_api_model_id": "deepseek-flash",
+      "ocr": "local Tesseract preferred",
+      "final_answer": "existing SiliconFlow Cheap"
+    },
+    "trusted_live_fence": "BLOCKED_EXISTING_DEEPSEEK_MONTH_AND_ACCOUNT_FACTS",
+    "provider_calls": 0,
+    "schema_migration": false,
+    "dependency_manifest_changed": false,
+    "product_runtime_dependency": {
+      "python": "3.13.0",
+      "pypdfium2": "5.8.0",
+      "install_scope": "E:\\RAG quention\\.venv only",
+      "compatible_parser_smoke": true
+    },
+    "deepseek_model_resolution": {
+      "registry_api_model_id": "deepseek-flash",
+      "provider": "deepseek",
+      "role": "vlm",
+      "catalog_input": [
+        "text",
+        "image"
+      ],
+      "supports_vision": true,
+      "api": "openai-completions",
+      "supports_multi_content": true,
+      "image_wire": "user message content has image_url data URI plus text prompt",
+      "network_probe": false
+    },
+    "local_ocr_smoke": {
+      "engine": "TesseractOCR via product PyMuPDF runtime",
+      "tessdata": "E:\\WK\\deps\\tessdata",
+      "synthetic_text_expected_and_read": "LOCAL OCR PAGE 9",
+      "layout_schema": "image-ocr-layout-v1",
+      "benchmark_documents_sent_to_ocr": false
+    },
+    "page_scope": {
+      "config_field": "image_pages",
+      "semantics": "one-based physical PDF pages; 1..1000, unique positive strict integers",
+      "precedence": "upload override over KB default; null does not clear existing setting",
+      "task_snapshot": [
+        "tenant_id",
+        "subject_id",
+        "knowledge_base_id",
+        "document_id",
+        "source_version",
+        "source_sha256",
+        "physical_pages"
+      ],
+      "worker_checks_source_version_and_hash_before_processing": true,
+      "original_pdf_retained": true,
+      "only_selected_page_assets_dispatched_to_image_processor": true
+    },
+    "offline_parser_targets": [
+      {
+        "qid": "row-0958",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "physical_page": 9,
+        "pdf_asset_count": 21,
+        "target_asset_count": 1,
+        "target_asset": "images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg",
+        "markdown_parent_reference": true
+      },
+      {
+        "qid": "row-0684",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "physical_page": 10,
+        "pdf_asset_count": 1,
+        "target_asset_count": 1,
+        "target_asset": "images/11-21-16-Updated-Post-Election-Release_p10_requested_render.jpg",
+        "markdown_parent_reference": true
+      }
+    ],
+    "real_rag_scenarios": {
+      "row-0958": "NOT_RUN_AUTHORITY_BLOCKED",
+      "row-0684": "NOT_RUN_AUTHORITY_BLOCKED"
+    },
+    "local_test_failure": {
+      "module": "tests/weknora_port/test_ingest.py",
+      "exit_code": 2,
+      "reason": "python-pptx import unavailable in product venv; parser coverage isolated in test_p27_page_scoped_vision.py",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\test-ingest-collection-failure.log"
+    },
+    "harness_failure": {
+      "first_actual_pdf_script_exit_code": 1,
+      "reason": "script launched from E drive did not initially add repository to sys.path; final script added explicit repository path and passed",
+      "evidence": "E:\\WK\\run\\p27-resume-20261017\\actual-pdf-page-scope.log"
+    },
+    "upload_endpoint_contract_test": "PASS: page override forwarded and non-PDF page scope rejected with 422 error.code IMAGE_PAGE_SCOPE_PDF_ONLY"
+  },
+  "changed_files": [
+    "backend/weknora_port/documents.py",
+    "backend/weknora_port/http_api.py",
+    "backend/weknora_port/image_configuration.py",
+    "backend/weknora_port/image_tasks.py",
+    "backend/weknora_port/ingestion/core.py",
+    "backend/weknora_port/ingestion/upstream_pdf_parser.py",
+    "backend/weknora_port/runtime.py",
+    "tests/weknora_port/test_p27_page_scoped_vision.py",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json",
+    "tests/weknora_port/test_http_api.py"
+  ],
+  "previous_p27_gate_diagnosis_superseded": [
+    "Owner authorized a new 1,000,000-token maximum and selected DeepSeek V4.1 Flash, but the trusted approved authority cannot issue a production send because APPROVED_METER_UNIMPLEMENTED and production source-fact assembly, historical UNKNOWN bounds, real account carry-in, and shared-account consumers remain unverified.",
+    "The last recorded P26 KB state had multimodal disabled and no VLM role. This continuation did not inspect secret contents or modify live model/KB configuration.",
+    "Real HTTP/API/Worker/PostgreSQL/Redis/DeepSeek/Embedding/Rerank/Cheap execution was not run; neither target completed a real visual RAG loop."
+  ],
+  "gate_resolution": {
+    "baseline": "c145ef6659857318919b20a8d16552c3894dcef5",
+    "stale_diagnosis_corrected": "APPROVED_METER_UNIMPLEMENTED is absent from current executable source; production ApprovedTokenAuthority and per-call SourceFacts assembly already exist and were used in P22/P25.",
+    "actual_image_meter_gap_before_patch": "source_facts.bind_wire_facts rejects hosted media with MODEL_INPUT_BOUND_NOT_APPLICABLE for its text-only recipes.",
+    "minimal_change": {
+      "recipe": "deepseek-inline-image-1024/v1",
+      "input_bound": "all immutable wire bytes + 1024 * validated inline image count",
+      "applicable_identity": "official DeepSeek / deepseek-flash / OpenAI Chat Completions / vision",
+      "media": "static inline JPEG/PNG only",
+      "output_bound": "existing max_tokens full-completion contract including reasoning",
+      "old_text_media_denial_preserved": true,
+      "live_config_or_grant_created": false,
+      "source": "https://api-docs.deepseek.com/guides/vision/#token-usage",
+      "output_contract_source": "https://api-docs.deepseek.com/api/create-chat-completion/"
+    },
+    "earliest_remaining_live_blocker": "TOKEN_MONTH_BLOCKED: USAGE_EXCEEDS_RESERVATION on existing deepseek-owner-main/2026-10-01",
+    "account_audit": {
+      "at": "2026-10-17T07:55:13.340530+00:00",
+      "access": "read-only",
+      "real_provider_requests": 0,
+      "postgres_identity": {
+        "database": "weknora_python_port_20261013",
+        "system_identifier": "7696088403504697382"
+      },
+      "months": [
+        {
+          "account_id": "deepseek-owner-main",
+          "provider": "deepseek",
+          "month": "2026-10-01",
+          "limit_tokens": 1000000,
+          "carry_in_tokens": 0,
+          "carry_status": "KNOWN",
+          "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+          "approval_source": "OWNER:20261015-real-egress:0f16e911c36ee71d841c7c63403bc9ec803a196c2188c4a4e12d2351db866bad",
+          "blocked_reason": "USAGE_EXCEEDS_RESERVATION"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "limit_tokens": 1693086,
+          "carry_in_tokens": 14,
+          "carry_status": "KNOWN",
+          "carry_source": "LEDGER:real/embedding-0:14-preserved-original-bucket",
+          "approval_source": "OWNER:20261016-unrestricted-siliconflow-MVP",
+          "blocked_reason": ""
+        }
+      ],
+      "token_calls": [
+        {
+          "account_id": "deepseek-owner-main",
+          "budget_provider": "deepseek",
+          "provider": "deepseek",
+          "month": "2026-10-01",
+          "model": "deepseek-flash",
+          "capability": "chat",
+          "state": "unknown",
+          "rows": 1,
+          "reserved_input": "195",
+          "reserved_output": "64",
+          "held_tokens": "259",
+          "actual_total": null,
+          "known_lower_bound": "221"
+        },
+        {
+          "account_id": "deepseek-owner-main",
+          "budget_provider": "deepseek",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "settled",
+          "rows": 1,
+          "reserved_input": "85",
+          "reserved_output": "0",
+          "held_tokens": "14",
+          "actual_total": "14",
+          "known_lower_bound": "14"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "settled",
+          "rows": 395,
+          "reserved_input": "758979",
+          "reserved_output": "0",
+          "held_tokens": "202980",
+          "actual_total": "202980",
+          "known_lower_bound": "202980"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "settled",
+          "rows": 23,
+          "reserved_input": "424535",
+          "reserved_output": "0",
+          "held_tokens": "115504",
+          "actual_total": "115504",
+          "known_lower_bound": "115504"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "rows": 61,
+          "reserved_input": "823355",
+          "reserved_output": "0",
+          "held_tokens": "823355",
+          "actual_total": null,
+          "known_lower_bound": "0"
+        },
+        {
+          "account_id": "siliconflow-owner-main",
+          "budget_provider": "siliconflow",
+          "provider": "siliconflow",
+          "month": "2026-10-01",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "rows": 247,
+          "reserved_input": "2141801",
+          "reserved_output": "193548",
+          "held_tokens": "551233",
+          "actual_total": "551233",
+          "known_lower_bound": "551233"
+        }
+      ],
+      "preservation_hashes": {
+        "deepseek-owner-main": {
+          "rows": 2,
+          "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30"
+        },
+        "siliconflow-owner-main": {
+          "rows": 726,
+          "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a"
+        }
+      },
+      "monetary_send_groups": [],
+      "shared_account_consumers": "NOT_VERIFIED: local ledger cannot establish provider-account-wide external consumers"
+    },
+    "deepseek_original_numeric_usage": {
+      "access": "read-only",
+      "rows": [
+        {
+          "request_id": "real/answer/1/cheap",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "capability": "chat",
+          "state": "unknown",
+          "outcome": "RESPONSE_RECEIVED",
+          "reserved_input": 195,
+          "reserved_output": 64,
+          "held_tokens": 259,
+          "actual_total": null,
+          "known_lower_bound": 221,
+          "usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 44,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 177,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 221,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": true,
+                  "value": 44,
+                  "present": true
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+            "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+            "derived_total": 221,
+            "reported_total": {
+              "path": "total_tokens",
+              "valid": true,
+              "value": 221,
+              "present": true
+            },
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 221
+          }
+        }
+      ],
+      "real_provider_requests": 0
+    },
+    "history_preservation": {
+      "access": "read-only",
+      "provider_requests": 0,
+      "account_calls": {
+        "deepseek-owner-main": {
+          "rows": 2,
+          "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+          "unchanged": true
+        },
+        "siliconflow-owner-main": {
+          "rows": 726,
+          "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+          "unchanged": true
+        }
+      },
+      "months_unchanged": true,
+      "status": "PASS"
+    },
+    "run_fence": {
+      "owner_authorized_total_tokens": 1000000,
+      "opened_live_headroom": 0,
+      "consumed_tokens": 0,
+      "temporary_allocations_opened": 0,
+      "unused_issued_allocation_to_revoke": 0,
+      "p25_fence_reused": false,
+      "account_limits_or_historical_rows_changed": false,
+      "combined_two_provider_admission_activated": false
+    },
+    "stage_2_configuration": "NOT_RUN_ACCOUNT_GATE_BLOCKED",
+    "stage_3": {
+      "row-0958": "NOT_RUN_ACCOUNT_GATE_BLOCKED",
+      "row-0684": "NOT_RUN_ACCOUNT_GATE_BLOCKED"
+    },
+    "model_calls": {
+      "deepseek_vision": 0,
+      "cheap_final": 0,
+      "embedding": 0,
+      "rerank": 0,
+      "other_auxiliary": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "new_unknown": 0,
+      "model_latency_ms": null
+    },
+    "test": {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_send_gate.py tests/weknora_port/test_provider_usage.py -q -p no:cacheprovider --basetemp=E:/RAG-Tests/p27meter-verified",
+      "exit_code": 0,
+      "result": "116 passed in 1.78s",
+      "kind": "offline contracts only; no provider or DB fixture writes",
+      "log": "E:\\WK\\run\\p27-gate-20261017\\meter-tests-verified.log"
+    },
+    "modified_source_hashes": {
+      "backend/weknora_port/source_facts.py": "f3ce75acd53c276308818cafb5bb0104c9a022495b3e62bdc407f6b9e17b6723",
+      "tests/weknora_port/test_p27_vision_meter.py": "843d243935fbb21c7c64b24e119dfa44d5a258cd549f08e39359f0e0349e8c86"
+    },
+    "missing_materials": [
+      "authoritative incident review and trusted recovery decision preserving old UNKNOWN/month limits",
+      "current existing key to provider billing account association and complete consumption/carry source",
+      "verified coverage or conservative upper bound for other shared-account consumers"
+    ]
+  },
+  "changed_files_this_continuation": [
+    "backend/weknora_port/source_facts.py",
+    "tests/weknora_port/test_p27_vision_meter.py",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+    "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.results.json"
+  ],
+  "prior_blockers_before_incident_recovery": [
+    "Existing deepseek-owner-main October month has USAGE_EXCEEDS_RESERVATION; historical UNKNOWN and output overrun must not be cleared by a new grant or recipe.",
+    "Current key/billing-account association, full historical/carry coverage and other shared-account consumers lack independently verified evidence.",
+    "SiliconFlow P25 fence remains closed. The combined new P27 1,000,000-token fence and live model/KB configuration were not activated while DeepSeek prerequisites were false."
+  ],
+  "prior_call_counters_before_incident_recovery": {
+    "uploads": 0,
+    "worker_image_tasks": 0,
+    "ocr_model": 0,
+    "vlm": 0,
+    "embedding": 0,
+    "rerank": 0,
+    "cheap_final_answers": 0,
+    "provider_requests": 0,
+    "provider_tokens": 0,
+    "new_unknown": 0,
+    "latency_ms": null,
+    "database_or_redis_writes": 0,
+    "local_tesseract_synthetic_smokes": 1
+  },
+  "incident_recovery_20261017": {
+    "status": "RECOVERED",
+    "source_head": "9d4788a6b7f47f31459fbebdf5873577a7599dac",
+    "historical_wire": {
+      "schema": "p27-historical-wire-audit/v1",
+      "access": "read-only",
+      "provider_calls": 0,
+      "request_body": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer only from the user sentence."
+          },
+          {
+            "role": "user",
+            "content": "What protocol do blue widgets use?"
+          }
+        ],
+        "max_completion_tokens": 64
+      },
+      "reconstructed_wire": "{\"max_completion_tokens\":64,\"messages\":[{\"content\":\"Answer only from the user sentence.\",\"role\":\"system\"},{\"content\":\"What protocol do blue widgets use?\",\"role\":\"user\"}],\"model\":\"deepseek-flash\"}",
+      "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f",
+      "wire_bytes": 195,
+      "ledger": {
+        "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+        "request_id": "real/answer/1/cheap",
+        "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f",
+        "wire_bytes": 195,
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "state": "unknown",
+        "outcome": "RESPONSE_RECEIVED",
+        "reserved_input": 195,
+        "reserved_output": 64,
+        "held_tokens": 259,
+        "actual_total": null,
+        "usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 44,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 177,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 221,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": true,
+                "value": 0,
+                "present": true
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": true,
+                "value": 44,
+                "present": true
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false,
+          "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+          "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+          "derived_total": 221,
+          "reported_total": {
+            "path": "total_tokens",
+            "valid": true,
+            "value": 221,
+            "present": true
+          },
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 221
+        }
+      },
+      "historical_renderer_commit": "561e3bc^",
+      "thinking_on_wire": null,
+      "reasoning_effort_on_wire": null,
+      "response_body_retained": false,
+      "response_usage_retained": true,
+      "matches_durable_wire_identity": true
+    },
+    "request_size": {
+      "schema": "p27-actual-image-request-size/v1",
+      "provider_calls": 0,
+      "cases": [
+        {
+          "qid": "row-0958",
+          "physical_page": 9,
+          "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "image_path": "E:\\WK\\run\\p27-gate-20261017\\row-0958-p9.jpg",
+          "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+          "dimensions": [
+            2000,
+            1125
+          ],
+          "image_bytes": 228312,
+          "base64_chars": 304416,
+          "request_wire_bytes": 304728,
+          "wire_sha256": "6c6d1b0e7620f123b24010d25fabed8b52bc5abe66c57377bbe6785d9c117ff2",
+          "max_tokens": 5000,
+          "thinking": null,
+          "input_reservation": 305752,
+          "output_reservation": 5000,
+          "total_reservation": 310752,
+          "fits_1000000": true,
+          "scope": "offline target render and proposed default Caption request; not a sent request or ingestion"
+        },
+        {
+          "qid": "row-0684",
+          "physical_page": 10,
+          "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "image_path": "E:\\WK\\run\\p27-gate-20261017\\row-0684-p10.jpg",
+          "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+          "dimensions": [
+            1546,
+            2000
+          ],
+          "image_bytes": 307605,
+          "base64_chars": 410140,
+          "request_wire_bytes": 410452,
+          "wire_sha256": "78122679c747af52b4279ab3f222aa16f398b7645eebb18445661c496df7eeea",
+          "max_tokens": 5000,
+          "thinking": null,
+          "input_reservation": 411476,
+          "output_reservation": 5000,
+          "total_reservation": 416476,
+          "fits_1000000": true,
+          "scope": "offline target render and proposed default Caption request; not a sent request or ingestion"
+        }
+      ],
+      "sum_two_reservations": 727228
+    },
+    "account_endpoint_audit": {
+      "schema": "p27-read-only-provider-account-endpoints/v1",
+      "generation_calls": 0,
+      "credential_source": "existing .env.local / DEEPSEEK_API_KEY; value not exported",
+      "credential_sha256": "a9152466b4630eb420b73081c9e3cab5a9c28eccf364d8f5cd81cecaf97017f3",
+      "requests": [
+        {
+          "method": "GET",
+          "endpoint": "https://api.deepseek.com/models",
+          "status": 200,
+          "response_sha256": "b86388abe65929c84de3825eee299b8d78bae23e82e300239f3c788569eb5f39",
+          "top_level_fields": [
+            "data",
+            "object"
+          ],
+          "models": [
+            {
+              "id": "deepseek-flash",
+              "owned_by": "deepseek",
+              "name": "DeepSeek-V4.1-Flash",
+              "max_output_tokens": 393216,
+              "input_modalities": [
+                "text",
+                "image"
+              ]
+            },
+            {
+              "id": "deepseek-v4-pro",
+              "owned_by": "deepseek",
+              "name": "DeepSeek-V4-Pro",
+              "max_output_tokens": 393216,
+              "input_modalities": [
+                "text"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "endpoint": "https://api.deepseek.com/user/balance",
+          "status": 200,
+          "response_sha256": "1513ed76eca0c3820341dc839f2897cb182e42db86a7204a3449efdda804af60",
+          "top_level_fields": [
+            "balance_infos",
+            "is_available"
+          ],
+          "is_available": true,
+          "identity_fields_present": []
+        }
+      ],
+      "billing_account_association": "UNVERIFIED: metadata/balance cannot establish UID-to-key association or exclusivity"
+    },
+    "history_preservation": {
+      "provider_generation_calls": 0,
+      "account_calls": {
+        "deepseek-owner-main": {
+          "rows": 2,
+          "sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+          "unchanged": true
+        },
+        "siliconflow-owner-main": {
+          "rows": 726,
+          "sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+          "unchanged": true
+        }
+      },
+      "only_expected_month_change": true,
+      "status": "PASS"
+    },
+    "recovery_receipt": {
+      "data": {
+        "after": {
+          "calls": [
+            {
+              "account_id": "deepseek-owner-main",
+              "actual_total": 14,
+              "bound_source": "wire-bytes-upper-bound/v1",
+              "budget_provider": "deepseek",
+              "call_id": "87802219ded5bd2071961ed48f82a3831f8d9194f21644154bdebe417bf7d1b7",
+              "capability": "embedding",
+              "endpoint": "https://api.siliconflow.cn/v1/embeddings",
+              "fingerprint": "af078b5f58fc80cfdde27b0887c3823d572cd4e6fbe1539776e5f98d5359a422",
+              "finished_at": "2026-10-15 14:11:31.809652+00:00",
+              "held_tokens": 14,
+              "known_lower_bound": 14,
+              "model": "BAAI/bge-m3",
+              "model_id": "sf-embed",
+              "month": "2026-10-01",
+              "origin_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "outcome": "RESPONSE_RECEIVED",
+              "permission_source": "OWNER:20261015-real-egress",
+              "provider": "siliconflow",
+              "request_id": "real/embedding-0",
+              "reserved_input": 85,
+              "reserved_output": 0,
+              "retrieval_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "session_id": "",
+              "state": "settled",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "usage_facts": {
+                "derived_total": 14,
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "path": "prompt_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 14
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "path": "completion_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 0
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "path": "total_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 14
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "path": "prompt_cache_hit_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "path": "cache_creation_input_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "path": "prompt_cache_miss_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":0,\"prompt_tokens\":14,\"total_tokens\":14}",
+                "observed_lower_bound": 14,
+                "prior_numeric_raw": [],
+                "raw_sha256": "9a12eb563f8ca93e7ce761722ca0837d5e11942c2405de7bf2a713438c2d5e58",
+                "reported_total": {
+                  "path": "total_tokens",
+                  "present": true,
+                  "valid": true,
+                  "value": 14
+                },
+                "semantics": "openai-input-inclusive/v1",
+                "simulated": false
+              },
+              "wire_bytes": 85,
+              "wire_sha256": "8cff33dce0f9a2b0e82fd0c296287a13bc1e1ee2c3f8e8ddfd4b4df68057326b"
+            },
+            {
+              "account_id": "deepseek-owner-main",
+              "actual_total": null,
+              "bound_source": "wire-bytes-upper-bound/v1",
+              "budget_provider": "deepseek",
+              "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+              "capability": "chat",
+              "endpoint": "https://api.deepseek.com/chat/completions",
+              "fingerprint": "35fd324a0c965968195a77f6a3815f6432d021a612fa0acef4c7ca0090b3207b",
+              "finished_at": "2026-10-15 14:11:33.518744+00:00",
+              "held_tokens": 259,
+              "known_lower_bound": 221,
+              "model": "deepseek-flash",
+              "model_id": "ds-chat",
+              "month": "2026-10-01",
+              "origin_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "outcome": "RESPONSE_RECEIVED",
+              "permission_source": "OWNER:20261015-real-egress",
+              "provider": "deepseek",
+              "request_id": "real/answer/1/cheap",
+              "reserved_input": 195,
+              "reserved_output": 64,
+              "retrieval_kbs": [
+                "089cc0f7-32a7-4d55-a62c-5b2612262dfe"
+              ],
+              "session_id": "",
+              "state": "unknown",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "usage_facts": {
+                "derived_total": 221,
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "path": "prompt_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 44
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "path": "completion_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 177
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "path": "total_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 221
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "path": "prompt_cache_hit_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 0
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "path": "cache_creation_input_tokens",
+                      "present": false,
+                      "valid": false,
+                      "value": null
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "path": "prompt_cache_miss_tokens",
+                      "present": true,
+                      "valid": true,
+                      "value": 44
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":177,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":44,\"prompt_tokens\":44,\"total_tokens\":221}",
+                "observed_lower_bound": 221,
+                "prior_numeric_raw": [],
+                "raw_sha256": "ece0510dd18be83814e425301f97b49fbacc5c093921a4e83b5159d05bc27530",
+                "reported_total": {
+                  "path": "total_tokens",
+                  "present": true,
+                  "valid": true,
+                  "value": 221
+                },
+                "semantics": "openai-input-inclusive/v1",
+                "simulated": false
+              },
+              "wire_bytes": 195,
+              "wire_sha256": "59e5ce47d546fd2f03b671204fc576a733d5949d6e71a165006b87592b271f4f"
+            }
+          ],
+          "month": {
+            "account_id": "deepseek-owner-main",
+            "approval_source": "OWNER:20261015-real-egress:0f16e911c36ee71d841c7c63403bc9ec803a196c2188c4a4e12d2351db866bad",
+            "blocked_reason": "",
+            "carry_in_tokens": 0,
+            "carry_source": "LEDGER:port_token_calls:<2026-10-01",
+            "carry_status": "KNOWN",
+            "limit_tokens": 1000000,
+            "month": "2026-10-01",
+            "provider": "deepseek"
+          },
+          "slots": [
+            {
+              "call_id": "87802219ded5bd2071961ed48f82a3831f8d9194f21644154bdebe417bf7d1b7",
+              "created_at": "2026-10-15 14:11:31.393866+00:00",
+              "fingerprint": "af078b5f58fc80cfdde27b0887c3823d572cd4e6fbe1539776e5f98d5359a422",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "unit": "tokens"
+            },
+            {
+              "call_id": "e09466be51171579dfa2b646552fd14b7998ccb2f2032f5a2796ff24a48716be",
+              "created_at": "2026-10-15 14:11:31.892717+00:00",
+              "fingerprint": "35fd324a0c965968195a77f6a3815f6432d021a612fa0acef4c7ca0090b3207b",
+              "subject_id": "owner-real-16534d86",
+              "tenant_id": 322,
+              "unit": "tokens"
+            }
+          ]
+        },
+        "calls_sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+        "commit_confirmed": true,
+        "intent_sha256": "78b405c7751a6a3d296e6dfdc36a65551f46a443f7359e7cc0f23f5c29cd98eb",
+        "slots_sha256": "1518790ab2c1fa27d3e2ad5bded1468795b2ea44b2bb14f6d239fa45ce9ce2a7"
+      },
+      "sha256": "11c30850453f3533ec1fcb8833062b7c8e6fd7ff9b1af33cc324e345e1d028b0"
+    },
+    "actual_generation_calls": 0,
+    "actual_generation_tokens": 0,
+    "new_unknown": 0,
+    "task_token_ceiling": 1000000,
+    "temporary_live_allocation_opened": false,
+    "offline_test_result": {
+      "passed": 25,
+      "exitcode": 0
+    },
+    "account_identity": "UNVERIFIED",
+    "exclusive_consumers": "UNVERIFIED",
+    "browser_console": "https://platform.deepseek.com/usage; Debugger unattached; handoff tab retained",
+    "evidence_directory": "docs\\evaluation\\evidence\\p27-incident-recovery-20261017",
+    "changed_files": [
+      "scripts/weknora_port_p27_recover.py",
+      "tests/weknora_port/test_p27_incident_recovery.py",
+      "docs/evaluation/P27_MULTIMODAL_RAG_REAL_INGESTION.md",
+      "docs\\evaluation\\P27_MULTIMODAL_RAG_REAL_INGESTION.results.json",
+      "docs\\evaluation\\evidence\\p27-incident-recovery-20261017"
+    ]
+  },
+  "prior_state_before_live_run": {
+    "status": "P27_BLOCKED",
+    "blockers": [
+      "Current credential-to-billing-UID association and complete account/other-consumer coverage are not independently established; Edge console inspection cannot attach.",
+      "No live combined P27 fence activated until those account facts are available. Historical cap-field block was explicitly recovered; it is no longer the blocker."
+    ],
+    "scenarios": {
+      "row-0684": {
+        "status": "NOT_RUN",
+        "offline_parser_status": "PASS",
+        "reason": "Offline parser readiness preserved; no real upload/RAG because the original DeepSeek account month is blocked and whole-account coverage is not verified."
+      },
+      "row-0958": {
+        "status": "NOT_RUN",
+        "offline_parser_status": "PASS",
+        "reason": "Offline parser readiness preserved; no real upload/RAG because the original DeepSeek account month is blocked and whole-account coverage is not verified."
+      }
+    },
+    "calls": {
+      "uploads": 0,
+      "worker_image_tasks": 0,
+      "ocr_model": 0,
+      "vlm": 0,
+      "embedding": 0,
+      "rerank": 0,
+      "cheap_final_answers": 0,
+      "provider_requests": 2,
+      "provider_tokens": 0,
+      "new_unknown": 0,
+      "latency_ms": null,
+      "database_or_redis_writes": 1,
+      "local_tesseract_synthetic_smokes": 1,
+      "provider_generation_requests": 0,
+      "read_only_provider_metadata_requests": 2,
+      "database_month_rows_updated": 1
+    },
+    "next_step": "Obtain verifiable current Key/billing-account association and actual exclusive/shared-consumer scope, then activate the already authorized bounded P27 flow using existing machinery. Do not replay the historical UNKNOWN call."
+  },
+  "quality_limitations": [
+    "B3 image details were not extracted and all rerank candidates were filtered; no final Cheap call.",
+    "Pew image-derived text reached final Cheap but lacked readable subgroup percentages; answer incorrectly assigned overall79% to both groups."
+  ],
+  "live_execution_20261017": {
+    "analysis": {
+      "schema": "p27-live-trace-analysis/v1",
+      "status": "P27_PARTIAL",
+      "production_source": "14788b9ed37cfd82d15ac8ecbb62efcab4f14d35",
+      "model_calls": {
+        "calls": 24,
+        "input": 47550,
+        "output": 2635,
+        "total": 50185,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "model_groups": [
+        {
+          "provider": "siliconflow",
+          "capability": "embedding",
+          "calls": 15,
+          "input": 24814,
+          "output": 0,
+          "total": 24814,
+          "unknown": 0,
+          "unknown_held": 0
+        },
+        {
+          "provider": "deepseek",
+          "capability": "vision",
+          "calls": 2,
+          "input": 2050,
+          "output": 2001,
+          "total": 4051,
+          "unknown": 0,
+          "unknown_held": 0
+        },
+        {
+          "provider": "siliconflow",
+          "capability": "rerank",
+          "calls": 2,
+          "input": 7801,
+          "output": 0,
+          "total": 7801,
+          "unknown": 0,
+          "unknown_held": 0
+        },
+        {
+          "provider": "siliconflow",
+          "capability": "chat",
+          "calls": 5,
+          "input": 12885,
+          "output": 634,
+          "total": 13519,
+          "unknown": 0,
+          "unknown_held": 0
+        }
+      ],
+      "cases": [
+        {
+          "qid": "row-0958",
+          "question": "What are two examples of reflecting surfaces?",
+          "gold": [
+            "['shiny object', 'mirror']"
+          ],
+          "kb": "63236a5c-c0d6-499d-84e5-34475564f1c0",
+          "document_id": "3afe479e-723d-42a9-9c80-a7fc8b2eda79",
+          "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "source_version": "e34af609-a64d-478a-b3da-8284e3c0bca0",
+          "physical_page": 9,
+          "original_http_readback": {
+            "sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+            "bytes": 1906963,
+            "matches": true
+          },
+          "task_id": "919ec78c-036a-4651-885b-c186227d9034",
+          "task_state": "completed",
+          "task_attempt": 1,
+          "ocr_status": {
+            "error": "",
+            "status": "completed",
+            "binding": {
+              "source": "knowledge_base",
+              "adapter": "tesseract",
+              "model_id": "",
+              "capability": "LOCAL_ENGINE"
+            }
+          },
+          "caption_status": {
+            "error": "",
+            "status": "completed",
+            "binding": {
+              "source": "knowledge_base",
+              "adapter": "vlm",
+              "model_id": "mdl3fc917e2fa4a9429ed45c96ea06cb1feeceb1c19c574aeefd52985a7e7eeb",
+              "capability": "CATALOG_DECLARED"
+            }
+          },
+          "ocr": "Bends the wave when\n[7\nbecause the\nSpreads the wave out\nentering/leaving a\nMWY\nsubstancewould\nwhen going througha\nsubstance to another\nUP\nbe a different\ngap or barrier\n<A仁=\ndensity toanother\nREFLECTION:\nsubstance.\ni?ae\nBounces the wave back\nre x ty Se\ntowards where it came\nPic:\nfp pg gare RN\nky\nfrom\nCs\n一\n°\na\na\na\n——\noe\nRefraction,\nDiffraction\nMaximum diffraction occurs\nwhen: the gap is equal to the\nwave.\nBS:\nAll wave can be reflected and refracted\nMinimum diffraction occurs\n\\/\nwhen: the gap is smaller or\nLaw of Reflection:\nlarger than the wave.\nReflecting surtace, eg shinyet Angle of incidence = Angle of Reflection",
+          "caption": "这张图片是一张关于物理学中**波的特性**的教育图解，主要介绍和解释了波的三种基本现象：**反射（Reflection）**、**折射（Refraction）**和**衍射（Diffraction）**。\n\n图中结合了文字定义和直观的示意图，说明了波在不同介质交界处的反弹与弯曲，以及波穿过缝隙时的扩散规律（如反射定律、波速变化导致折射、缝隙与波长的关系对衍射的影响等）。",
+          "asset_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+          "actual_vision_wire_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+          "actual_vision_wire_bytes": 304741,
+          "actual_cap": 5000,
+          "actual_thinking_parameter": null,
+          "vision_usage": {
+            "calls": 1,
+            "input": 1018,
+            "output": 840,
+            "total": 1858,
+            "unknown": 0,
+            "unknown_held": 0
+          },
+          "input_reservation": 305765,
+          "output_reservation": 5000,
+          "chunk_types": {
+            "text": 6,
+            "summary": 1,
+            "image_ocr": 1,
+            "image_caption": 1
+          },
+          "vector_count": 9,
+          "derived_chunk_ids": [
+            "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+            "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+          ],
+          "parent_chunk_ids": [
+            "48e47fc7-528e-409c-94d8-5819d1ca580a"
+          ],
+          "stages": {
+            "search": {
+              "count": 9,
+              "image_child_ids": [
+                "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+                "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+              ],
+              "image_parent_ids": [
+                "48e47fc7-528e-409c-94d8-5819d1ca580a"
+              ]
+            },
+            "rerank": {
+              "count": 0,
+              "image_child_ids": [],
+              "image_parent_ids": []
+            },
+            "context": {
+              "count": 0,
+              "image_child_ids": [],
+              "image_parent_ids": []
+            }
+          },
+          "caption_in_final_context": false,
+          "ocr_in_final_context": false,
+          "caption_in_actual_final_request": false,
+          "ocr_in_actual_final_request": false,
+          "final_answer_calls": 0,
+          "fixed_refusal": true,
+          "answer": "当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。",
+          "answer_diagnostic": {
+            "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+            "metrics": {
+              "normalized_exact_match": 0,
+              "character_f1": 0.0
+            },
+            "official_judge": "NOT_RUN"
+          },
+          "official_judge": "NOT_RUN",
+          "ingestion_seconds": 12.912922,
+          "qa_seconds": 4.644237400003476,
+          "provider_latency_ms": "NOT_CAPTURED_SEPARATELY",
+          "usage": {
+            "calls": 11,
+            "input": 10050,
+            "output": 1053,
+            "total": 11103,
+            "unknown": 0,
+            "unknown_held": 0
+          },
+          "public_citations_enabled": false,
+          "source_chunk_readback": "PASS: four derived chunks read through ordinary HTTP and checked for page/version/text identity",
+          "full_visual_to_final_chain": false,
+          "status": "QUALITY_FAILURE",
+          "failure_categories": [
+            "VISUAL_DETAILS_NOT_EXTRACTED",
+            "RERANK_FILTERS_ALL_CANDIDATES",
+            "FIXED_EVIDENCE_INSUFFICIENT"
+          ],
+          "manual_answer_correct": false,
+          "necessary_gold_facts_in_derived_text": false,
+          "manual_basis": "Original target image visibly labels shiny object or mirror; OCR corrupts it and Caption only summarizes wave phenomena. No final model call occurred.",
+          "rerank_observer_scores": {
+            "image_ocr": 0.007838763296604156,
+            "image_caption": 0.010727103799581528,
+            "image_parent": 0.014426711946725845
+          },
+          "rerank_input_count": 4,
+          "rerank_output_count": 4,
+          "rerank_score_evidence": "Existing RerankRegistryObserver records model.rerank return; not claiming an additional raw HTTP response capture.",
+          "raw_provider_caption_matches_persisted_result": true,
+          "raw_usage_matches_settled_ledger": true,
+          "finish_reason": "stop"
+        },
+        {
+          "qid": "row-0684",
+          "question": "Do more men or women (in %) think a female president will be elected in a lifetime?",
+          "gold": [
+            "men"
+          ],
+          "kb": "2cf0b09f-9524-4a44-810d-45542619ef74",
+          "document_id": "7bf79dd9-f45a-4783-84e1-bc914a484195",
+          "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "source_version": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db",
+          "physical_page": 10,
+          "original_http_readback": {
+            "sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+            "bytes": 5924004,
+            "matches": true
+          },
+          "task_id": "3692d8a9-7771-4b76-9fd8-80216a464832",
+          "task_state": "completed",
+          "task_attempt": 1,
+          "ocr_status": {
+            "error": "",
+            "status": "completed",
+            "binding": {
+              "source": "knowledge_base",
+              "adapter": "tesseract",
+              "model_id": "",
+              "capability": "LOCAL_ENGINE"
+            }
+          },
+          "caption_status": {
+            "error": "",
+            "status": "completed",
+            "binding": {
+              "source": "knowledge_base",
+              "adapter": "vlm",
+              "model_id": "mdl3fc917e2fa4a9429ed45c96ea06cb1feeceb1c19c574aeefd52985a7e7eeb",
+              "capability": "CATALOG_DECLARED"
+            }
+          },
+          "ocr": "8\nPEW RESEARCH CENTER\nOther important findings\nVoters pessimistic on how Trump will impact race relations. Nearly half ofvoters (46%) say\nTrump’s election will lead to worse race relations, while only about half as many (25%) expect race\nrelations to improve; 26% say his election won’t make a difference. Among Clinton voters, 84%\nexpect race relations to worsen under Trump. Among Trump supporters, half expect\nimprovement, while 38% say his election won’t makea difference.\nPost-victory, most Trump backers confident in an accurate vote count. ID August, just 38% of\nregistered voters who supported Trump were very confident that their vote would be counted\naccurately. But in the aftermath ofTrump’s\nvictory, 75% expressed confidence that their cs\nvotes were counted accurately. The views of\nWill the country elect a female\nClinton supporters showed no change: After\npresident in your lifetime?\nthe election 67% were confident that their\n% ofvoters who say ...\nvotes were counted accurately.\nNo\nmYes\nAll voters\n17 ol\nMost expect woman president, eventually.\nFollowing Clinton’s defeat, a sizable majority\n—|\nof voters (79%) still expect there will be a\nfemale president “in their lifetime.” There are\nWomen | 48 (ZS\nno significant differences in these opinions\namong men and women, or Clinton supporters\nTrump voters\n47) ETE\nand Trump backers.\nClinton voters\naly [ee\nVoters say press has too much influence.\nNote: Don’t know responses not shown. Q46bb.\nVoters grade the press very negatively, and\nSource: Voter callback survey conducted Nov. 10-14, 2016.\nmost (57%) say it had too much influence on\nPRESSS SEs\nthe outcome of the election. Just 27% say the CT\npress had the right amount of influence on the election, while 13% say it had too little influence.\nAbout six-in-ten Trump voters (62%) say the press had too much influence, as do 50% of Clinton\nvoters.\nwww.pewresearch.org",
+          "caption": "这张图片是**皮尤研究中心（Pew Research Center）**一份关于**2016年美国大选后选民态度**的调查报告页面。\n\n主要内容概括如下：\n*   **左侧文本**：列出了几项重要调查发现，包括选民对特朗普执政后**种族关系**的悲观预期、对**计票准确性**的信心变化、对**女性总统**的预期，以及认为**新闻媒体对选举影响力过大**的看法。\n*   **右侧图表**：是一个条形图，展示了不同群体（所有选民、男女、特朗普和克林顿支持者）对“**有生之年国家是否会选出女总统**”的预测。数据显示，绝大多数选民（约80%）对此持肯定态度。",
+          "asset_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+          "actual_vision_wire_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+          "actual_vision_wire_bytes": 410465,
+          "actual_cap": 5000,
+          "actual_thinking_parameter": null,
+          "vision_usage": {
+            "calls": 1,
+            "input": 1032,
+            "output": 1161,
+            "total": 2193,
+            "unknown": 0,
+            "unknown_held": 0
+          },
+          "input_reservation": 411489,
+          "output_reservation": 5000,
+          "chunk_types": {
+            "text": 162,
+            "image_ocr": 1,
+            "image_caption": 1,
+            "summary": 1
+          },
+          "vector_count": 165,
+          "derived_chunk_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "parent_chunk_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ],
+          "stages": {
+            "search": {
+              "count": 30,
+              "image_child_ids": [
+                "1580bcd9-8f38-4465-bb30-1162cce13061",
+                "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+              ],
+              "image_parent_ids": [
+                "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+              ]
+            },
+            "rerank": {
+              "count": 4,
+              "image_child_ids": [
+                "1580bcd9-8f38-4465-bb30-1162cce13061",
+                "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+              ],
+              "image_parent_ids": [
+                "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+              ]
+            },
+            "context": {
+              "count": 2,
+              "image_child_ids": [],
+              "image_parent_ids": [
+                "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+              ]
+            }
+          },
+          "caption_in_final_context": true,
+          "ocr_in_final_context": true,
+          "caption_in_actual_final_request": true,
+          "ocr_in_actual_final_request": true,
+          "final_answer_calls": 1,
+          "fixed_refusal": false,
+          "answer": "## Answer\n\nAccording to the Pew Research Center survey conducted November 10–14, 2016, **both men and women** expect a female president will be elected in their lifetime, with **no significant differences** between the two groups.\n\n- **Women**: 79% expect a female president in their lifetime\n- **Men**: 79% expect a female president in their lifetime\n\nThe survey found that 79% of all voters (across gender lines) still expected a female president \"in their lifetime\" following Clinton's defeat, and there were no significant differences in these opinions among men and women, or among Clinton supporters and Trump backers.",
+          "answer_diagnostic": {
+            "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+            "metrics": {
+              "normalized_exact_match": 0,
+              "character_f1": 0.012244897959183673
+            },
+            "official_judge": "NOT_RUN"
+          },
+          "official_judge": "NOT_RUN",
+          "ingestion_seconds": 20.839759,
+          "qa_seconds": 5.779336700012209,
+          "provider_latency_ms": "NOT_CAPTURED_SEPARATELY",
+          "usage": {
+            "calls": 13,
+            "input": 37500,
+            "output": 1582,
+            "total": 39082,
+            "unknown": 0,
+            "unknown_held": 0
+          },
+          "public_citations_enabled": false,
+          "source_chunk_readback": "PASS: four derived chunks read through ordinary HTTP and checked for page/version/text identity",
+          "full_visual_to_final_chain": true,
+          "status": "QUALITY_FAILURE",
+          "failure_categories": [
+            "CHART_VALUES_NOT_EXTRACTED",
+            "UNSUPPORTED_GROUP_PERCENTAGE_IN_ANSWER"
+          ],
+          "manual_answer_correct": false,
+          "necessary_gold_facts_in_derived_text": false,
+          "manual_basis": "Original chart visibly shows men81%, women78%. OCR garbles bars and Caption says about80% without exact group values. Cheap receives the real derived content but invents both groups79% from overall79% prose.",
+          "rerank_observer_scores": {
+            "image_ocr": 0.8536705374717712,
+            "image_caption": 0.8735278844833374,
+            "image_parent": 0.9033378958702087
+          },
+          "rerank_input_count": 30,
+          "rerank_output_count": 30,
+          "rerank_score_evidence": "Existing RerankRegistryObserver records model.rerank return; not claiming an additional raw HTTP response capture.",
+          "raw_provider_caption_matches_persisted_result": true,
+          "raw_usage_matches_settled_ledger": true,
+          "finish_reason": "stop"
+        }
+      ],
+      "fence": {
+        "total_allocation": 1000000,
+        "actual_new_occupied": 50185,
+        "unused_revoked": 949815,
+        "accounts": {
+          "deepseek": {
+            "limit": 4324,
+            "occupied": 4324,
+            "headroom": 0
+          },
+          "siliconflow": {
+            "limit": 1739220,
+            "occupied": 1739220,
+            "headroom": 0
+          }
+        }
+      },
+      "history_preservation": {
+        "deepseek": {
+          "old_rows": 2,
+          "all_old_rows_unchanged": true,
+          "old_rows_sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+          "old_unknown_count": 1,
+          "old_unknown_held": 259
+        },
+        "siliconflow": {
+          "old_rows": 726,
+          "all_old_rows_unchanged": true,
+          "old_rows_sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+          "old_unknown_count": 61,
+          "old_unknown_held": 823355
+        }
+      },
+      "authority_revocation": {
+        "active_config": "disabled",
+        "used_bundle_sha256": "1fd7e679dc08465d8fa3fc4f6501c121ae58529fc5417b9100127c731f354b75",
+        "both_month_headroom": 0,
+        "task_owned_api_worker_stopped": true
+      }
+    },
+    "account_proof": {
+      "schema": "p27-owner-window-account-proof/v1",
+      "export_name": "usage_data_2026-10-11_2026-10-17.zip",
+      "export_sha256": "3397bad99e3f324d20551b593faa4e0047fc867db55eaa9da2cd2fa9f66176ac",
+      "export_account_sha256": "5aa23ee42ea74fd4dae05e985f08e7de17d3e0d9ac211a0a164a8b0ce9d30100",
+      "current_credential_sha256": "a9152466b4630eb420b73081c9e3cab5a9c28eccf364d8f5cd81cecaf97017f3",
+      "masked_export_credential_matches": true,
+      "account_alias_preserved": "deepseek-owner-main",
+      "key_name": "ccswitch-deepseek",
+      "owner_supplied_identifier_matches_export_user_id": false,
+      "owner_fact": "不是本项目专用，但是最近只有这个项目在用。对就是这个，你就看这七天的，都是这个项目在用。",
+      "audit_window": "2026-10-11 through 2026-10-17 export, +08:00; not a complete month audit",
+      "amounts": {
+        "output_tokens": 16920,
+        "input_cache_miss_tokens": 25764,
+        "request_count": 21,
+        "input_cache_hit_tokens": 10112
+      },
+      "observed_tokens": 52796,
+      "consumer_scope": "Owner-attested all usage in this seven-day export belongs to this project; shared account, not technically exclusive",
+      "conservative_treatment": "Keep entire export total in account-cap planning, in addition to old local held occupancy; do not net out or settle UNKNOWN"
+    },
+    "source_binding": {
+      "source_sha": "14788b9ed37cfd82d15ac8ecbb62efcab4f14d35",
+      "files": {
+        "backend\\weknora_port\\__init__.py": "a2ed2a3af692c6aadb6f6872cb5867985b9e34592297f02957c3a73b9a157936",
+        "backend\\weknora_port\\authority.py": "de1931e72153f6a3bcd747cee3019bda7e1257ba4317598cb872dc213e598b29",
+        "backend\\weknora_port\\conversation\\__init__.py": "076f141c1b8617e41a79cc16a83acd90250448850cc693134e00e10f30814937",
+        "backend\\weknora_port\\conversation\\extraction.py": "3f1a38f18320ee13f54aed2df6d04fd37ad211e89b649540491c7001380a1afb",
+        "backend\\weknora_port\\conversation\\history.py": "f47ff4eddcc34e1cb30d100bf8fffd049f553972390c2045d09a48ecd9208b17",
+        "backend\\weknora_port\\conversation\\maintenance.py": "6dc12d28c1eb59ca993e84dcb984c6c916608ed4ee80404942fd7c197c2f6e79",
+        "backend\\weknora_port\\conversation\\maintenance_types.py": "bd170aaac1d0241ad6873ecb8a6e200a8df23084999952596b1d4525cf5c2f65",
+        "backend\\weknora_port\\conversation\\management.py": "6cabee00b690a319fbd9a003cc9f6bdd46fb8c9c4991a765680b8a2797ca2a75",
+        "backend\\weknora_port\\conversation\\memory.py": "09f7dbb8fe443db20b362037026d2d0cd06930ec9f015b70e52c3f4bdf751cfc",
+        "backend\\weknora_port\\conversation\\prompts.py": "631e1e941509632dceefcb3819484057fabf2d14843540e54e8c1927604b86af",
+        "backend\\weknora_port\\conversation\\ranking.py": "aec71eda8dbc89738e6f40aca4328fc948495db9f40ba2994f0712095c2e8f32",
+        "backend\\weknora_port\\conversation\\topics.py": "17832e318b10fbf192b2e5203a0e33f376a79febf5efc4ad47fa69657eeeade0",
+        "backend\\weknora_port\\conversation\\turns.py": "2658cf9456696dee42369b7635f232e537f659045b249e403b0b1c147647d3f6",
+        "backend\\weknora_port\\conversation\\types.py": "9b1815ba4a2509467cc4b466d370a25ce040cfd2d12cb95d8e4497e5e86d8e7b",
+        "backend\\weknora_port\\conversation\\unicode15.py": "671a755d3e15d7cdf0cfe715e93ba43e225c199cf3874712f4e9141a4b5bffa4",
+        "backend\\weknora_port\\conversation_configuration.py": "7bdfa03852d3e0f5fe76882e1ed5fbe612bd0989f573797b995a2d5dabd485a7",
+        "backend\\weknora_port\\crypto.py": "918d19fac0965b0fe7eed1817f4b32e5e26519b36730ec04250f990379b83c8d",
+        "backend\\weknora_port\\development.py": "142ab26f2c11e045d58dcf77b488b49da222585afd14571c5307e3ae5faf40cf",
+        "backend\\weknora_port\\document_profile.py": "845e97eb5ab06472000872a7aa15283d453126c694e9c5fc84ae651ae438dcbc",
+        "backend\\weknora_port\\documents.py": "167f310b4da5d6e96f14e12c86d851d2978866dcd5ea4b6cd6138ab495cf1745",
+        "backend\\weknora_port\\entrypoint.py": "4e1687fe6896169cc157c1b2ba89c2878b5ff092d2b8b3199c3c10be45376107",
+        "backend\\weknora_port\\generation\\__init__.py": "6c6dd78d562fc9a6611f0f0ed278cb9127db489d6bc90ed2badeea0ad0b5fd43",
+        "backend\\weknora_port\\generation\\context.py": "f771e408f2773de524305371a4e2a997028d63d1bc8df7644b55460c6a640d73",
+        "backend\\weknora_port\\generation\\coordinator.py": "d84f4a0a250abdd28fb462af60f239f1cac7b9272b1ad87073ac09b61836ae4f",
+        "backend\\weknora_port\\generation\\estimator.py": "31d5156f6b117eb065d3410e3947f16717036b0a7b973a07b0992797dda88fef",
+        "backend\\weknora_port\\generation\\features.py": "b9cbf8421c64c4bc9b822631ee43d4b1f0f8ef6150e701ed8f91693d7f3fc12a",
+        "backend\\weknora_port\\generation\\router.py": "270363dc71bc59295dc7c816a21e16492e8ff1f652ea49d6e3f59dda5e8b649b",
+        "backend\\weknora_port\\generation\\types.py": "c486f7bb819983a70b1b556ef16918786791851f97855a5c11e06a596bad0ae1",
+        "backend\\weknora_port\\http_api.py": "f8f8ea53308bb05f8db52e94369fe15141a9755eee7ca7a55e4fbc65b947dde9",
+        "backend\\weknora_port\\image_configuration.py": "e2decadfca3be8662490f3d2960e1aa97a40f906aa6bb8829fd90280c433fda9",
+        "backend\\weknora_port\\image_multimodal.py": "cf63b1665d3293f997987a78cea7270a6cedb26cca39855ca3fc005899402b0e",
+        "backend\\weknora_port\\image_tasks.py": "45cd9f89d6dac559ea00981dbb2244c94d168ba2544bf9f4a478956d976fd28b",
+        "backend\\weknora_port\\ingestion\\__init__.py": "847f9ba12acc4008db0f17ea4ee6866865a607e0df6102963bdabbdd85686cf2",
+        "backend\\weknora_port\\ingestion\\_docx_runtime_adapter.py": "10ed924b046e90a06d014cb7ece811e6f40c522c541d2034bf3fef4baf1739ef",
+        "backend\\weknora_port\\ingestion\\_excel_runtime_adapter.py": "25198cc0db26d6e564df5481ebf78036b828a9edffd9923c2cf62a0d4321bb86",
+        "backend\\weknora_port\\ingestion\\_office_runtime_adapter.py": "3cc7c1ce63c8377b21b9d06ae94bed449ae54849989be53be572a8957144fd23",
+        "backend\\weknora_port\\ingestion\\core.py": "26a04b36ad5382b1de85d570fa7595e7f582a0d6f17cc02561cd522dbdfb910d",
+        "backend\\weknora_port\\ingestion\\html_conversion.py": "907e3554f3377acf7b458a23b8f3d7988643c798e4cc60fe8c3c5906c855b2c9",
+        "backend\\weknora_port\\ingestion\\mineru.py": "60653e9bc0e46ae14e8dff0bce36d3edb6eef75302fe9c4f57de7c4b95846e54",
+        "backend\\weknora_port\\ingestion\\mineru_runner.py": "9a2e7d13dc455d87ac1d151f5c60357b54d822fd72b86ec7442171243c377149",
+        "backend\\weknora_port\\ingestion\\upstream_chain_parser.py": "5018cd4b74d92eb396c0bc2bc14ddbfa01c2df126c1faccbeef1daae217cd29b",
+        "backend\\weknora_port\\ingestion\\upstream_concurrency.py": "5ad3910e11abde2a8df4154d6a63e62af935f629e3f8e92f2a8beb92c1bb802b",
+        "backend\\weknora_port\\ingestion\\upstream_doc_parser.py": "473718b00322487607df050e51e93c1a99d8c206dc3318ebb3d16684721e6c6f",
+        "backend\\weknora_port\\ingestion\\upstream_docx_merge.py": "0f3d7cf7c11d989a4e1627ec84dce73698599fe211e2b97e06d92e95bd004ccc",
+        "backend\\weknora_port\\ingestion\\upstream_docx_parser.py": "28bad005dc1cb37948fbcd310561e98acd82b71de5c7cc17da02e381b5d1c734",
+        "backend\\weknora_port\\ingestion\\upstream_excel_convert.py": "52c112cd3d4d1ad2164f786b4743028ac3442c10ea3928ed6b5579a819690969",
+        "backend\\weknora_port\\ingestion\\upstream_excel_parser.py": "fea2ff4f9d2896347940cf14717f91617a3887c8c8fa6bd9e91346c071d1d17b",
+        "backend\\weknora_port\\ingestion\\upstream_markdown_helpers.py": "551a25db19be4d640c66e35499e6a12d131547108a426b7c94e0951f28251efd",
+        "backend\\weknora_port\\ingestion\\upstream_office_tempfile.py": "24ecde971a8833a0e489d5fc4f6c7e103cbdb6070d345c9c216e455ff16f0100",
+        "backend\\weknora_port\\ingestion\\upstream_pdf_parser.py": "321198b01333c00336a1459baf1c8c2ab0f63ed62c5314f8eaa44a09ac941dc1",
+        "backend\\weknora_port\\ingestion\\upstream_ppt_convert.py": "bf1866e97299903a18bad24bc79d10172edfa0b112196e1124ea9cbc866de13c",
+        "backend\\weknora_port\\ingestion\\upstream_pptx_media.py": "820c1f33a5a246c87616e40a917daeee67ebe7d8f8fccd392f850d24989b131f",
+        "backend\\weknora_port\\ingestion\\upstream_xlsx_merge.py": "94cab0c10cf090cbf72b5d922b5b63abd1b0d0a4e35676de12d1c4951cfdbd43",
+        "backend\\weknora_port\\ingestion\\upstream_xlsx_repair.py": "810eece79035c260144952e87b55c858d3c6367e0bc701a5abdd86d35ee9f117",
+        "backend\\weknora_port\\initialize.py": "81a6306dc6f7465b98282d76e689000da211ef1ff056dba4d2020bb010ada0bb",
+        "backend\\weknora_port\\memory_runtime.py": "1bf74cfa97cac98c1eed853dba90ff50d000dee0cd5d44efec11492bad06a09a",
+        "backend\\weknora_port\\model_registry.py": "00b2745cd6f5fc15832042d468e81c9547946745549267aab60735ccbd0f720c",
+        "backend\\weknora_port\\model_selection.py": "80a5175c740810f953b96fc5c60b536e7e6604961540e7ee322bf91d446fa10c",
+        "backend\\weknora_port\\models\\__init__.py": "9f58a09fb832a4f04bc8e20aca821db0112b80532cb7c0d58c10cf839e694188",
+        "backend\\weknora_port\\models\\catalog.py": "61824313d21e5b20e135f1e52b716741c81d68ff0ad15b1f5a1243237cc6d78a",
+        "backend\\weknora_port\\models\\catalog_resources\\native_request_oracle.py": "301b6f3e687966ce1fd612ac9136f399502deb4c5d3a0ee1061b24bdcffce704",
+        "backend\\weknora_port\\models\\compat.py": "aae7066b8ec707eddac4a1d57ec740424956eda8d4714a6e7a2682cc8bf93037",
+        "backend\\weknora_port\\models\\local_ollama.py": "54ccd62a5933e059c3e9062364cf92ad8fd6456bbcfb308ea441333ccc5375e4",
+        "backend\\weknora_port\\models\\native_request.py": "04b7199d532631d7849c152e866e68cc9fe4c5f33c136fb498ac58a47fb2e082",
+        "backend\\weknora_port\\models\\native_response.py": "72735b755676d7a931ea592214d3baa967cd4143228c15e260d0482fe7ac59f8",
+        "backend\\weknora_port\\models\\output_contract.py": "99797c9783882f5c808460d48056c6faa8ab03518630c47e68d33e8461edfe55",
+        "backend\\weknora_port\\models\\provider.py": "fcf29af6909dd73072feb02cd2ba223f5df7565ce97d261e0cf24cec17d14e76",
+        "backend\\weknora_port\\models\\request.py": "01a230cd8d2b95ca15cc1efa4b0cdc783aece15e5c870fa2d2b9c8039871438f",
+        "backend\\weknora_port\\models\\safe_network.py": "92051be5afaa4410c8bdfa5bc6cfac15d1d1679b00be557cfee56c70cad09143",
+        "backend\\weknora_port\\models\\signing.py": "106e7daf351a918a1d0f288866b1be0eba04c1fd8ae09736d8398d3a00be007e",
+        "backend\\weknora_port\\models\\stream.py": "dc4fe76a75654146e0527151b32c3515ad7f4ca1763c7b927d197ed1703741cf",
+        "backend\\weknora_port\\models\\synthetic.py": "cad5ca9317e199bfa6f74dd0c0bcbd1e9dbcf45078aebf768bf02cb21fe204be",
+        "backend\\weknora_port\\models\\transport.py": "8c8dfc8d29548e5236188cfc9d0928ed935a46d82969e4a38e37cd2efd586bbd",
+        "backend\\weknora_port\\models\\types.py": "bb5ae85b5b63c2429036316afd47dd8918fb63be08dafc384e9d5389c9d23d7c",
+        "backend\\weknora_port\\models\\usage.py": "93251e76a9ad948969cdaf09fb46556200942cbc3351aa2f2c69d916cfde38b8",
+        "backend\\weknora_port\\models\\usage_facts.py": "4f1bc032364f906e462e650932fe8cc7a5d80803aed29b47cd705fafa08c27b5",
+        "backend\\weknora_port\\references\\__init__.py": "6844c968ed16e76378586cda869474b645fd62a487acd6e65b33c722df2466ee",
+        "backend\\weknora_port\\references\\decoder.py": "b91800397431d1458fa941e8acc8d8eec8a93dafaa68d0739a68935a60305441",
+        "backend\\weknora_port\\references\\registry.py": "74ece6dcbf0b9aef69e4830728ffb683f81f9132effa3c8c984b74400e95c572",
+        "backend\\weknora_port\\retrieval\\__init__.py": "b8196d10f2143742df53bea74e33e1b40bb95b6a975ddee725ec4cfa0ae12232",
+        "backend\\weknora_port\\retrieval\\context.py": "6a2907a5e3b7fd067faddbb05ffc81fe816691584497edc2b7c2c28bd855ad7f",
+        "backend\\weknora_port\\retrieval\\filter_top_k.py": "7d95798bfb8630453c041d12333b60fadbd0ef97dc90593d52f857b4421c93eb",
+        "backend\\weknora_port\\retrieval\\fusion.py": "44d1a98e601bb69977ca2b197c145b300e104c419bbbfddb8a46ab7dac78700d",
+        "backend\\weknora_port\\retrieval\\memory_affinity.py": "f8c1da502f4100dd3166c067525a6aa3dcf893bcb515b90d8b6d29d72639db35",
+        "backend\\weknora_port\\retrieval\\merge.py": "5f37e8689541be1c9718adb112a8be79141e7afee2112851cc200c30f2fff334",
+        "backend\\weknora_port\\retrieval\\pipeline.py": "481a54b288d05243b96d415645b53d6032e3b02fd49b3df65ccfcde2fef11cbe",
+        "backend\\weknora_port\\retrieval\\query.py": "3c2c44c83cd097f495f0153d3c1f4aec23e97fe8eb5bb65d589af35ed71d8e6f",
+        "backend\\weknora_port\\retrieval\\rerank.py": "c3d6f6654772543f90afcce04cf1d4b850ebb7df5d87e438b7c54d98d149ecfe",
+        "backend\\weknora_port\\retrieval\\search.py": "edee1bbc3439926a4f0b1fd039204439dbe280ccdcb8181840daa274e96f2696",
+        "backend\\weknora_port\\retrieval\\types.py": "9a137488600780e0e34de9c250da4566e7650a89df4fd849f61feacabbfe8076",
+        "backend\\weknora_port\\runtime.py": "0184c9cea7cc9146954bfb3a06593ad83c602500f805a939f6129c0bf5e35585",
+        "backend\\weknora_port\\service.py": "13ec2eb64d79bae40995219024d0cfc33aa131d91df635e70facda3e56ad7c03",
+        "backend\\weknora_port\\source_facts.py": "f3ce75acd53c276308818cafb5bb0104c9a022495b3e62bdc407f6b9e17b6723",
+        "backend\\weknora_port\\storage\\__init__.py": "c95bcb93d61d7c72913fa6ddfa629ff6c4dfed0d062fe850c5d2d7e0dea037ad",
+        "backend\\weknora_port\\storage\\chunks.py": "055623ab12d3b91b4d948c59022a8f94f5b879b7e3d695e00454c253f0a12022",
+        "backend\\weknora_port\\storage\\configuration.py": "a994329f32cd8bd4befc14e251a01120484bcf0cb94222de9401eba3dcb10857",
+        "backend\\weknora_port\\storage\\configuration_migrate.py": "3b1db825adb69bcd077928c2ae97080dd156f8013a48938b9c42f90165b71094",
+        "backend\\weknora_port\\storage\\connections.py": "4ddf3bd8d5b685771e6e39f3dc53a245c5c7d53aed32e71c3005bd3cdb7013a5",
+        "backend\\weknora_port\\storage\\document_profile_migrate.py": "08002a2daf422b4c376ad60fea7c8e43bf1218178875411ce6c0f49765352944",
+        "backend\\weknora_port\\storage\\generation.py": "f61fd8c0dbf75750dbf53046fd1a92412f0788927a07bee083258fad6912a12e",
+        "backend\\weknora_port\\storage\\generation_migrate.py": "658c8911275a8bcd38b366205df1b2ec74cc247458bd2663fe9be70fb567bd4f",
+        "backend\\weknora_port\\storage\\history.py": "c1e74dea611e90b8b4989d3226f7df69d04af17181fdf28d946738fc038ee70d",
+        "backend\\weknora_port\\storage\\hybrid.py": "49789246535a67b19be7083d964451ad32a9b3ab5b223979876211193caf8a9a",
+        "backend\\weknora_port\\storage\\image_tasks_migrate.py": "53ec68de749a9722b1525cda2d62521f89632eb95bf9825b9ddc2011662fc1a5",
+        "backend\\weknora_port\\storage\\indexing.py": "c390bde739474b52fd3b58c68b70abb926099e979907e81c7510f2afe16bfeaa",
+        "backend\\weknora_port\\storage\\knowledge.py": "ccb3c3a41d68d58623841bee1d02beae70978fe184e7cbdd091b6e23f398387d",
+        "backend\\weknora_port\\storage\\local_principal.py": "cf65a00190963c7c551dfe12e5d8476b5911f7dcb0e602d60a4a93060cd080fb",
+        "backend\\weknora_port\\storage\\memory.py": "6ba8ef75979c91c29ada7d0f55a3b007010eb3572fee6046fc57444fe59ec5ce",
+        "backend\\weknora_port\\storage\\memory_queue.py": "7aaade8d7cfb0028ec54aed22c0865995ca4b2d849fdd1486b0626ccd372fe9e",
+        "backend\\weknora_port\\storage\\migrate.py": "cdb536744e198127615541d6bc80cc878a2a2e02ad89d04a1d93b9d4b43bbc7d",
+        "backend\\weknora_port\\storage\\models.py": "3ae85b55ac9e97cca3cf0d10bc9cac7e8afb1fb199fe59aaff421e7031e445e6",
+        "backend\\weknora_port\\storage\\models_migrate.py": "4d27f9d65baee453b814527930f7f919df61c44863e7f91e2394e9f0fd0279c3",
+        "backend\\weknora_port\\storage\\postgres.py": "892a9a58eefd9cdc2dc613ad0c4bd620e33a3a20200e580ad6ec79ea904c190e",
+        "backend\\weknora_port\\storage\\send_gate.py": "aa258ce6299bdd407ae23f07c5e6e3c576e3ffb43270bcbdce8b6f2440e5aebb",
+        "backend\\weknora_port\\storage\\send_gate_migrate.py": "dad58d6277a722f6225043a707793f7aa59242294effed2f78711c1154cbb5ab",
+        "backend\\weknora_port\\storage\\token_budget.py": "72dfcf1cca82bedf5dc5eae76c126a3b79b20ecb81214d93062604cf9c5858aa",
+        "backend\\weknora_port\\storage\\token_migrate.py": "798c5d8c361ae9819aaf2eb446160d46addd358064bc0d2d494e78dba4aff3a8",
+        "backend\\weknora_port\\storage\\turns.py": "b331a460421ac19a056fdf84ac7a29a2297352d3e3c4cf6e8580abd6579e667b",
+        "backend\\weknora_port\\storage\\turns_migrate.py": "30b3c2615951ef5c891811263dd74cd312c4aa348a8ac5b48d12c1889061ea3e",
+        "backend\\weknora_port\\streaming\\__init__.py": "043cf6fe16dfe0f1fb5bacc2eb01476dea3cc4ce73e9bc6ca1555a849e016d65",
+        "backend\\weknora_port\\streaming\\events.py": "c0b4b722edf04235eb5f072c40c6e08c916299c31862cc3debdab9951cd553c7",
+        "backend\\weknora_port\\streaming\\manager.py": "350543e234ec77c61d978b789c9df167a8c93935e3ea8f1731b04e312f029775",
+        "backend\\weknora_port\\streaming\\replay.py": "939450ecb10ae05fb0e14b6194a859c69529c4f43c34b0ccbe1307509aabcfe1",
+        "backend\\weknora_port\\tesseract_ocr.py": "7a7ab41b146bdc97869759a7242eb9e623be6843fa56a8e0910eb96010a87266",
+        "backend\\weknora_port\\worker.py": "de956c1ec69ccfb114df397678152d5979203fc5012adda6fa5f1304e51a9ba4"
+      },
+      "product_python": "E:/RAG quention/.venv/Scripts/python.exe",
+      "pipelines_modified": false,
+      "source_changes_in_live_run": false
+    },
+    "scope": "Real HTTP/FastAPI/Worker/PGvector/Redis and real providers; no mock model/business API.",
+    "source_commit": "14788b9ed37cfd82d15ac8ecbb62efcab4f14d35",
+    "evidence_directory": "docs\\evaluation\\evidence\\p27-live-20261017",
+    "run_directory": "E:\\WK\\run\\p27-live-20261017",
+    "fence_close_summary": {
+      "status": "CLOSED",
+      "accounts": {
+        "deepseek": {
+          "limit": 4324,
+          "occupied": 4324,
+          "headroom": 0
+        },
+        "siliconflow": {
+          "limit": 1739220,
+          "occupied": 1739220,
+          "headroom": 0
+        }
+      },
+      "actual_tokens": 50185,
+      "unused_revoked": 949815,
+      "history_preservation": {
+        "deepseek": {
+          "old_rows": 2,
+          "all_old_rows_unchanged": true,
+          "old_rows_sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+          "old_unknown_count": 1,
+          "old_unknown_held": 259
+        },
+        "siliconflow": {
+          "old_rows": 726,
+          "all_old_rows_unchanged": true,
+          "old_rows_sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+          "old_unknown_count": 61,
+          "old_unknown_held": 823355
+        }
+      },
+      "raw_immutable_receipts_on_E": {
+        "fence\\close-after.json": "1f34fcf711bacf4b0bfc1e2ef11cf848220a447082c9e303bc0e202e6a585401",
+        "fence\\close-before.json": "114e61071ef6c81a2a6bbbfeb161abd45aac9dbec540442e1f5bd6a7dc44b3b2",
+        "fence\\close-precommit.json": "e2363b50f6864b8d6e54874a08daf6bb3586c802b669fd685a9183ca4f390c82",
+        "fence\\intent.json": "82ede9fbfb38fb8d1b1897d449d1a4a3851f04f19336381d3e8ed5496555bd2b",
+        "fence\\open-after.json": "fbf4258a578bbe0145ab39007de6ce285c3c050d3598f9317f3e10cd9eb4c642",
+        "fence\\open-before.json": "296478400daf1d9e0bc8a3898bd77ef220302b233465ccef931945782bc465d2",
+        "fence\\open-precommit.json": "ec411461ca329e34a9adab21826c1bc14d732e4e016114bdff2c090e44e6db96"
+      },
+      "raw_export_sha256": "3397bad99e3f324d20551b593faa4e0047fc867db55eaa9da2cd2fa9f66176ac"
+    },
+    "production_changes": [
+      "backend/weknora_port/authority.py",
+      "backend/weknora_port/development.py",
+      "backend/weknora_port/entrypoint.py"
+    ],
+    "tests_changed": [
+      "tests/weknora_port/test_authority_approved.py",
+      "tests/weknora_port/test_p27_authority_bundle.py"
+    ],
+    "migrations": [],
+    "dependencies": [],
+    "offline_tests": {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest tests/weknora_port/test_p27_authority_bundle.py tests/weknora_port/test_authority_approved.py tests/weknora_port/test_authority_usage.py tests/weknora_port/test_output_budget_contract.py tests/weknora_port/test_p27_vision_meter.py tests/weknora_port/test_development_entry.py --basetemp=E:/WK/run/p27-authority-bundle-20261017-02/pytest-temp --junitxml=E:/WK/run/p27-authority-bundle-20261017-02/pytest.xml -q --tb=short -p no:cacheprovider",
+      "passed": 129,
+      "exitcode": 0
+    },
+    "inherited_dirty_files_preserved": true,
+    "no_push_deploy_merge_tag": true,
+    "closeout_verification": {
+      "status": "PASS",
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382",
+      "accounts": {
+        "deepseek": {
+          "rows": 4,
+          "calls_sha256": "0d0218a7217e207ee5d4af8bc13fd31105dc22b3e04a44a4d1d4c28c36aeedcd",
+          "month_unchanged_since_close": true,
+          "headroom": 0,
+          "reserved_count": 0,
+          "unknown_count": 1
+        },
+        "siliconflow": {
+          "rows": 748,
+          "calls_sha256": "625deb86cee8a057c7a63565c3ca22244e257ca2eeb475963910926782cf5927",
+          "month_unchanged_since_close": true,
+          "headroom": 0,
+          "reserved_count": 0,
+          "unknown_count": 61
+        }
+      },
+      "provider_calls": 0,
+      "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+      "redis_database": 15,
+      "redis_prefix": "weknora-python-p27:2b810c56a34b491fa3330ef1e2b5cc92",
+      "closed_ports": [
+        56425,
+        56426
+      ],
+      "authority_config_disabled": true
+    },
+    "artifact_diff_check": {
+      "final_exitcode": 0,
+      "preserve_raw_sse_bytes": true,
+      "scoped_evidence_attributes": true,
+      "initial_failures_preserved": true
+    }
+  }
+}

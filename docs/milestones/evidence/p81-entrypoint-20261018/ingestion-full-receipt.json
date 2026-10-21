@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "kind": "ONE_SYNTHETIC_PNG_REAL_HTTP_MINERU_PG_CHUNK_KEYWORD_INDEX_READBACK",
+  "tenant_id": 332,
+  "api_port": 56427,
+  "cloud_allowed": false,
+  "provider_construction_attempts": 0,
+  "knowledge_base_id": "2efe0d9b-1b23-4fad-b5a3-75019e8bb124",
+  "document_id": "8970929a-e1f8-4bff-9c67-66d69798d60e",
+  "document_status": "completed",
+  "parse_status": "completed",
+  "parser_engine": "mineru-basic",
+  "source_version": "281ab94d-9909-48a7-b307-2ea375a159f8",
+  "source_sha256": "47259c448c9b0d671dc8be428e761550ebcb4f4e7a5a7d19749931e7ba345c97",
+  "chunk_count": 1,
+  "keyword_index_row_count": 1,
+  "keyword_only_dimension_zero": true,
+  "readback_http_status": 200,
+  "readback_chunk_id": "cee6621f-415a-4eb3-94c7-c362db7a986c",
+  "readback_source_version": "281ab94d-9909-48a7-b307-2ea375a159f8",
+  "readback_locator_count": 1,
+  "readback_locator_ranges_valid": true,
+  "redis_prefix": "weknora-python-p81-20261018-11b9675d216f4a10a253eabc1028bd04",
+  "storage_root": "E:\\WK\\run\\p81-retirement-20261018\\ingestion\\assets",
+  "upload_attempts": 1,
+  "real_provider_calls": 0,
+  "parser_calls": [
+    {
+      "filename": "p81-synthetic-note.png",
+      "document_id": "8970929a-e1f8-4bff-9c67-66d69798d60e",
+      "source_version": "281ab94d-9909-48a7-b307-2ea375a159f8",
+      "parser_engine": null,
+      "mineru_source": {
+        "source_sha256": "47259c448c9b0d671dc8be428e761550ebcb4f4e7a5a7d19749931e7ba345c97",
+        "source_version": "281ab94d-9909-48a7-b307-2ea375a159f8",
+        "document_id": "8970929a-e1f8-4bff-9c67-66d69798d60e",
+        "parser_engine": "mineru-basic",
+        "parser_version": "4.0.12",
+        "schema": "docvortex.middle",
+        "schema_version": "2.0",
+        "producer": {
+          "name": "mineru",
+          "version": "4.0.12"
+        },
+        "offset_space": "derived_unicode_codepoints",
+        "middle": {
+          "logical_path": "mineru/middle_json.json",
+          "sha256": "4b27dae8ff3b5cdffb73cebacdaf1bbe425605c7a36d5e22860c39f1b6d333bb"
+        },
+        "page_indices": [
+          0
+        ],
+        "is_full_document": true,
+        "source_page_count": 1,
+        "derived_text_sha256": "1a1df1042dd939b7ef431af8c144d2b0b560fdd80215cb8ef94fc92ee7708fcb"
+      },
+      "failure_codes": [],
+      "seconds": 10.963
+    }
+  ]
+}

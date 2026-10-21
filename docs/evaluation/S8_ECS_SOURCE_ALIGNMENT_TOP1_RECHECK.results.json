@@ -1,0 +1,2299 @@
+{
+  "schema": "s8-ecs-all-source-alignment-top1-recheck/v1",
+  "status": "COMPLETE_SCOPE_WITH_REMAINING_QUALITY_FAILURES",
+  "not_s8_full_evaluation_complete": true,
+  "code_baseline": "3d90756f064ea28810beac0fcc250e05d539d954",
+  "branch": "codex/s8-six-dataset-evaluation-20261019",
+  "image": "sha256:8e31042a532fc80be6f5595407fcaf30da37147a88edb1d998a773bda3a2ffa8",
+  "stage_id": "s8-aligned-all-top1-20261020",
+  "source_alignment": {
+    "source_kb_groups": 28,
+    "unique_source_hashes": 27,
+    "old_versions_preserved": 52,
+    "old_vectors_preserved_disabled": 474,
+    "new_documents": 28,
+    "new_body_chunks": 629,
+    "new_summary_chunks": 28,
+    "new_active_vectors_1024": 657,
+    "mineru_basic_groups": 27,
+    "native_pdf_groups": 1,
+    "parser_source": "MinerU4.0.12 original SDK caches plus current local image-body OCR/normalization; native PDF kept native",
+    "new_cloud_ocr_or_caption_calls": 0,
+    "summary_binding_change": "Only 3 affected tenant332 KBs: existing Xing summary binding to configured Qwen; defaults and tenant1 not changed",
+    "sources": [
+      {
+        "source_key": "3c2c82384d6832f9ed94513981df6d7442e9441cd8ccc3b562239a9fbf4f010a",
+        "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "expected_full_input_sha256": "5433de8b15dae8de25143e93f0ae9acd8cfa79989d0e571b36d226204f1a49a2",
+        "actual_new_source": {
+          "document_id": "45a64de0-73c0-442c-af9a-dcdc171d83a0",
+          "source_version": "69cebfcf-1a97-4af8-aadf-03700ee163fe",
+          "body_chunks": 52,
+          "summary_chunks": 1,
+          "embedding_count": 53,
+          "original_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "readable_chunk_count": 53
+        },
+        "old_switch": [
+          {
+            "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "disabled_embeddings": 35,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "c58f50534484f80d3242f0b236b883a394343e498a544126ebee29034f11e00b",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/3c2c82384d6832f9ed94513981df6d7442e9441cd8ccc3b562239a9fbf4f010a.result.json",
+        "ledger_sha256": "e7b0dde8d8e4dd9c5feedc0e7313b894c8af2089f049f5c4ffd71a553ede6655"
+      },
+      {
+        "source_key": "eefc7c872f02af8273da85c6007d01147e5513400e0a7e5778a4029d456b3c9c",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "428cca795816237571181f0b2f491ecb81d895359a142c07aa93d160ab58dd9d",
+        "expected_full_input_sha256": "fd834911986a48973edc5138ca0bdc51f976df6d6fce4f0215952240eed787dd",
+        "actual_new_source": {
+          "document_id": "8d9d3149-d79b-4604-941d-6f088161ee39",
+          "source_version": "9a654f80-f5bc-4170-98e0-275ff64e7dad",
+          "body_chunks": 2,
+          "summary_chunks": 1,
+          "embedding_count": 3,
+          "original_sha256": "428cca795816237571181f0b2f491ecb81d895359a142c07aa93d160ab58dd9d",
+          "readable_chunk_count": 3
+        },
+        "old_switch": [
+          {
+            "document_id": "47a414bd-a891-4570-abc7-a74e4511cc6d",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "6a50b4aa-3ef4-40b3-b8f5-884f5614c61b",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "c631ab4561cb9fbc5f4cdfa801841f56e9121fd4a3c165f18e98f9b8834d4995",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/eefc7c872f02af8273da85c6007d01147e5513400e0a7e5778a4029d456b3c9c.result.json",
+        "ledger_sha256": "4a8101dd9bbfe1c425ce00847c45576f7e0c2a538280149d2d2c82bc57273ff5"
+      },
+      {
+        "source_key": "49d75adcee615a0219e6dc964ff3f270bbbd13f3769920906f3fe565579d7f92",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "9dcbf54a42f97ec64a804ed454d5dc480c395b78cc7b106646cbc4d1d1730027",
+        "expected_full_input_sha256": "d567eed98d3b60fed905282428b6931f4dd03ba628e38c329b664115015843b3",
+        "actual_new_source": {
+          "document_id": "26d673dd-aaf4-426b-9d5c-d983b6ee0d40",
+          "source_version": "2c8c9b31-347c-499b-948d-a03b324970d5",
+          "body_chunks": 3,
+          "summary_chunks": 1,
+          "embedding_count": 4,
+          "original_sha256": "9dcbf54a42f97ec64a804ed454d5dc480c395b78cc7b106646cbc4d1d1730027",
+          "readable_chunk_count": 4
+        },
+        "old_switch": [
+          {
+            "document_id": "428fb04b-1447-40e3-8c29-ff8bb259b0cc",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "e9c81335-d206-4f42-a32c-63780364367c",
+            "disabled_embeddings": 2,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "8eb7b782da7a6b3a97475430fc3eb88b8670b480d0151540804dec8998c1680f",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/49d75adcee615a0219e6dc964ff3f270bbbd13f3769920906f3fe565579d7f92.result.json",
+        "ledger_sha256": "f7fdd298b6cc6961f985b225e760a877a05c2ddf89df983b2e85d83719f4fd5b"
+      },
+      {
+        "source_key": "c6b8ed9a86b582253f4a4240b946ef9c137546d87b22b07f3979336d1013e735",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+        "expected_full_input_sha256": "218586f3eb874e9221e170914323c94579bed5750b5456b0cb092d4e4ac01839",
+        "actual_new_source": {
+          "document_id": "652463e8-d445-44be-80b8-3080e745bb42",
+          "source_version": "ffd4ed5e-86f7-4302-a7a1-f8500996444f",
+          "body_chunks": 1,
+          "summary_chunks": 1,
+          "embedding_count": 2,
+          "original_sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+          "readable_chunk_count": 2
+        },
+        "old_switch": [
+          {
+            "document_id": "61754d8a-ca1f-48fb-a04a-942d3fcd29a2",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "35dfc67c0ef3e45e93ad645c583375c1e6dc24724a96b7e3cb1b19d331f4ea4d",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/c6b8ed9a86b582253f4a4240b946ef9c137546d87b22b07f3979336d1013e735.result.json",
+        "ledger_sha256": "4b7c40a0c69e154544d9f36f90bf6deccf24860de1be2dab776725052e8629a9"
+      },
+      {
+        "source_key": "a03e9bfb4113246a05055ba5bf9e69c09ef92c7d2524e29cf9d51a46d159ac03",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "e50bedfce6755d6987307c35bf2b6f08207af5ec9088bb5a36e6cc005a9972aa",
+        "expected_full_input_sha256": "97aac285c0eab563210f6ec7cae6053da575f5bc4b29d058cb49c933925ffc1d",
+        "actual_new_source": {
+          "document_id": "ded56e5c-12f5-401f-b2a8-04b5c565fcbd",
+          "source_version": "0c2d9905-900f-449a-b4b4-10bfd2c74244",
+          "body_chunks": 8,
+          "summary_chunks": 1,
+          "embedding_count": 9,
+          "original_sha256": "e50bedfce6755d6987307c35bf2b6f08207af5ec9088bb5a36e6cc005a9972aa",
+          "readable_chunk_count": 9
+        },
+        "old_switch": [
+          {
+            "document_id": "10c8f162-8f3b-464e-bfc8-eec99fefe8fc",
+            "disabled_embeddings": 4,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "6af51334-1820-4097-9923-24d22fb36a8d",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "47ae4507327acbc1ba85770cf35755356cd1ddc0d8447649ef0a8e8dc7b03367",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/a03e9bfb4113246a05055ba5bf9e69c09ef92c7d2524e29cf9d51a46d159ac03.result.json",
+        "ledger_sha256": "03802154a5b48bbc7864c9932ca8542b53999de1714b2b6b8d1768167b0f1646"
+      },
+      {
+        "source_key": "ce57605d0e2aa8cbcc99e546576b76259a494498c7d357a7e98eabfae88545cc",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "477ea3f2303b379dfb273b8e55bb6c4cc6564802e18ff38aeccb9a02f8f996ed",
+        "expected_full_input_sha256": "c837186995b7d0eadf8269c39b6658da02f251b543d7dd4cfc7ee032ed340b1b",
+        "actual_new_source": {
+          "document_id": "e9346031-700c-4d48-a7d0-2d64acdc08d0",
+          "source_version": "770c4b8e-242e-41b2-ad37-2812b443fdde",
+          "body_chunks": 1,
+          "summary_chunks": 1,
+          "embedding_count": 2,
+          "original_sha256": "477ea3f2303b379dfb273b8e55bb6c4cc6564802e18ff38aeccb9a02f8f996ed",
+          "readable_chunk_count": 2
+        },
+        "old_switch": [
+          {
+            "document_id": "50feb39d-301d-4292-b3d5-507a4a459417",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "65e68330-f371-46c7-85fd-6df60a2057b6",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "36c769d645c9907622c95dbf62e63bc405779723cc1a41804ba06c9228d5ba18",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/ce57605d0e2aa8cbcc99e546576b76259a494498c7d357a7e98eabfae88545cc.result.json",
+        "ledger_sha256": "fd8f7d0c6b20920a61037921b2abbc02d2e75d6829f4c2bbd41d32983a3a2c69"
+      },
+      {
+        "source_key": "e54fb2984594ede9b25a4b3bd64c35a139af42233a46e5328b2d7b62cec343cd",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "cee5dfe5832d25aaf999a07ccee36b931340ae088152a0dee79ad05e33aedc54",
+        "expected_full_input_sha256": "4d5db504b8516827d6923fbf2acda685c4e667433906acaa61f041dbed596151",
+        "actual_new_source": {
+          "document_id": "23fb2ca8-3f9a-4fad-b57b-82b52eee2efc",
+          "source_version": "9ba6bc3e-7e8c-4c46-af37-37e6f60477a3",
+          "body_chunks": 4,
+          "summary_chunks": 1,
+          "embedding_count": 5,
+          "original_sha256": "cee5dfe5832d25aaf999a07ccee36b931340ae088152a0dee79ad05e33aedc54",
+          "readable_chunk_count": 5
+        },
+        "old_switch": [
+          {
+            "document_id": "cd2cf3d5-5e03-4750-99cf-0b694bb68206",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "e3e61538-5ace-4d3a-9f39-c3316737374a",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "2085f12b5c9fe744b25ab0456bc1270b18dba6bf638e68176fa98f4a57007d78",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/e54fb2984594ede9b25a4b3bd64c35a139af42233a46e5328b2d7b62cec343cd.result.json",
+        "ledger_sha256": "f79d68d5683e64cc69d10a094576027b79925db77fd009d51cdc02eec8fb566d"
+      },
+      {
+        "source_key": "4f494845244a79a7547c2a53cd50f3d4ca8d553ced8ad7d9cdeaab036175b682",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "c99c8655ef4070c55307afd220e4d29931cbe2fbc92e11cd4e607efb310323fa",
+        "expected_full_input_sha256": "2a144e8639a8f92d4f8fcf1bbd0636298eb54b5804aec98bab6beb31060769b1",
+        "actual_new_source": {
+          "document_id": "1485b3e2-14fa-43a3-9665-fef337562ac1",
+          "source_version": "8d5c47cc-1488-4132-9434-203e1bbf443c",
+          "body_chunks": 2,
+          "summary_chunks": 1,
+          "embedding_count": 3,
+          "original_sha256": "c99c8655ef4070c55307afd220e4d29931cbe2fbc92e11cd4e607efb310323fa",
+          "readable_chunk_count": 3
+        },
+        "old_switch": [
+          {
+            "document_id": "24226786-49cb-4c0e-a3c9-cc1689f31c73",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "5995561a-434e-4863-a712-44f64315950c",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "7b5b2cecef781d26a8acf25e57e8bd173faa1c1b3b145bab6051a048a8fb8a81",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/4f494845244a79a7547c2a53cd50f3d4ca8d553ced8ad7d9cdeaab036175b682.result.json",
+        "ledger_sha256": "bbacb271dd5738dc0cdc69d235cc4bafd92db31354218787d9529cede1c62e03"
+      },
+      {
+        "source_key": "1522f7336dff23c4b5cd9464635841fafd6cdc5886e3399f5c8b5671d692ec17",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "2d5dd15d51beb6e5a74c1c48208f3464c10ef9893f251956e3e8ea6ac44f700e",
+        "expected_full_input_sha256": "c7883de20af16b0e16a93169cb3dea92a718f2f0e24d32d1a0689a94f708a1a8",
+        "actual_new_source": {
+          "document_id": "7b3857c6-f69d-433f-b4dd-3f399daa74c2",
+          "source_version": "2e58938d-3815-4af8-913d-8a6c31da8055",
+          "body_chunks": 9,
+          "summary_chunks": 1,
+          "embedding_count": 10,
+          "original_sha256": "2d5dd15d51beb6e5a74c1c48208f3464c10ef9893f251956e3e8ea6ac44f700e",
+          "readable_chunk_count": 10
+        },
+        "old_switch": [
+          {
+            "document_id": "417bd81a-1001-406e-bbf8-fdcfee4679f2",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "af9c7647-991c-46b9-8795-2e1f8a87cdd0",
+            "disabled_embeddings": 5,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "a71378314d7a96d7aa4025ef65f18482ab46e6778bb7add7967c72ec57dc19c1",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/1522f7336dff23c4b5cd9464635841fafd6cdc5886e3399f5c8b5671d692ec17.result.json",
+        "ledger_sha256": "ecbef324458468429ac687382e96f2727fe4ae6e08d2e0f15170c4b9f425c65d"
+      },
+      {
+        "source_key": "ced674fecd010d25dcf7ffcf92c2fd2e7b5a97ef4e27d82a1c92fe3efcce4db4",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "5bf98977353643999616d974a9fe3168b56dc770a60181bc2aa8d849b464d91d",
+        "expected_full_input_sha256": "f2ad5e9bd68d96262c5dca170ac43cfaf6569a3fe04d151aa566cdda6ee09508",
+        "actual_new_source": {
+          "document_id": "55d3bfde-24e1-4220-bf46-ba83414c8f91",
+          "source_version": "0a10eb3a-a9e7-46a3-b4dd-49f5a3e45305",
+          "body_chunks": 4,
+          "summary_chunks": 1,
+          "embedding_count": 5,
+          "original_sha256": "5bf98977353643999616d974a9fe3168b56dc770a60181bc2aa8d849b464d91d",
+          "readable_chunk_count": 5
+        },
+        "old_switch": [
+          {
+            "document_id": "00ac79d9-fe98-4812-ba00-594274cfc887",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "014f4ac2-23a2-45d0-96ba-ea8cc49298c6",
+            "disabled_embeddings": 4,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "a841a6265565eb3f4d2f3e4a0ff9351f8fbeb9fbe32018a05cb9d07897c8794a",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/ced674fecd010d25dcf7ffcf92c2fd2e7b5a97ef4e27d82a1c92fe3efcce4db4.result.json",
+        "ledger_sha256": "7c70f9f43182d7420af8ff126aa57fb979a0c6dd974efc255d704c9053f59a11"
+      },
+      {
+        "source_key": "5164b7ec68754067d5fdf296a800774efa1ae3ea071a607a7e45fb866a014e14",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "ed01f2d5e8157c375502a926e24606751104abe70a1f95520a9fdf252310091c",
+        "expected_full_input_sha256": "6ae709b642401f61c6fee93dc973da6c5be759e3edf2830c5e272734cd33ce3c",
+        "actual_new_source": {
+          "document_id": "eb6a7f53-cb2d-4615-ab01-7c604c01d151",
+          "source_version": "92a01d91-20c7-4a6d-a429-82f26e0be1e1",
+          "body_chunks": 5,
+          "summary_chunks": 1,
+          "embedding_count": 6,
+          "original_sha256": "ed01f2d5e8157c375502a926e24606751104abe70a1f95520a9fdf252310091c",
+          "readable_chunk_count": 6
+        },
+        "old_switch": [
+          {
+            "document_id": "8b6939c7-d087-4171-a68e-9ad24b2d503c",
+            "disabled_embeddings": 4,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "afa00364-15b0-4fd5-ab11-b0c7ec958353",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "5a776226178b08d713c7973e49e0c4c1484d0fa425b49453b1f20b1f04b0b6bd",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/5164b7ec68754067d5fdf296a800774efa1ae3ea071a607a7e45fb866a014e14.result.json",
+        "ledger_sha256": "ab7571b1e028c8bf8e5a7feb268f8d7551c243aed0cb6d35bcfd831d6a34daa9"
+      },
+      {
+        "source_key": "793ed1e1f9d4dca38977174574c878a7eaacd86563bd389065d2ebc1f7b88f25",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "d0f87c71999e2e9439d8d66bda2886955800bb3adfcbe5bdd575a575c4651d6e",
+        "expected_full_input_sha256": "219ef3c0a8ea75844fa9b9fb940c80b0040c236b6d1ad0bce5648613e573f60a",
+        "actual_new_source": {
+          "document_id": "7bde07f1-c187-4868-baa0-790453e73d5c",
+          "source_version": "cf6bd67d-c3a4-48d5-977f-70585e5157e7",
+          "body_chunks": 12,
+          "summary_chunks": 1,
+          "embedding_count": 13,
+          "original_sha256": "d0f87c71999e2e9439d8d66bda2886955800bb3adfcbe5bdd575a575c4651d6e",
+          "readable_chunk_count": 13
+        },
+        "old_switch": [
+          {
+            "document_id": "685af233-c6cf-4e54-867e-42c4ffbca2c7",
+            "disabled_embeddings": 12,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "e41d3813-6dae-4a31-b984-7dfb334985f5",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "e918cb42d6931dab8d46e60b59cba66e0cf93b1e9ae37b916c2af721fa056bf1",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/793ed1e1f9d4dca38977174574c878a7eaacd86563bd389065d2ebc1f7b88f25.result.json",
+        "ledger_sha256": "1e9ff1770560214b99ca260ba223154b93946fcf36b2e6d872cd1b1eab419bfb"
+      },
+      {
+        "source_key": "3e1812908ec090da7715cb7c2638f434d571c7d328afbfb8f46b2f2c2d27dd72",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "1cf6737ad4bca84fc82cb93d446aaef001357d7dd08e46a509875f2ed7e6b436",
+        "expected_full_input_sha256": "b26ccccb393f59c5863a1aa8c1d13ada88ca92cb0b4dc7809e6aa56fa6f460db",
+        "actual_new_source": {
+          "document_id": "209ab266-ff5f-4592-96b2-992a98513b53",
+          "source_version": "cd4ccda9-71db-4479-8ce0-270bdbe37ed4",
+          "body_chunks": 10,
+          "summary_chunks": 1,
+          "embedding_count": 11,
+          "original_sha256": "1cf6737ad4bca84fc82cb93d446aaef001357d7dd08e46a509875f2ed7e6b436",
+          "readable_chunk_count": 11
+        },
+        "old_switch": [
+          {
+            "document_id": "35d4f9dc-dfcf-4106-94f4-42869a226e64",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "3b658083-804c-47af-b663-528fcf7e230b",
+            "disabled_embeddings": 8,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "9d37072334075cebadf644c3c1883aebe419261ef7958c0868266c5f593cb417",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/3e1812908ec090da7715cb7c2638f434d571c7d328afbfb8f46b2f2c2d27dd72.result.json",
+        "ledger_sha256": "92aa4c777e04531b01015cfc248bc2fe6587d3561def08a496b32acc1d8c54df"
+      },
+      {
+        "source_key": "30f7a00176b377a9398dfcd7d516423fcd737c8438e80b07dc1847c93d7b9290",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "7da5ed976b27d3c24f6b269e7aaa46b9ab35bc1f3c7997e25119d8180366e860",
+        "expected_full_input_sha256": "0496d3b9859b342c193903c3511b7470d4fd44054672250c3e69bf7dd4f60fae",
+        "actual_new_source": {
+          "document_id": "274ad130-71bd-4be0-a3cb-d80b8b621e28",
+          "source_version": "45340fa3-3d26-412a-810c-41d91ee4c974",
+          "body_chunks": 11,
+          "summary_chunks": 1,
+          "embedding_count": 12,
+          "original_sha256": "7da5ed976b27d3c24f6b269e7aaa46b9ab35bc1f3c7997e25119d8180366e860",
+          "readable_chunk_count": 12
+        },
+        "old_switch": [
+          {
+            "document_id": "b6218784-dc90-4eaa-9c04-fc59942b1231",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "e0a11025-81be-48ac-8feb-b46739cbc0f4",
+            "disabled_embeddings": 11,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "61569efa1d546470447754954d6bdc1a3861f90a45fd5ae674dc36eb51ccedbe",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/30f7a00176b377a9398dfcd7d516423fcd737c8438e80b07dc1847c93d7b9290.result.json",
+        "ledger_sha256": "4ef771f0931df61556e322162b364791ca65f219fba748e3946def289e18a51d"
+      },
+      {
+        "source_key": "cd3b877880c413f0c10a1784dc0db2a14ac15973df92dfe78598a6870e0367f0",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "854a9981be969d8373367d40d21f7c64778148c2fe1b6558e581cb962e29a5b2",
+        "expected_full_input_sha256": "f80636a17f89da08fdd5c3e7aadff5e74e8eaa276a185b5cda9eeda96be688f5",
+        "actual_new_source": {
+          "document_id": "0eb9df22-0cc8-44c3-afd0-2ad4ef6d62fc",
+          "source_version": "9846c7b7-56dc-4413-9d79-2cf7b863a681",
+          "body_chunks": 19,
+          "summary_chunks": 1,
+          "embedding_count": 20,
+          "original_sha256": "854a9981be969d8373367d40d21f7c64778148c2fe1b6558e581cb962e29a5b2",
+          "readable_chunk_count": 20
+        },
+        "old_switch": [
+          {
+            "document_id": "6d8a0e24-41b6-4db7-8046-49ea456200ea",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "f3cf3c89-e830-4157-a302-13972a2efae5",
+            "disabled_embeddings": 17,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "1a9ba7388d7f490899e11b8874eea94f891b6895d4417030a83595b7235fddf6",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/cd3b877880c413f0c10a1784dc0db2a14ac15973df92dfe78598a6870e0367f0.result.json",
+        "ledger_sha256": "6aa7207e81bb13388704fba927af8115afa0fb32206d513c8bba1813dea7aef8"
+      },
+      {
+        "source_key": "83cb1e3f599534084884b28ed90800f5a00ece20ea903113e3bedadbbbf19f4d",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "bce4e102948824826f61dde270bb92fdb9fd5e32bdf8250b38702d7b28e12da8",
+        "expected_full_input_sha256": "5b7e8f1f3e5fbc7422bfede2cde4a52d25c9633e083eab199c23e9053975a197",
+        "actual_new_source": {
+          "document_id": "f55b7c4c-09ff-4496-a83c-7f2d4f5c9334",
+          "source_version": "8a635daa-4630-4e12-9987-dae39ae6b2e6",
+          "body_chunks": 14,
+          "summary_chunks": 1,
+          "embedding_count": 15,
+          "original_sha256": "bce4e102948824826f61dde270bb92fdb9fd5e32bdf8250b38702d7b28e12da8",
+          "readable_chunk_count": 15
+        },
+        "old_switch": [
+          {
+            "document_id": "9bc423fc-b20c-4966-b4d0-1f2033cd73b7",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "d5d35f38-5674-4d94-a76a-7b32fb575b02",
+            "disabled_embeddings": 9,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "c9928bf06c0cf6ef6b8f9a6ed57dd95eceeb51d7ad1afdd290759082bb5a77d1",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/83cb1e3f599534084884b28ed90800f5a00ece20ea903113e3bedadbbbf19f4d.result.json",
+        "ledger_sha256": "c58a9e5a1f38e334089eeb5a1580f938529104bdb55b62c86266dbb71553f63b"
+      },
+      {
+        "source_key": "845a6a1901380ca61dabfb90d88a56d06d321f71c15926c7f393aa057f16c1e7",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "643f1b7e4c0f1db2890f0f452cea6ce7fc8fb81abd3e2ea45e94c41d3de0b16e",
+        "expected_full_input_sha256": "2d3a96176aff88c826217232ea014ed7205f3ddf04f670162a86c28e6006d3d0",
+        "actual_new_source": {
+          "document_id": "fa5798e6-6116-4f00-bec5-516d619ef791",
+          "source_version": "d4644f32-c89d-40aa-bade-96dec7544008",
+          "body_chunks": 23,
+          "summary_chunks": 1,
+          "embedding_count": 24,
+          "original_sha256": "643f1b7e4c0f1db2890f0f452cea6ce7fc8fb81abd3e2ea45e94c41d3de0b16e",
+          "readable_chunk_count": 24
+        },
+        "old_switch": [
+          {
+            "document_id": "436a91ac-fd89-4d06-a5af-b98f8f7fb3d2",
+            "disabled_embeddings": 19,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "da185871-cd75-4612-9a5c-d9230bfe018e",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "643c9db55bb109ff27cd5de5ca74b70ce068802aaee796eb193d566368969d8a",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/845a6a1901380ca61dabfb90d88a56d06d321f71c15926c7f393aa057f16c1e7.result.json",
+        "ledger_sha256": "32cf59b42d9354aa21154ed6d2e62201aa3d1d4e3031a925bc6f95d208bf8033"
+      },
+      {
+        "source_key": "50f438ab4fb6a4dcc00183fcefb15a3b413a09986725596e750b3a42696ed624",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "55204e21c7d46913df3736befad467caa7ba39b2f177cf91e4a54c1b1e2cdbd3",
+        "expected_full_input_sha256": "bd8f9f028e3fc475b3c97ae257685a552b59509b3a5efd5d9374dada60f036c7",
+        "actual_new_source": {
+          "document_id": "18fcd56f-e39c-48c3-9de5-396107547a10",
+          "source_version": "eb4d08d6-7ba8-4d62-95be-2492fc96535c",
+          "body_chunks": 1,
+          "summary_chunks": 1,
+          "embedding_count": 2,
+          "original_sha256": "55204e21c7d46913df3736befad467caa7ba39b2f177cf91e4a54c1b1e2cdbd3",
+          "readable_chunk_count": 2
+        },
+        "old_switch": [
+          {
+            "document_id": "e6528a3e-f866-40c5-88b0-5bd198bed7f2",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "eaa19824-636a-4308-b919-1607b82cab01",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "980c15585a4e88bfe18c1d79ea5f984c68f5183d15a644cfcca5ecef352c53f7",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/50f438ab4fb6a4dcc00183fcefb15a3b413a09986725596e750b3a42696ed624.result.json",
+        "ledger_sha256": "df12a273f676512a79293d629219e4d720693393e2acbdee1d565d2cd8517688"
+      },
+      {
+        "source_key": "36216eed8e96489bce4ab5a19577bf8a1a210a4fe9e8690ebbf53d50eb07603e",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "e83b311d1208ee6e95f5adbf143846a25475b51d310576ff280a336bcca083c2",
+        "expected_full_input_sha256": "a674efc72dcdcc59a81ef81afe6e6bac7f86d27580121b650a212d9a4778778a",
+        "actual_new_source": {
+          "document_id": "a29793f6-fa6a-4a9f-8833-f17366a1b981",
+          "source_version": "4207e4cf-a7f4-410a-a7a9-5ba2ca86991f",
+          "body_chunks": 10,
+          "summary_chunks": 1,
+          "embedding_count": 11,
+          "original_sha256": "e83b311d1208ee6e95f5adbf143846a25475b51d310576ff280a336bcca083c2",
+          "readable_chunk_count": 11
+        },
+        "old_switch": [
+          {
+            "document_id": "53792a2a-7b25-4da3-b972-d30941fdc139",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "62263242-304e-40d6-996d-500cd4f3522f",
+            "disabled_embeddings": 10,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "971f91bc473d3fa9a4f0d98e3a34589011b83b0b4eefac074d34dc5c79bfeeef",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/36216eed8e96489bce4ab5a19577bf8a1a210a4fe9e8690ebbf53d50eb07603e.result.json",
+        "ledger_sha256": "089555072a3ee4080d6302ca20a9aa21a28794a2c6d345136ec11252988636ca"
+      },
+      {
+        "source_key": "14cb623b6c3bcc36b99cac9476839807793c7d3cfeb189d6857a125ded212632",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "f035c220a167a19439dd3ce1245d633db01382b609bb18aa6feea7156dc3126a",
+        "expected_full_input_sha256": "f0926c9c969f9f43606675a196d5d54e24aa77953688c1ad8b2e5c35d6b75fa5",
+        "actual_new_source": {
+          "document_id": "c9392f47-1522-46a1-b3f9-795e0d9bb3c5",
+          "source_version": "2763cedd-1c1c-405d-8818-9726fda71467",
+          "body_chunks": 12,
+          "summary_chunks": 1,
+          "embedding_count": 13,
+          "original_sha256": "f035c220a167a19439dd3ce1245d633db01382b609bb18aa6feea7156dc3126a",
+          "readable_chunk_count": 13
+        },
+        "old_switch": [
+          {
+            "document_id": "8311a2fc-ebff-4918-8d32-dda296511e54",
+            "disabled_embeddings": 12,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "da59e43e-90d4-4f65-b454-cdabb5f8421a",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "90d306cab172bf0f701b0107f1450d34ad99aa14dd0bf0fec9fbaea2498edc3f",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/14cb623b6c3bcc36b99cac9476839807793c7d3cfeb189d6857a125ded212632.result.json",
+        "ledger_sha256": "b5f231df6f153dfcddef183103fdce007360d264bace5b1749629c7da6c43d0e"
+      },
+      {
+        "source_key": "3e4479d6406f6bc0371e199f295ddc3f5ca71aaa2c5cad4f060ce00995dea5c5",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "8e7278d62f6a1af8675cd9bb1babfabe945c73998bd96d3d4604bef976b9bd86",
+        "expected_full_input_sha256": "c2a5002079d98a9b8f85e4fd1cf682fbfa06a4764a4faae9ab15237cf72fe3f6",
+        "actual_new_source": {
+          "document_id": "e2f9a9d4-f171-4380-b593-f918653af90f",
+          "source_version": "5f69cec1-d181-4932-878f-a59bb2c545e9",
+          "body_chunks": 1,
+          "summary_chunks": 1,
+          "embedding_count": 2,
+          "original_sha256": "8e7278d62f6a1af8675cd9bb1babfabe945c73998bd96d3d4604bef976b9bd86",
+          "readable_chunk_count": 2
+        },
+        "old_switch": [
+          {
+            "document_id": "86038b06-3692-4c7c-8d7c-318b9fde8eb2",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "f8437b24-9042-4a30-b2e1-d0069a14199a",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "83c8629ddb3da1ae872e9a3ec69de5a402ecf984ae0ead693f467047ab05e7d7",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/3e4479d6406f6bc0371e199f295ddc3f5ca71aaa2c5cad4f060ce00995dea5c5.result.json",
+        "ledger_sha256": "b596d7ec0990004d19ba4381a5c0c392990582f8af2e591b3d8bee204d55dfbb"
+      },
+      {
+        "source_key": "199d32eed52673a26df366dd754e990c1e93f7bbfda973f0c5b106ff43bc9e1e",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "dc35626bf3405e7829e35c36265b06be82c95d5d03318a6eab17662afc4f6601",
+        "expected_full_input_sha256": "0ab08d9c58f7b0f43f3a2fffe0ac48d22dd908ede492a5b06eca16adccd23500",
+        "actual_new_source": {
+          "document_id": "c8c3e569-2044-48b6-924f-cb21d62cc322",
+          "source_version": "18359035-4595-4ccf-be2a-a58d4ac7746d",
+          "body_chunks": 4,
+          "summary_chunks": 1,
+          "embedding_count": 5,
+          "original_sha256": "dc35626bf3405e7829e35c36265b06be82c95d5d03318a6eab17662afc4f6601",
+          "readable_chunk_count": 5
+        },
+        "old_switch": [
+          {
+            "document_id": "3b697cef-e79e-409b-b286-0ad00ca87e97",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "fdd1f04c-5428-44f3-9c18-7a7457807f07",
+            "disabled_embeddings": 4,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "632b92dda324f3ac05bd5073f879b07b1fcb27aed05df66553a3561c06803ac9",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/199d32eed52673a26df366dd754e990c1e93f7bbfda973f0c5b106ff43bc9e1e.result.json",
+        "ledger_sha256": "3194bd33ef9426942a31acc294d789a602c2b744e2c9a0f6a4e233fdd295c37e"
+      },
+      {
+        "source_key": "38f4fb2cf4cbb16f597ad5986c5877e41e700c55d40a3ea7c334895b28785ab7",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "b96bbf617b52a7626ceccf1bc15d4fc74c2500df30a90882154daf990e8fce00",
+        "expected_full_input_sha256": "45831656c332107cc4b77a9486c9c87b56c091386ce6ad7586053b0239b1e02e",
+        "actual_new_source": {
+          "document_id": "f00c3c0e-8ee5-4d2b-93cc-05ac5e6491b3",
+          "source_version": "2c12364a-696a-436d-a94b-8fe3a69c3fc6",
+          "body_chunks": 6,
+          "summary_chunks": 1,
+          "embedding_count": 7,
+          "original_sha256": "b96bbf617b52a7626ceccf1bc15d4fc74c2500df30a90882154daf990e8fce00",
+          "readable_chunk_count": 7
+        },
+        "old_switch": [
+          {
+            "document_id": "a2d039de-26aa-44ac-9c14-dc49ecd89252",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "bc82bed1-3ea6-42b1-b37d-bb84db9ad249",
+            "disabled_embeddings": 4,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "921a27812c35654c80f06203e4da66852bbf46334199ece4e0c0e9916601562f",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/38f4fb2cf4cbb16f597ad5986c5877e41e700c55d40a3ea7c334895b28785ab7.result.json",
+        "ledger_sha256": "98410a08ea2279965e3a2403158be90fd4d5441f3ad096ae28185594903929eb"
+      },
+      {
+        "source_key": "48b70797f30ce31756d4f4dbce34ab1ba7900966afe4b53a83a6d0415289ccc4",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "f2e079f35e9813d1054656805e2ad8c5b70b1f5fbbd367073b193c0da8cde394",
+        "expected_full_input_sha256": "616c4d62b067f775420a77bc70f13e0bd622cee47aa1373825767a73e43d8348",
+        "actual_new_source": {
+          "document_id": "4b7c3302-a6d2-4e53-9d12-bd327f2c2458",
+          "source_version": "c7546318-c958-4223-b5ef-d76a80293a79",
+          "body_chunks": 2,
+          "summary_chunks": 1,
+          "embedding_count": 3,
+          "original_sha256": "f2e079f35e9813d1054656805e2ad8c5b70b1f5fbbd367073b193c0da8cde394",
+          "readable_chunk_count": 3
+        },
+        "old_switch": [
+          {
+            "document_id": "26409000-2aaa-4830-9ecb-6d1152d3661e",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "431008d7-5640-4e41-ae92-fff89adc9bbc",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "20c2141a04045606d03649f65c9bd564749ab683ebde71b8f01aa49c452401d8",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/48b70797f30ce31756d4f4dbce34ab1ba7900966afe4b53a83a6d0415289ccc4.result.json",
+        "ledger_sha256": "f9bcd4cdbba3c92a1cd5dd69a639c374a532fe1aa3b8d56a1bb4dad0eeb29210"
+      },
+      {
+        "source_key": "22d6cdb7091141a9cdca1af44dbec4cd1634869ddb5a2f40daba57f16f847a3c",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "source_sha256": "3471a533f957c8aed9d8732878a763c039017f454c70eecf1cc832038d76e956",
+        "expected_full_input_sha256": "17db115b27578eba1d88575ca6bd186f2ec305109fde7d5168af6ea89c5a821f",
+        "actual_new_source": {
+          "document_id": "c40453f0-0c0d-491a-9f6d-92c1da5ed5d4",
+          "source_version": "6ab734dc-7082-4a5e-a0b5-631181bac6af",
+          "body_chunks": 1,
+          "summary_chunks": 1,
+          "embedding_count": 2,
+          "original_sha256": "3471a533f957c8aed9d8732878a763c039017f454c70eecf1cc832038d76e956",
+          "readable_chunk_count": 2
+        },
+        "old_switch": [
+          {
+            "document_id": "95b93247-6b64-4929-87fc-1fe0d0847cbb",
+            "disabled_embeddings": 1,
+            "payload_preserved": true
+          },
+          {
+            "document_id": "b7571d8c-6a42-42ae-a4cd-ce465b99883d",
+            "disabled_embeddings": 3,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "b73ccad92ce346393ada397601f35348c9a16a283aa73d19a266a19e6fa474a4",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/22d6cdb7091141a9cdca1af44dbec4cd1634869ddb5a2f40daba57f16f847a3c.result.json",
+        "ledger_sha256": "7e25d36855920ef84c33a8e1ebe1fc8207c57f99dff94054965991d82897aec2"
+      },
+      {
+        "source_key": "350a53502f992e618ff9cb1a55a18a91eca5912d98560e0465b6c7aa55e83825",
+        "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "expected_full_input_sha256": "3cef5147acd72d1db926d48d2f4769e1f6d982795f8ad32a6c4a91c0e8ab1131",
+        "actual_new_source": {
+          "document_id": "0b9850f8-6a5e-4855-91e4-7ac745eecaea",
+          "source_version": "10bce0ac-2fa8-46c1-8fc4-067d575d7370",
+          "body_chunks": 125,
+          "summary_chunks": 1,
+          "embedding_count": 126,
+          "original_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "readable_chunk_count": 126
+        },
+        "old_switch": [
+          {
+            "document_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "disabled_embeddings": 53,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "5c316d16722ea478f4daaa1595fab4fa722a2e9f0eb6c6c7bb4041298c71764d",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/350a53502f992e618ff9cb1a55a18a91eca5912d98560e0465b6c7aa55e83825.result.json",
+        "ledger_sha256": "af0395c0c1caee908281ae849a7748dde77911f736b11610b981cfd80a61ab7f"
+      },
+      {
+        "source_key": "fd5da9d3af429f6e295e3a4d83a25ce8c5c43a74085b1b5c4e770f920701ab3a",
+        "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+        "source_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+        "expected_full_input_sha256": "3cef5147acd72d1db926d48d2f4769e1f6d982795f8ad32a6c4a91c0e8ab1131",
+        "actual_new_source": {
+          "document_id": "746726ca-75b4-4f25-a18b-e8808b2e1cd7",
+          "source_version": "d719b57f-74cb-49cf-a0bd-b2b1f1cd0cf1",
+          "body_chunks": 125,
+          "summary_chunks": 1,
+          "embedding_count": 126,
+          "original_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "readable_chunk_count": 126
+        },
+        "old_switch": [
+          {
+            "document_id": "0f29b3c5-efbb-464e-8f39-cea5c68ba3d7",
+            "disabled_embeddings": 23,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "f3d8b69063c3fd9a2acaead0f57ec14b5e6fd40d1d59611b7fc82970992c2a20",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/fd5da9d3af429f6e295e3a4d83a25ce8c5c43a74085b1b5c4e770f920701ab3a.result.json",
+        "ledger_sha256": "86f2a0bae8bf48d4e4084b2689e2250875eec9a026b2ed3eacd4854b918d2631"
+      },
+      {
+        "source_key": "293af08b69d8739e7f2e12e47693b49b5f1348a49cfcf37cd23772e1d5decbea",
+        "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+        "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "expected_full_input_sha256": "372e5ee469e3e14056461292945563ce6c2ac0a05d06e056468cfa74a9410733",
+        "actual_new_source": {
+          "document_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+          "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb",
+          "body_chunks": 162,
+          "summary_chunks": 1,
+          "embedding_count": 163,
+          "original_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "readable_chunk_count": 163
+        },
+        "old_switch": [
+          {
+            "document_id": "35c37b2d-3ce7-49ab-98fe-de6d3e6974f9",
+            "disabled_embeddings": 163,
+            "payload_preserved": true
+          }
+        ],
+        "bulk_result_sha256": "4aa446a9cc91fc7a2e58892e195cdb0f20925f5f358142bd772b64252f669bdf",
+        "bulk_result_host_path": "/opt/rag-s8/s8-aligned-all-top1-20261020/ingestion-host/293af08b69d8739e7f2e12e47693b49b5f1348a49cfcf37cd23772e1d5decbea.result.json",
+        "ledger_sha256": "b691683eab2f377a46fa5f6ba1650462e7609e00dd1e8d17afc4974bdc508c82"
+      }
+    ]
+  },
+  "experiment": {
+    "graph_enabled": false,
+    "rerank_top1_floorless": true,
+    "rerank_context_enabled": true,
+    "normal_threshold": 0.3,
+    "normal_generation": "Qwen/Qwen3.5-4B, temperature0.7/max_tokens2048/enable_thinking=false",
+    "query_understanding": "Qwen/Qwen3.5-4B, temperature0.3/max_tokens150/enable_thinking=false",
+    "causal_limit": "JOINT_SOURCE_VERSION_ALIGNMENT_AND_MODELPASSAGE_AND_FLOORLESS_CHANGE; NOT PURE_TOP1_AB",
+    "production_defaults_promoted": false,
+    "full_kb_scope": true,
+    "new_question_posts": 9,
+    "rerun_old_unknown": false
+  },
+  "quality_summary": {
+    "manual_engineering_pass": 5,
+    "partial": 3,
+    "fail": 1,
+    "denominator": 9,
+    "not_official_cross_dataset_accuracy": true
+  },
+  "cases": [
+    {
+      "case_id": "scifact-1304",
+      "qid": "1304",
+      "dataset": "scifact",
+      "question": {
+        "content": "Tirasemtiv targets cardiac muscle.",
+        "request_id": "1549cdc6-2b3c-5b99-9bdf-e83ccacb2d16",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7"
+        ],
+        "document_scope": []
+      },
+      "session_id": "1401fbd9-482a-42a5-8e78-e8d2799c5d6a",
+      "run_id": "2692ace1-46e1-4272-9dbd-e5f65fbba346",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PARTIAL",
+      "first_quality_loss": "RERANK",
+      "fact_review": "目标来源在Search，重排仅保留无关Tafamidis；回答合理说明不足，未完成目标事实回答。",
+      "answer": "根据提供的资料，Tirasemtiv 并未被提及。资料中仅讨论了 Tafamidis（一种 transthyretin 稳定剂）在 ATTR 淀粉样变性中的疗效、安全性和副作用。因此，基于现有资料无法确认 Tirasemtiv 是否针对心肌或相关细节。\n\nSources: full-87bc9d62ed86aad608d6b01e.md",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 0.0,
+            "precision_at_k": 0.0,
+            "f1_at_k": 0.0,
+            "hit_at_k": 0,
+            "mrr_at_k": 0.0,
+            "map_at_k": 0.0,
+            "ndcg_at_k": 0.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 0.0,
+            "precision_at_k": 0.0,
+            "f1_at_k": 0.0,
+            "hit_at_k": 0,
+            "mrr_at_k": 0.0,
+            "map_at_k": 0.0,
+            "ndcg_at_k": 0.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 0.0,
+            "precision_at_k": 0.0,
+            "f1_at_k": 0.0,
+            "hit_at_k": 0,
+            "mrr_at_k": 0.0,
+            "map_at_k": 0.0,
+            "ndcg_at_k": 0.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 2140,
+      "raw_rerank_top1": 0.01858997717499733,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "metrics": null,
+        "included_in_answer_metric_denominator": false,
+        "status": "NOT_APPLICABLE_NO_ANSWER_GOLD"
+      },
+      "attempts": [
+        {
+          "attempt_id": "2692ace1-46e1-4272-9dbd-e5f65fbba346/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "90ab36f509628584f0208143cfff64ffc7121f164fff4f113144f83ea7bd329e",
+          "context_sha256": "872f9b246fa31618fab9fbb195b716468748ba363b4818515976ff39d9e0e5c3"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 12796,
+        "completion_tokens": 114,
+        "total_tokens": 12910
+      },
+      "post_elapsed_seconds": 7.709096726030111,
+      "source_readbacks": 57,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "miracl-zh-5704915#0",
+      "qid": "5704915#0",
+      "dataset": "miracl-zh",
+      "question": {
+        "content": "香山在北京哪个区？",
+        "request_id": "58cb0fd6-a762-5ca3-828a-b5d46ed6bd12",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2"
+        ],
+        "document_scope": []
+      },
+      "session_id": "087c50ad-299c-414d-bb6d-0514ccef5ecb",
+      "run_id": "5ebefadf-3bdc-4a34-a603-57b0796ed497",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PASS",
+      "first_quality_loss": "NONE",
+      "fact_review": "海淀区，真实原文及生成输入支持；人工事实审查，不是官方生成Gold成绩。",
+      "answer": "香山位于北京市海淀区。\n\nSources: 2477c37caea3e7cd1b0d0dc3.md, c778d093532140cc823cd8a5.md",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 6,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 4,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 4,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 4,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 4,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 4,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 1194,
+      "raw_rerank_top1": 0.9989128112792969,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "metrics": null,
+        "included_in_answer_metric_denominator": false,
+        "status": "NOT_APPLICABLE_NO_ANSWER_GOLD"
+      },
+      "attempts": [
+        {
+          "attempt_id": "5ebefadf-3bdc-4a34-a603-57b0796ed497/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "74904db6a04ee03ca2bc9e002dce11b6c1652e9fdd862c2e49b4963bfe3a7350",
+          "context_sha256": "1a8d4d6f9d381d3817463e6a0a6484f2cd027f52c6c946bce640523fdd5202bd"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 8126,
+        "completion_tokens": 80,
+        "total_tokens": 8206
+      },
+      "post_elapsed_seconds": 6.183675323147327,
+      "source_readbacks": 59,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "dataset": "longbench-zh",
+      "question": {
+        "content": "在基于立体卫星影像的DSM生产作业中，影像星下点的分辨率应该满足什么要求？",
+        "request_id": "2263a3c9-e67c-5d36-9766-470c93ec7582",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "76770fba-17c3-4704-8663-10aa669476ce"
+        ],
+        "document_scope": []
+      },
+      "session_id": "08377a51-247a-4afa-b363-a96e5d16c641",
+      "run_id": "b4f74594-e2cf-4da4-8b5f-a3da60555086",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PASS",
+      "first_quality_loss": "NONE",
+      "fact_review": "“优于5m”有原文支持；全文F1为0.20689655，语义正确与字符串分数分列。",
+      "answer": "在基于立体卫星影像的 DSM 生产作业中，影像星下点的分辨率要求如下：\n\n影像星下点的分辨率应优于 5m。\n\nSources: 6bf461d387564edcd4acc378.md",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 3,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 7,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 0.5,
+            "map_at_k": 0.5,
+            "ndcg_at_k": 0.6309297535714575,
+            "retrieved_count_at_k": 2,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 6,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 0.5,
+            "map_at_k": 0.5,
+            "ndcg_at_k": 0.6309297535714575,
+            "retrieved_count_at_k": 2,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 6,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 0.5,
+            "map_at_k": 0.5,
+            "ndcg_at_k": 0.6309297535714575,
+            "retrieved_count_at_k": 2,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 3378,
+      "raw_rerank_top1": 0.9928861260414124,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_OFFICIAL_TASK_METRIC_ON_SMALL_SELECTED_SAMPLE",
+        "metrics": {
+          "qa_f1_zh_score": 0.20689655172413793
+        },
+        "task": "multifieldqa_zh",
+        "function": "qa_f1_zh_score",
+        "binding": {
+          "revision": "c5ea10bcd06285223c58dfed76bbc92d22273709",
+          "sha256": "e22e2a2662e0f7e683137fa3541f64edb6a801e9138d16d2f3459a6ab9941323",
+          "source": "https://raw.githubusercontent.com/THUDM/LongBench/c5ea10bcd06285223c58dfed76bbc92d22273709/LongBench/metrics.py"
+        },
+        "included_in_answer_metric_denominator": true,
+        "evaluation_unit": "FULL_COMPLETED_APP_RESPONSE_INCLUDING_FIXED_REFUSALS",
+        "official_whole_benchmark": "NOT_CLAIMED"
+      },
+      "attempts": [
+        {
+          "attempt_id": "b4f74594-e2cf-4da4-8b5f-a3da60555086/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "370ff895bd152f68e7ca0dc28de51dcc60427d4f0e338ab04d5f5e662a5d53de",
+          "context_sha256": "a909166463f208fcbaac7aa7976a119b4eae4896a0716f02f2943d2e5f4d2003"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 8670,
+        "completion_tokens": 87,
+        "total_tokens": 8757
+      },
+      "post_elapsed_seconds": 6.187539087142795,
+      "source_readbacks": 15,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+      "qid": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+      "dataset": "longbench-zh",
+      "question": {
+        "content": "谷丙转氨酶和谷草转氨酶偏高的原因",
+        "request_id": "6218e236-28c5-502d-a70d-b793009ed2cb",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "76770fba-17c3-4704-8663-10aa669476ce"
+        ],
+        "document_scope": []
+      },
+      "session_id": "8b72fb80-6650-49d7-a983-ba1865499c84",
+      "run_id": "39925beb-27e5-4902-bb86-2205e1a723b3",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PARTIAL",
+      "first_quality_loss": "GENERATION",
+      "fact_review": "原因原文已送达；漏单核细胞增多症，新增“2倍”阈值，并混淆病理/非病理分类。",
+      "answer": "谷丙转氨酶（ALT）和谷草转氨酶（AST）偏高，通常表示肝细胞受损，但原因多样，并不一定意味着患有肝炎。根据提供的资料，主要原因包括：\n\n1.  **病毒性肝炎**：这是最常见的原因，包括甲肝、乙肝、丙肝等急慢性病毒性肝炎。\n2.  **非病理性/暂时性因素**：\n    *   **生活习惯**：如熬夜、饮酒、过度劳累、剧烈运动。\n    *   **饮食**：近期摄入过于油腻的食物。\n    *   **其他**：某些感染（如流感、肺炎、伤寒、结核等）或妊娠（正常妊娠或妊娠急性脂肪肝）也可能导致升高。\n3.  **器质性肝病**：\n    *   脂肪肝。\n    *   肝硬化活动期。\n    *   肝癌。\n    *   肝脓肿、肝结核、肝豆状核变性。\n4.  **胆道疾病**：如胆囊炎、胆石症急性发作或胆管阻塞。\n5.  **心脏疾病**：如心肌炎、心肌梗死、心力衰竭。\n6.  **中毒性或药物性肝损害**：\n    *   长期或大量饮酒。\n    *   服用损伤肝脏的药物（包括抗生素如红霉素、四环素，解热镇痛药，避孕药，以及部分中药如半夏、槟榔、青黛等）。\n    *   化学制剂中毒。\n\n**重要提示**：转氨酶升高程度不一，轻度升高（如不超过正常值2倍）可能与生活方式有关，经过休息和调整后可能恢复正常。若持续升高或伴有其他症状，建议去医院进行进一步排查（如腹部B超、病毒性肝炎筛查等），以找出具体原因对症治疗。\n\nSources a3b95e51f9296127d5854ca5.md",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 10,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 19,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 2,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 2,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 2,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 6897,
+      "raw_rerank_top1": 0.9999668598175049,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_OFFICIAL_TASK_METRIC_ON_SMALL_SELECTED_SAMPLE",
+        "metrics": {
+          "rouge_zh_score": 0.254980075201981
+        },
+        "task": "dureader",
+        "function": "rouge_zh_score",
+        "binding": {
+          "revision": "c5ea10bcd06285223c58dfed76bbc92d22273709",
+          "sha256": "e22e2a2662e0f7e683137fa3541f64edb6a801e9138d16d2f3459a6ab9941323",
+          "source": "https://raw.githubusercontent.com/THUDM/LongBench/c5ea10bcd06285223c58dfed76bbc92d22273709/LongBench/metrics.py"
+        },
+        "included_in_answer_metric_denominator": true,
+        "evaluation_unit": "FULL_COMPLETED_APP_RESPONSE_INCLUDING_FIXED_REFUSALS",
+        "official_whole_benchmark": "NOT_CLAIMED"
+      },
+      "attempts": [
+        {
+          "attempt_id": "39925beb-27e5-4902-bb86-2205e1a723b3/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "299d44f3a7d90183365a3f77cb5f9bec558d211d966eacc2c11e9f459f7faeee",
+          "context_sha256": "0fd2c8a05a74a00f9286a22622ff8155ea30ba45ba2bcfba05e77d01955d61e2"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 16838,
+        "completion_tokens": 451,
+        "total_tokens": 17289
+      },
+      "post_elapsed_seconds": 21.14262772584334,
+      "source_readbacks": 35,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "qid": "5a729fe55542991f9a20c53b",
+      "dataset": "hotpotqa",
+      "question": {
+        "content": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+        "request_id": "12645d1d-3708-5847-a946-bfe103897446",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+        ],
+        "document_scope": []
+      },
+      "session_id": "0216c75f-bff8-418b-9bf8-a4182350c7cc",
+      "run_id": "ae343906-18c7-4822-b269-183388725954",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PASS",
+      "first_quality_loss": "NONE",
+      "fact_review": "Pieter van Musschenbroek正确；两跳3条必要支持事实均进入生成输入。",
+      "answer": "根据提供的资料，**Pieter van Musschenbroek**（皮特·范·迈森布鲁克）被记录为发明了莱顿瓶（Leyden jar）和摩擦仪（tribometer）的人。\n\n*   **莱顿瓶**：资料明确指出 Pieter van Musschenbroek 在 1746 年发明了莱顿瓶，这是第一种电容器。\n*   **摩擦仪**：资料指出摩擦仪（tribometer）是由 18 世纪的荷兰科学家 Musschenbroek 发明的。\n\nSources: e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc.txt, 613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825.txt",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.8333333333333333,
+            "ndcg_at_k": 0.9197207891481876,
+            "retrieved_count_at_k": 10,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 7,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.8333333333333333,
+            "ndcg_at_k": 0.9197207891481876,
+            "retrieved_count_at_k": 4,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 7,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.8333333333333333,
+            "ndcg_at_k": 0.9197207891481876,
+            "retrieved_count_at_k": 4,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 7,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.8333333333333333,
+            "ndcg_at_k": 0.9197207891481876,
+            "retrieved_count_at_k": 4,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 5264,
+      "raw_rerank_top1": 0.9937303066253662,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_ANSWER_DIAGNOSTICS",
+        "metrics": {
+          "hotpot_answer_em": 0.0,
+          "hotpot_answer_token_f1": 0.2727272727272727
+        },
+        "supporting_facts": "SEPARATE_FROM_ANSWER",
+        "included_in_answer_metric_denominator": true,
+        "evaluation_unit": "FULL_COMPLETED_APP_RESPONSE_INCLUDING_FIXED_REFUSALS",
+        "official_whole_benchmark": "NOT_CLAIMED"
+      },
+      "attempts": [
+        {
+          "attempt_id": "ae343906-18c7-4822-b269-183388725954/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "4a65442db03c17b224bfc4ab4900945755053309a29b8f1b54520ebe76903546",
+          "context_sha256": "4b16013204f5db1c7038175db42283412b88a136e1731e025e555973bd2061bd"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 8961,
+        "completion_tokens": 261,
+        "total_tokens": 9222
+      },
+      "post_elapsed_seconds": 10.448204199783504,
+      "source_readbacks": 49,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "hotpotqa-5a7631cd5542994ccc91870c",
+      "qid": "5a7631cd5542994ccc91870c",
+      "dataset": "hotpotqa",
+      "question": {
+        "content": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+        "request_id": "bcf6ca77-7ca0-5b04-957f-cdd3214b7435",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+        ],
+        "document_scope": []
+      },
+      "session_id": "f5fb5351-af87-42b9-bc67-11287b51266d",
+      "run_id": "a2da05d4-d344-4583-b6b7-eda96b36b919",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "FAIL",
+      "first_quality_loss": "RERANK",
+      "fact_review": "The Frost Place地点第二跳丢失，Context仅1/2必要事实；答案无依据推测纽约。",
+      "answer": "Jeanne Marie Beaumont 在 2007 年至 2010 年期间担任主任的研讨会是 **The Frost Place Advanced Seminar**。\n\n根据提供的资料，该研讨会位于 **The Frost Place**（具体城市未在片段中明确提及，但文中提到她于1983年搬到纽约市，且曾在纽约的92nd Street Y任教，暗示该机构可能位于纽约）。\n\nSources: 4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd.txt",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.2,
+            "f1_at_k": 0.33333333333333337,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.6111111111111112,
+            "ndcg_at_k": 0.7977228895450266,
+            "retrieved_count_at_k": 10,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 2,
+          "source_metrics": {
+            "recall_at_k": 0.5,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.16666666666666669,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.5,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 2,
+          "source_metrics": {
+            "recall_at_k": 0.5,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.16666666666666669,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.5,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 2,
+          "source_metrics": {
+            "recall_at_k": 0.5,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.16666666666666669,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 0.5,
+            "ndcg_at_k": 0.6131471927654584,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 2632,
+      "raw_rerank_top1": 0.998090922832489,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_ANSWER_DIAGNOSTICS",
+        "metrics": {
+          "hotpot_answer_em": 0.0,
+          "hotpot_answer_token_f1": 0.0
+        },
+        "supporting_facts": "SEPARATE_FROM_ANSWER",
+        "included_in_answer_metric_denominator": true,
+        "evaluation_unit": "FULL_COMPLETED_APP_RESPONSE_INCLUDING_FIXED_REFUSALS",
+        "official_whole_benchmark": "NOT_CLAIMED"
+      },
+      "attempts": [
+        {
+          "attempt_id": "a2da05d4-d344-4583-b6b7-eda96b36b919/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "32321fb650bf701409e51b25a1e561619044a95ce06aedb5d43a6d0a320cb6b5",
+          "context_sha256": "914a575cf0153e119b8a46d88e9c093aa67cb876e11255c13dcadcadc38f4088"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 7925,
+        "completion_tokens": 185,
+        "total_tokens": 8110
+      },
+      "post_elapsed_seconds": 48.99659597314894,
+      "source_readbacks": 51,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "dataset": "mmlongbench-doc",
+      "question": {
+        "content": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+        "request_id": "b774f2d4-ec6e-5d47-8f5a-d9a40d9cf4b8",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "7f1d720d-9561-446f-a8cc-6a562c339d23"
+        ],
+        "document_scope": []
+      },
+      "session_id": "20cc238a-0035-42fd-baf9-e9a2d71219ff",
+      "run_id": "1ae3c1da-a22e-45d6-b6de-ac49e294920b",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PASS",
+      "first_quality_loss": "NONE",
+      "fact_review": "Coding time!保留后，现有邻接Merge带入Kaggle Cat vs Dog及25k图片原文，答案正确。",
+      "answer": "在 PPT 的“Coding time!”部分中提到的用于训练的数据集是 **Kaggle's Cat vs Dog dataset**（Kaggle猫狗数据集），该数据集包含 2.5 万张猫狗图片。\n\nSources: catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 764,
+      "raw_rerank_top1": 0.1073344498872757,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.2054794520547945
+        },
+        "official_judge": "NOT_RUN",
+        "answer_format": "Str",
+        "official_gpt_judge": "NOT_RUN"
+      },
+      "attempts": [
+        {
+          "attempt_id": "1ae3c1da-a22e-45d6-b6de-ac49e294920b/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "c3c2dfe6e49171d99ff5b417ca35212581bde3566482c9b0c085d8c227aa823c",
+          "context_sha256": "54763b3e9bcfbab40aaea5bfb55888bb73b2a7b482e1266c4728ce17220e2b0b"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 7907,
+        "completion_tokens": 117,
+        "total_tokens": 8024
+      },
+      "post_elapsed_seconds": 12.970157786738127,
+      "source_readbacks": 32,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "dataset": "mmlongbench-doc",
+      "question": {
+        "content": "Who has a higher median campaign grade? Trump or Clinton?",
+        "request_id": "de46dcc2-0dc6-5b13-9a43-57eca7dfc062",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "fd444069-cc1a-42d0-9617-e95fa90b6941"
+        ],
+        "document_scope": []
+      },
+      "session_id": "9f8805c2-6363-4fef-b22e-7bf41a33b926",
+      "run_id": "9a22d075-2c2f-4fcd-b742-0b720d83b07d",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PARTIAL",
+      "first_quality_loss": "GENERATION",
+      "fact_review": "Clinton核心答案正确且有据；将原文平均评分称作中位数，统计措辞不正确。",
+      "answer": "根据提供的资料，**希拉里·克林顿（Hillary Clinton）** 获得了比唐纳德·特朗普（Donald Trump）更高的平均竞选评分（中位数）。\n\n具体数据如下：\n*   **希拉里·克林顿**的平均评分为 **C**。\n*   **唐纳德·特朗普**的平均评分为 **C-**。\n\n此外，资料指出这是“落选候选人首次获得比获胜者更多的正面评分”（即A或B评级的比例更高：克林顿为43%，特朗普为30%）。\n\nSources: 11-21-16-Updated-Post-Election-Release.pdf",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 9,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 6,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 6,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 4729,
+      "raw_rerank_top1": 0.9223226308822632,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.07291666666666667
+        },
+        "official_judge": "NOT_RUN",
+        "answer_format": "Str",
+        "official_gpt_judge": "NOT_RUN"
+      },
+      "attempts": [
+        {
+          "attempt_id": "9a22d075-2c2f-4fcd-b742-0b720d83b07d/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "239209231fe20861dacf5b68527dfa4ced35ce158e93c21b09893ef4eda56364",
+          "context_sha256": "34f5607c8677b30b1585953435981c55c5763b00954f586366f9fe2c34394f34"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 8810,
+        "completion_tokens": 158,
+        "total_tokens": 8968
+      },
+      "post_elapsed_seconds": 17.454119977075607,
+      "source_readbacks": 32,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+      "dataset": "mmlongbench-doc",
+      "question": {
+        "content": "What are two examples of reflecting surfaces?",
+        "request_id": "d2e185cd-ac9e-5af2-9d5b-8eb1e7af02c4",
+        "mode": "quick",
+        "reasoning_effort": "off",
+        "knowledge_base_scope": [
+          "7f1d720d-9561-446f-a8cc-6a562c339d23"
+        ],
+        "document_scope": []
+      },
+      "session_id": "a5ec588d-7efe-4141-a51e-dd2812a94c30",
+      "run_id": "7cf1cb89-b511-4a13-86ec-3c553d6bc1fa",
+      "execution_status": "COMPLETE",
+      "engineering_fact_verdict": "PASS",
+      "first_quality_loss": "NONE",
+      "fact_review": "当前OCR原文明确含shiny object or mirror，真实Context/wire及答案均支持。",
+      "answer": "根据提供的资料，反射面（reflecting surface）的例子包括：\n1. 镜子（mirror）\n2. 有光泽的物体（shiny object）\n\nSources: b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+      "stages": {
+        "search": {
+          "chunk_count": 30,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 2,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "rerank": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "merge": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        },
+        "context": {
+          "chunk_count": 1,
+          "source_metrics": {
+            "recall_at_k": 1.0,
+            "precision_at_k": 0.1,
+            "f1_at_k": 0.18181818181818182,
+            "hit_at_k": 1,
+            "mrr_at_k": 1.0,
+            "map_at_k": 1.0,
+            "ndcg_at_k": 1.0,
+            "retrieved_count_at_k": 1,
+            "no_answer_retrieval_empty": null
+          }
+        }
+      },
+      "context_characters": 757,
+      "raw_rerank_top1": 0.5213643908500671,
+      "qu_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "temperature": 0.3,
+        "max_tokens": 150,
+        "enable_thinking": false
+      },
+      "final_wire": {
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "enable_thinking": false
+      },
+      "answer_metric": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.265625
+        },
+        "official_judge": "NOT_RUN",
+        "answer_format": "List",
+        "official_gpt_judge": "NOT_RUN",
+        "typed_list": {
+          "status": "UNPARSEABLE_FULL_RESPONSE_NOT_EXTRACTED",
+          "unordered_multiset_exact": null,
+          "normalization": "literal Python/JSON string list; alphanumeric lowercase; order ignored; duplicates preserved"
+        }
+      },
+      "attempts": [
+        {
+          "attempt_id": "7cf1cb89-b511-4a13-86ec-3c553d6bc1fa/answer/1/cheap",
+          "role": "cheap",
+          "model_requested": "Qwen/Qwen3.5-4B",
+          "model_reported": "Qwen/Qwen3.5-4B",
+          "status": "COMPLETED",
+          "finish_reason": "stop",
+          "prompt_sha256": "a15d8a5fe26b5d6a8254c33df9b97ffbe6315120e912c6dbc656bb9fa52601cf",
+          "context_sha256": "37775cb98627d5d3560b59c07e07c8ab0d1bacf2d381cb4636c77b2a58482ad0"
+        }
+      ],
+      "calls": 4,
+      "usage": {
+        "prompt_tokens": 7535,
+        "completion_tokens": 104,
+        "total_tokens": 7639
+      },
+      "post_elapsed_seconds": 10.729634360875934,
+      "source_readbacks": 33,
+      "source_readback_bytehash_failures": 0,
+      "actual_context_wire_binding": true,
+      "sse_pg_history_equal": true,
+      "official_metric_and_manual_quality_are_separate": true
+    }
+  ],
+  "usage": {
+    "source_updates": {
+      "calls": 96,
+      "prompt_tokens": 136437,
+      "completion_tokens": 4669,
+      "total_tokens": 141106
+    },
+    "nine_qa": {
+      "calls": 36,
+      "prompt_tokens": 87568,
+      "completion_tokens": 1557,
+      "total_tokens": 89125
+    },
+    "total": {
+      "status": "ALL_SOURCE_ALIGNMENT_AND_NINE_API_RUNS_COMPLETE_PENDING_QUALITY_REVIEW",
+      "source_groups": 28,
+      "old_document_versions_preserved": 52,
+      "new_vectors": 657,
+      "question_submissions": 9,
+      "provider_calls": 132,
+      "usage": {
+        "prompt_tokens": 224005,
+        "completion_tokens": 6226,
+        "total_tokens": 230231
+      },
+      "by_model": {
+        "siliconflow|BAAI/bge-m3|embedding": {
+          "calls": 77,
+          "prompt_tokens": 88845,
+          "completion_tokens": 0,
+          "total_tokens": 88845
+        },
+        "siliconflow|Qwen/Qwen3.5-4B|chat": {
+          "calls": 46,
+          "prompt_tokens": 83690,
+          "completion_tokens": 6226,
+          "total_tokens": 89916
+        },
+        "siliconflow|BAAI/bge-reranker-v2-m3|rerank": {
+          "calls": 9,
+          "prompt_tokens": 51470,
+          "completion_tokens": 0,
+          "total_tokens": 51470
+        }
+      },
+      "new_unknown": 0,
+      "old_unknown_unchanged": true,
+      "database_proof": {
+        "old_documents": {
+          "count": 52,
+          "disabled": 52
+        },
+        "old_indexes": {
+          "count": 474,
+          "disabled": 474
+        },
+        "new_documents": {
+          "count": 28,
+          "completed_enabled": 28
+        },
+        "new_indexes": {
+          "count": 657,
+          "active_1024_vector": 657
+        },
+        "unknown": {
+          "count": 2,
+          "digest": "82002b507d1e099536c161f9c3051349"
+        }
+      },
+      "master_status": "CLOSED",
+      "master_before_sha256": "8428889912ee34cf72689a9a391e09a410adf0171b801b445d3fcaa4e3734b18",
+      "master_closed_sha256": "25722d675055aacf7322503ccc3df7df427fc2c384b92e10cef0d8a3bce2dbdf",
+      "unused_software_space_withdrawn": {
+        "calls": 312,
+        "tokens": 3469769
+      },
+      "original_api_healthy": true
+    }
+  },
+  "resources": {
+    "scope": "nine normal FastAPI question windows, start through controlled stop before original restore",
+    "host_mem_available_sample_min_bytes": 1970536448,
+    "host_mem_available_sample_min_gib": 1.835205078125,
+    "container_peak_max_bytes": 1033715712,
+    "container_peak_max_mib": 985.828125,
+    "all_limits_one_gib": true,
+    "cases": [
+      {
+        "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+        "host_mem_available_min_bytes": 2420850688,
+        "container_memory_peak_bytes": 306290688,
+        "limit_bytes": 1073741824,
+        "sample_count": 25,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+        "host_mem_available_min_bytes": 2468954112,
+        "container_memory_peak_bytes": 307105792,
+        "limit_bytes": 1073741824,
+        "sample_count": 36,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "miracl-zh-5704915#0",
+        "host_mem_available_min_bytes": 2426511360,
+        "container_memory_peak_bytes": 303636480,
+        "limit_bytes": 1073741824,
+        "sample_count": 21,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "host_mem_available_min_bytes": 2479316992,
+        "container_memory_peak_bytes": 304156672,
+        "limit_bytes": 1073741824,
+        "sample_count": 20,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "scifact-1304",
+        "host_mem_available_min_bytes": 2482520064,
+        "container_memory_peak_bytes": 308662272,
+        "limit_bytes": 1073741824,
+        "sample_count": 23,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "host_mem_available_min_bytes": 1981014016,
+        "container_memory_peak_bytes": 1033715712,
+        "limit_bytes": 1073741824,
+        "sample_count": 29,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+        "host_mem_available_min_bytes": 1970536448,
+        "container_memory_peak_bytes": 730349568,
+        "limit_bytes": 1073741824,
+        "sample_count": 26,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "hotpotqa-5a7631cd5542994ccc91870c",
+        "host_mem_available_min_bytes": 2437668864,
+        "container_memory_peak_bytes": 306495488,
+        "limit_bytes": 1073741824,
+        "sample_count": 64,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      },
+      {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "host_mem_available_min_bytes": 2440028160,
+        "container_memory_peak_bytes": 315408384,
+        "limit_bytes": 1073741824,
+        "sample_count": 32,
+        "interval_seconds": 1.0,
+        "interpretation": "minimum of recorded samples; sub-second continuous minimum is not measured"
+      }
+    ]
+  },
+  "protection": {
+    "new_unknown": 0,
+    "old_ecs_unknown_count": 2,
+    "old_unknown_digest_unchanged": true,
+    "master_closed": true,
+    "original_api_restored_healthy": true,
+    "tenant1_untouched": true,
+    "main_original_dirty_files_preserved": true
+  },
+  "tool_issue": {
+    "initial_export_reformatted_json": "Preserved original failed export and scores; zero-Provider raw byte re-export performed. All authoritative scorer readback failures now0.",
+    "historical_receipts_modified": false,
+    "provider_retries_due_to_export": 0
+  },
+  "evidence": {
+    "authoritative_root": "E:\\RAG quention\\var\\reports\\s8-aligned-top1-20261020\\raw-final-evidence",
+    "zip": "E:\\RAG quention\\var\\reports\\s8-aligned-top1-20261020\\raw-final-evidence.zip",
+    "zip_sha256": "7a3063e740ff21e18cf3d762d0713f457f993b221a84756f8e00e357f503760b",
+    "files_verified": 1859,
+    "detailed_scores": "E:\\RAG quention\\var\\reports\\s8-aligned-top1-20261020\\scoring\\R9-final-scores-v2.json",
+    "fact_reviews": [
+      "E:\\RAG quention\\var\\reports\\s8-aligned-top1-20261020\\scoring\\fact-review-first3-v2.json",
+      "E:\\RAG quention\\var\\reports\\s8-aligned-top1-20261020\\scoring\\fact-review-middle3-v2.json",
+      "E:\\RAG quention\\var\\reports\\s8-aligned-top1-20261020\\scoring\\fact-review-mml3-v2.json"
+    ]
+  },
+  "commands": [
+    {
+      "command": "python test_sync_aligned_sources.py --repo-root E:/RAG-Worktrees/s8-six-dataset-evaluation",
+      "exit_code": 0,
+      "result": "23 offline tests PASS"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -B all-controller/test_top1_stage_tools.py",
+      "exit_code": 0,
+      "result": "18 offline tests PASS"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -B all-controller/test_remote_prepare_and_freeze.py",
+      "exit_code": 0,
+      "result": "10 offline tests PASS"
+    },
+    {
+      "command": "python sync_aligned_sources.py --manifest source-manifest.json --repo-root /app --output ... (actual ECS container)",
+      "exit_code": 0,
+      "result": "28 sources,629 bodies, exact prepared chunk hashes matched"
+    },
+    {
+      "command": "python3 -B run_all_aligned.py --execute (systemd Restart=no)",
+      "exit_code": 0,
+      "result": "28 SAFE_COMPLETE sources +9 SAFE_COMPLETE question posts"
+    },
+    {
+      "command": "python3 remote_finish_all.py",
+      "exit_code": 0,
+      "result": "52/474 old disabled preserved;28/657 new active verified;master CLOSED"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -B scoring/score_aligned_top1.py --evidence-root raw-final-evidence --source-snapshot raw-final-evidence/metadata/actual-source-snapshot.json --output scoring/R9-final-scores-v2.json",
+      "exit_code": 0,
+      "result": "9 receipts scored,readback failures0,zero Provider"
+    }
+  ],
+  "next_minimum_recommendation": "Keep these aligned source versions. Independently measure Rerank source retention (SciFact/Frost) and generation factual precision (DuReader/statistical labels); do not infer global Top1 promotion from these9."
+}

@@ -1,0 +1,11 @@
+FROM python:3.11-slim
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/app OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+COPY deploy/s8/requirements.txt /app/deploy/s8/requirements.txt
+RUN pip install --no-cache-dir -r /app/deploy/s8/requirements.txt
+COPY backend/__init__.py /app/backend/__init__.py
+COPY backend/weknora_port /app/backend/weknora_port
+COPY eval_center /app/eval_center
+COPY scripts /app/scripts
+RUN python -c "import backend.weknora_port.runtime, backend.weknora_port.http_api, scripts.s8_ecs_runtime"
+CMD ["python", "-m", "scripts.s8_ecs_runtime", "api"]

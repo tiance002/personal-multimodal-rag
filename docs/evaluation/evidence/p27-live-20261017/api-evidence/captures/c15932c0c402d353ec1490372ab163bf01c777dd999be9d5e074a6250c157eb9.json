@@ -1,0 +1,109 @@
+{
+  "schema": "p8-passive-ordinary-capture/v1",
+  "run_id": "ae73ff5d-01b2-44f4-b197-b18b298e51be",
+  "session_id": "a70cc4af-2886-4294-b3f5-20200abbaf0c",
+  "message_id": "47c5d340-2127-4b73-be58-17df1e39d9af",
+  "question": "What are two examples of reflecting surfaces?",
+  "rankings": {
+    "search": [
+      [
+        "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "7b692e52-5b12-5959-9c9e-c792fb0bf466",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "f2c41958-d28b-43bd-b83a-3fd1812b943e",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "f8980975-4554-430d-8366-53dfed904ee6",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "f6c8f64f-3d06-43e6-8a3b-97ebf320e73c",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "2a62425a-2855-48e0-b87a-3aa69b1bf992",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "48e47fc7-528e-409c-94d8-5819d1ca580a",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "54648ffb-a8fe-4879-8747-f19ee27fc0f0",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ],
+      [
+        "d5021bf4-4290-4519-9d0e-1cb9e302bdae",
+        "63236a5c-c0d6-499d-84e5-34475564f1c0",
+        "3afe479e-723d-42a9-9c80-a7fc8b2eda79"
+      ]
+    ],
+    "rerank": [],
+    "context": []
+  },
+  "evidence": [],
+  "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "prompt_sha256": "6e1ca1c6faecf14f35ff0dc2826da1b49ae140650ca410cafb0e17a492126f42",
+  "messages": [
+    {
+      "role": "system",
+      "content": "\n\n## Source handling protocol (system-owned)\nRetrieved content uses request-local source handles: cN identifies a knowledge chunk, wN a web page, dN a document, and bN a knowledge base.\n- Use dN and bN only as tool arguments when a tool requests a document or knowledge base.\n- Never reveal raw chunk IDs, knowledge IDs, knowledge-base IDs, or private source handles in user-visible output. This does not change separate instructions to preserve retrieved Markdown image URLs.\n- Source citations are disabled for this answer. Do not add <ref>, <kb>, <web>, or source attribution links to the answer. This does not prohibit a URL explicitly requested by the user, Wiki navigation links, downloadable deliverables, or relevant image URLs.\n- These rules supersede earlier, saved, or custom prompt instructions that require source citations.\n\n## Resource handle protocol (system-owned)\nSome durable resources and high-entropy Wiki slugs are represented by request-local res://NNNN handles. Wiki issues may use iN handles.\n- Copy supplied handles exactly in links, images, and tool arguments; they refer only to the supplied resource versions.\n- For downloadable deliverables generated in the session workspace, use sandbox:<file name>; never reuse or invent a resource handle. This download convention does not apply to editing installed skill files.\nMCP routing uses request-local msN server IDs and mtN tool references. Copy them exactly from the directory or describe result; never invent them.\n",
+      "multi_content": [],
+      "images": [],
+      "name": "",
+      "tool_call_id": "",
+      "tool_calls": [],
+      "reasoning_content": "",
+      "reasoning_metadata": {},
+      "kind": "",
+      "turn_id": "",
+      "reasoning_signature": ""
+    },
+    {
+      "role": "user",
+      "content": "What are two examples of reflecting surfaces?",
+      "multi_content": [],
+      "images": [],
+      "name": "",
+      "tool_call_id": "",
+      "tool_calls": [],
+      "reasoning_content": "",
+      "reasoning_metadata": {},
+      "kind": "",
+      "turn_id": "",
+      "reasoning_signature": ""
+    }
+  ],
+  "context": {
+    "user_content": "What are two examples of reflecting surfaces?",
+    "rendered_contexts": "",
+    "result_ids": [],
+    "system_prompt_override": "",
+    "images": []
+  },
+  "policy": {
+    "mode": "CHEAP_ONLY",
+    "threshold": "0.35",
+    "quality_escalation": true,
+    "truncated_escalation": true,
+    "abstention_escalation": false,
+    "provider_fallback": false
+  },
+  "fixed_fallback": "当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。",
+  "observer": "READ_ONLY_AFTER_NORMAL_PREPARATION",
+  "gold_loaded": false
+}

@@ -1,0 +1,190 @@
+{
+  "status": "PASS_OFFLINE_DETERMINISM_NOT_HISTORICAL_CAUSAL_PROOF",
+  "cloud_calls": 0,
+  "database_calls": 0,
+  "checks": [
+    {
+      "case": "row-0434-on",
+      "kind": "captured_final_search_dedup_topk",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "c6ec1da3bedda735f5aac201f4dcf7a1cfb2f0860c73c7b1f96dedaa876dbd8f",
+      "same_score_topk_secondary_order_stable": true,
+      "not_pre_fusion_or_historical_vector_replay": true
+    },
+    {
+      "case": "row-0434-off",
+      "kind": "captured_final_search_dedup_topk",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "78109cc60b126e63aca6232f58106354cc4523cc8d2814bde6585ea5c2d8bd32",
+      "same_score_topk_secondary_order_stable": true,
+      "not_pre_fusion_or_historical_vector_replay": true
+    },
+    {
+      "case": "row-0959-on",
+      "kind": "captured_final_search_dedup_topk",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "ec0028b9cf74554819e8236fae3c7639f72be923c39bb5689341c077e0258277",
+      "same_score_topk_secondary_order_stable": true,
+      "not_pre_fusion_or_historical_vector_replay": true
+    },
+    {
+      "case": "row-0959-off",
+      "kind": "captured_final_search_dedup_topk",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "858264359969d1e1814dd93ec55c143457b999ba3ece52e55c1fb619936dc3cf",
+      "same_score_topk_secondary_order_stable": true,
+      "not_pre_fusion_or_historical_vector_replay": true
+    },
+    {
+      "case": "row-0958-on",
+      "kind": "captured_final_search_dedup_topk",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "d00df2345efdf8d5b92c2e3bc4946b855aab4de26f84d0b60f639762a31ea806",
+      "same_score_topk_secondary_order_stable": true,
+      "not_pre_fusion_or_historical_vector_replay": true
+    },
+    {
+      "case": "row-0958-off",
+      "kind": "captured_final_search_dedup_topk",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "60163911bc09e091f5a2f5fdb960795ecc215b2973797ed5904c4d9f51670399",
+      "same_score_topk_secondary_order_stable": true,
+      "not_pre_fusion_or_historical_vector_replay": true
+    },
+    {
+      "kind": "synthetic_ordered_weighted_rrf",
+      "repetitions": 100,
+      "stable": true,
+      "output_sha256": "34bbf58fc3555f4242b9773b8d504ca8f434a9479579567bdadda436b965bb42",
+      "historical_component_rankings_available": false
+    },
+    {
+      "kind": "synthetic_repository_completion_timing",
+      "repetitions": 20,
+      "stable": true,
+      "actual_search_gather_order": [
+        "a",
+        "b",
+        "c"
+      ]
+    }
+  ],
+  "expansions": [
+    {
+      "case": "row-0434-on",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "rewrite": "PPT中coding time部分引入的用于训练的数据集是什么",
+      "generated_in_source_order": [
+        "PPT coding time 部分 引入 用于 训练 数据 集是 什么",
+        "PPT中coding",
+        "time部分引入的用于训练的数据集是什么"
+      ],
+      "actual_embedding_order": [
+        "PPT中coding time部分引入的用于训练的数据集是什么"
+      ],
+      "expansion_was_executed": false,
+      "generated_set_matches_actual_expansions": null,
+      "note": "Observed provider send/completion order need not equal gather result order."
+    },
+    {
+      "case": "row-0434-off",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "rewrite": "PPT中coding time部分介绍的训练数据集是什么",
+      "generated_in_source_order": [
+        "PPT coding time 部分 介绍 训练 数据 集是 什么",
+        "PPT中coding",
+        "time部分介绍的训练数据集是什么"
+      ],
+      "actual_embedding_order": [
+        "PPT中coding time部分介绍的训练数据集是什么"
+      ],
+      "expansion_was_executed": false,
+      "generated_set_matches_actual_expansions": null,
+      "note": "Observed provider send/completion order need not equal gather result order."
+    },
+    {
+      "case": "row-0959-on",
+      "q0": "What are used for long-distance communication as introduced in this slide?",
+      "rewrite": "What are used for long-distance communication as introduced in this slide?",
+      "generated_in_source_order": [
+        "used long distance communication introduced this slide",
+        "long-distance",
+        "communication",
+        "introduced"
+      ],
+      "actual_embedding_order": [
+        "What are used for long-distance communication as introduced in this slide?"
+      ],
+      "expansion_was_executed": false,
+      "generated_set_matches_actual_expansions": null,
+      "note": "Observed provider send/completion order need not equal gather result order."
+    },
+    {
+      "case": "row-0959-off",
+      "q0": "What are used for long-distance communication as introduced in this slide?",
+      "rewrite": "What are used for long-distance communication as introduced in this slide",
+      "generated_in_source_order": [
+        "used long distance communication introduced this slide",
+        "long-distance",
+        "communication",
+        "introduced"
+      ],
+      "actual_embedding_order": [
+        "What are used for long-distance communication as introduced in this slide"
+      ],
+      "expansion_was_executed": false,
+      "generated_set_matches_actual_expansions": null,
+      "note": "Observed provider send/completion order need not equal gather result order."
+    },
+    {
+      "case": "row-0958-on",
+      "q0": "What are two examples of reflecting surfaces?",
+      "rewrite": "什么是反射面 两个反射面的例子",
+      "generated_in_source_order": [
+        "什么 反射 反射面 两个 反射 反射面 例子",
+        "什么是反射面",
+        "两个反射面的例子",
+        "反射面 两个反射面的例子"
+      ],
+      "actual_embedding_order": [
+        "什么是反射面 两个反射面的例子",
+        "两个反射面的例子",
+        "什么 反射 反射面 两个 反射 反射面 例子",
+        "什么是反射面",
+        "反射面 两个反射面的例子"
+      ],
+      "expansion_was_executed": true,
+      "generated_set_matches_actual_expansions": true,
+      "note": "Observed provider send/completion order need not equal gather result order."
+    },
+    {
+      "case": "row-0958-off",
+      "q0": "What are two examples of reflecting surfaces?",
+      "rewrite": "What are two examples of reflecting surfaces?",
+      "generated_in_source_order": [
+        "two examples reflecting surfaces",
+        "examples",
+        "reflecting",
+        "surfaces"
+      ],
+      "actual_embedding_order": [
+        "What are two examples of reflecting surfaces?",
+        "surfaces",
+        "two examples reflecting surfaces",
+        "reflecting",
+        "examples"
+      ],
+      "expansion_was_executed": true,
+      "generated_set_matches_actual_expansions": true,
+      "note": "Observed provider send/completion order need not equal gather result order."
+    }
+  ],
+  "historical_embedding_vectors": "NOT_CAPTURED",
+  "historical_prefusion_vector_keyword_lists": "NOT_CAPTURED"
+}

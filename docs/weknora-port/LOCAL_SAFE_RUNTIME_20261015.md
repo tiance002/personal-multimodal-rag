@@ -1,0 +1,47 @@
+# Local safe transport / runtime takeover — 2026-10-15
+
+Scope: first authorized takeover batch only. SOURCE_READ / IMPLEMENTED / OFFLINE_PASS / ISOLATED_INTEGRATION_PASS for controlled Local calls and failed-memory protection. Full upstream Local/Ollama service parity, ordinary Go engine, REAL_LOCAL_PASS, REAL_PROVIDER_PASS and CUTOVER_PASS are not established. No prior530/4PG PASS is carried forward.
+
+## Preserved scene
+
+Worktree E:/WK/model-cfg; branch codex/weknora-model-local-20261014; baseline9d9f62879005d14885c7a51a8e1bf8af596badb0. Before edits, two dirty files were saved verbatim in evidence/LOCAL_TAKEOVER_20261015: local_ollama.py SHA2566cd3095957389a437db932e84269543b2e0878262dde03c7bd1ccc4ff4a4ce01; provider.py SHA25635ac1456b60f57b1df2f51dcd6a38833e807d89daac46e63638cb978bc0f2ed5; binary patch98ca277c74402df0c9f9017d5e72782f116a4f775fec77966290f6024435bf0a. snapshot.json additionally carries base64 originals so checkout EOL filters cannot lose original bytes. Existing half-completed transport/NDJSON work was extended; no reset or replacement of Owner work.
+
+Overwritten AUTO_QUEUE receipt first saved as deepseek_AUTO_QUEUE.json, then tracked old receipt restored to exact raw Git bytes from accepted2bc2a063a11d1cf3a9e42a9ecfcd55d4124ce3df. New source-provider test output now writes this batch's evidence directory. Earlier records remain available; no historical evidence deleted.
+
+## Implementation and controlled configuration
+
+local_connection_config derives chat connection only from explicit global Local service, stripping per-row endpoint/query/headers/secrets; no local credential lookup. ProviderModel chat and stream use existing AsyncHTTPTransport.open, validate_endpoint and the original gate.authorize/finish, within one call_lifetime covering ensure and chat. Pre-cancel/model/run deadline expiry checks precede ensure. Ollama options.num_predict feeds the existing output-budget admission. Non-local paths retain default POST and prior protocol behavior.
+
+HTTPLocalService has no separate HTTP client. GET /api/tags and optional POST /api/pull also pass the same transport/gate under scoped child request IDs. Its constructor requires an explicit allow_pull bool; there is no implicit product-wide pull removal. This batch's real runtime/fixtures select allow_pull=False. Explicit allow_pull=True retains the source check->pull->chat sequence, and only adds that exact control endpoint to the model's closed endpoint set. Mock tests exercise both successful authorized pull and HTTP200 string-error/incomplete pull; failure never reaches chat or successful done. No real pull or service startup occurred. Source's optional-service/automatic-start branches are not claimed equivalent by this limited adapter.
+
+ApplicationRuntime accepts the explicit service dependency; both registry_for_context and ordinary _configuration factories go through _make_model. Factory receives the global connection config to build its closed endpoint admission; original model.config identity is retained for immutable row/registry/P5 checks. transport.gate must remain exactly the injected LeasedSendGate, and actual Local provider/transport types are checked. Existing SafeHTTPTransport/SSRF controlled configuration still applies; no host/network whitelist, environment, system ACL or existing service configuration was changed. Physical destinations are evidenced by send_calls.endpoint, not the row URL retained as identity metadata. Generation attempt endpoint metadata still reflects the configured row identity; do not use it as proof of actual Local destination.
+
+NDJSON uses response.aiter_bytes incrementally through the common transport, never client.post buffering. It handles split JSON, bounded lines, malformed/truncated EOF, top-level HTTP200 error strings and terminal done; first event is delivered before EOF and cancellation closes the response. Missing/partial usage remains UNKNOWN with absent counters, explicit0+0 is REPORTED0. Explicit mismatched model is rejected; reported model is never filled from request. Run-deadline exceptions stay fatal. No Agent tool execution was added; tool-call mapping remains neutral metadata only.
+
+BoundOrdinaryService consults persisted scoped port_turns status/error before memory hooks. Only completed+empty error invokes record_turn_memory. Existing operation IDs/dedup are unchanged. Formal HTTP tests cover actual generation error with remember-that synthetic query, plus an adapter fault returning a non-None failure receipt after that same actual failure. The latter is an explicitly injected return-shape counterexample, not a claim that the unmodified coordinator naturally returns such an object. Both keep authoritative error, memory0/jobs0 and retained UNKNOWN send reservations. Same-request HTTP replay adds neither sends nor jobs.
+
+## Actual tests and source binding
+
+Python executable for every test: E:/RAG quention/.venv/Scripts/python.exe -B. PYTHONDONTWRITEBYTECODE=1; PYTHONPATH uses E:/WK/deps/reader and primary worktree var/weknora-port/runtime-deps. Existing approved isolated DSN injected without printing credentials. Commands below run in E:/WK/model-cfg, always --noconftest, -p no:cacheprovider, --tb=short.
+
+Final command1:
+`python -B -m pytest --noconftest tests/weknora_port/test_local_controlled.py tests/weknora_port/test_local_ollama.py tests/weknora_port/test_local_runtime_pg.py tests/weknora_port/test_provider_transport.py -q -p no:cacheprovider --tb=short --junitxml=docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/closed.final.junit.xml`
+Exit0:60passed6.21s. closed.final.stdout/exitcode/JUnit plus runtime-success.json, runtime-failed-remember.json and runtime-failed-object.json. All Ollama/cloud model responses are closed MockTransport; actual formal ASGI entry, SQL and Redis are real isolated components. Both Local runtime factories verified with exact LeasedSendGate identity. Successful turn automatically enqueues once; two genuine failed HTTP cases create no memory/jobs, keep positive UNKNOWN reservation and null actual cost. No manual schedule used.
+
+Final command2:
+`python -B -m pytest --noconftest tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_stream.py tests/weknora_port/test_provider_safe_network.py tests/weknora_port/test_kb_model_selection.py -q -p no:cacheprovider --tb=short --junitxml=docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/remote.final.junit.xml`
+Exit0:113passed4.94s. remote.final.stdout/exitcode/JUnit. These groups are targeted affected protection, not the old530 aggregate or full corpus. final-run.inputs.json binds exact working code/tests; receipt.json adds raw Git upstream and staged/working source plus JUnit hashes. Function wire fixtures in inherited Local tests are source-derived Python fixtures; no full Go client or live Local parity is inferred from them.
+
+Retained failures: initial py_compile indentation error corrected before pytest (not behavior PASS); runtime.initial2fail from PG connection timeout; local.retry27pass2fail from old Redis run_id; authorized.final36pass1fail revealed early RESPONSE_RECEIVED on denied availability, fixed by preserving failure outcome, assertion unchanged. Other successful intermediate logs retained without substituting them for final code-bound evidence. No blanket repeated full test/40QA runs.
+
+## Environment evidence and real Local limit
+
+At first read-only inspection the dedicated PG/Redis containers had exited255. Only named weknora-python-resume-pg-20261013 (paradedb0.22.6-pg17,127.0.0.1:56423) and weknora-python-resume-redis-20261013 (redis7.4.2,127.0.0.1:56424) were restarted unchanged. No image pull, mount/config change or old25438 access. PG physical system7696088403504697382 is verified by existing guard before fixture writes. Redis container ID/binding/image and new run_id fa7bde76dcd020d396902fa924d0ea3e7b26ceb2 are recorded in redis-identity.json. New tests explicitly bind this identity, DB15, fresh random local-takeover prefix. Existing default fixture identity remains unchanged; no flush or prior keys deleted. Test fixture data/UNKNOWN retained. Containers remain available for isolated review.
+
+Read-only Ollama: Get-Command found E:/ollama/ollama.exe; --version reported client0.34.4 and warning no running instance. No11434 listener was observed; GET127.0.0.1:11434/api/version failed with HttpRequestException, so /api/tags did not yield a model list. CLI/API probe combined command completed but functional service availability was unavailable. No suitable installed small model can be confirmed yet. Real synthetic model validation NOT RUN; no model chosen/replaced/downloaded, no persistent service started. ollama-readonly.json records this limit. This is not a reason to pause offline work or infer live success.
+
+## Independent review / next coordination
+
+Primary worktree still2bc2a06 with its four original untracked handoff/build logs; QA1530af3 remains clean; MQbe5b109 remains separately accepted and untouched. This commit belongs only to model-cfg. Local batch is ready for independent review; next ordinary QA/fallback/history/Caption language work remains serially coordinated, no QA merge or P8 deletion here. Local real smoke requires a running already-approved service and an observed installed model, plus exact endpoint/network admission and existing send authorization; not performed in this batch.
+
+未实现的命令不得报告通过。

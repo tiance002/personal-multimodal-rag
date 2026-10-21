@@ -1,0 +1,787 @@
+{
+  "schema_version": "s4-answer-quality-repair-v1",
+  "status": "PASS",
+  "acceptance_scope": "Bounded engineering repair and targeted verification; unresolved model semantic errors retained, not all answers correct.",
+  "generated_at": "2026-10-19T08:51:00.635814+00:00",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "initial_head": "2c21bbcc68384224b5d4a29d1300adf404c1f9b2",
+  "implementation_commit": "2e214051d7c00cac487fb1bd0382f18e8078c779",
+  "report_commit": "Resolve git log -1 --format=%H -- docs/evaluation/S4_ANSWER_QUALITY_REPAIR.md; full SHA in final response.",
+  "initial_dirty_files": [
+    {
+      "path": ".serena/project.yml",
+      "status": " M",
+      "sha256": "51e48d867c3084972718681dc8bc13c43445e4bd28c3f96b678d2a50ca53f907"
+    },
+    {
+      "path": "progress.md",
+      "status": " M",
+      "sha256": "fd590677562963d0a5cc9516410886ecdff303cadffb8d46dfc917cdfe4098d7"
+    },
+    {
+      "path": "scripts/m4_result_contract.py",
+      "status": " M",
+      "sha256": "e307f5346e6f431540233732a762d3e3dad2b27bc1d772497bc6a12bd892397b"
+    },
+    {
+      "path": "scripts/m4_tenant332_api.py",
+      "status": " M",
+      "sha256": "08dfdf67c2f1e5cb8663cc4e395785197240043cf4ce782b697f06438cbbfa4d"
+    },
+    {
+      "path": "scripts/s1_normal_api_check.py",
+      "status": " M",
+      "sha256": "f0ed4d93c0c63c81bea5bb44d33a510402ba2ebc784971e86b693463d571dfb1"
+    },
+    {
+      "path": "tests/weknora_port/test_m4_result_contract.py",
+      "status": " M",
+      "sha256": "4f553193a6445a9f353a21eb9cd8c75e602ff12c188bea54bdfd4fff1c249ed7"
+    },
+    {
+      "path": "tests/weknora_port/test_m4_tenant332_api.py",
+      "status": " M",
+      "sha256": "72e81048f7e9e809e803e3f59c3a24cbb82f903a36b78e6187defccad6554bee"
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/M4_FULL_QUALITY_BASELINE.md",
+      "status": "??",
+      "sha256": "de3c4afbf54c1fa18dbb37418c55965ad13f3d5fe4b9cbbb2b22295b76bb2d4a"
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/M4_FULL_QUALITY_BASELINE.results.json",
+      "status": "??",
+      "sha256": "18fea877ed29673cc49a2085bcfef1f3bf9bdc41f53023dac73554b340185217"
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/findings.md",
+      "status": "??",
+      "sha256": "da222da1164ba9b7d1b98955807c49a982888a320ec2093958415e75ee48394c"
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/progress.md",
+      "status": "??",
+      "sha256": "6283e82573904e8d773444a8a3155254f240e642622d648dad5e8435aaae4ed9"
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/task_plan.md",
+      "status": "??",
+      "sha256": "8d7ec2fde1dfe73925d56fc3d783892c9f50ca7fff0ca53ae1b73f4af57ddb68"
+    },
+    {
+      "path": "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+      "status": "??",
+      "sha256": "331e7232bb31da9766fe992f0461092039f69f1e9ed06822351d5ab7d6c0e087"
+    },
+    {
+      "path": "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+      "status": "??",
+      "sha256": "3bd81bfbdf2ccb5900e70d57301a95cec06535cc431ed7aea118dc6f1d82c31b"
+    },
+    {
+      "path": "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+      "status": "??",
+      "sha256": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350"
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+      "status": "??",
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+      "status": "??",
+      "sha256": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a"
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt",
+      "status": "??",
+      "sha256": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+    }
+  ],
+  "initial18_unchanged": true,
+  "issues": [
+    {
+      "id": "date_native_spacing",
+      "classification": "CONFIRMED_ROOT_CAUSE",
+      "first_failure": "native_pdf_layout_join",
+      "before": "2026-1 0-1 2",
+      "source": "2026-10-12",
+      "after": "2026-10-12",
+      "fix": "Use valid PDF font-cell horizontal bounds for word-gap inference; preserve original tight boxes for layout; fall back when absent.",
+      "offline_status": "PASS",
+      "real_status": "PASS_SINGLE_SAMPLE",
+      "source_sha256": "9cf9b35209cac1162a0edafe4f56616446bdfd3e1dadda5ce8bae0931853e1e5",
+      "not_mineru_failure": true,
+      "historical_final_wire_contains_bad_summary": false,
+      "historical_final_wire_contains_bad_native_text": true,
+      "normalized_document": "NOT_PRESENT_ON_NATIVE_PDF_PATH; ParsedDocument is used",
+      "history_unchanged": true
+    },
+    {
+      "id": "date_summary_wrong_month",
+      "classification": "CONFIRMED_ROOT_CAUSE",
+      "first_failure": "generated_summary_output_after_corrupted_native_input",
+      "before": "2026年1月12日",
+      "after": "2026年10月12日",
+      "real_after_source": "new normally uploaded version Summary",
+      "causality_limit": "Old q1 intermediate Context includes description, but final Provider request does not include that Summary. New KB and disabled Caption also differ; not a one-variable generation A/B.",
+      "generic_summary_truth_guarantee": "NOT_IMPLEMENTED_NOT_CLAIMED"
+    },
+    {
+      "id": "unit_over_specificity",
+      "classification": "CURRENT_MODEL_CAPABILITY_LIMIT",
+      "confirmed_first_failure": "document_summary_generation",
+      "source": "unit NP-204",
+      "unsupported_summary": "204号机组",
+      "final_answer_inherits_summary": true,
+      "status": "UNRESOLVED_MODEL_QUALITY",
+      "production_fix": null,
+      "reason": "No safe general deterministic rewrite or unsupported equipment-type validator; no new Prompt or judge.",
+      "real_s4_retest": "NOT_RUN_NOT_AUTHORIZED_SCOPE"
+    },
+    {
+      "id": "site_unit_relation",
+      "classification": "CURRENT_MODEL_CAPABILITY_LIMIT",
+      "confirmed_first_failure": "final_generation",
+      "source": {
+        "Site": "West Yard",
+        "Unit": "WY-309",
+        "Reading": 51,
+        "CheckedOn": "2026-10-13"
+      },
+      "wire_relation_correct": true,
+      "summary_relation_correct": true,
+      "answer_problem": "Calls West Yard the unit although WY-309 is supplied; RecordedOn time is not a separate supported field.",
+      "status": "UNRESOLVED_MODEL_QUALITY",
+      "production_fix": null,
+      "real_s4_retest": "NOT_RUN_NOT_AUTHORIZED_SCOPE"
+    },
+    {
+      "id": "answer_language",
+      "classification": "EXISTING_FIX_REGRESSION_VERIFIED",
+      "historical_failure": "System already required Simplified Chinese; English q0 answered entirely in English. No history or QU language override.",
+      "existing_fix_commit": "d4331eef50f03a504247776c78d932502576e2d1",
+      "s4_production_prompt_changes": false,
+      "new_english_question_chinese_answer": "PASS",
+      "english_names_preserved": "North Pier and actual filename preserved",
+      "explicit_other_language": "OFFLINE_AND_MOCK_BROWSER_PASS; real English model NOT_RUN"
+    },
+    {
+      "id": "private_source_handles",
+      "classification": "CONFIRMED_ROOT_CAUSE",
+      "first_failure": "display_formatter_missed_explicit_inline_source_contexts_and_EOF",
+      "fix": "Remove only observed source-attribution templates outside code; buffer partial SSE source annotations; use matching history formatting.",
+      "before_leak_cases": 5,
+      "frozen_answer_denominator": 12,
+      "after_display_pass_cases": 12,
+      "split_points_verified": 8523,
+      "source_ids_and_versions_changed": false,
+      "enabled_mapping": "OFFLINE_CONTRACT_PASS; public UI remains disabled",
+      "plain_d1_c2_and_code": "PASS",
+      "new_real_handle_generation": "NOT_RUN_NOT_NEEDED_FOR_DISPLAY_REPLAY"
+    }
+  ],
+  "tests": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q tests/weknora_port/test_s4_pdf_spacing.py --tb=short",
+      "phase": "RED",
+      "exit_code": 1,
+      "result": "4 failed,4 passed; original native spacing reproduced"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q tests/weknora_port/test_s4_pdf_spacing.py tests/weknora_port/test_ingest.py -k 's4_pdf or pdf' --tb=short",
+      "exit_code": 1,
+      "result": "collection failed: bare venv lacks pptx; product-config PYTHONPATH fixes test assembly, no install"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q tests/weknora_port/test_s4_pdf_spacing.py tests/weknora_port/test_references.py tests/weknora_port/test_generation_protocol.py tests/weknora_port/test_generation.py tests/weknora_port/test_s3_answer_prompt.py tests/weknora_port/test_conversation_configuration.py --tb=short",
+      "exit_code": 0,
+      "result": "149 passed in4.26s",
+      "kind": "OFFLINE"
+    },
+    {
+      "command": "$env:PYTHONPATH='E:/WK/deps/reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps'; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q tests/weknora_port/test_ingest.py -k 'pdf' --tb=short",
+      "exit_code": 0,
+      "result": "4 passed,7 deselected in3.75s; child environment restored",
+      "kind": "OFFLINE_REAL_PDF"
+    },
+    {
+      "command": "npm --prefix frontend test -- adapter.spec.ts -g \"answer language defaults\" --output=E:/WK/run/s4-quality-20261019/language-ui-test",
+      "exit_code": 0,
+      "result": "1 passed in8.2s",
+      "kind": "REAL_TEST_BROWSER_MOCK_API"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/s4-handle-display-20261019/replay_all_s2.py",
+      "exit_code": 0,
+      "result": "Final code12/12,8523 split points; original token boundaries; original S2 SHA unchanged",
+      "kind": "OFFLINE_REAL_RECEIPT_REPLAY"
+    },
+    {
+      "command": "$env:PLAYWRIGHT_CHROME_PATH='C:/Program Files/Google/Chrome/Application/chrome.exe'; & ./node_modules/.bin/playwright.cmd test --config E:/WK/run/s4-handle-display-20261019/playwright.focused.config.ts tests/weknora-port/adapter.spec.ts --grep 'observed S2 inline source handles' --reporter=line --output E:/WK/run/s4-handle-display-20261019/playwright-eof-results",
+      "cwd": "frontend",
+      "exit_code": 0,
+      "result": "2 passed in7.3s",
+      "kind": "REAL_CHROME_MOCK_API"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "frontend",
+      "exit_code": 0,
+      "result": "TypeScript/Vite274 modules; build304ms"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/s4_date_replay.py --source 'E:\\WK\\run\\s3-product-20261019\\samples\\north_pier_inspection.pdf' --source-sha256 9cf9b35209cac1162a0edafe4f56616446bdfd3e1dadda5ce8bae0931853e1e5 --output 'E:\\WK\\run\\s4-quality-20261019\\date-native-replay.json'",
+      "exit_code": 0,
+      "result": "Only two invented spaces removed; scanned asset SHA unchanged; all source slices match"
+    },
+    {
+      "command": "git diff --check; git diff --cached --check",
+      "exit_code": 0,
+      "result": "PASS"
+    }
+  ],
+  "real_validation": {
+    "status": "PASS_SINGLE_DATE_RAG_SAMPLE",
+    "api": "http://127.0.0.1:56425",
+    "tenant_id": 1,
+    "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+    "document_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+    "source_version": "390db60f-f6d3-49d9-b71b-1bc459ae634d",
+    "source_sha256": "9cf9b35209cac1162a0edafe4f56616446bdfd3e1dadda5ce8bae0931853e1e5",
+    "run_id": "014465de-c3d3-4e18-8392-4739aa1e0524",
+    "session_id": "a4bef71c-d92d-4424-ad19-3c3bddc78127",
+    "question": "What was the inspection date?",
+    "answer": "根据提供的资料，北码头（North Pier）的检查日期是 **2026-10-12**。\n\nSources: north_pier_inspection.pdf",
+    "stages": {
+      "Search": {
+        "status": "OBSERVED",
+        "count": 3,
+        "event_fields": {
+          "candidate_count": 3
+        },
+        "facts": [
+          {
+            "id": "942f6770-2423-47ac-959b-74f2fd2f21be",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "text",
+            "score": 0.016393442622950817,
+            "content": "### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)"
+          },
+          {
+            "id": "f4a74dff-1b13-5d83-8abc-7b877bc22b27",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "summary",
+            "score": 0.01605222734254992,
+            "content": "# Summary\n北码头维护笔记，记录设备检查数量及现场读数。\n\n这是一份关于2026年10月12日北码头维护的笔记，记录了阀门和仪表的数量，并附带了现场检查卡片的扫描件。检查卡显示站点为北码头，单元编号为NP-204，读数为37。"
+          },
+          {
+            "id": "51d8eea0-65e5-4f24-aa59-d025086cc643",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "image_ocr",
+            "score": 0.015949820788530467,
+            "content": "FIELD CHECK CARD\n\nSITE: NORTH PIER\n\nUNIT: NP-204\n\nREADING: 37"
+          }
+        ]
+      },
+      "Rerank": {
+        "status": "OBSERVED",
+        "count": 1,
+        "event_fields": {
+          "candidate_count": 1
+        },
+        "facts": [
+          {
+            "id": "942f6770-2423-47ac-959b-74f2fd2f21be",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "text",
+            "score": 0.2615946411109361,
+            "content": "### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)"
+          }
+        ]
+      },
+      "Merge": {
+        "status": "OBSERVED",
+        "count": 1,
+        "event_fields": {
+          "candidate_count": 1
+        },
+        "facts": [
+          {
+            "id": "942f6770-2423-47ac-959b-74f2fd2f21be",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "text",
+            "score": 0.2615946411109361,
+            "content": "### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)"
+          }
+        ]
+      },
+      "TopK": {
+        "status": "OBSERVED_AFTER_TOPK_AT_CONTEXT",
+        "note": "No dedicated TopK snapshot. Context snapshot follows TopK and optional source-unit expansion; it cannot isolate their individual effects.",
+        "count": 1,
+        "facts": [
+          {
+            "id": "942f6770-2423-47ac-959b-74f2fd2f21be",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "text",
+            "score": 0.2615946411109361,
+            "content": "### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)"
+          }
+        ]
+      },
+      "Context": {
+        "status": "OBSERVED",
+        "count": 1,
+        "result_ids": [
+          "942f6770-2423-47ac-959b-74f2fd2f21be"
+        ],
+        "selected_chunk_facts": [
+          {
+            "id": "942f6770-2423-47ac-959b-74f2fd2f21be",
+            "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+            "knowledge_base_id": "349e2703-2d87-41cb-b740-7c2689dbf3f4",
+            "chunk_type": "text",
+            "content": "### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)"
+          }
+        ],
+        "selected_chunk_types": [
+          "text"
+        ],
+        "rendered_contexts": "<documents>\n<document>\n<title>north_pier_inspection</title>\n<description>这是一份关于2026年10月12日北码头维护的笔记，记录了阀门和仪表的数量，并附带了现场检查卡片的扫描件。检查卡显示站点为北码头，单元编号为NP-204，读数为37。</description>\n</document>\n</documents>\n<context id=\"1\">### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)\n\n> **Image text (OCR):** FIELD CHECK CARD\n> \n> SITE: NORTH PIER\n> \n> UNIT: NP-204\n> \n> READING: 37</context>",
+        "user_content": "## Reference materials (source data)\n<documents>\n<document>\n<title>north_pier_inspection</title>\n<description>这是一份关于2026年10月12日北码头维护的笔记，记录了阀门和仪表的数量，并附带了现场检查卡片的扫描件。检查卡显示站点为北码头，单元编号为NP-204，读数为37。</description>\n</document>\n</documents>\n<context id=\"1\">### North Pier Maintenance Note\nInspection date: 2026-10-12\nThe scanned field check card is filed on page 2.\nItem | Count\nValves | 4\nMeters | 2\n\n![north_pier_inspection_page_2.jpg](images/north_pier_inspection_page_2.jpg)\n\n> **Image text (OCR):** FIELD CHECK CARD\n> \n> SITE: NORTH PIER\n> \n> UNIT: NP-204\n> \n> READING: 37</context>\n\n## Request metadata\nCurrent time: 2026-10-19 Monday\n\n## User request\nWhat was the inspection date?\n",
+        "labeled_image_facts": {
+          "meaning": "Exact labeled excerpts from final context; labels alone do not establish original OCR provenance.",
+          "image_caption": "",
+          "image_text_ocr_label": "FIELD CHECK CARD\n\nSITE: NORTH PIER\n\nUNIT: NP-204\n\nREADING: 37</context>"
+        }
+      }
+    },
+    "search_rerank_merge_context_counts": [
+      3,
+      1,
+      1,
+      1
+    ],
+    "rerank_raw_scores": [
+      0.26112768054008484,
+      0.026541516184806824,
+      5.342199801816605e-05
+    ],
+    "retention": "Existing0.3 threshold -> existing top1 fallback0.15; configuration unchanged",
+    "actual_original_text_in_final_wire": true,
+    "original_date_in_final_wire": true,
+    "query_understand": {
+      "model": "Qwen/Qwen3.5-4B",
+      "rewrite": "What was the inspection date?",
+      "intent": "kb_search",
+      "thinking": false
+    },
+    "generation": {
+      "model": "Qwen/Qwen3.5-4B",
+      "thinking": false,
+      "thinking_budget": "UNSPECIFIED",
+      "finish_reason": "stop",
+      "fallback": false,
+      "expensive_upgrade": false,
+      "input_tokens": 523,
+      "output_tokens": 34,
+      "total_tokens": 557,
+      "seconds": 1.2505996000254527
+    },
+    "client_total_seconds": 6.983137600007467,
+    "upload_seconds": 31.44636260002153,
+    "sse_persistence": {
+      "status": "MATCH",
+      "assistant_message_id": "b7ddb1bb-226d-45cf-a197-ae4f826c91a5",
+      "saved_content": "根据提供的资料，北码头（North Pier）的检查日期是 **2026-10-12**。\n\nSources: north_pier_inspection.pdf",
+      "history_file": "E:\\WK\\run\\s4-quality-20261019\\date.history.json",
+      "saved_turn_status": "completed",
+      "saved_error_code": "",
+      "saved_is_completed": true,
+      "comparison_scope": "complete_provider_body",
+      "empty_body_match_is_not_answer_success": false,
+      "reason": null
+    },
+    "protocol_complete": true,
+    "index_proof": [
+      {
+        "chunk_id": "51d8eea0-65e5-4f24-aa59-d025086cc643",
+        "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+        "dimension": 1024,
+        "vector_present": true
+      },
+      {
+        "chunk_id": "942f6770-2423-47ac-959b-74f2fd2f21be",
+        "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+        "dimension": 1024,
+        "vector_present": true
+      },
+      {
+        "chunk_id": "f4a74dff-1b13-5d83-8abc-7b877bc22b27",
+        "knowledge_id": "433a9ffc-4b3e-4f1e-8b0b-88bcdf8e1de1",
+        "dimension": 1024,
+        "vector_present": true
+      }
+    ],
+    "source_history_proof": {
+      "original_source_http_status": 200,
+      "original_sha256": "9cf9b35209cac1162a0edafe4f56616446bdfd3e1dadda5ce8bae0931853e1e5",
+      "same_history_after_cloud_close": true,
+      "provider_calls_before_readbacks": 9,
+      "provider_calls_after_readbacks": 9,
+      "cloud_allowed": false
+    },
+    "comparison_limit": "New isolated KB with only original PDF; Caption disabled. Not a strict single-variable final-generation A/B. Deterministic original-source replay isolates parser change."
+  },
+  "new_usage": {
+    "provider_calls": 9,
+    "settled_calls": 9,
+    "unknown_calls": 0,
+    "prompt_tokens": 3993,
+    "completion_tokens": 200,
+    "total_tokens": 4193,
+    "upload_tokens": 1020,
+    "question_tokens": 3173,
+    "actual_models": [
+      "BAAI/bge-m3",
+      "BAAI/bge-reranker-v2-m3",
+      "Qwen/Qwen3.5-4B"
+    ],
+    "caption_calls": 0,
+    "deepseek_calls": 0,
+    "cash_cost": "NOT_ESTIMATED"
+  },
+  "calls": [
+    {
+      "call_id": "2befe6542f7f04c8f63392ed121023dfdadfd83e8792491e9c3573d3cf864ca4",
+      "request_id": "390db60f-f6d3-49d9-b71b-1bc459ae634d/source-embedding",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:06.253540+00:00",
+      "finished_at": "2026-10-19 08:44:06.708098+00:00",
+      "usage": {
+        "prompt_tokens": 114,
+        "completion_tokens": 0,
+        "total_tokens": 114,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "e0b266ce57cc3735d64e5fb685fa59e2c0faadbe86f60e08cd23134659927d51",
+      "request_id": "390db60f-f6d3-49d9-b71b-1bc459ae634d/document-summary",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:06.972301+00:00",
+      "finished_at": "2026-10-19 08:44:09.790490+00:00",
+      "usage": {
+        "prompt_tokens": 683,
+        "completion_tokens": 138,
+        "total_tokens": 821,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "88e2249623cdf7fdebe099d7e5843c095c01e288a3d92f8013017d2b51ebfc7f",
+      "request_id": "390db60f-f6d3-49d9-b71b-1bc459ae634d/summary-embedding",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:09.941211+00:00",
+      "finished_at": "2026-10-19 08:44:10.199782+00:00",
+      "usage": {
+        "prompt_tokens": 85,
+        "completion_tokens": 0,
+        "total_tokens": 85,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "a7f135b80db4ee986626546d06af6a9124b74c45c1ca3d2521c83c0a56dd7708",
+      "request_id": "014465de-c3d3-4e18-8392-4739aa1e0524/query_rewrite",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:45.719513+00:00",
+      "finished_at": "2026-10-19 08:44:46.595243+00:00",
+      "usage": {
+        "prompt_tokens": 2338,
+        "completion_tokens": 28,
+        "total_tokens": 2366,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "1dedaa33f036eb9718d88488a28de00daead15c6272ce8d8204ceb3d18422d9e",
+      "request_id": "014465de-c3d3-4e18-8392-4739aa1e0524/query-embedding-349e2703-2d87-41cb-b740-7c2689dbf3f4-b5d59181e0cd1654",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:46.715766+00:00",
+      "finished_at": "2026-10-19 08:44:46.966164+00:00",
+      "usage": {
+        "prompt_tokens": 9,
+        "completion_tokens": 0,
+        "total_tokens": 9,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "4f91c78e9a2aacd79cff6ab60f90f4bf1a4d40d2afb82d510995cdff1d50d80f",
+      "request_id": "014465de-c3d3-4e18-8392-4739aa1e0524/query-embedding-349e2703-2d87-41cb-b740-7c2689dbf3f4-3b1957f394d1b896",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:48.220458+00:00",
+      "finished_at": "2026-10-19 08:44:48.372135+00:00",
+      "usage": {
+        "prompt_tokens": 4,
+        "completion_tokens": 0,
+        "total_tokens": 4,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "4d2f9628d4440107d34135ee71145b31607b40d3742104b565d47e124fa1ea02",
+      "request_id": "014465de-c3d3-4e18-8392-4739aa1e0524/query-embedding-349e2703-2d87-41cb-b740-7c2689dbf3f4-81223fe4eea41ebc",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:48.222152+00:00",
+      "finished_at": "2026-10-19 08:44:48.496839+00:00",
+      "usage": {
+        "prompt_tokens": 5,
+        "completion_tokens": 0,
+        "total_tokens": 5,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "b80cd41887f8dbc51cc81f321f64786dc15f5445eeae1ddffe716129a99564f6",
+      "request_id": "014465de-c3d3-4e18-8392-4739aa1e0524/rerank",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:48.941253+00:00",
+      "finished_at": "2026-10-19 08:44:49.164376+00:00",
+      "usage": {
+        "prompt_tokens": 232,
+        "completion_tokens": 0,
+        "total_tokens": 232,
+        "status": "REPORTED"
+      }
+    },
+    {
+      "call_id": "7fe05055bdefde043603473aa26d61013551f06e9ef0581a798de29dd91f8dba",
+      "request_id": "014465de-c3d3-4e18-8392-4739aa1e0524/answer/1/cheap",
+      "tenant_id": 1,
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-19 08:44:49.497406+00:00",
+      "finished_at": "2026-10-19 08:44:50.753989+00:00",
+      "usage": {
+        "prompt_tokens": 523,
+        "completion_tokens": 34,
+        "total_tokens": 557,
+        "status": "REPORTED"
+      }
+    }
+  ],
+  "safety": {
+    "baseline_provider_rows_unchanged": 623,
+    "all_historical_call_fingerprints_unchanged": true,
+    "old_s3_rows_unchanged": {
+      "documents": true,
+      "chunks": true,
+      "tasks": true
+    },
+    "old_s3_config_unchanged": true,
+    "no_unknown_release_or_resend": true,
+    "default_models_prompts_thresholds_unchanged": true,
+    "no_schema_changes": true,
+    "authorization": {
+      "owner_approved": true,
+      "status": "CLOSED",
+      "owner_reply": "批准上述 S4 最小真实复验",
+      "recorded_at": "2026-10-19T08:41:38.675219+00:00",
+      "tenant_id": 1,
+      "providers": [
+        "siliconflow",
+        "deepseek"
+      ],
+      "models": [
+        "BAAI/bge-m3",
+        "BAAI/bge-reranker-v2-m3",
+        "Qwen/Qwen3.5-4B",
+        "deepseek-flash"
+      ],
+      "max_provider_calls": 12,
+      "max_uploads": 1,
+      "max_questions": 1,
+      "max_caption_requests": 0,
+      "cloud_mode": "ordinary; existing Gate and ledger; no cumulative hard token/call fence",
+      "stop_on_new_unknown": true,
+      "no_retries": true,
+      "source_sha256": "9cf9b35209cac1162a0edafe4f56616446bdfd3e1dadda5ce8bae0931853e1e5",
+      "question": "What was the inspection date?",
+      "code_sha": "2e214051d7c00cac487fb1bd0382f18e8078c779",
+      "used_provider_calls": 9,
+      "stop_reason": "Authorized single upload and single question complete; no retry; remaining allowance revoked"
+    },
+    "runtime_cloud_allowed": false,
+    "temporary_scope_closed": true,
+    "ordinary_mode_has_cumulative_hard_fence": false,
+    "local_only_commits": true,
+    "push_deploy_merge_tag": "NOT_RUN_NOT_AUTHORIZED"
+  },
+  "historical_evidence": {
+    "historical_calls_not_new": true,
+    "files": [
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\samples\\north_pier_inspection.pdf",
+        "sha256": "9cf9b35209cac1162a0edafe4f56616446bdfd3e1dadda5ce8bae0931853e1e5",
+        "bytes": 35340
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\samples\\north_pier_service_brief.pptx",
+        "sha256": "382670af50e0e5c7247efaad9ba23dcd0f42db5aec195bbadb74aa766fb62419",
+        "bytes": 55347
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\samples\\site_readings.xlsx",
+        "sha256": "8791281e99941b5624acf3f40ef26fad81851cbaee3f2391daa9d834a4b7da04",
+        "bytes": 5088
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\samples\\parse_results.json",
+        "sha256": "a0786bd917b7fc8838b0443bc2a03db46bdf681f1133a8d7b841c6d68c28d6b0",
+        "bytes": 1748
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\eb65f8ad595e4f0a95b37fdcf11fd7a1.request.json",
+        "sha256": "20005763d904b4e1c53a5966e10309f567b324b265d2d9b7485a67a3adc33608",
+        "bytes": 3954
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\eb65f8ad595e4f0a95b37fdcf11fd7a1.response.body",
+        "sha256": "47274b99bf9d4a5e1b5be6e5a4a4162ca14b741e6e69fab8c6e93a7ccce742c5",
+        "bytes": 1084
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\b8012b694bad48fca442102933c027bc.request.json",
+        "sha256": "e792dba128328dbcdfa3232794177d85d7fb77eeb1838742d12fb6f75bed307d",
+        "bytes": 3344
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\b8012b694bad48fca442102933c027bc.response.body",
+        "sha256": "583ad819a32c6e4cdf5abe80de7e5ccc187870bf03b80cb2e00e4679a47692eb",
+        "bytes": 17538
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\7b33910dee444abdb1dc182f15806db7.request.json",
+        "sha256": "d616e3210099876f7cc65b179bd268993dbafb94d05301e95dcb7e3b23d267d6",
+        "bytes": 4039
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\7b33910dee444abdb1dc182f15806db7.response.body",
+        "sha256": "9e81ed6275568bdbec42cc61bb6677cbb62cb73678c13beb479a0f5af4b68faa",
+        "bytes": 1016
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\c5feb6afbe4a43349e96617f6e6ec7c4.request.json",
+        "sha256": "79ed4a4828e738d5570d5ec8ad65a1ebccc80d08f60ccada2f4bcde843c1d71a",
+        "bytes": 3856
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\3e47e2424d34458e86dd64451b1bd9cd.request.json",
+        "sha256": "69ad2fcbca871293f89bb64a642d91fbf0ed522d3abdc16af3a722a8b21ec1c0",
+        "bytes": 2986
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\2191734476e84d98ae52b4e9e4259501.request.json",
+        "sha256": "db66269317dcd675790ab9059ef7190665fe21d171ee4cb38b8c2b2fff1e1156",
+        "bytes": 3416
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\2191734476e84d98ae52b4e9e4259501.response.body",
+        "sha256": "c33b0f1ca3aa16bc7753143b442146ec756b47ae96e96c9b64c49cab9b674c9c",
+        "bytes": 21153
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\6d2497549d09439993a685be1f2a42bc.request.json",
+        "sha256": "2d77f19fb54e70fbb649e879df2eaa2535df31ec3f893d9d89e38801fbcbbb91",
+        "bytes": 3477
+      },
+      {
+        "path": "E:\\WK\\run\\s3-product-20261019\\evidence\\6d2497549d09439993a685be1f2a42bc.response.body",
+        "sha256": "e0697aaa13fab63cd4b5f77061e5a21cfdc4eecffbaf512c2f802538d73b1394",
+        "bytes": 514921
+      }
+    ]
+  },
+  "evidence_archive": {
+    "path": "docs/evaluation/evidence/S4_REAL_DATE_REGRESSION_20261019.zip",
+    "sha256": "f49e6bd0f2366c73a9ed4c4945f9946512516f6984a07397826dc9ad6cafebd5",
+    "files": 66,
+    "bytes": 116242,
+    "credential_scan": "NO_PATTERN_MATCHES"
+  },
+  "local_artifacts": [
+    "docs/evaluation/evidence/S4_NATIVE_DATE_REPLAY_20261019.json",
+    "docs/evaluation/evidence/S4_SOURCE_HANDLE_DISPLAY_20261019.json"
+  ],
+  "not_run": [
+    {
+      "item": "real unit/site or over-specificity model retest",
+      "reason": "No safe verified semantic fix; outside authorized single-date scope"
+    },
+    {
+      "item": "real explicit English response",
+      "reason": "Contract and mock browser verified; no new English-model authorization"
+    },
+    {
+      "item": "full S1/S2/S3 or six-dataset rerun",
+      "reason": "Excluded"
+    },
+    {
+      "item": "rewrite old S3 documents/chunks/summaries",
+      "reason": "Preserved historical versions and evidence"
+    }
+  ],
+  "tool_errors": [
+    {
+      "item": "read-only embeddings query assumed tenant_id on embeddings",
+      "status": "FIXED_TOOL_ONLY",
+      "exit_code_before": 1,
+      "exit_code_after": 0,
+      "fix": "Scope via knowledge_bases tenant join; no schema change or resend"
+    }
+  ]
+}

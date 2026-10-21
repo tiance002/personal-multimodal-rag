@@ -1,0 +1,148 @@
+{
+  "status": "PASS_ARTIFACT_INTEGRITY_ZERO_SEND",
+  "case_count": 40,
+  "omni_page_count": 24,
+  "zip_manifest_checks": true,
+  "task_api_stopped": true,
+  "provider_sends_this_check": 0,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: in the working copy of 'scripts/m4_tenant332_api.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/weknora_port/test_m4_tenant332_api.py', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "HEAD^",
+        "HEAD",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "targeted_tests_already_executed": {
+    "env": {
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "--noconftest",
+      "-p",
+      "no:cacheprovider",
+      "-q",
+      "--tb=short",
+      "tests/weknora_port/test_rerank_model_passage.py",
+      "tests/weknora_port/test_merge_source_retention.py",
+      "tests/weknora_port/test_knowledge_storage.py",
+      "tests/weknora_port/test_conversation_configuration.py",
+      "tests/weknora_port/test_pipeline.py",
+      "tests/weknora_port/test_source_evidence.py",
+      "tests/weknora_port/test_development_entry.py",
+      "tests/weknora_port/test_m4_result_contract.py"
+    ],
+    "exit_code": 0,
+    "summary": "167 passed in 7.02s",
+    "evidence_source": "Earlier actual tool output in this task; not rerun during artifact verification"
+  },
+  "scripts_compile": {
+    "count": 5,
+    "exit_code": 0,
+    "method": "Python compile(source,filename,exec) without imports or pycache"
+  },
+  "production_files_sha256": {
+    "backend/weknora_port/conversation_configuration.py": "b2278d6c6dabdc14b10367916693e44075dcea0f47f847f85383e14a60a436d1",
+    "backend/weknora_port/development.py": "d3dda351a2f5492e6fecab6bb75c98704b2b2370a9f137a20c85e21aab334328",
+    "backend/weknora_port/retrieval/merge.py": "10d84e4c86360c67b531214d1ed29f7b2fbd465b8ce5632e40edff42c4573c15",
+    "backend/weknora_port/retrieval/pipeline.py": "66bfc9fca8b97a17b7a508af8bd6b5bff0e95cf385289436a80e12c5d0b6a1e8",
+    "backend/weknora_port/retrieval/rerank.py": "7398cbc45980fc7aa6d7f16420395a4d40213a00d5ea065cbf2ddc260a76a4f0",
+    "backend/weknora_port/retrieval/types.py": "64fda069135986aa6db71be4db6ff6b4d0c558b9bb7dfb8010a6215dc7421385",
+    "backend/weknora_port/runtime.py": "cd65fa73fd8791f91bc7a5a6122d9c8f72722f5072973515d97d97a47fd3731e",
+    "backend/weknora_port/storage/knowledge.py": "17756f950953ead6313a3923b3f3d069c6fb830ef8c7ad79849634089b0742fa"
+  },
+  "normal_api_commands": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/s1_normal_api_check.py --config 'E:\\WK\\run\\p81-retirement-20261018\\local.json' --authorization 'E:\\WK\\run\\s1-rerank-input-20261019\\owner-authorization.json' --output 'E:\\WK\\run\\s1-rerank-input-20261019\\normal-api-omni' --helpers 'E:\\WK\\run\\phase01-evidence-20261018\\run_case.py' --send",
+      "exit_code": 1,
+      "question_submitted": false,
+      "provider_sends": 0
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/s1_normal_api_check.py --config 'E:\\WK\\run\\p81-retirement-20261018\\local.json' --authorization 'E:\\WK\\run\\s1-rerank-input-20261019\\owner-authorization.json' --output 'E:\\WK\\run\\s1-rerank-input-20261019\\normal-api-omni' --helpers 'E:\\WK\\run\\phase01-evidence-20261018\\run_case.py' --send --resume-unsubmitted",
+      "exit_code": 0,
+      "question_submitted": true,
+      "business_outcome": "FAILED_LOCAL_EXECUTION_SCOPE_DENIED",
+      "provider_sends": 0
+    }
+  ],
+  "native_analysis_command": {
+    "argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "scripts/s1_rerank_ab_analysis.py",
+      "--input",
+      "E:\\WK\\run\\s1-rerank-input-20261019",
+      "--config",
+      "E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "--quote-plan",
+      "E:\\WK\\run\\m4-s1-20261018\\replay_plan.json",
+      "--out",
+      "E:\\WK\\run\\s1-rerank-input-20261019\\native_analysis.json",
+      "--threshold",
+      "0.3",
+      "--topk",
+      "5"
+    ],
+    "exit_code": 0
+  },
+  "replay_command": {
+    "argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-B",
+      "scripts/m4_s1_replay.py",
+      "--raw",
+      "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\qa_results.jsonl",
+      "--plan",
+      "E:\\WK\\run\\m4-s1-20261018\\replay_plan.json",
+      "--config",
+      "E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "--out",
+      "E:\\WK\\run\\m4-s1-20261018\\saved_receipt_replay.json"
+    ],
+    "exit_code": 0
+  },
+  "direct_ab_shell_exit_files": [
+    {
+      "case": "hotpot-frost",
+      "exit_code": 0
+    },
+    {
+      "case": "hotpot-romeo",
+      "exit_code": 0
+    },
+    {
+      "case": "mml-0434",
+      "exit_code": 0
+    },
+    {
+      "case": "mml-0959",
+      "exit_code": 0
+    },
+    {
+      "case": "omni-page007",
+      "exit_code": 0
+    },
+    {
+      "case": "omni-no-exact-fact",
+      "exit_code": 0
+    }
+  ]
+}

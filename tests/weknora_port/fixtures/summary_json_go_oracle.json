@@ -1,0 +1,105 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "scope": "source parseDocumentSummaryOutput + common JSON recovery + KnowledgeProfile.Normalize; namespace-only adapters, not full worker",
+  "source_function_sha256": "27ca7652026b65bc0b8caf1176a4b22676d05e94c39994eb792e7e6c5e86ffbb",
+  "cases": [
+    " Legacy plain ",
+    "{\"summary\":\"x\",\"gist\":\" y \",\"topics\":[\"k\",\"K.\"]}",
+    "Sure, here is the profile: {\"summary\":\"brief\",\"gist\":\"topic\",\"topics\":[\"A\"]} trailing [1]",
+    "Before ```json\n{\"gist\":\"fenced\"}\n``` after",
+    "Before [1] {\"summary\":\"later object must not win\"}",
+    "{\"summary\":\"raw\nnewline\"}",
+    "{\"summary\":\"escaped\\nnewline\"}",
+    "{\"SUMMARY\":\"case folded\",\"topics\":[null,\"x\"]}",
+    "{\"summary\":123}",
+    "{\"topics\":[]}",
+    "{\"summary\":\"braces } [ within string\"}",
+    "null",
+    "[{\"summary\":\"array wrong target\"}]"
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "profile": null,
+      "summary": "Legacy plain"
+    },
+    {
+      "index": 1,
+      "profile": {
+        "gist": "y",
+        "topics": [
+          "k"
+        ]
+      },
+      "summary": "x"
+    },
+    {
+      "index": 2,
+      "profile": {
+        "gist": "topic",
+        "topics": [
+          "A"
+        ]
+      },
+      "summary": "brief"
+    },
+    {
+      "index": 3,
+      "profile": {
+        "gist": "fenced"
+      },
+      "summary": "fenced"
+    },
+    {
+      "index": 4,
+      "profile": null,
+      "summary": "Before [1] {\"summary\":\"later object must not win\"}"
+    },
+    {
+      "index": 5,
+      "profile": null,
+      "summary": "{\"summary\":\"raw\nnewline\"}"
+    },
+    {
+      "index": 6,
+      "profile": null,
+      "summary": "escaped\nnewline"
+    },
+    {
+      "index": 7,
+      "profile": {
+        "topics": [
+          "x"
+        ]
+      },
+      "summary": "case folded"
+    },
+    {
+      "index": 8,
+      "profile": null,
+      "summary": "{\"summary\":123}"
+    },
+    {
+      "index": 9,
+      "profile": null,
+      "summary": "{\"topics\":[]}"
+    },
+    {
+      "index": 10,
+      "profile": null,
+      "summary": "braces } [ within string"
+    },
+    {
+      "index": 11,
+      "profile": null,
+      "summary": "null"
+    },
+    {
+      "index": 12,
+      "profile": null,
+      "summary": "[{\"summary\":\"array wrong target\"}]"
+    }
+  ],
+  "exit_code": 0,
+  "provider_calls": 0
+}

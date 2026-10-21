@@ -1,0 +1,181 @@
+{
+  "schema": "s8-1-questions-only/v1",
+  "purpose": "For send-side use only; no scoring labels are included.",
+  "source_files": [
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.results.json",
+      "sha256": "1d4b1fc9065785cb7ba5bbeb6736d76da062613e0363513525a500d3d30974fa"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.md",
+      "sha256": "512485e55ff473b846f92432fd9dda29b070aa60812faee11023306fa99e0786"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_ECS_OVERNIGHT_DEPLOYMENT.md",
+      "sha256": "36a4cce0b359428da4119a260baca96befc9f159ca3a04479034f869ddf18c0d"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_ECS_OVERNIGHT_DEPLOYMENT.results.json",
+      "sha256": "b5592abe46c48f8565d3e05b402539406bfc3fc6055246afa87adffaf12f3b2d"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-ecs-finish-20261020\\FULL_CORPUS_SOURCE_ID_MAP.results.json",
+      "sha256": "5281003b2ebbfd1897d5977131ef803b50de7cd7522a5436e4e00d55414c499a"
+    },
+    {
+      "path": "C:\\Users\\22088\\.codex\\attachments\\d8e75743-1cf7-4a66-b3b7-ccab45a3f538\\已粘贴的文本.txt",
+      "sha256": "53d5a8f3a065444bfff9250ab15e7704ce94885135b01654a3490a9dbd60b142"
+    }
+  ],
+  "case_count": 9,
+  "cases": [
+    {
+      "identity": {
+        "case_id": "scifact-1304",
+        "dataset": "scifact",
+        "qid": "1304",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "Tirasemtiv targets cardiac muscle.",
+      "scope": {
+        "knowledge_base_id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "miracl-zh-5704915#0",
+        "dataset": "miracl-zh",
+        "qid": "5704915#0",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "香山在北京哪个区？",
+      "scope": {
+        "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "dataset": "longbench-zh",
+        "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "在基于立体卫星影像的DSM生产作业中，影像星下点的分辨率应该满足什么要求？",
+      "scope": {
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+        "dataset": "longbench-zh",
+        "qid": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "谷丙转氨酶和谷草转氨酶偏高的原因",
+      "scope": {
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+        "dataset": "hotpotqa",
+        "qid": "5a729fe55542991f9a20c53b",
+        "arms": [
+          "A",
+          "C"
+        ]
+      },
+      "question": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "scope": {
+        "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "hotpotqa-5a7631cd5542994ccc91870c",
+        "dataset": "hotpotqa",
+        "qid": "5a7631cd5542994ccc91870c",
+        "arms": [
+          "A",
+          "C"
+        ]
+      },
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "scope": {
+        "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "arms": [
+          "A",
+          "B"
+        ]
+      },
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "scope": {
+        "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "Who has a higher median campaign grade? Trump or Clinton?",
+      "scope": {
+        "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    },
+    {
+      "identity": {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+        "arms": [
+          "A",
+          "B"
+        ]
+      },
+      "question": "What are two examples of reflecting surfaces?",
+      "scope": {
+        "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "document_scope": [],
+        "scope_note": "Frozen case permits this KB. document_scope is empty in frozen record; server must enforce KB scope."
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "kind": "ACTUAL_ISOLATED_PG_SCHEMA",
+  "database": "weknora_python_port_20261013",
+  "system_identifier": "7696038373595934758",
+  "migrations": {
+    "001_retrieval": "1e82073728a9d1656abd2e0da4a68debd8332f56cb5c1815ad4305b95c9f2dcf",
+    "003_common": "8076ebbedffcbc398cd9d9bc3f23c56bdbcc2134e286680dc46fb0f4dcfcc7ee",
+    "002_memory": "615db120be7eda605156ade0a9f594f7a997dc4959fe54aa784316de65341bb6"
+  },
+  "receipts": [
+    {
+      "version": "001_retrieval",
+      "sha256": "1e82073728a9d1656abd2e0da4a68debd8332f56cb5c1815ad4305b95c9f2dcf"
+    },
+    {
+      "version": "002_memory",
+      "sha256": "615db120be7eda605156ade0a9f594f7a997dc4959fe54aa784316de65341bb6"
+    },
+    {
+      "version": "003_common",
+      "sha256": "8076ebbedffcbc398cd9d9bc3f23c56bdbcc2134e286680dc46fb0f4dcfcc7ee"
+    }
+  ],
+  "extensions": [
+    {
+      "extname": "fuzzystrmatch",
+      "extversion": "1.2"
+    },
+    {
+      "extname": "pg_ivm",
+      "extversion": "1.13"
+    },
+    {
+      "extname": "pg_search",
+      "extversion": "0.22.6"
+    },
+    {
+      "extname": "pg_stat_statements",
+      "extversion": "1.11"
+    },
+    {
+      "extname": "plpgsql",
+      "extversion": "1.0"
+    },
+    {
+      "extname": "postgis",
+      "extversion": "3.6.2"
+    },
+    {
+      "extname": "postgis_tiger_geocoder",
+      "extversion": "3.6.2"
+    },
+    {
+      "extname": "postgis_topology",
+      "extversion": "3.6.2"
+    },
+    {
+      "extname": "uuid-ossp",
+      "extversion": "1.1"
+    },
+    {
+      "extname": "vector",
+      "extversion": "0.8.1"
+    }
+  ],
+  "embedding_dimension": 3,
+  "embedding_kind": "SYNTHETIC_FIXTURE_ONLY",
+  "real_provider_calls": 0,
+  "old_database_writes": 0
+}

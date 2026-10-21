@@ -1,0 +1,24 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_____ test_startup_mapping_does_not_drop_locale_or_resolved_prompt_fields _____
+tests\weknora_port\test_conversation_configuration.py:9: in test_startup_mapping_does_not_drop_locale_or_resolved_prompt_fields
+    assert cfg.language_locale=='ko-KR'
+E   AssertionError: assert 'zh-CN' == 'ko-KR'
+E     
+E     - ko-KR
+E     + zh-CN
+________ test_request_source_overrides_have_an_explicit_typed_contract ________
+tests\weknora_port\test_conversation_configuration.py:17: in test_request_source_overrides_have_an_explicit_typed_contract
+    row=MessageCreate(content='q',request_id='x',knowledge_base_scope=['kb'],summary_model_id='baseline',reasoning_effort='off')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   pydantic_core._pydantic_core.ValidationError: 2 validation errors for MessageCreate
+E   summary_model_id
+E     Extra inputs are not permitted [type=extra_forbidden, input_value='baseline', input_type=str]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   reasoning_effort
+E     Extra inputs are not permitted [type=extra_forbidden, input_value='off', input_type=str]
+E       For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_conversation_configuration.py::test_startup_mapping_does_not_drop_locale_or_resolved_prompt_fields
+FAILED tests/weknora_port/test_conversation_configuration.py::test_request_source_overrides_have_an_explicit_typed_contract
+2 failed in 0.83s

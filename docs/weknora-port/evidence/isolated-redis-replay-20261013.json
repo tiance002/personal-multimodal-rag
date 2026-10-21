@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "kind": "ACTUAL_ISOLATED_PG_REDIS_REPLAY",
+  "database": "weknora_python_port_20261013",
+  "system_identifier": "7696038373595934758",
+  "redis_run_id": "71baa8e1ae7da4e7b8a3de8ecaa642a1c4716bad",
+  "redis_version": "7.4.2",
+  "key": "weknora-python-port:20261013:stream:events:a4cb4ec6-f700-416e-b3e2-6fa7f245bd22:f8de1851-ae4f-48f4-987c-caddd757cf8f",
+  "ttl": 86400,
+  "raw_before_complete_offset": 4,
+  "replayed_event_types": [
+    "agent_query",
+    "answer",
+    "answer",
+    "complete"
+  ],
+  "wire_frames": [
+    "event: message\ndata: {\"id\":\"a83c4e80-006d-45a7-8cd9-5459d5e6521d\",\"response_type\":\"agent_query\",\"content\":\"\",\"done\":false,\"data\":{\"assistant_message_id\":\"f8de1851-ae4f-48f4-987c-caddd757cf8f\",\"request_id\":\"a83c4e80-006d-45a7-8cd9-5459d5e6521d\",\"session_id\":\"a4cb4ec6-f700-416e-b3e2-6fa7f245bd22\"}}\n\n",
+    "event: message\ndata: {\"id\":\"a83c4e80-006d-45a7-8cd9-5459d5e6521d\",\"response_type\":\"answer\",\"content\":\"fixture answer\",\"done\":false,\"data\":{\"event_id\":\"answer-1\"}}\n\n",
+    "event: message\ndata: {\"id\":\"a83c4e80-006d-45a7-8cd9-5459d5e6521d\",\"response_type\":\"answer\",\"content\":\"\",\"done\":true,\"data\":{\"event_id\":\"answer-1\"}}\n\n",
+    "event: message\ndata: {\"id\":\"a83c4e80-006d-45a7-8cd9-5459d5e6521d\",\"response_type\":\"complete\",\"content\":\"\",\"done\":false,\"usage\":{\"status\":\"UNKNOWN\"}}\n\n"
+  ],
+  "generation_posts": 0,
+  "real_provider_calls": 0,
+  "old_database_writes": 0,
+  "not_run": [
+    "HTTP reconnect",
+    "browser reconnect",
+    "full RAG generation"
+  ]
+}

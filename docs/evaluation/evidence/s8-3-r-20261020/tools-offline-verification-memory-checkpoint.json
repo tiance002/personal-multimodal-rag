@@ -1,0 +1,66 @@
+{
+  "schema": "s8-3-r-offline-memory-checkpoint-verification/v1",
+  "status": "PASS",
+  "scope": "diagnostic sampler helper and offline tests only",
+  "commands": [
+    {
+      "command": ".venv/Scripts/python.exe -m py_compile var/reports/s8-3-r-20261020/s8_3_r_ecs_acceptance.py",
+      "exit_code": 0,
+      "key_output": "No syntax errors; no output"
+    },
+    {
+      "command": ".venv/Scripts/python.exe var/reports/s8-3-r-20261020/test_tools_offline.py",
+      "exit_code": 0,
+      "key_output": "Ran 11 tests in 0.506s; OK",
+      "tests": 11
+    }
+  ],
+  "files": {
+    "s8_3_r_ecs_acceptance.py": "fe010fcd7fd1c9412d285f114d3a9d24158e823e69fdc98ede730a03acdaa6e0",
+    "test_tools_offline.py": "3335f544d38c550826d49904d394a1288209bed0789730d493cd2470ddfc2c08"
+  },
+  "sampler_change": {
+    "periodic_durable_checkpoint": true,
+    "append_only_fsynced_journal": true,
+    "atomic_current_snapshot": true,
+    "preserves_prior_memory_artifacts": true,
+    "checkpoint_status_values": [
+      "periodic",
+      "finalized"
+    ],
+    "scope": "Observed samples only; no claim about unsampled intervals"
+  },
+  "offline_checks": [
+    "Native child process termination after durable checkpoint preserves periodic snapshot when finally is skipped",
+    "Normal process exit persists finalized snapshot",
+    "Existing memory.json remains byte-identical and new capture receives unique path"
+  ],
+  "mechanism": {
+    "confirmed": [
+      "Old helper buffered memory samples in RAM and wrote memory.json only in outer serve finally",
+      "Pinned deploy/s8/requirements.txt specifies uvicorn==0.35.0",
+      "Local installed uvicorn 0.35.0 capture_signals restores original handlers then calls signal.raise_signal for captured signals"
+    ],
+    "inference": "SIGTERM can terminate the process after Uvicorn graceful shutdown before the helpers outer finally executes",
+    "limitation": "Actual signal delivery and exact termination mechanism for each historical container were not independently recorded"
+  },
+  "historical_run": {
+    "source": "downloaded-final/cases",
+    "cases": 12,
+    "memory_json_present": 0,
+    "memory_json_missing": 12,
+    "memory_measurements_status": "NOT_RECORDED",
+    "host_available_memory_minimum": "NOT_RECORDED",
+    "container_memory_peak": "NOT_RECORDED",
+    "archived_container_limit_bytes": 1073741824,
+    "container_limit_evidence_cases": 12,
+    "oom_killed_field_present_in_candidate_snapshots": false,
+    "no_oom_conclusion": "Requires separate inspected exit/OOM evidence; not established by these candidate snapshots"
+  },
+  "historical_artifacts_modified": false,
+  "questions_replayed": 0,
+  "provider_calls": 0,
+  "network_calls": 0,
+  "production_changes": false,
+  "tests_rerun_for_receipt": false
+}

@@ -1,0 +1,288 @@
+{
+  "schema": "p33-evidence-loss-diagnosis/v1",
+  "status": "P33_COMPLETE_DIAG_ONLY",
+  "date": "2026-10-17",
+  "baseline_sha": "0a956fa6540177fd1d42904ae528d81dc3424739",
+  "fixed_upstream": {
+    "version": "WeKnora v0.8.2",
+    "commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "archive": "E:\\WK\\go-linux\\source-3e8b0bfc.tar",
+    "archive_sha256": "2dcc5f18f9442058c5e1a4f1f4c09c0b6cf795879f9fa83977fa74573008f21e",
+    "git_metadata_in_loose_source": false
+  },
+  "execution": {
+    "new_provider_calls": 0,
+    "new_tokens": 0,
+    "database_writes": 0,
+    "database_provider_calls": 0,
+    "production_code_changes": [],
+    "pytest": "NOT_RUN",
+    "reingestion_or_embedding": "NOT_RUN",
+    "historical_unknowns_changed": false
+  },
+  "cases": [
+    {
+      "case_id": "mml-0434",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "necessary_fact": "Kaggle's Cat vs Dog dataset",
+      "indexed": true,
+      "search": {
+        "candidate_count": 30,
+        "target_rank": 15,
+        "target_chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+        "target_hybrid_score": 0.012425249169435215
+      },
+      "rerank": {
+        "input_count": 30,
+        "target_provider_input_index": 14,
+        "target_text_chars": 466,
+        "target_text_preserved": true,
+        "retained_count": 0,
+        "raw_response_body_saved": false,
+        "target_raw_score": "UNKNOWN",
+        "target_provider_index": "UNKNOWN",
+        "threshold_branch": "UNKNOWN"
+      },
+      "merge": {
+        "reached": false,
+        "reason": "SearchNothing after empty Rerank result"
+      },
+      "top_k": "NOT_REACHED; standalone snapshot not saved",
+      "context": {
+        "result_count": 0,
+        "necessary_fact_present": false,
+        "actual_final_request_contains_fact": false
+      },
+      "loss_stage": "Rerank output/selection boundary",
+      "classification": "Root sub-branch UNKNOWN; no Python-only defect demonstrated"
+    },
+    {
+      "case_id": "hotpot-5a7631",
+      "qid": "5a7631cd5542994ccc91870c",
+      "necessary_fact": "Franconia, New Hampshire",
+      "gold": "Franconia, New Hampshire",
+      "indexed": true,
+      "search": {
+        "candidate_count": 30,
+        "target_rank": 15,
+        "target_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+        "target_search_score": 0.013126332622601277,
+        "source_recall_at_10": 1.0
+      },
+      "rerank": {
+        "input_count": 30,
+        "target_provider_input_index": 14,
+        "target_text_preserved": true,
+        "retained_count": 2,
+        "target_retained": false,
+        "target_raw_score": "UNKNOWN",
+        "raw_response_body_saved": false
+      },
+      "merge": {
+        "input_count": 2,
+        "output_count": 2,
+        "input_equals_output_ids": true
+      },
+      "top_k": {
+        "standalone_snapshot_saved": false,
+        "context_ids_equal_merge_output_ids": true
+      },
+      "context": {
+        "chunk_count": 2,
+        "necessary_fact_present": false,
+        "answer": "Portland, Maine",
+        "answer_matches_gold": false
+      },
+      "loss_stage": "Rerank",
+      "classification": "Rerank selection/model relevance boundary; exact score/filter branch UNKNOWN; no Python-only defect demonstrated"
+    },
+    {
+      "case_id": "omni-page007",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_lecture1_page_007.png",
+      "necessary_fact": {
+        "coefficient_matrix": [
+          [
+            1,
+            -2,
+            1
+          ],
+          [
+            0,
+            2,
+            -8
+          ],
+          [
+            -4,
+            5,
+            9
+          ]
+        ],
+        "augmented_last_column": [
+          0,
+          8,
+          -9
+        ],
+        "metric_status": "diagnostic only; no official QA Gold"
+      },
+      "indexed": {
+        "database_system_identifier": "7696088403504697382",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "document_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+        "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+        "file_sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+        "chunk_id": "51316a20-67fd-4732-b520-c049999933d0",
+        "chunk_type": "image_ocr",
+        "index_status": "ready",
+        "embedding_enabled": true,
+        "page_number": null,
+        "source_type": "standalone_image"
+      },
+      "search": {
+        "candidate_count": 30,
+        "target_rank": 5,
+        "target_search_score": 0.014427767354596622
+      },
+      "rerank": {
+        "input_count": 30,
+        "target_provider_input_index": 4,
+        "target_text_chars": 476,
+        "target_text_preserved": true,
+        "retained_count": 1,
+        "kept_chunk_type": "summary",
+        "kept_summary_model_score": 0.766,
+        "ocr_raw_score": "UNKNOWN",
+        "raw_response_body_saved": false
+      },
+      "merge": {
+        "input_count": 1,
+        "output_count": 1,
+        "kept_summary": true
+      },
+      "top_k": {
+        "standalone_snapshot_saved": false,
+        "context_ids_equal_merge_output_ids": true
+      },
+      "context": {
+        "chunk_count": 1,
+        "matrix_and_values_present": false,
+        "answer_values": [
+          6,
+          10,
+          12
+        ],
+        "answer_supported_by_context": false
+      },
+      "loss_stage": "Rerank",
+      "classification": "OCR/index/search succeeded; necessary OCR evidence was not retained by Rerank; exact score/filter branch UNKNOWN"
+    },
+    {
+      "case_id": "mml-0959-control",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+      "necessary_fact": "ionosphere refracts radiowaves; microwaves send satellite signals",
+      "indexed": true,
+      "search": {
+        "candidate_count": 30,
+        "target_rank": 2,
+        "target_chunk_id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+        "target_search_score": 0.5968030684026117
+      },
+      "rerank": {
+        "input_count": 30,
+        "target_provider_input_index": 1,
+        "retained_count": 2,
+        "target_retained": true,
+        "target_model_score": 0.5237
+      },
+      "merge": {
+        "input_count": 2,
+        "output_count": 2,
+        "input_equals_output_ids": true
+      },
+      "top_k": {
+        "standalone_snapshot_saved": false,
+        "context_ids_equal_merge_output_ids": true
+      },
+      "context": {
+        "chunk_count": 2,
+        "necessary_fact_present": true,
+        "actual_final_request_contains_fact": true,
+        "answer_correct": true
+      },
+      "loss_stage": null,
+      "classification": "P32 historical positive control; no P33 rerun"
+    }
+  ],
+  "query_evidence": {
+    "actual_embedding_text_equals_rerank_query": true,
+    "query_rewrite_response_saved": false,
+    "local_expansion_variants_and_hits_saved": false,
+    "missing_items": [
+      "Query Rewrite response text",
+      "per-variant Query Expansion inputs/hits",
+      "raw Rerank response body",
+      "rejected candidates' score/index",
+      "standalone TopK output"
+    ]
+  },
+  "upstream_comparison": {
+    "conclusion": "No Python-only deviation demonstrated that explains the captured loss. Search-to-Rerank candidate mapping verified; for Hotpot/Omni/0959 merge output IDs match Context IDs.",
+    "python_pipeline_order": [
+      "Search",
+      "Rerank",
+      "memory_affinity",
+      "Merge",
+      "TopK",
+      "Context"
+    ],
+    "python_sources": {
+      "rerank": "backend/weknora_port/retrieval/rerank.py::rerank",
+      "merge": [
+        "backend/weknora_port/retrieval/merge.py::merge",
+        "backend/weknora_port/retrieval/merge.py::expand_neighbors"
+      ],
+      "top_k": "backend/weknora_port/retrieval/filter_top_k.py::filter_top_k",
+      "context": "backend/weknora_port/retrieval/context.py::into_chat_message",
+      "pipeline": "backend/weknora_port/retrieval/pipeline.py::run"
+    },
+    "python_default_rerank_threshold": 0.3,
+    "python_top1_fallback_floor": 0.15,
+    "fixed_source_files_sha256": {
+      "internal/application/service/chat_pipeline/rerank.go": "fe89172323f4368b31de950a7fd8ac1a4abbd7cf4833e4feff6b73a4758b16e0",
+      "internal/application/service/chat_pipeline/merge.go": "6e9d7c4ed6d7c37f700a7f3a031d04a89c6242b829f26b46c55efdbaed1c0bfe",
+      "internal/application/service/chat_pipeline/merge_expand.go": "dbaba0f90d210b9d69031774ecee74890f6156774ccad8fd58c57beb69250512",
+      "internal/application/service/chat_pipeline/filter_top_k.go": "6247b843499705862c95c3e193e745796044fee86f5607b854c8a1b7175b2cb4",
+      "internal/application/service/chat_pipeline/into_chat_message.go": "fb63f0b6707adb15e5748ce9f493a84183e27731c7adbe86966990b9b87bdd3b",
+      "internal/application/service/knowledgebase_search_results.go": "e4240be3377b8bd9766c2dbdb4679283455391a67317ebd10cab119d868b89b0"
+    }
+  },
+  "verification": {
+    "frozen_record_consistency": {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B docs/evaluation/evidence/p33-evidence-loss-20261017/check_frozen_records.py",
+      "exit_code": 0,
+      "status": "PASS",
+      "checks": 26,
+      "provider_calls": 0,
+      "database_writes": 0,
+      "report": "docs/evaluation/evidence/p33-evidence-loss-20261017/frozen-record-consistency-check.json"
+    },
+    "omni_database_readonly": {
+      "command": "inline Python read-only query via scripts.weknora_port_mvp_real.connection()",
+      "exit_code": 0,
+      "status": "PASS",
+      "database": "weknora_python_port_20261013",
+      "system_identifier": "7696088403504697382",
+      "artifact": "docs/evaluation/evidence/p33-evidence-loss-20261017/omni-db-readonly.json",
+      "exact_invocation_persisted": false
+    },
+    "new_api_or_provider_calls": "NOT_RUN",
+    "pytest": "NOT_RUN"
+  },
+  "known_limits": [
+    "Raw provider Rerank response body and rejected-candidate score/index were not saved in P32.",
+    "Query Rewrite response body and per-variant local Query Expansion hits were not saved.",
+    "TopK has no standalone frozen snapshot.",
+    "No formal official QA score exists for the Omni matrix diagnostic.",
+    "The fixed upstream loose Go source folder lacks Git metadata; archive and six source file hashes are recorded."
+  ],
+  "recommended_next_step": "No global strategy change. If a separate future authorization permits, capture sanitized candidate index/score and threshold outcome for a bounded diagnostic; do not repeat calls or modify policy in P33."
+}

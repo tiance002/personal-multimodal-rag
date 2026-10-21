@@ -1,0 +1,64 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_empty_kb_uses_source_model_fallback_through_http ____________
+tests\weknora_port\test_qa_followup_fallback_pg.py:62: in test_empty_kb_uses_source_model_fallback_through_http
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_qa_followup_fallback_pg.py:59: in scenario
+    assert message['turn_status']=='completed',reply.text
+E   AssertionError: event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"agent_query","content":"","done":false,"data":{"request_id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","query":"What is available in this knowledge base?","session_id":"bef204a2-425d-4e44-b19c-1e9e678b69dc","assistant_message_id":"2b48303f-e5e4-45cd-88fe-3e7c4521f4ef"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"history","status":"started"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"history","status":"completed"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"memory","status":"started"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"memory","status":"completed"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"understand","status":"started"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"understand","status":"completed"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"progress","content":"","done":false,"data":{"stage":"retrieval","status":"started"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"error","content":"","done":true,"data":{"error_code":"ORDINARY_CHAIN_FAILED","status":"failed"}}
+E     
+E     event: message
+E     data: {"id":"cdc69538-6010-444a-b9dc-0bf93a15cd66","response_type":"complete","content":"","done":false,"data":{"status":"failed","error_code":"ORDINARY_CHAIN_FAILED"}}
+E     
+E     
+E   assert 'error' == 'completed'
+E     
+E     - completed
+E     + error
+============================== warnings summary ===============================
+tests/weknora_port/test_qa_followup_fallback_pg.py::test_empty_kb_uses_source_model_fallback_through_http
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_qa_followup_fallback_pg.py::test_empty_kb_uses_source_model_fallback_through_http
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_qa_followup_fallback_pg.py::test_empty_kb_uses_source_model_fallback_through_http
+1 failed, 2 warnings in 4.82s

@@ -1,0 +1,470 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "source_sha256": {
+    "memory_affinity.go": "47bd27392a995d5bcac503bc834c17f337ab0cddc22058b2db0de72265206f66",
+    "session_knowledge_qa.go": "bfc76618b54725ff85f6f3fba194c0e93b5ef9bab50c2d067e2fc54443228dc3",
+    "session_qa_helpers.go": "daac1e03b819763bc6fc5a72a3077c5edc2466637ee2ebd95d1cfdb00841455d"
+  },
+  "cases": [
+    {
+      "Kind": "affinity",
+      "Rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "stranger",
+          "Score": 0.8
+        },
+        {
+          "ID": "b",
+          "KnowledgeID": "familiar",
+          "Score": 0.78
+        }
+      ],
+      "Hits": {
+        "familiar": 8
+      }
+    },
+    {
+      "Kind": "affinity",
+      "Rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "relevant",
+          "Score": 0.9
+        },
+        {
+          "ID": "b",
+          "KnowledgeID": "familiar",
+          "Score": 0.4
+        }
+      ],
+      "Hits": {
+        "familiar": 1000
+      }
+    },
+    {
+      "Kind": "affinity",
+      "Rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "d",
+          "Score": 1.0
+        },
+        {
+          "ID": "b",
+          "KnowledgeID": "d",
+          "Score": 1.0
+        },
+        {
+          "ID": "empty",
+          "KnowledgeID": "",
+          "Score": 0.3
+        }
+      ],
+      "Hits": {
+        "d": 2
+      }
+    },
+    {
+      "Kind": "affinity",
+      "Rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "d",
+          "Score": 0.8
+        }
+      ],
+      "Hits": {
+        "d": 1
+      }
+    },
+    {
+      "Kind": "affinity",
+      "Rows": [],
+      "Hits": {
+        "d": 8
+      }
+    },
+    {
+      "Kind": "model",
+      "Request": "",
+      "Profile": "",
+      "KBIDs": [
+        "b",
+        "a"
+      ],
+      "Bases": [
+        {
+          "ID": "a",
+          "SummaryModelID": "cheap"
+        },
+        {
+          "ID": "b",
+          "SummaryModelID": "expensive"
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    },
+    {
+      "Kind": "model",
+      "Request": "",
+      "Profile": "",
+      "KBIDs": [
+        "a",
+        "b"
+      ],
+      "Bases": [
+        {
+          "ID": "a",
+          "SummaryModelID": "expensive"
+        },
+        {
+          "ID": "b",
+          "SummaryModelID": "remote"
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    },
+    {
+      "Kind": "model",
+      "Request": "cheap",
+      "Profile": "expensive",
+      "KBIDs": [
+        "b"
+      ],
+      "Bases": [
+        {
+          "ID": "b",
+          "SummaryModelID": "remote"
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    },
+    {
+      "Kind": "model",
+      "Request": "missing",
+      "Profile": "expensive",
+      "KBIDs": [
+        "b"
+      ],
+      "Bases": [
+        {
+          "ID": "b",
+          "SummaryModelID": "remote"
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    },
+    {
+      "Kind": "model",
+      "Request": "embed",
+      "Profile": "",
+      "KBIDs": [
+        "b"
+      ],
+      "Bases": [
+        {
+          "ID": "b",
+          "SummaryModelID": "expensive"
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    },
+    {
+      "Kind": "model",
+      "Request": "cheap",
+      "Profile": "missing",
+      "KBIDs": [
+        "b"
+      ],
+      "Bases": [
+        {
+          "ID": "b",
+          "SummaryModelID": "remote"
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    },
+    {
+      "Kind": "model",
+      "Request": "",
+      "Profile": "",
+      "KBIDs": [
+        "a"
+      ],
+      "Bases": [
+        {
+          "ID": "a",
+          "SummaryModelID": ""
+        }
+      ],
+      "Models": [
+        {
+          "ID": "cheap",
+          "Type": "KnowledgeQA",
+          "Source": "siliconflow"
+        },
+        {
+          "ID": "expensive",
+          "Type": "KnowledgeQA",
+          "Source": "deepseek"
+        },
+        {
+          "ID": "remote",
+          "Type": "KnowledgeQA",
+          "Source": "remote"
+        },
+        {
+          "ID": "embed",
+          "Type": "Embedding",
+          "Source": "remote"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "asked": [
+        "stranger",
+        "familiar"
+      ],
+      "kind": "affinity",
+      "rows": [
+        {
+          "ID": "b",
+          "KnowledgeID": "familiar",
+          "Score": 0.8969999999999999
+        },
+        {
+          "ID": "a",
+          "KnowledgeID": "stranger",
+          "Score": 0.8
+        }
+      ]
+    },
+    {
+      "asked": [
+        "relevant",
+        "familiar"
+      ],
+      "kind": "affinity",
+      "rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "relevant",
+          "Score": 0.9
+        },
+        {
+          "ID": "b",
+          "KnowledgeID": "familiar",
+          "Score": 0.45999999999999996
+        }
+      ]
+    },
+    {
+      "asked": [
+        "d"
+      ],
+      "kind": "affinity",
+      "rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "d",
+          "Score": 1.075
+        },
+        {
+          "ID": "b",
+          "KnowledgeID": "d",
+          "Score": 1.075
+        },
+        {
+          "ID": "empty",
+          "KnowledgeID": "",
+          "Score": 0.3
+        }
+      ]
+    },
+    {
+      "asked": [
+        "d"
+      ],
+      "kind": "affinity",
+      "rows": [
+        {
+          "ID": "a",
+          "KnowledgeID": "d",
+          "Score": 0.8
+        }
+      ]
+    },
+    {
+      "asked": null,
+      "kind": "affinity",
+      "rows": []
+    },
+    {
+      "error": false,
+      "id": "expensive",
+      "kind": "model"
+    },
+    {
+      "error": false,
+      "id": "remote",
+      "kind": "model"
+    },
+    {
+      "error": false,
+      "id": "cheap",
+      "kind": "model"
+    },
+    {
+      "error": false,
+      "id": "expensive",
+      "kind": "model"
+    },
+    {
+      "error": false,
+      "id": "expensive",
+      "kind": "model"
+    },
+    {
+      "error": true,
+      "id": "",
+      "kind": "model"
+    },
+    {
+      "error": false,
+      "id": "cheap",
+      "kind": "model"
+    }
+  ],
+  "exit_code": 0,
+  "scope": "Exact affinity OnEvent/factor and selectChatModelID/resolveChatModelID functions; stub DTO/model/KB/knowledge services/logger. Not full Go engine.",
+  "real_provider_calls": 0
+}

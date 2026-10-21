@@ -1,0 +1,183 @@
+FFFFFFF.FFFFFF                                                           [100%]
+================================== FAILURES ===================================
+_____ test_unrecognized_environment_proxy_keys_are_ignored[environment0] ______
+tests\weknora_port\test_proxy_boundary.py:16: in test_unrecognized_environment_proxy_keys_are_ignored
+    assert environment_proxy(scheme+"://api.example/v1",environment) is None
+E   AssertionError: assert 'http://proxy.example:8080' is None
+E    +  where 'http://proxy.example:8080' = environment_proxy(('https' + '://api.example/v1'), {'https': 'http://proxy.example:8080'})
+_____ test_unrecognized_environment_proxy_keys_are_ignored[environment1] ______
+tests\weknora_port\test_proxy_boundary.py:16: in test_unrecognized_environment_proxy_keys_are_ignored
+    assert environment_proxy(scheme+"://api.example/v1",environment) is None
+E   AssertionError: assert 'http://proxy.example:8080' is None
+E    +  where 'http://proxy.example:8080' = environment_proxy(('http' + '://api.example/v1'), {'http': 'http://proxy.example:8080'})
+__ test_cgi_rejection_precedes_no_proxy_and_loopback[http://api.example/v1] ___
+tests\weknora_port\test_proxy_boundary.py:21: in test_cgi_rejection_precedes_no_proxy_and_loopback
+    with pytest.raises(ProviderError,match="PROVIDER_PROXY_CGI_BLOCKED"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProviderError
+___ test_cgi_rejection_precedes_no_proxy_and_loopback[http://localhost/v1] ____
+tests\weknora_port\test_proxy_boundary.py:21: in test_cgi_rejection_precedes_no_proxy_and_loopback
+    with pytest.raises(ProviderError,match="PROVIDER_PROXY_CGI_BLOCKED"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProviderError
+___ test_cgi_rejection_precedes_no_proxy_and_loopback[http://127.0.0.2/v1] ____
+tests\weknora_port\test_proxy_boundary.py:21: in test_cgi_rejection_precedes_no_proxy_and_loopback
+    with pytest.raises(ProviderError,match="PROVIDER_PROXY_CGI_BLOCKED"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProviderError
+_ test_no_proxy_uses_source_nontransitional_idna[xn--fa-hia.example-fa\xdf.example] _
+tests\weknora_port\test_proxy_boundary.py:27: in test_no_proxy_uses_source_nontransitional_idna
+    assert environment_proxy("https://"+host+"/v1",{"HTTPS_PROXY":"http://proxy.example:8080","NO_PROXY":rule}) is None
+E   AssertionError: assert 'http://proxy.example:8080' is None
+E    +  where 'http://proxy.example:8080' = environment_proxy((('https://' + 'xn--fa-hia.example') + '/v1'), {'HTTPS_PROXY': 'http://proxy.example:8080', 'NO_PROXY': 'fa脽.example'})
+_ test_no_proxy_uses_source_nontransitional_idna[fa\xdf.example-xn--fa-hia.example] _
+tests\weknora_port\test_proxy_boundary.py:27: in test_no_proxy_uses_source_nontransitional_idna
+    assert environment_proxy("https://"+host+"/v1",{"HTTPS_PROXY":"http://proxy.example:8080","NO_PROXY":rule}) is None
+E   AssertionError: assert 'http://proxy.example:8080' is None
+E    +  where 'http://proxy.example:8080' = environment_proxy((('https://' + 'fa脽.example') + '/v1'), {'HTTPS_PROXY': 'http://proxy.example:8080', 'NO_PROXY': 'xn--fa-hia.example'})
+_ test_private_proxy_bypass_requires_source_raw_host_socket_match[proxy.example:8080-False] _
+tests\weknora_port\test_proxy_boundary.py:42: in test_private_proxy_bypass_requires_source_raw_host_socket_match
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:39: in run
+    with pytest.raises(ProviderError,match="PROVIDER_SSRF_IP_BLOCKED"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProviderError
+_ test_private_proxy_bypass_requires_source_raw_host_socket_match[http://proxy.example-False] _
+tests\weknora_port\test_proxy_boundary.py:42: in test_private_proxy_bypass_requires_source_raw_host_socket_match
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:39: in run
+    with pytest.raises(ProviderError,match="PROVIDER_SSRF_IP_BLOCKED"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProviderError
+___________ test_connect_budget_includes_write_and_all_header_reads ___________
+tests\weknora_port\test_proxy_boundary.py:71: in test_connect_budget_includes_write_and_all_header_reads
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:68: in run
+    with pytest.raises(httpcore.ReadTimeout): await stream.read(65536)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ReadTimeout
+______ test_connect_pending_survives_status_line_until_complete_headers _______
+tests\weknora_port\test_proxy_boundary.py:81: in test_connect_pending_survives_status_line_until_complete_headers
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:79: in run
+    await stream.read(65536);assert stream.connect_pending
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert False
+E    +  where False = <backend.weknora_port.models.safe_network.ProxyStream object at 0x00000194BBB4A690>.connect_pending
+____ test_connect_blocked_io_has_native_deadline_and_closes_stream[write] _____
+tests\weknora_port\test_proxy_boundary.py:95: in exchange
+    await stream.write(b"CONNECT api.example:443 HTTP/1.1\r\n\r\n")
+backend\weknora_port\models\safe_network.py:341: in write
+    await self.stream.write(buffer,timeout)
+tests\weknora_port\test_proxy_boundary.py:90: in write
+    if operation=="write":await asyncio.Event().wait()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\locks.py:213: in wait
+    await fut
+E   asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+tests\weknora_port\test_proxy_boundary.py:100: in test_connect_blocked_io_has_native_deadline_and_closes_stream
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:98: in run
+    await asyncio.wait_for(exchange(),.5)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: in __aexit__
+    raise TimeoutError from exc_val
+E   TimeoutError
+_____ test_connect_blocked_io_has_native_deadline_and_closes_stream[read] _____
+tests\weknora_port\test_proxy_boundary.py:96: in exchange
+    if operation=="read":await stream.read(65536)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\models\safe_network.py:343: in read
+    data = await self.stream.read(max_bytes, 60 if timeout is None and self.connect_pending else timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:91: in read
+    async def read(self,size,timeout=None): await asyncio.Event().wait()
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\locks.py:213: in wait
+    await fut
+E   asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+tests\weknora_port\test_proxy_boundary.py:100: in test_connect_blocked_io_has_native_deadline_and_closes_stream
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_proxy_boundary.py:98: in run
+    await asyncio.wait_for(exchange(),.5)
+D:\Drivers\python\Lib\asyncio\tasks.py:506: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\timeouts.py:116: in __aexit__
+    raise TimeoutError from exc_val
+E   TimeoutError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_proxy_boundary.py::test_unrecognized_environment_proxy_keys_are_ignored[environment0]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_unrecognized_environment_proxy_keys_are_ignored[environment1]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_cgi_rejection_precedes_no_proxy_and_loopback[http://api.example/v1]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_cgi_rejection_precedes_no_proxy_and_loopback[http://localhost/v1]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_cgi_rejection_precedes_no_proxy_and_loopback[http://127.0.0.2/v1]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_no_proxy_uses_source_nontransitional_idna[xn--fa-hia.example-fa\xdf.example]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_no_proxy_uses_source_nontransitional_idna[fa\xdf.example-xn--fa-hia.example]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_private_proxy_bypass_requires_source_raw_host_socket_match[proxy.example:8080-False]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_private_proxy_bypass_requires_source_raw_host_socket_match[http://proxy.example-False]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_connect_budget_includes_write_and_all_header_reads
+FAILED tests/weknora_port/test_proxy_boundary.py::test_connect_pending_survives_status_line_until_complete_headers
+FAILED tests/weknora_port/test_proxy_boundary.py::test_connect_blocked_io_has_native_deadline_and_closes_stream[write]
+FAILED tests/weknora_port/test_proxy_boundary.py::test_connect_blocked_io_has_native_deadline_and_closes_stream[read]
+13 failed, 1 passed, 2 deselected in 2.11s

@@ -1,0 +1,1166 @@
+{
+  "schema": "rag-m4-plan/v1",
+  "baseline_sha": "5099efe5aae1de1bc5849c7db2f081c32fe22d5c",
+  "upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "overall_authorization": null,
+  "input_files": [
+    {
+      "path": "E:\\WK\\run\\p32-20261017\\plan.json",
+      "sha256": "88a44dab00333521dd1c2d1dd845ff423dc352fe14bc000cda15414735bbb318"
+    },
+    {
+      "path": "E:\\WK\\run\\p32-20261017\\plan-frozen.json",
+      "sha256": "1fb1398fde8496242d1943d9c2adb85a075296b89993d552fd029150d3864e3e"
+    },
+    {
+      "path": "E:\\WK\\run\\p32-20261017\\source-bindings.json",
+      "sha256": "8de49c0669fbdb64486d7749f8c222114b3a0ed944947eaf3b65433251dd1804"
+    },
+    {
+      "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+      "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5"
+    },
+    {
+      "path": "E:\\WK\\run\\p19-20261016\\state.json",
+      "sha256": "4086b949abc560fcb0aa9b781cba99e3a835bb6153e52cf03305d728fa5978fd"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\rag_m3_score.py",
+      "sha256": "9b3110d2758337ccffaf6c5096235ef455119eebbdd5f4b05c3c0f7fc3709dd9"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\p32_score_results.py",
+      "sha256": "e1c24c2815ec0bd0dad51023f7e4eaf46b78aad3868532a1df1af54404457ce1"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\weknora_port_p19_score.py",
+      "sha256": "0fa821262b3db73e95e107e9c2edfb0cb1548bb129ca47963e9e8c0ee11efc8c"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\eval_center\\metrics.py",
+      "sha256": "07408cb4f3224b1f357dba009b5b1036f1bcbe10619903ce9d8173fd5d9b0e51"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\eval_center\\weknora_scoring.py",
+      "sha256": "b9d5cf2f26181a7dd4d905e0774e1316447587c98e47ae0e77ed402b35b2bbe5"
+    },
+    {
+      "path": "E:\\WK\\run\\p9-20261016\\baseline\\official-longbench\\metrics.py",
+      "sha256": "e22e2a2662e0f7e683137fa3541f64edb6a801e9138d16d2f3459a6ab9941323"
+    },
+    {
+      "path": "E:\\WK\\run\\p9-20261016\\baseline\\official-longbench\\receipt.json",
+      "sha256": "5d7b6dba281389fd32f8fe15098eb02af39001d7bb22d40e53b4e9152e55b221"
+    }
+  ],
+  "production": {
+    "query_understanding": "A",
+    "rerank_threshold": 0.3,
+    "top1_minimum": 0.15,
+    "router": "DYNAMIC",
+    "force_role": null
+  },
+  "authorization_proposal_only": {
+    "status": "NOT_APPROVED",
+    "end_to_end_requests": 11,
+    "provider_calls_total": 132,
+    "token_limit_total_including_unresolved_reservations": 600000,
+    "per_batch_calls": 12,
+    "per_batch_tokens": 100000,
+    "batch_size": 1,
+    "max_minutes_per_batch": 40,
+    "unknown_policy": "STOP_NO_RETRY_NO_NEW_GRANT_FILE"
+  },
+  "cases": [
+    {
+      "case_id": "scifact-247",
+      "dataset": "scifact",
+      "qid": "247",
+      "question": "Chemical injury represses transglutaminase 2 activity.",
+      "selection_role": "known_difficult",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7",
+      "kb_scope": [
+        "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "222d167a-387d-4e30-8412-2cc30393fed5",
+          "source_version": "0dd046ba-c276-4275-9885-f42e0fc164e4",
+          "file_sha256": "646fc6fa8857fbe3c8c403e8e88f70d6f338a1205c6e887d3885c02666009ded",
+          "source_id": "13578199",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\646fc6fa8857fbe3c8c4\\a3db970d61d8860173acc988.md",
+          "parser_engine": "markdown"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [],
+      "qrels": {
+        "13578199": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "official_document_qrels",
+        "metrics": [
+          "subset_source_Recall@10",
+          "subset_source_MRR@10",
+          "subset_source_nDCG@10"
+        ],
+        "answer_accuracy_applicable": false
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "scifact-339",
+      "dataset": "scifact",
+      "qid": "339",
+      "question": "Dexamethasone increases risk of postoperative bleeding.",
+      "selection_role": "ordinary_regression",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7",
+      "kb_scope": [
+        "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "9fbacd57-8ea3-4f30-978d-21be7e2f3429",
+          "source_version": "a65a0488-d5dc-4d15-a60e-fcb0b5e3ef94",
+          "file_sha256": "f1de5eb2431ac82716471fcab7563044b2bec49204a5d2f907d551710dbae516",
+          "source_id": "23349986",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\f1de5eb2431ac8271647\\a7909789138ef3046253024e.md",
+          "parser_engine": "markdown"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [],
+      "qrels": {
+        "23349986": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "official_document_qrels",
+        "metrics": [
+          "subset_source_Recall@10",
+          "subset_source_MRR@10",
+          "subset_source_nDCG@10"
+        ],
+        "answer_accuracy_applicable": false
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "miracl-91294",
+      "dataset": "miracl-zh",
+      "qid": "91294#0",
+      "question": "人马座有哪些临近星座？",
+      "selection_role": "known_difficult",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+      "kb_scope": [
+        "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "541b3a8a-70a0-48dc-b31a-19ee96df3b94",
+          "source_version": "73301c48-abc1-4f05-9a30-24dccb10f41e",
+          "file_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+          "source_id": "2145#2",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\f59e42e6916ab57d0b2e\\0d4183f5ea0a1bd37fd04c19.md",
+          "parser_engine": "markdown"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [],
+      "qrels": {
+        "132748#0": 0,
+        "2145#0": 0,
+        "2145#2": 1,
+        "2145#4": 0,
+        "2145#7": 0,
+        "2145#8": 0,
+        "2145#9": 0,
+        "42308#4": 0
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "official_judgments_with_candidate_pool_scope",
+        "metrics": [
+          "subset_passage_Recall@10",
+          "subset_passage_MRR@10",
+          "subset_passage_nDCG@10"
+        ],
+        "answer_accuracy_applicable": false
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "miracl-7049630",
+      "dataset": "miracl-zh",
+      "qid": "7049630#0",
+      "question": "北京市有哪些国企？",
+      "selection_role": "ordinary_regression",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+      "kb_scope": [
+        "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "57970155-c9f5-478c-aa3b-a54e333e13a1",
+          "source_version": "622c31d9-1fdb-46b3-ac6a-04eb474e536f",
+          "file_sha256": "1b4c444363f43eccf05e802f0531d41c3f0309eb98deecd3224d4175ca95f0fe",
+          "source_id": "463#83",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\1b4c444363f43eccf05e\\53a34a57fe3be8f87b356b19.md",
+          "parser_engine": "markdown"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [],
+      "qrels": {
+        "463#83": 1,
+        "463#88": 0
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "official_judgments_with_candidate_pool_scope",
+        "metrics": [
+          "subset_passage_Recall@10",
+          "subset_passage_MRR@10",
+          "subset_passage_nDCG@10"
+        ],
+        "answer_accuracy_applicable": false
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "longbench-6770736a",
+      "dataset": "longbench-zh",
+      "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+      "question": "美国的节日",
+      "selection_role": "known_difficult",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+      "kb_scope": [
+        "76770fba-17c3-4704-8663-10aa669476ce"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "fa3fbf82-1af6-4c25-8177-24fbd1c002bd",
+          "source_version": "a570fa74-2dba-4420-803a-87e55bfbcefe",
+          "file_sha256": "949f99754a82fd5d86578c9758bdd1f3c8d1b9ae7957464c94a0e6b283d272da",
+          "source_id": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\949f99754a82fd5d8657\\e6a5bb3ad92e2836b162ae0d.md",
+          "parser_engine": "markdown"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [
+        "新年（New Year&apos;s Day），林肯纪念日（Lincoln&apos;s Birthday），圣瓦伦丁节（情人节St. Valentine&apos;s Day），华盛顿诞辰日（Washington&apos;s Birthday），圣帕特里克节（St. Patrick&apos;s Day），愚人节（April Fools&apos; Day）复活节（Easter、一般指春分月圆后第一个星期日），植树节（Arbor Day）五月的第二个星期五），母亲节（Mothers&apos; Day五月的第二个星期日），阵亡将士纪念日（五月的最后一个星期一），国旗日（Flag Day），父亲节（Fathers&apos; Day）六月的第三个星期日），独立日（美国国庆节），劳动节（Labor Day九月的第一个星期一），哥伦布日（Columbus Day），退伍军人节（Veteran&apos;s Day），万圣节（Hallowmas），感恩节（Thanksgiving Day），圣诞节（Christmas）。"
+      ],
+      "qrels": {
+        "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "paired_task_context_diagnostic",
+        "metrics": [
+          "task_specific_ROUGE_ZH_or_QA_F1_ZH"
+        ],
+        "answer_accuracy_applicable": true
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "longbench-51abd206",
+      "dataset": "longbench-zh",
+      "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+      "question": "2005年全市农村劳动力技能培训了多少人？",
+      "selection_role": "ordinary_regression",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+      "kb_scope": [
+        "76770fba-17c3-4704-8663-10aa669476ce"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916",
+          "source_version": "7c0165f6-d93d-4cda-a27a-3699e3f94ce9",
+          "file_sha256": "4698602b9e77c4d8957e001391b4f04bb82106bdbfb7490c3991c3b67eaf2d57",
+          "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\4698602b9e77c4d8957e\\e09fb407c46212e8f3c529d5.md",
+          "parser_engine": "markdown"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [
+        "2.2万人。"
+      ],
+      "qrels": {
+        "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "paired_task_context_diagnostic",
+        "metrics": [
+          "task_specific_ROUGE_ZH_or_QA_F1_ZH"
+        ],
+        "answer_accuracy_applicable": true
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "hotpot-5a7631",
+      "dataset": "hotpotqa",
+      "qid": "5a7631cd5542994ccc91870c",
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "selection_role": "known_difficult",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "kb_scope": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "source_version": "de3ec8ca-5496-4ecf-abcb-3b65423d1fe9",
+          "file_sha256": "f43886e7f9b452c786e071701ce14871456ec95342cb132e7a212c397458eb9e",
+          "source_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\f43886e7f9b452c786e0\\4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd.txt",
+          "parser_engine": "plain"
+        },
+        {
+          "id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "source_version": "00aadff9-83c8-4a17-ab39-09359f2128cc",
+          "file_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+          "source_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\9da0210243443211f7c8\\6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d.txt",
+          "parser_engine": "plain"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [
+        "Franconia, New Hampshire"
+      ],
+      "qrels": {
+        "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd": 1,
+        "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "SOURCE_DERIVED_SUPPORTING_FACT_DOCUMENT_PROJECTION",
+        "metrics": [
+          "answer_EM",
+          "answer_token_F1",
+          "subset_source_Recall@10"
+        ],
+        "answer_accuracy_applicable": true
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "hotpot-5a8ad6",
+      "dataset": "hotpotqa",
+      "qid": "5a8ad6805542992d82986f93",
+      "question": "Leonard Whiting played the tragic hero of Romeo and Juliet in the film version by which director?",
+      "selection_role": "ordinary_regression",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "kb_scope": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "03a732df-64ad-4044-a2c6-caebf2409e7c",
+          "source_version": "8da9f6b8-d156-4858-be75-b52658a677f8",
+          "file_sha256": "e8c999a2a9cb0bd946a42ccbe415589e311d4717e38619240b0cf5cec8522d8a",
+          "source_id": "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\e8c999a2a9cb0bd946a4\\c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76.txt",
+          "parser_engine": "plain"
+        },
+        {
+          "id": "443629fe-7970-4c67-b132-e5574c771ade",
+          "source_version": "95a63d26-9d6e-4319-86aa-70b18b36bbca",
+          "file_sha256": "1f53c6fe334fc2cf03f4571a4b71c61d4c5fdc31b836c42ce6309a3726768572",
+          "source_id": "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\1f53c6fe334fc2cf03f4\\d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85.txt",
+          "parser_engine": "plain"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [
+        "Zeffirelli"
+      ],
+      "qrels": {
+        "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76": 1,
+        "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "SOURCE_DERIVED_SUPPORTING_FACT_DOCUMENT_PROJECTION",
+        "metrics": [
+          "answer_EM",
+          "answer_token_F1",
+          "subset_source_Recall@10"
+        ],
+        "answer_accuracy_applicable": true
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "mml-0434",
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "selection_role": "known_difficult",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "kb_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+          "source_version": "03f5a072-4021-4aca-9233-2dca910614f2",
+          "file_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+          "file_path": "D:\\RAG-v6-special-subsets-r1\\download-verification-attempt1\\source-files\\object-01.pdf",
+          "parser_engine": "mineru-basic"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [
+        "Cat vs Dog dataset"
+      ],
+      "qrels": {
+        "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "SOURCE_DERIVED_OFFICIAL_DOCUMENT_IDENTITY",
+        "metrics": [
+          "project_normalized_EM",
+          "project_character_F1",
+          "source_fact_review"
+        ],
+        "answer_accuracy_applicable": true
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "mml-0959",
+      "dataset": "mmlongbench-doc",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+      "question": "What are used for long-distance communication as introduced in this slide?",
+      "selection_role": "ordinary_regression",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "kb_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+          "file_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+          "file_path": "D:\\RAG-v6-special-subsets-r1\\download-verification-attempt1\\source-files\\object-02.pdf",
+          "parser_engine": "mineru-basic"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [
+        "['radiowaves', 'microwaves']"
+      ],
+      "qrels": {
+        "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf": 1
+      },
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "SOURCE_DERIVED_OFFICIAL_DOCUMENT_IDENTITY",
+        "metrics": [
+          "project_normalized_EM",
+          "project_character_F1",
+          "source_fact_review"
+        ],
+        "answer_accuracy_applicable": true
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    },
+    {
+      "case_id": "omni-page012",
+      "dataset": "omnidocbench",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+      "question": "In the slide Changes to English (in America), what category is Change 7 about?",
+      "selection_role": "ordinary_regression",
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+      "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+      "kb_scope": [
+        "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef"
+      ],
+      "document_scope": [],
+      "expected_documents": [
+        {
+          "id": "6a50b4aa-3ef4-40b3-b8f5-884f5614c61b",
+          "source_version": "148c9991-cf38-4919-be8b-afe17ada78f9",
+          "file_sha256": "428cca795816237571181f0b2f491ecb81d895359a142c07aa93d160ab58dd9d",
+          "source_id": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_EnglishtoAmericanTransition_page_012.png",
+          "file_path": "E:\\WK\\run\\p9-20261016\\s\\428cca79581623757118\\PPT_EnglishtoAmericanTransition_page_012.png",
+          "parser_engine": "image"
+        }
+      ],
+      "expected_chunk_ids": [],
+      "answer_points": [],
+      "qrels": {},
+      "gold": {
+        "path": "E:\\WK\\run\\p9-20261016\\gold-all.json",
+        "sha256": "c8f397b3d4232a169b39aa19b4f5cdaf83983dffc912f96768e548b83a643bf5",
+        "type": "official_parsing_gold_only_no_QA_Gold",
+        "metrics": [
+          "RAG_engineering_source_fact_review_NOT_official_QA"
+        ],
+        "answer_accuracy_applicable": false
+      },
+      "manual_source_fact_review_required": true,
+      "prior_results": "HISTORICAL_ONLY_NOT_CURRENT_SCORE",
+      "stages_required": [
+        "Search",
+        "Rerank",
+        "Merge/TopK",
+        "Context",
+        "actual_provider_evidence",
+        "answer",
+        "SSE_history_consistency"
+      ],
+      "new_execution": "NOT_RUN",
+      "actual_tokens": null,
+      "quality_metrics": null
+    }
+  ],
+  "dataset_inventory": [
+    {
+      "dataset": "scifact",
+      "frozen_qids": 8,
+      "native_answer_gold_count": 0,
+      "historical_indexed_documents": 11,
+      "selected_for_new_current_baseline": 2,
+      "all_frozen_qid_source_coverage": [
+        {
+          "qid": "1102",
+          "positive_sources": [
+            "3874000"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "1304",
+          "positive_sources": [
+            "12631697"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "1351",
+          "positive_sources": [
+            "28369117"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "242",
+          "positive_sources": [
+            "10608822",
+            "2212067"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "247",
+          "positive_sources": [
+            "13578199"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "339",
+          "positive_sources": [
+            "23349986"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "611",
+          "positive_sources": [
+            "32408470"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "621",
+          "positive_sources": [
+            "1642727"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        }
+      ],
+      "dataset_version": "beir-scifact-5f7d1de60b170fc8027bb7898e2efca1"
+    },
+    {
+      "dataset": "miracl-zh",
+      "frozen_qids": 8,
+      "native_answer_gold_count": 0,
+      "historical_indexed_documents": 13,
+      "selected_for_new_current_baseline": 2,
+      "all_frozen_qid_source_coverage": [
+        {
+          "qid": "277616#0",
+          "positive_sources": [
+            "52693#24"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5704915#0",
+          "positive_sources": [
+            "157420#0",
+            "157707#0"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5721594#0",
+          "positive_sources": [
+            "19538#2"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "692002#0",
+          "positive_sources": [
+            "21741#24"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "704170#0",
+          "positive_sources": [
+            "117659#15"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "7049630#0",
+          "positive_sources": [
+            "463#83"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "7696#0",
+          "positive_sources": [
+            "10530#1",
+            "4150#0",
+            "90901#6"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "91294#0",
+          "positive_sources": [
+            "2145#2"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        }
+      ],
+      "dataset_version": "MIRACL-ZH-CANDIDATE-POOL-SHARD0-SEED20260928-V1"
+    },
+    {
+      "dataset": "longbench-zh",
+      "frozen_qids": 8,
+      "native_answer_gold_count": 8,
+      "historical_indexed_documents": 8,
+      "selected_for_new_current_baseline": 2,
+      "all_frozen_qid_source_coverage": [
+        {
+          "qid": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+          "positive_sources": [
+            "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+          "positive_sources": [
+            "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+          "positive_sources": [
+            "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9",
+          "positive_sources": [
+            "dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+          "positive_sources": [
+            "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+          "positive_sources": [
+            "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05",
+          "positive_sources": [
+            "multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2",
+          "positive_sources": [
+            "multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        }
+      ],
+      "dataset_version": "LongBench-ZH-HF-5e628be450b7e67fb7ae6e201bd6d8f7056f7672-SEED20260928-V1"
+    },
+    {
+      "dataset": "hotpotqa",
+      "frozen_qids": 8,
+      "native_answer_gold_count": 8,
+      "historical_indexed_documents": 24,
+      "selected_for_new_current_baseline": 2,
+      "all_frozen_qid_source_coverage": [
+        {
+          "qid": "5a8ad6805542992d82986f93",
+          "positive_sources": [
+            "hotpotqa-context:c1ec0a2639fecac168c239ed90030c66694473b079b03c0deee52d4c5b437a76",
+            "hotpotqa-context:d0eb3a3e5ef6a6a2ab786f7949ea3dd67f5841d47f52d182d1e63897be4ded85"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5a745a6055429974ef308be4",
+          "positive_sources": [
+            "hotpotqa-context:106d7d79e61a35c353b96a86e9f52f22abeff820bdd1962a452978e426c93d51",
+            "hotpotqa-context:a8d9c99aa7e89f31b2f13ab98de47856491f24711b9ce1ebadbb1a051ac42616"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5a729fe55542991f9a20c53b",
+          "positive_sources": [
+            "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+            "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5ae3992d5542994393b9e722",
+          "positive_sources": [
+            "hotpotqa-context:2681f8efe9088c25cebcf7345848e5339bc8f02b4f63e9b9d3d707963f0ae331",
+            "hotpotqa-context:8c33a54cac2958610d112f8d957ae4b940f526d1ef2163797a77b308853bcf16"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5ab672165542995eadeeffe0",
+          "positive_sources": [
+            "hotpotqa-context:127d56714b425ba1a5d5062faadf37e0eedf79f038d5b3b15441eb6b84b062c0",
+            "hotpotqa-context:4c703b9348c45159a0282e6532795b3f5594fbd996bc6a7d95fec81d51340bf6"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5a8911ad554299515336129c",
+          "positive_sources": [
+            "hotpotqa-context:13cc55da07441beed8ab4281e9498704b24054a26ba7eb58f2cf88635050d73f",
+            "hotpotqa-context:ab4b09ad03473bf19f3244caec8abf00ecf4ba511038494ded4c1706d64d6b29"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5a7b68a75542997c3ec97153",
+          "positive_sources": [
+            "hotpotqa-context:46c0cdfb975e13514a984356eec4b9e0d606c7ccbc258146585c8acfc1b6e92a",
+            "hotpotqa-context:a4ac70a472b41ab675e315fc55977d32fbf6ac7cf2177fdc8a03dd20b21d79c6"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "5a7631cd5542994ccc91870c",
+          "positive_sources": [
+            "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+            "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        }
+      ],
+      "dataset_version": "HotpotQA-1908d6afbbead072334abe2965f91bd2709910ab"
+    },
+    {
+      "dataset": "mmlongbench-doc",
+      "frozen_qids": 8,
+      "native_answer_gold_count": 8,
+      "historical_indexed_documents": 2,
+      "selected_for_new_current_baseline": 2,
+      "all_frozen_qid_source_coverage": [
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0684",
+          "positive_sources": [
+            "11-21-16-Updated-Post-Election-Release.pdf"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+          "positive_sources": [
+            "11-21-16-Updated-Post-Election-Release.pdf"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0685",
+          "positive_sources": [
+            "11-21-16-Updated-Post-Election-Release.pdf"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0431",
+          "positive_sources": [
+            "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+          "positive_sources": [
+            "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0430",
+          "positive_sources": [
+            "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf"
+          ],
+          "historical_catalog_missing": [],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+          "positive_sources": [
+            "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf"
+          ],
+          "historical_catalog_missing": [
+            "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf"
+          ],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        },
+        {
+          "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+          "positive_sources": [
+            "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf"
+          ],
+          "historical_catalog_missing": [
+            "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf"
+          ],
+          "current_db_coverage": "NOT_YET_VERIFIED_FOR_NONSELECTED_QIDS"
+        }
+      ],
+      "dataset_version": "MMLongBench-Doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86"
+    },
+    {
+      "dataset": "omnidocbench",
+      "frozen_QA_Gold": 0,
+      "parsing_Gold_pages": 24,
+      "historical_reliable_page_text_NED_denominator": 3,
+      "selected_for_new_current_baseline": 1,
+      "note": "page012 reuses an existing engineering question for current-version diagnostic only; matrix page007 excluded; no official QA accuracy."
+    }
+  ],
+  "excluded_case": {
+    "case_id": "omni-page007",
+    "reason": "M3.5 matrix upload/QA/refresh acceptance preserved; no repeat or repair in M4.0"
+  },
+  "execution_contract": {
+    "path": "existing normal FastAPI -> Query Understanding -> Search -> Rerank -> Merge/Context -> DYNAMIC -> generation -> SSE/history",
+    "payload_fields_only": [
+      "content",
+      "request_id",
+      "knowledge_base_scope",
+      "document_scope"
+    ],
+    "new_session_per_case": true,
+    "no_gold_or_ideal_evidence_in_payload": true,
+    "offline_only_until_new_owner_authorization": true,
+    "daily_identity_must_match_manifest": "Do not change principal or remap historical data; otherwise report blocked scope.",
+    "no_legacy_AB_runner": "M3/P32 runner startup/prepare pins old HEAD, overrides consent/principal; not authorized for M4."
+  },
+  "offline_revision": 2,
+  "revision_note": "Only scoring/provenance detail added before any send; all 11 questions, Gold, source versions and selection unchanged.",
+  "source_fingerprints": {
+    "backend/weknora_port/development.py": "de50915d4e48c170ce6c7c5ac5c8e3ab9ce8f91a1f241202fe0fe37e5763b5eb",
+    "backend/weknora_port/runtime.py": "ce27dbd195de41518a82949072b26eb62130c6da190aa227a9329fd20c3162e1",
+    "backend/weknora_port/execution.py": "e90f1ae1c88fb087075afe17671e861d0804fadf0ff4b259f1411f77126194f7",
+    "backend/weknora_port/retrieval/pipeline.py": "9f7a33c3b62b2e6121f70f092801bf72249fc245055b2c564cf0507e5f51a439",
+    "backend/weknora_port/retrieval/query.py": "c70426963242277c3239d4d115e5441db46dc4bebef9a586f1eab2b99bab93a7",
+    "backend/weknora_port/retrieval/search.py": "d37389d8ddfc1c6ebc2a6bcd8e53d1baf26cb6098608b8c5cc75d51c6abf957d",
+    "backend/weknora_port/retrieval/rerank.py": "5b3bab4a44ade213225284ce15f6045361e3833cd83e8da87783f575282fd392",
+    "backend/weknora_port/retrieval/merge.py": "5f37e8689541be1c9718adb112a8be79141e7afee2112851cc200c30f2fff334",
+    "backend/weknora_port/retrieval/context.py": "6a2907a5e3b7fd067faddbb05ffc81fe816691584497edc2b7c2c28bd855ad7f",
+    "backend/weknora_port/generation/coordinator.py": "b73e7748983d7357c17dd6bffaf36ec233227f7f13681c6f311f63abac565eb2",
+    "backend/weknora_port/generation/router.py": "270363dc71bc59295dc7c816a21e16492e8ff1f652ea49d6e3f59dda5e8b649b",
+    "scripts/rag_m40_preflight.py": "7b116aa01694085816baa09160f5b88c3e059aaae0bf6522bf7f7351bbde0bf8",
+    "scripts/p9_score_real.py": "408562ead14711b6e4d67dfc67bc82192ff9c227f0fee46769ca95859ac86572",
+    "scripts/p8_score_real.py": "5352c4d971d7f7b26cf559c36af004b2d51409539af60110f45da6015bfd186a"
+  },
+  "scoring_rules": {
+    "not_run": "All absent run/model/stage data remain NOT_RUN/null, never scored0 or carried from history.",
+    "retrieval": "Project chunk ranks onto frozen source IDs at K=10. Report Search/Rerank/Context separately. Subset only, not official full-corpus recall.",
+    "exact_evidence": "A same-document summary is only source ID hit. Human source-supported fact coverage separately records original/derived chunk and version.",
+    "generation": "Only full completed application answers use native Gold scoring; failed/cancelled/no-receipt attempts retained outside completed denominator.",
+    "gold_limits": "SciFact/MIRACL have qrels only, no answer accuracy. LongBench tasks separate. Hotpot EM/F1 no support/joint. MML string diagnostics separate fact support. Omni no official QA.",
+    "failure_order": [
+      "admission/API_scope",
+      "Query Understanding",
+      "Search",
+      "Rerank",
+      "Merge/TopK",
+      "Context",
+      "provider evidence delivery",
+      "generation",
+      "SSE/persistence",
+      "score data mapping"
+    ],
+    "failure_categories": [
+      "SOURCE_NOT_RECALLED",
+      "FACT_DROPPED_AT_RERANK",
+      "FACT_DROPPED_AFTER_MERGE",
+      "FACT_NOT_SENT_TO_MODEL",
+      "WRONG_REASONING_WITH_EVIDENCE",
+      "ANSWER_FORMAT_MISMATCH",
+      "SOURCE_CONFLICT",
+      "UNSUPPORTED_ADDITION",
+      "CAPABILITY_LIMIT",
+      "UNDETERMINED"
+    ],
+    "provenance": "Model-derived OCR/Caption/Summary stays identified; valid source identity is not semantic entailment.",
+    "usage": "Actual Provider usage only. Missing usage UNREPORTED; unknown response STOP, hold, no resend. All batches share Owner overall cap, never renew by file cycling."
+  },
+  "normal_api_readiness": "BLOCKED: manifest tenant332 differs from daily tenant1. No principal switch, data remap or experimental service will be used to evade it."
+}

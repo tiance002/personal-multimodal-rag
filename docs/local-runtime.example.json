@@ -1,0 +1,41 @@
+{
+  "python": "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+  "node": "C:/Program Files/nodejs/node.exe",
+  "state_dir": "E:/WK/eviroute/application",
+  "api_port": 56425,
+  "ui_port": 56426,
+  "containers": [
+    {
+      "service": "postgres",
+      "id": "89c5cb748e2ec7aca3b1e3b181dfe936a4054137ddb4de5c4e8689e86387e720",
+      "volume": "weknora-python-resume-pg-20261013",
+      "image": "paradedb/paradedb:v0.22.6-pg17"
+    },
+    {
+      "service": "redis",
+      "id": "15fe772fab7d9ac5b6023ff2075ebb5e12ccee80e274f91b16fe612e8748e897",
+      "volume": "weknora-python-resume-redis-20261013",
+      "image": "redis:7.4.2"
+    }
+  ],
+  "environment": {
+    "PYTHONPATH": "E:/WK/deps/reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps",
+    "WEKNORA_HTML_CODEC_PATH": "E:\\WK\\deps\\htmlcodec\\htmlcodec.exe",
+    "WEKNORA_HTML_CODEC_SHA256": "0c5bbcb9bb6d7860010f5317bd4c8d1716f9a75e7b7aec553a84a41dc8bbd8a1",
+    "WEKNORA_PORT_DATABASE_URL": "postgresql://<existing-user>:<existing-password>@127.0.0.1:56423/weknora_python_port_20261013",
+    "WEKNORA_PORT_DATABASE_SYSTEM_ID": "7696088403504697382",
+    "WEKNORA_PORT_DATABASE_NAME": "weknora_python_port_20261013",
+    "WEKNORA_PORT_REDIS_URL": "redis://127.0.0.1:56424/15",
+    "WEKNORA_PORT_REDIS_PREFIX": "weknora-python-eviroute-local",
+    "WEKNORA_PORT_STORAGE_ROOT": "E:/WK/eviroute/assets",
+    "WEKNORA_PORT_SECRET_KEY_FILE": "E:/WK/run/p8-20261016/master.key",
+    "WEKNORA_PORT_TOKENIZER_ASSET": "D:/RAG-Tokenizer-Assets/cl100k_base.tiktoken",
+    "WEKNORA_PORT_ROUTER_MODE": "DYNAMIC",
+    "WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID": "",
+    "WEKNORA_PORT_CLOUD_ALLOWED": "false",
+    "WEKNORA_PORT_MINERU_ENABLED": "1",
+    "WEKNORA_PORT_MINERU_PYTHON": "E:/WK/mineru-env/Scripts/python.exe",
+    "WEKNORA_PORT_MINERU_MODEL_ROOT": "E:/WK/run/p10-mineru/models",
+    "WEKNORA_PORT_MINERU_TEMP_ROOT": "E:/WK/eviroute/mineru-tmp"
+  }
+}

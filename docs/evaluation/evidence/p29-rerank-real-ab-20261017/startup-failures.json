@@ -1,0 +1,26 @@
+{
+  "kind": "transcribed tool-return diagnostics, not fabricated raw stdout",
+  "events": [
+    {
+      "command": "initial start.py with missing required Redis prefix",
+      "child_exit_code": 1,
+      "error": "EXPLICIT_REDIS_IDENTITY_PREFIX_REQUIRED",
+      "parent_exit_code": -1,
+      "cloud_requests_at_failure": 0,
+      "raw_child_log": "api-332.stderr.txt inside raw-evidence.zip"
+    },
+    {
+      "command": "taskkill /PID 20144 /T",
+      "exit_code": 128,
+      "error": "non-forced termination returned nonzero; CalledProcessError preserved in tool transcript",
+      "cloud_requests_at_failure": 0
+    },
+    {
+      "command": "start.py while processes.json already exists after failed stop",
+      "exit_code": 1,
+      "error": "AssertionError: processes.json already exists",
+      "raw_log": "start-observed.stdout.txt inside raw-evidence.zip",
+      "cloud_requests_at_failure": 0
+    }
+  ]
+}

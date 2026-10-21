@@ -1,0 +1,967 @@
+{
+  "kind": "actual-loopback-http-postgres-redis-mock-provider-only",
+  "real_provider_calls": 0,
+  "redis_db": 15,
+  "redis_run_id": "fa7bde76dcd020d396902fa924d0ea3e7b26ceb2",
+  "redis_prefix": "qa-entry:20261015:a12655d7-312d-47d8-ac37-623d3c98979e",
+  "history": {
+    "session": "463db96d-3962-4c64-bcc6-a215d140317c",
+    "first_request_id": "6b5c2d67-ba1a-4db0-a56d-6363c2ce7e2b",
+    "second_request_id": "15a96e7b-0863-4ada-b72c-b9c358dfea45",
+    "first_assistant": "5894bddd-6fb7-43c3-90ef-9e29dce2acc1",
+    "second_assistant": "92b7fb58-426d-4572-9650-31304e75a9f4",
+    "message_count": 4,
+    "rewrite_contains_first_round": true,
+    "final_contains_first_round": true,
+    "citation_readback_http": 200,
+    "replay_new_sends": 0
+  },
+  "fallback": [
+    {
+      "case": "default",
+      "session": "908c1e37-fbbc-4f3c-8488-8f153c55645d",
+      "assistant": "a3cd8a3c-5cd6-4cf5-9cc0-d5d77ccbf55b",
+      "content": "Blue widgets use W-17. ",
+      "stream_calls": 2,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+            "query": "What is available in this knowledge base?",
+            "session_id": "908c1e37-fbbc-4f3c-8488-8f153c55645d",
+            "assistant_message_id": "a3cd8a3c-5cd6-4cf5-9cc0-d5d77ccbf55b"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "cheap",
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/1/cheap"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "cheap",
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/1/cheap"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "expensive",
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "answer",
+          "content": "Blue widgets use W-17. ",
+          "done": false,
+          "data": {
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive",
+            "role": "expensive",
+            "finish_reason": "",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive-answer"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "answer",
+          "content": "",
+          "done": true,
+          "data": {
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive",
+            "role": "expensive",
+            "finish_reason": "stop",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive-answer"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "expensive",
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive"
+          }
+        },
+        {
+          "id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive",
+            "role": "expensive",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "model_requested": "deepseek-flash",
+            "model_reported": "deepseek-flash",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 1,
+            "attempts": [
+              {
+                "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "9c4211fd52357472ae1cf87d9c37f0d147bd7b8070f9ca9d977e87235f37ecc6",
+                "prompt_sha256": "9437f03e55c97153c78afbd4d6f054b36b7696b222b10de428bbd12ea84fda96",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "INVALID_HANDLES"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 1,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              },
+              {
+                "attempt_id": "f8e5f91e-9791-43d6-99dc-6dd039ca036d/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "ca8e82d52b9637d6e1a3000f5e991e31c9fa66afa1bf33b74c3d4bcd91cd8ae9",
+                "prompt_sha256": "9437f03e55c97153c78afbd4d6f054b36b7696b222b10de428bbd12ea84fda96",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "INVALID_HANDLES"
+                ],
+                "upgrade_reason": "INVALID_HANDLES",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 1,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              }
+            ],
+            "router": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "unknown"
+              ],
+              "task_anchors": [],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1028,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            }
+          },
+          "usage": {
+            "prompt_tokens": 200,
+            "completion_tokens": 20,
+            "total_tokens": 220,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported"
+          }
+        }
+      ]
+    },
+    {
+      "case": "fixed",
+      "session": "41394efe-7704-41c8-8538-1b4d44a5ba3b",
+      "assistant": "c81c00a4-b94d-4b59-80b5-b65694576def",
+      "content": "FIXED_SOURCE_REPLY",
+      "stream_calls": 0,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+            "query": "What is available in this knowledge base?",
+            "session_id": "41394efe-7704-41c8-8538-1b4d44a5ba3b",
+            "assistant_message_id": "c81c00a4-b94d-4b59-80b5-b65694576def"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "answer",
+          "content": "FIXED_SOURCE_REPLY",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "a94b9181-0979-4222-a280-8e784cf2eab9-fallback"
+          }
+        },
+        {
+          "id": "a94b9181-0979-4222-a280-8e784cf2eab9",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": []
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported"
+          }
+        }
+      ]
+    },
+    {
+      "case": "empty_prompt",
+      "session": "80e00f88-faba-4323-a252-eb61f279fc16",
+      "assistant": "3f11bfe2-9709-4cef-88c0-9f8da49f5ec8",
+      "content": "EMPTY_PROMPT_FIXED",
+      "stream_calls": 0,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+            "query": "What is available in this knowledge base?",
+            "session_id": "80e00f88-faba-4323-a252-eb61f279fc16",
+            "assistant_message_id": "3f11bfe2-9709-4cef-88c0-9f8da49f5ec8"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "answer",
+          "content": "EMPTY_PROMPT_FIXED",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "fcef78d7-3351-4634-a94c-aca91d54ffc0-fallback"
+          }
+        },
+        {
+          "id": "fcef78d7-3351-4634-a94c-aca91d54ffc0",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": []
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported"
+          }
+        }
+      ]
+    },
+    {
+      "case": "unknown_strategy",
+      "session": "472f5bf6-f7d3-49de-a28e-a4a0a4a2af91",
+      "assistant": "13de2fe9-bcaa-45e9-9256-e42ded7d9854",
+      "content": "OTHER_FIXED",
+      "stream_calls": 0,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+            "query": "What is available in this knowledge base?",
+            "session_id": "472f5bf6-f7d3-49de-a28e-a4a0a4a2af91",
+            "assistant_message_id": "13de2fe9-bcaa-45e9-9256-e42ded7d9854"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "answer",
+          "content": "OTHER_FIXED",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "cacb6071-1d45-4aca-a857-17c4768d9a5a-fallback"
+          }
+        },
+        {
+          "id": "cacb6071-1d45-4aca-a857-17c4768d9a5a",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": []
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported"
+          }
+        }
+      ]
+    },
+    {
+      "case": "model",
+      "session": "2f2be3cb-ddea-4b71-acdb-48539b96e09e",
+      "assistant": "1880cf7d-a7b6-4c6d-904a-8bf9e2376e00",
+      "content": "GENERAL_FALLBACK_REPLY",
+      "stream_calls": 1,
+      "port_status": "completed",
+      "events": [
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+            "query": "What is available in this knowledge base?",
+            "session_id": "2f2be3cb-ddea-4b71-acdb-48539b96e09e",
+            "assistant_message_id": "1880cf7d-a7b6-4c6d-904a-8bf9e2376e00"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "cheap",
+            "attempt_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0/answer/1/cheap"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "cheap",
+            "attempt_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0/answer/1/cheap"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "answer",
+          "content": "GENERAL_FALLBACK_REPLY",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "model_requested": "XingChenAGI/Xing4.0-29B",
+            "model_reported": "XingChenAGI/Xing4.0-29B",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 0,
+            "event_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0/answer/1/cheap-answer"
+          },
+          "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 10,
+            "total_tokens": 110,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported"
+          }
+        },
+        {
+          "id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "model_requested": "XingChenAGI/Xing4.0-29B",
+            "model_reported": "XingChenAGI/Xing4.0-29B",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 0,
+            "attempts": [
+              {
+                "attempt_id": "6fda7d2a-1a85-4eae-8e55-20b630aa47b0/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "ec9f1b3e95999d3f99abb87c4c5e67ca540baa0f20d3ba2b0c1295f2c1a3c9c8",
+                "prompt_sha256": "4d1d7a229a107c77e621d7dcf20575969b4c164ed81bce06bf1acb31e6fa31b8",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              }
+            ],
+            "router": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "unknown"
+              ],
+              "task_anchors": [],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 857,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            }
+          },
+          "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 10,
+            "total_tokens": 110,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported"
+          }
+        }
+      ]
+    }
+  ],
+  "private_error": "ORDINARY_CHAIN_FAILED",
+  "budget_error": "ORDINARY_CHAIN_FAILED",
+  "observed_budget_gate_codes": [
+    "MONTHLY_BUDGET_EXCEEDED",
+    "MONTHLY_BUDGET_EXCEEDED"
+  ],
+  "observed_private_gate_code": "MODEL_ORIGIN_KB_EGRESS_DENIED"
+}

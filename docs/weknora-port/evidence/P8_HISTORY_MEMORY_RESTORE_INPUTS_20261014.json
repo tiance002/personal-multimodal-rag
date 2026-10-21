@@ -1,0 +1,51 @@
+{
+  "fixtures": [
+    {
+      "label": "history",
+      "tenant": 104,
+      "subject_id": "fixture-owner:f0a3f784-a0ef-441a-917d-e059620acc9c",
+      "storage_root": "E:\\WK\\run\\8687db5a1018",
+      "counts": {
+        "knowledge_bases": 1,
+        "chunks": 2,
+        "sessions": 4,
+        "messages": 8,
+        "knowledges": 1,
+        "port_turns": 4,
+        "send_calls": 27,
+        "models": 5,
+        "generation_runs": 4,
+        "generation_attempts": 4,
+        "port_model_configuration": 1
+      },
+      "source_case": "existing closed mock fixture; no regeneration",
+      "real_provider_calls": 0
+    },
+    {
+      "label": "memory-active",
+      "tenant": 110,
+      "subject_id": "fixture-owner:e55e953c-01a6-426d-bf47-b56d8d41adf6",
+      "storage_root": "E:\\WK\\run\\2f8e876438a0",
+      "counts": {
+        "memory_subjects": 1,
+        "memory_items": 2,
+        "port_model_configuration": 1
+      },
+      "source_case": "existing closed mock fixture; no regeneration",
+      "real_provider_calls": 0
+    },
+    {
+      "label": "memory-forgotten",
+      "tenant": 111,
+      "subject_id": "fixture-owner:9a50a75c-27d6-45da-a2e8-74a3698d9077",
+      "storage_root": "E:\\WK\\run\\7914d9d56e22",
+      "counts": {
+        "memory_tombstones": 2,
+        "memory_subjects": 1,
+        "port_model_configuration": 1
+      },
+      "source_case": "existing closed mock fixture; no regeneration",
+      "real_provider_calls": 0
+    }
+  ]
+}

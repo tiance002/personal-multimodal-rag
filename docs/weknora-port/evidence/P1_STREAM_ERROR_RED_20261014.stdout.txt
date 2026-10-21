@@ -1,0 +1,57 @@
+FF.....F                                                                 [100%]
+================================== FAILURES ===================================
+____ test_generic_error_does_not_drop_subsequent_answer_or_reopen_thinking ____
+tests\weknora_port\test_stream_error_continuation.py:15: in test_generic_error_does_not_drop_subsequent_answer_or_reopen_thinking
+    out=run(co.run(request('CHEAP_ONLY'),CTX))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:283: in run
+    raise error
+backend\weknora_port\generation\coordinator.py:138: in _attempt
+    raise GenerationError(code if isinstance(code, str) else 'PROVIDER_STREAM_FAILED', sent=True)
+E   backend.weknora_port.generation.types.GenerationError: PROVIDER_RESPONSE_INVALID
+_____ test_generic_error_eof_flushes_held_tail_without_success_or_upgrade _____
+tests\weknora_port\test_stream_error_continuation.py:32: in test_generic_error_eof_flushes_held_tail_without_success_or_upgrade
+    assert ''.join(x.content for x in store.events if x.type=='thinking')=='thought re'
+E   AssertionError: assert 'thought ' == 'thought re'
+E     
+E     - thought re
+E     ?         --
+E     + thought
+_____ test_buffered_cheap_recovered_error_only_publishes_selected_attempt _____
+tests\weknora_port\test_stream_error_continuation.py:48: in test_buffered_cheap_recovered_error_only_publishes_selected_attempt
+    out=run(co.run(request(),CTX))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:283: in run
+    raise error
+backend\weknora_port\generation\coordinator.py:138: in _attempt
+    raise GenerationError(code if isinstance(code, str) else 'PROVIDER_STREAM_FAILED', sent=True)
+E   backend.weknora_port.generation.types.GenerationError: PROVIDER_STREAM_FAILED
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_stream_error_continuation.py::test_generic_error_does_not_drop_subsequent_answer_or_reopen_thinking
+FAILED tests/weknora_port/test_stream_error_continuation.py::test_generic_error_eof_flushes_held_tail_without_success_or_upgrade
+FAILED tests/weknora_port/test_stream_error_continuation.py::test_buffered_cheap_recovered_error_only_publishes_selected_attempt
+3 failed, 5 passed in 0.93s

@@ -1,0 +1,45 @@
+[codex/weknora-python-port-integrate-image-20261014 0e772b0] fix(port): gate local Ollama lifecycle and require persisted success for memory
+ Date: Thu Oct 15 10:08:45 2026 +0800
+ 50 files changed, 2389 insertions(+), 216 deletions(-)
+ create mode 100644 docs/weknora-port/LOCAL_SAFE_RUNTIME_20261015.md
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/authorized.final.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/authorized.final.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/authorized.final.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/closed.final.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/closed.final.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/closed.final.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/controlled.initial.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/controlled.initial.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/controlled.initial.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/deepseek-working.patch
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/deepseek_AUTO_QUEUE.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/final-run.inputs.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local.final.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local.final.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local.final.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local.retry.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local.retry.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local.retry.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/local_ollama.py
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/ollama-readonly.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/protection.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/protection.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/protection.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/provider.py
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/receipt.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/redis-identity.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/remote.final.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/remote.final.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/remote.final.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime-failed-object.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime-failed-remember.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime-success.json
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime.bound.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime.bound.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime.bound.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime.initial.exitcode.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime.initial.junit.xml
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/runtime.initial.stdout.txt
+ create mode 100644 docs/weknora-port/evidence/LOCAL_TAKEOVER_20261015/snapshot.json
+ create mode 100644 tests/weknora_port/test_local_controlled.py
+ create mode 100644 tests/weknora_port/test_local_runtime_pg.py

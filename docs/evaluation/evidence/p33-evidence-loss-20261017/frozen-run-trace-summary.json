@@ -1,0 +1,1952 @@
+{
+  "schema": "p33-evidence-loss-diagnosis/v1",
+  "status": "P33_COMPLETE_DIAG_ONLY",
+  "baseline_sha": "0a956fa6540177fd1d42904ae528d81dc3424739",
+  "fixed_upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "source_tree_sha": "same as baseline before P33; no production files changed",
+  "real_provider_calls_this_task": 0,
+  "new_token_usage": 0,
+  "database_write_count": 0,
+  "database_provider_calls": 0,
+  "postgres_evidence": "docs/evaluation/evidence/p33-evidence-loss-20261017/omni-db-readonly.json",
+  "postgres_system_identifier": "7696088403504697382",
+  "p32_sources": {
+    "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\evaluation\\P32_BROWSER_AND_SIX_DATASET_RAG.md": "c42f7590403f8488b9a815a4a2053a9061d32c606aae66755cc71c2f7c81fa27",
+    "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\evaluation\\P32_BROWSER_AND_SIX_DATASET_RAG.results.json": "ce1c914e423a8a9b21d52a00e97b6b10e12862ad65fdd183689a871ce014b1dd",
+    "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\evaluation\\evidence\\p32-browser-six-dataset-20261017\\raw-evidence.zip": "536d32504591e67699c59ff574d1758b032346154e2ea519ca6bb77abb042d88"
+  },
+  "fixed_upstream_archive": {
+    "owner_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "archive_path": "E:\\WK\\go-linux\\source-3e8b0bfc.tar",
+    "archive_sha256": "2dcc5f18f9442058c5e1a4f1f4c09c0b6cf795879f9fa83977fa74573008f21e",
+    "git_metadata": "not present in loose Go directory; archive content checked; six target file hashes recorded",
+    "source_file_sha256": {
+      "internal/application/service/chat_pipeline/rerank.go": "fe89172323f4368b31de950a7fd8ac1a4abbd7cf4833e4feff6b73a4758b16e0",
+      "internal/application/service/chat_pipeline/merge.go": "6e9d7c4ed6d7c37f700a7f3a031d04a89c6242b829f26b46c55efdbaed1c0bfe",
+      "internal/application/service/chat_pipeline/merge_expand.go": "dbaba0f90d210b9d69031774ecee74890f6156774ccad8fd58c57beb69250512",
+      "internal/application/service/chat_pipeline/filter_top_k.go": "6247b843499705862c95c3e193e745796044fee86f5607b854c8a1b7175b2cb4",
+      "internal/application/service/chat_pipeline/into_chat_message.go": "fb63f0b6707adb15e5748ce9f493a84183e27731c7adbe86966990b9b87bdd3b",
+      "internal/application/service/knowledgebase_search_results.go": "e4240be3377b8bd9766c2dbdb4679283455391a67317ebd10cab119d868b89b0"
+    }
+  },
+  "cases": [
+    {
+      "case_id": "mml-0434",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "run_id": "ba4ebadf-12cf-4c38-a30a-576c24fadf57",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "gold": [
+        "Cat vs Dog dataset"
+      ],
+      "diagnostic_expected": null,
+      "gold_metric_status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+      "answer": "根据知识库中的文档信息，我无法直接获取该 PPT 中\"coding time\"部分的具体内容。知识库中仅包含以下两份文档：\n\n1. **catvsdogdlpycon15se-150512122612-lva1-app6891_95** — 2015 PYCON 深度学习与深度数据科学演示文稿\n2. **b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95** — 物理复习指南（涵盖能量概念）\n\n这两份文档与\"coding time\"部分介绍训练数据集的内容没有直接关联。\n\n**建议：** 请提供该 PPT 的具体文件名或链接，我可以尝试检索其中的内容来回答你的问题。",
+      "answer_support_status": "absent",
+      "necessary_answer_facts_in_context": false,
+      "query": {
+        "original_question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+        "rewrite_model_request_id": "ba4ebadf-12cf-4c38-a30a-576c24fadf57/query_rewrite",
+        "rewrite_request_sha256": "6f4b4ee52c9b23e1ee8e616f3d4ba7f5025228ed125b4b62ac2879d68a526562",
+        "rewrite_response_text_saved": false,
+        "actual_embedding_texts": [
+          "PPT中'coding time'部分介绍的训练数据集是什么"
+        ],
+        "actual_rerank_query": "PPT中'coding time'部分介绍的训练数据集是什么",
+        "local_query_expansion_inputs_and_hits": "UNKNOWN_NOT_CAPTURED; P32 did not save local expand_queries variants or per-variant search hits. Do not infer from final candidate count.",
+        "embedding_text_equals_rerank_query": true,
+        "actual_rewrite_provenance": "The exact text is preserved in the Embedding and Rerank outbound request bodies. The Query Rewrite provider response itself was not saved."
+      },
+      "search": {
+        "candidate_count": 30,
+        "ranked_candidates": [
+          {
+            "rank": 1,
+            "id": "185b43ce-578a-4f03-ac75-548ed2fe71bb",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 37,
+            "chunk_type": "text",
+            "score": 0.014878819810326658,
+            "content_chars": 507,
+            "content_sha256": "d3286eb9827796b97530aa38a09f769260b6cafd16a68afd4d227c2e6046f871"
+          },
+          {
+            "rank": 2,
+            "id": "32a4d9f4-4e5d-4f4f-bf4f-451ab3156d44",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 38,
+            "chunk_type": "text",
+            "score": 0.01463330457290768,
+            "content_chars": 505,
+            "content_sha256": "d6b23b9454b1f0c2b7516df85316289985efdd487b623ea81a2e76171f9e1cae"
+          },
+          {
+            "rank": 3,
+            "id": "ffba759e-aaea-4d67-949b-e635307ba0f0",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 30,
+            "chunk_type": "text",
+            "score": 0.014091586001489203,
+            "content_chars": 699,
+            "content_sha256": "1914d0cac16573c7e4fa830add02b3d7216ee23db78edb17af643a23753a71cc"
+          },
+          {
+            "rank": 4,
+            "id": "08347472-4700-49fe-99f9-799ab56dba44",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 46,
+            "chunk_type": "text",
+            "score": 0.01375,
+            "content_chars": 382,
+            "content_sha256": "72a2417fad16ce671ca39eea411e496c9aedebc1abaeef8282bc5e5862a0ee26"
+          },
+          {
+            "rank": 5,
+            "id": "791e865f-ee8f-4a78-b5dc-e0fbb60ac3b8",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 20,
+            "chunk_type": "text",
+            "score": 0.013615903975993998,
+            "content_chars": 511,
+            "content_sha256": "7a19c26f7c804d85463c276e93d2ce797c691680945e1813e657db26af00746d"
+          },
+          {
+            "rank": 6,
+            "id": "13ad4173-e4dd-47a6-9327-2d867a164604",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 43,
+            "chunk_type": "text",
+            "score": 0.013272444617178391,
+            "content_chars": 416,
+            "content_sha256": "286f90c8d6a231c7b060e967e71c5018f0c06f2ca3c9e5263cced79a16467ca4"
+          },
+          {
+            "rank": 7,
+            "id": "9e8e0eaf-f85c-4bcf-af30-6d2edc9658a0",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 34,
+            "chunk_type": "text",
+            "score": 0.013209013209013208,
+            "content_chars": 439,
+            "content_sha256": "1cc643353993a24ca05cb44c4f812d7906c1c6c934c84a2c7f185de547c74590"
+          },
+          {
+            "rank": 8,
+            "id": "a29849a1-0821-45d7-9566-e0a519c16a9f",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 35,
+            "chunk_type": "text",
+            "score": 0.013095773381294962,
+            "content_chars": 435,
+            "content_sha256": "2c13e712a42b4e941160717909476a7245532889c50fb126d09bc28d492dc9fd"
+          },
+          {
+            "rank": 9,
+            "id": "6713446e-404d-585b-aa1d-e2e82849d6e4",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 52,
+            "chunk_type": "summary",
+            "score": 0.013029542920847268,
+            "content_chars": 588,
+            "content_sha256": "0e472c32eea4ceca31521d117b41d966ce5de565456963fafd641646e51627cc"
+          },
+          {
+            "rank": 10,
+            "id": "8e07f79d-db45-4890-84a2-adae11f597e4",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 33,
+            "chunk_type": "text",
+            "score": 0.012913752913752912,
+            "content_chars": 424,
+            "content_sha256": "f37d3399486840de5440fda5fcf01cce33cb4276e580dca59208e14d649dfb56"
+          },
+          {
+            "rank": 11,
+            "id": "5baeaadf-76b7-420f-9611-9d17f458dcd7",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 27,
+            "chunk_type": "text",
+            "score": 0.012849910661107801,
+            "content_chars": 475,
+            "content_sha256": "258182469e871efbadc7ab8470abea34b3866a542d028f4a712f9a93135f5b85"
+          },
+          {
+            "rank": 12,
+            "id": "1db271e2-56d1-4964-b8a5-b56c85cd8e05",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 48,
+            "chunk_type": "text",
+            "score": 0.012761937478529713,
+            "content_chars": 497,
+            "content_sha256": "4e783d4458b14f1e124271cbb07b79b5fbb7133ae730b9b5bece8688adf18b23"
+          },
+          {
+            "rank": 13,
+            "id": "99d09e05-cbf4-4051-9afd-b14b9b898906",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 26,
+            "chunk_type": "text",
+            "score": 0.012686567164179104,
+            "content_chars": 505,
+            "content_sha256": "99131dfe519ec0b41fa114d5d74026659957ff0fb3331073f3456714c38d6603"
+          },
+          {
+            "rank": 14,
+            "id": "237a93ce-1565-4548-bc11-02e63ab37937",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 5,
+            "chunk_type": "text",
+            "score": 0.012586427656850191,
+            "content_chars": 472,
+            "content_sha256": "a93da433eafb8db44d1d76f19827d32249d1c13b79702839faee0cb38b475288"
+          },
+          {
+            "rank": 15,
+            "id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 17,
+            "chunk_type": "text",
+            "score": 0.012425249169435215,
+            "content_chars": 468,
+            "content_sha256": "0c4fd9e4e9b40deb0d8221997d4d6083790ce40bf7c08737524faea0b157ba5b"
+          },
+          {
+            "rank": 16,
+            "id": "03ded062-5230-49ea-a20e-182d67e3a552",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 28,
+            "chunk_type": "text",
+            "score": 0.01242263483642794,
+            "content_chars": 504,
+            "content_sha256": "8344a6fe918751f523ccb777658ac5933632cbf66f36b7015d27b7d1068d418f"
+          },
+          {
+            "rank": 17,
+            "id": "3c362d81-e6ae-4502-8b6c-406df0cc4b92",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.012086565945283788,
+            "content_chars": 501,
+            "content_sha256": "f758a1e690b4cd28fb03021e44a2f7afcb6dd1da5fea6bcb150716dc350ff899"
+          },
+          {
+            "rank": 18,
+            "id": "fd940fce-1051-45d3-94b9-76ead14eaea0",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 32,
+            "chunk_type": "text",
+            "score": 0.011993345432546884,
+            "content_chars": 512,
+            "content_sha256": "0232453673897ecc5c6b7cf7cfa82863faa981847041dc8578a9d3af91cdd1b1"
+          },
+          {
+            "rank": 19,
+            "id": "42561e56-985e-4c8b-8fa3-a0987b77692f",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 31,
+            "chunk_type": "text",
+            "score": 0.011954545454545454,
+            "content_chars": 205,
+            "content_sha256": "7cb7b463a4f7f4bd28075a559912ca28022ce78e2c4a5d199ae1be9a756f978c"
+          },
+          {
+            "rank": 20,
+            "id": "bace4362-0c2f-401c-961d-252d00abb1d9",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.011944444444444445,
+            "content_chars": 509,
+            "content_sha256": "9ec3de58c744231fcdfd63e56f088cd8a05ea8218d42e69c4fbdf4f395b9ffa3"
+          },
+          {
+            "rank": 21,
+            "id": "69ed84c3-7c2b-4455-97ae-c8d3c5beca79",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 4,
+            "chunk_type": "text",
+            "score": 0.011859459459459458,
+            "content_chars": 509,
+            "content_sha256": "1afc473a2580af677b2e33ea3f622e2d079e6401a5f9472e0524410cda951055"
+          },
+          {
+            "rank": 22,
+            "id": "7f8c91bf-46e2-428a-9683-56123d08f414",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 36,
+            "chunk_type": "text",
+            "score": 0.011831879460745438,
+            "content_chars": 718,
+            "content_sha256": "3a1e84f42f63658eff5358a4e9495e9a84ae314f94265f0bfc58613636c8050b"
+          },
+          {
+            "rank": 23,
+            "id": "17f6acb9-72d7-4ad4-a8bf-de006e9db163",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 29,
+            "chunk_type": "text",
+            "score": 0.011695538057742781,
+            "content_chars": 255,
+            "content_sha256": "a1f09266ecda04e094fd0551ab27755e9c536b44be0c5f429a8adfe32430fee4"
+          },
+          {
+            "rank": 24,
+            "id": "7e9e04eb-e1f8-44ad-9d70-4e12027df1cf",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 42,
+            "chunk_type": "text",
+            "score": 0.011545454545454545,
+            "content_chars": 494,
+            "content_sha256": "480726ad295e19c71b3246f969d9517d0689db4fc42e59497e9f37056dd58a06"
+          },
+          {
+            "rank": 25,
+            "id": "0ea1d8ed-920b-4efa-8795-e4ec3782f818",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 7,
+            "chunk_type": "text",
+            "score": 0.011504799548277808,
+            "content_chars": 259,
+            "content_sha256": "73327ac19217379d4f57ad10600ee12b460a085822604392119400a0ab702abc"
+          },
+          {
+            "rank": 26,
+            "id": "40f1a43f-6480-40ce-a6fd-cd428fe5e6e2",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 44,
+            "chunk_type": "text",
+            "score": 0.011483616504854369,
+            "content_chars": 501,
+            "content_sha256": "095551cc8705770a79b7ee5a8130fe544704b259e5cd008e31e0e036db473cd6"
+          },
+          {
+            "rank": 27,
+            "id": "bbe06dfe-8061-405e-88ad-6f9596312f16",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 13,
+            "chunk_type": "text",
+            "score": 0.011266149870801033,
+            "content_chars": 460,
+            "content_sha256": "fd289459d1c9672fae2a5cb764133829d185e5b7cf10a75a2633901b08baa5a6"
+          },
+          {
+            "rank": 28,
+            "id": "dd85ab7d-0b49-4961-ab95-e1ae315e8641",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 39,
+            "chunk_type": "text",
+            "score": 0.011251342642320085,
+            "content_chars": 179,
+            "content_sha256": "8f4349db5426248f5dea199edf9244170cd1341c923309019d9abc9197b0a79a"
+          },
+          {
+            "rank": 29,
+            "id": "9d2e8908-2dd1-4f14-bb59-e09c1b930e7d",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 50,
+            "chunk_type": "text",
+            "score": 0.011145703611457036,
+            "content_chars": 493,
+            "content_sha256": "73b4d552713b0f248e979ec82ac231fb9995fd8492e84445b3bdf41c4c777785"
+          },
+          {
+            "rank": 30,
+            "id": "c2b66e8d-d5f2-45cd-8f39-842d13256be9",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 14,
+            "chunk_type": "text",
+            "score": 0.011097359735973596,
+            "content_chars": 491,
+            "content_sha256": "973a353a3ef0f381d1a24f8e79c30de6f16faacaa1eff10ef0ff04820a47e4c1"
+          }
+        ],
+        "required_candidate": {
+          "id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+          "rank": 15,
+          "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+          "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+          "chunk_type": "text",
+          "score": 0.012425249169435215,
+          "source_version": "03f5a072-4021-4aca-9233-2dca910614f2",
+          "content": "Audio Recognition\n\n(chart by Clarifai)\n\nImage Recognition\n\n(chart by Clarifai)\n\nNatural Langauge Processing\n\n8\n\nNatural Langauge Processing\n\ncloudy days don't last forever.\n\nchibird\n\nDL? How?\n\nalmost at the code...\n\nDeep neural networks learn hierarchicalfeature representations\n\n(picture by Dato)\n\nKaggle's Cat vs Dog dataset (25k dog/cat pictures)\n\n(picture by Dato)\n\nDashboard\n\nCompetition Details » Get the Data » Make a submission\n\nHome\n\nData\n\nMake a submission\n\n",
+          "content_sha256": "0c4fd9e4e9b40deb0d8221997d4d6083790ce40bf7c08737524faea0b157ba5b"
+        }
+      },
+      "rerank": {
+        "request_id": "ba4ebadf-12cf-4c38-a30a-576c24fadf57/rerank",
+        "request_wire_sha256": "8c730c5e6dd03f3c18b5a460861d43ebd1a1b477326bb906ca36fbfd8e401fe9",
+        "request_status": 200,
+        "request_state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+        "input_count": 30,
+        "required_candidate_provider_input_indices": [
+          {
+            "index": 14,
+            "mapping_basis": "P32 Search candidate rank minus one; Search count equals request documents count (30) and exact candidate text was present at this index",
+            "text_sha256": "b8915ee85efae2292adf79a2058a1416469f6616b351d34bd23b5445be6e1324",
+            "text_chars": 466,
+            "required_phrase_present": true,
+            "required_phrase": "Kaggle's Cat vs Dog dataset",
+            "contains_search_chunk_content": true,
+            "snippet": "Audio Recognition\n\n(chart by Clarifai)\n\nImage Recognition\n\n(chart by Clarifai)\n\nNatural Langauge Processing\n\n8\n\nNatural Langauge Processing\n\ncloudy days don't last forever.\n\nchibird\n\nDL? How?\n\nalmost at the code...\n\nDeep neural networks learn hierarchicalfeature representations\n\n(picture by Dato)\n\nKaggle's Cat vs Dog dataset (25k dog/cat pictures)\n\n(picture by Dato)\n\nDashboard\n\nCompetition Details » Get the Data » Make a submission\n\nHome\n\nData\n\nMake a submission"
+          }
+        ],
+        "selected_count_in_stage": 0,
+        "selected_results": [],
+        "target_raw_score": "UNKNOWN_NOT_SAVED",
+        "raw_response_body_saved": false,
+        "rerank_scored_results_per_call": null,
+        "stage_present": false,
+        "other_keyword_hits_not_id_mapped": "Excluded from target mapping; generic term matches in unrelated passages do not identify the required Search chunk."
+      },
+      "merge": {
+        "stage_present": false,
+        "input_ids": [],
+        "output_ids": [],
+        "output_count": 0,
+        "results": [],
+        "target_retained": false
+      },
+      "top_k_context": {
+        "standalone_top_k_snapshot_saved": false,
+        "context_stage_ids": [],
+        "captured_result_ids": [],
+        "rendered_context_chars": 0,
+        "rendered_context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "final_provider_user_chars": 30,
+        "final_provider_user_sha256": "d0a4927601a2c840c04dca8ebc27a46c607927683f8ec32f1ca205568f52f9ae",
+        "target_terms_in_final_user": {
+          "Kaggle": false,
+          "Cat vs Dog": false
+        },
+        "target_id_in_context": false,
+        "p32_prepared_roles_and_content_match_wire": true,
+        "captured_context_and_wire_checked": "Exact roles/content equality comes from P32 final-verification.json. context.user_content is a component before the answer adapter adds its source-data envelope, so its standalone SHA is not expected to equal the full wire user message."
+      },
+      "provider_final_answer": {
+        "request_id": "ba4ebadf-12cf-4c38-a30a-576c24fadf57/answer/1/cheap",
+        "wire_sha256": "d78e9bf7a0d98699a720ed40bc6696a304ad6a9f8dc566441a514e266b13d5f2",
+        "status": 200,
+        "model": "XingChenAGI/Xing4.0-29B",
+        "finish_reason": "stop"
+      },
+      "artifact_paths": {
+        "stage": "E:\\WK\\run\\p32-20261017\\evidence-332\\stages\\95849d53ad8c137fc1c5be6c52af2d7846e5dc63bc20e86e800ee009fb39fca2.json",
+        "capture": "E:\\WK\\run\\p32-20261017\\evidence-332\\captures\\95849d53ad8c137fc1c5be6c52af2d7846e5dc63bc20e86e800ee009fb39fca2.json",
+        "rerank_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\2fa8a03461a516885e02f9ece3a7ce7309d9700f9af329a23249b8f359f761bf.json",
+        "answer_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\acd11dac412079b13ab6caf18970eada2a1ef74764bad2b0a30c8d8303c7b7d6.json",
+        "embedding_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\d78431487b5c89f15bb687d825a1346832982ebc7dc6c4b408aefbce2eaf15ee.json"
+      }
+    },
+    {
+      "case_id": "hotpot-5a7631",
+      "qid": "5a7631cd5542994ccc91870c",
+      "run_id": "02074de1-c0a0-4df7-9ae2-5c62b7ff5586",
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "gold": [
+        "Franconia, New Hampshire"
+      ],
+      "diagnostic_expected": null,
+      "gold_metric_status": "COMPUTED_ANSWER_DIAGNOSTICS",
+      "answer": "Jeanne Marie Beaumont directed the **The Frost Place Advanced Seminar** from 2007–2010. The seminar is located at **The Frost Place**, which is a New England literary center based in **Portland, Maine**.",
+      "answer_support_status": "partial_wrong_target",
+      "necessary_answer_facts_in_context": false,
+      "query": {
+        "original_question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+        "rewrite_model_request_id": "02074de1-c0a0-4df7-9ae2-5c62b7ff5586/query_rewrite",
+        "rewrite_request_sha256": "11e97ea769e30cb132e064c5b740e9549c4b590bbf3ebe3c16b6052c12f171ea",
+        "rewrite_response_text_saved": false,
+        "actual_embedding_texts": [
+          "Jeanne Marie Beaumont 2007-2010 研讨会 举办地点"
+        ],
+        "actual_rerank_query": "Jeanne Marie Beaumont 2007-2010 研讨会 举办地点",
+        "local_query_expansion_inputs_and_hits": "UNKNOWN_NOT_CAPTURED; P32 did not save local expand_queries variants or per-variant search hits. Do not infer from final candidate count.",
+        "embedding_text_equals_rerank_query": true,
+        "actual_rewrite_provenance": "The exact text is preserved in the Embedding and Rerank outbound request bodies. The Query Rewrite provider response itself was not saved."
+      },
+      "search": {
+        "candidate_count": 30,
+        "ranked_candidates": [
+          {
+            "rank": 1,
+            "id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 2,
+            "chunk_type": "text",
+            "score": 0.016162909836065574,
+            "content_chars": 486,
+            "content_sha256": "0e20687d67f3e302d2a7c26e0efd7483fc23f9625574d88edce6fc384ee3e8f9"
+          },
+          {
+            "rank": 2,
+            "id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.016129032258064516,
+            "content_chars": 284,
+            "content_sha256": "a9049c40296f85bdd2d933a350f9c3342a25be5b6687cc4db7866da5e21fdac9"
+          },
+          {
+            "rank": 3,
+            "id": "fee4d31b-8589-5875-992e-4630fec57b3e",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 4,
+            "chunk_type": "summary",
+            "score": 0.016029143897996354,
+            "content_chars": 893,
+            "content_sha256": "9dfaee701f08af9b8d91c9d7ec0811b917eec4b7531f0441917de206b80c90a2"
+          },
+          {
+            "rank": 4,
+            "id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 3,
+            "chunk_type": "text",
+            "score": 0.015552884615384614,
+            "content_chars": 311,
+            "content_sha256": "c007ac58aabc8a30ff0943bfcf278f72215b00ea09cb577d38779bb994d27654"
+          },
+          {
+            "rank": 5,
+            "id": "c4492186-cfbe-5506-8458-95b710705447",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "0819c30b-64ea-4074-81bc-09b9bf54be10",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.01553113553113553,
+            "content_chars": 182,
+            "content_sha256": "489726cd7178729fa1af335c652ceb6fbb5e0d4933720f0b84dd0022405d101a"
+          },
+          {
+            "rank": 6,
+            "id": "ab2aa381-04e4-4948-8d6b-35f214998e12",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "0819c30b-64ea-4074-81bc-09b9bf54be10",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.015017825311942958,
+            "content_chars": 291,
+            "content_sha256": "2c9a777c09d45952ce255a96df2e9237c5153997514e31d7a67a0a6cc415ffa4"
+          },
+          {
+            "rank": 7,
+            "id": "2f9f3444-4a28-437b-a396-766338fb738d",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "7095035e-c5eb-4f9e-a2bd-46d15e00fc97",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.014492753623188404,
+            "content_chars": 443,
+            "content_sha256": "bc9edb2b558c0b2a332145deb2587d0e85e6d578bfb82a9b37c0715e4e40bc74"
+          },
+          {
+            "rank": 8,
+            "id": "025578be-9e8b-5292-9241-0c7dcc3e0a5f",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "7095035e-c5eb-4f9e-a2bd-46d15e00fc97",
+            "chunk_index": 2,
+            "chunk_type": "summary",
+            "score": 0.014477611940298507,
+            "content_chars": 537,
+            "content_sha256": "50910396cf91272bd45210d4691a60d83e7561c7028ac0ed2a4edac96567dd0d"
+          },
+          {
+            "rank": 9,
+            "id": "c5a37cee-1d94-5809-b343-4f2285463a60",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "73fe3f83-3fbc-41a1-8512-188190f13e33",
+            "chunk_index": 2,
+            "chunk_type": "summary",
+            "score": 0.013755980861244018,
+            "content_chars": 455,
+            "content_sha256": "474c232341eea269575b048377d528c842f85029722050a699eac9b087626f50"
+          },
+          {
+            "rank": 10,
+            "id": "c44c0676-5cd3-4e45-bd04-1edb03d837ae",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "73ea918d-bbdf-4a8e-ad9c-065101af492f",
+            "chunk_index": 2,
+            "chunk_type": "text",
+            "score": 0.013643095149944464,
+            "content_chars": 477,
+            "content_sha256": "dd8fc9fdfc9d0687fb994f324642585dd569a0a1c65edac6822a2ea5f72a6855"
+          },
+          {
+            "rank": 11,
+            "id": "3966da48-dab5-5220-8594-f16bfbfdfc80",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.013386901152213462,
+            "content_chars": 297,
+            "content_sha256": "37b38b68a8d134d2d79319330622a93c2acea1a0292c129e74fdc8b94c0a108e"
+          },
+          {
+            "rank": 12,
+            "id": "012d7ead-19c0-49bc-8a66-fdf9e89359e3",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.013293650793650793,
+            "content_chars": 442,
+            "content_sha256": "b2b2865b529b3acbc2eac6265c4136e3b93adb32ab6144392ba738d3f7b8c421"
+          },
+          {
+            "rank": 13,
+            "id": "f7800189-f7d3-4335-b1ac-6ded9ac04c16",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "7095035e-c5eb-4f9e-a2bd-46d15e00fc97",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.013229437229437228,
+            "content_chars": 131,
+            "content_sha256": "6229c53764f80091da7d0a0314d1cf45bff254322b2afd8dae9d216f9ffd0163"
+          },
+          {
+            "rank": 14,
+            "id": "1ff1b01d-4389-5206-8e97-62a8c7322e17",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "158f44a7-5815-48df-bac7-5138a31b456d",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.01319971108703503,
+            "content_chars": 382,
+            "content_sha256": "274bfc6ffe087e5964f5c70604cf5c2dabde260e8de1ae502be91905e3cf7270"
+          },
+          {
+            "rank": 15,
+            "id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.013126332622601277,
+            "content_chars": 153,
+            "content_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812"
+          },
+          {
+            "rank": 16,
+            "id": "dc76eef9-f73c-493a-ac49-4cfa32e802d6",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "73fe3f83-3fbc-41a1-8512-188190f13e33",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.012927689594356261,
+            "content_chars": 465,
+            "content_sha256": "2114be5876bbe5b54d7b0049220f38eac0bb8a49bdcdc4e30001e0d87ce87369"
+          },
+          {
+            "rank": 17,
+            "id": "b01b1ba9-48db-43ef-9f0e-85b150e8cac6",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "c1042286-e1f5-4727-8469-bb58f5eb9da5",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.012808127914723516,
+            "content_chars": 341,
+            "content_sha256": "b83d234b12a726468cc79cf1ea08878f4172b44b258ebff6fce011a82d62ce9a"
+          },
+          {
+            "rank": 18,
+            "id": "02b53bb6-34d0-4f26-836c-22ebdc156cf7",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.01272032902467685,
+            "content_chars": 412,
+            "content_sha256": "3add67bb0e7aabcebcfe988985bedde1ef772eeef742d57dd5439ff9f88b1bf1"
+          },
+          {
+            "rank": 19,
+            "id": "2cae1171-3ca0-4d2a-8f33-1f148fe211e5",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "73fe3f83-3fbc-41a1-8512-188190f13e33",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.012596153846153845,
+            "content_chars": 176,
+            "content_sha256": "892306b1f9af78975bfd5505aa83369fb5c07f3f3b7b1be9102999f02bae9070"
+          },
+          {
+            "rank": 20,
+            "id": "77a63178-2dde-4a9f-9257-35a7daba3535",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "73ea918d-bbdf-4a8e-ad9c-065101af492f",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.012561857632280167,
+            "content_chars": 153,
+            "content_sha256": "f9b5b7279d8a59dc68c6abb8a0486160d635a36d4db4199958d417fc374b2321"
+          },
+          {
+            "rank": 21,
+            "id": "6738bf5c-0787-57f7-8b5f-5d0fb1b69121",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "c1042286-e1f5-4727-8469-bb58f5eb9da5",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.011985294117647058,
+            "content_chars": 363,
+            "content_sha256": "2978b771e4260cb35693f25efa4081c509b57c85cacabe9289191797d10b6ca8"
+          },
+          {
+            "rank": 22,
+            "id": "51d4dc1b-f722-4fd6-8e04-040605286752",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "158f44a7-5815-48df-bac7-5138a31b456d",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.011843238587424634,
+            "content_chars": 353,
+            "content_sha256": "aa6f4afcee3810a5a120e351b091559ce21aa308138c1dc0a444a20daee4ee2a"
+          },
+          {
+            "rank": 23,
+            "id": "0dbba904-45e0-5b5a-9e7b-6d9e7092347d",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+            "chunk_index": 2,
+            "chunk_type": "summary",
+            "score": 0.011833288662556955,
+            "content_chars": 612,
+            "content_sha256": "e617e79d9281523394c9bb7555e4542c6e8de92f1e24a7a9a07d398cd1388865"
+          },
+          {
+            "rank": 24,
+            "id": "2a95d110-78f3-49e3-ad76-1f6582b7496c",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "60de9db0-996d-4348-aba7-af0ed176b98e",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.011636470761525998,
+            "content_chars": 476,
+            "content_sha256": "9057f8f462ca97a81f7377cefc44c9783ba8c0c8bccc8bd7c41d58d88d4b3c4e"
+          },
+          {
+            "rank": 25,
+            "id": "b548d48f-7bc5-5849-9f07-4c72dd4a594a",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "35a50ce3-5f0a-449e-939c-318294480751",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.011611917494270435,
+            "content_chars": 160,
+            "content_sha256": "85cf0161c96edf1b8f2dc3c9585643b133e509a81e0e1d488330412cfe96c1de"
+          },
+          {
+            "rank": 26,
+            "id": "ffd035d9-4c47-52da-b057-b0fab55a8d07",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.011575246132208157,
+            "content_chars": 367,
+            "content_sha256": "49d0136d84086c1face8133e5e91ed92bdb274f70bac7702401771c09142f7c0"
+          },
+          {
+            "rank": 27,
+            "id": "4ed2f837-f7ad-483b-8914-f4a0fd8ce15c",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "7998e6f2-704d-4ea7-af95-13b09b290086",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.011446808510638298,
+            "content_chars": 350,
+            "content_sha256": "3f171037fd2462da2507fdf4813bee06b87e3291d346b63191ddd55266ff049c"
+          },
+          {
+            "rank": 28,
+            "id": "ed5d885c-ba8c-5e24-b4f5-7794231e2d37",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.011287878787878788,
+            "content_chars": 378,
+            "content_sha256": "59715346cb8b28476c97acff5ec10bcfe3269e9cc17845bd73c74f142a1fd6ea"
+          },
+          {
+            "rank": 29,
+            "id": "c7df42db-cc48-4c54-beb1-75adcba4dd4b",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.011263923619004319,
+            "content_chars": 366,
+            "content_sha256": "487818d089c8b92d53e892b951fe598dac2d0dc76e741053a93bfee592217105"
+          },
+          {
+            "rank": 30,
+            "id": "590cbdc6-a1f1-50f1-87a4-60c95d11444c",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "60de9db0-996d-4348-aba7-af0ed176b98e",
+            "chunk_index": 2,
+            "chunk_type": "summary",
+            "score": 0.011029411764705881,
+            "content_chars": 542,
+            "content_sha256": "f7dd9b0db144e7babca93a18ef2bcdc12fbba640b8f685bb9ab82c4b77892021"
+          }
+        ],
+        "required_candidate": {
+          "id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "rank": 15,
+          "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+          "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "chunk_type": "text",
+          "score": 0.013126332622601277,
+          "source_version": "00aadff9-83c8-4a17-ab39-09359f2128cc",
+          "content": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+          "content_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812"
+        }
+      },
+      "rerank": {
+        "request_id": "02074de1-c0a0-4df7-9ae2-5c62b7ff5586/rerank",
+        "request_wire_sha256": "954a7767c871336f1dfe66874a40404d4f56c83ff67eb68d52a17eb6f9b9f4a7",
+        "request_status": 200,
+        "request_state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+        "input_count": 30,
+        "required_candidate_provider_input_indices": [
+          {
+            "index": 14,
+            "mapping_basis": "P32 Search candidate rank minus one; Search count equals request documents count (30) and exact candidate text was present at this index",
+            "text_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+            "text_chars": 153,
+            "required_phrase_present": true,
+            "required_phrase": "located at Robert Frost's former home in Franconia, New Hampshire",
+            "contains_search_chunk_content": true,
+            "snippet": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States."
+          }
+        ],
+        "selected_count_in_stage": 2,
+        "selected_results": [
+          {
+            "id": "fee4d31b-8589-5875-992e-4630fec57b3e",
+            "chunk_type": "summary",
+            "composite_score": 0.6871671034599263,
+            "retained_model_score": "0.9706",
+            "base_score": "0.0160",
+            "content_sha256": "9dfaee701f08af9b8d91c9d7ec0811b917eec4b7531f0441917de206b80c90a2"
+          },
+          {
+            "id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "chunk_type": "text",
+            "composite_score": 0.4940226931205163,
+            "retained_model_score": "0.6489",
+            "base_score": "0.0156",
+            "content_sha256": "c007ac58aabc8a30ff0943bfcf278f72215b00ea09cb577d38779bb994d27654"
+          }
+        ],
+        "target_raw_score": "UNKNOWN_NOT_SAVED",
+        "raw_response_body_saved": false,
+        "rerank_scored_results_per_call": null,
+        "stage_present": true,
+        "other_keyword_hits_not_id_mapped": "Excluded from target mapping; generic term matches in unrelated passages do not identify the required Search chunk."
+      },
+      "merge": {
+        "stage_present": true,
+        "input_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "output_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "output_count": 2,
+        "results": [
+          {
+            "rank": 1,
+            "id": "fee4d31b-8589-5875-992e-4630fec57b3e",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 4,
+            "chunk_type": "summary",
+            "score": 0.6871671034599263,
+            "content_chars": 893,
+            "content_sha256": "9dfaee701f08af9b8d91c9d7ec0811b917eec4b7531f0441917de206b80c90a2"
+          },
+          {
+            "rank": 2,
+            "id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+            "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+            "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+            "chunk_index": 3,
+            "chunk_type": "text",
+            "score": 0.4940226931205163,
+            "content_chars": 725,
+            "content_sha256": "7d0effd231af1ddc5959c89eb5cbeea9a1b7d64ae8c3a129ec9ca284f486525a"
+          }
+        ],
+        "target_retained": false
+      },
+      "top_k_context": {
+        "standalone_top_k_snapshot_saved": false,
+        "context_stage_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "captured_result_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "rendered_context_chars": 2632,
+        "rendered_context_sha256": "914a575cf0153e119b8a46d88e9c093aa67cb876e11255c13dcadcadc38f4088",
+        "final_provider_user_chars": 2172,
+        "final_provider_user_sha256": "6961d555e580ce250cbe43783ec73998ea64b18a58213759cf7af59ca76e15cb",
+        "target_terms_in_final_user": {
+          "Franconia": false,
+          "New Hampshire": false
+        },
+        "target_id_in_context": false,
+        "p32_prepared_roles_and_content_match_wire": true,
+        "captured_context_and_wire_checked": "Exact roles/content equality comes from P32 final-verification.json. context.user_content is a component before the answer adapter adds its source-data envelope, so its standalone SHA is not expected to equal the full wire user message."
+      },
+      "provider_final_answer": {
+        "request_id": "02074de1-c0a0-4df7-9ae2-5c62b7ff5586/answer/1/cheap",
+        "wire_sha256": "07f0350f16be5a446ddffe084ab9e13242325158087b77758fe42f35907785c9",
+        "status": 200,
+        "model": "XingChenAGI/Xing4.0-29B",
+        "finish_reason": "stop"
+      },
+      "artifact_paths": {
+        "stage": "E:\\WK\\run\\p32-20261017\\evidence-332\\stages\\ed86254b2dddfbf233a999673814f4258b2ec9c75e1bc2c47096edebeb45cf19.json",
+        "capture": "E:\\WK\\run\\p32-20261017\\evidence-332\\captures\\ed86254b2dddfbf233a999673814f4258b2ec9c75e1bc2c47096edebeb45cf19.json",
+        "rerank_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\51aa608bef8594c2fa9bf443132dbbb2a54e67e1a779c377d1fecc20ccee239a.json",
+        "answer_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\42b092457c92cbd282bb25c4e3b4ed10744e89e1dfa27f251a0037af65dcf7eb.json",
+        "embedding_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\a29301bba5deb39370292ff62acaa24cec013570bf377058dd831c49563d900f.json"
+      }
+    },
+    {
+      "case_id": "omni-page007",
+      "qid": "omnidocbench:aa1ee96d106dbe53d0ae59474d75c6e6d9b53fec:PPT_lecture1_page_007.png",
+      "run_id": "1a4f13e2-dfd2-4328-9c3e-8b6a5f2d0813",
+      "question": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+      "gold": [],
+      "diagnostic_expected": {
+        "matrix": [
+          [
+            1,
+            -2,
+            1
+          ],
+          [
+            0,
+            2,
+            -8
+          ],
+          [
+            -4,
+            5,
+            9
+          ]
+        ],
+        "last_column": [
+          0,
+          8,
+          -9
+        ]
+      },
+      "gold_metric_status": "NOT_APPLICABLE_NO_OFFICIAL_QA_GOLD",
+      "answer": "## 线性方程组的系数矩阵与增广矩阵\n\n根据课件内容，线性方程组的矩阵表示方法包括系数矩阵和增广矩阵的构造。\n\n**系数矩阵**由线性方程组的系数构成，即从每个方程中提取对应的系数，组成一个矩阵。\n\n**增广矩阵**是在系数矩阵的基础上，将最后一列（对应常数项）也纳入其中，形成增广矩阵。\n\n课件中提到的线性方程组为：\n\n$$\n\\begin{cases}\nx_1 + x_2 + x_3 = 6 \\\\\n2x_1 + 3x_2 + x_3 = 10 \\\\\nx_1 + 2x_2 + 3x_3 = 12\n\\end{cases}\n$$\n\n**系数矩阵**为：\n\n$$\nA = \\begin{pmatrix} 1 & 1 & 1 \\\\ 2 & 3 & 1 \\\\ 1 & 2 & 3 \\end{pmatrix}\n$$\n\n**增广矩阵**为：\n\n$$\n\\bar{A} = \\begin{pmatrix} 1 & 1 & 1 & 6 \\\\ 2 & 3 & 1 & 10 \\\\ 1 & 2 & 3 & 12 \\end{pmatrix}\n$$\n\n**增广矩阵最后一列的三个数**为：**6、10、12**。",
+      "answer_support_status": "unsupported_specifics",
+      "necessary_answer_facts_in_context": false,
+      "query": {
+        "original_question": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+        "rewrite_model_request_id": "1a4f13e2-dfd2-4328-9c3e-8b6a5f2d0813/query_rewrite",
+        "rewrite_request_sha256": "53639a7d66b6a888b903814a97dfb9ab6974800800a8bfbb5e3d5ea9a7131796",
+        "rewrite_response_text_saved": false,
+        "actual_embedding_texts": [
+          "课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数"
+        ],
+        "actual_rerank_query": "课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数",
+        "local_query_expansion_inputs_and_hits": "UNKNOWN_NOT_CAPTURED; P32 did not save local expand_queries variants or per-variant search hits. Do not infer from final candidate count.",
+        "embedding_text_equals_rerank_query": true,
+        "actual_rewrite_provenance": "The exact text is preserved in the Embedding and Rerank outbound request bodies. The Query Rewrite provider response itself was not saved."
+      },
+      "search": {
+        "candidate_count": 30,
+        "ranked_candidates": [
+          {
+            "rank": 1,
+            "id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.016393442622950817,
+            "content_chars": 90,
+            "content_sha256": "c2de43da87f6cf3f0bca796481078386ae5c3112f6c22c9e5811322bbbc94090"
+          },
+          {
+            "rank": 2,
+            "id": "dfd946f7-ca87-5fc9-b430-d76f21162484",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "428fb04b-1447-40e3-8c29-ff8bb259b0cc",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.015776209677419356,
+            "content_chars": 102,
+            "content_sha256": "f8c4aca6d150d5c362e6d94d0da7930a9a4e774579d42c07cdd596c3870e9c71"
+          },
+          {
+            "rank": 3,
+            "id": "82fd6f93-750e-56fd-a193-0b7614926abd",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "53792a2a-7b25-4da3-b972-d30941fdc139",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.015702087286527514,
+            "content_chars": 162,
+            "content_sha256": "e8baafa989505857b7c850d161a52f7e9bc17dca2829c095ebceeff0643cc94a"
+          },
+          {
+            "rank": 4,
+            "id": "f082bd12-1429-5be1-affe-40b1f86fbeda",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "26409000-2aaa-4830-9ecb-6d1152d3661e",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.015396825396825395,
+            "content_chars": 255,
+            "content_sha256": "b93b7f280fd6b477c46f8ce9002158ce5eee52711749d67f94167fbca66364a2"
+          },
+          {
+            "rank": 5,
+            "id": "51316a20-67fd-4732-b520-c049999933d0",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.014427767354596622,
+            "content_chars": 237,
+            "content_sha256": "088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144"
+          },
+          {
+            "rank": 6,
+            "id": "823a6957-c7bd-4dcb-ae79-6d15b45b8d04",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "3b697cef-e79e-409b-b286-0ad00ca87e97",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.014241486068111455,
+            "content_chars": 635,
+            "content_sha256": "c2dab3ba5fe21eab28a5645d489ac7d7dc30c3a96c7ad80fd392ff7e86e0cd17"
+          },
+          {
+            "rank": 7,
+            "id": "4ec61903-c12f-400a-9eb9-b6a8613fcec3",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "e41d3813-6dae-4a31-b984-7dfb334985f5",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.013896037056098815,
+            "content_chars": 2266,
+            "content_sha256": "324ee53e95051235f806a95e3362d65ceb6910b3b586781dfb88dcfb5a32ff8e"
+          },
+          {
+            "rank": 8,
+            "id": "068bfe7a-ed0e-482a-8d15-246c3ed1de5d",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "53792a2a-7b25-4da3-b972-d30941fdc139",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.013866930171277997,
+            "content_chars": 1316,
+            "content_sha256": "f7fd1ce9465d1c5c342d0ce83ae4c167fccea65c8102ef651aa21bb67bec106b"
+          },
+          {
+            "rank": 9,
+            "id": "1627c9f9-a1ed-5596-b728-4e2e436ea4ec",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "6af51334-1820-4097-9923-24d22fb36a8d",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.013852813852813853,
+            "content_chars": 172,
+            "content_sha256": "d0ac368cf916e73b39efa447c60e5fb702fb90fc36d52ff068661820357c65c5"
+          },
+          {
+            "rank": 10,
+            "id": "4a49de44-efd2-405c-a12d-22d94330ddd8",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "26409000-2aaa-4830-9ecb-6d1152d3661e",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.013848631239935587,
+            "content_chars": 417,
+            "content_sha256": "75e7bf03053a7c17c77cf0b0eac7d4c65da66eceefe43e9e9a44d267c436ab10"
+          },
+          {
+            "rank": 11,
+            "id": "5e0ee189-a2ce-5873-8bc4-7f9cd5c9c360",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "50feb39d-301d-4292-b3d5-507a4a459417",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.013459459459459458,
+            "content_chars": 119,
+            "content_sha256": "bd832652c688f6d839378350dd92945cf71165b32eeaa1aeba719bb560731c2b"
+          },
+          {
+            "rank": 12,
+            "id": "588e2c05-2913-5d09-8e99-2e790809c2f6",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "e41d3813-6dae-4a31-b984-7dfb334985f5",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.013388566694283345,
+            "content_chars": 132,
+            "content_sha256": "9cfa88b23968e04b31e054e693545a15b47a16d0acc72c54932ec0ab435f2585"
+          },
+          {
+            "rank": 13,
+            "id": "552ca47d-2368-5ab5-abe1-d67d75c24914",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "f8437b24-9042-4a30-b2e1-d0069a14199a",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.013365384615384614,
+            "content_chars": 169,
+            "content_sha256": "6a0a582e086172fa4866f6d8a58ec767037b354e12b62dbd5f0b0ccb3e13f9aa"
+          },
+          {
+            "rank": 14,
+            "id": "2ada1cc3-a10c-5797-b406-c943e4e3e4a5",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "e6528a3e-f866-40c5-88b0-5bd198bed7f2",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.012703252032520325,
+            "content_chars": 141,
+            "content_sha256": "56ec949bd9054d01d732e2c4d602cae5ab045cdd4fcf7367b59797cd51386762"
+          },
+          {
+            "rank": 15,
+            "id": "15143485-ab9b-5641-9967-f82599262ed9",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "3b697cef-e79e-409b-b286-0ad00ca87e97",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.012659087052435092,
+            "content_chars": 94,
+            "content_sha256": "dc8a2b5d38a5be38dcbb1c38e5d039b4e4234833603de959242989cba2222e9e"
+          },
+          {
+            "rank": 16,
+            "id": "c39d03d3-0b6d-4d7d-bec5-9d3ae4b6d200",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "6af51334-1820-4097-9923-24d22fb36a8d",
+            "chunk_index": 0,
+            "chunk_type": "text",
+            "score": 0.012379807692307692,
+            "content_chars": 274,
+            "content_sha256": "3500c094495f4b98fb8d91dae9f43361746de815c9cbfd95a6869a6081ebacc0"
+          },
+          {
+            "rank": 17,
+            "id": "d55db92a-02e1-5181-b5fc-16f3146d07de",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "afa00364-15b0-4fd5-ab11-b0c7ec958353",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.012194092827004219,
+            "content_chars": 121,
+            "content_sha256": "2597ab3d141858b1a7cfd4cf10a5fdfeebddc3e6686c7db2f05ccdc6fdaa1ac8"
+          },
+          {
+            "rank": 18,
+            "id": "198b8660-d520-49df-9b24-f05dcdb745eb",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "e6528a3e-f866-40c5-88b0-5bd198bed7f2",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.012012761825495908,
+            "content_chars": 555,
+            "content_sha256": "3b4141a7f13a2d21bcfcb47dae32ad49b33774c09658585d90e7fba0c0c4ec5e"
+          },
+          {
+            "rank": 19,
+            "id": "87394a45-6901-4d5d-be05-1799ad8c95d9",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "f8437b24-9042-4a30-b2e1-d0069a14199a",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.01193700323815131,
+            "content_chars": 459,
+            "content_sha256": "3261570e8e3ca99d09ed0e4b546c872ddbbb5e0ac734df83e55b20b2b5388f94"
+          },
+          {
+            "rank": 20,
+            "id": "aaeeac70-2e06-568b-93f1-21a70c2c6be4",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "417bd81a-1001-406e-bbf8-fdcfee4679f2",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.011913875598086123,
+            "content_chars": 269,
+            "content_sha256": "d6629db734f2a10ff587189ce7fa66ea043b5befaaeb4ee01a4c1170edb85472"
+          },
+          {
+            "rank": 21,
+            "id": "dbdb34a2-1aae-492b-bd74-654341549275",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "da185871-cd75-4612-9a5c-d9230bfe018e",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.011892130857648099,
+            "content_chars": 8188,
+            "content_sha256": "e62ca1135708a9679a769c4b237051b3291eeea5d56d0514e919685c99b89017"
+          },
+          {
+            "rank": 22,
+            "id": "35c63a8f-f38c-4cea-912d-7bf2d9c3625f",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "a2d039de-26aa-44ac-9c14-dc49ecd89252",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.011490683229813664,
+            "content_chars": 1397,
+            "content_sha256": "f8f0820be7f5363ae42e8f7a269c9dba373c2b610bed372d6032865e5f9fb37d"
+          },
+          {
+            "rank": 23,
+            "id": "d2ac9737-8cf5-48bb-a455-22934c7ab703",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "50feb39d-301d-4292-b3d5-507a4a459417",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.011422985616534003,
+            "content_chars": 217,
+            "content_sha256": "92220daf2626789d633b8f949a71a0df73c3f31b9d238aa9256b0f02dd9d3051"
+          },
+          {
+            "rank": 24,
+            "id": "b0a82355-b88e-43cb-8af9-9e4d95024993",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "6d8a0e24-41b6-4db7-8046-49ea456200ea",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.010701479157328551,
+            "content_chars": 6561,
+            "content_sha256": "bc879638e924f8247edcdd8e98d23c63b09f4416cb49e935722c222ae42301b2"
+          },
+          {
+            "rank": 25,
+            "id": "07866ea2-f13c-5702-b19b-70f66f8ea92b",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "a2d039de-26aa-44ac-9c14-dc49ecd89252",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.010596110128820408,
+            "content_chars": 227,
+            "content_sha256": "e530b3a7c8f7abbd0b795f220063a8f800e164758604adf40787806af59e4b20"
+          },
+          {
+            "rank": 26,
+            "id": "2b74a61d-551a-5797-b1aa-5810ec447da4",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "6a50b4aa-3ef4-40b3-b8f5-884f5614c61b",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.010249939918288872,
+            "content_chars": 109,
+            "content_sha256": "e5b78687b3477d8ba6d3476928af6f9cbf6661ba7d09a65e2d8168052026bf83"
+          },
+          {
+            "rank": 27,
+            "id": "190445fe-8c09-5e9e-a5fa-eb89f54bc2ab",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "5995561a-434e-4863-a712-44f64315950c",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.010175202156334232,
+            "content_chars": 156,
+            "content_sha256": "0f0d6d9fcabc4b39cdca9fde3d7e393157fc9713fdbeef19727322b6790c194e"
+          },
+          {
+            "rank": 28,
+            "id": "4a35c9f1-7806-4612-b9dd-52fbd4d4b18b",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "6af51334-1820-4097-9923-24d22fb36a8d",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.010159448394742513,
+            "content_chars": 1690,
+            "content_sha256": "8f844de03fbd13fdf7556f1ba4ccf169d418c629fedc09c2f9e8335eaf80d74f"
+          },
+          {
+            "rank": 29,
+            "id": "0ffb0999-44f2-4d6e-894b-49d667d615d5",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "5995561a-434e-4863-a712-44f64315950c",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.010056306306306306,
+            "content_chars": 380,
+            "content_sha256": "8c69fc937e7f0a07b6a4472ff327576350b3fddbeaef1b9dd191bc7621d59298"
+          },
+          {
+            "rank": 30,
+            "id": "297f7a1a-571b-4b0a-aa0f-5a7ca2caa8a9",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "428fb04b-1447-40e3-8c29-ff8bb259b0cc",
+            "chunk_index": 0,
+            "chunk_type": "image_ocr",
+            "score": 0.01,
+            "content_chars": 628,
+            "content_sha256": "ea3db4b3054606a092d4d42a5f06d23594564fe79af015f545a79f1e6e85e295"
+          }
+        ],
+        "required_candidate": {
+          "id": "51316a20-67fd-4732-b520-c049999933d0",
+          "rank": 5,
+          "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+          "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+          "chunk_type": "image_ocr",
+          "score": 0.014427767354596622,
+          "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+          "content": "Matrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9",
+          "content_sha256": "088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144"
+        }
+      },
+      "rerank": {
+        "request_id": "1a4f13e2-dfd2-4328-9c3e-8b6a5f2d0813/rerank",
+        "request_wire_sha256": "499ec3fdf906de030f76b941d1aab48b7350e96f9a398de56286c8e09f0f5e4b",
+        "request_status": 200,
+        "request_state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+        "input_count": 30,
+        "required_candidate_provider_input_indices": [
+          {
+            "index": 4,
+            "mapping_basis": "P32 Search candidate rank minus one; Search count equals request documents count (30) and exact candidate text was present at this index",
+            "text_sha256": "981a19fb031cea7ee7b82138360e5023cb86e06a387ef0a44cefe5f5796ad4f8",
+            "text_chars": 476,
+            "required_phrase_present": true,
+            "required_phrase": "The augmented matrix Is",
+            "contains_search_chunk_content": true,
+            "snippet": "Matrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9\n\nMatrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9"
+          }
+        ],
+        "selected_count_in_stage": 1,
+        "selected_results": [
+          {
+            "id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+            "chunk_type": "summary",
+            "composite_score": 0.5644880830264483,
+            "retained_model_score": "0.7660",
+            "base_score": "0.0164",
+            "content_sha256": "c2de43da87f6cf3f0bca796481078386ae5c3112f6c22c9e5811322bbbc94090"
+          }
+        ],
+        "target_raw_score": "UNKNOWN_NOT_SAVED",
+        "raw_response_body_saved": false,
+        "rerank_scored_results_per_call": null,
+        "stage_present": true,
+        "other_keyword_hits_not_id_mapped": "Excluded from target mapping; generic term matches in unrelated passages do not identify the required Search chunk."
+      },
+      "merge": {
+        "stage_present": true,
+        "input_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "output_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "output_count": 1,
+        "results": [
+          {
+            "rank": 1,
+            "id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+            "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "chunk_index": 1,
+            "chunk_type": "summary",
+            "score": 0.5644880830264483,
+            "content_chars": 90,
+            "content_sha256": "c2de43da87f6cf3f0bca796481078386ae5c3112f6c22c9e5811322bbbc94090"
+          }
+        ],
+        "target_retained": false
+      },
+      "top_k_context": {
+        "standalone_top_k_snapshot_saved": false,
+        "context_stage_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "captured_result_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "rendered_context_chars": 295,
+        "rendered_context_sha256": "f34141275317e54aa5769cf74c02ad04a42a916527329111ea9079ae948ac8f1",
+        "final_provider_user_chars": 459,
+        "final_provider_user_sha256": "36fb1a606df3ff04914d104602a1bc0e89cb41ba8e4912853cc344d5e7371012",
+        "target_terms_in_final_user": {
+          "2x2": false,
+          "-9": false,
+          "matrix": false
+        },
+        "target_id_in_context": false,
+        "p32_prepared_roles_and_content_match_wire": true,
+        "captured_context_and_wire_checked": "Exact roles/content equality comes from P32 final-verification.json. context.user_content is a component before the answer adapter adds its source-data envelope, so its standalone SHA is not expected to equal the full wire user message."
+      },
+      "provider_final_answer": {
+        "request_id": "1a4f13e2-dfd2-4328-9c3e-8b6a5f2d0813/answer/1/cheap",
+        "wire_sha256": "bf7d62aab70e92a4778a52bcddb0aa2edc54586c55d80fd0aab4ecda1688c7ca",
+        "status": 200,
+        "model": "XingChenAGI/Xing4.0-29B",
+        "finish_reason": "stop"
+      },
+      "artifact_paths": {
+        "stage": "E:\\WK\\run\\p32-20261017\\evidence-332\\stages\\41f99c4fc42b18eb64fa4a1acb7f7fc0fd89cbfe4dc1bceb5fc1947277b6c467.json",
+        "capture": "E:\\WK\\run\\p32-20261017\\evidence-332\\captures\\41f99c4fc42b18eb64fa4a1acb7f7fc0fd89cbfe4dc1bceb5fc1947277b6c467.json",
+        "rerank_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\315dadcb0568bbc74d88ff4bf4adb27fa8f39b59b9a9c6de928cb57b844ad89a.json",
+        "answer_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\aa57397310cf243b9f715fea51df8eaf70b4018d4f0fc432e08687a7b5c199d0.json",
+        "embedding_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\93bc7aa347f11457575ac846d39e7656ca0196455f0bb711f3cdb8b34d546cf7.json"
+      }
+    },
+    {
+      "case_id": "mml-0959",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+      "run_id": "71d59b6e-6dff-4431-945a-3b1a800b5d89",
+      "question": "What are used for long-distance communication as introduced in this slide?",
+      "gold": [
+        "['radiowaves', 'microwaves']"
+      ],
+      "diagnostic_expected": null,
+      "gold_metric_status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+      "answer": "根据幻灯片内容，用于长距离通信的方法包括：\n\n1. **信号折射**：信号可以通过大气不同层的折射来传播更远；其中无线电波（radiowaves）会被电离层（ionosphere）折射，从而能够传播更远。\n2. **微波通信**：微波可以用于将信号发送到卫星上，实现长距离通信。\n\n因此，幻灯片介绍的长距离通信手段主要是无线电波的折射传播以及微波的卫星通信。",
+      "answer_support_status": "direct_support",
+      "necessary_answer_facts_in_context": true,
+      "query": {
+        "original_question": "What are used for long-distance communication as introduced in this slide?",
+        "rewrite_model_request_id": "71d59b6e-6dff-4431-945a-3b1a800b5d89/query_rewrite",
+        "rewrite_request_sha256": "2af5d313fbaa2240e0ba0af18e719d2873b1a92e6844ec7d422a8fa7ae16cd08",
+        "rewrite_response_text_saved": false,
+        "actual_embedding_texts": [
+          "用于远距离通信的介质有哪些"
+        ],
+        "actual_rerank_query": "用于远距离通信的介质有哪些",
+        "local_query_expansion_inputs_and_hits": "UNKNOWN_NOT_CAPTURED; P32 did not save local expand_queries variants or per-variant search hits. Do not infer from final candidate count.",
+        "embedding_text_equals_rerank_query": true,
+        "actual_rewrite_provenance": "The exact text is preserved in the Embedding and Rerank outbound request bodies. The Query Rewrite provider response itself was not saved."
+      },
+      "search": {
+        "candidate_count": 30,
+        "ranked_candidates": [
+          {
+            "rank": 1,
+            "id": "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 26,
+            "chunk_type": "text",
+            "score": 0.6452181492075002,
+            "content_chars": 414,
+            "content_sha256": "80ac815ad2442d7dee4a1809b08895229a59d8dbe732bf2626b0355b0bd6b89a"
+          },
+          {
+            "rank": 2,
+            "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 24,
+            "chunk_type": "text",
+            "score": 0.5968030684026117,
+            "content_chars": 486,
+            "content_sha256": "662b5b280a784d91d7a38a4520cbec76c5f9c84a908f016fa44bbf5a324567bb"
+          },
+          {
+            "rank": 3,
+            "id": "db55666d-8462-48ba-9d37-f33c3b4a3117",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 23,
+            "chunk_type": "text",
+            "score": 0.5672285739740099,
+            "content_chars": 449,
+            "content_sha256": "7b97bffb04b1c825ef4156b52ae5977027ca3706b33c1479c26be42159764dd2"
+          },
+          {
+            "rank": 4,
+            "id": "6be45b3e-241c-4e1d-b167-8384df05c831",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 22,
+            "chunk_type": "text",
+            "score": 0.5244767864903138,
+            "content_chars": 1026,
+            "content_sha256": "bfebd9c311fe3de742efab568ebf0643823e5985cca218920b144cfa9c9b8ed6"
+          },
+          {
+            "rank": 5,
+            "id": "3fc6cd69-fba9-46ef-bc8f-fa5b5e25fe3b",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 27,
+            "chunk_type": "text",
+            "score": 0.5218377006177297,
+            "content_chars": 491,
+            "content_sha256": "3a9ce69b3c7bbb4d689ab4b756a5ed9459851e1e205894c0354a0ffed3d23b71"
+          },
+          {
+            "rank": 6,
+            "id": "ab7ab6df-693b-44c9-b4ad-13807d821f60",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 25,
+            "chunk_type": "text",
+            "score": 0.5032617766098674,
+            "content_chars": 400,
+            "content_sha256": "b58d7dcc622306c074b1c69098a232fc647a55e52be5310f0e99422689fb009a"
+          },
+          {
+            "rank": 7,
+            "id": "9f0421d3-668b-4424-9973-239e6ccc6f53",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 15,
+            "chunk_type": "text",
+            "score": 0.5005479738005757,
+            "content_chars": 477,
+            "content_sha256": "d8c1bc327708e3f5c2f403201633047acc7f0a142c98506e260a57fe8d856e74"
+          },
+          {
+            "rank": 8,
+            "id": "90bb5609-19f2-494e-8edb-7c4eb639b2a0",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 19,
+            "chunk_type": "text",
+            "score": 0.49683953486944255,
+            "content_chars": 394,
+            "content_sha256": "0830d7ae9b41196de660a1d5781de526bc93a8964021cdbac0cc33dd16f41c61"
+          },
+          {
+            "rank": 9,
+            "id": "4b63cfce-a07d-4a6f-9eff-cc4295b6fa0b",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 28,
+            "chunk_type": "text",
+            "score": 0.4907586532367205,
+            "content_chars": 455,
+            "content_sha256": "21385d51762f226b494b85585b7efdf97fcac0f6520204246a23998404a48dc5"
+          },
+          {
+            "rank": 10,
+            "id": "ab1186c8-dcf2-4c29-97ff-b4068c4565c6",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 18,
+            "chunk_type": "text",
+            "score": 0.4685099121394398,
+            "content_chars": 941,
+            "content_sha256": "c6b72db2412fbf1a8b55fd30a3b29bf85fedacc5ecd1fcf40049076abf24d4a6"
+          },
+          {
+            "rank": 11,
+            "id": "6e64e631-7735-4163-9552-cce46ea910eb",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 20,
+            "chunk_type": "text",
+            "score": 0.46574783038289125,
+            "content_chars": 443,
+            "content_sha256": "ebb1dae2329e87f3d77a09b583daafd92a4681d3811483537433d8a65b9f2e11"
+          },
+          {
+            "rank": 12,
+            "id": "c34276b9-4e15-439c-987b-88ced5612dda",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 21,
+            "chunk_type": "text",
+            "score": 0.46452371146627014,
+            "content_chars": 244,
+            "content_sha256": "c09fd1083138d5b2544a6ed3af759db8d2c35de24c04323e3eaf719cbe1ba7a9"
+          },
+          {
+            "rank": 13,
+            "id": "1e937177-59fb-48a2-beb1-b64877cacdec",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 9,
+            "chunk_type": "text",
+            "score": 0.46304803123893923,
+            "content_chars": 492,
+            "content_sha256": "0807a8bb3cb3d744aee010d5937178391267696c18b10e16f41b045a566e794c"
+          },
+          {
+            "rank": 14,
+            "id": "f34aeae6-a202-40a6-afd2-9c8b5b0edcf3",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 16,
+            "chunk_type": "text",
+            "score": 0.4526455350719206,
+            "content_chars": 505,
+            "content_sha256": "b71f0b1c29c42ff7d106957fd839853c626a8c124364b565a4811076e6b0bdd7"
+          },
+          {
+            "rank": 15,
+            "id": "f002e6e2-c28e-4f48-a5f1-50d25391793c",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 13,
+            "chunk_type": "text",
+            "score": 0.4418125307326929,
+            "content_chars": 195,
+            "content_sha256": "0636afda04012d803dde4d5e09bd67c6b3ded5c472eea6635bb6ad30a14e4115"
+          },
+          {
+            "rank": 16,
+            "id": "a0408cd5-c020-481b-af21-a828b94b840f",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 14,
+            "chunk_type": "text",
+            "score": 0.44133826191298997,
+            "content_chars": 908,
+            "content_sha256": "7bb2908ff7d8ac8776d827875f107612b55b2d8a2f7ad8d22c46530fb2cdc753"
+          },
+          {
+            "rank": 17,
+            "id": "a983453d-18b0-4f8d-a1a4-34cca611e74c",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 5,
+            "chunk_type": "text",
+            "score": 0.4387196805135738,
+            "content_chars": 469,
+            "content_sha256": "3f3391e35148aeb75dc03fe23f114ce2827783b8df5cc9e913ff6647892c5e24"
+          },
+          {
+            "rank": 18,
+            "id": "f0471ddb-9dc3-59d9-88ac-5c78e0e30d8a",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 34,
+            "chunk_type": "summary",
+            "score": 0.43747346620274985,
+            "content_chars": 706,
+            "content_sha256": "c6926644f9dcef3945ecd53b907fe47863e3e2dcd684668dabd59264288985be"
+          },
+          {
+            "rank": 19,
+            "id": "aacbb0ff-3096-49f8-a4fe-4ca00f90e0fd",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 4,
+            "chunk_type": "text",
+            "score": 0.43280792038291604,
+            "content_chars": 379,
+            "content_sha256": "5ebe397b8a8348db1eb9fb2fd125523e0c06388e81e9b1cb5020c5223450beae"
+          },
+          {
+            "rank": 20,
+            "id": "2d269657-872d-4339-8a11-b826a2182ddf",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 8,
+            "chunk_type": "text",
+            "score": 0.4314057713949351,
+            "content_chars": 322,
+            "content_sha256": "938c6ab3f966bc68caef4d656e38fc4b70853e3068c7a5952ab0a4c6588e23e6"
+          },
+          {
+            "rank": 21,
+            "id": "93355055-4707-4943-8965-d4e1524a0db9",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 49,
+            "chunk_type": "text",
+            "score": 0.42110530808165725,
+            "content_chars": 475,
+            "content_sha256": "296b24cf38f2540c69fd7443e4e51fc34c0e5e17279e8f57a01ee95ed37c9290"
+          },
+          {
+            "rank": 22,
+            "id": "ea36e3ed-5182-4949-880d-f28357e0c699",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 32,
+            "chunk_type": "text",
+            "score": 0.4181322314431821,
+            "content_chars": 475,
+            "content_sha256": "1d1d0d6417d682ddc044476b74b468b98eb8859b52ddbe3680f5a44ffc924d2b"
+          },
+          {
+            "rank": 23,
+            "id": "1db271e2-56d1-4964-b8a5-b56c85cd8e05",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 48,
+            "chunk_type": "text",
+            "score": 0.4166627926261599,
+            "content_chars": 497,
+            "content_sha256": "4e783d4458b14f1e124271cbb07b79b5fbb7133ae730b9b5bece8688adf18b23"
+          },
+          {
+            "rank": 24,
+            "id": "d336e962-a5d9-49af-ac42-7e61e4041b43",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 12,
+            "chunk_type": "text",
+            "score": 0.4134678757070137,
+            "content_chars": 436,
+            "content_sha256": "b52de9300f230a25ab71dd21d581547a6ecff6d3bd0fa6d26f53e84ef6b6a67e"
+          },
+          {
+            "rank": 25,
+            "id": "0c126e38-0db6-4d4d-a5da-6dea0da96381",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 29,
+            "chunk_type": "text",
+            "score": 0.41234421331707294,
+            "content_chars": 398,
+            "content_sha256": "09a8c9d39aa30a6320eb2209ec4e06ed2ee5bac632fbecab88b072c20355aaca"
+          },
+          {
+            "rank": 26,
+            "id": "4700141e-905b-4f82-a777-e2548830de13",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 30,
+            "chunk_type": "text",
+            "score": 0.41209792097875575,
+            "content_chars": 255,
+            "content_sha256": "1dc128d5a36f86ef14602289dad30917f240b5873fda18426b9a7453a26d3439"
+          },
+          {
+            "rank": 27,
+            "id": "101c52c5-6c1b-4ec7-a51f-0e5770361191",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 10,
+            "chunk_type": "text",
+            "score": 0.4096619273630848,
+            "content_chars": 498,
+            "content_sha256": "14a8f932cf4a36f7cd3e0885ea63e41ffa5883dc2ce74e32db61402efb505761"
+          },
+          {
+            "rank": 28,
+            "id": "bace4362-0c2f-401c-961d-252d00abb1d9",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 1,
+            "chunk_type": "text",
+            "score": 0.4081809343242395,
+            "content_chars": 509,
+            "content_sha256": "9ec3de58c744231fcdfd63e56f088cd8a05ea8218d42e69c4fbdf4f395b9ffa3"
+          },
+          {
+            "rank": 29,
+            "id": "03138047-88f4-41ef-905b-0348b0022b96",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 51,
+            "chunk_type": "text",
+            "score": 0.4037712012219864,
+            "content_chars": 293,
+            "content_sha256": "f88e02f9c4711bf0ebfc67e894f95f7a1e6e48e2a2fcbab62de603375f613d4c"
+          },
+          {
+            "rank": 30,
+            "id": "2462caf1-4676-404c-8a71-1ef99db1bdf3",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "chunk_index": 2,
+            "chunk_type": "text",
+            "score": 0.40323610207163507,
+            "content_chars": 483,
+            "content_sha256": "74eee805ffd765a68d2b68b3a9a5708e39a2ea018617c9ae822ec8e2e553c0ac"
+          }
+        ],
+        "required_candidate": {
+          "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+          "rank": 2,
+          "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+          "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "chunk_type": "text",
+          "score": 0.5968030684026117,
+          "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+          "content": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality\n\n",
+          "content_sha256": "662b5b280a784d91d7a38a4520cbec76c5f9c84a908f016fa44bbf5a324567bb"
+        }
+      },
+      "rerank": {
+        "request_id": "71d59b6e-6dff-4431-945a-3b1a800b5d89/rerank",
+        "request_wire_sha256": "0b73ae3540ae1209b17810e05f94b95da17834c03b1bde0667c8ad8c9e0aa0f7",
+        "request_status": 200,
+        "request_state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+        "input_count": 30,
+        "required_candidate_provider_input_indices": [
+          {
+            "index": 1,
+            "mapping_basis": "P32 Search candidate rank minus one; Search count equals request documents count (30) and exact candidate text was present at this index",
+            "text_sha256": "25b4aabe375a00c28c4a9718bd270055683d9463427949ff9ac69316988006f5",
+            "text_chars": 484,
+            "required_phrase_present": true,
+            "required_phrase": "microwaves can be used to send signals to satellites",
+            "contains_search_chunk_content": true,
+            "snippet": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality"
+          }
+        ],
+        "selected_count_in_stage": 2,
+        "selected_results": [
+          {
+            "id": "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+            "chunk_type": "text",
+            "composite_score": 0.6627328560896121,
+            "retained_model_score": "0.6153",
+            "base_score": "0.6452",
+            "content_sha256": "80ac815ad2442d7dee4a1809b08895229a59d8dbe732bf2626b0355b0bd6b89a"
+          },
+          {
+            "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+            "chunk_type": "text",
+            "composite_score": 0.5932573077926646,
+            "retained_model_score": "0.5237",
+            "base_score": "0.5968",
+            "content_sha256": "662b5b280a784d91d7a38a4520cbec76c5f9c84a908f016fa44bbf5a324567bb"
+          }
+        ],
+        "target_raw_score": "UNKNOWN_NOT_SAVED",
+        "raw_response_body_saved": false,
+        "rerank_scored_results_per_call": null,
+        "stage_present": true,
+        "other_keyword_hits_not_id_mapped": "Excluded from target mapping; generic term matches in unrelated passages do not identify the required Search chunk."
+      },
+      "merge": {
+        "stage_present": true,
+        "input_ids": [
+          "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+          "df6098cb-68e6-4546-b9e0-8682b4bf19e9"
+        ],
+        "output_ids": [
+          "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+          "df6098cb-68e6-4546-b9e0-8682b4bf19e9"
+        ],
+        "output_count": 2,
+        "results": [
+          {
+            "rank": 1,
+            "id": "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 26,
+            "chunk_type": "text",
+            "score": 0.6627328560896121,
+            "content_chars": 414,
+            "content_sha256": "80ac815ad2442d7dee4a1809b08895229a59d8dbe732bf2626b0355b0bd6b89a"
+          },
+          {
+            "rank": 2,
+            "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "chunk_index": 24,
+            "chunk_type": "text",
+            "score": 0.5932573077926646,
+            "content_chars": 486,
+            "content_sha256": "662b5b280a784d91d7a38a4520cbec76c5f9c84a908f016fa44bbf5a324567bb"
+          }
+        ],
+        "target_retained": true
+      },
+      "top_k_context": {
+        "standalone_top_k_snapshot_saved": false,
+        "context_stage_ids": [
+          "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+          "df6098cb-68e6-4546-b9e0-8682b4bf19e9"
+        ],
+        "captured_result_ids": [
+          "1a4c8c0f-68d1-484e-9304-bf9acecc155c",
+          "df6098cb-68e6-4546-b9e0-8682b4bf19e9"
+        ],
+        "rendered_context_chars": 1720,
+        "rendered_context_sha256": "4728305faa8f84b1f2f8078997bac645a3d3601201d1111c31d7f0a7d4e5843a",
+        "final_provider_user_chars": 1427,
+        "final_provider_user_sha256": "01a5956e005d447794353f105a0ca051ac1b7adec9092a0ff6465f83cb9a8ad9",
+        "target_terms_in_final_user": {
+          "microwaves": true,
+          "satellite": true,
+          "ionosphere": true
+        },
+        "target_id_in_context": true,
+        "p32_prepared_roles_and_content_match_wire": true,
+        "captured_context_and_wire_checked": "Exact roles/content equality comes from P32 final-verification.json. context.user_content is a component before the answer adapter adds its source-data envelope, so its standalone SHA is not expected to equal the full wire user message."
+      },
+      "provider_final_answer": {
+        "request_id": "71d59b6e-6dff-4431-945a-3b1a800b5d89/answer/1/cheap",
+        "wire_sha256": "d7d4272cd2b74b9ad376df706e94ea46e757fb93a6ca8f87d9791337e32c32ce",
+        "status": 200,
+        "model": "XingChenAGI/Xing4.0-29B",
+        "finish_reason": "stop"
+      },
+      "artifact_paths": {
+        "stage": "E:\\WK\\run\\p32-20261017\\evidence-332\\stages\\a94a5a5a0ec86c5040e2e57e7977666078ecb38ed4d3a47ee839cfc90cc48bfd.json",
+        "capture": "E:\\WK\\run\\p32-20261017\\evidence-332\\captures\\a94a5a5a0ec86c5040e2e57e7977666078ecb38ed4d3a47ee839cfc90cc48bfd.json",
+        "rerank_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\4750d349b683be50bc300272e6c77c3d55474ce2772f042b43778a785fc401a5.json",
+        "answer_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\315be47051ef0e6d2cc79d972e37be6c483ca0d65c139d266516f8f1148d87b8.json",
+        "embedding_request": "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\fe8505108f09ce2c5a972535d24cfbc72c7baa626652c165377956f4204eba00.json"
+      }
+    }
+  ],
+  "evidence_limitations": [
+    "P32保存了请求线体，不保存 Rerank 供应商响应正文。被过滤候选的原始分数、返回 index 和具体阈值分支为 UNKNOWN。",
+    "P32 保存了实际 Embedding 输入、Rerank query 和最终 Search 列表，但没有保存 Query Rewrite 模型响应正文，也没有保存本地 Query Expansion 每个变体及各次召回命中；故只报告能从 HTTP 请求读取的文本，Expansion 为 UNKNOWN。",
+    "0434 的评分器对 rerank_retained 保留 null；P32 报告根据空 Rerank/Context 与固定拒答记录有效结果为0，不把 null 改写成供应商评分证据。",
+    "Final-model wire vs prepared-message equality uses the P32 final-verification.json per-case result; the captured context builder field is not itself the full provider user message because generation wraps it in a source-data envelope."
+  ],
+  "production_changes": [],
+  "tests": {
+    "frozen_record_consistency_check": "PASS",
+    "command": "python -B - (inline frozen evidence consistency assertions)",
+    "exit_code": 0,
+    "live_api_or_model": "NOT_RUN",
+    "pytest": "NOT RUN; no production change"
+  }
+}

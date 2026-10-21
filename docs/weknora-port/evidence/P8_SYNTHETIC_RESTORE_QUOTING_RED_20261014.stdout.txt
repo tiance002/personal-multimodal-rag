@@ -1,0 +1,4 @@
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 47
+    query=sql.SQL('SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text),'[]'::jsonb) AS rows FROM {} t WHERE ').format(sql.Identifier(name))+where
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?

@@ -1,0 +1,3056 @@
+{
+  "kind": "actual-http-pg-redis-mock-model-transport",
+  "real_cloud_calls": 0,
+  "checks": [
+    "wrong_chitchat_explicit_kb_retrieves_context_and_clean_sse_history_replay",
+    "greeting_and_history_followup_no_retrieval_with_history_to_provider",
+    "unknown_utc_retrieves_and_empty_evidence_respects_model_or_fixed_strategy",
+    "scope_and_egress_denials_prevent_model_transport"
+  ],
+  "tenant": 345,
+  "kb": "97dcd831-f895-4ffb-b294-5cbf8b439375",
+  "empty_kb": "c5907ab3-baa3-443e-a601-bf438e1c6599",
+  "redis_prefix": "serial-integration:20261015:81b5d95f-b503-4702-bb34-28359c46cdd1",
+  "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+  "pg_system_id": "7696088403504697382",
+  "owner_ledger_unchanged_sha256": "8538faf73069ca8e9479bc7df0bf3487979e4376ded20f5a334cd6bf6cdf14e7",
+  "internal_source_readback": {
+    "chunk_id": "b1ed8ffe-9fd4-4347-95d5-27a7a3c45c68",
+    "document_id": "e870b89e-dbc3-404a-9ed2-75e3315fce14",
+    "knowledge_base_id": "97dcd831-f895-4ffb-b294-5cbf8b439375",
+    "filename": "p21.txt",
+    "text": "The source handbook says blue widgets use protocol W-17. Keep the widgets dry.",
+    "chunk_index": 0,
+    "start": 0,
+    "end": 78,
+    "source_version": "1654edd3-6be3-41f9-9a0e-4fce1a9265f2",
+    "chunk_type": "text",
+    "page_number": null,
+    "image_info": [],
+    "source_url": "/api/v1/knowledge-bases/97dcd831-f895-4ffb-b294-5cbf8b439375/documents/e870b89e-dbc3-404a-9ed2-75e3315fce14/source"
+  },
+  "mock_transport_requests": 22,
+  "synthetic_usage_rows": [
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 20,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 30,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+          "derived_total": 30,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 30
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 20,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 30,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+          "derived_total": 30,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 30
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": null,
+        "cached_tokens": 0,
+        "prompt_tokens": null,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "meta.tokens.input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "meta.tokens.output_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "meta.tokens.total_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "image",
+              {
+                "path": "meta.tokens.image_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "siliconflow-rerank-tokens/v1",
+          "simulated": true,
+          "raw_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "numeric_raw": "{}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 0
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 100,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 110,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+          "derived_total": 110,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 110
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 20,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 30,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+          "derived_total": 30,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 30
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 100,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 110,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+          "derived_total": 110,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 110
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 20,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 30,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+          "derived_total": 30,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 30
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 100,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 110,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+          "derived_total": 110,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 110
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 20,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 30,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+          "derived_total": 30,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 30
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 110,
+        "cached_tokens": 0,
+        "prompt_tokens": 100,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 100,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 110,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+          "derived_total": 110,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 110
+        }
+      }
+    },
+    {
+      "state": "settled",
+      "usage": {
+        "status": "REPORTED",
+        "cache_status": "unreported",
+        "total_tokens": 30,
+        "cached_tokens": 0,
+        "prompt_tokens": 20,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": 10,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 20,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 30,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "eb95cb0041f1105280d542da5801f1dec2fef1ce9dc30f3e4e51bf7fb6f2aaad",
+          "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":20,\"total_tokens\":30}",
+          "derived_total": 30,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 30
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    },
+    {
+      "state": "unknown",
+      "usage": {
+        "status": "UNKNOWN",
+        "cache_status": "unsupported",
+        "total_tokens": 10,
+        "cached_tokens": 0,
+        "prompt_tokens": 10,
+        "cache_reported": false,
+        "cache_miss_tokens": 0,
+        "cache_read_tokens": 0,
+        "completion_tokens": null,
+        "cache_write_tokens": 0,
+        "provider_usage_facts": {
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "valid": true,
+                "value": 10,
+                "present": true
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "valid": false,
+                "value": null,
+                "present": false
+              }
+            ]
+          ],
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": true,
+          "raw_sha256": "779380d5d84b98b69138f2b0b7f4c50f837eb930f0d97e279eb386562cbe2b8f",
+          "numeric_raw": "{\"prompt_tokens\":10,\"total_tokens\":10}",
+          "derived_total": null,
+          "prior_numeric_raw": [],
+          "observed_lower_bound": 10
+        }
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "agent_query",
+      "content": "",
+      "done": false,
+      "data": {
+        "request_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+        "query": "请依据知识库回答蓝色部件的协议",
+        "session_id": "c859bf44-a25b-49d1-8823-dd685ae7625a",
+        "assistant_message_id": "b3abff3d-0182-48fd-9f6e-57a01f40355c"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "history",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "history",
+        "status": "completed"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "memory",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "memory",
+        "status": "completed"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "understand",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "understand",
+        "status": "completed"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "retrieval",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "retrieval",
+        "status": "completed",
+        "candidate_count": 2
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "rerank",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "rerank",
+        "status": "completed",
+        "candidate_count": 2
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "merge",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "merge",
+        "status": "completed",
+        "candidate_count": 1
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "context",
+        "status": "started"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "context",
+        "status": "completed",
+        "selected_evidence_count": 1
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "generation",
+        "status": "started",
+        "role": "cheap",
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "answer",
+      "content": "Blue widgets use W-17. ",
+      "done": false,
+      "data": {
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap",
+        "role": "cheap",
+        "finish_reason": "",
+        "truncated": false,
+        "is_fallback": false,
+        "event_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap-answer"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "answer",
+      "content": "",
+      "done": false,
+      "data": {
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap",
+        "role": "cheap",
+        "finish_reason": "",
+        "truncated": false,
+        "is_fallback": false,
+        "event_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap-answer"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "answer",
+      "content": " [manual](https://example.test) ![figure](https://example.test/i.png)",
+      "done": false,
+      "data": {
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap",
+        "role": "cheap",
+        "finish_reason": "",
+        "truncated": false,
+        "is_fallback": false,
+        "event_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap-answer"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "answer",
+      "content": "",
+      "done": true,
+      "data": {
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap",
+        "role": "cheap",
+        "finish_reason": "stop",
+        "truncated": false,
+        "is_fallback": false,
+        "event_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap-answer"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "progress",
+      "content": "",
+      "done": false,
+      "data": {
+        "stage": "generation",
+        "status": "completed",
+        "role": "cheap",
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap"
+      }
+    },
+    {
+      "id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b",
+      "response_type": "complete",
+      "content": "",
+      "done": false,
+      "data": {
+        "is_fallback": false,
+        "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap",
+        "role": "cheap",
+        "finish_reason": "stop",
+        "truncated": false,
+        "upgraded": false,
+        "model_requested": "XingChenAGI/Xing4.0-29B",
+        "model_reported": "XingChenAGI/Xing4.0-29B",
+        "usage_status": "REPORTED",
+        "invalid_handle_count": 0,
+        "attempts": [
+          {
+            "attempt_id": "3599fa40-6d76-47c4-80ec-0c30e1a4602b/answer/1/cheap",
+            "ordinal": 1,
+            "role": "cheap",
+            "provider": "siliconflow",
+            "model_requested": "XingChenAGI/Xing4.0-29B",
+            "endpoint": "https://fixture.invalid",
+            "envelope_sha256": "dbfa6e7e0df763baa72e67b265d6f3043f7b8192cd2a5921ae8af0cdd64dc017",
+            "prompt_sha256": "04a87fb1927ff45a854d93894fe5db5093df58f40c2e6031445492f3dcdb5fcf",
+            "context_sha256": "8b8f3de867097a494ec964d064ef07ae5041a2d61d388d6d05892e935faf9698",
+            "model_reported": "XingChenAGI/Xing4.0-29B",
+            "status": "COMPLETED",
+            "finish_reason": "stop",
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 100,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 10,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 110,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+                "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+                "derived_total": 110,
+                "simulated": true,
+                "observed_lower_bound": 110,
+                "prior_numeric_raw": []
+              }
+            },
+            "objective": [],
+            "upgrade_reason": null,
+            "cost_status": "UNKNOWN",
+            "error_code": null,
+            "invalid_handle_count": 0,
+            "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+          }
+        ],
+        "router": {
+          "router_version": "rule-router-v1/draft-v0.4",
+          "threshold": "0.35",
+          "mode": "CHEAP_ONLY",
+          "task_labels": [
+            "unknown"
+          ],
+          "task_anchors": [],
+          "T": {
+            "value": 0.1,
+            "status": "UNKNOWN_NOT_INFERRED"
+          },
+          "C": {
+            "value": 0.0,
+            "status": "UNKNOWN_NOT_INFERRED"
+          },
+          "J": {
+            "value": 0.0,
+            "status": "UNKNOWN_NOT_INFERRED"
+          },
+          "D": {
+            "value": 0.0,
+            "status": "UNKNOWN_NOT_INFERRED"
+          },
+          "L": {
+            "value": 0.0,
+            "status": "ESTIMATED"
+          },
+          "M": {
+            "value": 0.0,
+            "status": "UNKNOWN_NOT_INFERRED"
+          },
+          "condition_count": null,
+          "condition_count_basis": "UNKNOWN",
+          "logic": "NONE_OR_UNPARSED",
+          "dependency_depth": null,
+          "output_count": null,
+          "estimated_input_tokens": 920,
+          "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+          "token_basis": "not_provider_actual",
+          "score": "0.1",
+          "decision_model_role": "chat_cheap",
+          "route_reason": "OFFLINE_ARM"
+        }
+      },
+      "usage": {
+        "prompt_tokens": 100,
+        "completion_tokens": 10,
+        "total_tokens": 110,
+        "status": "REPORTED",
+        "cached_tokens": 0,
+        "cache_read_tokens": 0,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 0,
+        "cache_reported": false,
+        "cache_status": "unreported",
+        "provider_usage_facts": {
+          "semantics": "aggregate-disjoint-calls/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 100,
+                "present": true,
+                "valid": true,
+                "path": "disjoint-physical-calls/input"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 10,
+                "present": true,
+                "valid": true,
+                "path": "disjoint-physical-calls/output"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 110,
+                "present": true,
+                "valid": true,
+                "path": "disjoint-physical-calls/total"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "disjoint-physical-calls/cache_read"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "disjoint-physical-calls/cache_write"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "disjoint-physical-calls/cache_miss"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "disjoint-physical-calls/reasoning"
+              }
+            ]
+          ],
+          "numeric_raw": "[{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}]",
+          "raw_sha256": "aedc4550080b5fe364aae6ffafe66831e03b8402b3660250f8d70df6f3805de8",
+          "derived_total": 110,
+          "simulated": true,
+          "observed_lower_bound": 0,
+          "prior_numeric_raw": []
+        }
+      }
+    }
+  ],
+  "fallback_cases": [
+    {
+      "strategy": "model",
+      "stream_calls": 1,
+      "content": "This answer uses general knowledge, not this knowledge base. Beijing time is UTC+8. ",
+      "events": [
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+            "query": "utc时间转换北京时间",
+            "session_id": "1b909385-9e57-4b3d-a35a-6d33c110067b",
+            "assistant_message_id": "165260fc-9d96-46ea-bf3e-7504104af93f"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "started",
+            "role": "cheap",
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "answer",
+          "content": "This answer uses general knowledge, not this knowledge base. Beijing time is UTC+8. ",
+          "done": false,
+          "data": {
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap-answer"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "answer",
+          "content": "",
+          "done": false,
+          "data": {
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap-answer"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "answer",
+          "content": "",
+          "done": false,
+          "data": {
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap-answer"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "answer",
+          "content": "",
+          "done": true,
+          "data": {
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "stop",
+            "truncated": false,
+            "is_fallback": true,
+            "event_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap-answer"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "generation",
+            "status": "completed",
+            "role": "cheap",
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap"
+          }
+        },
+        {
+          "id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap",
+            "role": "cheap",
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "model_requested": "XingChenAGI/Xing4.0-29B",
+            "model_reported": "XingChenAGI/Xing4.0-29B",
+            "usage_status": "REPORTED",
+            "invalid_handle_count": 0,
+            "attempts": [
+              {
+                "attempt_id": "ddef5494-7cd7-45be-bec6-a3bc50baa50f/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid",
+                "envelope_sha256": "ce5a3f8e5b2f306ce6b2041f46deafc2a147d927d8349183379d3e13f9af6f1f",
+                "prompt_sha256": "24e5087b9e65554d81bf459ef8bd7ce8d1691cde523a0c1bc5e2b0d9804baa4d",
+                "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported",
+                  "provider_usage_facts": {
+                    "semantics": "openai-input-inclusive/v1",
+                    "fields": [
+                      [
+                        "input",
+                        {
+                          "value": 100,
+                          "present": true,
+                          "valid": true,
+                          "path": "prompt_tokens"
+                        }
+                      ],
+                      [
+                        "output",
+                        {
+                          "value": 10,
+                          "present": true,
+                          "valid": true,
+                          "path": "completion_tokens"
+                        }
+                      ],
+                      [
+                        "total",
+                        {
+                          "value": 110,
+                          "present": true,
+                          "valid": true,
+                          "path": "total_tokens"
+                        }
+                      ],
+                      [
+                        "cache_read",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_hit_tokens"
+                        }
+                      ],
+                      [
+                        "cache_write",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "cache_creation_input_tokens"
+                        }
+                      ],
+                      [
+                        "cache_miss",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "prompt_cache_miss_tokens"
+                        }
+                      ],
+                      [
+                        "reasoning",
+                        {
+                          "value": null,
+                          "present": false,
+                          "valid": false,
+                          "path": "completion_tokens_details.reasoning_tokens"
+                        }
+                      ]
+                    ],
+                    "numeric_raw": "{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}",
+                    "raw_sha256": "b3ef6016c9453bff3263f5449d5b45394fdf621a6af3e1882d810a4520027cb4",
+                    "derived_total": 110,
+                    "simulated": true,
+                    "observed_lower_bound": 110,
+                    "prior_numeric_raw": []
+                  }
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0,
+                "endpoint_sha256": "ced3e0a35be9e21c303bd5e8eaaf8887cff32ad8ac1a9b662ab4e79b3c937718"
+              }
+            ],
+            "router": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "CHEAP_ONLY",
+              "task_labels": [
+                "transform",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "transform",
+                  "sha256": "0b0d6cb3b2edb2dfbbacc696e113b418c791927b62f54e09f21a430c8d750dca"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 791,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "OFFLINE_ARM"
+            }
+          },
+          "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 10,
+            "total_tokens": 110,
+            "status": "REPORTED",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": {
+              "semantics": "aggregate-disjoint-calls/v1",
+              "fields": [
+                [
+                  "input",
+                  {
+                    "value": 100,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/input"
+                  }
+                ],
+                [
+                  "output",
+                  {
+                    "value": 10,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/output"
+                  }
+                ],
+                [
+                  "total",
+                  {
+                    "value": 110,
+                    "present": true,
+                    "valid": true,
+                    "path": "disjoint-physical-calls/total"
+                  }
+                ],
+                [
+                  "cache_read",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_read"
+                  }
+                ],
+                [
+                  "cache_write",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_write"
+                  }
+                ],
+                [
+                  "cache_miss",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/cache_miss"
+                  }
+                ],
+                [
+                  "reasoning",
+                  {
+                    "value": null,
+                    "present": false,
+                    "valid": false,
+                    "path": "disjoint-physical-calls/reasoning"
+                  }
+                ]
+              ],
+              "numeric_raw": "[{\"completion_tokens\":10,\"prompt_tokens\":100,\"total_tokens\":110}]",
+              "raw_sha256": "aedc4550080b5fe364aae6ffafe66831e03b8402b3660250f8d70df6f3805de8",
+              "derived_total": 110,
+              "simulated": true,
+              "observed_lower_bound": 0,
+              "prior_numeric_raw": []
+            }
+          }
+        }
+      ],
+      "sse_history_refreshed_equal": true,
+      "replay_new_sends": 0
+    },
+    {
+      "strategy": "fixed",
+      "stream_calls": 0,
+      "content": "CONFIGURED_FIXED_SOURCE_REPLY",
+      "events": [
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "agent_query",
+          "content": "",
+          "done": false,
+          "data": {
+            "request_id": "28284df7-e41d-4a62-af5b-d4069e890050",
+            "query": "utc时间转换北京时间",
+            "session_id": "356f4d47-9638-496e-b772-30baca0592dc",
+            "assistant_message_id": "33629728-d8cd-4e8c-a15d-f2ad44b1b534"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "started"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "history",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "started"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "memory",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "started"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "understand",
+            "status": "completed"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "progress",
+          "content": "",
+          "done": false,
+          "data": {
+            "stage": "retrieval",
+            "status": "started"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "answer",
+          "content": "CONFIGURED_FIXED_SOURCE_REPLY",
+          "done": true,
+          "data": {
+            "is_fallback": true,
+            "event_id": "28284df7-e41d-4a62-af5b-d4069e890050-fallback"
+          }
+        },
+        {
+          "id": "28284df7-e41d-4a62-af5b-d4069e890050",
+          "response_type": "complete",
+          "content": "",
+          "done": false,
+          "data": {
+            "is_fallback": true,
+            "attempts": [],
+            "router": null
+          },
+          "usage": {
+            "prompt_tokens": null,
+            "completion_tokens": null,
+            "total_tokens": null,
+            "status": "UNKNOWN",
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cache_miss_tokens": 0,
+            "cache_reported": false,
+            "cache_status": "unreported",
+            "provider_usage_facts": null
+          }
+        }
+      ],
+      "sse_history_refreshed_equal": true,
+      "replay_new_sends": 0
+    }
+  ]
+}

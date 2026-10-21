@@ -1,0 +1,6800 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "source_hashes": {
+    "internal/models/api/types.go": "7f381c8198f6145ad363e3a59aaa06a3757da5e1e3bcda91bc92641140cfb365",
+    "internal/models/api/compat_settings.go": "c2a1a6d23c22134afbd8fb91238c562f3703bf11148c4a6a16644103b03e3f11",
+    "internal/models/api/special_tokens.go": "feb7ad56fbe4c3fd8226c9250f1a04b9791af3b15957db1e776d559b6d7bd5c4",
+    "internal/models/api/options.go": "6a7ee64411adb92d486aa7422ac525aa7f7b3ab76be7341327c750bfb6d859c4",
+    "internal/models/api/prompt_cache.go": "a06d4767eb350078128b58acc3091f1d4001b35acbe8bebfcd47c8127ee58abc",
+    "internal/models/api/openairesponses/request.go": "f60945ff70621895ef6521d7c34a965eca24cf0ee2c3a68e1a6f8db4fcb55b04",
+    "internal/models/api/anthropicmessages/request.go": "7cdab0e639ebdab1d75e2580a6f5b60fea12b68084106a2ce2b25336a10cc3f3",
+    "internal/models/api/googlegenai/request.go": "15668293118e32001f12409101638aec25d2575b46ab6579028f3b2ba0d77207"
+  },
+  "kind": "exact-request-source-with-neutral-type-stubs",
+  "provider_calls": 0,
+  "exit_code": 0,
+  "cases": [
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "off",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "off",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "minimal",
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "minimal",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "minimal",
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "minimal",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "low",
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "low",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "low",
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "low",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "medium",
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "medium",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "medium",
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "medium",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "high",
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "high",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "high",
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "high",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "high",
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "xhigh",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "high",
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "xhigh",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "high",
+          "summary": "auto"
+        },
+        "store": false,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "max",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "openai-responses",
+      "body": {
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "input": [
+          {
+            "type": "message",
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "type": "reasoning",
+            "id": "r1",
+            "encrypted_content": "opaque"
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "Answer"
+              }
+            ]
+          },
+          {
+            "type": "function_call",
+            "id": "i1",
+            "call_id": "c1",
+            "name": "lookup",
+            "arguments": "{}"
+          },
+          {
+            "type": "function_call_output",
+            "call_id": "c1",
+            "output": "{\"x\":1}"
+          }
+        ],
+        "instructions": "Use evidence.",
+        "max_output_tokens": 256,
+        "model": "m",
+        "reasoning": {
+          "effort": "high",
+          "summary": "auto"
+        },
+        "store": false,
+        "stream": true,
+        "tool_choice": "required",
+        "tools": [
+          {
+            "description": "Search",
+            "name": "lookup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      "level": "max",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 256,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "temperature": 0.5,
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 256,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "temperature": 0.5,
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 256,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "temperature": 0.5,
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "off",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 256,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "temperature": 0.5,
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "off",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 9216,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 8192,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 9216,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 8192,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 2048,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 1024,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "minimal",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 2048,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 1024,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "minimal",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 3072,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 2048,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "low",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 3072,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 2048,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "low",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 9216,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 8192,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "medium",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 9216,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 8192,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "medium",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 17408,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 16384,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "high",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 17408,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 16384,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "high",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 17408,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 16384,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "xhigh",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 17408,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 16384,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "xhigh",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 17408,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 16384,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "max",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "anthropic-messages",
+      "body": {
+        "max_tokens": 17408,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Question"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              },
+              {
+                "type": "text",
+                "text": "Answer"
+              },
+              {
+                "type": "tool_use",
+                "id": "c1",
+                "name": "lookup",
+                "input": {}
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "c1",
+                "content": "{\"x\":1}"
+              }
+            ]
+          }
+        ],
+        "model": "m",
+        "stream": true,
+        "system": "Use evidence.",
+        "thinking": {
+          "budget_tokens": 16384,
+          "type": "enabled"
+        },
+        "tool_choice": {
+          "type": "any"
+        },
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Search",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "default": "x"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ]
+      },
+      "level": "max",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "thinkingBudget": 0
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "off",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "thinkingBudget": 0
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "off",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": -1
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": -1
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "auto",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 128
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "minimal",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 128
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "minimal",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 2048
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "low",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 2048
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "low",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 8192
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "medium",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 8192
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "medium",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 24576
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "high",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 24576
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "high",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 24576
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "xhigh",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 24576
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "xhigh",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 24576
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "max",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": false
+    },
+    {
+      "api": "google-generative-ai",
+      "body": {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": "Question"
+              }
+            ],
+            "role": "user"
+          },
+          {
+            "parts": [
+              {
+                "text": "Answer"
+              },
+              {
+                "functionCall": {
+                  "args": {},
+                  "id": "c1",
+                  "name": "lookup"
+                },
+                "thoughtSignature": "SIG"
+              }
+            ],
+            "role": "model"
+          },
+          {
+            "parts": [
+              {
+                "functionResponse": {
+                  "id": "c1",
+                  "name": "lookup",
+                  "response": {
+                    "result": {
+                      "x": 1
+                    }
+                  }
+                }
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "generationConfig": {
+          "maxOutputTokens": 256,
+          "seed": 5,
+          "temperature": 0.5,
+          "thinkingConfig": {
+            "includeThoughts": true,
+            "thinkingBudget": 24576
+          },
+          "topP": 0.9
+        },
+        "systemInstruction": {
+          "parts": [
+            {
+              "text": "Use evidence."
+            }
+          ]
+        },
+        "toolConfig": {
+          "functionCallingConfig": {
+            "mode": "ANY"
+          }
+        },
+        "tools": [
+          {
+            "functionDeclarations": [
+              {
+                "description": "Search",
+                "name": "lookup",
+                "parameters": {
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "level": "max",
+      "messages": [
+        {
+          "role": "system",
+          "content": "Use evidence."
+        },
+        {
+          "role": "user",
+          "content": "Question"
+        },
+        {
+          "role": "assistant",
+          "content": "Answer",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "lookup",
+                "arguments": "{}"
+              },
+              "provider_metadata": {
+                "openai_responses_item_id": "i1",
+                "thought_signature": "SIG"
+              }
+            }
+          ],
+          "reasoning_content": "edited",
+          "reasoning_metadata": {
+            "anthropic_thinking_blocks": [
+              {
+                "type": "thinking",
+                "thinking": "opaque <| token",
+                "signature": "SIG"
+              }
+            ],
+            "openai_responses_reasoning": [
+              {
+                "type": "reasoning",
+                "id": "r1",
+                "encrypted_content": "opaque"
+              }
+            ]
+          }
+        },
+        {
+          "role": "tool",
+          "content": "{\"x\":1}",
+          "tool_call_id": "c1"
+        }
+      ],
+      "stream": true
+    }
+  ]
+}

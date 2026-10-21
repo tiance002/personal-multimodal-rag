@@ -1,0 +1,349 @@
+{
+  "schema": "s8-2-proposed-remaining/v1",
+  "status": "NOT_RUN",
+  "authorization": "NOT_AUTHORIZED_REQUIRES_NEW_OWNER_AUTHORIZATION",
+  "scope": "Proposed remaining questions from frozen cohort40 after excluding the nine A9 qids; no S8.2 start or authorization implied.",
+  "source_manifest": {
+    "path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\source_manifest_40.json",
+    "sha256": "05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d",
+    "status": "FROZEN_FOR_PREPARATION",
+    "special_freeze_manifest_sha256": "00b55e8e1e97b9bdb42ee00a32e9cd22c1d0d7e4b9ff7987c6fb58abd176ff15",
+    "base_source_manifest_sha256": "35e4031652f953f74380add6f48e8f6d7c216d31ddc949bf08d0fd5f5f3493c0",
+    "dataset_count": 5,
+    "cohort_count": 40,
+    "hotpot_case_file_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+    "mml_case_file_sha256": "1e6ef01f9b8bd6fa1d92b6b068b1add4cc13760935eff21f53ab7e34cd6b5c19"
+  },
+  "a9_exclusion": {
+    "source": "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\cases\\questions-only.json",
+    "sha256": "9f498f6bb8e09a7250d53cc8a65e796b036326f3642b3de95e6cdac7b9f52e7a",
+    "distinct_qids": 9,
+    "all_found_in_cohort": true,
+    "identities": [
+      "scifact:1304",
+      "miracl-zh:5704915#0",
+      "longbench-zh:multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "longbench-zh:dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+      "hotpotqa:5a729fe55542991f9a20c53b",
+      "hotpotqa:5a7631cd5542994ccc91870c",
+      "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958"
+    ]
+  },
+  "proposed_remaining": {
+    "count": 31,
+    "items": [
+      {
+        "dataset": "hotpotqa",
+        "qid": "5a745a6055429974ef308be4",
+        "identity": "hotpotqa:5a745a6055429974ef308be4",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\hotpotqa-cases.jsonl",
+        "source_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "hotpotqa",
+        "qid": "5a7b68a75542997c3ec97153",
+        "identity": "hotpotqa:5a7b68a75542997c3ec97153",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\hotpotqa-cases.jsonl",
+        "source_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "hotpotqa",
+        "qid": "5a8911ad554299515336129c",
+        "identity": "hotpotqa:5a8911ad554299515336129c",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\hotpotqa-cases.jsonl",
+        "source_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "hotpotqa",
+        "qid": "5a8ad6805542992d82986f93",
+        "identity": "hotpotqa:5a8ad6805542992d82986f93",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\hotpotqa-cases.jsonl",
+        "source_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "hotpotqa",
+        "qid": "5ab672165542995eadeeffe0",
+        "identity": "hotpotqa:5ab672165542995eadeeffe0",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\hotpotqa-cases.jsonl",
+        "source_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "hotpotqa",
+        "qid": "5ae3992d5542994393b9e722",
+        "identity": "hotpotqa:5ae3992d5542994393b9e722",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\hotpotqa-cases.jsonl",
+        "source_sha256": "d94120b211e53fb01ec27d5c74e569100960c9098cfc86968e454c36a6575720",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+        "identity": "longbench-zh:dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\manifest.json",
+        "source_sha256": "891029790b066b02a134f469a5fda2298b3a42b28b2b9c05aa3cc735df02301e",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+        "identity": "longbench-zh:dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\manifest.json",
+        "source_sha256": "891029790b066b02a134f469a5fda2298b3a42b28b2b9c05aa3cc735df02301e",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9",
+        "identity": "longbench-zh:dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\manifest.json",
+        "source_sha256": "891029790b066b02a134f469a5fda2298b3a42b28b2b9c05aa3cc735df02301e",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+        "identity": "longbench-zh:multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\manifest.json",
+        "source_sha256": "891029790b066b02a134f469a5fda2298b3a42b28b2b9c05aa3cc735df02301e",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05",
+        "identity": "longbench-zh:multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\manifest.json",
+        "source_sha256": "891029790b066b02a134f469a5fda2298b3a42b28b2b9c05aa3cc735df02301e",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "longbench-zh",
+        "qid": "multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2",
+        "identity": "longbench-zh:multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\manifest.json",
+        "source_sha256": "891029790b066b02a134f469a5fda2298b3a42b28b2b9c05aa3cc735df02301e",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "277616#0",
+        "identity": "miracl-zh:277616#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": true
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "5721594#0",
+        "identity": "miracl-zh:5721594#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "692002#0",
+        "identity": "miracl-zh:692002#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "704170#0",
+        "identity": "miracl-zh:704170#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "7049630#0",
+        "identity": "miracl-zh:7049630#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "7696#0",
+        "identity": "miracl-zh:7696#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "91294#0",
+        "identity": "miracl-zh:91294#0",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\miracl-zh\\manifest.json",
+        "source_sha256": "e9dbbac0001321a27d16d89d8851596481b078445efd0d0c3e34bd102450fe79",
+        "possible_historical_unknown_overlap": true
+      },
+      {
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0430",
+        "identity": "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0430",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\mmlongbench-doc-cases.jsonl",
+        "source_sha256": "1e6ef01f9b8bd6fa1d92b6b068b1add4cc13760935eff21f53ab7e34cd6b5c19",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0431",
+        "identity": "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0431",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\mmlongbench-doc-cases.jsonl",
+        "source_sha256": "1e6ef01f9b8bd6fa1d92b6b068b1add4cc13760935eff21f53ab7e34cd6b5c19",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0684",
+        "identity": "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0684",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\mmlongbench-doc-cases.jsonl",
+        "source_sha256": "1e6ef01f9b8bd6fa1d92b6b068b1add4cc13760935eff21f53ab7e34cd6b5c19",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0685",
+        "identity": "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0685",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\mmlongbench-doc-cases.jsonl",
+        "source_sha256": "1e6ef01f9b8bd6fa1d92b6b068b1add4cc13760935eff21f53ab7e34cd6b5c19",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+        "identity": "mmlongbench-doc:mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0959",
+        "source_path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\mmlongbench-doc-cases.jsonl",
+        "source_sha256": "1e6ef01f9b8bd6fa1d92b6b068b1add4cc13760935eff21f53ab7e34cd6b5c19",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "scifact",
+        "qid": "1102",
+        "identity": "scifact:1102",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": true
+      },
+      {
+        "dataset": "scifact",
+        "qid": "1351",
+        "identity": "scifact:1351",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "scifact",
+        "qid": "242",
+        "identity": "scifact:242",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "scifact",
+        "qid": "247",
+        "identity": "scifact:247",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "scifact",
+        "qid": "339",
+        "identity": "scifact:339",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "scifact",
+        "qid": "611",
+        "identity": "scifact:611",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": false
+      },
+      {
+        "dataset": "scifact",
+        "qid": "621",
+        "identity": "scifact:621",
+        "source_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\scifact\\manifest.json",
+        "source_sha256": "0f9957b10413f4ed85bac62a112e416485e749f940637cdb4cd393f3e5e0982c",
+        "possible_historical_unknown_overlap": true
+      }
+    ]
+  },
+  "historical_unknown_protection": {
+    "authoritative_protected_qid_list": "NOT_FOUND in retained local report package; final S8.1 audit retains count=2 plus digest, not QID identities.",
+    "p8_observation_source": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\P8_SIX_DATASET_REAL_WIRING.results.json",
+    "p8_source_sha256": "3f2d0f307774454937587e6e11b36b9904ed8c7913077cc6c793ace829c9a5a0",
+    "p8_historical_unknown_rewritten": false,
+    "p8_initial_unknown_held_qid_count": 7,
+    "overlap_with_remaining_qids": [
+      {
+        "dataset": "miracl-zh",
+        "qid": "277616#0",
+        "identity": "miracl-zh:277616#0",
+        "status": "P8 historical unknown-held token row; not confirmed as the protected old ledger QID set"
+      },
+      {
+        "dataset": "miracl-zh",
+        "qid": "91294#0",
+        "identity": "miracl-zh:91294#0",
+        "status": "P8 historical unknown-held token row; not confirmed as the protected old ledger QID set"
+      },
+      {
+        "dataset": "scifact",
+        "qid": "1102",
+        "identity": "scifact:1102",
+        "status": "P8 historical unknown-held token row; not confirmed as the protected old ledger QID set"
+      },
+      {
+        "dataset": "scifact",
+        "qid": "621",
+        "identity": "scifact:621",
+        "status": "P8 historical unknown-held token row; not confirmed as the protected old ledger QID set"
+      }
+    ],
+    "overlap_count": 4,
+    "handling": "Do not silently exclude. Treat listed P8 unknown-held overlaps as protected pending owner review; the exact old protected UNKNOWN QID set cannot be confirmed from count+digest alone."
+  },
+  "conservative_capacity": {
+    "per_question_calls_upper": 11,
+    "per_question_tokens_upper": 100000,
+    "max_calls": 341,
+    "max_tokens": 3100000,
+    "typical_observed_calls_per_question": 4,
+    "typical_calls_estimate": 124,
+    "typical_range_note": "Experience-only planning estimate; not a guarantee or authorization."
+  },
+  "evidence_sources": [
+    {
+      "path": "E:\\RAG quention\\var\\reports\\v6-full40-evaluation-entry-r4-r17\\frozen-local\\source_manifest_40.json",
+      "sha256": "05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\cases\\questions-only.json",
+      "sha256": "9f498f6bb8e09a7250d53cc8a65e796b036326f3642b3de95e6cdac7b9f52e7a"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\P8_SIX_DATASET_REAL_WIRING.results.json",
+      "sha256": "3f2d0f307774454937587e6e11b36b9904ed8c7913077cc6c793ace829c9a5a0"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\final-audit-and-close.stdout",
+      "sha256": "32aad80ec0a75e64bc26e2091e9b4122d6a46d2481cbfd437aeb3f510ddf9c3d"
+    }
+  ]
+}

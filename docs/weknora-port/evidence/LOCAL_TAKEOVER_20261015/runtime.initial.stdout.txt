@@ -1,0 +1,86 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______ test_native_local_both_runtime_factories_share_gate_and_complete _______
+tests\weknora_port\test_local_runtime_pg.py:80: in test_native_local_both_runtime_factories_share_gate_and_complete
+    actual_pg_run(run())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_local_runtime_pg.py:64: in run
+    async with isolated_mock_application() as (app,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:95: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:9: in build_native_fixture
+    ???
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\connections.py:19: in lease
+    connection = await self.acquire()
+                 ^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:19: in acquire
+    try:return await self.open_connection()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:3: in open_connection
+    ???
+tests\weknora_port\test_memory_storage_pg.py:42: in connection
+    conn = await psycopg.AsyncConnection.connect(dsn,autocommit=True,row_factory=dict_row,connect_timeout=5)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\psycopg\connection_async.py:140: in connect
+    raise last_ex.with_traceback(None)
+E   psycopg.errors.ConnectionTimeout: connection timeout expired
+________ test_failed_remember_http_turn_never_writes_memory_or_queues _________
+tests\weknora_port\test_local_runtime_pg.py:96: in test_failed_remember_http_turn_never_writes_memory_or_queues
+    actual_pg_run(run())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_local_runtime_pg.py:84: in run
+    async with isolated_mock_application() as (app,wire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:95: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:9: in build_native_fixture
+    ???
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\connections.py:19: in lease
+    connection = await self.acquire()
+                 ^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:19: in acquire
+    try:return await self.open_connection()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<verified-isolated-native-assembly>:3: in open_connection
+    ???
+tests\weknora_port\test_memory_storage_pg.py:42: in connection
+    conn = await psycopg.AsyncConnection.connect(dsn,autocommit=True,row_factory=dict_row,connect_timeout=5)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\psycopg\connection_async.py:140: in connect
+    raise last_ex.with_traceback(None)
+E   psycopg.errors.ConnectionTimeout: connection timeout expired
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_local_runtime_pg.py::test_native_local_both_runtime_factories_share_gate_and_complete
+FAILED tests/weknora_port/test_local_runtime_pg.py::test_failed_remember_http_turn_never_writes_memory_or_queues
+2 failed in 11.75s

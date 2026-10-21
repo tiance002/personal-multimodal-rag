@@ -1,0 +1,660 @@
+{
+  "source_commit": "81db3dc953a0e085212b9526a387d22515c695e8",
+  "cases": [
+    {
+      "case": "expensive",
+      "session_id": "4bfe2ed7-5da4-473f-8d0f-7a0d460f9b2d",
+      "run_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3",
+      "question": "若电离层有效且卫星有效且无线电波属于电磁波且微波属于电磁波，是否可以根据课件区分两者的远距离通信方式？分别列出无线电波、微波的传播路径、介质、应用，并指出资料不足的部分。",
+      "route": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "extract",
+          "apply_rule"
+        ],
+        "task_anchors": [
+          {
+            "task": "extract",
+            "sha256": "37774a07ef39925a1629d7c396d1dc37e072e97ff353d773d69e690343c1a005"
+          },
+          {
+            "task": "apply_rule",
+            "sha256": "768da8b98032817de2171c9b5218ffeb85185d6f3700e509e901f3255591d7c4"
+          }
+        ],
+        "T": {
+          "value": 0.16,
+          "status": "OBSERVED"
+        },
+        "C": {
+          "value": 0.15,
+          "status": "OBSERVED"
+        },
+        "J": {
+          "value": 0.03,
+          "status": "OBSERVED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "ESTIMATED"
+        },
+        "M": {
+          "value": 0.04,
+          "status": "OBSERVED"
+        },
+        "condition_count": 4,
+        "condition_count_basis": "OBSERVED",
+        "logic": "AND",
+        "dependency_depth": null,
+        "output_count": 6,
+        "estimated_input_tokens": 1116,
+        "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+        "token_basis": "not_provider_actual",
+        "score": "0.38",
+        "decision_model_role": "chat_expensive",
+        "route_reason": "SCORE_AT_OR_ABOVE_THRESHOLD"
+      },
+      "is_fallback": false,
+      "finish_reason": "stop",
+      "upgraded": false,
+      "truncated": false,
+      "stage_counts": {
+        "search": 30,
+        "rerank": 1,
+        "context": 1
+      },
+      "evidence": [
+        {
+          "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+          "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+          "start_at": 10575,
+          "end_at": 11061,
+          "source_content": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality\n\n"
+        }
+      ],
+      "answer": "**结论：可以部分区分，但课件资料不足以完整列出两者的传播路径、介质和应用。**\n\n课件只明确提到两点：电离层会折射无线电波，使无线电波能传播得更远；微波可用于向卫星发送信号。课件没有分别说明两者的传播路径、介质和应用，因此无法据此完整区分。\n\n## 无线电波\n\n| 项目 | 课件可支持的内容 | 资料是否充足 |\n|---|---|---|\n| 传播路径 | 可被大气不同层折射；其中电离层折射无线电波，使其传播更远 | 部分充足（仅涉及折射机制） |\n| 介质 | 大气层，特别是电离层 | 部分充足 |\n| 应用 | 未提及 | **不足** |\n\n## 微波\n\n| 项目 | 课件可支持的内容 | 资料是否充足 |\n|---|---|---|\n| 传播路径 | 可用于向卫星发送信号（课件未说明具体路径） | 部分充足 |\n| 介质 | 未明确说明；只能推断涉及向卫星传输的链路 | **不足** |\n| 应用 | 卫星通信（向卫星发送信号） | 部分充足 |\n\n## 资料不足的部分\n\n1. **无线电波的应用**：课件未列举任何具体用途。\n2. **微波的传播路径与介质**：课件只说明微波可用于向卫星发送信号，没有说明微波是否也受电离层折射、是否主要沿直线传播，也没有说明它经过哪些介质。\n3. **两者的对比依据**：课件没有直接比较无线电波与微波的远距离通信方式，因此“区分两者”只能依据上述零散信息作有限推断，不能形成完整对照。\n4. **前提条件的作用**：“电离层有效”“卫星有效”“两者均属于电磁波”这些前提在课件中没有展开论证；课件只把电离层折射和卫星通信作为现象提及。\n\n**建议补充**：若要完整区分，需要补充关于无线电波与微波的频率范围、传播方式（天波、地波、视距传播等）、典型介质和具体应用的资料。",
+      "sse_equals_history": true,
+      "actual_wire_messages_equal_capture": true,
+      "post_seconds": 59.1300580999814,
+      "provider_calls": 4,
+      "all_chain_usage": {
+        "prompt_tokens": 9144,
+        "completion_tokens": 489,
+        "total_tokens": 9633
+      },
+      "attempts": [
+        {
+          "attempt_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3/answer/1/expensive",
+          "role": "expensive",
+          "provider": "deepseek",
+          "finish_reason": "stop",
+          "status": "COMPLETED",
+          "upgrade_reason": null,
+          "prompt_sha256": "e87c8668c0b465fc749ab41d407755fb9d2ba3b62aface62773e20887c6c27b8",
+          "context_sha256": "f784ae94cd889e39bf4437884c123ac8e45b24aaa662fdf6436b28e7a14f3470",
+          "usage": {
+            "prompt_tokens": 999,
+            "completion_tokens": 425,
+            "total_tokens": 1424,
+            "status": "REPORTED"
+          },
+          "wire_sha256": "4af3d41590c9b76b35d5ca009094c806b4787a1b65f9a329ea1c07e987215360",
+          "max_tokens": 1024,
+          "raw_response": "NOT_CAPTURED_P9_PARSED_RECEIPT_ONLY"
+        }
+      ],
+      "core_facts_supported": true,
+      "answer_quality": "SUPPORTED_CORE_WITH_EXPLICIT_LIMITS"
+    },
+    {
+      "case": "upgrade",
+      "session_id": "c3cdd33a-9a99-40df-9b01-65eb44c19737",
+      "run_id": "9ca3ab2e-c97b-41fe-ab52-832d1f176dc7",
+      "question": "请根据知识库，用不超过100个汉字解释无线电波和微波如何用于远距离通信，并指出两者传播路径的区别。",
+      "route": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "ESTIMATED"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": 1065,
+        "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      },
+      "is_fallback": false,
+      "finish_reason": "stop",
+      "upgraded": false,
+      "truncated": false,
+      "stage_counts": {
+        "search": 30,
+        "rerank": 1,
+        "context": 1
+      },
+      "evidence": [
+        {
+          "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+          "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+          "start_at": 10575,
+          "end_at": 11061,
+          "source_content": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality\n\n"
+        }
+      ],
+      "answer": "## 无线电波与微波远距离通信\n\n无线电波和微波均可用于远距离通信，但传播路径不同。无线电波可被大气层不同层折射，信号可沿大气层折射传播更远，但信号易扩散、质量下降；微波则主要用于向卫星发送信号，传播路径更直接，受大气干扰较小，通信质量更稳定。",
+      "sse_equals_history": true,
+      "actual_wire_messages_equal_capture": true,
+      "post_seconds": 126.91042800000287,
+      "provider_calls": 4,
+      "all_chain_usage": {
+        "prompt_tokens": 7826,
+        "completion_tokens": 108,
+        "total_tokens": 7934
+      },
+      "attempts": [
+        {
+          "attempt_id": "9ca3ab2e-c97b-41fe-ab52-832d1f176dc7/answer/1/cheap",
+          "role": "cheap",
+          "provider": "siliconflow",
+          "finish_reason": "stop",
+          "status": "COMPLETED",
+          "upgrade_reason": null,
+          "prompt_sha256": "386e589c1ce409549ce41d31604b8d7492e2a9914b01f85c0fd7f0e0f1901996",
+          "context_sha256": "f784ae94cd889e39bf4437884c123ac8e45b24aaa662fdf6436b28e7a14f3470",
+          "usage": {
+            "prompt_tokens": 1059,
+            "completion_tokens": 76,
+            "total_tokens": 1135,
+            "status": "REPORTED"
+          },
+          "wire_sha256": "99f08641ea8d302ad1a7d57cc1304cbf6b00b1b88875f98c1dd6ef119d98e9e3",
+          "max_tokens": 120,
+          "raw_response": "NOT_CAPTURED_P9_PARSED_RECEIPT_ONLY"
+        }
+      ],
+      "core_facts_supported": true,
+      "answer_quality": "PARTIAL_UNSUPPORTED_STABILITY_CLAIM"
+    },
+    {
+      "case": "upgrade-concise",
+      "session_id": "34a570ad-6d45-4a32-b767-1a59a7b4591c",
+      "run_id": "86b39352-e93e-42a7-9478-fa25e63cd019",
+      "question": "根据知识库，用英文两句话（合计不超过35个英文单词）解释电离层对无线电波、卫星对微波远距离通信的作用。不要标题或扩展推论。",
+      "route": {
+        "router_version": "rule-router-v1/draft-v0.4",
+        "threshold": "0.35",
+        "mode": "DYNAMIC",
+        "task_labels": [
+          "unknown"
+        ],
+        "task_anchors": [],
+        "T": {
+          "value": 0.1,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "C": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "J": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "D": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "L": {
+          "value": 0.0,
+          "status": "ESTIMATED"
+        },
+        "M": {
+          "value": 0.0,
+          "status": "UNKNOWN_NOT_INFERRED"
+        },
+        "condition_count": null,
+        "condition_count_basis": "UNKNOWN",
+        "logic": "NONE_OR_UNPARSED",
+        "dependency_depth": null,
+        "output_count": null,
+        "estimated_input_tokens": 1226,
+        "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+        "token_basis": "not_provider_actual",
+        "score": "0.1",
+        "decision_model_role": "chat_cheap",
+        "route_reason": "SCORE_BELOW_THRESHOLD"
+      },
+      "is_fallback": false,
+      "finish_reason": "stop",
+      "upgraded": true,
+      "truncated": false,
+      "stage_counts": {
+        "search": 30,
+        "rerank": 2,
+        "context": 2
+      },
+      "evidence": [
+        {
+          "id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+          "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+          "start_at": 10575,
+          "end_at": 11061,
+          "source_content": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality\n\n"
+        },
+        {
+          "id": "3fc6cd69-fba9-46ef-bc8f-fa5b5e25fe3b",
+          "knowledge_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+          "start_at": 11825,
+          "end_at": 12316,
+          "source_content": "radiowaves are reflected\n\nWhen there are obstructions the signal can drop in quality; so to fix this the microwave transmitters are placed close together on high hills to avoid the obstructions. Line of sight is an assured way of sending signals but we are not always in sight of them\n\nP1g: Receiving Signals\n\noff the ionosphere.\n\nAn advantage of wired communication is that you can send rapid amount of data very quickly\n\nradio waves reflected from a charged layer of the upper atmosphere\n\n"
+        }
+      ],
+      "answer": "The ionosphere is a charged layer of the upper atmosphere that reflects radio waves, letting them travel farther. Microwaves can be sent to satellites for long-distance communication.",
+      "sse_equals_history": true,
+      "actual_wire_messages_equal_capture": true,
+      "post_seconds": 222.8475424000062,
+      "provider_calls": 5,
+      "all_chain_usage": {
+        "prompt_tokens": 10287,
+        "completion_tokens": 144,
+        "total_tokens": 10431
+      },
+      "attempts": [
+        {
+          "attempt_id": "86b39352-e93e-42a7-9478-fa25e63cd019/answer/1/cheap",
+          "role": "cheap",
+          "provider": "siliconflow",
+          "finish_reason": "length",
+          "status": "TRUNCATED",
+          "upgrade_reason": null,
+          "prompt_sha256": "05fe3cc04f2e15231daaa851b8ce39e04e0323391e41c484f0d6be302d7109c1",
+          "context_sha256": "766672891e26353416329c5fe835da9201518e374c0e5785eef9a439813c7853",
+          "usage": {
+            "prompt_tokens": 1212,
+            "completion_tokens": 48,
+            "total_tokens": 1260,
+            "status": "REPORTED"
+          },
+          "wire_sha256": "745015a92833f9bb738f5abe1d161196a0992a368242968cb72ce495a08bf6f1",
+          "max_tokens": 48,
+          "raw_response": "E:\\WK\\run\\rag-m2-20261017\\evidence-332\\raw\\0ecc76605ae698c4e51b4f1a3d3b53acb2a1e47613519bdc73d273b105ca8c15.body",
+          "raw_answer": "The ionosphere refracts radio waves, allowing them to travel long distances by reflecting signals off charged atmospheric layers. Satellites receive microwave signals relayed from ground stations, enabling long-distance communication beyond line-of-sight limitations",
+          "raw_finish_reasons": [
+            "length"
+          ],
+          "raw_protocol_done": true,
+          "raw_sha256": "05d74c463ab69c754477ce35f7cc536ba3797b35012c3c337ccd9bc6c0c2219a",
+          "raw_bytes": 12803
+        },
+        {
+          "attempt_id": "86b39352-e93e-42a7-9478-fa25e63cd019/answer/2/expensive",
+          "role": "expensive",
+          "provider": "deepseek",
+          "finish_reason": "stop",
+          "status": "COMPLETED",
+          "upgrade_reason": "TRUNCATION",
+          "prompt_sha256": "05fe3cc04f2e15231daaa851b8ce39e04e0323391e41c484f0d6be302d7109c1",
+          "context_sha256": "766672891e26353416329c5fe835da9201518e374c0e5785eef9a439813c7853",
+          "usage": {
+            "prompt_tokens": 1121,
+            "completion_tokens": 34,
+            "total_tokens": 1155,
+            "status": "REPORTED"
+          },
+          "wire_sha256": "583861534dbafe9101e799d321217c60fed85949549e7089516426d30d106273",
+          "max_tokens": 48,
+          "raw_response": "E:\\WK\\run\\rag-m2-20261017\\evidence-332\\raw\\38d8ff353e63b859a08a0e663873e4d60a67cee33aa862e035de00d99a9fe9f0.body",
+          "raw_answer": "The ionosphere is a charged layer of the upper atmosphere that reflects radio waves, letting them travel farther. Microwaves can be sent to satellites for long-distance communication.",
+          "raw_finish_reasons": [
+            "stop"
+          ],
+          "raw_protocol_done": true,
+          "raw_sha256": "fff938c1a8536ef312ea18e0ba20cd8a7474aa3c71c64b025cb80df1f1df5f36",
+          "raw_bytes": 10646
+        }
+      ],
+      "core_facts_supported": true,
+      "answer_quality": "SUPPORTED_COMPLETE_RESCUE"
+    }
+  ],
+  "provider_calls": 13,
+  "all_usage_reported": true,
+  "unknown_outcomes": 0,
+  "total_usage": {
+    "prompt_tokens": 27257,
+    "completion_tokens": 741,
+    "total_tokens": 27998
+  },
+  "legacy_accounting_unchanged": true,
+  "calls": [
+    {
+      "call_id": "9b89a171ff5e30820d2222c6495064d80c72625c7f8cd05d90fcdbfbc5434ce6",
+      "request_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3/query_rewrite",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:16:21.712424+00:00",
+      "finished_at": "2026-10-17 15:17:12.747029+00:00",
+      "usage": {
+        "prompt_tokens": 2565,
+        "completion_tokens": 64,
+        "total_tokens": 2629,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 51.034605
+    },
+    {
+      "call_id": "4a12e66b24610f9c7dc1dc335b65677f0f0ce6f3f5fda162c85257c5e75222a0",
+      "request_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-7a8a060d274c1a76",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:17:12.944675+00:00",
+      "finished_at": "2026-10-17 15:17:13.273388+00:00",
+      "usage": {
+        "prompt_tokens": 62,
+        "completion_tokens": 0,
+        "total_tokens": 62,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 0.328713
+    },
+    {
+      "call_id": "381390ea8c59a142fabe4a3dba2ffbe14b3d8d5962b9c62a4ede846a3a1ac4e2",
+      "request_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3/rerank",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:17:14.776985+00:00",
+      "finished_at": "2026-10-17 15:17:15.388476+00:00",
+      "usage": {
+        "prompt_tokens": 5518,
+        "completion_tokens": 0,
+        "total_tokens": 5518,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 0.611491
+    },
+    {
+      "call_id": "f10697af3168a507df10055eab24a6b1466ee417ef0d00f1cf1fb5cb3ea50d6d",
+      "request_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3/answer/1/expensive",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:17:16.363750+00:00",
+      "finished_at": "2026-10-17 15:17:19.277195+00:00",
+      "usage": {
+        "prompt_tokens": 999,
+        "completion_tokens": 425,
+        "total_tokens": 1424,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 2.913445
+    },
+    {
+      "call_id": "53ed6a8347d3536ecb6678ad0f9cca78985cac331db818ff1707a82b14b99d89",
+      "request_id": "9ca3ab2e-c97b-41fe-ab52-832d1f176dc7/query_rewrite",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:17:36.401805+00:00",
+      "finished_at": "2026-10-17 15:18:42.239150+00:00",
+      "usage": {
+        "prompt_tokens": 2546,
+        "completion_tokens": 32,
+        "total_tokens": 2578,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 65.837345
+    },
+    {
+      "call_id": "9468980bb1498c86eb91e0ed55fa80f3287b993f89deeb3baeecfa1906bcef51",
+      "request_id": "9ca3ab2e-c97b-41fe-ab52-832d1f176dc7/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-9e59df94660b3695",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:18:42.395160+00:00",
+      "finished_at": "2026-10-17 15:18:42.702391+00:00",
+      "usage": {
+        "prompt_tokens": 21,
+        "completion_tokens": 0,
+        "total_tokens": 21,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 0.307231
+    },
+    {
+      "call_id": "341d8d5f4a4e7873fb0c2379b9f8ec03c36f5b5f1ae799921dd388928e3792db",
+      "request_id": "9ca3ab2e-c97b-41fe-ab52-832d1f176dc7/rerank",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:18:43.500256+00:00",
+      "finished_at": "2026-10-17 15:18:44.944744+00:00",
+      "usage": {
+        "prompt_tokens": 4200,
+        "completion_tokens": 0,
+        "total_tokens": 4200,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 1.444488
+    },
+    {
+      "call_id": "99b1993134581baaf87e364227a0579d2c057c0948f2e9a8406e6630c1c65167",
+      "request_id": "9ca3ab2e-c97b-41fe-ab52-832d1f176dc7/answer/1/cheap",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:18:45.851990+00:00",
+      "finished_at": "2026-10-17 15:19:42.467197+00:00",
+      "usage": {
+        "prompt_tokens": 1059,
+        "completion_tokens": 76,
+        "total_tokens": 1135,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 56.615207
+    },
+    {
+      "call_id": "4a914b09c481139c9c90f4c6bf25965de19f13f6a94703f71e64ebb3f077df6a",
+      "request_id": "86b39352-e93e-42a7-9478-fa25e63cd019/query_rewrite",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:20:49.600111+00:00",
+      "finished_at": "2026-10-17 15:22:41.084382+00:00",
+      "usage": {
+        "prompt_tokens": 2555,
+        "completion_tokens": 62,
+        "total_tokens": 2617,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 111.484271
+    },
+    {
+      "call_id": "5da6f56fb77c2932e7e3212971b14f56ec79a16ded41c95963898ba076138612",
+      "request_id": "86b39352-e93e-42a7-9478-fa25e63cd019/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-08103fad153c68a8",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "capability": "embedding",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:22:41.297058+00:00",
+      "finished_at": "2026-10-17 15:22:41.634632+00:00",
+      "usage": {
+        "prompt_tokens": 55,
+        "completion_tokens": 0,
+        "total_tokens": 55,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 0.337574
+    },
+    {
+      "call_id": "3eaeb859a1c39fe4c21cfb149522087060a1e9b779138b7a984ca901af81f937",
+      "request_id": "86b39352-e93e-42a7-9478-fa25e63cd019/rerank",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "capability": "rerank",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:22:42.650832+00:00",
+      "finished_at": "2026-10-17 15:22:43.226085+00:00",
+      "usage": {
+        "prompt_tokens": 5344,
+        "completion_tokens": 0,
+        "total_tokens": 5344,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 0.575253
+    },
+    {
+      "call_id": "7d73d15f1e17869b071150ac6e71e5f48e6b790f5ed44b463db6200708f1bc16",
+      "request_id": "86b39352-e93e-42a7-9478-fa25e63cd019/answer/1/cheap",
+      "provider": "siliconflow",
+      "model": "XingChenAGI/Xing4.0-29B",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:22:44.381071+00:00",
+      "finished_at": "2026-10-17 15:24:29.801338+00:00",
+      "usage": {
+        "prompt_tokens": 1212,
+        "completion_tokens": 48,
+        "total_tokens": 1260,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 105.420267
+    },
+    {
+      "call_id": "a1125d782a89d52ecb2b16499a519cb33a058b01d895a3e715166842613f5926",
+      "request_id": "86b39352-e93e-42a7-9478-fa25e63cd019/answer/2/expensive",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "capability": "chat",
+      "outcome": "RESPONSE_RECEIVED",
+      "created_at": "2026-10-17 15:24:29.922506+00:00",
+      "finished_at": "2026-10-17 15:24:30.953939+00:00",
+      "usage": {
+        "prompt_tokens": 1121,
+        "completion_tokens": 34,
+        "total_tokens": 1155,
+        "status": "REPORTED"
+      },
+      "provider_elapsed_seconds": 1.031433
+    }
+  ],
+  "status": "M2_COMPLETE",
+  "baseline_commit": "80458e33a59f02fba5c476ddc97a916ede16874c",
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "production_fix_commit": "77b4601dc5586ea7789058baca167059a3da85d6",
+  "backend_tree": "9edb7a6c75d3daa6a1bd6074ee2d16947bb9035c",
+  "frontend_tree": "1ddce3f4eb940c779f5bf7c7f171787c143110a8",
+  "acceptance": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "global_strategy_changed": false,
+    "hard_limit_raised_on_upgrade": false,
+    "end_to_end_queries": 3,
+    "max_end_to_end_queries": 4,
+    "max_provider_calls": 24
+  },
+  "validation": {
+    "targeted_tests": 116,
+    "actual_isolated_pg_rollback_tests": 1,
+    "exit_code": 0,
+    "frontend_build_exit_code": 0,
+    "full_browser_retest": "NOT_RUN_NOT_REQUIRED_M2",
+    "evidence_root": "E:\\WK\\run\\rag-m2-20261017",
+    "consistency": {
+      "source_chunks_unchanged": 88,
+      "same_file_hash_versions_and_text": true,
+      "replay_equals_final_history": true,
+      "replay_model_call_delta": 0,
+      "public_role_status": [
+        {
+          "role": "embedding",
+          "credential_status": "CONFIGURED"
+        },
+        {
+          "role": "rerank",
+          "credential_status": "CONFIGURED"
+        },
+        {
+          "role": "cheap",
+          "credential_status": "CONFIGURED"
+        },
+        {
+          "role": "expensive",
+          "credential_status": "CONFIGURED"
+        },
+        {
+          "role": "vlm",
+          "credential_status": "NOT_CONFIGURED"
+        }
+      ],
+      "raw_upgrade_responses": 2
+    },
+    "closeout": {
+      "owned_api_stopped": true,
+      "listening_ports": {
+        "56425": false,
+        "56426": false,
+        "56427": false
+      },
+      "legacy_accounting_unchanged": true,
+      "provider_calls": 13,
+      "unknown_outcomes": 0,
+      "first_stop_identity_guard_rejected": true,
+      "diagnostic_stop_uses_actual_m2_runner": true
+    }
+  }
+}

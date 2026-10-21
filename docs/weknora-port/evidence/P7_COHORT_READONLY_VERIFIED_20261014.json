@@ -1,0 +1,96 @@
+{
+  "schema": "native-six-cohort-readonly-verification-v1",
+  "kind": "ACTUAL_NATIVE_ISOLATED_COHORT_WITH_MOCK_MODELS",
+  "system_identifier": "7696088403504697382",
+  "manifest_sha256": "05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d",
+  "input_receipts": [
+    {
+      "path": "var/weknora-port/p7-six-full-utf8-fixed-20261014/native-results.jsonl",
+      "sha256": "c0f79124b24791099e372d253ff85386e3a230a1fcab413cce0fd18c9b629b4c",
+      "bytes": 4417812,
+      "git_head": "12859f4dd5394764cb21bdbecb9ebf17f3a0abe6",
+      "command_complete": false
+    },
+    {
+      "path": "var/weknora-port/p7-remaining-f07002a-20261014/native-results.jsonl",
+      "sha256": "209c55c3631fac8d4bafe500206927285c60876fa295387bb82f27bc888af0c3",
+      "bytes": 526981,
+      "git_head": "f07002af9ec86527167b3f00514a6200e06e5e6f",
+      "command_complete": false
+    },
+    {
+      "path": "var/weknora-port/p7-mml-omni-78dda16-20261014/native-results.jsonl",
+      "sha256": "3f383bec9c884c3d543d5b4035cc7ff460d783be1904234720bf22660795a562",
+      "bytes": 201648,
+      "git_head": "78dda16ac63d0aa8ac83cd5cfb429e34fec5092e",
+      "command_complete": true
+    }
+  ],
+  "sources": {
+    "scifact": 5183,
+    "miracl-zh": 6000,
+    "longbench-zh": 400,
+    "hotpotqa": 73,
+    "mmlongbench-doc": 3
+  },
+  "omni_original_images": 24,
+  "qa_cases": 40,
+  "persisted_assistants": 160,
+  "paired_capture_verified": true,
+  "citation_readbacks_verified": 80,
+  "mock_answer_model_calls": 200,
+  "mock_auxiliary_calls": 120,
+  "known_mock_answer_cost_microunits": 2000,
+  "unknown_mock_aux_occupied_microunits": 8000,
+  "latency": {
+    "OFF": {
+      "generation": {
+        "p50_seconds": 0.05415219999849796,
+        "p95_seconds": 0.11817024000920355
+      },
+      "shared_preparation_plus_generation": {
+        "p50_seconds": 0.3311788499704562,
+        "p95_seconds": 1.0603669950156471
+      }
+    },
+    "CHEAP_ONLY": {
+      "generation": {
+        "p50_seconds": 0.05342950002523139,
+        "p95_seconds": 0.08555739992880247
+      },
+      "shared_preparation_plus_generation": {
+        "p50_seconds": 0.32806555001297966,
+        "p95_seconds": 1.0593925900408065
+      }
+    },
+    "EXPENSIVE_ONLY": {
+      "generation": {
+        "p50_seconds": 0.05314174998784438,
+        "p95_seconds": 0.07848006498534221
+      },
+      "shared_preparation_plus_generation": {
+        "p50_seconds": 0.32562580006197095,
+        "p95_seconds": 1.0561755298636852
+      }
+    },
+    "DYNAMIC": {
+      "generation": {
+        "p50_seconds": 0.08518494997406378,
+        "p95_seconds": 0.10972277005785129
+      },
+      "shared_preparation_plus_generation": {
+        "p50_seconds": 0.3578284000395797,
+        "p95_seconds": 1.0942499349592254
+      }
+    }
+  },
+  "latency_kind": "MEASURED_MOCK_GENERATION_AND_RECONSTRUCTED_COMMON_PREPARATION_NOT_REAL_PROVIDER_LATENCY",
+  "omni_parsing": "NOT_RUN_NO_NATIVE_GEOMETRY_PREDICTION",
+  "omni_independent_qa": "NOT_RUN_OVERLAY_UNAVAILABLE",
+  "mml_page_base": "UNKNOWN",
+  "model_quality": "NOT_RUN_SIMULATED_MODELS",
+  "real_provider_calls": 0,
+  "full_source_parity": "NOT_CLAIMED",
+  "whole_original_command_pass": false,
+  "cutover": "NOT_RUN"
+}

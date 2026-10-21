@@ -1,0 +1,453 @@
+{
+  "status": "P8_1_ENTRYPOINT_COMPLETE",
+  "container_deletion": "NOT_EXECUTED_AWAITING_EXACT_OBJECT_OWNER_APPROVAL",
+  "baseline_commit": "28a17f12340d08cf87467aef1926edc815a685ef",
+  "implementation_commit": "083fdbf8b3af9992b16add22b3c1cb36865783ef",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "source_files": [
+    "README.md",
+    "backend/app/domain/models.py",
+    "backend/weknora_port/ingestion/mineru.py",
+    "backend/weknora_port/ingestion/types.py",
+    "docs/LEGACY_ENTRYPOINTS.md",
+    "docs/WEKNORA_DEVELOPMENT.md",
+    "docs/local-runtime.example.json",
+    "frontend/playwright.api-missing.config.ts",
+    "frontend/playwright.config.ts",
+    "frontend/playwright.weknora.config.ts",
+    "frontend/src/main.tsx",
+    "frontend/src/vite-env.d.ts",
+    "frontend/src/weknora_port/api.ts",
+    "frontend/tests/api-configuration/missing-base.spec.ts",
+    "frontend/vite.config.ts",
+    "pyproject.toml",
+    "scripts/eviroute-rag-dependencies.ps1",
+    "scripts/local_runtime.py",
+    "scripts/start_backend.py",
+    "tests/weknora_port/test_development_entry.py",
+    "tests/weknora_port/test_local_runtime.py",
+    "tests/weknora_port/test_mineru.py",
+    "wk.ps1"
+  ],
+  "architecture": [
+    "React WeKnoraPythonApp",
+    "backend.weknora_port FastAPI",
+    "backend.weknora_port Worker",
+    "existing PostgreSQL/pgvector and Redis DB15"
+  ],
+  "commands": [
+    {
+      "command": ".\\wk.ps1 check -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "REAL_RESOURCE_READ_ONLY"
+    },
+    {
+      "command": ".\\wk.ps1 start -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "REAL_HOST_API_WORKER_REACT"
+    },
+    {
+      "command": ".\\wk.ps1 status -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "REAL_OWNED_PROCESS_AND_API_IDENTITY"
+    },
+    {
+      "command": ".\\wk.ps1 start -Config E:\\WK\\run\\p81-retirement-20261018\\local.json (while already started)",
+      "exit_code": 1,
+      "expected_rejection": "RECORDED_PROCESSES_STILL_PRESENT"
+    },
+    {
+      "command": "& \"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B scripts/start_backend.py",
+      "exit_code": 1,
+      "expected_rejection": "RETIRED"
+    },
+    {
+      "command": "& \"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B -m pytest tests/weknora_port/test_local_runtime.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_mineru.py tests/weknora_port/test_m34_mineru_routing.py tests/weknora_port/test_http_api.py tests/weknora_port/test_streaming.py tests/weknora_port/test_history_storage.py -q -p no:cacheprovider --basetemp E:\\WK\\run\\p81-retirement-20261018\\pytest-tmp",
+      "exit_code": 0,
+      "passed": 83,
+      "kind": "OFFLINE_AFFECTED_MODULES_INCLUDING_SYNTHETIC_API_SSE"
+    },
+    {
+      "command": "npm test -- --config=playwright.config.ts tests/weknora-port/adapter.spec.ts --reporter=line",
+      "cwd": "frontend",
+      "exit_code": 0,
+      "passed": 10,
+      "kind": "BROWSER_API_MOCK_CONTRACT"
+    },
+    {
+      "command": "npm test -- --config=playwright.api-missing.config.ts --reporter=line",
+      "cwd": "frontend",
+      "exit_code": 0,
+      "passed": 1,
+      "kind": "BROWSER_MISSING_CONFIG_NO_API_SEND"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "frontend",
+      "exit_code": 0
+    },
+    {
+      "command": "& \"E:\\RAG quention\\.venv\\Scripts\\python.exe\" -B E:\\WK\\run\\p81-retirement-20261018\\ingestion\\single_upload_smoke.py",
+      "exit_code": 0,
+      "kind": "REAL_HTTP_MINERU_PG_REDIS_NO_MODEL"
+    },
+    {
+      "command": ".\\wk.ps1 stop -Config E:\\WK\\run\\p81-retirement-20261018\\local.json",
+      "exit_code": 0,
+      "kind": "ONLY_MATCHING_OWNED_HOST_PIDS"
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "kind": "FINAL_IMPLEMENTATION_STAGE_CHECK"
+    }
+  ],
+  "real_edge": {
+    "browser": "existing user Edge extension profile",
+    "url": "http://127.0.0.1:56426",
+    "result": "PASS_CONNECTED_TO_WEKNORA_PYTHON_API",
+    "screenshot": "evidence/p81-entrypoint-20261018/edge-connected.png",
+    "new_qa_requests": 0
+  },
+  "ingestion": {
+    "status": "PASS",
+    "kind": "ONE_SYNTHETIC_PNG_REAL_HTTP_MINERU_PG_CHUNK_KEYWORD_INDEX_READBACK",
+    "database": "weknora_python_port_20261013",
+    "system_identifier": "7696088403504697382",
+    "redis_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+    "tenant_id": 332,
+    "api_port": 56427,
+    "cloud_allowed": false,
+    "provider_construction_attempts": 0,
+    "knowledge_base_id": "2efe0d9b-1b23-4fad-b5a3-75019e8bb124",
+    "document_id": "8970929a-e1f8-4bff-9c67-66d69798d60e",
+    "document_status": "completed",
+    "parse_status": "completed",
+    "parser_engine": "mineru-basic",
+    "source_version": "281ab94d-9909-48a7-b307-2ea375a159f8",
+    "chunk_count": 1,
+    "keyword_index_row_count": 1,
+    "keyword_only_dimension_zero": true,
+    "readback_http_status": 200,
+    "readback_source_version": "281ab94d-9909-48a7-b307-2ea375a159f8",
+    "readback_locator_count": 1,
+    "upload_attempts": 1,
+    "redis_prefix": "weknora-python-p81-20261018-11b9675d216f4a10a253eabc1028bd04",
+    "storage_root": "E:\\WK\\run\\p81-retirement-20261018\\ingestion\\assets"
+  },
+  "resources": {
+    "provider_rows_before": 245,
+    "provider_rows_after": 245,
+    "cloud_provider_calls": 0,
+    "model_tokens": 0,
+    "new_unknown": 0,
+    "owned_ports_released": {
+      "56425": true,
+      "56426": true,
+      "56427": true
+    },
+    "containers_unchanged": [
+      {
+        "id": "89c5cb748e2ec7aca3b1e3b181dfe936a4054137ddb4de5c4e8689e86387e720",
+        "project": "eviroute-rag",
+        "service": "postgres",
+        "state": "running",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "15fe772fab7d9ac5b6023ff2075ebb5e12ccee80e274f91b16fe612e8748e897",
+        "project": "eviroute-rag",
+        "service": "redis",
+        "state": "running",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "5aeef69378f354ee4592912227da64cba544069b9e8bf0bd4dcd098373993400",
+        "project": "raglocalfirst0930",
+        "service": "worker",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "db29f9707d27d1616e74382b8e16ac4868395cad97051ea05eeb79e942cefe35",
+        "project": "raglocalfirst0930",
+        "service": "api",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "771f37725a715bf5b208b95779c085e133dcac79930d1c61ea3b312030a94451",
+        "project": "raglocalfirst0930",
+        "service": "frontend",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "cb866de1e6586ad9aab53803dfdb8b243b8e01520574d147934cc5110c142215",
+        "project": "ragv1final0927",
+        "service": "frontend",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "c788a7f9a2c3af8b4535eb046af6015dd38427dee99b9eb8929593d2ac3d3ea8",
+        "project": "ragv1final0927",
+        "service": "api",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "fa1f8b0bc9f53fd1a23ad41bf94215a1649d5ff8462f1f52716cfa1b08408e47",
+        "project": "ragv1final0927",
+        "service": "worker",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "8175fe24a247bef2c483b4dab8a774daabb7c20dae53b5ed8d88578f2ba75446",
+        "project": "v1reviewfinal0927",
+        "service": "frontend",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "c00025e807fb6c71f2d4e12b4955b54030ef4bdb3955178418e5a5483a5be700",
+        "project": "v1reviewfinal0927",
+        "service": "api",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "2d97164a06f142e1ba58d46d56d08de995162623430af7848b81fcf0f75abf6b",
+        "project": "v1reviewfinal0927",
+        "service": "worker",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "a94fa5ee4d291751b753a8c06578ce854745580a1988717339503ea189ba0f16",
+        "project": "v1review0927",
+        "service": "frontend",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "3eaf7afb7aa65ad47cfc4b90dcc7cf1e4b07314f129e9f74509ae55977ee82e4",
+        "project": "v1review0927",
+        "service": "api",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      },
+      {
+        "id": "13eb81278a26e66b81b45056dfa88d6be96471032841449ab9e4a7e6166eac03",
+        "project": "v1review0927",
+        "service": "worker",
+        "state": "exited",
+        "restart": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "unchanged": true
+      }
+    ],
+    "deleted_containers": [],
+    "deleted_volumes": [],
+    "database_schema_changed": false
+  },
+  "protected_files": {
+    "unchanged": true,
+    "paths": {
+      ".serena/project.yml": "51e48d867c3084972718681dc8bc13c43445e4bd28c3f96b678d2a50ca53f907",
+      "progress.md": "fd590677562963d0a5cc9516410886ecdff303cadffb8d46dfc917cdfe4098d7",
+      "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json": "331e7232bb31da9766fe992f0461092039f69f1e9ed06822351d5ab7d6c0e087",
+      "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md": "3bd81bfbdf2ccb5900e70d57301a95cec06535cc431ed7aea118dc6f1d82c31b",
+      "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a",
+      "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+    }
+  },
+  "retired_api_worker_proposed_deletion": [
+    {
+      "id": "5aeef69378f354ee4592912227da64cba544069b9e8bf0bd4dcd098373993400",
+      "project": "raglocalfirst0930",
+      "service": "worker",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "db29f9707d27d1616e74382b8e16ac4868395cad97051ea05eeb79e942cefe35",
+      "project": "raglocalfirst0930",
+      "service": "api",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "c788a7f9a2c3af8b4535eb046af6015dd38427dee99b9eb8929593d2ac3d3ea8",
+      "project": "ragv1final0927",
+      "service": "api",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "fa1f8b0bc9f53fd1a23ad41bf94215a1649d5ff8462f1f52716cfa1b08408e47",
+      "project": "ragv1final0927",
+      "service": "worker",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "c00025e807fb6c71f2d4e12b4955b54030ef4bdb3955178418e5a5483a5be700",
+      "project": "v1reviewfinal0927",
+      "service": "api",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "2d97164a06f142e1ba58d46d56d08de995162623430af7848b81fcf0f75abf6b",
+      "project": "v1reviewfinal0927",
+      "service": "worker",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "3eaf7afb7aa65ad47cfc4b90dcc7cf1e4b07314f129e9f74509ae55977ee82e4",
+      "project": "v1review0927",
+      "service": "api",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    },
+    {
+      "id": "13eb81278a26e66b81b45056dfa88d6be96471032841449ab9e4a7e6166eac03",
+      "project": "v1review0927",
+      "service": "worker",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE_ALREADY_STOPPED_NO_RESTART",
+      "delete_permission": "PENDING_OWNER"
+    }
+  ],
+  "retained_old_frontend": [
+    {
+      "id": "771f37725a715bf5b208b95779c085e133dcac79930d1c61ea3b312030a94451",
+      "project": "raglocalfirst0930",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE"
+    },
+    {
+      "id": "cb866de1e6586ad9aab53803dfdb8b243b8e01520574d147934cc5110c142215",
+      "project": "ragv1final0927",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE"
+    },
+    {
+      "id": "8175fe24a247bef2c483b4dab8a774daabb7c20dae53b5ed8d88578f2ba75446",
+      "project": "v1reviewfinal0927",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE"
+    },
+    {
+      "id": "a94fa5ee4d291751b753a8c06578ce854745580a1988717339503ea189ba0f16",
+      "project": "v1review0927",
+      "state": "exited",
+      "restart": "no",
+      "action_taken": "NONE"
+    }
+  ],
+  "preserved": [
+    "all existing volumes, databases, historical ledgers/UNKNOWN/Gold/source versions/indexes",
+    "old backend/app runtime source and old UI source with historical callers",
+    "original eight uncommitted paths byte-identical"
+  ],
+  "not_run": [
+    {
+      "item": "wheel build",
+      "reason": "verified runtime has no setuptools/wheel/build; no installation or network in this task; source import independence and TOML rule checked instead"
+    },
+    {
+      "item": "real cloud QA/vector embedding/Caption",
+      "reason": "task explicitly zero cloud; existing historical real acceptance preserved separately"
+    },
+    {
+      "item": "old API real start",
+      "reason": "retired service not started; mismatched identity rejection exercised by offline/browser mocks"
+    }
+  ],
+  "limits": [
+    "Stop-Process is not graceful application draining; stop while idle, uncertain sends retain existing UNKNOWN semantics",
+    "MinerU supports single-frame PNG/JPEG/BMP/WebP/TIFF and wholly scanned PDF; mixed PDF scanned-page automatic OCR not added",
+    "formal startup uses existing LocalPrincipalStore slot local (tenant1 in this instance); isolated parser test explicitly uses existing tenant332 and new KB with server-side keyword-only settings, no business API mock",
+    "old container/volume/database deletion requires separate exact-object approval"
+  ],
+  "evidence_root": "E:\\WK\\run\\p81-retirement-20261018",
+  "artifact_manifest": "evidence/p81-entrypoint-20261018/manifest.json"
+}

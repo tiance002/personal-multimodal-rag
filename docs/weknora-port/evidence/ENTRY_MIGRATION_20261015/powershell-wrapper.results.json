@@ -1,0 +1,85 @@
+[
+  {
+    "name": "verify-default",
+    "command": [
+      "C:\\Users\\22088\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.EXE",
+      "-NoProfile",
+      "-File",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\verify-m0.ps1",
+      "-Python",
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-Report",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\ENTRY_MIGRATION_20261015\\verify-default.json"
+    ],
+    "exit": 0,
+    "expected": 0,
+    "matched": true
+  },
+  {
+    "name": "eval-schema",
+    "command": [
+      "C:\\Users\\22088\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.EXE",
+      "-NoProfile",
+      "-File",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\eval.ps1",
+      "-Python",
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-Mode",
+      "Schema",
+      "-Report",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\ENTRY_MIGRATION_20261015\\eval-schema.json"
+    ],
+    "exit": 0,
+    "expected": 0,
+    "matched": true
+  },
+  {
+    "name": "eval-old-quality-denied",
+    "command": [
+      "C:\\Users\\22088\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.EXE",
+      "-NoProfile",
+      "-File",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\eval.ps1",
+      "-Python",
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-Mode",
+      "Quality"
+    ],
+    "exit": 2,
+    "expected": 2,
+    "matched": true
+  },
+  {
+    "name": "eval-verify-inputs-denied",
+    "command": [
+      "C:\\Users\\22088\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.EXE",
+      "-NoProfile",
+      "-File",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\eval.ps1",
+      "-Python",
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-Mode",
+      "Verify-Existing",
+      "-AllowIsolatedRead"
+    ],
+    "exit": 2,
+    "expected": 2,
+    "matched": true
+  },
+  {
+    "name": "eval-execute-authorization-denied",
+    "command": [
+      "C:\\Users\\22088\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.EXE",
+      "-NoProfile",
+      "-File",
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\scripts\\eval.ps1",
+      "-Python",
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-Mode",
+      "Execute-Native"
+    ],
+    "exit": 2,
+    "expected": 2,
+    "matched": true
+  }
+]

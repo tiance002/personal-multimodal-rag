@@ -1,0 +1,39 @@
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+PUBLIC_FULL_CORPUS_ERROR OperationalError connection failed: connection to server at "127.0.0.1", port 56423 failed: Address already in use (0x00002740/10048)
+	Is the server running on that host and accepting TCP/IP connections? [('D:\\Drivers\\python\\Lib\\contextlib.py', 214, '__aenter__'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\storage\\connections.py', 19, 'lease'), ('<verified-isolated-native-assembly>', 3, 'acquire'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\tests\\weknora_port\\test_memory_storage_pg.py', 42, 'connection'), ('E:\\RAG quention\\.venv\\Lib\\site-packages\\psycopg\\connection_async.py', 140, 'connect')]
+  + Exception Group Traceback (most recent call last):
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_six_mock.py", line 41, in <module>
+  |     actual_pg_run(main(parser.parse_args()))
+  |     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_memory_storage_pg.py", line 36, in actual_pg_run
+  |     return runner.run(awaitable)
+  |            ~~~~~~~~~~^^^^^^^^^^^
+  |   File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  |   File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+  |     return future.result()
+  |            ~~~~~~~~~~~~~^^
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_six_mock.py", line 33, in main
+  |     await runner.run(frozen)
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 136, in run
+  |     await self.ingest_dataset(dataset)
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 70, in ingest_dataset
+  |     async with asyncio.TaskGroup() as group:
+  |                ~~~~~~~~~~~~~~~~~^^
+  |   File "D:\Drivers\python\Lib\asyncio\taskgroups.py", line 154, in __aexit__
+  |     raise me from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 68, in ingest
+    |     receipt=await self._upload(kb,*row)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 40, in _upload
+    |     raise RuntimeError('NATIVE_INGESTION_NOT_COMPLETED:'+str(document.get('error_code','')))
+    | RuntimeError: NATIVE_INGESTION_NOT_COMPLETED:DOCUMENT_PROCESSING_FAILED
+    +------------------------------------

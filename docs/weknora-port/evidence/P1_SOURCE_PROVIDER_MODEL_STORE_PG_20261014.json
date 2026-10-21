@@ -1,0 +1,50 @@
+{
+  "kind": "actual-isolated-pg-real-aes-synthetic-records",
+  "system_identifier": "7696088403504697382",
+  "database": "weknora_python_port_20261013",
+  "model_calls": 0,
+  "old_database_writes": 0,
+  "cases": {
+    "old_pin": {
+      "migration_sha256": "e3d22edc4a5d53415835be33ea2620d955248c038747b62ad8db5e5477427691",
+      "tenant_id": 132,
+      "knowledge_base_id": "0b67af03-37c0-4315-8bf0-9cdcb2be1d40",
+      "pinned_model_id": "mdl4a0e711ed96c19ad35fc916cb9e3370339cc90cc7765f85d141e7648666bb",
+      "new_model_id": "mdlad66f85fb34132d650c981a8f5c80ad73f2e45f44b142ddee14ec5e26b4ce",
+      "retained_row_count": 2,
+      "stored_secrets_encrypted": true,
+      "credential_update_preserved_id": true,
+      "public": {
+        "id": "mdl4a0e711ed96c19ad35fc916cb9e3370339cc90cc7765f85d141e7648666bb",
+        "role": "embedding",
+        "provider": "fixture",
+        "model": "synthetic-embedding",
+        "base_url": "https://fixture.invalid/v1",
+        "key_configured": true,
+        "source": "remote",
+        "stored_source": "remote",
+        "representation": "source-provider/v2"
+      },
+      "physical_keys": [
+        "6b0755acecf9fe815687e0b88fd6a8e9a59d84539d73774992712ef4c98f54c6",
+        "7c3fe48454ba5740d1f6542d2a15b68167bb70fc48adfc07dc80d3ca01aee3c3"
+      ]
+    },
+    "concurrent_physical": {
+      "tenant_id": 133,
+      "concurrent_same_id": "mdlb8d56da640c544b563beb0d84001b702b6896552e9e7f84bff127ad05f02f",
+      "concurrent_row_count": 1,
+      "cheap_id": "mdl6fae2ef26cf225298fb4f019ba23cb4cfd82cb62de4f1cbe6a71274309df8",
+      "expensive_id": "mdl80798243546ee56a16d0dd957ae56092816c7e1466546050c0dc9b2ca444d",
+      "same_physical_key": "21465773d024313e7d5efe2f57f386bff75e8cefdf5a59ae93f09603e8f2fa14"
+    },
+    "strict_scope": {
+      "tenant_id": 134,
+      "model_id": "mdldab8da66ccd3a0b337a2f79271bc23b3269d8813b7bed08a66dfd8799c496",
+      "wrong_key_denied": true,
+      "foreign_owner_denied": true,
+      "public_available_without_decrypt": true,
+      "original_key_readback_ok": true
+    }
+  }
+}

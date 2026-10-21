@@ -1,0 +1,1382 @@
+{
+  "schema": "rag-m3.1-source-and-evidence-diagnostics/v1",
+  "status": "M3_1_PARTIAL",
+  "baseline_commit": "fee2229f97725df18ed2da4d4f94c87c130758c6",
+  "date": "2026-10-18",
+  "production_default": "A",
+  "a": {
+    "status": "PASS_OFFLINE",
+    "negative_source": "Only immediately negated source clauses excluded from intent guard; other positive KB/source requests still guard. This is not general negation understanding.",
+    "two_source_request": "Teaching material explicitly evaluating an uploaded scheme retrieves even when internal state contains a document; no stable attachment identity inferred.",
+    "attachment_contract_limit": "Ordinary MessageCreate and React send no message-level image/document attachment fields; internal attachment_prompt has no stable document ID. Ambiguous attachments preserve existing doc_only behavior.",
+    "fallback_fix": "Current attachment retained in user-content data, including SearchNothing model fallback; not inserted into system instructions."
+  },
+  "b": {
+    "b1": {
+      "status": "PASS_REAL_SOURCE_FOLLOWUP",
+      "actual_query_provider": "deepseek",
+      "actual_query_model": "deepseek-flash",
+      "raw_intent": "follow_up",
+      "effective_intent": "kb_search",
+      "search_count": 30,
+      "rerank_count": 1,
+      "merge_count": 1,
+      "context_count": 1,
+      "answer_quality": "PASS_CORE_FACTS_WITH_MINOR_INFERENCES",
+      "sse_equals_persisted": true,
+      "token_usage": 8435
+    },
+    "b2": {
+      "status": "BLOCKED_INPUT_CONTRACT",
+      "actual_provider": null,
+      "search": null,
+      "context": null,
+      "answer": null,
+      "token_usage": "NOT_RUN",
+      "reason": "Normal message API/React still has no image/attachment transport. New authorization is present; input contract remains the blocker. No browser question sent."
+    },
+    "end_to_end_requests": 1,
+    "provider_requests": 4,
+    "reported_tokens": 8435,
+    "new_unknown": 0,
+    "historical_unknown": "UNMODIFIED_NOT_RECONCILED"
+  },
+  "c": {
+    "status": "PASS_OFFLINE_SAVED_RESPONSES",
+    "new_rerank_requests": 0,
+    "first_loss": "FILTERED_BEFORE_ACCEPTED_MMR",
+    "threshold": 0.3,
+    "top1_fallback_floor": 0.15,
+    "rerank_top_k": 30,
+    "configuration_basis": "M3 report plus runtime/PipelineState defaults; capture pipeline_state omits threshold/top_k. Replay output checked against saved completed stages.",
+    "cases": [
+      {
+        "case": "omni-page007-A",
+        "run_id": "283e21f9-06c1-4a64-8c7c-34d148b6cfb9",
+        "stage_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\40d0a96e87c28a0bbb4fa92731cd809ed036b1925ba78fdfbb03cae6e2e5fb08.json",
+        "result_source": "E:\\WK\\run\\rag-m3-20261017\\cases\\omni-page007-A\\result.json",
+        "wire_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\0b14960ebd54a02e1ce210624feb8247364d2963ab5e2ba363a48552648cf40e.json",
+        "response_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\0b14960ebd54a02e1ce210624feb8247364d2963ab5e2ba363a48552648cf40e.body",
+        "wire_sha256": "eb873731914f651fa2a782ac2222202744a1148a3e9a9fa0021294718644afd3",
+        "query": "课件中线性方程组的系数矩阵和增广矩阵最后一列的三个数是什么",
+        "candidate_count": 30,
+        "all_inputs_exactly_match_product_enriched_passage": true,
+        "selected_indices": [
+          0
+        ],
+        "fallback_used": false,
+        "accepted_count": 1,
+        "saved_rerank_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "saved_merge_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "saved_context_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "product_replay_status": "PASS",
+        "product_replay_exception": null,
+        "focus": [
+          {
+            "chunk_id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+            "chunk_type": "summary",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "search_rank_one_based": 1,
+            "search_score": 0.016393442622950817,
+            "actual_input_index_zero_based": 0,
+            "enriched_passage_exact": "Summary\n线性方程组的矩阵表示方法\n\n文档介绍了一组线性方程组的矩阵表示，包括系数矩阵和增广矩阵的构造方法。通过将方程组转化为矩阵形式，便于使用高斯消元法等矩阵运算求解。",
+            "enriched_passage_sha256": "d907b124bff6f21f2ffb8037dafc058e9ecce450e3960137071deb76c3355103",
+            "raw_response_rank_one_based": 1,
+            "raw_score": 0.5140959024429321,
+            "passes_0_3": true,
+            "selected_after_fallback": true,
+            "accepted": true,
+            "in_saved_rerank": true,
+            "in_merge": true,
+            "in_context_capture": true,
+            "first_loss": "NONE",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "PASS",
+              "accepted": "PASS",
+              "mmr_and_rerank_top_k": "PASS",
+              "merge": "PASS",
+              "context": "PASS"
+            }
+          },
+          {
+            "chunk_id": "51316a20-67fd-4732-b520-c049999933d0",
+            "chunk_type": "image_ocr",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "search_rank_one_based": 6,
+            "search_score": 0.014596036585365853,
+            "actual_input_index_zero_based": 5,
+            "enriched_passage_exact": "Matrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9\n\nMatrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9",
+            "enriched_passage_sha256": "981a19fb031cea7ee7b82138360e5023cb86e06a387ef0a44cefe5f5796ad4f8",
+            "raw_response_rank_one_based": 2,
+            "raw_score": 0.1673908233642578,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3 (fallback only used if entire selection empty)",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          }
+        ]
+      },
+      {
+        "case": "omni-page007-B",
+        "run_id": "36849265-c0f0-4b3c-b122-71572ffaa436",
+        "stage_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\36e56d53a2517c619555e22823a204bd489593cc2c9b865e1c1a755772224e01.json",
+        "result_source": "E:\\WK\\run\\rag-m3-20261017\\cases\\omni-page007-B\\result.json",
+        "wire_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\e4544e8a16e4a844e5f7d95ceebbcbd22185f119004e2d259abbabd2bb63fe20.json",
+        "response_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\e4544e8a16e4a844e5f7d95ceebbcbd22185f119004e2d259abbabd2bb63fe20.body",
+        "wire_sha256": "499ec3fdf906de030f76b941d1aab48b7350e96f9a398de56286c8e09f0f5e4b",
+        "query": "课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数",
+        "candidate_count": 30,
+        "all_inputs_exactly_match_product_enriched_passage": true,
+        "selected_indices": [
+          0
+        ],
+        "fallback_used": false,
+        "accepted_count": 1,
+        "saved_rerank_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "saved_merge_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "saved_context_ids": [
+          "4427641f-3190-598a-98a2-8f8d63d55d0e"
+        ],
+        "product_replay_status": "PASS",
+        "product_replay_exception": null,
+        "focus": [
+          {
+            "chunk_id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+            "chunk_type": "summary",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "search_rank_one_based": 1,
+            "search_score": 0.016393442622950817,
+            "actual_input_index_zero_based": 0,
+            "enriched_passage_exact": "Summary\n线性方程组的矩阵表示方法\n\n文档介绍了一组线性方程组的矩阵表示，包括系数矩阵和增广矩阵的构造方法。通过将方程组转化为矩阵形式，便于使用高斯消元法等矩阵运算求解。",
+            "enriched_passage_sha256": "d907b124bff6f21f2ffb8037dafc058e9ecce450e3960137071deb76c3355103",
+            "raw_response_rank_one_based": 1,
+            "raw_score": 0.7705795764923096,
+            "passes_0_3": true,
+            "selected_after_fallback": true,
+            "accepted": true,
+            "in_saved_rerank": true,
+            "in_merge": true,
+            "in_context_capture": true,
+            "first_loss": "NONE",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "PASS",
+              "accepted": "PASS",
+              "mmr_and_rerank_top_k": "PASS",
+              "merge": "PASS",
+              "context": "PASS"
+            }
+          },
+          {
+            "chunk_id": "51316a20-67fd-4732-b520-c049999933d0",
+            "chunk_type": "image_ocr",
+            "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+            "search_rank_one_based": 5,
+            "search_score": 0.014427767354596622,
+            "actual_input_index_zero_based": 4,
+            "enriched_passage_exact": "Matrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9\n\nMatrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9",
+            "enriched_passage_sha256": "981a19fb031cea7ee7b82138360e5023cb86e06a387ef0a44cefe5f5796ad4f8",
+            "raw_response_rank_one_based": 2,
+            "raw_score": 0.27084100246429443,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3 (fallback only used if entire selection empty)",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          }
+        ]
+      },
+      {
+        "case": "hotpot-5a7631-A",
+        "run_id": "bfd78bec-bb87-426f-892d-cd5e0897c917",
+        "stage_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\f586704ba3582d3ff716861c60d89ce2be00cc7c9b9f6b363eeb4f63b52375af.json",
+        "result_source": "E:\\WK\\run\\rag-m3-20261017\\cases\\hotpot-5a7631-A\\result.json",
+        "wire_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\b42ccf829d0d16456a946bc7379b4b8350972e0e6eeec04d935d4068cbdfc39a.json",
+        "response_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\b42ccf829d0d16456a946bc7379b4b8350972e0e6eeec04d935d4068cbdfc39a.body",
+        "wire_sha256": "954a7767c871336f1dfe66874a40404d4f56c83ff67eb68d52a17eb6f9b9f4a7",
+        "query": "Jeanne Marie Beaumont 2007-2010 研讨会 举办地点",
+        "candidate_count": 30,
+        "all_inputs_exactly_match_product_enriched_passage": true,
+        "selected_indices": [
+          2,
+          3
+        ],
+        "fallback_used": false,
+        "accepted_count": 2,
+        "saved_rerank_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "saved_merge_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "saved_context_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+        ],
+        "product_replay_status": "PASS",
+        "product_replay_exception": null,
+        "focus": [
+          {
+            "chunk_id": "3966da48-dab5-5220-8594-f16bfbfdfc80",
+            "chunk_type": "summary",
+            "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "search_rank_one_based": 11,
+            "search_score": 0.013386901152213462,
+            "actual_input_index_zero_based": 10,
+            "enriched_passage_exact": "Summary\nA museum and nonprofit educational center for poetry at Robert Frost's former home in Franconia, New Hampshire.\n\nThe Frost Place is a museum and nonprofit educational center dedicated to poetry, situated at the former home of poet Robert Frost in Franconia, New Hampshire, United States.",
+            "enriched_passage_sha256": "9d8dadc032a6d36387855b16f336f15f0c30fa7a3331535625c9bd38bf318b58",
+            "raw_response_rank_one_based": 10,
+            "raw_score": 0.000403647922212258,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3 (fallback only used if entire selection empty)",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          },
+          {
+            "chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+            "chunk_type": "text",
+            "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "search_rank_one_based": 15,
+            "search_score": 0.013126332622601277,
+            "actual_input_index_zero_based": 14,
+            "enriched_passage_exact": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+            "enriched_passage_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+            "raw_response_rank_one_based": 5,
+            "raw_score": 0.002824527444317937,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3 (fallback only used if entire selection empty)",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          }
+        ]
+      },
+      {
+        "case": "hotpot-5a7631-B",
+        "run_id": "9f941081-21b9-42b3-92e4-6adb305fce5c",
+        "stage_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\6d0965454e7420653f2a9454a69442c1199f2286aca33f07c2731233247e3744.json",
+        "result_source": "E:\\WK\\run\\rag-m3-20261017\\cases\\hotpot-5a7631-B\\result.json",
+        "wire_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\695cc527a82b844cd37d446382854a1c5cafc94ec723388d5ed0e9d95bdddc8b.json",
+        "response_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\695cc527a82b844cd37d446382854a1c5cafc94ec723388d5ed0e9d95bdddc8b.body",
+        "wire_sha256": "37b8b2110946cfc102eb281b2a600ae17419a11635e8b92b463adfddcfcc6050",
+        "query": "Where is the seminar directed by Jeanne Marie Beaumont in 2007-2010 located?",
+        "candidate_count": 30,
+        "all_inputs_exactly_match_product_enriched_passage": true,
+        "selected_indices": [
+          0,
+          3,
+          1
+        ],
+        "fallback_used": false,
+        "accepted_count": 3,
+        "saved_rerank_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "abc3a6aa-5453-4f0a-b7b6-5270cc96067f"
+        ],
+        "saved_merge_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "abc3a6aa-5453-4f0a-b7b6-5270cc96067f"
+        ],
+        "saved_context_ids": [
+          "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "abc3a6aa-5453-4f0a-b7b6-5270cc96067f"
+        ],
+        "product_replay_status": "PASS",
+        "product_replay_exception": null,
+        "focus": [
+          {
+            "chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+            "chunk_type": "text",
+            "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "search_rank_one_based": 6,
+            "search_score": 0.014614427860696517,
+            "actual_input_index_zero_based": 5,
+            "enriched_passage_exact": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+            "enriched_passage_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+            "raw_response_rank_one_based": 4,
+            "raw_score": 0.02049975097179413,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3 (fallback only used if entire selection empty)",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          },
+          {
+            "chunk_id": "3966da48-dab5-5220-8594-f16bfbfdfc80",
+            "chunk_type": "summary",
+            "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+            "search_rank_one_based": 10,
+            "search_score": 0.013866930171277997,
+            "actual_input_index_zero_based": 9,
+            "enriched_passage_exact": "Summary\nA museum and nonprofit educational center for poetry at Robert Frost's former home in Franconia, New Hampshire.\n\nThe Frost Place is a museum and nonprofit educational center dedicated to poetry, situated at the former home of poet Robert Frost in Franconia, New Hampshire, United States.",
+            "enriched_passage_sha256": "9d8dadc032a6d36387855b16f336f15f0c30fa7a3331535625c9bd38bf318b58",
+            "raw_response_rank_one_based": 6,
+            "raw_score": 0.005511672701686621,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3 (fallback only used if entire selection empty)",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          }
+        ]
+      },
+      {
+        "case": "mml-0434-A",
+        "run_id": "312cf9f0-2961-4f1c-b064-d6a3dab817e3",
+        "stage_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\e97ba6644ea4be1bf59a97bc241bb44835b1ab54dd28d3da83e19033525904a2.json",
+        "result_source": "E:\\WK\\run\\rag-m3-20261017\\cases\\mml-0434-A\\result.json",
+        "wire_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\81857375e3a167ac2f29eeb7ec8c5e1bdb08e06fb23e63da79c2e60538c563fd.json",
+        "response_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\81857375e3a167ac2f29eeb7ec8c5e1bdb08e06fb23e63da79c2e60538c563fd.body",
+        "wire_sha256": "85a69d90b1183e49193bd2e72bf7123e01995f1c16fc9071c8eb8314d0a0fb9a",
+        "query": "PPT中'coding time'部分介绍的数据集是什么",
+        "candidate_count": 30,
+        "all_inputs_exactly_match_product_enriched_passage": true,
+        "selected_indices": [],
+        "fallback_used": false,
+        "accepted_count": 0,
+        "saved_rerank_ids": [],
+        "saved_merge_ids": [],
+        "saved_context_ids": [],
+        "product_replay_status": "PASS_EXPECTED_SEARCH_NOTHING",
+        "product_replay_exception": "SearchNothing",
+        "focus": [
+          {
+            "chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+            "chunk_type": "text",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "search_rank_one_based": 11,
+            "search_score": 0.013035714285714286,
+            "actual_input_index_zero_based": 10,
+            "enriched_passage_exact": "Audio Recognition\n\n(chart by Clarifai)\n\nImage Recognition\n\n(chart by Clarifai)\n\nNatural Langauge Processing\n\n8\n\nNatural Langauge Processing\n\ncloudy days don't last forever.\n\nchibird\n\nDL? How?\n\nalmost at the code...\n\nDeep neural networks learn hierarchicalfeature representations\n\n(picture by Dato)\n\nKaggle's Cat vs Dog dataset (25k dog/cat pictures)\n\n(picture by Dato)\n\nDashboard\n\nCompetition Details » Get the Data » Make a submission\n\nHome\n\nData\n\nMake a submission",
+            "enriched_passage_sha256": "b8915ee85efae2292adf79a2058a1416469f6616b351d34bd23b5445be6e1324",
+            "raw_response_rank_one_based": 2,
+            "raw_score": 0.001054094755090773,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3; entire batch empty and top1 below fallback floor0.15",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          }
+        ]
+      },
+      {
+        "case": "mml-0434-B",
+        "run_id": "c1ea979b-6d33-472f-9777-efb1f71485d3",
+        "stage_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\71e9b2eab6d8e49449bbd5701717653dd2c5ffc6f48fd92ccbf4b4b4f4c12dce.json",
+        "result_source": "E:\\WK\\run\\rag-m3-20261017\\cases\\mml-0434-B\\result.json",
+        "wire_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\0878485ffc325ab494ddb7fbf023cfbe11aeb2f11e478bc2b748efc66a31abae.json",
+        "response_source": "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\0878485ffc325ab494ddb7fbf023cfbe11aeb2f11e478bc2b748efc66a31abae.body",
+        "wire_sha256": "d341369b5f0eab1ac0f720e817d7593c73523cc5d36c7d8b2a3d4ecd8daa914a",
+        "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+        "candidate_count": 30,
+        "all_inputs_exactly_match_product_enriched_passage": true,
+        "selected_indices": [],
+        "fallback_used": false,
+        "accepted_count": 0,
+        "saved_rerank_ids": [],
+        "saved_merge_ids": [],
+        "saved_context_ids": [],
+        "product_replay_status": "PASS_EXPECTED_SEARCH_NOTHING",
+        "product_replay_exception": "SearchNothing",
+        "focus": [
+          {
+            "chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+            "chunk_type": "text",
+            "knowledge_id": "4019d2aa-c21d-42c2-8e8f-4d5aee4039ce",
+            "search_rank_one_based": 10,
+            "search_score": 0.013251366120218579,
+            "actual_input_index_zero_based": 9,
+            "enriched_passage_exact": "Audio Recognition\n\n(chart by Clarifai)\n\nImage Recognition\n\n(chart by Clarifai)\n\nNatural Langauge Processing\n\n8\n\nNatural Langauge Processing\n\ncloudy days don't last forever.\n\nchibird\n\nDL? How?\n\nalmost at the code...\n\nDeep neural networks learn hierarchicalfeature representations\n\n(picture by Dato)\n\nKaggle's Cat vs Dog dataset (25k dog/cat pictures)\n\n(picture by Dato)\n\nDashboard\n\nCompetition Details » Get the Data » Make a submission\n\nHome\n\nData\n\nMake a submission",
+            "enriched_passage_sha256": "b8915ee85efae2292adf79a2058a1416469f6616b351d34bd23b5445be6e1324",
+            "raw_response_rank_one_based": 4,
+            "raw_score": 0.004162943456321955,
+            "passes_0_3": false,
+            "selected_after_fallback": false,
+            "accepted": false,
+            "in_saved_rerank": false,
+            "in_merge": false,
+            "in_context_capture": false,
+            "first_loss": "RERANK_FILTER_0_3; entire batch empty and top1 below fallback floor0.15",
+            "stage_status": {
+              "search": "PASS",
+              "actual_rerank_input": "PASS",
+              "raw_provider_response": "PASS",
+              "filtered": "DROPPED",
+              "accepted": "DROPPED",
+              "mmr_and_rerank_top_k": "DROPPED",
+              "merge": "DROPPED",
+              "context": "DROPPED"
+            },
+            "downstream_reason": "Not an MMR/TopK/Merge exclusion: candidate was absent because filtered() had already dropped it."
+          }
+        ]
+      }
+    ],
+    "source_artifacts": {
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\retrieval\\rerank.py": {
+        "sha256": "c3d6f6654772543f90afcce04cf1d4b850ebb7df5d87e438b7c54d98d149ecfe"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\scored-final-v3.json": {
+        "sha256": "f9344068b50692bf054a8f2c0e0f3f7ec9d19b6c0a2c881c4ad0dd7eaabc43ca"
+      },
+      "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\milestones\\RAG_M3_REPORT.md": {
+        "sha256": "a41d8d922452e4273a5f273d8e9f6b21859f8f97fc9b831bdd5cbe3178d5fbe9"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\captures\\40d0a96e87c28a0bbb4fa92731cd809ed036b1925ba78fdfbb03cae6e2e5fb08.json": {
+        "sha256": "03dcc39973ff64bf32b2815e0d49fcff39ca6bd4b502dad5921f32d208c41b05"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\40d0a96e87c28a0bbb4fa92731cd809ed036b1925ba78fdfbb03cae6e2e5fb08.json": {
+        "sha256": "cfeb70061c57093d4c325426f545a26780ef8d856e3e3de2b3c816cbbbf82071"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\cases\\omni-page007-A\\result.json": {
+        "sha256": "1836bc8116116d2602f234287a5f953ed3285020c55af0bb90953cbca3826d56"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\0b14960ebd54a02e1ce210624feb8247364d2963ab5e2ba363a48552648cf40e.json": {
+        "sha256": "35bc9fb1cf4bbf08c5c98c912c2a4cd24c03ca8ca7ffd4258ac267e947817d5d"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\0b14960ebd54a02e1ce210624feb8247364d2963ab5e2ba363a48552648cf40e.body": {
+        "sha256": "9cd83ae704b2944ab2b9aa11753b809f11418d7550f84d90edb9886f5e3c2d5f"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\captures\\36e56d53a2517c619555e22823a204bd489593cc2c9b865e1c1a755772224e01.json": {
+        "sha256": "594fab8438feadfd026a18eae23f4037977f7ade53346249384e93f9fb485f06"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\36e56d53a2517c619555e22823a204bd489593cc2c9b865e1c1a755772224e01.json": {
+        "sha256": "2cc0b719a2187cc08bab8df6edbde22e435be6bfd191b6646771a6e1cf99a170"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\cases\\omni-page007-B\\result.json": {
+        "sha256": "f52ed528f2e5813be36bf54a7b1f9d470b75601469e9c92138b48bfa87cde927"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\e4544e8a16e4a844e5f7d95ceebbcbd22185f119004e2d259abbabd2bb63fe20.json": {
+        "sha256": "6d30df8c30a832fb362e48b37ca671321766e97310b5eae18b81279fdea15c82"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\e4544e8a16e4a844e5f7d95ceebbcbd22185f119004e2d259abbabd2bb63fe20.body": {
+        "sha256": "2d88062e5a828521e4472ec8320613283117a0e8a7944fa7fc4f89ed29770dad"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\captures\\f586704ba3582d3ff716861c60d89ce2be00cc7c9b9f6b363eeb4f63b52375af.json": {
+        "sha256": "b2abc493984c99b15df92a4494f074013b8cddccb770ad838e88a1c4221c9527"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\f586704ba3582d3ff716861c60d89ce2be00cc7c9b9f6b363eeb4f63b52375af.json": {
+        "sha256": "e759277248461e196cba337f5cd774f79ac570bb16a68f506a656737d19b3a89"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\cases\\hotpot-5a7631-A\\result.json": {
+        "sha256": "741e5b3b7b6510c29304bec0f8bb03959a639e4d60f71cef936698b058a32d7e"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\b42ccf829d0d16456a946bc7379b4b8350972e0e6eeec04d935d4068cbdfc39a.json": {
+        "sha256": "06afe4041a2cff35e6265374c93e5c9c938ca5ef785f2a90beca152364beec8a"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\b42ccf829d0d16456a946bc7379b4b8350972e0e6eeec04d935d4068cbdfc39a.body": {
+        "sha256": "3d70e7e1ab6cec9a61d3b3e7c001025773a015a1b6635d90d0e526d0d1ae6006"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\captures\\6d0965454e7420653f2a9454a69442c1199f2286aca33f07c2731233247e3744.json": {
+        "sha256": "80f2e5e477db744ded7a530c08b788d92e770b3a11b30766b3bb30baf036074c"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\6d0965454e7420653f2a9454a69442c1199f2286aca33f07c2731233247e3744.json": {
+        "sha256": "f8baf9143cd35e57a43067b7187fe32621923d5d39c1b59e4bcefad0473ca5a6"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\cases\\hotpot-5a7631-B\\result.json": {
+        "sha256": "aa6c2cdfa9b8fb22e1d507266b06f8a61909ab61afe8c402a9bab3f890656823"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\695cc527a82b844cd37d446382854a1c5cafc94ec723388d5ed0e9d95bdddc8b.json": {
+        "sha256": "48a05b0960fbbb3d6d497b49a41055e3cf9c2c9bdfa7e1c78297503cb3f83161"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\695cc527a82b844cd37d446382854a1c5cafc94ec723388d5ed0e9d95bdddc8b.body": {
+        "sha256": "e6e5d2fa04405674b42bf5f5317ec6ba1a3c5ba134c2f46174e79810b3659b64"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\captures\\e97ba6644ea4be1bf59a97bc241bb44835b1ab54dd28d3da83e19033525904a2.json": {
+        "sha256": "8dfa9a24e155c4c2c42a22446c1dea6e4d5d3a41ab782172a1f493c913ccb47f"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\e97ba6644ea4be1bf59a97bc241bb44835b1ab54dd28d3da83e19033525904a2.json": {
+        "sha256": "ce65ddd8e114994094e86c4af053616c20845e1b98b850c1ab763b6a6b3c0ff7"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\cases\\mml-0434-A\\result.json": {
+        "sha256": "5dc564897ff0a914594e8e7186eb08dcfd062bd087f9d92f34183244212e2de2"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\81857375e3a167ac2f29eeb7ec8c5e1bdb08e06fb23e63da79c2e60538c563fd.json": {
+        "sha256": "2d087aa32564637be7d20de51e78aa58b5210f8de9e2869b86fe0040fae295a2"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\81857375e3a167ac2f29eeb7ec8c5e1bdb08e06fb23e63da79c2e60538c563fd.body": {
+        "sha256": "3f69e486c308545bc66d7d53c8e89a488025c7b201ce9f4beae9cef1adb1e13a"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\captures\\71e9b2eab6d8e49449bbd5701717653dd2c5ffc6f48fd92ccbf4b4b4f4c12dce.json": {
+        "sha256": "e34db5dd8dad0bdf9b7e6f2abc12952e56578607dded00b14bd963a4dafe2f9a"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\stages\\71e9b2eab6d8e49449bbd5701717653dd2c5ffc6f48fd92ccbf4b4b4f4c12dce.json": {
+        "sha256": "e983cc556c6ab575402bd49c6aef2421d77b111807b587a8ab5e1ba6c0d431d0"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\cases\\mml-0434-B\\result.json": {
+        "sha256": "ebf4ce48e49a54f2a92250b2357b3ceaa79184f7956cd1aa4fad2ed94a617c94"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\provider-requests\\0878485ffc325ab494ddb7fbf023cfbe11aeb2f11e478bc2b748efc66a31abae.json": {
+        "sha256": "decc35248c83c75f835da8bc6cdaf7277ffaa78b791f7076730bc4aaf6f8b920"
+      },
+      "E:\\WK\\run\\rag-m3-20261017\\evidence-332\\raw\\0878485ffc325ab494ddb7fbf023cfbe11aeb2f11e478bc2b748efc66a31abae.body": {
+        "sha256": "97125ae38166ab4561c1bc2c80ba8d81959964e0b305253d062415ce17efcd54"
+      },
+      "E:\\WK\\run\\rag-m31-20261018\\replay_evidence.py": {
+        "sha256": "3067438e4718a73e43c5e90c51aa19e71b37a81bc30007ced9f0ae1617b69706"
+      }
+    },
+    "full_evidence_path": "E:\\WK\\run\\rag-m31-20261018\\omni-evidence-flow.json",
+    "full_evidence_sha256": "12fa6ea2ede25cd1c554dccc40297d7cd2ee4b592e0de649e8aaa812d128f516",
+    "replay_script": "E:\\WK\\run\\rag-m31-20261018\\replay_evidence.py",
+    "replay_script_sha256": "3067438e4718a73e43c5e90c51aa19e71b37a81bc30007ced9f0ae1617b69706",
+    "replay_exit_code": 0,
+    "strategy_decision": "No Rerank implementation bug demonstrated. Keep defaults. Omni is reasonably ranked but excluded by absolute threshold; Hotpot/0434 scores much lower. A single global threshold reduction is not justified by this diagnosis."
+  },
+  "preflight": {
+    "mode": "READ_ONLY_NO_PROVIDER_REQUESTS",
+    "new_provider_requests": 0,
+    "new_tokens": 0,
+    "authorization": "PENDING_NEW_M31_OWNER_CONFIRMATION",
+    "b2": "BLOCKED_INPUT_CONTRACT",
+    "postgres": {
+      "system_identifier": "7696088403504697382",
+      "database": "weknora_python_port_20261013"
+    },
+    "roles": {
+      "vlm": {
+        "provider": "",
+        "model": "",
+        "key_configured": false
+      },
+      "cheap": {
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "key_configured": true
+      },
+      "rerank": {
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "key_configured": true
+      },
+      "embedding": {
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "key_configured": true
+      },
+      "expensive": {
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "key_configured": true
+      }
+    },
+    "kb": {
+      "id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "cloud_allowed": true
+    },
+    "current_provider_outcomes": [
+      {
+        "outcome": "RESPONSE_RECEIVED",
+        "count": 217
+      }
+    ],
+    "redis": {
+      "address": "127.0.0.1:56424",
+      "db": 15,
+      "run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+      "version": "7.4.2",
+      "health": "PING_OK",
+      "historical_run_id": "dcff9d65a25725574ba0cfbc743d409fac211ef0",
+      "same_run_as_m3": true
+    }
+  },
+  "verification": {
+    "pytest_command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_m31_source_constraints.py tests/weknora_port/test_p21_boundaries.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_service.py -q -p no:cacheprovider --basetemp E:\\WK\\run\\rag-m31-20261018\\pytest-final-user-data",
+    "pytest_exit_code": 0,
+    "pytest_result": "148 passed in 2.13s",
+    "pytest_log": "E:\\WK\\run\\rag-m31-20261018\\pytest-final-user-data.log",
+    "before_fix_result": "5 failed, 5 passed; exit1",
+    "before_fix_log": "E:\\WK\\run\\rag-m31-20261018\\pytest-before.log",
+    "diff_check_exit_code": 0,
+    "real_api_browser": {
+      "normal_api_b1": "PASS_REAL",
+      "browser_image_b2": "NOT_RUN_BLOCKED_INPUT_CONTRACT"
+    },
+    "diagnostic_setup_errors": [
+      "Read-only preflight first used Windows Proactor loop; switched diagnostic only to SelectorEventLoop.",
+      "First Rerank replay omitted product segmenter; reran with pinned default_segmenter. Both failures preserved in raw evidence/diagnostic notes."
+    ]
+  },
+  "initial_closeout_b": {
+    "b1": {
+      "status": "BLOCKED_AUTHORIZATION",
+      "actual_provider": null,
+      "search": null,
+      "context": null,
+      "answer": null,
+      "token_usage": "NOT_RUN",
+      "reason": "New M3.1 finite authorization confirmation requested; no response at closeout. Historical M3 authorization not reused."
+    },
+    "b2": {
+      "status": "BLOCKED_INPUT_CONTRACT",
+      "actual_provider": null,
+      "search": null,
+      "context": null,
+      "answer": null,
+      "token_usage": "NOT_RUN",
+      "reason": "Normal MessageCreate extra=forbid, request/service binding and React composer have no message-level images/attachments. Browser/API real image request NOT_RUN. No new transport feature added."
+    },
+    "end_to_end_requests": 0,
+    "provider_requests": 0,
+    "reported_tokens": 0,
+    "new_unknown": 0,
+    "historical_unknown": "UNMODIFIED_NOT_RECONCILED"
+  },
+  "post_authorization_b1": {
+    "schema": "rag-m31-live-b1-result/v1",
+    "status": "PASS_REAL_SOURCE_FOLLOWUP",
+    "source_commit": "cc131bf4123da6b1d1616effc74298b468a1d23e",
+    "session_id": "6d3da3ce-e15d-4f0c-926f-3fae43cc2302",
+    "run_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e",
+    "request_id": "90490521-e2b7-405e-9f71-b8e41cd59f7c",
+    "question": "课件还提到这些远距离通信方式可能遇到什么问题？请根据课件回答。",
+    "authorization": "NEW_OWNER_CONFIRMED_CLOSED_AFTER_ONE_REQUEST",
+    "history": {
+      "real_rounds": 2,
+      "exact_equal_to_original_B_provider_history": true,
+      "history_sha256": "bda020b4326e6240955848e55e294215c64e81454e62a9f655be4127121d738d",
+      "new_calls_for_history": 0
+    },
+    "query_understanding": {
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "reported_model": "deepseek-flash",
+      "raw_intent": "follow_up",
+      "effective_intent": "kb_search",
+      "rewrite": "课件中提到的远距离通信方式可能遇到什么问题",
+      "raw_response": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.body",
+      "raw_sha256": "5701323c8322627e417e509180887970d16e2d2719a72cf20dc806f389a63ab3"
+    },
+    "stages": [
+      {
+        "stage": "understand",
+        "fields": {},
+        "seconds": 0.7464604999986477
+      },
+      {
+        "stage": "retrieval",
+        "fields": {
+          "candidate_count": 30
+        },
+        "seconds": 2.1273382999934256
+      },
+      {
+        "stage": "rerank",
+        "fields": {
+          "candidate_count": 1
+        },
+        "seconds": 0.699608700000681
+      },
+      {
+        "stage": "merge",
+        "fields": {
+          "candidate_count": 1
+        },
+        "seconds": 0.19194210000569
+      },
+      {
+        "stage": "context",
+        "fields": {
+          "selected_evidence_count": 1
+        },
+        "seconds": 0.33092030000989325
+      }
+    ],
+    "context": {
+      "selected_chunks": 1,
+      "rendered_characters": 1279,
+      "user_content_characters": 1419,
+      "evidence_present_in_actual_generation_request": true,
+      "chunk_id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+      "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+      "offset_start": 10575,
+      "offset_end": 11061,
+      "source_quote": "train, bus -can receive more than one signal at a time\n\nLong distance communication -signals can be refracted by different layers in the atmosphere allowing them to travel further -ionosphere refracts radiowaves -microwaves can be used to send signals to satellites\n\nP1g: Wireless Communication\n\nProblems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality\n\n",
+      "context_sha256": "f784ae94cd889e39bf4437884c123ac8e45b24aaa662fdf6436b28e7a14f3470"
+    },
+    "answer": "## 长距离通信可能遇到的问题\n\n根据课件内容，长距离通信可能遇到以下问题：\n\n1. **信号扩散**：信号在传播过程中会扩散，导致信号覆盖范围扩大，难以精确发送信号。\n2. **大气层折射**：信号在穿过不同大气层时会发生折射，这使得信号难以准确到达目的地，增加了发送信号的难度。\n3. **信号质量下降**：由于上述因素，信号在远距离传输过程中质量会下降，影响通信效果。",
+    "finish_reason": "stop",
+    "role": "cheap",
+    "upgraded": false,
+    "sse_equals_persisted": true,
+    "end_to_end_seconds": 17.295727199991234,
+    "calls": [
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/query_rewrite",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "capability": "chat",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "hit",
+          "total_tokens": 2634,
+          "cached_tokens": 2432,
+          "prompt_tokens": 2607,
+          "cache_reported": true,
+          "cache_miss_tokens": 175,
+          "cache_read_tokens": 2432,
+          "completion_tokens": 27,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 2607,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 27,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 2634,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": true,
+                  "value": 2432,
+                  "present": true
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": true,
+                  "value": 175,
+                  "present": true
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "89fff62332b5ae0e7d3b6ec14ecf416f150487b23e46d45ba352c65a48fd2fd5",
+            "numeric_raw": "{\"completion_tokens\":27,\"prompt_cache_hit_tokens\":2432,\"prompt_cache_miss_tokens\":175,\"prompt_tokens\":2607,\"total_tokens\":2634}",
+            "derived_total": 2634,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 2634
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.json",
+        "wire_sha256": "852e317c9ea8933699ad02d50fc1162dc52261c1fb29dfd4421ba1959b8430e4",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.body",
+        "raw_body_sha256": "5701323c8322627e417e509180887970d16e2d2719a72cf20dc806f389a63ab3",
+        "model_reported": "deepseek-flash"
+      },
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-da1049646735a052",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "capability": "embedding",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unsupported",
+          "total_tokens": 16,
+          "cached_tokens": 0,
+          "prompt_tokens": 16,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 0,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 16,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 16,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "7dd7a72829554a26749da9bb6dd2b38f086c49bfb1c9ae9b29b7fdabf3672d36",
+            "numeric_raw": "{\"completion_tokens\":0,\"prompt_tokens\":16,\"total_tokens\":16}",
+            "derived_total": 16,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 16
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\c3566445b305d642ccade70d883c64d65a88a42bd28c6a714f0b04ca2f248dd8.json",
+        "wire_sha256": "da71b570fe4c9808aba5608e2725e071e367bd564c382b79a086282dad7f62a5",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\c3566445b305d642ccade70d883c64d65a88a42bd28c6a714f0b04ca2f248dd8.body",
+        "raw_body_sha256": "a3f6c67db240578ffe76d1367eb86e0cb46d4d349a4288bf6246e0a92df5080b",
+        "model_reported": "BAAI/bge-m3"
+      },
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "capability": "rerank",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unsupported",
+          "total_tokens": 4408,
+          "cached_tokens": 0,
+          "prompt_tokens": 4408,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 0,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "meta.tokens.input_tokens",
+                  "valid": true,
+                  "value": 4408,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "meta.tokens.output_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "meta.tokens.total_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "image",
+                {
+                  "path": "meta.tokens.image_tokens",
+                  "valid": true,
+                  "value": 0,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "siliconflow-rerank-tokens/v1",
+            "simulated": false,
+            "raw_sha256": "e2a0ad4e7bfd991c698740674999b3a54f06155ddbd7f91ba48459ba514b8a83",
+            "numeric_raw": "{\"meta.tokens.image_tokens\":0,\"meta.tokens.input_tokens\":4408,\"meta.tokens.output_tokens\":0}",
+            "derived_total": 4408,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 0
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\e3cb5152da83c7def2e59efcbb0cbe6497427e6fa25f67eebf7b060e55cfde0c.json",
+        "wire_sha256": "9e79a14d00f98fd46f78c921711707d6798b7318928b5e80d31cc3e0276c13c4",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\e3cb5152da83c7def2e59efcbb0cbe6497427e6fa25f67eebf7b060e55cfde0c.body",
+        "raw_body_sha256": "84925a498355cd55e87c4bb2187f5828e0e2ec5bd241f74072320df130e5f937",
+        "model_reported": "UNREPORTED"
+      },
+      {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/answer/1/cheap",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+        "capability": "chat",
+        "outcome": "RESPONSE_RECEIVED",
+        "usage": {
+          "status": "REPORTED",
+          "cache_status": "unreported",
+          "total_tokens": 1377,
+          "cached_tokens": 0,
+          "prompt_tokens": 1272,
+          "cache_reported": false,
+          "cache_miss_tokens": 0,
+          "cache_read_tokens": 0,
+          "completion_tokens": 105,
+          "cache_write_tokens": 0,
+          "provider_usage_facts": {
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "prompt_tokens",
+                  "valid": true,
+                  "value": 1272,
+                  "present": true
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "completion_tokens",
+                  "valid": true,
+                  "value": 105,
+                  "present": true
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "total_tokens",
+                  "valid": true,
+                  "value": 1377,
+                  "present": true
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "prompt_cache_hit_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "cache_creation_input_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "prompt_cache_miss_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "completion_tokens_details.reasoning_tokens",
+                  "valid": false,
+                  "value": null,
+                  "present": false
+                }
+              ]
+            ],
+            "semantics": "openai-input-inclusive/v1",
+            "simulated": false,
+            "raw_sha256": "f9c22663e511dc28f82abaee29d19b5634e13b6c2fd8d17eb1b3f9512f44fdcc",
+            "numeric_raw": "{\"completion_tokens\":105,\"prompt_tokens\":1272,\"total_tokens\":1377}",
+            "derived_total": 1377,
+            "prior_numeric_raw": [],
+            "observed_lower_bound": 1377
+          }
+        },
+        "wire_record": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\provider-requests\\2ebe488f012d1aceafb30d24fc7f3ac5f61839674322ee451ecbb54a2e8ac88f.json",
+        "wire_sha256": "eb01237c98fcd59ea0d8d91987eb88db4aa6d6897160d3273f5f349fae2e0f32",
+        "raw_body_path": "E:\\WK\\run\\rag-m31-20261018\\live-b1\\evidence-332\\raw\\2ebe488f012d1aceafb30d24fc7f3ac5f61839674322ee451ecbb54a2e8ac88f.body",
+        "raw_body_sha256": "93e9dab94cb4a6d5b73ca2999313449da133bdccff87caa1fc760a3ca598e5bc",
+        "model_reported": "XingChenAGI/Xing4.0-29B"
+      }
+    ],
+    "provider_calls": 4,
+    "input_tokens": 8303,
+    "output_tokens": 132,
+    "total_tokens": 8435,
+    "unknown": 0,
+    "missing_usage": 0,
+    "legacy_accounting_unchanged": true,
+    "source_resources_unchanged": true,
+    "own_api_stopped": true,
+    "b2": "BLOCKED_INPUT_CONTRACT",
+    "evidence_root": "E:\\WK\\run\\rag-m31-20261018\\live-b1",
+    "semantic_review": {
+      "schema": "rag-m31-live-semantic-review/v1",
+      "run_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e",
+      "review": "PASS_CORE_FACTS_WITH_MINOR_INFERENCES",
+      "history_selection": {
+        "source_session": "f92e5f27-758c-41b0-a030-2cd95280fb88",
+        "target_session": "6d3da3ce-e15d-4f0c-926f-3fae43cc2302",
+        "selected_complete_rounds": 2,
+        "selected_run_ids": [
+          "fcd015dd-fc5d-459a-acd6-3f9ee6f8b23a",
+          "1de702fc-43cc-4ce7-9e3d-c846b287fa4f"
+        ],
+        "stage_observation": "understand.completed and every later completed pipeline stage records these exact two request_ids in this order; each query/answer content hash equals the source capture.",
+        "message_sha256": [
+          {
+            "run_id": "fcd015dd-fc5d-459a-acd6-3f9ee6f8b23a",
+            "role": "user",
+            "sha256": "faf5fb89bed56b6a7a7308f7909c9234fcf4b179eb370b5ceea6527b264cc757"
+          },
+          {
+            "run_id": "fcd015dd-fc5d-459a-acd6-3f9ee6f8b23a",
+            "role": "assistant",
+            "sha256": "4b6aa5287fc7834d793e2ca6788783014eca1d63ae67cb502ab9a7f1fc47d0cd"
+          },
+          {
+            "run_id": "1de702fc-43cc-4ce7-9e3d-c846b287fa4f",
+            "role": "user",
+            "sha256": "2c9089b861cdf4db3483b4ac7f14e91323818e713eb2692cd9ad621d7d324f74"
+          },
+          {
+            "run_id": "1de702fc-43cc-4ce7-9e3d-c846b287fa4f",
+            "role": "assistant",
+            "sha256": "8abf07c0533428ea9606cfff5a82317326293773d9de7380b6bea459719a4482"
+          }
+        ],
+        "actual_answer_request": "6 messages: system + the four exact historical messages + current user/context; all four source message texts are present byte-for-byte in the outbound provider body.",
+        "query_understanding_request": "The actual DeepSeek request system message contains all four exact historical messages; query-understanding user message contains the current B1 question."
+      },
+      "query_understanding": {
+        "request_id": "c0696630-2e52-4c57-bcf4-e82b9231fc7e/query_rewrite",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "http_status": 200,
+        "raw_model_intent": "follow_up",
+        "raw_rewrite_query": "课件中提到的远距离通信方式可能遇到什么问题",
+        "effective_runtime_intent": "kb_search",
+        "needs_retrieval": true,
+        "ranking_counts": {
+          "search": 30,
+          "rerank": 1,
+          "context": 1
+        },
+        "follow_up_runtime_branch_exercised": false,
+        "resolution": "The source-scoped request clause '请根据课件回答' resolves effective intent to kb_search before the follow_up-specific resolver branch. The provider was not forced; raw follow_up is preserved in its actual HTTP response, while the completed understand stage records kb_search."
+      },
+      "answer_support": {
+        "context_capture": "READ_ONLY_AFTER_NORMAL_PREPARATION",
+        "selected_context_evidence_count": 1,
+        "evidence": [
+          {
+            "chunk_id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+            "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+            "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+            "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+            "chunk_index": 24,
+            "source_offsets": [
+              10575,
+              11061
+            ],
+            "quote": "Problems that can occur: -signal can spread out -waves can refract when passing through different layers of atmosphere -makes it difficult to send signals when you want to -drop in quality"
+          }
+        ],
+        "actual_answer_request_contains_quote": true,
+        "assessment": {
+          "supported_core_points": [
+            "signal can spread out",
+            "refraction through different atmospheric layers can make intended sending difficult",
+            "drop in signal quality"
+          ],
+          "inference_or_overstatement": "The answer expands 'signal can spread out' to say coverage expands, and attributes quality loss to the preceding factors; neither detail is explicit in the quoted chunk. These are plausible explanation, not direct source facts.",
+          "user_visible_citation": "The completed API assistant message has zero knowledge_references, so the supported source was in the actual model context but no clickable citation was persisted."
+        }
+      },
+      "provider_requests": {
+        "actual_count": 4,
+        "all_http_200": true,
+        "calls": [
+          "query_rewrite: DeepSeek deepseek-flash",
+          "query_embedding: SiliconFlow BAAI/bge-m3",
+          "rerank: SiliconFlow BAAI/bge-reranker-v2-m3",
+          "answer: SiliconFlow XingChenAGI/Xing4.0-29B"
+        ],
+        "extra_provider_calls_observed": 0
+      },
+      "evidence_files": [
+        "history-before.json",
+        "history-seed.json",
+        "cases/b1-B/messages.json",
+        "cases/b1-B/result.json",
+        "evidence-332/provider-requests/e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.json",
+        "evidence-332/raw/e9d50883bd8c0e758d08852b58c56449253465f19f0fc37b46c4f193d491e58d.body",
+        "evidence-332/provider-requests/2ebe488f012d1aceafb30d24fc7f3ac5f61839674322ee451ecbb54a2e8ac88f.json",
+        "evidence-332/captures/5d26057e5f186124f16f8ba6197d2f2a029062a7c4b63282d58ad65dbac1cf09.json",
+        "evidence-332/stages/5d26057e5f186124f16f8ba6197d2f2a029062a7c4b63282d58ad65dbac1cf09.json"
+      ],
+      "reviewer_initial_label": "PASS_WITH_ANSWER_CITATION_GAP",
+      "product_contract_adjudication": "Public citation display has been disabled by Owner since P21. Missing clickable citations is expected; core source support and internal identity were verified independently. Two explanatory additions remain labelled as inferences."
+    },
+    "citation_contract": "EXPECTED_DISABLED_PUBLIC_CITATIONS; not an acceptance failure",
+    "commands": {
+      "prepare": 0,
+      "start": 0,
+      "query": 0,
+      "snapshot_initial": 1,
+      "snapshot_after_factual_diagnostic_tenant_metadata_fix": 0,
+      "stop": 0
+    },
+    "diagnostic_error_note": "Initial inline summarizer treated capture ranking pairs as objects; corrected analyzer to use saved typed stage SearchResult rows. No API/model request repeated.",
+    "test_scope": "No production code changed or offline tests repeated in this authorized continuation."
+  },
+  "authorization_followup": {
+    "source": "Owner direct confirmation: 我确认授权进行真实问答",
+    "recorded_at": "2026-10-18T01:17:49.215306+00:00",
+    "scope": "M3.1 existing SiliconFlow/DeepSeek and public M3 history/index",
+    "approved_max_e2e": 2,
+    "approved_max_provider": 12,
+    "approved_reported_tokens": 100000,
+    "planned_e2e": 1,
+    "b2": "BLOCKED_INPUT_CONTRACT",
+    "unknown_policy": "STOP_NO_RETRY",
+    "status": "CLOSED_NO_FURTHER_SENDS",
+    "executed_e2e": 1,
+    "executed_provider": 4,
+    "reported_tokens": 8435,
+    "new_unknown": 0,
+    "unused_e2e_not_executed": 1,
+    "unused_reported_token_execution_headroom": 91565,
+    "note": "Own API stopped; unused local experiment execution permission closed. No account allowance/legacy ledger changes."
+  },
+  "final_integrity": {
+    "mode": "READ_ONLY",
+    "old_source_messages_unchanged": true,
+    "chunk_quote_and_document_kb_version_match_live_db": true,
+    "owned_api_port_closed": true,
+    "new_provider_requests": 0
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "baseline_commit": "3b528f22d12d2c50fa19c195f79dd1681879c0d0",
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "source_sha256": {
+    "internal\\searchutil\\imageinfo.go": "92d7397177a848c2c933fa998912d27f74537967799fe0f51c4044a29382e996",
+    "internal\\types\\chunk.go": "c69fbd3338e040359b103b88863361a7f5a5b6b5047231da612573191a742bec",
+    "internal\\application\\service\\knowledgebase_search_results.go": "e4240be3377b8bd9766c2dbdb4679283455391a67317ebd10cab119d868b89b0"
+  },
+  "runtime_and_fixture_sha256": {
+    "backend/weknora_port/retrieval/merge.py": "215acc7e1af1813b5ac705bf977d520f8c1ba7d2b5cbee9bc9ceff1295cd25e8",
+    "backend/weknora_port/storage/hybrid.py": "49789246535a67b19be7083d964451ad32a9b3ab5b223979876211193caf8a9a",
+    "backend/weknora_port/storage/knowledge.py": "ccb3c3a41d68d58623841bee1d02beae70978fe184e7cbdd091b6e23f398387d",
+    "tests/weknora_port/test_hybrid_storage.py": "a0bc214bc74c74acdf766e03c932d14ebb90cd26540a9a66fe88db991874950f",
+    "tests/weknora_port/test_search_image_completion.py": "ef3b8fda5615fcb69d56e588cbd01d46c615d8cd4e1e195857ade8eb94a28177",
+    "tests/weknora_port/test_search_image_completion_pg.py": "93a09337fb2c634ecb62fbf0f8ea38aeaae2442f078e0d60dc95c3ab20dc86c0",
+    "tests/weknora_port/fixtures/image_completion_go_oracle.json": "111622bf2e8d11d9b58b06b84b8c861255f96b998279a2e884a0df46a2171edd",
+    "scripts/weknora_port_image_completion_oracle.py": "cb574c9d6ed01d57327d82bfb5a7a523175f7ea1d6952d74a6183b2d5d1807b7",
+    "backend/weknora_port/generation/context.py": "f771e408f2773de524305371a4e2a997028d63d1bc8df7644b55460c6a640d73",
+    "backend/weknora_port/retrieval/context.py": "6a2907a5e3b7fd067faddbb05ffc81fe816691584497edc2b7c2c28bd855ad7f",
+    "backend/weknora_port/storage/postgres.py": "892a9a58eefd9cdc2dc613ad0c4bd620e33a3a20200e580ad6ec79ea904c190e",
+    "backend/weknora_port/documents.py": "65da8157d40e0fce0e2927f9eab47013bc1c81e93a5c1558fbd1de200543e110",
+    "tests/weknora_port/native_fixture.py": "b9790bca6cd70dfa7689c82588d43767ba70fc2dd93c378f0707162a0dfe3f9b",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/run-check.py": "fc75e5d4b26b25e3d142334b82826715d0a5c58c8a8ca6b7514b66f265329638",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/run-frozen-search.py": "ebe7b7e6ebfb37c54401afe8d5af4ce86f931af16bb93ddf7b40530e89dba8d7",
+    "backend/weknora_port/retrieval/search.py": "edee1bbc3439926a4f0b1fd039204439dbe280ccdcb8181840daa274e96f2696",
+    "backend/weknora_port/references/registry.py": "40bbc2e2d047020458b22a6637e836f4d280ffb7f93d90794e9cff5be40ee4e1",
+    "backend/weknora_port/generation/coordinator.py": "d84f4a0a250abdd28fb462af60f239f1cac7b9272b1ad87073ac09b61836ae4f",
+    "backend/weknora_port/generation/router.py": "270363dc71bc59295dc7c816a21e16492e8ff1f652ea49d6e3f59dda5e8b649b",
+    "backend/weknora_port/retrieval/fusion.py": "44d1a98e601bb69977ca2b197c145b300e104c419bbbfddb8a46ab7dac78700d",
+    "backend/weknora_port/http_api.py": "756e655bbe2fb3441183b6db3ee2e7b592a79385b5c7e7fe85fa12ce220fbd16"
+  },
+  "runtime_changed_files": [
+    "backend/weknora_port/retrieval/merge.py",
+    "backend/weknora_port/storage/hybrid.py",
+    "backend/weknora_port/storage/knowledge.py"
+  ],
+  "protected_original_files": {
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+  },
+  "upstream_mapping_lines": [
+    {
+      "line": 87,
+      "text": "searchutil.EnrichSearchResultsImageInfo(ctx, s.chunkRepo, tenantID, searchResults)"
+    },
+    {
+      "line": 343,
+      "text": "Seq:                     chunk.ChunkIndex,"
+    }
+  ],
+  "status": "SOURCE_READ / IMPLEMENTED / OFFLINE_PASS / ISOLATED_INTEGRATION_PASS for named seq/image completion; no whole-stage, provider or cutover claim",
+  "offline": {
+    "exit_code": 0,
+    "passed": 124,
+    "receipt": "offline-final.exitcode.txt"
+  },
+  "go": {
+    "exit_code": 0,
+    "cases": 16,
+    "scope": "SOURCE_EXTRACTED_TYPED_REPOSITORY_ADAPTER",
+    "receipt": "go.exitcode.txt"
+  },
+  "real_provider_calls": 0,
+  "rank_ties": "UNDEFINED_FUSION_TIE_ORDER; ranking implementation unchanged",
+  "upstream_git_blob_binding": {
+    "internal\\searchutil\\imageinfo.go": {
+      "git_blob_sha256": "92d7397177a848c2c933fa998912d27f74537967799fe0f51c4044a29382e996",
+      "working_sha256": "92d7397177a848c2c933fa998912d27f74537967799fe0f51c4044a29382e996",
+      "canonical_equal": true
+    },
+    "internal\\types\\chunk.go": {
+      "git_blob_sha256": "c69fbd3338e040359b103b88863361a7f5a5b6b5047231da612573191a742bec",
+      "working_sha256": "c69fbd3338e040359b103b88863361a7f5a5b6b5047231da612573191a742bec",
+      "canonical_equal": true
+    },
+    "internal\\application\\service\\knowledgebase_search_results.go": {
+      "git_blob_sha256": "e4240be3377b8bd9766c2dbdb4679283455391a67317ebd10cab119d868b89b0",
+      "working_sha256": "e4240be3377b8bd9766c2dbdb4679283455391a67317ebd10cab119d868b89b0",
+      "canonical_equal": true
+    }
+  },
+  "unchanged_source_ast_vs_baseline": [
+    "backend/weknora_port/generation/router.py",
+    "backend/weknora_port/retrieval/fusion.py",
+    "backend/weknora_port/retrieval/search.py",
+    "backend/weknora_port/generation/coordinator.py",
+    "backend/weknora_port/models/safe_network.py",
+    "backend/weknora_port/ingestion/core.py",
+    "tests/weknora_port/native_fixture.py"
+  ],
+  "knowledge_loader_only_added_seq_keyword_ast_proof": true,
+  "isolated_integration": {
+    "asgi_http_pg_redis_mock_models": {
+      "exit_code": 0,
+      "passed": 1,
+      "receipt": "pg-dto-fixed.pg.json",
+      "source_parent_sequences": [
+        0,
+        7
+      ],
+      "child_literal_count": 4,
+      "context_handles": [
+        "c2"
+      ],
+      "new_fixture_only": true
+    },
+    "frozen_actual_go_full_search_comparison": {
+      "exit_code": 0,
+      "result_count": 10,
+      "shared_field_count": 18,
+      "image_info_equal": true,
+      "same_candidate_set": true,
+      "child_literal_equal": true,
+      "db_writes": 0,
+      "ddl": 0,
+      "receipt": "frozen-current.pg.json",
+      "score_and_tied_order_parity": "NOT_REASSERTED"
+    }
+  },
+  "evidence_sha256": {
+    ".gitattributes": "2b9eeae22177b496742b15c5dffbb88c51263b9d66c03f8498182eb9592f15aa",
+    "frozen-current.command.json": "8584d3a803c21e4df8156b464647e2765c02ca1b5c0de36c0e042c60a886ff7f",
+    "frozen-current.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "frozen-current.pg.json": "ae3922e226a862947ef32c98a8085f4cd57b6a6583ff73c0bcd32f379e3d06c5",
+    "frozen-current.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frozen-current.stdout.txt": "9d6ca36eadda30af2b19c2ffd3ebc997782dc9eee7973a0ef77154275a7030ee",
+    "go.command.json": "ec2efb609fe32c13d0c0dcee96a22f56ed06b27144c7a40e6ad6ea364ad7467a",
+    "go.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "go.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "go.stdout.txt": "0dcd914ff03be8201b0b44306f812edfb9541d875c917dc6b0225fba4417592b",
+    "green-initial.command.json": "63ca3512931f1fc569d17cd7afafc5b42bcc27f631bc905b14468339a58f33e6",
+    "green-initial.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "green-initial.junit.xml": "80b024a4b2410e1b3ebfdfaf8ff02386dfaca5ab4af17525f32b4d49ae3e95c2",
+    "green-initial.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "green-initial.stdout.txt": "52dd2b9e404f171fa6cd00e70201229291f34b6a78f00b039b01342c286d8cc0",
+    "isolated-start.json": "ebae9c01ddf14ea7da046e77f8e1c21f1077d364e1dd9384339cd74125204e33",
+    "offline-final.command.json": "cc8749b2689e82d564746a0365446482ce8eadc26ef27791f90c1395cc97d301",
+    "offline-final.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "offline-final.junit.xml": "07e149cb16ac3752582ca4dc4bba681536e95b811dc62ea79c8faacbee37f561",
+    "offline-final.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "offline-final.stdout.txt": "17a426ecf47d5c9b39434a0de1a5c8ecce13d6c09e60be4de94d3c97f1ac70d1",
+    "offline-oracle.command.json": "75d3fbe557cc050255d6bf6344ef243803ec3fc7616e6c955387e501a28b25f9",
+    "offline-oracle.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "offline-oracle.junit.xml": "1f5790b4942aa8cd311979ca22352c0c6ecdc71b081d6b9d2b531c436e6359fc",
+    "offline-oracle.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "offline-oracle.stdout.txt": "a92948d7ef32f142d025e89a6be782e9815fccfde112e39a47375f43220e3602",
+    "oracle.go": "2cafbd47675952cc31d78f5a5ceb84a33b1c197c464dff315d0dfc0ab58a7527",
+    "pg-context-handle.command.json": "7f946c37cc24431e99a5ca113f4e26babc246f81895163d7765a32c5a9d964b2",
+    "pg-context-handle.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "pg-context-handle.junit.xml": "d0963673a3b61db40cb3a535c5c3f5ae8b3b2634191afd458293d7558fea04c2",
+    "pg-context-handle.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg-context-handle.stdout.txt": "25ede25fdc4f9f0e8d3e590c9f0e58db27e4283c554e8cc0a796745862384bee",
+    "pg-dto-fixed.command.json": "e6b6b1ec94c9390818d9667c242cb8d2e0ed985caa0b1f6718837f2f65820b26",
+    "pg-dto-fixed.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "pg-dto-fixed.junit.xml": "fc1b27e8ee5063bb028b160be8492515cccfbec0f166a65b64d6ed6903cd1128",
+    "pg-dto-fixed.pg.json": "f31db146d45f7f0b0db1848264394e58dd3a4bc984a8b41b71667f8700ac0cf3",
+    "pg-dto-fixed.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg-dto-fixed.stdout.txt": "dc7c9b903ed9a8202facb33fb69c68b83f86cfe1a5fbb7923409c7ec6cb7c3da",
+    "pg-guard-fixed.command.json": "3f886d1c2fbbb0c3a7a787b72aa3f99b869aabb15abb94671e3f0a46a6b7bdf3",
+    "pg-guard-fixed.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "pg-guard-fixed.junit.xml": "16c4d1ca301dc1f734421b6a3195b86b5d928482004ea922ec5f31c14beaa9f6",
+    "pg-guard-fixed.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg-guard-fixed.stdout.txt": "565504f053575c07a0ea7f0e2bc6948ee2835bb6da832f03cbfe354ed3556c3a",
+    "pg-initial.command.json": "70b086ef2c009a02317e9f3449476f2dcdab17d2517774786db73652f868d610",
+    "pg-initial.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "pg-initial.junit.xml": "2be0ea974138dbda32fe405a54e82ad9addcbba726a7b1b97988d67a655d843e",
+    "pg-initial.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg-initial.stdout.txt": "bac001afba12dbed7a94cd3dc72076ac7a4e19001bc2cbf363c5e3b6e61bee15",
+    "pg-pump.command.json": "d352912d54141274828861aa23104beb806eff50985b9e192177bdfb8c271c99",
+    "pg-pump.domain-diagnostic.json": "c3d9d0ebf37efa59c0a521c2d9d9daa0bb0ebd923f80300b1b284bcdcfc45a57",
+    "pg-pump.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "pg-pump.junit.xml": "c24f821b085c72eb51c608f1faeae17d236a737828c0734aa694da3a99309fc4",
+    "pg-pump.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg-pump.stdout.txt": "8b06763120c1f94fbd7d7ab4ddfd02364328b9e3a5fbcdb5e0cece1cfac9e343",
+    "pg-worker.command.json": "d27c1739910b4067cd5b08b372db7f3070a8856b0bedb1bd914c9e745db85d22",
+    "pg-worker.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "pg-worker.junit.xml": "3228d06cc5a8686711959ba3b7fe5238baa6a6bc0e199c96b1fcf815172d85ea",
+    "pg-worker.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pg-worker.stdout.txt": "2c8f9a9f2837668256edee4a680ad9e5d9718521416fed3d6c6d372ed546c849",
+    "plan-findings.md": "77e211a9d617f49954229240ca32532010a7dba3e3310096c76c124431fd0931",
+    "plan-progress.md": "d70acd57b4ef92773663a2d5996bf874624ec77f6ce37eaa56e19ca248e5c06b",
+    "plan-task_plan.md": "7b519d629bc330531a47d57eea2fb09465382a66a51d9c2d9964117346dead18",
+    "red.command.json": "dbee1151e520d70793c324f5f3147219a171f3b8bfe8bbf3588466cfd38d3f33",
+    "red.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "red.junit.xml": "7a24d582c712eb28474ecf35079977464185f42af6e7acc0f3a48099663613f6",
+    "red.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "red.stdout.txt": "f8c3cf5334098445ff95d8e239226510e0b586fccbd11d37bd085c30996c186d",
+    "resume-infra-preflight.json": "742d06ee246536bfec36665d4d2889b2716875837ce5a6c167d2ecea2ac90554",
+    "run-check.py": "fc75e5d4b26b25e3d142334b82826715d0a5c58c8a8ca6b7514b66f265329638",
+    "run-frozen-search.py": "ebe7b7e6ebfb37c54401afe8d5af4ce86f931af16bb93ddf7b40530e89dba8d7",
+    "runtime.patch": "630530c1aa67bd5a50064d5b61f5847137dae14936d41fb1188f0c2aa8dd04b9",
+    "staged-check.json": "9636c323892dbae7e001ac7afd6d3b3fddc1fd24e5d109d8a468da12b7c22bb0",
+    "staged-source-check.json": "2388040cb6eaa157f7f8ca81f0730fafa29647815fa26b37273555551e87b5e3",
+    "summary-guard-red.command.json": "b23dd6146cb029f27f78b8df0a698a44d719559540e7a7179922c099668b2c2d",
+    "summary-guard-red.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "summary-guard-red.junit.xml": "31cf248af5cfbd275b1b715a7f8795a27bec9fbc2f2ebf4b6fab599506b17b41",
+    "summary-guard-red.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "summary-guard-red.stdout.txt": "2827d698833be532b53aaf10bb6987c9dacfd66b8c6d5d85a7e3750d6e7eccb9"
+  },
+  "staged_git_blob_sha256": {
+    "backend/weknora_port/retrieval/merge.py": "04a846b301470a74be706eeff5c4ba4382b0d873d1e42085fc8b9886fdc958ec",
+    "backend/weknora_port/storage/hybrid.py": "efd4b6268ca8438aa4079ce99fc94ad1ea9125f70380b5de198899c3821a32b3",
+    "backend/weknora_port/storage/knowledge.py": "28928c56ea21fb5ff33d50a4439210b500e2c61cb10f9e995e02e7d3293fb0cf",
+    "tests/weknora_port/test_hybrid_storage.py": "73e4b459ead923299a121c08fce25dc3eee5392381acfd5cb9517771b62d3c12",
+    "tests/weknora_port/test_search_image_completion.py": "ba0daf3cd877a687c011e687c8e1d5b2df120709fa586b5edea2f3f4605e7e4b",
+    "tests/weknora_port/test_search_image_completion_pg.py": "83a758d9749de74f90d6083bee1d7b3221b8ecf04483b75a8f7d1437eacf57f5",
+    "tests/weknora_port/fixtures/image_completion_go_oracle.json": "ffb8d5d7134de000d31a1d768f0f4e862bf924f49fe98a95b8a050d06a790e02",
+    "scripts/weknora_port_image_completion_oracle.py": "059bf517f36437e7346fa18ae9418b4f8708c245d760718a15cb576689df5f23",
+    "backend/weknora_port/generation/context.py": "8ceac316b0d2d9e55a139fe647642830e0fcc7d5abe1fdf093b2cf88f9f1552d",
+    "backend/weknora_port/retrieval/context.py": "9a03f968faf8133562363fbcd09f9e9eaad17171918ade35717083be9f640d3c",
+    "backend/weknora_port/storage/postgres.py": "7212e85e0a6ce451c870cad5c9e97c6465d05856207ac150a385ac84f09c9905",
+    "backend/weknora_port/documents.py": "a7d39f11f2c97c2036239f406f085f7472c31b74649f7a2b27388e492def2bd3",
+    "tests/weknora_port/native_fixture.py": "3d5e14a6b066fa33ac97e403434e3be005bd0b0f858ab64c4c319ed37ec4979b",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/run-check.py": "fc75e5d4b26b25e3d142334b82826715d0a5c58c8a8ca6b7514b66f265329638",
+    "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/run-frozen-search.py": "ebe7b7e6ebfb37c54401afe8d5af4ce86f931af16bb93ddf7b40530e89dba8d7",
+    "backend/weknora_port/retrieval/search.py": "cd17a093aa32a26e44fc893f552b425f155c301f88c44d1fe561aebb268e04af",
+    "backend/weknora_port/references/registry.py": "c1c5eabf86c42e34d67e4a9ae3a713b29389cc029fe3ddd28a39e8cf2c28ed12",
+    "backend/weknora_port/generation/coordinator.py": "1a18061c898ec7353665af69fd7cdd4ab1e269c587f04a41d8f83665e98ef0ef",
+    "backend/weknora_port/generation/router.py": "eed2ab58b1c0632f7957ab081845d7afc3edb50a4db366a6f9bfd8a8535bfd81",
+    "backend/weknora_port/retrieval/fusion.py": "6a7db8f3b7294759dc011ba7bdda7ca3db74df9929c15620121f88a301948968",
+    "backend/weknora_port/http_api.py": "ddefc51c3f1865ef01c5f13faa3f98ad38289d43af66a1013b35b50e01600b95"
+  },
+  "staged_diff_checks": {
+    "full_with_raw_logs_exit": 2,
+    "source_check_exit": 0,
+    "exact_raw_exclusions": [
+      "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-guard-fixed.junit.xml",
+      "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-guard-fixed.stdout.txt",
+      "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-initial.junit.xml",
+      "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/pg-initial.stdout.txt",
+      "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/red.junit.xml",
+      "docs/weknora-port/evidence/SEQ_IMAGE_COMPLETION_20261015/red.stdout.txt"
+    ]
+  }
+}

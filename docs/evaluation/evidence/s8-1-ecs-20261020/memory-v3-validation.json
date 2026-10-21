@@ -1,0 +1,113 @@
+{
+  "schema": "s8-1-memory-v3-validation/v1",
+  "status": "OFFLINE_PASS",
+  "captured_at_utc": "2026-10-20T01:50:14.017385+00:00",
+  "scope": "Only local validation of the11-line host-driver memory patch; no61-suite rerun and no live/remote operations",
+  "cwd": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation",
+  "validation": {
+    "argv": [
+      "D:\\Drivers\\python\\python.exe",
+      "-B",
+      "-c",
+      "\nfrom pathlib import Path\nimport ast,json,types,hashlib\nbase=Path('E:/RAG quention/var/reports/s8-1-ecs-20261020/controller')\nbaseline=base/'ecs_case_driver.actual-remote.py';updated=base/'ecs_case_driver.memory-v3.py'\narchive=Path('E:/RAG-Worktrees/s8-six-dataset-evaluation/scripts/s8_1_ecs_case_driver.py')\nold=baseline.read_text(encoding='utf-8');new=updated.read_text(encoding='utf-8')\nassert hashlib.sha256(baseline.read_bytes()).hexdigest()=='041f8d1a223e2e1ac3bd4f8eddc393d4e9805389058cff73dc58eaa789e102a8'\nassert hashlib.sha256(updated.read_bytes()).hexdigest()=='b963b26953d556329777073fe1a6994f05e33949f7a6adec99328881b922ee7f'\nassert archive.read_bytes()==updated.read_bytes()\ntree=ast.parse(new,filename=str(updated));compile(new,str(updated),'exec',dont_inherit=True)\nbegin=new.index('            # Same temporary container/image. Reserve headroom')\nend=new.index(\"            if container_safe_inspect(NAME)['image']!=IMAGE:\",begin)\nblock=new[begin:end]\nassert len(block.splitlines())==11\nassert new[:begin]+new[end:]==old\nrun=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='run')\ncalls=[node for node in ast.walk(run) if isinstance(node,ast.Call) and isinstance(node.func,ast.Name) and node.func.id=='execute_command']\ndef named(name):\n rows=[node for node in calls if len(node.args)>2 and isinstance(node.args[2],ast.Constant) and node.args[2].value==name]\n assert len(rows)==1,name\n return rows[0]\npositions={name:named(name).lineno for name in ('start-controlled-api','controlled-memory-headroom','controlled-memory-readback','normal-api-question-once')}\nassert positions['start-controlled-api']<positions['controlled-memory-headroom']<positions['controlled-memory-readback']<positions['normal-api-question-once']\nsnippet='\\n'.join(line[12:] for line in block.splitlines())\nresults=[]\nfor memory,swap,want_success in [(1073741824,1073741824,True),(536870912,1073741824,False),(1073741824,-1,False)]:\n observed=[];saved=[]\n def execute(argv,report,name,**kwargs):\n  observed.append({'argv':argv,'name':name})\n  return types.SimpleNamespace(stdout=json.dumps({'Memory':memory,'MemorySwap':swap}) if argv[:2]==['docker','inspect'] else 'synthetic-only')\n namespace={'execute_command':execute,'NAME':'synthetic-container','report':Path('/synthetic-report'),'json':json,'save':lambda *args,**kwargs:saved.append((args,kwargs))}\n try:exec(compile(snippet,'<synthetic-memory-v3>','exec'),namespace);success=True;error=None\n except ValueError as exc:success=False;error=str(exc)\n assert success==want_success\n if not success:assert error=='S8_1_CONTROLLED_MEMORY_LIMIT_NOT_CONFIRMED'\n assert observed[0]['argv']==['docker','update','--memory','1g','--memory-swap','1g','synthetic-container']\n assert len(observed)==2 and len(saved)==1\n results.append({'Memory':memory,'MemorySwap':swap,'expected_success':want_success,'actual_success':success,'expected_refusal_code':error,'result':'PASS'})\nprint(json.dumps({'status':'OFFLINE_PASS','ast_parse':'PASS','in_memory_compile':'PASS','byte_identical_archive':'PASS','only_change_is_11_line_memory_block':'PASS','ordered_unique_call_line_numbers':positions,'order':'start < memory update < limits readback < sole normal API question','synthetic_cases':results,'real_docker_commands':0,'provider_requests':0,'pycache_written':False},ensure_ascii=False))\n"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"status\": \"OFFLINE_PASS\", \"ast_parse\": \"PASS\", \"in_memory_compile\": \"PASS\", \"byte_identical_archive\": \"PASS\", \"only_change_is_11_line_memory_block\": \"PASS\", \"ordered_unique_call_line_numbers\": {\"start-controlled-api\": 310, \"controlled-memory-headroom\": 313, \"controlled-memory-readback\": 315, \"normal-api-question-once\": 324}, \"order\": \"start < memory update < limits readback < sole normal API question\", \"synthetic_cases\": [{\"Memory\": 1073741824, \"MemorySwap\": 1073741824, \"expected_success\": true, \"actual_success\": true, \"expected_refusal_code\": null, \"result\": \"PASS\"}, {\"Memory\": 536870912, \"MemorySwap\": 1073741824, \"expected_success\": false, \"actual_success\": false, \"expected_refusal_code\": \"S8_1_CONTROLLED_MEMORY_LIMIT_NOT_CONFIRMED\", \"result\": \"PASS\"}, {\"Memory\": 1073741824, \"MemorySwap\": -1, \"expected_success\": false, \"actual_success\": false, \"expected_refusal_code\": \"S8_1_CONTROLLED_MEMORY_LIMIT_NOT_CONFIRMED\", \"result\": \"PASS\"}], \"real_docker_commands\": 0, \"provider_requests\": 0, \"pycache_written\": false}\n",
+    "stderr": "",
+    "results": {
+      "status": "OFFLINE_PASS",
+      "ast_parse": "PASS",
+      "in_memory_compile": "PASS",
+      "byte_identical_archive": "PASS",
+      "only_change_is_11_line_memory_block": "PASS",
+      "ordered_unique_call_line_numbers": {
+        "start-controlled-api": 310,
+        "controlled-memory-headroom": 313,
+        "controlled-memory-readback": 315,
+        "normal-api-question-once": 324
+      },
+      "order": "start < memory update < limits readback < sole normal API question",
+      "synthetic_cases": [
+        {
+          "Memory": 1073741824,
+          "MemorySwap": 1073741824,
+          "expected_success": true,
+          "actual_success": true,
+          "expected_refusal_code": null,
+          "result": "PASS"
+        },
+        {
+          "Memory": 536870912,
+          "MemorySwap": 1073741824,
+          "expected_success": false,
+          "actual_success": false,
+          "expected_refusal_code": "S8_1_CONTROLLED_MEMORY_LIMIT_NOT_CONFIRMED",
+          "result": "PASS"
+        },
+        {
+          "Memory": 1073741824,
+          "MemorySwap": -1,
+          "expected_success": false,
+          "actual_success": false,
+          "expected_refusal_code": "S8_1_CONTROLLED_MEMORY_LIMIT_NOT_CONFIRMED",
+          "result": "PASS"
+        }
+      ],
+      "real_docker_commands": 0,
+      "provider_requests": 0,
+      "pycache_written": false
+    }
+  },
+  "source_archive_diffcheck": {
+    "argv": [
+      "git",
+      "diff",
+      "--no-index",
+      "--check",
+      "--",
+      "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\controller\\ecs_case_driver.memory-v3.py",
+      "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\scripts\\s8_1_ecs_case_driver.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\controller\\ecs_case_driver.memory-v3.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\scripts\\s8_1_ecs_case_driver.py', LF will be replaced by CRLF the next time Git touches it\n",
+    "interpretation": "Source and repository copy are byte-identical; Git may emit LF/CRLF conversion advice, retained verbatim."
+  },
+  "source_sha256": {
+    "baseline_041f": "041f8d1a223e2e1ac3bd4f8eddc393d4e9805389058cff73dc58eaa789e102a8",
+    "memory_v3": "b963b26953d556329777073fe1a6994f05e33949f7a6adec99328881b922ee7f",
+    "repository_archive": "b963b26953d556329777073fe1a6994f05e33949f7a6adec99328881b922ee7f"
+  },
+  "earlier_validation": {
+    "evidence_chunk_id": "8fb98a",
+    "combined_tool_command_exit_code": 0,
+    "individual_AST_and_synthetic_exit_codes_captured_separately": false,
+    "note": "Earlier combined PowerShell invocation printed OFFLINE_PASS and diffcheck success with overall exit0; this receipt captures a new bounded standalone validation process exit0 and separate diffcheck exit0."
+  },
+  "root_reported_real_execution": {
+    "attribution": "Root latest task; not queried or rerun by this worker",
+    "docker_update_contract": "Root verified existing CLI contract read-only; three remaining controlled instances1GiB await final evidence-package readback",
+    "goal_actual_provider_calls": 51,
+    "goal_actual_tokens": 118703,
+    "new_cloud_UNKNOWN": 0,
+    "parent_authorization": "CLOSED",
+    "remaining_three_cases": "Root reported actual completion"
+  },
+  "b0434_preservation": {
+    "status": "ORIGINAL_OOM_FAILURE_NOT_RETESTED",
+    "original_provider_calls": 3,
+    "original_provider_ledger": "ALL_SETTLED",
+    "original_actual_tokens": 7621,
+    "automatic_or_manual_resend_by_worker": false,
+    "old_STOP_child_changed_by_worker": false,
+    "no_claim_oom_case_fixed_or_revalidated": true
+  },
+  "no_other_changes": {
+    "live_tool_or_production_source_modified": false,
+    "remote_operations": 0,
+    "provider_requests": 0,
+    "git_commit": "NOT RUN",
+    "tests61": "NOT RERUN"
+  },
+  "required_sentence": "未实现的命令不得报告通过。"
+}

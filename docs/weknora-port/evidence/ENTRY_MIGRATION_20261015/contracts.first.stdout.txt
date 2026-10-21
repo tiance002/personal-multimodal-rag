@@ -1,0 +1,13 @@
+............F..                                                          [100%]
+================================== FAILURES ===================================
+_______________ test_schema_validation_is_not_native_execution ________________
+tests\weknora_port\test_entrypoint_migration.py:77: in test_schema_validation_is_not_native_execution
+    assert entry.main(['eval','--mode','schema','--dataset',str(dataset),'--output',str(output)])==0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = <function main at 0x000001D34477CC20>(['eval', '--mode', 'schema', '--dataset', 'C:\\Users\\22088\\AppData\\Local\\Temp\\pytest-of-22088\\pytest-1041\\test_schema_validation_is_not_0\\core.jsonl', '--output', ...])
+E    +    where <function main at 0x000001D34477CC20> = entry.main
+---------------------------- Captured stdout call -----------------------------
+{"path": "C:\\Users\\22088\\AppData\\Local\\Temp\\pytest-of-22088\\pytest-1041\\test_schema_validation_is_not_0\\core.jsonl", "records": 1, "required_fields": ["answer_points", "expected_chunk_ids", "kb_scope", "question"], "schema": "core-v1", "status": "FAIL", "errors": ["line 1: expected_chunk_ids must be a non-empty string list", "line 1: answer_points must be a non-empty string list"], "operation": "schema-validation", "executed_native": false, "real_provider_calls": 0}
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_entrypoint_migration.py::test_schema_validation_is_not_native_execution
+1 failed, 14 passed in 0.57s

@@ -1,0 +1,89 @@
+.FFF....FFFFFFFF.F.....                                                  [100%]
+================================== FAILURES ===================================
+_______________ test_complete_search_maps_chunk_index_to_seq[1] _______________
+tests\weknora_port\test_search_image_completion.py:62: in test_complete_search_maps_chunk_index_to_seq
+    assert rows[0].seq==rows[0].chunk_index==index
+E   AssertionError: assert 0 == 1
+E    +  where 0 = SearchResult(id='parent', content='source parent ![scan](images/a.png)', score=1.0, knowledge_id='doc', knowledge_base...tent_rewritten=False, content_revision=1, is_enabled=True, matched_content='index parent', seq=0, knowledge_channel='').seq
+E    +  and   1 = SearchResult(id='parent', content='source parent ![scan](images/a.png)', score=1.0, knowledge_id='doc', knowledge_base...tent_rewritten=False, content_revision=1, is_enabled=True, matched_content='index parent', seq=0, knowledge_channel='').chunk_index
+_______________ test_complete_search_maps_chunk_index_to_seq[9] _______________
+tests\weknora_port\test_search_image_completion.py:62: in test_complete_search_maps_chunk_index_to_seq
+    assert rows[0].seq==rows[0].chunk_index==index
+E   AssertionError: assert 0 == 9
+E    +  where 0 = SearchResult(id='parent', content='source parent ![scan](images/a.png)', score=1.0, knowledge_id='doc', knowledge_base...tent_rewritten=False, content_revision=1, is_enabled=True, matched_content='index parent', seq=0, knowledge_channel='').seq
+E    +  and   9 = SearchResult(id='parent', content='source parent ![scan](images/a.png)', score=1.0, knowledge_id='doc', knowledge_base...tent_rewritten=False, content_revision=1, is_enabled=True, matched_content='index parent', seq=0, knowledge_channel='').chunk_index
+____ test_complete_search_fills_two_parents_without_touching_child_or_rank ____
+tests\weknora_port\test_search_image_completion.py:73: in test_complete_search_fills_two_parents_without_touching_child_or_rank
+    images=[json.loads(r.image_info) for r in rows[:2]]
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\json\decoder.py:344: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\json\decoder.py:362: in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[1-knowledge_id-other-doc] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[1-knowledge_base_id-other-kb] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[1-tenant_id-2] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[1-metadata-value3] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[2-knowledge_id-other-doc] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[2-knowledge_base_id-other-kb] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[2-tenant_id-2] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+_ test_child_cannot_cross_parent_domain_even_when_document_allowed[2-metadata-value3] _
+tests\weknora_port\test_search_image_completion.py:98: in test_child_cannot_cross_parent_domain_even_when_document_allowed
+    with pytest.raises((PermissionError,RetrievalScopeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (PermissionError, RetrievalScopeError)
+____ test_second_batch_failure_retains_direct_images_and_typed_projection _____
+tests\weknora_port\test_search_image_completion.py:126: in test_second_batch_failure_retains_direct_images_and_typed_projection
+    assert set(json.loads(out['parent'])[0])==FIELDS
+E   AssertionError: assert {'caption', '...art_pos', ...} == {'caption', '...t_pos', 'url'}
+E     
+E     Extra items in the left set:
+E     'page_number'
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_search_image_completion.py::test_complete_search_maps_chunk_index_to_seq[1]
+FAILED tests/weknora_port/test_search_image_completion.py::test_complete_search_maps_chunk_index_to_seq[9]
+FAILED tests/weknora_port/test_search_image_completion.py::test_complete_search_fills_two_parents_without_touching_child_or_rank
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[1-knowledge_id-other-doc]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[1-knowledge_base_id-other-kb]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[1-tenant_id-2]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[1-metadata-value3]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[2-knowledge_id-other-doc]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[2-knowledge_base_id-other-kb]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[2-tenant_id-2]
+FAILED tests/weknora_port/test_search_image_completion.py::test_child_cannot_cross_parent_domain_even_when_document_allowed[2-metadata-value3]
+FAILED tests/weknora_port/test_search_image_completion.py::test_second_batch_failure_retains_direct_images_and_typed_projection
+12 failed, 11 passed in 2.01s

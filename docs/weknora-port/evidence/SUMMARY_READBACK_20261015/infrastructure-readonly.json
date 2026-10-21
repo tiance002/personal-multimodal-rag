@@ -1,0 +1,41 @@
+[
+  {
+    "argv": [
+      "docker",
+      "inspect",
+      "eviroute-rag-postgres",
+      "eviroute-rag-redis",
+      "--format",
+      "{{.Name}} {{.Image}} {{json .NetworkSettings.Ports}}"
+    ],
+    "exitcode": 0,
+    "stdout": "/eviroute-rag-postgres sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2 {\"5432/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"56423\"}]}\n/eviroute-rag-redis sha256:fbdbaea47b9ae4ecc2082ecdb4e1cea81e32176ffb1dcf643d422ad07427e5d9 {\"6379/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"56424\"}]}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "docker",
+      "exec",
+      "eviroute-rag-postgres",
+      "sh",
+      "-c",
+      "pg_controldata \"$PGDATA\" | head -n 5"
+    ],
+    "exitcode": 0,
+    "stdout": "pg_control version number:            1700\nCatalog version number:               202406281\nDatabase system identifier:           7696088403504697382\nDatabase cluster state:               in production\npg_control last modified:             Thu 15 Oct 2026 10:38:00 AM UTC\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "docker",
+      "exec",
+      "eviroute-rag-redis",
+      "redis-cli",
+      "INFO",
+      "server"
+    ],
+    "exitcode": 0,
+    "stdout": "# Server\nredis_version:7.4.2\nredis_git_sha1:00000000\nredis_git_dirty:0\nredis_build_id:9bc0dc34e778d2e\nredis_mode:standalone\nos:Linux 6.6.87.2-microsoft-standard-WSL2 x86_64\narch_bits:64\nmonotonic_clock:POSIX clock_gettime\nmultiplexing_api:epoll\natomicvar_api:c11-builtin\ngcc_version:12.2.0\nprocess_id:1\nprocess_supervised:no\nrun_id:de03f13f2ffba1146b01434f25514c4478e046fd\ntcp_port:6379\nserver_time_usec:1792060683987015\nuptime_in_seconds:2414\nuptime_in_days:0\nhz:10\nconfigured_hz:10\nlru_clock:13675787\nexecutable:/data/redis-server\nconfig_file:\nio_threads_active:0\nlistener0:name=tcp,bind=*,bind=-::*,port=6379\n",
+    "stderr": ""
+  }
+]

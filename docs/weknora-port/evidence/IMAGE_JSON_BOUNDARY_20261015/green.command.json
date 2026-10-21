@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "--noconftest",
+    "-q",
+    "tests/weknora_port/test_image_json_boundary.py",
+    "tests/weknora_port/test_search_image_completion.py",
+    "tests/weknora_port/test_knowledge_storage.py",
+    "tests/weknora_port/test_hybrid_storage.py",
+    "tests/weknora_port/test_pipeline.py",
+    "tests/weknora_port/test_reference_metadata.py",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=E:\\WK\\run\\image-json-boundary-20261015\\pytest-green",
+    "--junitxml=E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\IMAGE_JSON_BOUNDARY_20261015\\green.junit.xml"
+  ],
+  "cwd": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "env_paths": {
+    "PYTHONPATH": "E:\\RAG-Worktrees\\weknora-python-port-20261013;E:\\WK\\deps\\reader;E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\runtime-deps",
+    "TMP": "E:\\WK\\run\\image-json-boundary-20261015\\tmp",
+    "TEMP": "E:\\WK\\run\\image-json-boundary-20261015\\tmp",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}

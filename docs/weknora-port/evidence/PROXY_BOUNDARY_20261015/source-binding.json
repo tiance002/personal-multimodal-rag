@@ -1,0 +1,57 @@
+{
+  "baseline_commit": "e1b945b9ce10fc06a82babfddff5c0ae6c2cb7ba",
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "file_sha256": {
+    "backend/weknora_port/models/safe_network.py": "92051be5afaa4410c8bdfa5bc6cfac15d1d1679b00be557cfee56c70cad09143",
+    "pyproject.toml": "7e565bbc90813702de693f19448b935955e9e01dcd75687ff33c6920ea56859e",
+    "tests/weknora_port/test_proxy_boundary.py": "e1fe35efe4b0997565bfe5fdb6746d470a6a61de0ae81645c8c2cf72260d59aa",
+    "tests/weknora_port/test_provider_proxy.py": "809e11aa0bca7ef52a56b5bdba503e49a8f3ce65cb3ce8f7d961f7ede1404b22",
+    "tests/weknora_port/test_provider_safe_network.py": "556e2ea61732bb51e5193df920871231dbc6d43e31227b8cd65ab87a851ff3e3",
+    "scripts/weknora_port_proxy_oracle.py": "305497359a86281d4cd6807be2cd0e48488bdedb76ee13f6786d1e399ec64d4b",
+    "tests/weknora_port/fixtures/proxy_connect_oracle_test.go": "d0bfa467a260c6bf6cf36d0559db1129c3fbb148d89ee19884f8727602f276bd",
+    "tests/weknora_port/fixtures/proxy_go_oracle.json": "b916bdb96df5b3fce7057d4f15c1050435560aca04eb1f6e0b61bbe6d1ee9b12"
+  },
+  "unchanged_safety_function_ast_sha256": {
+    "SSRFPolicy.__init__": "0323cfec1ebf44203523acfc5a7b80805088cc32365101343307f9d6633387d3",
+    "SSRFPolicy.from_environment": "2cb445ed5e4549e277f8d212642f611fc1df420e083b72804798774ff5b73634",
+    "SSRFPolicy.whitelisted_name": "dc06c13b53b00099ec0b4b387401de2f19b203e3de22727b7c765ae93f08e618",
+    "SSRFPolicy.validate_name": "4b2d01b8c2fe331accf0e3e0dc95679bbcc93d2ada44c87c6a251c1ce8016325",
+    "SSRFPolicy.resolved_addresses": "ba28649d49cd8df023be9e67dfde73d13a71e862f6fbf8bc7fd8833596bc5fe9",
+    "SSRFPolicy.validate_url": "739f25677309e1f478fcd31613078c383964464a876e6a3bbd24db564b0cf4c3",
+    "CheckedStream.__init__": "5b060650906be2dc2a04daa1534c04a75255cdd30aa4f95bdbee6690c9b76022",
+    "CheckedStream.read": "33e58aa0c57b632e411bb64bd32ff3e2e84b9898d43dbe6f4aae1ff860d85818",
+    "CheckedStream.write": "06dfde5c7719dedf27e72db7ff8554fe429e1de6cd67dad8142d7611837bbc75",
+    "CheckedStream.aclose": "8d27a6656b7da7ea61f309e26c702366afdca0c52765ad22ab8f435fb5569c6c",
+    "CheckedStream.get_extra_info": "5f3e8cc1db24492bfa7ee238cedc69f2aeccecb5738b6f353a3566d3c6d77db9",
+    "CheckedStream.start_tls": "df07c386c0b4e6f7ae2dccbc1619c2e521f1ee17364be0b272597ad860d0b8c2",
+    "SafeNetworkBackend.__init__": "7c338e4094feb7de2398f791163bd9b2aa7768ff5e628fab691d25b4b500b54f",
+    "SafeNetworkBackend.connect_tcp": "06a144ee65d286d03135dbbe7ebba68cb9009fcf6a6e70b9c05711a12582aea8",
+    "SafeNetworkBackend.connect_unix_socket": "76655cbd574364cd24512bd30de83217fcb6aee29aacc473246cc800222db814",
+    "SafeNetworkBackend.sleep": "ab874d2ca2b22674563840d78c97637043e4710ec30e83654df6afa1992a88bc",
+    "_proxy_parts": "31ebe1ce3dc482fa7e4500339951966552d3e3da91a9f71f999b990b25eadbc6",
+    "ProxyNetworkBackend._socks": "536a2ef7f1ee2970a0a509f9f72a7344e58734531bff5d49e10ada7d1b15698e"
+  },
+  "runtime": {
+    "idna": "3.20",
+    "idna_file": "E:\\RAG quention\\.venv\\Lib\\site-packages\\idna\\__init__.py",
+    "httpx": "0.28.1",
+    "httpcore": "1.0.9"
+  },
+  "protected_original_files": {
+    "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md": "cdc9de8dffd716337514853627be6524601a6fa9480425e329ff2e3712dae350",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt": "7b7d267b235d55ab1556438617c38650b0439eecf31931acab18b7e04bfa3b0a",
+    "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt": "2ee4b187eb4d64a06b5a8d694097d23ceef71950057acacb60f261154fd9f9d2"
+  },
+  "final_tests": {
+    "command_exit": 0,
+    "passed": 158,
+    "real_network_calls": 0,
+    "real_provider_calls": 0
+  },
+  "owner_decisions_pending": [
+    "SOCKS empty-password acceptance",
+    "proxy URL path/query/fragment acceptance"
+  ],
+  "oracle_scope": "Actual Go standard-library env and net.Pipe Transport; IsSystemProxy body extracted unchanged with standard env shim, not whole upstream utils package."
+}

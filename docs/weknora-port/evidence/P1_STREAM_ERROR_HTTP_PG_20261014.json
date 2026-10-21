@@ -1,0 +1,42 @@
+{
+  "kind": "ACTUAL_ASGI_HTTP_PG_REDIS_GATED_MOCK_PROVIDER",
+  "scope": "one source-style channel notice injected before unchanged real ProviderModel mock-wire; malformed JSON failure uses actual parser",
+  "root": "E:\\WK\\run\\644c28254679",
+  "cases": [
+    {
+      "request_id": "8244015b-235c-41e1-b049-48d9c0e47eb4",
+      "case": "same-channel-recovered",
+      "answer_attempts": 1,
+      "ledger": [
+        {
+          "state": "settled",
+          "reserved_microunits": 100,
+          "actual_microunits": 10
+        }
+      ],
+      "attempt": {
+        "role": "expensive",
+        "status": "COMPLETED"
+      },
+      "terminal_events": 1
+    },
+    {
+      "request_id": "577b2caa-a381-4d66-9126-7f087e932df5",
+      "case": "error-eof",
+      "answer_attempts": 1,
+      "ledger": [
+        {
+          "state": "unknown",
+          "reserved_microunits": 100,
+          "actual_microunits": null
+        }
+      ],
+      "attempt": {
+        "role": "expensive",
+        "status": "FAILED"
+      },
+      "terminal_events": 1
+    }
+  ],
+  "real_provider_calls": 0
+}

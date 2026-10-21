@@ -1,0 +1,24 @@
+{
+  "status": "S8_1_DELIVERY_VALIDATION_PASS",
+  "exit_code": 0,
+  "git_diff_check": {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'deploy/s8/compose.yml', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "branch": "codex/s8-six-dataset-evaluation-20261019",
+  "json_files_parsed": 13,
+  "files_checked": 28,
+  "secrets_pattern_failures": [],
+  "compose_only_requested_app_memory_changed": true,
+  "post_calls_tokens_status_consistent": true,
+  "future_driver_sha256": "64bc94df07b891ff7b3aa7adba83d90709be19bd530dfb57613ef9e05a6777ef",
+  "real_rag_memory_valley": "NOT_MEASURED",
+  "real_model_calls_by_validation": 0,
+  "new_model_tests": "NOT_RUN"
+}

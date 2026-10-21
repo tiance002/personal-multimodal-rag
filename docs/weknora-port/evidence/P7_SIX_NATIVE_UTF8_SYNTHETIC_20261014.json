@@ -1,0 +1,3985 @@
+{
+  "schema": "native-six-execution-v1",
+  "execution_kind": "ISOLATED_MOCK",
+  "manifest_sha256": "synthetic",
+  "records": [
+    {
+      "event": "source_ingested",
+      "source_id": "scifact-source",
+      "native_document_id": "7a48fd23-85d1-4ad1-bf13-c706444314c3",
+      "knowledge_base_id": "63156573-252b-43d0-a56d-59e373be4cc3",
+      "sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+      "bytes": 78,
+      "ingestion_seconds": 0.15303970000240952,
+      "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+    },
+    {
+      "event": "dataset_ingested",
+      "dataset": "scifact",
+      "version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "source_documents": 1,
+      "knowledge_base_id": "63156573-252b-43d0-a56d-59e373be4cc3",
+      "full_frozen_corpus": true
+    },
+    {
+      "event": "native_case",
+      "dataset": "scifact",
+      "dataset_version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "qid": "scifact-q",
+      "execution_kind": "ISOLATED_MOCK",
+      "capture_sha256": "7694b7d6c68dc055aae09430ed0064964a94807461fac1371b6fcab25b78b44d",
+      "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+      "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b",
+      "ranked_original_documents": {
+        "search": [
+          "scifact-source"
+        ],
+        "rerank": [
+          "scifact-source"
+        ],
+        "context": [
+          "scifact-source"
+        ]
+      },
+      "modes": [
+        {
+          "mode": "OFF",
+          "run_id": "221c7623-b46a-43eb-acb9-a216919dc432",
+          "assistant_message_id": "eef13ed9-3265-429f-9555-5617dd0b5e13",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "baseline",
+            "selected_attempt_id": "221c7623-b46a-43eb-acb9-a216919dc432/answer/1/baseline",
+            "attempts": [
+              {
+                "attempt_id": "221c7623-b46a-43eb-acb9-a216919dc432/answer/1/baseline",
+                "ordinal": 1,
+                "role": "baseline",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "fc09ee68f40a2b089f3203811ceedfb41d76eece68202d703b433a7a070e607d",
+                "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+                "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": null,
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+            "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b"
+          },
+          "generation_seconds": 0.051766499993391335,
+          "model_calls": [
+            {
+              "request_id": "221c7623-b46a-43eb-acb9-a216919dc432/answer/1/baseline",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "CHEAP_ONLY",
+          "run_id": "e90d90ca-d2c4-42c8-9e6d-5796007742fa",
+          "assistant_message_id": "9f167ac8-c91e-44d0-972e-6e3d3b706f1f",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "cheap",
+            "selected_attempt_id": "e90d90ca-d2c4-42c8-9e6d-5796007742fa/answer/1/cheap",
+            "attempts": [
+              {
+                "attempt_id": "e90d90ca-d2c4-42c8-9e6d-5796007742fa/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "47318625e7041a9f50d32fa209a5e8e4f83259f1ac60e32b872d0787723c8e91",
+                "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+                "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "CHEAP_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1228,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+            "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b"
+          },
+          "generation_seconds": 0.05690089997369796,
+          "model_calls": [
+            {
+              "request_id": "e90d90ca-d2c4-42c8-9e6d-5796007742fa/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "EXPENSIVE_ONLY",
+          "run_id": "a289124d-bb2b-498f-8e9e-f11e2a737244",
+          "assistant_message_id": "6704b5d0-4129-447f-bd97-900fb6231ba7",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4\" chunk_id=\"ec9217eb-fbb4-4681-9a38-f8812d480772\" kb_id=\"63156573-252b-43d0-a56d-59e373be4cc3\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "ec9217eb-fbb4-4681-9a38-f8812d480772",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "7a48fd23-85d1-4ad1-bf13-c706444314c3",
+                "knowledge_base_id": "63156573-252b-43d0-a56d-59e373be4cc3",
+                "knowledge_title": "b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4",
+                "knowledge_filename": "b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "a289124d-bb2b-498f-8e9e-f11e2a737244/answer/1/expensive",
+            "attempts": [
+              {
+                "attempt_id": "a289124d-bb2b-498f-8e9e-f11e2a737244/answer/1/expensive",
+                "ordinal": 1,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "73f67e0b73b5b6ad944c7f5184259e1d3e0cca25f5288e9612055e556898e29d",
+                "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+                "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "EXPENSIVE_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1228,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_expensive",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+            "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b"
+          },
+          "generation_seconds": 0.049109400017187,
+          "model_calls": [
+            {
+              "request_id": "a289124d-bb2b-498f-8e9e-f11e2a737244/answer/1/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "ec9217eb-fbb4-4681-9a38-f8812d480772",
+              "source_id": "scifact-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "DYNAMIC",
+          "run_id": "d2ea39f9-6405-45e5-9d80-2e0b6085c3f4",
+          "assistant_message_id": "b4e35cf0-3191-40e0-8482-d4cbbf0c60b3",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4\" chunk_id=\"ec9217eb-fbb4-4681-9a38-f8812d480772\" kb_id=\"63156573-252b-43d0-a56d-59e373be4cc3\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "ec9217eb-fbb4-4681-9a38-f8812d480772",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "7a48fd23-85d1-4ad1-bf13-c706444314c3",
+                "knowledge_base_id": "63156573-252b-43d0-a56d-59e373be4cc3",
+                "knowledge_title": "b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4",
+                "knowledge_filename": "b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "b2ad7ce9cb53d89aba0ab4625cbdc15402f21b72e68aea9bb33084a2900a5fb4.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "d2ea39f9-6405-45e5-9d80-2e0b6085c3f4/answer/2/expensive",
+            "attempts": [
+              {
+                "attempt_id": "d2ea39f9-6405-45e5-9d80-2e0b6085c3f4/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "cc44c1dc9b58fbc45e35ffcdb4c6090e46afa9fa4e1eecb51664e06c47cc6a6d",
+                "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+                "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              },
+              {
+                "attempt_id": "d2ea39f9-6405-45e5-9d80-2e0b6085c3f4/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "9b7a99399f967a0ffb3a9c0b955fb08d32e9541b65b6c1c7ff0b76a086e1cc7b",
+                "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+                "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": "TRUNCATION",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1228,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            },
+            "usage": {
+              "prompt_tokens": 200,
+              "completion_tokens": 20,
+              "total_tokens": 220,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "prompt_sha256": "acf8909e24cfe964b02b3616b258af9b949714686cc845af82587f232dca2605",
+            "context_sha256": "65bc485f2beedf7d07879cdac8f286ae983974e6c5c746f9b1622c6a25b5072b"
+          },
+          "generation_seconds": 0.08916759991552681,
+          "model_calls": [
+            {
+              "request_id": "d2ea39f9-6405-45e5-9d80-2e0b6085c3f4/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            },
+            {
+              "request_id": "d2ea39f9-6405-45e5-9d80-2e0b6085c3f4/answer/2/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "ec9217eb-fbb4-4681-9a38-f8812d480772",
+              "source_id": "scifact-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        }
+      ],
+      "auxiliary_calls": [
+        {
+          "request_id": "221c7623-b46a-43eb-acb9-a216919dc432/query-embedding-63156573-252b-43d0-a56d-59e373be4cc3-08c07051187ca5d4",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "221c7623-b46a-43eb-acb9-a216919dc432/query-embedding-63156573-252b-43d0-a56d-59e373be4cc3-2ea88c7a30351b12",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "221c7623-b46a-43eb-acb9-a216919dc432/query-embedding-63156573-252b-43d0-a56d-59e373be4cc3-98134dca8ff1c117",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "221c7623-b46a-43eb-acb9-a216919dc432/query_rewrite",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "usage": {
+            "status": "REPORTED",
+            "cache_status": "unreported",
+            "total_tokens": 30,
+            "cached_tokens": 0,
+            "prompt_tokens": 20,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": 10,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": 10,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "221c7623-b46a-43eb-acb9-a216919dc432/rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        }
+      ],
+      "preparation_seconds": 1.3735246000578627,
+      "model_quality_status": "NOT_RUN_SIMULATED_MODELS",
+      "gold_indexed": false,
+      "stage_acceptance": "NOT_CLAIMED"
+    },
+    {
+      "event": "source_ingested",
+      "source_id": "miracl-zh-source",
+      "native_document_id": "e3f0fc17-5e47-46e2-a89a-12e2939f74b1",
+      "knowledge_base_id": "64fb1a53-1846-4a7d-afc6-a2edcdbca514",
+      "sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+      "bytes": 78,
+      "ingestion_seconds": 0.10085570008959621,
+      "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+    },
+    {
+      "event": "dataset_ingested",
+      "dataset": "miracl-zh",
+      "version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "source_documents": 1,
+      "knowledge_base_id": "64fb1a53-1846-4a7d-afc6-a2edcdbca514",
+      "full_frozen_corpus": true
+    },
+    {
+      "event": "native_case",
+      "dataset": "miracl-zh",
+      "dataset_version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "qid": "miracl-zh-q",
+      "execution_kind": "ISOLATED_MOCK",
+      "capture_sha256": "b9dc5722ebf432f825bbfceafe55cb49eec63735d1c14a23cf010e956da3e024",
+      "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+      "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716",
+      "ranked_original_documents": {
+        "search": [
+          "miracl-zh-source"
+        ],
+        "rerank": [
+          "miracl-zh-source"
+        ],
+        "context": [
+          "miracl-zh-source"
+        ]
+      },
+      "modes": [
+        {
+          "mode": "OFF",
+          "run_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37",
+          "assistant_message_id": "456c5e93-a363-480a-aa6d-4e200892e427",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "baseline",
+            "selected_attempt_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/answer/1/baseline",
+            "attempts": [
+              {
+                "attempt_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/answer/1/baseline",
+                "ordinal": 1,
+                "role": "baseline",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "807618b06cb1ac9940d990ad9d60f07582c85027bcab930144f81785f9d38300",
+                "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+                "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": null,
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+            "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716"
+          },
+          "generation_seconds": 0.04880859993863851,
+          "model_calls": [
+            {
+              "request_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/answer/1/baseline",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "CHEAP_ONLY",
+          "run_id": "be02bc20-e016-4beb-ac22-0bab836a11e0",
+          "assistant_message_id": "fa0a522d-771b-46fa-b751-e0ae820bbdd0",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "cheap",
+            "selected_attempt_id": "be02bc20-e016-4beb-ac22-0bab836a11e0/answer/1/cheap",
+            "attempts": [
+              {
+                "attempt_id": "be02bc20-e016-4beb-ac22-0bab836a11e0/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "c5456911efa1bea42f043d735b50f49be3fcdf3d130f0edc7e900cf07ab423ce",
+                "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+                "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "CHEAP_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1236,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+            "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716"
+          },
+          "generation_seconds": 0.049117600079625845,
+          "model_calls": [
+            {
+              "request_id": "be02bc20-e016-4beb-ac22-0bab836a11e0/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "EXPENSIVE_ONLY",
+          "run_id": "242c7529-1ed3-4209-a9fb-b60ed7472975",
+          "assistant_message_id": "2d667e15-4181-4036-abf7-847e37309e6b",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3\" chunk_id=\"317bc928-149d-4086-8d56-bfab7e8490bd\" kb_id=\"64fb1a53-1846-4a7d-afc6-a2edcdbca514\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "317bc928-149d-4086-8d56-bfab7e8490bd",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "e3f0fc17-5e47-46e2-a89a-12e2939f74b1",
+                "knowledge_base_id": "64fb1a53-1846-4a7d-afc6-a2edcdbca514",
+                "knowledge_title": "3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3",
+                "knowledge_filename": "3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "242c7529-1ed3-4209-a9fb-b60ed7472975/answer/1/expensive",
+            "attempts": [
+              {
+                "attempt_id": "242c7529-1ed3-4209-a9fb-b60ed7472975/answer/1/expensive",
+                "ordinal": 1,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "dd527b85896be58d65b784075fe21480c5abddf01b5acb4f8d2707e53d243527",
+                "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+                "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "EXPENSIVE_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1236,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_expensive",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+            "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716"
+          },
+          "generation_seconds": 0.04625829996075481,
+          "model_calls": [
+            {
+              "request_id": "242c7529-1ed3-4209-a9fb-b60ed7472975/answer/1/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "317bc928-149d-4086-8d56-bfab7e8490bd",
+              "source_id": "miracl-zh-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "DYNAMIC",
+          "run_id": "116b2ec3-6c51-476d-a4b5-b7ff52a10b7e",
+          "assistant_message_id": "a171212e-f58f-4e21-afd0-f048e785ca6b",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3\" chunk_id=\"317bc928-149d-4086-8d56-bfab7e8490bd\" kb_id=\"64fb1a53-1846-4a7d-afc6-a2edcdbca514\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "317bc928-149d-4086-8d56-bfab7e8490bd",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "e3f0fc17-5e47-46e2-a89a-12e2939f74b1",
+                "knowledge_base_id": "64fb1a53-1846-4a7d-afc6-a2edcdbca514",
+                "knowledge_title": "3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3",
+                "knowledge_filename": "3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "3c2c4bae2e8d1786d77511c70916359eac4b742a0d84f05e16c3c8a6d56a35f3.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "116b2ec3-6c51-476d-a4b5-b7ff52a10b7e/answer/2/expensive",
+            "attempts": [
+              {
+                "attempt_id": "116b2ec3-6c51-476d-a4b5-b7ff52a10b7e/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "50342a93ea5eb7eccf9d3f1fb8fca5a041e54a37e5060312e7119ff64ce7233a",
+                "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+                "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              },
+              {
+                "attempt_id": "116b2ec3-6c51-476d-a4b5-b7ff52a10b7e/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "ac92d170c8dddcda2d51497879fe398bc05a085e4a93936735063ccdf861dd30",
+                "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+                "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": "TRUNCATION",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1236,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            },
+            "usage": {
+              "prompt_tokens": 200,
+              "completion_tokens": 20,
+              "total_tokens": 220,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "prompt_sha256": "b6d6ac364e3afa1a0d526a016221f87ac1147f129d6fbd5d6b3bb61d3e1ba0a7",
+            "context_sha256": "0136bfe700fdca849755ca4abfeff0474f27b75a9840e405ff1c7909db6ba716"
+          },
+          "generation_seconds": 0.08211270009633154,
+          "model_calls": [
+            {
+              "request_id": "116b2ec3-6c51-476d-a4b5-b7ff52a10b7e/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            },
+            {
+              "request_id": "116b2ec3-6c51-476d-a4b5-b7ff52a10b7e/answer/2/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "317bc928-149d-4086-8d56-bfab7e8490bd",
+              "source_id": "miracl-zh-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        }
+      ],
+      "auxiliary_calls": [
+        {
+          "request_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/query-embedding-64fb1a53-1846-4a7d-afc6-a2edcdbca514-08c07051187ca5d4",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/query-embedding-64fb1a53-1846-4a7d-afc6-a2edcdbca514-2ea88c7a30351b12",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/query-embedding-64fb1a53-1846-4a7d-afc6-a2edcdbca514-98134dca8ff1c117",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/query_rewrite",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "usage": {
+            "status": "REPORTED",
+            "cache_status": "unreported",
+            "total_tokens": 30,
+            "cached_tokens": 0,
+            "prompt_tokens": 20,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": 10,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": 10,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "0cb23311-3d9c-42b9-a959-1c16ee506d37/rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        }
+      ],
+      "preparation_seconds": 0.5547363000223413,
+      "model_quality_status": "NOT_RUN_SIMULATED_MODELS",
+      "gold_indexed": false,
+      "stage_acceptance": "NOT_CLAIMED"
+    },
+    {
+      "event": "source_ingested",
+      "source_id": "longbench-zh-source",
+      "native_document_id": "a99f8106-7259-428f-8ca1-d1f37d0e0333",
+      "knowledge_base_id": "8b9e8ec2-7b00-4eb4-90f0-c739b9566c12",
+      "sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+      "bytes": 78,
+      "ingestion_seconds": 0.10855859995353967,
+      "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+    },
+    {
+      "event": "dataset_ingested",
+      "dataset": "longbench-zh",
+      "version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "source_documents": 1,
+      "knowledge_base_id": "8b9e8ec2-7b00-4eb4-90f0-c739b9566c12",
+      "full_frozen_corpus": true
+    },
+    {
+      "event": "native_case",
+      "dataset": "longbench-zh",
+      "dataset_version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "qid": "longbench-zh-q",
+      "execution_kind": "ISOLATED_MOCK",
+      "capture_sha256": "7041a7a0fca99a186247e050d765a9228e450a3d65293fae8d2c39ad51f45397",
+      "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+      "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694",
+      "ranked_original_documents": {
+        "search": [
+          "longbench-zh-source"
+        ],
+        "rerank": [
+          "longbench-zh-source"
+        ],
+        "context": [
+          "longbench-zh-source"
+        ]
+      },
+      "modes": [
+        {
+          "mode": "OFF",
+          "run_id": "85c15038-8d39-400f-86eb-9eb5514b51c2",
+          "assistant_message_id": "21dc9c73-bd35-4226-b50a-68c635315f88",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "baseline",
+            "selected_attempt_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/answer/1/baseline",
+            "attempts": [
+              {
+                "attempt_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/answer/1/baseline",
+                "ordinal": 1,
+                "role": "baseline",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "10b97e1fed873e2b0acc22df2b55b5857cc80c0683efa533b3ed07b83614137d",
+                "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+                "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": null,
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+            "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694"
+          },
+          "generation_seconds": 0.04518740007188171,
+          "model_calls": [
+            {
+              "request_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/answer/1/baseline",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "CHEAP_ONLY",
+          "run_id": "3a8683ea-13c7-4efc-8da2-524d761a8246",
+          "assistant_message_id": "88012eda-265c-463b-bc86-dd10f115021b",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "cheap",
+            "selected_attempt_id": "3a8683ea-13c7-4efc-8da2-524d761a8246/answer/1/cheap",
+            "attempts": [
+              {
+                "attempt_id": "3a8683ea-13c7-4efc-8da2-524d761a8246/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "9d8e232b52a48fe52eea3cbc21660544502e672d0e301d0e769f66510f5cd158",
+                "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+                "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "CHEAP_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1228,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+            "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694"
+          },
+          "generation_seconds": 0.046465500025078654,
+          "model_calls": [
+            {
+              "request_id": "3a8683ea-13c7-4efc-8da2-524d761a8246/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "EXPENSIVE_ONLY",
+          "run_id": "76ec5590-29d1-463f-bec1-e2bf9abbe191",
+          "assistant_message_id": "bd8950ad-0431-4529-902d-9d3954a18596",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd\" chunk_id=\"f84c1dc1-81b2-40f4-9a4d-186b7192484c\" kb_id=\"8b9e8ec2-7b00-4eb4-90f0-c739b9566c12\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "f84c1dc1-81b2-40f4-9a4d-186b7192484c",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "a99f8106-7259-428f-8ca1-d1f37d0e0333",
+                "knowledge_base_id": "8b9e8ec2-7b00-4eb4-90f0-c739b9566c12",
+                "knowledge_title": "f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd",
+                "knowledge_filename": "f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "76ec5590-29d1-463f-bec1-e2bf9abbe191/answer/1/expensive",
+            "attempts": [
+              {
+                "attempt_id": "76ec5590-29d1-463f-bec1-e2bf9abbe191/answer/1/expensive",
+                "ordinal": 1,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "44bca4a4ee61c59947fc9791d2386d08615e2689f0bf9d04425000f144137663",
+                "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+                "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "EXPENSIVE_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1228,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_expensive",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+            "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694"
+          },
+          "generation_seconds": 0.049468299956060946,
+          "model_calls": [
+            {
+              "request_id": "76ec5590-29d1-463f-bec1-e2bf9abbe191/answer/1/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "f84c1dc1-81b2-40f4-9a4d-186b7192484c",
+              "source_id": "longbench-zh-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "DYNAMIC",
+          "run_id": "5fc734e8-f728-421e-ba18-f817ec05f094",
+          "assistant_message_id": "0bcef9b7-e8c7-4542-8df8-23276840f36d",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd\" chunk_id=\"f84c1dc1-81b2-40f4-9a4d-186b7192484c\" kb_id=\"8b9e8ec2-7b00-4eb4-90f0-c739b9566c12\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "f84c1dc1-81b2-40f4-9a4d-186b7192484c",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "a99f8106-7259-428f-8ca1-d1f37d0e0333",
+                "knowledge_base_id": "8b9e8ec2-7b00-4eb4-90f0-c739b9566c12",
+                "knowledge_title": "f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd",
+                "knowledge_filename": "f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "f5e948278b10cac66f2e475bca4e7b2733e444c4831143ef9761fe3159e5bdbd.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "5fc734e8-f728-421e-ba18-f817ec05f094/answer/2/expensive",
+            "attempts": [
+              {
+                "attempt_id": "5fc734e8-f728-421e-ba18-f817ec05f094/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "27e39b1736856e129a889d9ba5c2e860da49c334eddc33cb30b7588104954c0c",
+                "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+                "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              },
+              {
+                "attempt_id": "5fc734e8-f728-421e-ba18-f817ec05f094/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "ddd2c515127e7b2faa5249726ac1b022872a3c6ef650d4b48622129f35ff44d6",
+                "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+                "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": "TRUNCATION",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1228,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            },
+            "usage": {
+              "prompt_tokens": 200,
+              "completion_tokens": 20,
+              "total_tokens": 220,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "prompt_sha256": "46bbe080e50113ccae89cae164a3cc8bcf087793c871c2f198ebf667c9678c36",
+            "context_sha256": "8a3e886e83eb66e78cd46c4ee898a7549e4631d3469cda276b4c94ed9fd42694"
+          },
+          "generation_seconds": 0.08241279993671924,
+          "model_calls": [
+            {
+              "request_id": "5fc734e8-f728-421e-ba18-f817ec05f094/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            },
+            {
+              "request_id": "5fc734e8-f728-421e-ba18-f817ec05f094/answer/2/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "f84c1dc1-81b2-40f4-9a4d-186b7192484c",
+              "source_id": "longbench-zh-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        }
+      ],
+      "auxiliary_calls": [
+        {
+          "request_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/query-embedding-8b9e8ec2-7b00-4eb4-90f0-c739b9566c12-08c07051187ca5d4",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/query-embedding-8b9e8ec2-7b00-4eb4-90f0-c739b9566c12-2ea88c7a30351b12",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/query-embedding-8b9e8ec2-7b00-4eb4-90f0-c739b9566c12-98134dca8ff1c117",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/query_rewrite",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "usage": {
+            "status": "REPORTED",
+            "cache_status": "unreported",
+            "total_tokens": 30,
+            "cached_tokens": 0,
+            "prompt_tokens": 20,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": 10,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": 10,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "85c15038-8d39-400f-86eb-9eb5514b51c2/rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        }
+      ],
+      "preparation_seconds": 0.5482531000161543,
+      "model_quality_status": "NOT_RUN_SIMULATED_MODELS",
+      "gold_indexed": false,
+      "stage_acceptance": "NOT_CLAIMED"
+    },
+    {
+      "event": "source_ingested",
+      "source_id": "hotpotqa-source",
+      "native_document_id": "337b24e4-1ead-4993-a9d3-e649b8f5c276",
+      "knowledge_base_id": "e40504e2-ff7b-4cf6-b83f-06144ad25499",
+      "sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+      "bytes": 78,
+      "ingestion_seconds": 0.1008857999695465,
+      "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+    },
+    {
+      "event": "dataset_ingested",
+      "dataset": "hotpotqa",
+      "version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "source_documents": 1,
+      "knowledge_base_id": "e40504e2-ff7b-4cf6-b83f-06144ad25499",
+      "full_frozen_corpus": true
+    },
+    {
+      "event": "native_case",
+      "dataset": "hotpotqa",
+      "dataset_version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "qid": "hotpotqa-q",
+      "execution_kind": "ISOLATED_MOCK",
+      "capture_sha256": "62a6cbe3c2c38c4eedfef749e5d10a8113752c85753e3a953a59a4568ddf7254",
+      "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+      "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec",
+      "ranked_original_documents": {
+        "search": [
+          "hotpotqa-source"
+        ],
+        "rerank": [
+          "hotpotqa-source"
+        ],
+        "context": [
+          "hotpotqa-source"
+        ]
+      },
+      "modes": [
+        {
+          "mode": "OFF",
+          "run_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e",
+          "assistant_message_id": "97d31123-153d-47c8-b255-431b1adb1601",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "baseline",
+            "selected_attempt_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/answer/1/baseline",
+            "attempts": [
+              {
+                "attempt_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/answer/1/baseline",
+                "ordinal": 1,
+                "role": "baseline",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "d6a42b6edba1013880e90855dad605d6123cc6baf254800b51fa6fcc515e42e8",
+                "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+                "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": null,
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+            "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec"
+          },
+          "generation_seconds": 0.05176770000252873,
+          "model_calls": [
+            {
+              "request_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/answer/1/baseline",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "CHEAP_ONLY",
+          "run_id": "dab35093-871b-48c0-84d2-9bfab859c8de",
+          "assistant_message_id": "5e542201-abc1-45f4-ad42-45196abce405",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "cheap",
+            "selected_attempt_id": "dab35093-871b-48c0-84d2-9bfab859c8de/answer/1/cheap",
+            "attempts": [
+              {
+                "attempt_id": "dab35093-871b-48c0-84d2-9bfab859c8de/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "869c45741bc86e0b025423d7606f122c5f77900349e4453f430b3a2c347f72c8",
+                "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+                "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "CHEAP_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1225,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+            "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec"
+          },
+          "generation_seconds": 0.05717649997677654,
+          "model_calls": [
+            {
+              "request_id": "dab35093-871b-48c0-84d2-9bfab859c8de/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "EXPENSIVE_ONLY",
+          "run_id": "19d95322-762e-4c66-ad2e-78f75ac7ff3e",
+          "assistant_message_id": "fec23225-367f-44d2-a1a3-9fbf27795f1d",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439\" chunk_id=\"9ee6883c-8315-4f57-8b70-ba2ecb8d0769\" kb_id=\"e40504e2-ff7b-4cf6-b83f-06144ad25499\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "9ee6883c-8315-4f57-8b70-ba2ecb8d0769",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "337b24e4-1ead-4993-a9d3-e649b8f5c276",
+                "knowledge_base_id": "e40504e2-ff7b-4cf6-b83f-06144ad25499",
+                "knowledge_title": "648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439",
+                "knowledge_filename": "648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "19d95322-762e-4c66-ad2e-78f75ac7ff3e/answer/1/expensive",
+            "attempts": [
+              {
+                "attempt_id": "19d95322-762e-4c66-ad2e-78f75ac7ff3e/answer/1/expensive",
+                "ordinal": 1,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "31c454728f5227ef76203d43236432ebae3d071e58d5389b628c820f4d49a538",
+                "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+                "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "EXPENSIVE_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1225,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_expensive",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+            "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec"
+          },
+          "generation_seconds": 0.050826999940909445,
+          "model_calls": [
+            {
+              "request_id": "19d95322-762e-4c66-ad2e-78f75ac7ff3e/answer/1/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "9ee6883c-8315-4f57-8b70-ba2ecb8d0769",
+              "source_id": "hotpotqa-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "DYNAMIC",
+          "run_id": "ebdf0999-2a1f-4e00-a451-0cd853900244",
+          "assistant_message_id": "19324bb6-1fbf-40cd-8ee9-cb1cb8b51f5b",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439\" chunk_id=\"9ee6883c-8315-4f57-8b70-ba2ecb8d0769\" kb_id=\"e40504e2-ff7b-4cf6-b83f-06144ad25499\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "9ee6883c-8315-4f57-8b70-ba2ecb8d0769",
+                "content": "public source\nBlue widgets use protocol W-17. Literal replacement symbol: �.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "337b24e4-1ead-4993-a9d3-e649b8f5c276",
+                "knowledge_base_id": "e40504e2-ff7b-4cf6-b83f-06144ad25499",
+                "knowledge_title": "648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439",
+                "knowledge_filename": "648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439.txt",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "648039bb1022c6e8edd358eaf37dc5de2500f3cd2faaa1e04edb6aa667640439.txt"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "ebdf0999-2a1f-4e00-a451-0cd853900244/answer/2/expensive",
+            "attempts": [
+              {
+                "attempt_id": "ebdf0999-2a1f-4e00-a451-0cd853900244/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "18605e97b8ad557056b3c692cff4544e93201b00f906bbc1f4d42b8e2371f83d",
+                "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+                "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              },
+              {
+                "attempt_id": "ebdf0999-2a1f-4e00-a451-0cd853900244/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "0ae5ba97a1d67026f66e3e22bd9936f5c372d1f03e366f53d1fce1a85189810c",
+                "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+                "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": "TRUNCATION",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1225,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            },
+            "usage": {
+              "prompt_tokens": 200,
+              "completion_tokens": 20,
+              "total_tokens": 220,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "prompt_sha256": "48c3b5a532969de861a6603191ad502bc41d05cfe6e0b59ec1aade4047bab757",
+            "context_sha256": "a6a6661558b4702337bcf4362f97e8745cfd168cc844d1e65e568a3bdf4710ec"
+          },
+          "generation_seconds": 0.08008830004837364,
+          "model_calls": [
+            {
+              "request_id": "ebdf0999-2a1f-4e00-a451-0cd853900244/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            },
+            {
+              "request_id": "ebdf0999-2a1f-4e00-a451-0cd853900244/answer/2/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "9ee6883c-8315-4f57-8b70-ba2ecb8d0769",
+              "source_id": "hotpotqa-source",
+              "source_sha256": "dc4d3377eb1964dcf3123368e41f6f97d247c4e21fba5e51e021991602c127e7",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        }
+      ],
+      "auxiliary_calls": [
+        {
+          "request_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/query-embedding-e40504e2-ff7b-4cf6-b83f-06144ad25499-08c07051187ca5d4",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/query-embedding-e40504e2-ff7b-4cf6-b83f-06144ad25499-2ea88c7a30351b12",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/query-embedding-e40504e2-ff7b-4cf6-b83f-06144ad25499-98134dca8ff1c117",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/query_rewrite",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "usage": {
+            "status": "REPORTED",
+            "cache_status": "unreported",
+            "total_tokens": 30,
+            "cached_tokens": 0,
+            "prompt_tokens": 20,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": 10,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": 10,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "527029b8-3d8b-4937-85f8-ab53a98ff22e/rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        }
+      ],
+      "preparation_seconds": 0.5395306999562308,
+      "model_quality_status": "NOT_RUN_SIMULATED_MODELS",
+      "gold_indexed": false,
+      "stage_acceptance": "NOT_CLAIMED"
+    },
+    {
+      "event": "source_ingested",
+      "source_id": "mmlongbench-doc-source.pdf",
+      "native_document_id": "854c6b51-f1dd-4e28-a2d2-f59a1fe4634b",
+      "knowledge_base_id": "12bd9a9b-047c-4342-a5d1-2599ee1b8a2e",
+      "sha256": "a09ed2f8c5fe9d9c2cfaeacddeb8aba67d53a77ed2fd7ef5488def868538d1c6",
+      "bytes": 799,
+      "ingestion_seconds": 0.10170329990796745,
+      "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+    },
+    {
+      "event": "dataset_ingested",
+      "dataset": "mmlongbench-doc",
+      "version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "source_documents": 1,
+      "knowledge_base_id": "12bd9a9b-047c-4342-a5d1-2599ee1b8a2e",
+      "full_frozen_corpus": true
+    },
+    {
+      "event": "native_case",
+      "dataset": "mmlongbench-doc",
+      "dataset_version": "SYNTHETIC_NOT_FROZEN_ACCEPTANCE",
+      "qid": "mmlongbench-doc-q",
+      "execution_kind": "ISOLATED_MOCK",
+      "capture_sha256": "fb398abcc77cba2508547b897e82a2abe3ee8a26d2900ac7d2ecc3a9b6af655e",
+      "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+      "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7",
+      "ranked_original_documents": {
+        "search": [
+          "mmlongbench-doc-source.pdf"
+        ],
+        "rerank": [
+          "mmlongbench-doc-source.pdf"
+        ],
+        "context": [
+          "mmlongbench-doc-source.pdf"
+        ]
+      },
+      "modes": [
+        {
+          "mode": "OFF",
+          "run_id": "417e44d3-a213-4312-a470-1e4870e444b1",
+          "assistant_message_id": "8eea3f38-2708-43e9-8dae-bd2d0fb16d3d",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "baseline",
+            "selected_attempt_id": "417e44d3-a213-4312-a470-1e4870e444b1/answer/1/baseline",
+            "attempts": [
+              {
+                "attempt_id": "417e44d3-a213-4312-a470-1e4870e444b1/answer/1/baseline",
+                "ordinal": 1,
+                "role": "baseline",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "2348abf47ddd4794a96bbe5f06c9dc4486b89069180104b326bb81364cd49a52",
+                "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+                "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": null,
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+            "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7"
+          },
+          "generation_seconds": 0.05220120004378259,
+          "model_calls": [
+            {
+              "request_id": "417e44d3-a213-4312-a470-1e4870e444b1/answer/1/baseline",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "CHEAP_ONLY",
+          "run_id": "2fa2cd6e-1df7-4736-8490-7e84a801076e",
+          "assistant_message_id": "19b44c9b-64ea-4bf6-83e2-2cd26b878535",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "CHEAP_REJECTED_DRAFT",
+            "thinking": "",
+            "references": [],
+            "selected_role": "cheap",
+            "selected_attempt_id": "2fa2cd6e-1df7-4736-8490-7e84a801076e/answer/1/cheap",
+            "attempts": [
+              {
+                "attempt_id": "2fa2cd6e-1df7-4736-8490-7e84a801076e/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "2741aa5aa8d46732211b039f1c1fadd5164b74d7ae563232c5b2730468a59621",
+                "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+                "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "CHEAP_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1186,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "length",
+            "truncated": true,
+            "upgraded": false,
+            "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+            "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7"
+          },
+          "generation_seconds": 0.05140270001720637,
+          "model_calls": [
+            {
+              "request_id": "2fa2cd6e-1df7-4736-8490-7e84a801076e/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "EXPENSIVE_ONLY",
+          "run_id": "663ad673-2ea9-4e5e-b019-a8204ed870d6",
+          "assistant_message_id": "ac772f65-aa65-425b-b2f9-42432ec46455",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"mmlongbench-doc-source\" chunk_id=\"611f26e0-1506-45cc-8f1d-d2165f383578\" kb_id=\"12bd9a9b-047c-4342-a5d1-2599ee1b8a2e\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "611f26e0-1506-45cc-8f1d-d2165f383578",
+                "content": "Native PDF public source evidence.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "854c6b51-f1dd-4e28-a2d2-f59a1fe4634b",
+                "knowledge_base_id": "12bd9a9b-047c-4342-a5d1-2599ee1b8a2e",
+                "knowledge_title": "mmlongbench-doc-source",
+                "knowledge_filename": "mmlongbench-doc-source.pdf",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "mmlongbench-doc-source.pdf"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "663ad673-2ea9-4e5e-b019-a8204ed870d6/answer/1/expensive",
+            "attempts": [
+              {
+                "attempt_id": "663ad673-2ea9-4e5e-b019-a8204ed870d6/answer/1/expensive",
+                "ordinal": 1,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "0e9cb7e5b2dc71b76e39cb7ff765d072c949e9f2e751832751794f61029a0a7a",
+                "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+                "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "EXPENSIVE_ONLY",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1186,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_expensive",
+              "route_reason": "OFFLINE_ARM"
+            },
+            "usage": {
+              "prompt_tokens": 100,
+              "completion_tokens": 10,
+              "total_tokens": 110,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": false,
+            "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+            "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7"
+          },
+          "generation_seconds": 0.04712959995958954,
+          "model_calls": [
+            {
+              "request_id": "663ad673-2ea9-4e5e-b019-a8204ed870d6/answer/1/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "611f26e0-1506-45cc-8f1d-d2165f383578",
+              "source_id": "mmlongbench-doc-source.pdf",
+              "source_sha256": "a09ed2f8c5fe9d9c2cfaeacddeb8aba67d53a77ed2fd7ef5488def868538d1c6",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        },
+        {
+          "mode": "DYNAMIC",
+          "run_id": "399ac8e4-b111-493b-94dc-cd2b85e69277",
+          "assistant_message_id": "0480585a-ae96-406e-862a-351e79edb1b6",
+          "status": "COMPLETED",
+          "result": {
+            "answer": "Blue widgets use W-17. <kb doc=\"mmlongbench-doc-source\" chunk_id=\"611f26e0-1506-45cc-8f1d-d2165f383578\" kb_id=\"12bd9a9b-047c-4342-a5d1-2599ee1b8a2e\" />",
+            "thinking": "",
+            "references": [
+              {
+                "id": "611f26e0-1506-45cc-8f1d-d2165f383578",
+                "content": "Native PDF public source evidence.",
+                "score": 0.6448942358540455,
+                "knowledge_id": "854c6b51-f1dd-4e28-a2d2-f59a1fe4634b",
+                "knowledge_base_id": "12bd9a9b-047c-4342-a5d1-2599ee1b8a2e",
+                "knowledge_title": "mmlongbench-doc-source",
+                "knowledge_filename": "mmlongbench-doc-source.pdf",
+                "chunk_index": 0,
+                "chunk_type": "text",
+                "knowledge_source": "mmlongbench-doc-source.pdf"
+              }
+            ],
+            "selected_role": "expensive",
+            "selected_attempt_id": "399ac8e4-b111-493b-94dc-cd2b85e69277/answer/2/expensive",
+            "attempts": [
+              {
+                "attempt_id": "399ac8e4-b111-493b-94dc-cd2b85e69277/answer/1/cheap",
+                "ordinal": 1,
+                "role": "cheap",
+                "provider": "siliconflow",
+                "model_requested": "XingChenAGI/Xing4.0-29B",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "ef76aa8ea81ad134e6ae8eef31c90da9016277ba5525322130f557ab4e14f7d0",
+                "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+                "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7",
+                "model_reported": "XingChenAGI/Xing4.0-29B",
+                "status": "TRUNCATED",
+                "finish_reason": "length",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [
+                  "TRUNCATED"
+                ],
+                "upgrade_reason": null,
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              },
+              {
+                "attempt_id": "399ac8e4-b111-493b-94dc-cd2b85e69277/answer/2/expensive",
+                "ordinal": 2,
+                "role": "expensive",
+                "provider": "deepseek",
+                "model_requested": "deepseek-flash",
+                "endpoint": "https://fixture.invalid/v1",
+                "envelope_sha256": "38eec5771f9848bf9464b91099de8edddba850f9438fd778b1a3750e1adeea48",
+                "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+                "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7",
+                "model_reported": "deepseek-flash",
+                "status": "COMPLETED",
+                "finish_reason": "stop",
+                "usage": {
+                  "prompt_tokens": 100,
+                  "completion_tokens": 10,
+                  "total_tokens": 110,
+                  "status": "REPORTED",
+                  "cached_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cache_miss_tokens": 0,
+                  "cache_reported": false,
+                  "cache_status": "unreported"
+                },
+                "objective": [],
+                "upgrade_reason": "TRUNCATION",
+                "cost_status": "UNKNOWN",
+                "error_code": null,
+                "invalid_handle_count": 0
+              }
+            ],
+            "route": {
+              "router_version": "rule-router-v1/draft-v0.4",
+              "threshold": "0.35",
+              "mode": "DYNAMIC",
+              "task_labels": [
+                "extract",
+                "unknown"
+              ],
+              "task_anchors": [
+                {
+                  "task": "extract",
+                  "sha256": "f1cf2fd5c86895128d559088259a132d4d4689a4d6ae4e0339100393438ec986"
+                }
+              ],
+              "T": {
+                "value": 0.1,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "C": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "J": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "D": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "L": {
+                "value": 0.0,
+                "status": "ESTIMATED"
+              },
+              "M": {
+                "value": 0.0,
+                "status": "UNKNOWN_NOT_INFERRED"
+              },
+              "condition_count": null,
+              "condition_count_basis": "UNKNOWN",
+              "logic": "NONE_OR_UNPARSED",
+              "dependency_depth": null,
+              "output_count": null,
+              "estimated_input_tokens": 1186,
+              "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+              "token_basis": "not_provider_actual",
+              "score": "0.1",
+              "decision_model_role": "chat_cheap",
+              "route_reason": "SCORE_BELOW_THRESHOLD"
+            },
+            "usage": {
+              "prompt_tokens": 200,
+              "completion_tokens": 20,
+              "total_tokens": 220,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 0,
+              "cache_reported": false,
+              "cache_status": "unreported"
+            },
+            "finish_reason": "stop",
+            "truncated": false,
+            "upgraded": true,
+            "prompt_sha256": "b2583cee3df892b137837543d3fac27579cdd7a0defcb2f10e9afc440b61146c",
+            "context_sha256": "25662b030f829bd8d1db57fad4a8b4ab1a2dba7252e32b80aa9b95af3a29e6b7"
+          },
+          "generation_seconds": 0.08395749994087964,
+          "model_calls": [
+            {
+              "request_id": "399ac8e4-b111-493b-94dc-cd2b85e69277/answer/1/cheap",
+              "provider": "siliconflow",
+              "model": "XingChenAGI/Xing4.0-29B",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            },
+            {
+              "request_id": "399ac8e4-b111-493b-94dc-cd2b85e69277/answer/2/expensive",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "capability": "chat",
+              "state": "settled",
+              "usage": {
+                "status": "REPORTED",
+                "cache_status": "unreported",
+                "total_tokens": 110,
+                "cached_tokens": 0,
+                "prompt_tokens": 100,
+                "cache_reported": false,
+                "cache_miss_tokens": 0,
+                "cache_read_tokens": 0,
+                "completion_tokens": 10,
+                "cache_write_tokens": 0
+              },
+              "reserved_microunits": 100,
+              "actual_microunits": 10,
+              "price_source": "SYNTHETIC-NOT-BILLING"
+            }
+          ],
+          "citations": [
+            {
+              "chunk_id": "611f26e0-1506-45cc-8f1d-d2165f383578",
+              "source_id": "mmlongbench-doc-source.pdf",
+              "source_sha256": "a09ed2f8c5fe9d9c2cfaeacddeb8aba67d53a77ed2fd7ef5488def868538d1c6",
+              "readable": true,
+              "quote_matches_chunk": true,
+              "chunk_type": "text",
+              "semantic_support": "NOT_EVALUATED"
+            }
+          ],
+          "quality": {
+            "status": "NOT_RUN_SIMULATED_OR_UNCONFIRMED_MODELS",
+            "quality_metrics": null,
+            "execution_kind": "ISOLATED_MOCK"
+          }
+        }
+      ],
+      "auxiliary_calls": [
+        {
+          "request_id": "417e44d3-a213-4312-a470-1e4870e444b1/query-embedding-12bd9a9b-047c-4342-a5d1-2599ee1b8a2e-08c07051187ca5d4",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "417e44d3-a213-4312-a470-1e4870e444b1/query-embedding-12bd9a9b-047c-4342-a5d1-2599ee1b8a2e-2ea88c7a30351b12",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "417e44d3-a213-4312-a470-1e4870e444b1/query-embedding-12bd9a9b-047c-4342-a5d1-2599ee1b8a2e-98134dca8ff1c117",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": 10,
+            "cached_tokens": 0,
+            "prompt_tokens": 10,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "417e44d3-a213-4312-a470-1e4870e444b1/query_rewrite",
+          "provider": "siliconflow",
+          "model": "XingChenAGI/Xing4.0-29B",
+          "capability": "chat",
+          "state": "settled",
+          "usage": {
+            "status": "REPORTED",
+            "cache_status": "unreported",
+            "total_tokens": 30,
+            "cached_tokens": 0,
+            "prompt_tokens": 20,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": 10,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": 10,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        },
+        {
+          "request_id": "417e44d3-a213-4312-a470-1e4870e444b1/rerank",
+          "provider": "siliconflow",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "state": "unknown",
+          "usage": {
+            "status": "UNKNOWN",
+            "cache_status": "unsupported",
+            "total_tokens": null,
+            "cached_tokens": 0,
+            "prompt_tokens": null,
+            "cache_reported": false,
+            "cache_miss_tokens": 0,
+            "cache_read_tokens": 0,
+            "completion_tokens": null,
+            "cache_write_tokens": 0
+          },
+          "reserved_microunits": 100,
+          "actual_microunits": null,
+          "price_source": "SYNTHETIC-NOT-BILLING"
+        }
+      ],
+      "preparation_seconds": 0.5566254999721423,
+      "model_quality_status": "NOT_RUN_SIMULATED_MODELS",
+      "gold_indexed": false,
+      "stage_acceptance": "NOT_CLAIMED"
+    },
+    {
+      "event": "source_ingested",
+      "source_id": "synthetic-omni-page",
+      "native_document_id": "425cae06-2f4b-46b1-b573-2b2afaa327e3",
+      "knowledge_base_id": "40256d65-7f7d-4640-8d3d-6efda4d09776",
+      "sha256": "1d4c203d5c185173a2b0f28030283807aaa28effb0e3dd20e0b44e9981bc0944",
+      "bytes": 287,
+      "ingestion_seconds": 0.13776089996099472,
+      "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+    },
+    {
+      "event": "native_omni_page",
+      "page_id": "synthetic-omni-page",
+      "source": {
+        "source_id": "synthetic-omni-page",
+        "native_document_id": "425cae06-2f4b-46b1-b573-2b2afaa327e3",
+        "knowledge_base_id": "40256d65-7f7d-4640-8d3d-6efda4d09776",
+        "sha256": "1d4c203d5c185173a2b0f28030283807aaa28effb0e3dd20e0b44e9981bc0944",
+        "bytes": 287,
+        "ingestion_seconds": 0.13776089996099472,
+        "status": "NATIVE_INGESTED_ORIGINAL_READBACK_VERIFIED"
+      },
+      "parsing": {
+        "status": "NOT_RUN",
+        "page_id": "synthetic-omni-page",
+        "metrics": null,
+        "independent_qa": "NOT_RUN_OVERLAY_UNAVAILABLE"
+      },
+      "independent_qa": "NOT_RUN_OVERLAY_UNAVAILABLE",
+      "gold_indexed": false
+    }
+  ],
+  "real_model_quality": "NOT_RUN",
+  "stage_acceptance": "NOT_CLAIMED"
+}

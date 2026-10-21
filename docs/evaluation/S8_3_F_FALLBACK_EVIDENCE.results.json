@@ -1,0 +1,459 @@
+{
+  "schema": "s8-3-f-fallback-evidence/v1",
+  "status": "PASS_OFFLINE_SCOPE",
+  "conclusions": {
+    "SOURCE_BOUNDARY": "SOURCE_BOUNDARY_PASS",
+    "FIXED_FALLBACK": "FIXED_FALLBACK_PASS",
+    "FIXED_FALLBACK_evidence_scope": "OFFLINE_MOCKTRANSPORT_IN_MEMORY_PERSISTENCE_AND_SCRIPTED_SQL_CONTRACTS",
+    "MODEL_FALLBACK_QUALITY": "NOT_RUN"
+  },
+  "version": {
+    "initial_reference_head": "86d42a7374f738c996e7804a067b0052291ec997",
+    "initial_branch": "codex/ecs-deploy-skill-20261020",
+    "branch": "codex/s8-3-f-fallback-evidence-20261020",
+    "preserved_concurrent_commit": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+    "implementation_commit": "a5f85562b6aa11e4ec9a988c0c3fbde6fc856665",
+    "delivery_commit_resolution": "git log -1 --format=%H -- docs/evaluation/S8_3_F_FALLBACK_EVIDENCE.md"
+  },
+  "root_cause": {
+    "function": "ApplicationRuntime._fallback_documents",
+    "location": "backend/weknora_port/runtime.py",
+    "data_flow": "knowledges.description -> truncated catalog listing -> fallback kb_documents substitution -> FinalizedContext.system_prompt_override -> prepare_generation System message -> Provider wire, without source_unit/Context evidence.",
+    "distinction": "This is SearchNothing model fallback metadata contamination, not the repaired normal bounded_source_v1 Summary projection.",
+    "historical_observation": "Both S8.3-R postcode real outputs abstained from postcode digits but promoted unread KTH/course metadata to facts despite a metadata warning."
+  },
+  "changes": [
+    {
+      "file": "backend/weknora_port/runtime.py",
+      "function": "_fallback_documents",
+      "change": "SELECT only title/file_name/file_type, never description; JSON quote catalog title/type under metadata-only/not-read label; preserve empty listing and limit50."
+    },
+    {
+      "file": "backend/weknora_port/conversation_assets/fallback.yaml",
+      "templates": [
+        "model_fallback",
+        "default_fallback_prompt"
+      ],
+      "change": "Insufficient retrieved evidence does not establish KB absence; directory is not document-content evidence; no inference of details or citations to unsupplied chunks; respect source-only requests; label permitted general knowledge separately."
+    },
+    {
+      "file": "backend/weknora_port/conversation_assets/manifest.json",
+      "change": "Update exact fallback asset SHA, preserving integrity checks and declared LF bytes."
+    }
+  ],
+  "fixed_model_contract": {
+    "source_evidence_modes": [
+      "off",
+      "bounded_source_v1"
+    ],
+    "search_rerank_fixture": "Actual pipeline Search30 and actual ProviderModel/MockTransport rerank allscore0.1, below unchanged0.3 and0.15; SearchNothing clears evidence, no merge/context source resurrection.",
+    "fixed": {
+      "new_final_generation_calls": 0,
+      "literal_test_response": "The available knowledge-base evidence is insufficient to answer this question.",
+      "earlier_mock_calls_preserved": [
+        "query/chat",
+        "embedding",
+        "rerank"
+      ],
+      "earlier_mock_usage_tokens": [
+        15,
+        15,
+        15
+      ],
+      "generation_result_usage_note": "GenerationResult/FinalCommit usage remains generation-attempt-only; it is not whole-turn Provider usage. Prior gate records remain; no fake total0 is written.",
+      "sse_commit_history_replay": "PASS_OFFLINE",
+      "no_chunk_references": true
+    },
+    "model": {
+      "custom_prompt": "Remains configurable/verbatim, but generated Description can no longer enter via the catalog placeholder.",
+      "system_user_wire": "Built through actual RuntimeService.prepare_turn, prepare_generation and ProviderModel.build_request_body with saved catalog fixture; no send.",
+      "hallucination_risk": "NOT_ELIMINATED: titles, filenames, history, general knowledge or custom prompts can still cause unsupported model inferences. No new actual model response."
+    },
+    "faults": "Existing HTTP rerank degradation retains valid Search evidence; invalid indices and actual egress-denial faults fail instead of becoming evidence-empty fallback. Synthetic UNKNOWN remains FAILED/UNKNOWN and replay does not resend."
+  },
+  "scope_guards": {
+    "tenant": "tenant_id=%s",
+    "kb": "knowledge_base_id=ANY(%s)",
+    "document": "admission document_ids conditional id=ANY(%s)",
+    "deleted": "deleted_at IS NULL",
+    "enabled": "enable_status='enabled'",
+    "cap": 50,
+    "session": "Existing turns._session(guard,session_id,principal) before catalog SQL",
+    "verification": "Scripted SQL predicates/parameters and denied-session unit tests; no new real-PG cross-tenant integration claim."
+  },
+  "wire_comparison": {
+    "historical_saved_request": {
+      "path": "E:\\RAG quention\\var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\64f5ed899760352389940b173ea20ffd7fe3a1f32504b53178734aadceafc15c\\evidence\\1fe80ab12e5e40c593f944cc636be573.request.json",
+      "sha256": "01ab4da5c538f3a60b8d94f0010fcf4459d6698ed31f0784df57bed76cfd89f1",
+      "request_id": "fea2b6d6-52ce-4b1f-bf53-9c89dab566f4/answer/1/cheap",
+      "actual_provider_calls_for_that_historical_turn": 4,
+      "usage_total": 6285,
+      "description_present": true,
+      "original_source_chunks": 0,
+      "contains_KTH_description": true
+    },
+    "postfix_offline_build": {
+      "path": "E:\\RAG quention\\var\\reports\\s8-3-f-20261020\\postfix-model-wire.json",
+      "description_present": false,
+      "contains_KTH_description": false,
+      "catalog_entries": 2,
+      "original_question_preserved": true,
+      "model": "Qwen/Qwen3.5-4B",
+      "max_tokens": 2048,
+      "enable_thinking": false,
+      "real_sends": 0,
+      "real_response": "NOT_RUN"
+    },
+    "claims": "Source data boundary only; title/name/general-knowledge hallucination remains unmeasured. Historical4calls6285Token reused as evidence, not counted anew."
+  },
+  "tests": {
+    "RED": {
+      "receipt": {
+        "command": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "tests/weknora_port/test_fallback_catalog_boundary.py"
+        ],
+        "exit_code": 1,
+        "scope": "offline unit no DB/Provider"
+      },
+      "result": "5 failed,4 passed; before production changes"
+    },
+    "catalog_GREEN": {
+      "receipt": {
+        "command": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "tests/weknora_port/test_fallback_catalog_boundary.py",
+          "tests/weknora_port/test_p28_native_fallback.py"
+        ],
+        "exit_code": 0,
+        "scope": "offline unit no DB/Provider"
+      },
+      "result": "19 passed"
+    },
+    "fixed_contract": {
+      "task": "S8.3-F fixed/model fallback service contract",
+      "baseline_head_from_parent": "86d42a7",
+      "source_file": "E:/RAG-Worktrees/s8-six-dataset-evaluation/tests/weknora_port/test_fallback_evidence_contract.py",
+      "source_sha256": "ede80143181dda83779acd2cf655efb4d3a71ea6b3d9ba328c4a475097f651ed",
+      "source_read": "PASS",
+      "implemented": "PASS",
+      "offline_pass": "PASS",
+      "isolated_integration_pass": "NOT RUN",
+      "real_provider_pass": "NOT RUN",
+      "cutover_pass": "NOT RUN",
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest -q --tb=short -p no:cacheprovider tests/weknora_port/test_fallback_evidence_contract.py",
+      "working_directory": "E:/RAG-Worktrees/s8-six-dataset-evaluation",
+      "sandbox_permissions": "require_escalated",
+      "exit_code": 0,
+      "key_output": "14 passed in 1.19s",
+      "log": "pytest-new-final.log",
+      "command_history": "commands.txt",
+      "initial_test_run": {
+        "exit_code": 1,
+        "key_output": "2 failed, 12 passed in 2.05s",
+        "log": "pytest-new-initial.log",
+        "cause": "Fixture used obsolete synthetic MODEL_EGRESS_DENIED; corrected to real transport-gate MODEL_ORIGIN_KB_EGRESS_DENIED."
+      },
+      "coverage": [
+        "off and bounded_source_v1: Search returns 30; actual ProviderModel rerank returns all scores 0.1; formal pipeline raises SearchNothing and service enters no-evidence fallback",
+        "fixed strategy: exactly three preceding QU/embedding/rerank calls; no final answer Provider send; all three reported usage records preserved in injected gate",
+        "model strategy: exactly one final fallback stream and no rejected Search candidate in final generation messages",
+        "exact final text across SSE, commit callback, ordinary history and completed replay; empty references for no-evidence fallback",
+        "UNKNOWN final model transport: one failed UNKNOWN attempt; fixed response; replay sends no additional Provider request and preserves UNKNOWN",
+        "actual rerank HTTP 503 follows existing search degradation without being labelled no-evidence; malformed duplicate-index response and actual gate egress denial fail without fallback",
+        "normal admitted evidence: one final answer call; persisted real chunk reference; off and bounded modes both work"
+      ],
+      "limitations": [
+        "ProviderModel, RetrievalPipeline, RuntimeService, GenerationCoordinator, ordinary history processing and replay are production implementations. HTTP wire uses httpx.MockTransport; admission, persistence and usage gate reuse in-memory test doubles.",
+        "No real PostgreSQL/Redis/HTTP socket or hosted Provider was used. SQL durability, HTTP API history DTO and formal metadata aggregation are not independently established by this module.",
+        "The prior QU/embedding/rerank usage check asserts injected gate records remain available. GenerationResult and FinalCommit usage remain generation-attempt-only; formal run metadata aggregation is covered by the root-owned metadata tests.",
+        "Existing test_fallback_output_pg.py and test_qa_followup_fallback_pg.py were read as references and NOT RUN, because this subtask is offline-only.",
+        "Initial sandbox pytest launch stalled with no output and was interrupted using its tracked session; exit 1. The result is not claimed as a test pass. Escalated local test process completed normally."
+      ],
+      "production_edits": [],
+      "new_dependencies": [],
+      "commit": null,
+      "tag": null
+    },
+    "final_joint_GREEN": {
+      "receipt": {
+        "command": [
+          "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "tests/weknora_port/test_fallback_catalog_boundary.py",
+          "tests/weknora_port/test_fallback_evidence_contract.py",
+          "tests/weknora_port/test_p28_native_fallback.py",
+          "tests/weknora_port/test_fallback_output.py",
+          "tests/weknora_port/test_p21_boundaries.py",
+          "tests/weknora_port/test_m31_source_constraints.py",
+          "tests/weknora_port/test_generation_storage.py",
+          "tests/weknora_port/test_history_storage.py",
+          "tests/weknora_port/test_turn_storage.py",
+          "tests/weknora_port/test_conversation_configuration.py",
+          "tests/weknora_port/test_http_api.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 5.175,
+        "scope": "Offline targeted units/MockTransport/SQL doubles only; no actualPG/Redis/Provider",
+        "real_provider_calls": 0
+      },
+      "result": "237 passed,1 skipped in3.41s",
+      "skip": "Explicit isolated PostgreSQL DSN not supplied; real PostgreSQL NOT_RUN."
+    },
+    "first_failures_preserved": [
+      "Initial changed YAML hash not yet updated -> asset integrity rejection; manifest corrected, guard retained.",
+      "P28 old final_evidence_projection constructor seam removed in existing baseline -> fixture adapted to current opt-in expand_source_evidence hook.",
+      "Two stale historical assertions expected no configured-language suffix and retired disabled-citation wording -> tests now assert already approved current contracts; no generation/citation source changes.",
+      "New fixture initially used obsolete synthetic egress-denial code -> corrected to actual transport MODEL_ORIGIN_KB_EGRESS_DENIED; preserved failure log.",
+      "Sandbox pytest launch stalled, tracked process stopped; permitted local test process rerun, no external models."
+    ],
+    "not_run": [
+      "Real model fallback quality",
+      "Real PG/Redis service integration",
+      "ECS",
+      "S8.3-R12QA rerun",
+      "Memory gap backfill",
+      "Full repository/six-dataset evaluation"
+    ]
+  },
+  "protection": {
+    "status": "PASS",
+    "initial_head": "86d42a7374f738c996e7804a067b0052291ec997",
+    "current_parent": "ea20815240f1a7ecd4c76c44dd1eb24b7fdf6ba5",
+    "concurrent_files": [
+      {
+        "path": ".agents/skills/ecs-incremental-deploy/SKILL.md",
+        "initial_sha256": "7490448e919e8cdef44f2ef1ab85ce65aea7f01c4187f648514605547b732e98",
+        "current_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+        "concurrent_committed_sha256": "3ef25b8d9b37f7f102a3694f19c68d3c9a48d0ed7da6dc4f8223f0e22eef730f",
+        "matches_concurrent_commit": true
+      },
+      {
+        "path": ".agents/skills/ecs-incremental-deploy/agents/openai.yaml",
+        "initial_sha256": "b1e083b6ecd7e2e08873c5a696dc6452f919a39304f91fc7e515399729807925",
+        "current_sha256": "d8e4e6803ace03236aa73c31baf40e6aeb20bff6b9a6a2765eac0ffefbd9911b",
+        "concurrent_committed_sha256": "d8e4e6803ace03236aa73c31baf40e6aeb20bff6b9a6a2765eac0ffefbd9911b",
+        "matches_concurrent_commit": true
+      }
+    ],
+    "concurrent_commit_preserved": true,
+    "main_protected_paths": 16,
+    "main_protected_files": 20,
+    "main_protected_hashes_unchanged": true,
+    "provider_or_ecs_actions_this_goal": 0
+  },
+  "unchanged_source_checks": [
+    {
+      "path": "backend/weknora_port/service.py",
+      "baseline_sha256": "2f96624d54e39147b190ced72fe77bfa30fb68675f8afa1e636f40e798d4e499",
+      "current_sha256": "2f96624d54e39147b190ced72fe77bfa30fb68675f8afa1e636f40e798d4e499",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/generation/context.py",
+      "baseline_sha256": "8139c54a20884910785ab1098ce2f253cc204ad17f2afca2f97788a7d9e7b16f",
+      "current_sha256": "8139c54a20884910785ab1098ce2f253cc204ad17f2afca2f97788a7d9e7b16f",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/generation/coordinator.py",
+      "baseline_sha256": "9c760a51516fdb921a5fae3d65e9bc31b26b0fde8baf163938433a5eea11c32f",
+      "current_sha256": "9c760a51516fdb921a5fae3d65e9bc31b26b0fde8baf163938433a5eea11c32f",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/development.py",
+      "baseline_sha256": "fb22fd07b661fdc9b405e795cd52fc0bca7a7d91b169580b542b79ac4d83bdf9",
+      "current_sha256": "fb22fd07b661fdc9b405e795cd52fc0bca7a7d91b169580b542b79ac4d83bdf9",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/retrieval/search.py",
+      "baseline_sha256": "92f7ed9c42d1fcb9caa95afb2753af58b8abef9f7e02aad873cba43331a07367",
+      "current_sha256": "92f7ed9c42d1fcb9caa95afb2753af58b8abef9f7e02aad873cba43331a07367",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/retrieval/rerank.py",
+      "baseline_sha256": "652dd3995cc8aed0e5320ed2c18ab72016919e427f0074225ea346c8e7e41cb2",
+      "current_sha256": "652dd3995cc8aed0e5320ed2c18ab72016919e427f0074225ea346c8e7e41cb2",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/retrieval/merge.py",
+      "baseline_sha256": "45fefea483063f9ac9266673453889302d32e2ddd3dc726ab48e6ae71bfe84cb",
+      "current_sha256": "45fefea483063f9ac9266673453889302d32e2ddd3dc726ab48e6ae71bfe84cb",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/retrieval/pipeline.py",
+      "baseline_sha256": "2262fc80b72d0d812398993eb65c52c6c8d7ba318aba0d5378b986eb05dd5df7",
+      "current_sha256": "2262fc80b72d0d812398993eb65c52c6c8d7ba318aba0d5378b986eb05dd5df7",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/retrieval/source_evidence.py",
+      "baseline_sha256": "16017b7320db32b120fd6a2d78d070594c5286cbd5afd62a51add3e866b1af49",
+      "current_sha256": "16017b7320db32b120fd6a2d78d070594c5286cbd5afd62a51add3e866b1af49",
+      "unchanged": true
+    },
+    {
+      "path": "backend/weknora_port/execution.py",
+      "baseline_sha256": "b5fae6cd51582d178bbdc2954e7f43dbeee972e70c378e2c4c3fc140a8d4e5de",
+      "current_sha256": "b5fae6cd51582d178bbdc2954e7f43dbeee972e70c378e2c4c3fc140a8d4e5de",
+      "unchanged": true
+    }
+  ],
+  "actual_new_usage": {
+    "provider_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "new_unknown": 0,
+    "scope": "No real send occurred; synthetic test usage excluded, historical usage/unknown not resettled or counted as0."
+  },
+  "historical_usage_not_new": {
+    "S8_3_R_postcode_A": {
+      "provider_calls": 4,
+      "tokens": 6285
+    },
+    "S8_3_R_postcode_B": {
+      "provider_calls": 4,
+      "tokens": 6381
+    }
+  },
+  "defaults_and_impact": {
+    "fallback_strategy_default": "model",
+    "source_evidence_mode_default": "off",
+    "model_fixed_switch_automatic": false,
+    "normal_rag_changes": false,
+    "intended_default_model_fallback_change": "On future local runtime load, built-in model fallback consumes cleaned metadata-only catalog and revised fallback template. No running ECS service updated.",
+    "unchanged": "Models/normalPrompt/router/thresholds/Graph/SendGate/UNKNOWN/idempotency/SSE/PGSchema/Gold/Description rows/index/sourceversions"
+  },
+  "recommendations": [
+    {
+      "scope": "Strict knowledge-base-only product configuration",
+      "recommendation": "Prefer existing fixed fallback; configure concise evidence-insufficient response. Owner chooses whether to change deployed default.",
+      "existing_setting": "WEKNORA_PORT_FALLBACK_STRATEGY=fixed",
+      "changed_now": false
+    },
+    {
+      "scope": "Explicit general-knowledge mode",
+      "recommendation": "Retain configurable model fallback and clearly separate non-KB knowledge; custom prompt remains owner responsibility.",
+      "changed_now": false
+    },
+    {
+      "scope": "Later authorized real model validation",
+      "recommendation": "Source-only no-answer + title implying venue + directory title lookup + allowed general knowledge; verify unsupported claims and refs, not only absence of postcode digits. No authorization opened here.",
+      "status": "NOT_RUN"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/catalog-red.log",
+      "sha256": "e20dad2648bd4d7cbb9fec555a693f22f42b3576ff2a8618014a502149356310",
+      "bytes": 4113
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/catalog-red.receipt.json",
+      "sha256": "8c30fc3a26b418808e41d2dd2cf6461f45d1e72db33ecb6aa3f3bb8e343616ab",
+      "bytes": 305
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/catalog-green.log",
+      "sha256": "dce76cfc63bf9efeb8bec0c5c426a826c0fe94a263998dc67a822ffb6745df29",
+      "bytes": 8101
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/catalog-green.receipt.json",
+      "sha256": "f69eefde5fcd3eae8e681ea3454e2b4385e4c09d0a2d29eeedcfb7c79d31a3bc",
+      "bytes": 360
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/catalog-green-v2.log",
+      "sha256": "854efc22619c96432ae6a4783023a8261018b0d515b3fac6d536a6d123a12487",
+      "bytes": 101
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/catalog-green-v2.receipt.json",
+      "sha256": "8110f0cb9332e7441fd49364bc3d2cddca8c2e860089e7e1c4f8735d0caa9de8",
+      "bytes": 360
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/targeted-green.log",
+      "sha256": "71a0cd2721c718ae16333441419fc158942b5399b437c1ed63778d85b4ebb995",
+      "bytes": 3236
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/targeted-green.receipt.json",
+      "sha256": "fe03bca1a7aaeeafe9de3f8ccc3a7e9a02669632fd3346c809c99c015ac0d92b",
+      "bytes": 952
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/targeted-green-v2.log",
+      "sha256": "9114ca7e4aaee26dc2f181a3b7cb0aaf4a286a2b44f501621ea0f97d627e70b3",
+      "bytes": 545
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/targeted-green-v2.receipt.json",
+      "sha256": "18ac9ab35904aec94875eec4c7729c339672fc331ea0f1889e49b48533b47bc3",
+      "bytes": 952
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/postfix-model-wire.json",
+      "sha256": "217616073b014a478f1600eb0bf1f228fae88425862510e744def5557f79fcc8",
+      "bytes": 3777
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/wire-comparison.json",
+      "sha256": "f52b1612155ad6fddffb492c505fc41dd732ee536be52ad03cc3d0b894db33f8",
+      "bytes": 1190
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/protection.json",
+      "sha256": "83ac9687b0701faa58423a5c881fdeab38895402d287db50d44ea87d3b33a42b",
+      "bytes": 1209
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/fixed-contract/results.json",
+      "sha256": "1469bad8ff8523809d63ef106a8bb3c7bdea473d4a5a9d7425cbe8e640b3ef99",
+      "bytes": 3381
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/fixed-contract/commands.txt",
+      "sha256": "b6ef6e696052343c7e1d268d1c50f68f3b646efe274f324a01a6993fd8f1cfc8",
+      "bytes": 909
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/fixed-contract/pytest-new-initial.log",
+      "sha256": "3a796b0cb521d812d8d9ca603d034063dd7fc2b36a3f0c4737e9582dda0b02d0",
+      "bytes": 2328
+    },
+    {
+      "path": "docs/evaluation/evidence/s8-3-f-20261020/fixed-contract/pytest-new-final.log",
+      "sha256": "dcbca5d76c0d987997dac605235fd39d0b4c00aed75a71b100e48cf148c7f7d2",
+      "bytes": 101
+    }
+  ],
+  "stop": "Offline finite goal complete; local commits only; no Provider grant, ECS deployment/restart, Push, merge, S8.4 or additional QA."
+}

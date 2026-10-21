@@ -1,3 +1,5 @@
+> HISTORICAL RUNTIME RECORD: the development source default now uses docs/WEKNORA_DEVELOPMENT.md. This document retains prior service facts; no container replacement is implied.
+
 # 当前普通服务运行说明
 
 更新日期：2026-10-12。普通 API/Worker 已部署，公开小样本入库及真实资料在整库/单文档范围的问答、引用和网页刷新已验证。限定任务工程收尾见 [修复报告](audits/no-candidates-20261011/MINIMAL_FIX_REPORT.md) 最新节；不代表负责人发布验收。[暂停交接](audits/no-candidates-20261011/PAUSE_HANDOFF.md)保留历史记录。历史评测窗口不构成当前运行授权。

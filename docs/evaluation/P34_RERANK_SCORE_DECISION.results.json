@@ -1,0 +1,139 @@
+{
+  "schema": "p34-rerank-score-decision/v1",
+  "status": "P34_BLOCKED",
+  "created_at": "2026-10-17",
+  "source_sha": "f8ec9c548e48ef565f5011b8a02a705d4bfabb7c",
+  "fixed_upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "provider": "siliconflow",
+  "model": "BAAI/bge-reranker-v2-m3",
+  "owner_authorization": "P34 user instruction: up to four real Rerank requests, one per frozen sample",
+  "token_authority": "P31 authority remains revoked; not restored or bypassed",
+  "global_cloud_setting": "Process-local P32 isolation recipe was enabled for read-only preflight; persistent KB settings were not changed",
+  "real_provider_calls": 0,
+  "other_model_calls": 0,
+  "token_usage": "NOT_RUN_NO_PROVIDER_REQUEST_SENT",
+  "latency": "NOT_APPLICABLE_NO_PROVIDER_REQUEST_SENT",
+  "input_reproduction": {
+    "status": "PASS",
+    "historical_wire_sha_verified": true,
+    "all_four_have_30_candidates": true,
+    "candidate_order_and_target_index_verified": true,
+    "current_tenant_scoped_source_chunks_verified": true,
+    "current_image_enrichment_reproduced": true,
+    "current_role_and_adapter_wire_reproduction": "NOT_RUN_AFTER_CREDENTIAL_DECRYPTION_BLOCK",
+    "evidence": "E:\\WK\\run\\p34-rerank-20261017\\preflight.json"
+  },
+  "blocker": {
+    "code": "STORED_SECRET_DECRYPT_FAILED",
+    "stage": "normal strict decryption of the configured SiliconFlow Rerank API credential",
+    "interpretation": "The stored credential cannot be used through the normal configuration path. Whether this is a master-key mismatch or invalid stored ciphertext was not determined.",
+    "retries": 0,
+    "credential_plaintext_read_or_disclosed": false,
+    "credential_ciphertext_disclosed": false,
+    "configuration_or_ledger_modified": false
+  },
+  "native_filter_replay": "NOT_RUN_NO_NEW_MODEL_RESPONSE",
+  "policy_decision": {
+    "choice": "A_KEEP_CURRENT_MODEL_AND_THRESHOLD_PENDING_VALID_SCORE_EVIDENCE",
+    "meaning": "No production change is justified because P34 obtained no new scores; this is a conservative hold, not evidence that the threshold is optimal.",
+    "threshold": 0.3,
+    "top1_fallback_floor": 0.15,
+    "global_strategy_conclusion": "INSUFFICIENT_EVIDENCE"
+  },
+  "cases": [
+    {
+      "case_id": "mml-0434",
+      "query": "PPT中'coding time'部分介绍的训练数据集是什么",
+      "historical_request_id": "ba4ebadf-12cf-4c38-a30a-576c24fadf57/rerank",
+      "frozen_body_sha256": "8c730c5e6dd03f3c18b5a460861d43ebd1a1b477326bb906ca36fbfd8e401fe9",
+      "frozen_body_bytes": 14014,
+      "candidate_count": 30,
+      "target_chunk_id": "085643dc-5ebb-4b8a-b7f1-75427da40015",
+      "target_input_index": 14,
+      "target_type": "text",
+      "current_source_and_provider_text_match": true,
+      "p34_status": "NOT_RUN_BLOCKED_BEFORE_SEND",
+      "new_score": null,
+      "new_model_rank": null,
+      "historical_p33": {
+        "target_search_rank": 15,
+        "rerank_retained_count": 0,
+        "target_score": "UNKNOWN"
+      }
+    },
+    {
+      "case_id": "hotpot-5a7631",
+      "query": "Jeanne Marie Beaumont 2007-2010 研讨会 举办地点",
+      "historical_request_id": "02074de1-c0a0-4df7-9ae2-5c62b7ff5586/rerank",
+      "frozen_body_sha256": "954a7767c871336f1dfe66874a40404d4f56c83ff67eb68d52a17eb6f9b9f4a7",
+      "frozen_body_bytes": 12045,
+      "candidate_count": 30,
+      "target_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+      "target_input_index": 14,
+      "target_type": "text",
+      "current_source_and_provider_text_match": true,
+      "p34_status": "NOT_RUN_BLOCKED_BEFORE_SEND",
+      "new_score": null,
+      "new_model_rank": null,
+      "historical_p33": {
+        "target_search_rank": 15,
+        "target_retained": false,
+        "other_candidates_retained_count": 2,
+        "target_score": "UNKNOWN"
+      }
+    },
+    {
+      "case_id": "omni-page007",
+      "query": "课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数",
+      "historical_request_id": "1a4f13e2-dfd2-4328-9c3e-8b6a5f2d0813/rerank",
+      "frozen_body_sha256": "499ec3fdf906de030f76b941d1aab48b7350e96f9a398de56286c8e09f0f5e4b",
+      "frozen_body_bytes": 97363,
+      "candidate_count": 30,
+      "target_chunk_id": "51316a20-67fd-4732-b520-c049999933d0",
+      "target_input_index": 4,
+      "target_type": "image_ocr",
+      "current_source_and_provider_text_match": true,
+      "p34_status": "NOT_RUN_BLOCKED_BEFORE_SEND",
+      "new_score": null,
+      "new_model_rank": null,
+      "historical_p33": {
+        "target_search_rank": 5,
+        "target_retained": false,
+        "summary_retained_count": 1,
+        "summary_score": 0.766,
+        "target_score": "UNKNOWN"
+      }
+    },
+    {
+      "case_id": "mml-0959",
+      "query": "用于远距离通信的介质有哪些",
+      "historical_request_id": "71d59b6e-6dff-4431-945a-3b1a800b5d89/rerank",
+      "frozen_body_sha256": "0b73ae3540ae1209b17810e05f94b95da17834c03b1bde0667c8ad8c9e0aa0f7",
+      "frozen_body_bytes": 13618,
+      "candidate_count": 30,
+      "target_chunk_id": "df6098cb-68e6-4546-b9e0-8682b4bf19e9",
+      "target_input_index": 1,
+      "target_type": "text",
+      "current_source_and_provider_text_match": true,
+      "p34_status": "NOT_RUN_BLOCKED_BEFORE_SEND",
+      "new_score": null,
+      "new_model_rank": null,
+      "historical_p33": {
+        "target_search_rank": 2,
+        "target_retained": true,
+        "target_score": 0.5237
+      }
+    }
+  ],
+  "evidence_paths": [
+    "docs/evaluation/P32_BROWSER_AND_SIX_DATASET_RAG.md",
+    "docs/evaluation/P33_EVIDENCE_LOSS_DIAGNOSIS.md",
+    "docs/evaluation/P33_EVIDENCE_LOSS_DIAGNOSIS.results.json",
+    "docs/evaluation/evidence/p33-evidence-loss-20261017/frozen-run-trace-summary.json",
+    "E:\\WK\\run\\p32-20261017\\evidence-332\\provider-requests\\",
+    "E:\\WK\\run\\p34-rerank-20261017\\preflight.json"
+  ],
+  "production_code_changed": false,
+  "historical_unknown_modified": false,
+  "historical_results_modified": false
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="13" time="1.771" timestamp="2026-10-13T21:44:07.536003+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_turn_storage" name="test_new_admission_writes_both_messages_and_claim_atomically_before_model" time="0.002" /><testcase classname="tests.weknora_port.test_turn_storage" name="test_repeat_replays_stable_ids_without_insert_and_payload_changes_fail" time="0.002"><failure message="KeyError: 'client_request_id'">def test_repeat_replays_stable_ids_without_insert_and_payload_changes_fail():
+        async def run():
+            row=stored();db=DB();repo=PostgresTurnRepository(Leases(db),PRINCIPAL);request=OrdinaryTurnRequest('session','private question','client')
+            row['payload_sha256']=repo._payload(request,ScopeSnapshot('private question',('kb',),()))
+            db.answers=[[row],[{'id':'user','role':'user'},{'id':'assistant','role':'assistant'}]]
+            accepted=await repo.accept(request,PRINCIPAL)
+            assert not accepted.is_new and accepted.replay_only and accepted.assistant_message_id=='assistant'
+            assert not any(sql.startswith('INSERT') for sql,_ in db.calls)
+            db.answers=[[row]]
+            with pytest.raises(ProviderError,match='PAYLOAD_CONFLICT'):await repo.accept(replace(request,content='different private'),PRINCIPAL)
+&gt;       asyncio.run(run())
+
+tests\weknora_port\test_turn_storage.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_turn_storage.py:68: in run
+    accepted=await repo.accept(request,PRINCIPAL)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\turns.py:93: in accept
+    return self._accepted(row)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;backend.weknora_port.storage.turns.PostgresTurnRepository object at 0x000001F60BE34550&gt;
+row = {'session_id': 'session', 'q0': 'private question', 'run_id': 'run', 'user_message_id': 'user', ...}
+new = False
+
+    def _accepted(self,row,*,new=False):
+        kbs,docs=_tuple(row['knowledge_base_scope']),_tuple(row['document_scope'])
+        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs)
+        context=CallContext(row['run_id'],TrustedScope(self.principal.subject_id,kbs,docs),cancelled=asyncio.Event(),session_id=row['session_id'])
+        return AcceptedTurn(row['run_id'],row['session_id'],row['user_message_id'],row['assistant_message_id'],context,
+&gt;                           MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new,row['client_request_id'])
+                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'client_request_id'
+
+backend\weknora_port\storage\turns.py:74: KeyError</failure></testcase><testcase classname="tests.weknora_port.test_turn_storage" name="test_invalid_primitive_or_scope_does_not_create_messages[turn_input0]" time="0.002" /><testcase classname="tests.weknora_port.test_turn_storage" name="test_invalid_primitive_or_scope_does_not_create_messages[turn_input1]" time="0.001" /><testcase classname="tests.weknora_port.test_turn_storage" name="test_invalid_primitive_or_scope_does_not_create_messages[turn_input2]" time="0.001" /><testcase classname="tests.weknora_port.test_turn_storage" name="test_deleted_session_foreign_principal_and_smart_are_denied" time="0.001" /><testcase classname="tests.weknora_port.test_turn_storage" name="test_insert_failure_rolls_back_messages_and_claim" time="0.001" /><testcase classname="tests.weknora_port.test_turn_storage" name="test_failure_updates_only_assistant_and_no_budget_unknown_release" time="0.001"><failure message="KeyError: 'client_request_id'">def test_failure_updates_only_assistant_and_no_budget_unknown_release():
+        async def run():
+            row=stored();db=DB([[row],[dict(is_completed=False)]]);repo=PostgresTurnRepository(Leases(db),PRINCIPAL);accepted=repo._accepted(row,new=True)
+            assert await repo.commit_failure(accepted,'MODEL_CALL_TIMEOUT') is True
+            update=next(sql for sql,_ in db.calls if sql.startswith('UPDATE messages'))
+            assert "role='assistant' AND is_completed=false" in update
+            assert 'content=' not in update and not any('send_calls' in sql or 'settle' in sql for sql,_ in db.calls)
+            db.answers=[[row],[dict(is_completed=True)]]
+            before=len(db.calls);assert await repo.commit_failure(accepted,'MODEL_CALL_TIMEOUT') is False
+            assert not any(sql.startswith('UPDATE') for sql,_ in db.calls[before:])
+&gt;       asyncio.run(run())
+
+tests\weknora_port\test_turn_storage.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_turn_storage.py:105: in run
+    row=stored();db=DB([[row],[dict(is_completed=False)]]);repo=PostgresTurnRepository(Leases(db),PRINCIPAL);accepted=repo._accepted(row,new=True)
+                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;backend.weknora_port.storage.turns.PostgresTurnRepository object at 0x000001F60BDA7F00&gt;
+row = {'session_id': 'session', 'q0': 'private question', 'run_id': 'run', 'user_message_id': 'user', ...}
+new = True
+
+    def _accepted(self,row,*,new=False):
+        kbs,docs=_tuple(row['knowledge_base_scope']),_tuple(row['document_scope'])
+        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs)
+        context=CallContext(row['run_id'],TrustedScope(self.principal.subject_id,kbs,docs),cancelled=asyncio.Event(),session_id=row['session_id'])
+        return AcceptedTurn(row['run_id'],row['session_id'],row['user_message_id'],row['assistant_message_id'],context,
+&gt;                           MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new,row['client_request_id'])
+                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'client_request_id'
+
+backend\weknora_port\storage\turns.py:74: KeyError</failure></testcase><testcase classname="tests.weknora_port.test_turn_storage" name="test_validate_run_returns_replay_and_filters_owned_active_messages" time="0.002"><failure message="KeyError: 'client_request_id'">def test_validate_run_returns_replay_and_filters_owned_active_messages():
+        async def run():
+            row=stored();db=DB([[row],[{'id':'user','role':'user'},{'id':'assistant','role':'assistant'}]])
+            repo=PostgresTurnRepository(Leases(db),PRINCIPAL)
+            accepted=await repo.validate_run('session','assistant',PRINCIPAL)
+            assert accepted.replay_only and not accepted.is_new
+            assert any('deleted_at IS NULL' in sql and "id=ANY(%s)" in sql for sql,_ in db.calls)
+&gt;       asyncio.run(run())
+
+tests\weknora_port\test_turn_storage.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_turn_storage.py:119: in run
+    accepted=await repo.validate_run('session','assistant',PRINCIPAL)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\turns.py:126: in validate_run
+    snapshot=await self._resolve(guard,self._accepted(row).request,session)
+                                       ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;backend.weknora_port.storage.turns.PostgresTurnRepository object at 0x000001F60BF48350&gt;
+row = {'session_id': 'session', 'q0': 'private question', 'run_id': 'run', 'user_message_id': 'user', ...}
+new = False
+
+    def _accepted(self,row,*,new=False):
+        kbs,docs=_tuple(row['knowledge_base_scope']),_tuple(row['document_scope'])
+        request=OrdinaryTurnRequest(row['session_id'],row['q0'],row['run_id'],'quick',kbs,docs)
+        context=CallContext(row['run_id'],TrustedScope(self.principal.subject_id,kbs,docs),cancelled=asyncio.Event(),session_id=row['session_id'])
+        return AcceptedTurn(row['run_id'],row['session_id'],row['user_message_id'],row['assistant_message_id'],context,
+&gt;                           MemoryContext(self.principal.tenant_id,self.principal.subject_id),request,new,not new,row['client_request_id'])
+                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'client_request_id'
+
+backend\weknora_port\storage\turns.py:74: KeyError</failure></testcase><testcase classname="tests.weknora_port.test_turn_storage" name="test_principal_bootstrap_returns_existing_singleton_never_picks_other_tenant" time="0.002" /><testcase classname="tests.weknora_port.test_turn_storage_pg" name="test_actual_pg_bootstrap_restart_and_concurrent_durable_admission" time="0.351" /><testcase classname="tests.weknora_port.test_turn_storage_pg" name="test_actual_pg_scope_deletion_and_scoped_client_id" time="0.197" /><testcase classname="tests.weknora_port.test_turn_storage_pg" name="test_actual_pg_failure_receipt_and_atomic_final_authority" time="0.298" /></testsuite></testsuites>

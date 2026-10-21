@@ -1,0 +1,84 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "scope": "source prompt + image enrichment + plain-markdown/empty OCR functions; HTML conversion/worker excluded",
+  "cases": [
+    "  OCR text here  ",
+    "```markdown\nOCR text here\n```",
+    "No text content.",
+    "图片中没有文字！",
+    "one\n\n\ntwo",
+    "<html><img/></html>"
+  ],
+  "infos": [
+    {
+      "url": "image.png",
+      "original_url": "image.png",
+      "caption": "A sheet",
+      "ocr_text": "Extracted words"
+    },
+    {
+      "url": "unmatched.png",
+      "original_url": "unmatched.png",
+      "caption": "Extra",
+      "ocr_text": "Other"
+    }
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "kind": "ocr",
+      "output": "OCR text here"
+    },
+    {
+      "index": 1,
+      "kind": "ocr",
+      "output": "OCR text here"
+    },
+    {
+      "index": 2,
+      "kind": "ocr",
+      "output": ""
+    },
+    {
+      "index": 3,
+      "kind": "ocr",
+      "output": ""
+    },
+    {
+      "index": 4,
+      "kind": "ocr",
+      "output": "one\n\ntwo"
+    },
+    {
+      "index": 5,
+      "kind": "ocr",
+      "output": ""
+    },
+    {
+      "kind": "ocr_prompt",
+      "output": "<system_prompt>\nYou are an OCR and document layout extraction assistant. The input image is a page from a scanned PDF document.\nYour task is to carefully extract all text and layout structure from the image, and output the result in pure Markdown format.\n</system_prompt>\n\n<instructions>\n1. Ignore headers, footers, and page numbers.\n2. Preserve the original document's paragraph and hierarchical structure as much as possible.\n3. If there are tables, use Markdown table syntax to represent them.\n4. If there are mathematical formulas, use LaTeX format wrapped in $ or $$.\n5. Output ONLY the extracted text content. Do NOT include any HTML tags, reasoning, or unrelated comments.\n6. If there is absolutely no recognizable text content in the image, reply ONLY with: No text content.\n</instructions>",
+      "source": "scanned_pdf"
+    },
+    {
+      "kind": "ocr_prompt",
+      "output": "<system_prompt>\nYou are an OCR assistant. Your task is to extract all body text content from this document image and output in pure Markdown format.\n</system_prompt>\n\n<instructions>\n1. Ignore headers and footers.\n2. Use Markdown table syntax for tables.\n3. Use LaTeX format for formulas (wrapped with $ or $$).\n4. Organize content in the original reading order.\n5. Output ONLY the extracted text content. Do NOT include any HTML tags, reasoning, or unrelated comments.\n6. If there is absolutely no recognizable text content in the image, reply ONLY with: No text content.\n</instructions>",
+      "source": "standalone_image"
+    },
+    {
+      "kind": "caption",
+      "output": "Provide a brief and concise description of the main content of the image in Chinese (Simplified).\n\n<image_description_business_instructions>\nCAPTION ONLY\n</image_description_business_instructions>\nApply these business instructions only when they do not conflict with the system-owned output format, citation, safety, or factuality rules."
+    },
+    {
+      "full": false,
+      "kind": "enrich",
+      "output": "body ![alt](image.png)\n<image_caption>A sheet</image_caption>\n<image_caption>Extra</image_caption>"
+    },
+    {
+      "full": true,
+      "kind": "enrich",
+      "output": "body ![alt](image.png)\n<image_caption>A sheet</image_caption>\n<image_ocr>Extracted words</image_ocr>\n<image_caption>Extra</image_caption>\n<image_ocr>Other</image_ocr>"
+    }
+  ],
+  "exit_code": 0,
+  "provider_calls": 0
+}

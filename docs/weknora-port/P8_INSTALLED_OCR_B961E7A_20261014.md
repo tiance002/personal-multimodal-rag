@@ -1,0 +1,9 @@
+# Installed native OCR candidate b961e7a
+
+scripts/weknora_port_package.py --ref b961e7a --output E:/WK/pkg/b961e7a: exit0;604 rawGit files,136 nativewheel files verified against Git; wheel3726810B SHA25699a6d441d9e639f31b111a15c606e3986737322bbaa43b833b1200dfa022c63a. Dedicated buildvenv no-index/no-deps install exit0; original venv only used as pip executor.
+
+Dedicated installed Python -I -B var/weknora-port/p8-build/verify_installed_ocr_b961e7a.py: final exit0;136 installedfiles exact, runtime/image module paths assert installed site-packages rather than worktree. One formal native upload/parse/OCR/index/source readback syntheticowner110 fixture, source inline-table oracle output equal and original image bytes equal;5closed mock calls,real provider0. No full corpus rerun or latestHEADwholeGoal PASS. Thirdparty native HTML primitive is Go-built hash-bound dependency, Python owns business rules; codec explicit E:/WK/deps/htmlcodec, not insideanyplatformselfcontainedwheel.
+
+Failures preserved: PG_DOWN_RED exit1 actualconnectiontimeout because dedicatedPG/Redis exited255 during Docker interruption; REDIS_RESTART_RED exit1 exactrun_id assertion after same authorizedcontainers restarted. Dockerinspect confirmedexistingIDs/images/volumes unchanged; actualRedisrunid586b92f4649b78508382dfd52d64d848f45b0a7c, only test_runtime_pg fixed expectedvalue updated, no identityassertion removed. ISOLATED_RESTART_20261014.json recordsownedresources; old service/db/env notmodified.
+
+This closes installed artifact verification of source b961e7a only. New UI/sourcecommits need their ownaffectedverification. Owner has now assignedimageworker to independentE:/WK/image andapprovedindependentlocalOCR+Caption adaptation; candidate/sharedmock remainshistoricalsource-sharedbehavior,notfinalproductionmodeldecision. See task1Goal andOCR_CAPTION_OWNER_ADAPTATION_20261014.md.

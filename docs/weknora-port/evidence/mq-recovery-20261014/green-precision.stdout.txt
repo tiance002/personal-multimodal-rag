@@ -1,0 +1,20 @@
+..F.                                                                     [100%]
+================================== FAILURES ===================================
+____________ test_three_expired_deliveries_archive_scoped_payload _____________
+tests\weknora_port\test_memory_queue_recovery.py:80: in test_three_expired_deliveries_archive_scoped_payload
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:74: in run
+    assert archived["failed_at"]==clock[0] and archived["error_class"]=="LeaseExpired"
+E   assert (1791980491.6227 == 1791980491.6227236)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_memory_queue_recovery.py::test_three_expired_deliveries_archive_scoped_payload
+1 failed, 3 passed in 1.38s

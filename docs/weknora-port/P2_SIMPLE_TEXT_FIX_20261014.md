@@ -1,0 +1,13 @@
+# Close actual legal UTF-8 ingestion blocker
+
+The full frozen native run reached1935verified original readbacks, then failed TEXT_DECODE_REPLACED. The existing _parse_plain/_parse_markdown treated any literal U+FFFD in decoded text as UnicodeDecodeError, including legal UTF-8 source bytes. No frozen source was altered.
+
+Fixed upstream internal/infrastructure/docparser/builtin_converter.go:SimpleFormatReader.Read returns string(req.FileContent) for TXT/MD. Valid BOM and literal U+FFFD are source content, not an error. The native simple decoder now preserves valid UTF-8/BOM and implements Go's per-invalid-byte rune replacement, with immutable original bytes retained. Markdown image/table normalization remains its existing port behavior and is not newly claimed fully equivalent to Go simple dispatch.
+
+Go command: `E:/RAG-reference/toolchains/go1.26.0/go/bin/go.exe run var/weknora-port/oracle/simple-text/main.go`, exit0.8same-byte fixtures exercise valid literal U+FFFD, BOM, incomplete/invalid/overlong UTF-8, emoji and NUL; outputs use the exact source string(bytes) branch observed through Go JSON. Python tests compare exact content/failure status for both TXT and MD. This is bounded extraction/encoding parity, not full source engine acceptance.
+
+Actual command: `E:/RAG quention/.venv/Scripts/python.exe -B -m pytest tests/weknora_port/test_simple_text_source.py tests/weknora_port/test_ingest.py::test_image_markdown_and_embedded_data_assets_preserve_content_and_failure_metadata tests/weknora_port/test_ingest.py::test_config_priority_parent_identity_and_storage_neutral_records tests/weknora_port/test_native_six_runner.py -q --junitxml=docs/weknora-port/evidence/P2_SIMPLE_TEXT_ENTRY_20261014.junit.xml`, exit0;4passed9.13s. The actual dedicated PG/Redis six-adapter fixture includes legal U+FFFD in original sources and verifies completed upload/index/original hash/4mode result/citation readback. Existing Markdown/data-image/config assertions retained. First collection attempt exited4 because root test dependencies lacked pptx; retained as DEPENDENCY_NOT_RUN. Follow-up only read existing oldC P2 site-packages via PYTHONPATH for test imports; no C write/install or original environment modification.
+
+Evidence P2_SIMPLE_TEXT_GO_20261014 JSONL/exitcode and P2_SIMPLE_TEXT_ENTRY_20261014 stdout/JUnit/exitcode; full failed run binding P7_FULL_POOLED_UTF8_FAILURE_BINDING_20261014.json. Previous failed data, partial rows and UNKNOWN retained.
+
+Bounded SOURCE_READ / IMPLEMENTED / OFFLINE_PASS / ISOLATED_INTEGRATION_PASS for this actual ingestion blocker. Full frozen cohort execution will resume on a new result namespace; no fullP2/P7/real-provider/cutover PASS.

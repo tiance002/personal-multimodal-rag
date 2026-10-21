@@ -1,0 +1,25 @@
+server {
+    listen 80;
+    server_name _;
+    client_max_body_size 50m;
+    auth_basic "Private S8 workbench";
+    auth_basic_user_file /run/secrets/ui.htpasswd;
+    root /usr/share/nginx/html;
+    index index.html;
+    location /api/ {
+        proxy_pass http://api:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Authorization "Bearer __S8_API_TOKEN__";
+        proxy_buffering off;
+        proxy_read_timeout 360s;
+    }
+    location ~ ^/(healthz|readyz)$ {
+        proxy_pass http://api:8000;
+        proxy_set_header Authorization "Bearer __S8_API_TOKEN__";
+        proxy_set_header Host $host;
+    }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

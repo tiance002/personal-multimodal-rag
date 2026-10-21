@@ -1,0 +1,940 @@
+{
+  "schema": "s6-graphrag-minimal/v1",
+  "status": "PASS",
+  "stop_reason": "S6_AUTHORIZED_SELECTED_REAL_TWO_HOP_API_COMPLETE",
+  "scope": "S6 text source-bound graph only; PPT progressive-display solution deferred by Owner latest instruction",
+  "baseline_commit": "78bf9839d2030749f715a9395ce355209d8f52ff",
+  "implementation_commit": "df271a98b01ac2f63e0a315f30f4ada8097daab0",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "remote_read_sha": "2c21bbcc68384224b5d4a29d1300adf404c1f9b2",
+  "validation": {
+    "SOURCE_READ": "PASS",
+    "IMPLEMENTED": "PASS",
+    "OFFLINE_PASS": "PASS",
+    "ISOLATED_INTEGRATION_PASS": "PASS_REAL_PG_SYNTHETIC_GRAPH_ROLLBACK",
+    "REAL_PROVIDER_PASS": "PASS_SELECTED_SAMPLE",
+    "CUTOVER_PASS": "NOT_REQUESTED_NO_PRODUCTION_DEFAULT_CHANGE",
+    "REAL_FASTAPI_PASS": "PASS"
+  },
+  "repositories": [
+    {
+      "name": "HippoRAG",
+      "url": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "sha": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "license": "MIT",
+      "examined": [
+        "src/hipporag/information_extraction/openie_openai.py",
+        "src/hipporag/HippoRAG.py",
+        "src/hipporag/utils/misc_utils.py"
+      ],
+      "selected": "bounded OpenIE/source passage concepts",
+      "not_selected": "global undirected personalized PageRank, fuzzy synonym merges, additional embeddings/recognition-memory calls"
+    },
+    {
+      "name": "LightRAG",
+      "url": "https://github.com/HKUDS/LightRAG",
+      "sha": "aaebfe1bb8d55deb6a4304d357a3bf4c92fcd40a",
+      "license": "MIT",
+      "examined": [
+        "lightrag/operate.py",
+        "lightrag/kg/postgres_impl.py",
+        "lightrag/lightrag.py"
+      ],
+      "selected": "source contributions and current-version invalidation; raw chunk recovery",
+      "not_selected": "AGE/Cypher PGGraphStorage, generated graph descriptions as factual evidence, whole framework migration"
+    },
+    {
+      "name": "RAG-Anything",
+      "url": "https://github.com/HKUDS/RAG-Anything",
+      "sha": "da6e2d87a7d3f2746c4541f59953b8764213f6a2",
+      "license": "MIT",
+      "examined": [
+        "raganything/utils.py",
+        "raganything/processor.py",
+        "raganything/modalprocessors.py"
+      ],
+      "selected": "explicit source/page identity concept",
+      "not_selected": "caption-derived nodes as verified originals; duplicate multimodal ingestion"
+    },
+    {
+      "name": "SlideRAG",
+      "url": "https://github.com/iLearn-Lab/SlideRAG",
+      "sha": "6eb788d13bdbbd5604745bea37d64878ea7b2db7",
+      "license": "MIT",
+      "examined": [
+        "raganything/processor.py",
+        "raganything/config.py"
+      ],
+      "selected": null,
+      "not_selected": "topic cosine similarity cannot prove progressive-display continuity; PPT work now deferred"
+    }
+  ],
+  "design": {
+    "storage": "plain PostgreSQL, independent evidence/nodes/edges tables",
+    "default_enabled": false,
+    "switch": "WEKNORA_PORT_GRAPH_ENABLED=true",
+    "build": "explicit graph_cli index of all current original child chunks for one document",
+    "ordinary_upload_graph_fanout": false,
+    "old_kb_graph_flag": "retired placeholder remains false; not the S6 switch",
+    "source_types": [
+      "text",
+      "image_ocr"
+    ],
+    "generated_summary_or_caption_is_original": false,
+    "limits": {
+      "document_chunks": 12,
+      "document_source_chars": 32768,
+      "chunk_chars": 16384,
+      "max_hops": 2,
+      "paths": 3,
+      "outgoing_per_hop": 12,
+      "graph_added_chunks": 4,
+      "graph_added_chars": 4096,
+      "combined_raw_chars": 14000,
+      "rendered_context_chars": 16000
+    },
+    "fusion": "after ordinary Rerank/MMR/Merge/TopK; independently verified graph paths recover only raw current chunks; graph score 0 is not a BGE relevance score",
+    "proof_semantics": "exact source quotes, direction/order, temporal and negation checks; NOT semantic entailment judgment",
+    "entity_linking": "exact typed literal/grounded alias to a unique current document-subject anchor in same KB; no fuzzy merge or ungrounded pronoun expansion"
+  },
+  "migration": {
+    "schema": "s6-explicit-graph-migration/v1",
+    "status": "APPLIED",
+    "migration": "016_graph",
+    "sha256": "77168a6b90480afab61944647004b15f56b3b8bbe27c044a2c50936e3347d132",
+    "provider_calls": 0,
+    "postgres_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013"
+  },
+  "identity": {
+    "tenant_id": 1,
+    "subject_sha256": "4a8c5c959f9ffb8d0f621c5bfc29030ebd17f565b2512a920bbe61058451ff15",
+    "identity": {
+      "postgres_system_id": "7696088403504697382",
+      "database": "weknora_python_port_20261013",
+      "redis_run_id": "4c5d8c6990f72ba7ac4060d59a6e7cb7b5625ab6",
+      "redis_db": "15",
+      "redis_prefix": "weknora-python-s4-a82fed51eb174980b29aec84ba35d5f7",
+      "tenant_id": 1,
+      "cloud_allowed": false,
+      "ocr": "mineru-basic"
+    },
+    "models": [
+      {
+        "role": "embedding",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3"
+      },
+      {
+        "role": "rerank",
+        "model_id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3"
+      },
+      {
+        "role": "cheap",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B"
+      },
+      {
+        "role": "expensive",
+        "model_id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+        "provider": "deepseek",
+        "model": "deepseek-flash"
+      },
+      {
+        "role": "vlm",
+        "model_id": "mdlb9cb9c0a01cdd84449ad50711f91d4ae8afdf2b538c0c149bd0e879e334e5",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen2.5-VL-72B-Instruct"
+      }
+    ]
+  },
+  "isolated_kb": {
+    "id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+    "name": "S6 sourced two-hop engineering diagnostic 20261019",
+    "cloud_allowed": false,
+    "document_count": 0
+  },
+  "source_manifest_sha256": "108ca3ca54114ff05fcd0d185d5ee42e6783aec23bdd2713090a3696e9696e4b",
+  "prepared_sources": [
+    {
+      "sha256": "b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8",
+      "bytes": 502,
+      "characters": 500,
+      "original_path": "E:\\WK\\run\\p8-20261016\\s\\hotpotqa\\b6cc805398afebfa8327.txt",
+      "historical_source_id": "hotpotqa-context:0f94a2d0a92bd4a9f9e3672bba1af95e35b3f0ff0de86ca8c80a71d78f38936f",
+      "engineering_not_official_qa": true
+    },
+    {
+      "sha256": "decbe8d51474b802a881e06db02901c98b31e03bd88b0dcd254b043c9eb7f00a",
+      "bytes": 429,
+      "characters": 429,
+      "original_path": "E:\\WK\\run\\p8-20261016\\s\\hotpotqa\\decbe8d51474b802a881.txt",
+      "historical_source_id": "hotpotqa-context:1c5fa1db320d59cba389daa592d258d7cd237eca31134a4f70efd152d7d06f4f",
+      "engineering_not_official_qa": true
+    }
+  ],
+  "intended_question": "Franklin bells 配合使用的装置储存的是什么电？请依据知识库回答。",
+  "real_build": {
+    "status": "PASS_SELECTED_REAL_SOURCES_WITH_REJECTED_MODEL_SUGGESTIONS",
+    "documents_uploaded": 2,
+    "original_child_chunks": 2,
+    "summary_chunks": 2,
+    "vectors": 4,
+    "dimension": 1024,
+    "nodes": 16,
+    "edges": 9,
+    "evidence_contributions": 2,
+    "extraction_provider_calls": 4,
+    "qwen_valid_nodes_edges": [
+      0,
+      0
+    ],
+    "deepseek_original_valid_nodes_edges": [
+      16,
+      8
+    ],
+    "deepseek_relation_suggestions": 12,
+    "deepseek_original_rejected_relations": 4,
+    "extra_source_sentence_edges": 1,
+    "graph_on_api": "PASS",
+    "answer": "Franklin bells 配合使用的装置（莱顿瓶）储存的是**静电**（或**静态电荷**）。\n\n根据资料，莱顿瓶（Leyden jar）是一种用于储存静电的装置，其原理是在玻璃瓶内外的两个电极之间储存静电。Franklin bells 利用莱顿瓶进行早期电电荷演示。\n\nSources: b6cc805398afebfa8327.txt, decbe8d51474b802a881.txt",
+    "quality_note": "Quote proof is not semantic adjudication; not an official Hotpot accuracy score"
+  },
+  "tests": [
+    {
+      "kind": "OFFLINE_SYNTHETIC_AND_REGRESSION",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_extraction.py tests/weknora_port/test_graph_retrieval.py tests/weknora_port/test_graph_service.py tests/weknora_port/test_graph_storage_pg.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_development_entry.py tests/weknora_port/test_evidence_capture.py tests/weknora_port/test_filter_top_k.py tests/weknora_port/test_merge_source_retention.py",
+      "passed": 220,
+      "skipped": 1,
+      "seconds": 2.87,
+      "exit_code": 0,
+      "skip": "real PostgreSQL DSN intentionally absent from this invocation; independently executed below"
+    },
+    {
+      "kind": "REAL_POSTGRES_SYNTHETIC_SOURCE_ROLLBACK",
+      "command": "python -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_storage_pg.py::test_actual_pg_graph_source_lifecycle_and_scope_rollback",
+      "passed": 1,
+      "seconds": 0.82,
+      "exit_code": 0,
+      "artifact": "E:/WK/run/s6-graphrag-20261019/graph-pg-test.txt",
+      "dsn_printed": false
+    },
+    {
+      "kind": "CLI_SMOKE",
+      "command": "python -m backend.weknora_port.graph_cli --help",
+      "exit_code": 0
+    },
+    {
+      "kind": "WHITESPACE",
+      "command": "git diff --cached --check",
+      "exit_code": 0
+    },
+    {
+      "kind": "ACCEPTANCE_EXECUTOR_SYNTHETIC_CONTRACT",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_s6_graph_acceptance.py",
+      "passed": 21,
+      "seconds": 0.36,
+      "exit_code": 0
+    },
+    {
+      "kind": "ZERO_SEND_NORMAL_ASSEMBLY_PREFLIGHT",
+      "command": "python -B scripts/s6_graph_acceptance.py prepare --config E:/WK/run/s4-quality-20261019/local.json --authorization E:/WK/run/s6-graphrag-20261019/owner-authorization.json --manifest E:/WK/run/s6-graphrag-20261019/text-sources.json --output E:/WK/run/s6-graphrag-20261019/acceptance",
+      "exit_code": 0,
+      "status": "ZERO_SEND_PREPARED",
+      "authorization": "BLOCKED_AUTHORIZATION_NO_SEND",
+      "provider_calls": 0
+    },
+    {
+      "kind": "FINAL_CHANGED_MODULE_OFFLINE",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest --noconftest -p no:cacheprovider -q --tb=short tests/weknora_port/test_graph_quote_completion.py tests/weknora_port/test_graph_service.py tests/weknora_port/test_graph_extraction.py tests/weknora_port/test_graph_retrieval.py tests/weknora_port/test_graph_storage_pg.py tests/weknora_port/test_s6_graph_acceptance.py",
+      "passed": 173,
+      "skipped": 1,
+      "seconds": 2.23,
+      "exit_code": 0,
+      "skip": "real PG DSN omitted here; actual PG validation separately passed"
+    },
+    {
+      "kind": "REAL_API",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/s6-graphrag-20261019/api_once_fixed.py",
+      "exit_code": 0,
+      "provider_calls": 7
+    },
+    {
+      "kind": "DAILY_RESTORE",
+      "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File wk.ps1 start -Config E:/WK/run/s4-quality-20261019/local.json",
+      "exit_code": 0,
+      "cloud_allowed": false
+    },
+    {
+      "kind": "DAILY_STATUS",
+      "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File wk.ps1 status -Config E:/WK/run/s4-quality-20261019/local.json",
+      "exit_code": 0,
+      "api_worker_ui": true
+    }
+  ],
+  "fixed_test_failures": [
+    {
+      "issue": "incorrect test_development.py target",
+      "exit_code": 4,
+      "resolution": "correct actual file test_development_entry.py; no tests passed on failed command"
+    },
+    {
+      "issue": "new proof-replay error message differed from storage assertion",
+      "exit_code": 1,
+      "resolution": "stable SOURCE_PROOF error code; did not weaken validation"
+    },
+    {
+      "issue": "forged quote accepted by fusion helper",
+      "exit_code": 1,
+      "resolution": "fusion now independently rechecks path/source/quote, test unchanged and passes"
+    }
+  ],
+  "usage": {
+    "new_provider_calls": 17,
+    "new_prompt_tokens": 7968,
+    "new_completion_tokens": 1585,
+    "new_total_reported_tokens": 9553,
+    "new_unknown": 0,
+    "historical_unknown_provider_count": 8,
+    "historical_unknown_usage": "UNCHANGED_NOT_ASSUMED_ZERO",
+    "cash_cost": "NOT_ESTIMATED",
+    "calls": [
+      {
+        "id": "626b7dec27c8f7d19b825956ea239d5a5195588b1032740a55b26305539b494e",
+        "request_id": "9bce2280-59e7-4d9d-97d5-98820b8adfb3/source-embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "dbe31052882613db6373db3284e478fb9ff4edf0106d030c97ef9fee56ab46ca",
+        "status": "SETTLED",
+        "prompt_tokens": 120,
+        "completion_tokens": 0,
+        "total_tokens": 120
+      },
+      {
+        "id": "d9a94b03bed5184341754f7120667751f4908560df290454232145deff30af62",
+        "request_id": "9bce2280-59e7-4d9d-97d5-98820b8adfb3/document-summary",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "capability": "chat",
+        "wire_sha256": "a3d51949406ae86e4273347f5f2c100d0c7a7b4017d4de6afdfb73557fd7aecf",
+        "status": "SETTLED",
+        "prompt_tokens": 670,
+        "completion_tokens": 151,
+        "total_tokens": 821
+      },
+      {
+        "id": "cec76277db9f3b9ebfdaf1f983a23b2e34c9ec879fa8310e5209c5201b78eb34",
+        "request_id": "9bce2280-59e7-4d9d-97d5-98820b8adfb3/summary-embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "6859346b19711aaf07f069e554ce66e4c2f4948b9f566c008e9f401bfb62d641",
+        "status": "SETTLED",
+        "prompt_tokens": 105,
+        "completion_tokens": 0,
+        "total_tokens": 105
+      },
+      {
+        "id": "3ceb51d77732a92b13177898e194ec6f06bcd8f0d4346918dcd28ad3f0c2d6bf",
+        "request_id": "bc43d6be-015b-4f86-b333-8dcbe356136b/source-embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "46e066c025ae4860e7a22838059c8d92acf69522f3df3d5360a41ea72ec28291",
+        "status": "SETTLED",
+        "prompt_tokens": 116,
+        "completion_tokens": 0,
+        "total_tokens": 116
+      },
+      {
+        "id": "9b9f11efb4714b949f5750687177c017ccbba41258366e136f099ddb76a7df8d",
+        "request_id": "bc43d6be-015b-4f86-b333-8dcbe356136b/document-summary",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "capability": "chat",
+        "wire_sha256": "8455d8788d2878738e43a9e2b57a68efd5e16420bac9e193f593a6226737b7bd",
+        "status": "SETTLED",
+        "prompt_tokens": 668,
+        "completion_tokens": 117,
+        "total_tokens": 785
+      },
+      {
+        "id": "bba3ec92db33e8206a246391dac61cfcf5c6091e7202708c6bf656852877c0ce",
+        "request_id": "bc43d6be-015b-4f86-b333-8dcbe356136b/summary-embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "e9fc98f44e8223c068d9f36077cbfea4bee036492e54674c241a4dbfb81a3439",
+        "status": "SETTLED",
+        "prompt_tokens": 83,
+        "completion_tokens": 0,
+        "total_tokens": 83
+      },
+      {
+        "id": "7be13d645cfa518ec84dac85b1cea5bb06908d9b37a865318208e9714e5c9504",
+        "request_id": "s6-index-17de36c284ab49a4bc77b5ec536b40f9/graph-extract-77918834-4eaa-4505-a85b-143114dcf170",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "capability": "chat",
+        "wire_sha256": "ccfa550df4e5a58dec2c0c0f16918195e9baeb17a7be176e0dbee2bb8eef3e06",
+        "status": "SETTLED",
+        "prompt_tokens": 664,
+        "completion_tokens": 73,
+        "total_tokens": 737
+      },
+      {
+        "id": "4904f7944d01902392e7041c28136a3c0c785cabe04c356cc3a828ebade8a2de",
+        "request_id": "s6-index-ad59ce1b91b24bc7aca7436d7412d8ae/graph-extract-cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "capability": "chat",
+        "wire_sha256": "76d6c69ed93cbee7964660e13cf07100d08dbbddd8dad42dca36b9ff1edd42b1",
+        "status": "SETTLED",
+        "prompt_tokens": 657,
+        "completion_tokens": 60,
+        "total_tokens": 717
+      },
+      {
+        "id": "12364cc39c69231278753f76b7638e7e03550b428218d3ebe0a8c545547275ff",
+        "request_id": "s6-deepseek-graph-e341a2c7074841eb9bd099874e1787d5/graph-extract-77918834-4eaa-4505-a85b-143114dcf170",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+        "capability": "chat",
+        "wire_sha256": "b061d6f6cbbb5cf3031835adea3759068250a17c41ed1834975af500fa395ec7",
+        "status": "SETTLED",
+        "prompt_tokens": 603,
+        "completion_tokens": 593,
+        "total_tokens": 1196
+      },
+      {
+        "id": "9beb0805f80bdc56deecce8488c4759b6d87f052d84db454227f881516eeb97a",
+        "request_id": "s6-deepseek-graph-1431a4a1c8f6439fa705adfc001dd5f7/graph-extract-cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+        "capability": "chat",
+        "wire_sha256": "61330debd8581d771b3edc106bf276cc5b16080c94e870fbce86b0baa80f1e77",
+        "status": "SETTLED",
+        "prompt_tokens": 600,
+        "completion_tokens": 439,
+        "total_tokens": 1039
+      },
+      {
+        "id": "4ac87f7dfc6cfef2d8c8f95b81519f5521c30f4575b227bc26bd4e5bfd82b8f2",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/query_rewrite",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "capability": "chat",
+        "wire_sha256": "c61b4acb3459edd21467b36ec8ebaeae7c6e561e228bd1601029a4c6747f2aa1",
+        "status": "SETTLED",
+        "prompt_tokens": 2348,
+        "completion_tokens": 42,
+        "total_tokens": 2390
+      },
+      {
+        "id": "a124378736010a947759895aa2b9a7416cb282a321123a35e67039120e703b6c",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/query-embedding-63266207-95cf-42a6-8e5b-6b3ae18f0819-cbfa1eee02e64ff8",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "39cbcd3e23abb07f2e448105e838e0f69d83c588476216a155bdfc5f459859a6",
+        "status": "SETTLED",
+        "prompt_tokens": 14,
+        "completion_tokens": 0,
+        "total_tokens": 14
+      },
+      {
+        "id": "c7dc4886862b4cab60ea3249bff618cbc4be8315594b27e6e7834a39262d069b",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/query-embedding-63266207-95cf-42a6-8e5b-6b3ae18f0819-df54ef99b85f1a3f",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "e39cf5098bcb94ab2f35e9ce9d54a45b47f238ccf212b69118d071226395a9b3",
+        "status": "SETTLED",
+        "prompt_tokens": 16,
+        "completion_tokens": 0,
+        "total_tokens": 16
+      },
+      {
+        "id": "8870e254d0285c90cbcade174552275bbb69fe2d4f873b26fc327b017b7c8370",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/query-embedding-63266207-95cf-42a6-8e5b-6b3ae18f0819-f6f7e02bd0286ce0",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "e42b48caeefdd0cad35886fbf784ef55cc34016b5c274e2b55863493dd4e10c4",
+        "status": "SETTLED",
+        "prompt_tokens": 3,
+        "completion_tokens": 0,
+        "total_tokens": 3
+      },
+      {
+        "id": "2e41d19adfbba49400d0b03626f4a5dfec56a16e986cdb4080ea353144153241",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/query-embedding-63266207-95cf-42a6-8e5b-6b3ae18f0819-16853c4b14fc3da9",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "capability": "embedding",
+        "wire_sha256": "3f496a5aca05640b73f5b637fb5ef0fe77af2b2da980c668457433b110cbe3b8",
+        "status": "SETTLED",
+        "prompt_tokens": 11,
+        "completion_tokens": 0,
+        "total_tokens": 11
+      },
+      {
+        "id": "354e00286ca99b312ceef1fb2266fc0f4a0f46ce20f4f3df6704df3359286595",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+        "capability": "rerank",
+        "wire_sha256": "1c207adb2e3fa04b55f87d6164390aa5ecf41f6759fbbd26eaffd095c330bf83",
+        "status": "SETTLED",
+        "prompt_tokens": 456,
+        "completion_tokens": 0,
+        "total_tokens": 456
+      },
+      {
+        "id": "a530df58c04dcf5d6e701279d7b2637d09d92f11132c09d209006fe4de87f397",
+        "request_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b/answer/1/cheap",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "capability": "chat",
+        "wire_sha256": "0617046c100d1bdf17d9756afb077fbacad9e264e4d7bb3b57fbe8ce915aa42d",
+        "status": "SETTLED",
+        "prompt_tokens": 834,
+        "completion_tokens": 110,
+        "total_tokens": 944
+      }
+    ]
+  },
+  "integrity": {
+    "historical_calls_unchanged": true,
+    "model_configuration_unchanged": true,
+    "original_18_files_unchanged": true,
+    "historical_unknown_provider_count": 8,
+    "graph_counts": {
+      "port_graph_evidence": 2,
+      "port_graph_nodes": 16,
+      "port_graph_edges": 9
+    },
+    "daily_cloud_allowed": false,
+    "daily_graph_default": false,
+    "daily_api_worker_ui_restored": true
+  },
+  "remaining": [
+    {
+      "id": "PPT_PROGRESSIVE",
+      "state": "DEFERRED_BY_OWNER",
+      "detail": "no solution implementation; pre-existing finite read-only observations do not establish semantic continuity"
+    },
+    {
+      "id": "FROST_SEMINAR_IDENTITY",
+      "state": "QUALITY_GAP",
+      "detail": "current sources do not prove Advanced Seminar belongs to Frost Place; no fuzzy bridge"
+    },
+    {
+      "id": "OPENIE_SEMANTICS",
+      "state": "LIMITATION",
+      "detail": "literal quote checks are not semantic truth; pronouns, passive/reversed relations, implicit and ambiguous identities can be rejected or missed"
+    },
+    {
+      "id": "LARGE_GRAPH",
+      "state": "LIMITATION",
+      "detail": "explicit bounded build/load; no automatic full corpus graph or graph management UI"
+    },
+    {
+      "id": "QWEN_GRAPH_EXTRACTION",
+      "state": "QUALITY_GAP",
+      "detail": "Two real Qwen responses rejected by unchanged source/schema validation; DeepSeek responses partially valid. No blanket model promotion."
+    }
+  ],
+  "next": "Stop S6; no S7/S8, no PPT implementation, no Push/merge/deploy/tag. The parallel Top1 experiment remains isolated from this branch.",
+  "acceptance_executor": {
+    "script": "scripts/s6_graph_acceptance.py",
+    "prepare": "PASS_ZERO_SEND",
+    "run": "PASS_AFTER_PRESERVED_ZERO_SEND_TOOL_FAILURES",
+    "starts_worker": false,
+    "runtime_factory": false,
+    "existing_entrypoint": true,
+    "owner_grant_created_by_executor": false,
+    "source_sentence_replay": "NO_PROVIDER_NEW_SEND"
+  },
+  "evidence_archive": {
+    "path": "docs/evaluation/evidence/s6-graphrag-20261019/zero-send-evidence.zip",
+    "sha256": "d438bd3a8dd4df3be5aea3740daed5e53661f8bfdb1bc112f24489d0368f3920",
+    "secrets_or_config_included": false,
+    "ppt_solution_included": false
+  },
+  "tested_code_commit": "030f0e3d65fe0cd5b667ef2b1ba4a94e3e3d8f47",
+  "delivery_commit_note": "The final docs commit contains this report; obtain its SHA with git rev-parse HEAD. Tested production code SHA is recorded separately.",
+  "real_api": {
+    "status": "PASS_SELECTED_REAL_TWO_HOP_API_SAMPLE",
+    "run_id": "15ced6a3-fc3e-4c6a-810e-311b4965b08b",
+    "session_id": "dff86ebf-6dda-46cd-af9f-4cff8c40f5ab",
+    "request_id": "bcdf8310-b0df-4f44-91ac-ed713a621913",
+    "http": 200,
+    "answer": "Franklin bells 配合使用的装置（莱顿瓶）储存的是**静电**（或**静态电荷**）。\n\n根据资料，莱顿瓶（Leyden jar）是一种用于储存静电的装置，其原理是在玻璃瓶内外的两个电极之间储存静电。Franklin bells 利用莱顿瓶进行早期电电荷演示。\n\nSources: b6cc805398afebfa8327.txt, decbe8d51474b802a881.txt",
+    "answer_sha256": "c6e483df070c1c1ca21440baf1f50a23b749bd001f53e2cfbb61aa71199c50e6",
+    "ordinary_pipeline": {
+      "search": 4,
+      "rerank": 2,
+      "merge": 2,
+      "ordinary_documents": [
+        "4d35e306-4a19-470b-bf68-93731539439d"
+      ]
+    },
+    "graph": {
+      "paths": 3,
+      "added_chunks": 1,
+      "added_raw_chars": 429,
+      "recovered_chunk": "cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+      "recovered_raw_rerank_score": 0.0038456118
+    },
+    "context_count": 3,
+    "full_raw_sources_in_actual_generation_wire": true,
+    "sources": [
+      {
+        "id": "77918834-4eaa-4505-a85b-143114dcf170",
+        "knowledge_id": "4d35e306-4a19-470b-bf68-93731539439d",
+        "chunk_type": "text",
+        "parent_chunk_id": null,
+        "content": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar.\n Franklin bells are only a qualitative indicator of electric charge and were used for simple demonstrations rather than research.\n This was the first device that converted electrical energy into mechanical energy in the form of continuous mechanical motion, in this case, the moving of a bell clapper back and forth between two oppositely charged bells.",
+        "start_at": 0,
+        "end_at": 500,
+        "metadata": {
+          "source_filename": "b6cc805398afebfa8327.txt",
+          "source_version": "9bce2280-59e7-4d9d-97d5-98820b8adfb3",
+          "parsed_source_id": "4d35e306-4a19-470b-bf68-93731539439d:child:0"
+        },
+        "context_header": ""
+      },
+      {
+        "id": "cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+        "knowledge_id": "734d37f7-40bc-4b75-a44b-e7ce30562c0f",
+        "chunk_type": "text",
+        "parent_chunk_id": null,
+        "content": "A Leyden jar, or Leiden jar, is a device that \"stores\" static electricity between two electrodes on the inside and outside of a glass jar.\n A Leyden jar typically consists of a glass jar with metal foil cemented to the inside and the outside surfaces, and a metal terminal projecting vertically through the jar lid to make contact with the inner foil.\n It was the original form of a capacitor (originally known as a \"condenser\").",
+        "start_at": 0,
+        "end_at": 429,
+        "metadata": {
+          "source_filename": "decbe8d51474b802a881.txt",
+          "source_version": "bc43d6be-015b-4f86-b333-8dcbe356136b",
+          "parsed_source_id": "734d37f7-40bc-4b75-a44b-e7ce30562c0f:child:0"
+        },
+        "context_header": ""
+      }
+    ],
+    "answer_fact_supported": true,
+    "finish_reason": "stop",
+    "dynamic": "Cheap once; no upgrade, fallback or truncation",
+    "sse_provider_postgres_answer_equal": true,
+    "history_readback_equal_without_send": true,
+    "historical_call_fingerprints_unchanged": 654,
+    "api_seconds": 44.71408510004403,
+    "query_understanding": {
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "thinking": false,
+      "max_tokens": 150,
+      "prompt_tokens": 2348,
+      "completion_tokens": 42,
+      "transport_read_seconds": 25.6486516
+    },
+    "generation": {
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "thinking": false,
+      "max_tokens": 1024,
+      "prompt_tokens": 834,
+      "completion_tokens": 110,
+      "transport_headers_seconds": 11.4929012,
+      "transport_read_seconds": 15.3024394
+    },
+    "transport_note": "Normal gate included; DNS/TCP/TLS/model queue cannot be separated from these logs",
+    "provider_calls": 7,
+    "prompt_tokens": 3682,
+    "completion_tokens": 152,
+    "total_tokens": 3834,
+    "unknown": 0
+  },
+  "quote_completion": {
+    "status": "SOURCE_PROOF_REPLAY_AND_REAL_PG_PATH_PASS",
+    "provider_calls": 0,
+    "provider_ledger_unchanged": true,
+    "records": [
+      {
+        "document_id": "4d35e306-4a19-470b-bf68-93731539439d",
+        "source_version": "9bce2280-59e7-4d9d-97d5-98820b8adfb3",
+        "source_sha256": "b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8",
+        "nodes": 9,
+        "edges": 6,
+        "lineage": {
+          "kind": "SOURCE_SENTENCE_REPLAY_NO_MODEL_SEND",
+          "original_call_id": "c2f86df3b6cd52289cec7fd0a7efc44e8b5c4edaa16b33c6abda6151533c60ea",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "model_id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+          "request_id": "s6-deepseek-graph-e341a2c7074841eb9bd099874e1787d5/graph-extract-77918834-4eaa-4505-a85b-143114dcf170",
+          "wire_sha256": "b061d6f6cbbb5cf3031835adea3759068250a17c41ed1834975af500fa395ec7",
+          "raw_response_sha256": "12a0bc4fbd44f14668cda41a004a09ca7de662a7e1b9406f8259a5f4bc991612",
+          "raw_capture_sha256": "f7544ab4bbbf5cac42634da78e9c59e2260742abc2dd71fb6309e4ac92bbea63",
+          "quote_completions": [
+            {
+              "kind": "SOURCE_SENTENCE_EXTENSION_NOT_LLM_QUOTE",
+              "relation_index": 1,
+              "original_quote": "electric charge designed to work with a Leyden jar",
+              "original_quote_start": 95,
+              "original_quote_end": 145,
+              "derived_quote": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar",
+              "derived_quote_start": 0,
+              "derived_quote_end": 145,
+              "offset_space": "chunk_local_unicode_codepoints",
+              "chunk_id": "77918834-4eaa-4505-a85b-143114dcf170",
+              "source_version": "9bce2280-59e7-4d9d-97d5-98820b8adfb3",
+              "source_sha256": "b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8",
+              "edge_id": "ge-e1fba264b80f7dc06a5c12caa4c277395843e3790398fdd0ec1f2540c2d1eb2a",
+              "verification": "QUOTE_AND_ORDER_CHECKED_NOT_SEMANTIC_JUDGE"
+            }
+          ],
+          "model_quote_is_unchanged_in_original_receipt": true
+        },
+        "persisted": {
+          "evidence_id": "2daeca486a73afccf81c30b5892b80377735ff868dc3fdf572e3a2ddd471df92",
+          "nodes": 9,
+          "edges": 6
+        }
+      },
+      {
+        "document_id": "734d37f7-40bc-4b75-a44b-e7ce30562c0f",
+        "source_version": "bc43d6be-015b-4f86-b333-8dcbe356136b",
+        "source_sha256": "decbe8d51474b802a881e06db02901c98b31e03bd88b0dcd254b043c9eb7f00a",
+        "nodes": 7,
+        "edges": 3,
+        "lineage": {
+          "kind": "SOURCE_SENTENCE_REPLAY_NO_MODEL_SEND",
+          "original_call_id": "dc53a589f7a06fc6d938a984734304cad5412be631e43b39767dd6c8f03379cf",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "model_id": "mdl2f3f91c525da1aa4f92e128fbd7f1f993b4c7423dede8220d8f47ed64f290",
+          "request_id": "s6-deepseek-graph-1431a4a1c8f6439fa705adfc001dd5f7/graph-extract-cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+          "wire_sha256": "61330debd8581d771b3edc106bf276cc5b16080c94e870fbce86b0baa80f1e77",
+          "raw_response_sha256": "b48631d24d3b0b64b474c85e02ced8c08cbe92e0494fd730396c633bac8d18ea",
+          "raw_capture_sha256": "6ea6cbefb5f8b282a431363d7ee40224ccaa84ade2731d58ca50d2b3e8065f33",
+          "quote_completions": [],
+          "model_quote_is_unchanged_in_original_receipt": true
+        },
+        "persisted": null
+      }
+    ],
+    "paths": [
+      {
+        "node_ids": [
+          "gn-b616ed43739f4ac1fac2971f52b2de6de0200a3a4600401f6c16529905d62f3f",
+          "gn-00a98cb416c013e6f3ba22f21a61da80ffcf4012f1b4b32e5d6124c9e5eda2d5",
+          "gn-52ce804f8ce01136ed4888f4742a53e59b4766515f2690d3cda96c1d717f95fe",
+          "gn-30a4446fef5f0afd9cd7f0a0931be527a90568dd7f0b418d4e2b241729768d27"
+        ],
+        "edges": [
+          {
+            "id": "ge-e1fba264b80f7dc06a5c12caa4c277395843e3790398fdd0ec1f2540c2d1eb2a",
+            "source_id": "gn-b616ed43739f4ac1fac2971f52b2de6de0200a3a4600401f6c16529905d62f3f",
+            "target_id": "gn-00a98cb416c013e6f3ba22f21a61da80ffcf4012f1b4b32e5d6124c9e5eda2d5",
+            "predicate": "designed to work with",
+            "quote": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar",
+            "quote_start": 0,
+            "quote_end": 145,
+            "temporal_text": "",
+            "verification": "QUOTE_AND_ORDER_CHECKED_NOT_SEMANTIC_JUDGE"
+          },
+          {
+            "id": "ge-194675d6f93ba71de10ad383e1e663318fa73797c849ed820e6ab9a8833a4afa",
+            "source_id": "gn-52ce804f8ce01136ed4888f4742a53e59b4766515f2690d3cda96c1d717f95fe",
+            "target_id": "gn-30a4446fef5f0afd9cd7f0a0931be527a90568dd7f0b418d4e2b241729768d27",
+            "predicate": "consists of",
+            "quote": "A Leyden jar typically consists of a glass jar",
+            "quote_start": 140,
+            "quote_end": 186,
+            "temporal_text": "",
+            "verification": "QUOTE_AND_ORDER_CHECKED_NOT_SEMANTIC_JUDGE"
+          }
+        ],
+        "sources": [
+          {
+            "tenant_id": 1,
+            "owner_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+            "knowledge_base_id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+            "document_id": "4d35e306-4a19-470b-bf68-93731539439d",
+            "source_version": "9bce2280-59e7-4d9d-97d5-98820b8adfb3",
+            "chunk_id": "77918834-4eaa-4505-a85b-143114dcf170",
+            "content": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar.\n Franklin bells are only a qualitative indicator of electric charge and were used for simple demonstrations rather than research.\n This was the first device that converted electrical energy into mechanical energy in the form of continuous mechanical motion, in this case, the moving of a bell clapper back and forth between two oppositely charged bells.",
+            "start_at": 0,
+            "end_at": 500,
+            "page_number": null
+          },
+          {
+            "tenant_id": 1,
+            "owner_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+            "knowledge_base_id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+            "document_id": "734d37f7-40bc-4b75-a44b-e7ce30562c0f",
+            "source_version": "bc43d6be-015b-4f86-b333-8dcbe356136b",
+            "chunk_id": "cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+            "content": "A Leyden jar, or Leiden jar, is a device that \"stores\" static electricity between two electrodes on the inside and outside of a glass jar.\n A Leyden jar typically consists of a glass jar with metal foil cemented to the inside and the outside surfaces, and a metal terminal projecting vertically through the jar lid to make contact with the inner foil.\n It was the original form of a capacitor (originally known as a \"condenser\").",
+            "start_at": 0,
+            "end_at": 429,
+            "page_number": null
+          }
+        ],
+        "reference_links": [
+          [
+            "gn-00a98cb416c013e6f3ba22f21a61da80ffcf4012f1b4b32e5d6124c9e5eda2d5",
+            "gn-52ce804f8ce01136ed4888f4742a53e59b4766515f2690d3cda96c1d717f95fe"
+          ]
+        ]
+      },
+      {
+        "node_ids": [
+          "gn-b616ed43739f4ac1fac2971f52b2de6de0200a3a4600401f6c16529905d62f3f",
+          "gn-00a98cb416c013e6f3ba22f21a61da80ffcf4012f1b4b32e5d6124c9e5eda2d5",
+          "gn-52ce804f8ce01136ed4888f4742a53e59b4766515f2690d3cda96c1d717f95fe",
+          "gn-ffa658cdf6ea5c89a7ee8ca69b8b9d8dd3304f7b10f5f2586cc25ed184164396"
+        ],
+        "edges": [
+          {
+            "id": "ge-e1fba264b80f7dc06a5c12caa4c277395843e3790398fdd0ec1f2540c2d1eb2a",
+            "source_id": "gn-b616ed43739f4ac1fac2971f52b2de6de0200a3a4600401f6c16529905d62f3f",
+            "target_id": "gn-00a98cb416c013e6f3ba22f21a61da80ffcf4012f1b4b32e5d6124c9e5eda2d5",
+            "predicate": "designed to work with",
+            "quote": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar",
+            "quote_start": 0,
+            "quote_end": 145,
+            "temporal_text": "",
+            "verification": "QUOTE_AND_ORDER_CHECKED_NOT_SEMANTIC_JUDGE"
+          },
+          {
+            "id": "ge-7d039c5a940698b25dc3cf7b9b0518dd6a19215328f26d6a7a419fc7594b68f4",
+            "source_id": "gn-52ce804f8ce01136ed4888f4742a53e59b4766515f2690d3cda96c1d717f95fe",
+            "target_id": "gn-ffa658cdf6ea5c89a7ee8ca69b8b9d8dd3304f7b10f5f2586cc25ed184164396",
+            "predicate": "stores",
+            "quote": "A Leyden jar, or Leiden jar, is a device that \"stores\" static electricity",
+            "quote_start": 0,
+            "quote_end": 73,
+            "temporal_text": "",
+            "verification": "QUOTE_AND_ORDER_CHECKED_NOT_SEMANTIC_JUDGE"
+          }
+        ],
+        "sources": [
+          {
+            "tenant_id": 1,
+            "owner_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+            "knowledge_base_id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+            "document_id": "4d35e306-4a19-470b-bf68-93731539439d",
+            "source_version": "9bce2280-59e7-4d9d-97d5-98820b8adfb3",
+            "chunk_id": "77918834-4eaa-4505-a85b-143114dcf170",
+            "content": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar.\n Franklin bells are only a qualitative indicator of electric charge and were used for simple demonstrations rather than research.\n This was the first device that converted electrical energy into mechanical energy in the form of continuous mechanical motion, in this case, the moving of a bell clapper back and forth between two oppositely charged bells.",
+            "start_at": 0,
+            "end_at": 500,
+            "page_number": null
+          },
+          {
+            "tenant_id": 1,
+            "owner_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+            "knowledge_base_id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+            "document_id": "734d37f7-40bc-4b75-a44b-e7ce30562c0f",
+            "source_version": "bc43d6be-015b-4f86-b333-8dcbe356136b",
+            "chunk_id": "cd592c2d-0974-4a72-bdb9-d0c1dd765822",
+            "content": "A Leyden jar, or Leiden jar, is a device that \"stores\" static electricity between two electrodes on the inside and outside of a glass jar.\n A Leyden jar typically consists of a glass jar with metal foil cemented to the inside and the outside surfaces, and a metal terminal projecting vertically through the jar lid to make contact with the inner foil.\n It was the original form of a capacitor (originally known as a \"condenser\").",
+            "start_at": 0,
+            "end_at": 429,
+            "page_number": null
+          }
+        ],
+        "reference_links": [
+          [
+            "gn-00a98cb416c013e6f3ba22f21a61da80ffcf4012f1b4b32e5d6124c9e5eda2d5",
+            "gn-52ce804f8ce01136ed4888f4742a53e59b4766515f2690d3cda96c1d717f95fe"
+          ]
+        ]
+      },
+      {
+        "node_ids": [
+          "gn-b616ed43739f4ac1fac2971f52b2de6de0200a3a4600401f6c16529905d62f3f",
+          "gn-fce070e1f97845f980788ff7b1ce1a7b1d249d5a268ee9a5b7b76a8ada93425e"
+        ],
+        "edges": [
+          {
+            "id": "ge-81b347381abd197393d68eae6518451269bef5e4ca72f7a6967d086f3fe25bd0",
+            "source_id": "gn-b616ed43739f4ac1fac2971f52b2de6de0200a3a4600401f6c16529905d62f3f",
+            "target_id": "gn-fce070e1f97845f980788ff7b1ce1a7b1d249d5a268ee9a5b7b76a8ada93425e",
+            "predicate": "are only a qualitative indicator of",
+            "quote": "Franklin bells are only a qualitative indicator of electric charge",
+            "quote_start": 148,
+            "quote_end": 214,
+            "temporal_text": "",
+            "verification": "QUOTE_AND_ORDER_CHECKED_NOT_SEMANTIC_JUDGE"
+          }
+        ],
+        "sources": [
+          {
+            "tenant_id": 1,
+            "owner_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6",
+            "knowledge_base_id": "63266207-95cf-42a6-8e5b-6b3ae18f0819",
+            "document_id": "4d35e306-4a19-470b-bf68-93731539439d",
+            "source_version": "9bce2280-59e7-4d9d-97d5-98820b8adfb3",
+            "chunk_id": "77918834-4eaa-4505-a85b-143114dcf170",
+            "content": "Franklin bells (also known as Gordon’s Bells or lightning bells) are an early demonstration of electric charge designed to work with a Leyden jar.\n Franklin bells are only a qualitative indicator of electric charge and were used for simple demonstrations rather than research.\n This was the first device that converted electrical energy into mechanical energy in the form of continuous mechanical motion, in this case, the moving of a bell clapper back and forth between two oppositely charged bells.",
+            "start_at": 0,
+            "end_at": 500,
+            "page_number": null
+          }
+        ],
+        "reference_links": []
+      }
+    ],
+    "nodes": 16,
+    "edges": 9
+  },
+  "authorization": {
+    "closed": true,
+    "total_limit": {
+      "calls": 20,
+      "tokens": 200000
+    },
+    "actual_calls": 17,
+    "actual_reported_tokens": 9553,
+    "historical_unknown_released": false,
+    "unused_temporary_space_revoked": true,
+    "owner_reply": [
+      "call_35f1dd5115674eedbc06f762110a3852:0",
+      "call_a5db1b80428d412f92b104b448afddda:0"
+    ],
+    "zero_send_failures_preserved": [
+      "Origin missing: consent PATCH 403; no upload or model",
+      "client request ID 45 > repository 36: POST 422; no admitted turn or model"
+    ]
+  },
+  "real_evidence_archive": {
+    "path": "docs/evaluation/evidence/s6-graphrag-20261019/real-acceptance-evidence.zip",
+    "sha256": "d8f647bded942f736e1363067804a279bfceb45f4e53094033c045b88ea90958",
+    "files": 131,
+    "secrets_or_config_included": false
+  }
+}

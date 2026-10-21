@@ -1,0 +1,543 @@
+{
+  "schema": "s8-1-scoring-ground-truth/v1",
+  "purpose": "SCORING SIDE ONLY; MUST NOT ENTER MODEL INPUT",
+  "source_files": [
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.results.json",
+      "sha256": "1d4b1fc9065785cb7ba5bbeb6736d76da062613e0363513525a500d3d30974fa"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.md",
+      "sha256": "512485e55ff473b846f92432fd9dda29b070aa60812faee11023306fa99e0786"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_ECS_OVERNIGHT_DEPLOYMENT.md",
+      "sha256": "36a4cce0b359428da4119a260baca96befc9f159ca3a04479034f869ddf18c0d"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_ECS_OVERNIGHT_DEPLOYMENT.results.json",
+      "sha256": "b5592abe46c48f8565d3e05b402539406bfc3fc6055246afa87adffaf12f3b2d"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-ecs-finish-20261020\\FULL_CORPUS_SOURCE_ID_MAP.results.json",
+      "sha256": "5281003b2ebbfd1897d5977131ef803b50de7cd7522a5436e4e00d55414c499a"
+    },
+    {
+      "path": "C:\\Users\\22088\\.codex\\attachments\\d8e75743-1cf7-4a66-b3b7-ccab45a3f538\\已粘贴的文本.txt",
+      "sha256": "53d5a8f3a065444bfff9250ab15e7704ce94885135b01654a3490a9dbd60b142"
+    }
+  ],
+  "cases": [
+    {
+      "identity": {
+        "case_id": "scifact-1304",
+        "dataset": "scifact",
+        "qid": "1304",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "Tirasemtiv targets cardiac muscle.",
+      "knowledge_base_id": "f4b6ddb2-c05c-4ece-ba73-c1dad6eea8d7",
+      "gold": {
+        "dataset_version": "beir-scifact-5f7d1de60b170fc8027bb7898e2efca1",
+        "qrels_kind": "official_document_qrels",
+        "qrels": {
+          "12631697": 1
+        },
+        "answers": [],
+        "evaluation_metadata": {}
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "12631697",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "19c07672-2657-49e1-bdcc-b2452ad1cb68",
+          "source_version": "62a42e7b-d087-4592-9c8d-9a712d5c8ca2",
+          "original_sha256": "9919557f47089893549eacd78da44fdc81da832afdebf0d7430438a1a69b3e76",
+          "mapping_basis": "EXACT_SOURCE_ID_CORPUS_LINE_AND_BYTES_THEN_ORIGINAL_UPLOAD_SHA"
+        }
+      ],
+      "scoring": {
+        "answer": "NOT_APPLICABLE_NO_ANSWER_GOLD; no support/refute label",
+        "retrieval": "document_qrels Recall/MRR on explicitly declared indexed subset"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "miracl-zh-5704915#0",
+        "dataset": "miracl-zh",
+        "qid": "5704915#0",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "香山在北京哪个区？",
+      "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+      "gold": {
+        "dataset_version": "MIRACL-ZH-CANDIDATE-POOL-SHARD0-SEED20260928-V1",
+        "qrels_kind": "official_judgments_with_candidate_pool_scope",
+        "qrels": {
+          "157420#0": 1,
+          "157420#4": 0,
+          "157707#0": 1
+        },
+        "answers": [],
+        "evaluation_metadata": {}
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "157420#0",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "99c12c20-77a2-4fd3-841e-ebd677d5c647",
+          "source_version": "5864ad55-a1ce-4f86-81b7-e2ba707333ef",
+          "original_sha256": "c6ecd91d540a205bb7ee8b54ab7516f29e9aa010e76b57f80f3e14b565d83060",
+          "mapping_basis": "EXACT_SOURCE_ID_CORPUS_LINE_AND_BYTES_THEN_ORIGINAL_UPLOAD_SHA"
+        },
+        {
+          "source_id": "157420#4",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "2ec88d57-1718-4799-ba86-d81465079bb3",
+          "source_version": "85f7f907-cc6b-4796-ac61-d8ab75d10063",
+          "original_sha256": "022e963364c17edf9846a632deca806ad8d8df6ae15847ebb8d48f8eb3c7f6e1",
+          "mapping_basis": "EXACT_SOURCE_ID_CORPUS_LINE_AND_BYTES_THEN_ORIGINAL_UPLOAD_SHA"
+        },
+        {
+          "source_id": "157707#0",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "079d6f4e-d102-4a76-adfa-1c72a636cc3b",
+          "source_version": "dcf5fabb-f44e-40e3-b0dc-50529cef21ce",
+          "original_sha256": "4e0cbad0c0429586108a04d2ebb8ea7e8b5524e9fa3f8af69e5df184e5f13dc7",
+          "mapping_basis": "EXACT_SOURCE_ID_CORPUS_LINE_AND_BYTES_THEN_ORIGINAL_UPLOAD_SHA"
+        }
+      ],
+      "scoring": {
+        "answer": "NOT_APPLICABLE_NO_ANSWER_GOLD",
+        "retrieval": "positive-passage Recall/MRR in declared candidate/index pool; grade 0 excluded"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "dataset": "longbench-zh",
+        "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "在基于立体卫星影像的DSM生产作业中，影像星下点的分辨率应该满足什么要求？",
+      "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+      "gold": {
+        "dataset_version": "LongBench-ZH-HF-5e628be450b7e67fb7ae6e201bd6d8f7056f7672-SEED20260928-V1",
+        "qrels_kind": "paired_task_context_diagnostic",
+        "qrels": {
+          "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc": 1
+        },
+        "answers": [
+          "分辨率优于5m。"
+        ],
+        "evaluation_metadata": {}
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+          "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca",
+          "original_sha256": "5063c351d4e58b7f139f64637b70fa68fd3b0110fa47b67285002cb962216d21",
+          "mapping_basis": "EXACT_SOURCE_ID_CORPUS_LINE_AND_BYTES_THEN_ORIGINAL_UPLOAD_SHA"
+        }
+      ],
+      "scoring": {
+        "answer": "qa_f1_zh_score (Chinese F1); official task metric"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+        "dataset": "longbench-zh",
+        "qid": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "谷丙转氨酶和谷草转氨酶偏高的原因",
+      "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+      "gold": {
+        "dataset_version": "LongBench-ZH-HF-5e628be450b7e67fb7ae6e201bd6d8f7056f7672-SEED20260928-V1",
+        "qrels_kind": "paired_task_context_diagnostic",
+        "qrels": {
+          "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828": 1
+        },
+        "answers": [
+          "1、大量或长期饮酒者谷氨酸转氨酶升高。2、病毒性肝炎这是引起谷氨酸转氨酶升高最常见的疾病，各类急、慢性病毒性肝炎均可导致谷氨酸转氨酶偏高。3、肝硬化与肝癌肝硬化活动时，一般都会出现谷氨酸转氨酶升高。4、胆道疾病胆囊炎、胆石症急性发作时，常有发热、腹痛、恶心、呕吐、黄疸、血胆红素及谷氨酸转氨酶ALT升高。5、中毒性肝炎多种药物和化学制剂都能引起谷氨酸转氨酶ALT升高。6、心脏疾病急性心肌梗塞、心肌炎、心力衰竭时，谷丙转氨酶和谷草转氨酶均升高。7、其他某些感染性疾病，如肺炎、伤寒、结核病、传染性单核细胞增多症等，都有转氨酶升高的现象。"
+        ],
+        "evaluation_metadata": {}
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "89dade96-8e89-4758-adf3-b23b164a6edf",
+          "source_version": "537fa4fd-efd7-4d10-a514-00e0d0e8dcd6",
+          "original_sha256": "48b5fd12e6dddb0a4336f248d6e520a041c2e12e12c0c50d30939f857f7778c3",
+          "mapping_basis": "EXACT_SOURCE_ID_CORPUS_LINE_AND_BYTES_THEN_ORIGINAL_UPLOAD_SHA"
+        }
+      ],
+      "scoring": {
+        "answer": "rouge_zh_score (ROUGE-L); official task metric"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+        "dataset": "hotpotqa",
+        "qid": "5a729fe55542991f9a20c53b",
+        "arms": [
+          "A",
+          "C"
+        ]
+      },
+      "question": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "gold": {
+        "dataset_version": "HotpotQA-1908d6afbbead072334abe2965f91bd2709910ab",
+        "qrels_kind": "SOURCE_DERIVED_SUPPORTING_FACT_DOCUMENT_PROJECTION",
+        "qrels": {
+          "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825": 1,
+          "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc": 1
+        },
+        "answers": [
+          "Pieter van Musschenbroek"
+        ],
+        "evaluation_metadata": {
+          "answer_scorer": "hotpot_answer_normalization_em_token_f1",
+          "gold_source": "OFFICIAL_NATIVE_ANSWER_AND_SUPPORTING_FACTS",
+          "original_split": "validation_distractor",
+          "supporting_facts": [
+            {
+              "document_id": "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+              "sentence_index_zero_based": 1,
+              "title": "Tribometer"
+            },
+            {
+              "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+              "sentence_index_zero_based": 0,
+              "title": "Pieter van Musschenbroek"
+            },
+            {
+              "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+              "sentence_index_zero_based": 2,
+              "title": "Pieter van Musschenbroek"
+            }
+          ]
+        }
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253",
+          "source_version": "35d1280e-8347-4d97-a523-f0956a7c4a71",
+          "original_sha256": "29baf81935dc55110ab75f4711c4502f91e9beda98a4ff12c35b4d728c10fd16",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        },
+        {
+          "source_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "source_version": "1bd681ce-5c23-43b5-b53f-3bc2fe194625",
+          "original_sha256": "45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        }
+      ],
+      "scoring": {
+        "support": "Separate any/all required sources and supporting-fact coverage; inspect facts in actual model Context",
+        "answer": "hotpot_answer_normalization_em_token_f1"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "hotpotqa-5a7631cd5542994ccc91870c",
+        "dataset": "hotpotqa",
+        "qid": "5a7631cd5542994ccc91870c",
+        "arms": [
+          "A",
+          "C"
+        ]
+      },
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "gold": {
+        "dataset_version": "HotpotQA-1908d6afbbead072334abe2965f91bd2709910ab",
+        "qrels_kind": "SOURCE_DERIVED_SUPPORTING_FACT_DOCUMENT_PROJECTION",
+        "qrels": {
+          "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd": 1,
+          "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d": 1
+        },
+        "answers": [
+          "Franconia, New Hampshire"
+        ],
+        "evaluation_metadata": {
+          "answer_scorer": "hotpot_answer_normalization_em_token_f1",
+          "gold_source": "OFFICIAL_NATIVE_ANSWER_AND_SUPPORTING_FACTS",
+          "original_split": "validation_distractor",
+          "supporting_facts": [
+            {
+              "document_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+              "sentence_index_zero_based": 9,
+              "title": "Jeanne Marie Beaumont"
+            },
+            {
+              "document_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+              "sentence_index_zero_based": 0,
+              "title": "The Frost Place"
+            }
+          ]
+        }
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "hotpotqa-context:4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "source_version": "de3ec8ca-5496-4ecf-abcb-3b65423d1fe9",
+          "original_sha256": "f43886e7f9b452c786e071701ce14871456ec95342cb132e7a212c397458eb9e",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        },
+        {
+          "source_id": "hotpotqa-context:6f0a9eac1754766bf1109a26d9e07ace837c07c72d068e9650858ddbeeef506d",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "source_version": "00aadff9-83c8-4a17-ab39-09359f2128cc",
+          "original_sha256": "9da0210243443211f7c8e76e35c9f725d25d13dae8f8cad0cb39004bc405c812",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        }
+      ],
+      "scoring": {
+        "support": "Separate any/all required sources and supporting-fact coverage; inspect facts in actual model Context",
+        "answer": "hotpot_answer_normalization_em_token_f1"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "arms": [
+          "A",
+          "B"
+        ]
+      },
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "gold": {
+        "dataset_version": "MMLongBench-Doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86",
+        "qrels_kind": "SOURCE_DERIVED_OFFICIAL_DOCUMENT_IDENTITY",
+        "qrels": {
+          "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf": 1
+        },
+        "answers": [
+          "Cat vs Dog dataset"
+        ],
+        "evaluation_metadata": {
+          "answer_format": "Str",
+          "evidence_pages": [
+            34
+          ],
+          "evidence_sources": "['Pure-text (Plain-text)']",
+          "gold_source": "OFFICIAL_NATIVE_TYPED_ANSWER",
+          "official_gpt_normalization": "NOT_RUN",
+          "original_row_index": 434,
+          "page_index_convention": "UNKNOWN",
+          "parsing_gold": "NOT_AVAILABLE"
+        }
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "0f29b3c5-efbb-464e-8f39-cea5c68ba3d7",
+          "source_version": "17ea092f-00ec-42a0-b65c-9a99f6fb24e5",
+          "original_sha256": "40a74d3fc5e73c81465206a4043c19b850daf66fc5617756f5894d25ad054b4b",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        }
+      ],
+      "scoring": {
+        "support": "Check evidence page/fact in actual Context; no official parsing Gold",
+        "answer": "Typed-answer project diagnostic; official GPT normalization NOT RUN"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "arms": [
+          "A"
+        ]
+      },
+      "question": "Who has a higher median campaign grade? Trump or Clinton?",
+      "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+      "gold": {
+        "dataset_version": "MMLongBench-Doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86",
+        "qrels_kind": "SOURCE_DERIVED_OFFICIAL_DOCUMENT_IDENTITY",
+        "qrels": {
+          "11-21-16-Updated-Post-Election-Release.pdf": 1
+        },
+        "answers": [
+          "Clinton"
+        ],
+        "evaluation_metadata": {
+          "answer_format": "Str",
+          "evidence_pages": [
+            28,
+            29
+          ],
+          "evidence_sources": "['Chart']",
+          "gold_source": "OFFICIAL_NATIVE_TYPED_ANSWER",
+          "official_gpt_normalization": "NOT_RUN",
+          "original_row_index": 687,
+          "page_index_convention": "UNKNOWN",
+          "parsing_gold": "NOT_AVAILABLE"
+        }
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "11-21-16-Updated-Post-Election-Release.pdf",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "35c37b2d-3ce7-49ab-98fe-de6d3e6974f9",
+          "source_version": "8358d755-b476-4986-bcce-fe3c979531a0",
+          "original_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        }
+      ],
+      "scoring": {
+        "support": "Check evidence page/fact in actual Context; no official parsing Gold",
+        "answer": "Typed-answer project diagnostic; official GPT normalization NOT RUN"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    },
+    {
+      "identity": {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+        "dataset": "mmlongbench-doc",
+        "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958",
+        "arms": [
+          "A",
+          "B"
+        ]
+      },
+      "question": "What are two examples of reflecting surfaces?",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "gold": {
+        "dataset_version": "MMLongBench-Doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86",
+        "qrels_kind": "SOURCE_DERIVED_OFFICIAL_DOCUMENT_IDENTITY",
+        "qrels": {
+          "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf": 1
+        },
+        "answers": [
+          "['shiny object', 'mirror']"
+        ],
+        "evaluation_metadata": {
+          "answer_format": "List",
+          "evidence_pages": [
+            9
+          ],
+          "evidence_sources": "['Figure']",
+          "gold_source": "OFFICIAL_NATIVE_TYPED_ANSWER",
+          "official_gpt_normalization": "NOT_RUN",
+          "original_row_index": 958,
+          "page_index_convention": "UNKNOWN",
+          "parsing_gold": "NOT_AVAILABLE"
+        }
+      },
+      "qrel_source_mappings": [
+        {
+          "source_id": "b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95.pdf",
+          "status": "REUSE_CURRENT_1024_INDEXED",
+          "document_id": "8fdbe2af-9cc0-4b4a-a554-352a61ca5252",
+          "source_version": "3ff26984-be2a-4c7e-8b8f-bb8140c156f8",
+          "original_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "mapping_basis": "EXACT_SOURCE_UNIT_ID_AND_ORIGINAL_FILE_SHA_TO_SUCCESSFUL_UPLOAD_CHECKPOINT"
+        }
+      ],
+      "scoring": {
+        "support": "Check evidence page/fact in actual Context; no official parsing Gold",
+        "answer": "Typed-answer project diagnostic; official GPT normalization NOT RUN"
+      },
+      "fact_support": "UNVERIFIED_REQUIRES_ACTUAL_STAGE_TRAJECTORY; matching document identity alone is insufficient"
+    }
+  ],
+  "scoring_contracts": {
+    "omnidocbench_24": {
+      "use": "Only reuse already saved 24-page receipts",
+      "NED_mapped_pages": 3,
+      "NED_status": "3NED",
+      "NOT_SCORABLE_pages": 21,
+      "NOT_SCORABLE_status": "21NOT_SCORABLE",
+      "new_OCR": "NOT_RUN",
+      "new_embedding": "NOT_RUN",
+      "official_layout_table_formula_metric": "NOT_AVAILABLE"
+    }
+  },
+  "missing_fields": [
+    {
+      "field": "frozen document_scope",
+      "location": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.results.json#/historical_S8_0_snapshot/original_results/frozen40",
+      "question_ids": [
+        "scifact-1304",
+        "miracl-zh-5704915#0",
+        "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+        "hotpotqa-5a729fe55542991f9a20c53b",
+        "hotpotqa-5a7631cd5542994ccc91870c",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958"
+      ],
+      "status": "EMPTY_BY_FREEZE; KB scope is present and current server must enforce it"
+    },
+    {
+      "field": "MML page_index_convention",
+      "location": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.results.json#/historical_S8_0_snapshot/original_results/frozen40/gold_scoring_only/evaluation_metadata",
+      "question_ids": [
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958"
+      ],
+      "status": "UNKNOWN_IN_SOURCE"
+    },
+    {
+      "field": "MML parsing Gold and official GPT normalization",
+      "location": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\docs\\evaluation\\S8_SIX_DATASET_EVALUATION.results.json#/historical_S8_0_snapshot/original_results/frozen40/gold_scoring_only/evaluation_metadata",
+      "question_ids": [
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0958"
+      ],
+      "status": "NOT_AVAILABLE / NOT_RUN"
+    }
+  ],
+  "scoring_source_files": [
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\scripts\\rag_m3_score.py",
+      "sha256": "2619c507f70ddb0d56ce416d6de2b1e1dc360deaafc336683943e6471ec7ecc2"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\scripts\\p9_score_real.py",
+      "sha256": "e0e76850db4d83d6b07e3ee0d1f46e4d1eb1886e6881a82a3181dbc96cc20828"
+    },
+    {
+      "path": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation\\scripts\\weknora_port_p19_score.py",
+      "sha256": "4706c1525e239a5d401d7bb8d310d09f04a0f97769522f7f111295ed62881814"
+    }
+  ]
+}

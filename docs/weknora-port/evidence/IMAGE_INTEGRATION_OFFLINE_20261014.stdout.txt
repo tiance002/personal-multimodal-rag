@@ -1,0 +1,40 @@
+................F....................................................... [ 93%]
+.....                                                                    [100%]
+================================== FAILURES ===================================
+_ test_missing_postprocessor_keeps_text_document_pending_and_not_search_indexed _
+tests\weknora_port\test_documents.py:69: in execute
+    status, code, metadata, doc_id, tenant, kb_id = params
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: too many values to unpack (expected 6)
+
+During handling of the above exception, another exception occurred:
+tests\weknora_port\test_documents.py:249: in test_missing_postprocessor_keeps_text_document_pending_and_not_search_indexed
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_documents.py:243: in exercise
+    item = await service.upload_document(PRINCIPAL, kb["id"], "pending.txt", "text/plain",
+backend\weknora_port\documents.py:307: in upload_document
+    return await self._process_document(principal,kb,name,data,document_id,source_version,metadata,
+backend\weknora_port\documents.py:427: in _process_document
+    return await self._mark(principal, knowledge_base_id, document_id, "failed", code, metadata,image_task=image_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\documents.py:583: in _mark
+    await self._rows(
+backend\weknora_port\documents.py:184: in _rows
+    cursor = await repository.connection.execute(sql, tuple(params))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_documents.py:69: in execute
+    status, code, metadata, doc_id, tenant, kb_id = params
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: too many values to unpack (expected 6)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_documents.py::test_missing_postprocessor_keeps_text_document_pending_and_not_search_indexed
+1 failed, 76 passed in 3.33s

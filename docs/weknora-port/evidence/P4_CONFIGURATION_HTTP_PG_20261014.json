@@ -1,0 +1,115 @@
+{
+  "kind": "ACTUAL_ASGI_HTTP_PG_REDIS_GATED_MOCK_WIRE",
+  "schema_011_sha256": "e0be3d7a43d6c2957c5fd85b02add4fa006a6a72c85208b6b935071901bcd101",
+  "root": "E:\\WK\\run\\11526d4553ab",
+  "cases": [
+    {
+      "case": "request-baseline",
+      "run_id": "8dce43b3-0eb4-43c2-86d0-f7858035cece",
+      "aux_model": "deepseek-flash",
+      "answer_model": "deepseek-flash",
+      "language": "English",
+      "max_tokens": 111,
+      "replay_no_sends": true,
+      "changed_options_conflict": true,
+      "request_configuration": {
+        "accept_language": "en-US,en;q=0.8",
+        "reasoning_effort": "off",
+        "summary_model_id": "mdl34f289039a5463b7b4351a46df61c55347a6554d76bf822aa59cbafddfc65"
+      },
+      "aux_prompt": "STARTUP REWRITE English",
+      "final_prompt_prefix": "STARTUP FINAL English"
+    },
+    {
+      "case": "dedicated-vs-cheap",
+      "run_id": "04c54b87-4cbe-40e1-a5c2-26367f61486d",
+      "aux_model": "deepseek-flash",
+      "answer_model": "XingChenAGI/Xing4.0-29B",
+      "language": "Korean",
+      "max_tokens": 111,
+      "replay_no_sends": true,
+      "changed_options_conflict": true,
+      "request_configuration": {
+        "accept_language": "ko-KR",
+        "reasoning_effort": "off",
+        "summary_model_id": "mdl34f289039a5463b7b4351a46df61c55347a6554d76bf822aa59cbafddfc65"
+      },
+      "aux_prompt": "SESSION REWRITE Korean",
+      "final_prompt_prefix": "SESSION FINAL Korean"
+    },
+    {
+      "case": "invalid-model-fallback",
+      "run_id": "c3593e03-5e9d-4f2b-b3b8-e5bc77feac76",
+      "aux_model": "XingChenAGI/Xing4.0-29B",
+      "answer_model": "XingChenAGI/Xing4.0-29B",
+      "language": "Chinese (Traditional)",
+      "max_tokens": 111,
+      "replay_no_sends": true,
+      "changed_options_conflict": true,
+      "request_configuration": {
+        "accept_language": "zh-TW",
+        "reasoning_effort": "off",
+        "summary_model_id": "missing"
+      },
+      "aux_prompt": "STARTUP REWRITE Chinese (Traditional)",
+      "final_prompt_prefix": "STARTUP FINAL Chinese (Traditional)"
+    },
+    {
+      "case": "non-chat-model-fallback",
+      "run_id": "f3fd7ae0-02f5-4650-839a-70df65793606",
+      "aux_model": "XingChenAGI/Xing4.0-29B",
+      "answer_model": "XingChenAGI/Xing4.0-29B",
+      "language": "Chinese (Simplified)",
+      "max_tokens": 111,
+      "replay_no_sends": true,
+      "changed_options_conflict": true,
+      "request_configuration": {
+        "reasoning_effort": "off",
+        "summary_model_id": "mdlc4fd2b2aaa11a9f0ea6c9c090d6a803fc333fdcd1b36f53002398b704a0ea"
+      },
+      "aux_prompt": "STARTUP REWRITE Chinese (Simplified)",
+      "final_prompt_prefix": "STARTUP FINAL Chinese (Simplified)"
+    },
+    {
+      "case": "global-intent",
+      "run_id": "2d5b600c-519c-4498-ae18-66e0dcb8f7e6",
+      "aux_model": "deepseek-flash",
+      "answer_model": "XingChenAGI/Xing4.0-29B",
+      "language": "English",
+      "max_tokens": 111,
+      "replay_no_sends": true,
+      "changed_options_conflict": true,
+      "request_configuration": {
+        "accept_language": "en-US",
+        "reasoning_effort": "off"
+      },
+      "aux_prompt": "SESSION REWRITE English",
+      "final_prompt_prefix": "GLOBAL GREETING English"
+    },
+    {
+      "case": "startup-locale-wins",
+      "run_id": "5d5cf268-13f8-4122-a406-c840f85269c1",
+      "aux_model": "XingChenAGI/Xing4.0-29B",
+      "answer_model": "XingChenAGI/Xing4.0-29B",
+      "language": "French",
+      "max_tokens": 111,
+      "replay_no_sends": true,
+      "changed_options_conflict": true,
+      "request_configuration": {
+        "accept_language": "en-US",
+        "reasoning_effort": "off"
+      },
+      "aux_prompt": "STARTUP REWRITE French",
+      "final_prompt_prefix": "STARTUP FINAL French"
+    },
+    {
+      "case": "request-null-unset",
+      "run_id": "d54bfd76-3267-4398-a255-b253869868bd",
+      "default_thinking_preserved": true,
+      "language": "French",
+      "null_accepted": true
+    }
+  ],
+  "real_provider_calls": 0,
+  "historical_rows_rewritten": false
+}

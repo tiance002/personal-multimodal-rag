@@ -1,0 +1,23 @@
+{
+  "schema": "p9-actual-provider-wire/v1",
+  "request_id": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db/summary-embedding",
+  "run_id": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db/summary-embedding",
+  "capability": "embedding",
+  "stage": "auxiliary",
+  "provider": "siliconflow",
+  "model": "BAAI/bge-m3",
+  "boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+  "wire_sha256": "7564a8eca3dfc05572f6f357c877c88d3cdac585b8cf6ff299ab19fc609b7d4f",
+  "wire_bytes": 757,
+  "body": {
+    "encoding_format": "float",
+    "input": [
+      "# Summary\n2016年美国总统选举后选民对特朗普竞选表现和总统前景的评价调查。\n\nPew Research Center于2016年11月10日至14日对1,254名选民进行的四年一度选举后调查，发现特朗普作为获胜候选人获得的评价为28年来最低，仅30%选民给出A或B级评价，而输掉的克林顿获得43%的A或B级评价，首次出现输家评价高于胜者。特朗普选民对总统前景充满信心（88%），但克林顿选民对特朗普处理重大议题的能力缺乏信心，且43%的克林顿选民认为特朗普是糟糕的总统人选。两党选民对下一届共和党与民主党关系是否会改善的预期也存在显著分歧。"
+    ],
+    "model": "BAAI/bge-m3"
+  },
+  "finish_reason": null,
+  "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+  "headers_saved": false,
+  "status_code": 200
+}

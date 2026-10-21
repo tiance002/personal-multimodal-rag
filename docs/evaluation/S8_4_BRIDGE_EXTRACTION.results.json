@@ -1,0 +1,312 @@
+{
+  "schema": "s84a-bridge-evaluation/v1",
+  "overall_status": "OFFLINE_BRIDGE_PARTIAL",
+  "offline_status": "OFFLINE_BRIDGE_PARTIAL",
+  "real_feasibility_status": "BRIDGE_UNVERIFIED",
+  "baseline": {
+    "stage": "S8.3-F",
+    "commit": "15c8777bdaaf0cfd3e6eb5995bd88c2d6f53b709",
+    "includes_s8_3_r_fixes": true
+  },
+  "implementation": {
+    "commit": "b10e2a07585ad51c65473ef6b02fc42dee51b16d",
+    "branch": "codex/s8-4-bridge-extraction-20261020",
+    "default_mode": "off",
+    "schema_or_public_api_change": false,
+    "production_configuration_changed": false,
+    "deployment_performed": false,
+    "push_or_merge_performed": false,
+    "current_code_head": "4fb10233f922a47b2ddb058e79e9ec1389088c9e",
+    "source_check_fix_commit": "4fb10233f922a47b2ddb058e79e9ec1389088c9e"
+  },
+  "upstream_failure": {
+    "saved_search_candidate_count_per_frost_arm": 30,
+    "first_rerank_threshold": 0.3,
+    "second_hop_chunk_id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+    "first_rerank_score": {
+      "A": 0.00799383781850338,
+      "B": 0.017354240640997887
+    },
+    "drop_stage": "first-rerank threshold, before MMR/Merge",
+    "raw_request_index_chunk_bindings_frozen": true
+  },
+  "offline": {
+    "status": "PASS",
+    "command": "python -m pytest -q -p no:reporter tests/weknora_port/test_provider_request.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_s8_4_bridge_ecs.py tests/weknora_port/test_bridge_rescue.py tests/weknora_port/test_bridge_pipeline.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_source_evidence.py tests/weknora_port/test_service.py tests/weknora_port/test_kb_model_selection.py tests/weknora_port/test_generation.py",
+    "exit_code": 0,
+    "passed": 384,
+    "elapsed_seconds": 7.52,
+    "receipt_stdout": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\offline-tests.stdout.txt",
+    "receipt_exit_code": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\offline-tests.exit-code.txt",
+    "frost_real_sample_semantics": "UNVERIFIED_PRONOUN_AND_RELATION; no Q1 or second rerank",
+    "generic_positive_path": "Mock Cheap -> program Q1 -> Mock BGE -> raw supplemental source in final Context",
+    "saved_negative_controls": [
+      "leyden-negative",
+      "postcode-negative",
+      "scifact-611-negative",
+      "mml-0687-negative"
+    ],
+    "gold_or_historical_answers_in_runtime_input": false,
+    "real_provider_calls": 0,
+    "actual_tokens": 0,
+    "latest_focused_run": {
+      "status": "PASS",
+      "command": "python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s8_4_bridge_ecs.py tests/weknora_port/test_bridge_rescue.py tests/weknora_port/test_bridge_pipeline.py",
+      "exit_code": 0,
+      "passed": 132,
+      "elapsed_seconds": 0.92,
+      "receipt_stdout": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\offline-tests-after-fixes.stdout.txt",
+      "receipt_exit_code": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\offline-tests-after-fixes.exit-code.txt",
+      "fixes": [
+        "LeasedKnowledgeRepository delegates current-chunk reads",
+        "Optional frozen source-link fields are compared when present"
+      ],
+      "code_head": "4fb10233f922a47b2ddb058e79e9ec1389088c9e"
+    }
+  },
+  "authorized_real_test": {
+    "owner_explicitly_authorized": true,
+    "max_provider_calls": 8,
+    "max_total_tokens": 30000,
+    "planned_exact_operations": 4,
+    "planned_capabilities": {
+      "chat": 2,
+      "rerank": 2
+    },
+    "frozen_case_count": 6,
+    "actual_provider_calls": 2,
+    "actual_tokens": 1546,
+    "new_unknown": 0,
+    "zero_send_preflight": "PASS_S84A_READY_ZERO_SEND",
+    "cheap_calls": 2,
+    "bge_calls": 0,
+    "final_answer_generation_calls": 0,
+    "embedding_calls": 0,
+    "historical_grants_reused": false,
+    "execution_ledger": "CLOSED",
+    "registry_roles": {
+      "cheap": {
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "capability": "chat"
+      },
+      "rerank": {
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "capability": "rerank"
+      }
+    },
+    "preflight_receipt": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\prepare-zero-send-optional-link-fix.stdout",
+    "capability_gate_receipt": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\preflight-capability-gate.stdout",
+    "external_egress_explicitly_authorized": true,
+    "owner_authorization_receipt": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\external-egress-authorization.json",
+    "provider_calls_by_capability": {
+      "chat": 2,
+      "rerank": 0
+    },
+    "reported_tokens_by_capability": {
+      "chat": 1546,
+      "rerank": 0
+    },
+    "usage_by_capability": {
+      "chat": {
+        "calls": 2,
+        "input_tokens": 1234,
+        "output_tokens": 312,
+        "total_tokens": 1546
+      },
+      "rerank": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "per_case_usage": [
+      {
+        "case_id": "frost-B",
+        "usage": {
+          "completion_tokens": 156,
+          "prompt_tokens": 617,
+          "total_tokens": 773
+        },
+        "wire_sha256": "50c4d3727f27459c87b5875b58e1f1c2e96407fd7f3bd93d09ac76969d5c39b2"
+      },
+      {
+        "case_id": "frost-A",
+        "usage": {
+          "completion_tokens": 156,
+          "prompt_tokens": 617,
+          "total_tokens": 773
+        },
+        "wire_sha256": "50c4d3727f27459c87b5875b58e1f1c2e96407fd7f3bd93d09ac76969d5c39b2"
+      }
+    ],
+    "unused_call_allowance_revoked": 6,
+    "unused_token_allowance_revoked": 28454,
+    "normal_pipeline_not_run": true,
+    "full_fastapi_e2e": "NOT RUN"
+  },
+  "ecs_inventory": {
+    "status": "READ_ONLY_INVENTORY",
+    "api_container": "rag-s8-api-1",
+    "worker_container": "rag-s8-worker-1",
+    "database_container": "rag-s8-db-1",
+    "redis_container": "rag-s8-redis-1",
+    "api_image": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "api_revision": "29ecf2f5d3037eed99a4de783546dee272a761bd",
+    "worker_changed_or_restarted": false,
+    "production_configuration_changed": false,
+    "remote_empty_private_stage_created": "/opt/rag-s8/state/s8-4-bridge-20261021-bcb00a6d3ee94e47",
+    "remote_source_or_input_transfer": "TRANSFERRED_AND_EXTRACTED; 202 files verified in the authorized isolated stage",
+    "stage_runner_sha256": "cb2b7b261b9badc70cfeba2c2a7bec8c3f6280c054b916bade9e94e612c7d065",
+    "stage_runtime_sha256": "ba66fd3f773500188722dd4d537cbbf98cb2a1948cc6485d0d3c9dfccab503fd"
+  },
+  "transfer_review": {
+    "decision": "OWNER_AUTHORIZED_AFTER_INITIAL_AUTO_REVIEW_REJECTION",
+    "action": "SCP local code bundle plus six frozen case inputs to the specified ECS stage path",
+    "tool_execution": "TRANSFERRED_AND_EXTRACTED",
+    "reason": "Automatic review determined that general real-test authorization did not specifically authorize this destination and source/corpus payload; it required destination- and payload-level authorization.",
+    "bundle_bytes": 2844989,
+    "bundle_sha256": "e71e588cef13e10cc9f19dd1d558a53729f6b02a0bd8ab345330935cf8cdd7df",
+    "bundle_contents": [
+      "Committed backend/weknora_port source package",
+      "scripts/s8_ecs_runtime.py and scripts/s8_4_bridge_ecs.py",
+      "Six frozen source-only cases: Frost A/B, Leyden, postcode, SciFact 611, MML 0687",
+      "Fresh owner-authorization.json capped at 8 calls and 30000 tokens"
+    ],
+    "contains_credentials": false,
+    "contains_gold_or_historical_answers": false,
+    "destination": "root@120.55.115.162:/opt/rag-s8/state/s8-4-bridge-20261021-bcb00a6d3ee94e47/transfer_bundle.zip",
+    "owner_authorization": "Owner explicitly authorized this exact source and frozen corpus transfer to the listed isolated ECS stage after the initial rejection.",
+    "remote_extraction_verified_files": 202,
+    "current_status": "COMPLETED_AFTER_EXPLICIT_OWNER_AUTHORIZATION"
+  },
+  "next_step": "Owner may choose a separate saved-data contract study and source-relationship review. Real BGE and full FastAPI A/B remain NOT RUN. The current trial ledger is CLOSED and unused allowance is revoked.",
+  "provider_run_review": {
+    "decision": "OWNER_AUTHORIZED_AND_EXECUTED_AFTER_INITIAL_REJECTION",
+    "destination": "SiliconFlow",
+    "requested_operations": {
+      "chat": 2,
+      "rerank": 2
+    },
+    "roles": {
+      "cheap": "Qwen/Qwen3.5-4B",
+      "rerank": "BAAI/bge-reranker-v2-m3"
+    },
+    "authorized_caps": {
+      "max_calls": 8,
+      "max_tokens": 30000
+    },
+    "provider_calls": 2,
+    "command_started": true,
+    "reason": "Initial review required destination- and payload-level authorization; the owner explicitly approved the presented SiliconFlow data scope before the subsequent successful execution.",
+    "receipt": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\real-provider-run-review.txt",
+    "initial_rejected_command_started": false,
+    "owner_message": "授权按此范围继续"
+  },
+  "real_execution_status": "REAL_BRIDGE_FEASIBILITY_COMPLETE",
+  "real_semantics": {
+    "status": "BRIDGE_UNVERIFIED",
+    "cases": [
+      {
+        "actual_quote_interval": [
+          155,
+          311
+        ],
+        "actual_validation_error": "BRIDGE_JSON_FIELD_INVALID",
+        "case_id": "frost-A",
+        "claimed_interval_matches_quote": false,
+        "claimed_quote_interval": [
+          73,
+          311
+        ],
+        "json_object_valid": true,
+        "q1_admitted": false,
+        "quote_unicode_characters": 156,
+        "rescue_count": 0,
+        "semantic_status": "UNVERIFIED",
+        "subject": "She",
+        "subject_resolution": ""
+      },
+      {
+        "actual_quote_interval": [
+          155,
+          311
+        ],
+        "actual_validation_error": "BRIDGE_JSON_FIELD_INVALID",
+        "case_id": "frost-B",
+        "claimed_interval_matches_quote": false,
+        "claimed_quote_interval": [
+          73,
+          311
+        ],
+        "json_object_valid": true,
+        "q1_admitted": false,
+        "quote_unicode_characters": 156,
+        "rescue_count": 0,
+        "semantic_status": "UNVERIFIED",
+        "subject": "She",
+        "subject_resolution": ""
+      }
+    ],
+    "negative_controls": [
+      {
+        "case_id": "leyden-negative",
+        "status": "PASS_NO_CALL_NO_RESCUE"
+      },
+      {
+        "case_id": "postcode-negative",
+        "status": "PASS_NO_CALL_NO_RESCUE"
+      },
+      {
+        "case_id": "scifact-611-negative",
+        "status": "PASS_NO_CALL_NO_RESCUE"
+      },
+      {
+        "case_id": "mml-0687-negative",
+        "status": "PASS_NO_CALL_NO_RESCUE"
+      }
+    ],
+    "normal_results_preserved": true,
+    "context_source_mapping_check": "PASS",
+    "same_cheap_body_for_both_arms": true,
+    "model_output_repaired_or_readmitted": false,
+    "q1": "NOT GENERATED_OR_ADMITTED",
+    "real_second_rerank_scores": null,
+    "bge_status": "NOT RUN: first-hop extraction rejected",
+    "named_subject_proof": "UNVERIFIED",
+    "event_institution_location_relation": "UNVERIFIED",
+    "actual_span_verification": "FAIL: empty subject_resolution and incorrect quote_start",
+    "full_bridge_restored": false
+  },
+  "real_execution_integrity": {
+    "status": "REAL_BRIDGE_FEASIBILITY_COMPLETE",
+    "error": null,
+    "provider_call_count": 2,
+    "execution_claim_count": 2,
+    "all_actual_tokens": 1546,
+    "new_unknown": 0,
+    "ledger_status": "CLOSED",
+    "old_history_roles_models_source_counts_preserved": true,
+    "normal_pipeline_not_run": true,
+    "final_answer_generation_calls": 0,
+    "embedding_calls": 0,
+    "production_configuration_changed": false,
+    "deployment_performed": false,
+    "remaining_cases_not_run": 0
+  },
+  "receipts": {
+    "final_summary": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\real-provider-run.stdout",
+    "remote_receipt_audit": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\final-receipt-audit.stdout",
+    "offline_integrity_audit": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\real-evidence-audit.json",
+    "offline_audit_exit_code": 0,
+    "directory": "E:\\RAG quention\\var\\reports\\s8-4-bridge-extraction-20261021\\downloaded-final",
+    "archive_sha256": "3ca96d4c886963c0ae372cf4e01e9c36a76eab15688d95fcd70ddd2ac7042beb",
+    "archive_bytes": 44029,
+    "verified_receipt_files": 21,
+    "request_and_response_headers_saved": false
+  },
+  "stop_condition": "Current Cheap extraction and source identity/relationship evidence are insufficient; the user-defined stop condition is met without relaxing validation.",
+  "acceptance": "NOT OWNER-ACCEPTED; no milestone tag"
+}

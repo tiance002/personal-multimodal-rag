@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="12" time="3.062" timestamp="2026-10-14T08:22:38.548006+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_memory_management_api_pg" name="test_actual_personal_toggle_pending_confirm_reject_and_foreign_denials" time="1.556"><failure message="AttributeError: 'MemoryItem' object has no attribute 'key'">def test_actual_personal_toggle_pending_confirm_reject_and_foreign_denials():
+        async def scenario():
+            async with isolated_mock_application() as (runtime,wire,root):
+                who=runtime.principal;context=MemoryContext(who.tenant_id,who.subject_id);scope=MemoryScope(who.tenant_id,who.subject_id)
+                async with runtime.leases.lease() as guard:
+                    await guard.connection.execute('UPDATE tenants SET memory_config=%s::jsonb WHERE id=%s',(json.dumps({'enabled':True,'write_mode':'explicit_only'}),who.tenant_id))
+                app=create_app(runtime,resolve_principal=lambda request:LocalPrincipal(who.tenant_id,'foreign-synthetic-owner') if request.headers.get('X-Test-Foreign') else who,
+                    allowed_origins=('http://fixture.invalid',))
+                async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://fixture.invalid',headers={'Origin':'http://fixture.invalid'}) as client:
+                    initial=(await client.get('/api/v1/memory/settings')).json()['data'];assert initial['workspace_enabled'] and initial['user_enabled'] and initial['effective']
+                    before=len(wire)
+                    off=await client.put('/api/v1/memory/settings',json={'enabled':False});assert off.status_code==200 and not off.json()['data']['effective']
+                    assert not (await runtime.memory.recall(context,'public fixture')).prompt
+                    on=await client.put('/api/v1/memory/settings',json={'enabled':True});assert on.status_code==200 and on.json()['data']['effective']
+                    assert len(wire)==before
+                    assert (await client.put('/api/v1/memory/settings',json={})).status_code==400
+                    assert (await client.put('/api/v1/memory/settings',json={'enabled':None})).status_code==400
+                    assert (await client.put('/api/v1/memory/settings',json={'enabled':'false'})).status_code==422
+                    assert (await client.put('/api/v1/memory/settings',json={'enabled':False},headers={'X-Test-Foreign':'1'})).status_code==403
+                    assert (await client.get('/api/v1/memory/settings')).json()['data']['effective']
+                    pending=await runtime.memory_manager.remember(context,MemoryItem('',0,'','fact','Synthetic pending memory',topic='pending',inferred=True))
+                    assert pending.status=='pending'
+                    listed=(await client.get('/api/v1/memory/items?status=pending')).json();assert any(i['id']==pending.id for i in listed['data'])
+                    assert (await client.post('/api/v1/memory/items/'+pending.id+'/confirm',headers={'X-Test-Foreign':'1'})).status_code==403
+                    confirmed=await client.post('/api/v1/memory/items/'+pending.id+'/confirm');assert confirmed.status_code==200 and confirmed.json()['data']['status']=='active'
+                    assert (await runtime.memory_repository.get_item(scope,pending.id)).status=='active'
+                    rejected=await runtime.memory_manager.remember(context,MemoryItem('',0,'','fact','Synthetic rejected memory',topic='rejected',inferred=True))
+                    assert (await client.post('/api/v1/memory/items/'+rejected.id+'/reject',headers={'X-Test-Foreign':'1'})).status_code==403
+                    response=await client.post('/api/v1/memory/items/'+rejected.id+'/reject');assert response.status_code==200
+                    assert await runtime.memory_repository.get_item(scope,rejected.id) is None
+                    assert await runtime.memory_repository.has_tombstone(scope,rejected.key)
+                    assert (await client.post('/api/v1/memory/items/'+str(uuid.uuid4())+'/confirm')).status_code==404
+                    from pathlib import Path
+                    Path('docs/weknora-port/evidence/P4_MEMORY_MANAGEMENT_API_20261014.json').write_text(json.dumps({'kind':'ACTUAL_NATIVE_FASTAPI_ASGI_PG_ENTRY','tenant':who.tenant_id,'subject':who.subject_id,
+                        'personal_disabled_recall_empty':True,'toggle_model_sends':0,'pending_confirmed':pending.id,'rejected_with_tombstone':rejected.id,
+                        'foreign_settings_confirm_reject_denied':True,'real_provider_calls':0,'old_data_modified':False},indent=2),encoding='utf-8')
+&gt;       actual_pg_run(scenario())
+
+tests\weknora_port\test_memory_management_api_pg.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def scenario():
+        async with isolated_mock_application() as (runtime,wire,root):
+            who=runtime.principal;context=MemoryContext(who.tenant_id,who.subject_id);scope=MemoryScope(who.tenant_id,who.subject_id)
+            async with runtime.leases.lease() as guard:
+                await guard.connection.execute('UPDATE tenants SET memory_config=%s::jsonb WHERE id=%s',(json.dumps({'enabled':True,'write_mode':'explicit_only'}),who.tenant_id))
+            app=create_app(runtime,resolve_principal=lambda request:LocalPrincipal(who.tenant_id,'foreign-synthetic-owner') if request.headers.get('X-Test-Foreign') else who,
+                allowed_origins=('http://fixture.invalid',))
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://fixture.invalid',headers={'Origin':'http://fixture.invalid'}) as client:
+                initial=(await client.get('/api/v1/memory/settings')).json()['data'];assert initial['workspace_enabled'] and initial['user_enabled'] and initial['effective']
+                before=len(wire)
+                off=await client.put('/api/v1/memory/settings',json={'enabled':False});assert off.status_code==200 and not off.json()['data']['effective']
+                assert not (await runtime.memory.recall(context,'public fixture')).prompt
+                on=await client.put('/api/v1/memory/settings',json={'enabled':True});assert on.status_code==200 and on.json()['data']['effective']
+                assert len(wire)==before
+                assert (await client.put('/api/v1/memory/settings',json={})).status_code==400
+                assert (await client.put('/api/v1/memory/settings',json={'enabled':None})).status_code==400
+                assert (await client.put('/api/v1/memory/settings',json={'enabled':'false'})).status_code==422
+                assert (await client.put('/api/v1/memory/settings',json={'enabled':False},headers={'X-Test-Foreign':'1'})).status_code==403
+                assert (await client.get('/api/v1/memory/settings')).json()['data']['effective']
+                pending=await runtime.memory_manager.remember(context,MemoryItem('',0,'','fact','Synthetic pending memory',topic='pending',inferred=True))
+                assert pending.status=='pending'
+                listed=(await client.get('/api/v1/memory/items?status=pending')).json();assert any(i['id']==pending.id for i in listed['data'])
+                assert (await client.post('/api/v1/memory/items/'+pending.id+'/confirm',headers={'X-Test-Foreign':'1'})).status_code==403
+                confirmed=await client.post('/api/v1/memory/items/'+pending.id+'/confirm');assert confirmed.status_code==200 and confirmed.json()['data']['status']=='active'
+                assert (await runtime.memory_repository.get_item(scope,pending.id)).status=='active'
+                rejected=await runtime.memory_manager.remember(context,MemoryItem('',0,'','fact','Synthetic rejected memory',topic='rejected',inferred=True))
+                assert (await client.post('/api/v1/memory/items/'+rejected.id+'/reject',headers={'X-Test-Foreign':'1'})).status_code==403
+                response=await client.post('/api/v1/memory/items/'+rejected.id+'/reject');assert response.status_code==200
+                assert await runtime.memory_repository.get_item(scope,rejected.id) is None
+&gt;               assert await runtime.memory_repository.has_tombstone(scope,rejected.key)
+                                                                           ^^^^^^^^^^^^
+E               AttributeError: 'MemoryItem' object has no attribute 'key'
+
+tests\weknora_port\test_memory_management_api_pg.py:42: AttributeError</failure></testcase><testcase classname="tests.weknora_port.test_http_api" name="test_runtime_identity_and_read_envelopes_use_server_resolved_principal" time="0.017" /><testcase classname="tests.weknora_port.test_http_api" name="test_message_post_starts_once_and_get_replays_the_same_run_without_generation" time="0.015" /><testcase classname="tests.weknora_port.test_http_api" name="test_duplicate_request_id_replays_existing_run_without_starting_a_second_worker" time="0.014" /><testcase classname="tests.weknora_port.test_http_api" name="test_stream_disconnect_does_not_cancel_the_separate_background_turn" time="0.012" /><testcase classname="tests.weknora_port.test_http_api" name="test_background_failure_emits_safe_error_for_assistant_message_only" time="0.013" /><testcase classname="tests.weknora_port.test_http_api" name="test_model_configuration_never_returns_write_only_keys_and_accepts_only_five_roles" time="0.018" /><testcase classname="tests.weknora_port.test_http_api" name="test_smart_mode_is_explicitly_unavailable_and_scope_identity_is_not_client_controlled" time="0.015" /><testcase classname="tests.weknora_port.test_http_api" name="test_missing_server_principal_fails_closed" time="0.013" /><testcase classname="tests.weknora_port.test_http_api" name="test_exception_messages_are_not_promoted_to_public_error_codes" time="0.014" /><testcase classname="tests.weknora_port.test_http_api" name="test_known_model_rebinding_error_code_remains_actionable" time="0.018" /><testcase classname="tests.weknora_port.test_http_api" name="test_cross_site_origin_is_rejected_before_any_mutation_but_allowlisted_shadow_origin_is_supported" time="0.021" /></testsuite></testsuites>

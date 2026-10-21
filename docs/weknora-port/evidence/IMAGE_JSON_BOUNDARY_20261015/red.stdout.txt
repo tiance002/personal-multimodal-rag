@@ -1,0 +1,116 @@
+FFF..F......FF.FFF...FFF....FF....                                       [100%]
+================================== FAILURES ===================================
+_____________ test_parent_aggregation_matches_go_json[uppercase] ______________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [] == [{'url': 'ima...pos': 0, ...}]
+E     
+E     Right contains one more item: {'url': 'images/a.png', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+__________ test_parent_aggregation_matches_go_json[all-mixed-fields] __________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [] == [{'url': 'a',...pos': 8, ...}]
+E     
+E     Right contains one more item: {'url': 'a', 'original_url': 'o', 'start_pos': -3, 'end_pos': 8, ...}
+E     Use -v to get more diff
+__________ test_parent_aggregation_matches_go_json[case-later-wins] ___________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'fir...pos': 0, ...}] == [{'url': 'las...pos': 0, ...}]
+E     
+E     At index 0 diff: {'url': 'first', 'original_url': '', 'start_pos': 0, 'end_pos': 0, 'caption': '', 'ocr_text': ''} != {'url': 'last', 'original_url': '', 'start_pos': 0, 'end_pos': 0, 'caption': '', 'ocr_text': ''}
+E     Use -v to get more diff
+________ test_parent_aggregation_matches_go_json[repeated-case-order] _________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'mid...pos': 0, ...}] == [{'url': 'las...pos': 0, ...}]
+E     
+E     At index 0 diff: {'url': 'middle', 'original_url': '', 'start_pos': 0, 'end_pos': 0, 'caption': '', 'ocr_text': ''} != {'url': 'last', 'original_url': '', 'start_pos': 0, 'end_pos': 0, 'caption': '', 'ocr_text': ''}
+E     Use -v to get more diff
+______ test_parent_aggregation_matches_go_json[int--9223372036854775809] ______
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'a',...4775809, ...}] == []
+E     
+E     Left contains one more item: {'url': 'a', 'original_url': '', 'start_pos': -9223372036854775809, 'end_pos': -9223372036854775809, ...}
+E     Use -v to get more diff
+______ test_parent_aggregation_matches_go_json[int-9223372036854775808] _______
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'a',...4775808, ...}] == []
+E     
+E     Left contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 9223372036854775808, 'end_pos': 9223372036854775808, ...}
+E     Use -v to get more diff
+_____ test_parent_aggregation_matches_go_json[valid-then-wrong-rejected] ______
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'a',...pos': 0, ...}] == []
+E     
+E     Left contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+______ test_parent_aggregation_matches_go_json[wrong-string-then-valid] _______
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'a',...pos': 0, ...}] == []
+E     
+E     Left contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+_ test_parent_aggregation_matches_go_json[bad-second-item-invalidates-array] __
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'a',...pos': 0, ...}] == []
+E     
+E     Left contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+_________ test_parent_aggregation_matches_go_json[object-not-string] __________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [{'url': 'a',...pos': 0, ...}] == []
+E     
+E     Left contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+__________ test_parent_aggregation_matches_go_json[null-array-item] ___________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [] == [{'url': 'a',...pos': 0, ...}]
+E     
+E     Right contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+_______ test_parent_aggregation_matches_go_json[unknown-fields-ignored] _______
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [] == [{'url': 'a',...pos': 0, ...}]
+E     
+E     Right contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+_______ test_parent_aggregation_matches_go_json[unicode-simple-fold-s] ________
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [] == [{'url': 'a',...pos': 0, ...}]
+E     
+E     Right contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 9, 'end_pos': 0, ...}
+E     Use -v to get more diff
+_ test_parent_aggregation_matches_go_json[no-unicode-full-casefold-expansion] _
+tests\weknora_port\test_image_json_boundary.py:12: in test_parent_aggregation_matches_go_json
+    assert json.loads(rows[0].image_info or '[]')==json.loads(case['expected_parent'] or '[]')
+E   AssertionError: assert [] == [{'url': 'a',...pos': 0, ...}]
+E     
+E     Right contains one more item: {'url': 'a', 'original_url': '', 'start_pos': 0, 'end_pos': 0, ...}
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[uppercase]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[all-mixed-fields]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[case-later-wins]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[repeated-case-order]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[int--9223372036854775809]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[int-9223372036854775808]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[valid-then-wrong-rejected]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[wrong-string-then-valid]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[bad-second-item-invalidates-array]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[object-not-string]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[null-array-item]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[unknown-fields-ignored]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[unicode-simple-fold-s]
+FAILED tests/weknora_port/test_image_json_boundary.py::test_parent_aggregation_matches_go_json[no-unicode-full-casefold-expansion]
+14 failed, 20 passed in 1.45s

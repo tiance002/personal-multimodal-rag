@@ -1,0 +1,26 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "files": {
+    "excel_parser.py": {
+      "source_sha256": "8acdb16ccd5a81dfd656aec6ac380d24379bc276cba739ac217f854d554db1b5",
+      "adapted_sha256": "fea2ff4f9d2896347940cf14717f91617a3887c8c8fa6bd9e91346c071d1d17b"
+    },
+    "excel_convert.py": {
+      "source_sha256": "f65b83fd2957d82661b56cbd02c7790739d56787ab34c0a8d0644a13616cc923",
+      "adapted_sha256": "52c112cd3d4d1ad2164f786b4743028ac3442c10ea3928ed6b5579a819690969"
+    },
+    "xlsx_merge.py": {
+      "source_sha256": "502056dd1a7a51510532838c66c45bc09db591dfcefed94bc12651beee7eb7d4",
+      "adapted_sha256": "94cab0c10cf090cbf72b5d922b5b63abd1b0d0a4e35676de12d1c4951cfdbd43"
+    },
+    "xlsx_repair.py": {
+      "source_sha256": "0b3494e25fc1247109ad906b91f0f11cebf8c30bc16db1cb39edc6cc8ee5836e",
+      "adapted_sha256": "810eece79035c260144952e87b55c858d3c6367e0bc701a5abdd86d35ee9f117"
+    }
+  },
+  "adaptations": [
+    "relative imports/DTO bridge",
+    "sheet count and actual row provenance observation only; parser text/row logic unchanged"
+  ],
+  "external_model_calls": 0
+}

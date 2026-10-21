@@ -1,0 +1,25 @@
+=== RUN   TestSourceConnectDeadlines
+=== RUN   TestSourceConnectDeadlines/write-block
+--- FAIL: TestSourceConnectDeadlines (0.00s)
+    --- FAIL: TestSourceConnectDeadlines/write-block (0.00s)
+panic: synctest.Run not supported with asynctimerchan!=0 [recovered, repanicked]
+
+goroutine 8 [running]:
+testing.tRunner.func1.2({0x7ff666bbb340, 0x7ff666c58fa0})
+	E:/RAG-reference/toolchains/go1.26.0/go/src/testing/testing.go:1974 +0x239
+testing.tRunner.func1()
+	E:/RAG-reference/toolchains/go1.26.0/go/src/testing/testing.go:1977 +0x349
+panic({0x7ff666bbb340?, 0x7ff666c58fa0?})
+	E:/RAG-reference/toolchains/go1.26.0/go/src/runtime/panic.go:860 +0x13a
+internal/synctest.Run(0x2554cd3fe840)
+	E:/RAG-reference/toolchains/go1.26.0/go/src/runtime/synctest.go:173 +0x34b
+testing/synctest.Test(0x2554cd36c600, 0x2554cd374510)
+	E:/RAG-reference/toolchains/go1.26.0/go/src/testing/synctest/synctest.go:290 +0x90
+command-line-arguments.TestSourceConnectDeadlines.func1(0x2554cd36c600)
+	E:/WK/run/proxy-boundary-20261015/proxy_connect_oracle_test.go:22 +0x72
+testing.tRunner(0x2554cd36c600, 0x2554cd3744e0)
+	E:/RAG-reference/toolchains/go1.26.0/go/src/testing/testing.go:2036 +0xc3
+created by testing.(*T).Run in goroutine 7
+	E:/RAG-reference/toolchains/go1.26.0/go/src/testing/testing.go:2101 +0x4a9
+FAIL	command-line-arguments	3.926s
+FAIL

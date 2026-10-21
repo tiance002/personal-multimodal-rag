@@ -1,0 +1,22 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_native_model_priority_order_replay_and_affinity_delete_entry ______
+tests\weknora_port\test_affinity_kb_http_pg.py:96: in test_native_model_priority_order_replay_and_affinity_delete_entry
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_affinity_kb_http_pg.py:55: in scenario
+    changed=await client.post('/api/v1/sessions/'+session+'/messages',json={**body,'knowledge_base_scope':list(reversed(request_order))});assert changed.status_code==409 and len(wire)==count
+                                                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert (200 == 409)
+E    +  where 200 = <Response [200 OK]>.status_code
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_affinity_kb_http_pg.py::test_native_model_priority_order_replay_and_affinity_delete_entry
+1 failed in 10.25s

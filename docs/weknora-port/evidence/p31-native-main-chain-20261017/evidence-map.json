@@ -1,0 +1,58 @@
+{
+  "schema": "p31-task-a-evidence-map/v1",
+  "scope": "Read-only task A audit: strict evidence projection and Summary gating. No source changes, tests, DB, model or network calls.",
+  "revisions": {
+    "python_repo": {
+      "path": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+      "head": "84bd4bb09f29fdf96fd239fc68898b34d41eb990"
+    },
+    "fixed_upstream": {
+      "path": "E:\\RAG-reference\\WeKnora-3e8b0bfc",
+      "head": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+      "verified_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97"
+    }
+  },
+  "minimal_removal_map": [
+    {
+      "file": "backend/weknora_port/runtime.py",
+      "functions": "_project_source_evidence (473-521); _source_merge_input (523-559); _pipeline (561-571)",
+      "remove": "The callback and adapter implementations plus their wiring in _pipeline (566-571). _project_source_evidence removes every summary (479), runs a second top-K (480), requires source_version, reloads exact chunks and calls documents.read_source_chunk, then rejects on missing/mismatch/empty original text (490-521). _source_merge_input prefilters summary and generated-summary metadata from rerank/search/history and clears search_results to force the selected list (533-558).",
+      "keep": "Ordinary merge/context flow; normal model context and citation metadata. Do not delete general DocumentService.read_source_chunk API merely because this call site becomes unused; check other callers before cleanup."
+    },
+    {
+      "file": "backend/weknora_port/retrieval/pipeline.py",
+      "functions": "RetrievalPipeline.__init__ (58-66), run (109-125)",
+      "remove": "Once runtime no longer supplies them, the optional final_evidence_projection/merge_input_adapter fields and branches can be removed to avoid retaining the special path. The default existing path is explicit: merge(state,...) at 110-111, filter_top_k(state) at 118-119, then into_chat_message at 123-124.",
+      "keep": "Call cancellation/deadline checks and normal stage progression. filter_top_k only sorts/caps by score and stable IDs; it has no summary type filter (backend/weknora_port/retrieval/filter_top_k.py:25-34)."
+    },
+    {
+      "file": "backend/weknora_port/service.py",
+      "functions": "prepare_turn (298-317)",
+      "remove": "No source projection code is here. Avoid changing the SearchNothing catch: it is the normal no-retrieval fallback, currently also reached if projection line 521 fabricates SearchNothing after deleting all projected rows.",
+      "keep": "Only actual SearchNothing should take the fallback branch; permission/database/provider errors should remain distinct."
+    }
+  ],
+  "native_path_and_scope": {
+    "python": "retrieval/merge.py:371-383 selects rerank results or score-sorted Search results, deduplicates/history-injects, validates scope (376), resolves parents (378), sequentially merges, adds FAQ/neighbors, and sets merge_results. context.py:108-127 consumes merge_results; only FAQ is special, all other result types including summary pass through as document contexts. service.py:317 and 333-335 preserves Evidence.from_result, finalized context, and stage IDs.",
+    "scope_reads_to_preserve": "runtime.py:136-171 LeasedKnowledgeRepository validates scope owner and leases normal retrieval methods; storage/knowledge.py:76-82 requires owner and KB scope; 90-119 queries tenant-scoped chunks/KB/documents with soft-delete checks and optional document_ids; 123-130 independently validates returned tenant/KB/document scope. retrieval/search.py:59-81 validate_targets and validate_results remain. retrieval/merge.py:222-260 resolve_parents and 329-369 expand_neighbors continue using repository-scoped chunk reads. Do not convert DB/permission exceptions to SearchNothing.",
+    "extra_source_read": "documents.py:707-743 read_source_chunk has independent principal/tenant/document/source_version/original-content checks used by _project_source_evidence (runtime.py:506). This is the extra proof projection’s exact source read; normal parent/neighbor retrieval does not need it. Keep this general API if separately used; remove only the final-projection dependency unless repository-wide caller scan justifies more."
+  },
+  "summary_native_behavior": {
+    "upstream_search": "Fixed upstream knowledgebase_search_results.go:361-377 isSearchableChunk allows ChunkTypeSummary alongside text/FAQ/table/image types; buildSearchResult at 328-358 preserves ChunkType and ChunkMetadata.",
+    "upstream_merge": "Fixed upstream chat_pipeline/merge.go:55-96 selects rerank-or-search, dedups, injects history, resolves parents, groups/merges, populates FAQ, expands neighbors and final-dedups; there is no summary-specific exclusion. The label dedup_summary at line 59 is just a dedup event label: dedup() lines 116-125 calls removeDuplicateResults, not a summary-type filter.",
+    "upstream_context": "Fixed upstream into_chat_message.go:123-163 renders chatManage.MergeResult; only FAQ gets priority grouping. references.go:50-59 forwards chunk_id, document/KB ID, chunk_index, chunk_type, and enriched content; orderedPipelineReferences lines 108-126 partitions FAQ vs every non-FAQ type. chunk.go:24-25 defines summary as its own ChunkType.",
+    "python": "runtime.py:479 and 537-540 are the two explicit summary/model-generated-summary gates. Remove those gates with their adapters; do not cast summary to text. Existing types retain chunk_type; current context treats non-FAQ as ordinary document context."
+  },
+  "tests": {
+    "direct_coverage": "No test under backend/tests imports weknora_port or directly mentions _project_source_evidence, _source_merge_input, final_evidence_projection, merge_input_adapter, or SOURCE_EVIDENCE_UNAVAILABLE (read-only rg scan). Therefore there is no direct regression test for this production adapter path.",
+    "related_but_not_direct": [
+      "backend/tests/test_context_neighbor_repository.py:200+ and :288+ cover the separate backend.app context-expansion path, not weknora_port.",
+      "backend/tests/test_retrieval_contract.py:20-55 covers the separate backend.app retrieval port and scope.",
+      "backend/tests/test_postgres_scope_boundaries.py:40,77 and backend/tests/test_knowledge_scope_boundaries.py:19,33 are scope guardrails, but do not exercise this WeKnora port adapter."
+    ],
+    "minimal_new_offline_checks": "A focused port-level pipeline test should show (1) summary Search/Rerank rows survive merge/filter_top_k into context without requiring source_version/read_source_chunk; (2) a real empty Search still follows SearchNothing fallback; (3) out-of-scope candidates and parent/neighbor reads remain rejected by validate_results/scoped repository. Do not mistake the listed legacy tests as coverage of the production path."
+  },
+  "commands": {
+    "git_rev_parse": "Executed read-only `git -C <repo> rev-parse HEAD` for Python and upstream; fixed upstream matched required SHA. Source searches/reads only; tests NOT RUN."
+  }
+}

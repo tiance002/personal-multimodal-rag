@@ -1,0 +1,101 @@
+{
+  "schema": "rag-m4-authorized-execution-checkpoint/v1",
+  "date": "2026-10-18",
+  "baseline_commit": "4506bb2c634f70950a58db5ab384c732d804a12d",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "owner_authorization": {
+    "status": "APPROVED_IN_CHAT",
+    "frozen_questions": 11,
+    "provider_call_limit_total": 132,
+    "token_limit_total": 600000,
+    "provider_call_limit_per_batch": 12,
+    "token_limit_per_batch": 100000,
+    "providers": ["SiliconFlow", "DeepSeek"],
+    "routing": "DYNAMIC",
+    "unknown_policy": "STOP_IMMEDIATELY"
+  },
+  "identity_check": {
+    "daily_config": "E:\\WK\\run\\p81-retirement-20261018\\local.json",
+    "postgres_system_id": "7696088403504697382",
+    "database": "weknora_python_port_20261013",
+    "daily_api_principal": {
+      "tenant_id": 1,
+      "subject_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6"
+    },
+    "daily_cloud_allowed": false,
+    "frozen_evaluation_owner": {
+      "tenant_id": 332,
+      "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366"
+    },
+    "normal_api_binding": "BLOCKED_LOCAL_PRINCIPAL_MISMATCH",
+    "reason": "The normal entrypoint resolves the runtime principal; runtime assembly bootstraps only the existing port_local_principal slot='local'. No legitimate tenant 332 API principal is registered in the daily runtime."
+  },
+  "read_only_principal_inventory": {
+    "evidence_path": "E:\\WK\\run\\rag-m40-20261018\\identity-inventory-postauth.json",
+    "reproduction_script": "E:\\WK\\run\\rag-m40-20261018\\identity_inventory_postauth.py",
+    "database": "weknora_python_port_20261013",
+    "readonly_transaction": true,
+    "principal_rows": [
+      {
+        "slot": "local",
+        "tenant_id": 1,
+        "subject_id": "web_user:local:bba83fda-3749-499b-9b1a-1f42aa2da8a6"
+      }
+    ],
+    "evaluation_knowledge_base_count": 6,
+    "evaluation_tenant_ids": [332],
+    "provider_calls": 0
+  },
+  "execution": {
+    "result": "BLOCKED_BEFORE_API_START",
+    "api_started": false,
+    "worker_started": false,
+    "ui_started": false,
+    "cloud_gate_enabled": false,
+    "provider_calls": 0,
+    "actual_tokens": 0,
+    "unknown": 0,
+    "database_or_redis_writes": 0,
+    "end_to_end_questions_attempted": 0,
+    "quality_metrics": null,
+    "all_case_stages": "NOT_RUN"
+  },
+  "commands": [
+    {
+      "command": "& .\\wk.ps1 status -Config 'E:\\WK\\run\\p81-retirement-20261018\\local.json'; exit $LASTEXITCODE",
+      "exit_code": 0,
+      "result": "PostgreSQL and Redis are running; API, Worker, and UI are stopped; source_root matches this worktree."
+    },
+    {
+      "command": "& .\\wk.ps1 check -Config 'E:\\WK\\run\\p81-retirement-20261018\\local.json'; exit $LASTEXITCODE",
+      "exit_code": 0,
+      "result": "Correct PostgreSQL/Redis identities, tenant_id=1, cloud_allowed=false, OCR mineru-basic."
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/rag_m40_preflight.py --plan docs/milestones/RAG_M4_0_BASELINE.plan.json --config E:\\WK\\run\\p81-retirement-20261018\\local.json --output E:\\WK\\run\\rag-m40-20261018\\preflight-authorized-identity-20261018.json; exit $LASTEXITCODE",
+      "exit_code": 0,
+      "result": "OFFLINE_DATA_READY_ONLY; all 11 frozen data bindings READY; API binding LOCAL_PRINCIPAL_MISMATCH; no provider calls. The preflight is read-only and does not materialize the chat authorization as a runtime grant."
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B E:\\WK\\run\\rag-m40-20261018\\identity_inventory_postauth.py",
+      "exit_code": 0,
+      "result": "SET TRANSACTION READ ONLY inventory returned one slot=local principal for tenant 1 and all six frozen M4 KBs for tenant 332; transaction rolled back; provider calls=0."
+    },
+    {
+      "command": "git status --short; git branch --show-current; git rev-parse HEAD; git log -3 --oneline",
+      "exit_code": 0,
+      "result": "HEAD 4506bb2c634f70950a58db5ab384c732d804a12d on the expected branch; the original 8 dirty paths remain unchanged."
+    }
+  ],
+  "source_evidence": [
+    "backend/weknora_port/entrypoint.py:create_app resolves requests to proxy.target.principal and calls factory(settings).",
+    "backend/weknora_port/development.py:assemble uses LocalPrincipalStore.bootstrap() when no explicit test principal is supplied.",
+    "backend/weknora_port/storage/local_principal.py:bootstrap reads the sole slot='local' principal and otherwise initializes a new local tenant; it provides no tenant 332 identity selector.",
+    "docs/milestones/RAG_M4_REPORT.results.json: the current daily principal is tenant 1 and frozen data scope was previously verified as tenant 332 with LOCAL_PRINCIPAL_MISMATCH."
+  ],
+  "diagnostic_notes": [
+    "An initial read-only DB inventory query cast varchar KB IDs as uuid[] and exited 1 with an operator type mismatch; it ran after SET TRANSACTION READ ONLY and wrote nothing. Correcting the diagnostic cast to varchar[] produced the successful saved inventory.",
+    "The first temporary evidence-script write had a Python string-literal syntax error before connecting to PostgreSQL; the corrected script then completed successfully. No application or external-provider request was made."
+  ],
+  "required_to_resume": "Provide a supported, legitimate normal-API identity path for tenant 332 that preserves the daily tenant 1 principal and the frozen knowledge-base ownership. Do not use test-only principal injection, edit port_local_principal, remap data, or start a legacy executor."
+}

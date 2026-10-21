@@ -1,0 +1,42 @@
+........FF....                                                           [100%]
+================================== FAILURES ===================================
+_____ test_rerank_fault_is_not_misreported_as_empty_evidence[denied-off] ______
+tests\weknora_port\test_fallback_evidence_contract.py:214: in test_rerank_fault_is_not_misreported_as_empty_evidence
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_fallback_evidence_contract.py:211: in scenario
+    assert f.repository.failures[0][1] == expected
+E   AssertionError: assert 'ORDINARY_CHAIN_FAILED' == 'MODEL_EGRESS_DENIED'
+E     
+E     - MODEL_EGRESS_DENIED
+E     + ORDINARY_CHAIN_FAILED
+_ test_rerank_fault_is_not_misreported_as_empty_evidence[denied-bounded_source_v1] _
+tests\weknora_port\test_fallback_evidence_contract.py:214: in test_rerank_fault_is_not_misreported_as_empty_evidence
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_fallback_evidence_contract.py:211: in scenario
+    assert f.repository.failures[0][1] == expected
+E   AssertionError: assert 'ORDINARY_CHAIN_FAILED' == 'MODEL_EGRESS_DENIED'
+E     
+E     - MODEL_EGRESS_DENIED
+E     + ORDINARY_CHAIN_FAILED
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_fallback_evidence_contract.py::test_rerank_fault_is_not_misreported_as_empty_evidence[denied-off]
+FAILED tests/weknora_port/test_fallback_evidence_contract.py::test_rerank_fault_is_not_misreported_as_empty_evidence[denied-bounded_source_v1]
+2 failed, 12 passed in 2.05s

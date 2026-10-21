@@ -1,0 +1,24 @@
+...................F.                                                    [100%]
+================================== FAILURES ===================================
+_____ test_fallback_safety_and_unclassified_errors_still_raise[failure11] _____
+tests\weknora_port\test_fallback_output.py:43: in test_fallback_safety_and_unclassified_errors_still_raise
+    with pytest.raises(type(failure)):run(co.run(fallback(),CTX))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_generation.py:20: in run
+    def run(awaitable):return asyncio.run(awaitable)
+                              ^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\generation\coordinator.py:373: in run
+    raise GenerationError('PROVIDER_STREAM_FAILED', sent=True) from None
+E   backend.weknora_port.generation.types.GenerationError: PROVIDER_STREAM_FAILED
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_fallback_output.py::test_fallback_safety_and_unclassified_errors_still_raise[failure11]
+1 failed, 20 passed in 0.85s

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="7.148" timestamp="2026-10-15T14:56:37.660168+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_search_image_completion_pg" name="test_actual_complete_search_context_and_http_reference_readback" time="3.911"><failure message="backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED">tests\weknora_port\test_search_image_completion_pg.py:121: in test_actual_complete_search_context_and_http_reference_readback
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_search_image_completion_pg.py:71: in scenario
+    results=await repo.hybrid_search((target,),SearchParams('scan protocol',disable_keywords=True,skip_context_enrichment=True),context,(.1,.2,.3))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\storage\hybrid.py:124: in hybrid_search
+    images = await collect_image_info(empty_ids, SimpleNamespace(targets=targets),
+backend\weknora_port\retrieval\merge.py:160: in collect_image_info
+    for child in await children(ids):
+                 ^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\merge.py:138: in children
+    raise RetrievalScopeError()
+E   backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED</failure></testcase></testsuite></testsuites>

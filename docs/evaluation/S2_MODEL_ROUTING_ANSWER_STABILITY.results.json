@@ -1,0 +1,869 @@
+{
+  "schema": "s2-model-routing-answer-stability/v1",
+  "date": "2026-10-19",
+  "status": "PASS",
+  "status_scope": "Limited S2 criteria; not universal semantic correctness or global model selection approval.",
+  "baseline_commit": "e9b89404317b92f65d627ab077dc32e09ce91d25",
+  "implementation_commit": "dcc61d91eeec53f107f0cd63b937a4975e8ae81a",
+  "branch": "codex/weknora-python-port-integrate-image-20261014",
+  "prompt_decision": "REJECT_B_RETAIN_PRODUCTION_PROMPT",
+  "candidate_guidance": "Answer completeness:\nCover each part of the user's request and every directly supported answer item within that scope, including relevant alternatives. Do not replace a requested list or comparison with a single example. If a requested part lacks support, identify that gap explicitly. Keep the answer focused and concise; omit background and extra factual claims that are unnecessary to resolve the request.",
+  "models": {
+    "332": {
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "default_roles_unchanged": true
+    },
+    "1": {
+      "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "default_roles_unchanged": true
+    }
+  },
+  "cases": [
+    {
+      "case_id": "mml0959-radio-waves",
+      "q0": "What are used for long-distance communication as introduced in this slide?",
+      "tenant_id": 332,
+      "kb_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "historical_input": {
+        "request_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\083b6d6cc8014f2ba055e57659c44017.request.json",
+        "request_sha256": "c4b668e94a8dd5a452131f43c1dc98ba2608bc1498dc086a433333dd63e7a2e3",
+        "stage_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\stages\\61edf0015c1177f530c9ed826a3c66635f9648286ddb42a6a93cffe0a27073b1.json",
+        "stage_sha256": "55558c435fd7a062e08c8c8057bf88313510959ece19f7068da3419445d17e6b",
+        "response_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\083b6d6cc8014f2ba055e57659c44017.response.body",
+        "response_sha256": "4eef5ec671b2da095853fda83733c66027990fbff5e2f5159d090cd3776593eb"
+      },
+      "posthoc_evaluation": {
+        "A": "SUPPORTED_COMPLETE",
+        "B": "SUPPORTED_COMPLETE",
+        "facts": "Both radio waves and microwaves included; ionosphere refraction and satellite transmission match frozen source.",
+        "change": "No incremental B benefit; current Qwen A already avoids historical Xing omission."
+      },
+      "arms": {
+        "A": {
+          "answer": "Based on the provided reference materials, the following methods are used for long-distance communication:\n\n*   **Different methods** (implied to be beyond short-range Bluetooth or Wi-Fi)\n*   **Refracted signals**: Signals can be refracted by different layers in the atmosphere, allowing them to travel further. Specifically, the **ionosphere refracts radiowaves**.\n*   **Microwaves**: These can be used to send signals to satellites.\n\nThe materials also note that while these methods allow for long-distance communication, problems can occur such as signal spreading, waves refracting unpredictably through atmospheric layers, and potential drops in quality.",
+          "finish_reason": "stop",
+          "elapsed_seconds": 3.2179599999799393,
+          "first_content_seconds": 0.6706750000012107,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "47940386afc9db80e3d4d9da94d6337db82ecbcb7e4854e1db564e4fda87208c",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1132,
+              "completion_tokens": 132,
+              "total_tokens": 1264
+            },
+            "request_id": "s2-mml0959-radio-waves-e92fd65e344143c6b6754b1b46b3f7c1/A"
+          },
+          "usage_reasoning_tokens": 0
+        },
+        "B": {
+          "answer": "Based on the provided reference materials, the following methods are introduced for long-distance communication:\n\n*   **Different methods** are used specifically for long-distance communication, as short-range communication relies on Bluetooth or Wi-Fi.\n*   **Refracted signals**: Signals can travel further because they are refracted by different layers in the atmosphere. Specifically, the **ionosphere refracts radiowaves**.\n*   **Satellite links**: **Microwaves** can be used to send signals to satellites.\n\nThe materials also note that while these methods allow for longer distances, challenges can still occur, such as signals spreading out, refracting unpredictably through atmospheric layers, or experiencing a drop in quality.",
+          "finish_reason": "stop",
+          "elapsed_seconds": 1.6325897999922745,
+          "first_content_seconds": 0.528563599975314,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "33b01edf40d0f277c7f07f8cf8cd691a94c3f5d7037156d4cf30c979e7a6ec9d",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1205,
+              "completion_tokens": 142,
+              "total_tokens": 1347
+            },
+            "request_id": "s2-mml0959-radio-waves-e92fd65e344143c6b6754b1b46b3f7c1/B"
+          },
+          "usage_reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case_id": "longbench-us-holidays",
+      "q0": "美国的节日",
+      "tenant_id": 332,
+      "kb_scope": [
+        "76770fba-17c3-4704-8663-10aa669476ce"
+      ],
+      "document_scope": [],
+      "historical_input": {
+        "request_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\892980bc0178413ebd49080e32e9288d.request.json",
+        "request_sha256": "569253cefa4b35a8500405ee11e7ff807eb21c620f85757ea5156982ba175a3c",
+        "stage_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\stages\\e72538d4decd44bb9dec05f2f2a5708cae84350ee7e8d06980f5e0e0ef5b238e.json",
+        "stage_sha256": "50e8398c713b320bb6d1a4de2628f97fd0c579ad868b28cfbdef1287c1453cc6",
+        "response_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\892980bc0178413ebd49080e32e9288d.response.body",
+        "response_sha256": "ca2c8010a771fe5cf07a8f8de13d9b848cc6540b75abb09cb2a8768b1157d9c6"
+      },
+      "posthoc_evaluation": {
+        "A": "PARTIAL_UNSUPPORTED_EXTENSION",
+        "B": "TRUNCATED_PARTIAL",
+        "facts": "A lists supported holiday names but infers Thanksgiving federal status from ambiguous source markers and adds unsupported state-law classification. B reaches length and omits later holidays. No official generation metric: Gold applicability not established.",
+        "change": "B regresses output completeness at same 1024 output cap."
+      },
+      "arms": {
+        "A": {
+          "answer": "美国的节日种类繁多，既有源自宗教传统的节日，也有纪念历史人物或事件的联邦假日，还有深受移民文化影响的民间节日。以下是根据现有资料整理的美国主要节日及其特点：\n\n### 一、主要联邦假日（Federal Holidays）\n这些节日通常是政府机构和银行放假的日子：\n\n| 节日名称 | 日期 | 备注 |\n|----------|------|------|\n| **元旦（New Year's Day）** | 1月1日 | 庆祝新年开始，部分城市有盛大游行或倒数活动 |\n| **马丁·路德·金纪念日（MLK Day）** | 1月第三个星期一 | 纪念民权领袖，始于1986年 |\n| **总统日（Washington's Birthday）** | 2月第三个星期一 | 纪念乔治·华盛顿，原为2月22日 |\n| **林肯诞辰纪念日（Lincoln's Birthday）** | 2月12日 | 除南部外，26个州为法定假日 |\n| **复活节（Easter Day）** | 春分后第一个满月后的第一个星期日 | 宗教节日，庆祝耶稣复活，日期不固定（3月23日–4月26日） |\n| **阵亡将士纪念日（Memorial Day）** | 5月最后一个星期一 | 纪念在战争中牺牲的军人 |\n| **国旗日（Flag Day）** | 6月14日 | 纪念1777年通过《国旗法案》 |\n| **父亲节（Father's Day）** | 6月第三个星期日 | 非联邦假日，但广泛庆祝 |\n| **独立日（Independence Day）** | 7月4日 | 纪念美国独立，全国放假，常有烟花、游行 |\n| **劳动节（Labor Day）** | 9月第一个星期一 | 纪念工人对经济的贡献，是最后一个夏日假期 |\n| **哥伦布日（Columbus Day）** | 10月第二个星期一 | 纪念1492年哥伦布抵达美洲 |\n| **退伍军人节（Veterans Day）** | 11月11日 | 纪念所有曾为美国服役的军人，非仅阵亡者 |\n| **感恩节（Thanksgiving Day）** | 11月第四个星期四 | 非联邦假日？注：多数州为法定假日，家庭团聚、吃火鸡 |\n| **圣诞节（Christmas Day）** | 12月25日 | 最重要的节日，全国放假，家庭聚会、送礼 |\n\n> 注：部分节日虽非联邦法定假日，但在各州或地区广泛庆祝。\n\n---\n\n### 二、其他重要民间与宗教节日\n\n- **情人节（St. Valentine's Day）**  \n  2月14日，纪念殉道者圣瓦伦丁，年轻人互赠礼物、鲜花，表达爱意。\n\n- **圣帕特里克节（St. Patrick's Day）**  \n  3月17日，纪念爱尔兰守护神圣帕特里克，绿衣、三叶草、游行是典型庆祝方式。\n\n- **愚人节（April Fool's Day）**  \n  4月1日，源于法国旧历新年习俗，人们互相恶作剧，被称为“四月傻瓜”。\n\n- **复活节（Easter）**  \n  日期不固定，象征春天复苏与耶稣复活，常见活动包括彩蛋、兔子、教堂礼拜。\n\n- **万圣节（Halloween）**  \n  10月31日，非联邦假日，儿童装扮鬼怪、敲门讨糖，氛围欢乐而非恐怖。\n\n- **植树节（Arbor Day）**  \n  5月第二个星期五（各州略有不同），鼓励植树造林，非联邦假日。\n\n- **母亲节（Mother's Day）**  \n  5月第二个星期日，非联邦假日，家人互赠礼物、表达感恩。\n\n---\n\n### 三、节日文化特点\n\n- **多元融合**：美国是多民族国家，许多节日由移民带入（如春节、哈努卡节），但仅**感恩节**被视为真正属于美国本土的独特节日。\n- **宗教影响**：复活节、圣诞节、情人节等深受基督教传统影响。\n- **家庭导向**：多数节日强调家庭团聚，如感恩节、圣诞节。\n- **历史纪念**：独立日、退伍军人节、总统日等体现对美国建国与历史的尊重。\n\n---\n\n### 四、注意事项\n\n- 复活节和总统日等日期每年不同，需提前查询具体日期。\n- 万圣节、母亲节、植树节等虽非联邦假日，但民间庆祝热烈。\n- 感恩节虽常被视为“美国节日”，但非联邦法定假日（多数州放假）。\n\n如需了解某一年份的具体节日安排，可查询当年日历或访问美国劳工部官网。",
+          "finish_reason": "stop",
+          "elapsed_seconds": 13.418278200027999,
+          "first_content_seconds": 0.7549736000364646,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "46fe396be1e144f6a9a039cc8b8eaba03c2c4bf2a6c8b973b6fa75b7538733d5",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 6475,
+              "completion_tokens": 1008,
+              "total_tokens": 7483
+            },
+            "request_id": "s2-longbench-us-holidays-8c5be633d5e94d4eb4c5383ab1b798fc/A"
+          },
+          "usage_reasoning_tokens": 0
+        },
+        "B": {
+          "answer": "美国的节日繁多，文化多元，既有源自移民传统的节日，也有独特的本土节日。以下是根据参考材料整理的美国主要节日，按时间顺序排列，并包含日期、起源与庆祝方式：\n\n---\n\n### 一、元旦节（New Year's Day）\n- **日期**：每年1月1日  \n- **性质**：联邦假日  \n- **庆祝方式**：举办新年晚会，午夜钟声响起，人们“辞旧迎新”。部分城市如纽约时代广场会举行大规模倒数活动。  \n- **备注**：虽然热闹，但在美国人眼中不如圣诞节重要。\n\n---\n\n### 二、林肯诞辰纪念日（Lincoln's Birthday）\n- **日期**：每年2月12日  \n- **性质**：多数州的法定节日（非联邦假日）  \n- **起源**：纪念美国第16任总统亚伯拉罕·林肯  \n- **庆祝方式**：讲演、纪念文章、参观林肯纪念堂等。\n\n---\n\n### 三、圣瓦伦丁节（St. Valentine's Day / 情人节）\n- **日期**：每年2月14日  \n- **起源**：纪念3世纪殉教圣徒圣瓦伦丁，由教会将古罗马牧神节习俗基督教化  \n- **庆祝方式**：情侣互赠礼物、巧克力、鲜花；亲友间也互送小礼品表达感情。\n\n---\n\n### 四、华盛顿诞辰纪念日（Washington's Birthday / 总统节）\n- **日期**：每年2月第三个星期一（联邦假日）  \n- **起源**：纪念美国首任总统乔治·华盛顿（1732年2月22日）  \n- **庆祝方式**：公众仪式、盛大宴会；部分地区有吃樱桃馅饼、玩纸斧等习俗（源于华盛顿砍樱桃树的故事）。\n\n---\n\n### 五、圣帕特里克节（St. Patrick's Day）\n- **日期**：每年3月17日  \n- **起源**：纪念爱尔兰守护神圣帕特里克，起源于5世纪末的爱尔兰  \n- **庆祝方式**：游行、教堂礼拜、聚餐；佩戴三叶草、穿绿色衣服、装饰绿黄配色。\n\n---\n\n### 六、复活节（Easter Day）\n- **日期**：春分后第一个满月之后的第一个星期日（约3月23日至4月26日之间）  \n- **起源**：基督教节日，纪念耶稣基督复活  \n- **庆祝方式**：吃复活节彩蛋、装饰兔子和鸡蛋象征丰产；参加社区聚会、教堂活动。\n\n---\n\n### 七、愚人节（April Fool's Day）\n- **日期**：每年4月1日  \n- **起源**：源于法国旧历新年庆祝习俗，后传入英国和美国  \n- **庆祝方式**：互相恶作剧、布置假环境、送假礼品。\n\n---\n\n### 八、母亲节（Mother's Day）\n- **日期**：每年5月第二个星期日  \n- **性质**：美国主要节日（非联邦假日）  \n- **庆祝方式**：家人互赠礼物、卡片，表达感恩。\n\n---\n\n### 九、阵亡将士纪念日（Memorial Day）\n- **日期**：每年5月最后一个星期一  \n- **起源**：最初为纪念内战牺牲将士，后扩展至所有战争牺牲军人  \n- **庆祝方式**：降半旗、扫墓、纪念活动；部分学校停课。\n\n---\n\n### 十、国旗日（Flag Day）\n- **日期**：每年6月14日  \n- **起源**：纪念1777年6月14日美国国旗正式通过  \n- **庆祝方式**：悬挂国旗、举行纪念活动。\n\n---\n\n### 十一、父亲节（Father's Day）\n- **日期**：每年6月第三个星期日  \n- **庆祝方式**：家人互赠礼物、卡片，感谢父亲。\n\n---\n\n### 十二、独立日（Independence Day）\n- **日期**：每年7月4日  \n- **性质**：联邦假日，相当于中国国庆节  \n- **起源**：纪念1776年7月4日美国宣布独立  \n- **庆祝方式**：烟火表演、音乐会、游行、吃西瓜和热狗大赛。\n\n---\n\n### 十三、哥伦布日（Columbus Day）\n- **日期**：每年10月第二个星期一（多数地区为假日）  \n- **起源**：纪念1492年哥伦布首次抵达美洲  \n- **庆祝方式**：教堂活动、游行等。\n\n---\n\n### 十四、万圣节（Halloween）\n- **日期**：每年10月31日  \n- **起源**：源于凯尔特人的“萨温节”，后融合基督教元素  \n- **庆祝方式**：",
+          "finish_reason": "length",
+          "elapsed_seconds": 25.706725399999414,
+          "first_content_seconds": 1.0241171999950893,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "39b2b1a38a8e7b9623667f0d46bf8304136ce0c11b69386ff7a3f80ef39abb0e",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 6548,
+              "completion_tokens": 1024,
+              "total_tokens": 7572
+            },
+            "request_id": "s2-longbench-us-holidays-8c5be633d5e94d4eb4c5383ab1b798fc/B"
+          },
+          "usage_reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case_id": "hotpot-5a8911-unsupported-hosted",
+      "q0": "Nuestra Belleza México 2010 was crowned by the winner of what other 2010 pageant, the winner of which was crowned on 23 August 2010?",
+      "tenant_id": 332,
+      "kb_scope": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "document_scope": [],
+      "historical_input": {
+        "request_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\de8b0b002cf14a0ebc7f6b98b01b95bc.request.json",
+        "request_sha256": "d0b35ad6a2b49e2b9b07fb6097687ab6a8eda45dd0c5aa3e23ea9be85be44353",
+        "stage_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\stages\\fe93ca32a1b9aaf171cc95c141b976a6301be59b8eebe84c67692b1ddc23cbc1.json",
+        "stage_sha256": "6c901813edf391f7ed9986ddff4016c6f1c6ee54fd36052ceeb2b14c5ac8509e",
+        "response_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\de8b0b002cf14a0ebc7f6b98b01b95bc.response.body",
+        "response_sha256": "a56fc348e82825bdaa3d496b078c3d935dde20e2aaedeadeb597a1cd619dbb26"
+      },
+      "posthoc_evaluation": {
+        "A": "CORE_CORRECT_RELATION_ERROR",
+        "B": "CORE_CORRECT_RELATION_ERROR",
+        "facts": "Both identify Miss Universe 2010. A incorrectly makes Stefania the crowned winner; B further confuses Ximena/Karin and the two pageants. Frozen source explicitly states Ximena was crowned by Stefania as Miss Universe successor.",
+        "change": "No reliable factual improvement; B adds stronger entity/event confusion."
+      },
+      "arms": {
+        "A": {
+          "answer": "The winner of the **Miss Universe 2010** pageant crowned the winner of Nuestra Belleza México 2010.\n\nAccording to the provided materials:\n*   **Miss Universe 2010** was held on **August 23, 2010**, in Las Vegas, USA, with **Stefanía Fernández** of Venezuela crowned as the winner.\n*   **Nuestra Belleza México 2010** was held on September 25, 2010, in Saltillo, Mexico. The winner, **Karin Ontiveros** from Jalisco, was crowned by the outgoing titleholder, **Ximena Navarrete** (who was the winner of Miss Universe 2010).\n\nTherefore, the other 2010 pageant is **Miss Universe 2010**, and its winner was crowned on August 23, 2010.",
+          "finish_reason": "stop",
+          "elapsed_seconds": 2.6169572000508197,
+          "first_content_seconds": 0.5979397000046447,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "27fa48e994587d2c69a4b1895e9c70f7bfd4ce83ab4a7b1a1f6edadf07012028",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1569,
+              "completion_tokens": 202,
+              "total_tokens": 1771
+            },
+            "request_id": "s2-hotpot-5a8911-unsupported-hosted-378cfb1f1f7e4ce6b68c7fbc0c73adc5/A"
+          },
+          "usage_reasoning_tokens": 0
+        },
+        "B": {
+          "answer": "The **Nuestra Belleza México 2010** winner was crowned by the winner of the **Miss Universe 2010** pageant.\n\nHere are the specific details based on the provided sources:\n*   **Miss Universe 2010** was held on **August 23, 2010**, at the Mandalay Bay Events Center in Las Vegas, Nevada.\n*   The winner of that pageant was **Stefanía Fernández** of Venezuela.\n*   She crowned **Ximena Navarrete** (Miss Universe 2010) as the winner of **Nuestra Belleza México 2010** on September 25, 2010.",
+          "finish_reason": "stop",
+          "elapsed_seconds": 6.540351100033149,
+          "first_content_seconds": 0.47729040001286194,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "a6ee05fd289712149478e5819862e6d0797cf238b011e92c680e7a148d200a1c",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1642,
+              "completion_tokens": 154,
+              "total_tokens": 1796
+            },
+            "request_id": "s2-hotpot-5a8911-unsupported-hosted-378cfb1f1f7e4ce6b68c7fbc0c73adc5/B"
+          },
+          "usage_reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case_id": "hotpot-5a745a-success",
+      "q0": "Which of the following works was completed first, Something Wicked This Way Comes or The Wind in the Willows?",
+      "tenant_id": 332,
+      "kb_scope": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "document_scope": [],
+      "historical_input": {
+        "request_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\45e0c505771e488da2954b293889487a.request.json",
+        "request_sha256": "79fe0928e54e7ee48790a58e6a22be5a26d6f606554748dc09a097b7a0ce6acb",
+        "stage_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\stages\\f78af5fa268c5f213d57eac6ff36cbd663f6cd8e5da83cff4b1aa48cf4444d84.json",
+        "stage_sha256": "f7fac8951bd0407e38438132e91b09c8a811dfd8bd6ba0c009133424c63bbc71",
+        "response_path": "E:\\WK\\run\\m4-full-sweep-20261018\\api-execution\\provider\\45e0c505771e488da2954b293889487a.response.body",
+        "response_sha256": "fae9388bd3655d3354862d8136c8e24ebea7c00bddb5cddee3554c69fa163795"
+      },
+      "posthoc_evaluation": {
+        "A": "CORE_CORRECT_FACT_PARTIAL",
+        "B": "CORE_CORRECT_FACT_PARTIAL",
+        "facts": "Both name The Wind in the Willows. Source supports book publication1908 versus other source film release1983, not two book publication dates. A states missing book date; B asserts75-year comparison across different types.",
+        "change": "Core answer retained; B loses evidence limitation."
+      },
+      "arms": {
+        "A": {
+          "answer": "Based on the provided reference materials:\n\n*   **The Wind in the Willows** was first published in **1908** (source: d2, c2).\n*   **Something Wicked This Way Comes** is a film released in **1983**, based on a novel by Ray Bradbury (source: d1, c1). While the specific publication year of the novel is not explicitly stated in the text, the film's release date (1983) is significantly later than the publication date of *The Wind in the Willows*.\n\nTherefore, **The Wind in the Willows** was completed first.",
+          "finish_reason": "stop",
+          "elapsed_seconds": 4.020446500042453,
+          "first_content_seconds": 0.6241894999984652,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "436092a31266447ac062cbf1d37a2d7015f37c62eb38aeb945767ca263f087f8",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1422,
+              "completion_tokens": 134,
+              "total_tokens": 1556
+            },
+            "request_id": "s2-hotpot-5a745a-success-8edb4273e869462bbb1bd534cd453fb9/A"
+          },
+          "usage_reasoning_tokens": 0
+        },
+        "B": {
+          "answer": "**The Wind in the Willows** was completed first.\n\nBased on the provided reference materials:\n*   **The Wind in the Willows** was first published in **1908** (Source: d2, c2).\n*   **Something Wicked This Way Comes** is a film released in **1983**, adapted from a novel by Ray Bradbury (Source: d1, c1).\n\nTherefore, *The Wind in the Willows* predates *Something Wicked This Way Comes* by over 75 years.",
+          "finish_reason": "stop",
+          "elapsed_seconds": 1.7567686999682337,
+          "first_content_seconds": 0.38528769998811185,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "4ebcafcb0af137d9a2f76c176e6c87a49ca6ca744f38cf140ea13a9162fd1233",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1495,
+              "completion_tokens": 117,
+              "total_tokens": 1612
+            },
+            "request_id": "s2-hotpot-5a745a-success-8edb4273e869462bbb1bd534cd453fb9/B"
+          },
+          "usage_reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case_id": "m32-omni-summary-only-no-evidence",
+      "q0": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+      "tenant_id": 332,
+      "kb_scope": [
+        "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef"
+      ],
+      "document_scope": [],
+      "historical_input": {
+        "request_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\provider-requests\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.json",
+        "request_sha256": "0e9fe93d38130152cf996a2b4121ec4360aade30791d5480b508e9631a9a2199",
+        "stage_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\stages\\22ef493f5e4f56e046ce178b7200bb4acc5c6ab0c939c6accb71d333809f78a3.json",
+        "stage_sha256": "1166be2760dc4d07b7ec63713531624ed901c134643f8b47320d879e03bc2319",
+        "response_path": "E:\\WK\\run\\rag-m32-20261018\\omni-supplement\\evidence-332\\raw\\07ec1765606bb1ad4b9fece149c21531dc1ebc30eac96d35423a4411e4ba8d97.body",
+        "response_sha256": "2c23dd2809914aa3c567b4638ed8f3f3bc3d2e81d1a34a75951a2c6c581382d8"
+      },
+      "posthoc_evaluation": {
+        "A": "HONEST_INSUFFICIENT_EVIDENCE",
+        "B": "HONEST_INSUFFICIENT_EVIDENCE",
+        "facts": "Only generated Summary is present; neither original equations nor numerical matrices. Both say numbers unavailable; no invented matrix. Constructed engineering diagnostic, not official no-answer Gold.",
+        "change": "Both correct limitation; B slower, no quality gain."
+      },
+      "arms": {
+        "A": {
+          "answer": "根据提供的参考材料，**无法回答**该问题。\n\n**原因说明：**\n提供的文档片段（`d1`）仅是对线性方程组矩阵表示方法的**总结性介绍**，内容概括为“包括系数矩阵和增广矩阵的构造方法”以及“便于使用高斯消元法等矩阵运算求解”。该片段**未包含具体的线性方程组实例**，因此无法从中提取出具体的系数矩阵，也无法得知增广矩阵最后一列的三个数。\n\n**建议下一步：**\n请提供包含具体线性方程组的课件页面、相关文档片段或包含具体数值的参考材料，以便我为您提取所需数据。",
+          "finish_reason": "stop",
+          "elapsed_seconds": 3.648123899998609,
+          "first_content_seconds": 0.5280215999810025,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "a77583ae2d9d92f35bab1e54d4f75454b4a06c4509c3f0e1966f28dd362454df",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 941,
+              "completion_tokens": 134,
+              "total_tokens": 1075
+            },
+            "request_id": "s2-m32-omni-summary-only-no-evidence-6476af157f7840b8a5875000e6d7ceb7/A"
+          },
+          "usage_reasoning_tokens": 0
+        },
+        "B": {
+          "answer": "根据提供的参考材料，无法回答该问题。\n\n**缺失信息说明：**\n提供的文档片段（`d1`）仅介绍了线性方程组矩阵表示的**概念和方法**（即系数矩阵和增广矩阵的构造原理），并未包含具体的**数值示例**或**具体的线性方程组**。因此，无法从中提取出“系数矩阵”的具体内容，也无法得知“增广矩阵最后一列的三个数”。\n\n**建议下一步：**\n请提供包含具体线性方程组数值的课件页面、截图或相关文档片段，以便我为您提取所需的矩阵和数值。",
+          "finish_reason": "stop",
+          "elapsed_seconds": 34.53425960004097,
+          "first_content_seconds": 0.9011889000539668,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "e217bd1b5bb6558c88e1f11d16326b967bc3111f4c33599cc6263307d15959ad",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1014,
+              "completion_tokens": 121,
+              "total_tokens": 1135
+            },
+            "request_id": "s2-m32-omni-summary-only-no-evidence-6476af157f7840b8a5875000e6d7ceb7/B"
+          },
+          "usage_reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "case_id": "s1-omni-matrix-positive",
+      "q0": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+      "tenant_id": 1,
+      "kb_scope": [
+        "9d3461a5-080c-4b5e-a367-c82b79d3013c"
+      ],
+      "document_scope": [],
+      "historical_input": {
+        "request_path": "E:\\WK\\run\\s1-modelpassage-api-20261019\\normal-api-model-passage\\evidence\\5a1412fde14545c0aa579c591bb4fbbb.request.json",
+        "request_sha256": "a2a90892923cdf9c7965e2d67e424e3ceaff9aa6d55802f653d245b8652961cf",
+        "stage_path": "E:\\WK\\run\\s1-modelpassage-api-20261019\\normal-api-model-passage\\evidence\\f9ca2b68086e0c5fdc3a4eec4dcefb0cbfbc532ac51dede9dc05d95816e53451.stages.json",
+        "stage_sha256": "6facc01dec3b1b5587a85b40b11dcb6c638d734b9702bede572589747341c439",
+        "response_path": "E:\\WK\\run\\s1-modelpassage-api-20261019\\normal-api-model-passage\\evidence\\5a1412fde14545c0aa579c591bb4fbbb.response.body",
+        "response_sha256": "dda80fb3f9bd9e121b50c051d2ec969470fac27deb36e9d4c9b849705cf9b3b0"
+      },
+      "posthoc_evaluation": {
+        "A": "SUPPORTED_COMPLETE",
+        "B": "SUPPORTED_COMPLETE",
+        "facts": "Every matrix position/sign and augmented last column matches unchanged MinerU source_text.",
+        "change": "Both correct; no incremental B benefit."
+      },
+      "arms": {
+        "A": {
+          "answer": "根据提供的课件内容（文档 `d1`），针对给定的线性方程组：\n\n$$\n\\left\\{ \\begin{matrix} x_{1} - 2x_{2} + x_{3} = 0 \\\\ 2x_{2} - 8x_{3} = 8 \\\\ - 4x_{1} + 5x_{2} + 9x_{3} = - 9 \\end{matrix} \\right.\n$$\n\n**1. 系数矩阵**\n课件中明确给出的系数矩阵为：\n$$\n\\begin{bmatrix}\n1 & -2 & 1 \\\\\n0 & 2 & -8 \\\\\n-4 & 5 & 9\n\\end{bmatrix}\n$$\n\n**2. 增广矩阵最后一列的三个数**\n课件中给出的增广矩阵为：\n$$\n\\begin{bmatrix}\n1 & -2 & 1 & \\mathbf{0} \\\\\n0 & 2 & -8 & \\mathbf{8} \\\\\n-4 & 5 & 9 & \\mathbf{-9}\n\\end{bmatrix}\n$$\n因此，增广矩阵最后一列的三个数分别是：**0**、**8**、**-9**。",
+          "finish_reason": "stop",
+          "elapsed_seconds": 7.5165440000128,
+          "first_content_seconds": 0.5962015999830328,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "e5f90d679ba1022d1dfe17a1085930438e1fccfebe173350afd083dab5e218c0",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1229,
+              "completion_tokens": 274,
+              "total_tokens": 1503
+            },
+            "request_id": "s2-s1-omni-matrix-positive-f8c86f8a946d42f5bb196296171150d8/A"
+          },
+          "usage_reasoning_tokens": 0
+        },
+        "B": {
+          "answer": "根据提供的课件内容，线性方程组的系数矩阵及增广矩阵最后一列的三个数如下：\n\n**1. 系数矩阵**\n课件中给出的线性方程组为：\n$$\n\\left\\{ \\begin{matrix} x_{1} - 2x_{2} + x_{3} = 0 \\\\ 2x_{2} - 8x_{3} = 8 \\\\ - 4x_{1} + 5x_{2} + 9x_{3} = - 9 \\end{matrix} \\right.\n$$\n\n其对应的**系数矩阵**为：\n$$\n\\begin{bmatrix}\n1 & -2 & 1 \\\\\n0 & 2 & -8 \\\\\n-4 & 5 & 9\n\\end{bmatrix}\n$$\n\n**2. 增广矩阵最后一列的三个数**\n增广矩阵是将常数项放在最后一列形成的矩阵：\n$$\n\\begin{bmatrix}\n1 & -2 & 1 & \\mathbf{0} \\\\\n0 & 2 & -8 & \\mathbf{8} \\\\\n-4 & 5 & 9 & \\mathbf{-9}\n\\end{bmatrix}\n$$\n\n因此，增广矩阵最后一列的三个数分别是：\n*   **0**\n*   **8**\n*   **-9**",
+          "finish_reason": "stop",
+          "elapsed_seconds": 8.383016199979465,
+          "first_content_seconds": 0.5026115999789909,
+          "receipt": {
+            "provider": "siliconflow",
+            "model": "Qwen/Qwen3.5-4B",
+            "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+            "outcome": "RESPONSE_RECEIVED",
+            "wire_sha256": "24b2f2b53a23a99f14a887fbd7ae96a8b86218f5d5a1097f34b9694b4eafa57d",
+            "usage": {
+              "status": "REPORTED",
+              "prompt_tokens": 1302,
+              "completion_tokens": 297,
+              "total_tokens": 1599
+            },
+            "request_id": "s2-s1-omni-matrix-positive-f8c86f8a946d42f5bb196296171150d8/B"
+          },
+          "usage_reasoning_tokens": 0
+        }
+      }
+    }
+  ],
+  "normal_api": {
+    "status": "COMPLETE",
+    "tenant_id": 1,
+    "session_id": "af64c76e-8955-40d5-9183-fab16375413f",
+    "run_id": "ccff9480-c184-428e-8e8b-212a6541458b",
+    "client_request_id": "0a199ee8-1ecb-4b6a-9455-048e62c755ff",
+    "q0": "请写出课件中线性方程组的系数矩阵，以及增广矩阵最后一列的三个数。",
+    "kb_scope": [
+      "9d3461a5-080c-4b5e-a367-c82b79d3013c"
+    ],
+    "document_scope": [],
+    "intent": "kb_search",
+    "rewrite_query": "课件中线性方程组的系数矩阵及增广矩阵最后一列的三个数",
+    "stages": {
+      "understand": {
+        "elapsed_seconds": 1.1182644367218018,
+        "input_count": 0,
+        "rerank_count": 0,
+        "merge_count": 0
+      },
+      "retrieval": {
+        "elapsed_seconds": 1.5731642246246338,
+        "input_count": 2,
+        "rerank_count": 0,
+        "merge_count": 0
+      },
+      "rerank": {
+        "elapsed_seconds": 0.5165350437164307,
+        "input_count": 2,
+        "rerank_count": 2,
+        "merge_count": 0
+      },
+      "merge": {
+        "elapsed_seconds": 0.0449831485748291,
+        "input_count": 2,
+        "rerank_count": 2,
+        "merge_count": 2
+      },
+      "source_unit": {
+        "elapsed_seconds": 0.06441998481750488,
+        "input_count": 2,
+        "rerank_count": 2,
+        "merge_count": 2
+      },
+      "context": {
+        "elapsed_seconds": 0.017032384872436523,
+        "input_count": 2,
+        "rerank_count": 2,
+        "merge_count": 2
+      }
+    },
+    "evidence_trace": [
+      {
+        "stage": "rerank_raw",
+        "input_ids": [
+          "a06e7826-577a-53ca-bd68-f53d8315a160",
+          "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+        ],
+        "response": [
+          {
+            "index": 0,
+            "score": 0.9610400199890137
+          },
+          {
+            "index": 1,
+            "score": 0.8417180776596069
+          }
+        ]
+      },
+      {
+        "stage": "rerank_filter_mmr",
+        "threshold": 0.3,
+        "accepted_ids": [
+          "a06e7826-577a-53ca-bd68-f53d8315a160",
+          "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+        ],
+        "mmr_ids": [
+          "a06e7826-577a-53ca-bd68-f53d8315a160",
+          "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+        ]
+      },
+      {
+        "stage": "source_unit",
+        "anchor": "a06e7826-577a-53ca-bd68-f53d8315a160",
+        "decision": "UNCHANGED",
+        "reason": "SUMMARY_SHORT_SOURCE",
+        "added_ids": [],
+        "added_chars": 0
+      },
+      {
+        "stage": "source_unit",
+        "anchor": "96ad695f-bb32-4df9-9cfb-1e8281f2fc31",
+        "decision": "UNCHANGED",
+        "reason": "PRECEDING_SOURCE_WINDOW",
+        "added_ids": [],
+        "added_chars": 0
+      }
+    ],
+    "context_ids": [
+      "a06e7826-577a-53ca-bd68-f53d8315a160",
+      "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+    ],
+    "context_chars": 935,
+    "answer": "根据提供的课件内容，线性方程组的系数矩阵及增广矩阵最后一列的三个数如下：\n\n**1. 系数矩阵**\n课件中给出的系数矩阵为：\n$$\n\\begin{bmatrix}\n1 & -2 & 1 \\\\\n0 & 2 & -8 \\\\\n-4 & 5 & 9\n\\end{bmatrix}\n$$\n\n**2. 增广矩阵最后一列的三个数**\n增广矩阵的最后一列（即常数项列）的三个数依次为：\n*   **0**\n*   **8**\n*   **-9**\n\n**依据说明：**\n上述数据直接来源于文档 `d1` 中的第 2 段（chunk `c2`），该段明确列出了对应线性方程组的系数矩阵和增广矩阵。",
+    "answer_quality": "SUPPORTED_MATRIX_ALL_POSITIONS_SIGNS_AND_LAST_COLUMN",
+    "model_role": "cheap",
+    "finish_reason": "stop",
+    "generation_issues": [],
+    "fallback": false,
+    "upgraded": false,
+    "router": {
+      "router_version": "rule-router-v1/draft-v0.4",
+      "threshold": "0.35",
+      "mode": "DYNAMIC",
+      "task_labels": [
+        "unknown"
+      ],
+      "task_anchors": [],
+      "T": {
+        "value": 0.1,
+        "status": "UNKNOWN_NOT_INFERRED"
+      },
+      "C": {
+        "value": 0.0,
+        "status": "UNKNOWN_NOT_INFERRED"
+      },
+      "J": {
+        "value": 0.0,
+        "status": "UNKNOWN_NOT_INFERRED"
+      },
+      "D": {
+        "value": 0.0,
+        "status": "UNKNOWN_NOT_INFERRED"
+      },
+      "L": {
+        "value": 0.0,
+        "status": "ESTIMATED"
+      },
+      "M": {
+        "value": 0.0,
+        "status": "UNKNOWN_NOT_INFERRED"
+      },
+      "condition_count": null,
+      "condition_count_basis": "UNKNOWN",
+      "logic": "NONE_OR_UNPARSED",
+      "dependency_depth": null,
+      "output_count": null,
+      "estimated_input_tokens": 1334,
+      "estimator": "LOCAL_TEXT_PROXY/tiktoken-0.14.0/cl100k_base/canonical_messages_json_v1/223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+      "token_basis": "not_provider_actual",
+      "score": "0.1",
+      "decision_model_role": "chat_cheap",
+      "route_reason": "SCORE_BELOW_THRESHOLD"
+    },
+    "http_timing": {
+      "elapsed_seconds": 6.515138899965677,
+      "first_answer_seconds": 6.512133100011852
+    },
+    "calls": [
+      {
+        "call_id": "0589d3bc6e1efd1243fa9d35f52fa6b4f5754ebef55fe6ea35814db49b810795",
+        "request_id": "ccff9480-c184-428e-8e8b-212a6541458b/query_rewrite",
+        "capability": "chat",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "outcome": "RESPONSE_RECEIVED",
+        "wire_sha256": "cd8c9505e5ac59d90127ec8027d8236feb8a1717cba839fb093cd8671bf43f00",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 2351,
+          "completion_tokens": 34,
+          "total_tokens": 2385
+        },
+        "timing_seconds": {
+          "transport_open_to_headers": 1.0487195000168867,
+          "transport_open_to_read_complete": 1.0493021000293083,
+          "meaning": "transport open includes normal gate admission; no separate DNS/TCP/TLS/queue timing"
+        }
+      },
+      {
+        "call_id": "348c31db06f17851862deb5ac77e39e79d55d2f77769a98043465ce6618d153e",
+        "request_id": "ccff9480-c184-428e-8e8b-212a6541458b/query-embedding-9d3461a5-080c-4b5e-a367-c82b79d3013c-112a3692787f607d",
+        "capability": "embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "outcome": "RESPONSE_RECEIVED",
+        "wire_sha256": "878f7a12e3d2ac2aeff2e6ea4e6f987c6f06096f28181420d88f0cbc41d7796d",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 26,
+          "completion_tokens": 0,
+          "total_tokens": 26
+        },
+        "timing_seconds": {
+          "transport_open_to_headers": 0.42224579997127876,
+          "transport_open_to_read_complete": 0.4573968999902718,
+          "meaning": "transport open includes normal gate admission; no separate DNS/TCP/TLS/queue timing"
+        }
+      },
+      {
+        "call_id": "b82ae1ed6ca3d1d29cc0dd13452eb617cbcd0bc7ce04bf3cc45b3b6ef7f44570",
+        "request_id": "ccff9480-c184-428e-8e8b-212a6541458b/query-embedding-9d3461a5-080c-4b5e-a367-c82b79d3013c-2db840f39df8767b",
+        "capability": "embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "model_id": "mdlf8bfb8f2c47f8764f4f4b5851d00d9cf3fd02d827b92919b52eb6b5e69039",
+        "outcome": "RESPONSE_RECEIVED",
+        "wire_sha256": "f42cc5e6e91806d52e0d3408128f219472a3421c98b31e461222f43d06712f63",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 39,
+          "completion_tokens": 0,
+          "total_tokens": 39
+        },
+        "timing_seconds": {
+          "transport_open_to_headers": 0.17141509999055415,
+          "transport_open_to_read_complete": 0.2086905000032857,
+          "meaning": "transport open includes normal gate admission; no separate DNS/TCP/TLS/queue timing"
+        }
+      },
+      {
+        "call_id": "8de439a329ea2bd2e5505423e540ba6f0cae4bae02a202bf1ce167123302da07",
+        "request_id": "ccff9480-c184-428e-8e8b-212a6541458b/rerank",
+        "capability": "rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "model_id": "mdl8397d606d3b4437f1adb06798fb4fb0efaad577c6038db1e1e3fbe2bd80fd",
+        "outcome": "RESPONSE_RECEIVED",
+        "wire_sha256": "edea5ef5e597de8d105bd78f5f3f422c5beba8904de42d363038f25a0ee80f0d",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 366,
+          "completion_tokens": 0,
+          "total_tokens": 366
+        },
+        "timing_seconds": {
+          "transport_open_to_headers": 0.3670115999993868,
+          "transport_open_to_read_complete": 0.36747769999783486,
+          "meaning": "transport open includes normal gate admission; no separate DNS/TCP/TLS/queue timing"
+        }
+      },
+      {
+        "call_id": "20b1fdc83ee312cb86f7ba05adb6bc1c3eec673df057a75fd9aad97ae0aa3351",
+        "request_id": "ccff9480-c184-428e-8e8b-212a6541458b/answer/1/cheap",
+        "capability": "chat",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": "mdl96a368bfb0c176c6e38e325c53a030ae3e40b000254c17d19a854f4495846",
+        "outcome": "RESPONSE_RECEIVED",
+        "wire_sha256": "e5f90d679ba1022d1dfe17a1085930438e1fccfebe173350afd083dab5e218c0",
+        "usage": {
+          "status": "REPORTED",
+          "prompt_tokens": 1229,
+          "completion_tokens": 174,
+          "total_tokens": 1403
+        },
+        "timing_seconds": {
+          "transport_open_to_headers": 0.32184550003148615,
+          "transport_open_to_read_complete": 1.7585732000297867,
+          "meaning": "transport open includes normal gate admission; no separate DNS/TCP/TLS/queue timing"
+        }
+      }
+    ],
+    "checks": {
+      "historical_calls_unchanged": true,
+      "new_provider_rows": 17,
+      "unknown_unchanged": true,
+      "roles_unchanged": true,
+      "sources_unchanged": true,
+      "chunks_unchanged": true,
+      "sse_db_answer_equal": true,
+      "history_db_answer_equal": true,
+      "history_refresh_identical": true,
+      "completed_public_status": true,
+      "history_finish_correct": true,
+      "wire_source_content_exact": true,
+      "production_candidate_guidance_absent": true,
+      "new_provider_rows_exact": true,
+      "no_new_unknown": true
+    },
+    "public_internal_handle_residue": true,
+    "public_internal_handle_note": "Valid d1/c2 natural-language source prose remains despite disabled public citation UI; not a wrong-source reference and not claimed cleaned in S2.",
+    "browser_full_end_to_end": "NOT_RUN; frontend adapter browser tests use mocked business API, normal real regression is HTTP/SSE/PG"
+  },
+  "reuse_only_cases": [
+    {
+      "case_id": "m2-expensive-normal",
+      "reuse_only": true,
+      "tenant_id": 332,
+      "kb_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "run_id": "53efc436-1464-4f02-bdf3-4cb32747a4a3",
+      "question_source_path": "E:\\WK\\run\\rag-m2-20261017\\query-expensive\\result.json",
+      "source_paths": [
+        "E:\\WK\\run\\rag-m2-20261017\\query-expensive\\result.json",
+        "E:\\WK\\run\\rag-m2-20261017\\query-expensive\\messages.json",
+        "E:\\WK\\run\\rag-m2-20261017\\query-expensive\\answer.sse"
+      ],
+      "historical": "Expensive DeepSeek completion; report describes source-supported core answer with explicit limits. Reuse only; no Provider request reproduction."
+    },
+    {
+      "case_id": "m2-cheap48-to-expensive34-upgrade",
+      "reuse_only": true,
+      "tenant_id": 332,
+      "kb_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "run_id": "86b39352-e93e-42a7-9478-fa25e63cd019",
+      "question_source_path": "E:\\WK\\run\\rag-m2-20261017\\query-upgrade-concise\\result.json",
+      "source_paths": [
+        "E:\\WK\\run\\rag-m2-20261017\\query-upgrade-concise\\result.json",
+        "E:\\WK\\run\\rag-m2-20261017\\query-upgrade-concise\\messages.json",
+        "E:\\WK\\run\\rag-m2-20261017\\query-upgrade-concise\\answer.sse",
+        "E:\\WK\\run\\rag-m2-20261017\\query-upgrade-concise\\replay.sse"
+      ],
+      "historical": "Cheap finished length at 48 output tokens; Expensive stopped at 34 under same cap. Reuse only; no Provider request reproduction."
+    }
+  ],
+  "usage": {
+    "provider_calls": 17,
+    "input_tokens": 29985,
+    "output_tokens": 3947,
+    "total_tokens": 33932,
+    "new_unknown": 0,
+    "historical_unknown": 4,
+    "fixed_context_generations": 12,
+    "normal_api_questions": 1,
+    "expensive_new_calls": 0,
+    "authority_status": "CLOSED",
+    "unused_provider_calls_revoked": 7
+  },
+  "protected": {
+    "historical_calls_unchanged": true,
+    "new_provider_rows": 17,
+    "unknown_unchanged": true,
+    "roles_unchanged": true,
+    "sources_unchanged": true,
+    "chunks_unchanged": true,
+    "sse_db_answer_equal": true,
+    "history_db_answer_equal": true,
+    "history_refresh_identical": true,
+    "completed_public_status": true,
+    "history_finish_correct": true,
+    "wire_source_content_exact": true,
+    "production_candidate_guidance_absent": true,
+    "new_provider_rows_exact": true,
+    "no_new_unknown": true
+  },
+  "initial_paths_preserved": [
+    {
+      "path": ".serena/project.yml",
+      "unchanged": true
+    },
+    {
+      "path": "progress.md",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/m4_result_contract.py",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/m4_tenant332_api.py",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/s1_normal_api_check.py",
+      "unchanged": true
+    },
+    {
+      "path": "tests/weknora_port/test_m4_result_contract.py",
+      "unchanged": true
+    },
+    {
+      "path": "tests/weknora_port/test_m4_tenant332_api.py",
+      "unchanged": true
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/M4_FULL_QUALITY_BASELINE.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/M4_FULL_QUALITY_BASELINE.results.json",
+      "unchanged": true
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/findings.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/progress.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/evaluation/m4-full-sweep-20261018/task_plan.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/weknora-port/AUTHORITY_STOP_STATE_20261015.json",
+      "unchanged": true
+    },
+    {
+      "path": "docs/weknora-port/OWNER_DEEPSEEK_AUTHORITY_HANDOFF_20261015.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/weknora-port/OWNER_DEEPSEEK_HANDOFF_20261014.md",
+      "unchanged": true
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.exitcode.txt",
+      "unchanged": true
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stderr.txt",
+      "unchanged": true
+    },
+    {
+      "path": "docs/weknora-port/evidence/P6_ORDINARY_GO_BUILD_20261014.stdout.txt",
+      "unchanged": true
+    }
+  ],
+  "not_run": [
+    "No new Expensive/upgrade call; reuse M2 real receipts and unchanged-path regression",
+    "No whole-dataset rerun",
+    "No upload/OCR/index rebuild",
+    "No semantic judge or fact-based automatic escalation introduced",
+    "No whole Edge browser end-to-end in S2"
+  ],
+  "remaining_quality_limits": [
+    "Nonempty stop can contain omissions, unsupported claims and wrong entity relations; no sound local universal semantic gate added",
+    "Enhanced completeness instruction failed controlled regression and was not adopted",
+    "Source-derived holiday classifications ambiguous; no official LongBench generation accuracy claimed",
+    "Valid internal d1/c2 prose residue remains; propose separate narrow presentation cleanup for Owner review"
+  ]
+}

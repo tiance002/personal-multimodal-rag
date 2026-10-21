@@ -1,0 +1,388 @@
+{
+  "schema": "p27-live-trace-analysis/v1",
+  "status": "P27_PARTIAL",
+  "production_source": "14788b9ed37cfd82d15ac8ecbb62efcab4f14d35",
+  "model_calls": {
+    "calls": 24,
+    "input": 47550,
+    "output": 2635,
+    "total": 50185,
+    "unknown": 0,
+    "unknown_held": 0
+  },
+  "model_groups": [
+    {
+      "provider": "siliconflow",
+      "capability": "embedding",
+      "calls": 15,
+      "input": 24814,
+      "output": 0,
+      "total": 24814,
+      "unknown": 0,
+      "unknown_held": 0
+    },
+    {
+      "provider": "deepseek",
+      "capability": "vision",
+      "calls": 2,
+      "input": 2050,
+      "output": 2001,
+      "total": 4051,
+      "unknown": 0,
+      "unknown_held": 0
+    },
+    {
+      "provider": "siliconflow",
+      "capability": "rerank",
+      "calls": 2,
+      "input": 7801,
+      "output": 0,
+      "total": 7801,
+      "unknown": 0,
+      "unknown_held": 0
+    },
+    {
+      "provider": "siliconflow",
+      "capability": "chat",
+      "calls": 5,
+      "input": 12885,
+      "output": 634,
+      "total": 13519,
+      "unknown": 0,
+      "unknown_held": 0
+    }
+  ],
+  "cases": [
+    {
+      "qid": "row-0958",
+      "question": "What are two examples of reflecting surfaces?",
+      "gold": [
+        "['shiny object', 'mirror']"
+      ],
+      "kb": "63236a5c-c0d6-499d-84e5-34475564f1c0",
+      "document_id": "3afe479e-723d-42a9-9c80-a7fc8b2eda79",
+      "source_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+      "source_version": "e34af609-a64d-478a-b3da-8284e3c0bca0",
+      "physical_page": 9,
+      "original_http_readback": {
+        "sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+        "bytes": 1906963,
+        "matches": true
+      },
+      "task_id": "919ec78c-036a-4651-885b-c186227d9034",
+      "task_state": "completed",
+      "task_attempt": 1,
+      "ocr_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "tesseract",
+          "model_id": "",
+          "capability": "LOCAL_ENGINE"
+        }
+      },
+      "caption_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "vlm",
+          "model_id": "mdl3fc917e2fa4a9429ed45c96ea06cb1feeceb1c19c574aeefd52985a7e7eeb",
+          "capability": "CATALOG_DECLARED"
+        }
+      },
+      "ocr": "Bends the wave when\n[7\nbecause the\nSpreads the wave out\nentering/leaving a\nMWY\nsubstancewould\nwhen going througha\nsubstance to another\nUP\nbe a different\ngap or barrier\n<A仁=\ndensity toanother\nREFLECTION:\nsubstance.\ni?ae\nBounces the wave back\nre x ty Se\ntowards where it came\nPic:\nfp pg gare RN\nky\nfrom\nCs\n一\n°\na\na\na\n——\noe\nRefraction,\nDiffraction\nMaximum diffraction occurs\nwhen: the gap is equal to the\nwave.\nBS:\nAll wave can be reflected and refracted\nMinimum diffraction occurs\n\\/\nwhen: the gap is smaller or\nLaw of Reflection:\nlarger than the wave.\nReflecting surtace, eg shinyet Angle of incidence = Angle of Reflection",
+      "caption": "这张图片是一张关于物理学中**波的特性**的教育图解，主要介绍和解释了波的三种基本现象：**反射（Reflection）**、**折射（Refraction）**和**衍射（Diffraction）**。\n\n图中结合了文字定义和直观的示意图，说明了波在不同介质交界处的反弹与弯曲，以及波穿过缝隙时的扩散规律（如反射定律、波速变化导致折射、缝隙与波长的关系对衍射的影响等）。",
+      "asset_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "actual_vision_wire_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "actual_vision_wire_bytes": 304741,
+      "actual_cap": 5000,
+      "actual_thinking_parameter": null,
+      "vision_usage": {
+        "calls": 1,
+        "input": 1018,
+        "output": 840,
+        "total": 1858,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "input_reservation": 305765,
+      "output_reservation": 5000,
+      "chunk_types": {
+        "text": 6,
+        "summary": 1,
+        "image_ocr": 1,
+        "image_caption": 1
+      },
+      "vector_count": 9,
+      "derived_chunk_ids": [
+        "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+        "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+      ],
+      "parent_chunk_ids": [
+        "48e47fc7-528e-409c-94d8-5819d1ca580a"
+      ],
+      "stages": {
+        "search": {
+          "count": 9,
+          "image_child_ids": [
+            "ce85c833-0a9f-4128-9a8d-967ebda8a5c7",
+            "f2c41958-d28b-43bd-b83a-3fd1812b943e"
+          ],
+          "image_parent_ids": [
+            "48e47fc7-528e-409c-94d8-5819d1ca580a"
+          ]
+        },
+        "rerank": {
+          "count": 0,
+          "image_child_ids": [],
+          "image_parent_ids": []
+        },
+        "context": {
+          "count": 0,
+          "image_child_ids": [],
+          "image_parent_ids": []
+        }
+      },
+      "caption_in_final_context": false,
+      "ocr_in_final_context": false,
+      "caption_in_actual_final_request": false,
+      "ocr_in_actual_final_request": false,
+      "final_answer_calls": 0,
+      "fixed_refusal": true,
+      "answer": "当前知识库中未检索到足以回答此问题的有效证据。请补充相关资料，或调整问题后重试。",
+      "answer_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.0
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "official_judge": "NOT_RUN",
+      "ingestion_seconds": 12.912922,
+      "qa_seconds": 4.644237400003476,
+      "provider_latency_ms": "NOT_CAPTURED_SEPARATELY",
+      "usage": {
+        "calls": 11,
+        "input": 10050,
+        "output": 1053,
+        "total": 11103,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "public_citations_enabled": false,
+      "source_chunk_readback": "PASS: four derived chunks read through ordinary HTTP and checked for page/version/text identity",
+      "full_visual_to_final_chain": false,
+      "status": "QUALITY_FAILURE",
+      "failure_categories": [
+        "VISUAL_DETAILS_NOT_EXTRACTED",
+        "RERANK_FILTERS_ALL_CANDIDATES",
+        "FIXED_EVIDENCE_INSUFFICIENT"
+      ],
+      "manual_answer_correct": false,
+      "necessary_gold_facts_in_derived_text": false,
+      "manual_basis": "Original target image visibly labels shiny object or mirror; OCR corrupts it and Caption only summarizes wave phenomena. No final model call occurred.",
+      "rerank_observer_scores": {
+        "image_ocr": 0.007838763296604156,
+        "image_caption": 0.010727103799581528,
+        "image_parent": 0.014426711946725845
+      },
+      "rerank_input_count": 4,
+      "rerank_output_count": 4,
+      "rerank_score_evidence": "Existing RerankRegistryObserver records model.rerank return; not claiming an additional raw HTTP response capture.",
+      "raw_provider_caption_matches_persisted_result": true,
+      "raw_usage_matches_settled_ledger": true,
+      "finish_reason": "stop"
+    },
+    {
+      "qid": "row-0684",
+      "question": "Do more men or women (in %) think a female president will be elected in a lifetime?",
+      "gold": [
+        "men"
+      ],
+      "kb": "2cf0b09f-9524-4a44-810d-45542619ef74",
+      "document_id": "7bf79dd9-f45a-4783-84e1-bc914a484195",
+      "source_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+      "source_version": "068ef192-3eb1-4d5f-b8a1-6c3b398b67db",
+      "physical_page": 10,
+      "original_http_readback": {
+        "sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+        "bytes": 5924004,
+        "matches": true
+      },
+      "task_id": "3692d8a9-7771-4b76-9fd8-80216a464832",
+      "task_state": "completed",
+      "task_attempt": 1,
+      "ocr_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "tesseract",
+          "model_id": "",
+          "capability": "LOCAL_ENGINE"
+        }
+      },
+      "caption_status": {
+        "error": "",
+        "status": "completed",
+        "binding": {
+          "source": "knowledge_base",
+          "adapter": "vlm",
+          "model_id": "mdl3fc917e2fa4a9429ed45c96ea06cb1feeceb1c19c574aeefd52985a7e7eeb",
+          "capability": "CATALOG_DECLARED"
+        }
+      },
+      "ocr": "8\nPEW RESEARCH CENTER\nOther important findings\nVoters pessimistic on how Trump will impact race relations. Nearly half ofvoters (46%) say\nTrump’s election will lead to worse race relations, while only about half as many (25%) expect race\nrelations to improve; 26% say his election won’t make a difference. Among Clinton voters, 84%\nexpect race relations to worsen under Trump. Among Trump supporters, half expect\nimprovement, while 38% say his election won’t makea difference.\nPost-victory, most Trump backers confident in an accurate vote count. ID August, just 38% of\nregistered voters who supported Trump were very confident that their vote would be counted\naccurately. But in the aftermath ofTrump’s\nvictory, 75% expressed confidence that their cs\nvotes were counted accurately. The views of\nWill the country elect a female\nClinton supporters showed no change: After\npresident in your lifetime?\nthe election 67% were confident that their\n% ofvoters who say ...\nvotes were counted accurately.\nNo\nmYes\nAll voters\n17 ol\nMost expect woman president, eventually.\nFollowing Clinton’s defeat, a sizable majority\n—|\nof voters (79%) still expect there will be a\nfemale president “in their lifetime.” There are\nWomen | 48 (ZS\nno significant differences in these opinions\namong men and women, or Clinton supporters\nTrump voters\n47) ETE\nand Trump backers.\nClinton voters\naly [ee\nVoters say press has too much influence.\nNote: Don’t know responses not shown. Q46bb.\nVoters grade the press very negatively, and\nSource: Voter callback survey conducted Nov. 10-14, 2016.\nmost (57%) say it had too much influence on\nPRESSS SEs\nthe outcome of the election. Just 27% say the CT\npress had the right amount of influence on the election, while 13% say it had too little influence.\nAbout six-in-ten Trump voters (62%) say the press had too much influence, as do 50% of Clinton\nvoters.\nwww.pewresearch.org",
+      "caption": "这张图片是**皮尤研究中心（Pew Research Center）**一份关于**2016年美国大选后选民态度**的调查报告页面。\n\n主要内容概括如下：\n*   **左侧文本**：列出了几项重要调查发现，包括选民对特朗普执政后**种族关系**的悲观预期、对**计票准确性**的信心变化、对**女性总统**的预期，以及认为**新闻媒体对选举影响力过大**的看法。\n*   **右侧图表**：是一个条形图，展示了不同群体（所有选民、男女、特朗普和克林顿支持者）对“**有生之年国家是否会选出女总统**”的预测。数据显示，绝大多数选民（约80%）对此持肯定态度。",
+      "asset_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "actual_vision_wire_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "actual_vision_wire_bytes": 410465,
+      "actual_cap": 5000,
+      "actual_thinking_parameter": null,
+      "vision_usage": {
+        "calls": 1,
+        "input": 1032,
+        "output": 1161,
+        "total": 2193,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "input_reservation": 411489,
+      "output_reservation": 5000,
+      "chunk_types": {
+        "text": 162,
+        "image_ocr": 1,
+        "image_caption": 1,
+        "summary": 1
+      },
+      "vector_count": 165,
+      "derived_chunk_ids": [
+        "1580bcd9-8f38-4465-bb30-1162cce13061",
+        "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+      ],
+      "parent_chunk_ids": [
+        "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+      ],
+      "stages": {
+        "search": {
+          "count": 30,
+          "image_child_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        },
+        "rerank": {
+          "count": 4,
+          "image_child_ids": [
+            "1580bcd9-8f38-4465-bb30-1162cce13061",
+            "843d7d56-8e27-46e1-874c-b6d63e7e874d"
+          ],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        },
+        "context": {
+          "count": 2,
+          "image_child_ids": [],
+          "image_parent_ids": [
+            "ac0cf47f-d449-4a91-84ea-4a8f5b5550d9"
+          ]
+        }
+      },
+      "caption_in_final_context": true,
+      "ocr_in_final_context": true,
+      "caption_in_actual_final_request": true,
+      "ocr_in_actual_final_request": true,
+      "final_answer_calls": 1,
+      "fixed_refusal": false,
+      "answer": "## Answer\n\nAccording to the Pew Research Center survey conducted November 10–14, 2016, **both men and women** expect a female president will be elected in their lifetime, with **no significant differences** between the two groups.\n\n- **Women**: 79% expect a female president in their lifetime\n- **Men**: 79% expect a female president in their lifetime\n\nThe survey found that 79% of all voters (across gender lines) still expected a female president \"in their lifetime\" following Clinton's defeat, and there were no significant differences in these opinions among men and women, or among Clinton supporters and Trump backers.",
+      "answer_diagnostic": {
+        "status": "COMPUTED_PROJECT_DIAGNOSTICS_ON_NATIVE_GOLD",
+        "metrics": {
+          "normalized_exact_match": 0,
+          "character_f1": 0.012244897959183673
+        },
+        "official_judge": "NOT_RUN"
+      },
+      "official_judge": "NOT_RUN",
+      "ingestion_seconds": 20.839759,
+      "qa_seconds": 5.779336700012209,
+      "provider_latency_ms": "NOT_CAPTURED_SEPARATELY",
+      "usage": {
+        "calls": 13,
+        "input": 37500,
+        "output": 1582,
+        "total": 39082,
+        "unknown": 0,
+        "unknown_held": 0
+      },
+      "public_citations_enabled": false,
+      "source_chunk_readback": "PASS: four derived chunks read through ordinary HTTP and checked for page/version/text identity",
+      "full_visual_to_final_chain": true,
+      "status": "QUALITY_FAILURE",
+      "failure_categories": [
+        "CHART_VALUES_NOT_EXTRACTED",
+        "UNSUPPORTED_GROUP_PERCENTAGE_IN_ANSWER"
+      ],
+      "manual_answer_correct": false,
+      "necessary_gold_facts_in_derived_text": false,
+      "manual_basis": "Original chart visibly shows men81%, women78%. OCR garbles bars and Caption says about80% without exact group values. Cheap receives the real derived content but invents both groups79% from overall79% prose.",
+      "rerank_observer_scores": {
+        "image_ocr": 0.8536705374717712,
+        "image_caption": 0.8735278844833374,
+        "image_parent": 0.9033378958702087
+      },
+      "rerank_input_count": 30,
+      "rerank_output_count": 30,
+      "rerank_score_evidence": "Existing RerankRegistryObserver records model.rerank return; not claiming an additional raw HTTP response capture.",
+      "raw_provider_caption_matches_persisted_result": true,
+      "raw_usage_matches_settled_ledger": true,
+      "finish_reason": "stop"
+    }
+  ],
+  "fence": {
+    "total_allocation": 1000000,
+    "actual_new_occupied": 50185,
+    "unused_revoked": 949815,
+    "accounts": {
+      "deepseek": {
+        "limit": 4324,
+        "occupied": 4324,
+        "headroom": 0
+      },
+      "siliconflow": {
+        "limit": 1739220,
+        "occupied": 1739220,
+        "headroom": 0
+      }
+    }
+  },
+  "history_preservation": {
+    "deepseek": {
+      "old_rows": 2,
+      "all_old_rows_unchanged": true,
+      "old_rows_sha256": "95852dfccace40e748fc1503847bc402cb237353fe96b98d7cb22362fc4f9e30",
+      "old_unknown_count": 1,
+      "old_unknown_held": 259
+    },
+    "siliconflow": {
+      "old_rows": 726,
+      "all_old_rows_unchanged": true,
+      "old_rows_sha256": "fa2e307e70643c83d256df3fab1458c8f35b6a78a9d02b3a181ecdf134c8d33a",
+      "old_unknown_count": 61,
+      "old_unknown_held": 823355
+    }
+  },
+  "authority_revocation": {
+    "active_config": "disabled",
+    "used_bundle_sha256": "1fd7e679dc08465d8fa3fc4f6501c121ae58529fc5417b9100127c731f354b75",
+    "both_month_headroom": 0,
+    "task_owned_api_worker_stopped": true
+  }
+}

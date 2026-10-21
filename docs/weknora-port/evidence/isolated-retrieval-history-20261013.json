@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "kind": "ACTUAL_ISOLATED_PG_RETRIEVAL_HISTORY",
+  "database": "weknora_python_port_20261013",
+  "system_identifier": "7696038373595934758",
+  "fixture_ids": {
+    "kb": "e0e853f4-0bcb-48d1-a1a2-880d39e241ff",
+    "other_kb": "9dfb96d6-c0c3-4e83-930a-66aed1f0b4d3",
+    "doc": "3a3e182f-49c3-456a-8665-8c73a14e93e6",
+    "other_doc": "a0a6425e-5c2a-4e29-aede-f14bc7b3712c",
+    "chunk": "9d6fdefb-1370-4297-b8b6-cb7bc1923744",
+    "other_chunk": "85177e11-db80-42dd-a701-b54e8bf4aeef",
+    "session": "a4cb4ec6-f700-416e-b3e2-6fa7f245bd22",
+    "request": "a83c4e80-006d-45a7-8cd9-5459d5e6521d",
+    "q": "d974b102-f018-4a79-8595-e643be568e84",
+    "a": "f8de1851-ae4f-48f4-987c-caddd757cf8f"
+  },
+  "vector_ids": [
+    "9d6fdefb-1370-4297-b8b6-cb7bc1923744"
+  ],
+  "keyword_ids": [
+    "9d6fdefb-1370-4297-b8b6-cb7bc1923744"
+  ],
+  "citation_readback": {
+    "chunk_id": "9d6fdefb-1370-4297-b8b6-cb7bc1923744",
+    "body": "retrievalalpha source body"
+  },
+  "persisted_answer": {
+    "content": "fixture answer",
+    "knowledge_references": [
+      {
+        "chunk_id": "9d6fdefb-1370-4297-b8b6-cb7bc1923744",
+        "knowledge_id": "3a3e182f-49c3-456a-8665-8c73a14e93e6",
+        "knowledge_base_id": "e0e853f4-0bcb-48d1-a1a2-880d39e241ff"
+      }
+    ],
+    "usage": {
+      "status": "UNKNOWN"
+    },
+    "is_completed": true
+  },
+  "real_provider_calls": 0,
+  "old_database_writes": 0,
+  "not_run": [
+    "real embeddings",
+    "full RAG generation",
+    "HTTP/SSE recovery"
+  ]
+}

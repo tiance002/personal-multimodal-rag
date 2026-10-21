@@ -6,7 +6,7 @@ import { defineConfig } from "@playwright/test";
 const executablePath = process.env.PLAYWRIGHT_CHROME_PATH;
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./tests/weknora-port",
   workers: 1,
   fullyParallel: false,
   timeout: 15_000,
@@ -16,9 +16,14 @@ export default defineConfig({
     launchOptions: executablePath ? { executablePath } : {},
   },
   webServer: {
-    command: "npm run dev -- --host 127.0.0.1",
+    command: "npm run dev -- --host 127.0.0.1 --strictPort",
+    env: {
+      ...process.env,
+      VITE_WEKNORA_API_BASE: "/api/v1",
+      VITE_API_PROXY_TARGET: "http://127.0.0.1:56425",
+    },
     url: "http://127.0.0.1:5173",
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 30_000,
   },
 });

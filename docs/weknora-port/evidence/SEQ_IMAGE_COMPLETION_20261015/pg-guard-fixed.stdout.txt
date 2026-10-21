@@ -1,0 +1,24 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_actual_complete_search_context_and_http_reference_readback _______
+tests\weknora_port\test_search_image_completion_pg.py:121: in test_actual_complete_search_context_and_http_reference_readback
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_search_image_completion_pg.py:106: in scenario
+    assert ref['id']==expected['id'] and ref['seq']==ref['chunk_index']==7,ref
+E   AssertionError: {'id': '3b4ef686-35dc-5742-8e55-7feffa702b6c', 'seq': 1, 'score': 0.016208355367530406, 'end_at': 0, ...}
+E   assert ('3b4ef686-35d...-7feffa702b6c' == '2a007ce9-8cc...-aa1ab95c0412'
+E     
+E     - 2a007ce9-8cc8-411b-8a57-aa1ab95c0412
+E     + 3b4ef686-35dc-5742-8e55-7feffa702b6c)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_search_image_completion_pg.py::test_actual_complete_search_context_and_http_reference_readback
+1 failed in 11.45s

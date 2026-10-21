@@ -1,0 +1,12 @@
+.                                                                        [100%]
+============================== warnings summary ===============================
+tests/weknora_port/test_development_entry_pg.py::test_executable_api_and_worker_image_ingest_memory_and_replay
+  E:\RAG quention\.venv\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/weknora_port/test_development_entry_pg.py::test_executable_api_and_worker_image_ingest_memory_and_replay
+  E:\RAG quention\.venv\Lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 2 warnings in 9.32s

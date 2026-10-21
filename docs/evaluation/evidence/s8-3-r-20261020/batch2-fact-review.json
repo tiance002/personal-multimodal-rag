@@ -1,0 +1,2167 @@
+{
+  "schema": "s8-3-r-batch2-independent-factual-review/v1",
+  "scope": "Read-only saved evidence review; zero model/network/database calls; only this reviewer JSON written.",
+  "criteria": "factual-checkpoints-precall.json; manual multi-hop relation coverage, not document-ID presence alone.",
+  "cases": [
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b::source-bounded",
+      "arm": "B",
+      "source_mode": "bounded_source_v1",
+      "actual_answer": "据提供的资料，Pieter van Musschenbroek 被记载为发明了莱顿瓶（Leyden jar）和摩擦仪（tribometer）的荷兰科学家。\n\n具体依据如下：\n1. 关于莱顿瓶：资料明确指出他“于1746年获得莱顿瓶的首创发明”（credited with the invention of the first capacitor in 1746: the Leyden jar）。\n2. 关于摩擦仪：资料提到“摩擦仪是由18世纪的荷兰科学家Musschenbroek发明的”（It was invented by the 18th century Dutch scientist Musschenbroek）。\n\nSources: e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc.txt, 613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825.txt",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\154227d2f3f4549245108934a6dfc8e20a15d75ddfcad850590bfec57107c6c3\\evidence\\27868cb33af04741a288e31fcb81f1d3.request.json",
+      "provider_request_sha256": "627f73883c4906698b59c1347805a2f1f8ec553f8a18ac063e588683f5ed9025",
+      "stage_file": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\154227d2f3f4549245108934a6dfc8e20a15d75ddfcad850590bfec57107c6c3\\evidence\\47f8f41a4df80c3435fec6ad01da8ce8c51ee2b8e66b01bf57868ffcf22f1421.stages.json",
+      "stage_file_sha256": "6e83c567bfdc4ceeb012c26186bb521059f1edd88966c7eb9523cb1dd29476c4",
+      "provider_wire_chars_all_messages": 4265,
+      "provider_user_chars": 2960,
+      "legacy_context_chars": 3662,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Actual provider body.messages is authoritative. Legacy context may differ; no finalized context exists on SearchNothing fallback.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 4,
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 366
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 429
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 476
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 234
+        }
+      ],
+      "actual_wire_evidence_content_chars": 1505,
+      "target_chunks": [
+        {
+          "id": "0dbba904-45e0-5b5a-9e7b-6d9e7092347d",
+          "type": "summary",
+          "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "chars": 612,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "# Summary\nDutch scientist Pieter van Musschenbroek's scientific career and contributions.\n\nPieter van Musschenbroek (1692–1761) was a Dutch scientist who held positions in mathematics, philosophy, medicine, and astronomy across Duisburg, Ut",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge"
+          ]
+        },
+        {
+          "id": "c7df42db-cc48-4c54-beb1-75adcba4dd4b",
+          "type": "text",
+          "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "chars": 366,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "Pieter van Musschenbroek (14 March 1692 – 19 September 1761) was a Dutch scientist.\n He was a professor in Duisburg, Utrecht, and Leiden, where he held positions in mathematics, philosophy, medicine, and astronomy.\n He is credited with the ",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "source_unit",
+            "context"
+          ]
+        },
+        {
+          "id": "ffd035d9-4c47-52da-b057-b0fab55a8d07",
+          "type": "summary",
+          "knowledge_id": "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253",
+          "chars": 367,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "# Summary\nA tribometer is an instrument for measuring friction and wear between two surfaces.\n\nThe document defines a tribometer as an instrument for measuring tribological quantities like coefficient of friction, friction force, and wear v",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge"
+          ]
+        },
+        {
+          "id": "41295870-5f65-458c-b045-85280c1184a3",
+          "type": "text",
+          "knowledge_id": "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253",
+          "chars": 234,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "A tribometer is an instrument that measures tribological quantities, such as coefficient of friction, friction force, and wear volume, between two surfaces in contact.\n It was invented by the 18th century Dutch scientist Musschenbroek",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "source_unit",
+            "context"
+          ]
+        },
+        {
+          "id": "02b53bb6-34d0-4f26-836c-22ebdc156cf7",
+          "type": "text",
+          "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "chars": 412,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": " He performed pioneering work on the buckling of compressed struts.\n Musschenbroek was also one of the first scientists (1729) to provide detailed descriptions of testing machines for tension, compression, and flexure testing.\n An early exa",
+          "stage_membership": [
+            "retrieval"
+          ]
+        }
+      ],
+      "fact_coverage": [
+        {
+          "fact": "identity",
+          "source_text": "Pieter van Musschenbroek (14 March 1692 – 19 September 1761) was a Dutch scientist.",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "rerank": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "merge": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "source_unit": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "context": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ]
+          }
+        },
+        {
+          "fact": "leyden_invention",
+          "source_text": "He is credited with the invention of the first capacitor in 1746: the Leyden jar.",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "rerank": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "merge": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "source_unit": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "context": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ]
+          }
+        },
+        {
+          "fact": "tribometer_invention",
+          "source_text": "It was invented by the 18th century Dutch scientist Musschenbroek",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "rerank": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "merge": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "source_unit": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "context": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ]
+          }
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 7
+        },
+        "merge": {
+          "candidate_count": 7
+        },
+        "source_unit": {
+          "candidate_count": 4
+        },
+        "context": {
+          "selected_evidence_count": 4
+        }
+      },
+      "stage_sequence": [
+        [
+          "understand",
+          "started"
+        ],
+        [
+          "understand",
+          "completed"
+        ],
+        [
+          "retrieval",
+          "started"
+        ],
+        [
+          "retrieval",
+          "completed"
+        ],
+        [
+          "rerank",
+          "started"
+        ],
+        [
+          "rerank",
+          "completed"
+        ],
+        [
+          "merge",
+          "started"
+        ],
+        [
+          "merge",
+          "completed"
+        ],
+        [
+          "source_unit",
+          "started"
+        ],
+        [
+          "source_unit",
+          "completed"
+        ],
+        [
+          "context",
+          "started"
+        ],
+        [
+          "context",
+          "completed"
+        ]
+      ],
+      "pipeline_error_type": null,
+      "final_result_ids": [
+        "c7df42db-cc48-4c54-beb1-75adcba4dd4b",
+        "e8a751ff-032c-4c8c-bb31-4eddc73b3a86",
+        "2a95d110-78f3-49e3-ad76-1f6582b7496c",
+        "41295870-5f65-458c-b045-85280c1184a3"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 7673,
+        "provider_by_capability": {
+          "chat": {
+            "calls": 2,
+            "reported_tokens": 3972,
+            "unreported_usage_calls": 0
+          },
+          "embedding": {
+            "calls": 1,
+            "reported_tokens": 19,
+            "unreported_usage_calls": 0
+          },
+          "rerank": {
+            "calls": 1,
+            "reported_tokens": 3682,
+            "unreported_usage_calls": 0
+          }
+        },
+        "generation_usage": {
+          "prompt_tokens": 1344,
+          "completion_tokens": 248,
+          "total_tokens": 1592,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 1344,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 1344,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 248,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 1592,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 1344,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":248,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1344,\"prompt_tokens\":1344,\"total_tokens\":1592}]",
+            "raw_sha256": "3f4dc47e8089c6497140adee27566e4f1750fe9a3a330f5c8f040d799cadb0af",
+            "derived_total": 1592,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 9130.3,
+        "ttfc_ms": 9129.79,
+        "latency_ms": 9403.8,
+        "memory": {
+          "sample_count": 0,
+          "host_mem_available_min_kib": null,
+          "container_memory_peak_bytes": null
+        }
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 169,
+        "completed_execute_calls": 169,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 534.088,
+        "window_elapsed_ms": 9127.483,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "source_provenance_limit": "Target content read from saved retrieval stage records with chunk_type=text and exact fact membership checked in actual wire; no independent source-file byte readback exists in supplied case bundle. Historical fact checkpoints support expected answer. This is weaker provenance than batch1 independent original-byte hash readback.",
+      "factual_review": {
+        "gold_type": "HotpotQA answer entity plus explicit two invention relations.",
+        "answer_factual_status": "PASS",
+        "requested_answer_status": "PASS",
+        "first_quality_loss": "NONE_FOR_REQUIRED_FACTS",
+        "required_fact_coverage": "3/3 explicit original facts in actual wire: Pieter identity, Leyden invention credited to him in 1746, tribometer invented by Dutch scientist Musschenbroek.",
+        "proof": [
+          {
+            "source": "Pieter van Musschenbroek ... was a Dutch scientist.",
+            "answer": "Pieter van Musschenbroek ... 荷兰科学家"
+          },
+          {
+            "source": "He is credited with the invention of the first capacitor in 1746: the Leyden jar.",
+            "answer": "1746年...莱顿瓶"
+          },
+          {
+            "source": "It was invented by the 18th century Dutch scientist Musschenbroek",
+            "answer": "摩擦仪...18世纪的荷兰科学家Musschenbroek"
+          }
+        ],
+        "omissions": "No required identity/invention relation omissions.",
+        "noise": "Original Leyden jar construction and Franklin electrostatic-machine chunks remain; A additionally delivers generated summaries. B reduces evidence text from 3026 to 1505 characters while retaining all three required facts.",
+        "quantifier_note": "The source credits this man with the inventions. Answer does not claim exclusivity over all historical attribution."
+      },
+      "citation_review": {
+        "status": "PASS_FILENAME_ATTRIBUTION",
+        "note": "Both exact supplied original filenames for Pieter and tribometer are cited. Citation granularity is filename, not pinpoint chunk/line. UI click not tested."
+      }
+    },
+    {
+      "case_id": "engineering-unanswerable-postcode::source-off",
+      "arm": "A",
+      "source_mode": "off",
+      "actual_answer": "提供的课程资料中并未包含会议场地的地址或邮编信息。\n\n文档一主要涉及物理课程中的能量与热传递笔记，文档二是关于2015年在瑞典皇家理工学院（KTH）举办的深度学习的演示文稿，但两份文档的具体内容摘要中均未提及会议场地的详细地址或邮编。\n\n如果您需要该信息，建议查阅原始课件中的“附录”、“参考文献”或“会议详情”页面。\n\nSources: 无",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\64f5ed899760352389940b173ea20ffd7fe3a1f32504b53178734aadceafc15c\\evidence\\1fe80ab12e5e40c593f944cc636be573.request.json",
+      "provider_request_sha256": "01ab4da5c538f3a60b8d94f0010fcf4459d6698ed31f0784df57bed76cfd89f1",
+      "stage_file": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\64f5ed899760352389940b173ea20ffd7fe3a1f32504b53178734aadceafc15c\\evidence\\0f74cfb3878b69cc7e14ac7ec8769ac3e6ff49bce75bced526580ddc848631c7.stages.json",
+      "stage_file_sha256": "74198b4a31951b9a7ec587d101ca6bd6af00547b3012998918a1a91dffe56f1d",
+      "provider_wire_chars_all_messages": 2198,
+      "provider_user_chars": 58,
+      "legacy_context_chars": null,
+      "legacy_context_is_actual_wire": null,
+      "legacy_context_note": "Actual provider body.messages is authoritative. Legacy context may differ; no finalized context exists on SearchNothing fallback.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "actual_wire_chunks": [],
+      "actual_wire_evidence_content_chars": 0,
+      "target_chunks": [],
+      "fact_coverage": [],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        }
+      },
+      "stage_sequence": [
+        [
+          "understand",
+          "started"
+        ],
+        [
+          "understand",
+          "completed"
+        ],
+        [
+          "retrieval",
+          "started"
+        ],
+        [
+          "retrieval",
+          "completed"
+        ],
+        [
+          "rerank",
+          "started"
+        ]
+      ],
+      "pipeline_error_type": "SearchNothing",
+      "final_result_ids": [],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 6285,
+        "provider_by_capability": {
+          "chat": {
+            "calls": 2,
+            "reported_tokens": 3069,
+            "unreported_usage_calls": 0
+          },
+          "embedding": {
+            "calls": 1,
+            "reported_tokens": 15,
+            "unreported_usage_calls": 0
+          },
+          "rerank": {
+            "calls": 1,
+            "reported_tokens": 3201,
+            "unreported_usage_calls": 0
+          }
+        },
+        "generation_usage": {
+          "prompt_tokens": 588,
+          "completion_tokens": 94,
+          "total_tokens": 682,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 588,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 588,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 94,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 682,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 588,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":94,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":588,\"prompt_tokens\":588,\"total_tokens\":682}]",
+            "raw_sha256": "74e5a8110b4b90f46746c6b0af56e5b57fe0a68fb6f8a7928c48fbdfbe31a4f3",
+            "derived_total": 682,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 8613.82,
+        "ttfc_ms": 8613.52,
+        "latency_ms": 8892.7,
+        "memory": {
+          "sample_count": 0,
+          "host_mem_available_min_kib": null,
+          "container_memory_peak_bytes": null
+        }
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 136,
+        "completed_execute_calls": 136,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 584.591,
+        "window_elapsed_ms": 8611.409,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "source_provenance_limit": "No target original source or source-byte readback in this case. Only saved retrieval candidates and generated doc-list metadata in actual fallback wire; metadata cannot prove venue or absence across unread courseware.",
+      "factual_review": {
+        "gold_type": "Engineering unanswerable/abstain control; not official dataset Gold.",
+        "answer_factual_status": "FAIL_UNREAD_METADATA_AS_FACT",
+        "requested_postcode_status": "PASS_ABSTAIN_NO_DIGITS_INVENTED",
+        "first_quality_loss": "RERANK_SEARCHNOTHING_FALLBACK_FOR_DELIVERY; ANSWER_FOR_UNSUPPORTED_DETAILS",
+        "required_fact_coverage": "No source chunks delivered. Fallback system prompt only contains generated truncated document-list descriptions.",
+        "proof": [
+          {
+            "actual_wire_metadata": "这是一份2015年5月在瑞典皇家理工学院（KTH）举办的关于深度学习和数据科学的演示文稿",
+            "answer": "关于2015年在瑞典皇家理工学院（KTH）举办的深度学习的演示文稿"
+          },
+          {
+            "actual_wire_instruction": "Treat the document listing as metadata ... cannot support a summary of unread contents or detailed factual claims.",
+            "answer": "Both describe unread courseware contents and imply venue from metadata."
+          }
+        ],
+        "error": "Both withhold postal code but promote unread generated listing metadata to detailed claims. B explicitly equates KTH presentation metadata with the asked conference venue. A similarly presents KTH/course contents as read facts. Saved inventory instead identifies The Deep Learning Conspirators / Université de Montréal context; no delivered original source establishes requested venue or postcode.",
+        "omissions": "No actual source evidence for postal code or venue, no original courseware chunk; full courseware absence is not independently re-established by this fallback wire.",
+        "noise": "Fallback lists unrelated physics and cat/dog deep-learning document descriptions.",
+        "source_mode_effect": "Source-unit processing never runs in either arm due SearchNothing before completed rerank; no claim that bounded mode removes fallback metadata summaries."
+      },
+      "citation_review": {
+        "status": "NO_USABLE_SOURCE_CITATION",
+        "note": "B lists document titles from metadata, not actual supplied source filename evidence; A ends Sources: 无. Neither supplies evidence for detailed venue/content claims."
+      },
+      "fallback_metadata": {
+        "actual_wire_has_truncated_generated_descriptions": true,
+        "original_chunk_count": 0,
+        "explicit_metadata_only_instruction_present": true,
+        "system_metadata_snippet": "You are WeKnora, a professional and friendly AI assistant developed by Tencent.\n\nNo content directly matched the user's query via search. However, the knowledge base contains the following documents:\n\n- b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95 (pdf): 该文档是物理课程关于能量与热传递的笔记，涵盖了温度与热能的定义、比热容和潜热的计算公式、热传递的三种方式（传导、对流、辐射）及其在房屋隔热中的应用。此外，文档还介绍了激光的特性与用途、红外线与微波的烹...\n- catvsdogdlpycon15se-150512122612-lva1-app6891_95 (pdf): 这是一份2015年5月在瑞典皇家理工学院（KTH）举办的关于深度学习和数据科学的演示文稿，由Roelof Pieters主讲。文档介绍了用于图像识别（如猫狗分类）的主要Python库，包括用于机器学习...\n\n\n",
+        "summary_marker_absence_does_not_mean_no_generated_content": true
+      }
+    },
+    {
+      "case_id": "hotpotqa-5a7631cd5542994ccc91870c::source-bounded",
+      "arm": "B",
+      "source_mode": "bounded_source_v1",
+      "actual_answer": "根据提供的资料，Jeanne Marie Beaumont 在 2007 年至 2010 年间担任负责人（Director）的研讨会是 **The Frost Place Advanced Seminar**，该研讨会位于 **纽约市（New York City）**。\n\n*   **依据来源**：资料明确指出她“在纽约市（New York City）在 1983 年移居”，且“担任 Frost Place 高级研讨会从 2007–2010 年的负责人”。虽然资料未直接提及 Frost Place 的具体地址，但结合她当时位于纽约市的背景以及该机构名称（Frost Place）通常位于纽约市的常识性关联，可推断其位置。不过，严格依据提供的文本，资料仅确认了她在纽约市任职以及该研讨会的名称和时间段，未提供街道地址。\n\nSources: 4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd.txt",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\6ac2888ad69ab4a361855ab272db0f2114f59f5f7a3da8b13da82f5bf7c6648e\\evidence\\525962b2d1064649b5cfcb054bb0bb4b.request.json",
+      "provider_request_sha256": "b04083cd43c31ae8cad3283084e7723c69d74b2abc40b73b689383589d8fa4b2",
+      "stage_file": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\6ac2888ad69ab4a361855ab272db0f2114f59f5f7a3da8b13da82f5bf7c6648e\\evidence\\d55864412ee3f7ee37e7f83c7f98facde079b1c83ab702dbbed3a97d97dddcd2.stages.json",
+      "stage_file_sha256": "2784e0d0e36dda48b16a9e2ad8492f3f4ce87477625025c04c2caa5ac3907ae3",
+      "provider_wire_chars_all_messages": 3348,
+      "provider_user_chars": 2043,
+      "legacy_context_chars": 2280,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Actual provider body.messages is authoritative. Legacy context may differ; no finalized context exists on SearchNothing fallback.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 3,
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"3\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 311
+        },
+        {
+          "tag": "<chunk index=\"2\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 490
+        },
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 442
+        }
+      ],
+      "actual_wire_evidence_content_chars": 1243,
+      "target_chunks": [
+        {
+          "id": "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "type": "summary",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 893,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "# Summary\nBiographical profile of American poet Jeanne Marie Beaumont covering her career, publications, teaching, and film adapta\n\nJeanne Marie Beaumont is an American poet with four poetry collections, including 'Letters from Limbo' (2016",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge"
+          ]
+        },
+        {
+          "id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+          "type": "text",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 284,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge"
+          ]
+        },
+        {
+          "id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "type": "text",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 311,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "from Eastern College and an M.F.A. in Writing from Columbia University.\n She has taught at Rutgers University and regularly teaches at the 92nd Street Y.\n She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and se",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "source_unit",
+            "context"
+          ]
+        },
+        {
+          "id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+          "type": "text",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 486,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": " The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010.\n Beaumont was co-editor of \"American Letters & Commentary\" from 199",
+          "stage_membership": [
+            "retrieval",
+            "source_unit",
+            "context"
+          ]
+        },
+        {
+          "id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "type": "text",
+          "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "chars": 153,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+          "stage_membership": [
+            "retrieval"
+          ]
+        },
+        {
+          "id": "3966da48-dab5-5220-8594-f16bfbfdfc80",
+          "type": "summary",
+          "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "chars": 297,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "# Summary\nA museum and nonprofit educational center for poetry at Robert Frost's former home in Franconia, New Hampshire.\n\nThe Frost Place is a museum and nonprofit educational center dedicated to poetry, situated at the former home of poet",
+          "stage_membership": [
+            "retrieval"
+          ]
+        }
+      ],
+      "fact_coverage": [
+        {
+          "fact": "hop1_directed_2007_2010",
+          "source_text": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "rerank": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "merge": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "source_unit": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "context": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ]
+          }
+        },
+        {
+          "fact": "hop2_franconia",
+          "source_text": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+          "exact_fact_in_actual_wire": false,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "31417c7c-7abf-4723-956a-74bf7ee14683"
+            ],
+            "rerank": [],
+            "merge": [],
+            "source_unit": [],
+            "context": []
+          }
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 3
+        },
+        "merge": {
+          "candidate_count": 3
+        },
+        "source_unit": {
+          "candidate_count": 3
+        },
+        "context": {
+          "selected_evidence_count": 3
+        }
+      },
+      "stage_sequence": [
+        [
+          "understand",
+          "started"
+        ],
+        [
+          "understand",
+          "completed"
+        ],
+        [
+          "retrieval",
+          "started"
+        ],
+        [
+          "retrieval",
+          "completed"
+        ],
+        [
+          "rerank",
+          "started"
+        ],
+        [
+          "rerank",
+          "completed"
+        ],
+        [
+          "merge",
+          "started"
+        ],
+        [
+          "merge",
+          "completed"
+        ],
+        [
+          "source_unit",
+          "started"
+        ],
+        [
+          "source_unit",
+          "completed"
+        ],
+        [
+          "context",
+          "started"
+        ],
+        [
+          "context",
+          "completed"
+        ]
+      ],
+      "pipeline_error_type": null,
+      "final_result_ids": [
+        "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+        "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+        "012d7ead-19c0-49bc-8a66-fdf9e89359e3"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 7079,
+        "provider_by_capability": {
+          "chat": {
+            "calls": 2,
+            "reported_tokens": 3537,
+            "unreported_usage_calls": 0
+          },
+          "embedding": {
+            "calls": 1,
+            "reported_tokens": 23,
+            "unreported_usage_calls": 0
+          },
+          "rerank": {
+            "calls": 1,
+            "reported_tokens": 3519,
+            "unreported_usage_calls": 0
+          }
+        },
+        "generation_usage": {
+          "prompt_tokens": 905,
+          "completion_tokens": 235,
+          "total_tokens": 1140,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 905,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 905,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 235,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 1140,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 905,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":235,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":905,\"prompt_tokens\":905,\"total_tokens\":1140}]",
+            "raw_sha256": "381d8cf7d92e3da28be3e63cc546146db01a39ad030cdeb5a4a490807301d892",
+            "derived_total": 1140,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 10863.49,
+        "ttfc_ms": 10863.28,
+        "latency_ms": 11146.41,
+        "memory": {
+          "sample_count": 0,
+          "host_mem_available_min_kib": null,
+          "container_memory_peak_bytes": null
+        }
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 162,
+        "completed_execute_calls": 161,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 682.995,
+        "window_elapsed_ms": 10860.162,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "source_provenance_limit": "Target content read from saved retrieval stage records with chunk_type=text and exact fact membership checked in actual wire; no independent source-file byte readback exists in supplied case bundle. Historical fact checkpoints support expected answer. This is weaker provenance than batch1 independent original-byte hash readback.",
+      "factual_review": {
+        "gold_type": "HotpotQA location answer plus both supporting relations.",
+        "answer_factual_status": "FAIL_UNSUPPORTED_LOCATION",
+        "requested_answer_status": "FAIL",
+        "unsupported_fact_status": "FAIL",
+        "first_quality_loss": "RERANK",
+        "first_quality_loss_proof": "Both arms retrieve exact original text locating The Frost Place in Franconia, New Hampshire, United States; that original location relation and associated source summary are absent after rerank and from actual wire.",
+        "required_fact_coverage": "1/2 required relation facts in actual wire, despite source document hits earlier.",
+        "proof": [
+          {
+            "source": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010",
+            "answer": "2007 年至 2010 年间...The Frost Place Advanced Seminar"
+          },
+          {
+            "source": "The Frost Place ... located ... in Franconia, New Hampshire, United States.",
+            "answer": "纽约市（New York City）"
+          }
+        ],
+        "error": "B conflates Beaumont moving to New York City in 1983 with seminar location, adds unsupported assertion that Frost Place is usually associated with New York, and says 任职 where the source says moved. Stating inference and missing address does not support the claimed city.",
+        "omissions": "Franconia, New Hampshire, United States second-hop relation absent in delivered context and answer.",
+        "noise": "Biographical teaching/publication/film/residence context survives. B source expansion adds predecessor biography chunks; it cannot recover a different location document already dropped by rerank.",
+        "interpretation": "Expected negative control for rerank loss; source expansion is not expected to repair missing other-document hop."
+      },
+      "citation_review": {
+        "status": "SOURCE_FILENAME_PRESENT_BUT_INSUFFICIENT_FOR_LOCATION",
+        "note": "Cites exact Beaumont filename; it supports direction dates but not seminar city. No citation to missing Frost Place location source. UI click not tested."
+      }
+    },
+    {
+      "case_id": "engineering-unanswerable-postcode::source-bounded",
+      "arm": "B",
+      "source_mode": "bounded_source_v1",
+      "actual_answer": "根据提供的资料，无法回答关于会议场地的邮政编码。\n\n提供的文档中：\n1. 第一份文档（关于物理能量与热传递）与会议场地无关。\n2. 第二份文档（关于深度学习和猫狗分类）仅提到会议于2015年5月在**瑞典皇家理工学院**（KTH）举办，但未提及该场地的具体邮政编码。\n\n因此，基于现有材料无法提供该邮政编码。\n\nSources: b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95, catvsdogdlpycon15se-150512122612-lva1-app6891_95",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\c7e0fb28597260f07b2dd34c489a25fe1292a0de5f6ffe264ee8bf3cf145b83c\\evidence\\c82dc553d6404f699976245c632b185e.request.json",
+      "provider_request_sha256": "7a0500c4021ac5b959825a4bea49b2dae0bb6fd085877cc5e52542e9c8a6fbbb",
+      "stage_file": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\c7e0fb28597260f07b2dd34c489a25fe1292a0de5f6ffe264ee8bf3cf145b83c\\evidence\\0a70700694944e359a25f67416391c63d240c928283d8f7ef387607b6157c7c8.stages.json",
+      "stage_file_sha256": "61ecaa6db5443dfff9f2635234a6db6eec9726847033a2516daf50e0af982236",
+      "provider_wire_chars_all_messages": 2310,
+      "provider_user_chars": 114,
+      "legacy_context_chars": null,
+      "legacy_context_is_actual_wire": null,
+      "legacy_context_note": "Actual provider body.messages is authoritative. Legacy context may differ; no finalized context exists on SearchNothing fallback.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "actual_wire_chunks": [],
+      "actual_wire_evidence_content_chars": 0,
+      "target_chunks": [],
+      "fact_coverage": [],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        }
+      },
+      "stage_sequence": [
+        [
+          "understand",
+          "started"
+        ],
+        [
+          "understand",
+          "completed"
+        ],
+        [
+          "retrieval",
+          "started"
+        ],
+        [
+          "retrieval",
+          "completed"
+        ],
+        [
+          "rerank",
+          "started"
+        ]
+      ],
+      "pipeline_error_type": "SearchNothing",
+      "final_result_ids": [],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 6381,
+        "provider_by_capability": {
+          "chat": {
+            "calls": 2,
+            "reported_tokens": 3146,
+            "unreported_usage_calls": 0
+          },
+          "embedding": {
+            "calls": 1,
+            "reported_tokens": 18,
+            "unreported_usage_calls": 0
+          },
+          "rerank": {
+            "calls": 1,
+            "reported_tokens": 3217,
+            "unreported_usage_calls": 0
+          }
+        },
+        "generation_usage": {
+          "prompt_tokens": 602,
+          "completion_tokens": 165,
+          "total_tokens": 767,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 602,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 602,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 165,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 767,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 602,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":165,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":602,\"prompt_tokens\":602,\"total_tokens\":767}]",
+            "raw_sha256": "b28bd907f9a69733f6bd57206fc63011157f7a88d5affbf17d93e71a305fe496",
+            "derived_total": 767,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 10891.07,
+        "ttfc_ms": 10890.7,
+        "latency_ms": 11170.4,
+        "memory": {
+          "sample_count": 0,
+          "host_mem_available_min_kib": null,
+          "container_memory_peak_bytes": null
+        }
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 136,
+        "completed_execute_calls": 136,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 780.345,
+        "window_elapsed_ms": 10888.649,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "source_provenance_limit": "No target original source or source-byte readback in this case. Only saved retrieval candidates and generated doc-list metadata in actual fallback wire; metadata cannot prove venue or absence across unread courseware.",
+      "factual_review": {
+        "gold_type": "Engineering unanswerable/abstain control; not official dataset Gold.",
+        "answer_factual_status": "FAIL_UNREAD_METADATA_AS_FACT",
+        "requested_postcode_status": "PASS_ABSTAIN_NO_DIGITS_INVENTED",
+        "first_quality_loss": "RERANK_SEARCHNOTHING_FALLBACK_FOR_DELIVERY; ANSWER_FOR_UNSUPPORTED_DETAILS",
+        "required_fact_coverage": "No source chunks delivered. Fallback system prompt only contains generated truncated document-list descriptions.",
+        "proof": [
+          {
+            "actual_wire_metadata": "这是一份2015年5月在瑞典皇家理工学院（KTH）举办的关于深度学习和数据科学的演示文稿",
+            "answer": "会议于2015年5月在瑞典皇家理工学院（KTH）举办"
+          },
+          {
+            "actual_wire_instruction": "Treat the document listing as metadata ... cannot support a summary of unread contents or detailed factual claims.",
+            "answer": "Both describe unread courseware contents and imply venue from metadata."
+          }
+        ],
+        "error": "Both withhold postal code but promote unread generated listing metadata to detailed claims. B explicitly equates KTH presentation metadata with the asked conference venue. A similarly presents KTH/course contents as read facts. Saved inventory instead identifies The Deep Learning Conspirators / Université de Montréal context; no delivered original source establishes requested venue or postcode.",
+        "omissions": "No actual source evidence for postal code or venue, no original courseware chunk; full courseware absence is not independently re-established by this fallback wire.",
+        "noise": "Fallback lists unrelated physics and cat/dog deep-learning document descriptions.",
+        "source_mode_effect": "Source-unit processing never runs in either arm due SearchNothing before completed rerank; no claim that bounded mode removes fallback metadata summaries."
+      },
+      "citation_review": {
+        "status": "FAIL_TITLES_AS_SOURCES",
+        "note": "B lists document titles from metadata, not actual supplied source filename evidence; A ends Sources: 无. Neither supplies evidence for detailed venue/content claims."
+      },
+      "fallback_metadata": {
+        "actual_wire_has_truncated_generated_descriptions": true,
+        "original_chunk_count": 0,
+        "explicit_metadata_only_instruction_present": true,
+        "system_metadata_snippet": "You are WeKnora, a professional and friendly AI assistant developed by Tencent.\n\nNo content directly matched the user's query via search. However, the knowledge base contains the following documents:\n\n- b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95 (pdf): 该文档是物理课程关于能量与热传递的笔记，涵盖了温度与热能的定义、比热容和潜热的计算公式、热传递的三种方式（传导、对流、辐射）及其在房屋隔热中的应用。此外，文档还介绍了激光的特性与用途、红外线与微波的烹...\n- catvsdogdlpycon15se-150512122612-lva1-app6891_95 (pdf): 这是一份2015年5月在瑞典皇家理工学院（KTH）举办的关于深度学习和数据科学的演示文稿，由Roelof Pieters主讲。文档介绍了用于图像识别（如猫狗分类）的主要Python库，包括用于机器学习...\n\n\n",
+        "summary_marker_absence_does_not_mean_no_generated_content": true
+      }
+    },
+    {
+      "case_id": "hotpotqa-5a7631cd5542994ccc91870c::source-off",
+      "arm": "A",
+      "source_mode": "off",
+      "actual_answer": "根据提供的资料，Jeanne Marie Beaumont 在 2007 年至 2010 年期间担任“Frost Place Advanced Seminar”的主任。\n\n资料中未包含该 seminar 的具体地理位置信息，仅提及了 seminar 的名称。\n\nSources: 4866720cf65df06daf5ae77f99c9f1390aad9021d5f06c933c15d7dba22d71dd.txt",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\df6ea66aa2b578067273ecac8c33d80bdb75f379411327d0c21e34a28dcb0306\\evidence\\58df5e11aaa348318980dde5f19cbd32.request.json",
+      "provider_request_sha256": "211ee52f48c8534647dfe1b5fb4536781b8bf504af1cce72295fcb1c4192337d",
+      "stage_file": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\df6ea66aa2b578067273ecac8c33d80bdb75f379411327d0c21e34a28dcb0306\\evidence\\af69195a551d71219b33781375b75f1f7f2b3df499949cc575e49bc699329e7e.stages.json",
+      "stage_file_sha256": "079425e21024790ac9b0175c7af67be47d948e5eadb54fafe206d012118b4d99",
+      "provider_wire_chars_all_messages": 4378,
+      "provider_user_chars": 3073,
+      "legacy_context_chars": 3387,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Actual provider body.messages is authoritative. Legacy context may differ; no finalized context exists on SearchNothing fallback.",
+      "actual_wire_summary_marker": true,
+      "actual_wire_summary_chunk_type": true,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"4\" view=\"full\" type=\"summary\">",
+          "chars": 897
+        },
+        {
+          "tag": "<chunk index=\"3\" view=\"full\" type=\"text\">",
+          "chars": 729
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 728
+        }
+      ],
+      "actual_wire_evidence_content_chars": 2354,
+      "target_chunks": [
+        {
+          "id": "fee4d31b-8589-5875-992e-4630fec57b3e",
+          "type": "summary",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 893,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "# Summary\nBiographical profile of American poet Jeanne Marie Beaumont covering her career, publications, teaching, and film adapta\n\nJeanne Marie Beaumont is an American poet with four poetry collections, including 'Letters from Limbo' (2016",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "abc3a6aa-5453-4f0a-b7b6-5270cc96067f",
+          "type": "text",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 284,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "Jeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "86c40ec8-2147-431b-a1d4-3bfbc08e1232",
+          "type": "text",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 486,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": " The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010.\n Beaumont was co-editor of \"American Letters & Commentary\" from 199",
+          "stage_membership": [
+            "retrieval"
+          ]
+        },
+        {
+          "id": "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "type": "text",
+          "knowledge_id": "a973df4a-0b4b-43f7-ad17-55265aac1556",
+          "chars": 311,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "from Eastern College and an M.F.A. in Writing from Columbia University.\n She has taught at Rutgers University and regularly teaches at the 92nd Street Y.\n She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and se",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "31417c7c-7abf-4723-956a-74bf7ee14683",
+          "type": "text",
+          "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "chars": 153,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+          "stage_membership": [
+            "retrieval"
+          ]
+        },
+        {
+          "id": "3966da48-dab5-5220-8594-f16bfbfdfc80",
+          "type": "summary",
+          "knowledge_id": "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+          "chars": 297,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": "# Summary\nA museum and nonprofit educational center for poetry at Robert Frost's former home in Franconia, New Hampshire.\n\nThe Frost Place is a museum and nonprofit educational center dedicated to poetry, situated at the former home of poet",
+          "stage_membership": [
+            "retrieval"
+          ]
+        }
+      ],
+      "fact_coverage": [
+        {
+          "fact": "hop1_directed_2007_2010",
+          "source_text": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "rerank": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "merge": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ],
+            "context": [
+              "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b"
+            ]
+          }
+        },
+        {
+          "fact": "hop2_franconia",
+          "source_text": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+          "exact_fact_in_actual_wire": false,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "31417c7c-7abf-4723-956a-74bf7ee14683"
+            ],
+            "rerank": [],
+            "merge": [],
+            "context": []
+          }
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 3
+        },
+        "merge": {
+          "candidate_count": 3
+        },
+        "context": {
+          "selected_evidence_count": 3
+        }
+      },
+      "stage_sequence": [
+        [
+          "understand",
+          "started"
+        ],
+        [
+          "understand",
+          "completed"
+        ],
+        [
+          "retrieval",
+          "started"
+        ],
+        [
+          "retrieval",
+          "completed"
+        ],
+        [
+          "rerank",
+          "started"
+        ],
+        [
+          "rerank",
+          "completed"
+        ],
+        [
+          "merge",
+          "started"
+        ],
+        [
+          "merge",
+          "completed"
+        ],
+        [
+          "context",
+          "started"
+        ],
+        [
+          "context",
+          "completed"
+        ]
+      ],
+      "pipeline_error_type": null,
+      "final_result_ids": [
+        "fee4d31b-8589-5875-992e-4630fec57b3e",
+        "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+        "abc3a6aa-5453-4f0a-b7b6-5270cc96067f"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 7155,
+        "provider_by_capability": {
+          "chat": {
+            "calls": 2,
+            "reported_tokens": 3700,
+            "unreported_usage_calls": 0
+          },
+          "embedding": {
+            "calls": 1,
+            "reported_tokens": 19,
+            "unreported_usage_calls": 0
+          },
+          "rerank": {
+            "calls": 1,
+            "reported_tokens": 3436,
+            "unreported_usage_calls": 0
+          }
+        },
+        "generation_usage": {
+          "prompt_tokens": 1192,
+          "completion_tokens": 115,
+          "total_tokens": 1307,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 1192,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 1192,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 115,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 1307,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 1192,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":115,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1192,\"prompt_tokens\":1192,\"total_tokens\":1307}]",
+            "raw_sha256": "05de7bd18c67c266711a31d1e0a0040dd0667fd95357349aaa3aa3cf0bb5e151",
+            "derived_total": 1307,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 7613.51,
+        "ttfc_ms": 7613.25,
+        "latency_ms": 7883.68,
+        "memory": {
+          "sample_count": 0,
+          "host_mem_available_min_kib": null,
+          "container_memory_peak_bytes": null
+        }
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 161,
+        "completed_execute_calls": 161,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 521.708,
+        "window_elapsed_ms": 7611.165,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "source_provenance_limit": "Target content read from saved retrieval stage records with chunk_type=text and exact fact membership checked in actual wire; no independent source-file byte readback exists in supplied case bundle. Historical fact checkpoints support expected answer. This is weaker provenance than batch1 independent original-byte hash readback.",
+      "factual_review": {
+        "gold_type": "HotpotQA location answer plus both supporting relations.",
+        "answer_factual_status": "FAIL_MISSING_LOCATION_WITH_CALIBRATED_ABSTENTION",
+        "requested_answer_status": "FAIL",
+        "unsupported_fact_status": "PASS",
+        "first_quality_loss": "RERANK",
+        "first_quality_loss_proof": "Both arms retrieve exact original text locating The Frost Place in Franconia, New Hampshire, United States; that original location relation and associated source summary are absent after rerank and from actual wire.",
+        "required_fact_coverage": "1/2 required relation facts in actual wire, despite source document hits earlier.",
+        "proof": [
+          {
+            "source": "She served as the Director of The Frost Place Advanced Seminar from 2007–2010",
+            "answer": "2007 年至 2010 年期间...Frost Place Advanced Seminar"
+          },
+          {
+            "source": "The Frost Place ... located ... in Franconia, New Hampshire, United States.",
+            "answer": "未包含该 seminar 的具体地理位置信息"
+          }
+        ],
+        "error": "A does not provide the expected location, but accurately acknowledges evidence gap in delivered context and does not invent a city.",
+        "omissions": "Franconia, New Hampshire, United States second-hop relation absent in delivered context and answer.",
+        "noise": "Biographical teaching/publication/film/residence context survives. B source expansion adds predecessor biography chunks; it cannot recover a different location document already dropped by rerank.",
+        "interpretation": "Expected negative control for rerank loss; source expansion is not expected to repair missing other-document hop."
+      },
+      "citation_review": {
+        "status": "SOURCE_FILENAME_PRESENT_BUT_INSUFFICIENT_FOR_LOCATION",
+        "note": "Cites exact Beaumont filename; it supports direction dates but not seminar city. No citation to missing Frost Place location source. UI click not tested."
+      }
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b::source-off",
+      "arm": "A",
+      "source_mode": "off",
+      "actual_answer": "根据提供的资料，皮特·范·穆斯克布鲁克（Pieter van Musschenbroek）是莱顿瓶（Leyden jar）和摩擦仪（Tribometer）的发明者，他是一位18世纪的荷兰科学家。\n\n*   **莱顿瓶**：资料指出，范·穆斯克布鲁克于1746年发明了莱顿瓶，这是世界上第一个电容器。\n*   **摩擦仪**：资料提到，一种用于测量两个接触表面之间摩擦和磨损的仪器（摩擦仪）是由18世纪的荷兰科学家穆斯克布鲁克发明的。\n\nSources: e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc.txt, 613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825.txt",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\e9ea6f3e8692c6f9948c1ef18ea377086c60601e2f2f368dd743d85e6e7cfffc\\evidence\\0f5c7a6be14341d9b12a49e34961654f.request.json",
+      "provider_request_sha256": "b8632b6c7399459514d3874f2d2db461f5398aa09d3af95817b4b4d683b17471",
+      "stage_file": "var\\reports\\s8-3-r-20261020\\downloaded-final\\executions\\e9ea6f3e8692c6f9948c1ef18ea377086c60601e2f2f368dd743d85e6e7cfffc\\evidence\\b84df35570608f565aae7405918933afe0bf2e15f0bacd1ea19c633a32a02f2e.stages.json",
+      "stage_file_sha256": "b9007b7f8d07987655b09921cdc56eb865e222c00d13789e9ae153596128b2e1",
+      "provider_wire_chars_all_messages": 5938,
+      "provider_user_chars": 4633,
+      "legacy_context_chars": 5264,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Actual provider body.messages is authoritative. Legacy context may differ; no finalized context exists on SearchNothing fallback.",
+      "actual_wire_summary_marker": true,
+      "actual_wire_summary_chunk_type": true,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"2\" view=\"full\" type=\"summary\">",
+          "chars": 612
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 366
+        },
+        {
+          "tag": "<chunk index=\"2\" view=\"full\" type=\"summary\">",
+          "chars": 542
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 476
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 429
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 234
+        },
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"summary\">",
+          "chars": 367
+        }
+      ],
+      "actual_wire_evidence_content_chars": 3026,
+      "target_chunks": [
+        {
+          "id": "0dbba904-45e0-5b5a-9e7b-6d9e7092347d",
+          "type": "summary",
+          "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "chars": 612,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "# Summary\nDutch scientist Pieter van Musschenbroek's scientific career and contributions.\n\nPieter van Musschenbroek (1692–1761) was a Dutch scientist who held positions in mathematics, philosophy, medicine, and astronomy across Duisburg, Ut",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "c7df42db-cc48-4c54-beb1-75adcba4dd4b",
+          "type": "text",
+          "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "chars": 366,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "Pieter van Musschenbroek (14 March 1692 – 19 September 1761) was a Dutch scientist.\n He was a professor in Duisburg, Utrecht, and Leiden, where he held positions in mathematics, philosophy, medicine, and astronomy.\n He is credited with the ",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "41295870-5f65-458c-b045-85280c1184a3",
+          "type": "text",
+          "knowledge_id": "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253",
+          "chars": 234,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "A tribometer is an instrument that measures tribological quantities, such as coefficient of friction, friction force, and wear volume, between two surfaces in contact.\n It was invented by the 18th century Dutch scientist Musschenbroek",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "ffd035d9-4c47-52da-b057-b0fab55a8d07",
+          "type": "summary",
+          "knowledge_id": "a9aa34bf-0b2b-4bce-b0d4-fa1c18a8b253",
+          "chars": 367,
+          "exact_content_in_actual_wire": true,
+          "xml_escaped_content_in_actual_wire": true,
+          "short_proof": "# Summary\nA tribometer is an instrument for measuring friction and wear between two surfaces.\n\nThe document defines a tribometer as an instrument for measuring tribological quantities like coefficient of friction, friction force, and wear v",
+          "stage_membership": [
+            "retrieval",
+            "rerank",
+            "merge",
+            "context"
+          ]
+        },
+        {
+          "id": "02b53bb6-34d0-4f26-836c-22ebdc156cf7",
+          "type": "text",
+          "knowledge_id": "4c4ac0af-303d-4ef8-8456-da62c9996153",
+          "chars": 412,
+          "exact_content_in_actual_wire": false,
+          "xml_escaped_content_in_actual_wire": false,
+          "short_proof": " He performed pioneering work on the buckling of compressed struts.\n Musschenbroek was also one of the first scientists (1729) to provide detailed descriptions of testing machines for tension, compression, and flexure testing.\n An early exa",
+          "stage_membership": [
+            "retrieval"
+          ]
+        }
+      ],
+      "fact_coverage": [
+        {
+          "fact": "identity",
+          "source_text": "Pieter van Musschenbroek (14 March 1692 – 19 September 1761) was a Dutch scientist.",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "rerank": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "merge": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "context": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ]
+          }
+        },
+        {
+          "fact": "leyden_invention",
+          "source_text": "He is credited with the invention of the first capacitor in 1746: the Leyden jar.",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "rerank": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "merge": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ],
+            "context": [
+              "c7df42db-cc48-4c54-beb1-75adcba4dd4b"
+            ]
+          }
+        },
+        {
+          "fact": "tribometer_invention",
+          "source_text": "It was invented by the 18th century Dutch scientist Musschenbroek",
+          "exact_fact_in_actual_wire": true,
+          "stages_with_supporting_original_text": {
+            "retrieval": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "rerank": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "merge": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ],
+            "context": [
+              "41295870-5f65-458c-b045-85280c1184a3"
+            ]
+          }
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 7
+        },
+        "merge": {
+          "candidate_count": 7
+        },
+        "context": {
+          "selected_evidence_count": 7
+        }
+      },
+      "stage_sequence": [
+        [
+          "understand",
+          "started"
+        ],
+        [
+          "understand",
+          "completed"
+        ],
+        [
+          "retrieval",
+          "started"
+        ],
+        [
+          "retrieval",
+          "completed"
+        ],
+        [
+          "rerank",
+          "started"
+        ],
+        [
+          "rerank",
+          "completed"
+        ],
+        [
+          "merge",
+          "started"
+        ],
+        [
+          "merge",
+          "completed"
+        ],
+        [
+          "context",
+          "started"
+        ],
+        [
+          "context",
+          "completed"
+        ]
+      ],
+      "pipeline_error_type": null,
+      "final_result_ids": [
+        "0dbba904-45e0-5b5a-9e7b-6d9e7092347d",
+        "c7df42db-cc48-4c54-beb1-75adcba4dd4b",
+        "590cbdc6-a1f1-50f1-87a4-60c95d11444c",
+        "e8a751ff-032c-4c8c-bb31-4eddc73b3a86",
+        "41295870-5f65-458c-b045-85280c1184a3",
+        "2a95d110-78f3-49e3-ad76-1f6582b7496c",
+        "ffd035d9-4c47-52da-b057-b0fab55a8d07"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 8029,
+        "provider_by_capability": {
+          "chat": {
+            "calls": 2,
+            "reported_tokens": 4344,
+            "unreported_usage_calls": 0
+          },
+          "embedding": {
+            "calls": 1,
+            "reported_tokens": 20,
+            "unreported_usage_calls": 0
+          },
+          "rerank": {
+            "calls": 1,
+            "reported_tokens": 3665,
+            "unreported_usage_calls": 0
+          }
+        },
+        "generation_usage": {
+          "prompt_tokens": 1723,
+          "completion_tokens": 241,
+          "total_tokens": 1964,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 1723,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 1723,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 241,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 1964,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 1723,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":241,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1723,\"prompt_tokens\":1723,\"total_tokens\":1964}]",
+            "raw_sha256": "b59635ad02a493307a8de836c7d77d4976c59b54fa4bf6c6e21d1d3e24c5b1d4",
+            "derived_total": 1964,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 10074.36,
+        "ttfc_ms": 10074.05,
+        "latency_ms": 10378.12,
+        "memory": {
+          "sample_count": 0,
+          "host_mem_available_min_kib": null,
+          "container_memory_peak_bytes": null
+        }
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 157,
+        "completed_execute_calls": 157,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 506.07,
+        "window_elapsed_ms": 10071.019,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "source_provenance_limit": "Target content read from saved retrieval stage records with chunk_type=text and exact fact membership checked in actual wire; no independent source-file byte readback exists in supplied case bundle. Historical fact checkpoints support expected answer. This is weaker provenance than batch1 independent original-byte hash readback.",
+      "factual_review": {
+        "gold_type": "HotpotQA answer entity plus explicit two invention relations.",
+        "answer_factual_status": "PASS",
+        "requested_answer_status": "PASS",
+        "first_quality_loss": "NONE_FOR_REQUIRED_FACTS",
+        "required_fact_coverage": "3/3 explicit original facts in actual wire: Pieter identity, Leyden invention credited to him in 1746, tribometer invented by Dutch scientist Musschenbroek.",
+        "proof": [
+          {
+            "source": "Pieter van Musschenbroek ... was a Dutch scientist.",
+            "answer": "Pieter van Musschenbroek ... 荷兰科学家"
+          },
+          {
+            "source": "He is credited with the invention of the first capacitor in 1746: the Leyden jar.",
+            "answer": "1746年...莱顿瓶"
+          },
+          {
+            "source": "It was invented by the 18th century Dutch scientist Musschenbroek",
+            "answer": "摩擦仪...18世纪的荷兰科学家Musschenbroek"
+          }
+        ],
+        "omissions": "No required identity/invention relation omissions.",
+        "noise": "Original Leyden jar construction and Franklin electrostatic-machine chunks remain; A additionally delivers generated summaries. B reduces evidence text from 3026 to 1505 characters while retaining all three required facts.",
+        "quantifier_note": "The source credits this man with the inventions. Answer does not claim exclusivity over all historical attribution."
+      },
+      "citation_review": {
+        "status": "PASS_FILENAME_ATTRIBUTION",
+        "note": "Both exact supplied original filenames for Pieter and tribometer are cited. Citation granularity is filename, not pinpoint chunk/line. UI click not tested."
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "case_id": "hotpotqa-5a7631cd5542994ccc91870c",
+      "original_query_rewrite_request_body_equal": true,
+      "rewrite_A": "Where is the seminar directed by Jeanne Marie Beaumont located in 2007-2010?",
+      "rewrite_B": "Where is the seminar directed by Jeanne Marie Beaumont located that took place between 2007 and 2010?",
+      "embedding_body_equal": false,
+      "rerank_body_equal": false,
+      "search_id_order_equal": false,
+      "search_id_set_equal": false,
+      "search_content_and_scores_equal": false,
+      "rerank_content_and_scores_equal": false,
+      "merge_content_and_scores_equal": false,
+      "observed_change": {
+        "all_message_chars_A_B": [
+          4378,
+          3348
+        ],
+        "evidence_content_chars_A_B": [
+          2354,
+          1243
+        ],
+        "reported_tokens_A_B": [
+          7155,
+          7079
+        ],
+        "post_to_complete_ms_A_B": [
+          7613.51,
+          10863.49
+        ]
+      },
+      "limitations": [
+        "One trial per arm, variable rewrite/rerank output and provider latency; normal end-to-end A/B, not a frozen post-rerank intervention.",
+        "No inference of statistically significant quality or latency effect."
+      ]
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "original_query_rewrite_request_body_equal": true,
+      "rewrite_A": "Who is credited with inventing both the Leyden jar and the Tribometer?",
+      "rewrite_B": "Who is credited with inventing both the Leyden jar and the tribometer?",
+      "embedding_body_equal": false,
+      "rerank_body_equal": false,
+      "search_id_order_equal": false,
+      "search_id_set_equal": false,
+      "search_content_and_scores_equal": false,
+      "rerank_content_and_scores_equal": false,
+      "merge_content_and_scores_equal": false,
+      "observed_change": {
+        "all_message_chars_A_B": [
+          5938,
+          4265
+        ],
+        "evidence_content_chars_A_B": [
+          3026,
+          1505
+        ],
+        "reported_tokens_A_B": [
+          8029,
+          7673
+        ],
+        "post_to_complete_ms_A_B": [
+          10074.36,
+          9130.3
+        ]
+      },
+      "limitations": [
+        "One trial per arm, variable rewrite/rerank output and provider latency; normal end-to-end A/B, not a frozen post-rerank intervention.",
+        "No inference of statistically significant quality or latency effect."
+      ]
+    },
+    {
+      "case_id": "engineering-unanswerable-postcode",
+      "original_query_rewrite_request_body_equal": true,
+      "rewrite_A": "课程资料中提到的会议场地邮编是多少",
+      "rewrite_B": "According to this courseware, what is the conference venue's postal code?",
+      "embedding_body_equal": false,
+      "rerank_body_equal": false,
+      "search_id_order_equal": false,
+      "search_id_set_equal": false,
+      "search_content_and_scores_equal": false,
+      "rerank_content_and_scores_equal": "NOT_COMPLETED",
+      "merge_content_and_scores_equal": "NOT_COMPLETED",
+      "observed_change": {
+        "all_message_chars_A_B": [
+          2198,
+          2310
+        ],
+        "evidence_content_chars_A_B": [
+          0,
+          0
+        ],
+        "reported_tokens_A_B": [
+          6285,
+          6381
+        ],
+        "post_to_complete_ms_A_B": [
+          8613.82,
+          10891.07
+        ]
+      },
+      "limitations": [
+        "One trial per arm, variable rewrite/rerank output and provider latency; normal end-to-end A/B, not a frozen post-rerank intervention.",
+        "No inference of statistically significant quality or latency effect."
+      ]
+    }
+  ],
+  "overall": {
+    "answer_quality": "Frost both fail requested location: A calibrates abstention, B invents NYC. Leyden both PASS all explicit supporting facts. Postcode both abstain/no fabricated postcode but fail full factual restraint by promoting unread generated metadata to venue/content facts.",
+    "delivery": "Hotpot B wires remove generated summaries and contain only source_text chunks. Frost second hop lost at RERANK in both. Postcode uses no-context SearchNothing fallback before source_unit/context; generated truncated descriptions remain in SYSTEM prompt.",
+    "comparability": "All paired query-rewrite request bodies match, but output rewrites differ for all three pairs. Embedding/rerank request bodies and retrieval sets/order/content differ. Source-mode quality effects are confounded by natural upstream variability.",
+    "persistence": "Six saved PG audits PASS with SSE complete and persisted assistant content exact match.",
+    "limits": [
+      "No new model, database or network calls. Original byte provenance for batch2 target files not independently verified; exact fact substrings and original chunk types are checked in saved stage/wire records.",
+      "Memory sample_count=0 for all six: memory peaks NOT MEASURED, not zero.",
+      "Reported usage aggregates chat/embedding/rerank; generation-only usage saved separately.",
+      "No full-courseware proof of absence or UI citation-click test.",
+      "RAG SQL observations are scoped client observations, not all PostgreSQL workload.",
+      "Only one execution per arm; no significance or causal quality/latency conclusion."
+    ]
+  }
+}

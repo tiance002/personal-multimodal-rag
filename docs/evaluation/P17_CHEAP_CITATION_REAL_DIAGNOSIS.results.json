@@ -1,0 +1,499 @@
+{
+  "schema": "p17-cheap-citation-real-diagnosis/v1",
+  "status": "P17_COMPLETE",
+  "cases": [
+    {
+      "qid": "692002#0",
+      "question": "美国有哪些经济学专家？",
+      "run_id": "f3ca9fe6-ed08-41b7-9432-67835cd0a74d",
+      "attempt_id": "f3ca9fe6-ed08-41b7-9432-67835cd0a74d/answer/1/cheap",
+      "root_cause": "NOT_REPRODUCED_VALID_CITATION_PRESERVED",
+      "raw_answer": "# 美国经济学专家\n\n根据参考资料，芝加哥大学拥有众多诺贝尔奖得主，他们是美国经济学领域的杰出专家：\n\n- **米尔顿·弗里德曼**（Milton Friedman）\n- **乔治·斯蒂格勒**（George Stigler）\n- **罗纳德·科斯**（Ronald Coase）\n- **尤金·法马**（Eugene Fama）\n- **拉尔斯·彼得·汉森**（Lars Peter Hansen）\n\n其中，**乔治·斯蒂格勒**于1982年荣获诺贝尔经济学奖，是全球商学院教授获此殊荣的第一人。截至2019年，芝加哥大学经济系共有33位诺贝尔奖得主曾在此学习或工作，位居世界首位。\n\n这些经济学家共同构成了著名的**芝加哥经济学派**，坚持自由主义经济学立场。\n\n> 来源：芝加哥大学相关资料（<ref id=\"c1\"/>）",
+      "raw_answer_chars": 364,
+      "raw_delta_count": 194,
+      "adapter_and_decoder_inputs_exact": true,
+      "decoder_output": "# 美国经济学专家\n\n根据参考资料，芝加哥大学拥有众多诺贝尔奖得主，他们是美国经济学领域的杰出专家：\n\n- **米尔顿·弗里德曼**（Milton Friedman）\n- **乔治·斯蒂格勒**（George Stigler）\n- **罗纳德·科斯**（Ronald Coase）\n- **尤金·法马**（Eugene Fama）\n- **拉尔斯·彼得·汉森**（Lars Peter Hansen）\n\n其中，**乔治·斯蒂格勒**于1982年荣获诺贝尔经济学奖，是全球商学院教授获此殊荣的第一人。截至2019年，芝加哥大学经济系共有33位诺贝尔奖得主曾在此学习或工作，位居世界首位。\n\n这些经济学家共同构成了著名的**芝加哥经济学派**，坚持自由主义经济学立场。\n\n> 来源：芝加哥大学相关资料（<kb doc=\"e86fa4bb21efcfb2bf027beb\" chunk_id=\"43c6d4c8-3234-4071-848a-1fc0510fda58\" kb_id=\"214b8b2f-84f9-4d75-ab79-eccbdcd50ec2\" />）",
+      "decoder_output_chars": 480,
+      "decoder_equals_attempt_and_persistence": true,
+      "finish_reason": "stop",
+      "done_marker_received": true,
+      "http_network_eof_observed": false,
+      "protocol_capture_complete": true,
+      "raw_response_sha256": "d44a07c7707d65d6b7fa3bd78d084056b4d20575ef38aad9cff15515d05a490c",
+      "raw_response_path": "E:\\WK\\run\\p17-20261016\\raw\\b949cab9133a3f2da6ceea38cb9817df4ed22145e8bf3b3c5a3dad137b4bfaa4.body",
+      "journal_path": "E:\\WK\\run\\p17-20261016\\diagnostics\\b949cab9133a3f2da6ceea38cb9817df4ed22145e8bf3b3c5a3dad137b4bfaa4.jsonl",
+      "registry": {
+        "chunks": [
+          [
+            "c1",
+            [
+              "43c6d4c8-3234-4071-848a-1fc0510fda58",
+              "68c6a478-5f15-4284-871b-40f7e23e0389",
+              "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+              "e86fa4bb21efcfb2bf027beb",
+              0,
+              "text"
+            ]
+          ]
+        ],
+        "documents": [
+          [
+            "d1",
+            "68c6a478-5f15-4284-871b-40f7e23e0389"
+          ]
+        ],
+        "knowledge_bases": [
+          [
+            "b1",
+            "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2"
+          ]
+        ],
+        "webs": [],
+        "citable": "frozenset({'c1'})",
+        "resources": []
+      },
+      "valid_markers": [
+        "c1"
+      ],
+      "final_references": [
+        {
+          "id": "43c6d4c8-3234-4071-848a-1fc0510fda58",
+          "seq": 0,
+          "score": 0.32062595201005134,
+          "end_at": 181,
+          "content": "# 芝加哥大学\n\n米尔顿·弗里德曼、乔治·斯蒂格勒、罗纳德·科斯、尤金·法马、拉尔斯·彼得·汉森等众多诺贝尔奖得主坚持自由主义而被誉为芝加哥经济学派。截止至2019年，芝加哥大学的经济系中共有33位诺贝尔奖得主曾在此学习或工作、位居世界首位。其中，1982年，该校的经济学家同时也教授MBA课程的乔治·斯蒂格勒荣获诺贝尔经济奖，是全球商学院教授获此殊荣的第一人。",
+          "metadata": {
+            "assets": "[]",
+            "sha256": "5028866316aae6e496b566ccd8ae5d43dbff2a0b947991f79485f0bd4c5726d1",
+            "media_type": "text/markdown",
+            "chunk_count": "1",
+            "processed_at": "2026-10-16T08:07:51.516775+00:00",
+            "index_enabled": "true",
+            "indexed_count": "1",
+            "parser_engine": "markdown",
+            "source_version": "f87d2efb-8a26-4c04-b5eb-3ccde90fd4b9",
+            "parser_metadata": "map[document_id:68c6a478-5f15-4284-871b-40f7e23e0389 embedded_image_count:0 file_type:.md filename:e86fa4bb21efcfb2bf027beb.md input_bytes:502 knowledge_base_id:214b8b2f-84f9-4d75-ab79-eccbdcd50ec2 owner_id:p8-real-3de2eca0bea340babcde75ce60c9a366 parser_engine:markdown source_version:f87d2efb-8a26-4c04-b5eb-3ccde90fd4b9 status:parsed]"
+          },
+          "start_at": 0,
+          "chunk_type": "text",
+          "image_info": "",
+          "match_type": 0,
+          "chunk_index": 0,
+          "knowledge_id": "68c6a478-5f15-4284-871b-40f7e23e0389",
+          "sub_chunk_id": null,
+          "chunk_metadata": {
+            "source_version": "f87d2efb-8a26-4c04-b5eb-3ccde90fd4b9",
+            "source_filename": "e86fa4bb21efcfb2bf027beb.md",
+            "parsed_source_id": "68c6a478-5f15-4284-871b-40f7e23e0389:child:0"
+          },
+          "knowledge_title": "e86fa4bb21efcfb2bf027beb",
+          "parent_chunk_id": "",
+          "knowledge_source": "e86fa4bb21efcfb2bf027beb.md",
+          "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+          "knowledge_channel": "",
+          "knowledge_filename": "e86fa4bb21efcfb2bf027beb.md",
+          "knowledge_description": "芝加哥大学被誉为芝加哥经济学派，该学派众多诺贝尔奖得主（包括米尔顿·弗里德曼、乔治·斯蒂格勒、罗纳德·科斯、尤金·法马、拉尔斯·彼得·汉森等）坚持自由主义经济学。截至2019年，芝加哥大学经济系共有33位诺贝尔奖得主曾在此学习或工作，位居世界首位。其中1982年，乔治·斯蒂格勒成为首位同时教授MBA课程的商学院教授获诺贝尔经济学奖。"
+        }
+      ],
+      "source_readback": [
+        {
+          "data": {
+            "chunk_id": "43c6d4c8-3234-4071-848a-1fc0510fda58",
+            "document_id": "68c6a478-5f15-4284-871b-40f7e23e0389",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "filename": "e86fa4bb21efcfb2bf027beb.md",
+            "text": "# 芝加哥大学\n\n米尔顿·弗里德曼、乔治·斯蒂格勒、罗纳德·科斯、尤金·法马、拉尔斯·彼得·汉森等众多诺贝尔奖得主坚持自由主义而被誉为芝加哥经济学派。截止至2019年，芝加哥大学的经济系中共有33位诺贝尔奖得主曾在此学习或工作、位居世界首位。其中，1982年，该校的经济学家同时也教授MBA课程的乔治·斯蒂格勒荣获诺贝尔经济奖，是全球商学院教授获此殊荣的第一人。",
+            "chunk_index": 0,
+            "start": 0,
+            "end": 181,
+            "source_version": "f87d2efb-8a26-4c04-b5eb-3ccde90fd4b9",
+            "chunk_type": "text",
+            "page_number": null,
+            "image_info": [],
+            "source_url": "/api/v1/knowledge-bases/214b8b2f-84f9-4d75-ab79-eccbdcd50ec2/documents/68c6a478-5f15-4284-871b-40f7e23e0389/source"
+          },
+          "meta": {
+            "request_id": "c0ef3dd5-937f-4b7d-bed7-2c752e81b6a4"
+          }
+        }
+      ],
+      "same_system_prompt_as_p9": true,
+      "context_sha256": "da3c104d8ce60b8194ffed76720421caa253e1fab9cd4cf85225ba89b45a7eae",
+      "prompt_sha256": "d2dc24a1382fa720c11f5eaa178f6dc834a13d871787d94c9e717c1dd668dd90",
+      "usage": {
+        "prompt_tokens": 1265,
+        "completion_tokens": 195,
+        "total_tokens": 1460
+      },
+      "seconds": 8.209035999985645,
+      "historical_p9_cause": "UNRESOLVED_NO_PREDECODE_HISTORY"
+    },
+    {
+      "qid": "704170#0",
+      "question": "醇类化合物有哪些特征？",
+      "run_id": "955deefe-b90a-4b89-863a-1147d4b77ce7",
+      "attempt_id": "955deefe-b90a-4b89-863a-1147d4b77ce7/answer/1/cheap",
+      "root_cause": "MODEL_DID_NOT_GENERATE_CITATION",
+      "raw_answer": "## 醇类化合物的特征\n\n根据参考资料，醇类化合物的氧原子具有**孤电子对**，即没有成对的电子。与强酸性物质（如硫酸）反应时，醇可以表现出一定的**弱碱性**。\n\n具体来说，以甲醇为例，醇类化合物在化学性质上表现出以下特征：\n\n1. **氧原子具有孤电子对**：这是醇类化合物最核心的结构特征，决定了其化学性质。\n2. **可表现弱碱性**：醇的氧原子上的孤电子对使其能够与强酸（如硫酸）发生反应，表现出一定的碱性。\n\n醇类化合物通常含有羟基（—OH）结构，这是其区别于其他有机化合物的重要标志。",
+      "raw_answer_chars": 249,
+      "raw_delta_count": 157,
+      "adapter_and_decoder_inputs_exact": true,
+      "decoder_output": "## 醇类化合物的特征\n\n根据参考资料，醇类化合物的氧原子具有**孤电子对**，即没有成对的电子。与强酸性物质（如硫酸）反应时，醇可以表现出一定的**弱碱性**。\n\n具体来说，以甲醇为例，醇类化合物在化学性质上表现出以下特征：\n\n1. **氧原子具有孤电子对**：这是醇类化合物最核心的结构特征，决定了其化学性质。\n2. **可表现弱碱性**：醇的氧原子上的孤电子对使其能够与强酸（如硫酸）发生反应，表现出一定的碱性。\n\n醇类化合物通常含有羟基（—OH）结构，这是其区别于其他有机化合物的重要标志。",
+      "decoder_output_chars": 249,
+      "decoder_equals_attempt_and_persistence": true,
+      "finish_reason": "stop",
+      "done_marker_received": true,
+      "http_network_eof_observed": false,
+      "protocol_capture_complete": true,
+      "raw_response_sha256": "ae53050069501cec9a03719ff74ea14b8208760ae32ead07901eb226179ff899",
+      "raw_response_path": "E:\\WK\\run\\p17-20261016\\raw\\4d1dc1599069b66bb07f08eef3dbd73e3d9add961d992d04e60bb7d9ed53d3e4.body",
+      "journal_path": "E:\\WK\\run\\p17-20261016\\diagnostics\\4d1dc1599069b66bb07f08eef3dbd73e3d9add961d992d04e60bb7d9ed53d3e4.jsonl",
+      "registry": {
+        "chunks": [
+          [
+            "c1",
+            [
+              "8115c731-0638-420d-b08f-8ab56f25c88a",
+              "11ee49e6-8701-4b3e-bdfb-fd7ee7532509",
+              "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+              "a8159f4c332df8f40796bc50",
+              0,
+              "text"
+            ]
+          ]
+        ],
+        "documents": [
+          [
+            "d1",
+            "11ee49e6-8701-4b3e-bdfb-fd7ee7532509"
+          ]
+        ],
+        "knowledge_bases": [
+          [
+            "b1",
+            "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2"
+          ]
+        ],
+        "webs": [],
+        "citable": "frozenset({'c1'})",
+        "resources": []
+      },
+      "valid_markers": [],
+      "final_references": [],
+      "source_readback": [],
+      "same_system_prompt_as_p9": true,
+      "context_sha256": "11fa277a14696bdd982cf1823258bb0ae1ab007251357284d5b598cf37246454",
+      "prompt_sha256": "1029707f1b79e4c7d3676aba84dd8cf8bef03a0934d766278c26e2e9d4e449dd",
+      "usage": {
+        "prompt_tokens": 1205,
+        "completion_tokens": 160,
+        "total_tokens": 1365
+      },
+      "seconds": 7.444700799998827,
+      "historical_p9_cause": "UNRESOLVED_NO_PREDECODE_HISTORY"
+    }
+  ],
+  "rerank_settlements": [
+    {
+      "request_id": "f3ca9fe6-ed08-41b7-9432-67835cd0a74d/rerank",
+      "tokens": {
+        "input_tokens": 3404,
+        "output_tokens": 0,
+        "image_tokens": 0
+      },
+      "billed_units": {
+        "input_tokens": 3404,
+        "output_tokens": 0,
+        "image_tokens": 0,
+        "search_units": 0,
+        "classifications": 0
+      },
+      "settled_total": 3404,
+      "ledger_state": "settled",
+      "raw_sha256": "7e383b934fdafd590d1f3aa1f26b3228afe7fa359f5903def8047faabe9f9475"
+    },
+    {
+      "request_id": "955deefe-b90a-4b89-863a-1147d4b77ce7/rerank",
+      "tokens": {
+        "input_tokens": 3430,
+        "output_tokens": 0,
+        "image_tokens": 0
+      },
+      "billed_units": {
+        "input_tokens": 3430,
+        "output_tokens": 0,
+        "image_tokens": 0,
+        "search_units": 0,
+        "classifications": 0
+      },
+      "settled_total": 3430,
+      "ledger_state": "settled",
+      "raw_sha256": "7d944c90d1b22cc605f9c544d4eb4585bc99da63105bc52f63def411f5de989a"
+    }
+  ],
+  "usage": {
+    "actual_total": 14793,
+    "input_tokens": 14393,
+    "output_tokens": 400,
+    "answer_only_tokens": 2825,
+    "rerank_tokens": 6834,
+    "new_unknown": 0,
+    "new_unknown_held": 0,
+    "calls": 10,
+    "formal_qa": 2,
+    "answer_calls": 2,
+    "rewrite_calls": 2,
+    "embedding_calls": 4,
+    "rerank_calls": 2
+  },
+  "production_bug_confirmed": false,
+  "production_fixes": [],
+  "historical_p9_not_retroactively_reclassified": true,
+  "baseline_sha": "cb7e1817b1350ca8f550b890196358fdc710768f",
+  "execution_sha": "cc0877ec9a65b4aa802768817c1288df66e9958e",
+  "commands": [
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m pytest tests/weknora_port/test_p17_observer.py tests/weknora_port/test_p17_fence.py -q --tb=short -p no:cacheprovider --basetemp E:/WK/run/p17-20261016/unit-final",
+      "exitcode": 0,
+      "result": "37 passed in2.06s",
+      "log": "E:\\WK\\run\\p17-20261016\\unit-final.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/prepare.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\prepare.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m scripts.weknora_port_p17_fence open --approval-file E:/WK/run/p17-20261016/owner-approval.txt",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\fence-open.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/run.py start",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\start.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/run.py ready",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\ready.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/run.py query --case 1",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\query1.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/run.py query --case 2",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\query2.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B -m scripts.weknora_port_p17_fence close",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\fence-close.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/closeout.py",
+      "exitcode": 1,
+      "log": "E:\\WK\\run\\p17-20261016\\closeout.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/closeout-v2.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\closeout-v2.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/analyze.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\analyze.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -B E:/WK/run/p17-20261016/deliver.py",
+      "exitcode": 0,
+      "log": "E:\\WK\\run\\p17-20261016\\deliver.log"
+    }
+  ],
+  "closeout": {
+    "status": "PASS",
+    "old_rows": 618,
+    "old_unknown_count": 61,
+    "all_old_rows_unchanged": true,
+    "new_rows": 10,
+    "new_actual_tokens": 14793,
+    "new_prompt_tokens": 14393,
+    "new_unknown_count": 0,
+    "new_unknown_held": 0,
+    "models": {
+      "XingChenAGI/Xing4.0-29B": 4,
+      "BAAI/bge-m3": 4,
+      "BAAI/bge-reranker-v2-m3": 2
+    },
+    "capabilities": {
+      "chat": 4,
+      "embedding": 4,
+      "rerank": 2
+    },
+    "new_rerank_settlement_count": 2,
+    "new_rerank_tokens": 6834,
+    "closed_limit": 1468295,
+    "closed_headroom": 0,
+    "unused_increment_revoked": 185207,
+    "protected_files_verified": 151,
+    "preexisting_running_log_manifest_exception": 1,
+    "production_files_unchanged": 567,
+    "kb_documents_chunks_embeddings_unchanged": true,
+    "deepseek_unchanged": true,
+    "redis_run_id_unchanged": true,
+    "api_stopped": true,
+    "runtime_sha": "cc0877ec9a65b4aa802768817c1288df66e9958e"
+  },
+  "history": {
+    "status": "PASS",
+    "protected_files": 2247,
+    "changed": [],
+    "wrong_workspace_created_file_removed": true,
+    "scope": "P14 prior1877 + inherited378 manifests; newP17 artifacts not historical"
+  },
+  "evidence_sha256": {
+    "E:\\WK\\run\\p17-20261016\\all-new-ledger.json": "161f826907dc4cd309b145b36545a241e89bcbb4f4fce30fae86adc5b5cca605",
+    "E:\\WK\\run\\p17-20261016\\analysis.json": "3b74f78fd0bdf4da260503c938269519716390c7654c2585d601290d6605f63a",
+    "E:\\WK\\run\\p17-20261016\\analyze.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\analyze.log": "76ae31c53cbb97234f9ba4518d31a7de865505dea697fb01507fdb2725d94566",
+    "E:\\WK\\run\\p17-20261016\\analyze.py": "254b49b3a9af064be40edb8ea7a2531b8163d9f08d60b702abc435306633d12e",
+    "E:\\WK\\run\\p17-20261016\\api-process.json": "87c7687a57414dfbf6dccc3054e0308e9c7c494cfeefde86a6af20b1bc523ad5",
+    "E:\\WK\\run\\p17-20261016\\api.stderr": "0d893ec562499206c017e9ca0711d244cbb29aad65b36a0dad32cacee5e60962",
+    "E:\\WK\\run\\p17-20261016\\api.stdout": "dbbb60a6d108101b133c639fece1397dea071bf2d76541b578660e1b61deb95f",
+    "E:\\WK\\run\\p17-20261016\\authority.json": "745a3f0cdb429c52d2f493c09b7f7dfd52b62780e048906d764db1238c2547e0",
+    "E:\\WK\\run\\p17-20261016\\chunks-after.json": "91d71d7d8716503efe6aa41f6d67e5f458d19f96b12b51c28ac9627156302dba",
+    "E:\\WK\\run\\p17-20261016\\chunks-before.json": "91d71d7d8716503efe6aa41f6d67e5f458d19f96b12b51c28ac9627156302dba",
+    "E:\\WK\\run\\p17-20261016\\closeout-audit.json": "8cb914f63da3281b7c3ff794630943baf458a4adc5057f2dc10ea7443ac5e033",
+    "E:\\WK\\run\\p17-20261016\\closeout-v2.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\closeout-v2.log": "68e185752061dc79b4a94288c137e4127d3e373c0467af7a048cb23e5431145b",
+    "E:\\WK\\run\\p17-20261016\\closeout-v2.py": "19c81d3d5984ab9dbcad10429938733f0f7eb9d50ebf8c3c447cb6e88d7abb50",
+    "E:\\WK\\run\\p17-20261016\\closeout.exitcode.txt": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+    "E:\\WK\\run\\p17-20261016\\closeout.log": "cd8b50c7a639b15b1e595c99ac1c29209751332b11164c5a83978f5bbad9e1a6",
+    "E:\\WK\\run\\p17-20261016\\closeout.py": "ba15a6257c82ec9f29a2440da7b91168bc5ab60feb29f2f450392040f70287ea",
+    "E:\\WK\\run\\p17-20261016\\deepseek-calls-after.json": "f93d36ab33a39a79324c947b5e95f4dd9cb3eaf0c3fc22341cdf652e19b34139",
+    "E:\\WK\\run\\p17-20261016\\deepseek-calls-before.json": "f93d36ab33a39a79324c947b5e95f4dd9cb3eaf0c3fc22341cdf652e19b34139",
+    "E:\\WK\\run\\p17-20261016\\deepseek-months-after.json": "ba2f8427a7cd0d521168ca41a72089a12980307b02ff02e15cce74340507ef33",
+    "E:\\WK\\run\\p17-20261016\\deepseek-months-before.json": "ba2f8427a7cd0d521168ca41a72089a12980307b02ff02e15cce74340507ef33",
+    "E:\\WK\\run\\p17-20261016\\deliver.py": "0af631e3e258d95cdb92c877d8a4e903165534270dd2bbfe620e1d0c3db74f91",
+    "E:\\WK\\run\\p17-20261016\\documents-after.json": "9db74be4821cba8e4836881972c9c25a8999573dd0c9c8f8af121c4949aa089c",
+    "E:\\WK\\run\\p17-20261016\\documents-before.json": "9db74be4821cba8e4836881972c9c25a8999573dd0c9c8f8af121c4949aa089c",
+    "E:\\WK\\run\\p17-20261016\\embeddings-after.json": "3100d71c5e16507417f2cd8f31111d5431e970f1dc34428a362eda6957664ed6",
+    "E:\\WK\\run\\p17-20261016\\embeddings-before.json": "3100d71c5e16507417f2cd8f31111d5431e970f1dc34428a362eda6957664ed6",
+    "E:\\WK\\run\\p17-20261016\\extended-history-audit.json": "c93b8d11194c63e75687eeb92c037a2e60f7cfcba63b284d226cfcc7afaa1cd2",
+    "E:\\WK\\run\\p17-20261016\\fence-close.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\fence-close.log": "a51d39d9cdd2cadd4311f8f005275ac462d067137ddb93cb5b8a18e028b5d412",
+    "E:\\WK\\run\\p17-20261016\\fence-open.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\fence-open.log": "6f9148e414e99cfcf903a019cfdde2f48c4b9b8b27ba6022d3d52af2634f4b1b",
+    "E:\\WK\\run\\p17-20261016\\frozen.json": "3b03edd9dbbe48a86601e7d5f5ea950260338757f96615f8a57e50e76356ec44",
+    "E:\\WK\\run\\p17-20261016\\historical-manifest-exception.json": "15ea8af20a7f7e4d6915f65881958c42d1a926f2d53929cb45a0c5eb5354c703",
+    "E:\\WK\\run\\p17-20261016\\kb-after.json": "228edf9c8f47b5fc18712f846e99cdab49cb331ccb0a79dedc5cbd4b40b507bb",
+    "E:\\WK\\run\\p17-20261016\\kb-before.json": "228edf9c8f47b5fc18712f846e99cdab49cb331ccb0a79dedc5cbd4b40b507bb",
+    "E:\\WK\\run\\p17-20261016\\ledger-after.json": "ab9768c4258e520f7ee90f793f2f42aaef2d00dbdcfcc05c31322b0c2757b224",
+    "E:\\WK\\run\\p17-20261016\\ledger-before.json": "42a675569351e05b690b5c248136803668d384c61a825f6a36c349b74ed34636",
+    "E:\\WK\\run\\p17-20261016\\months-after.json": "2d133f66d1193ed66428dfac288d558bfa96eeef5726f270c12c0b72a3bccdad",
+    "E:\\WK\\run\\p17-20261016\\months-before.json": "afaa7bc6fa49526ea601eb50e59e8a14b82051d932adff2a7b7e95c1e6417b90",
+    "E:\\WK\\run\\p17-20261016\\owned-processes-before-stop.json": "5e9312adf4ffcd98d89672f5dff9c70421e57fc083737db847d2cc7212c29f32",
+    "E:\\WK\\run\\p17-20261016\\owner-approval.txt": "090c7d3806a49094bf8fba0e52dfe4a469de753bb0a8881b8a2b5d0cb109ed83",
+    "E:\\WK\\run\\p17-20261016\\pg-identity.json": "a1bbf6ee22fd07900b0484eb711bd784e7cd68978e4c2177e7a4668bcb6594ff",
+    "E:\\WK\\run\\p17-20261016\\prepare.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\prepare.log": "ab7ac6056cb9053ded82486b4bc8550089d8ac42d237e368b8066d9b8c0366b0",
+    "E:\\WK\\run\\p17-20261016\\prepare.py": "0bf9b082978e5c97245f12af6edaa775b7720b7259705fe7cbb84b28c70b0827",
+    "E:\\WK\\run\\p17-20261016\\production-before.json": "639448c3e57c9a434fdf7d1db2b558a3d014066d9640a069c41b9116463d3239",
+    "E:\\WK\\run\\p17-20261016\\protected-before.json": "fdf9353ecb3ff3a52843150f973bd231f4a98b2d8ee2318c093e04e8e5fe94a6",
+    "E:\\WK\\run\\p17-20261016\\protected-hash-discrepancies.json": "290f57b25b9eb841445b988eee58f5b6db8980bd159993cb718bb805764b8673",
+    "E:\\WK\\run\\p17-20261016\\query1-body.json": "f13c850edfad41de5021552a3bc7a7ce781a784f81d7348e914b98f0f68fbd20",
+    "E:\\WK\\run\\p17-20261016\\query1-chunkreadback.json": "8f280382e46187ab2639f88756e560428d3a7f6272f6ddf929b6ec69584fd11b",
+    "E:\\WK\\run\\p17-20261016\\query1-http.json": "57839cb74bbf25d742f0d18329b1b0f7df71f48069bfee667bd46b4212ff0b00",
+    "E:\\WK\\run\\p17-20261016\\query1-intent.json": "8e648b6b45d25bb257e7a982ff46308ec7d5ab86abe34b7331576c0ddee92a07",
+    "E:\\WK\\run\\p17-20261016\\query1-messages.json": "9c7b63aab0ef2b12b44f637dbe209ef5954cf2f47f85c9fa0d4034991906688b",
+    "E:\\WK\\run\\p17-20261016\\query1-preflight.json": "aa20e791080aec32fe12cea370dd2e28b9ae79cb13315cfcb15c15893457542a",
+    "E:\\WK\\run\\p17-20261016\\query1-session.json": "1516c6cd7890178264a91299633b491a6a798cff81c1eab06e77774cd8b338b7",
+    "E:\\WK\\run\\p17-20261016\\query1.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\query1.log": "744d6c27bb0432320578f3e39ca8102d8f8c6dc58ffff55b1ccdfa84e47f8ce0",
+    "E:\\WK\\run\\p17-20261016\\query1.sse": "514abba73f8d4bdffd2155bd3371d8a821825e9049d6e5f0747b13726e6b67c9",
+    "E:\\WK\\run\\p17-20261016\\query2-body.json": "b831784a66c2c8658fdfa257a45b8b92acdfecf8b5ed2abfb6b6c5f5f4d42a7e",
+    "E:\\WK\\run\\p17-20261016\\query2-chunkreadback.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "E:\\WK\\run\\p17-20261016\\query2-http.json": "fc04ab7c51238e454c9e58698825486772536c3c3d0a502e00bf24f6ec82419f",
+    "E:\\WK\\run\\p17-20261016\\query2-intent.json": "5a362f6f3a7c0afa4393b162c8194f19a630f8e9c704682ce52aaa33bae06ce8",
+    "E:\\WK\\run\\p17-20261016\\query2-messages.json": "6bc888f980fcb8fc9a7ff4e0bcb33accd7026f69aca82251cde821ea9571686a",
+    "E:\\WK\\run\\p17-20261016\\query2-preflight.json": "f2493369263f424c263fc5609aeabbf19993d6edffc2429e042211a4d4014dc1",
+    "E:\\WK\\run\\p17-20261016\\query2-session.json": "482bf8ccfbc385d3ef187dc1d3eeaf7076489714f8e342168d5797b8806cb99d",
+    "E:\\WK\\run\\p17-20261016\\query2.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\query2.log": "77f5f56f5596b5b1cd7320a38611ab776d4062b74896ccd58b1231073166f816",
+    "E:\\WK\\run\\p17-20261016\\query2.sse": "5460507f7d17772a099eea99f678690e2bb1d119146e2e04674ca8f5da99b6ff",
+    "E:\\WK\\run\\p17-20261016\\ready.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\ready.json": "d5be9ce6f0a01bfef4da27b3c0dcb0212a22820748b3a02838eb3945c35634dd",
+    "E:\\WK\\run\\p17-20261016\\ready.log": "d3dab70415ac53f45f0082c4e42e9ec9ef5f365e3f3b77bec97648b4a7c4797d",
+    "E:\\WK\\run\\p17-20261016\\redis-identity.json": "22e16ed61f911ddd83ed9869cca490c343cf96f1444ca48682841f60ea096933",
+    "E:\\WK\\run\\p17-20261016\\run.py": "3acd7ed2b8085fac6eb3ec874e44086ea015f0d51bd026e617210bbccf329703",
+    "E:\\WK\\run\\p17-20261016\\start.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\start.log": "16ec24a01079ee04fec9715751596e0620701afc948839ff4627747c0fd075fd",
+    "E:\\WK\\run\\p17-20261016\\state.json": "9fd6099977650870881c70a4ca600e74f6ffaceb80728437449c983ddaadacc6",
+    "E:\\WK\\run\\p17-20261016\\unit-final.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\unit-final.log": "f539f2c9377c87d510dca23a479001521861230873f679b3c1a80a1d023ead4e",
+    "E:\\WK\\run\\p17-20261016\\unit.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+    "E:\\WK\\run\\p17-20261016\\unit.log": "66626a6899b22704b0e90b21208d7e8466550cb3d881eab87985058725e18178",
+    "E:\\WK\\run\\p17-20261016\\wrong-workspace-created-script.py": "81fa65f8bcb24cd89d8a7c5642a53df6c5f570d655715bae609afd52848854d5",
+    "E:\\WK\\run\\p17-20261016\\captures\\078b6bc1383a637d64ccd2e2f3a794af45edbf93ee818f6152a5ad299752f54d.json": "f6259074938a761218f435fe68321778759a0f9fc399dceca069855fa9d0f3f8",
+    "E:\\WK\\run\\p17-20261016\\captures\\70a9ab7f77c6db120049b105d2f257fd8b39022f8c4d2ac1392d7ce694969577.json": "db3fa2adbf860e6832c3d8e56a0fa92aeddea4e7f0f23f6ce63873e1baacf62a",
+    "E:\\WK\\run\\p17-20261016\\diagnostics\\4d1dc1599069b66bb07f08eef3dbd73e3d9add961d992d04e60bb7d9ed53d3e4.jsonl": "88014c4331b97b3500d68ee8e7c2abbabb17baae8d2a29fb1b975c9afc01b3a7",
+    "E:\\WK\\run\\p17-20261016\\diagnostics\\b949cab9133a3f2da6ceea38cb9817df4ed22145e8bf3b3c5a3dad137b4bfaa4.jsonl": "29c5a05103ad85c0188cd771075a79392419675c523bb83c14c39155699e8f51",
+    "E:\\WK\\run\\p17-20261016\\diagnostics\\bc9eda47715e09dadde85cbd6aa87db67b9aa14763b6109f0c77ca79d6af67f4.jsonl": "9fa2a070896fdd7138807317b0c7e73b1d3f0fca5df3f4066d807de61696b129",
+    "E:\\WK\\run\\p17-20261016\\diagnostics\\c30927d9023d4aad80c3670d60969bbc32178830dce2aa4711caf4a9d574cfbc.jsonl": "c99e6ee0beaa5d86a411fe9df16c1105016e4c7801554f3190a8890220f68f6f",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\close-after.json": "546f694816042c4787a6b474ca28cf087d982ade93b8c647c0908461f9321b41",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\close-before.json": "f5d2240280c14e36aa6deddf31e79f97f245f3e350564df4f31aa24c15e47977",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\close-precommit.json": "cf508453050fbd77818b8aeb824a8eb28def264fc3d3060a1cf8dbe3d451fadc",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\intent.json": "09de148a1dde06f32a03c03324b66153909a6714429aabceeeb770a1182e8176",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\open-after.json": "f2add19ec325d4df821f56d3686c576c47e5271e30bbaae0fab8c2416b2ce44b",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\open-before.json": "0c8f4461720497ccf0037079e52332cc8d3caa505cca09ee0b060a84885a926e",
+    "E:\\WK\\run\\p17-20261016\\fence-200000\\open-precommit.json": "7ac427c33a3c450c79c81faccf99c13da5263d8f5eb8659de41b8803f6c6d3e2",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\0731ebb0a8e6e9fb8df13bf954eaf959df0ed9a9ca57dbf1c746b13a780d6fe9.json": "1e81e488ef2ea7e15e6052f5030b90c351f9bcc6c4120d275b521c308ca70c83",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\4d1dc1599069b66bb07f08eef3dbd73e3d9add961d992d04e60bb7d9ed53d3e4.json": "cf63b7f1607ce2a98ea4f1ec7b69895a112b096855cb54f137ccbc89bfe4bc63",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\51370f1db92f640ca9eeeaafd8ccde39c4819b2e22f6d98f60f15873e3e048fc.json": "d1c3957ae6a1db507109ed0dbcaa5519bcbfc197d47b9cb744398bef360339ee",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\8a6c17f95562612db452fa1c82db49c2e3f27839d3718ec9f9c9b3bfa134b800.json": "1dd748d9893fb1c4b9ae1746aacd1a3a709f6e39ef82a35654d5426cbb07149d",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\96add866b5386340ad982032eaaccff52a533f520eef3cdb14117efb568250aa.json": "2a5578f3ac3bd219f03e73f43534658b790ff035353f676f5f1f5898a6fef612",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\b949cab9133a3f2da6ceea38cb9817df4ed22145e8bf3b3c5a3dad137b4bfaa4.json": "6696dab84b9dbb2e450c780148ce3650e363a7334d58f7a50979a8515a409280",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\bc9eda47715e09dadde85cbd6aa87db67b9aa14763b6109f0c77ca79d6af67f4.json": "76f8d30a9e26056e0d0880d2076b3c1ea111db271592063060fc9bf4c6cb4004",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\c30927d9023d4aad80c3670d60969bbc32178830dce2aa4711caf4a9d574cfbc.json": "1f27d250a00ce0bfbc6918facda6d49990eaf5c5a41851c2e5de08c35c3cf8ad",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\f975258db96f03a7e5deb304dc979f845d8710cafaf19d71d5dcf17d5dc3e5ae.json": "6bffb0d3048c6acb37d49e7268bffeb3e19f64852af36cd1019ec0c90fc0a044",
+    "E:\\WK\\run\\p17-20261016\\provider-requests\\fa088fa4f47d210a560041dad19d33eb46be87e4c49efc30f618f4f3626748b6.json": "6d9926177ccdac49bf888964d935afa8862c3acb8e27000222824de2735ccbb4",
+    "E:\\WK\\run\\p17-20261016\\raw\\4d1dc1599069b66bb07f08eef3dbd73e3d9add961d992d04e60bb7d9ed53d3e4.body": "ae53050069501cec9a03719ff74ea14b8208760ae32ead07901eb226179ff899",
+    "E:\\WK\\run\\p17-20261016\\raw\\b949cab9133a3f2da6ceea38cb9817df4ed22145e8bf3b3c5a3dad137b4bfaa4.body": "d44a07c7707d65d6b7fa3bd78d084056b4d20575ef38aad9cff15515d05a490c",
+    "E:\\WK\\run\\p17-20261016\\raw\\bc9eda47715e09dadde85cbd6aa87db67b9aa14763b6109f0c77ca79d6af67f4.body": "7e383b934fdafd590d1f3aa1f26b3228afe7fa359f5903def8047faabe9f9475",
+    "E:\\WK\\run\\p17-20261016\\raw\\c30927d9023d4aad80c3670d60969bbc32178830dce2aa4711caf4a9d574cfbc.body": "7d944c90d1b22cc605f9c544d4eb4585bc99da63105bc52f63def411f5de989a",
+    "E:\\WK\\run\\p17-20261016\\rerank\\078b6bc1383a637d64ccd2e2f3a794af45edbf93ee818f6152a5ad299752f54d.json": "d852a34daba98f1694db3ba38636d6b2bea521965689183bf3867deb778217d3",
+    "E:\\WK\\run\\p17-20261016\\rerank\\70a9ab7f77c6db120049b105d2f257fd8b39022f8c4d2ac1392d7ce694969577.json": "e0a74d2a22ad215d6d339fdb3d54c53e5a1acc2992d221015353fd4bbfff5b86",
+    "E:\\WK\\run\\p17-20261016\\stages\\078b6bc1383a637d64ccd2e2f3a794af45edbf93ee818f6152a5ad299752f54d.json": "9753f27c0592d1021f0e8bc3902e81ac7afe6c9f0c4e0cec18225c2ae871cb8a",
+    "E:\\WK\\run\\p17-20261016\\stages\\70a9ab7f77c6db120049b105d2f257fd8b39022f8c4d2ac1392d7ce694969577.json": "464e42c3bad30aaebb03197b0eac055e1b4f19d70ff62535fb50ef737478dbd7",
+    "E:\\WK\\run\\p17-20261016\\deliver.log": "742e02a4c09226bc61c20da0575c918a5358782097e5e00a1af9bde362772456",
+    "E:\\WK\\run\\p17-20261016\\deliver.exitcode.txt": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+  },
+  "scope": {
+    "kb_scope": [
+      "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2"
+    ],
+    "document_scope": []
+  },
+  "safety": {
+    "maximum_qa": 2,
+    "actual_qa": 2,
+    "prompt_router_retrieval_unchanged": true,
+    "same_system_prompt_as_p9_verified_both": true,
+    "no_generated_citations_added": true,
+    "raw_capture_only_public_frozen_dataset": true,
+    "headers_saved": false,
+    "keys_saved": false,
+    "raw_capture_limit_bytes": 2097152,
+    "raw_protocol_done_verified": true,
+    "no_additional_model_calls_for_metering": true
+  },
+  "remaining": [
+    "P9 historical raw responses absent; new cases cannot retrospectively establish their cause",
+    "No production decoder bug found; model citation compliance remains a quality problem",
+    "This is not an answer-factuality or citation-semantic-completeness benchmark"
+  ]
+}

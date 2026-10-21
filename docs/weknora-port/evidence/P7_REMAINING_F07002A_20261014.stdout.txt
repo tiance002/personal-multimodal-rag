@@ -1,0 +1,55 @@
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "source_ingested", "dataset": null, "qid": null, "page_id": null}
+{"event": "dataset_ingested", "dataset": "longbench-zh", "qid": null, "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "multifieldqa_zh:741f37778b75805b150988026cf24e53885d61d47a64bd05", "page_id": null}
+{"event": "native_case", "dataset": "longbench-zh", "qid": "multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2", "page_id": null}
+{"event": "dataset_ingested", "dataset": "hotpotqa", "qid": null, "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5a8ad6805542992d82986f93", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5a745a6055429974ef308be4", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5a729fe55542991f9a20c53b", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5ae3992d5542994393b9e722", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5ab672165542995eadeeffe0", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5a8911ad554299515336129c", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5a7b68a75542997c3ec97153", "page_id": null}
+{"event": "native_case", "dataset": "hotpotqa", "qid": "5a7631cd5542994ccc91870c", "page_id": null}
+PUBLIC_FULL_CORPUS_ERROR FileNotFoundError [Errno 2] No such file or directory: 'E:\\RAG-Tests\\runtime-source-d3339ce0-210a-4193-89a7-f1b54d6743b7\\87\\163d72d4-49e7-4935-9e40-e0e463c681d5\\a54b39ce-bcf8-4703-8e0d-6bb3c7ad791e\\fe1eb219-b03c-40d8-9e72-24f56d113290\\assets\\0000-7109dcb2-af05-48d1-8949-b56cde61fb12-catvsdogdlpycon15se-150512122612-lva1-app6891_95_page_1.jpg' [('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\documents.py', 292, 'upload_document'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\documents.py', 421, '_persist_assets'), ('E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\documents.py', 401, '_write_immutable')]
+  + Exception Group Traceback (most recent call last):
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_six_mock.py", line 47, in <module>
+  |     actual_pg_run(main(parser.parse_args()))
+  |     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\tests\weknora_port\test_memory_storage_pg.py", line 36, in actual_pg_run
+  |     return runner.run(awaitable)
+  |            ~~~~~~~~~~^^^^^^^^^^^
+  |   File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+  |     return self._loop.run_until_complete(task)
+  |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  |   File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+  |     return future.result()
+  |            ~~~~~~~~~~~~~^^
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_six_mock.py", line 39, in main
+  |     await runner.run(frozen,datasets=args.datasets)
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 141, in run
+  |     await self.ingest_dataset(dataset)
+  |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 70, in ingest_dataset
+  |     async with asyncio.TaskGroup() as group:
+  |                ~~~~~~~~~~~~~~~~~^^
+  |   File "D:\Drivers\python\Lib\asyncio\taskgroups.py", line 154, in __aexit__
+  |     raise me from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 68, in ingest
+    |     receipt=await self._upload(kb,*row)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "E:\RAG-Worktrees\weknora-python-port-20261013\eval_center\weknora_six_runner.py", line 40, in _upload
+    |     raise RuntimeError('NATIVE_INGESTION_NOT_COMPLETED:'+str(document.get('error_code','')))
+    | RuntimeError: NATIVE_INGESTION_NOT_COMPLETED:DOCUMENT_PROCESSING_FAILED
+    +------------------------------------

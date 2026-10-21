@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="0.883" timestamp="2026-10-14T19:48:44.285339+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_late_delivery_cannot_ack_or_overwrite_successor[False]" time="0.005"><failure message="AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'&#10;  &#10;  - ad8c707ba74a8b29f84792928bc7da01bc796bf6&#10;  + 586b92f4649b78508382dfd52d64d848f45b0a7c">tests\weknora_port\test_memory_queue_recovery.py:52: in test_late_delivery_cannot_ack_or_overwrite_successor
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:30: in run
+    client,q,p,clock=await fixture()
+                     ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:13: in fixture
+    assert (await client.info("server"))["run_id"]=="ad8c707ba74a8b29f84792928bc7da01bc796bf6"
+E   AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'
+E     
+E     - ad8c707ba74a8b29f84792928bc7da01bc796bf6
+E     + 586b92f4649b78508382dfd52d64d848f45b0a7c</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_late_delivery_cannot_ack_or_overwrite_successor[True]" time="0.005"><failure message="AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'&#10;  &#10;  - ad8c707ba74a8b29f84792928bc7da01bc796bf6&#10;  + 586b92f4649b78508382dfd52d64d848f45b0a7c">tests\weknora_port\test_memory_queue_recovery.py:52: in test_late_delivery_cannot_ack_or_overwrite_successor
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:30: in run
+    client,q,p,clock=await fixture()
+                     ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:13: in fixture
+    assert (await client.info("server"))["run_id"]=="ad8c707ba74a8b29f84792928bc7da01bc796bf6"
+E   AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'
+E     
+E     - ad8c707ba74a8b29f84792928bc7da01bc796bf6
+E     + 586b92f4649b78508382dfd52d64d848f45b0a7c</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_three_expired_deliveries_archive_scoped_payload" time="0.005"><failure message="AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'&#10;  &#10;  - ad8c707ba74a8b29f84792928bc7da01bc796bf6&#10;  + 586b92f4649b78508382dfd52d64d848f45b0a7c">tests\weknora_port\test_memory_queue_recovery.py:80: in test_three_expired_deliveries_archive_scoped_payload
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:56: in run
+    client,q,p,clock=await fixture(); calls=[]
+                     ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:13: in fixture
+    assert (await client.info("server"))["run_id"]=="ad8c707ba74a8b29f84792928bc7da01bc796bf6"
+E   AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'
+E     
+E     - ad8c707ba74a8b29f84792928bc7da01bc796bf6
+E     + 586b92f4649b78508382dfd52d64d848f45b0a7c</failure></testcase><testcase classname="tests.weknora_port.test_memory_queue_recovery" name="test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped" time="0.029"><failure message="AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'&#10;  &#10;  - ad8c707ba74a8b29f84792928bc7da01bc796bf6&#10;  + 586b92f4649b78508382dfd52d64d848f45b0a7c">tests\weknora_port\test_memory_queue_recovery.py:106: in test_transient_redis_failure_recovers_without_enqueue_and_stop_stays_stopped
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:84: in run
+    client,q,p,clock=await fixture(); done=asyncio.Event()
+                     ^^^^^^^^^^^^^^^
+tests\weknora_port\test_memory_queue_recovery.py:13: in fixture
+    assert (await client.info("server"))["run_id"]=="ad8c707ba74a8b29f84792928bc7da01bc796bf6"
+E   AssertionError: assert '586b92f4649b...4d848f45b0a7c' == 'ad8c707ba74a...7da01bc796bf6'
+E     
+E     - ad8c707ba74a8b29f84792928bc7da01bc796bf6
+E     + 586b92f4649b78508382dfd52d64d848f45b0a7c</failure></testcase></testsuite></testsuites>

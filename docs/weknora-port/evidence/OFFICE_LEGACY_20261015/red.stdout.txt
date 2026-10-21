@@ -1,0 +1,19 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____________________ test_default_doc_reader_is_registered ____________________
+tests\weknora_port\test_office_legacy.py:32: in test_default_doc_reader_is_registered
+    assert registry.resolve("", "legacy.doc") == "doc"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\ingestion\core.py:487: in resolve
+    raise ValueError(f"no parser engine supports extension {ext or '(no extension)'}")
+E   ValueError: no parser engine supports extension .doc
+____________ test_pptx_unresolved_image_survives_markitdown_retry _____________
+tests\weknora_port\test_office_legacy.py:48: in test_pptx_unresolved_image_survives_markitdown_retry
+    assert len(parsed.assets) == 1
+E   AssertionError: assert 0 == 1
+E    +  where 0 = len(())
+E    +    where () = ParsedDocument(content='Blue widgets W-17. ![diagram](image1.png)', assets=(), metadata={'filename': 'slides.pptx', 'f..., 'knowledge_base_id': '', 'document_id': '', 'source_version': 'original-v1', 'embedded_image_count': 0}, failures=()).assets
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_office_legacy.py::test_default_doc_reader_is_registered
+FAILED tests/weknora_port/test_office_legacy.py::test_pptx_unresolved_image_survives_markitdown_retry
+2 failed in 3.69s

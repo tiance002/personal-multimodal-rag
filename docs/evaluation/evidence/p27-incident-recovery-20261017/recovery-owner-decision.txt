@@ -1,0 +1,8 @@
+Owner continuation, 2026-10-17, current P27 task:
+1. 先只读检查旧请求的真实 wire，确认 max_tokens 是否正确发送，并核实当时 thinking 参数。
+2. 制定一次明确的历史异常恢复决定：保留原始请求、真实回执、UNKNOWN 和259 Token 保守占用；如证据支持，采用单独的、可审计的恢复流程解除后续调用阻断，而不是静默修改历史状态。
+3. 核实实际 DeepSeek 密钥所对应的计费账户及是否有其他消费者；如确实是专用账户，使用可验证的账户身份和独占使用依据，不必为了测试继续设计新的计量系统。
+4. 开启真实调用前，顺便检查新图片 Recipe 的预留上界。它将整个 Base64 请求字节计入上界，可能非常保守，甚至使一张较大的图片耗尽100万 Token 的预留空间；这需要依据实际请求大小判断，而不是预先假设会发生。
+5. 不要无限增加审批与校验环节，却始终不解决最早那一次64→177 Token 的异常。
+
+Execution decision under that authorization: the reconstructed 195-byte request has exactly the stored wire SHA-256. It contains max_completion_tokens=64, not max_tokens, and no explicit thinking or reasoning_effort. The code-owned cap check repaired in 561e3bc8 rejects that request today. Clear only the month block caused by this incident; do not settle/release the UNKNOWN call, lower its held amount, change quota/carry or activate an external-send grant. Keep account identity and consumer coverage unresolved until supported by evidence.

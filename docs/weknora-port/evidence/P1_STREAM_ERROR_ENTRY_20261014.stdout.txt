@@ -1,0 +1,21 @@
+.........F                                                               [100%]
+================================== FAILURES ===================================
+________ test_actual_http_same_channel_recovery_and_error_eof_unknown _________
+tests\weknora_port\test_stream_error_http_pg.py:65: in test_actual_http_same_channel_recovery_and_error_eof_unknown
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_stream_error_http_pg.py:41: in scenario
+    session=(await client.post('/api/v1/sessions',json={'knowledge_base_scope':[kb],'document_scope':[doc['id']]})).json()['data']['id']
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'data'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_stream_error_http_pg.py::test_actual_http_same_channel_recovery_and_error_eof_unknown
+1 failed, 9 passed in 7.38s

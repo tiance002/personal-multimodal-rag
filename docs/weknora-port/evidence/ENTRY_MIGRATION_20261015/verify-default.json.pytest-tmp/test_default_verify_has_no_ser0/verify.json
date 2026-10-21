@@ -1,0 +1,29 @@
+{
+  "gate": "NATIVE_DEVELOPMENT_ENTRY",
+  "scope": "STATIC_AND_TARGETED_OFFLINE_ONLY_NOT_M0_ACCEPTANCE",
+  "status": "PASS",
+  "checks": {
+    "schema_applied": false,
+    "model_probe": "NOT_RUN"
+  },
+  "test_command": [
+    "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "--noconftest",
+    "tests/weknora_port/test_development_entry.py",
+    "tests/weknora_port/test_entrypoint_migration.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--tb=short",
+    "--basetemp",
+    "E:\\RAG-Worktrees\\weknora-python-port-20261013\\docs\\weknora-port\\evidence\\ENTRY_MIGRATION_20261015\\verify-default.json.pytest-tmp\\test_default_verify_has_no_ser0\\verify.json.pytest-tmp"
+  ],
+  "test_exit": 0,
+  "database_services_started": false,
+  "schema_applied": false,
+  "model_probe": "NOT_RUN",
+  "real_provider_calls": 0
+}

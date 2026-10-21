@@ -1,0 +1,5 @@
+Preserved diagnostic command failure (no application request or network send):
+python -B -c "import asyncio,json; from redis.asyncio import Redis; from scripts.weknora_port_mvp_real import connection; async def_unused=0"
+Exit code: 1
+SyntaxError: invalid syntax at async def_unused=0
+Corrected multiline identity check exited 0; see identity.json.

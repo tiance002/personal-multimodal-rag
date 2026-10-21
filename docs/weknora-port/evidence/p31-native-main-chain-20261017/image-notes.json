@@ -1,0 +1,279 @@
+{
+  "schema": "weknora-p31-image-rollback-notes/v1",
+  "generated_at_utc": "2026-10-17T11:29:24.236850+00:00",
+  "task": "P31 C: retire image_pages and restore fixed-source whole-document PDF/image flow",
+  "repository": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+  "repository_head": "84bd4bb09f29fdf96fd239fc68898b34d41eb990",
+  "fixed_upstream": {
+    "path": "E:\\RAG-reference\\WeKnora-3e8b0bfc",
+    "commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "pdf_sha256": "5b48c524ad280026cdd81033880ddc96958e8fe269edc55c09c6f466efde1496"
+  },
+  "request": {
+    "path": "C:\\Users\\22088\\.codex\\attachments\\fc70a8ed-9f5f-407d-b2d7-2feb52bf7d78\\已粘贴的文本.txt",
+    "sha256": "744017df3ec3d217bc6ea684e82c6300a5f29408f98b00a0235b578f1d17f5a2",
+    "read_fully": true
+  },
+  "owned_files": [
+    {
+      "path": "backend/weknora_port/documents.py",
+      "sha256": "ff7a16b338c08f64b894c8901efb59d51ef4317b83b735b27b490d2592b9d053"
+    },
+    {
+      "path": "backend/weknora_port/http_api.py",
+      "sha256": "068a1c6977d670ce4e8b201bba60cc41fb386d3a14c85e0dc1cd430dfdc1a536"
+    },
+    {
+      "path": "backend/weknora_port/image_configuration.py",
+      "sha256": "1278d4a8a23f1d774a2cf0e92bfc98b611881b32d17a66a06f4e890dbeda1e68"
+    },
+    {
+      "path": "backend/weknora_port/image_tasks.py",
+      "sha256": "b66d570d78085ac8fb70bf7db54a5ed69ac838c95d14f4db3270d36a5b10e977"
+    },
+    {
+      "path": "backend/weknora_port/ingestion/core.py",
+      "sha256": "490851cd892a3bb4617a102bb11e4fc530d3c26e7e295249004c7c01f6825b9c"
+    },
+    {
+      "path": "backend/weknora_port/ingestion/upstream_pdf_parser.py",
+      "sha256": "8ed28108b0451b3ca51777ac75bb9a6e84f4b7d7e150e5cce8a18be0ff9028ed"
+    },
+    {
+      "path": "tests/weknora_port/test_p27_page_scoped_vision.py",
+      "sha256": "fcc6e24da5b32524daa7449025d30bdbb961068f800963f7d1c2707d3a6b5a5c"
+    },
+    {
+      "path": "tests/weknora_port/test_http_api.py",
+      "sha256": "37c7596c3803af4f519e60170dced55d4a03fbf191a065e01a52b20944533e29"
+    },
+    {
+      "path": "tests/weknora_port/test_documents.py",
+      "sha256": "7b2b84603c17c3169304c71655a4d096b7dd3c738ca1f2c062e0fbd1b6f92b29"
+    }
+  ],
+  "implementation": [
+    "Removed ImageProcessingWrite.image_pages; extra=forbid rejects old KB configuration requests with HTTP422 REQUEST_INVALID.",
+    "Upload rejects image_pages in process_overrides and as a direct multipart field (including empty value) with HTTP422 IMAGE_PAGES_UNSUPPORTED before runtime upload.",
+    "effective_image_config copies KB configuration and removes legacy image_pages only from the copy; explicit new override keys are rejected.",
+    "DocumentRequest no longer has pdf_image_pages; document ingestion no longer sends physical page selection or filters parsed assets.",
+    "PDF routing restores fixed-source native-text/scanned classification, scanned-only whole-page rendering, native embedded/vector figure extraction, ordered assembly and fallback behavior. Direct old PDFParser(image_pages=...) is explicitly rejected.",
+    "Removed page_scope_snapshot_valid and physical_pages constraints from task creation/claim. New task snapshots store optional source_sha256 directly; old page_scope.source_sha256 remains readable for compatibility.",
+    "Legacy task overrides are copied and image_pages removed in memory only. Historical selected_config/KB JSON/schema/chunks/assets are not rewritten or deleted by this task.",
+    "Existing owner/version/hash/claim checks and model binding/configuration abstractions are retained."
+  ],
+  "source_mapping": [
+    {
+      "symbol": "_classify_page",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 167,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 210,
+      "ast_equal": true
+    },
+    {
+      "symbol": "_render_scanned_pages",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 1119,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 1162,
+      "ast_equal": true
+    },
+    {
+      "symbol": "_select_embedded_images",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 1144,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 1187,
+      "ast_equal": true
+    },
+    {
+      "symbol": "_extract_embedded_images",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 1234,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 1277,
+      "ast_equal": true
+    },
+    {
+      "symbol": "_extract_vector_figure_clips",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 528,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 571,
+      "ast_equal": true
+    },
+    {
+      "symbol": "PDFParser.parse_into_text",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 1444,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 1489,
+      "ast_equal": true
+    },
+    {
+      "symbol": "PDFParser._route",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 1477,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 1522,
+      "ast_equal": true
+    },
+    {
+      "symbol": "PDFParser._route_locked",
+      "upstream_path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\docreader\\parser\\pdf_parser.py",
+      "upstream_line": 1485,
+      "port_path": "E:\\RAG-Worktrees\\weknora-python-port-20261013\\backend\\weknora_port\\ingestion\\upstream_pdf_parser.py",
+      "port_line": 1530,
+      "ast_equal": true
+    }
+  ],
+  "native_go_mapping": [
+    {
+      "path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\internal\\application\\service\\knowledge_process.go",
+      "symbol": "knowledgeService.enqueueImageMultimodalTasks",
+      "line": 4129,
+      "fact": "Fan-out iterates extracted StoredImage entries; no physical-page selector. MaxRetry(3), 30min timeout remain native queue references."
+    },
+    {
+      "path": "E:\\RAG-reference\\WeKnora-3e8b0bfc\\internal\\application\\service\\image_multimodal.go",
+      "symbol": "ImageMultimodalService.Handle",
+      "line": 151,
+      "fact": "Native image handler drops orphan/aborted work, resolves VLM, reads stored bytes, OCR/captions image and creates child chunks. No image_pages selection."
+    }
+  ],
+  "intentional_constructor_difference": "Port PDFParser.__init__ explicitly rejects retired image_pages kwargs; normal routing methods match fixed upstream AST.",
+  "test_semantics": "test_p27_page_scoped_vision.py intentionally replaces retired P27 selected-page behavior with P31 native full-document, legacy compatibility and rejection expectations. Its module comment documents this reason. Existing saved historical evidence was not modified.",
+  "verification": {
+    "test_runs": [
+      {
+        "command_argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "--noconftest",
+          "--basetemp=E:/WK/run/p31-20261017/image-tests/temp-01",
+          "tests/weknora_port/test_p27_page_scoped_vision.py",
+          "tests/weknora_port/test_http_api.py",
+          "-q",
+          "--junitxml=E:/WK/run/p31-20261017/image-tests/run-01.xml"
+        ],
+        "working_directory": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+        "command_powershell": "& 'E:/RAG quention/.venv/Scripts/python.exe' '-B' '-m' 'pytest' '--noconftest' '--basetemp=E:/WK/run/p31-20261017/image-tests/temp-01' 'tests/weknora_port/test_p27_page_scoped_vision.py' 'tests/weknora_port/test_http_api.py' '-q' '--junitxml=E:/WK/run/p31-20261017/image-tests/run-01.xml'",
+        "exit_code": 0,
+        "result": "PASS",
+        "passed": 20,
+        "log": "E:\\WK\\run\\p31-20261017\\image-tests\\run-01.log",
+        "junit": "E:\\WK\\run\\p31-20261017\\image-tests\\run-01.xml",
+        "log_sha256": "f1df23bb9eddc8259d651d941cc8ab6606e6c4a57f0e2d8979fde3fd85b7f838"
+      },
+      {
+        "command_argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "--noconftest",
+          "--basetemp=E:/WK/run/p31-20261017/image-tests/temp-02",
+          "tests/weknora_port/test_p27_page_scoped_vision.py",
+          "tests/weknora_port/test_http_api.py",
+          "tests/weknora_port/test_documents.py",
+          "tests/weknora_port/test_image_configuration.py",
+          "tests/weknora_port/test_image_processing.py",
+          "tests/weknora_port/test_ingest.py",
+          "-q",
+          "--junitxml=E:/WK/run/p31-20261017/image-tests/run-02.xml"
+        ],
+        "working_directory": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+        "command_powershell": "& 'E:/RAG quention/.venv/Scripts/python.exe' '-B' '-m' 'pytest' '--noconftest' '--basetemp=E:/WK/run/p31-20261017/image-tests/temp-02' 'tests/weknora_port/test_p27_page_scoped_vision.py' 'tests/weknora_port/test_http_api.py' 'tests/weknora_port/test_documents.py' 'tests/weknora_port/test_image_configuration.py' 'tests/weknora_port/test_image_processing.py' 'tests/weknora_port/test_ingest.py' '-q' '--junitxml=E:/WK/run/p31-20261017/image-tests/run-02.xml'",
+        "exit_code": 2,
+        "result": "COLLECTION_ERROR",
+        "passed": null,
+        "log": "E:\\WK\\run\\p31-20261017\\image-tests\\run-02.log",
+        "junit": "E:\\WK\\run\\p31-20261017\\image-tests\\run-02.xml",
+        "log_sha256": "fc7129a0f69c26f4bfcea43bbbcd0cc5aa8a93ce4e22a7d103fad4d5d83254ef",
+        "failure": "test_ingest.py imports pptx at collection; selected Python lacks pptx (ModuleNotFoundError). No dependency installed. Original failure artifacts retained."
+      },
+      {
+        "command_argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-B",
+          "-m",
+          "pytest",
+          "--noconftest",
+          "--basetemp=E:/WK/run/p31-20261017/image-tests/temp-03",
+          "tests/weknora_port/test_p27_page_scoped_vision.py",
+          "tests/weknora_port/test_http_api.py",
+          "tests/weknora_port/test_documents.py",
+          "tests/weknora_port/test_image_configuration.py",
+          "tests/weknora_port/test_image_processing.py",
+          "-q",
+          "--junitxml=E:/WK/run/p31-20261017/image-tests/run-03.xml"
+        ],
+        "working_directory": "E:\\RAG-Worktrees\\weknora-python-port-20261013",
+        "command_powershell": "& 'E:/RAG quention/.venv/Scripts/python.exe' '-B' '-m' 'pytest' '--noconftest' '--basetemp=E:/WK/run/p31-20261017/image-tests/temp-03' 'tests/weknora_port/test_p27_page_scoped_vision.py' 'tests/weknora_port/test_http_api.py' 'tests/weknora_port/test_documents.py' 'tests/weknora_port/test_image_configuration.py' 'tests/weknora_port/test_image_processing.py' '-q' '--junitxml=E:/WK/run/p31-20261017/image-tests/run-03.xml'",
+        "exit_code": 0,
+        "result": "PASS",
+        "passed": 39,
+        "log": "E:\\WK\\run\\p31-20261017\\image-tests\\run-03.log",
+        "junit": "E:\\WK\\run\\p31-20261017\\image-tests\\run-03.xml",
+        "log_sha256": "febfec811df87f782f54272f5a7cc5b049d4d3ecf6e069654ea584033d5a0582"
+      }
+    ],
+    "diff_check": {
+      "command_argv": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "backend/weknora_port/documents.py",
+        "backend/weknora_port/http_api.py",
+        "backend/weknora_port/image_configuration.py",
+        "backend/weknora_port/image_tasks.py",
+        "backend/weknora_port/ingestion/core.py",
+        "backend/weknora_port/ingestion/upstream_pdf_parser.py",
+        "tests/weknora_port/test_p27_page_scoped_vision.py",
+        "tests/weknora_port/test_http_api.py",
+        "tests/weknora_port/test_documents.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'tests/weknora_port/test_http_api.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/weknora_port/test_p27_page_scoped_vision.py', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    "source_ast_comparison": {
+      "exit_code": 0,
+      "compared_functions": 8,
+      "equal_functions": 8,
+      "method": "ast.dump(..., include_attributes=False) equality from local fixed upstream and current port sources"
+    },
+    "covered_behaviors": [
+      "Native 3-page PDF retains all text and produces no extra whole-page images.",
+      "Mixed 3-page PDF preserves both native embedded figures plus one scanned page asset in full-document routing.",
+      "Offline lifecycle upload processes both native embedded and scanned assets despite historical image_pages=[999]; immutable source readback is unchanged.",
+      "Explicit upload model overrides and DeepSeek vision wire body remain supported without provider requests.",
+      "Historical task JSON is unchanged when retired page scope is ignored; current source version/hash/owner/claim guards still reject stale identities.",
+      "Direct multipart and JSON-in-form retired selectors are rejected; KB DTO rejects image_pages as extra."
+    ],
+    "database_tests": "NOT RUN",
+    "cloud_calls": "NOT RUN",
+    "real_pdf_provider_acceptance": "NOT RUN; parent owns subsequent directed acceptance"
+  },
+  "runtime_coordination": {
+    "owner": "parent",
+    "requested_change": "Remove image_pages from runtime.py update_image_processing allowed field set (previous line765).",
+    "parent_reported_done": true,
+    "edited_by_this_agent": false
+  },
+  "result": "PASS for 39 focused offline tests and 8 fixed-source AST comparisons; broad ingestion suite collection blocked by missing pptx. No live DB/provider acceptance claimed.",
+  "boundaries": {
+    "cloud_calls": 0,
+    "database_connections": 0,
+    "database_writes": 0,
+    "dependency_installs": 0,
+    "commits": 0,
+    "grants_changed": false,
+    "historical_data_migration": false,
+    "model_configuration_abstraction_changed": false
+  }
+}

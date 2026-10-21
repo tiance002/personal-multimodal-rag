@@ -1,0 +1,21 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_actual_complete_search_context_and_http_reference_readback _______
+tests\weknora_port\test_search_image_completion_pg.py:130: in test_actual_complete_search_context_and_http_reference_readback
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_search_image_completion_pg.py:119: in scenario
+    assert source.json()['data']['content']==expected['content']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'content'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_search_image_completion_pg.py::test_actual_complete_search_context_and_http_reference_readback
+1 failed in 11.10s

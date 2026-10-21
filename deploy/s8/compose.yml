@@ -1,0 +1,109 @@
+name: rag-s8
+x-app-environment: &app-environment
+  S8_DB_HOST: db
+  S8_DB_USER: weknora
+  S8_DB_PASSWORD_FILE: /run/secrets/database_password
+  S8_API_TOKEN_FILE: /run/secrets/api_token
+  S8_PRINCIPAL_FILE: /run/secrets/principal.json
+  S8_LOG_DIR: /data/logs
+  WEKNORA_PORT_DATABASE_NAME: weknora_s8
+  WEKNORA_PORT_DATABASE_SYSTEM_ID: ${S8_PG_SYSTEM_ID:-0}
+  WEKNORA_PORT_REDIS_URL: redis://redis:6379/8
+  WEKNORA_PORT_REDIS_RUN_ID: ${S8_REDIS_RUN_ID:-0000000000000000000000000000000000000000}
+  WEKNORA_PORT_REDIS_PREFIX: weknora-python-s8:runtime
+  WEKNORA_PORT_STORAGE_ROOT: /var/lib/eviroute/storage
+  WEKNORA_PORT_SECRET_KEY_FILE: /run/secrets/model_key
+  WEKNORA_PORT_EXECUTION_ROOT: /opt/rag-s8/state/executions
+  WEKNORA_PORT_TOKENIZER_ASSET: /opt/assets/cl100k_base.tiktoken
+  WEKNORA_PORT_ROUTER_MODE: DYNAMIC
+  WEKNORA_PORT_CLOUD_ALLOWED: 'false'
+  WEKNORA_PORT_GRAPH_ENABLED: 'false'
+  WEKNORA_PORT_RERANK_TOP1_FLOORLESS: 'false'
+  WEKNORA_PORT_MINERU_ENABLED: 'false'
+  WEKNORA_PORT_ORIGINS: http://127.0.0.1:${S8_UI_PORT:-18880}
+x-app: &app
+  image: rag-s8-api:${S8_SOURCE_COMMIT:-local}
+  build: {context: ../.., dockerfile: deploy/s8/Dockerfile.api}
+  restart: unless-stopped
+  init: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 128
+  mem_limit: 1g
+  memswap_limit: 1g
+  cpus: 0.75
+  stop_grace_period: 30s
+  volumes:
+    - ${S8_ROOT:-/opt/rag-s8}/storage:/var/lib/eviroute/storage
+    - ${S8_ROOT:-/opt/rag-s8}/logs:/data/logs
+    - ${S8_ROOT:-/opt/rag-s8}/state:/opt/rag-s8/state
+    - ${S8_ROOT:-/opt/rag-s8}/config/assets:/opt/assets:ro
+  secrets:
+    - database_password
+    - model_key
+    - api_token
+    - {source: principal, target: principal.json}
+  depends_on:
+    db: {condition: service_healthy}
+    redis: {condition: service_healthy}
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+services:
+  db:
+    image: paradedb/paradedb@sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: weknora_s8
+      POSTGRES_USER: weknora
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    command: [postgres, -c, shared_buffers=128MB, -c, work_mem=4MB, -c, maintenance_work_mem=64MB, -c, max_connections=30, -c, max_parallel_workers=2]
+    ports: ['127.0.0.1:${S8_PG_PORT:-15432}:5432']
+    volumes: [s8-pg:/var/lib/postgresql/data]
+    shm_size: 128m
+    mem_limit: 1g
+    cpus: 1.25
+    healthcheck: {test: [CMD-SHELL, 'pg_isready -U weknora -d weknora_s8'], interval: 10s, timeout: 5s, retries: 12}
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  redis:
+    image: redis:7.4.2
+    restart: unless-stopped
+    command: [redis-server, --appendonly, 'yes', --maxmemory, 64mb, --maxmemory-policy, noeviction]
+    ports: ['127.0.0.1:${S8_REDIS_PORT:-16379}:6379']
+    volumes: [s8-redis:/data]
+    mem_limit: 128m
+    cpus: 0.25
+    healthcheck: {test: [CMD, redis-cli, ping], interval: 10s, timeout: 3s, retries: 6}
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  api:
+    <<: *app
+    environment: {<<: *app-environment, S8_COMPONENT: api}
+    command: [python, -m, scripts.s8_ecs_runtime, api]
+    ports: ['127.0.0.1:${S8_API_PORT:-18800}:8000']
+    healthcheck: {test: [CMD, python, -m, scripts.s8_ecs_runtime, check], interval: 20s, timeout: 10s, retries: 6, start_period: 20s}
+  worker:
+    <<: *app
+    environment: {<<: *app-environment, S8_COMPONENT: worker}
+    command: [python, -m, scripts.s8_ecs_runtime, worker]
+    # Keep stopped until the new scoped task tables have been inspected.
+    profiles: [worker]
+  frontend:
+    image: rag-s8-frontend:${S8_SOURCE_COMMIT:-local}
+    build: {context: ../.., dockerfile: deploy/s8/Dockerfile.frontend}
+    restart: unless-stopped
+    ports: ['127.0.0.1:${S8_UI_PORT:-18880}:80']
+    secrets: [api_token, {source: ui_password, target: ui.htpasswd}]
+    depends_on:
+      api: {condition: service_healthy}
+    mem_limit: 96m
+    cpus: 0.25
+    security_opt: [no-new-privileges:true]
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+volumes:
+  s8-pg: {name: rag-s8-pg}
+  s8-redis: {name: rag-s8-redis}
+secrets:
+  database_password: {file: '${S8_ROOT:-/opt/rag-s8}/secrets/database_password'}
+  model_key: {file: '${S8_ROOT:-/opt/rag-s8}/secrets/model_key'}
+  api_token: {file: '${S8_ROOT:-/opt/rag-s8}/secrets/api_token'}
+  principal: {file: '${S8_ROOT:-/opt/rag-s8}/secrets/principal.json', name: principal.json}
+  ui_password: {file: '${S8_ROOT:-/opt/rag-s8}/secrets/ui.htpasswd', name: ui.htpasswd}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.296" timestamp="2026-10-14T20:01:08.131696+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_configuration_http_pg" name="test_actual_configuration_priority_independent_auxiliary_and_request_replay" time="0.213"><failure message="ValueError: MIGRATION_SOURCE_CHECKSUM_MISMATCH">tests\weknora_port\test_configuration_http_pg.py:96: in test_actual_configuration_priority_independent_auxiliary_and_request_replay
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_configuration_http_pg.py:18: in scenario
+    async with isolated_mock_application() as (app,oldwire,root):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:214: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\native_fixture.py:95: in isolated_mock_application
+    application,redis,wire,root,pool=await namespace['build_native_fixture']()
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;verified-isolated-native-assembly&gt;:11: in build_native_fixture
+    ???
+backend\weknora_port\storage\turns_migrate.py:20: in apply_turn_schema
+    await apply_turn_configuration_schema(identity_guard)
+backend\weknora_port\storage\turns_migrate.py:30: in apply_turn_configuration_schema
+    raise ValueError('MIGRATION_SOURCE_CHECKSUM_MISMATCH')
+E   ValueError: MIGRATION_SOURCE_CHECKSUM_MISMATCH</failure></testcase></testsuite></testsuites>

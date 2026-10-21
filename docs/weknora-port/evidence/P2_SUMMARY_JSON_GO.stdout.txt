@@ -1,0 +1,17 @@
+=== RUN   TestEmit
+ORACLE {"index":0,"profile":null,"summary":"Legacy plain"}
+ORACLE {"index":1,"profile":{"gist":"y","topics":["k"]},"summary":"x"}
+ORACLE {"index":2,"profile":{"gist":"topic","topics":["A"]},"summary":"brief"}
+ORACLE {"index":3,"profile":{"gist":"fenced"},"summary":"fenced"}
+ORACLE {"index":4,"profile":null,"summary":"Before [1] {\"summary\":\"later object must not win\"}"}
+ORACLE {"index":5,"profile":null,"summary":"{\"summary\":\"raw\nnewline\"}"}
+ORACLE {"index":6,"profile":null,"summary":"escaped\nnewline"}
+ORACLE {"index":7,"profile":{"topics":["x"]},"summary":"case folded"}
+ORACLE {"index":8,"profile":null,"summary":"{\"summary\":123}"}
+ORACLE {"index":9,"profile":null,"summary":"{\"topics\":[]}"}
+ORACLE {"index":10,"profile":null,"summary":"braces } [ within string"}
+ORACLE {"index":11,"profile":null,"summary":"null"}
+ORACLE {"index":12,"profile":null,"summary":"[{\"summary\":\"array wrong target\"}]"}
+--- PASS: TestEmit (0.00s)
+PASS
+ok  	summary_oracle	3.483s

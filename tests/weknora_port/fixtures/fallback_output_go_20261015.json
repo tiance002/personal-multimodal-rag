@@ -1,0 +1,85 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "exit_code": 0,
+  "rows": [
+    {
+      "completion_count": 1,
+      "events": [
+        {
+          "content": "FIXED_SOURCE_REPLY",
+          "done": true,
+          "is_fallback": true,
+          "truncated": false
+        }
+      ],
+      "name": "empty",
+      "persisted_content": "FIXED_SOURCE_REPLY"
+    },
+    {
+      "completion_count": 1,
+      "events": [
+        {
+          "content": "partial ",
+          "done": false,
+          "is_fallback": true,
+          "truncated": false
+        },
+        {
+          "content": "FIXED_SOURCE_REPLY",
+          "done": true,
+          "is_fallback": true,
+          "truncated": false
+        }
+      ],
+      "name": "partial_eof",
+      "persisted_content": "partial FIXED_SOURCE_REPLY"
+    },
+    {
+      "completion_count": 1,
+      "events": [
+        {
+          "content": "normal answer",
+          "done": true,
+          "is_fallback": true,
+          "truncated": false
+        }
+      ],
+      "name": "normal_done",
+      "persisted_content": "normal answer"
+    },
+    {
+      "completion_count": 1,
+      "events": [
+        {
+          "content": "partial ",
+          "done": false,
+          "is_fallback": true,
+          "truncated": false
+        },
+        {
+          "content": "FIXED_SOURCE_REPLY",
+          "done": true,
+          "is_fallback": true,
+          "truncated": false
+        }
+      ],
+      "name": "thinking_ignored",
+      "persisted_content": "partial FIXED_SOURCE_REPLY"
+    },
+    {
+      "name": "nonvision_image",
+      "prompt": "FALLBACK rewritten question English - doc\n\n\n[用户上传图片内容]\na public widget picture\n\nQUOTED SOURCE"
+    }
+  ],
+  "source_sha256": "bfc76618b54725ff85f6f3fba194c0e93b5ef9bab50c2d067e2fc54443228dc3",
+  "handler_sha256": "f77699de82d49a73ebe894c7f5e094b43299c20b486058f5c28d37691189a1ae",
+  "handler_append_statement": "streamCtx.assistantMessage.Content += data.Content",
+  "function_sha256": {
+    "func -0": "542ed0aecf502cf9ea27ead9b0fd59dd03229d1834432b96a1808797999390c7",
+    "func -1": "3ec1c06ae205a14c823e9369ddf3dfa49b0f5f197c7eae9f8f2176fecec7c374",
+    "func -2": "92cd0de0e4ed0eaf49e0af0baf1da5b3c65534ca49ab4f34a2b6426b37061ed6",
+    "func -3": "7d24cc8717a2ff63244fb8f8c138d7dac68cb12ef69ce1e970f4a0d6d6fb5395"
+  },
+  "scope": "Exact fixed fallback consumer/emitter/fixed/render functions plus exact handler append statement. DTO/event recorder, identity decoder for plain text only, listing and deterministic placeholders, unused truncation helper seams; not public KnowledgeQA, citation decoding or actual Go DB.",
+  "real_provider_calls": 0
+}

@@ -1,0 +1,50 @@
+{
+  "kind": "ACTUAL_SYNTHETIC_REDIS_SSE_RESTORE_NEW_PREFIX_NATIVE_REPLAY",
+  "tenant": 104,
+  "source_prefix": "weknora-resume:20261013:d7db43cc-5d64-45e1-83d5-d1791633d130",
+  "target_prefix": "wk-restore:20261014:history-f53cb53",
+  "redis_container": "692b84d8fee031b145e6b1b0037625a955f0bb3cdb321854d11a6bbb03b02664",
+  "redis_run_id": "586b92f4649b78508382dfd52d64d848f45b0a7c",
+  "snapshot": "E:\\WK\\restore\\redis-history-f53cb53\\stream-snapshot.json",
+  "snapshot_sha256": "3cd1f0bc998aa3ed99e2009c7027479ba9ea257861704eb099ee004b41cf3de6",
+  "keys": [
+    {
+      "case": "partial",
+      "events": 25,
+      "terminal_complete": 1,
+      "native_replay_equal": true,
+      "offset_at_end_empty": true,
+      "dump_sha256": "119c2464b33c7abd1f205286169375e351bdc97836203792b5215c3c525e8908"
+    },
+    {
+      "case": "disconnect",
+      "events": 25,
+      "terminal_complete": 1,
+      "native_replay_equal": true,
+      "offset_at_end_empty": true,
+      "dump_sha256": "a003bedf205af593202d823416bdfb5561807849c87978cf3344a56556c2c013"
+    },
+    {
+      "case": "hidden-cheap",
+      "events": 19,
+      "terminal_complete": 1,
+      "native_replay_equal": true,
+      "offset_at_end_empty": true,
+      "dump_sha256": "62fec091e66d2367b4e8f023ed273c1de1bbe0215fc58fd13574c5edf3121350"
+    },
+    {
+      "case": "final-commit-wins",
+      "events": 22,
+      "terminal_complete": 1,
+      "native_replay_equal": true,
+      "offset_at_end_empty": true,
+      "dump_sha256": "7a2e0b7df040667275184dd935d16170b11f4b2f14f088f1c464d78c4b18c474"
+    }
+  ],
+  "expiry_preserved": true,
+  "source_keys_modified": false,
+  "old_business_database_accessed": false,
+  "real_provider_calls": 0,
+  "worker_jobs_restored": "NOT_CLAIMED",
+  "cutover": "NOT_RUN"
+}

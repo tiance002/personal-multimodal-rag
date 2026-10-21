@@ -1,0 +1,272 @@
+diff --git a/backend/weknora_port/models/local_ollama.py b/backend/weknora_port/models/local_ollama.py
+index 44c4992..27ad862 100644
+--- a/backend/weknora_port/models/local_ollama.py
++++ b/backend/weknora_port/models/local_ollama.py
+@@ -23,7 +23,8 @@ import base64
+ import binascii
+ import json
+ from copy import deepcopy
+-from typing import Any, AsyncIterator, Mapping, Protocol, Sequence
++from dataclasses import replace
++from typing import AsyncIterator, Mapping, Protocol, Sequence
+ 
+ from .request import neutralize
+ from .types import (ChatOptions, ChatResponse, FunctionCall, Message, ModelConfig,
+@@ -31,10 +32,25 @@ from .types import (ChatOptions, ChatResponse, FunctionCall, Message, ModelConfi
+ 
+ 
+ class LocalChatService(Protocol):
+-    """Injected local connection seam (one adapter = upstream OllamaService)."""
++    """Injected local connection seam (one adapter = upstream OllamaService).
+ 
++    Chat bytes are sent through the injected ProviderModel transport (one
++    controlled egress boundary), so this seam only supplies the connection
++    base URL and the availability check; it never buffers a chat response.
++    """
++
++    base_url: str
+     async def ensure_model_available(self, model_name: str) -> None: ...
+-    def chat(self, model_name: str, request: Mapping[str, Any]) -> AsyncIterator[Mapping[str, Any]]: ...
++
++
++def local_connection_config(config: ModelConfig, base_url: str) -> ModelConfig:
++    """The only local chat connection source: service, not row inline secrets.
++
++    api='ollama' renders /api/chat; base URL comes from the injected service;
++    the row's endpoint URL/query and any inline credential are dropped.
++    """
++    return replace(config, api="ollama", base_url=base_url.rstrip("/"),
++                   endpoint_url="", query={}, requires_auth=False)
+ 
+ 
+ # ---------------------------------------------------------------- request wire
+@@ -187,15 +203,13 @@ def _message_identity(env):
+ 
+ def parse_ollama_response(env, config: ModelConfig) -> ChatResponse:
+     """Non-stream /api/chat body -> ChatResponse (upstream Chat callback)."""
++    _reject_vendor_error(env)
+     message = _message_identity(env)
+     content = _text(message.get("content"))
+     if content == "":
+         content = _text(message.get("thinking"))
+     calls = tuple(call for _, call in _response_tool_calls(message.get("tool_calls") or []))
+-    prompt, completion = _count(env.get("prompt_eval_count")), _count(env.get("eval_count"))
+-    return ChatResponse(content, "", "", calls,
+-        TokenUsage(prompt, completion, prompt + completion, "REPORTED", 0, 0, 0, 0, False, "unsupported"),
+-        {}, "")
++    return ChatResponse(content, "", "", calls, _usage(env), {}, "")
+ 
+ 
+ def _text(value) -> str:
+@@ -214,11 +228,33 @@ def _count(value) -> int:
+     return value
+ 
+ 
+-def _usage(env):
+-    prompt, completion = _count(env.get("prompt_eval_count")), _count(env.get("eval_count"))
+-    if prompt <= 0 and completion <= 0:
+-        return None
+-    return TokenUsage(prompt, completion, prompt + completion, "REPORTED", 0, 0, 0, 0, False, "unsupported")
++def _reject_vendor_error(env) -> None:
++    """Ollama may answer HTTP 200 with a top-level ``error`` (non-stream and,
++    as an NDJSON line, in-stream). Surface a fixed project code only: the
++    vendor text can echo a key or the private prompt."""
++    error = env.get("error") if isinstance(env, Mapping) else None
++    if (isinstance(error, Mapping) and error) or (isinstance(error, str) and error.strip()):
++        raise ProviderError("PROVIDER_API_ERROR", sent=True)
++
++
++def _usage(env) -> TokenUsage:
++    """Ollama eval counters, without fabricating a settlement.
++
++    Both ``prompt_eval_count`` and ``eval_count`` present (including an explicit
++    zero) -> REPORTED with the sum. Neither present -> UNKNOWN. Only one
++    present -> UNKNOWN with the missing counter left absent, never padded to 0.
++    """
++    prompt_present = env.get("prompt_eval_count") is not None
++    completion_present = env.get("eval_count") is not None
++    if prompt_present and completion_present:
++        prompt, completion = _count(env["prompt_eval_count"]), _count(env["eval_count"])
++        return TokenUsage(prompt, completion, prompt + completion, "REPORTED",
++                          0, 0, 0, 0, False, "unsupported")
++    if not prompt_present and not completion_present:
++        return TokenUsage(cache_status="unsupported")
++    return TokenUsage(_count(env["prompt_eval_count"]) if prompt_present else None,
++                      _count(env["eval_count"]) if completion_present else None,
++                      None, "UNKNOWN", 0, 0, 0, 0, False, "unsupported")
+ 
+ 
+ class OllamaStreamState:
+@@ -300,6 +336,7 @@ def _ndjson_object(line):
+         raise ProviderError("PROVIDER_RESPONSE_INVALID", sent=True) from None
+     if not isinstance(value, dict):
+         raise ProviderError("PROVIDER_RESPONSE_INVALID", sent=True)
++    _reject_vendor_error(value)
+     return value
+ 
+ 
+@@ -308,8 +345,10 @@ def _ndjson_object(line):
+ class HTTPLocalService:
+     """Minimal OllamaService equivalent over an injectable httpx transport.
+ 
+-    Model name is the only per-row input; the connection (base URL / client)
+-    comes from this service, matching upstream's global OllamaService.
++    Model name is the only per-row input; the connection (base URL) comes from
++    this service, matching upstream's global OllamaService. Chat bytes do not
++    flow through this client: the ProviderModel transport sends them (one
++    controlled egress boundary), so there is no buffering chat() here.
+     """
+ 
+     def __init__(self, base_url: str = "http://localhost:11434", *, transport=None,
+@@ -338,6 +377,8 @@ class HTTPLocalService:
+             listed = json.loads(response.content)
+         except (ValueError, TypeError):
+             raise ProviderError("PROVIDER_RESPONSE_INVALID", sent=True) from None
++        if not isinstance(listed, Mapping) or listed.get("error"):
++            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
+         names = {row.get("name") for row in (listed.get("models") or []) if isinstance(row, Mapping)}
+         wanted = model_name if ":" in model_name else model_name + ":latest"
+         if wanted in names or model_name in names:
+@@ -351,29 +392,12 @@ class HTTPLocalService:
+             raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE") from None
+         if response.status_code != 200:
+             raise ProviderError("MODEL_LOCAL_MODEL_UNAVAILABLE")
+-        async for _ in ndjson_events(response):
+-            pass
+-
+-    async def chat(self, model_name: str, request: Mapping[str, Any]) -> AsyncIterator[dict]:
++        # A refused/broken pull still yields HTTP 200 with an NDJSON error line.
+         try:
+-            response = await self.client.post(self.base_url + "/api/chat", json=request)
+-        except Exception as error:  # noqa: BLE001
+-            if isinstance(error, ProviderError):
+-                raise
+-            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE") from None
+-        if response.status_code != 200:
+-            raise ProviderError("MODEL_LOCAL_CHAT_FAILED")
+-        if request.get("stream"):
+-            async for item in ndjson_events(response):
+-                yield item
+-        else:
+-            try:
+-                item = json.loads(await response.aread())
+-            except (ValueError, TypeError):
+-                raise ProviderError("PROVIDER_RESPONSE_INVALID", sent=True) from None
+-            if not isinstance(item, dict):
+-                raise ProviderError("PROVIDER_RESPONSE_INVALID", sent=True)
+-            yield item
++            async for _ in ndjson_events(response):
++                pass
++        except ProviderError:
++            raise ProviderError("MODEL_LOCAL_MODEL_UNAVAILABLE") from None
+ 
+ 
+ def local_error_event(error: ProviderError) -> StreamResponse:
+@@ -383,4 +407,4 @@ def local_error_event(error: ProviderError) -> StreamResponse:
+ 
+ __all__ = ["LocalChatService", "build_ollama_body", "convert_ollama_messages",
+            "parse_ollama_response", "OllamaStreamState", "ndjson_events",
+-           "HTTPLocalService", "local_error_event"]
++           "HTTPLocalService", "local_error_event", "local_connection_config"]
+diff --git a/backend/weknora_port/models/provider.py b/backend/weknora_port/models/provider.py
+index b403f55..e03eb73 100644
+--- a/backend/weknora_port/models/provider.py
++++ b/backend/weknora_port/models/provider.py
+@@ -14,7 +14,8 @@ from .usage import normalize_usage, accumulate_usage
+ from .stream import StreamAssembler, sse_events, decode_tool_calls
+ from .native_request import build_native_body
+ from .native_response import parse_native_response, NativeStreamState, native_usage
+-from .local_ollama import build_ollama_body, parse_ollama_response, OllamaStreamState, local_error_event
++from .local_ollama import (build_ollama_body, parse_ollama_response, OllamaStreamState,
++                           local_error_event, ndjson_events, local_connection_config)
+ 
+ 
+ def decode_json(raw):
+@@ -266,10 +267,7 @@ class ProviderModel:
+             for event in assembler.fail(error):
+                 yield identity_event(event)
+ 
+-    async def _local_chat(self, messages, options, context, *, _capability="chat"):
+-        service = self.local_service
+-        if service is None:
+-            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
++    async def _local_ensure(self, service):
+         try:
+             await service.ensure_model_available(self.config.model)
+         except CallCancelled:
+@@ -278,22 +276,24 @@ class ProviderModel:
+             raise
+         except Exception:
+             raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE") from None
+-        body = build_ollama_body(self.config, messages, options, stream=False,
+-                                 image_resolver=self.image_resolver)
+-        last: dict = {}
+-        try:
+-            async for envelope in service.chat(self.config.model, body):
+-                last = envelope
+-        except CallCancelled:
+-            raise
+-        except ProviderError:
+-            raise
+-        except Exception:
+-            raise ProviderError("MODEL_LOCAL_CHAT_FAILED") from None
+-        return parse_ollama_response(last, self.config)
++
++    async def _local_chat(self, messages, options, context, *, _capability="chat"):
++        service = self.local_service
++        if service is None:
++            raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
++        effective = local_connection_config(self.config, service.base_url)
++        async with call_lifetime(context, DEFAULT_CHAT_TIMEOUT) as lifetime:
++            await self._local_ensure(service)
++            body = build_ollama_body(self.config, messages, options, stream=False,
++                                     image_resolver=self.image_resolver)
++            async with self.transport.open(effective, "/api/chat", body, context,
++                    capability=_capability, stream=False, lifetime=lifetime) as handle:
++                env = decode_json(await handle.response.aread())
++                response = parse_ollama_response(env, self.config)
++                handle.observed(response.usage)
++                return response
+ 
+     async def _local_stream(self, messages, options, context):
+-        image_resolver = self.image_resolver
+         def identity(event):
+             return replace(event, data={**(event.data or {}),
+                 "model_requested": self.config.model, "model_reported": None})
+@@ -301,22 +301,22 @@ class ProviderModel:
+         if service is None:
+             yield identity(local_error_event(ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")))
+             return
+-        try:
+-            await service.ensure_model_available(self.config.model)
+-        except CallCancelled:
+-            raise
+-        except ProviderError as error:
+-            yield identity(local_error_event(error))
+-            return
+-        except Exception:
+-            yield identity(local_error_event(ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")))
+-            return
+-        body = build_ollama_body(self.config, messages, options, stream=True, image_resolver=image_resolver)
++        effective = local_connection_config(self.config, service.base_url)
+         state = OllamaStreamState(self.config)
+         try:
+-            async for envelope in service.chat(self.config.model, body):
+-                for event in state.feed(envelope):
+-                    yield identity(event)
++            async with call_lifetime(context, DEFAULT_STREAM_TIMEOUT) as lifetime:
++                await self._local_ensure(service)
++                body = build_ollama_body(self.config, messages, options, stream=True,
++                                         image_resolver=self.image_resolver)
++                async with self.transport.open(effective, "/api/chat", body, context,
++                        capability="chat", stream=True, lifetime=lifetime) as handle:
++                    usage = None
++                    async for env in ndjson_events(handle.response):
++                        for event in state.feed(env):
++                            if event.is_final and event.usage is not None:
++                                usage = event.usage
++                            yield identity(event)
++                    handle.observed(usage or TokenUsage(cache_status="unsupported"))
+         except CallCancelled:
+             raise
+         except ProviderError as error:

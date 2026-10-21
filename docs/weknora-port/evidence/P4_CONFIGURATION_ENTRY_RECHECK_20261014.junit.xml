@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="7.270" timestamp="2026-10-14T20:05:13.571359+08:00" hostname="天策"><testcase classname="tests.weknora_port.test_configuration_http_pg" name="test_actual_configuration_priority_independent_auxiliary_and_request_replay" time="4.606"><failure message="AssertionError: assert (True and 'pending' == 'completed'&#10;  &#10;  - completed&#10;  + pending)">tests\weknora_port\test_configuration_http_pg.py:96: in test_actual_configuration_priority_independent_auxiliary_and_request_replay
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_configuration_http_pg.py:84: in scenario
+    assert saved['is_completed'] and saved['turn_status']=='completed'
+E   AssertionError: assert (True and 'pending' == 'completed'
+E     
+E     - completed
+E     + pending)</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,104 @@
+{
+  "schema": "rag-phase01-development-cases/v1",
+  "not_holdout": true,
+  "no_new_cloud_authorization": true,
+  "cases": [
+    {
+      "case_id": "E1-matrix-combined",
+      "kind": "SAVED_PROVIDER_RERANK",
+      "tenant_id": 1,
+      "evidence_dir": "E:\\WK\\run\\qwen-single-rag-20261018\\live\\evidence",
+      "required_sets": [
+        [
+          "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+        ]
+      ],
+      "requirement": "full structured matrix and last column; exact signs/rows retained"
+    },
+    {
+      "case_id": "E2-coefficient",
+      "kind": "SYNTHETIC_SUMMARY_ONLY_BOUNDARY",
+      "tenant_id": 1,
+      "basis_case": "E1-matrix-combined",
+      "question": "课件中线性方程组的系数矩阵是什么？",
+      "required_sets": [
+        [
+          "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+        ]
+      ]
+    },
+    {
+      "case_id": "E2-last-column",
+      "kind": "SYNTHETIC_SUMMARY_ONLY_BOUNDARY",
+      "tenant_id": 1,
+      "basis_case": "E1-matrix-combined",
+      "question": "增广矩阵最后一列的三个数分别是什么？",
+      "required_sets": [
+        [
+          "96ad695f-bb32-4df9-9cfb-1e8281f2fc31"
+        ]
+      ]
+    },
+    {
+      "case_id": "E3-year-count",
+      "kind": "SAVED_PROVIDER_RERANK",
+      "tenant_id": 332,
+      "evidence_dir": "E:\\WK\\run\\rag-m40-20261018\\batch-008\\evidence",
+      "required_sets": [
+        [
+          "39aa8800-a6cd-48a6-8ec6-95ce8eb8a7d1",
+          "a24de97d-e1c5-41c5-900b-631ad782b776"
+        ]
+      ],
+      "requirement": "count text plus original source period; question year is not evidence"
+    },
+    {
+      "case_id": "E4-0959",
+      "kind": "SAVED_PROVIDER_RERANK",
+      "tenant_id": 332,
+      "evidence_dir": "E:\\WK\\run\\rag-m40-20261018\\batch-012\\evidence",
+      "required_sets": [
+        [
+          "df6098cb-68e6-4546-b9e0-8682b4bf19e9"
+        ]
+      ]
+    },
+    {
+      "case_id": "E6-hotpot-location",
+      "kind": "SAVED_PROVIDER_RERANK",
+      "tenant_id": 332,
+      "evidence_dir": "E:\\WK\\run\\rag-m40-20261018\\batch-009\\evidence",
+      "required_sets": [
+        [
+          "ec07a1fd-8a8e-4f23-a7d6-65d385d2343b",
+          "31417c7c-7abf-4723-956a-74bf7ee14683"
+        ]
+      ],
+      "requirement": "director period and linked seminar location both needed"
+    },
+    {
+      "case_id": "E6-hotpot-director",
+      "kind": "SAVED_PROVIDER_RERANK",
+      "tenant_id": 332,
+      "evidence_dir": "E:\\WK\\run\\rag-m40-20261018\\batch-010\\evidence",
+      "required_sets": [
+        [
+          "defd6222-f0a1-4058-b86d-e933cf2f6755"
+        ]
+      ],
+      "requirement": "one original passage sufficient despite two qrels docs"
+    },
+    {
+      "case_id": "E6-0434",
+      "kind": "SAVED_PROVIDER_RERANK",
+      "tenant_id": 332,
+      "evidence_dir": "E:\\WK\\run\\rag-m40-20261018\\batch-011\\evidence",
+      "required_sets": [
+        [
+          "085643dc-5ebb-4b8a-b7f1-75427da40015"
+        ]
+      ],
+      "source_mapping": "SOURCE_MAPPING_GAP; Kaggle text does not prove Coding time chapter association"
+    }
+  ]
+}

@@ -1,0 +1,652 @@
+{
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "scope": "SOURCE_EXTRACTED_TYPED_REPOSITORY_ADAPTER; not full upstream application",
+  "exit_code": 0,
+  "cases": [
+    {
+      "name": "direct-six-fields",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\",\"caption\":\"caption\",\"ocr_text\":\"OCR\",\"page_number\":3,\"source_type\":\"owner\",\"ocr_layout\":{\"x\":1}}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "two-level",
+      "children": [
+        {
+          "id": "t",
+          "parent_chunk_id": "p",
+          "chunk_type": "text",
+          "image_info": "",
+          "is_enabled": true
+        },
+        {
+          "id": "g",
+          "parent_chunk_id": "t",
+          "chunk_type": "image_caption",
+          "image_info": "[{\"url\":\"a\",\"caption\":\"second\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "two-parents",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "t",
+          "parent_chunk_id": "q",
+          "chunk_type": "text",
+          "image_info": "",
+          "is_enabled": true
+        },
+        {
+          "id": "b",
+          "parent_chunk_id": "t",
+          "chunk_type": "image_caption",
+          "image_info": "[{\"url\":\"b\",\"ocr_text\":\"B\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        },
+        {
+          "id": "q",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "nonempty-literal",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[]"
+        },
+        {
+          "id": "q",
+          "image_info": " "
+        },
+        {
+          "id": "r",
+          "image_info": "bad"
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "first-batch-failure",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 1
+    },
+    {
+      "name": "second-batch-failure",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "t",
+          "parent_chunk_id": "p",
+          "chunk_type": "text",
+          "image_info": "",
+          "is_enabled": true
+        },
+        {
+          "id": "g",
+          "parent_chunk_id": "t",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"grandchild\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 2
+    },
+    {
+      "name": "disabled-and-other-type",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": false
+        },
+        {
+          "id": "b",
+          "parent_chunk_id": "p",
+          "chunk_type": "summary",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "whole-array-type-error",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"valid\"},{\"url\":false}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "duplicate-update-text-only",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"original\",\"start_pos\":3,\"end_pos\":9,\"ocr_text\":\"first\",\"caption\":\"first\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "b",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"changed\",\"start_pos\":44,\"ocr_text\":\"second\",\"caption\":\"\"}]",
+          "is_enabled": true
+        },
+        {
+          "id": "c",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\",\"caption\":\"last\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "fallback-distinct-keys",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"original_url\": \"b\", \"caption\": \"fallback\"}, {\"url\": \"a\", \"original_url\": \"b\"}, {\"url\": \"b\", \"caption\": \"replace fallback\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "null-defaults",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[null,{\"url\":\"a\",\"start_pos\":null,\"caption\":null}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "no-url",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"caption\":\"no URL\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "invalid-int-whole-array",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\",\"start_pos\":1.5}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "nonarray",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "{\"url\":\"a\"}",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "disabled-text-blocks-grandchildren",
+      "children": [
+        {
+          "id": "t",
+          "parent_chunk_id": "p",
+          "chunk_type": "text",
+          "image_info": "",
+          "is_enabled": false
+        },
+        {
+          "id": "g",
+          "parent_chunk_id": "t",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"hidden\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ],
+      "fail_at": 0
+    },
+    {
+      "name": "duplicates-preserve-nonempty",
+      "children": [
+        {
+          "id": "a",
+          "parent_chunk_id": "p",
+          "chunk_type": "image_ocr",
+          "image_info": "[{\"url\":\"a\"}]",
+          "is_enabled": true
+        }
+      ],
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        },
+        {
+          "id": "p",
+          "image_info": ""
+        },
+        {
+          "id": "p",
+          "image_info": " [] "
+        }
+      ],
+      "fail_at": 0
+    }
+  ],
+  "rows": [
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "direct-six-fields",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"caption\",\"ocr_text\":\"OCR\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ],
+        [
+          "t"
+        ]
+      ],
+      "name": "two-level",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"second\",\"ocr_text\":\"\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p",
+          "q"
+        ],
+        [
+          "t"
+        ]
+      ],
+      "name": "two-parents",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+        },
+        {
+          "id": "q",
+          "image_info": "[{\"url\":\"b\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"B\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [],
+      "name": "nonempty-literal",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[]"
+        },
+        {
+          "id": "q",
+          "image_info": " "
+        },
+        {
+          "id": "r",
+          "image_info": "bad"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "first-batch-failure",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ],
+        [
+          "t"
+        ]
+      ],
+      "name": "second-batch-failure",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "disabled-and-other-type",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "whole-array-type-error",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "duplicate-update-text-only",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"original\",\"start_pos\":3,\"end_pos\":9,\"caption\":\"last\",\"ocr_text\":\"second\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "fallback-distinct-keys",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"\",\"original_url\":\"b\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"replace fallback\",\"ocr_text\":\"\"},{\"url\":\"a\",\"original_url\":\"b\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "null-defaults",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "no-url",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "invalid-int-whole-array",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "nonarray",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "disabled-text-blocks-grandchildren",
+      "results": [
+        {
+          "id": "p",
+          "image_info": ""
+        }
+      ]
+    },
+    {
+      "calls": [
+        [
+          "p"
+        ]
+      ],
+      "name": "duplicates-preserve-nonempty",
+      "results": [
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+        },
+        {
+          "id": "p",
+          "image_info": "[{\"url\":\"a\",\"original_url\":\"\",\"start_pos\":0,\"end_pos\":0,\"caption\":\"\",\"ocr_text\":\"\"}]"
+        },
+        {
+          "id": "p",
+          "image_info": " [] "
+        }
+      ]
+    }
+  ],
+  "extracted_sha256": {
+    "collector": "cb75c2024e5a1fe26413beba53098505fe89ec11c1612e9bcd93cb72bfcf97a3",
+    "enrich": "ca3ceee834bb61d0a663118a4f44a072b1a3971a08bb35416b82751d35e85d48",
+    "image_info_type": "5b904255ce5217e0fed2aa7a46afbc310b177c7755f6589154b13408c60275ea"
+  },
+  "adapted_bodies_sha256": "f6b15631b9687f476a50cecf5c6b57a487aee65bd1fadd7cda82b8dceeccf9d1"
+}

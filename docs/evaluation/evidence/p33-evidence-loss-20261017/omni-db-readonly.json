@@ -1,0 +1,133 @@
+{
+  "schema": "p33-omni-db-readonly/v1",
+  "read_only": true,
+  "database": "weknora_python_port_20261013",
+  "postgres_system_identifier": "7696088403504697382",
+  "scope": {
+    "tenant_id": 332,
+    "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+    "knowledge_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0"
+  },
+  "knowledge_base": {
+    "id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+    "name": "P8 omnidocbench",
+    "tenant_id": 332,
+    "image_processing_config": {
+      "ocr_adapter": "tesseract",
+      "caption_mode": "follow_ocr",
+      "enable_multimodal": true
+    },
+    "embedding_model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+    "rerank_model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3"
+  },
+  "document": {
+    "id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+    "tenant_id": 332,
+    "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+    "title": "PPT_lecture1_page_007",
+    "file_name": "PPT_lecture1_page_007.png",
+    "file_type": "png",
+    "file_hash": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+    "parse_status": "completed",
+    "enable_status": "enabled",
+    "metadata": {
+      "assets": [
+        {
+          "path": "332\\b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef\\dfeb8157-6bf9-4fe2-927a-f38d40b342a0\\35ad1226-ec0e-4931-a87d-257e756f525c\\assets\\0000-8b38ce71-cba0-4b1f-b39f-c27a3e93c666-PPT_lecture1_page_007.png",
+          "size": 115771,
+          "sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+          "metadata": {},
+          "media_type": "image/png",
+          "page_number": null,
+          "source_type": "standalone_image",
+          "logical_path": "images/PPT_lecture1_page_007.png"
+        }
+      ],
+      "sha256": "95a3151c2c9f5f3d9e36392065ecd1e7ab6cf49ae9c591b698cff7196ab78601",
+      "media_type": "image/png",
+      "chunk_count": 2,
+      "processed_at": "2026-10-16T08:28:59.982433+00:00",
+      "index_enabled": true,
+      "indexed_count": 2,
+      "parser_engine": "image",
+      "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+      "parser_metadata": {
+        "status": "parsed",
+        "filename": "PPT_lecture1_page_007.png",
+        "owner_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+        "file_type": ".png",
+        "document_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0",
+        "input_bytes": 115771,
+        "parser_engine": "image",
+        "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+        "image_source_type": "standalone_image",
+        "knowledge_base_id": "b66d8ae4-8cfe-4c9b-86d8-c28cb66ca3ef",
+        "embedded_image_count": 1
+      }
+    }
+  },
+  "chunks": [
+    {
+      "id": "51316a20-67fd-4732-b520-c049999933d0",
+      "chunk_index": 0,
+      "chunk_type": "image_ocr",
+      "is_enabled": true,
+      "index_status": "ready",
+      "parent_chunk_id": "e80caacd-b289-4745-967e-816671ac2cf7",
+      "content": "Matrix representation of system of linear equations\nX1 — 2x2 +X3=0\nGiven a system of linear equations\n2X2 — 8x3 =8\n| 十5X> 十9Xa 三一9\n1\n-2\n1\nThe coefficient matrix Is | 0\n2 -8\n-4\n5\n9\n1\n-—-2\n1\n0\nThe augmented matrix Is | 0\n2 一8 8 |\n-4\n5\n9\n-9",
+      "content_sha256": "088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144",
+      "image_info": "[{\"url\": \"images/PPT_lecture1_page_007.png\", \"original_url\": \"images/PPT_lecture1_page_007.png\", \"start_pos\": 0, \"end_pos\": 0, \"page_number\": null, \"source_type\": \"standalone_image\", \"caption\": \"\", \"ocr_text\": \"Matrix representation of system of linear equations\\nX1 — 2x2 +X3=0\\nGiven a system of linear equations\\n2X2 — 8x3 =8\\n| 十5X> 十9Xa 三一9\\n1\\n-2\\n1\\nThe coefficient matrix Is | 0\\n2 -8\\n-4\\n5\\n9\\n1\\n-—-2\\n1\\n0\\nThe augmented matrix Is | 0\\n2 一8 8 |\\n-4\\n5\\n9\\n-9\", \"ocr_layout\": {\"schema\": \"image-ocr-layout-v1\", \"coordinate_basis\": \"image-pixels-top-left\", \"lines\": [{\"text\": \"Matrix representation of system of linear equations\", \"bbox\": [211.15883382161456, 190.04288736979166, 2081.935872395833, 270.7477823893229], \"start\": 0, \"end\": 51}, {\"text\": \"X1 — 2x2 +X3=0\", \"bbox\": [1513.3048502604165, 413.359375, 2107.1407877604165, 481.8944905598958], \"start\": 52, \"end\": 66}, {\"text\": \"Given a system of linear equations\", \"bbox\": [207.319580078125, 507.4209798177083, 1339.9881184895833, 583.0017903645833], \"start\": 67, \"end\": 101}, {\"text\": \"2X2 — 8x3 =8\", \"bbox\": [1579.8518880208333, 507.4209798177083, 2046.9607747395833, 583.0017903645833], \"start\": 102, \"end\": 114}, {\"text\": \"| 十5X> 十9Xa 三一9\", \"bbox\": [1369.3330078125, 399.9219563802083, 2212.570149739583, 685.5917154947916], \"start\": 115, \"end\": 130}, {\"text\": \"1\", \"bbox\": [1076.2701822916665, 699.3836263020833, 1106.177978515625, 751.9058430989583], \"start\": 131, \"end\": 132}, {\"text\": \"-2\", \"bbox\": [1224.72119140625, 699.3836263020833, 1313.3951822916665, 751.9058430989583], \"start\": 133, \"end\": 135}, {\"text\": \"1\", \"bbox\": [1433.96044921875, 699.3836263020833, 1463.8681640625, 751.9058430989583], \"start\": 136, \"end\": 137}, {\"text\": \"The coefficient matrix Is | 0\", \"bbox\": [203.4803263346354, 701.3033040364583, 1105.9602864583333, 931.8887532552083], \"start\": 138, \"end\": 167}, {\"text\": \"2 -8\", \"bbox\": [1252.875732421875, 701.3033040364583, 1519.0638020833333, 931.8887532552083], \"start\": 168, \"end\": 172}, {\"text\": \"-4\", \"bbox\": [1045.55615234375, 879.1884765625, 1138.00537109375, 934.2727864583333], \"start\": 173, \"end\": 175}, {\"text\": \"5\", \"bbox\": [1253.5155436197915, 879.1884765625, 1285.4325358072915, 934.2727864583333], \"start\": 176, \"end\": 177}, {\"text\": \"9\", \"bbox\": [1430.7610677083333, 879.1884765625, 1465.154296875, 934.2727864583333], \"start\": 178, \"end\": 179}, {\"text\": \"1\", \"bbox\": [1117.862060546875, 1060.9130859375, 1147.6930338541665, 1114.71630859375], \"start\": 180, \"end\": 181}, {\"text\": \"-—-2\", \"bbox\": [1265.6731770833333, 1060.9130859375, 1354.8974609375, 1114.71630859375], \"start\": 182, \"end\": 186}, {\"text\": \"1\", \"bbox\": [1476.1922200520833, 1060.9130859375, 1506.0232747395833, 1114.71630859375], \"start\": 187, \"end\": 188}, {\"text\": \"0\", \"bbox\": [1652.1578776041665, 1060.9130859375, 1685.2138671875, 1114.71630859375], \"start\": 189, \"end\": 190}, {\"text\": \"The augmented matrix Is | 0\", \"bbox\": [203.4803263346354, 1062.832763671875, 1148.1920572916665, 1293.418212890625], \"start\": 191, \"end\": 218}, {\"text\": \"2 一8 8 |\", \"bbox\": [1293.8277180989583, 1062.8326822916665, 1736.9285481770833, 1295.980224609375], \"start\": 219, \"end\": 227}, {\"text\": \"-4\", \"bbox\": [1087.7879231770833, 1062.8326822916665, 1178.6245930989583, 1295.980224609375], \"start\": 228, \"end\": 230}, {\"text\": \"5\", \"bbox\": [1295.1075032552083, 1241.35791015625, 1326.1990559895833, 1296.4422200520833], \"start\": 231, \"end\": 232}, {\"text\": \"9\", \"bbox\": [1472.9928385416665, 1241.35791015625, 1506.8357747395833, 1296.4422200520833], \"start\": 233, \"end\": 234}, {\"text\": \"-9\", \"bbox\": [1624.00341796875, 1241.35791015625, 1713.7010091145833, 1296.4422200520833], \"start\": 235, \"end\": 237}]}, \"ocr_status\": {\"status\": \"completed\", \"error\": \"\", \"binding\": {\"adapter\": \"tesseract\", \"model_id\": \"\", \"source\": \"knowledge_base\", \"capability\": \"LOCAL_ENGINE\"}}, \"caption_status\": {\"status\": \"unavailable\", \"error\": \"IMAGE_CAPTION_VISION_MODEL_REQUIRED\"}}]",
+      "metadata": {
+        "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+        "image_source_type": "standalone_image",
+        "page_number": null,
+        "recommended": true
+      },
+      "embedding_enabled": true,
+      "embedding_dimension": 1024,
+      "embedding_content_sha256": "088a90867822c715162b2400097a75958a8b11f4f532a6dbc222cd13f4d3c144",
+      "embedding_content_equals_chunk": true
+    },
+    {
+      "id": "4427641f-3190-598a-98a2-8f8d63d55d0e",
+      "chunk_index": 1,
+      "chunk_type": "summary",
+      "is_enabled": true,
+      "index_status": "ready",
+      "parent_chunk_id": "e80caacd-b289-4745-967e-816671ac2cf7",
+      "content": "# Summary\n线性方程组的矩阵表示方法\n\n文档介绍了一组线性方程组的矩阵表示，包括系数矩阵和增广矩阵的构造方法。通过将方程组转化为矩阵形式，便于使用高斯消元法等矩阵运算求解。",
+      "content_sha256": "c2de43da87f6cf3f0bca796481078386ae5c3112f6c22c9e5811322bbbc94090",
+      "image_info": "",
+      "metadata": {
+        "origin": "model_generated_summary",
+        "upstream_parent_link": true
+      },
+      "embedding_enabled": true,
+      "embedding_dimension": 1024,
+      "embedding_content_sha256": "c2de43da87f6cf3f0bca796481078386ae5c3112f6c22c9e5811322bbbc94090",
+      "embedding_content_equals_chunk": true
+    },
+    {
+      "id": "e80caacd-b289-4745-967e-816671ac2cf7",
+      "chunk_index": 0,
+      "chunk_type": "text",
+      "is_enabled": true,
+      "index_status": "ready",
+      "parent_chunk_id": null,
+      "content": "![PPT_lecture1_page_007.png](images/PPT_lecture1_page_007.png)",
+      "content_sha256": "9110983fb473148093ef9c57317ab374b53ad48f937ffd7ba9c53f26fc6dd806",
+      "image_info": "",
+      "metadata": {
+        "source_filename": "PPT_lecture1_page_007.png",
+        "source_version": "35ad1226-ec0e-4931-a87d-257e756f525c",
+        "parsed_source_id": "dfeb8157-6bf9-4fe2-927a-f38d40b342a0:child:0"
+      },
+      "embedding_enabled": true,
+      "embedding_dimension": 1024,
+      "embedding_content_sha256": "bccb3473d6fe057948dcefc4752f489cf00f2a63abd1805cde142a1602685606",
+      "embedding_content_equals_chunk": false
+    }
+  ],
+  "writes": 0,
+  "provider_calls": 0
+}

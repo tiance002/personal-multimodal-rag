@@ -1,0 +1,23 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_actual_configuration_priority_independent_auxiliary_and_request_replay _
+tests\weknora_port\test_configuration_http_pg.py:96: in test_actual_configuration_priority_independent_auxiliary_and_request_replay
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_configuration_http_pg.py:84: in scenario
+    assert saved['is_completed'] and saved['turn_status']=='completed'
+E   AssertionError: assert (True and 'pending' == 'completed'
+E     
+E     - completed
+E     + pending)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_configuration_http_pg.py::test_actual_configuration_priority_independent_auxiliary_and_request_replay
+1 failed in 7.27s

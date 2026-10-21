@@ -1,0 +1,323 @@
+"""All generation is synthetic or HTTPX MockTransport; no runtime legacy import."""
+import asyncio,json
+from dataclasses import replace
+from decimal import Decimal
+from pathlib import Path
+from types import SimpleNamespace
+import pytest
+from backend.weknora_port.generation import (GenerationCoordinator,GenerationRequest,GenerationError,GenerationReplay,RoleBinding,RouterPolicy,ValidatedRewrite,Evidence,History,TokenEstimate,prepare_generation)
+from backend.weknora_port.generation.router import decide
+from backend.weknora_port.generation.features import extract_features
+from backend.weknora_port.retrieval.context import FinalizedContext
+from backend.weknora_port.models import provider_config
+from backend.weknora_port.models.types import CallContext,TrustedScope,StreamResponse,TokenUsage,ProviderError,ModelCallTimeout,CallCancelled,RunDeadlineExceeded
+from backend.weknora_port.generation.coordinator import EMPTY_TRUNCATED_FALLBACK
+
+CTX=CallContext('run',TrustedScope('owner',('kb',)),session_id='session')
+E=Evidence('chunk-current','real source evidence','doc-current','kb',knowledge_title='Source',score=.8,source_content='real source evidence')
+def request(mode='DYNAMIC',**kw):
+    # Explicit opt-in preserves legacy citation and router safety counterexamples.
+    values=dict(citations_enabled=True,run_id='run',session_id='session',message_id='assistant',q0='extract source',finalized=FinalizedContext('<context id="1">real source evidence</context>\nextract source','<context id="1">real source evidence</context>',(E.id,)),evidence=(E,),policy=RouterPolicy(mode=mode));values.update(kw);return GenerationRequest(**values)
+def run(awaitable):return asyncio.run(awaitable)
+def event(text='',*,done=False,finish='',usage=None,final=False,data=None,kind='answer'):return StreamResponse(kind,text,done,usage=usage,finish_reason=finish,data=data,is_final=final)
+class Model:
+    def __init__(self,role,outputs):
+        self.config=provider_config('siliconflow' if role=='cheap' else 'deepseek','XingChenAGI/Xing4.0-29B' if role=='cheap' else 'deepseek-flash')
+        self.outputs=list(outputs);self.calls=[]
+    async def chat_stream(self,messages,options,context):
+        self.calls.append((messages,options,context))
+        for value in self.outputs:
+            if isinstance(value,BaseException):raise value
+            if callable(value):value=value(context)
+            yield value
+class Store:
+    def __init__(self):self.events=[];self.trace=[]
+    async def append_event(self,session,message,event):self.events.append(event);self.trace.append(event.type)
+class Committer:
+    def __init__(self,store,fail=False):self.calls=[];self.store=store;self.fail=fail
+    async def commit_final(self,commit):
+        if self.fail:raise RuntimeError('mock storage failure')
+        self.calls.append(commit);self.store.trace.append('COMMIT')
+class Lifecycle:
+    def __init__(self):self.claims=[];self.started=[];self.finished=[]
+    async def claim_run(self,run_id,sha,context):
+        if self.claims:raise GenerationReplay()
+        self.claims.append((run_id,sha,context))
+    async def begin_attempt(self,record,context):self.started.append((record,context))
+    async def finish_attempt(self,record,context):self.finished.append((record,context))
+def setup(cheap,expensive=None,*,lifecycle=None,fail_commit=False,estimator=None):
+    c=Model('cheap',cheap);e=Model('expensive',expensive or [event('expensive final <ref id="c1"/>',done=True,finish='stop',final=True)])
+    bindings={role:RoleBinding(role,m.config.provider,m.config.model,m.config.base_url,m) for role,m in [('cheap',c),('expensive',e),('baseline',e)]}
+    store=Store();committer=Committer(store,fail_commit);life=lifecycle or Lifecycle()
+    return GenerationCoordinator(bindings,store,committer,lifecycle=life,estimator=estimator),c,e,store,committer,life
+
+LEGACY=json.loads((Path(__file__).parent/'fixtures/p5_legacy_decisions.json').read_text(encoding='utf-8'))['cases']
+@pytest.mark.parametrize('case',LEGACY)
+def test_exact_frozen_legacy_snapshot(case):
+    d=decide(case['question'],'fixture prompt',RouterPolicy(mode=case['mode']))
+    assert d.public(RouterPolicy(mode=case['mode']))==case['decision']
+
+def test_router_max_not_sum_rewrite_and_L_unknown():
+    q0='\u82e5\u91d1\u989d\u22645000\uff0c\u4e14\u5df2\u6279\u51c6\uff0c\u80fd\u5426\u62a5\u9500';rewrite='extract source'
+    original=extract_features(q0,'prompt');rewritten=extract_features(rewrite,'prompt')
+    d=decide(rewrite,'prompt',RouterPolicy(mode='DYNAMIC'),understanding=ValidatedRewrite(q0,rewrite))
+    assert d.features.contributions==tuple(max(a,b) for a,b in zip(original.contributions,rewritten.contributions))
+    assert d.features.statuses[4]=='UNKNOWN' and d.features.estimated_input_tokens is None
+@pytest.mark.parametrize('tokens,l',[(2000,0),(2001,2),(6000,2),(6001,5),(12000,5),(12001,8)])
+def test_frozen_input_L_boundaries(tokens,l):assert extract_features('extract source','full prompt',estimated_tokens=tokens,estimator='VERIFIED_TEST_TOKENIZER/v1').contributions[4]==l
+@pytest.mark.parametrize('value',[0,-1,1.5,True])
+def test_invalid_estimator_never_invents_zero(value):
+    with pytest.raises(ValueError):extract_features('q','p',estimated_tokens=value,estimator='TEST')
+
+def test_baseline_bypasses_router_and_estimator():
+    class Explodes:
+        def estimate(self,*a):raise AssertionError('baseline must bypass')
+    co,c,e,store,commit,life=setup([],estimator=Explodes())
+    out=run(co.run(request('OFF'),CTX));assert out.route is None and not c.calls and len(e.calls)==1 and out.selected_role=='baseline'
+
+@pytest.mark.parametrize('mode,calls', [('CHEAP_ONLY',(1,0)),('EXPENSIVE_ONLY',(0,1))])
+def test_fixed_only_modes_do_not_upgrade(mode,calls):
+    co,c,e,*_=setup([event('partial',done=True,finish='length',final=True)])
+    run(co.run(request(mode),CTX));assert (len(c.calls),len(e.calls))==calls
+
+@pytest.mark.parametrize('outputs,reason',[
+    ([event('cheap partial',done=True,finish='length',final=True)],'TRUNCATION'),
+    ([event('',done=True,finish='stop',final=True)],'MODEL_EMPTY'),
+    ([event('cheap answer <ref id="c999"/>',done=True,finish='stop',final=True)],'INVALID_HANDLES'),
+])
+def test_approved_upgrade_exactly_two_distinct_attempts(outputs,reason):
+    co,c,e,store,commit,life=setup(outputs)
+    out=run(co.run(request(),CTX))
+    assert out.upgraded and out.selected_role=='expensive' and len(c.calls)==len(e.calls)==1
+    assert out.attempts[1].upgrade_reason==reason
+    assert out.attempts[0].attempt_id!=out.attempts[1].attempt_id and out.attempts[0].envelope_sha256!=out.attempts[1].envelope_sha256
+    assert c.calls[0][0] is e.calls[0][0] and c.calls[0][1] is e.calls[0][1]
+    assert all('cheap partial' not in message.content for message in e.calls[0][0])
+    assert all('cheap answer' not in ev.content and 'cheap partial' not in ev.content for ev in store.events)
+    assert len(life.started)==len(life.finished)==2 and len(commit.calls)==1
+    assert store.trace[-2:]==['COMMIT','complete']
+
+@pytest.mark.parametrize('failure',[ModelCallTimeout(sent=True),ProviderError('PROVIDER_HTTP_ERROR',status_code=500,sent=True),ProviderError('PROVIDER_RESPONSE_INVALID',sent=True),ProviderError('MODEL_BUDGET_DENIED'),ProviderError('MODEL_EGRESS_DENIED'),ProviderError('PROVIDER_MODEL_IDENTITY_MISMATCH',sent=True),CallCancelled(),RunDeadlineExceeded(),TimeoutError('untyped timeout')])
+def test_non_model_timeout_and_other_errors_never_upgrade(failure):
+    co,c,e,store,commit,life=setup([event('discarded draft'),failure])
+    with pytest.raises((ProviderError,TimeoutError)):run(co.run(request(),CTX))
+    assert len(c.calls)==1 and not e.calls and not commit.calls and not store.events
+    assert life.finished[0][0].cost_status=='UNKNOWN'
+
+@pytest.mark.parametrize('text',['\u8bc1\u636e\u4e0d\u8db3','No enough information to answer.','I cannot answer this request.'])
+def test_nonempty_stop_refusal_no_semantic_classifier_or_upgrade(text):
+    co,c,e,*_=setup([event(text,done=True,finish='stop',final=True)])
+    out=run(co.run(request(),CTX));assert out.answer==text and not out.upgraded and not e.calls
+
+@pytest.mark.parametrize('finish',['length','max_tokens','MAX_OUTPUT_TOKENS'])
+def test_empty_truncation_precedes_empty_and_final_source_fallback(finish):
+    co,c,e,*_=setup([event('',done=True,finish=finish,final=True)],[event('',done=True,finish=finish,final=True)])
+    out=run(co.run(request(),CTX));assert out.answer==EMPTY_TRUNCATED_FALLBACK and out.attempts[1].upgrade_reason=='TRUNCATION' and out.truncated
+
+def test_final_empty_stop_source_semantics_no_invented_fallback():
+    co,c,e,store,commit,_=setup([event('',done=True,finish='stop',final=True)],[event('',done=True,finish='stop',final=True)])
+    out=run(co.run(request(),CTX));assert out.answer=='' and commit.calls[0].answer=='' and store.events[-1].type=='complete'
+
+def test_final_invalid_ref_stripped_current_valid_ref_kept():
+    co,c,e,store,commit,_=setup([event('answer <ref id="c999"/> <ref id="c1"/>',done=True,finish='stop',final=True)])
+    out=run(co.run(request('CHEAP_ONLY'),CTX));assert 'c999' not in out.answer and 'chunk_id="chunk-current"' in out.answer and len(out.references)==1
+    assert out.attempts[0].invalid_handle_count==1
+
+def test_split_citations_resources_and_cheap_state_isolated():
+    evidence=replace(E,content='![image](resource://abcdefghijklmnopqrstuv)')
+    req=request(evidence=(evidence,),history=(History('previous','historic <kb doc="old" chunk_id="chunk-old" />'),))
+    co,c,e,store,commit,_=setup([event('draft <ref id="c99"/>',done=True,finish='stop',final=True)], [event('![image](re'),event('s://0001) claim <re'),event('f id="c1"/>',done=True,finish='stop',final=True)])
+    out=run(co.run(req,CTX));assert 'resource://abcdefghijklmnopqrstuv' in out.answer and 'chunk_id="chunk-current"' in out.answer
+    assert 'c99' not in out.answer and out.attempts[1].invalid_handle_count==0
+    assert [r['id'] for r in out.references]==['chunk-current']
+
+def test_clean_eof_and_duplicate_done_no_duplicate_answer():
+    co,c,e,*_=setup([event('one'),event('two',done=True,finish='stop'),event('ignored duplicate',done=True,finish='stop',final=True)])
+    out=run(co.run(request(),CTX));assert out.answer=='onetwo'
+    co,c,e,*_=setup([event('EOF without finish')]);out=run(co.run(request(),CTX));assert out.answer=='EOF without finish' and out.finish_reason==''
+
+def test_cancel_after_cheap_prevents_expensive_and_publication():
+    async def exercise():
+        cancelled=asyncio.Event()
+        def stop(ctx):cancelled.set();return event('partial',done=True,finish='length',final=True)
+        co,c,e,store,commit,life=setup([stop])
+        with pytest.raises(CallCancelled):await co.run(request(),replace(CTX,cancelled=cancelled))
+        assert not e.calls and not store.events and not commit.calls
+    run(exercise())
+
+def test_idempotent_replay_never_invokes_provider_again():
+    co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)])
+    run(co.run(request(),CTX))
+    with pytest.raises(GenerationReplay):run(co.run(request(),CTX))
+    assert len(c.calls)==1
+
+def test_finalization_failure_never_emits_complete():
+    co,c,e,store,commit,_=setup([event('answer',done=True,finish='stop',final=True)],fail_commit=True)
+    with pytest.raises(GenerationError,match='GENERATION_FINAL_COMMIT_FAILED'):run(co.run(request(),CTX))
+    assert all(ev.type!='complete' for ev in store.events)
+
+def test_scope_and_endpoint_identity_denials_before_send():
+    co,c,e,*_=setup([])
+    with pytest.raises(GenerationError,match='GENERATION_EVIDENCE_SCOPE_MISMATCH'):run(co.run(request(),replace(CTX,scope=TrustedScope('owner',('wrong',)))))
+    co.bindings['cheap']=replace(co.bindings['cheap'],endpoint='https://wrong.example')
+    with pytest.raises(GenerationError,match='GENERATION_ENDPOINT_IDENTITY_MISMATCH'):run(co.run(request(),CTX))
+    assert not c.calls and not e.calls
+
+def test_closed_default_lifecycle_and_unverified_estimator():
+    co,c,e,store,commit,_=setup([]);co.lifecycle=None
+    from backend.weknora_port.generation.types import ClosedLifecycle
+    co.lifecycle=ClosedLifecycle()
+    with pytest.raises(GenerationError,match='GENERATION_LIFECYCLE_UNAVAILABLE'):run(co.run(request(),CTX))
+    assert not c.calls
+
+
+def test_original_message_order_prompts_and_source_handles():
+    req=request(history=(History('earlier query','earlier answer'),),memory_prompt='\nMEMORY BLOCK')
+    prepared=prepare_generation(req)
+    assert [m.role for m in prepared.messages]==['system','user','assistant','user']
+    assert 'Source data boundary:' in prepared.messages[0].content and 'Answer presentation:' in prepared.messages[0].content and 'MEMORY BLOCK' in prepared.messages[0].content
+    assert '<retrieval type="knowledge" mode="semantic">' in prepared.messages[-1].content
+    assert '<chunk id="c1" index="0" view="full" type="text">' in prepared.messages[-1].content
+    assert 'chunk-current' not in prepared.full_prompt and 'doc-current' not in prepared.full_prompt
+
+
+def test_full_prompt_estimator_called_once_after_context_and_before_route():
+    class Estimator:
+        def __init__(self):self.calls=[]
+        def estimate(self,messages,options):self.calls.append(messages);return TokenEstimate(2001,'PINNED_OFFLINE_ESTIMATOR/v1')
+    estimator=Estimator();co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)],estimator=estimator)
+    out=run(co.run(request(),CTX));assert len(estimator.calls)==1 and estimator.calls[0] is c.calls[0][0]
+    assert out.route['estimated_input_tokens']==2001 and out.route['L']['value']==.02
+
+
+def test_physical_resource_source_model_output_order_is_preserved():
+    evidence=replace(E,content='![image](local://folder/image.png?x=1&y=2)')
+    req=request(evidence=(evidence,))
+    co,c,e,*_=setup([event('![image](res://0001)',done=True,finish='stop',final=True)])
+    out=run(co.run(req,CTX))
+    assert out.answer=='![image](local://folder/image.png?x=1&amp;y=2)'
+
+
+def test_cancellation_during_atomic_callback_prevents_complete_publication():
+    async def exercise():
+        cancelled=asyncio.Event()
+        co,c,e,store,commit,_=setup([event('answer',done=True,finish='stop',final=True)])
+        class CancelOnCommit:
+            async def commit_final(self,data):cancelled.set()
+        co.committer=CancelOnCommit()
+        with pytest.raises(CallCancelled):await co.run(request(),replace(CTX,cancelled=cancelled))
+        assert all(ev.type!='complete' for ev in store.events)
+    run(exercise())
+
+def test_final_public_metadata_drops_endpoint_query_credentials():
+    from backend.weknora_port.generation.coordinator import public_attempt
+    from backend.weknora_port.generation.types import AttemptRecord
+    record=AttemptRecord('attempt',1,'cheap','provider','model','https://fixture.example/v1?private=SYNTHETIC_SECRET_VALUE','e','p','c')
+    public=public_attempt(record)
+    assert public['endpoint']=='https://fixture.example' and 'SYNTHETIC_SECRET_VALUE' not in json.dumps(public)
+    assert public['endpoint_sha256']
+
+
+@pytest.mark.parametrize('kwargs',[{'threshold':Decimal('.34')},{'quality_escalation':False},{'quality_escalation':1},{'truncated_escalation':False},{'provider_fallback':True},{'abstention_escalation':True}])
+def test_frozen_policy_flags_and_threshold_cannot_be_reconfigured(kwargs):
+    with pytest.raises(ValueError):RouterPolicy(**kwargs)
+
+def test_usage_or_settlement_failure_after_finish_never_publishes_or_upgrades():
+    co,c,e,store,commit,life=setup([event('completed draft',done=True,finish='stop'),ProviderError('MODEL_USAGE_SETTLEMENT_FAILED',sent=True)])
+    with pytest.raises(ProviderError):run(co.run(request(),CTX))
+    assert not e.calls and not store.events and not commit.calls
+
+def test_default_L_unknown_does_not_invent_actual_input_load():
+    co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)])
+    out=run(co.run(request(),CTX))
+    assert out.route['estimated_input_tokens'] is None and out.route['L']=={'value':0.,'status':'UNKNOWN'}
+
+
+def test_source_encoder_does_not_rewrite_known_ids_in_user_prose():
+    req=request(q0='question about doc-current')
+    req=replace(req,finalized=replace(req.finalized,user_content=req.finalized.rendered_contexts+'\nquestion about doc-current'))
+    prepared=prepare_generation(req)
+    assert prepared.messages[-1].content.split('\n\n## Configured answer language',1)[0].endswith('question about doc-current')
+
+@pytest.mark.parametrize("mode", ["DYNAMIC", "CHEAP_ONLY", "EXPENSIVE_ONLY", "OFF"])
+def test_configurable_role_provider_model_endpoint_uses_uniform_interface(mode):
+    co,c,e,store,commit,life=setup([event('partial',done=True,finish='length',final=True)])
+    c.config=provider_config('openai-compatible','configured-small',base_url='https://small.example/v1')
+    e.config=provider_config('siliconflow','configured-large',base_url='https://large.example/v1')
+    co.bindings={role:RoleBinding(role,m.config.provider,m.config.model,m.config.base_url,m) for role,m in [('cheap',c),('expensive',e),('baseline',e)]}
+    out=run(co.run(request(mode),CTX))
+    expected={'DYNAMIC':(1,1),'CHEAP_ONLY':(1,0),'EXPENSIVE_ONLY':(0,1),'OFF':(0,1)}[mode]
+    assert (len(c.calls),len(e.calls))==expected
+    for record in out.attempts:
+        model=c if record.role=='cheap' else e
+        assert (record.provider,record.model_requested,record.endpoint)==(model.config.provider,model.config.model,model.config.base_url)
+        assert record.model_reported is None
+    assert len(commit.calls)==1
+
+def test_configurable_binding_still_checks_actual_configuration_identity():
+    co,c,e,*_=setup([event('answer',done=True,finish='stop',final=True)])
+    co.bindings['cheap']=replace(co.bindings['cheap'],model_requested='different-config-model')
+    with pytest.raises(GenerationError,match='GENERATION_MODEL_IDENTITY_MISMATCH'):
+        run(co.run(request(),CTX))
+    assert not c.calls and not e.calls
+
+@pytest.mark.parametrize('output', [
+    ModelCallTimeout(sent=True),
+    event('MODEL_CALL_TIMEOUT',kind='error',data={'error_code':'MODEL_CALL_TIMEOUT','error_class':'ModelCallTimeout'},final=True),
+])
+def test_latest_frozen_timeout_policy_preserves_unknown_without_upgrade(output):
+    co,c,e,store,commit,life=setup([event('discarded draft'),output])
+    with pytest.raises(ModelCallTimeout):
+        run(co.run(request(),CTX))
+    assert len(c.calls)==1 and not e.calls and not commit.calls and not store.events
+    assert len(life.started)==len(life.finished)==1
+    record=life.finished[0][0]
+    assert record.error_code=='MODEL_CALL_TIMEOUT'
+    assert record.usage.status==record.cost_status=='UNKNOWN'
+
+@pytest.mark.parametrize('mode', ['OFF', 'CHEAP_ONLY', 'EXPENSIVE_ONLY'])
+def test_non_upgradable_stream_visible_before_provider_finishes(mode):
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def stream(messages,options,context):
+            yield event('first <re')
+            first.set()
+            await release.wait()
+            yield event('f id="c1"/> second',done=True,finish='stop')
+            yield event('duplicate',done=True,finish='stop')
+        c.chat_stream=stream;e.chat_stream=stream
+        task=asyncio.create_task(co.run(request(mode),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='first '
+        release.set();out=await asyncio.wait_for(task,1)
+        deltas=[v for v in store.events if v.type=='answer']
+        assert ''.join(v.content for v in deltas)==out.answer
+        assert len({v.event_id for v in deltas})==1
+        assert sum(v.done for v in deltas)==1
+        assert 'duplicate' not in out.answer
+        assert store.trace[-2:]==['COMMIT','complete']
+    run(exercise())
+
+def test_dynamic_cheap_draft_buffered_expensive_stream_live():
+    async def exercise():
+        co,c,e,store,commit,life=setup([])
+        first=asyncio.Event();release=asyncio.Event()
+        async def cheap(messages,options,context):
+            yield event('rejected cheap',done=True,finish='length')
+        async def expensive(messages,options,context):
+            assert not store.events
+            yield event('accepted first')
+            first.set();await release.wait()
+            yield event(' second',done=True,finish='stop')
+        c.chat_stream=cheap;e.chat_stream=expensive
+        task=asyncio.create_task(co.run(request(),CTX))
+        await asyncio.wait_for(first.wait(),1)
+        assert not task.done() and not commit.calls
+        assert ''.join(v.content for v in store.events if v.type=='answer')=='accepted first'
+        release.set();out=await asyncio.wait_for(task,1)
+        assert out.upgraded and len(life.finished)==2
+        assert ''.join(v.content for v in store.events if v.type=='answer')==out.answer
+        assert all('rejected cheap' not in v.content for v in store.events)
+    run(exercise())

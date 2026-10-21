@@ -1,0 +1,50 @@
+{
+  "data": {
+    "revision": "1",
+    "roles": [
+      {
+        "role": "embedding",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3",
+        "base_url": "https://api.siliconflow.cn/v1",
+        "key_configured": true,
+        "source": "remote"
+      },
+      {
+        "role": "rerank",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3",
+        "base_url": "https://api.siliconflow.cn/v1",
+        "key_configured": true,
+        "source": "remote"
+      },
+      {
+        "role": "cheap",
+        "provider": "siliconflow",
+        "model": "XingChenAGI/Xing4.0-29B",
+        "base_url": "https://api.siliconflow.cn/v1",
+        "key_configured": true,
+        "source": "remote"
+      },
+      {
+        "role": "expensive",
+        "provider": "",
+        "model": "",
+        "base_url": "",
+        "key_configured": false,
+        "source": ""
+      },
+      {
+        "role": "vlm",
+        "provider": "",
+        "model": "",
+        "base_url": "",
+        "key_configured": false,
+        "source": ""
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "3fbc4876-b800-451b-98e3-b55bcaf077b6"
+  }
+}

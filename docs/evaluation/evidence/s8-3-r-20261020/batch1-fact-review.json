@@ -1,0 +1,1831 @@
+{
+  "schema": "s8-3-r-batch1-independent-factual-review/v1",
+  "scope": "Read-only local saved evidence review; zero model/network/database calls. Only this reviewer JSON is written.",
+  "cases": [
+    {
+      "case_id": "scifact-1101::source-off",
+      "arm": "A",
+      "source_mode": "off",
+      "actual_answer": "根据提供的资料，该陈述是**错误的**。\n\n资料明确指出：在刚性水凝胶基质上，hESCs 显示整合素依赖的 GSK3 和 Src 活性升高，这**促进**了β-catenin 的**降解**，从而**抑制**了间质分化（inhibits differentiation）。\n\n相反，资料指出是在**柔性**（compliant）水凝胶上，hESCs 在细胞 - 细胞黏附处富集β-catenin，促进 Wnt 依赖的间质分化。\n\n**来源**：\nc4f9885b6c380748b5baca9f.md",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-batch1\\executions\\2f0d7e9d0f3b299f4f5206d85b50671de1ca8b3bc30a2d9eb5319b9d9a25bc1a\\evidence\\232e9e2c3f02490bab68d1fe23071470.request.json",
+      "provider_wire_chars_all_messages": 3360,
+      "provider_user_chars": 2055,
+      "legacy_context_chars": 1870,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Legacy finalized_context differs from actual request rendering; summary descriptions there are not evidence of delivery.",
+      "actual_wire_summary_marker": true,
+      "actual_wire_summary_chunk_type": true,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "original_source_file": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-remaining-top1-20261020\\evidence\\final-raw\\cases\\B-cbb4e76a71f1834d9024428d28ddcc5e08a516723736b6af6cb3774bc22291eb\\readback\\source-bd584376-39c6-4e0a-8b96-be23d97d0fda.bin",
+        "sha256_observed": "bd7e2c84ea9bca3f8f59aa2bacbb72af0ccf31f864660341a54ffb3a54e48882",
+        "sha256_matches_inventory": true,
+        "full_file_exact_in_wire": false,
+        "full_file_chars": 1271,
+        "meaningful_body_exact_in_wire": true
+      },
+      "target_chunks": [
+        {
+          "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+          "type": "text",
+          "chars": 1182,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "ecffcd81c370df9459184d667e0e83dc5a8917ff0eaa227e0ba4c505b96b97ec",
+          "short_proof": "Regenerative medicine is predicated on understanding the mechanisms regulating development and "
+        },
+        {
+          "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+          "type": "summary",
+          "chars": 281,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": false,
+          "content_sha256": "3882a1da567f00502b1553da24a12af05b10aed9e4ff8b67cffa2af334b3db4b",
+          "short_proof": "# Summary\nhESCs在不同力学基质上的Wnt依赖间充质分化调控机制研究。\n\n本文研究了人类胚胎干细胞（hESCs）在不同力学特性基质上的分化行为。在柔性水凝胶上，hESCs在细胞-"
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 2
+        },
+        "merge": {
+          "candidate_count": 2
+        },
+        "context": {
+          "selected_evidence_count": 2
+        }
+      },
+      "final_result_ids": [
+        "ebc55551-bbe0-5fae-b060-7e54af407833",
+        "7f16d202-b50c-49af-83e7-f9208329df22"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 14660,
+        "generation_usage": {
+          "prompt_tokens": 880,
+          "completion_tokens": 144,
+          "total_tokens": 1024,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 880,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 880,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 144,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 1024,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 880,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":144,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":880,\"prompt_tokens\":880,\"total_tokens\":1024}]",
+            "raw_sha256": "2a9aa8d19a0744fcf3d6aa830af45863bfcdee44d27a2e94b7c71c16ccbd6168",
+            "derived_total": 1024,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 11422.87,
+        "ttfc_ms": 11422.7,
+        "post_to_history_total_ms": 11704.41
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 155,
+        "completed_execute_calls": 155,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 567.881,
+        "window_elapsed_ms": 11419.581,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "recovery": {
+        "used_readonly_recovery": false,
+        "original_http_status": "PASS",
+        "authoritative_http_file": "http-result.json"
+      },
+      "provider_request_sha256": "18982da4a1339e299935c1a9bfcd02a565408847558ee22604347e49987bfa00",
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"2\" view=\"full\" type=\"summary\">",
+          "chars": 281
+        },
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"text\">",
+          "chars": 1182
+        }
+      ],
+      "actual_wire_evidence_content_chars": 1463,
+      "source_byte_coverage_note": "Full source file exact substring is false for split SciFact files because title and body are in separate XML chunks; B contains both exact source chunks, totaling the full source character count. A contains the full body only.",
+      "target_stage_membership": {
+        "retrieval": [
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.016393442622950817
+          },
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.01129032258064516
+          }
+        ],
+        "rerank": [
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.6850654991980522
+          },
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6781893908000384
+          }
+        ],
+        "merge": [
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.6850654991980522
+          },
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6781893908000384
+          }
+        ],
+        "context": [
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.6850654991980522
+          },
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6781893908000384
+          }
+        ]
+      },
+      "citation_review": {
+        "answer_cites_expected_source_filename": true,
+        "granularity": "Filename-level source attribution; no chunk/line pinpoint citation. UI clicking was not tested by this read-only review.",
+        "limitations": "A correct source filename does not prove that original target content reached generation; see exact wire membership."
+      },
+      "factual_review": {
+        "gold_type": "Official SciFact REFUTES stance label; QA factual quality scored separately.",
+        "stance_status": "PASS_REFUTES",
+        "answer_factual_status": "FAIL_TERM_TRANSLATION",
+        "proof": [
+          {
+            "source": "human embryonic stem cells (hESCs)",
+            "answer": "hESCs"
+          },
+          {
+            "source": "promotes β-catenin degradation and inhibits differentiation",
+            "answer": "促进β-catenin 的降解，从而抑制了间质分化"
+          },
+          {
+            "source": "enhanced Wnt-dependent mesoderm differentiation",
+            "answer": "促进 Wnt 依赖的间质分化"
+          }
+        ],
+        "error": "Mesoderm means 中胚层; answer uses 间质, repeating the historical generated-summary mistranslation. Correct inhibitory direction alone does not make full QA factual status pass.",
+        "omissions": "B does not specify mesoderm again in the stiff-condition sentence, but immediately supplies it for the compliant contrast. No material checkpoint omission. Neither answer needs all mechanistic Cbl/P120 details for this claim.",
+        "noise": "B adds an 89-character source title chunk; A includes a 281-character generated summary with translation error."
+      }
+    },
+    {
+      "case_id": "miracl-zh-91294#0::source-off",
+      "arm": "A",
+      "source_mode": "off",
+      "actual_answer": "人马座西接天蝎座、东连摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边是一系列小型星座如望远镜座、显微镜座和南冕座。\n\nSources: 0d4183f5ea0a1bd37fd04c19.md",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-batch1\\executions\\47fb6183db77b8883c322cc81aad95ea2059316feee0593148f61a37dc40a687\\evidence\\3adb4ac122794079901160a33532fe2c.request.json",
+      "provider_wire_chars_all_messages": 3800,
+      "provider_user_chars": 2495,
+      "legacy_context_chars": 1642,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Legacy finalized_context differs from actual request rendering; summary descriptions there are not evidence of delivery.",
+      "actual_wire_summary_marker": true,
+      "actual_wire_summary_chunk_type": true,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "original_source_file": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-remaining-top1-20261020\\evidence\\final-raw\\cases\\B-a9b3350fe2bed030da6f8e6491fcd67fa56c779f67a5ad62fc575f8ff9a90872\\readback\\source-541b3a8a-70a0-48dc-b31a-19ee96df3b94.bin",
+        "sha256_observed": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+        "sha256_matches_inventory": true,
+        "full_file_exact_in_wire": false,
+        "full_file_chars": 84,
+        "meaningful_body_exact_in_wire": false
+      },
+      "target_chunks": [
+        {
+          "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+          "type": "summary",
+          "chars": 103,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": false,
+          "content_sha256": "f94f79163f91168f35065e90bb5baef115bf16e2de592696a8c78c05c7ca9367",
+          "short_proof": "# Summary\n人马座的星座概述及其周边星座分布。\n\n人马座是夏季夜空中最大、最显著的星座之一，西接天蝎座、东连摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边是一系列小型星座如望远镜座、显微"
+        },
+        {
+          "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+          "type": "text",
+          "chars": 84,
+          "exact_content_in_actual_wire": false,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+          "short_proof": "# 人马座\n\n人马座是夏季夜空中最大、最显著的星座之一，它西接天蝎座、東連摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边则是一系列小型星座，如望远镜座、显微镜座、南冕座等。"
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 9
+        },
+        "merge": {
+          "candidate_count": 8
+        },
+        "context": {
+          "selected_evidence_count": 8
+        }
+      },
+      "final_result_ids": [
+        "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+        "2b590199-2b8e-4957-8071-79c2b0fc7004",
+        "f6632136-5414-494b-8136-1f8f4f97b712",
+        "ea91d536-c1a6-47a3-8b7d-3ca69f379807",
+        "74ea19e6-ca34-4f5f-8b76-a2be3a41c893",
+        "50eeab77-2be7-4a59-a943-b423558f6192",
+        "bc01acf9-abc1-482c-b2b8-e1fe3620df2c",
+        "19a61e2c-7494-4416-8246-035f3210e1bf"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 7941,
+        "generation_usage": {
+          "cache_miss_tokens": 1592,
+          "cache_read_tokens": 0,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "completion_tokens": 66,
+          "prompt_tokens": 1592,
+          "provider_usage_facts": {
+            "derived_total": 1658,
+            "fields": [
+              [
+                "input",
+                {
+                  "path": "disjoint-physical-calls/input",
+                  "present": true,
+                  "valid": true,
+                  "value": 1592
+                }
+              ],
+              [
+                "output",
+                {
+                  "path": "disjoint-physical-calls/output",
+                  "present": true,
+                  "valid": true,
+                  "value": 66
+                }
+              ],
+              [
+                "total",
+                {
+                  "path": "disjoint-physical-calls/total",
+                  "present": true,
+                  "valid": true,
+                  "value": 1658
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "path": "disjoint-physical-calls/cache_read",
+                  "present": true,
+                  "valid": true,
+                  "value": 0
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "path": "disjoint-physical-calls/cache_write",
+                  "present": false,
+                  "valid": false,
+                  "value": null
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "path": "disjoint-physical-calls/cache_miss",
+                  "present": true,
+                  "valid": true,
+                  "value": 1592
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "path": "disjoint-physical-calls/reasoning",
+                  "present": true,
+                  "valid": true,
+                  "value": 0
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":66,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1592,\"prompt_tokens\":1592,\"total_tokens\":1658}]",
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": [],
+            "raw_sha256": "ffe21e0623de8399161c61a43b6f02261645b83c6064f39267f16b49b37697fd",
+            "semantics": "aggregate-disjoint-calls/v1",
+            "simulated": false
+          },
+          "status": "REPORTED",
+          "total_tokens": 1658
+        },
+        "post_to_complete_ms": 9654.02,
+        "ttfc_ms": 9653.03,
+        "post_to_history_total_ms": 9933.98
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 157,
+        "completed_execute_calls": 157,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 767.919,
+        "window_elapsed_ms": 9651.024,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "recovery": {
+        "used_readonly_recovery": true,
+        "original_http_status": "FAIL",
+        "authoritative_http_file": "recovered-http-result.json"
+      },
+      "provider_request_sha256": "703bac81689e76f043880e042edcb83e725f487452965d1ea7f0fe021f47eeb4",
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"summary\">",
+          "chars": 103
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 46
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 104
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 134
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 80
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 28
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 100
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\">",
+          "chars": 196
+        }
+      ],
+      "actual_wire_evidence_content_chars": 791,
+      "source_byte_coverage_note": "MIRACL target source is a single 84-character chunk; exact whole-file membership is directly measurable.",
+      "target_stage_membership": {
+        "retrieval": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.016237314597970336
+          },
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.01597782258064516
+          }
+        ],
+        "rerank": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.702553730027737
+          },
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.6969710596915214
+          }
+        ],
+        "merge": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.702553730027737
+          }
+        ],
+        "context": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.702553730027737
+          }
+        ]
+      },
+      "citation_review": {
+        "answer_cites_expected_source_filename": true,
+        "granularity": "Filename-level source attribution; no chunk/line pinpoint citation. UI clicking was not tested by this read-only review.",
+        "limitations": "A correct source filename does not prove that original target content reached generation; see exact wire membership."
+      },
+      "factual_review": {
+        "gold_type": "Official MIRACL document-retrieval qrels, not official generation-answer Gold; manual source-fact review only.",
+        "answer_factual_status": "PASS",
+        "delivery_status": "FAIL_ORIGINAL_DROPPED_AT_MERGE",
+        "proof": [
+          {
+            "source": "西接天蝎座、東連摩羯座",
+            "answer": "西接天蝎座、东连摩羯座"
+          },
+          {
+            "source": "北面是蛇夫座、盾牌座和巨蛇座",
+            "answer": "北面是蛇夫座、盾牌座和巨蛇座"
+          },
+          {
+            "source": "望远镜座、显微镜座、南冕座等",
+            "answer": "望远镜座、显微镜座、南冕座"
+          }
+        ],
+        "omissions": "No required eight-neighbor name/direction omissions. Both retain source non-exhaustive 如/等 sense.",
+        "noise": "B retains two additional same-constellation chunks (46+104 characters) unrelated to neighbor question; A has seven non-target chunks including Centaurus/star-distance noise."
+      }
+    },
+    {
+      "case_id": "scifact-241::source-off",
+      "arm": "A",
+      "source_mode": "off",
+      "actual_answer": "在NIH 3T3细胞中，昼夜节律（细胞钟）与细胞分裂（有丝分裂）存在紧密的同步关系。具体表现为：两个振荡器处于**1:1模式锁定**状态，细胞分裂严格发生在昼夜节律报告基因**Rev-Erbα-YFP表达峰值前的5小时**。\n\n此外，研究指出这种同步状态对温度、遗传和药理学扰动具有高度的鲁棒性，且反向耦合（即昼夜节律调控细胞周期）占主导地位。\n\nSources: 35890f03e990453d0448cf40.md",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-batch1\\executions\\5a1b29774b882686446c6e3ef55e4664570c142b90d4957ecfb8d4c2f33067ec\\evidence\\459d1ecc6d9e4d4eac385016cfa231cc.request.json",
+      "provider_wire_chars_all_messages": 3249,
+      "provider_user_chars": 1944,
+      "legacy_context_chars": 1722,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Legacy finalized_context differs from actual request rendering; summary descriptions there are not evidence of delivery.",
+      "actual_wire_summary_marker": true,
+      "actual_wire_summary_chunk_type": true,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 0,
+      "original_source_file": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-remaining-top1-20261020\\evidence\\final-raw\\cases\\B-e5c6a27da0ff5d4187960635a93a849af4d2e7c59753e8cfb9939ac887258a93\\readback\\source-f5e9e387-7472-4199-988e-e325689b1fb3.bin",
+        "sha256_observed": "833e2bd5bc6f25442849152733ef8572b0fa22746f3d0ae62577dc60e329a89d",
+        "sha256_matches_inventory": true,
+        "full_file_exact_in_wire": false,
+        "full_file_chars": 1296,
+        "meaningful_body_exact_in_wire": true
+      },
+      "target_chunks": [
+        {
+          "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+          "type": "text",
+          "chars": 1196,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "b08ec5f54454adadc2f605177724eaaf3330441a1b789ac3fbb1892a598c3883",
+          "short_proof": "Circadian cycles and cell cycles are two fundamental periodic processes with a period in the ra"
+        },
+        {
+          "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+          "type": "summary",
+          "chars": 200,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": false,
+          "content_sha256": "171a918c1cc371a84c3ebfd923b8b6b9102ceeb5845679d5d96de9d92d560d36",
+          "short_proof": "# Summary\n研究单个哺乳动物细胞中昼夜节律与细胞周期振荡器的双向同步机制。\n\n本文通过时间延时成像和随机建模，在单个NIH3T3成纤维细胞中量化了昼夜节律与细胞周期之间的双向耦合。研"
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 2
+        },
+        "merge": {
+          "candidate_count": 2
+        },
+        "context": {
+          "selected_evidence_count": 2
+        }
+      },
+      "final_result_ids": [
+        "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+        "13670870-d3ed-4479-8dd9-173a69dcd09c"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 9884,
+        "generation_usage": {
+          "prompt_tokens": 831,
+          "completion_tokens": 134,
+          "total_tokens": 965,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 831,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 831,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 134,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 965,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 831,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":134,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":831,\"prompt_tokens\":831,\"total_tokens\":965}]",
+            "raw_sha256": "a31be2d11b95f4f114db224d77e6c0a17bd988892c733d2f48f8441f87d7fd13",
+            "derived_total": 965,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 9533.44,
+        "ttfc_ms": 9533.07,
+        "post_to_history_total_ms": 9809.14
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 155,
+        "completed_execute_calls": 155,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 517.651,
+        "window_elapsed_ms": 9531.001,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "recovery": {
+        "used_readonly_recovery": false,
+        "original_http_status": "PASS",
+        "authoritative_http_file": "http-result.json"
+      },
+      "provider_request_sha256": "18af4df613214302712abb87256d1d43b4d9b194d1a8a3ea4dee79b9698c0eb1",
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"2\" view=\"full\" type=\"summary\">",
+          "chars": 200
+        },
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"text\">",
+          "chars": 1196
+        }
+      ],
+      "actual_wire_evidence_content_chars": 1396,
+      "source_byte_coverage_note": "Full source file exact substring is false for split SciFact files because title and body are in separate XML chunks; B contains both exact source chunks, totaling the full source character count. A contains the full body only.",
+      "target_stage_membership": {
+        "retrieval": [
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.01631411951348493
+          },
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.012746633260256811
+          }
+        ],
+        "rerank": [
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.6750403824951668
+          },
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.3919756264733234
+          }
+        ],
+        "merge": [
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.6750403824951668
+          },
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.3919756264733234
+          }
+        ],
+        "context": [
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.6750403824951668
+          },
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.3919756264733234
+          }
+        ]
+      },
+      "citation_review": {
+        "answer_cites_expected_source_filename": true,
+        "granularity": "Filename-level source attribution; no chunk/line pinpoint citation. UI clicking was not tested by this read-only review.",
+        "limitations": "A correct source filename does not prove that original target content reached generation; see exact wire membership."
+      },
+      "factual_review": {
+        "gold_type": "Official SciFact SUPPORTS narrow association/timing stance; QA factual quality scored separately.",
+        "stance_status": "PASS_SUPPORTS",
+        "answer_factual_status": "FAIL_COUPLING_DIRECTION",
+        "proof": [
+          {
+            "source": "both oscillators tick in a 1:1 mode-locked state",
+            "answer": "1:1模式锁定"
+          },
+          {
+            "source": "cell divisions occurring tightly 5 h before the peak",
+            "answer": "表达峰值前的5小时"
+          },
+          {
+            "source": "While gating of cell division by the circadian cycle has been most studied ... reverse coupling is predominant in NIH3T3 cells",
+            "answer": "反向耦合（即昼夜节律调控细胞周期）占主导地位"
+          }
+        ],
+        "error": "Explicitly interprets reverse coupling as circadian→cell cycle, opposite to the source contrast (cell cycle→circadian). Narrow association label remains correct.",
+        "omissions": "B omits predominant reverse coupling and robustness; these are not necessary for answering the narrow association claim. If evaluated against every precall checkpoint as a mandatory recitation, coupling checkpoint is NOT STATED rather than contradicted. Approximately 5h preserves source timing to useful precision, though source says tightly 5h.",
+        "noise": "B adds a 100-character source title chunk; A includes a 200-character generated summary with causal-direction error."
+      }
+    },
+    {
+      "case_id": "scifact-1101::source-bounded",
+      "arm": "B",
+      "source_mode": "bounded_source_v1",
+      "actual_answer": "根据提供的资料，该陈述**不正确**。\n\n资料指出，在**坚硬**的水凝胶基质上，人胚胎干细胞（hESCs）表现出**升高的**整合素依赖性 GSK3 和 Src 活性，这会促进**β-连环蛋白（β-catenin）的降解**，从而**抑制**（而非促进）分化。相反，在**柔软**的基质上，hESCs 会在细胞-细胞连接处积累β-连环蛋白，并表现出增强的Wnt依赖性中胚层分化。\n\n来源：c4f9885b6c380748b5baca9f.md",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-batch1\\executions\\60837bd88fbb3e4f9508fbc265e10acae260412a9beeecc792534cfe8e168670\\evidence\\f7951f50a61f4b3287470282c890c880.request.json",
+      "provider_wire_chars_all_messages": 3221,
+      "provider_user_chars": 1916,
+      "legacy_context_chars": 1678,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Legacy finalized_context differs from actual request rendering; summary descriptions there are not evidence of delivery.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 2,
+      "original_source_file": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-remaining-top1-20261020\\evidence\\final-raw\\cases\\B-cbb4e76a71f1834d9024428d28ddcc5e08a516723736b6af6cb3774bc22291eb\\readback\\source-bd584376-39c6-4e0a-8b96-be23d97d0fda.bin",
+        "sha256_observed": "bd7e2c84ea9bca3f8f59aa2bacbb72af0ccf31f864660341a54ffb3a54e48882",
+        "sha256_matches_inventory": true,
+        "full_file_exact_in_wire": false,
+        "full_file_chars": 1271,
+        "meaningful_body_exact_in_wire": true
+      },
+      "target_chunks": [
+        {
+          "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+          "type": "text",
+          "chars": 1182,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "ecffcd81c370df9459184d667e0e83dc5a8917ff0eaa227e0ba4c505b96b97ec",
+          "short_proof": "Regenerative medicine is predicated on understanding the mechanisms regulating development and "
+        },
+        {
+          "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+          "type": "summary",
+          "chars": 281,
+          "exact_content_in_actual_wire": false,
+          "exact_content_in_saved_source": false,
+          "content_sha256": "3882a1da567f00502b1553da24a12af05b10aed9e4ff8b67cffa2af334b3db4b",
+          "short_proof": "# Summary\nhESCs在不同力学基质上的Wnt依赖间充质分化调控机制研究。\n\n本文研究了人类胚胎干细胞（hESCs）在不同力学特性基质上的分化行为。在柔性水凝胶上，hESCs在细胞-"
+        },
+        {
+          "id": "ae74f133-2d7f-41b2-9b6a-42258c3447b2",
+          "type": "text",
+          "chars": 89,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "201fa8a67710599b506b4470602c63cc532aac4107185ac1eeed45530a836e07",
+          "short_proof": "# Tissue Mechanics Orchestrate Wnt-Dependent Human Embryonic Stem Cell Differentiation.\n\n"
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 2
+        },
+        "merge": {
+          "candidate_count": 2
+        },
+        "source_unit": {
+          "candidate_count": 2
+        },
+        "context": {
+          "selected_evidence_count": 2
+        }
+      },
+      "final_result_ids": [
+        "7f16d202-b50c-49af-83e7-f9208329df22",
+        "ae74f133-2d7f-41b2-9b6a-42258c3447b2"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 14528,
+        "generation_usage": {
+          "prompt_tokens": 754,
+          "completion_tokens": 138,
+          "total_tokens": 892,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 754,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 754,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 138,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 892,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 754,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":138,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":754,\"prompt_tokens\":754,\"total_tokens\":892}]",
+            "raw_sha256": "64f3aba4d0d5b8c6214dc4e716a1b1819ebae9132dc1b05dc509c5104624ee3f",
+            "derived_total": 892,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 9842.86,
+        "ttfc_ms": 9741.0,
+        "post_to_history_total_ms": 10115.28
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 159,
+        "completed_execute_calls": 159,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 503.448,
+        "window_elapsed_ms": 9840.307,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "recovery": {
+        "used_readonly_recovery": false,
+        "original_http_status": "PASS",
+        "authoritative_http_file": "http-result.json"
+      },
+      "provider_request_sha256": "e8cfb1b7389cced35f74d7e750e2481e9726d3c921396173032c741d22233aec",
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 1182
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 89
+        }
+      ],
+      "actual_wire_evidence_content_chars": 1271,
+      "source_byte_coverage_note": "Full source file exact substring is false for split SciFact files because title and body are in separate XML chunks; B contains both exact source chunks, totaling the full source character count. A contains the full body only.",
+      "target_stage_membership": {
+        "retrieval": [
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.016393442622950817
+          },
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.01129032258064516
+          }
+        ],
+        "rerank": [
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.6850654991980522
+          },
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6777718602633868
+          }
+        ],
+        "merge": [
+          {
+            "id": "ebc55551-bbe0-5fae-b060-7e54af407833",
+            "type": "summary",
+            "score": 0.6850654991980522
+          },
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6777718602633868
+          }
+        ],
+        "source_unit": [
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6777718602633868
+          },
+          {
+            "id": "ae74f133-2d7f-41b2-9b6a-42258c3447b2",
+            "type": "text",
+            "score": 0
+          }
+        ],
+        "context": [
+          {
+            "id": "7f16d202-b50c-49af-83e7-f9208329df22",
+            "type": "text",
+            "score": 0.6777718602633868
+          },
+          {
+            "id": "ae74f133-2d7f-41b2-9b6a-42258c3447b2",
+            "type": "text",
+            "score": 0
+          }
+        ]
+      },
+      "citation_review": {
+        "answer_cites_expected_source_filename": true,
+        "granularity": "Filename-level source attribution; no chunk/line pinpoint citation. UI clicking was not tested by this read-only review.",
+        "limitations": "A correct source filename does not prove that original target content reached generation; see exact wire membership."
+      },
+      "factual_review": {
+        "gold_type": "Official SciFact REFUTES stance label; QA factual quality scored separately.",
+        "stance_status": "PASS_REFUTES",
+        "answer_factual_status": "PASS",
+        "proof": [
+          {
+            "source": "human embryonic stem cells (hESCs)",
+            "answer": "人胚胎干细胞（hESCs）"
+          },
+          {
+            "source": "promotes β-catenin degradation and inhibits differentiation",
+            "answer": "促进β-连环蛋白（β-catenin）的降解，从而抑制分化"
+          },
+          {
+            "source": "enhanced Wnt-dependent mesoderm differentiation",
+            "answer": "增强的Wnt依赖性中胚层分化"
+          }
+        ],
+        "error": null,
+        "omissions": "B does not specify mesoderm again in the stiff-condition sentence, but immediately supplies it for the compliant contrast. No material checkpoint omission. Neither answer needs all mechanistic Cbl/P120 details for this claim.",
+        "noise": "B adds an 89-character source title chunk; generated summary and mistranslation absent in actual provider wire."
+      },
+      "source_mode_note": "Bounded arm determined from frozen case ID and arm field; stored source_mode is bounded_source_v1"
+    },
+    {
+      "case_id": "scifact-241::source-bounded",
+      "arm": "B",
+      "source_mode": "bounded_source_v1",
+      "actual_answer": "是的，根据提供的资料，细胞钟（昼夜节律）与有丝分裂（细胞分裂）的时机在 NIH 3T3 细胞中是相关联的。\n\n具体而言，研究发现 NIH 3T3 成纤维细胞中的昼夜节律振荡器与细胞周期振荡器之间存在 1:1 的模式锁定状态。在这种状态下，细胞分裂发生在昼夜节律 Rev-Erbα-YFP 报告基因表达峰值之前大约 5 小时。\n\nSources: 35890f03e990453d0448cf40.md",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-batch1\\executions\\684434c51d57d0f451ccadb4b1525a57fc4236dd318363fd74bfcb896f53c6f0\\evidence\\146e8d22249a496d956dd762a45ea32a.request.json",
+      "provider_wire_chars_all_messages": 3202,
+      "provider_user_chars": 1897,
+      "legacy_context_chars": 1622,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Legacy finalized_context differs from actual request rendering; summary descriptions there are not evidence of delivery.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 2,
+      "original_source_file": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-remaining-top1-20261020\\evidence\\final-raw\\cases\\B-e5c6a27da0ff5d4187960635a93a849af4d2e7c59753e8cfb9939ac887258a93\\readback\\source-f5e9e387-7472-4199-988e-e325689b1fb3.bin",
+        "sha256_observed": "833e2bd5bc6f25442849152733ef8572b0fa22746f3d0ae62577dc60e329a89d",
+        "sha256_matches_inventory": true,
+        "full_file_exact_in_wire": false,
+        "full_file_chars": 1296,
+        "meaningful_body_exact_in_wire": true
+      },
+      "target_chunks": [
+        {
+          "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+          "type": "text",
+          "chars": 1196,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "b08ec5f54454adadc2f605177724eaaf3330441a1b789ac3fbb1892a598c3883",
+          "short_proof": "Circadian cycles and cell cycles are two fundamental periodic processes with a period in the ra"
+        },
+        {
+          "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+          "type": "summary",
+          "chars": 200,
+          "exact_content_in_actual_wire": false,
+          "exact_content_in_saved_source": false,
+          "content_sha256": "171a918c1cc371a84c3ebfd923b8b6b9102ceeb5845679d5d96de9d92d560d36",
+          "short_proof": "# Summary\n研究单个哺乳动物细胞中昼夜节律与细胞周期振荡器的双向同步机制。\n\n本文通过时间延时成像和随机建模，在单个NIH3T3成纤维细胞中量化了昼夜节律与细胞周期之间的双向耦合。研"
+        },
+        {
+          "id": "2c57263d-72df-4551-bf68-977d83e0c5ac",
+          "type": "text",
+          "chars": 100,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "4fbd0cfa6216b82fa0aa766a852c274c8973545f8c82a4447606aa567613da03",
+          "short_proof": "# Robust synchronization of coupled circadian and cell cycle oscillators in single mammalian ce"
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 2
+        },
+        "merge": {
+          "candidate_count": 2
+        },
+        "source_unit": {
+          "candidate_count": 2
+        },
+        "context": {
+          "selected_evidence_count": 2
+        }
+      },
+      "final_result_ids": [
+        "13670870-d3ed-4479-8dd9-173a69dcd09c",
+        "2c57263d-72df-4551-bf68-977d83e0c5ac"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 9790,
+        "generation_usage": {
+          "prompt_tokens": 745,
+          "completion_tokens": 126,
+          "total_tokens": 871,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 745,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 745,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 126,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 871,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 745,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":126,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":745,\"prompt_tokens\":745,\"total_tokens\":871}]",
+            "raw_sha256": "fe8ccbe1b76bc07aba6ea87f5648def5b22f26ce288dc986b4002b0694adaba7",
+            "derived_total": 871,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 9042.37,
+        "ttfc_ms": 9042.23,
+        "post_to_history_total_ms": 9317.98
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 158,
+        "completed_execute_calls": 157,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 496.731,
+        "window_elapsed_ms": 9038.85,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "recovery": {
+        "used_readonly_recovery": false,
+        "original_http_status": "PASS",
+        "authoritative_http_file": "http-result.json"
+      },
+      "provider_request_sha256": "65124769ba7b0ed76514268747a1566bb945d95cce9a50532d45d9a848f2d577",
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"1\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 1196
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 100
+        }
+      ],
+      "actual_wire_evidence_content_chars": 1296,
+      "source_byte_coverage_note": "Full source file exact substring is false for split SciFact files because title and body are in separate XML chunks; B contains both exact source chunks, totaling the full source character count. A contains the full body only.",
+      "target_stage_membership": {
+        "retrieval": [
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.01631411951348493
+          },
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.012746633260256811
+          }
+        ],
+        "rerank": [
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.67454624806905
+          },
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.39201126409043463
+          }
+        ],
+        "merge": [
+          {
+            "id": "930ff2d8-1849-58a5-bb6e-0189669f3b52",
+            "type": "summary",
+            "score": 0.67454624806905
+          },
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.39201126409043463
+          }
+        ],
+        "source_unit": [
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.39201126409043463
+          },
+          {
+            "id": "2c57263d-72df-4551-bf68-977d83e0c5ac",
+            "type": "text",
+            "score": 0
+          }
+        ],
+        "context": [
+          {
+            "id": "13670870-d3ed-4479-8dd9-173a69dcd09c",
+            "type": "text",
+            "score": 0.39201126409043463
+          },
+          {
+            "id": "2c57263d-72df-4551-bf68-977d83e0c5ac",
+            "type": "text",
+            "score": 0
+          }
+        ]
+      },
+      "citation_review": {
+        "answer_cites_expected_source_filename": true,
+        "granularity": "Filename-level source attribution; no chunk/line pinpoint citation. UI clicking was not tested by this read-only review.",
+        "limitations": "A correct source filename does not prove that original target content reached generation; see exact wire membership."
+      },
+      "factual_review": {
+        "gold_type": "Official SciFact SUPPORTS narrow association/timing stance; QA factual quality scored separately.",
+        "stance_status": "PASS_SUPPORTS",
+        "answer_factual_status": "PASS",
+        "proof": [
+          {
+            "source": "both oscillators tick in a 1:1 mode-locked state",
+            "answer": "1:1 的模式锁定状态"
+          },
+          {
+            "source": "cell divisions occurring tightly 5 h before the peak",
+            "answer": "表达峰值之前大约 5 小时"
+          },
+          {
+            "source": "reverse coupling is predominant in NIH3T3 cells",
+            "answer": "Does not assert a coupling direction; not a checkpoint contradiction."
+          }
+        ],
+        "error": null,
+        "omissions": "B omits predominant reverse coupling and robustness; these are not necessary for answering the narrow association claim. If evaluated against every precall checkpoint as a mandatory recitation, coupling checkpoint is NOT STATED rather than contradicted. Approximately 5h preserves source timing to useful precision, though source says tightly 5h.",
+        "noise": "B adds a 100-character source title chunk; generated summary and causal-direction error absent in actual provider wire."
+      },
+      "source_mode_note": "Bounded arm determined from frozen case ID and arm field; stored source_mode is bounded_source_v1"
+    },
+    {
+      "case_id": "miracl-zh-91294#0::source-bounded",
+      "arm": "B",
+      "source_mode": "bounded_source_v1",
+      "actual_answer": "根据提供的资料，人马座的临近星座如下：\n\n*   **西侧**：天蝎座\n*   **东侧**：摩羯座\n*   **北方**：蛇夫座、盾牌座、巨蛇座\n*   **南方**：望远镜座、显微镜座、南冕座等小型星座\n\nSources: 0d4183f5ea0a1bd37fd04c19.md",
+      "provider_request": "var\\reports\\s8-3-r-20261020\\downloaded-batch1\\executions\\adda43c2d3eb7bcb69f04f66ed79db92ae71ffc71679b0b5ca4692f6b87d2ab0\\evidence\\fd73a45449f64244ba0b111215893131.request.json",
+      "provider_wire_chars_all_messages": 2394,
+      "provider_user_chars": 1089,
+      "legacy_context_chars": 630,
+      "legacy_context_is_actual_wire": false,
+      "legacy_context_note": "Legacy finalized_context differs from actual request rendering; summary descriptions there are not evidence of delivery.",
+      "actual_wire_summary_marker": false,
+      "actual_wire_summary_chunk_type": false,
+      "actual_wire_description": false,
+      "actual_wire_source_text_count": 3,
+      "original_source_file": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-remaining-top1-20261020\\evidence\\final-raw\\cases\\B-a9b3350fe2bed030da6f8e6491fcd67fa56c779f67a5ad62fc575f8ff9a90872\\readback\\source-541b3a8a-70a0-48dc-b31a-19ee96df3b94.bin",
+        "sha256_observed": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+        "sha256_matches_inventory": true,
+        "full_file_exact_in_wire": true,
+        "full_file_chars": 84,
+        "meaningful_body_exact_in_wire": true
+      },
+      "target_chunks": [
+        {
+          "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+          "type": "summary",
+          "chars": 103,
+          "exact_content_in_actual_wire": false,
+          "exact_content_in_saved_source": false,
+          "content_sha256": "f94f79163f91168f35065e90bb5baef115bf16e2de592696a8c78c05c7ca9367",
+          "short_proof": "# Summary\n人马座的星座概述及其周边星座分布。\n\n人马座是夏季夜空中最大、最显著的星座之一，西接天蝎座、东连摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边是一系列小型星座如望远镜座、显微"
+        },
+        {
+          "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+          "type": "text",
+          "chars": 84,
+          "exact_content_in_actual_wire": true,
+          "exact_content_in_saved_source": true,
+          "content_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+          "short_proof": "# 人马座\n\n人马座是夏季夜空中最大、最显著的星座之一，它西接天蝎座、東連摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边则是一系列小型星座，如望远镜座、显微镜座、南冕座等。"
+        }
+      ],
+      "stage_counts": {
+        "understand": {},
+        "retrieval": {
+          "candidate_count": 30
+        },
+        "rerank": {
+          "candidate_count": 9
+        },
+        "merge": {
+          "candidate_count": 9
+        },
+        "source_unit": {
+          "candidate_count": 3
+        },
+        "context": {
+          "selected_evidence_count": 3
+        }
+      },
+      "final_result_ids": [
+        "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+        "2b590199-2b8e-4957-8071-79c2b0fc7004",
+        "f6632136-5414-494b-8136-1f8f4f97b712"
+      ],
+      "metrics": {
+        "provider_calls": 4,
+        "reported_tokens": 7165,
+        "generation_usage": {
+          "prompt_tokens": 794,
+          "completion_tokens": 88,
+          "total_tokens": 882,
+          "status": "REPORTED",
+          "cached_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "cache_miss_tokens": 794,
+          "cache_reported": true,
+          "cache_status": "miss",
+          "provider_usage_facts": {
+            "semantics": "aggregate-disjoint-calls/v1",
+            "fields": [
+              [
+                "input",
+                {
+                  "value": 794,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/input"
+                }
+              ],
+              [
+                "output",
+                {
+                  "value": 88,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/output"
+                }
+              ],
+              [
+                "total",
+                {
+                  "value": 882,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/total"
+                }
+              ],
+              [
+                "cache_read",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_read"
+                }
+              ],
+              [
+                "cache_write",
+                {
+                  "value": null,
+                  "present": false,
+                  "valid": false,
+                  "path": "disjoint-physical-calls/cache_write"
+                }
+              ],
+              [
+                "cache_miss",
+                {
+                  "value": 794,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/cache_miss"
+                }
+              ],
+              [
+                "reasoning",
+                {
+                  "value": 0,
+                  "present": true,
+                  "valid": true,
+                  "path": "disjoint-physical-calls/reasoning"
+                }
+              ]
+            ],
+            "numeric_raw": "[{\"completion_tokens\":88,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":794,\"prompt_tokens\":794,\"total_tokens\":882}]",
+            "raw_sha256": "d97ae63ef63469e9d5343533f6d6a16a16f0269c3dfcce3a682653ce40c679b0",
+            "derived_total": 882,
+            "simulated": false,
+            "observed_lower_bound": 0,
+            "prior_numeric_raw": []
+          }
+        },
+        "post_to_complete_ms": 6108.01,
+        "ttfc_ms": 6107.77,
+        "post_to_history_total_ms": 6431.43
+      },
+      "persistence": {
+        "http_status": 200,
+        "sse_complete": true,
+        "sse_history_content_match": true,
+        "pg_audit_status": "PASS",
+        "failed_pg_checks": [],
+        "assistant_content_matches_sse": true
+      },
+      "rag_sql_observation": {
+        "scope": "private_api_process_execute_calls_during_accepted_question_ASGI_window",
+        "execute_calls": 165,
+        "completed_execute_calls": 165,
+        "failed_execute_calls": 0,
+        "execute_elapsed_sum_ms": 560.625,
+        "window_elapsed_ms": 6105.68,
+        "query_text_saved": false,
+        "parameters_saved": false,
+        "limitations": "Includes request persistence/provider accounting SQL; excludes fetch/decode time and other processes. Elapsed sum can overlap concurrent calls."
+      },
+      "recovery": {
+        "used_readonly_recovery": false,
+        "original_http_status": "PASS",
+        "authoritative_http_file": "http-result.json"
+      },
+      "provider_request_sha256": "0bc56ad538836f71b39786bed8f0d6a50f1652151e5a48f8cf1b62d64bf5d8c8",
+      "actual_wire_chunks": [
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 84
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 46
+        },
+        {
+          "tag": "<chunk index=\"0\" view=\"full\" type=\"text\" evidence_kind=\"source_text\">",
+          "chars": 104
+        }
+      ],
+      "actual_wire_evidence_content_chars": 234,
+      "source_byte_coverage_note": "MIRACL target source is a single 84-character chunk; exact whole-file membership is directly measurable.",
+      "target_stage_membership": {
+        "retrieval": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.016237314597970336
+          },
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.01597782258064516
+          }
+        ],
+        "rerank": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.7025608468223232
+          },
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.6968364843245475
+          }
+        ],
+        "merge": [
+          {
+            "id": "6d65929f-18e4-5478-b1f4-d19aeac6936f",
+            "type": "summary",
+            "score": 0.7025608468223232
+          },
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.6968364843245475
+          }
+        ],
+        "source_unit": [
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.6968364843245475
+          }
+        ],
+        "context": [
+          {
+            "id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "type": "text",
+            "score": 0.6968364843245475
+          }
+        ]
+      },
+      "citation_review": {
+        "answer_cites_expected_source_filename": true,
+        "granularity": "Filename-level source attribution; no chunk/line pinpoint citation. UI clicking was not tested by this read-only review.",
+        "limitations": "A correct source filename does not prove that original target content reached generation; see exact wire membership."
+      },
+      "factual_review": {
+        "gold_type": "Official MIRACL document-retrieval qrels, not official generation-answer Gold; manual source-fact review only.",
+        "answer_factual_status": "PASS",
+        "delivery_status": "PASS",
+        "proof": [
+          {
+            "source": "西接天蝎座、東連摩羯座",
+            "answer": "西接天蝎座、东连摩羯座"
+          },
+          {
+            "source": "北面是蛇夫座、盾牌座和巨蛇座",
+            "answer": "北面是蛇夫座、盾牌座和巨蛇座"
+          },
+          {
+            "source": "望远镜座、显微镜座、南冕座等",
+            "answer": "望远镜座、显微镜座、南冕座"
+          }
+        ],
+        "omissions": "No required eight-neighbor name/direction omissions. Both retain source non-exhaustive 如/等 sense.",
+        "noise": "B retains two additional same-constellation chunks (46+104 characters) unrelated to neighbor question."
+      },
+      "source_mode_note": "Bounded arm determined from frozen case ID and arm field; stored source_mode is bounded_source_v1"
+    }
+  ],
+  "comparisons": [
+    {
+      "case_id": "miracl-zh-91294#0",
+      "original_query_rewrite_request_body_equal": true,
+      "rewrite_A": "人马座有哪些临近星座",
+      "rewrite_B": "人马座有哪些临近星座",
+      "embedding_body_equal": true,
+      "rerank_body_equal": true,
+      "search_id_order_equal": true,
+      "search_id_set_equal": true,
+      "search_content_and_scores_equal": true,
+      "rerank_content_and_scores_equal": false,
+      "merge_content_and_scores_equal": false,
+      "limitations": [
+        "One physical execution per arm; no statistical or model-determinism conclusion.",
+        "Different per-session source mode; provider time variability and rerank outputs can differ even with identical input."
+      ],
+      "rerank_ids_order_equal": true,
+      "observed_change": {
+        "all_message_chars_A_B": [
+          3800,
+          2394
+        ],
+        "evidence_content_chars_A_B": [
+          791,
+          234
+        ],
+        "reported_tokens_A_B": [
+          7941,
+          7165
+        ],
+        "post_to_complete_ms_A_B": [
+          9654.02,
+          6108.01
+        ]
+      },
+      "causal_limit": "Query rewrite, embedding and rerank request bodies and retrieval IDs/content/scores match exactly. Rerank scores differ and MIRACL merge count differs (8 vs 9), so this is a normal end-to-end A/B observation, not a strictly frozen post-rerank intervention. Improvements cannot be attributed exclusively to one transformation with statistical confidence."
+    },
+    {
+      "case_id": "scifact-1101",
+      "original_query_rewrite_request_body_equal": true,
+      "rewrite_A": "Stiff substrates encourage mesodermal differentiation by degrading beta-catenin in an integrin-dependent manner",
+      "rewrite_B": "Stiff substrates encourage mesodermal differentiation by degrading beta-catenin in an integrin-dependent manner",
+      "embedding_body_equal": true,
+      "rerank_body_equal": true,
+      "search_id_order_equal": true,
+      "search_id_set_equal": true,
+      "search_content_and_scores_equal": true,
+      "rerank_content_and_scores_equal": false,
+      "merge_content_and_scores_equal": false,
+      "limitations": [
+        "One physical execution per arm; no statistical or model-determinism conclusion.",
+        "Different per-session source mode; provider time variability and rerank outputs can differ even with identical input."
+      ],
+      "rerank_ids_order_equal": true,
+      "observed_change": {
+        "all_message_chars_A_B": [
+          3360,
+          3221
+        ],
+        "evidence_content_chars_A_B": [
+          1463,
+          1271
+        ],
+        "reported_tokens_A_B": [
+          14660,
+          14528
+        ],
+        "post_to_complete_ms_A_B": [
+          11422.87,
+          9842.86
+        ]
+      },
+      "causal_limit": "Query rewrite, embedding and rerank request bodies and retrieval IDs/content/scores match exactly. Rerank scores differ and MIRACL merge count differs (8 vs 9), so this is a normal end-to-end A/B observation, not a strictly frozen post-rerank intervention. Improvements cannot be attributed exclusively to one transformation with statistical confidence."
+    },
+    {
+      "case_id": "scifact-241",
+      "original_query_rewrite_request_body_equal": true,
+      "rewrite_A": "Cellular clocks and mitosis timing in NIH 3T3 cells",
+      "rewrite_B": "Cellular clocks and mitosis timing in NIH 3T3 cells",
+      "embedding_body_equal": true,
+      "rerank_body_equal": true,
+      "search_id_order_equal": true,
+      "search_id_set_equal": true,
+      "search_content_and_scores_equal": true,
+      "rerank_content_and_scores_equal": false,
+      "merge_content_and_scores_equal": false,
+      "limitations": [
+        "One physical execution per arm; no statistical or model-determinism conclusion.",
+        "Different per-session source mode; provider time variability and rerank outputs can differ even with identical input."
+      ],
+      "rerank_ids_order_equal": true,
+      "observed_change": {
+        "all_message_chars_A_B": [
+          3249,
+          3202
+        ],
+        "evidence_content_chars_A_B": [
+          1396,
+          1296
+        ],
+        "reported_tokens_A_B": [
+          9884,
+          9790
+        ],
+        "post_to_complete_ms_A_B": [
+          9533.44,
+          9042.37
+        ]
+      },
+      "causal_limit": "Query rewrite, embedding and rerank request bodies and retrieval IDs/content/scores match exactly. Rerank scores differ and MIRACL merge count differs (8 vs 9), so this is a normal end-to-end A/B observation, not a strictly frozen post-rerank intervention. Improvements cannot be attributed exclusively to one transformation with statistical confidence."
+    }
+  ],
+  "overall": {
+    "manual_answer_quality": "MIRACL both PASS; SciFact1101 A translation FAIL/B PASS; SciFact241 A direction FAIL/B narrow QA PASS. SciFact official stance labels correct in both arms.",
+    "delivery": "B all three actual wires remove generated summaries and contain target source text. MIRACL A does not deliver original; SciFact A delivers original plus erroneous summaries.",
+    "persistence": "All six saved PG audits PASS with completed SSE and exact assistant-history/SSE content match; MIRACL A recovered by read-only analysis with no rePOST. Original false-failure file preserved.",
+    "limitations": [
+      "No new model, database or network calls. Saved source snapshot hashes independently verified against inventory, not live DB.",
+      "No UI click validation; citations are filename-level.",
+      "All cases are development cases; no holdout generalization.",
+      "Token counts are provider-reported aggregate across chat, embedding and rerank; cannot interpret as generation-only context tokens.",
+      "RAG SQL count is saved scoped observation, not full PostgreSQL server workload.",
+      "No latency significance claim from one trial per arm."
+    ]
+  }
+}

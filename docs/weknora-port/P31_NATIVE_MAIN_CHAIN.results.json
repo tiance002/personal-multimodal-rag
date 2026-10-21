@@ -1,0 +1,308 @@
+{
+  "schema": "p31-native-main-chain/v1",
+  "status": "P31_COMPLETE",
+  "baseline_sha": "84bd4bb09f29fdf96fd239fc68898b34d41eb990",
+  "fixed_upstream_sha": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "production_source_hashes": {
+    "backend/weknora_port/development.py": "403c265251d33c1023046a1bedba0c27057c4e28db30d479dc58d0e903201e7c",
+    "backend/weknora_port/documents.py": "ff7a16b338c08f64b894c8901efb59d51ef4317b83b735b27b490d2592b9d053",
+    "backend/weknora_port/entrypoint.py": "1b0a2eb7ab7281d7e0fa260caaab2c26b3daa0e3f4899aa2030d77ee7baa99af",
+    "backend/weknora_port/http_api.py": "068a1c6977d670ce4e8b201bba60cc41fb386d3a14c85e0dc1cd430dfdc1a536",
+    "backend/weknora_port/image_configuration.py": "1278d4a8a23f1d774a2cf0e92bfc98b611881b32d17a66a06f4e890dbeda1e68",
+    "backend/weknora_port/image_tasks.py": "b66d570d78085ac8fb70bf7db54a5ed69ac838c95d14f4db3270d36a5b10e977",
+    "backend/weknora_port/ingestion/core.py": "490851cd892a3bb4617a102bb11e4fc530d3c26e7e295249004c7c01f6825b9c",
+    "backend/weknora_port/ingestion/upstream_pdf_parser.py": "8ed28108b0451b3ca51777ac75bb9a6e84f4b7d7e150e5cce8a18be0ff9028ed",
+    "backend/weknora_port/retrieval/pipeline.py": "9f7a33c3b62b2e6121f70f092801bf72249fc245055b2c564cf0507e5f51a439",
+    "backend/weknora_port/runtime.py": "481e97bdca33e7e8d68134a7f28b50056e2110a6dd62fb14a0acf6398238313a",
+    "backend/weknora_port/worker.py": "02a3f03f45c5d6edfa3905beab798d024129586a04f0b2e19cbb3b945b459e24",
+    "tests/weknora_port/test_documents.py": "7b2b84603c17c3169304c71655a4d096b7dd3c738ca1f2c062e0fbd1b6f92b29",
+    "tests/weknora_port/test_http_api.py": "37c7596c3803af4f519e60170dced55d4a03fbf191a065e01a52b20944533e29",
+    "tests/weknora_port/test_p27_page_scoped_vision.py": "fcc6e24da5b32524daa7449025d30bdbb961068f800963f7d1c2707d3a6b5a5c",
+    "backend/weknora_port/storage/migrations/015_provider_calls.sql": "4235bae1813279a06b0c9a5b003ff96fc703e046185adcd97902838716f258b6",
+    "backend/weknora_port/storage/provider_calls_migrate.py": "0d8085cedcdc05feb87ba0ff0074a5d849d5fa7c526e361cb9945450242cdb20",
+    "tests/weknora_port/test_p31_native_evidence.py": "4d019e83116fe391530c4fc2ab81caa9a8b4da32fed05be2e87f28d8c01f5522",
+    "tests/weknora_port/test_p31_provider_calls.py": "a31b63b2f97ee3fdc5caa0f9b20ecdbcb46837f0ca8342158e4dc002b1cf96ee",
+    "scripts/p31_native_acceptance.py": "1e849d5a34b0474a4e8e71785ac18682f638f42d998c20036e5f5c2d4e077bd6"
+  },
+  "rollback": {
+    "evidence": "Removed runtime source proof and Summary exclusion plus optional pipeline branches; scoped normal source reads remain",
+    "provider": "Normal registered provider/credential requests with usage and no-resend identity; no Token Authority, reservations, account budget, meter, or settlement gate",
+    "pdf": "Removed page selection/render special path; restored fixed upstream per-page scan/native/embedded routing; image_pages explicitly rejected"
+  },
+  "new_schema": "015_provider_calls: usage and request identity only, no old table changes",
+  "usage_record_failure": "logs error; keeps durable UNKNOWN operation, no answer override or automatic resend",
+  "account_hard_token_budget_guarantee": false,
+  "tests": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B -m pytest tests/weknora_port/test_p31_provider_calls.py tests/weknora_port/test_p31_native_evidence.py tests/weknora_port/test_pipeline.py tests/weknora_port/test_generation.py tests/weknora_port/test_service.py tests/weknora_port/test_provider_usage.py tests/weknora_port/test_provider_transport.py tests/weknora_port/test_development_entry.py -q -p no:cacheprovider --basetemp=E:\\WK\\run\\p31-20261017\\pytest-native",
+      "exit_code": 0,
+      "passed": 229,
+      "kind": "OFFLINE",
+      "stdout": "native-tests.stdout.txt"
+    },
+    {
+      "command": "See image-notes.json tests/verification commands",
+      "exit_code": 0,
+      "passed": 39,
+      "kind": "OFFLINE_PDF_ASGI_IN_MEMORY",
+      "stdout": "image-tests/run-03.log"
+    },
+    {
+      "command": "Broader test_ingest.py collection",
+      "exit_code": 2,
+      "kind": "NOT_PASSED",
+      "reason": "Independent missing pptx; no dependency changes",
+      "stdout": "image-tests/run-02.log"
+    }
+  ],
+  "real_acceptance": {
+    "status": "P31_COMPLETE",
+    "cases": {
+      "row-0959": {
+        "status": "PASS_REAL_API_PG_REDIS_PROVIDER",
+        "answer": "## 长距离通信的用途\n\n根据幻灯片内容，用于长距离通信的方法包括：\n\n1. **无线电波（Radiowaves）**：可以被大气层中的不同层折射，使信号能够传播更远。其中，**电离层（ionosphere）** 会折射无线电波，这是实现长距离通信的关键机制之一。\n\n2. **微波（Microwaves）**：可以用于将信号发送到卫星，从而实现远距离通信。\n\n此外，幻灯片还提到了一些导致长距离通信困难的问题，例如信号扩散、波在不同大气层中折射导致信号难以精确发送、以及信号质量下降等。",
+        "sse_history_refreshed_equal": true,
+        "error_events": 0,
+        "finish_reason": "stop",
+        "scope": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "document_scope": [],
+        "stages": [
+          {
+            "stage": "understand",
+            "fields": {}
+          },
+          {
+            "stage": "retrieval",
+            "fields": {
+              "candidate_count": 30
+            }
+          },
+          {
+            "stage": "rerank",
+            "fields": {
+              "candidate_count": 2
+            }
+          },
+          {
+            "stage": "merge",
+            "fields": {
+              "candidate_count": 2
+            }
+          },
+          {
+            "stage": "context",
+            "fields": {
+              "selected_evidence_count": 2
+            }
+          }
+        ],
+        "context_types": [
+          "text",
+          "text"
+        ],
+        "necessary_fact_in_actual_wire": "ionosphere refracts radiowaves",
+        "final_calls": 1,
+        "elapsed_seconds": 9.174001,
+        "manual_fact_check": "Text communication statement matches existing chunks; synthetic image answer matches original image text. No official new dataset score."
+      },
+      "image-query": {
+        "status": "PASS_REAL_API_PG_REDIS_PROVIDER",
+        "answer": "EviRoute 提灯使用**琥珀色（amber）**镜片。",
+        "sse_history_refreshed_equal": true,
+        "error_events": 0,
+        "finish_reason": "stop",
+        "scope": "7176f41d-695b-4804-bda9-a99b0e8726b7",
+        "document_scope": [],
+        "stages": [
+          {
+            "stage": "understand",
+            "fields": {}
+          },
+          {
+            "stage": "retrieval",
+            "fields": {
+              "candidate_count": 4
+            }
+          },
+          {
+            "stage": "rerank",
+            "fields": {
+              "candidate_count": 4
+            }
+          },
+          {
+            "stage": "merge",
+            "fields": {
+              "candidate_count": 3
+            }
+          },
+          {
+            "stage": "context",
+            "fields": {
+              "selected_evidence_count": 3
+            }
+          }
+        ],
+        "context_types": [
+          "image_ocr",
+          "summary",
+          "image_caption"
+        ],
+        "necessary_fact_in_actual_wire": "amber lenses",
+        "final_calls": 1,
+        "elapsed_seconds": 5.617673,
+        "manual_fact_check": "Text communication statement matches existing chunks; synthetic image answer matches original image text. No official new dataset score."
+      }
+    },
+    "historical_tables_unchanged": true,
+    "cloud_calls": 16,
+    "groups": {
+      "siliconflow:chat": {
+        "calls": 5,
+        "input": 8076,
+        "output": 299,
+        "total": 8375
+      },
+      "siliconflow:embedding": {
+        "calls": 8,
+        "input": 203,
+        "output": 0,
+        "total": 203
+      },
+      "siliconflow:rerank": {
+        "calls": 2,
+        "input": 4301,
+        "output": 0,
+        "total": 4301
+      },
+      "deepseek:vision": {
+        "calls": 1,
+        "input": 1012,
+        "output": 375,
+        "total": 1387
+      }
+    },
+    "input_tokens": 13592,
+    "output_tokens": 674,
+    "total_tokens": 14266,
+    "new_unknown_calls": 0,
+    "new_budget_fences": 0,
+    "scope_isolation": {
+      "tenant332_kb_used_by": 344,
+      "http_status": 403,
+      "provider_calls_before": 0,
+      "provider_calls_after": 0,
+      "provider_delta": 0,
+      "expected": "403_or_404_and_zero_send_delta"
+    },
+    "image_ingest": {
+      "chunk_types": [
+        "text",
+        "image_ocr",
+        "image_caption",
+        "summary"
+      ],
+      "embedding_count": 4,
+      "physical_pages": 1,
+      "original_pdf_sha256": "3c2bc88546f1f91b5b52181c2a208396be112bcff56c61d3a92a9d9139b26e45",
+      "image_pages_parameter_sent": false,
+      "ocr": "local Tesseract",
+      "caption_model": "deepseek-flash",
+      "caption_calls": 1,
+      "source_readbacks": "source-readbacks.json",
+      "image_task_state": "completed"
+    }
+  },
+  "real_commands": [
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py prepare",
+      "exit_code": 0,
+      "stdout": "prepare.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py start",
+      "exit_code": 0,
+      "stdout": "start.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py query-text",
+      "exit_code": 0,
+      "stdout": "query-text.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py upload-image",
+      "exit_code": 0,
+      "stdout": "upload-image.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py query-image",
+      "exit_code": 0,
+      "stdout": "query-image.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py snapshot",
+      "exit_code": 0,
+      "stdout": "snapshot.stdout.txt"
+    },
+    {
+      "command": "& 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -B scripts/p31_native_acceptance.py stop",
+      "exit_code": 0,
+      "stdout": "stop.stdout.txt"
+    }
+  ],
+  "source_readback_verification": {
+    "exit_code": 0,
+    "original_pdf_sha_equal": true,
+    "text_and_image_children_readable": true,
+    "history_refreshed_no_new_calls": true
+  },
+  "not_run": [
+    "Real Edge UI interactions (frontend unchanged)",
+    "Mid-stream network interruption test",
+    "Full regression/six-dataset evaluation"
+  ],
+  "preservation": {
+    "old_ledgers_all_rows_digest_equal": true,
+    "old_unknown_count": 91,
+    "old_unknown_held_tokens": 827414,
+    "new_unknown_calls": 0,
+    "gold_and_historical_results_changed": false,
+    "inherited_dirty_excluded": [
+      ".serena/project.yml",
+      "progress.md",
+      "six inherited untracked handoff/evidence files"
+    ]
+  },
+  "evidence": {
+    "runtime": "E:\\WK\\run\\p31-20261017",
+    "repository": "docs/weknora-port/evidence/p31-native-main-chain-20261017",
+    "zip_sha256": "356b59c306d1db930805de18e867afe6a4aa17e39eb6e1da28c07c6a20f5796a"
+  },
+  "risks": [
+    "No account-wide hard Token budget guarantee",
+    "Usage DB failure can leave a no-resend UNKNOWN record; tokens then unavailable rather than fabricated",
+    "Legacy authority/fence harness is archival and not current entrypoint",
+    "Summary is generated content, not a certified PDF verbatim quote",
+    "pptx collection issue remains outside PDF scope"
+  ],
+  "processes": {
+    "own_stopped_pids": [
+      31556,
+      31980,
+      36084
+    ],
+    "ports_after": {
+      "56423": true,
+      "56424": true,
+      "56425": false,
+      "56427": false
+    }
+  },
+  "stop": {
+    "push": false,
+    "deploy": false,
+    "merge": false,
+    "tag": false,
+    "next_phase": false
+  }
+}

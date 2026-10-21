@@ -1,0 +1,44 @@
+- complementary:
+  - text: W
+  - strong: WeKnora
+  - text: Python adapter
+  - navigation "主导航":
+    - button "问答"
+    - button "资料库"
+    - button "模型设置"
+    - button "长期记忆"
+  - button "＋ 新对话"
+  - text: 历史会话
+  - paragraph: 还没有会话
+  - text: 本地知识工作台
+- main:
+  - text: 长期记忆
+  - status: 已连接到 WeKnora Python API
+  - heading "长期记忆" [level=1]
+  - paragraph: 查看当前用户的记忆，或遗忘不再需要的内容。
+  - button "刷新记忆"
+  - status: 记忆已启用 · 仅明确要求时记录 · 1 / 200 条有效记忆
+  - checkbox "启用我的长期记忆" [checked]
+  - text: 启用我的长期记忆
+  - article:
+    - strong: Review reject fixture
+    - paragraph: Synthetic review reject content
+    - text: pending · extracted
+    - button "确认 Review reject fixture": 确认记忆
+    - button "拒绝 Review reject fixture": 拒绝记忆
+    - button "遗忘 Review reject fixture": 遗忘
+  - article:
+    - strong: Review confirm fixture
+    - paragraph: Synthetic review confirm content
+    - text: pending · extracted
+    - button "确认 Review confirm fixture": 确认记忆
+    - button "拒绝 Review confirm fixture": 拒绝记忆
+    - button "遗忘 Review confirm fixture": 遗忘
+  - article:
+    - strong: Browser fixture memory
+    - paragraph: This is a recoverable synthetic browser memory.
+    - text: active · manual
+    - button "遗忘 Browser fixture memory": 遗忘
+  - button "上一页" [disabled]
+  - text: 第 1 页
+  - button "下一页" [disabled]

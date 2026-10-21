@@ -1,0 +1,115 @@
+......FF.F....FFFF.                                                      [100%]
+================================== FAILURES ===================================
+_ test_builtin_model_templates_distinguish_missing_evidence_from_absence[model_fallback] _
+tests\weknora_port\test_fallback_catalog_boundary.py:81: in test_builtin_model_templates_distinguish_missing_evidence_from_absence
+    prompt = next(row["content"] for row in source_prompt_templates()["fallback"] if row["id"] == identifier)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\conversation_configuration.py:19: in source_prompt_templates
+    if hashlib.sha256(raw).hexdigest()!=sha:raise ProviderError('CONVERSATION_TEMPLATE_ASSET_MISMATCH')
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   backend.weknora_port.models.types.ProviderError: CONVERSATION_TEMPLATE_ASSET_MISMATCH
+_ test_builtin_model_templates_distinguish_missing_evidence_from_absence[default_fallback_prompt] _
+tests\weknora_port\test_fallback_catalog_boundary.py:81: in test_builtin_model_templates_distinguish_missing_evidence_from_absence
+    prompt = next(row["content"] for row in source_prompt_templates()["fallback"] if row["id"] == identifier)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\conversation_configuration.py:19: in source_prompt_templates
+    if hashlib.sha256(raw).hexdigest()!=sha:raise ProviderError('CONVERSATION_TEMPLATE_ASSET_MISMATCH')
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   backend.weknora_port.models.types.ProviderError: CONVERSATION_TEMPLATE_ASSET_MISMATCH
+_ test_default_model_template_retains_metadata_and_general_knowledge_boundaries _
+tests\weknora_port\test_p28_native_fallback.py:27: in test_default_model_template_retains_metadata_and_general_knowledge_boundaries
+    prompt = next(row['content'] for row in source_prompt_templates()['fallback']
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\conversation_configuration.py:19: in source_prompt_templates
+    if hashlib.sha256(raw).hexdigest()!=sha:raise ProviderError('CONVERSATION_TEMPLATE_ASSET_MISMATCH')
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   backend.weknora_port.models.types.ProviderError: CONVERSATION_TEMPLATE_ASSET_MISMATCH
+________ test_source_failure_is_terminal_not_native_fallback[failure0] ________
+tests\weknora_port\test_p28_native_fallback.py:91: in test_source_failure_is_terminal_not_native_fallback
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:89: in scenario
+    await service.prepare_turn(turn)
+backend\weknora_port\service.py:316: in prepare_turn
+    pipeline=await _resolve(self.pipeline_factory(turn,progress))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:85: in <lambda>
+    service.pipeline_factory = lambda turn, progress: RetrievalPipeline(
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'final_evidence_projection'
+________ test_source_failure_is_terminal_not_native_fallback[failure1] ________
+tests\weknora_port\test_p28_native_fallback.py:91: in test_source_failure_is_terminal_not_native_fallback
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:89: in scenario
+    await service.prepare_turn(turn)
+backend\weknora_port\service.py:316: in prepare_turn
+    pipeline=await _resolve(self.pipeline_factory(turn,progress))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:85: in <lambda>
+    service.pipeline_factory = lambda turn, progress: RetrievalPipeline(
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'final_evidence_projection'
+________ test_source_failure_is_terminal_not_native_fallback[failure2] ________
+tests\weknora_port\test_p28_native_fallback.py:91: in test_source_failure_is_terminal_not_native_fallback
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:89: in scenario
+    await service.prepare_turn(turn)
+backend\weknora_port\service.py:316: in prepare_turn
+    pipeline=await _resolve(self.pipeline_factory(turn,progress))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:85: in <lambda>
+    service.pipeline_factory = lambda turn, progress: RetrievalPipeline(
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'final_evidence_projection'
+________ test_source_failure_is_terminal_not_native_fallback[failure3] ________
+tests\weknora_port\test_p28_native_fallback.py:91: in test_source_failure_is_terminal_not_native_fallback
+    asyncio.run(scenario())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:89: in scenario
+    await service.prepare_turn(turn)
+backend\weknora_port\service.py:316: in prepare_turn
+    pipeline=await _resolve(self.pipeline_factory(turn,progress))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_p28_native_fallback.py:85: in <lambda>
+    service.pipeline_factory = lambda turn, progress: RetrievalPipeline(
+E   TypeError: RetrievalPipeline.__init__() got an unexpected keyword argument 'final_evidence_projection'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_fallback_catalog_boundary.py::test_builtin_model_templates_distinguish_missing_evidence_from_absence[model_fallback]
+FAILED tests/weknora_port/test_fallback_catalog_boundary.py::test_builtin_model_templates_distinguish_missing_evidence_from_absence[default_fallback_prompt]
+FAILED tests/weknora_port/test_p28_native_fallback.py::test_default_model_template_retains_metadata_and_general_knowledge_boundaries
+FAILED tests/weknora_port/test_p28_native_fallback.py::test_source_failure_is_terminal_not_native_fallback[failure0]
+FAILED tests/weknora_port/test_p28_native_fallback.py::test_source_failure_is_terminal_not_native_fallback[failure1]
+FAILED tests/weknora_port/test_p28_native_fallback.py::test_source_failure_is_terminal_not_native_fallback[failure2]
+FAILED tests/weknora_port/test_p28_native_fallback.py::test_source_failure_is_terminal_not_native_fallback[failure3]
+7 failed, 12 passed in 2.14s

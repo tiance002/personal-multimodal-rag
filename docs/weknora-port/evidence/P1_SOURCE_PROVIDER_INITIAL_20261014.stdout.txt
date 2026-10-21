@@ -1,0 +1,24 @@
+.............F                                                           [100%]
+================================== FAILURES ===================================
+______ test_native_model_priority_order_replay_and_affinity_delete_entry ______
+tests\weknora_port\test_affinity_kb_http_pg.py:96: in test_native_model_priority_order_replay_and_affinity_delete_entry
+    actual_pg_run(scenario())
+tests\weknora_port\test_memory_storage_pg.py:36: in actual_pg_run
+    return runner.run(awaitable)
+           ^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_affinity_kb_http_pg.py:50: in scenario
+    assert len(streams)==1 and streams[0]['model']==expected
+E   AssertionError: assert (1 == 1 and 'deepseek-flash' == 'fixture-remote'
+E    +  where 1 = len([{'max_tokens': 1024, 'messages': [{'content': 'You are WeKnora, a knowledge-base question-answering assistant develop...User request\nWhat protocol do blue widgets use?\n', 'role': 'user'}], 'model': 'deepseek-flash', 'stream': True, ...}])
+E     
+E     - fixture-remote
+E     + deepseek-flash)
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_affinity_kb_http_pg.py::test_native_model_priority_order_replay_and_affinity_delete_entry
+1 failed, 13 passed in 8.50s

@@ -1,0 +1,118 @@
+{
+  "schema": "p9-actual-provider-wire/v1",
+  "request_id": "e34af609-a64d-478a-b3da-8284e3c0bca0/document-summary",
+  "run_id": "e34af609-a64d-478a-b3da-8284e3c0bca0/document-summary",
+  "capability": "chat",
+  "stage": "auxiliary",
+  "provider": "siliconflow",
+  "model": "XingChenAGI/Xing4.0-29B",
+  "boundary": "HTTPX_REQUEST_HOOK_AFTER_DURABLE_GATE",
+  "wire_sha256": "53ef646cc62d245d27e26499c1f60a93523146141fddf0e37f52138d783c52ea",
+  "wire_bytes": 6607,
+  "body": {
+    "enable_thinking": false,
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "content": "You are a precise document profiling expert. You read the text the user supplies and describe the document STRICTLY from that text — never from a filename, title, file extension, or any other external clue.\n\n## Output\nReturn strict JSON only, no prose before or after, with exactly these fields:\n{\"summary\": \"...\", \"gist\": \"...\", \"topics\": [\"...\"], \"doc_type\": \"...\", \"typical_question\": \"...\"}\n\n- summary: 2-3 sentences (about 60-120 words) covering the document's subject, its key points and its main conclusion. Objective, third person, no preamble.\n- gist: one line (at most 25 words) stating what the document is about.\n- topics: 3-5 short topic keywords (1-4 words each) that a reader would use to find this document. Use the document's own terminology; do not pad with generic words such as \"information\" or \"document\".\n- doc_type: a short label for the kind of document, e.g. \"user manual\", \"meeting notes\", \"contract\", \"research paper\", \"FAQ\", \"policy\", \"tutorial\", \"report\".\n- typical_question: one self-contained natural-language question that this document answers well. No pronouns such as \"it\" or \"this document\".\n\n## Content Rules\n- Base every field entirely on the provided content; add nothing that is not there.\n- If the content contains \"[...content omitted...]\" markers, it is a sampled excerpt from a longer document — cover the topics that appear across the provided sections, not only the beginning.\n- For technical documents keep key terms, metrics and identifiers; for meeting notes or reports highlight decisions, action items and conclusions.\n\n## Handling Image-Derived Text\n- Text wrapped in `<image_caption>...</image_caption>` or `<image_ocr>...</image_ocr>` IS extracted document text produced by a vision model. Treat it as first-class content.\n- A document whose only text comes from those blocks is NOT empty — profile it from the captions and OCR results.\n\n## Empty or Insufficient Content\n- Only when the content is genuinely empty, holds only bare image placeholders with no caption or OCR text, or otherwise carries no substantive text, return: {\"summary\": \"No textual content was extractable from this document.\", \"gist\": \"\", \"topics\": [], \"doc_type\": \"\", \"typical_question\": \"\"}\n- Do NOT fabricate a topic and do NOT guess from any other clue. Refusing to profile absent content is correct and preferred over a plausible-sounding invention.\n\n## Language\n- Write every field in Chinese (Simplified).\n",
+        "role": "system"
+      },
+      {
+        "content": "![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_1.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_1.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_2.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_2.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_3.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_3.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_4.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_4.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_5.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_5.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_6.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_6.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_7.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_7.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_8.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_8.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_9.jpg)\n<image_caption>这张图片是一张关于物理学中**波的特性**的教育图解，主要介绍和解释了波的三种基本现象：**反射（Reflection）**、**折射（Refraction）**和**衍射（Diffraction）**。\n\n图中结合了文字定义和直观的示意图，说明了波在不同介质交界处的反弹与弯曲，以及波穿过缝隙时的扩散规律（如反射定律、波速变化导致折射、缝隙与波长的关系对衍射的影响等）。</image_caption>\n<image_ocr>Bends the wave when\n[7\nbecause the\nSpreads the wave out\nentering/leaving a\nMWY\nsubstancewould\nwhen going througha\nsubstance to another\nUP\nbe a different\ngap or barrier\n<A仁=\ndensity toanother\nREFLECTION:\nsubstance.\ni?ae\nBounces the wave back\nre x ty Se\ntowards where it came\nPic:\nfp pg gare RN\nky\nfrom\nCs\n一\n°\na\na\na\n——\noe\nRefraction,\nDiffraction\nMaximum diffraction occurs\nwhen: the gap is equal to the\nwave.\nBS:\nAll wave can be reflected and refracted\nMinimum diffraction occurs\n\\/\nwhen: the gap is smaller or\nLaw of Reflection:\nlarger than the wave.\nReflecting surtace, eg shinyet Angle of incidence = Angle of Reflection</image_ocr>\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_10.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_10.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_11.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_11.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_12.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_12.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_13.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_13.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_14.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_14.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_15.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_15.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_16.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_16.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_17.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_17.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_18.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_18.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_19.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_19.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_20.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_20.jpg)\n\n![b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_21.jpg](images/b3m5kaeqm2w8n4bwcesw-140602121350-phpapp02_95_page_21.jpg)",
+        "role": "user"
+      }
+    ],
+    "model": "XingChenAGI/Xing4.0-29B",
+    "temperature": 0.3
+  },
+  "finish_reason": "stop",
+  "state": "ACTUAL_HTTP_RESPONSE_HEADERS_RECEIVED",
+  "headers_saved": false,
+  "status_code": 200,
+  "parsed_usage": {
+    "prompt_tokens": 2841,
+    "completion_tokens": 187,
+    "total_tokens": 3028,
+    "status": "REPORTED",
+    "cached_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "cache_miss_tokens": 0,
+    "cache_reported": false,
+    "cache_status": "unreported",
+    "provider_usage_facts": {
+      "semantics": "openai-input-inclusive/v1",
+      "fields": [
+        [
+          "input",
+          {
+            "value": 2841,
+            "present": true,
+            "valid": true,
+            "path": "prompt_tokens"
+          }
+        ],
+        [
+          "output",
+          {
+            "value": 187,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens"
+          }
+        ],
+        [
+          "total",
+          {
+            "value": 3028,
+            "present": true,
+            "valid": true,
+            "path": "total_tokens"
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "prompt_cache_hit_tokens"
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "cache_creation_input_tokens"
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "prompt_cache_miss_tokens"
+          }
+        ],
+        [
+          "reasoning",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "completion_tokens_details.reasoning_tokens"
+          }
+        ]
+      ],
+      "numeric_raw": "{\"completion_tokens\":187,\"prompt_tokens\":2841,\"total_tokens\":3028}",
+      "raw_sha256": "04ba42ab51af99e88c37171531eed8f3f60606f82759f15a9621063cd1d0e8c6",
+      "derived_total": 3028,
+      "simulated": false,
+      "observed_lower_bound": 0,
+      "prior_numeric_raw": []
+    }
+  }
+}

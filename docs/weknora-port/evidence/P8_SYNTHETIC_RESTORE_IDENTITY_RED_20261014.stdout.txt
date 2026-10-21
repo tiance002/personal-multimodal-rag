@@ -1,0 +1,41 @@
+Traceback (most recent call last):
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 154, in <module>
+    parser=argparse.ArgumentParser();parser.add_argument('--database',required=True);parser.add_argument('--output',required=True);parser.add_argument('--resume-empty-target',action='store_true');main(parser.parse_args())
+                                                                                                                                                                                                    ~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 144, in main
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:native=runner.run(native_readback())
+                                                                                 ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Drivers\python\Lib\asyncio\base_events.py", line 721, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\scripts\weknora_port_restore_fixture.py", line 138, in native_readback
+    data=await documents.read_document(principal,knowledge['knowledge_base_id'],knowledge['id'])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\documents.py", line 492, in read_document
+    await self._kb(principal, knowledge_base_id)
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\documents.py", line 188, in _kb
+    rows = await self._rows(
+           ^^^^^^^^^^^^^^^^^
+        "SELECT * FROM knowledge_bases WHERE id=%s AND tenant_id=%s AND deleted_at IS NULL",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (knowledge_base_id, principal.tenant_id))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\documents.py", line 170, in _rows
+    async with self.connection_factory.lease(
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+            writable_knowledge_base_ids=writable_knowledge_base_ids) as repository:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Drivers\python\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\storage\connections.py", line 23, in lease
+    await repository.verify_identity()
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\storage\postgres.py", line 133, in verify_identity
+    self.isolation.validate(identity)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "E:\RAG-Worktrees\weknora-python-port-20261013\backend\weknora_port\storage\postgres.py", line 46, in validate
+    raise PermissionError("ISOLATED_DATABASE_IDENTITY_REQUIRED")
+PermissionError: ISOLATED_DATABASE_IDENTITY_REQUIRED

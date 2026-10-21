@@ -1,0 +1,1834 @@
+running bdist_wheel
+running build
+running build_py
+creating build\lib\backend
+copying backend\__init__.py -> build\lib\backend
+creating build\lib\eval_center
+copying eval_center\build_reviewed_dataset.py -> build\lib\eval_center
+copying eval_center\cli.py -> build\lib\eval_center
+copying eval_center\contracts.py -> build\lib\eval_center
+copying eval_center\contracts_v2.py -> build\lib\eval_center
+copying eval_center\dataset.py -> build\lib\eval_center
+copying eval_center\development_data.py -> build\lib\eval_center
+copying eval_center\export_v2.py -> build\lib\eval_center
+copying eval_center\gold.py -> build\lib\eval_center
+copying eval_center\isolated_index.py -> build\lib\eval_center
+copying eval_center\metrics.py -> build\lib\eval_center
+copying eval_center\omni_contract.py -> build\lib\eval_center
+copying eval_center\paired_preparation.py -> build\lib\eval_center
+copying eval_center\paired_simulation.py -> build\lib\eval_center
+copying eval_center\paired_state.py -> build\lib\eval_center
+copying eval_center\public_benchmark_cli.py -> build\lib\eval_center
+copying eval_center\public_data.py -> build\lib\eval_center
+copying eval_center\public_langfuse.py -> build\lib\eval_center
+copying eval_center\public_paired_reporting.py -> build\lib\eval_center
+copying eval_center\public_report.py -> build\lib\eval_center
+copying eval_center\public_runner.py -> build\lib\eval_center
+copying eval_center\public_selection.py -> build\lib\eval_center
+copying eval_center\public_sync.py -> build\lib\eval_center
+copying eval_center\quality.py -> build\lib\eval_center
+copying eval_center\query_embedding_cache.py -> build\lib\eval_center
+copying eval_center\retrieval_replay.py -> build\lib\eval_center
+copying eval_center\runner.py -> build\lib\eval_center
+copying eval_center\runtime.py -> build\lib\eval_center
+copying eval_center\scoring_mappers.py -> build\lib\eval_center
+copying eval_center\server.py -> build\lib\eval_center
+copying eval_center\source_metrics.py -> build\lib\eval_center
+copying eval_center\special_public_data.py -> build\lib\eval_center
+copying eval_center\store.py -> build\lib\eval_center
+copying eval_center\telemetry.py -> build\lib\eval_center
+copying eval_center\verification.py -> build\lib\eval_center
+copying eval_center\verified_index.py -> build\lib\eval_center
+copying eval_center\weknora_dataset_inventory.py -> build\lib\eval_center
+copying eval_center\weknora_frozen_gold.py -> build\lib\eval_center
+copying eval_center\weknora_paired.py -> build\lib\eval_center
+copying eval_center\weknora_scoring.py -> build\lib\eval_center
+copying eval_center\weknora_six_runner.py -> build\lib\eval_center
+copying eval_center\weknora_source_packages.py -> build\lib\eval_center
+copying eval_center\__init__.py -> build\lib\eval_center
+creating build\lib\backend\app
+copying backend\app\bootstrap.py -> build\lib\backend\app
+copying backend\app\config.py -> build\lib\backend\app
+copying backend\app\env_loader.py -> build\lib\backend\app
+copying backend\app\main.py -> build\lib\backend\app
+copying backend\app\__init__.py -> build\lib\backend\app
+creating build\lib\backend\tests
+copying backend\tests\conftest.py -> build\lib\backend\tests
+copying backend\tests\isolated_target.py -> build\lib\backend\tests
+copying backend\tests\p55a_simulated_lifecycle.py -> build\lib\backend\tests
+copying backend\tests\pdf_closure_fixtures.py -> build\lib\backend\tests
+copying backend\tests\test_agent_limits.py -> build\lib\backend\tests
+copying backend\tests\test_agent_tool_allowlist.py -> build\lib\backend\tests
+copying backend\tests\test_agent_trace_sse.py -> build\lib\backend\tests
+copying backend\tests\test_answer_hardening.py -> build\lib\backend\tests
+copying backend\tests\test_answer_service.py -> build\lib\backend\tests
+copying backend\tests\test_answer_validation.py -> build\lib\backend\tests
+copying backend\tests\test_backend_env_loader.py -> build\lib\backend\tests
+copying backend\tests\test_backup_manifest.py -> build\lib\backend\tests
+copying backend\tests\test_bootstrap.py -> build\lib\backend\tests
+copying backend\tests\test_bounded_history.py -> build\lib\backend\tests
+copying backend\tests\test_budget_gate.py -> build\lib\backend\tests
+copying backend\tests\test_c4_peer_run_target.py -> build\lib\backend\tests
+copying backend\tests\test_cancellation_boundaries.py -> build\lib\backend\tests
+copying backend\tests\test_cancel_route.py -> build\lib\backend\tests
+copying backend\tests\test_caption_fact_guard.py -> build\lib\backend\tests
+copying backend\tests\test_caption_provenance.py -> build\lib\backend\tests
+copying backend\tests\test_chunking.py -> build\lib\backend\tests
+copying backend\tests\test_chunk_strategy.py -> build\lib\backend\tests
+copying backend\tests\test_citation_group_span.py -> build\lib\backend\tests
+copying backend\tests\test_citation_resolution.py -> build\lib\backend\tests
+copying backend\tests\test_clarification_persistence.py -> build\lib\backend\tests
+copying backend\tests\test_clean_slate_model_profiles.py -> build\lib\backend\tests
+copying backend\tests\test_clean_slate_secret_config.py -> build\lib\backend\tests
+copying backend\tests\test_config.py -> build\lib\backend\tests
+copying backend\tests\test_container_injection.py -> build\lib\backend\tests
+copying backend\tests\test_context_and_locators.py -> build\lib\backend\tests
+copying backend\tests\test_context_expansion.py -> build\lib\backend\tests
+copying backend\tests\test_context_neighbor_repository.py -> build\lib\backend\tests
+copying backend\tests\test_context_pool_policy.py -> build\lib\backend\tests
+copying backend\tests\test_conversation_scope.py -> build\lib\backend\tests
+copying backend\tests\test_deepseek_policy_boundary.py -> build\lib\backend\tests
+copying backend\tests\test_deepseek_safety.py -> build\lib\backend\tests
+copying backend\tests\test_document_version_boundaries.py -> build\lib\backend\tests
+copying backend\tests\test_document_version_route.py -> build\lib\backend\tests
+copying backend\tests\test_egress_matrix.py -> build\lib\backend\tests
+copying backend\tests\test_embedding_profile_isolation.py -> build\lib\backend\tests
+copying backend\tests\test_evidence.py -> build\lib\backend\tests
+copying backend\tests\test_evidence_accumulator.py -> build\lib\backend\tests
+copying backend\tests\test_final_answer_commit.py -> build\lib\backend\tests
+copying backend\tests\test_follow_up.py -> build\lib\backend\tests
+copying backend\tests\test_fusion.py -> build\lib\backend\tests
+copying backend\tests\test_global_memory_cloud_egress.py -> build\lib\backend\tests
+copying backend\tests\test_grant60.py -> build\lib\backend\tests
+copying backend\tests\test_graph_evidence.py -> build\lib\backend\tests
+copying backend\tests\test_graph_failure_isolation.py -> build\lib\backend\tests
+copying backend\tests\test_graph_scope_sql.py -> build\lib\backend\tests
+copying backend\tests\test_health.py -> build\lib\backend\tests
+copying backend\tests\test_hybrid_retrieval.py -> build\lib\backend\tests
+copying backend\tests\test_image_ocr_layout.py -> build\lib\backend\tests
+copying backend\tests\test_ingestion_claiming.py -> build\lib\backend\tests
+copying backend\tests\test_ingestion_lease_config.py -> build\lib\backend\tests
+copying backend\tests\test_ingestion_recovery.py -> build\lib\backend\tests
+copying backend\tests\test_ingestion_retry_route.py -> build\lib\backend\tests
+copying backend\tests\test_ingestion_state_machine.py -> build\lib\backend\tests
+copying backend\tests\test_inline_citation_group.py -> build\lib\backend\tests
+copying backend\tests\test_knowledge_scope_boundaries.py -> build\lib\backend\tests
+copying backend\tests\test_knowledge_tools.py -> build\lib\backend\tests
+copying backend\tests\test_langchain_agent.py -> build\lib\backend\tests
+copying backend\tests\test_langchain_quick_chain.py -> build\lib\backend\tests
+copying backend\tests\test_layering_preview.py -> build\lib\backend\tests
+copying backend\tests\test_ledger_history_compatibility.py -> build\lib\backend\tests
+copying backend\tests\test_legacy_doc.py -> build\lib\backend\tests
+copying backend\tests\test_llm_rerank.py -> build\lib\backend\tests
+copying backend\tests\test_local_caption_enricher.py -> build\lib\backend\tests
+copying backend\tests\test_local_caption_gateway.py -> build\lib\backend\tests
+copying backend\tests\test_message_run_link.py -> build\lib\backend\tests
+copying backend\tests\test_model_policy.py -> build\lib\backend\tests
+copying backend\tests\test_model_provider_contracts.py -> build\lib\backend\tests
+copying backend\tests\test_multimodal_ingestion.py -> build\lib\backend\tests
+copying backend\tests\test_native_release.py -> build\lib\backend\tests
+copying backend\tests\test_native_release_review_regressions.py -> build\lib\backend\tests
+copying backend\tests\test_native_table_evidence.py -> build\lib\backend\tests
+copying backend\tests\test_ollama_usage.py -> build\lib\backend\tests
+copying backend\tests\test_ordinary_chat_stream.py -> build\lib\backend\tests
+copying backend\tests\test_ordinary_deepseek_tls.py -> build\lib\backend\tests
+copying backend\tests\test_ordinary_output_budget.py -> build\lib\backend\tests
+copying backend\tests\test_ordinary_stream_integration.py -> build\lib\backend\tests
+copying backend\tests\test_ordinary_verification_fence.py -> build\lib\backend\tests
+copying backend\tests\test_original_header_boundary.py -> build\lib\backend\tests
+copying backend\tests\test_output_capability.py -> build\lib\backend\tests
+copying backend\tests\test_output_probe_failure.py -> build\lib\backend\tests
+copying backend\tests\test_p2_document_processing.py -> build\lib\backend\tests
+copying backend\tests\test_p2_pdf_offline_closure.py -> build\lib\backend\tests
+copying backend\tests\test_p3_adaptive_chunking.py -> build\lib\backend\tests
+copying backend\tests\test_p3_chunking_review_fixes.py -> build\lib\backend\tests
+copying backend\tests\test_p4_bge_admission.py -> build\lib\backend\tests
+copying backend\tests\test_p4_hybrid_once.py -> build\lib\backend\tests
+copying backend\tests\test_p4_hybrid_postgres.py -> build\lib\backend\tests
+copying backend\tests\test_p4_preflight_postgres.py -> build\lib\backend\tests
+copying backend\tests\test_p4_rag_pipeline.py -> build\lib\backend\tests
+copying backend\tests\test_p4_rag_postgres.py -> build\lib\backend\tests
+copying backend\tests\test_p4_rerank_diagnostics.py -> build\lib\backend\tests
+copying backend\tests\test_p4_rerank_integrated.py -> build\lib\backend\tests
+copying backend\tests\test_p4_rerank_once.py -> build\lib\backend\tests
+copying backend\tests\test_p55a_lifecycle_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p55b21_api_contract.py -> build\lib\backend\tests
+copying backend\tests\test_p55b21_global_scoped.py -> build\lib\backend\tests
+copying backend\tests\test_p55b21_global_scoped_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p55b2_memory.py -> build\lib\backend\tests
+copying backend\tests\test_p55b2_memory_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p55b_context_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p55b_context_window.py -> build\lib\backend\tests
+copying backend\tests\test_p55c_query_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p55c_query_understand.py -> build\lib\backend\tests
+copying backend\tests\test_p55c_scope_checkpoint_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p55c_stage0.py -> build\lib\backend\tests
+copying backend\tests\test_p55d_retrieval.py -> build\lib\backend\tests
+copying backend\tests\test_p55d_retrieval_postgres.py -> build\lib\backend\tests
+copying backend\tests\test_p55d_smart_reading.py -> build\lib\backend\tests
+copying backend\tests\test_p55e_memory_vector.py -> build\lib\backend\tests
+copying backend\tests\test_p55e_memory_vector_integration.py -> build\lib\backend\tests
+copying backend\tests\test_p5_router_boundaries.py -> build\lib\backend\tests
+copying backend\tests\test_p5_router_features.py -> build\lib\backend\tests
+copying backend\tests\test_p5_router_generation.py -> build\lib\backend\tests
+copying backend\tests\test_p5_router_replay.py -> build\lib\backend\tests
+copying backend\tests\test_parsers.py -> build\lib\backend\tests
+copying backend\tests\test_pdf_image_isolation.py -> build\lib\backend\tests
+copying backend\tests\test_pdf_ocr.py -> build\lib\backend\tests
+copying backend\tests\test_pdf_smask_placements.py -> build\lib\backend\tests
+copying backend\tests\test_pdf_table_evidence.py -> build\lib\backend\tests
+copying backend\tests\test_postgres_chunk_strategy.py -> build\lib\backend\tests
+copying backend\tests\test_postgres_ingestion_leases.py -> build\lib\backend\tests
+copying backend\tests\test_postgres_ocr_lineage.py -> build\lib\backend\tests
+copying backend\tests\test_postgres_run_terminal_states.py -> build\lib\backend\tests
+copying backend\tests\test_postgres_scope_boundaries.py -> build\lib\backend\tests
+copying backend\tests\test_prepared_image_layout.py -> build\lib\backend\tests
+copying backend\tests\test_prepared_ingestion.py -> build\lib\backend\tests
+copying backend\tests\test_pretransport_budget.py -> build\lib\backend\tests
+copying backend\tests\test_preview_contract.py -> build\lib\backend\tests
+copying backend\tests\test_privacy_configuration_answer.py -> build\lib\backend\tests
+copying backend\tests\test_product_gap_contract.py -> build\lib\backend\tests
+copying backend\tests\test_product_gateway.py -> build\lib\backend\tests
+copying backend\tests\test_product_receipt_repair.py -> build\lib\backend\tests
+copying backend\tests\test_product_wire_anchor.py -> build\lib\backend\tests
+copying backend\tests\test_quality_eval_schema.py -> build\lib\backend\tests
+copying backend\tests\test_quality_gate.py -> build\lib\backend\tests
+copying backend\tests\test_query_coverage.py -> build\lib\backend\tests
+copying backend\tests\test_question_checklist.py -> build\lib\backend\tests
+copying backend\tests\test_question_checklist_prompt_replay.py -> build\lib\backend\tests
+copying backend\tests\test_quick_answer_language_prompt.py -> build\lib\backend\tests
+copying backend\tests\test_quick_chain_budget.py -> build\lib\backend\tests
+copying backend\tests\test_quick_chain_quality.py -> build\lib\backend\tests
+copying backend\tests\test_quick_citation_prompt.py -> build\lib\backend\tests
+copying backend\tests\test_quick_evidence_flow.py -> build\lib\backend\tests
+copying backend\tests\test_rag_validation_scope.py -> build\lib\backend\tests
+copying backend\tests\test_reference_profile.py -> build\lib\backend\tests
+copying backend\tests\test_release_preflight.py -> build\lib\backend\tests
+copying backend\tests\test_restore_invariants.py -> build\lib\backend\tests
+copying backend\tests\test_retrieval_contract.py -> build\lib\backend\tests
+copying backend\tests\test_retrieval_execution_record.py -> build\lib\backend\tests
+copying backend\tests\test_retrieval_provenance.py -> build\lib\backend\tests
+copying backend\tests\test_retrieval_routing.py -> build\lib\backend\tests
+copying backend\tests\test_retrieval_terminal.py -> build\lib\backend\tests
+copying backend\tests\test_reviewed_immutable_batch.py -> build\lib\backend\tests
+copying backend\tests\test_reviewed_product_request.py -> build\lib\backend\tests
+copying backend\tests\test_runtime_readiness.py -> build\lib\backend\tests
+copying backend\tests\test_run_construction.py -> build\lib\backend\tests
+copying backend\tests\test_run_metrics.py -> build\lib\backend\tests
+copying backend\tests\test_run_presentation.py -> build\lib\backend\tests
+copying backend\tests\test_run_progress.py -> build\lib\backend\tests
+copying backend\tests\test_schema_check.py -> build\lib\backend\tests
+copying backend\tests\test_scope.py -> build\lib\backend\tests
+copying backend\tests\test_scope_and_graph_routes.py -> build\lib\backend\tests
+copying backend\tests\test_service_caption.py -> build\lib\backend\tests
+copying backend\tests\test_service_configuration.py -> build\lib\backend\tests
+copying backend\tests\test_service_usage.py -> build\lib\backend\tests
+copying backend\tests\test_siliconflow_xing_capacity.py -> build\lib\backend\tests
+copying backend\tests\test_smart_citation_replay.py -> build\lib\backend\tests
+copying backend\tests\test_smart_table_header_hint.py -> build\lib\backend\tests
+copying backend\tests\test_stable_run_requests.py -> build\lib\backend\tests
+copying backend\tests\test_static_pair_validation.py -> build\lib\backend\tests
+copying backend\tests\test_storage.py -> build\lib\backend\tests
+copying backend\tests\test_structured_answer_spacing.py -> build\lib\backend\tests
+copying backend\tests\test_structured_evidence.py -> build\lib\backend\tests
+copying backend\tests\test_table_header_hint.py -> build\lib\backend\tests
+copying backend\tests\test_targeted_merge_bound.py -> build\lib\backend\tests
+copying backend\tests\test_text_normalization.py -> build\lib\backend\tests
+copying backend\tests\test_user_model_settings.py -> build\lib\backend\tests
+copying backend\tests\test_v6_authority_dispatch.py -> build\lib\backend\tests
+copying backend\tests\test_v6_authority_durability.py -> build\lib\backend\tests
+copying backend\tests\test_v6_backend_meet.py -> build\lib\backend\tests
+copying backend\tests\test_v6_batch_operator.py -> build\lib\backend\tests
+copying backend\tests\test_v6_canonical_token_usage.py -> build\lib\backend\tests
+copying backend\tests\test_v6_capacity_profiles.py -> build\lib\backend\tests
+copying backend\tests\test_v6_embedding_batches.py -> build\lib\backend\tests
+copying backend\tests\test_v6_final_time_fence.py -> build\lib\backend\tests
+copying backend\tests\test_v6_free_model_mainpath.py -> build\lib\backend\tests
+copying backend\tests\test_v6_free_native_binding.py -> build\lib\backend\tests
+copying backend\tests\test_v6_generation_binding.py -> build\lib\backend\tests
+copying backend\tests\test_v6_ledger_authority.py -> build\lib\backend\tests
+copying backend\tests\test_v6_output_cap.py -> build\lib\backend\tests
+copying backend\tests\test_v6_owner_window_r3.py -> build\lib\backend\tests
+copying backend\tests\test_v6_public_qid_identity.py -> build\lib\backend\tests
+copying backend\tests\test_v6_text_capacity.py -> build\lib\backend\tests
+copying backend\tests\test_v6_token_grant.py -> build\lib\backend\tests
+copying backend\tests\test_v6_window_scope_closure.py -> build\lib\backend\tests
+copying backend\tests\test_v6_xing_calibration_once.py -> build\lib\backend\tests
+copying backend\tests\test_v6_xing_generation_binding.py -> build\lib\backend\tests
+copying backend\tests\test_validation_usd_budget.py -> build\lib\backend\tests
+copying backend\tests\test_version_activation.py -> build\lib\backend\tests
+copying backend\tests\test_version_source_contract.py -> build\lib\backend\tests
+copying backend\tests\test_xing_source_meeting.py -> build\lib\backend\tests
+copying backend\tests\test_xing_zero_reservation.py -> build\lib\backend\tests
+copying backend\tests\test_xlsx_resource_limits.py -> build\lib\backend\tests
+copying backend\tests\test_xlsx_storage_paths.py -> build\lib\backend\tests
+copying backend\tests\test_xlsx_table_evidence.py -> build\lib\backend\tests
+creating build\lib\backend\weknora_port
+copying backend\weknora_port\crypto.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\documents.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\document_profile.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\http_api.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\image_multimodal.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\memory_runtime.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\model_registry.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\runtime.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\service.py -> build\lib\backend\weknora_port
+copying backend\weknora_port\__init__.py -> build\lib\backend\weknora_port
+creating build\lib\backend\app\adapters
+copying backend\app\adapters\answer_audit.py -> build\lib\backend\app\adapters
+copying backend\app\adapters\langfuse_tracing.py -> build\lib\backend\app\adapters
+copying backend\app\adapters\office_preview.py -> build\lib\backend\app\adapters
+copying backend\app\adapters\redis_stream.py -> build\lib\backend\app\adapters
+copying backend\app\adapters\storage.py -> build\lib\backend\app\adapters
+copying backend\app\adapters\__init__.py -> build\lib\backend\app\adapters
+creating build\lib\backend\app\api
+copying backend\app\api\routes.py -> build\lib\backend\app\api
+copying backend\app\api\__init__.py -> build\lib\backend\app\api
+creating build\lib\backend\app\application
+copying backend\app\application\agent_ports.py -> build\lib\backend\app\application
+copying backend\app\application\answer_hardening.py -> build\lib\backend\app\application
+copying backend\app\application\answer_service.py -> build\lib\backend\app\application
+copying backend\app\application\answer_validation.py -> build\lib\backend\app\application
+copying backend\app\application\backup.py -> build\lib\backend\app\application
+copying backend\app\application\budget.py -> build\lib\backend\app\application
+copying backend\app\application\caption.py -> build\lib\backend\app\application
+copying backend\app\application\citations.py -> build\lib\backend\app\application
+copying backend\app\application\context_builder.py -> build\lib\backend\app\application
+copying backend\app\application\context_expansion.py -> build\lib\backend\app\application
+copying backend\app\application\context_window.py -> build\lib\backend\app\application
+copying backend\app\application\deepseek_gate_types.py -> build\lib\backend\app\application
+copying backend\app\application\evidence_accumulator.py -> build\lib\backend\app\application
+copying backend\app\application\evidence_quality.py -> build\lib\backend\app\application
+copying backend\app\application\execution_routing.py -> build\lib\backend\app\application
+copying backend\app\application\final_answer_commit.py -> build\lib\backend\app\application
+copying backend\app\application\follow_up.py -> build\lib\backend\app\application
+copying backend\app\application\graph.py -> build\lib\backend\app\application
+copying backend\app\application\ingestion.py -> build\lib\backend\app\application
+copying backend\app\application\knowledge_gateway.py -> build\lib\backend\app\application
+copying backend\app\application\knowledge_tools.py -> build\lib\backend\app\application
+copying backend\app\application\langchain_agent.py -> build\lib\backend\app\application
+copying backend\app\application\llm_rerank.py -> build\lib\backend\app\application
+copying backend\app\application\local_caption.py -> build\lib\backend\app\application
+copying backend\app\application\memory.py -> build\lib\backend\app\application
+copying backend\app\application\model_policy.py -> build\lib\backend\app\application
+copying backend\app\application\model_usage.py -> build\lib\backend\app\application
+copying backend\app\application\provider_usage.py -> build\lib\backend\app\application
+copying backend\app\application\quality.py -> build\lib\backend\app\application
+copying backend\app\application\query_expansion.py -> build\lib\backend\app\application
+copying backend\app\application\query_router.py -> build\lib\backend\app\application
+copying backend\app\application\query_understand.py -> build\lib\backend\app\application
+copying backend\app\application\question_checklist.py -> build\lib\backend\app\application
+copying backend\app\application\quick_chain.py -> build\lib\backend\app\application
+copying backend\app\application\rag_validation_scope.py -> build\lib\backend\app\application
+copying backend\app\application\retrieval.py -> build\lib\backend\app\application
+copying backend\app\application\retrieval_merge.py -> build\lib\backend\app\application
+copying backend\app\application\retrieval_policy.py -> build\lib\backend\app\application
+copying backend\app\application\retrieval_profile.py -> build\lib\backend\app\application
+copying backend\app\application\retrieval_provenance.py -> build\lib\backend\app\application
+copying backend\app\application\reviewed_grant60.py -> build\lib\backend\app\application
+copying backend\app\application\reviewed_immutable_batch.py -> build\lib\backend\app\application
+copying backend\app\application\reviewed_product_request.py -> build\lib\backend\app\application
+copying backend\app\application\router_feature_extraction.py -> build\lib\backend\app\application
+copying backend\app\application\rule_router_v1.py -> build\lib\backend\app\application
+copying backend\app\application\run_construction.py -> build\lib\backend\app\application
+copying backend\app\application\run_lifecycle.py -> build\lib\backend\app\application
+copying backend\app\application\run_metrics.py -> build\lib\backend\app\application
+copying backend\app\application\run_progress.py -> build\lib\backend\app\application
+copying backend\app\application\service_caption.py -> build\lib\backend\app\application
+copying backend\app\application\service_usage.py -> build\lib\backend\app\application
+copying backend\app\application\session_attempts.py -> build\lib\backend\app\application
+copying backend\app\application\static_pair_validation.py -> build\lib\backend\app\application
+copying backend\app\application\structured_evidence.py -> build\lib\backend\app\application
+copying backend\app\application\table_header_hint.py -> build\lib\backend\app\application
+copying backend\app\application\usd_pricing.py -> build\lib\backend\app\application
+copying backend\app\application\validation_usd_budget.py -> build\lib\backend\app\application
+copying backend\app\application\__init__.py -> build\lib\backend\app\application
+creating build\lib\backend\app\domain
+copying backend\app\domain\adaptive_chunking.py -> build\lib\backend\app\domain
+copying backend\app\domain\agent_policy.py -> build\lib\backend\app\domain
+copying backend\app\domain\bm25.py -> build\lib\backend\app\domain
+copying backend\app\domain\chunking.py -> build\lib\backend\app\domain
+copying backend\app\domain\embedding_identity.py -> build\lib\backend\app\domain
+copying backend\app\domain\errors.py -> build\lib\backend\app\domain
+copying backend\app\domain\evidence.py -> build\lib\backend\app\domain
+copying backend\app\domain\evidence_hint.py -> build\lib\backend\app\domain
+copying backend\app\domain\fusion.py -> build\lib\backend\app\domain
+copying backend\app\domain\graph.py -> build\lib\backend\app\domain
+copying backend\app\domain\models.py -> build\lib\backend\app\domain
+copying backend\app\domain\model_registry.py -> build\lib\backend\app\domain
+copying backend\app\domain\parsers.py -> build\lib\backend\app\domain
+copying backend\app\domain\scope.py -> build\lib\backend\app\domain
+copying backend\app\domain\table_evidence.py -> build\lib\backend\app\domain
+copying backend\app\domain\text_normalization.py -> build\lib\backend\app\domain
+copying backend\app\domain\version_source.py -> build\lib\backend\app\domain
+copying backend\app\domain\__init__.py -> build\lib\backend\app\domain
+creating build\lib\backend\app\ports
+copying backend\app\ports\context_budget.py -> build\lib\backend\app\ports
+copying backend\app\ports\deepseek_gate_types.py -> build\lib\backend\app\ports
+copying backend\app\ports\ingestion.py -> build\lib\backend\app\ports
+copying backend\app\ports\memory.py -> build\lib\backend\app\ports
+copying backend\app\ports\model_access.py -> build\lib\backend\app\ports
+copying backend\app\ports\model_usage.py -> build\lib\backend\app\ports
+copying backend\app\ports\office_preview.py -> build\lib\backend\app\ports
+copying backend\app\ports\ordinary_chat_stream.py -> build\lib\backend\app\ports
+copying backend\app\ports\output_capability.py -> build\lib\backend\app\ports
+copying backend\app\ports\persistence.py -> build\lib\backend\app\ports
+copying backend\app\ports\prepared_ingestion.py -> build\lib\backend\app\ports
+copying backend\app\ports\providers.py -> build\lib\backend\app\ports
+copying backend\app\ports\provider_send_claims.py -> build\lib\backend\app\ports
+copying backend\app\ports\query_understand.py -> build\lib\backend\app\ports
+copying backend\app\ports\ranking.py -> build\lib\backend\app\ports
+copying backend\app\ports\retrieval.py -> build\lib\backend\app\ports
+copying backend\app\ports\run_lifecycle.py -> build\lib\backend\app\ports
+copying backend\app\ports\run_presentation.py -> build\lib\backend\app\ports
+copying backend\app\ports\service_policy.py -> build\lib\backend\app\ports
+copying backend\app\ports\session_attempts.py -> build\lib\backend\app\ports
+copying backend\app\ports\stream_manager.py -> build\lib\backend\app\ports
+copying backend\app\ports\v6_token_budget.py -> build\lib\backend\app\ports
+copying backend\app\ports\xing_zero_reservation.py -> build\lib\backend\app\ports
+copying backend\app\ports\__init__.py -> build\lib\backend\app\ports
+creating build\lib\backend\app\workers
+copying backend\app\workers\ingestion.py -> build\lib\backend\app\workers
+copying backend\app\workers\__init__.py -> build\lib\backend\app\workers
+creating build\lib\backend\app\adapters\graph
+copying backend\app\adapters\graph\__init__.py -> build\lib\backend\app\adapters\graph
+creating build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\bge_tokenizer.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\cloud.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\deepseek.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\factory.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\ollama.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\ordinary_stream_capacity.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\runtime_readiness.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\service_capacity.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\service_configuration.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\service_deepseek_capacity.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\siliconflow_xing_capacity.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\usage.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\user_settings.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\v6_text_capacity.py -> build\lib\backend\app\adapters\models
+copying backend\app\adapters\models\__init__.py -> build\lib\backend\app\adapters\models
+creating build\lib\backend\app\adapters\ocr
+copying backend\app\adapters\ocr\__init__.py -> build\lib\backend\app\adapters\ocr
+creating build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\doc.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\image_ocr_layout.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\native.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\native_worker.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\pdf_tables.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\xls.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\xlsx.py -> build\lib\backend\app\adapters\parsers
+copying backend\app\adapters\parsers\__init__.py -> build\lib\backend\app\adapters\parsers
+creating build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\agent_repository.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\context_checkpoint.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\graph_repository.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\knowledge_repository.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\memory.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\query_understand.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\run_lifecycle.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\schema.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\service_usage.py -> build\lib\backend\app\adapters\postgres
+copying backend\app\adapters\postgres\__init__.py -> build\lib\backend\app\adapters\postgres
+creating build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\extraction.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\history.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\maintenance.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\maintenance_types.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\management.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\memory.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\prompts.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\ranking.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\topics.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\turns.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\types.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\unicode15.py -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\conversation\__init__.py -> build\lib\backend\weknora_port\conversation
+creating build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\context.py -> build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\coordinator.py -> build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\estimator.py -> build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\features.py -> build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\router.py -> build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\types.py -> build\lib\backend\weknora_port\generation
+copying backend\weknora_port\generation\__init__.py -> build\lib\backend\weknora_port\generation
+creating build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\core.py -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\upstream_docx_merge.py -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\upstream_docx_parser.py -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\upstream_markdown_helpers.py -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\upstream_pdf_parser.py -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\_docx_runtime_adapter.py -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\__init__.py -> build\lib\backend\weknora_port\ingestion
+creating build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\catalog.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\compat.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\native_request.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\native_response.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\provider.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\request.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\safe_network.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\signing.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\stream.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\transport.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\types.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\usage.py -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\__init__.py -> build\lib\backend\weknora_port\models
+creating build\lib\backend\weknora_port\references
+copying backend\weknora_port\references\decoder.py -> build\lib\backend\weknora_port\references
+copying backend\weknora_port\references\registry.py -> build\lib\backend\weknora_port\references
+copying backend\weknora_port\references\__init__.py -> build\lib\backend\weknora_port\references
+creating build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\context.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\filter_top_k.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\fusion.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\merge.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\pipeline.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\query.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\rerank.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\search.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\types.py -> build\lib\backend\weknora_port\retrieval
+copying backend\weknora_port\retrieval\__init__.py -> build\lib\backend\weknora_port\retrieval
+creating build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\chunks.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\configuration.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\configuration_migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\connections.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\document_profile_migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\generation.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\generation_migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\history.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\hybrid.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\indexing.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\knowledge.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\local_principal.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\memory.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\memory_queue.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\models.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\models_migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\postgres.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\send_gate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\send_gate_migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\turns.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\turns_migrate.py -> build\lib\backend\weknora_port\storage
+copying backend\weknora_port\storage\__init__.py -> build\lib\backend\weknora_port\storage
+creating build\lib\backend\weknora_port\streaming
+copying backend\weknora_port\streaming\events.py -> build\lib\backend\weknora_port\streaming
+copying backend\weknora_port\streaming\manager.py -> build\lib\backend\weknora_port\streaming
+copying backend\weknora_port\streaming\replay.py -> build\lib\backend\weknora_port\streaming
+copying backend\weknora_port\streaming\__init__.py -> build\lib\backend\weknora_port\streaming
+creating build\lib\backend\weknora_port\models\catalog_resources
+copying backend\weknora_port\models\catalog_resources\native_request_oracle.py -> build\lib\backend\weknora_port\models\catalog_resources
+creating build\lib\eval_center\tests
+copying eval_center\tests\test_cli.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_contracts.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_deployment_contract.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_development_data.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_end_to_end_privacy.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_gold.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_isolated_index.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_metrics.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_packager.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_paired_setup_retrieval_contract.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_benchmark_cli.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_data.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_ecs_host_identity.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_langfuse.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_paired_cli.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_paired_completion_status.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_paired_contract.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_paired_meet.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_paired_runtime.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_paired_state.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_r2_ecs_assembly.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_r3_owner_window.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_report.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_runner.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_selection.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_special_runtime.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_sync.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_public_window_preclaim.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_quality.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_query_embedding_cache.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_retrieval_replay.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_reviewed_dataset.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_runner.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_runner_statistics.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_runtime.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_scoring_mappers.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_server.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_source_metrics.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_store.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_telemetry.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_two_stage_admission.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_v2_import.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_v2_packager.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_verification.py -> build\lib\eval_center\tests
+copying eval_center\tests\test_verified_index.py -> build\lib\eval_center\tests
+running egg_info
+creating personal_rag.egg-info
+writing personal_rag.egg-info\PKG-INFO
+writing dependency_links to personal_rag.egg-info\dependency_links.txt
+writing requirements to personal_rag.egg-info\requires.txt
+writing top-level names to personal_rag.egg-info\top_level.txt
+writing manifest file 'personal_rag.egg-info\SOURCES.txt'
+reading manifest file 'personal_rag.egg-info\SOURCES.txt'
+writing manifest file 'personal_rag.egg-info\SOURCES.txt'
+creating build\lib\backend\weknora_port\profile_assets
+copying backend\weknora_port\profile_assets\generate_summary.yaml -> build\lib\backend\weknora_port\profile_assets
+copying backend\weknora_port\profile_assets\vlm_ocr_prompts.json -> build\lib\backend\weknora_port\profile_assets
+copying backend\weknora_port\conversation\NOTICE -> build\lib\backend\weknora_port\conversation
+copying backend\weknora_port\ingestion\LICENSE-THIRD-PARTY-WeKnora-MIT.txt -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\ingestion\requirements-parser-parity.txt -> build\lib\backend\weknora_port\ingestion
+copying backend\weknora_port\models\NOTICE -> build\lib\backend\weknora_port\models
+copying backend\weknora_port\models\catalog_resources\models.generated.json -> build\lib\backend\weknora_port\models\catalog_resources
+copying backend\weknora_port\models\catalog_resources\providers.generated.json -> build\lib\backend\weknora_port\models\catalog_resources
+copying backend\weknora_port\profile_assets\generate_summary.yaml -> build\lib\backend\weknora_port\profile_assets
+copying backend\weknora_port\profile_assets\vlm_ocr_prompts.json -> build\lib\backend\weknora_port\profile_assets
+creating build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\GOJIEBA_LICENSE -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\GO_LICENSE -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\hmm_model.utf8 -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\jieba.dict.utf8 -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\LICENSE -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\manifest.json -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\user.dict.utf8 -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+creating build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\001_retrieval.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\002_memory.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\003_common.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\004_generation.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\005_send_gate.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\006_configuration.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\007_turns.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\008_models.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\009_document_profile.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_common.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_configuration.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_document_profile.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_generation.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_memory.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_models.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_send_gate.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_turns.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\models\catalog_resources\models.generated.json -> build\lib\backend\weknora_port\models\catalog_resources
+copying backend\weknora_port\models\catalog_resources\providers.generated.json -> build\lib\backend\weknora_port\models\catalog_resources
+copying backend\weknora_port\retrieval\tokenizer_assets\GOJIEBA_LICENSE -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\GO_LICENSE -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\LICENSE -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\hmm_model.utf8 -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\jieba.dict.utf8 -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\manifest.json -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\retrieval\tokenizer_assets\user.dict.utf8 -> build\lib\backend\weknora_port\retrieval\tokenizer_assets
+copying backend\weknora_port\storage\migrations\001_retrieval.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\002_memory.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\003_common.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\004_generation.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\005_send_gate.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\006_configuration.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\007_turns.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\008_models.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\009_document_profile.sql -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_common.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_configuration.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_document_profile.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_generation.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_memory.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_models.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_send_gate.json -> build\lib\backend\weknora_port\storage\migrations
+copying backend\weknora_port\storage\migrations\source_manifest_turns.json -> build\lib\backend\weknora_port\storage\migrations
+warning: build_py: byte-compiling is disabled, skipping.
+
+installing to build\bdist.win-amd64\wheel
+running install
+running install_lib
+creating build\bdist.win-amd64\wheel
+creating build\bdist.win-amd64\wheel\backend
+creating build\bdist.win-amd64\wheel\backend\app
+creating build\bdist.win-amd64\wheel\backend\app\adapters
+copying build\lib\backend\app\adapters\answer_audit.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters
+creating build\bdist.win-amd64\wheel\backend\app\adapters\graph
+copying build\lib\backend\app\adapters\graph\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\graph
+copying build\lib\backend\app\adapters\langfuse_tracing.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters
+creating build\bdist.win-amd64\wheel\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\bge_tokenizer.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\cloud.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\deepseek.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\factory.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\ollama.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\ordinary_stream_capacity.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\runtime_readiness.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\service_capacity.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\service_configuration.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\service_deepseek_capacity.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\siliconflow_xing_capacity.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\usage.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\user_settings.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\v6_text_capacity.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+copying build\lib\backend\app\adapters\models\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\models
+creating build\bdist.win-amd64\wheel\backend\app\adapters\ocr
+copying build\lib\backend\app\adapters\ocr\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\ocr
+copying build\lib\backend\app\adapters\office_preview.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters
+creating build\bdist.win-amd64\wheel\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\doc.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\image_ocr_layout.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\native.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\native_worker.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\pdf_tables.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\xls.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\xlsx.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+copying build\lib\backend\app\adapters\parsers\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\parsers
+creating build\bdist.win-amd64\wheel\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\agent_repository.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\context_checkpoint.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\graph_repository.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\knowledge_repository.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\memory.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\query_understand.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\run_lifecycle.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\schema.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\service_usage.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\postgres\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters\postgres
+copying build\lib\backend\app\adapters\redis_stream.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters
+copying build\lib\backend\app\adapters\storage.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters
+copying build\lib\backend\app\adapters\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\adapters
+creating build\bdist.win-amd64\wheel\backend\app\api
+copying build\lib\backend\app\api\routes.py -> build\bdist.win-amd64\wheel\.\backend\app\api
+copying build\lib\backend\app\api\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\api
+creating build\bdist.win-amd64\wheel\backend\app\application
+copying build\lib\backend\app\application\agent_ports.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\answer_hardening.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\answer_service.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\answer_validation.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\backup.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\budget.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\caption.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\citations.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\context_builder.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\context_expansion.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\context_window.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\deepseek_gate_types.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\evidence_accumulator.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\evidence_quality.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\execution_routing.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\final_answer_commit.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\follow_up.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\graph.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\ingestion.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\knowledge_gateway.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\knowledge_tools.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\langchain_agent.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\llm_rerank.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\local_caption.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\memory.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\model_policy.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\model_usage.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\provider_usage.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\quality.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\query_expansion.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\query_router.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\query_understand.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\question_checklist.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\quick_chain.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\rag_validation_scope.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\retrieval.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\retrieval_merge.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\retrieval_policy.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\retrieval_profile.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\retrieval_provenance.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\reviewed_grant60.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\reviewed_immutable_batch.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\reviewed_product_request.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\router_feature_extraction.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\rule_router_v1.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\run_construction.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\run_lifecycle.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\run_metrics.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\run_progress.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\service_caption.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\service_usage.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\session_attempts.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\static_pair_validation.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\structured_evidence.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\table_header_hint.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\usd_pricing.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\validation_usd_budget.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\application\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\application
+copying build\lib\backend\app\bootstrap.py -> build\bdist.win-amd64\wheel\.\backend\app
+copying build\lib\backend\app\config.py -> build\bdist.win-amd64\wheel\.\backend\app
+creating build\bdist.win-amd64\wheel\backend\app\domain
+copying build\lib\backend\app\domain\adaptive_chunking.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\agent_policy.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\bm25.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\chunking.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\embedding_identity.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\errors.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\evidence.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\evidence_hint.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\fusion.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\graph.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\models.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\model_registry.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\parsers.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\scope.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\table_evidence.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\text_normalization.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\version_source.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\domain\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\domain
+copying build\lib\backend\app\env_loader.py -> build\bdist.win-amd64\wheel\.\backend\app
+copying build\lib\backend\app\main.py -> build\bdist.win-amd64\wheel\.\backend\app
+creating build\bdist.win-amd64\wheel\backend\app\ports
+copying build\lib\backend\app\ports\context_budget.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\deepseek_gate_types.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\ingestion.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\memory.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\model_access.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\model_usage.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\office_preview.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\ordinary_chat_stream.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\output_capability.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\persistence.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\prepared_ingestion.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\providers.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\provider_send_claims.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\query_understand.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\ranking.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\retrieval.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\run_lifecycle.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\run_presentation.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\service_policy.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\session_attempts.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\stream_manager.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\v6_token_budget.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\xing_zero_reservation.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+copying build\lib\backend\app\ports\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\ports
+creating build\bdist.win-amd64\wheel\backend\app\workers
+copying build\lib\backend\app\workers\ingestion.py -> build\bdist.win-amd64\wheel\.\backend\app\workers
+copying build\lib\backend\app\workers\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app\workers
+copying build\lib\backend\app\__init__.py -> build\bdist.win-amd64\wheel\.\backend\app
+creating build\bdist.win-amd64\wheel\backend\tests
+copying build\lib\backend\tests\conftest.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\isolated_target.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\p55a_simulated_lifecycle.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\pdf_closure_fixtures.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_agent_limits.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_agent_tool_allowlist.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_agent_trace_sse.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_answer_hardening.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_answer_service.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_answer_validation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_backend_env_loader.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_backup_manifest.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_bootstrap.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_bounded_history.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_budget_gate.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_c4_peer_run_target.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_cancellation_boundaries.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_cancel_route.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_caption_fact_guard.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_caption_provenance.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_chunking.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_chunk_strategy.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_citation_group_span.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_citation_resolution.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_clarification_persistence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_clean_slate_model_profiles.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_clean_slate_secret_config.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_config.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_container_injection.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_context_and_locators.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_context_expansion.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_context_neighbor_repository.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_context_pool_policy.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_conversation_scope.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_deepseek_policy_boundary.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_deepseek_safety.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_document_version_boundaries.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_document_version_route.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_egress_matrix.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_embedding_profile_isolation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_evidence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_evidence_accumulator.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_final_answer_commit.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_follow_up.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_fusion.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_global_memory_cloud_egress.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_grant60.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_graph_evidence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_graph_failure_isolation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_graph_scope_sql.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_health.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_hybrid_retrieval.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_image_ocr_layout.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ingestion_claiming.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ingestion_lease_config.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ingestion_recovery.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ingestion_retry_route.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ingestion_state_machine.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_inline_citation_group.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_knowledge_scope_boundaries.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_knowledge_tools.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_langchain_agent.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_langchain_quick_chain.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_layering_preview.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ledger_history_compatibility.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_legacy_doc.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_llm_rerank.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_local_caption_enricher.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_local_caption_gateway.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_message_run_link.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_model_policy.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_model_provider_contracts.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_multimodal_ingestion.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_native_release.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_native_release_review_regressions.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_native_table_evidence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ollama_usage.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ordinary_chat_stream.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ordinary_deepseek_tls.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ordinary_output_budget.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ordinary_stream_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_ordinary_verification_fence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_original_header_boundary.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_output_capability.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_output_probe_failure.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p2_document_processing.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p2_pdf_offline_closure.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p3_adaptive_chunking.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p3_chunking_review_fixes.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_bge_admission.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_hybrid_once.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_hybrid_postgres.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_preflight_postgres.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_rag_pipeline.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_rag_postgres.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_rerank_diagnostics.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_rerank_integrated.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p4_rerank_once.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55a_lifecycle_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b21_api_contract.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b21_global_scoped.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b21_global_scoped_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b2_memory.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b2_memory_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b_context_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55b_context_window.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55c_query_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55c_query_understand.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55c_scope_checkpoint_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55c_stage0.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55d_retrieval.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55d_retrieval_postgres.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55d_smart_reading.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55e_memory_vector.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p55e_memory_vector_integration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p5_router_boundaries.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p5_router_features.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p5_router_generation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_p5_router_replay.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_parsers.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_pdf_image_isolation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_pdf_ocr.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_pdf_smask_placements.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_pdf_table_evidence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_postgres_chunk_strategy.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_postgres_ingestion_leases.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_postgres_ocr_lineage.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_postgres_run_terminal_states.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_postgres_scope_boundaries.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_prepared_image_layout.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_prepared_ingestion.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_pretransport_budget.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_preview_contract.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_privacy_configuration_answer.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_product_gap_contract.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_product_gateway.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_product_receipt_repair.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_product_wire_anchor.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quality_eval_schema.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quality_gate.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_query_coverage.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_question_checklist.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_question_checklist_prompt_replay.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quick_answer_language_prompt.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quick_chain_budget.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quick_chain_quality.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quick_citation_prompt.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_quick_evidence_flow.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_rag_validation_scope.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_reference_profile.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_release_preflight.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_restore_invariants.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_retrieval_contract.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_retrieval_execution_record.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_retrieval_provenance.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_retrieval_routing.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_retrieval_terminal.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_reviewed_immutable_batch.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_reviewed_product_request.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_runtime_readiness.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_run_construction.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_run_metrics.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_run_presentation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_run_progress.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_schema_check.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_scope.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_scope_and_graph_routes.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_service_caption.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_service_configuration.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_service_usage.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_siliconflow_xing_capacity.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_smart_citation_replay.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_smart_table_header_hint.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_stable_run_requests.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_static_pair_validation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_storage.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_structured_answer_spacing.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_structured_evidence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_table_header_hint.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_targeted_merge_bound.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_text_normalization.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_user_model_settings.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_authority_dispatch.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_authority_durability.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_backend_meet.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_batch_operator.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_canonical_token_usage.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_capacity_profiles.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_embedding_batches.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_final_time_fence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_free_model_mainpath.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_free_native_binding.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_generation_binding.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_ledger_authority.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_output_cap.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_owner_window_r3.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_public_qid_identity.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_text_capacity.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_token_grant.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_window_scope_closure.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_xing_calibration_once.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_v6_xing_generation_binding.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_validation_usd_budget.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_version_activation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_version_source_contract.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_xing_source_meeting.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_xing_zero_reservation.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_xlsx_resource_limits.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_xlsx_storage_paths.py -> build\bdist.win-amd64\wheel\.\backend\tests
+copying build\lib\backend\tests\test_xlsx_table_evidence.py -> build\bdist.win-amd64\wheel\.\backend\tests
+creating build\bdist.win-amd64\wheel\backend\weknora_port
+creating build\bdist.win-amd64\wheel\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\extraction.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\history.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\maintenance.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\maintenance_types.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\management.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\memory.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\NOTICE -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\prompts.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\ranking.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\topics.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\turns.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\types.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\unicode15.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\conversation\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\conversation
+copying build\lib\backend\weknora_port\crypto.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+copying build\lib\backend\weknora_port\documents.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+copying build\lib\backend\weknora_port\document_profile.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+creating build\bdist.win-amd64\wheel\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\context.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\coordinator.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\estimator.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\features.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\router.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\types.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\generation\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\generation
+copying build\lib\backend\weknora_port\http_api.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+copying build\lib\backend\weknora_port\image_multimodal.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+creating build\bdist.win-amd64\wheel\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\core.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\LICENSE-THIRD-PARTY-WeKnora-MIT.txt -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\requirements-parser-parity.txt -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\upstream_docx_merge.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\upstream_docx_parser.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\upstream_markdown_helpers.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\upstream_pdf_parser.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\_docx_runtime_adapter.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\ingestion\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\ingestion
+copying build\lib\backend\weknora_port\memory_runtime.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+creating build\bdist.win-amd64\wheel\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\catalog.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+creating build\bdist.win-amd64\wheel\backend\weknora_port\models\catalog_resources
+copying build\lib\backend\weknora_port\models\catalog_resources\models.generated.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models\catalog_resources
+copying build\lib\backend\weknora_port\models\catalog_resources\native_request_oracle.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models\catalog_resources
+copying build\lib\backend\weknora_port\models\catalog_resources\providers.generated.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models\catalog_resources
+copying build\lib\backend\weknora_port\models\compat.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\native_request.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\native_response.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\NOTICE -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\provider.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\request.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\safe_network.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\signing.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\stream.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\transport.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\types.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\usage.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\models\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\models
+copying build\lib\backend\weknora_port\model_registry.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+creating build\bdist.win-amd64\wheel\backend\weknora_port\profile_assets
+copying build\lib\backend\weknora_port\profile_assets\generate_summary.yaml -> build\bdist.win-amd64\wheel\.\backend\weknora_port\profile_assets
+copying build\lib\backend\weknora_port\profile_assets\vlm_ocr_prompts.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\profile_assets
+creating build\bdist.win-amd64\wheel\backend\weknora_port\references
+copying build\lib\backend\weknora_port\references\decoder.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\references
+copying build\lib\backend\weknora_port\references\registry.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\references
+copying build\lib\backend\weknora_port\references\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\references
+creating build\bdist.win-amd64\wheel\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\context.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\filter_top_k.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\fusion.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\merge.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\pipeline.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\query.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\rerank.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\search.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+creating build\bdist.win-amd64\wheel\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\GOJIEBA_LICENSE -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\GO_LICENSE -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\hmm_model.utf8 -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\jieba.dict.utf8 -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\LICENSE -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\manifest.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\tokenizer_assets\user.dict.utf8 -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval\tokenizer_assets
+copying build\lib\backend\weknora_port\retrieval\types.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\retrieval\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\retrieval
+copying build\lib\backend\weknora_port\runtime.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+copying build\lib\backend\weknora_port\service.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+creating build\bdist.win-amd64\wheel\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\chunks.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\configuration.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\configuration_migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\connections.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\document_profile_migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\generation.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\generation_migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\history.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\hybrid.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\indexing.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\knowledge.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\local_principal.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\memory.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\memory_queue.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+creating build\bdist.win-amd64\wheel\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\001_retrieval.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\002_memory.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\003_common.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\004_generation.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\005_send_gate.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\006_configuration.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\007_turns.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\008_models.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\009_document_profile.sql -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_common.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_configuration.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_document_profile.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_generation.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_memory.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_models.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_send_gate.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\migrations\source_manifest_turns.json -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage\migrations
+copying build\lib\backend\weknora_port\storage\models.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\models_migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\postgres.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\send_gate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\send_gate_migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\turns.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\turns_migrate.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+copying build\lib\backend\weknora_port\storage\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\storage
+creating build\bdist.win-amd64\wheel\backend\weknora_port\streaming
+copying build\lib\backend\weknora_port\streaming\events.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\streaming
+copying build\lib\backend\weknora_port\streaming\manager.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\streaming
+copying build\lib\backend\weknora_port\streaming\replay.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\streaming
+copying build\lib\backend\weknora_port\streaming\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port\streaming
+copying build\lib\backend\weknora_port\__init__.py -> build\bdist.win-amd64\wheel\.\backend\weknora_port
+copying build\lib\backend\__init__.py -> build\bdist.win-amd64\wheel\.\backend
+creating build\bdist.win-amd64\wheel\eval_center
+copying build\lib\eval_center\build_reviewed_dataset.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\cli.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\contracts.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\contracts_v2.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\dataset.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\development_data.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\export_v2.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\gold.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\isolated_index.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\metrics.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\omni_contract.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\paired_preparation.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\paired_simulation.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\paired_state.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_benchmark_cli.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_data.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_langfuse.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_paired_reporting.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_report.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_runner.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_selection.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\public_sync.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\quality.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\query_embedding_cache.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\retrieval_replay.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\runner.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\runtime.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\scoring_mappers.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\server.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\source_metrics.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\special_public_data.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\store.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\telemetry.py -> build\bdist.win-amd64\wheel\.\eval_center
+creating build\bdist.win-amd64\wheel\eval_center\tests
+copying build\lib\eval_center\tests\test_cli.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_contracts.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_deployment_contract.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_development_data.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_end_to_end_privacy.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_gold.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_isolated_index.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_metrics.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_packager.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_paired_setup_retrieval_contract.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_benchmark_cli.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_data.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_ecs_host_identity.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_langfuse.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_paired_cli.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_paired_completion_status.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_paired_contract.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_paired_meet.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_paired_runtime.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_paired_state.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_r2_ecs_assembly.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_r3_owner_window.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_report.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_runner.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_selection.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_special_runtime.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_sync.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_public_window_preclaim.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_quality.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_query_embedding_cache.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_retrieval_replay.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_reviewed_dataset.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_runner.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_runner_statistics.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_runtime.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_scoring_mappers.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_server.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_source_metrics.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_store.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_telemetry.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_two_stage_admission.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_v2_import.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_v2_packager.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_verification.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\tests\test_verified_index.py -> build\bdist.win-amd64\wheel\.\eval_center\tests
+copying build\lib\eval_center\verification.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\verified_index.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\weknora_dataset_inventory.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\weknora_frozen_gold.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\weknora_paired.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\weknora_scoring.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\weknora_six_runner.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\weknora_source_packages.py -> build\bdist.win-amd64\wheel\.\eval_center
+copying build\lib\eval_center\__init__.py -> build\bdist.win-amd64\wheel\.\eval_center
+warning: install_lib: byte-compiling is disabled, skipping.
+
+running install_egg_info
+Copying personal_rag.egg-info to build\bdist.win-amd64\wheel\.\personal_rag-0.1.0-py3.13.egg-info
+running install_scripts
+creating build\bdist.win-amd64\wheel\personal_rag-0.1.0.dist-info\WHEEL
+creating 'E:\\RAG-Worktrees\\weknora-python-port-20261013\\var\\weknora-port\\p8-build\\dist-50fe8bd-raw-git-blobs\\.tmp-ywbueduu\\personal_rag-0.1.0-py3-none-any.whl' and adding 'build\\bdist.win-amd64\\wheel' to it
+adding 'backend/__init__.py'
+adding 'backend/app/__init__.py'
+adding 'backend/app/bootstrap.py'
+adding 'backend/app/config.py'
+adding 'backend/app/env_loader.py'
+adding 'backend/app/main.py'
+adding 'backend/app/adapters/__init__.py'
+adding 'backend/app/adapters/answer_audit.py'
+adding 'backend/app/adapters/langfuse_tracing.py'
+adding 'backend/app/adapters/office_preview.py'
+adding 'backend/app/adapters/redis_stream.py'
+adding 'backend/app/adapters/storage.py'
+adding 'backend/app/adapters/graph/__init__.py'
+adding 'backend/app/adapters/models/__init__.py'
+adding 'backend/app/adapters/models/bge_tokenizer.py'
+adding 'backend/app/adapters/models/cloud.py'
+adding 'backend/app/adapters/models/deepseek.py'
+adding 'backend/app/adapters/models/factory.py'
+adding 'backend/app/adapters/models/ollama.py'
+adding 'backend/app/adapters/models/ordinary_stream_capacity.py'
+adding 'backend/app/adapters/models/runtime_readiness.py'
+adding 'backend/app/adapters/models/service_capacity.py'
+adding 'backend/app/adapters/models/service_configuration.py'
+adding 'backend/app/adapters/models/service_deepseek_capacity.py'
+adding 'backend/app/adapters/models/siliconflow_xing_capacity.py'
+adding 'backend/app/adapters/models/usage.py'
+adding 'backend/app/adapters/models/user_settings.py'
+adding 'backend/app/adapters/models/v6_text_capacity.py'
+adding 'backend/app/adapters/ocr/__init__.py'
+adding 'backend/app/adapters/parsers/__init__.py'
+adding 'backend/app/adapters/parsers/doc.py'
+adding 'backend/app/adapters/parsers/image_ocr_layout.py'
+adding 'backend/app/adapters/parsers/native.py'
+adding 'backend/app/adapters/parsers/native_worker.py'
+adding 'backend/app/adapters/parsers/pdf_tables.py'
+adding 'backend/app/adapters/parsers/xls.py'
+adding 'backend/app/adapters/parsers/xlsx.py'
+adding 'backend/app/adapters/postgres/__init__.py'
+adding 'backend/app/adapters/postgres/agent_repository.py'
+adding 'backend/app/adapters/postgres/context_checkpoint.py'
+adding 'backend/app/adapters/postgres/graph_repository.py'
+adding 'backend/app/adapters/postgres/knowledge_repository.py'
+adding 'backend/app/adapters/postgres/memory.py'
+adding 'backend/app/adapters/postgres/query_understand.py'
+adding 'backend/app/adapters/postgres/run_lifecycle.py'
+adding 'backend/app/adapters/postgres/schema.py'
+adding 'backend/app/adapters/postgres/service_usage.py'
+adding 'backend/app/api/__init__.py'
+adding 'backend/app/api/routes.py'
+adding 'backend/app/application/__init__.py'
+adding 'backend/app/application/agent_ports.py'
+adding 'backend/app/application/answer_hardening.py'
+adding 'backend/app/application/answer_service.py'
+adding 'backend/app/application/answer_validation.py'
+adding 'backend/app/application/backup.py'
+adding 'backend/app/application/budget.py'
+adding 'backend/app/application/caption.py'
+adding 'backend/app/application/citations.py'
+adding 'backend/app/application/context_builder.py'
+adding 'backend/app/application/context_expansion.py'
+adding 'backend/app/application/context_window.py'
+adding 'backend/app/application/deepseek_gate_types.py'
+adding 'backend/app/application/evidence_accumulator.py'
+adding 'backend/app/application/evidence_quality.py'
+adding 'backend/app/application/execution_routing.py'
+adding 'backend/app/application/final_answer_commit.py'
+adding 'backend/app/application/follow_up.py'
+adding 'backend/app/application/graph.py'
+adding 'backend/app/application/ingestion.py'
+adding 'backend/app/application/knowledge_gateway.py'
+adding 'backend/app/application/knowledge_tools.py'
+adding 'backend/app/application/langchain_agent.py'
+adding 'backend/app/application/llm_rerank.py'
+adding 'backend/app/application/local_caption.py'
+adding 'backend/app/application/memory.py'
+adding 'backend/app/application/model_policy.py'
+adding 'backend/app/application/model_usage.py'
+adding 'backend/app/application/provider_usage.py'
+adding 'backend/app/application/quality.py'
+adding 'backend/app/application/query_expansion.py'
+adding 'backend/app/application/query_router.py'
+adding 'backend/app/application/query_understand.py'
+adding 'backend/app/application/question_checklist.py'
+adding 'backend/app/application/quick_chain.py'
+adding 'backend/app/application/rag_validation_scope.py'
+adding 'backend/app/application/retrieval.py'
+adding 'backend/app/application/retrieval_merge.py'
+adding 'backend/app/application/retrieval_policy.py'
+adding 'backend/app/application/retrieval_profile.py'
+adding 'backend/app/application/retrieval_provenance.py'
+adding 'backend/app/application/reviewed_grant60.py'
+adding 'backend/app/application/reviewed_immutable_batch.py'
+adding 'backend/app/application/reviewed_product_request.py'
+adding 'backend/app/application/router_feature_extraction.py'
+adding 'backend/app/application/rule_router_v1.py'
+adding 'backend/app/application/run_construction.py'
+adding 'backend/app/application/run_lifecycle.py'
+adding 'backend/app/application/run_metrics.py'
+adding 'backend/app/application/run_progress.py'
+adding 'backend/app/application/service_caption.py'
+adding 'backend/app/application/service_usage.py'
+adding 'backend/app/application/session_attempts.py'
+adding 'backend/app/application/static_pair_validation.py'
+adding 'backend/app/application/structured_evidence.py'
+adding 'backend/app/application/table_header_hint.py'
+adding 'backend/app/application/usd_pricing.py'
+adding 'backend/app/application/validation_usd_budget.py'
+adding 'backend/app/domain/__init__.py'
+adding 'backend/app/domain/adaptive_chunking.py'
+adding 'backend/app/domain/agent_policy.py'
+adding 'backend/app/domain/bm25.py'
+adding 'backend/app/domain/chunking.py'
+adding 'backend/app/domain/embedding_identity.py'
+adding 'backend/app/domain/errors.py'
+adding 'backend/app/domain/evidence.py'
+adding 'backend/app/domain/evidence_hint.py'
+adding 'backend/app/domain/fusion.py'
+adding 'backend/app/domain/graph.py'
+adding 'backend/app/domain/model_registry.py'
+adding 'backend/app/domain/models.py'
+adding 'backend/app/domain/parsers.py'
+adding 'backend/app/domain/scope.py'
+adding 'backend/app/domain/table_evidence.py'
+adding 'backend/app/domain/text_normalization.py'
+adding 'backend/app/domain/version_source.py'
+adding 'backend/app/ports/__init__.py'
+adding 'backend/app/ports/context_budget.py'
+adding 'backend/app/ports/deepseek_gate_types.py'
+adding 'backend/app/ports/ingestion.py'
+adding 'backend/app/ports/memory.py'
+adding 'backend/app/ports/model_access.py'
+adding 'backend/app/ports/model_usage.py'
+adding 'backend/app/ports/office_preview.py'
+adding 'backend/app/ports/ordinary_chat_stream.py'
+adding 'backend/app/ports/output_capability.py'
+adding 'backend/app/ports/persistence.py'
+adding 'backend/app/ports/prepared_ingestion.py'
+adding 'backend/app/ports/provider_send_claims.py'
+adding 'backend/app/ports/providers.py'
+adding 'backend/app/ports/query_understand.py'
+adding 'backend/app/ports/ranking.py'
+adding 'backend/app/ports/retrieval.py'
+adding 'backend/app/ports/run_lifecycle.py'
+adding 'backend/app/ports/run_presentation.py'
+adding 'backend/app/ports/service_policy.py'
+adding 'backend/app/ports/session_attempts.py'
+adding 'backend/app/ports/stream_manager.py'
+adding 'backend/app/ports/v6_token_budget.py'
+adding 'backend/app/ports/xing_zero_reservation.py'
+adding 'backend/app/workers/__init__.py'
+adding 'backend/app/workers/ingestion.py'
+adding 'backend/tests/conftest.py'
+adding 'backend/tests/isolated_target.py'
+adding 'backend/tests/p55a_simulated_lifecycle.py'
+adding 'backend/tests/pdf_closure_fixtures.py'
+adding 'backend/tests/test_agent_limits.py'
+adding 'backend/tests/test_agent_tool_allowlist.py'
+adding 'backend/tests/test_agent_trace_sse.py'
+adding 'backend/tests/test_answer_hardening.py'
+adding 'backend/tests/test_answer_service.py'
+adding 'backend/tests/test_answer_validation.py'
+adding 'backend/tests/test_backend_env_loader.py'
+adding 'backend/tests/test_backup_manifest.py'
+adding 'backend/tests/test_bootstrap.py'
+adding 'backend/tests/test_bounded_history.py'
+adding 'backend/tests/test_budget_gate.py'
+adding 'backend/tests/test_c4_peer_run_target.py'
+adding 'backend/tests/test_cancel_route.py'
+adding 'backend/tests/test_cancellation_boundaries.py'
+adding 'backend/tests/test_caption_fact_guard.py'
+adding 'backend/tests/test_caption_provenance.py'
+adding 'backend/tests/test_chunk_strategy.py'
+adding 'backend/tests/test_chunking.py'
+adding 'backend/tests/test_citation_group_span.py'
+adding 'backend/tests/test_citation_resolution.py'
+adding 'backend/tests/test_clarification_persistence.py'
+adding 'backend/tests/test_clean_slate_model_profiles.py'
+adding 'backend/tests/test_clean_slate_secret_config.py'
+adding 'backend/tests/test_config.py'
+adding 'backend/tests/test_container_injection.py'
+adding 'backend/tests/test_context_and_locators.py'
+adding 'backend/tests/test_context_expansion.py'
+adding 'backend/tests/test_context_neighbor_repository.py'
+adding 'backend/tests/test_context_pool_policy.py'
+adding 'backend/tests/test_conversation_scope.py'
+adding 'backend/tests/test_deepseek_policy_boundary.py'
+adding 'backend/tests/test_deepseek_safety.py'
+adding 'backend/tests/test_document_version_boundaries.py'
+adding 'backend/tests/test_document_version_route.py'
+adding 'backend/tests/test_egress_matrix.py'
+adding 'backend/tests/test_embedding_profile_isolation.py'
+adding 'backend/tests/test_evidence.py'
+adding 'backend/tests/test_evidence_accumulator.py'
+adding 'backend/tests/test_final_answer_commit.py'
+adding 'backend/tests/test_follow_up.py'
+adding 'backend/tests/test_fusion.py'
+adding 'backend/tests/test_global_memory_cloud_egress.py'
+adding 'backend/tests/test_grant60.py'
+adding 'backend/tests/test_graph_evidence.py'
+adding 'backend/tests/test_graph_failure_isolation.py'
+adding 'backend/tests/test_graph_scope_sql.py'
+adding 'backend/tests/test_health.py'
+adding 'backend/tests/test_hybrid_retrieval.py'
+adding 'backend/tests/test_image_ocr_layout.py'
+adding 'backend/tests/test_ingestion_claiming.py'
+adding 'backend/tests/test_ingestion_lease_config.py'
+adding 'backend/tests/test_ingestion_recovery.py'
+adding 'backend/tests/test_ingestion_retry_route.py'
+adding 'backend/tests/test_ingestion_state_machine.py'
+adding 'backend/tests/test_inline_citation_group.py'
+adding 'backend/tests/test_knowledge_scope_boundaries.py'
+adding 'backend/tests/test_knowledge_tools.py'
+adding 'backend/tests/test_langchain_agent.py'
+adding 'backend/tests/test_langchain_quick_chain.py'
+adding 'backend/tests/test_layering_preview.py'
+adding 'backend/tests/test_ledger_history_compatibility.py'
+adding 'backend/tests/test_legacy_doc.py'
+adding 'backend/tests/test_llm_rerank.py'
+adding 'backend/tests/test_local_caption_enricher.py'
+adding 'backend/tests/test_local_caption_gateway.py'
+adding 'backend/tests/test_message_run_link.py'
+adding 'backend/tests/test_model_policy.py'
+adding 'backend/tests/test_model_provider_contracts.py'
+adding 'backend/tests/test_multimodal_ingestion.py'
+adding 'backend/tests/test_native_release.py'
+adding 'backend/tests/test_native_release_review_regressions.py'
+adding 'backend/tests/test_native_table_evidence.py'
+adding 'backend/tests/test_ollama_usage.py'
+adding 'backend/tests/test_ordinary_chat_stream.py'
+adding 'backend/tests/test_ordinary_deepseek_tls.py'
+adding 'backend/tests/test_ordinary_output_budget.py'
+adding 'backend/tests/test_ordinary_stream_integration.py'
+adding 'backend/tests/test_ordinary_verification_fence.py'
+adding 'backend/tests/test_original_header_boundary.py'
+adding 'backend/tests/test_output_capability.py'
+adding 'backend/tests/test_output_probe_failure.py'
+adding 'backend/tests/test_p2_document_processing.py'
+adding 'backend/tests/test_p2_pdf_offline_closure.py'
+adding 'backend/tests/test_p3_adaptive_chunking.py'
+adding 'backend/tests/test_p3_chunking_review_fixes.py'
+adding 'backend/tests/test_p4_bge_admission.py'
+adding 'backend/tests/test_p4_hybrid_once.py'
+adding 'backend/tests/test_p4_hybrid_postgres.py'
+adding 'backend/tests/test_p4_preflight_postgres.py'
+adding 'backend/tests/test_p4_rag_pipeline.py'
+adding 'backend/tests/test_p4_rag_postgres.py'
+adding 'backend/tests/test_p4_rerank_diagnostics.py'
+adding 'backend/tests/test_p4_rerank_integrated.py'
+adding 'backend/tests/test_p4_rerank_once.py'
+adding 'backend/tests/test_p55a_lifecycle_integration.py'
+adding 'backend/tests/test_p55b21_api_contract.py'
+adding 'backend/tests/test_p55b21_global_scoped.py'
+adding 'backend/tests/test_p55b21_global_scoped_integration.py'
+adding 'backend/tests/test_p55b2_memory.py'
+adding 'backend/tests/test_p55b2_memory_integration.py'
+adding 'backend/tests/test_p55b_context_integration.py'
+adding 'backend/tests/test_p55b_context_window.py'
+adding 'backend/tests/test_p55c_query_integration.py'
+adding 'backend/tests/test_p55c_query_understand.py'
+adding 'backend/tests/test_p55c_scope_checkpoint_integration.py'
+adding 'backend/tests/test_p55c_stage0.py'
+adding 'backend/tests/test_p55d_retrieval.py'
+adding 'backend/tests/test_p55d_retrieval_postgres.py'
+adding 'backend/tests/test_p55d_smart_reading.py'
+adding 'backend/tests/test_p55e_memory_vector.py'
+adding 'backend/tests/test_p55e_memory_vector_integration.py'
+adding 'backend/tests/test_p5_router_boundaries.py'
+adding 'backend/tests/test_p5_router_features.py'
+adding 'backend/tests/test_p5_router_generation.py'
+adding 'backend/tests/test_p5_router_replay.py'
+adding 'backend/tests/test_parsers.py'
+adding 'backend/tests/test_pdf_image_isolation.py'
+adding 'backend/tests/test_pdf_ocr.py'
+adding 'backend/tests/test_pdf_smask_placements.py'
+adding 'backend/tests/test_pdf_table_evidence.py'
+adding 'backend/tests/test_postgres_chunk_strategy.py'
+adding 'backend/tests/test_postgres_ingestion_leases.py'
+adding 'backend/tests/test_postgres_ocr_lineage.py'
+adding 'backend/tests/test_postgres_run_terminal_states.py'
+adding 'backend/tests/test_postgres_scope_boundaries.py'
+adding 'backend/tests/test_prepared_image_layout.py'
+adding 'backend/tests/test_prepared_ingestion.py'
+adding 'backend/tests/test_pretransport_budget.py'
+adding 'backend/tests/test_preview_contract.py'
+adding 'backend/tests/test_privacy_configuration_answer.py'
+adding 'backend/tests/test_product_gap_contract.py'
+adding 'backend/tests/test_product_gateway.py'
+adding 'backend/tests/test_product_receipt_repair.py'
+adding 'backend/tests/test_product_wire_anchor.py'
+adding 'backend/tests/test_quality_eval_schema.py'
+adding 'backend/tests/test_quality_gate.py'
+adding 'backend/tests/test_query_coverage.py'
+adding 'backend/tests/test_question_checklist.py'
+adding 'backend/tests/test_question_checklist_prompt_replay.py'
+adding 'backend/tests/test_quick_answer_language_prompt.py'
+adding 'backend/tests/test_quick_chain_budget.py'
+adding 'backend/tests/test_quick_chain_quality.py'
+adding 'backend/tests/test_quick_citation_prompt.py'
+adding 'backend/tests/test_quick_evidence_flow.py'
+adding 'backend/tests/test_rag_validation_scope.py'
+adding 'backend/tests/test_reference_profile.py'
+adding 'backend/tests/test_release_preflight.py'
+adding 'backend/tests/test_restore_invariants.py'
+adding 'backend/tests/test_retrieval_contract.py'
+adding 'backend/tests/test_retrieval_execution_record.py'
+adding 'backend/tests/test_retrieval_provenance.py'
+adding 'backend/tests/test_retrieval_routing.py'
+adding 'backend/tests/test_retrieval_terminal.py'
+adding 'backend/tests/test_reviewed_immutable_batch.py'
+adding 'backend/tests/test_reviewed_product_request.py'
+adding 'backend/tests/test_run_construction.py'
+adding 'backend/tests/test_run_metrics.py'
+adding 'backend/tests/test_run_presentation.py'
+adding 'backend/tests/test_run_progress.py'
+adding 'backend/tests/test_runtime_readiness.py'
+adding 'backend/tests/test_schema_check.py'
+adding 'backend/tests/test_scope.py'
+adding 'backend/tests/test_scope_and_graph_routes.py'
+adding 'backend/tests/test_service_caption.py'
+adding 'backend/tests/test_service_configuration.py'
+adding 'backend/tests/test_service_usage.py'
+adding 'backend/tests/test_siliconflow_xing_capacity.py'
+adding 'backend/tests/test_smart_citation_replay.py'
+adding 'backend/tests/test_smart_table_header_hint.py'
+adding 'backend/tests/test_stable_run_requests.py'
+adding 'backend/tests/test_static_pair_validation.py'
+adding 'backend/tests/test_storage.py'
+adding 'backend/tests/test_structured_answer_spacing.py'
+adding 'backend/tests/test_structured_evidence.py'
+adding 'backend/tests/test_table_header_hint.py'
+adding 'backend/tests/test_targeted_merge_bound.py'
+adding 'backend/tests/test_text_normalization.py'
+adding 'backend/tests/test_user_model_settings.py'
+adding 'backend/tests/test_v6_authority_dispatch.py'
+adding 'backend/tests/test_v6_authority_durability.py'
+adding 'backend/tests/test_v6_backend_meet.py'
+adding 'backend/tests/test_v6_batch_operator.py'
+adding 'backend/tests/test_v6_canonical_token_usage.py'
+adding 'backend/tests/test_v6_capacity_profiles.py'
+adding 'backend/tests/test_v6_embedding_batches.py'
+adding 'backend/tests/test_v6_final_time_fence.py'
+adding 'backend/tests/test_v6_free_model_mainpath.py'
+adding 'backend/tests/test_v6_free_native_binding.py'
+adding 'backend/tests/test_v6_generation_binding.py'
+adding 'backend/tests/test_v6_ledger_authority.py'
+adding 'backend/tests/test_v6_output_cap.py'
+adding 'backend/tests/test_v6_owner_window_r3.py'
+adding 'backend/tests/test_v6_public_qid_identity.py'
+adding 'backend/tests/test_v6_text_capacity.py'
+adding 'backend/tests/test_v6_token_grant.py'
+adding 'backend/tests/test_v6_window_scope_closure.py'
+adding 'backend/tests/test_v6_xing_calibration_once.py'
+adding 'backend/tests/test_v6_xing_generation_binding.py'
+adding 'backend/tests/test_validation_usd_budget.py'
+adding 'backend/tests/test_version_activation.py'
+adding 'backend/tests/test_version_source_contract.py'
+adding 'backend/tests/test_xing_source_meeting.py'
+adding 'backend/tests/test_xing_zero_reservation.py'
+adding 'backend/tests/test_xlsx_resource_limits.py'
+adding 'backend/tests/test_xlsx_storage_paths.py'
+adding 'backend/tests/test_xlsx_table_evidence.py'
+adding 'backend/weknora_port/__init__.py'
+adding 'backend/weknora_port/crypto.py'
+adding 'backend/weknora_port/document_profile.py'
+adding 'backend/weknora_port/documents.py'
+adding 'backend/weknora_port/http_api.py'
+adding 'backend/weknora_port/image_multimodal.py'
+adding 'backend/weknora_port/memory_runtime.py'
+adding 'backend/weknora_port/model_registry.py'
+adding 'backend/weknora_port/runtime.py'
+adding 'backend/weknora_port/service.py'
+adding 'backend/weknora_port/conversation/NOTICE'
+adding 'backend/weknora_port/conversation/__init__.py'
+adding 'backend/weknora_port/conversation/extraction.py'
+adding 'backend/weknora_port/conversation/history.py'
+adding 'backend/weknora_port/conversation/maintenance.py'
+adding 'backend/weknora_port/conversation/maintenance_types.py'
+adding 'backend/weknora_port/conversation/management.py'
+adding 'backend/weknora_port/conversation/memory.py'
+adding 'backend/weknora_port/conversation/prompts.py'
+adding 'backend/weknora_port/conversation/ranking.py'
+adding 'backend/weknora_port/conversation/topics.py'
+adding 'backend/weknora_port/conversation/turns.py'
+adding 'backend/weknora_port/conversation/types.py'
+adding 'backend/weknora_port/conversation/unicode15.py'
+adding 'backend/weknora_port/generation/__init__.py'
+adding 'backend/weknora_port/generation/context.py'
+adding 'backend/weknora_port/generation/coordinator.py'
+adding 'backend/weknora_port/generation/estimator.py'
+adding 'backend/weknora_port/generation/features.py'
+adding 'backend/weknora_port/generation/router.py'
+adding 'backend/weknora_port/generation/types.py'
+adding 'backend/weknora_port/ingestion/LICENSE-THIRD-PARTY-WeKnora-MIT.txt'
+adding 'backend/weknora_port/ingestion/__init__.py'
+adding 'backend/weknora_port/ingestion/_docx_runtime_adapter.py'
+adding 'backend/weknora_port/ingestion/core.py'
+adding 'backend/weknora_port/ingestion/requirements-parser-parity.txt'
+adding 'backend/weknora_port/ingestion/upstream_docx_merge.py'
+adding 'backend/weknora_port/ingestion/upstream_docx_parser.py'
+adding 'backend/weknora_port/ingestion/upstream_markdown_helpers.py'
+adding 'backend/weknora_port/ingestion/upstream_pdf_parser.py'
+adding 'backend/weknora_port/models/NOTICE'
+adding 'backend/weknora_port/models/__init__.py'
+adding 'backend/weknora_port/models/catalog.py'
+adding 'backend/weknora_port/models/compat.py'
+adding 'backend/weknora_port/models/native_request.py'
+adding 'backend/weknora_port/models/native_response.py'
+adding 'backend/weknora_port/models/provider.py'
+adding 'backend/weknora_port/models/request.py'
+adding 'backend/weknora_port/models/safe_network.py'
+adding 'backend/weknora_port/models/signing.py'
+adding 'backend/weknora_port/models/stream.py'
+adding 'backend/weknora_port/models/transport.py'
+adding 'backend/weknora_port/models/types.py'
+adding 'backend/weknora_port/models/usage.py'
+adding 'backend/weknora_port/models/catalog_resources/models.generated.json'
+adding 'backend/weknora_port/models/catalog_resources/native_request_oracle.py'
+adding 'backend/weknora_port/models/catalog_resources/providers.generated.json'
+adding 'backend/weknora_port/profile_assets/generate_summary.yaml'
+adding 'backend/weknora_port/profile_assets/vlm_ocr_prompts.json'
+adding 'backend/weknora_port/references/__init__.py'
+adding 'backend/weknora_port/references/decoder.py'
+adding 'backend/weknora_port/references/registry.py'
+adding 'backend/weknora_port/retrieval/__init__.py'
+adding 'backend/weknora_port/retrieval/context.py'
+adding 'backend/weknora_port/retrieval/filter_top_k.py'
+adding 'backend/weknora_port/retrieval/fusion.py'
+adding 'backend/weknora_port/retrieval/merge.py'
+adding 'backend/weknora_port/retrieval/pipeline.py'
+adding 'backend/weknora_port/retrieval/query.py'
+adding 'backend/weknora_port/retrieval/rerank.py'
+adding 'backend/weknora_port/retrieval/search.py'
+adding 'backend/weknora_port/retrieval/types.py'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/GOJIEBA_LICENSE'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/GO_LICENSE'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/LICENSE'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/hmm_model.utf8'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/jieba.dict.utf8'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/manifest.json'
+adding 'backend/weknora_port/retrieval/tokenizer_assets/user.dict.utf8'
+adding 'backend/weknora_port/storage/__init__.py'
+adding 'backend/weknora_port/storage/chunks.py'
+adding 'backend/weknora_port/storage/configuration.py'
+adding 'backend/weknora_port/storage/configuration_migrate.py'
+adding 'backend/weknora_port/storage/connections.py'
+adding 'backend/weknora_port/storage/document_profile_migrate.py'
+adding 'backend/weknora_port/storage/generation.py'
+adding 'backend/weknora_port/storage/generation_migrate.py'
+adding 'backend/weknora_port/storage/history.py'
+adding 'backend/weknora_port/storage/hybrid.py'
+adding 'backend/weknora_port/storage/indexing.py'
+adding 'backend/weknora_port/storage/knowledge.py'
+adding 'backend/weknora_port/storage/local_principal.py'
+adding 'backend/weknora_port/storage/memory.py'
+adding 'backend/weknora_port/storage/memory_queue.py'
+adding 'backend/weknora_port/storage/migrate.py'
+adding 'backend/weknora_port/storage/models.py'
+adding 'backend/weknora_port/storage/models_migrate.py'
+adding 'backend/weknora_port/storage/postgres.py'
+adding 'backend/weknora_port/storage/send_gate.py'
+adding 'backend/weknora_port/storage/send_gate_migrate.py'
+adding 'backend/weknora_port/storage/turns.py'
+adding 'backend/weknora_port/storage/turns_migrate.py'
+adding 'backend/weknora_port/storage/migrations/001_retrieval.sql'
+adding 'backend/weknora_port/storage/migrations/002_memory.sql'
+adding 'backend/weknora_port/storage/migrations/003_common.sql'
+adding 'backend/weknora_port/storage/migrations/004_generation.sql'
+adding 'backend/weknora_port/storage/migrations/005_send_gate.sql'
+adding 'backend/weknora_port/storage/migrations/006_configuration.sql'
+adding 'backend/weknora_port/storage/migrations/007_turns.sql'
+adding 'backend/weknora_port/storage/migrations/008_models.sql'
+adding 'backend/weknora_port/storage/migrations/009_document_profile.sql'
+adding 'backend/weknora_port/storage/migrations/source_manifest.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_common.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_configuration.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_document_profile.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_generation.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_memory.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_models.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_send_gate.json'
+adding 'backend/weknora_port/storage/migrations/source_manifest_turns.json'
+adding 'backend/weknora_port/streaming/__init__.py'
+adding 'backend/weknora_port/streaming/events.py'
+adding 'backend/weknora_port/streaming/manager.py'
+adding 'backend/weknora_port/streaming/replay.py'
+adding 'eval_center/__init__.py'
+adding 'eval_center/build_reviewed_dataset.py'
+adding 'eval_center/cli.py'
+adding 'eval_center/contracts.py'
+adding 'eval_center/contracts_v2.py'
+adding 'eval_center/dataset.py'
+adding 'eval_center/development_data.py'
+adding 'eval_center/export_v2.py'
+adding 'eval_center/gold.py'
+adding 'eval_center/isolated_index.py'
+adding 'eval_center/metrics.py'
+adding 'eval_center/omni_contract.py'
+adding 'eval_center/paired_preparation.py'
+adding 'eval_center/paired_simulation.py'
+adding 'eval_center/paired_state.py'
+adding 'eval_center/public_benchmark_cli.py'
+adding 'eval_center/public_data.py'
+adding 'eval_center/public_langfuse.py'
+adding 'eval_center/public_paired_reporting.py'
+adding 'eval_center/public_report.py'
+adding 'eval_center/public_runner.py'
+adding 'eval_center/public_selection.py'
+adding 'eval_center/public_sync.py'
+adding 'eval_center/quality.py'
+adding 'eval_center/query_embedding_cache.py'
+adding 'eval_center/retrieval_replay.py'
+adding 'eval_center/runner.py'
+adding 'eval_center/runtime.py'
+adding 'eval_center/scoring_mappers.py'
+adding 'eval_center/server.py'
+adding 'eval_center/source_metrics.py'
+adding 'eval_center/special_public_data.py'
+adding 'eval_center/store.py'
+adding 'eval_center/telemetry.py'
+adding 'eval_center/verification.py'
+adding 'eval_center/verified_index.py'
+adding 'eval_center/weknora_dataset_inventory.py'
+adding 'eval_center/weknora_frozen_gold.py'
+adding 'eval_center/weknora_paired.py'
+adding 'eval_center/weknora_scoring.py'
+adding 'eval_center/weknora_six_runner.py'
+adding 'eval_center/weknora_source_packages.py'
+adding 'eval_center/tests/test_cli.py'
+adding 'eval_center/tests/test_contracts.py'
+adding 'eval_center/tests/test_deployment_contract.py'
+adding 'eval_center/tests/test_development_data.py'
+adding 'eval_center/tests/test_end_to_end_privacy.py'
+adding 'eval_center/tests/test_gold.py'
+adding 'eval_center/tests/test_isolated_index.py'
+adding 'eval_center/tests/test_metrics.py'
+adding 'eval_center/tests/test_packager.py'
+adding 'eval_center/tests/test_paired_setup_retrieval_contract.py'
+adding 'eval_center/tests/test_public_benchmark_cli.py'
+adding 'eval_center/tests/test_public_data.py'
+adding 'eval_center/tests/test_public_ecs_host_identity.py'
+adding 'eval_center/tests/test_public_langfuse.py'
+adding 'eval_center/tests/test_public_paired_cli.py'
+adding 'eval_center/tests/test_public_paired_completion_status.py'
+adding 'eval_center/tests/test_public_paired_contract.py'
+adding 'eval_center/tests/test_public_paired_meet.py'
+adding 'eval_center/tests/test_public_paired_runtime.py'
+adding 'eval_center/tests/test_public_paired_state.py'
+adding 'eval_center/tests/test_public_r2_ecs_assembly.py'
+adding 'eval_center/tests/test_public_r3_owner_window.py'
+adding 'eval_center/tests/test_public_report.py'
+adding 'eval_center/tests/test_public_runner.py'
+adding 'eval_center/tests/test_public_selection.py'
+adding 'eval_center/tests/test_public_special_runtime.py'
+adding 'eval_center/tests/test_public_sync.py'
+adding 'eval_center/tests/test_public_window_preclaim.py'
+adding 'eval_center/tests/test_quality.py'
+adding 'eval_center/tests/test_query_embedding_cache.py'
+adding 'eval_center/tests/test_retrieval_replay.py'
+adding 'eval_center/tests/test_reviewed_dataset.py'
+adding 'eval_center/tests/test_runner.py'
+adding 'eval_center/tests/test_runner_statistics.py'
+adding 'eval_center/tests/test_runtime.py'
+adding 'eval_center/tests/test_scoring_mappers.py'
+adding 'eval_center/tests/test_server.py'
+adding 'eval_center/tests/test_source_metrics.py'
+adding 'eval_center/tests/test_store.py'
+adding 'eval_center/tests/test_telemetry.py'
+adding 'eval_center/tests/test_two_stage_admission.py'
+adding 'eval_center/tests/test_v2_import.py'
+adding 'eval_center/tests/test_v2_packager.py'
+adding 'eval_center/tests/test_verification.py'
+adding 'eval_center/tests/test_verified_index.py'
+adding 'personal_rag-0.1.0.dist-info/METADATA'
+adding 'personal_rag-0.1.0.dist-info/WHEEL'
+adding 'personal_rag-0.1.0.dist-info/top_level.txt'
+adding 'personal_rag-0.1.0.dist-info/RECORD'
+removing build\bdist.win-amd64\wheel
+personal_rag-0.1.0-py3-none-any.whl

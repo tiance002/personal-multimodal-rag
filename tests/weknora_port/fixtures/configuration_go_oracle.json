@@ -1,0 +1,180 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "exit_code": 0,
+  "source_sha256": {
+    "config.go": "cd0bbf0af74c9e33826a4c6079d905ef1eeea62e41601b78f07a14c057b7e43b",
+    "query_understand.go": "4b30c67f6b59bcd74c6cba4bca1c6a5ea0a6327e7a04fa8fd587870864b86e63",
+    "context_helpers.go": "b043c03d60b4f02332024a6cf150a8a749053f1b6a4510e8d9c5d2600766f300",
+    "language.go": "79c649310ef3142548020e25a8012533dfdacf93dbb2d7e3f992f43b4cdf6914",
+    "api_types.go": "7f381c8198f6145ad363e3a59aaa06a3757da5e1e3bcda91bc92641140cfb365",
+    "session_qa_helpers.go": "daac1e03b819763bc6fc5a72a3077c5edc2466637ee2ebd95d1cfdb00841455d"
+  },
+  "scope": "Exact fixed loader/FindTemplate/selectModel/buildPrompts/intent/locale/reasoning functions. DTO/model lookup/logger/background and deterministic placeholder seams; not full Go engine or Agent execution.",
+  "rows": [
+    {
+      "input": "rw",
+      "kind": "startup",
+      "output": {
+        "context": "CONTEXT {{query}}",
+        "intents": {
+          "greeting": "GLOBAL {{language}}"
+        },
+        "prompt": "FINAL {{language}}",
+        "system": "REWRITE {{language}} {{conversation}}",
+        "user": "USER {{query}}"
+      }
+    },
+    {
+      "input": "missing",
+      "kind": "startup",
+      "output": {
+        "context": "CONTEXT {{query}}",
+        "intents": {
+          "greeting": "GLOBAL {{language}}"
+        },
+        "prompt": "FINAL {{language}}",
+        "system": "SAVED",
+        "user": "USER SAVED"
+      }
+    },
+    {
+      "input": "same",
+      "kind": "startup",
+      "output": {
+        "context": "CONTEXT {{query}}",
+        "intents": {
+          "greeting": "GLOBAL {{language}}"
+        },
+        "prompt": "FINAL {{language}}",
+        "system": "SYSTEM FIRST",
+        "user": ""
+      }
+    },
+    {
+      "input": "off",
+      "kind": "reasoning",
+      "output": {
+        "effort": "off",
+        "thinking": false
+      }
+    },
+    {
+      "input": "none",
+      "kind": "reasoning",
+      "output": {
+        "effort": "off",
+        "thinking": false
+      }
+    },
+    {
+      "input": "on",
+      "kind": "reasoning",
+      "output": {
+        "effort": "auto",
+        "thinking": true
+      }
+    },
+    {
+      "input": "high",
+      "kind": "reasoning",
+      "output": {
+        "effort": "high",
+        "thinking": true
+      }
+    },
+    {
+      "input": "HIGH",
+      "kind": "reasoning",
+      "output": {
+        "effort": "low",
+        "thinking": true
+      }
+    },
+    {
+      "input": "",
+      "kind": "reasoning",
+      "output": {
+        "effort": "low",
+        "thinking": true
+      }
+    },
+    {
+      "input": "en-US,en;q=0.8",
+      "kind": "locale",
+      "output": "English"
+    },
+    {
+      "input": " zh-TW ;q=0.9,en",
+      "kind": "locale",
+      "output": "Chinese (Traditional)"
+    },
+    {
+      "input": "",
+      "kind": "locale",
+      "output": "Chinese (Simplified)"
+    },
+    {
+      "input": "xx-Test",
+      "kind": "locale",
+      "output": "xx-Test"
+    },
+    {
+      "input": "LOCAL",
+      "kind": "intent",
+      "output": "LOCAL"
+    },
+    {
+      "input": "  ",
+      "kind": "intent",
+      "output": "GLOBAL"
+    },
+    {
+      "input": "",
+      "kind": "intent",
+      "output": "GLOBAL"
+    },
+    {
+      "input": "dedicated",
+      "kind": "model",
+      "output": {
+        "calls": [
+          "dedicated"
+        ],
+        "id": "dedicated",
+        "images": false
+      }
+    },
+    {
+      "input": "missing",
+      "kind": "model",
+      "output": {
+        "calls": [
+          "missing",
+          "baseline"
+        ],
+        "id": "baseline",
+        "images": false
+      }
+    },
+    {
+      "input": "baseline",
+      "kind": "model",
+      "output": {
+        "calls": [
+          "baseline"
+        ],
+        "id": "baseline",
+        "images": false
+      }
+    },
+    {
+      "input": null,
+      "kind": "prompts",
+      "output": {
+        "system": "SESSION Korean ------BEGIN------\nUser question: old\nAssistant answer: answer\n------END------\n",
+        "user": "SESSION q0\n\n<no_image_attached />\n<no_document_attached /> BACKGROUND"
+      }
+    }
+  ],
+  "real_provider_calls": 0
+}

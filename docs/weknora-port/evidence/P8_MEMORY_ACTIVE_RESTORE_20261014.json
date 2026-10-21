@@ -1,0 +1,54 @@
+{
+  "kind": "CONSISTENT_SYNTHETIC_OWNER_RESTORE_NEW_DATABASE_NATIVE_READBACK",
+  "source_system_identifier": "7696088403504697382",
+  "source_tenant": 110,
+  "target_database": "wk_port_restore_20261014_memory_active_f53cb53",
+  "container_reused_without_rename": "weknora-python-resume-pg-20261013",
+  "new_container": false,
+  "new_volume": false,
+  "artifact_root": "E:\\WK\\restore\\memory-active-f53cb53",
+  "snapshot_tables": {
+    "memory_items": {
+      "rows": 2,
+      "sha256": "025d8b45911191ad1f0a1b505cea6c8eeddd80d58af10496f6c66ed90182aa2c"
+    },
+    "memory_subjects": {
+      "rows": 1,
+      "sha256": "72d30e767353af3774deb5393014851bb54c9e60c5327f9b8ee605dfc786783b"
+    },
+    "port_model_configuration": {
+      "rows": 1,
+      "sha256": "1ea7942fbd42b7e3add4606eefd46b25e0f997fe4a1c54c4996f12c64319908c"
+    },
+    "tenants": {
+      "rows": 1,
+      "sha256": "e45c95a31d22fdc37c64da101756d01202d5d9c86e330ca7911293de98347f41"
+    },
+    "embeddings": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "supplement_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "copied_immutable_files": 0,
+  "storage_hashes": {},
+  "schema_sha256": "fcf7c69e75aee4cd50167fec9e7da2528fbaf5163e0f8e7852b98f19ebfa104f",
+  "snapshot_sha256": "3c00627d8629ed07621ef3bdcbf1076f7fd30106baa03bb7410871d49ed5c14b",
+  "path_mapping_document_ids": [],
+  "unknown_preserved": {
+    "n": 0,
+    "occupied": "0"
+  },
+  "restored_active_indices": 0,
+  "native_entry": {
+    "originals": [],
+    "active_chunks_readback": 0,
+    "history_assistants": [],
+    "memory_items": 2,
+    "memory_tombstones": 0,
+    "foreign_history_and_memory_denied": true
+  },
+  "real_provider_calls": 0,
+  "old_business_database_accessed": false,
+  "cutover": "NOT_RUN"
+}

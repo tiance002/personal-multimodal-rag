@@ -1,0 +1,31 @@
+{
+  "schema": "s8-1-memory-v4-offline-validation/v1",
+  "status": "OFFLINE_PASS",
+  "future_version": "memory-v4",
+  "future_driver_sha256": "64bc94df07b891ff7b3aa7adba83d90709be19bd530dfb57613ef9e05a6777ef",
+  "actual_completed_evaluation_version": "memory-v3",
+  "actual_v3_sha256": "b963b26953d556329777073fe1a6994f05e33949f7a6adec99328881b922ee7f",
+  "actual_v3_preserved_path": "E:\\RAG quention\\var\\reports\\s8-1-ecs-20261020\\controller\\ecs_case_driver.memory-v3.py",
+  "actual_completed_goal_memavailable_valley": "NOT_MEASURED",
+  "actual_goal_rerun": "NOT RUN",
+  "directed_test": {
+    "command": "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'\npython -B -m pytest tests/weknora_port/test_s8_1_ecs_case_driver_memory.py -q -p no:cacheprovider --basetemp 'E:/RAG quention/var/reports/s8-1-ecs-20261020/controller/pytest-memory-v4-1'",
+    "cwd": "E:\\RAG-Worktrees\\s8-six-dataset-evaluation",
+    "exit_code": 0,
+    "stdout": "............                                                             [100%]\n12 passed in 0.41s\n",
+    "evidence_chunk_id": "45dd43",
+    "scope": "offline meminfo/cgroup fixtures, summary minima, diagnostic failure, thread stop and lifecycle AST; no Docker or services"
+  },
+  "subsequent_documentary_label_change": "Only v4 docstring, result version label and sampled-minimum interpretation text added after tests; in-memory AST/compile then passed exit0; no sampling logic changed",
+  "default_sampling_interval_seconds": 1.0,
+  "container_discovery": "one already-existing docker inspect returns controlled PID; pinned /proc PID start token and scoped cgroup directory; reads v2 current/peak/max or v1 equivalents; no periodic Docker subprocess",
+  "outputs": [
+    "memory-samples.json",
+    "memory-summary.json"
+  ],
+  "missing_or_invalid_data": "UNKNOWN/UNAVAILABLE with null byte values; never fabricated0",
+  "monitor_failure_effect": "diagnostic-only; no gate/parent/cleanup control changes",
+  "remote_or_provider_calls_by_worker": 0,
+  "root_short_linux_self_test": "NOT RUN BY WORKER",
+  "git_commit": "NOT RUN"
+}

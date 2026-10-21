@@ -1,0 +1,71 @@
+{
+  "upstream": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "source": "internal/models/api/sse.go:ReadEvent",
+  "blob": "909edf3b6819aecd500191f12307b773cd1b19cf",
+  "toolchain": "go version go1.26.0 windows/amd64",
+  "exit_code": 0,
+  "scope": "UNMODIFIED_SSE_READER_ONLY",
+  "cases": [
+    {
+      "input": ": ping\nid: 4\nevent: ignored\ndata: {\"a\":1}\n\ndata:[DONE]  \n",
+      "events": [
+        {
+          "data": "{\"a\":1}",
+          "done": false
+        },
+        {
+          "data": "",
+          "done": true
+        }
+      ]
+    },
+    {
+      "input": "data: first\ndata: second\n",
+      "events": [
+        {
+          "data": "first",
+          "done": false
+        },
+        {
+          "data": "second",
+          "done": false
+        }
+      ]
+    },
+    {
+      "input": "event: stop\ndata: \ndata:  spaced \r\n",
+      "events": [
+        {
+          "data": "",
+          "done": false
+        },
+        {
+          "data": " spaced ",
+          "done": false
+        }
+      ]
+    },
+    {
+      "input": "data:{\"text\":\"中文\"}\r\ndata: [DONE]",
+      "events": [
+        {
+          "data": "{\"text\":\"中文\"}",
+          "done": false
+        },
+        {
+          "data": "",
+          "done": true
+        }
+      ]
+    },
+    {
+      "input": "data: final-without-newline",
+      "events": [
+        {
+          "data": "final-without-newline",
+          "done": false
+        }
+      ]
+    }
+  ]
+}
