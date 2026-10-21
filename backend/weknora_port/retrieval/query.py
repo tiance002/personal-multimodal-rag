@@ -160,9 +160,25 @@ _AMBIGUOUS_HISTORY = re.compile(r'比较|对比|相比|与|和|或者|还是|、
 _PROTECTED_NUMBERS = re.compile(r'\d+(?:[./:–—-]\d+)*%?|第[一二三四五六七八九十百零\d]+[点章节条项]')
 _PROTECTED_MARKERS = re.compile(r'不要|不得|不能|不超过|不少于|不低于|不|未|无|非|仅限|仅|只|至少|至多|必须|之前|之后|以前|以后|\b(?:not|no|never|without|only|before|after|at least|at most)\b', re.I)
 _REWRITE_GUARD_PROMPT = (
-    '\nRuntime query contract: preserve q0 and every explicit number, time, negation, comparison and restriction. '
-    'Only replace an unambiguous reference with a literal entity from the authorized conversation. '
-    'Do not invent relations, answer the question, or add facts. If ambiguous, keep q0. '
+    '\nRuntime Task 1 OVERRIDE: this overrides all earlier Task 1 instructions and examples that paraphrase, '
+    'translate, shorten, or rewrite grammar. For rewrite_query, copy q0 byte-for-byte except at most ONE '
+    'unambiguous pronoun/reference span replaced by a literal entity from the latest independent authorized USER question. '
+    'For consecutive reference questions, scan backward to that latest independent USER question. '
+    'Do not cross a newer independent topic to reuse an older subject. '
+    'Never take an antecedent only from an assistant answer. '
+    'Preserve the input language, punctuation (including terminal punctuation), whitespace, letter case, range glyphs, '
+    'numbers, signs, identifiers, comparisons, negations, and restrictions. '
+    'Do not translate even when the configured answer language differs. Do not produce a keyword query, '
+    'reorder words, rewrite grammar, summarize, answer the question, invent relations, or add facts. '
+    'If q0 is independent or no unique literal antecedent is available, copy q0 unchanged. '
+    'If ambiguous, keep q0 unchanged; never choose one of several entities. '
+    'Format-only examples, not source facts: '
+    'USER question="Who is Ada Rowan?"; q0="What did she direct from 2011–2014?"; '
+    'output={"rewrite_query":"What did Ada Rowan direct from 2011–2014?","intent":"kb_search","image_description":""}. '
+    'USER question="什么是朴素贝叶斯分类？"; q0="它在2020年之后有什么缺点？不要讨论多标签。"; '
+    'output={"rewrite_query":"朴素贝叶斯分类在2020年之后有什么缺点？不要讨论多标签。","intent":"kb_search","image_description":""}. '
+    'Return only one JSON object with exactly three fields: rewrite_query, intent, image_description. '
+    'No Markdown fences, labels, extra keys, or explanations. image_description is empty when no image is attached. '
     'Factual follow-ups and requests for sources require kb_search. '
     'follow_up is only for pure formatting, translation or rephrasing of a previous answer.')
 
