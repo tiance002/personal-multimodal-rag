@@ -45,7 +45,8 @@ def test_closed_chinese_compare_preserves_full_dimension_and_spans():
 def test_closed_english_compare_keeps_dimension():
     rows=try_rule_compare('Compare PostgreSQL and Redis in terms of persistence and concurrency.')
     assert [r.query_text for r in rows] == [
-        'What are PostgreSQL persistence and concurrency?', 'What are Redis persistence and concurrency?']
+        'What is known about PostgreSQL regarding persistence and concurrency?',
+        'What is known about Redis regarding persistence and concurrency?']
 
 
 @pytest.mark.parametrize('query', [

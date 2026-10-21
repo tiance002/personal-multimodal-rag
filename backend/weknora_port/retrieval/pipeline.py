@@ -178,6 +178,7 @@ class RetrievalPipeline:
     async def run(self, state, context):
         import asyncio
         from ..models.types import CallCancelled, RunDeadlineExceeded
+        from .search import SearchNothing, SearchError
         from .strategy import validate_strategy_mode, strategy_applicable
         validate_strategy_mode(state.retrieval_strategy_mode, state.source_evidence_mode)
         if type(state.bridge_rescue_mode) is not str or state.bridge_rescue_mode not in ('off', 'cheap_bridge_v1'):
@@ -214,7 +215,6 @@ class RetrievalPipeline:
         if candidate and state.needs_retrieval:
             from .strategy import plan_query
             from .strategy_executor import execute_plan, apply_strategy_result, fit_context_budget
-            from .search import SearchNothing, SearchError
             plan = plan_query(state.query, state.rewrite_query or state.query, state.query_type)
             state.strategy_plan = plan
             result = await execute_plan(state, context, plan, self.retrieve_once)

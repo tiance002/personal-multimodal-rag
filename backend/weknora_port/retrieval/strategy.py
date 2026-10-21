@@ -107,7 +107,7 @@ def try_rule_compare(effective_query):
                       dend - len(draw) + len(draw.rstrip()))
     rows = []
     for number, name, group in ((1, a, 'a'), (2, b, 'b')):
-        question = name + '的' + dimension + '是什么？' if language == 'cn' else 'What are ' + name + ' ' + dimension + '?'
+        question = name + '的' + dimension + '是什么？' if language == 'cn' else 'What is known about ' + name + ' regarding ' + dimension + '?'
         start, end = match.span(group)
         raw = effective_query[start:end]
         start += len(raw) - len(raw.lstrip())
