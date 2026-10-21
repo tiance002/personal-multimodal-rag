@@ -67,6 +67,16 @@ class PipelineState(SearchState):
     bridge_normal_qualifications: dict[str, dict[str, Any]] = field(default_factory=dict)
     bridge_trace: list[dict] = field(default_factory=list)
     bridge_context_char_limit: int = 16000
+    retrieval_strategy_mode: str = field(default='off', kw_only=True)
+    query_type: str = field(default='UNKNOWN', kw_only=True)
+    strategy_plan: Any = field(default=None, kw_only=True)
+    strategy_rounds: list[Any] = field(default_factory=list, kw_only=True)
+    strategy_trace: list[dict] = field(default_factory=list, kw_only=True)
+    strategy_coverage: dict[str, Any] = field(default_factory=dict, kw_only=True)
+    strategy_units_used: int = field(default=0, kw_only=True)
+    strategy_queries_seen: set[str] = field(default_factory=set, kw_only=True)
+    strategy_rerank_scores: dict[str, float] = field(default_factory=dict, kw_only=True)
+    strategy_rerank_accepted_ids: set[str] = field(default_factory=set, kw_only=True)
 
 class RetrievalPipeline:
 
@@ -90,9 +100,87 @@ class RetrievalPipeline:
             if isinstance(error, (CallCancelled, RunDeadlineExceeded)):
                 raise
 
+    async def retrieve_once(self, state, context, *, empty_allowed=False):
+        """Search through scoped originals once; no QU, bridge, Context or persistence."""
+        import asyncio
+        from ..models.types import CallCancelled, RunDeadlineExceeded
+        from .search import SearchNothing, SearchError
+        from .source_evidence import SourceEvidenceBudgetError
+        from .strategy_executor import RoundResult
+        def check_context():
+            if context.cancelled and context.cancelled.is_set():
+                raise CallCancelled()
+            if context.deadline is not None and context.deadline <= asyncio.get_running_loop().time():
+                raise RunDeadlineExceeded()
+        check_context()
+        try:
+            ordinary_empty = False
+            await self._progress("retrieval", "started")
+            try:
+                await search(state, context, self.repository, embedding_resolver=self.embedding_resolver, web_search=self.web_search, entity_search=self.entity_search, segmenter=self.segmenter)
+            except SearchNothing:
+                if not empty_allowed:
+                    raise
+                ordinary_empty = True
+            await self._progress("retrieval", "completed", candidate_count=sum(r is not None for r in state.search_results))
+            check_context()
+            await self._progress("rerank", "started")
+            try:
+                if not ordinary_empty:
+                    await rerank(state, context, self.registry, self.segmenter)
+            except SearchNothing:
+                if not empty_allowed:
+                    raise
+                ordinary_empty = True
+            from .memory_affinity import apply_memory_affinity
+            await apply_memory_affinity(state, context, self.affinity_resolver)
+            await self._progress("rerank", "completed", candidate_count=sum(r is not None for r in state.rerank_results))
+            check_context()
+            await self._progress("merge", "started")
+            if ordinary_empty:
+                # A graph rescue must not resurrect all threshold-rejected Search rows.
+                state.merge_results = []
+            else:
+                await merge(state, context, self.repository, self.segmenter)
+            await self._progress("merge", "completed", candidate_count=sum(r is not None for r in state.merge_results))
+            check_context()
+            if not ordinary_empty:
+                filter_top_k(state)
+            check_context()
+            if state.source_evidence_mode != 'off' and not ordinary_empty:
+                from .source_evidence import expand_source_evidence
+                await self._progress('source_unit', 'started')
+                await expand_source_evidence(state, context, self.repository)
+                await self._progress('source_unit', 'completed', candidate_count=len(state.merge_results))
+                check_context()
+                if not state.merge_results:
+                    if not empty_allowed:
+                        raise SearchNothing()
+                    ordinary_empty = True
+        except SearchNothing:
+            if not getattr(state, '_strategy_serial', False):
+                raise
+            state.merge_results = []
+            return RoundResult(state, status='EMPTY', reason='SEARCH_NOTHING')
+        except SourceEvidenceBudgetError:
+            if not getattr(state, '_strategy_serial', False):
+                raise
+            state.merge_results = []
+            return RoundResult(state, status='BUDGET_OMITTED', reason='SOURCE_UNIT_BUDGET_EXCEEDED')
+        except SearchError as error:
+            from .search import RetrievalScopeError
+            if isinstance(error, RetrievalScopeError) or not getattr(state, '_strategy_serial', False):
+                raise
+            state.merge_results = []
+            return RoundResult(state, status='ERROR', reason=str(error))
+        return RoundResult(state, status='EMPTY' if ordinary_empty else 'OK',
+                           reason='SEARCH_NOTHING' if ordinary_empty else '')
+
     async def run(self, state, context):
         import asyncio
         from ..models.types import CallCancelled, RunDeadlineExceeded
+        from .strategy import validate_strategy_mode, strategy_applicable
+        validate_strategy_mode(state.retrieval_strategy_mode, state.source_evidence_mode)
         if type(state.bridge_rescue_mode) is not str or state.bridge_rescue_mode not in ('off', 'cheap_bridge_v1'):
             raise ValueError('BRIDGE_RESCUE_MODE_INVALID')
         if state.bridge_rescue_mode != 'off' and (state.graph_enabled or state.rerank_top1_floorless):
@@ -121,6 +209,28 @@ class RetrievalPipeline:
         state.needs_retrieval = needs_retrieval(state.intent, state.web_search_enabled)
         if state.needs_retrieval:
             state.system_prompt_override = ''
+        candidate = state.retrieval_strategy_mode == 'query_structure_v1' and strategy_applicable(state)
+        if state.retrieval_strategy_mode != 'off' and not candidate:
+            state.strategy_trace.append({'stage':'strategy','decision':'STRATEGY_NOT_APPLICABLE'})
+        if candidate and state.needs_retrieval:
+            from .strategy import plan_query
+            from .strategy_executor import execute_plan, apply_strategy_result, fit_context_budget
+            from .search import SearchNothing, SearchError
+            plan = plan_query(state.query, state.rewrite_query or state.query, state.query_type)
+            state.strategy_plan = plan
+            result = await execute_plan(state, context, plan, self.retrieve_once)
+            apply_strategy_result(state, result)
+            if not state.merge_results:
+                if any(r.status == 'ERROR' for r in state.strategy_rounds):
+                    raise SearchError('STRATEGY_RETRIEVAL_FAILED')
+                raise SearchNothing()
+            await fit_context_budget(state, context)
+            if not state.merge_results:
+                raise SearchNothing()
+            await self._progress('context', 'started')
+            finalized = await into_chat_message(state, context, persist_sink=self.persist_sink)
+            await self._progress('context','completed',selected_evidence_count=len(finalized.result_ids))
+            return finalized
         graph_paths = ()
         if state.graph_enabled and state.needs_retrieval:
             from .search import validate_targets
@@ -132,50 +242,8 @@ class RetrievalPipeline:
                                      tenant_id=self.repository.tenant_id)
             await self._progress('graph', 'completed', path_count=len(graph_paths))
             check_context()
-        from .search import SearchNothing
-        ordinary_empty = False
-        await self._progress("retrieval", "started")
-        try:
-            await search(state, context, self.repository, embedding_resolver=self.embedding_resolver, web_search=self.web_search, entity_search=self.entity_search, segmenter=self.segmenter)
-        except SearchNothing:
-            if not graph_paths:
-                raise
-            ordinary_empty = True
-        await self._progress("retrieval", "completed", candidate_count=sum(r is not None for r in state.search_results))
-        check_context()
-        await self._progress("rerank", "started")
-        try:
-            if not ordinary_empty:
-                await rerank(state, context, self.registry, self.segmenter)
-        except SearchNothing:
-            if not graph_paths:
-                raise
-            ordinary_empty = True
-        from .memory_affinity import apply_memory_affinity
-        await apply_memory_affinity(state, context, self.affinity_resolver)
-        await self._progress("rerank", "completed", candidate_count=sum(r is not None for r in state.rerank_results))
-        check_context()
-        await self._progress("merge", "started")
-        if ordinary_empty:
-            # A graph rescue must not resurrect all threshold-rejected Search rows.
-            state.merge_results = []
-        else:
-            await merge(state, context, self.repository, self.segmenter)
-        await self._progress("merge", "completed", candidate_count=sum(r is not None for r in state.merge_results))
-        check_context()
-        if not ordinary_empty:
-            filter_top_k(state)
-        check_context()
-        if state.source_evidence_mode != 'off' and not ordinary_empty:
-            from .source_evidence import expand_source_evidence
-            await self._progress('source_unit', 'started')
-            await expand_source_evidence(state, context, self.repository)
-            await self._progress('source_unit', 'completed', candidate_count=len(state.merge_results))
-            check_context()
-            if not state.merge_results and not graph_paths:
-                # A Summary locator with no verifiable source is not a KB fact.
-                # Use the existing explicit SearchNothing/fallback contract.
-                raise SearchNothing()
+        round_result = await self.retrieve_once(state, context, empty_allowed=bool(graph_paths))
+        ordinary_empty = round_result.status == 'EMPTY'
         if graph_paths:
             from ..graph.retrieval import fuse_paths
             await self._progress('graph_fusion', 'started')

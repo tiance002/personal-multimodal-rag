@@ -411,9 +411,12 @@ class RuntimeService:
         options.setdefault('language',state.language)
         options.setdefault('supports_vision',state.chat_model_supports_vision)
         options.setdefault('faq_priority_enabled',state.faq_priority_enabled)
-        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding'} & options.keys()
+        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding','on_context_prepared'} & options.keys()
         if forbidden:
             raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
+        if getattr(state, 'retrieval_strategy_mode', 'off') == 'query_structure_v1':
+            from .retrieval.strategy_executor import record_delivered_coverage
+            options['on_context_prepared'] = lambda prepared: record_delivered_coverage(state, prepared)
         request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
             evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,**options)
         if getattr(state, 'rescue_evidence', ()):

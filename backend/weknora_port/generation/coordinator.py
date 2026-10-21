@@ -358,6 +358,8 @@ class GenerationCoordinator:
         if request.fixed_fallback is not None:
             return await self._fixed_fallback(request,context)
         prepared = prepare_generation(request)
+        if request.on_context_prepared is not None:
+            request.on_context_prepared(prepared)
         route = None
         role = 'baseline'
         if request.policy.mode != 'OFF':

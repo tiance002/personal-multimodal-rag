@@ -58,7 +58,8 @@ class PostgresKnowledgeRepository(ScopedKnowledgeRepository):
         if len(models)>1:
             if self.model_identity is None:
                 raise ValueError('EMBEDDING_IDENTITY_RESOLVER_REQUIRED')
-            identities=await asyncio.gather(*(self.model_identity(model,context) for model in models))
+            identities=([await self.model_identity(model,context) for model in sorted(models)]
+                        if getattr(params, 'serial', False) else await asyncio.gather(*(self.model_identity(model,context) for model in models)))
             if len(set(identities))!=1 or not identities[0]:
                 raise ValueError('KNOWLEDGE_BASE_EMBEDDING_MODELS_DIFFER')
         def flags(row):

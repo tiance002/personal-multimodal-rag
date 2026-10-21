@@ -44,6 +44,7 @@ class ConversationSettings:
     enable_rewrite: bool = True
     enable_query_expansion: bool = True
     enable_rerank: bool = True
+    retrieval_strategy_mode: str = field(default='off', kw_only=True)
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
     rerank_top1_floorless: bool = False  # S8 isolated opt-in; no public session override.
@@ -65,6 +66,8 @@ class ConversationSettings:
     intent_system_prompts: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
+        from .retrieval.strategy import validate_strategy_mode
+        validate_strategy_mode(self.retrieval_strategy_mode, self.source_evidence_mode)
         if type(self.bridge_rescue_mode) is not str or self.bridge_rescue_mode not in ('off', 'cheap_bridge_v1'):
             raise ValueError('BRIDGE_RESCUE_MODE_INVALID')
 
@@ -418,6 +421,15 @@ class ApplicationRuntime:
 
     async def create_session(self, principal, request):
         self._owner(principal)
+        from .retrieval.strategy import validate_strategy_mode
+        mode = getattr(request, 'retrieval_strategy_mode', None)
+        source_mode = request.source_evidence_mode
+        # Public candidate selection is explicit; never silently enable its
+        # required source profile or accept a partial candidate request.
+        if mode == 'query_structure_v1' and source_mode != 'bounded_source_v1':
+            raise ValueError('RETRIEVAL_STRATEGY_REQUIRES_BOUNDED_SOURCE')
+        validate_strategy_mode(mode if mode is not None else self.conversation.retrieval_strategy_mode,
+            source_mode if source_mode is not None else self.conversation.source_evidence_mode)
         session = str(uuid.uuid4())
         kbs = tuple(sorted(set(request.knowledge_base_scope)))
         docs = tuple(sorted(set(request.document_scope)))
@@ -426,9 +438,12 @@ class ApplicationRuntime:
                 await self.turns._resources(guard, kbs, docs)
                 defaults = self.conversation
                 roles = await self._snapshot(guard)
-                context_config = {}
-                if request.source_evidence_mode is not None:
-                    context_config = {"conversation": {"source_evidence_mode": request.source_evidence_mode}}
+                saved = {}
+                if source_mode is not None:
+                    saved["source_evidence_mode"] = source_mode
+                if mode is not None:
+                    saved["retrieval_strategy_mode"] = mode
+                context_config = {"conversation": saved} if saved else {}
                 await guard.connection.execute(
                     "INSERT INTO sessions(id,tenant_id,subject_id,title,knowledge_base_scope,"
                     "document_scope,max_rounds,enable_rewrite,embedding_top_k,vector_threshold,"
@@ -525,10 +540,12 @@ class ApplicationRuntime:
             keyword_threshold=effective['keyword_threshold'], rerank_top_k=effective['rerank_top_k'],
             rerank_threshold=effective['rerank_threshold'], enable_expansion=effective['enable_query_expansion'],
             source_evidence_mode=effective['source_evidence_mode'],
+            retrieval_strategy_mode=effective['retrieval_strategy_mode'],
             rerank_context_enabled=effective['rerank_context_enabled'],
             rerank_top1_floorless=source.rerank_top1_floorless,
             bridge_rescue_mode=source.bridge_rescue_mode,
-            bridge_cheap_model_id=snapshot.model_id('cheap') if source.bridge_rescue_mode != 'off' else '',
+            bridge_cheap_model_id=snapshot.model_id('cheap') if (source.bridge_rescue_mode != 'off'
+                or effective['retrieval_strategy_mode'] == 'query_structure_v1') else '',
             graph_enabled=self.graph_enabled,
             language=resolve_language(source.language_locale, turn.request.accept_language),
             rewrite_system_prompt=DEFAULT_REWRITE_SYSTEM if effective['rewrite_prompt_system'] is None else effective['rewrite_prompt_system'],

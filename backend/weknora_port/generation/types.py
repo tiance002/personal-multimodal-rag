@@ -38,6 +38,7 @@ class GenerationRequest:
     policy: RouterPolicy = field(default_factory=RouterPolicy)
     understanding: ValidatedRewrite | None = field(default=None, repr=False)
     rendered_at: datetime | None = field(default=None,repr=False)
+    on_context_prepared: Any = field(default=None, repr=False, compare=False, kw_only=True)
 
     def __post_init__(self):
         if self.rendered_at is not None and not isinstance(self.rendered_at,datetime):

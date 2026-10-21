@@ -2,7 +2,7 @@
 from __future__ import annotations
 from .query import go_strip, go_fields
 import asyncio
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Protocol, Sequence, Mapping
 from ..models.types import CallContext
 from ..models.cloud_errors import raise_if_send_denied
@@ -29,6 +29,7 @@ class SearchParams:
     disable_vector: bool = False
     disable_keywords: bool = False
     skip_context_enrichment: bool = False
+    serial: bool = field(default=False, kw_only=True)
 
 class RetrievalRepository(Protocol):
 
@@ -158,6 +159,20 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
     if not targets and (not state.web_search_enabled):
         return
     errors, results = ([], [])
+    serial = getattr(state, '_strategy_serial', False)
+
+    async def run_calls(calls):
+        if not serial:
+            return await asyncio.gather(*calls)
+        values = []
+        for index, call in enumerate(calls):
+            try:
+                values.append(await call)
+            except BaseException:
+                for pending in calls[index + 1:]:
+                    pending.close()
+                raise
+        return values
 
     async def recall(batch, params, embedding=None):
         try:
@@ -167,6 +182,10 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
             raise
         except Exception as exc:
             raise_if_send_denied(exc)
+            if serial and getattr(exc, 'sent', False):
+                raise
+            if serial:
+                state.strategy_trace.append({'stage':'search','status':'ERROR','reason':'RECALL_FAILED'})
             errors.append(exc)
             return []
 
@@ -179,6 +198,10 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
                 raise
             except Exception as exc:
                 raise_if_send_denied(exc)
+                if serial:
+                    if isinstance(exc, (PermissionError, RetrievalScopeError)) or getattr(exc, 'sent', False):
+                        raise
+                    raise SearchError('EMBEDDING_FAILED') from None
                 errors.append(exc)
                 vector_disabled = True
                 batch = [t for t in batch if t.keyword_index_enabled]
@@ -190,9 +213,10 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
         calls = []
         for bucket in buckets.values():
             disabled = bucket[0].disable_recall_thresholds if not (bucket[0].target_type == 'knowledge_base' and (not bucket[0].tag_ids) and (not bucket[0].scope_tag_ids)) else False
-            params = SearchParams(state.rewrite_query, state.embedding_top_k, 0 if disabled else state.vector_threshold, 0 if disabled else state.keyword_threshold, vector_disabled, False, True)
+            params = SearchParams(state.rewrite_query, state.embedding_top_k, 0 if disabled else state.vector_threshold, 0 if disabled else state.keyword_threshold, vector_disabled, False, True, serial=serial)
             calls.append(recall(bucket, params, embedding))
-        return [r for group_result in await asyncio.gather(*calls) for r in group_result]
+        groups = await run_calls(calls)
+        return [r for group_result in groups for r in group_result]
     grouped = {}
     for t in targets:
         grouped.setdefault(t.embedding_model_key, []).append(t)
@@ -220,14 +244,21 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
                 return validate_results(await entity_search(deepcopy(state), context), targets, context)
             except (RetrievalScopeError, PermissionError, CallCancelled, RunDeadlineExceeded):
                 raise
-            except Exception:
+            except Exception as error:
+                if serial:
+                    raise_if_send_denied(error)
+                    if getattr(error, 'sent', False):
+                        raise
+                    raise SearchError('ENTITY_SEARCH_FAILED') from None
                 return []
-        entity_task = asyncio.create_task(entities())
+        if not serial:
+            entity_task = asyncio.create_task(entities())
     try:
-        for batch in await asyncio.gather(*calls):
+        batches = await run_calls(calls)
+        for batch in batches:
             results.extend(batch)
         chunk_failed = bool(errors and (not results))
-        if not chunk_failed and state.enable_expansion and (len(results) < max(1, state.embedding_top_k)):
+        if not serial and not chunk_failed and state.enable_expansion and (len(results) < max(1, state.embedding_top_k)):
             variants = expand_queries(state.rewrite_query, state.query, segmenter)
             semaphore = asyncio.Semaphore(max(1, min(16, len(variants) * len(targets))))
 
@@ -238,12 +269,16 @@ async def search(state, context, repository, *, embedding_resolver=None, web_sea
                     return await recall((t,), params)
             for batch in await asyncio.gather(*(expand(q, t) for q in variants for t in targets)):
                 results.extend(batch)
+        if serial and state.entities:
+            results.extend(await entities())
         if entity_task:
             try:
                 results.extend(await entity_task)
             except BaseException:
                 entity_task.cancel()
                 raise
+        if serial and errors:
+            raise SearchError('SEARCH_FAILED') from None
         state.search_results = deduplicate(results, preserve_sources=
             getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1')
         if not state.search_results:

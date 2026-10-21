@@ -135,6 +135,8 @@ async def rerank(state, context, registry, segmenter=None):
         raise
     except Exception as exc:
         raise_if_send_denied(exc)
+        if getattr(state, '_strategy_serial', False) and (isinstance(exc, PermissionError) or getattr(exc, 'sent', False)):
+            raise
         raise RuntimeError('GET_RERANK_MODEL_FAILED') from None
     candidates = []
     passages = []
@@ -151,14 +153,20 @@ async def rerank(state, context, registry, segmenter=None):
     if not passages:
         return
 
+    invoke_count = 0
     async def invoke():
+        nonlocal invoke_count
+        invoke_count += 1
         # Provider still enforces document/request limits and stable batch indices.
-        response = await model.rerank(state.rewrite_query, model_passages, context.child('rerank'))
+        suffix = 'rerank' if invoke_count == 1 or not getattr(state, '_strategy_serial', False) else 'rerank/threshold-' + str(invoke_count)
+        response = await model.rerank(state.rewrite_query, model_passages, context.child(suffix))
         try:
             raw = list(response.results if hasattr(response, 'results') else response)
         except TypeError:
             raise InvalidRerankResponse('RERANK_RESPONSE_INVALID') from None
         _validate_raw_results(raw, len(candidates))
+        if getattr(state, '_strategy_serial', False):
+            state.strategy_rerank_scores = {candidates[r.index].id:r.score for r in raw}
         if getattr(state, 'source_evidence_mode', 'off') != 'off' or getattr(state, 'bridge_rescue_mode', 'off') != 'off':
             state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
                 'response': [{'index': r.index, 'score': r.score} for r in raw]})
@@ -182,6 +190,11 @@ async def rerank(state, context, registry, segmenter=None):
         raise
     except Exception as exc:
         raise_if_send_denied(exc)
+        if getattr(state, '_strategy_serial', False):
+            if isinstance(exc, PermissionError) or getattr(exc, 'sent', False):
+                raise
+            from .search import SearchError
+            raise SearchError('RERANK_FAILED') from None
         state.search_results = candidates
         return
     selected = filtered(raw, state.rerank_threshold)
@@ -194,8 +207,15 @@ async def rerank(state, context, registry, segmenter=None):
             raise
         except Exception as exc:
             raise_if_send_denied(exc)
+            if getattr(state, '_strategy_serial', False):
+                if isinstance(exc, PermissionError) or getattr(exc, 'sent', False):
+                    raise
+                from .search import SearchError
+                raise SearchError('RERANK_FAILED') from None
             state.search_results = candidates
             return
+    if getattr(state, '_strategy_serial', False):
+        state.strategy_rerank_accepted_ids = {candidates[r.index].id for r in selected}
     accepted = []
     texts = []
     from copy import deepcopy

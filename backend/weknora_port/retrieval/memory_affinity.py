@@ -18,7 +18,15 @@ async def apply_memory_affinity(state,context,resolver):
     if not ids:return
     try:affinity=await resolver(tuple(ids))
     except (CallCancelled,RunDeadlineExceeded):raise
-    except Exception:return  # Source service read failures return nil.
+    except Exception as error:
+        if getattr(state, '_strategy_serial', False):
+            from .search import RetrievalScopeError
+            from ..models.cloud_errors import raise_if_send_denied
+            raise_if_send_denied(error)
+            if isinstance(error, (PermissionError, RetrievalScopeError)) or getattr(error, 'sent', False):
+                raise
+            state.strategy_trace.append({'stage':'memory_affinity','status':'ERROR','reason':'OPTIONAL_AFFINITY_READ_FAILED'})
+        return  # Source service read failures return nil.
     if not affinity:return
     boosted=False
     for row in state.rerank_results:

@@ -31,6 +31,8 @@ _MODEL_ROLES = ("embedding", "rerank", "cheap", "expensive", "vlm")
 _SAFE_EXCEPTION_CODES = frozenset({
     "MODEL_CREDENTIAL_REBINDING_REQUIRED",
     "MODEL_ROLES_REQUIRED",
+    "RETRIEVAL_STRATEGY_MODE_INVALID",
+    "RETRIEVAL_STRATEGY_REQUIRES_BOUNDED_SOURCE",
     "REQUEST_INVALID",
     "RESOURCE_NOT_FOUND",
     "SCOPE_DENIED",
@@ -85,6 +87,7 @@ class VisionModelCreate(ApiModel):
 
 
 class SessionCreate(ApiModel):
+    retrieval_strategy_mode: Literal["off", "query_structure_v1"] | None = None
     source_evidence_mode: Literal["off", "bounded_source_v1"] | None = None
     knowledge_base_scope: list[str] = Field(min_length=1)
     document_scope: list[str] = Field(default_factory=list)
