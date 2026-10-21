@@ -21,6 +21,52 @@ ROLES = {
 RID = "s84a-stage-test/frost-A/bridge-extract"
 
 
+def test_leased_repository_delegates_current_chunk_reads(monkeypatch):
+    from contextlib import asynccontextmanager
+    import backend.weknora_port.runtime as runtime_module
+
+    @asynccontextmanager
+    async def lease():
+        yield object()
+
+    class CurrentChunkRepository:
+        def __init__(self, guard, resolve_tenant, **kwargs):
+            self.guard = guard
+
+        async def get_current_chunks(self, identifiers, call_context):
+            assert identifiers == ("chunk-1",)
+            assert call_context.scope.knowledge_base_ids == ("kb",)
+            return {"chunk-1": "current-source"}
+
+    application = SimpleNamespace(
+        principal=SimpleNamespace(tenant_id=1, subject_id="owner"),
+        leases=SimpleNamespace(lease=lease),
+    )
+    registry = SimpleNamespace(physical_key="test-physical-key")
+    repository = runtime_module.LeasedKnowledgeRepository(application, registry)
+    monkeypatch.setattr(runtime_module, "PostgresKnowledgeRepository", CurrentChunkRepository)
+
+    assert asyncio.run(repository.get_current_chunks(("chunk-1",), context())) == {
+        "chunk-1": "current-source"
+    }
+
+def test_source_identity_skips_only_unsaved_optional_link_fields():
+    frozen = {"id": "chunk-1", "content": "source", "knowledge_id": "doc",
+              "knowledge_base_id": "kb", "chunk_type": "text", "chunk_index": 1,
+              "start_at": 0, "end_at": 6, "metadata": {"source_version": "v1"},
+              "chunk_metadata": {"source_version": "v1"}}
+    actual = SearchResult("chunk-1", "source", 0, knowledge_id="doc",
+                          knowledge_base_id="kb", chunk_type="text", chunk_index=1,
+                          start_at=0, end_at=6, pre_chunk_id="previous")
+    actual.metadata = {"source_version": "v1"}
+    actual.chunk_metadata = {"source_version": "v1"}
+    assert runner.verify_source_pair(frozen, actual)["sha256"] == runner.sha("source")
+    frozen_with_link = {**frozen, "pre_chunk_id": "different"}
+    with pytest.raises(ValueError, match="S84A_CURRENT_SOURCE_BODY_OR_IDENTITY_CHANGED"):
+        runner.verify_source_pair(frozen_with_link, actual)
+    with pytest.raises(KeyError):
+        runner.source_identity({"content": "missing identity"})
+
 def owner(raw=b"frozen"):
     return {"approval_source": "Owner explicit current messages", "stage_id": "stage-test-20261020",
             "max_calls": 8, "max_tokens": 30000, "requests_sha256": runner.sha(raw)}

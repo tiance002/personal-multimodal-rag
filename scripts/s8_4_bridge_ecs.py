@@ -109,13 +109,18 @@ def request_plan(cases, prefix):
 def source_identity(row):
     return {key: row[key] for key in
             ("id", "content", "knowledge_id", "knowledge_base_id", "chunk_type",
-             "chunk_index", "start_at", "end_at", "pre_chunk_id", "next_chunk_id", "parent_chunk_id")}
+             "chunk_index", "start_at", "end_at")}
+
+
+def source_links_match(left, right):
+    return all(key not in left or key not in right or (left.get(key) or "") == (right.get(key) or "")
+               for key in ("pre_chunk_id", "next_chunk_id", "parent_chunk_id"))
 
 
 def verify_source_pair(frozen, actual):
     """Ignore generated descriptions; compare original identity/body/spans."""
     a = asdict(actual) if not isinstance(actual, dict) else actual
-    require(source_identity(frozen) == source_identity(a), "S84A_CURRENT_SOURCE_BODY_OR_IDENTITY_CHANGED")
+    require(source_identity(frozen) == source_identity(a) and source_links_match(frozen, a), "S84A_CURRENT_SOURCE_BODY_OR_IDENTITY_CHANGED")
     old_version = (frozen.get("metadata") or {}).get("source_version")
     require(bool(old_version) and (a.get("metadata") or {}).get("source_version") == old_version and
             (a.get("chunk_metadata") or {}).get("source_version") == old_version, "S84A_CURRENT_SOURCE_VERSION_CHANGED")
@@ -194,7 +199,7 @@ async def current_source_checks(app, registry, cases, prefix, principal):
         for row in case.get("source_rows", case["search_results"] + case["merge_results"]):
             if row is not None and row["chunk_type"] == "text":
                 prior = frozen.setdefault(row["id"], row)
-                require(source_identity(prior) == source_identity(row), "S84A_FROZEN_SOURCE_CONFLICT")
+                require(source_identity(prior) == source_identity(row) and source_links_match(prior, row), "S84A_FROZEN_SOURCE_CONFLICT")
         loaded = dict(await repo.get_current_chunks(tuple(frozen), context))
         require(set(loaded) == set(frozen), "S84A_CURRENT_SOURCE_SCOPE_OR_VERSION_DENIED")
         proof = [verify_source_pair(frozen[key], loaded[key]) for key in sorted(frozen)]
