@@ -257,9 +257,15 @@ def validate_settlements(rows, entries, plan, roles):
         identity = (row["request_id"], row["capability"])
         require(identity not in pg, "S84A_DUPLICATE_PROVIDER_OPERATION")
         pg[identity] = row
+    execution = {}
+    for entry in entries:
+        identity = (entry["request_id"], entry["capability"])
+        require(identity not in execution, "S84A_DUPLICATE_EXECUTION_OPERATION")
+        execution[identity] = entry
+    require(set(pg) == set(execution), "S84A_DUAL_LEDGER_KEYS_MISMATCH")
     totals = {"chat": {"calls": 0, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
               "rerank": {"calls": 0, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0}}
-    for entry in entries:
+    for entry in execution.values():
         rid, capability = entry["request_id"], entry["capability"]
         require(plan.get(rid) == capability and capability in totals, "S84A_UNAPPROVED_OPERATION")
         require(entry["status"] == "SETTLED" and entry.get("outcome") == "RESPONSE_RECEIVED",

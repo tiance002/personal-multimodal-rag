@@ -26,7 +26,10 @@ ADDED_CHARS = 1600
 CANDIDATES = 8
 SECOND_THRESHOLD = 0.3  # Experimental admission floor, not a calibrated probability.
 RELATION = re.compile(r'\b(?:direct(?:or|ed)?|headed|led|served|works?|worked|dean|chair|president)\b|主持|负责|担任', re.I)
-PRONOUN = re.compile(r'^(?:she|he|they|it|her|his|their|她|他|他们|她们|该人)$', re.I)
+PRONOUN = re.compile(
+    r'^(?:i|me|my|mine|myself|we|us|our|ours|ourselves|you|your|yours|yourself|yourselves|'
+    r'she|her|hers|herself|he|him|his|himself|they|them|their|theirs|themselves|it|its|itself|'
+    r'我|我们|本人|自己|你|您|你们|她|他|它|他们|她们|它们|该人)$', re.I)
 DIRECT_RELATION = re.compile(r'(?:directed|led|headed|served as (?:the )?(?:director|head|chair|president|dean)(?: of)?|was (?:the )?(?:director|head|chair|president|dean)(?: of)?|主持|负责|担任[^，。；]{0,20})', re.I)
 EXTRACTION_KEYS = {'status', 'source_chunk_id', 'quote_start', 'quote_end', 'quote',
                    'subject', 'subject_resolution', 'predicate', 'object', 'time',
@@ -156,6 +159,19 @@ def _unique_object(pairs):
     return out
 
 
+def _relation_ending(tail, time):
+    """Prove a complete object followed by its own time, not a later clause's.
+
+    Unsupported syntax stays unverified. In particular a remaining noun such
+    as ``Annex`` is not punctuation, and ``before moving ... from <time>``
+    cannot make that later time belong to the extracted direct relation.
+    """
+    temporal = (r'\s+(?:from|during|in)\s+' + re.escape(time)) if time else ''
+    continuation = (r'(?:,?\s+and\s+(?:serves|served|teaches|taught|works|worked)\b'
+                    r'[^.!?。！？;；\n]{1,320})?')
+    return bool(re.fullmatch(temporal + continuation + r'\s*[.!?。！？]?\s*', tail, re.I))
+
+
 def validate_extraction(content, windows, sources, question):
     """Return span proof and independent identity proof, never model confidence."""
     if not isinstance(content, str) or len(content) > 4096:
@@ -215,10 +231,11 @@ def validate_extraction(content, windows, sources, question):
     query_years = set(re.findall(r'\b(?:1[6-9]|20)\d{2}\b', question))
     time_aligned = not query_years or bool(data['time'] and query_years <=
         set(re.findall(r'\b(?:1[6-9]|20)\d{2}\b', data['time'])))
-    single_object = not re.search(r'\b(?:and|or)\b|以及|或者|和|或', quote[object_at+len(data['object']):], re.I)
+    complete_relation = _relation_ending(quote[object_at+len(data['object']):], data['time'])
     data['span_verified'] = True
     data['subject_verified'] = explicit
-    data['relation_verified'] = bool(explicit and direct and time_aligned and single_object)
+    data['relation_form_verified'] = bool(direct and time_aligned and complete_relation)
+    data['relation_verified'] = bool(explicit and data['relation_form_verified'])
     return data
 
 
@@ -227,13 +244,22 @@ def _location_facts(row, phrases):
     for start, end in sentence_spans(row.content):
         text = row.content[start:end]
         for phrase in phrases:
-            for _, phrase_end in _phrase_positions(text, phrase):
+            for phrase_start, phrase_end in _phrase_positions(text, phrase):
+                # A name inside "the rival of <name>" is not the grammatical
+                # subject. Only an optional article may precede the matched name.
+                if not re.fullmatch(r'\s*(?:(?:the|an?)\s+)?', text[:phrase_start], re.I):
+                    continue
                 tail = text[phrase_end:]
-                # This grammar requires a direct locative predication about
-                # the matched name; a nearby different subject is insufficient.
-                match = re.match(r'\s+(?:is|was|are)\s+[^;.!?\n]{0,120}?\b(?:located|based|situated)\s+(?:at|in|on)\s+(.+?)[.!?。！？]*$', tail, re.I)
+                # Keep classificatory nouns deliberately bounded. Arbitrary
+                # words between "is" and "located" could hide a subordinate
+                # clause with its own subject, as in "is studying whether ...".
+                classifier = (r'(?:(?:a|an|the)\s+(?:(?:museum|nonprofit|educational|'
+                              r'center|centre|for|poetry|institution|and|cultural|arts|'
+                              r'organization|organisation)\s+){1,16})?')
+                match = re.fullmatch(r'\s+(?:is|was|are)\s+' + classifier +
+                    r'(?:located|based|situated)\s+(?:at|in|on)\s+(.+?)[.!?。！？]*', tail, re.I)
                 if match is None:
-                    match = re.match(r'\s*(?:位于|坐落于)\s*(.+?)[。！？]*$', tail)
+                    match = re.fullmatch(r'\s*(?:位于|坐落于)\s*(.+?)[。！？]*', tail)
                 if match is None or re.search(r'\b(?:not|may|might|could|would|should|unlikely|allegedly|possibly|formerly|previously)\b|不位于|可能', tail, re.I):
                     continue
                 place = match[1].strip(' .。')

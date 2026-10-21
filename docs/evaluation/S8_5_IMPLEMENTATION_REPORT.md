@@ -47,6 +47,20 @@ python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/tes
 
 **273 passed，exit 0，3.24 秒**，`var/reports/s8-5/stage1/history-origin-green.txt/.exit`。生成边界另行 RED 1 failed → GREEN **85 passed，exit 0**：`python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s85_generation_history_boundary.py tests/weknora_port/test_generation.py`，证据 `generation-{red,green}.txt/.exit`。重复过渡运行不累加为测试总量。
 
+### 阶段 2：证据校验与账本修复（OFFLINE_PASS）
+
+修改 `retrieval/bridge_rescue.py:validate_extraction/_relation_ending/_location_facts/PRONOUN`：完整对象后只允许直接属于该关系的时间短语与少量无新主体的并列谓词；对象后多出的 Annex/II/Foundation、后续 moving/另一个人物的时间均不准入。地点匹配从句首的完整实体开始，只允许直接地点谓词或窄范围的机构类别补语；rival-of、laboratory 嵌套主体、否定和不确定句拒绝。补全英语/中文第一、二、三人称代词。原文 span、关系句式、主体身份分开记录；Frost 原句已证明 span/form 有效而主体仍未验证。
+
+修改 `scripts/s8_4_bridge_ecs.py:validate_settlements`：PG/执行两侧都按 `(request_id, capability)` 唯一建键，要求键集合完全相同，之后再逐项对比模型、wire 和真实 usage。仅修复校验函数，不改冻结收据和历史结果。
+
+RED：新增语义/账本测试 **34 failed / 58 passed，exit 1**；GREEN（增加两个边界测试后）**183 passed，exit 0，1.63 秒**。
+
+```powershell
+python -B -m pytest -q -p no:reporter -p no:cacheprovider tests/weknora_port/test_s85_bridge_semantics.py tests/weknora_port/test_bridge_rescue.py tests/weknora_port/test_bridge_pipeline.py tests/weknora_port/test_s8_4_bridge_ecs.py
+```
+
+证据：`var/reports/s8-5/stage2/{red,green}.stdout.txt/.stderr.txt/.exit-code.txt/.command.json`。阶段 2 使用旧偏移合同隔离复现语义缺陷；阶段 3 随活动合同迁移工程测试，旧冻结 JSON 和真实响应保持原样。
+
 ## 执行流程（由实际调用点核对，后续以离线轨迹验收）
 
 ```mermaid

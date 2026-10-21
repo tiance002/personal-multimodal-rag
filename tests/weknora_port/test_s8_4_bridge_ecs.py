@@ -269,6 +269,41 @@ def test_dual_ledger_usage_is_reported_by_capability():
     assert totals["rerank"]["calls"] == 0
 
 
+@pytest.mark.parametrize("duplicate_side", ["pg", "execution"])
+def test_s85_dual_ledger_rejects_duplicate_keys_on_each_side(duplicate_side):
+    row, entry = settlement()
+    second_row, second_entry = deepcopy(row), deepcopy(entry)
+    second_row["request_id"] = second_entry["request_id"] = RID + "-second"
+    rows, entries = [row, second_row], [entry, second_entry]
+    if duplicate_side == "pg":
+        rows[1] = deepcopy(row)
+    else:
+        entries[1] = deepcopy(entry)
+    plan = {RID: "chat", RID + "-second": "chat"}
+    with pytest.raises(ValueError):
+        runner.validate_settlements(rows, entries, plan, ROLES)
+
+
+def test_s85_dual_ledger_requires_exact_key_sets_at_equal_record_counts():
+    row, entry = settlement()
+    second_row, second_entry = deepcopy(row), deepcopy(entry)
+    second_row["request_id"] = RID + "-pg-only"
+    second_entry["request_id"] = RID + "-execution-only"
+    plan = {RID: "chat", RID + "-pg-only": "chat", RID + "-execution-only": "chat"}
+    with pytest.raises(ValueError):
+        runner.validate_settlements([row, second_row], [entry, second_entry], plan, ROLES)
+
+
+def test_s85_dual_ledger_matches_by_operation_key_independent_of_record_order():
+    row, entry = settlement()
+    rerank_row, rerank_entry = settlement("rerank")
+    rerank_row["request_id"] = rerank_entry["request_id"] = RID + "-rerank"
+    totals = runner.validate_settlements([row, rerank_row], [rerank_entry, entry],
+        {RID: "chat", RID + "-rerank": "rerank"}, ROLES)
+    assert totals["chat"] == {"calls": 1, "input_tokens": 10, "output_tokens": 5, "total_tokens": 15}
+    assert totals["rerank"] == totals["chat"]
+
+
 def test_unknown_close_keeps_held_tokens_and_never_reopens_history():
     data = {"status": "STOP", "entries": [{"status": "UNKNOWN", "held_tokens": 1234}]}
     before = deepcopy(data)
