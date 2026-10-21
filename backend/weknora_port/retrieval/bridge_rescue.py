@@ -430,6 +430,29 @@ def _location_facts(row, phrases):
     return facts
 
 
+def _literal_prefix_search_clues(object):
+    """At most three literal name prefixes; none establishes an alias.
+
+    Only the most specific useful whole-word prefixes are considered. The
+    verified complete object remains the relation object and the Q1 target.
+    """
+    words = list(re.finditer(r"[^\W\d_]+(?:['’\-][^\W\d_]+)*", object))
+    function_words = {'a', 'an', 'the', 'of', 'for', 'at', 'in', 'on', 'to', 'and', 'or'}
+    clues = []
+    for index in range(len(words) - 2, -1, -1):
+        prefix_words = words[:index + 1]
+        if prefix_words[-1][0].casefold() in function_words:
+            continue
+        if sum(word[0].casefold() not in function_words for word in prefix_words) < 2:
+            continue
+        clue = object[:prefix_words[-1].end()]
+        if len(clue) >= 4 and clue not in clues:
+            clues.append(clue)
+        if len(clues) == 3:
+            break
+    return tuple(clues)
+
+
 def _round_one(state):
     raw = next((x for x in reversed(state.evidence_trace) if x.get('stage') == 'rerank_raw'), None)
     filtered = next((x for x in reversed(state.evidence_trace) if x.get('stage') == 'rerank_filter_mmr'), None)
@@ -560,7 +583,8 @@ async def rescue_bridge(state, context, repository, registry):
         # Read back only the normal originals required to establish complementarity.
         normal_search = [r for r in state.search_results if r is not None and r.id in final_ids
                          and r.chunk_type == 'text' and r.id not in {x.id for x in originals}]
-        for row in await _read_originals(normal_search, state, context, repository):
+        normal_originals = await _read_originals(normal_search, state, context, repository)
+        for row in normal_originals:
             if _location_facts(row, phrases):
                 _trace(state, 'NORMAL_EVIDENCE_ALREADY_COMPLETE')
                 return
@@ -569,10 +593,27 @@ async def rescue_bridge(state, context, repository, registry):
             raise ValueError('BRIDGE_QUERY_TOO_LONG')
         _trace(state, 'BRIDGE_QUERY_VERIFIED', q1=q1, object=data['object'], target_attribute=data['target_attribute'])
         first_scores, accepted = _round_one(state)
-        pool = [r for r in state.search_results if r is not None and r.id not in accepted and
+        rejected = [r for r in state.search_results if r is not None and r.id not in accepted and
                 r.id not in final_ids and r.chunk_type == 'text' and
-                r.id in first_scores and first_scores[r.id] < state.rerank_threshold and
+                r.id in first_scores and first_scores[r.id] < state.rerank_threshold]
+        pool = [r for r in rejected if
                 any(any(_phrase_positions(r.content, phrase)) for phrase in phrases)]
+        if not pool:
+            prefix_clues = _literal_prefix_search_clues(data['object'])
+            if prefix_clues:
+                _trace(state, 'LITERAL_PREFIX_SEARCH_CLUES', object=data['object'],
+                       search_clues=list(prefix_clues), provenance='DETERMINISTIC_LITERAL_PREFIX',
+                       entity_aliases_verified=False)
+                # A prefix is only a retrieval clue. It must still be the
+                # grammatical subject of a direct original locative fact.
+                # Existing exact/model-clue pools are deliberately unchanged.
+                phrases = list(dict.fromkeys([*phrases, *prefix_clues]))
+                if any(_location_facts(row, prefix_clues) for row in [*originals, *normal_originals]):
+                    _trace(state, 'NORMAL_EVIDENCE_ALREADY_COMPLETE',
+                           reason='LITERAL_PREFIX_LOCATION_ALREADY_PRESENT')
+                    return
+                pool = [r for r in rejected if
+                        any(any(_phrase_positions(r.content, phrase)) for phrase in prefix_clues)]
         if not pool:
             _trace(state, 'BRIDGE_EXTRACTION_UNVERIFIED', reason='SECOND_HOP_SOURCE_NOT_IN_POOL', count=0)
             return
