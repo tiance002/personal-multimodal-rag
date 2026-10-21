@@ -188,8 +188,13 @@ class GenerationCoordinator:
                         if publish_live:
                             await self.store.append_event(request.session_id, request.message_id, notice)
                         continue
-                    if request.is_fallback and event.is_final and event.response_type=='answer' and data.get('provider_answer_done') is False:
-                        continue  # adapter EOF bookkeeping is not the source channel's Done.
+                    if event.is_final and event.response_type=='answer' and data.get('provider_answer_done') is False:
+                        if request.is_fallback:
+                            continue  # adapter EOF bookkeeping is not the source channel's Done.
+                        # The adapter has already settled the response and any
+                        # reported usage. Its EOF/[DONE] bookkeeping cannot
+                        # certify that this answer actually finished.
+                        raise GenerationError('PROVIDER_STREAM_INCOMPLETE',sent=True)
                     if request.is_fallback and event.response_type=='thinking':
                         continue  # fixed source fallback consumer handles answer events only.
                     if event.response_type == 'thinking':

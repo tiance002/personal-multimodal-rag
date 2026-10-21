@@ -78,3 +78,36 @@ def test_full_transport_errors_do_not_upgrade(kind):
             if kind=='wrongmodel':assert life.finished[0][0].model_reported=='wrong-model'
         finally:await transport.aclose()
     asyncio.run(exercise())
+
+@pytest.mark.parametrize('ending',[b'data: [DONE]\n\n',b''])
+def test_reported_jean_without_finish_reason_is_not_a_completed_answer(ending):
+    """C3 wire regression: response receipt/usage and answer completion differ."""
+    async def exercise():
+        config=provider_config('siliconflow','Qwen/Qwen3.5-4B');gate=Gate()
+        packets=[]
+        for text,count in [('',0),('Jean',1)]:
+            value={'model':config.model,'choices':[{'index':0,'delta':{'content':text},'finish_reason':None}],
+                'usage':{'prompt_tokens':1298,'completion_tokens':count,'total_tokens':1298+count}}
+            packets.append(b'data: '+json.dumps(value).encode()+b'\n\n')
+        wire=b''.join(packets)+ending
+        transport=AsyncHTTPTransport(allowed_endpoints=[resolve_endpoint(config,'/chat/completions')],
+            gate=gate,credential=lambda _: 'SIMULATED-NOT-A-KEY',
+            http_transport=httpx.MockTransport(lambda _:httpx.Response(200,stream=Fragmented(wire))))
+        model=ProviderModel(config,transport);binding=RoleBinding('cheap',config.provider,config.model,config.base_url,model)
+        store=Store();commit=Committer(store);life=Lifecycle()
+        coordinator=GenerationCoordinator({'cheap':binding},store,commit,lifecycle=life)
+        try:
+            with pytest.raises(ProviderError,match='PROVIDER_STREAM_INCOMPLETE'):
+                await coordinator.run(request(),CTX)
+            assert len(gate.calls)==len(gate.finishes)==len(life.finished)==1
+            assert gate.finishes[0][1]=='RESPONSE_RECEIVED'
+            usage=gate.finishes[0][2]
+            assert usage.status=='REPORTED' and (usage.prompt_tokens,usage.completion_tokens,usage.total_tokens)==(1298,1,1299)
+            record=life.finished[0][0]
+            assert record.status=='FAILED' and record.usage==usage and record.finish_reason==''
+            assert record.error_code=='PROVIDER_STREAM_INCOMPLETE'
+            assert not commit.calls and not any(event.type=='complete' for event in store.events)
+            assert not store.events  # DYNAMIC Cheap draft remains private on failure.
+        finally:
+            await transport.aclose()
+    asyncio.run(exercise())

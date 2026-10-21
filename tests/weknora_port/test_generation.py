@@ -136,6 +136,31 @@ def test_clean_eof_and_duplicate_done_no_duplicate_answer():
     out=run(co.run(request(),CTX));assert out.answer=='onetwo'
     co,c,e,*_=setup([event('EOF without finish')]);out=run(co.run(request(),CTX));assert out.answer=='EOF without finish' and out.finish_reason==''
 
+@pytest.mark.parametrize('mode',['DYNAMIC','CHEAP_ONLY','EXPENSIVE_ONLY','OFF'])
+def test_explicit_unfinished_provider_final_never_commits_partial_or_upgrades(mode):
+    usage=TokenUsage(prompt_tokens=1298,completion_tokens=1,total_tokens=1299,status='REPORTED')
+    outputs=[event('Jean'),event(done=True,final=True,usage=usage,data={'provider_answer_done':False})]
+    co,c,e,store,commit,life=setup(outputs,outputs)
+    with pytest.raises(ProviderError,match='PROVIDER_STREAM_INCOMPLETE'):
+        run(co.run(request(mode),CTX))
+    assert len(c.calls)+len(e.calls)==1 and not commit.calls
+    assert not any(row.type=='complete' for row in store.events)
+    assert len(life.finished)==1
+    record=life.finished[0][0]
+    assert record.status=='FAILED' and record.error_code=='PROVIDER_STREAM_INCOMPLETE'
+    assert record.usage==usage and record.finish_reason==''
+
+@pytest.mark.parametrize('finish',['stop','length'])
+def test_explicit_finished_provider_final_retains_valid_completion_contract(finish):
+    usage=TokenUsage(prompt_tokens=12,completion_tokens=3,total_tokens=15,status='REPORTED')
+    co,c,e,store,commit,life=setup([
+        event('provider answer',done=True,finish=finish),
+        event(done=True,finish=finish,final=True,usage=usage,data={'provider_answer_done':True})])
+    result=run(co.run(request('CHEAP_ONLY'),CTX))
+    assert result.answer==commit.calls[0].answer=='provider answer'
+    assert result.finish_reason==finish and result.usage==usage and len(c.calls)==1 and not e.calls
+    assert store.events[-1].type=='complete'
+
 def test_cancel_after_cheap_prevents_expensive_and_publication():
     async def exercise():
         cancelled=asyncio.Event()
