@@ -212,10 +212,11 @@ def test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval(tm
 
 def test_current_request_tree_bound_and_ledger_caps(bounded_report):
     report = bounded_report
-    assert report['schema'] == 's862r-reservation-dryrun/v3' and report['status'] == 'DRY_RUN_COMPLETE'
-    assert report['requested_full_calls'] == 33
-    assert set(report['requested_batches']) == {'qu-only', 'compare', 'parallel', 'dependent'}
-    assert report['requested_batches']['qu-only']['max_calls'] == 6
+    assert report['schema'] == profile.BOUNDED_BUDGET_SCHEMA and report['status'] == 'DRY_RUN_COMPLETE'
+    assert report['requested_full_calls'] == 9
+    assert set(report['requested_batches']) == {'compare'}
+    assert set(report['candidate_scopes_not_authorized']) == {'qu-only', 'parallel', 'dependent'}
+    assert report['candidate_scopes_not_authorized']['qu-only']['max_calls'] == 6
     for case in profile.BOUNDED_QUESTIONS:
         row = report['submission_bounds'][case + ':query_structure_v1']
         assert row['max_calls'] == 9
@@ -336,7 +337,7 @@ def bounded_authorization(tmp_path, monkeypatch, report):
     batch.update(kind='http', model_ids=report['model_ids'], max_calls=9,
         qu_request_sha256s={batch['turns'][0]['request_id']: report['records']['compare:query_structure_v1:QU']['body_sha256']})
     ledger['max_calls'] = 9
-    owner.update(goal='S8.6.2-R', max_total_tokens=500000,
+    owner.update(goal=profile.BOUNDED_GOAL, max_total_tokens=500000,
         profile_sha256=profile.digest(profile.profile_manifest(bounded_query_profile=True)))
     budget = dict(report)
     budget['implementation_sha256_LF'] = profile.digest(Path(profile.__file__).read_bytes().replace(b'\r\n', b'\n'))
@@ -348,10 +349,12 @@ def bounded_authorization(tmp_path, monkeypatch, report):
 
 
 @pytest.mark.parametrize('mutation,code', [('', ''), ('old-goal', 'S861_FRESH_OWNER_AUTHORIZATION_REQUIRED'),
+    ('old-r-goal', 'S861_FRESH_OWNER_AUTHORIZATION_REQUIRED'),
     ('wire', 'S862R_EXACT_QU_PREFLIGHT_REQUIRED'), ('aggregate', 'S862R_AGGREGATE_RESERVATION_LIMIT')])
 def test_new_goal_admission_binds_current_request_and_preserves_ledger(tmp_path, monkeypatch, bounded_report, mutation, code):
     owner, ledger, environment, auth_path, ledger_path = bounded_authorization(tmp_path, monkeypatch, bounded_report)
     if mutation == 'old-goal': owner['goal'] = 'S8.6.1'
+    elif mutation == 'old-r-goal': owner['goal'] = 'S8.6.2-R'
     elif mutation == 'wire': owner['batches']['candidate-only']['qu_request_sha256s'] = {}
     elif mutation == 'aggregate': owner['max_total_tokens'] = 1
     write_json(auth_path, owner)

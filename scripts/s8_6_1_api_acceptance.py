@@ -24,7 +24,9 @@ PROMPT_B_SUFFIX = (
     'Distinguish derived conclusions from directly stated facts. Do not invent missing inputs, entities, dates, locations, or relationships. If the evidence does not support a required relation, explicitly state the uncertainty.'
 )
 PROFILE_ID = 's8.6.1-formal-api-prompt-b/v1'
-BOUNDED_PROFILE_ID = 's8.6.2-r-formal-api-prompt-b/v2'
+BOUNDED_PROFILE_ID = 's8.6.2-r3-formal-api-prompt-b/v3'
+BOUNDED_GOAL = 'S8.6.2-R3'
+BOUNDED_BUDGET_SCHEMA = 's862r3-reservation-dryrun/v4'
 PROFILE_QUERY_BOUND = {'version': 'effective-query/v1', 'unicode_characters': 256, 'utf8_bytes': 1024}
 BASELINE = '0c496c230add039283c80635d4e7d4776a4e373b'
 KB_IDS = ('96a9eebd-ffb2-4bc6-9bea-3ed015845479',)
@@ -381,9 +383,16 @@ def profile_manifest(*, bounded_query_profile=False):
         'new_actual_provider_calls': 0, 'authorization': 'NONE'}
     if bounded_query_profile:
         from backend.weknora_port.retrieval.rule_registry import RULES, render_classification_guidance
-        manifest.update(profile=BOUNDED_PROFILE_ID, goal='S8.6.2-R',
-            question_inputs=BOUNDED_QUESTIONS, modes=['query_structure_v1'],
-            qu_only_inputs=QU_ONLY_QUESTIONS, effective_query_input_contract=dict(PROFILE_QUERY_BOUND),
+        from backend.weknora_port.retrieval import query as query_module
+        manifest.update(profile=BOUNDED_PROFILE_ID, goal=BOUNDED_GOAL,
+            question_inputs={'compare': BOUNDED_QUESTIONS['compare']}, modes=['query_structure_v1'],
+            candidate_inputs_not_authorized={case: question for case, question in BOUNDED_QUESTIONS.items()
+                if case != 'compare'}, qu_only_inputs={},
+            effective_query_input_contract=dict(PROFILE_QUERY_BOUND),
+            query_implementation_sha256_LF=digest(Path(query_module.__file__).read_bytes().replace(b'\r\n', b'\n')),
+            qu_prompt_sha256s={name: digest(getattr(query_module, name).encode('utf8'))
+                for name in ('_QU_V2_SYSTEM', '_QU_V2_USER', '_REWRITE_GUARD_V2')},
+            execution_scope='one initial compare HTTP submission; other cases require a later explicit authorization',
             raw_qu_response_capture='private normal Registry delegate; no response replacement',
             input_guard_stage='understand/completed; before planning, Embedding, Search and Rerank',
             input_bound_failure='PROFILE_INPUT_BOUND_EXCEEDED',
@@ -399,7 +408,7 @@ def _approved(environment):
     require(path, 'S861_FRESH_OWNER_AUTHORIZATION_REQUIRED')
     value = json.loads(Path(path).read_text(encoding='utf8'))
     bounded = environment.get('S861_BOUNDED_QUERY_PROFILE', 'false').lower() == 'true'
-    require(value.get('goal') == ('S8.6.2-R' if bounded else 'S8.6.1') and value.get('owner_approved') is True,
+    require(value.get('goal') == (BOUNDED_GOAL if bounded else 'S8.6.1') and value.get('owner_approved') is True,
             'S861_FRESH_OWNER_AUTHORIZATION_REQUIRED')
     require(value.get('profile_sha256') == digest(profile_manifest(bounded_query_profile=bounded)),
             'S861_AUTH_PROFILE_MISMATCH')
@@ -412,7 +421,8 @@ def _approved(environment):
     batch = environment.get('S861_BATCH_ID')
     scope = value.get('batches', {}).get(batch, {})
     if bounded:
-        require(scope.get('kind') in ('http', 'qu_only'), 'S862R_APPROVED_BATCH_KIND_REQUIRED')
+        require(scope.get('kind') == 'http' and len(scope.get('turns', [])) == 1
+            and scope['turns'][0].get('case') == 'compare', 'S862R3_INITIAL_COMPARE_ONLY')
         require(type(value.get('max_total_tokens')) is int and 0 < value['max_total_tokens'] <= 500000
             and sum(row.get('max_tokens', 500001) for row in value['batches'].values()) <= value['max_total_tokens'],
             'S862R_AGGREGATE_RESERVATION_LIMIT')
@@ -443,7 +453,7 @@ def _approved(environment):
     budget_bytes = Path(budget_path).read_bytes()
     require(digest(budget_bytes) == value.get('budget_preflight_sha256'), 'S861_BUDGET_PREFLIGHT_HASH_MISMATCH')
     budget = json.loads(budget_bytes)
-    require(budget.get('schema') == ('s862r-reservation-dryrun/v3' if bounded else 's861-reservation-dryrun/v2')
+    require(budget.get('schema') == (BOUNDED_BUDGET_SCHEMA if bounded else 's861-reservation-dryrun/v2')
         and budget.get('profile_sha256') == digest(profile_manifest(bounded_query_profile=bounded))
         and budget.get('implementation_sha256_LF') == digest(Path(__file__).read_bytes().replace(b'\r\n', b'\n')),
         'S861_BUDGET_PREFLIGHT_IMPLEMENTATION_MISMATCH')
@@ -855,7 +865,7 @@ def _bounded_dryrun_report(report, configs, query_chars, child_chars, child_lite
         'fits_existing_ledger': len(qu_names) <= 12 and costs(qu_names) <= 100000}
     recommended = {case: row for case, row in batches.items() if row['fits_existing_ledger']}
     complete = len(recommended) == len(batches)
-    report.update(schema='s862r-reservation-dryrun/v3',
+    report.update(schema=BOUNDED_BUDGET_SCHEMA,
         status='DRY_RUN_COMPLETE' if complete else 'BLOCKED_RESERVATION_BUDGET',
         profile=BOUNDED_PROFILE_ID, submission_bounds=bounds, requested_batches=batches,
         recommended_batches_not_authorized=recommended,
@@ -880,6 +890,20 @@ def _bounded_dryrun_report(report, configs, query_chars, child_chars, child_lite
         image_identity='NOT_BUILT_FOR_CURRENT_SOURCE',
         no_scope_reduction_assumes_two_objects=True,
         classification_quality='NOT_RUN; synthetic UNKNOWN captures exact normal understand_query request only')
+    # R3 starts with one HTTP comparison. Other complete request-tree previews
+    # remain inspectable candidates, never an implicit send authorization.
+    initial = {'compare': batches['compare']}
+    report.update(status='DRY_RUN_COMPLETE' if initial['compare']['fits_existing_ledger'] else 'BLOCKED_RESERVATION_BUDGET',
+        budget_block_reason='' if initial['compare']['fits_existing_ledger'] else 'Initial comparison exceeds the existing12-call/100000 reservation fence.',
+        requested_batches=initial,
+        requested_full_calls=initial['compare']['max_calls'],
+        recommended_batches_not_authorized=initial if initial['compare']['fits_existing_ledger'] else {},
+        recommended_max_calls=initial['compare']['max_calls'] if initial['compare']['fits_existing_ledger'] else 0,
+        recommended_reservation_upper=initial['compare']['reservation_tokens_upper']
+            if initial['compare']['fits_existing_ledger'] else 0,
+        candidate_scopes_not_authorized={case: row for case, row in batches.items() if case != 'compare'},
+        qu_only_phase='NOT_REQUESTED_IN_R3',
+        subsequent_http_cases='NOT_AUTHORIZED; require a separate explicit Owner decision')
     report['output_caps'].update(QU_on=256, extract=256, final_each_role=2048)
     report['model_ids'] = {role: config.model_id for role, config in configs.items()}
     return report
