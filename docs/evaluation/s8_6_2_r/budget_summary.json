@@ -1,0 +1,336 @@
+{
+  "schema": "s862r-reservation-dryrun/v3",
+  "status": "DRY_RUN_COMPLETE",
+  "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+  "implementation_sha256_LF": "ca99eaea03f792cc7f3b2c26a3ec5416d42c533f6bba42f94f669150eb4db07a",
+  "inventory_sha256": "e06fd4cf9cb6c6ede57af729373564669452276128304e6f059e1c27cae1eb6f",
+  "frozen_source_sha256": "e3dbf7ee2f280b4b2f7b4438b89f2691faefb7e103649acc661e3d0a700b1135",
+  "effective_query_input_contract": {
+    "version": "effective-query/v1",
+    "unicode_characters": 256,
+    "utf8_bytes": 1024
+  },
+  "derived_query_bounds": {
+    "initial_characters": 256,
+    "initial_utf8_bytes": 1024,
+    "child_characters": 288,
+    "child_utf8_bytes": 1056,
+    "child_derivation": "disjoint exact object/dimension spans plus longest enabled Registry template literal",
+    "Q1_characters": 192,
+    "Q1_utf8_bytes_upper": 768,
+    "json_string_bytes_per_character_upper": 6,
+    "nested_json": "actual extraction_payload then json.dumps then ProviderModel request renderer"
+  },
+  "output_caps": {
+    "QU_off": 150,
+    "QU_on": 256,
+    "extract": 256,
+    "final_each_role": 2048
+  },
+  "requested_batches": {
+    "compare": {
+      "kind": "http",
+      "submissions": [
+        "compare:query_structure_v1"
+      ],
+      "max_calls": 9,
+      "reservation_tokens_upper": 65261,
+      "fits_existing_ledger": true
+    },
+    "dependent": {
+      "kind": "http",
+      "submissions": [
+        "dependent:query_structure_v1"
+      ],
+      "max_calls": 9,
+      "reservation_tokens_upper": 65240,
+      "fits_existing_ledger": true
+    },
+    "parallel": {
+      "kind": "http",
+      "submissions": [
+        "parallel:query_structure_v1"
+      ],
+      "max_calls": 9,
+      "reservation_tokens_upper": 65210,
+      "fits_existing_ledger": true
+    },
+    "qu-only": {
+      "kind": "qu_only",
+      "submissions": [
+        "qu-only:two-object",
+        "qu-only:three-object",
+        "qu-only:parallel",
+        "qu-only:numeric-model",
+        "qu-only:relational-negative",
+        "qu-only:dimension-negative"
+      ],
+      "max_calls": 6,
+      "reservation_tokens_upper": 41712,
+      "fits_existing_ledger": true
+    }
+  },
+  "submission_bounds": {
+    "compare:query_structure_v1": {
+      "max_calls": 9,
+      "reservation_tokens_upper": 65261,
+      "physical_call_records": [
+        "compare:query_structure_v1:QU",
+        "embedding:initial",
+        "rerank:initial",
+        "extract",
+        "old-pool",
+        "embedding:Q1",
+        "rerank:Q1",
+        "compare:final:cheap",
+        "compare:final:expensive"
+      ],
+      "maximum_reservation_path": "dependent-max1-new-search",
+      "request_paths": {
+        "plain": {
+          "max_calls": 5,
+          "reservation_tokens_upper": 41220,
+          "physical_call_records": [
+            "compare:query_structure_v1:QU",
+            "embedding:initial",
+            "rerank:initial",
+            "compare:final:cheap",
+            "compare:final:expensive"
+          ]
+        },
+        "simple-family-max3": {
+          "max_calls": 9,
+          "reservation_tokens_upper": 62260,
+          "physical_call_records": [
+            "compare:query_structure_v1:QU",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "compare:final:cheap",
+            "compare:final:expensive"
+          ]
+        },
+        "dependent-max1-new-search": {
+          "max_calls": 9,
+          "reservation_tokens_upper": 65261,
+          "physical_call_records": [
+            "compare:query_structure_v1:QU",
+            "embedding:initial",
+            "rerank:initial",
+            "extract",
+            "old-pool",
+            "embedding:Q1",
+            "rerank:Q1",
+            "compare:final:cheap",
+            "compare:final:expensive"
+          ]
+        }
+      },
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": true,
+      "query_type_is_not_injected": true
+    },
+    "dependent:query_structure_v1": {
+      "max_calls": 9,
+      "reservation_tokens_upper": 65240,
+      "physical_call_records": [
+        "dependent:query_structure_v1:QU",
+        "embedding:initial",
+        "rerank:initial",
+        "extract",
+        "old-pool",
+        "embedding:Q1",
+        "rerank:Q1",
+        "dependent:final:cheap",
+        "dependent:final:expensive"
+      ],
+      "maximum_reservation_path": "dependent-max1-new-search",
+      "request_paths": {
+        "plain": {
+          "max_calls": 5,
+          "reservation_tokens_upper": 41199,
+          "physical_call_records": [
+            "dependent:query_structure_v1:QU",
+            "embedding:initial",
+            "rerank:initial",
+            "dependent:final:cheap",
+            "dependent:final:expensive"
+          ]
+        },
+        "simple-family-max3": {
+          "max_calls": 9,
+          "reservation_tokens_upper": 62239,
+          "physical_call_records": [
+            "dependent:query_structure_v1:QU",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "dependent:final:cheap",
+            "dependent:final:expensive"
+          ]
+        },
+        "dependent-max1-new-search": {
+          "max_calls": 9,
+          "reservation_tokens_upper": 65240,
+          "physical_call_records": [
+            "dependent:query_structure_v1:QU",
+            "embedding:initial",
+            "rerank:initial",
+            "extract",
+            "old-pool",
+            "embedding:Q1",
+            "rerank:Q1",
+            "dependent:final:cheap",
+            "dependent:final:expensive"
+          ]
+        }
+      },
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": true,
+      "query_type_is_not_injected": true
+    },
+    "parallel:query_structure_v1": {
+      "max_calls": 9,
+      "reservation_tokens_upper": 65210,
+      "physical_call_records": [
+        "parallel:query_structure_v1:QU",
+        "embedding:initial",
+        "rerank:initial",
+        "extract",
+        "old-pool",
+        "embedding:Q1",
+        "rerank:Q1",
+        "parallel:final:cheap",
+        "parallel:final:expensive"
+      ],
+      "maximum_reservation_path": "dependent-max1-new-search",
+      "request_paths": {
+        "plain": {
+          "max_calls": 5,
+          "reservation_tokens_upper": 41169,
+          "physical_call_records": [
+            "parallel:query_structure_v1:QU",
+            "embedding:initial",
+            "rerank:initial",
+            "parallel:final:cheap",
+            "parallel:final:expensive"
+          ]
+        },
+        "simple-family-max3": {
+          "max_calls": 9,
+          "reservation_tokens_upper": 62209,
+          "physical_call_records": [
+            "parallel:query_structure_v1:QU",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "embedding:compare-child",
+            "rerank:compare-child",
+            "parallel:final:cheap",
+            "parallel:final:expensive"
+          ]
+        },
+        "dependent-max1-new-search": {
+          "max_calls": 9,
+          "reservation_tokens_upper": 65210,
+          "physical_call_records": [
+            "parallel:query_structure_v1:QU",
+            "embedding:initial",
+            "rerank:initial",
+            "extract",
+            "old-pool",
+            "embedding:Q1",
+            "rerank:Q1",
+            "parallel:final:cheap",
+            "parallel:final:expensive"
+          ]
+        }
+      },
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": true,
+      "query_type_is_not_injected": true
+    },
+    "qu-only:two-object": {
+      "max_calls": 1,
+      "reservation_tokens_upper": 6972,
+      "physical_call_records": [
+        "qu-only:two-object:query_structure_v1:QU"
+      ],
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": false
+    },
+    "qu-only:three-object": {
+      "max_calls": 1,
+      "reservation_tokens_upper": 6970,
+      "physical_call_records": [
+        "qu-only:three-object:query_structure_v1:QU"
+      ],
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": false
+    },
+    "qu-only:parallel": {
+      "max_calls": 1,
+      "reservation_tokens_upper": 6955,
+      "physical_call_records": [
+        "qu-only:parallel:query_structure_v1:QU"
+      ],
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": false
+    },
+    "qu-only:numeric-model": {
+      "max_calls": 1,
+      "reservation_tokens_upper": 6960,
+      "physical_call_records": [
+        "qu-only:numeric-model:query_structure_v1:QU"
+      ],
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": false
+    },
+    "qu-only:relational-negative": {
+      "max_calls": 1,
+      "reservation_tokens_upper": 6930,
+      "physical_call_records": [
+        "qu-only:relational-negative:query_structure_v1:QU"
+      ],
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": false
+    },
+    "qu-only:dimension-negative": {
+      "max_calls": 1,
+      "reservation_tokens_upper": 6925,
+      "physical_call_records": [
+        "qu-only:dimension-negative:query_structure_v1:QU"
+      ],
+      "actual_usage": "NOT_RUN",
+      "final_generation_reserve_included": false
+    }
+  },
+  "requested_full_calls": 33,
+  "recommended_max_calls": 33,
+  "recommended_reservation_upper": 237423,
+  "fallback_included": true,
+  "query_expansion": false,
+  "automatic_threshold_retry_calls": 0,
+  "all_searchable_rows_matched": 11,
+  "physical_embedding_groups": 1,
+  "memory_calls": 0,
+  "source_revision": "5f81e781e1648e8496ecd974b8cca234e3d8b739",
+  "owner_total_token_authorization": 500000,
+  "owner_provider_attempts_limit": null,
+  "actual_new_tokens": 7268,
+  "actual_new_provider_attempts": 6,
+  "current_code_real_http_status": "NOT_RUN_AFTER_OFFLINE_IDENTITY_FIX",
+  "sent_code_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+  "sent_image": "sha256:c36eeaef8789e2de941d8914fefa4017e389c1ea59dfcefa1134a1e12702f156",
+  "sent_implementation_sha256_LF": "243c67d38bc19a642b17af94b804f3e1a28ba771ffdaeb7d4b426c2499e44a8a",
+  "request_body_hashes_unchanged_after_identity_fix": true,
+  "sent_preflight_sha256": "e249bfe4b71fa5cc10f5a0d5b8114e8cd4c45819be8f967e5ea1fae5892ed213",
+  "current_preflight_sha256": "0eca90b61b664cc494164b6f0ca647391d547a1715c38250d31c7ccff63e9d72"
+}

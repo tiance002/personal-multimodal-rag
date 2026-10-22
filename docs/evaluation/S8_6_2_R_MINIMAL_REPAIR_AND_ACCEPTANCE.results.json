@@ -1,0 +1,118 @@
+{
+  "schema": "s862r-minimal-repair-acceptance/v1",
+  "generated_at_utc": "2026-10-22T01:24:52.052733+00:00",
+  "status": "MINIMAL_REPAIR_OFFLINE_PASS_REAL_HTTP_BLOCKED",
+  "baseline": "71188d04e3f0ecd2ecbe761221f5bb127ac0bd04",
+  "branch": "codex/s8-6-adaptive-retrieval-20261021",
+  "rule_fix_commit": "eaccaa0b6920635fa98b4f633e4c81cfd171c6ea",
+  "bounded_profile_commit": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+  "latest_source_commit": "5f81e781e1648e8496ecd974b8cca234e3d8b739",
+  "identity_fix_real_validation": "NOT_RUN",
+  "production_ready": false,
+  "rule_versions": {
+    "COMPARE_SHARED": "2",
+    "PARALLEL_ATTRIBUTE": "2"
+  },
+  "minimal_counterexamples": {
+    "assigned_types": true,
+    "before_missplits": 4,
+    "after_single_query_fallbacks": 4,
+    "live_classification_claim": false
+  },
+  "offline": {
+    "rule_regressions": "PASS",
+    "budget_and_boundaries": "PASS",
+    "identity_fix": "PASS",
+    "scoped_counts_not_additive": [
+      273,
+      103,
+      96,
+      13
+    ],
+    "development_positive_slots_spans": [
+      24,
+      24
+    ],
+    "development_negative_false_splits": [
+      0,
+      31
+    ],
+    "type_gate_cases": [
+      11,
+      11
+    ],
+    "development_set_unchanged": true,
+    "agent_review_not_owner_signoff": true,
+    "production_accuracy_claim": false
+  },
+  "real": {
+    "qu_completed": 6,
+    "http_submitted": 1,
+    "http_completed_answers": 0,
+    "http_remaining_not_run": 2,
+    "actual_provider_attempts": 6,
+    "settled": 6,
+    "unknown": 0,
+    "actual_input_tokens": 7074,
+    "actual_output_tokens": 194,
+    "actual_total_tokens": 7268,
+    "unsettled_held_tokens": 0,
+    "original_reservations_sum": 41712,
+    "final_answer_correct": "NOT_EVALUABLE",
+    "latest_formal_api_acceptance": "NOT_RUN_AFTER_OFFLINE_IDENTITY_FIX",
+    "frost_direct_event_venue_relation": "UNVERIFIED_NOT_NEWLY_TESTED",
+    "pg_local_exact_reconciliation": "PASS"
+  },
+  "authorization": {
+    "owner_total_tokens": 500000,
+    "owner_provider_attempts_limit": null,
+    "planned_request_tree_calls": 33,
+    "planned_request_tree_reservation": 237423,
+    "new_ledger_status": "ALL_CLOSED",
+    "no_resend_after_failure": true
+  },
+  "preservation": {
+    "baseline_tracked_unchanged_files": 115,
+    "authorized_script_changed": true,
+    "formal_api_worker_unchanged": true,
+    "old_pg_unknown_count": 3,
+    "old_pg_unknown_fingerprint_preserved": true,
+    "source_scope_11_chunks_preserved": true,
+    "index_definitions_87_preserved": true,
+    "old_gold_and_frozen_reports_unchanged": true,
+    "new_production_modules_changed": [
+      "retrieval/rule_registry.py"
+    ]
+  },
+  "not_run": [
+    "latest repaired source HTTP acceptance",
+    "parallel HTTP question",
+    "Frost HTTP question",
+    "final answer quality",
+    "citations and final Context readback",
+    "HTTP replay no resend",
+    "second authenticated user"
+  ],
+  "limitations": [
+    "Known 日/差/无 conservative substring rejections remain",
+    "Three real English QU rewrites dropped terminal punctuation and safely fell back",
+    "Missing-dimension QU classification suggested SIMPLE_COMPARE; program safely rejected",
+    "Real relational guard not exercised because model returned UNKNOWN",
+    "No third rule family, planner, HyDE, memory, P5 or production deployment"
+  ],
+  "artifacts": {
+    "accepted-identity-green": "docs/evaluation/s8_6_2_r/accepted-identity-green.txt",
+    "accepted-identity-red": "docs/evaluation/s8_6_2_r/accepted-identity-red.txt",
+    "artifact_manifest": "docs/evaluation/s8_6_2_r/artifact_manifest.json",
+    "budget_summary": "docs/evaluation/s8_6_2_r/budget_summary.json",
+    "command_results": "docs/evaluation/s8_6_2_r/command_results.json",
+    "counterexamples": "docs/evaluation/s8_6_2_r/counterexamples.json",
+    "development_coverage_summary": "docs/evaluation/s8_6_2_r/development_coverage_summary.json",
+    "http_failure": "docs/evaluation/s8_6_2_r/http_failure.json",
+    "real_qu_samples": "docs/evaluation/s8_6_2_r/real_qu_samples.json",
+    "receipt_summary": "docs/evaluation/s8_6_2_r/receipt_summary.json",
+    "review-red-correct-root": "docs/evaluation/s8_6_2_r/review-red-correct-root.txt",
+    "rules-green": "docs/evaluation/s8_6_2_r/rules-green.txt"
+  },
+  "private_evidence_root": "E:\\RAG quention\\var\\reports\\s8-6-2-r"
+}

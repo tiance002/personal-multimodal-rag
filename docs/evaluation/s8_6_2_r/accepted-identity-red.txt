@@ -1,0 +1,185 @@
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+_ test_accepted_client_identity_authorizes_original_client_and_preserves_server_run _
+
+    def test_accepted_client_identity_authorizes_original_client_and_preserves_server_run():
+        runtime, base, turn, approved, resolutions = accepted_client_fixture()
+        context, request = turn.context, turn.request
+        profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+>       result = asyncio.run(runtime.ordinary.configuration(turn))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s862r_preflight.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_1_api_acceptance.py:210: in configuration
+    require(len(allowed) == 1 and allowed[0]['question'] == turn.request.content,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, code = 'S861_APPROVED_TURN_REQUIRED'
+
+    def require(value, code):
+        if not value:
+>           raise ValueError(code)
+E           ValueError: S861_APPROVED_TURN_REQUIRED
+
+scripts\s8_6_1_api_acceptance.py:73: ValueError
+_ test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback[] _
+
+client = ''
+
+    @pytest.mark.parametrize('client', ['', None, 's861-unknown-client'])
+    def test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback(client):
+        runtime, base, turn, approved, resolutions = accepted_client_fixture()
+        # An adversarial/incomplete AcceptedTurn cannot gain admission from a
+        # nested request_id that happens to equal an approved HTTP client ID.
+        turn = replace(turn, client_request_id=client,
+            request=replace(turn.request, request_id=approved['turns'][0]['request_id']))
+        profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+>       with pytest.raises(ValueError, match='S861_APPROVED_TURN_REQUIRED'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\weknora_port\test_s862r_preflight.py:95: Failed
+_ test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback[None] _
+
+client = None
+
+    @pytest.mark.parametrize('client', ['', None, 's861-unknown-client'])
+    def test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback(client):
+        runtime, base, turn, approved, resolutions = accepted_client_fixture()
+        # An adversarial/incomplete AcceptedTurn cannot gain admission from a
+        # nested request_id that happens to equal an approved HTTP client ID.
+        turn = replace(turn, client_request_id=client,
+            request=replace(turn.request, request_id=approved['turns'][0]['request_id']))
+        profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+>       with pytest.raises(ValueError, match='S861_APPROVED_TURN_REQUIRED'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\weknora_port\test_s862r_preflight.py:95: Failed
+_ test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback[s861-unknown-client] _
+
+client = 's861-unknown-client'
+
+    @pytest.mark.parametrize('client', ['', None, 's861-unknown-client'])
+    def test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback(client):
+        runtime, base, turn, approved, resolutions = accepted_client_fixture()
+        # An adversarial/incomplete AcceptedTurn cannot gain admission from a
+        # nested request_id that happens to equal an approved HTTP client ID.
+        turn = replace(turn, client_request_id=client,
+            request=replace(turn.request, request_id=approved['turns'][0]['request_id']))
+        profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+>       with pytest.raises(ValueError, match='S861_APPROVED_TURN_REQUIRED'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\weknora_port\test_s862r_preflight.py:95: Failed
+______ test_accepted_client_identity_cannot_rebind_to_second_server_run _______
+
+    def test_accepted_client_identity_cannot_rebind_to_second_server_run():
+        runtime, base, turn, approved, resolutions = accepted_client_fixture()
+        profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+>       asyncio.run(runtime.ordinary.configuration(turn))
+
+tests\weknora_port\test_s862r_preflight.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_1_api_acceptance.py:210: in configuration
+    require(len(allowed) == 1 and allowed[0]['question'] == turn.request.content,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, code = 'S861_APPROVED_TURN_REQUIRED'
+
+    def require(value, code):
+        if not value:
+>           raise ValueError(code)
+E           ValueError: S861_APPROVED_TURN_REQUIRED
+
+scripts\s8_6_1_api_acceptance.py:73: ValueError
+_ test_accepted_client_identity_qu_body_lookup_uses_client_but_model_context_uses_server_run _
+
+bounded_report = {'schema': 's862r-reservation-dryrun/v3', 'status': 'DRY_RUN_COMPLETE', 'profile_sha256': '491307defefcf7b3010058e27b1...8d93513bdb33d8cc', 'implementation_sha256_LF': '243c67d38bc19a642b17af94b804f3e1a28ba771ffdaeb7d4b426c2499e44a8a', ...}
+tmp_path = WindowsPath('E:/RAG quention/var/reports/s8-6-2-r/budget/temp-accepted-red/test_accepted_client_identity_0')
+
+    def test_accepted_client_identity_qu_body_lookup_uses_client_but_model_context_uses_server_run(bounded_report, tmp_path):
+        from backend.weknora_port.retrieval.query import understand_query
+        runtime, base, turn, approved, _ = accepted_client_fixture()
+        approved.update(model_ids=bounded_report['model_ids'], qu_model_id=bounded_report['model_ids']['cheap'],
+            qu_request_sha256s={turn.client_request_id: bounded_report['records']['compare:query_structure_v1:QU']['body_sha256']})
+        base.pipeline_state.chat_model_id = bounded_report['model_ids']['expensive']
+        base.pipeline_state.query_understand_model_id = base.pipeline_state.bridge_cheap_model_id = approved['qu_model_id']
+        base.pipeline_state.rerank_model_id = bounded_report['model_ids']['rerank']
+        seen = []
+        class Model:
+            config = real_config('cheap')
+            def build_request_body(self, messages, options):
+                return ProviderModel(self.config, None).build_request_body(messages, options)
+            async def chat(self, messages, options, context):
+                seen.append(context.request_id)
+                return SimpleNamespace(content=json.dumps({'rewrite_query': turn.request.content,
+                    'query_type':'SIMPLE_COMPARE','intent':'kb_search','image_description':''}), finish_reason='stop')
+        async def factory(active_turn, progress):
+            return RetrievalPipeline(Repo(), Registry(Model()), on_progress=progress)
+        runtime.ordinary.pipeline_factory = factory
+        profile.install_profile(runtime, tmp_path, approved_batch=approved,
+            expires_at=datetime.now(timezone.utc)+timedelta(hours=1), bounded_query_profile=True)
+        async def exercise():
+            cfg = await runtime.ordinary.configuration(turn)
+            pipeline = await runtime.ordinary.pipeline_factory(turn, None)
+            await understand_query(cfg.pipeline_state, turn.context, pipeline.registry)
+            await pipeline._progress('understand', 'completed')
+            return cfg.pipeline_state
+>       current = asyncio.run(exercise())
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s862r_preflight.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r_preflight.py:135: in exercise
+    cfg = await runtime.ordinary.configuration(turn)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\s8_6_1_api_acceptance.py:210: in configuration
+    require(len(allowed) == 1 and allowed[0]['question'] == turn.request.content,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, code = 'S861_APPROVED_TURN_REQUIRED'
+
+    def require(value, code):
+        if not value:
+>           raise ValueError(code)
+E           ValueError: S861_APPROVED_TURN_REQUIRED
+
+scripts\s8_6_1_api_acceptance.py:73: ValueError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s862r_preflight.py::test_accepted_client_identity_authorizes_original_client_and_preserves_server_run
+FAILED tests/weknora_port/test_s862r_preflight.py::test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback[]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback[None]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback[s861-unknown-client]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_accepted_client_identity_cannot_rebind_to_second_server_run
+FAILED tests/weknora_port/test_s862r_preflight.py::test_accepted_client_identity_qu_body_lookup_uses_client_but_model_context_uses_server_run
+6 failed, 27 deselected in 1.10s

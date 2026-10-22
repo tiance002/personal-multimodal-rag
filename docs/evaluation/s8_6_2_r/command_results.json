@@ -1,0 +1,587 @@
+{
+  "counts_not_additive": "Repeated pre/postfix tests overlap; not a 922-test rerun.",
+  "results": [
+    {
+      "name": "review RED",
+      "result": "4 failed, 2 passed",
+      "exit_code": 1
+    },
+    {
+      "name": "rule affected GREEN",
+      "result": "273 passed",
+      "exit_code": 0
+    },
+    {
+      "name": "bounded-profile pre-send GREEN",
+      "result": "103 passed",
+      "exit_code": 0
+    },
+    {
+      "name": "admitted identity RED",
+      "result": "6 failed",
+      "exit_code": 1
+    },
+    {
+      "name": "admitted identity GREEN",
+      "result": "96 passed",
+      "exit_code": 0
+    },
+    {
+      "name": "post-identity API composition",
+      "result": "13 passed",
+      "exit_code": 0
+    }
+  ],
+  "commands": [
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\review-red.command.json",
+      "sha256": "5e61b1ecee6befe2bf85058b1aed88adbeb194a4f9c0170e68fcd9be11f5feb9",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "E:/RAG quention/var/reports/s8-6-2-r/review-package/tests/test_review_regressions.py",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/review-red-temp"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 2,
+        "seconds": 3.6529373999219388,
+        "created_at_utc": "2026-10-22T00:41:38.627213+00:00",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "HEAD": "71188d04e3f0ecd2ecbe761221f5bb127ac0bd04",
+        "stdout_sha256": "6d59542d94bbd592c3bb2b1756b141c399e799c67b3cba5dc7c8bbbadd367b12",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\review-red-correct-root.command.json",
+      "sha256": "996088c676847e1dd705a3bdc6e76d2313256e1ef7477103966a24fb46f21de8",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s862r_review_regressions.py",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/review-red-correct-root-temp"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 1,
+        "seconds": 1.905391399981454,
+        "created_at_utc": "2026-10-22T00:45:47.962949+00:00",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "HEAD": "71188d04e3f0ecd2ecbe761221f5bb127ac0bd04",
+        "stdout_sha256": "f4b9bb7f13e29a65ccfcbecaac535b868d04a58c62b188138ce885def70dbdbb",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\rules-green.command.json",
+      "sha256": "d1e5c64c1d97162602ba6ddeb717bcee8cf17d4c89f9a6a05215c253d1b0b8e8",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s862r_review_regressions.py",
+          "tests/weknora_port/test_s862r_contract.py",
+          "tests/weknora_port/test_s862_rule_registry.py",
+          "tests/weknora_port/test_s862_coverage.py",
+          "tests/weknora_port/test_s862_query_alignment.py",
+          "tests/weknora_port/test_s862_pipeline.py",
+          "tests/weknora_port/test_s86_strategy.py",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/rules-green-temp"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "seconds": 3.9607144000474364,
+        "created_at_utc": "2026-10-22T00:47:28.029736+00:00",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "HEAD": "71188d04e3f0ecd2ecbe761221f5bb127ac0bd04",
+        "stdout_sha256": "db4b6d34061f5ccea650ae1c0319a70523014a07a6ddec56835749b1a59169df",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\development-coverage.command.json",
+      "sha256": "6678d4640376ac5296419a1ff573f4115a24472b48dc674ef7dcb37e85bb1374",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "E:/RAG quention/var/reports/s8-6-2/coverage/run_coverage.py",
+          "--root",
+          "C:/Users/22088/.codex/worktrees/s8-6-adaptive-retrieval/RAG quention",
+          "--report",
+          "E:/RAG quention/var/reports/s8-6-2-r/development-coverage.results.json"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "seconds": 0.4402070000069216,
+        "created_at_utc": "2026-10-22T00:54:58.754500+00:00",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "HEAD": "eaccaa0b6920635fa98b4f633e4c81cfd171c6ea",
+        "stdout_sha256": "bbb871f55dfbb50ebaca5cd2c9f7a1689829929ef74cc2c5f9f673430ee9d488",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\budget\\targeted-release.command.json",
+      "sha256": "96e52bad17fcaa5a3b68fc7da020c747378e7a629b0d2b6332d9074ab46a8580",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s862r_preflight.py",
+          "tests/weknora_port/test_s861_preflight.py",
+          "tests/weknora_port/test_s861_api_acceptance.py",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/budget/temp-release",
+          "--junitxml=E:/RAG quention/var/reports/s8-6-2-r/budget/targeted-release.junit.xml"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "elapsed_seconds": 5.206936359405518,
+        "stdout_sha256": "68aea2af9571a102cf1d05f9aeb8bbfd7dac3813e46ccb8198177c0fddc702d7",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "new_actual_provider_calls": 0
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\budget\\accepted-identity-red.command.json",
+      "sha256": "a5a867d7c7cd1a1927a3208b2113a9f080bf3f79de4224148d4cc1d8c727aa81",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s862r_preflight.py",
+          "-k",
+          "accepted_client",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/budget/temp-accepted-red"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 1,
+        "elapsed_seconds": 2.649125814437866,
+        "stdout_sha256": "0be73bcb515a5ff80ca34d844e5768410faf341ebd5e46ce32a5ef5d3c9742e3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "new_actual_provider_calls": 0
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\budget\\accepted-identity-green.command.json",
+      "sha256": "a3af518bdd8612484e28d99220366b3c77b6c33b3bf6a773d30f44d3a43da9af",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s862r_preflight.py",
+          "tests/weknora_port/test_s861_preflight.py",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/budget/temp-accepted-green",
+          "--junitxml=E:/RAG quention/var/reports/s8-6-2-r/budget/accepted-identity-green.junit.xml"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "elapsed_seconds": 5.061727285385132,
+        "stdout_sha256": "e4296f51fda47a1058b5598ed00aeb043122a050d8aa5faf973bbaf5863a4a0f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "new_actual_provider_calls": 0
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\post-identity-api.command.json",
+      "sha256": "3d49b0a24bca2ef6de6c43001320c6eccc792f8d7594e6cd5a340e9808e7d5e2",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s861_api_acceptance.py",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=E:/RAG quention/var/reports/s8-6-2-r/post-identity-api-temp"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "seconds": 3.172439799993299,
+        "created_at_utc": "2026-10-22T01:20:27.911285+00:00",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "HEAD": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "stdout_sha256": "eee2e834d78ddd5305a6c78a405ba1039ec796ee0fde438562b15734053c3b72",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\post-identity-dryrun.command.json",
+      "sha256": "04229662706565d63369ae5315c692481981a62041cf69c7e19b274c72aeda00",
+      "record": {
+        "argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "scripts.s8_6_1_api_acceptance",
+          "dry-run",
+          "--bounded-query-profile",
+          "--inventory",
+          "E:/RAG quention/var/reports/s8-6-2-r/current-inventory.json",
+          "--sources",
+          "tests/weknora_port/fixtures/s8_4_bridge/inputs.json",
+          "--output",
+          "E:/RAG quention/var/reports/s8-6-2-r/budget/post-identity-budget.results.json"
+        ],
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "exit_code": 0,
+        "seconds": 0.8407240000087768,
+        "created_at_utc": "2026-10-22T01:20:54.368121+00:00",
+        "new_provider_calls": 0,
+        "actual_tokens": 0,
+        "HEAD": "5f81e781e1648e8496ecd974b8cca234e3d8b739",
+        "stdout_sha256": "c156b21bc1ac8a453da14cd4cb0da0ccf2097ea7e3f865f7b30f585adb290c63",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\before-fixed.command.json",
+      "sha256": "8ce46575aa8a1f716588c7eba0fb2ceaaa48122763a5a6a43ea95a0afa292d03",
+      "record": {
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "action": "before",
+        "exit_code": 0,
+        "seconds": 1.5421924999682233,
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "provider_calls": 0,
+        "stdout_sha256": "c383838322aa3e60240b2b0b74e5ec8645899056faab05941008432ca944d785",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\transfer.command.json",
+      "sha256": "60bcdbb55eacca956e4998a13be0c451534f21d3cba0224033be92ff79f698e6",
+      "record": {
+        "argv": [
+          "scp.exe",
+          "-q",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\source.tar",
+          "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\source-manifest.json",
+          "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\verify_image.py",
+          "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\budget-preflight.json",
+          "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\current-inventory.json",
+          "root@120.55.115.162:/opt/rag-s8/diagnostics/s862r-20261022t010207z-cc548180/"
+        ],
+        "action": "transfer",
+        "exit_code": 0,
+        "seconds": 3.3154166999738663,
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "provider_calls": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\build.command.json",
+      "sha256": "75a8816b4a7c347b5f29d2bdb7ba719cc2de201e8ce4f412cec45ec97a3c4969",
+      "record": {
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "action": "build",
+        "exit_code": 0,
+        "seconds": 15.103935599909164,
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "provider_calls": 0,
+        "stdout_sha256": "e43f09ebfcd7b13f4840aae0c7f36bc4ef93522e465c2106f932a7bb3a7a5cdd",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\qu-only-runtime.command.json",
+      "sha256": "0d605a3b8331bf8d3af7373db822775a5149d3ef5a34d82c27a8bb062a87876c",
+      "record": {
+        "action": "launch",
+        "batch": "qu-only",
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "seconds": 13.895866999984719,
+        "stdout_bytes": 1167,
+        "stderr_bytes": 0,
+        "stdout_sha256": "1c39d299a49704a5423f00437dbd2ad4b55884df5399934d42932b9d1c76839e",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "retry": false,
+        "script_sha256": "b3060f7fbde8840239954bf918363c4a8454c64fef267f97768e0af196dfba28"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\compare-runtime.command.json",
+      "sha256": "65e3444095ef5ede389aa651e82ec5a3612b64007a9ea4787006ee75adcdefa7",
+      "record": {
+        "action": "launch",
+        "batch": "compare",
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "exit_code": 1,
+        "timeout": false,
+        "seconds": 5.813963300082833,
+        "stdout_bytes": 1179,
+        "stderr_bytes": 0,
+        "stdout_sha256": "1798472b63d38a05be1b218013b6971c3d169012ef2c950b0af101fc16c073e7",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "retry": false,
+        "script_sha256": "bb38a30386bc55aebede553d36b8e2cf871a89818c8b70e27ec63647d63d1c18"
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\reconcile.command.json",
+      "sha256": "7f4780848d531ae3174612144ea32c41902613fd77e420ba3e8a23be17599908",
+      "record": {
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "exit_code": 0,
+        "seconds": 1.6072261999361217,
+        "script_sha256": "792da7d2304bc7969afb6d26f9a2a0af2376f0a71fd2022954bf6884605c1162",
+        "provider_calls": 0
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\runtime-snapshot-20261022t011829z-4e9943ed\\fetch.command.json",
+      "sha256": "051bb76f99cdf69575991cb26815da093127d248e7591d1cfb191f94cc4377a6",
+      "record": {
+        "actual_remote_grant_sha256": "60566eb044ea594b763e91f88d77667d6d6dc8870c8b69b462a00776d875fe19",
+        "archive_bytes": 645120,
+        "archive_sha256": "5b94a6c0b1f95472c7bbc3e90bb6918c9b066716ee629a4d2eed11715e888a2a",
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "file_count": 109,
+        "grant_canonical_sha256": "dfd4e7fcb7c133d82c01e4d2fdd893a90f672957021b3a25c7c0ca9c7cd1bb75",
+        "local_grant_sha256": "30d090be05e03d5677584fe0b1bda6e072a8c5bbdd18636ec058137e127c46d2",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "provider_calls": 0,
+        "remote_writes": 0,
+        "roots": [
+          {
+            "archive_root": "diagnostic/records",
+            "remote_root": "/opt/rag-s8/diagnostics/s862r-20261022t010207z-cc548180/records"
+          },
+          {
+            "archive_root": "diagnostic/send-stop.json",
+            "remote_root": "/opt/rag-s8/diagnostics/s862r-20261022t010207z-cc548180/send-stop.json"
+          },
+          {
+            "archive_root": "diagnostic/reconciliation-before-close.json",
+            "remote_root": "/opt/rag-s8/diagnostics/s862r-20261022t010207z-cc548180/reconciliation-before-close.json"
+          },
+          {
+            "archive_root": "diagnostic/reconciliation-and-closure.json",
+            "remote_root": "/opt/rag-s8/diagnostics/s862r-20261022t010207z-cc548180/reconciliation-and-closure.json"
+          },
+          {
+            "archive_root": "batches/qu-only",
+            "remote_root": "/opt/rag-s8/state/executions/s861-s862r-cc548180-qu-only"
+          },
+          {
+            "archive_root": "batches/compare",
+            "remote_root": "/opt/rag-s8/state/executions/s861-s862r-cc548180-compare"
+          },
+          {
+            "archive_root": "batches/parallel",
+            "remote_root": "/opt/rag-s8/state/executions/s861-s862r-cc548180-parallel"
+          },
+          {
+            "archive_root": "batches/dependent",
+            "remote_root": "/opt/rag-s8/state/executions/s861-s862r-cc548180-dependent"
+          }
+        ],
+        "seconds": 0.9299583999672905,
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "status": "READ_ONLY_RUNTIME_SNAPSHOT_VERIFIED",
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "total_file_bytes": 534251
+      }
+    },
+    {
+      "private_record": "E:\\RAG quention\\var\\reports\\s8-6-2-r\\remote-preparation\\s862r-20261022t010207z-cc548180\\protect-1792631918509277100.command.json",
+      "sha256": "e187fac87dd0aae7f3852b85752341e8c837c85e15fbada4bad20ddaf7c8e2a5",
+      "record": {
+        "argv": [
+          "ssh.exe",
+          "-T",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=yes",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "ConnectTimeout=15",
+          "-i",
+          "C:/Users/22088/Downloads/study-plan-dev.pem",
+          "root@120.55.115.162",
+          "python3 -"
+        ],
+        "action": "protect",
+        "exit_code": 0,
+        "seconds": 1.4824543999275193,
+        "source_revision": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+        "profile_sha256": "491307defefcf7b3010058e27b1f98a4462706bbbeb6947a8d93513bdb33d8cc",
+        "provider_calls": 0,
+        "stdout_sha256": "bc9d05b7076d5cec5b947338a34c4fa48aa23969c6679ad3dc436c0e33278803",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

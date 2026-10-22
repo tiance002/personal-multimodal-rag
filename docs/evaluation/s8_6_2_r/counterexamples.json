@@ -1,0 +1,659 @@
+{
+  "method": "Assigned query_type parser/planner regression, not real QU classification or final-answer Gold",
+  "before": [
+    {
+      "q0": "分别介绍A和B之间的通信方式",
+      "assigned_query_type": "SIMPLE_PARALLEL",
+      "match": {
+        "status": "MATCHED",
+        "reject_reason": "",
+        "objects": [
+          "A",
+          "B之间"
+        ],
+        "dimension": "通信方式",
+        "object_spans": [
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            9
+          ]
+        ],
+        "dimension_span": [
+          10,
+          14
+        ],
+        "full_match": "分别介绍A和B之间的通信方式",
+        "rule_id": "PARALLEL_ATTRIBUTE",
+        "rule_version": "1",
+        "language": "cn",
+        "query_type": "SIMPLE_PARALLEL"
+      },
+      "plan": {
+        "q0": "分别介绍A和B之间的通信方式",
+        "effective_query": "分别介绍A和B之间的通信方式",
+        "query_type": "SIMPLE_PARALLEL",
+        "strategy": "RULE_PARALLEL",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "A的通信方式是什么？",
+            "covers": [
+              "A",
+              "通信方式"
+            ],
+            "depends_on": [],
+            "object_span": [
+              4,
+              5
+            ],
+            "dimension_span": [
+              10,
+              14
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "B之间的通信方式是什么？",
+            "covers": [
+              "B之间",
+              "通信方式"
+            ],
+            "depends_on": [],
+            "object_span": [
+              6,
+              9
+            ],
+            "dimension_span": [
+              10,
+              14
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_PARALLEL_RULE",
+        "rule_id": "PARALLEL_ATTRIBUTE",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "PARALLEL_ATTRIBUTE",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "subquery_count": 2,
+        "retrieval_units_planned": 2,
+        "full_match": true,
+        "object_spans": [
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            9
+          ]
+        ],
+        "dimension_span": [
+          10,
+          14
+        ],
+        "effective_query_sha256": "99a1e90505e810c459a2edcb4bc90ad135c98afb853df6c7c86b5845178235a0",
+        "q0_sha256": "99a1e90505e810c459a2edcb4bc90ad135c98afb853df6c7c86b5845178235a0"
+      }
+    },
+    {
+      "q0": "比较A和B之间的联系",
+      "assigned_query_type": "SIMPLE_COMPARE",
+      "match": {
+        "status": "MATCHED",
+        "reject_reason": "",
+        "objects": [
+          "A",
+          "B之间"
+        ],
+        "dimension": "联系",
+        "object_spans": [
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "dimension_span": [
+          8,
+          10
+        ],
+        "full_match": "比较A和B之间的联系",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "language": "cn",
+        "query_type": "SIMPLE_COMPARE"
+      },
+      "plan": {
+        "q0": "比较A和B之间的联系",
+        "effective_query": "比较A和B之间的联系",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "RULE_COMPARE",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "A的联系是什么？",
+            "covers": [
+              "A",
+              "联系"
+            ],
+            "depends_on": [],
+            "object_span": [
+              2,
+              3
+            ],
+            "dimension_span": [
+              8,
+              10
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "B之间的联系是什么？",
+            "covers": [
+              "B之间",
+              "联系"
+            ],
+            "depends_on": [],
+            "object_span": [
+              4,
+              7
+            ],
+            "dimension_span": [
+              8,
+              10
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_COMPARE_RULE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "subquery_count": 2,
+        "retrieval_units_planned": 2,
+        "full_match": true,
+        "object_spans": [
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "dimension_span": [
+          8,
+          10
+        ],
+        "effective_query_sha256": "bd0647b1829aaba3ec785e61a428af3427a7a79f30fc08d240b32621f13cc082",
+        "q0_sha256": "bd0647b1829aaba3ec785e61a428af3427a7a79f30fc08d240b32621f13cc082"
+      }
+    },
+    {
+      "q0": "比较PostgreSQL和Redis的区别",
+      "assigned_query_type": "SIMPLE_COMPARE",
+      "match": {
+        "status": "MATCHED",
+        "reject_reason": "",
+        "objects": [
+          "PostgreSQL",
+          "Redis"
+        ],
+        "dimension": "区别",
+        "object_spans": [
+          [
+            2,
+            12
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "dimension_span": [
+          19,
+          21
+        ],
+        "full_match": "比较PostgreSQL和Redis的区别",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "language": "cn",
+        "query_type": "SIMPLE_COMPARE"
+      },
+      "plan": {
+        "q0": "比较PostgreSQL和Redis的区别",
+        "effective_query": "比较PostgreSQL和Redis的区别",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "RULE_COMPARE",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "PostgreSQL的区别是什么？",
+            "covers": [
+              "PostgreSQL",
+              "区别"
+            ],
+            "depends_on": [],
+            "object_span": [
+              2,
+              12
+            ],
+            "dimension_span": [
+              19,
+              21
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "Redis的区别是什么？",
+            "covers": [
+              "Redis",
+              "区别"
+            ],
+            "depends_on": [],
+            "object_span": [
+              13,
+              18
+            ],
+            "dimension_span": [
+              19,
+              21
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_COMPARE_RULE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "subquery_count": 2,
+        "retrieval_units_planned": 2,
+        "full_match": true,
+        "object_spans": [
+          [
+            2,
+            12
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "dimension_span": [
+          19,
+          21
+        ],
+        "effective_query_sha256": "7e8b3d702713ff97c6a6470f5b80338adbd0212d3065639cb081bf2174a708f0",
+        "q0_sha256": "7e8b3d702713ff97c6a6470f5b80338adbd0212d3065639cb081bf2174a708f0"
+      }
+    },
+    {
+      "q0": "比较A和B的异同",
+      "assigned_query_type": "SIMPLE_COMPARE",
+      "match": {
+        "status": "MATCHED",
+        "reject_reason": "",
+        "objects": [
+          "A",
+          "B"
+        ],
+        "dimension": "异同",
+        "object_spans": [
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            5
+          ]
+        ],
+        "dimension_span": [
+          6,
+          8
+        ],
+        "full_match": "比较A和B的异同",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "language": "cn",
+        "query_type": "SIMPLE_COMPARE"
+      },
+      "plan": {
+        "q0": "比较A和B的异同",
+        "effective_query": "比较A和B的异同",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "RULE_COMPARE",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "A的异同是什么？",
+            "covers": [
+              "A",
+              "异同"
+            ],
+            "depends_on": [],
+            "object_span": [
+              2,
+              3
+            ],
+            "dimension_span": [
+              6,
+              8
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "B的异同是什么？",
+            "covers": [
+              "B",
+              "异同"
+            ],
+            "depends_on": [],
+            "object_span": [
+              4,
+              5
+            ],
+            "dimension_span": [
+              6,
+              8
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_COMPARE_RULE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "1",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "subquery_count": 2,
+        "retrieval_units_planned": 2,
+        "full_match": true,
+        "object_spans": [
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            5
+          ]
+        ],
+        "dimension_span": [
+          6,
+          8
+        ],
+        "effective_query_sha256": "01d7246edae28d7e4f721e07cf3a77133c09080b417e544e38ad3f36c80fb6ce",
+        "q0_sha256": "01d7246edae28d7e4f721e07cf3a77133c09080b417e544e38ad3f36c80fb6ce"
+      }
+    }
+  ],
+  "after": [
+    {
+      "q0": "分别介绍A和B之间的通信方式",
+      "assigned_query_type": "SIMPLE_PARALLEL",
+      "match": {
+        "status": "NOT_APPLICABLE",
+        "reject_reason": "RELATIONAL_OBJECT_LIST",
+        "objects": [],
+        "dimension": "",
+        "object_spans": [],
+        "dimension_span": null,
+        "full_match": "",
+        "rule_id": "PARALLEL_ATTRIBUTE",
+        "rule_version": "2",
+        "language": "",
+        "query_type": "SIMPLE_PARALLEL"
+      },
+      "plan": {
+        "q0": "分别介绍A和B之间的通信方式",
+        "effective_query": "分别介绍A和B之间的通信方式",
+        "query_type": "SIMPLE_PARALLEL",
+        "strategy": "PLAIN",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "分别介绍A和B之间的通信方式",
+            "covers": [
+              "分别介绍A和B之间的通信方式"
+            ],
+            "depends_on": [],
+            "object_span": null,
+            "dimension_span": null
+          }
+        ],
+        "constraints": [],
+        "reason": "RULE_NOT_APPLICABLE",
+        "rule_id": "PARALLEL_ATTRIBUTE",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "RELATIONAL_OBJECT_LIST",
+        "rule_full_match": false
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "PARALLEL_ATTRIBUTE",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "RELATIONAL_OBJECT_LIST",
+        "subquery_count": 0,
+        "retrieval_units_planned": 1,
+        "full_match": false,
+        "object_spans": [],
+        "dimension_span": null,
+        "effective_query_sha256": "99a1e90505e810c459a2edcb4bc90ad135c98afb853df6c7c86b5845178235a0",
+        "q0_sha256": "99a1e90505e810c459a2edcb4bc90ad135c98afb853df6c7c86b5845178235a0"
+      }
+    },
+    {
+      "q0": "比较A和B之间的联系",
+      "assigned_query_type": "SIMPLE_COMPARE",
+      "match": {
+        "status": "NOT_APPLICABLE",
+        "reject_reason": "RELATIONAL_OBJECT_LIST",
+        "objects": [],
+        "dimension": "",
+        "object_spans": [],
+        "dimension_span": null,
+        "full_match": "",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "language": "",
+        "query_type": "SIMPLE_COMPARE"
+      },
+      "plan": {
+        "q0": "比较A和B之间的联系",
+        "effective_query": "比较A和B之间的联系",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "PLAIN",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "比较A和B之间的联系",
+            "covers": [
+              "比较A和B之间的联系"
+            ],
+            "depends_on": [],
+            "object_span": null,
+            "dimension_span": null
+          }
+        ],
+        "constraints": [],
+        "reason": "RULE_NOT_APPLICABLE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "RELATIONAL_OBJECT_LIST",
+        "rule_full_match": false
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "RELATIONAL_OBJECT_LIST",
+        "subquery_count": 0,
+        "retrieval_units_planned": 1,
+        "full_match": false,
+        "object_spans": [],
+        "dimension_span": null,
+        "effective_query_sha256": "bd0647b1829aaba3ec785e61a428af3427a7a79f30fc08d240b32621f13cc082",
+        "q0_sha256": "bd0647b1829aaba3ec785e61a428af3427a7a79f30fc08d240b32621f13cc082"
+      }
+    },
+    {
+      "q0": "比较PostgreSQL和Redis的区别",
+      "assigned_query_type": "SIMPLE_COMPARE",
+      "match": {
+        "status": "NOT_APPLICABLE",
+        "reject_reason": "SHARED_DIMENSION_UNSPECIFIED",
+        "objects": [],
+        "dimension": "",
+        "object_spans": [],
+        "dimension_span": null,
+        "full_match": "",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "language": "",
+        "query_type": "SIMPLE_COMPARE"
+      },
+      "plan": {
+        "q0": "比较PostgreSQL和Redis的区别",
+        "effective_query": "比较PostgreSQL和Redis的区别",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "PLAIN",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "比较PostgreSQL和Redis的区别",
+            "covers": [
+              "比较PostgreSQL和Redis的区别"
+            ],
+            "depends_on": [],
+            "object_span": null,
+            "dimension_span": null
+          }
+        ],
+        "constraints": [],
+        "reason": "RULE_NOT_APPLICABLE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "SHARED_DIMENSION_UNSPECIFIED",
+        "rule_full_match": false
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "SHARED_DIMENSION_UNSPECIFIED",
+        "subquery_count": 0,
+        "retrieval_units_planned": 1,
+        "full_match": false,
+        "object_spans": [],
+        "dimension_span": null,
+        "effective_query_sha256": "7e8b3d702713ff97c6a6470f5b80338adbd0212d3065639cb081bf2174a708f0",
+        "q0_sha256": "7e8b3d702713ff97c6a6470f5b80338adbd0212d3065639cb081bf2174a708f0"
+      }
+    },
+    {
+      "q0": "比较A和B的异同",
+      "assigned_query_type": "SIMPLE_COMPARE",
+      "match": {
+        "status": "NOT_APPLICABLE",
+        "reject_reason": "SHARED_DIMENSION_UNSPECIFIED",
+        "objects": [],
+        "dimension": "",
+        "object_spans": [],
+        "dimension_span": null,
+        "full_match": "",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "language": "",
+        "query_type": "SIMPLE_COMPARE"
+      },
+      "plan": {
+        "q0": "比较A和B的异同",
+        "effective_query": "比较A和B的异同",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "PLAIN",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "比较A和B的异同",
+            "covers": [
+              "比较A和B的异同"
+            ],
+            "depends_on": [],
+            "object_span": null,
+            "dimension_span": null
+          }
+        ],
+        "constraints": [],
+        "reason": "RULE_NOT_APPLICABLE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "SHARED_DIMENSION_UNSPECIFIED",
+        "rule_full_match": false
+      },
+      "trace": {
+        "stage": "strategy_rule",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "NOT_APPLICABLE",
+        "reject_reason": "SHARED_DIMENSION_UNSPECIFIED",
+        "subquery_count": 0,
+        "retrieval_units_planned": 1,
+        "full_match": false,
+        "object_spans": [],
+        "dimension_span": null,
+        "effective_query_sha256": "01d7246edae28d7e4f721e07cf3a77133c09080b417e544e38ad3f36c80fb6ce",
+        "q0_sha256": "01d7246edae28d7e4f721e07cf3a77133c09080b417e544e38ad3f36c80fb6ce"
+      }
+    }
+  ]
+}

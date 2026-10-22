@@ -1,0 +1,84 @@
+FFFF..                                                                   [100%]
+================================== FAILURES ===================================
+_ test_relation_or_missing_attribute_must_not_split[\u5206\u522b\u4ecb\u7ecdA\u548cB\u4e4b\u95f4\u7684\u901a\u4fe1\u65b9\u5f0f-SIMPLE_PARALLEL] _
+
+query = '分别介绍A和B之间的通信方式', kind = 'SIMPLE_PARALLEL'
+
+    @pytest.mark.parametrize('query,kind', [
+        ('分别介绍A和B之间的通信方式','SIMPLE_PARALLEL'),
+        ('比较A和B之间的联系','SIMPLE_COMPARE'),
+        ('比较PostgreSQL和Redis的区别','SIMPLE_COMPARE'),
+        ('比较A和B的异同','SIMPLE_COMPARE'),
+    ])
+    def test_relation_or_missing_attribute_must_not_split(query, kind):
+        match=parse_rule(query,kind)
+        plan=plan_query(query,query,kind)
+>       assert not match.matched, (match.objects, match.dimension, match.render_queries())
+E       AssertionError: (('A', 'B之间'), '通信方式', ('A的通信方式是什么？', 'B之间的通信方式是什么？'))
+E       assert not True
+E        +  where True = RuleMatch(status='MATCHED', reject_reason='', objects=('A', 'B之间'), dimension='通信方式', object_spans=((4, 5), (6, 9)), d...ll_match='分别介绍A和B之间的通信方式', rule_id='PARALLEL_ATTRIBUTE', rule_version='1', language='cn', query_type='SIMPLE_PARALLEL').matched
+
+tests\weknora_port\test_s862r_review_regressions.py:15: AssertionError
+_ test_relation_or_missing_attribute_must_not_split[\u6bd4\u8f83A\u548cB\u4e4b\u95f4\u7684\u8054\u7cfb-SIMPLE_COMPARE] _
+
+query = '比较A和B之间的联系', kind = 'SIMPLE_COMPARE'
+
+    @pytest.mark.parametrize('query,kind', [
+        ('分别介绍A和B之间的通信方式','SIMPLE_PARALLEL'),
+        ('比较A和B之间的联系','SIMPLE_COMPARE'),
+        ('比较PostgreSQL和Redis的区别','SIMPLE_COMPARE'),
+        ('比较A和B的异同','SIMPLE_COMPARE'),
+    ])
+    def test_relation_or_missing_attribute_must_not_split(query, kind):
+        match=parse_rule(query,kind)
+        plan=plan_query(query,query,kind)
+>       assert not match.matched, (match.objects, match.dimension, match.render_queries())
+E       AssertionError: (('A', 'B之间'), '联系', ('A的联系是什么？', 'B之间的联系是什么？'))
+E       assert not True
+E        +  where True = RuleMatch(status='MATCHED', reject_reason='', objects=('A', 'B之间'), dimension='联系', object_spans=((2, 3), (4, 7)), dim..., 10), full_match='比较A和B之间的联系', rule_id='COMPARE_SHARED', rule_version='1', language='cn', query_type='SIMPLE_COMPARE').matched
+
+tests\weknora_port\test_s862r_review_regressions.py:15: AssertionError
+_ test_relation_or_missing_attribute_must_not_split[\u6bd4\u8f83PostgreSQL\u548cRedis\u7684\u533a\u522b-SIMPLE_COMPARE] _
+
+query = '比较PostgreSQL和Redis的区别', kind = 'SIMPLE_COMPARE'
+
+    @pytest.mark.parametrize('query,kind', [
+        ('分别介绍A和B之间的通信方式','SIMPLE_PARALLEL'),
+        ('比较A和B之间的联系','SIMPLE_COMPARE'),
+        ('比较PostgreSQL和Redis的区别','SIMPLE_COMPARE'),
+        ('比较A和B的异同','SIMPLE_COMPARE'),
+    ])
+    def test_relation_or_missing_attribute_must_not_split(query, kind):
+        match=parse_rule(query,kind)
+        plan=plan_query(query,query,kind)
+>       assert not match.matched, (match.objects, match.dimension, match.render_queries())
+E       AssertionError: (('PostgreSQL', 'Redis'), '区别', ('PostgreSQL的区别是什么？', 'Redis的区别是什么？'))
+E       assert not True
+E        +  where True = RuleMatch(status='MATCHED', reject_reason='', objects=('PostgreSQL', 'Redis'), dimension='区别', object_spans=((2, 12), ..._match='比较PostgreSQL和Redis的区别', rule_id='COMPARE_SHARED', rule_version='1', language='cn', query_type='SIMPLE_COMPARE').matched
+
+tests\weknora_port\test_s862r_review_regressions.py:15: AssertionError
+_ test_relation_or_missing_attribute_must_not_split[\u6bd4\u8f83A\u548cB\u7684\u5f02\u540c-SIMPLE_COMPARE] _
+
+query = '比较A和B的异同', kind = 'SIMPLE_COMPARE'
+
+    @pytest.mark.parametrize('query,kind', [
+        ('分别介绍A和B之间的通信方式','SIMPLE_PARALLEL'),
+        ('比较A和B之间的联系','SIMPLE_COMPARE'),
+        ('比较PostgreSQL和Redis的区别','SIMPLE_COMPARE'),
+        ('比较A和B的异同','SIMPLE_COMPARE'),
+    ])
+    def test_relation_or_missing_attribute_must_not_split(query, kind):
+        match=parse_rule(query,kind)
+        plan=plan_query(query,query,kind)
+>       assert not match.matched, (match.objects, match.dimension, match.render_queries())
+E       AssertionError: (('A', 'B'), '异同', ('A的异同是什么？', 'B的异同是什么？'))
+E       assert not True
+E        +  where True = RuleMatch(status='MATCHED', reject_reason='', objects=('A', 'B'), dimension='异同', object_spans=((2, 3), (4, 5)), dimen...=(6, 8), full_match='比较A和B的异同', rule_id='COMPARE_SHARED', rule_version='1', language='cn', query_type='SIMPLE_COMPARE').matched
+
+tests\weknora_port\test_s862r_review_regressions.py:15: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s862r_review_regressions.py::test_relation_or_missing_attribute_must_not_split[\u5206\u522b\u4ecb\u7ecdA\u548cB\u4e4b\u95f4\u7684\u901a\u4fe1\u65b9\u5f0f-SIMPLE_PARALLEL]
+FAILED tests/weknora_port/test_s862r_review_regressions.py::test_relation_or_missing_attribute_must_not_split[\u6bd4\u8f83A\u548cB\u4e4b\u95f4\u7684\u8054\u7cfb-SIMPLE_COMPARE]
+FAILED tests/weknora_port/test_s862r_review_regressions.py::test_relation_or_missing_attribute_must_not_split[\u6bd4\u8f83PostgreSQL\u548cRedis\u7684\u533a\u522b-SIMPLE_COMPARE]
+FAILED tests/weknora_port/test_s862r_review_regressions.py::test_relation_or_missing_attribute_must_not_split[\u6bd4\u8f83A\u548cB\u7684\u5f02\u540c-SIMPLE_COMPARE]
+4 failed, 2 passed in 0.41s

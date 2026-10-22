@@ -1,0 +1,629 @@
+{
+  "derived_actual_provider_attempts": 6,
+  "settled": 6,
+  "unknown": 0,
+  "input_tokens": 7074,
+  "output_tokens": 194,
+  "total_tokens": 7268,
+  "original_reservations_sum": 41712,
+  "unsettled_held_tokens": 0,
+  "both_sides_unique_keys": true,
+  "exact_pg_local_keysets": true,
+  "note": "Raw diagnostic provider_sends=0 describes reconciliation operation itself; experiment attempts are derived from six PG+Local+raw-response entries.",
+  "receipts": [
+    {
+      "request_id": "s861-f669ae5030a540de9a79ceca/query_rewrite",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat",
+      "wire_sha256": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4",
+      "reserved_tokens": 6972,
+      "held_tokens": 1215,
+      "status": "SETTLED",
+      "outcome": "RESPONSE_RECEIVED",
+      "usage": {
+        "cache_miss_tokens": 1181,
+        "cache_read_tokens": 0,
+        "cache_reported": true,
+        "cache_status": "miss",
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "completion_tokens": 34,
+        "prompt_tokens": 1181,
+        "provider_usage_facts": {
+          "derived_total": 1215,
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1181
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "present": true,
+                "valid": true,
+                "value": 34
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1215
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "present": false,
+                "valid": false,
+                "value": null
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1181
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":34,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1181,\"prompt_tokens\":1181,\"total_tokens\":1215}",
+          "observed_lower_bound": 1215,
+          "prior_numeric_raw": [],
+          "raw_sha256": "07def08e7eb895fb788ef501eef8a3de0cb10030d33c40d813d6ac556e950ade",
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false
+        },
+        "status": "REPORTED",
+        "total_tokens": 1215
+      }
+    },
+    {
+      "request_id": "s861-95700e191c1142dfa0d50d71/query_rewrite",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat",
+      "wire_sha256": "05a11fed54837126904be91ada033fa04c068541929f20d0eb24da8e214329ac",
+      "reserved_tokens": 6970,
+      "held_tokens": 1213,
+      "status": "SETTLED",
+      "outcome": "RESPONSE_RECEIVED",
+      "usage": {
+        "cache_miss_tokens": 1180,
+        "cache_read_tokens": 0,
+        "cache_reported": true,
+        "cache_status": "miss",
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "completion_tokens": 33,
+        "prompt_tokens": 1180,
+        "provider_usage_facts": {
+          "derived_total": 1213,
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1180
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "present": true,
+                "valid": true,
+                "value": 33
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1213
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "present": false,
+                "valid": false,
+                "value": null
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1180
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":33,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1180,\"prompt_tokens\":1180,\"total_tokens\":1213}",
+          "observed_lower_bound": 1213,
+          "prior_numeric_raw": [],
+          "raw_sha256": "901cf836e2aef08451e0d6744839f091c23b3e338cb0bd45f099efce10eb4d19",
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false
+        },
+        "status": "REPORTED",
+        "total_tokens": 1213
+      }
+    },
+    {
+      "request_id": "s861-a996745637bc40ecad40e2ac/query_rewrite",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat",
+      "wire_sha256": "5b62623ed9881f4c39ddcf1d85626bf3fdaa0cd1bedbfb635dadab572b1b534a",
+      "reserved_tokens": 6955,
+      "held_tokens": 1213,
+      "status": "SETTLED",
+      "outcome": "RESPONSE_RECEIVED",
+      "usage": {
+        "cache_miss_tokens": 1179,
+        "cache_read_tokens": 0,
+        "cache_reported": true,
+        "cache_status": "miss",
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "completion_tokens": 34,
+        "prompt_tokens": 1179,
+        "provider_usage_facts": {
+          "derived_total": 1213,
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1179
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "present": true,
+                "valid": true,
+                "value": 34
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1213
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "present": false,
+                "valid": false,
+                "value": null
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1179
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":34,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1179,\"prompt_tokens\":1179,\"total_tokens\":1213}",
+          "observed_lower_bound": 1213,
+          "prior_numeric_raw": [],
+          "raw_sha256": "d95917d09c5b8a4f6664419504b683e4e4e1d511ac974eef031c0c0097019cfe",
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false
+        },
+        "status": "REPORTED",
+        "total_tokens": 1213
+      }
+    },
+    {
+      "request_id": "s861-11e525027fcd4a2791a3ab44/query_rewrite",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat",
+      "wire_sha256": "c5b42cb9b1e2091bdca1166146a72a6a0478921d59103189bdafcbca0b4e7ce1",
+      "reserved_tokens": 6960,
+      "held_tokens": 1229,
+      "status": "SETTLED",
+      "outcome": "RESPONSE_RECEIVED",
+      "usage": {
+        "cache_miss_tokens": 1188,
+        "cache_read_tokens": 0,
+        "cache_reported": true,
+        "cache_status": "miss",
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "completion_tokens": 41,
+        "prompt_tokens": 1188,
+        "provider_usage_facts": {
+          "derived_total": 1229,
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1188
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "present": true,
+                "valid": true,
+                "value": 41
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1229
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "present": false,
+                "valid": false,
+                "value": null
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1188
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":41,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1188,\"prompt_tokens\":1188,\"total_tokens\":1229}",
+          "observed_lower_bound": 1229,
+          "prior_numeric_raw": [],
+          "raw_sha256": "7b8da49c03609f174d42f17a6bf6e9634ed3bacc76d89e17dd266bfd60b9443d",
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false
+        },
+        "status": "REPORTED",
+        "total_tokens": 1229
+      }
+    },
+    {
+      "request_id": "s861-0b77a7eb735a4707acad2dce/query_rewrite",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat",
+      "wire_sha256": "6678ee03c36c985f64e0fd3e663e535cf2174f4102483623d6e244acfdf39787",
+      "reserved_tokens": 6930,
+      "held_tokens": 1200,
+      "status": "SETTLED",
+      "outcome": "RESPONSE_RECEIVED",
+      "usage": {
+        "cache_miss_tokens": 1174,
+        "cache_read_tokens": 0,
+        "cache_reported": true,
+        "cache_status": "miss",
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "completion_tokens": 26,
+        "prompt_tokens": 1174,
+        "provider_usage_facts": {
+          "derived_total": 1200,
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1174
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "present": true,
+                "valid": true,
+                "value": 26
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1200
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "present": false,
+                "valid": false,
+                "value": null
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1174
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":26,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1174,\"prompt_tokens\":1174,\"total_tokens\":1200}",
+          "observed_lower_bound": 1200,
+          "prior_numeric_raw": [],
+          "raw_sha256": "261157fd49a6ba4b012de04b65e91ed13d227cf916de03e2024346bb79a70a0e",
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false
+        },
+        "status": "REPORTED",
+        "total_tokens": 1200
+      }
+    },
+    {
+      "request_id": "s861-d0b2aa881a6d4d95b2415415/query_rewrite",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat",
+      "wire_sha256": "b4c6352679f5a50bbed0c1e722686303ccf095e945f9a54ca6ad4bc4cb29d4e4",
+      "reserved_tokens": 6925,
+      "held_tokens": 1198,
+      "status": "SETTLED",
+      "outcome": "RESPONSE_RECEIVED",
+      "usage": {
+        "cache_miss_tokens": 1172,
+        "cache_read_tokens": 0,
+        "cache_reported": true,
+        "cache_status": "miss",
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "completion_tokens": 26,
+        "prompt_tokens": 1172,
+        "provider_usage_facts": {
+          "derived_total": 1198,
+          "fields": [
+            [
+              "input",
+              {
+                "path": "prompt_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1172
+              }
+            ],
+            [
+              "output",
+              {
+                "path": "completion_tokens",
+                "present": true,
+                "valid": true,
+                "value": 26
+              }
+            ],
+            [
+              "total",
+              {
+                "path": "total_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1198
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "path": "prompt_cache_hit_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "path": "cache_creation_input_tokens",
+                "present": false,
+                "valid": false,
+                "value": null
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "path": "prompt_cache_miss_tokens",
+                "present": true,
+                "valid": true,
+                "value": 1172
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "path": "completion_tokens_details.reasoning_tokens",
+                "present": true,
+                "valid": true,
+                "value": 0
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":26,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1172,\"prompt_tokens\":1172,\"total_tokens\":1198}",
+          "observed_lower_bound": 1198,
+          "prior_numeric_raw": [],
+          "raw_sha256": "65a49e50f7abea7c36654867b4f528445105baf60c9cad3c3c276f3258e65ca0",
+          "semantics": "openai-input-inclusive/v1",
+          "simulated": false
+        },
+        "status": "REPORTED",
+        "total_tokens": 1198
+      }
+    }
+  ],
+  "closure": {
+    "compare": {
+      "after_sha256": "04cb259f00decacc6d5313d93bfd7ba0ff9950bd7b31c3c96809ea355012e920",
+      "before_sha256": "3d231326d6f3dcad78fd557c6b19910a440db7feca762dae17ae1fd68510088f",
+      "entries": 0,
+      "status": "CLOSED"
+    },
+    "dependent": {
+      "after_sha256": "dd1bf0abc4ff708647c94f86d7d640c0a0a135138cd402bc68815e00c388810f",
+      "before_sha256": "0679b0805a732e32b6bdf6f3d82ca6d9627f72286cc489c9ef5175908d8abbae",
+      "entries": 0,
+      "status": "CLOSED"
+    },
+    "parallel": {
+      "after_sha256": "090631090113e8d9d8110fe3f5aa705971a94cc064f7048968810198b276938b",
+      "before_sha256": "5d1eabb413ce1ec28800e491a17bf96d4ffeb255591e880d0a959a2865d62bc4",
+      "entries": 0,
+      "status": "CLOSED"
+    },
+    "qu-only": {
+      "after_sha256": "ec0e8e10ec76b9c52521c7fdd32eeda32d26c52b1f4bb5a32a68c3841df23e87",
+      "before_sha256": "ac2b4bf19882a257da7564965e42145ede1e60472a3a671ffcce00e684f4ab35",
+      "entries": 6,
+      "status": "CLOSED"
+    }
+  }
+}

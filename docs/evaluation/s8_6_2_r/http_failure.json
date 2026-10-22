@@ -1,0 +1,63 @@
+{
+  "attempted_source": "c3db8915ac379608c5e8409b615c1aa7946d8360",
+  "compare": {
+    "status": "FAIL_BEFORE_PROVIDER_SEND",
+    "client_request_id": "s861-19eca8492fac40be92eab02d",
+    "server_run_id": "4ec70dbd-beb9-4998-8a13-7b3f28056081",
+    "session_id": "43f7700a-6a79-48db-aa46-9c14a36e7776",
+    "assistant_message_id": "fd05ffc9-f380-4436-891b-91c35efc2524",
+    "pg_turn_status": "error",
+    "pg_assistant_turn_status": "error",
+    "is_completed": false,
+    "error_code": "ORDINARY_CHAIN_FAILED",
+    "provider_attempts": 0,
+    "actual_tokens": 0,
+    "sse_frames": [
+      {
+        "id": "4ec70dbd-beb9-4998-8a13-7b3f28056081",
+        "response_type": "agent_query",
+        "content": "",
+        "done": false,
+        "data": {
+          "request_id": "4ec70dbd-beb9-4998-8a13-7b3f28056081",
+          "query": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+          "session_id": "43f7700a-6a79-48db-aa46-9c14a36e7776",
+          "assistant_message_id": "fd05ffc9-f380-4436-891b-91c35efc2524"
+        }
+      },
+      {
+        "id": "4ec70dbd-beb9-4998-8a13-7b3f28056081",
+        "response_type": "error",
+        "content": "",
+        "done": true,
+        "data": {
+          "error_code": "ORDINARY_CHAIN_FAILED",
+          "status": "failed"
+        }
+      },
+      {
+        "id": "4ec70dbd-beb9-4998-8a13-7b3f28056081",
+        "response_type": "complete",
+        "content": "",
+        "done": false,
+        "data": {
+          "status": "failed",
+          "error_code": "ORDINARY_CHAIN_FAILED"
+        }
+      }
+    ],
+    "final_answer_correct": "NOT_EVALUABLE_NO_ANSWER",
+    "evidence_support": "NOT_RUN",
+    "citation_readback": "NOT_RUN",
+    "replay_no_resend": "NOT_RUN"
+  },
+  "parallel": {
+    "status": "NOT_RUN_STOP_AFTER_COMPARE_FAILURE"
+  },
+  "dependent": {
+    "status": "NOT_RUN_STOP_AFTER_COMPARE_FAILURE"
+  },
+  "current_repaired_code_formal_api": "NOT_RUN",
+  "no_retry": true,
+  "stop_flag_preserved": true
+}

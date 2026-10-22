@@ -612,3 +612,8 @@ Legal baseline08ebd90; independent branch codex/s8-6-adaptive-retrieval-20261021
 源码提交 `5c3f7d2db9fa832cc4c2ede070bb405a6ac96d4e`，基线352b1ba包含0c496c2；S8.6.1零Provider准备已收尾。COMPARE_SHARED/v1、PARALLEL_ATTRIBUTE/v1和SIMPLE_PARALLEL已接入单次非思考QU与原串行retrieve_once，最多3单元。原B在安全性方面误拆先RED后修复；固定66例24/24正例、0/31反例误拆、11/11门控；扩展集合Owner逐条确认NOT_RUN。最终受影响离线322passed exit0，实际Provider/Token0。112保护文件、91既有合同、476旧证据与旧UNKNOWN冻结记录未改；真实QU/答案/API验收NOT_RUN。无Push/部署/P5/Schema/索引/阈值改动；本轮结束。报告：[S8_6_2_RULE_COVERAGE.md](docs/evaluation/S8_6_2_RULE_COVERAGE.md)。
 
 - 2026-10-22 Owner requested GitHub upload. Fast-forward push to origin/codex/s8-6-adaptive-retrieval-20261021 exit0; remote ls-remote verified1e70984eb43a6f15e04de393cf81d95c88dc1d13. Code and S8.6.2 reports are online; no deployment/provider calls.
+
+
+## 2026-10-22 S8.6.2-R 最小误拆修复与真实验收
+
+基线71188d04，规则修复eaccaa0（两族v2），有界验收c3db891，身份字段修复5f81e78。4个已知主动赋型反例RED4fail/2pass→受影响273pass；旧66题Gold不变24/24、0/31、11/11。当前256char/1024UTF8合同及真实renderer完整树33calls/237423reservation闭合，预算/边界103pass。Owner本Goal授权500000Tokens/Provider不限；新镜像c36eeaef实际QU6次均stop结算，7074input+194output=7268Tokens，UNKNOWN0；3个英文删句号回退，中文parallel仅形成2查询计划，负例2/2安全。首题正式HTTP发送前profile误用serverrunID匹配client授权，SSE/PG真实失败，Provider0，停止其余2题并关闭4新账本。最新脚本严格AcceptedTurn.client_request_id修复RED6fail→96pass，API配置另13pass；最新代码正式API NOT_RUN，不Push/生产部署/重试。PG/Local6keys/usage/bodyhash同，旧UNKNOWN3和来源/87索引/正式服务保持。详见docs/evaluation/S8_6_2_R_MINIMAL_REPAIR_AND_ACCEPTANCE.md/.results.json，状态MINIMAL_REPAIR_OFFLINE_PASS_REAL_HTTP_BLOCKED。
