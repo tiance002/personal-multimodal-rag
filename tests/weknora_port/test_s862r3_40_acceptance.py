@@ -373,3 +373,190 @@ def test_actual_fastapi_session_saves_profile_and_uses_trusted_client_admission(
     assert result.generation_options['citations_enabled'] is True
     assert result.pipeline_state.enable_expansion is False
     assert result.generation_options['policy'].mode == 'DYNAMIC'
+
+# Owner S864: new trusted ledgers may record only actual reported usage.
+# Legacy fixtures and the old38-case grant validator keep their old contract.
+def reported_grant(authorization, *, total=0):
+    env, original, _, _ = authorization
+    grant = deepcopy(original)
+    grant['accounting_mode'] = 'reported_usage_only_v1'
+    grant['owner_max_total_attempts'] = 40
+    selected = env['S840_BATCH_ID']
+    keys = [selected, *[k for k in grant['batches'] if k != selected][:5]]
+    grant['batches'] = {k: grant['batches'][k] for k in keys}
+    remaining = total
+    for number, batch in enumerate(grant['batches'].values()):
+        path = Path(batch['execution_file']); ledger = adapter.read(path)
+        ledger.update(accounting_mode='reported_usage_only_v1', entries=[], max_tokens=100000, max_calls=12)
+        if number and remaining:
+            tokens = min(100000, remaining); remaining -= tokens
+            row = settled_row(ledger['allowed_models'][0], 'reported-' + str(number), tokens)
+            row.pop('reserved_tokens'); row.pop('held_tokens')
+            row.update(wire_bytes=999999, output_budget=2048)
+            ledger['entries'] = [row]
+            ledger['status'] = 'CLOSED'
+        write(path, ledger)
+    assert remaining == 0
+    return env, grant
+
+
+def test_reported_owner_occupancy_counts_only_actual_usage_not_wire(authorization):
+    env, grant = reported_grant(authorization, total=490000)
+    assert adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE']) == 490000
+
+
+@pytest.mark.parametrize('state', ['INFLIGHT', 'UNKNOWN'])
+def test_reported_owner_occupancy_stops_even_selected_unsettled_and_preserves_unknown(authorization, state):
+    env, grant = reported_grant(authorization)
+    path = Path(env['WEKNORA_PORT_EXECUTION_FILE']); ledger = adapter.read(path)
+    row = settled_row(ledger['allowed_models'][0], 'unsettled', 10)
+    row.pop('reserved_tokens'); row.pop('held_tokens')
+    row.update(wire_bytes=4096, output_budget=2048, status=state, usage=None, outcome='UNKNOWN')
+    ledger['entries'] = [row]
+    if state == 'UNKNOWN': ledger['status'] = 'STOP'
+    write(path, ledger); before = path.read_bytes()
+    with pytest.raises(ValueError, match='UNKNOWN_OR_UNSETTLED_STOP'):
+        adapter.owner_occupancy(grant, path)
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize('mode', [None, 'unsupported-mode'])
+def test_reported_owner_occupancy_rejects_mixed_or_unknown_ledger_mode(authorization, mode):
+    env, grant = reported_grant(authorization)
+    path = Path(list(grant['batches'].values())[-1]['execution_file']); ledger = adapter.read(path)
+    if mode is None: ledger.pop('accounting_mode')
+    else: ledger['accounting_mode'] = mode
+    write(path, ledger)
+    with pytest.raises(ValueError, match='ACCOUNTING_MODE_MISMATCH'):
+        adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE'])
+
+
+@pytest.mark.parametrize('settled,attempts,allowed', [(490000, 0, True), (500000, 0, False), (0, 40, False)])
+def test_reported_owner_gate_checks_known_actual_without_request_estimator(authorization, settled, attempts, allowed):
+    env, grant = reported_grant(authorization, total=settled)
+    if attempts:
+        for number, batch in enumerate(list(grant['batches'].values())[1:]):
+            path = Path(batch['execution_file']); ledger = adapter.read(path)
+            for index in range(8):
+                row = settled_row(ledger['allowed_models'][0], f'completed-{number}-{index}', 0)
+                row.pop('reserved_tokens'); row.pop('held_tokens'); row['wire_bytes'] = 999999
+                ledger['entries'].append(row)
+            write(path, ledger)
+    path = Path(env['WEKNORA_PORT_EXECUTION_FILE'])
+    execution = SimpleNamespace(path=path)
+    admissions = []
+    async def authorize(call): admissions.append(call.context.request_id)
+    gate = SimpleNamespace(_local_execution=execution, authorize=authorize)
+    async def make(config, key, current_gate): return SimpleNamespace()
+    runtime = SimpleNamespace(_make_model=make, execution=execution)
+    adapter.install_owner_cap(runtime, grant, path)
+    # Deliberately no wire_bytes, output_budget or _OUTPUT_BOUND: this mode must
+    # not derive a token reservation from any request-size estimate.
+    call = SimpleNamespace(context=SimpleNamespace(request_id='actual-only-next'))
+    async def exercise():
+        await runtime._make_model(None, None, gate)
+        await gate.authorize(call)
+    if allowed:
+        asyncio.run(exercise()); assert admissions == ['actual-only-next']
+    else:
+        with pytest.raises(Exception, match='MODEL_SEND_AUTHORIZATION_FAILED'): asyncio.run(exercise())
+        assert admissions == []
+        stop = adapter.read(Path(grant['owner_lock_file']).with_name('owner-stop.json'))
+        assert stop['known_reported_tokens'] == settled
+        assert stop['attempts'] >= attempts
+        assert stop['code'] == ('S864_OWNER_ATTEMPT_CAP_EXCEEDED' if attempts else 'S840_OWNER_TOKEN_CAP_EXCEEDED')
+        assert 'next_wire_reservation' not in stop
+
+
+def test_reported_ledger_status_preserves_missing_usage_as_unknown_not_zero(authorization):
+    env, grant = reported_grant(authorization, total=100)
+    path = Path(list(grant['batches'].values())[1]['execution_file'])
+    ledger = adapter.read(path)
+    row = deepcopy(ledger['entries'][0]); row.update(id='b'*64, request_id='unknown', status='UNKNOWN', usage=None)
+    ledger['entries'].append(row); ledger['status'] = 'STOP'; write(path, ledger)
+    result = prior.ledger_status(path)
+    assert result['reported_tokens'] == result['known_reported_tokens'] == 100
+    assert result['unknown'] == result['unsettled'] == 1
+    assert result['held_tokens'] is None
+    assert result['actual_usage_complete'] is False
+    assert result['accounting_mode'] == 'reported_usage_only_v1'
+
+
+def test_reported_shared_owner_includes_vision_ledger_and_unknown_stops_all(authorization):
+    env, grant = reported_grant(authorization, total=120)
+    vision = list(grant['batches'].values())[1]
+    vision['kind'] = 'vision'
+    grant['batches']['new-vision-four-frozen-requests'] = vision
+    del grant['batches'][next(k for k,v in grant['batches'].items()
+        if v is vision and k != 'new-vision-four-frozen-requests')]
+    path = Path(vision['execution_file']); ledger = adapter.read(path)
+    model = ledger['allowed_models'][0]
+    model['capability'] = 'vision'
+    ledger['entries'][0]['capability'] = 'vision'
+    ledger['entries'][0]['id'] = hashlib.sha256(json.dumps([
+        ledger['entries'][0]['request_id'], 'vision']).encode()).hexdigest()
+    write(path, ledger)
+    assert adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE']) == 120
+    ledger['status'] = 'STOP'; ledger['entries'][0].update(status='UNKNOWN', usage=None)
+    write(path, ledger); before = path.read_bytes()
+    with pytest.raises(ValueError, match='UNKNOWN_OR_UNSETTLED_STOP'):
+        adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE'])
+    assert path.read_bytes() == before
+
+
+def test_reported_ledger_status_does_not_sum_invalid_settled_usage(authorization):
+    env, grant = reported_grant(authorization, total=100)
+    path = Path(list(grant['batches'].values())[1]['execution_file']); ledger = adapter.read(path)
+    ledger['entries'][0]['usage']['completion_tokens'] = 999
+    write(path, ledger)
+    result = prior.ledger_status(path)
+    assert result['known_reported_tokens'] == 0
+    assert result['invalid_settled_usage'] == result['unsettled'] == 1
+    assert result['actual_usage_complete'] is False
+    with pytest.raises(Exception, match='LOCAL_EXECUTION_INVALID'):
+        adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE'])
+
+def test_reported_owner_wrapper_reaches_normal_local_execution_without_byte_reservation(authorization):
+    env, grant = reported_grant(authorization, total=490000)
+    path = Path(env['WEKNORA_PORT_EXECUTION_FILE'])
+    execution = adapter.execution_module.LocalExecution(path)
+    admissions = []
+    async def authorize(call): admissions.append(call.context.request_id)
+    async def finish(call, *, outcome, usage): return True
+    gate = SimpleNamespace(application=SimpleNamespace(principal=SimpleNamespace(
+        tenant_id=332, subject_id='offline-subject')), authorize=authorize, finish=finish)
+    async def make(config, key, current_gate):
+        execution.install_gate(current_gate)
+        return SimpleNamespace()
+    runtime = SimpleNamespace(_make_model=make, execution=execution)
+    adapter.install_owner_cap(runtime, grant, path)
+    model = adapter.read(path)['allowed_models'][0]
+    call = SimpleNamespace(context=CallContext('actual-only-normal-gate', TrustedScope('offline-subject',
+        tuple(adapter.read(path)['allowed_kbs']), ())), **model,
+        wire_bytes=200000, output_budget=2048, wire_sha256='a'*64)
+    async def exercise():
+        await runtime._make_model(None, None, gate)
+        await gate.authorize(call)
+    asyncio.run(exercise())
+    row = adapter.read(path)['entries'][0]
+    assert row['status'] == 'INFLIGHT' and row['usage'] is None
+    assert row['wire_bytes'] == 200000
+    assert 'held_tokens' not in row and 'reserved_tokens' not in row
+    assert admissions == ['actual-only-normal-gate']
+
+
+def test_reported_ledger_status_retains_genuine_usage_even_when_outcome_unknown(authorization):
+    env, grant = reported_grant(authorization, total=100)
+    path = Path(list(grant['batches'].values())[1]['execution_file']); ledger = adapter.read(path)
+    unknown = deepcopy(ledger['entries'][0])
+    unknown.update(request_id='unknown-with-reported-usage', status='UNKNOWN', outcome='UNKNOWN')
+    unknown['id'] = hashlib.sha256(json.dumps([unknown['request_id'], unknown['capability']]).encode()).hexdigest()
+    unknown['usage'] = {'status':'REPORTED', 'prompt_tokens':30, 'completion_tokens':20, 'total_tokens':50}
+    ledger['entries'].append(unknown); ledger['status']='STOP'; write(path,ledger)
+    result = prior.ledger_status(path)
+    assert result['known_reported_tokens'] == result['reported_tokens'] == 150
+    assert result['settled_reported_tokens'] == 100
+    assert result['unknown'] == result['unsettled'] == 1
+    assert result['actual_usage_complete'] is False and result['held_tokens'] is None
+    with pytest.raises(ValueError, match='UNKNOWN_OR_UNSETTLED_STOP'):
+        adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE'])

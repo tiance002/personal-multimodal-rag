@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from dataclasses import replace
 import json
 import multiprocessing
+import os
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -31,7 +32,7 @@ def call(identity='run/1'):
 
 @pytest.fixture
 def ledger():
-    root = Path(__file__).resolve().parents[2] / 'var'
+    root = Path(os.environ.get('WEKNORA_EXECUTION_TEST_ROOT', Path(__file__).resolve().parents[2] / 'var'))
     root.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=root) as folder:
         path = Path(folder) / 'owner.json'
@@ -52,7 +53,7 @@ def test_pipeline_observation_preserves_state_and_result(ledger):
     class Context:
         user_content: str
     seen = []
-    state = SimpleNamespace(search_results=[], rerank_results=[], merge_results=[],
+    state = SimpleNamespace(search_results=[], rerank_results=[], merge_results=[], rescue_evidence=[],
         query='question', rewrite_query='same', intent='kb_search', needs_retrieval=True, user_content='raw evidence')
     async def progress(stage, status, **fields): seen.append((stage, status))
     pipeline = SimpleNamespace(on_progress=progress)
@@ -75,7 +76,7 @@ def test_trace_snapshot_cannot_acquire_future_selection_events(ledger):
     @dataclass
     class Context:
         user_content: str
-    state=SimpleNamespace(search_results=[],rerank_results=[],merge_results=[],evidence_trace=[])
+    state=SimpleNamespace(search_results=[],rerank_results=[],merge_results=[],rescue_evidence=[],evidence_trace=[])
     pipeline=SimpleNamespace(on_progress=None)
     async def execute(current,context):
         await pipeline.on_progress('retrieval','completed')
@@ -317,7 +318,8 @@ def test_inconsistent_reported_usage_retains_all_occupancy(ledger, usage):
 
 
 @pytest.mark.parametrize('kind', ['chat', 'embedding', 'rerank', 'unknown_provider', 'unknown_protocol', 'multimedia', 'missing_cap'])
-def test_actual_transport_open_bound_and_default_private(ledger, kind):
+@pytest.mark.parametrize('mode', [None, 'reported_usage_only_v1'])
+def test_actual_transport_open_bound_and_default_private(ledger, kind, mode):
     import httpx
     from backend.weknora_port.models.transport import AsyncHTTPTransport, configured_endpoint
     from backend.weknora_port.models.types import ModelConfig
@@ -332,6 +334,7 @@ def test_actual_transport_open_bound_and_default_private(ledger, kind):
     if kind == 'multimedia': body['messages'][0]['content'] = [{'type': 'image_url', 'image_url': 'secret'}]
     if kind == 'missing_cap': body.pop('max_tokens')
     change(ledger, capture_evidence=False, allowed_models=[{'provider': config.provider, 'model': 'model', 'model_id': 'm1', 'capability': capability}])
+    if mode: change(ledger, accounting_mode=mode)
     gate = LocalExecution(ledger).install_gate(Gate())
     sent = []
     def response(request):
@@ -353,7 +356,11 @@ def test_actual_transport_open_bound_and_default_private(ledger, kind):
         run(execute())
         assert len(sent) == 1
         row = data(ledger)['entries'][0]
-        assert row['reserved_tokens'] == len(sent[0]) + (50 if capability == 'chat' else 0) + 1024
+        if mode:
+            assert 'reserved_tokens' not in row and 'held_tokens' not in row
+            assert row['usage']['total_tokens'] == 15
+        else:
+            assert row['reserved_tokens'] == len(sent[0]) + (50 if capability == 'chat' else 0) + 1024
         assert row['status'] == 'SETTLED'
     assert not (ledger.parent / 'evidence').exists()
 

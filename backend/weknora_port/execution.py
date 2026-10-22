@@ -15,7 +15,110 @@ from .models.types import ProviderError
 
 _LOCK = threading.RLock()
 _OUTPUT_BOUND = ContextVar('local_execution_output_bound', default=None)
+_VISION_BOUND = ContextVar('local_execution_vision_input_bound', default=None)
 _LINUX_EXECUTION_ROOT = '/opt/rag-s8/state/executions'
+
+# Independent media/request limits, not token allowances. A deliberately narrow
+# inline JPEG/PNG contract uses DeepSeek's documented <=1024 tokens per image:
+# https://api-docs.deepseek.com/guides/vision/#token-usage (checked 2026-10-22).
+VISION_MAX_WIRE_BYTES = 48 * 1024 * 1024
+VISION_MAX_IMAGE_BYTES = 32 * 1024 * 1024
+VISION_MAX_TOTAL_IMAGE_BYTES = 64 * 1024 * 1024
+VISION_MAX_IMAGES = 600
+VISION_MAX_DIMENSION = 8192
+VISION_INPUT_RECIPE = 'deepseek-inline-image-text-bytes-1024/v1'
+REPORTED_USAGE_ONLY = 'reported_usage_only_v1'
+RESERVATION_MODE = 'reserved_tokens_v1'
+
+
+def _vision_request_facts(config, body, context, output_upper, *, estimate_input):
+    """Validate the exact vision request; estimate input only in legacy mode.
+
+    Inline base64 encodes pixels, not model text. Keep the full real wire hash
+    and byte limit; remove only validated image data URLs from the conservative
+    text surrogate. Provider usage remains the sole source of actual tokens.
+    This helper neither loads credentials nor invokes historical authorities.
+    """
+    import base64
+    from copy import deepcopy
+    import io
+    import re
+    import warnings
+    from urllib.parse import urlsplit
+    from PIL import Image
+    from .models.transport import configured_endpoint
+
+    endpoint = urlsplit(config.endpoint_url or config.base_url)
+    _require(config.provider == 'deepseek' and config.model == 'deepseek-flash'
+        and config.api == 'openai-completions' and config.supports_vision
+        and endpoint.scheme == 'https' and endpoint.netloc in ('api.deepseek.com', 'api.deepseek.com:443')
+        and not endpoint.username and not endpoint.password and not endpoint.query and not endpoint.fragment
+        and body.get('model') == config.model)
+    _require(not set(body) - {'model', 'messages', 'max_tokens', 'temperature', 'stream',
+        'stream_options', 'thinking', 'reasoning_effort', 'top_p', 'stop', 'frequency_penalty', 'presence_penalty'})
+    messages = body.get('messages')
+    _require(isinstance(messages, list) and bool(messages))
+    text_body = deepcopy(body) if estimate_input else None
+    count, total_bytes, dimensions = 0, 0, []
+    for index, message in enumerate(messages):
+        _require(isinstance(message, dict) and set(message) <= {'role', 'content'}
+            and message.get('role') in ('system', 'user', 'assistant'))
+        parts = message.get('content')
+        if isinstance(parts, str):
+            continue
+        _require(isinstance(parts, list) and bool(parts))
+        for part_index, part in enumerate(parts):
+            if isinstance(part, dict) and set(part) == {'type', 'text'} and part.get('type') == 'text':
+                _require(isinstance(part['text'], str))
+                continue
+            _require(isinstance(part, dict) and set(part) == {'type', 'image_url'}
+                and part['type'] == 'image_url' and message['role'] == 'user')
+            image = part['image_url']
+            _require(isinstance(image, dict) and not set(image) - {'url', 'detail'}
+                and image.get('detail', 'auto') in ('low', 'high', 'original', 'auto')
+                and isinstance(image.get('url'), str))
+            match = re.fullmatch(r'data:image/(jpeg|png);base64,([A-Za-z0-9+/=]+)', image['url'])
+            _require(match is not None)
+            _require(len(match[2]) <= 4 * ((VISION_MAX_IMAGE_BYTES + 2) // 3))
+            raw = base64.b64decode(match[2], validate=True)
+            _require(bool(raw) and len(raw) <= VISION_MAX_IMAGE_BYTES)
+            total_bytes += len(raw)
+            count += 1
+            _require(total_bytes <= VISION_MAX_TOTAL_IMAGE_BYTES and count <= VISION_MAX_IMAGES)
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter('error', Image.DecompressionBombWarning)
+                    with Image.open(io.BytesIO(raw)) as opened:
+                        _require(opened.format == {'jpeg': 'JPEG', 'png': 'PNG'}[match[1]]
+                            and getattr(opened, 'n_frames', 1) == 1)
+                        width, height = opened.size
+                        _require(min(width, height) > 0 and max(width, height) <= VISION_MAX_DIMENSION)
+                        dimensions.append((width, height))
+                        opened.verify()
+            except Image.DecompressionBombError:
+                raise ValueError('VISION_IMAGE_DIMENSIONS_UNVERIFIABLE') from None
+            if text_body is not None:
+                text_body['messages'][index]['content'][part_index]['image_url']['url'] = ''
+    _require(1 <= count <= VISION_MAX_IMAGES)
+    if count >= 15:
+        _require(all(max(size) <= min(VISION_MAX_DIMENSION, 4096) for size in dimensions))
+    # Match AsyncHTTPTransport's serializer exactly. The substitution affects
+    # only accounting: the actual Provider body and image bytes never change.
+    wire = json.dumps(body, ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False).encode('utf8')
+    _require(0 < len(wire) <= VISION_MAX_WIRE_BYTES)
+    facts = {'provider': config.provider, 'model': config.model, 'model_id': config.model_id,
+        'capability': 'vision', 'request_id': context.request_id, 'scope': context.scope,
+        'required_origin_kbs': context.required_origin_kbs,
+        'endpoint': configured_endpoint(config, 'vision'),
+        'wire_sha256': hashlib.sha256(wire).hexdigest(), 'wire_bytes': len(wire),
+        'request_output_budget': body.get('max_tokens'),
+        'output_tokens_upper_bound': output_upper,
+        'image_count': count, 'decoded_image_bytes': total_bytes}
+    if text_body is not None:
+        text_wire = json.dumps(text_body, ensure_ascii=False, separators=(',', ':'), sort_keys=True, allow_nan=False).encode('utf8')
+        facts.update(input_tokens_upper_bound=len(text_wire) + count * 1024,
+            text_wire_bytes=len(text_wire), input_bound_recipe=VISION_INPUT_RECIPE)
+    return facts
 
 
 def _linux_execution_location(path, approved_root):
@@ -86,6 +189,13 @@ def _usage_valid(usage, reserve):
             for k in ('cached_tokens', 'cache_read_tokens', 'cache_write_tokens', 'cache_miss_tokens')))
 
 
+def _reported_usage_valid(usage):
+    """Reported counters only; no estimate or reservation can satisfy this."""
+    return (isinstance(usage, dict) and all(type(usage.get(k)) is int for k in
+        ('prompt_tokens', 'completion_tokens', 'total_tokens')) and
+        _usage_valid(usage, usage['total_tokens']))
+
+
 def _require(condition):
     if not condition: raise ValueError('LOCAL_EXECUTION_CHECK_FAILED')
 
@@ -93,6 +203,8 @@ def _require(condition):
 def _validate_ledger(data):
     try:
         _require(isinstance(data, dict) and data['status'] in ('OPEN', 'STOP', 'CLOSED'))
+        mode = data.get('accounting_mode', RESERVATION_MODE)
+        _require(mode in (RESERVATION_MODE, REPORTED_USAGE_ONLY))
         _require(type(data['max_calls']) is int and 0 < data['max_calls'] <= 12)
         _require(type(data['max_tokens']) is int and 0 < data['max_tokens'] <= 100000)
         _require(str(data['tenant_id']) and isinstance(data['subject_id'], str) and data['subject_id'])
@@ -123,8 +235,24 @@ def _validate_ledger(data):
             _require(row_model in models)
             _require(isinstance(row['wire_sha256'], str) and len(row['wire_sha256']) == 64)
             int(row['wire_sha256'], 16)
+            if mode == REPORTED_USAGE_ONLY:
+                _require(not any(k in row for k in ('reserved_tokens', 'held_tokens', 'input_bound_recipe', 'input_tokens_upper_bound')))
+                _require(type(row['wire_bytes']) is int and row['wire_bytes'] > 0)
+                _require(row.get('usage') is None or _reported_usage_valid(row['usage']))
+                _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
+                    'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
+                if row['status'] == 'SETTLED':
+                    _require(row.get('outcome') == 'RESPONSE_RECEIVED' and _reported_usage_valid(row.get('usage')))
+                elif row['status'] != 'INFLIGHT':
+                    _require(data['status'] != 'OPEN')
+                continue
             reserved, held = row['reserved_tokens'], row['held_tokens']
             _require(type(reserved) is int and reserved >= 1024 and type(held) is int and 0 <= held <= reserved)
+            if 'input_bound_recipe' in row:
+                _require(row['capability'] == 'vision' and row['input_bound_recipe'] == VISION_INPUT_RECIPE)
+                _require(all(type(row[k]) is int and row[k] > 0 for k in ('input_tokens_upper_bound',
+                    'output_tokens_upper_bound', 'text_wire_bytes', 'image_count', 'decoded_image_bytes', 'wire_bytes')))
+                _require(reserved == row['input_tokens_upper_bound'] + row['output_tokens_upper_bound'] + 1024)
             _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
                 'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
             if row.get('usage') is not None: _require(_usage_valid(row['usage'], reserved))
@@ -134,7 +262,11 @@ def _validate_ledger(data):
             else:
                 _require(held == reserved)
                 if row['status'] != 'INFLIGHT': _require(data['status'] != 'OPEN')
-        _require(sum(row['held_tokens'] for row in entries) <= data['max_tokens'])
+        if mode == REPORTED_USAGE_ONLY:
+            known = sum(row['usage']['total_tokens'] for row in entries if row.get('usage') is not None)
+            _require(known < data['max_tokens'] or data['status'] != 'OPEN')
+        else:
+            _require(sum(row['held_tokens'] for row in entries) <= data['max_tokens'])
     except (KeyError, TypeError, ValueError):
         raise ProviderError('LOCAL_EXECUTION_INVALID') from None
 
@@ -170,6 +302,7 @@ class LocalExecution:
             if Path(data.get('evidence_dir', self.evidence)).resolve() != self.evidence.resolve():
                 raise ValueError('EXECUTION_EVIDENCE_PATH_INVALID')
             self.capture_evidence = data.get('capture_evidence', False)
+            self.accounting_mode = data.get('accounting_mode', RESERVATION_MODE)
             _stop_orphans(data)
 
     @contextmanager
@@ -189,6 +322,8 @@ class LocalExecution:
                 try: data = json.loads(self.path.read_text(encoding='utf-8'))
                 except (OSError, ValueError): raise ProviderError('LOCAL_EXECUTION_INVALID') from None
                 _validate_ledger(data)
+                if hasattr(self, 'accounting_mode') and data.get('accounting_mode', RESERVATION_MODE) != self.accounting_mode:
+                    raise ProviderError('LOCAL_EXECUTION_ACCOUNTING_MODE_CHANGED')
                 yield data
                 _validate_ledger(data)
                 tmp = self.path.with_name(self.path.name + '.' + uuid.uuid4().hex + '.tmp')
@@ -214,6 +349,20 @@ class LocalExecution:
         with self._ledger() as data:
             if data['status'] == 'STOP': raise ProviderError('LOCAL_EXECUTION_UNKNOWN_STOP')
             if data['status'] == 'CLOSED': raise ProviderError('LOCAL_EXECUTION_CLOSED')
+            if self.accounting_mode == REPORTED_USAGE_ONLY and any(r['status'] == 'INFLIGHT' for r in data['entries']):
+                # The caller must serialize the batch. A live admitted call is
+                # neither UNKNOWN nor cancelled merely because another asks.
+                raise ProviderError('LOCAL_EXECUTION_INFLIGHT_DENIED')
+            vision = _VISION_BOUND.get()
+            if call.capability == 'vision' or vision is not None:
+                if (not isinstance(vision, dict) or call.capability != 'vision'
+                    or any(vision[k] != getattr(call, k) for k in ('provider', 'model', 'model_id',
+                        'capability', 'endpoint', 'wire_sha256', 'wire_bytes'))
+                    or vision['request_id'] != call.context.request_id or vision['scope'] != call.context.scope
+                    or vision['required_origin_kbs'] != call.context.required_origin_kbs
+                    or vision['request_output_budget'] != call.output_budget
+                    or vision['output_tokens_upper_bound'] != _OUTPUT_BOUND.get()):
+                    raise ProviderError('LOCAL_EXECUTION_BOUND_UNVERIFIABLE')
             principal, context = gate.application.principal, call.context
             kbs = set(context.scope.knowledge_base_ids) | set(context.required_origin_kbs)
             allowed = {'provider': call.provider, 'model': call.model, 'model_id': call.model_id, 'capability': call.capability}
@@ -229,10 +378,21 @@ class LocalExecution:
                 raise ProviderError('LOCAL_EXECUTION_BOUND_INVALID')
             bound = _OUTPUT_BOUND.get()
             output_upper = bound if bound is not None else (call.output_budget or 0)
-            reserve = call.wire_bytes + output_upper + 1024
             entries = data['entries']
             if any(e['id'] == self._key(call) for e in entries):
                 raise ProviderError('LOCAL_EXECUTION_REUSE_DENIED')
+            if self.accounting_mode == REPORTED_USAGE_ONLY:
+                known = sum(e['usage']['total_tokens'] for e in entries)
+                if len(entries) >= data['max_calls'] or known >= data['max_tokens']:
+                    raise ProviderError('LOCAL_EXECUTION_LIMIT_DENIED')
+                entries.append({'id': self._key(call), 'request_id': context.request_id,
+                    **allowed, 'wire_sha256': call.wire_sha256, 'wire_bytes': call.wire_bytes,
+                    'output_budget': call.output_budget, 'status': 'INFLIGHT', 'usage': None,
+                    **({key: vision[key] for key in ('image_count', 'decoded_image_bytes')} if vision is not None else {}),
+                    'process_identity': {'pid': os.getpid(), 'creation_token': _process_token(os.getpid())}})
+                return
+            input_upper = vision['input_tokens_upper_bound'] if vision is not None else call.wire_bytes
+            reserve = input_upper + output_upper + 1024
             if (type(data['max_calls']) is not int or not 0 < data['max_calls'] <= 12 or
                     type(data['max_tokens']) is not int or not 0 < data['max_tokens'] <= 100000 or
                     len(entries) >= data['max_calls'] or sum(e['held_tokens'] for e in entries) + reserve > data['max_tokens']):
@@ -240,6 +400,9 @@ class LocalExecution:
             entries.append({'id': self._key(call), 'request_id': context.request_id,
                 **allowed, 'wire_sha256': call.wire_sha256, 'reserved_tokens': reserve,
                 'held_tokens': reserve, 'status': 'INFLIGHT',
+                **({key: vision[key] for key in ('input_tokens_upper_bound', 'output_tokens_upper_bound',
+                    'input_bound_recipe', 'text_wire_bytes', 'image_count', 'decoded_image_bytes', 'wire_bytes')}
+                   if vision is not None else {}),
                 'process_identity': {'pid': os.getpid(), 'creation_token': _process_token(os.getpid())}})
 
     def _finish(self, call, usage=None, failure='', outcome='UNKNOWN'):
@@ -251,8 +414,26 @@ class LocalExecution:
             row = rows[0]
             row['outcome'] = outcome
             row['usage'] = asdict(usage) if usage is not None else None
+            if self.accounting_mode == REPORTED_USAGE_ONLY:
+                reported_valid = _reported_usage_valid(row['usage'])
+                if row['usage'] is not None and not reported_valid:
+                    row['reported_usage_anomaly'] = row['usage']
+                    row['usage'], row['usage_invalid'] = None, True
+                valid = not failure and outcome == 'RESPONSE_RECEIVED' and reported_valid
+                row['status'] = 'SETTLED' if valid else failure or 'UNKNOWN'
+                if not valid:
+                    data['status'] = 'STOP'
+                elif sum(e['usage']['total_tokens'] for e in data['entries'] if e.get('usage') is not None) >= data['max_tokens']:
+                    data['status'], data['stopped_reason'] = 'STOP', 'REPORTED_USAGE_LIMIT_REACHED'
+                return
             reported_valid = _usage_valid(row['usage'], row['reserved_tokens'])
+            if 'input_bound_recipe' in row and row['usage'] is not None:
+                reported_valid = reported_valid and all(row['usage'].get(key) is None or
+                    row['usage'][key] <= row[bound] for key, bound in (
+                        ('prompt_tokens', 'input_tokens_upper_bound'), ('completion_tokens', 'output_tokens_upper_bound')))
             if row['usage'] is not None and not reported_valid:
+                if 'input_bound_recipe' in row:
+                    row['reported_usage_anomaly'] = row['usage']
                 row['usage'], row['usage_invalid'] = None, True
             valid = not failure and outcome == 'RESPONSE_RECEIVED' and reported_valid
             row['status'] = 'SETTLED' if valid else failure or 'UNKNOWN'
@@ -309,11 +490,16 @@ class LocalExecution:
                     _require(config.provider == 'siliconflow' and config.rerank_api == 'cohere-rerank')
                     _require(isinstance(body.get('query'), str) and isinstance(body.get('documents'), list))
                     _require(body['documents'] and all(isinstance(v, str) for v in body['documents']))
+                elif capability == 'vision':
+                    pass  # Narrow provider/media validation follows the output contract.
                 else: raise ValueError('UNSUPPORTED_CAPABILITY')
                 contract = resolve_output_contract(config, body, capability=capability)
-            except (ValueError, TypeError, AttributeError, KeyError, ProviderError):
+                vision = _vision_request_facts(config, body, context, contract.output_upper,
+                    estimate_input=self.accounting_mode != REPORTED_USAGE_ONLY) if capability == 'vision' else None
+            except (ValueError, TypeError, AttributeError, KeyError, OSError, SyntaxError, Warning, ProviderError):
                 raise ProviderError('LOCAL_EXECUTION_BOUND_UNVERIFIABLE') from None
             token = _OUTPUT_BOUND.set(contract.output_upper)
+            vision_token = _VISION_BOUND.set(vision)
             try:
                 prefix = None
                 if self.capture_evidence:
@@ -334,6 +520,8 @@ class LocalExecution:
                         try: yield handle
                         finally: proxy.finish()
             finally:
+                try: _VISION_BOUND.reset(vision_token)
+                except ValueError: pass
                 try: _OUTPUT_BOUND.reset(token)
                 except ValueError:
                     # Stream cancellation may close the generator in a copied

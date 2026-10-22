@@ -589,6 +589,25 @@ def parse_sse(text):
 def ledger_status(path):
     value = json.loads(Path(path).read_text(encoding='utf8'))
     entries = value['entries']
+    from backend.weknora_port import execution
+    mode = value.get('accounting_mode', execution.RESERVATION_MODE)
+    require(mode in (execution.RESERVATION_MODE, execution.REPORTED_USAGE_ONLY),
+            'S864_ACCOUNTING_MODE_MISMATCH')
+    if mode == execution.REPORTED_USAGE_ONLY:
+        settled = [row for row in entries if row['status'] == 'SETTLED'
+            and execution._reported_usage_valid(row.get('usage'))]
+        known = sum(row['usage']['total_tokens'] for row in entries
+            if execution._reported_usage_valid(row.get('usage')))
+        unsettled = len(entries) - len(settled)
+        return {'status': value['status'], 'accounting_mode': mode, 'attempts': len(entries),
+            'settled': len(settled), 'unsettled': unsettled,
+            'unknown': sum(row['status'] == 'UNKNOWN' for row in entries),
+            'invalid_settled_usage': sum(row['status'] == 'SETTLED'
+                and not execution._reported_usage_valid(row.get('usage')) for row in entries),
+            'known_reported_tokens': known, 'reported_tokens': known,
+            'settled_reported_tokens': sum(row['usage']['total_tokens'] for row in settled),
+            'actual_usage_complete': unsettled == 0, 'held_tokens': None,
+            'entries': entries, 'max_calls': value['max_calls'], 'max_tokens': value['max_tokens']}
     return {'status': value['status'], 'attempts': len(entries),
         'settled': sum(row['status'] == 'SETTLED' for row in entries),
         'unsettled': sum(row['status'] != 'SETTLED' for row in entries),

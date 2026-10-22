@@ -240,13 +240,27 @@ def owner_process_lock(path):
 
 def owner_occupancy(grant, selected_execution):
     """Actual settled totals plus retained occupancy; never resets a ledger."""
+    mode = grant.get('accounting_mode', execution_module.RESERVATION_MODE)
+    require(mode in (execution_module.RESERVATION_MODE, execution_module.REPORTED_USAGE_ONLY),
+            'S864_ACCOUNTING_MODE_MISMATCH')
+    reported_only = mode == execution_module.REPORTED_USAGE_ONLY
+    if reported_only:
+        require(grant.get('owner_max_total_attempts') == 40, 'S864_OWNER_ATTEMPT_CAP_REQUIRED')
     total = 0
     for batch in grant['batches'].values():
         path = Path(batch['execution_file'])
         data = read(path)
+        require(data.get('accounting_mode', execution_module.RESERVATION_MODE) == mode,
+                'S864_ACCOUNTING_MODE_MISMATCH')
         execution_module._validate_ledger(data)
         require(data['status'] != 'STOP', 'S840_UNKNOWN_OR_UNSETTLED_STOP')
         for row in data['entries']:
+            if reported_only:
+                require(row['status'] == 'SETTLED', 'S840_UNKNOWN_OR_UNSETTLED_STOP')
+                require(execution_module._reported_usage_valid(row.get('usage')),
+                        'S864_REPORTED_USAGE_REQUIRED')
+                total += row['usage']['total_tokens']
+                continue
             require(row['status'] in ('SETTLED', 'INFLIGHT'), 'S840_UNKNOWN_OR_UNSETTLED_STOP')
             require(row['status'] == 'SETTLED' or path.resolve() == Path(selected_execution).resolve(),
                 'S840_OTHER_CASE_INFLIGHT_STOP')
@@ -259,6 +273,9 @@ def install_owner_cap(runtime, grant, execution_file):
     import asyncio
     import inspect
     require(not getattr(runtime, '_s840_owner_cap_installed', False), 'S840_OWNER_CAP_ALREADY_INSTALLED')
+    mode = grant.get('accounting_mode', execution_module.RESERVATION_MODE)
+    require(mode in (execution_module.RESERVATION_MODE, execution_module.REPORTED_USAGE_ONLY),
+            'S864_ACCOUNTING_MODE_MISMATCH')
     original = runtime._make_model
     admission_lock = asyncio.Lock()
     async def make_model(config, key, gate):
@@ -273,6 +290,21 @@ def install_owner_cap(runtime, grant, execution_file):
                     stop_file = Path(grant['owner_lock_file']).with_name('owner-stop.json')
                     if stop_file.exists(): raise ProviderError('MODEL_SEND_AUTHORIZATION_FAILED')
                     held = owner_occupancy(grant, execution_file)
+                    if mode == execution_module.REPORTED_USAGE_ONLY:
+                        # New Owner instruction: actual usage only. No request
+                        # bytes, output estimate or token reservation is used.
+                        attempts = sum(len(read(batch['execution_file'])['entries'])
+                            for batch in grant['batches'].values())
+                        if held >= OWNER_TOKEN_CAP or attempts >= grant['owner_max_total_attempts']:
+                            write_new(stop_file, {'code': 'S840_OWNER_TOKEN_CAP_EXCEEDED'
+                                    if held >= OWNER_TOKEN_CAP else 'S864_OWNER_ATTEMPT_CAP_EXCEEDED',
+                                'accounting_mode': mode, 'known_reported_tokens': held,
+                                'attempts': attempts, 'owner_max_total_attempts': 40,
+                                'owner_cap': OWNER_TOKEN_CAP, 'request_id': call.context.request_id,
+                                'provider_sent': False, 'automatic_retry': False})
+                            raise ProviderError('MODEL_SEND_AUTHORIZATION_FAILED')
+                        await authorize(call)
+                        return
                     output = execution_module._OUTPUT_BOUND.get()
                     require(type(call.wire_bytes) is int and call.wire_bytes > 0
                         and type(output) is int and output >= 0, 'S840_ACTUAL_REQUEST_BOUND_REQUIRED')
