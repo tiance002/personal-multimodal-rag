@@ -158,12 +158,13 @@ def _parse_parallel(query: str) -> _Slots | None:
 
 _REJECTIONS = ('ambiguous object connectors', 'nested attributes or relative clauses', 'unbound object pronouns', 'time constraints',
     'negation or alternatives', 'source or permission restrictions', 'conditions or extra requests',
-    'quantitative or JOINT relations')
+    'quantitative or JOINT relations', 'relational object lists ending in 之间',
+    'unspecified standalone shared attribute (区别 or 异同 alone)')
 _TEMPLATES = (('cn', '{object}的{dimension}是什么？'),
               ('en', 'What is known about {object} regarding {dimension}?'))
 
 RULES = (
-    RuleDeclaration('COMPARE_SHARED', '1', 'SIMPLE_COMPARE', ('cn', 'en'),
+    RuleDeclaration('COMPARE_SHARED', '2', 'SIMPLE_COMPARE', ('cn', 'en'),
         ('比较A和B的X', 'A与B在X方面有何区别', '比较A和B在X方面的区别', '比较A、B、C的X',
          'Compare A and B in terms of X', 'Compare A with B on X', 'Compare A, B, and C in terms of X'),
         2, 3, ('objects', 'shared_dimension', 'complete_character_spans'), _REJECTIONS,
@@ -172,7 +173,7 @@ RULES = (
         ('比较A和B和C的性能', '比较A和B所主持会议的举办地点', '比较它和B的价格',
          'Compare A and B in terms of latency in 2024'),
         _parse_compare, _TEMPLATES),
-    RuleDeclaration('PARALLEL_ATTRIBUTE', '1', 'SIMPLE_PARALLEL', ('cn',),
+    RuleDeclaration('PARALLEL_ATTRIBUTE', '2', 'SIMPLE_PARALLEL', ('cn',),
         ('分别介绍/说明/查询A和B的X', '分别介绍/说明/查询A、B、C的X', 'A和B各自的X是什么'),
         2, 3, ('objects', 'shared_dimension', 'complete_character_spans'), _REJECTIONS,
         ('分别介绍PostgreSQL和Redis的一致性', '分别查询A、B、C的性能', 'A和B各自的性能是什么'),
@@ -188,6 +189,12 @@ def _slot_rejection(slots: _Slots, declaration: RuleDeclaration) -> str:
         return 'DUPLICATE_OBJECT'
     if not slots.dimension or len(slots.dimension) > 160:
         return 'DIMENSION_INVALID'
+    # The suffix qualifies the entire list, not the final object's identity.
+    # Reject without deleting it or treating individual 间 characters as unsafe.
+    if slots.language == 'cn' and slots.objects[-1].endswith('之间'):
+        return 'RELATIONAL_OBJECT_LIST'
+    if slots.dimension in ('区别', '异同'):
+        return 'SHARED_DIMENSION_UNSPECIFIED'
     for value in (*slots.objects, slots.dimension):
         if _UNSAFE_EN.search(value) or _UNSAFE_CN.search(value):
             return 'PROTECTED_OR_COMPLEX_CONSTRAINT'

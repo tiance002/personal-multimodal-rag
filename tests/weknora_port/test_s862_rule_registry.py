@@ -32,7 +32,7 @@ def test_closed_positive_slots_spans_and_exact_one_query_per_object(query, kind,
     assert result.objects == objects and result.dimension == dimension
     assert result.full_match == query and result.reject_reason == ''
     assert result.rule_id in {'COMPARE_SHARED', 'PARALLEL_ATTRIBUTE'}
-    assert result.rule_version == '1'
+    assert result.rule_version == '2'
     assert tuple(query[slice(*span)] for span in result.object_spans) == objects
     assert query[slice(*result.dimension_span)] == dimension
     expected = tuple(name + '的' + dimension + '是什么？' if language == 'cn'
@@ -140,7 +140,7 @@ def test_family_mismatch_fails_but_diagnostic_none_can_match_either():
 def test_explicit_registered_family_retains_trace_metadata_without_partial_slots(query, kind, rule_id):
     result = parse_rule(query, kind)
     assert not result.matched and result.objects == () and result.dimension == ''
-    assert result.rule_id == rule_id and result.rule_version == '1' and result.query_type == kind
+    assert result.rule_id == rule_id and result.rule_version == '2' and result.query_type == kind
 
 
 @pytest.mark.parametrize('value', [None, 1, [], '', 'A' * 401])
@@ -153,7 +153,7 @@ def test_registry_declarations_are_closed_and_self_validating_examples():
     assert {row.rule_id for row in RULES} == {'COMPARE_SHARED', 'PARALLEL_ATTRIBUTE'}
     assert {row.query_type for row in RULES} == {'SIMPLE_COMPARE', 'SIMPLE_PARALLEL'}
     for rule in RULES:
-        assert rule.rule_version == '1'
+        assert rule.rule_version == '2'
         assert rule.languages and rule.syntax and rule.required_attributes and rule.rejections
         assert rule.minimum_objects == 2 and rule.maximum_objects == 3
         assert rule.positive_examples and rule.negative_examples and callable(rule.parser)

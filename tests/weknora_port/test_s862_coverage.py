@@ -113,7 +113,7 @@ def test_frozen_case_registry_and_production_plan(case):
     assert 1 <= len(plan["subqueries"]) <= 3, record
     if case["expected_local_match"]:
         assert local["rule_id"] == case["expected_rule"], record
-        assert local["rule_version"] == "1", record
+        assert local["rule_version"] == "2", record
         assert local["objects"] == case["expected_objects"], record
         assert local["dimension"] == case["expected_dimension"], record
         assert local["object_spans"] == case["expected_object_spans"], record
