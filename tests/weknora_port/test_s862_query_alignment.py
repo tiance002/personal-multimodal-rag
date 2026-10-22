@@ -130,7 +130,7 @@ def test_invalid_enum_falls_back_to_unknown_without_discarding_q0(guidance_stub,
 @pytest.mark.parametrize('output,finish', [
     ('preface ' + compact_output(kind='SIMPLE_PARALLEL'), 'stop'),
     (compact_output(kind='SIMPLE_PARALLEL'), 'length'),
-    (compact_output(Q0[:-1], 'SIMPLE_PARALLEL'), 'stop'),
+    (compact_output(Q0[:-1].replace('Compare', 'compare'), 'SIMPLE_PARALLEL'), 'stop'),
 ])
 def test_new_label_does_not_bypass_whole_json_completion_or_literal_guard(guidance_stub, output, finish):
     result = current()

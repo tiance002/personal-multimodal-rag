@@ -289,7 +289,40 @@ def validate_rewrite(state, candidate):
     return ''
 
 
-def _record_rewrite(state, reason='', *, query_structure=False):
+def _exact_terminal_period_recovery(state, response):
+    """Recognize only the complete v2 output observed in the frozen QU replay."""
+    q0 = state.query
+    if (not q0.endswith('.') or q0.endswith(('..', '….'))
+            or getattr(response, 'finish_reason', '') != 'stop'
+            or getattr(response, 'tool_calls', ()) or getattr(response, 'truncated', False)):
+        return None
+    raw = getattr(response, 'content', None)
+    if not isinstance(raw, str):
+        return None
+
+    def unique_object(pairs):
+        data = {}
+        for key, value in pairs:
+            if key in data:
+                raise ValueError('DUPLICATE_QU_FIELD')
+            data[key] = value
+        return data
+    try:
+        data = json.loads(raw, object_pairs_hook=unique_object)
+        fields = {'rewrite_query', 'intent', 'image_description', 'query_type'}
+        if (not isinstance(data, dict) or set(data) != fields
+                or not all(isinstance(value, str) for value in data.values())
+                or data['rewrite_query'] != q0[:-1]):
+            return None
+        from .strategy import QueryType
+        QueryType(data['query_type'])  # Invalid labels cannot unlock this exception.
+        return {'raw_response_sha256': hashlib.sha256(raw.encode('utf-8')).hexdigest(),
+                'raw_response_hash_scope': 'chat_response.content_utf8'}
+    except (ValueError, TypeError, UnicodeError):
+        return None
+
+
+def _record_rewrite(state, reason='', *, query_structure=False, recovery=None):
     if known_ambiguous_reference(state):
         reason = 'AMBIGUOUS_REFERENCE'
     state.rewrite_fallback_reason = reason
@@ -305,6 +338,9 @@ def _record_rewrite(state, reason='', *, query_structure=False):
         'history_rounds':len(state.history)})
     if query_structure:
         state.query_trace[-1].update(contract='qu_v2', query_type=state.query_type)
+        if not reason and recovery is not None:
+            state.query_trace[-1].update(decision='RECOVERED',
+                reason='EXACT_ASCII_TERMINAL_PERIOD_RESTORED', **recovery)
 
 
 def resolve_intent(state):
@@ -423,9 +459,14 @@ async def understand_query(state, context, registry, *, history_loader=None, cap
         state.intent = resolve_intent(state)
         return
     parsed = parse_understanding(state, getattr(response, 'content', None), query_structure=query_structure)
+    recovery = (_exact_terminal_period_recovery(state, response)
+                if query_structure and parsed and not state.rewrite_fallback_reason else None)
+    if recovery is not None:
+        # Restore the user's exact bytes before applying every existing guard.
+        state.rewrite_query = state.query
     reason = ('REWRITE_PARSE_FAILED' if not parsed else state.rewrite_fallback_reason
               or validate_rewrite(state, state.rewrite_query))
-    _record_rewrite(state, reason, query_structure=query_structure)
+    _record_rewrite(state, reason, query_structure=query_structure, recovery=recovery)
     state.intent = resolve_intent(state)
     if caption_sink and state.image_description and state.user_message_id:
         try:

@@ -1,0 +1,43 @@
+{
+  "provenance": "Exact settled S8.6.2-R model outputs replayed offline; not new calls or a new semantic Gold",
+  "source_path": "docs/evaluation/s8_6_2_r/real_qu_samples.json",
+  "source_sha256": "df341b516aac6fdaf740603fdfe02f90c16c248a333dfa03277af32337c446fe",
+  "samples": [
+    {
+      "case": "two-object",
+      "q0": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+      "raw_model_output": "{\"rewrite_query\":\"Compare Leyden jar and Franklin bells in terms of operating principles and uses\",\"intent\":\"kb_search\",\"image_description\":\"\",\"query_type\":\"SIMPLE_COMPARE\"}",
+      "provider_request_id": "s861-f669ae5030a540de9a79ceca/query_rewrite",
+      "provider_model": "Qwen/Qwen3.5-4B",
+      "finish_reason": "stop",
+      "wire_sha256": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4",
+      "actual_input_tokens": 1181,
+      "actual_output_tokens": 34,
+      "actual_total_tokens": 1215
+    },
+    {
+      "case": "three-object",
+      "q0": "Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency.",
+      "raw_model_output": "{\"rewrite_query\":\"Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency\",\"intent\":\"kb_search\",\"image_description\":\"\",\"query_type\":\"SIMPLE_COMPARE\"}",
+      "provider_request_id": "s861-95700e191c1142dfa0d50d71/query_rewrite",
+      "provider_model": "Qwen/Qwen3.5-4B",
+      "finish_reason": "stop",
+      "wire_sha256": "05a11fed54837126904be91ada033fa04c068541929f20d0eb24da8e214329ac",
+      "actual_input_tokens": 1180,
+      "actual_output_tokens": 33,
+      "actual_total_tokens": 1213
+    },
+    {
+      "case": "numeric-model",
+      "q0": "Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements.",
+      "raw_model_output": "{\"rewrite_query\":\"Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements\",\"intent\":\"kb_search\",\"image_description\":\"\",\"query_type\":\"SIMPLE_COMPARE\"}",
+      "provider_request_id": "s861-11e525027fcd4a2791a3ab44/query_rewrite",
+      "provider_model": "Qwen/Qwen3.5-4B",
+      "finish_reason": "stop",
+      "wire_sha256": "c5b42cb9b1e2091bdca1166146a72a6a0478921d59103189bdafcbca0b4e7ce1",
+      "actual_input_tokens": 1188,
+      "actual_output_tokens": 41,
+      "actual_total_tokens": 1229
+    }
+  ]
+}
