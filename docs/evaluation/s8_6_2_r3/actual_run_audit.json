@@ -1,0 +1,655 @@
+{
+  "schema": "s862r3-independent-actual-run-audit/v1",
+  "goal": "S8.6.2-R3",
+  "audit_kind": "INDEPENDENT_AGENT_REVIEW_OF_SAVED_ACTUAL_EVIDENCE",
+  "scope": "One fresh Session, one English compare HTTP submission; no additional sends by this audit",
+  "input_snapshot": "runtime-snapshot-20261022t030006z-98793264",
+  "source_revision": "751c6b26d461e90e76d1c6c708977db9dd831eed",
+  "image_id": "sha256:9ef7691a9cb5667713d4e675e96055010165520984ef8ee1de6dd44532e5df50",
+  "profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+  "profile_sha256": "495447f94ab92f1e2ca770cc2cad851d4eaa40bad326e8b483d2c4d4279a8f2b",
+  "profile_composed_prompt_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+  "actual_final_system_sha256": "cabb2818fdfed59572a8dff282378c8373d2129aced63d1caec953e768b5cc68",
+  "actual_final_system_equals_frozen_renderer": true,
+  "current_budget_file_sha256": "297b292e19fe67b58efc2e133a4c336d23096dd867f6d70e0caada84d34d3e8c",
+  "client_request_id": "s861-f644e1376f9f4ccfa0d65f19",
+  "server_run_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7",
+  "session_id": "76565813-b420-4a34-92ff-47dfe053b599",
+  "assistant_message_id": "043cd95b-edbf-4ae6-91ca-6ecc2b402aa8",
+  "query": {
+    "q0": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+    "raw_rewrite_query": "Compare Leyden jar and Franklin bells in terms of operating principles and uses",
+    "effective_rewrite_query": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+    "raw_query_type": "SIMPLE_COMPARE",
+    "effective_query_type": "SIMPLE_COMPARE",
+    "raw_finish_reason": "stop",
+    "decision": "RECOVERED",
+    "reason": "EXACT_ASCII_TERMINAL_PERIOD_RESTORED",
+    "q0_sha256": "bd1a51b1714439fd32e625a2db619c8149c831b312448a186851ae8f844ab685",
+    "effective_rewrite_sha256": "bd1a51b1714439fd32e625a2db619c8149c831b312448a186851ae8f844ab685",
+    "raw_response_sha256": "85c46abac108e020ee10ef15ed80ecf044a8d5eb2372c3f8ac116d921b13ae2b",
+    "raw_response_hash_scope": "chat_response.content_utf8",
+    "history_rounds": 0,
+    "rule_id": "COMPARE_SHARED",
+    "rule_version": "2",
+    "rule_status": "MATCHED",
+    "rule_full_match": true,
+    "strategy": "RULE_COMPARE",
+    "retrieval_units_used": 2,
+    "actual_child_queries": [
+      {
+        "subquery_id": "sq-1",
+        "query": "What is known about Leyden jar regarding operating principles and uses?",
+        "object_span": [
+          8,
+          18
+        ],
+        "dimension_span": [
+          50,
+          79
+        ],
+        "embedding_wire_input_verified": true,
+        "rerank_wire_query_verified": true
+      },
+      {
+        "subquery_id": "sq-2",
+        "query": "What is known about Franklin bells regarding operating principles and uses?",
+        "object_span": [
+          23,
+          37
+        ],
+        "dimension_span": [
+          50,
+          79
+        ],
+        "embedding_wire_input_verified": true,
+        "rerank_wire_query_verified": true
+      }
+    ],
+    "proof_boundary": "Embedding and Rerank are proven by actual request bodies and settled PG/Local receipts; keyword SQL query parameters were not separately captured",
+    "query_expansion": false,
+    "bridge_calls": 0
+  },
+  "calls": [
+    {
+      "ordinal": 1,
+      "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/query_rewrite",
+      "capability": "chat",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "provider_reported_models": [
+        "Qwen/Qwen3.5-4B"
+      ],
+      "input_tokens": 1181,
+      "output_tokens": 34,
+      "total_tokens": 1215,
+      "usage_status": "REPORTED",
+      "usage_total_basis": "PROVIDER_REPORTED_TOTAL",
+      "wire_sha256": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4",
+      "wire_bytes": 5692,
+      "original_reserved_tokens": 6972,
+      "local_status": "SETTLED",
+      "pg_outcome": "RESPONSE_RECEIVED",
+      "pg_finished_at": "2026-10-22 02:55:54.325950+00:00",
+      "http_status": 200,
+      "raw_response_sha256": "4bb22164240ac4938a2935f85172fba44b8e05cd9e816f946ee9828a95d1dad7",
+      "raw_usage_matches_settlement": true,
+      "pg_local_full_usage_equal": true,
+      "captured_request": "batches/compare/evidence/093b72159e0f47218b0159a59fde91be.request.json",
+      "embedding_input": null,
+      "rerank_query": null,
+      "rerank_candidate_count": null,
+      "relative_transport_started_seconds": 0.0,
+      "relative_read_finished_seconds": 1.3477586889639497,
+      "authorized_kb_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "authorized_document_ids": [
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "a973df4a-0b4b-43f7-ad17-55265aac1556"
+      ]
+    },
+    {
+      "ordinal": 2,
+      "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-1/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-5232826baf3038aa",
+      "capability": "embedding",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+      "provider_reported_models": [
+        "BAAI/bge-m3"
+      ],
+      "input_tokens": 17,
+      "output_tokens": 0,
+      "total_tokens": 17,
+      "usage_status": "REPORTED",
+      "usage_total_basis": "PROVIDER_REPORTED_TOTAL",
+      "wire_sha256": "44e06a4baf283431a751f874aa04bb4220f71a1fc9ac63252f5e33dc71cfe66e",
+      "wire_bytes": 133,
+      "original_reserved_tokens": 1157,
+      "local_status": "SETTLED",
+      "pg_outcome": "RESPONSE_RECEIVED",
+      "pg_finished_at": "2026-10-22 02:55:54.537303+00:00",
+      "http_status": 200,
+      "raw_response_sha256": "e697b6b1e68b07ef2d00fc3776549f763a95255126f62681db8ac30b7909b89e",
+      "raw_usage_matches_settlement": true,
+      "pg_local_full_usage_equal": true,
+      "captured_request": "batches/compare/evidence/c2e39594c0474efe95980b6d544e5db1.request.json",
+      "embedding_input": [
+        "What is known about Leyden jar regarding operating principles and uses?"
+      ],
+      "rerank_query": null,
+      "rerank_candidate_count": null,
+      "relative_transport_started_seconds": 1.4124641311354935,
+      "relative_read_finished_seconds": 1.559022962115705,
+      "authorized_kb_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "authorized_document_ids": [
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "a973df4a-0b4b-43f7-ad17-55265aac1556"
+      ]
+    },
+    {
+      "ordinal": 3,
+      "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-1/rerank",
+      "capability": "rerank",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+      "provider_reported_models": [],
+      "input_tokens": 1308,
+      "output_tokens": 0,
+      "total_tokens": 1308,
+      "usage_status": "REPORTED",
+      "usage_total_basis": "SUM_OF_REPORTED_INPUT_OUTPUT",
+      "wire_sha256": "a24f8585ff8c8b606ed8f62055c22b532385623de944d021a0f4d9142ebe1e60",
+      "wire_bytes": 4833,
+      "original_reserved_tokens": 5857,
+      "local_status": "SETTLED",
+      "pg_outcome": "RESPONSE_RECEIVED",
+      "pg_finished_at": "2026-10-22 02:55:55.270647+00:00",
+      "http_status": 200,
+      "raw_response_sha256": "1379fbabcfbffad80566fec25fc6672a50898703c75c403825edcfb0f95eaf91",
+      "raw_usage_matches_settlement": true,
+      "pg_local_full_usage_equal": true,
+      "captured_request": "batches/compare/evidence/38baf27e5ba14facafa847b693343508.request.json",
+      "embedding_input": null,
+      "rerank_query": "What is known about Leyden jar regarding operating principles and uses?",
+      "rerank_candidate_count": 11,
+      "relative_transport_started_seconds": 2.0444988678209484,
+      "relative_read_finished_seconds": 2.292564714793116,
+      "authorized_kb_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "authorized_document_ids": [
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "a973df4a-0b4b-43f7-ad17-55265aac1556"
+      ]
+    },
+    {
+      "ordinal": 4,
+      "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-2/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-d662e17c4589cc4f",
+      "capability": "embedding",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+      "provider_reported_models": [
+        "BAAI/bge-m3"
+      ],
+      "input_tokens": 17,
+      "output_tokens": 0,
+      "total_tokens": 17,
+      "usage_status": "REPORTED",
+      "usage_total_basis": "PROVIDER_REPORTED_TOTAL",
+      "wire_sha256": "213d3c95896151e5fd8b31b69a2bfa0ff753fefa6101c041ed14564205262d9d",
+      "wire_bytes": 137,
+      "original_reserved_tokens": 1161,
+      "local_status": "SETTLED",
+      "pg_outcome": "RESPONSE_RECEIVED",
+      "pg_finished_at": "2026-10-22 02:55:55.501481+00:00",
+      "http_status": 200,
+      "raw_response_sha256": "26d3dc8cad33fe8ad1a9ad0f2ba0c0245e1daa5430d8346b2c7d00f51d733188",
+      "raw_usage_matches_settlement": true,
+      "pg_local_full_usage_equal": true,
+      "captured_request": "batches/compare/evidence/9873812ef6e249b1a9cca00a607c77c8.request.json",
+      "embedding_input": [
+        "What is known about Franklin bells regarding operating principles and uses?"
+      ],
+      "rerank_query": null,
+      "rerank_candidate_count": null,
+      "relative_transport_started_seconds": 2.3790916041471064,
+      "relative_read_finished_seconds": 2.5227807709015906,
+      "authorized_kb_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "authorized_document_ids": [
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "a973df4a-0b4b-43f7-ad17-55265aac1556"
+      ]
+    },
+    {
+      "ordinal": 5,
+      "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-2/rerank",
+      "capability": "rerank",
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+      "provider_reported_models": [],
+      "input_tokens": 1308,
+      "output_tokens": 0,
+      "total_tokens": 1308,
+      "usage_status": "REPORTED",
+      "usage_total_basis": "SUM_OF_REPORTED_INPUT_OUTPUT",
+      "wire_sha256": "11f969b4ccaacb72f668576f7f3bde6f06dce442766f1801b1369d08ca70fe7f",
+      "wire_bytes": 4837,
+      "original_reserved_tokens": 5861,
+      "local_status": "SETTLED",
+      "pg_outcome": "RESPONSE_RECEIVED",
+      "pg_finished_at": "2026-10-22 02:55:56.102180+00:00",
+      "http_status": 200,
+      "raw_response_sha256": "d0c4a83eab35b19d119367b3b873bd69243fd3321fb17135e1bb9b343429e357",
+      "raw_usage_matches_settlement": true,
+      "pg_local_full_usage_equal": true,
+      "captured_request": "batches/compare/evidence/5bf95e70ca734457a8f2ceee0d65dd79.request.json",
+      "embedding_input": null,
+      "rerank_query": "What is known about Franklin bells regarding operating principles and uses?",
+      "rerank_candidate_count": 11,
+      "relative_transport_started_seconds": 2.926671678200364,
+      "relative_read_finished_seconds": 3.1242207000032067,
+      "authorized_kb_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "authorized_document_ids": [
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "a973df4a-0b4b-43f7-ad17-55265aac1556"
+      ]
+    },
+    {
+      "ordinal": 6,
+      "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/answer/1/cheap",
+      "capability": "chat",
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "provider_reported_models": [
+        "Qwen/Qwen3.5-4B"
+      ],
+      "input_tokens": 1274,
+      "output_tokens": 302,
+      "total_tokens": 1576,
+      "usage_status": "REPORTED",
+      "usage_total_basis": "PROVIDER_REPORTED_TOTAL",
+      "wire_sha256": "f66f0de6c122300ffa50de3b548989acc5e7dce074621dc0922267a32ccbe9ff",
+      "wire_bytes": 5387,
+      "original_reserved_tokens": 8459,
+      "local_status": "SETTLED",
+      "pg_outcome": "RESPONSE_RECEIVED",
+      "pg_finished_at": "2026-10-22 02:56:04.141989+00:00",
+      "http_status": 200,
+      "raw_response_sha256": "189177e54e9483f57004a9dc89aca3e314a4138b394df2caf4e147460090cb93",
+      "raw_usage_matches_settlement": true,
+      "pg_local_full_usage_equal": true,
+      "captured_request": "batches/compare/evidence/79950b5993844686ba0850a5445924dd.request.json",
+      "embedding_input": null,
+      "rerank_query": null,
+      "rerank_candidate_count": null,
+      "relative_transport_started_seconds": 3.294457195792347,
+      "relative_read_finished_seconds": 11.163523213006556,
+      "authorized_kb_ids": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "authorized_document_ids": [
+        "3fdf4942-1265-4e9e-959d-27772f57e5dd",
+        "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+        "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+        "a973df4a-0b4b-43f7-ad17-55265aac1556"
+      ]
+    }
+  ],
+  "serial_execution": {
+    "physical_send_intervals_nonoverlapping": true,
+    "physical_order": [
+      "chat:98060179-90f4-42eb-863e-d2ed2d6e01b7/query_rewrite",
+      "embedding:98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-1/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-5232826baf3038aa",
+      "rerank:98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-1/rerank",
+      "embedding:98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-2/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-d662e17c4589cc4f",
+      "rerank:98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-2/rerank",
+      "chat:98060179-90f4-42eb-863e-d2ed2d6e01b7/answer/1/cheap"
+    ]
+  },
+  "sources": [
+    {
+      "chunk_id": "e8a751ff-032c-4c8c-bb31-4eddc73b3a86",
+      "document_id": "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "source_version": "5663a72f-6cf2-4731-8820-dfbe286da82b",
+      "chunk_type": "text",
+      "start": 0,
+      "end": 429,
+      "characters": 429,
+      "utf8_bytes": 429,
+      "content_sha256": "decbe8d51474b802a881e06db02901c98b31e03bd88b0dcd254b043c9eb7f00a",
+      "readback_http_status": 200,
+      "readback_equals_persisted_reference": true,
+      "full_original_visible_in_final_model_input": true,
+      "authorized_document_scope_match": true
+    },
+    {
+      "chunk_id": "0f650d87-44cc-4fe5-8a91-30844d2578e0",
+      "document_id": "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "source_version": "d89f6a4e-2db0-4378-9cac-6160ffd12253",
+      "chunk_type": "text",
+      "start": 0,
+      "end": 500,
+      "characters": 500,
+      "utf8_bytes": 502,
+      "content_sha256": "b6cc805398afebfa83279756fe543d11bb420511ef585f8260fee513485313e8",
+      "readback_http_status": 200,
+      "readback_equals_persisted_reference": true,
+      "full_original_visible_in_final_model_input": true,
+      "authorized_document_scope_match": true
+    }
+  ],
+  "source_delivery": {
+    "selected_originals": 2,
+    "delivered_originals": 2,
+    "readbacks": 2,
+    "readback_identity_content_version_scope_match": true,
+    "strategy_coverage_semantic_support": "NOT_CHECKED_BY_INTERNAL_TRACE",
+    "independent_core_support_review": "SUPPORTED"
+  },
+  "generation": {
+    "provider": "siliconflow",
+    "model_requested": "Qwen/Qwen3.5-4B",
+    "model_reported": "Qwen/Qwen3.5-4B",
+    "role": "cheap",
+    "attempt_count": 1,
+    "status": "COMPLETED",
+    "finish_reason": "stop",
+    "raw_finish_reasons": [
+      "stop"
+    ],
+    "raw_done_markers": 1,
+    "raw_json_sse_frames": 305,
+    "raw_response_sha256": "189177e54e9483f57004a9dc89aca3e314a4138b394df2caf4e147460090cb93",
+    "http_status": 200,
+    "capture_http_iterator_exhausted": false,
+    "capture_completion_caveat": "false means the raw HTTP iterator was not exhausted after parser stop at [DONE]; explicit stop and final usage were present, so this is not missing model completion",
+    "truncated": false,
+    "upgraded": false,
+    "is_fallback": false,
+    "invalid_handle_count": 0,
+    "generation_issues": [],
+    "input_tokens": 1274,
+    "output_tokens": 302,
+    "total_tokens": 1576,
+    "usage_status": "REPORTED",
+    "pg_message_generation_usage_totals_match": true,
+    "usage_provenance_caveat": "Message usage aggregates disjoint generation calls; its aggregate-disjoint-calls/v1 provenance differs from per-attempt openai-input-inclusive/v1 provenance by design",
+    "cost_status": "UNKNOWN",
+    "cost_status_caveat": "UNKNOWN is monetary cost status, not an unknown Provider send; no costs estimated",
+    "raw_model_answer": "Both the Leyden jar and Franklin bells are historical devices related to the study of static electricity, but they serve distinct functions based on their operating principles.\n\n**Leyden Jar**\n*   **Operating Principle:** The Leyden jar functions as the **original form of a capacitor** (originally known as a \"condenser\"). It stores static electricity between two electrodes: one metal foil cemented to the inside surface of a glass jar and another on the outside surface. A metal terminal projects through the lid to make contact with the inner foil, completing the circuit.\n*   **Use:** It is a storage device designed to hold an electric charge.\n\n**Franklin Bell (Gordon's Bells / Lightning Bell)**\n*   **Operating Principle:** Franklin bells are designed to **convert electrical energy into mechanical energy**. When charged by a Leyden jar, they cause the clapper of a bell to oscillate back and forth between two oppositely charged bells. Unlike a Leyden jar, they do not store energy but rather demonstrate the effects of charge through motion.\n*   **Use:** They serve as a **qualitative indicator of electric charge** and were used for simple demonstrations of continuous mechanical motion rather than for scientific research.\n\nIn summary, the Leyden jar is a storage device that accumulates charge, while the Franklin bell is a demonstration device that converts that charge into mechanical motion.\n\n<ref id=\"c1\"/>\n<ref id=\"c2\"/>",
+    "persisted_final_answer": "Both the Leyden jar and Franklin bells are historical devices related to the study of static electricity, but they serve distinct functions based on their operating principles.\n\n**Leyden Jar**\n*   **Operating Principle:** The Leyden jar functions as the **original form of a capacitor** (originally known as a \"condenser\"). It stores static electricity between two electrodes: one metal foil cemented to the inside surface of a glass jar and another on the outside surface. A metal terminal projects through the lid to make contact with the inner foil, completing the circuit.\n*   **Use:** It is a storage device designed to hold an electric charge.\n\n**Franklin Bell (Gordon's Bells / Lightning Bell)**\n*   **Operating Principle:** Franklin bells are designed to **convert electrical energy into mechanical energy**. When charged by a Leyden jar, they cause the clapper of a bell to oscillate back and forth between two oppositely charged bells. Unlike a Leyden jar, they do not store energy but rather demonstrate the effects of charge through motion.\n*   **Use:** They serve as a **qualitative indicator of electric charge** and were used for simple demonstrations of continuous mechanical motion rather than for scientific research.\n\nIn summary, the Leyden jar is a storage device that accumulates charge, while the Franklin bell is a demonstration device that converts that charge into mechanical motion.\n\n<kb doc=\"1c5fa1db320d59cba389daa592d258d7cd237eca31134a4f70efd152d7d06f4f\" chunk_id=\"e8a751ff-032c-4c8c-bb31-4eddc73b3a86\" kb_id=\"96a9eebd-ffb2-4bc6-9bea-3ed015845479\" />\n<kb doc=\"0f94a2d0a92bd4a9f9e3672bba1af95e35b3f0ff0de86ca8c80a71d78f38936f\" chunk_id=\"0f650d87-44cc-4fe5-8a91-30844d2578e0\" kb_id=\"96a9eebd-ffb2-4bc6-9bea-3ed015845479\" />"
+  },
+  "http_sse_pg_history_replay": {
+    "sse_frames": 30,
+    "replay_frames": 30,
+    "replay_http_status": 200,
+    "replay_frame_equality": true,
+    "sse_canonical_sha256": "18f7c45270c72e99ee154a7bb71a39985ab78462000126b8429058642d5b7563",
+    "replay_canonical_sha256": "18f7c45270c72e99ee154a7bb71a39985ab78462000126b8429058642d5b7563",
+    "sse_error_events": 0,
+    "all_sse_ids_match_server_run": true,
+    "answer_sse_pg_history_equal": true,
+    "references_sse_pg_history_equal": true,
+    "pg_turn_status": "completed",
+    "pg_assistant_is_completed": true,
+    "public_history_status": "completed",
+    "public_history_finish_reason": "stop",
+    "raw_pg_message_turn_status": {
+      "user": "pending",
+      "assistant": "pending"
+    },
+    "raw_status_contract_caveat": "Existing contract stores failure metadata in messages.turn_status; normal success is is_completed=true. http_api.py normalizes non-error/non-cancelled completed messages to public completed. port_turns.status is also completed. Raw pending is not being relabeled as a failed historical answer",
+    "replay_added_provider_attempts": 0,
+    "performance": {
+      "first_answer_seconds_observed": 12.389191093854606,
+      "whole_answer_seconds_observed": 12.389688522089273,
+      "inference": "SINGLE_OBSERVATION_NOT_A_PERFORMANCE_BENCHMARK"
+    }
+  },
+  "reconciliation": {
+    "local_entries": 6,
+    "pg_entries": 6,
+    "unique_keys_both_sides": true,
+    "exact_keysets": true,
+    "exact_keys": [
+      {
+        "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/answer/1/cheap",
+        "capability": "chat"
+      },
+      {
+        "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/query_rewrite",
+        "capability": "chat"
+      },
+      {
+        "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-1/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-5232826baf3038aa",
+        "capability": "embedding"
+      },
+      {
+        "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-1/rerank",
+        "capability": "rerank"
+      },
+      {
+        "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-2/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-d662e17c4589cc4f",
+        "capability": "embedding"
+      },
+      {
+        "request_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7/strategy/sq-2/rerank",
+        "capability": "rerank"
+      }
+    ],
+    "per_call_model_wire_full_usage_match": true,
+    "pg_session_binding_match": true,
+    "attempts": 6,
+    "settled": 6,
+    "unknown_sends": 0,
+    "unsettled": 0,
+    "actual_input_tokens": 5105,
+    "actual_output_tokens": 336,
+    "actual_total_tokens": 5441,
+    "original_reservation_sum": 29467,
+    "settled_held_tokens": 5441,
+    "unsettled_held_tokens": 0,
+    "authorized_max_calls": 9,
+    "authorized_max_tokens": 65261,
+    "closure_status": "CLOSED",
+    "closure_entries_unchanged": true,
+    "closure_before_sha256": "c2ef7b6315d74112c1a8c932d20a7287dac4db4b2116519659b17d65f76b702d",
+    "closure_after_sha256": "e530f8989c68c886b7531099f0a6f841259fa7db0122ed6c3627279f5354b3c4",
+    "reconciliation_before_close_sha256": "2afc101b108896becf383627d645f315d1ca6ca3e6c94f062cdc309dc39b7be2",
+    "reconciliation_and_closure_sha256": "868ca867ba98ecdfb6f1073c02d656bbf62d797ee9f457a7fe878e88687288aa",
+    "production_source_old_UNKNOWN_unchanged": true,
+    "audit_additional_provider_sends": 0,
+    "actual_tokens_by_capability": {
+      "chat": {
+        "calls": 2,
+        "input_tokens": 2455,
+        "output_tokens": 336,
+        "total_tokens": 2791
+      },
+      "embedding": {
+        "calls": 2,
+        "input_tokens": 34,
+        "output_tokens": 0,
+        "total_tokens": 34
+      },
+      "rerank": {
+        "calls": 2,
+        "input_tokens": 2616,
+        "output_tokens": 0,
+        "total_tokens": 2616
+      }
+    }
+  },
+  "quality_review": {
+    "reviewer": "INDEPENDENT_AGENT_REVIEW_NOT_OWNER_GOLD_APPROVAL",
+    "sample_denominator": 1,
+    "final_answer_correct": "PASS",
+    "core_correct_count": 1,
+    "core_scope": "Leyden jar stores charge as a capacitor; Franklin bells qualitatively demonstrate charge and convert electrical energy into clapper motion; both operating principles and uses are compared correctly",
+    "overall_quality": "PARTIAL",
+    "evidence_support": "PARTIAL",
+    "supplementary_fact_support": "ISSUES_FOUND",
+    "supplementary_issues": [
+      {
+        "expression": "A metal terminal projects through the lid to make contact with the inner foil, completing the circuit.",
+        "unsupported_fragment": "completing the circuit",
+        "finding": "UNSUPPORTED_AND_POTENTIALLY_MISLEADING",
+        "reason": "Original states only that the terminal makes contact with inner foil; it does not establish a completed circuit. No external physics adjudication was run by this audit."
+      },
+      {
+        "expression": "Unlike a Leyden jar, they do not store energy but rather demonstrate the effects of charge through motion.",
+        "unsupported_fragment": "they do not store energy",
+        "finding": "UNSUPPORTED_ABSOLUTE_OVERCLAIM",
+        "reason": "The original establishes indication/demonstration function, not a universal absence of energy storage."
+      }
+    ],
+    "additional_precision_risk": "The summary converts that charge into mechanical motion is less precise than the original electrical energy into mechanical energy wording.",
+    "citation_identity_and_ownership": "PASS",
+    "citation_readbacks_correct": 2,
+    "citation_readbacks_denominator": 2,
+    "citation_placement": "FAIL",
+    "citation_placement_reason": "Raw model emitted <ref id=\"c1\"/> and <ref id=\"c2\"/> as separate footer lines rather than inline beside supported claims, contrary to the supplied source protocol.",
+    "presentation_consistency": "ISSUES_FOUND_CITATION_PLACEMENT",
+    "all_answer_facts_verified": false,
+    "production_ready": false,
+    "automatic_acceptance": false,
+    "unverified_scope": [
+      "Unseen-sample QU classification quality",
+      "Chinese parallel HTTP case",
+      "Frost dependent HTTP case",
+      "Production deployment",
+      "General production answer accuracy"
+    ]
+  },
+  "artifact_privacy": {
+    "subject_ids_included": false,
+    "tenant_ids_included": false,
+    "credentials_included": false,
+    "provider_keys_included": false,
+    "kept_auditable_identifiers": [
+      "request IDs",
+      "server run ID",
+      "Session/message IDs",
+      "chunk/document/KB IDs",
+      "model IDs",
+      "source/image/profile hashes"
+    ]
+  },
+  "input_snapshot_provenance": {
+    "archive_file": "runtime-evidence.tar",
+    "archive_sha256": "55f8ddd6564013d4952c8542c7622a97a9b4d337cf0c99f11225b4894a81af91",
+    "manifest_path_relative_to_snapshot_files": "_snapshot/manifest.json",
+    "manifest_sha256": "b35fc6f96ec01eafd4bc9939763b4f60752818e495f574336f7b1ed95927baff",
+    "fetch_command_record_sha256": "b4b533a4c30309042ee16b7b67914a683f4a895e03c4d19d75ad5b887d478012",
+    "fetch_exit_code": 0,
+    "saved_execution_commands": [
+      {
+        "path_relative_to_snapshot_files": "diagnostic/records/compare-collector.command.json",
+        "command_record_sha256": "c78fbf1b35e2888949b30cb5e9825377a11662eae6d0cb21d8857a51bbcb75eb",
+        "command_program": "docker",
+        "label": "collector",
+        "exit_code": 0,
+        "timeout": false,
+        "stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "argv_included": false
+      },
+      {
+        "path_relative_to_snapshot_files": "diagnostic/records/compare-runtime-check.command.json",
+        "command_record_sha256": "e9294b2ae0797575886867c19d50ec0c5b8f046151c5668c8d0d2c7ceda5087e",
+        "command_program": "docker",
+        "label": "runtime-check",
+        "exit_code": 0,
+        "timeout": false,
+        "stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "argv_included": false
+      },
+      {
+        "path_relative_to_snapshot_files": "diagnostic/records/compare-ready.command.json",
+        "command_record_sha256": "f8b8e038db6bdf95b1923d4238a94818fb52b700642596a39040e4d70498b9b5",
+        "command_program": "docker",
+        "label": "ready",
+        "exit_code": 0,
+        "timeout": false,
+        "stdout_bytes": 1274,
+        "stderr_bytes": 0,
+        "argv_included": false
+      },
+      {
+        "path_relative_to_snapshot_files": "diagnostic/records/compare-loaded-source.command.json",
+        "command_record_sha256": "821dcfdb7c3fc9025c49a7f315ef0f99ad3450bce05723be3919a2fbdf03bd2b",
+        "command_program": "docker",
+        "label": "loaded-source",
+        "exit_code": 0,
+        "timeout": false,
+        "stdout_bytes": 5011,
+        "stderr_bytes": 0,
+        "argv_included": false
+      },
+      {
+        "path_relative_to_snapshot_files": "diagnostic/records/compare-docker-run.command.json",
+        "command_record_sha256": "aa9562d06c793347cd73a6eea06471f2f6d5a0b4763edfdf0739e65c2d8d39d9",
+        "command_program": "docker",
+        "label": "docker-run",
+        "exit_code": 0,
+        "timeout": false,
+        "stdout_bytes": 65,
+        "stderr_bytes": 0,
+        "argv_included": false
+      },
+      {
+        "path_relative_to_snapshot_files": "diagnostic/records/compare-stop.command.json",
+        "command_record_sha256": "8b073bd4bbc7992ce4fd3c1eb7c58597121b232d92fa2609ac93df83f2c8e391",
+        "command_program": "docker",
+        "label": "stop",
+        "exit_code": 0,
+        "timeout": false,
+        "stdout_bytes": 120,
+        "stderr_bytes": 0,
+        "argv_included": false
+      }
+    ],
+    "audit_validation": "Separate read-only artifact readback recomputed six actual wire hashes against PG receipts, numeric usages/model identities, two source content/version identities and q0 recovery; no tests or Provider sends"
+  },
+  "capture_identity": {
+    "mechanism": "Existing LocalExecution capture_evidence=true around normal Provider transport and SendGate",
+    "request_capture_boundary": "Transport input before admission; capture alone is not proof of send. PG/Local settled receipts and matching response bytes independently prove actual calls.",
+    "captured_physical_calls": 6,
+    "request_ids_match_server_run": true,
+    "all_capture_wire_sha256_match_pg_and_local": true,
+    "headers_saved": false,
+    "actual_provider_models": [
+      "Qwen/Qwen3.5-4B",
+      "BAAI/bge-m3",
+      "BAAI/bge-reranker-v2-m3"
+    ],
+    "expensive_calls": 0,
+    "capture_directory_relative_to_snapshot_files": "batches/compare/evidence"
+  }
+}

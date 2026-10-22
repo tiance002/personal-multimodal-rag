@@ -1,7 +1,7 @@
 {
   "schema": "s862r3-qu-http-acceptance/v1",
-  "generated_at_utc": "2026-10-22T02:02:45.887855+00:00",
-  "status": "READY_FOR_FRESH_OWNER_AUTHORIZATION",
+  "generated_at_utc": "2026-10-22T03:32:22.085287+00:00",
+  "status": "OFFLINE_PASS_REAL_HTTP_ENGINEERING_PASS_ANSWER_QUALITY_PARTIAL",
   "baseline": "22dcb59d78042fe8572027bfaecd18a7e300c75f",
   "branch": "codex/s8-6-adaptive-retrieval-20261021",
   "qu_fix_commit": "9c2aa9c49768acbeae7aedb6996f8a40fdfcaf21",
@@ -45,42 +45,48 @@
     "new_image_query_module_actual_api_process_verified": true,
     "stopped": true
   },
-  "real_http_qa": "NOT_RUN_AWAITING_NEW_OWNER_AUTHORIZATION",
-  "real_rule_activation": "NOT_RUN",
-  "real_embedding_hybrid_rerank_two_children": "NOT_RUN",
-  "real_original_source_delivery": "NOT_RUN",
-  "final_answer_correct": "NOT_RUN",
-  "citation_readback": "NOT_RUN",
-  "sse_pg_history_terminal_consistency": "NOT_RUN",
-  "actual_provider_attempts": 0,
-  "settled": 0,
+  "real_http_qa": "ENGINEERING_PASS_OVERALL_QUALITY_PARTIAL",
+  "real_rule_activation": "PASS_RULE_COMPARE_2_UNITS",
+  "real_embedding_hybrid_rerank_two_children": "PASS_ACTUAL_EMBEDDING_RERANK_WIRES_PIPELINE_HYBRID_STATE",
+  "real_original_source_delivery": "PASS_2_OF_2",
+  "final_answer_correct": "PASS_CORE_1_OF_1_INDEPENDENT_AGENT_REVIEW",
+  "citation_readback": "PASS_2_OF_2",
+  "sse_pg_history_terminal_consistency": "PASS",
+  "actual_provider_attempts": 6,
+  "settled": 6,
   "new_unknown": 0,
-  "actual_input_tokens": 0,
-  "actual_output_tokens": 0,
-  "actual_total_tokens": 0,
+  "actual_input_tokens": 5105,
+  "actual_output_tokens": 336,
+  "actual_total_tokens": 5441,
   "unsettled_held_tokens": 0,
   "authorization": {
     "old_500000_token_grant_reused": false,
-    "new_owner_approved": false,
+    "new_owner_approved": true,
     "initial_compare_only": true,
     "proposed_attempts_upper": 9,
     "proposed_reserved_tokens_upper": 65261,
-    "new_ledger_created": false,
-    "old_four_closed_ledgers_unchanged": true
+    "new_ledger_created": true,
+    "old_four_closed_ledgers_unchanged": true,
+    "closed_after_exact_reconciliation": true,
+    "remaining_calls_or_tokens_authorized_for_other_questions": false
   },
   "preservation": {
     "protected_tracked_files_unchanged": 215,
     "old_pg_unknown_count": 3,
     "old_pg_unknown_fingerprint_unchanged": true,
-    "provider_count_before_after": 13047,
     "index_definitions_count": 87,
     "production_api_worker_unchanged": true,
-    "schema_indexes_p5_models_prompts_unchanged": true
+    "schema_indexes_p5_models_prompts_unchanged": true,
+    "provider_count_before": 13047,
+    "provider_count_after": 13053,
+    "delta_exactly_six_settled": true,
+    "old_pg_unknown_count_after": 3
   },
   "remaining": [
-    "Fresh Owner authorization for exact current source/image/profile/first comparison",
-    "Real HTTP source/query/answer/receipt evaluation",
-    "Parallel/Frost only after first pass and explicit later scope"
+    "Supplementary unsupported wording and footer citation placement remain; no prompt/algorithm changes or retry",
+    "No unseen-sample or production quality claim from one comparison",
+    "ECS40 current inventory/profile/request-tree budgets and fresh quantitative authorization are being prepared",
+    "Production API/Worker still old revision29ecf2f5; no production update yet"
   ],
   "artifacts": {
     "artifact_manifest": "docs/evaluation/s8_6_2_r3/artifact_manifest.json",
@@ -89,7 +95,50 @@
     "preflight_summary": "docs/evaluation/s8_6_2_r3/preflight_summary.json",
     "protection": "docs/evaluation/s8_6_2_r3/protection.json",
     "replay.results": "docs/evaluation/s8_6_2_r3/replay.results.json",
-    "zero_ready_summary": "docs/evaluation/s8_6_2_r3/zero_ready_summary.json"
+    "zero_ready_summary": "docs/evaluation/s8_6_2_r3/zero_ready_summary.json",
+    "actual_run_audit": "docs/evaluation/s8_6_2_r3/actual_run_audit.json",
+    "actual_authorization_and_closure": "docs/evaluation/s8_6_2_r3/actual_authorization_and_closure.json",
+    "local_zero_ready_summary": "docs/evaluation/s8_6_2_r3/local_zero_ready_summary.json",
+    "followup40_preflight": "docs/evaluation/s8_6_2_r3/followup40_preflight.json"
   },
-  "private_evidence_root": "E:\\RAG quention\\var\\reports\\s8-6-2-r3"
+  "private_evidence_root": "E:\\RAG quention\\var\\reports\\s8-6-2-r3",
+  "preauthorization_snapshot_commit": "755841b1b087c2fd23be5c273d3b1d3c1c815c51",
+  "keyword_sql_wire_capture": "NOT_CAPTURED",
+  "overall_answer_quality": "PARTIAL",
+  "evidence_support": "PARTIAL",
+  "supplementary_fact_accuracy": "ISSUES_FOUND",
+  "citation_placement": "FAIL",
+  "actual_run_ledger": "CLOSED",
+  "actual_authorization_tree_reservation_upper": 65261,
+  "original_actual_call_reservation_sum": 29467,
+  "actual_final_rendered_system_prompt_sha256": "cabb2818fdfed59572a8dff282378c8373d2129aced63d1caec953e768b5cc68",
+  "actual_client_request_id": "s861-f644e1376f9f4ccfa0d65f19",
+  "actual_server_run_id": "98060179-90f4-42eb-863e-d2ed2d6e01b7",
+  "local_zero_provider_api_readiness": "PASS",
+  "local_real_model_qa": "NOT_RUN_CANCELLED_BY_OWNER",
+  "followup40": {
+    "status": "ECS_40_PREFLIGHT_IN_PROGRESS",
+    "latest_owner_steering": "Direct ECS40; no further local tests or supplementary three-question gate",
+    "cohort_sha256": "0e2f124015d9589dbe41497d7378362bdc0d009a295905a62809180fe4f4e746",
+    "manifest_sha256": "05a11e2d0e36be4d04bbb8472f10135ea703b464013e5ecdfd0297e69e28a05d",
+    "frozen_source_gold_verifier": {
+      "exit_code": 0,
+      "qa_per_dataset": 8,
+      "dataset_count": 5,
+      "denominator": 40,
+      "omni_parsing_pages_separate": 24,
+      "provider_calls": 0
+    },
+    "proposed_preservation": "Original40 denominator;38 eligible sends plus2 protected NOT_RUN; no replacement or Gold changes",
+    "protected_not_run": [
+      "scifact-339",
+      "hotpotqa-5ae3992d5542994393b9e722"
+    ],
+    "provider_calls": 0,
+    "actual_tokens": 0,
+    "production_api_worker_updated": false,
+    "current_request_tree_budget": "NOT_YET_PROVEN",
+    "old_500000_or_closed_compare_grants_reused": false,
+    "fresh_quantified_authorization_required": true
+  }
 }

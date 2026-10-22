@@ -622,3 +622,8 @@ Legal baseline08ebd90; independent branch codex/s8-6-adaptive-retrieval-20261021
 ## 2026-10-22 S8.6.2-R3 exact QU recovery / HTTP preparation
 
 Baseline22dcb59; queryfix9c2aa9c, source751c6b26. ExactASCIIterminalperiod-only recoveryv2 readsrawJSON/restoresq0 thenexistingguards;3frozenrealoutputsRED3fail->RULE_COMPARE2/3/2, affected82pass. NewR3profile/client-runASGI/budget103pass, Providers/PGmocks; actualEmbeddingnotrun. Source/image9ef7691a/profile495447/budget9calls65261frozen; zeroProviderrealAPI401/200/check0/moduleidentityPASS, candidate stopped143/noOOM/restart. NewProvider/Token/UNKNOWN0, oldPG13047/UNKNOWN3/source87indexes/old4CLOSEDledgersunchanged. NewOwnerauthorization required firstcompareonly; old500000notreused. Reports docs/evaluation/S8_6_2_R3_QU_HTTP_ACCEPTANCE.md/.results.json; READY_FOR_FRESH_OWNER_AUTHORIZATION, actualHTTPQA NOT_RUN, noPush/productiondeploy.
+
+
+## 2026-10-22 S8.6.2-R3 approved actual HTTP outcome
+
+Owner exact9/65261 granted; latest751c source/image9ef actualECS temporaryHTTP onecompare completed. ActualQUpreciseperiodrecovery→RULE_COMPARE2serialchildren; trueEmbedding/Rerankwires2each, originaldelivery/readback2/2, stop+usage+DONE, SSE30=replay30/PG/historyconsistent. Sixsettledcalls5105input+336output=5441Tokens,0newUNKNOWN/0unsettledheld, PGLocalkeysets/usage/wireexact6/6, ledgerCLOSEDentriesunchanged. Corefinalanswercorrect1/1; overallqualityPARTIAL, unsupportedextraexpressions andfooterrefplacement remain, noprompt/P5fixorretry. ProductionAPI/Workerunchanged. LatestOwnercancelledlocalrealQAandsupplementary3gate; nowECS40preflight, original40sourcesGoldreadonlyverifyPASS,2legacyUNKNOWNNOT_RUN, no40sendyet. Report docs/evaluation/S8_6_2_R3_QU_HTTP_ACCEPTANCE.md/.results.json.
