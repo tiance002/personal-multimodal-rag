@@ -610,3 +610,5 @@ Legal baseline08ebd90; independent branch codex/s8-6-adaptive-retrieval-20261021
 ### S8.6.2：闭合规则扩展与 QU 分类接线
 
 源码提交 `5c3f7d2db9fa832cc4c2ede070bb405a6ac96d4e`，基线352b1ba包含0c496c2；S8.6.1零Provider准备已收尾。COMPARE_SHARED/v1、PARALLEL_ATTRIBUTE/v1和SIMPLE_PARALLEL已接入单次非思考QU与原串行retrieve_once，最多3单元。原B在安全性方面误拆先RED后修复；固定66例24/24正例、0/31反例误拆、11/11门控；扩展集合Owner逐条确认NOT_RUN。最终受影响离线322passed exit0，实际Provider/Token0。112保护文件、91既有合同、476旧证据与旧UNKNOWN冻结记录未改；真实QU/答案/API验收NOT_RUN。无Push/部署/P5/Schema/索引/阈值改动；本轮结束。报告：[S8_6_2_RULE_COVERAGE.md](docs/evaluation/S8_6_2_RULE_COVERAGE.md)。
+
+- 2026-10-22 Owner requested GitHub upload. Fast-forward push to origin/codex/s8-6-adaptive-retrieval-20261021 exit0; remote ls-remote verified1e70984eb43a6f15e04de393cf81d95c88dc1d13. Code and S8.6.2 reports are online; no deployment/provider calls.
