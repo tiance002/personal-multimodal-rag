@@ -1,0 +1,533 @@
+"""Detached, single-attempt ECS acceptance payload runner (stdlib only).
+
+This is a process/evidence wrapper, not a grant or Provider gateway. A frozen
+payload remains responsible for the existing SendGate, budgets and receipts.
+No command retries, resumes, sends a model request, or modifies a grant/ledger.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import time
+import uuid
+
+DIAGNOSTICS_ROOT = Path("/opt/rag-s8/diagnostics")
+WORKSPACE_ROOT = Path("/opt/rag-s8")
+SCHEMA_VERSION = 1
+TERMINAL_STATES = {"SUCCEEDED", "FAILED", "INCOMPLETE_UNCONFIRMED", "INTERRUPTED_UNCONFIRMED"}
+_HEX = re.compile(r"^[0-9a-f]{64}$")
+_JOB_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,119}$")
+_PRIVATE_NAME = re.compile(r"(^|[._-])(env|secret|secrets|credential|credentials|password|passwd|token|private|key|keys|id_rsa|id_ed25519)([._-]|$)", re.I)
+
+
+class JobError(ValueError):
+    """An invalid or ambiguous job must not execute."""
+
+
+def _utc() -> str:
+    from datetime import datetime, timezone
+    return datetime.now(timezone.utc).isoformat()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _no_symlinks(path: Path) -> Path:
+    path = Path(path)
+    if not path.is_absolute() or ".." in path.parts:
+        raise JobError("absolute path without '..' required")
+    for ancestor in [path, *path.parents]:
+        if ancestor.is_symlink():
+            raise JobError(f"symlink forbidden: {ancestor}")
+    return path
+
+
+def validate_job_root(root: Path, must_exist: bool = False) -> Path:
+    root = _no_symlinks(Path(root))
+    base = _no_symlinks(DIAGNOSTICS_ROOT)
+    if root.parent != base or not _JOB_ID.fullmatch(root.name) or root.name in {".", ".."}:
+        raise JobError("job root must be a named direct child of diagnostics root")
+    if must_exist and not root.is_dir():
+        raise JobError("job directory does not exist")
+    return root
+
+
+def _regular(path: Path) -> Path:
+    _no_symlinks(path)
+    if not path.is_file() or not stat.S_ISREG(path.stat().st_mode):
+        raise JobError(f"regular file required: {path}")
+    return path
+
+
+def _json(path: Path) -> dict:
+    _regular(path)
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise JobError(f"invalid JSON: {path.name}") from exc
+    if not isinstance(value, dict):
+        raise JobError(f"JSON object required: {path.name}")
+    return value
+
+
+def _sync_dir(path: Path) -> None:
+    if os.name == "posix":
+        fd = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+
+
+def _atomic_json(path: Path, value: dict) -> None:
+    _no_symlinks(path)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    data = (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+        _sync_dir(path.parent)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def _exclusive_json(path: Path, value: dict) -> None:
+    _no_symlinks(path)
+    try:
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError as exc:
+        raise JobError("job already claimed; no retry/resume/re-send is permitted") from exc
+    with os.fdopen(fd, "w", encoding="utf-8") as stream:
+        json.dump(value, stream, sort_keys=True, indent=2)
+        stream.write("\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+    _sync_dir(path.parent)
+
+
+def _copy_new(source: Path, target: Path) -> None:
+    _regular(source)
+    with source.open("rb") as incoming, target.open("xb") as outgoing:
+        shutil.copyfileobj(incoming, outgoing, 1024 * 1024)
+        outgoing.flush()
+        os.fsync(outgoing.fileno())
+    target.chmod(0o400)
+
+
+def _validate_manifest(manifest: dict, root: Path, payload: Path) -> None:
+    allowed = {"schema_version", "kind", "job_id", "goal", "source", "image", "profile",
+               "payload_sha256", "workspace", "python", "args", "readonly_paths",
+               "grant_path", "grant_sha256", "artifact_roots"}
+    if set(manifest) - allowed:
+        raise JobError("unsupported manifest fields; environment/credentials/config are not embedded")
+    if manifest.get("schema_version") != SCHEMA_VERSION:
+        raise JobError("unsupported manifest schema_version")
+    if manifest.get("kind") not in {"acceptance", "zero_provider_probe"}:
+        raise JobError("explicit acceptance or zero_provider_probe kind required")
+    if manifest.get("job_id") != root.name:
+        raise JobError("job_id must match job root name")
+    for name in ("goal", "source", "image", "profile"):
+        if not isinstance(manifest.get(name), str) or not manifest[name].strip():
+            raise JobError(f"pinned {name} is required")
+    if not re.fullmatch(r"[0-9a-f]{40}", manifest["source"]):
+        raise JobError("source must be a pinned 40-hex Git revision")
+    if not re.fullmatch(r"sha256:[0-9a-f]{64}", manifest["image"]):
+        raise JobError("image must be a pinned sha256 image id")
+    if not _HEX.fullmatch(manifest["profile"]):
+        raise JobError("profile must be a pinned sha256")
+    expected = manifest.get("payload_sha256", "")
+    if not isinstance(expected, str) or not _HEX.fullmatch(expected) or sha256_file(payload) != expected:
+        raise JobError("payload_sha256 mismatch")
+    workspace = _no_symlinks(Path(manifest.get("workspace", "")))
+    base = _no_symlinks(WORKSPACE_ROOT)
+    if not workspace.is_dir() or not workspace.is_relative_to(base):
+        raise JobError("workspace must be an existing directory under permitted workspace root")
+    python = _regular(Path(manifest.get("python", "")))
+    # The caller selects the interpreter by invoking this CLI with that Python.
+    # A manifest cannot replace it with another program or shell.
+    if python.resolve() != Path(sys.executable).resolve():
+        raise JobError("python must be the current fixed Python executable")
+    arguments = manifest.get("args", [])
+    if not isinstance(arguments, list) or any(not isinstance(item, str) for item in arguments):
+        raise JobError("args must be a list of strings")
+    readonly = manifest.get("readonly_paths", [])
+    if not isinstance(readonly, list) or any(not isinstance(item, str) for item in readonly):
+        raise JobError("readonly_paths must be a list of absolute file paths")
+    for item in readonly:
+        _regular(Path(item))  # References only; contents are never copied.
+    if manifest.get("artifact_roots"):
+        raise JobError("payload integration must save selected receipts/artifacts under this job's output directory")
+    if manifest["kind"] == "acceptance":
+        _verify_grant(manifest)
+
+
+def _verify_grant(manifest: dict) -> None:
+    """Verify optional frozen reference identity without interpreting authority.
+
+    The normal payload's Registry/SendGate/LocalExecution own all approval,
+    expiry, scope and usage decisions. This wrapper never reads child ledgers.
+    """
+    if "grant_path" not in manifest and "grant_sha256" not in manifest:
+        return
+    grant = _regular(Path(manifest.get("grant_path", "")))
+    grant_sha = manifest.get("grant_sha256", "")
+    if not isinstance(grant_sha, str) or not _HEX.fullmatch(grant_sha) or sha256_file(grant) != grant_sha:
+        raise JobError("grant_sha256 mismatch")
+
+
+def prepare_job(root: Path, manifest_path: Path, payload_path: Path) -> dict:
+    root = validate_job_root(root)
+    manifest_path, payload_path = _regular(Path(manifest_path)), _regular(Path(payload_path))
+    manifest = _json(manifest_path)
+    _validate_manifest(manifest, root, payload_path)
+    if not DIAGNOSTICS_ROOT.is_dir():
+        raise JobError("diagnostics root must already exist")
+    try:
+        root.mkdir(mode=0o700)
+    except FileExistsError as exc:
+        raise JobError("job root already exists; prepare requires a new job id") from exc
+    control, output = root / "control", root / "output"
+    control.mkdir(mode=0o700)
+    output.mkdir(mode=0o700)
+    _copy_new(manifest_path, control / "manifest.json")  # Preserve original bytes.
+    _copy_new(payload_path, control / "payload.py")
+    _copy_new(_regular(Path(__file__).absolute()), control / "runner.py")
+    hashes = {name: sha256_file(control / name) for name in ("manifest.json", "payload.py", "runner.py")}
+    prepared = {"schema_version": 1, "job_id": root.name, "prepared_at": _utc(),
+                "control_sha256": hashes, "diagnostics_root": str(DIAGNOSTICS_ROOT),
+                "workspace_root": str(WORKSPACE_ROOT)}
+    _exclusive_json(control / "prepared.json", prepared)
+    _atomic_json(output / "state.json", {"schema_version": 1, "job_id": root.name,
+                 "status": "PREPARED", "updated_at": _utc(), "launch_completed": False})
+    _sync_dir(control)
+    _sync_dir(output)
+    _sync_dir(root)
+    _sync_dir(root.parent)
+    return {"job_id": root.name, "job_root": str(root), "status": "PREPARED", "control_sha256": hashes}
+
+
+def _frozen(root: Path, *, admission: bool = True) -> tuple[dict, dict]:
+    root = validate_job_root(root, must_exist=True)
+    prepared = _json(root / "control" / "prepared.json")
+    hashes = prepared.get("control_sha256", {})
+    for name in ("manifest.json", "payload.py", "runner.py"):
+        if sha256_file(_regular(root / "control" / name)) != hashes.get(name):
+            raise JobError(f"frozen control hash mismatch: {name}")
+    manifest = _json(root / "control" / "manifest.json")
+    if admission:
+        _validate_manifest(manifest, root, root / "control" / "payload.py")
+    elif manifest["kind"] == "acceptance":
+        _verify_grant(manifest)
+    _no_symlinks(root / "output")
+    if not (root / "output").is_dir():
+        raise JobError("output directory is missing")
+    return manifest, prepared
+
+
+def _boot_id() -> str:
+    return Path("/proc/sys/kernel/random/boot_id").read_text(encoding="ascii").strip()
+
+
+def process_identity(pid: int) -> dict:
+    try:
+        raw = Path(f"/proc/{int(pid)}/stat").read_text(encoding="ascii")
+        fields = raw[raw.rfind(")") + 2:].split()
+        return {"pid": int(pid), "boot_id": _boot_id(), "start_ticks": int(fields[19])}
+    except (OSError, ValueError, IndexError) as exc:
+        raise JobError("Linux process identity unavailable") from exc
+
+
+def identity_alive(identity: dict) -> bool:
+    try:
+        if identity.get("boot_id") != _boot_id():
+            return False
+        actual = process_identity(int(identity["pid"]))
+        raw = Path(f"/proc/{actual['pid']}/stat").read_text(encoding="ascii")
+        state = raw[raw.rfind(")") + 2:].split()[0]
+        return actual == identity and state not in {"Z", "X"}
+    except (OSError, KeyError, TypeError, ValueError, JobError):
+        return False
+
+
+def start_job(root: Path, handshake_timeout: float = 10) -> dict:
+    if sys.platform != "linux":
+        raise JobError("detached execution requires Linux /proc and flock")
+    if handshake_timeout <= 0 or handshake_timeout > 60:
+        raise JobError("handshake timeout must be greater than zero and at most 60 seconds")
+    root = validate_job_root(root, must_exist=True)
+    _frozen(root)
+    claim = {"schema_version": 1, "job_id": root.name, "claimed_at": _utc(),
+             "launch_token": uuid.uuid4().hex, "boot_id": _boot_id(),
+             "no_retry": True}
+    _exclusive_json(root / "control" / "started.json", claim)
+    _atomic_json(root / "output" / "state.json", {"schema_version": 1, "job_id": root.name,
+                 "status": "STARTING", "updated_at": _utc(), "launch_completed": False,
+                 "boot_id": claim["boot_id"]})
+    logpath = _no_symlinks(root / "output" / "supervisor.log")
+    try:
+        with logpath.open("xb", buffering=0) as log:
+            child = subprocess.Popen(
+                [sys.executable, str(root / "control" / "runner.py"), "_supervise",
+                 "--job-root", str(root), "--launch-token", claim["launch_token"]],
+                cwd=str(root), stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
+                close_fds=True, start_new_session=True,
+            )
+    except Exception as exc:
+        _atomic_json(root / "output" / "state.json", {"schema_version": 1, "job_id": root.name,
+                     "status": "INTERRUPTED_UNCONFIRMED", "updated_at": _utc(),
+                     "launch_completed": False, "reason": "supervisor_spawn_failed_no_retry",
+                     "error_type": type(exc).__name__})
+        raise JobError("supervisor spawn failed; job remains claimed, reconcile read-only") from exc
+    deadline = time.monotonic() + handshake_timeout
+    while time.monotonic() < deadline:
+        state = _json(root / "output" / "state.json")
+        if state.get("launch_completed") or state.get("status") in TERMINAL_STATES:
+            return {"job_id": root.name, "job_root": str(root), "start_acknowledged": bool(state.get("launch_completed")), **state}
+        if child.poll() is not None:
+            break
+        time.sleep(0.05)
+    # Never terminate or retry an ambiguous launch: it may already have sent.
+    return {"job_id": root.name, "job_root": str(root), "status": "START_UNCONFIRMED",
+            "start_acknowledged": False, "reason": "durable_running_handshake_not_observed",
+            "next_action": "status/fetch and read-only reconciliation; never rerun this job"}
+
+
+def _state(root: Path, state: dict, **changes: object) -> dict:
+    state = {**state, **changes, "updated_at": _utc(), "heartbeat_at": _utc()}
+    _atomic_json(root / "output" / "state.json", state)
+    return state
+
+
+def _safe_files(root: Path, *, include_control: bool = True) -> list[Path]:
+    files = []
+    if include_control:
+        for name in ("manifest.json", "payload.py", "runner.py", "prepared.json", "started.json"):
+            path = root / "control" / name
+            if path.exists() or path.is_symlink():
+                files.append(_regular(path))
+    output = root / "output"
+    _no_symlinks(output)
+    for path in sorted(output.rglob("*")):
+        _no_symlinks(path)  # Reject every symlink, even those with excluded names.
+        if (any(_PRIVATE_NAME.search(part) for part in path.relative_to(output).parts)
+                or path.suffix.lower() in {".pem", ".p12", ".pfx", ".kdbx"}):
+            continue
+        if path.is_dir():
+            continue
+        _regular(path)
+        if path.name.endswith(".tmp") or path.name == "artifacts.json":
+            continue
+        files.append(path)
+    return files
+
+
+def _file_manifest(root: Path, *, include_control: bool = True) -> dict:
+    return {str(path.relative_to(root)).replace(os.sep, "/"):
+            {"sha256": sha256_file(path), "bytes": path.stat().st_size}
+            for path in _safe_files(root, include_control=include_control)}
+
+
+def validate_result(manifest: dict, result: dict) -> bool:
+    """Require an explicit completion receipt, never infer success from exit 0."""
+    if result.get("runtime_complete") is not True:
+        return False
+    status = str(result.get("status", "")).upper()
+    if "UNKNOWN" in status or "INCOMPLETE" in status or status in {"FAILED", "FAIL", "ERROR"}:
+        return False
+    if any(key in result and (type(result[key]) is not int or result[key] != 0)
+           for key in ("unknown", "unsettled")):
+        return False
+    required_zero = ("provider_calls",) if manifest["kind"] == "zero_provider_probe" else ("unknown", "unsettled")
+    return all(type(result.get(key)) is int and result[key] == 0 for key in required_zero)
+
+
+def _supervise(root: Path, launch_token: str) -> int:
+    # Root policies are frozen in prepared metadata so a copied runner works in
+    # an explicitly configured test/probe workspace too.
+    global DIAGNOSTICS_ROOT, WORKSPACE_ROOT
+    root = _no_symlinks(root)
+    prepared = _json(root / "control" / "prepared.json")
+    DIAGNOSTICS_ROOT = Path(prepared["diagnostics_root"])
+    WORKSPACE_ROOT = Path(prepared["workspace_root"])
+    root = validate_job_root(root, must_exist=True)
+    import fcntl
+    lockpath = _no_symlinks(root / "control" / "supervisor.lock")
+    with lockpath.open("a+b") as lock:
+        try:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as exc:
+            raise JobError("supervisor already owns the job") from exc
+        claim = _json(root / "control" / "started.json")
+        if claim.get("launch_token") != launch_token:
+            raise JobError("supervisor launch token mismatch")
+        # A second private invocation must not execute a second payload even
+        # after the first supervisor has exited and released its flock.
+        _exclusive_json(root / "control" / "payload-started.json",
+                        {"at": _utc(), "no_retry": True, "boot_id": _boot_id()})
+        state = _json(root / "output" / "state.json")
+        state = _state(root, state, supervisor=process_identity(os.getpid()),
+                       status="STARTING", boot_id=_boot_id())
+        try:
+            manifest, _ = _frozen(root)
+            environment = os.environ.copy()
+            environment.update(ECS_ACCEPTANCE_JOB_ROOT=str(root),
+                               ECS_ACCEPTANCE_OUTPUT_DIR=str(root / "output"),
+                               ECS_ACCEPTANCE_MANIFEST=str(root / "control" / "manifest.json"))
+            with (root / "output" / "stdout.log").open("xb", buffering=0) as stdout, \
+                    (root / "output" / "stderr.log").open("xb", buffering=0) as stderr:
+                process = subprocess.Popen(
+                    [sys.executable, str(root / "control" / "payload.py"), *manifest.get("args", [])],
+                    cwd=manifest["workspace"], env=environment, stdin=subprocess.DEVNULL,
+                    stdout=stdout, stderr=stderr, close_fds=True, start_new_session=True,
+                )
+                state = _state(root, state, status="RUNNING", launch_completed=True,
+                               started_at=_utc(), payload=process_identity(process.pid))
+                while process.poll() is None:
+                    time.sleep(1)
+                    state = _state(root, state, status="RUNNING")
+                returncode = process.wait()
+                os.fsync(stdout.fileno())
+                os.fsync(stderr.fileno())
+            _frozen(root, admission=False)  # Preserve immutable identities after normal grant closure.
+            result_path = root / "output" / "result.json"
+            result_valid = False
+            if result_path.exists() or result_path.is_symlink():
+                result_valid = validate_result(manifest, _json(result_path))
+            status = "FAILED" if returncode else ("SUCCEEDED" if result_valid else "INCOMPLETE_UNCONFIRMED")
+            state = _state(root, state, status=status, exit_code=returncode, finished_at=_utc(),
+                           result_valid=result_valid,
+                           runtime_complete=returncode == 0 and result_valid,
+                           quality_review_required=True, acceptance_verdict="NOT_EVALUATED",
+                           reason="payload_exit_and_explicit_completion_receipt" if result_valid else "result_missing_or_incomplete_no_retry")
+            artifacts = {"schema_version": 1, "job_id": root.name, "created_at": _utc(),
+                         "status": status, "files": _file_manifest(root)}
+            _atomic_json(root / "output" / "artifacts.json", artifacts)
+            return 0 if status == "SUCCEEDED" else 1
+        except Exception as exc:
+            _state(root, state, status="INTERRUPTED_UNCONFIRMED", finished_at=_utc(),
+                   reason="supervisor_exception_no_retry", error_type=type(exc).__name__)
+            print(f"supervisor failed: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+            return 1
+
+
+def job_status(root: Path) -> dict:
+    root = validate_job_root(root, must_exist=True)
+    # Status does not validate mutable external grants and cannot execute code.
+    state = _json(root / "output" / "state.json")
+    answer = {**state, "job_root": str(root), "observed_at": _utc(), "read_only": True}
+    claimed = (root / "control" / "started.json").exists()
+    answer["started_claim_exists"] = claimed
+    if state.get("status") in {"RUNNING", "STARTING"} and claimed:
+        claim = _json(root / "control" / "started.json")
+        identity = state.get("supervisor")
+        try:
+            same_boot = claim.get("boot_id") == _boot_id()
+        except OSError:
+            same_boot = False
+        if not same_boot or (identity is not None and not identity_alive(identity)):
+            answer.update(status="INTERRUPTED_UNCONFIRMED",
+                          reason="boot_changed" if not same_boot else "supervisor_identity_not_alive",
+                          next_action="read-only reconcile receipts/UNKNOWN; no automatic re-execution")
+        elif identity is None:
+            answer.update(status="START_UNCONFIRMED", reason="supervisor_handshake_not_recorded")
+    checkpoint = root / "output" / "checkpoint.json"
+    if checkpoint.exists() or checkpoint.is_symlink():
+        try:
+            answer["checkpoint"] = _json(checkpoint)
+        except JobError:
+            answer["checkpoint_error"] = "invalid_or_unsafe_checkpoint"
+    artifacts = root / "output" / "artifacts.json"
+    if artifacts.exists():
+        saved = _json(artifacts)
+        current = _file_manifest(root)
+        answer["artifact_integrity"] = "MATCH" if saved.get("files") == current else "MISMATCH"
+    return answer
+
+
+def fetch_job(root: Path, destination: Path) -> dict:
+    root = validate_job_root(root, must_exist=True)
+    destination = _no_symlinks(Path(destination))
+    if destination.is_relative_to(root) or root.is_relative_to(destination):
+        raise JobError("export destination must be separate from job root")
+    files = _safe_files(root)
+    artifacts = root / "output" / "artifacts.json"
+    if artifacts.exists():
+        files.append(_regular(artifacts))
+    try:
+        destination.mkdir(mode=0o700)
+    except FileExistsError as exc:
+        raise JobError("export destination must be a new directory") from exc
+    exported = {}
+    for source in files:
+        relative = source.relative_to(root)
+        target = destination / relative
+        target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        before = sha256_file(source)
+        _copy_new(source, target)
+        after = sha256_file(source)
+        copied = sha256_file(target)
+        exported[relative.as_posix()] = {"sha256": copied, "bytes": target.stat().st_size,
+                                         "stable_during_copy": before == after == copied}
+    receipt = {"schema_version": 1, "job_id": root.name, "exported_at": _utc(),
+               "source_job_root": str(root), "status_observation": job_status(root),
+               "files": exported, "all_files_stable": all(row["stable_during_copy"] for row in exported.values()),
+               "exclusions": "No environment dump, external readonly files, symlinks, or secret/credential named files."}
+    _atomic_json(destination / "export-manifest.json", receipt)
+    _sync_dir(destination)
+    return receipt
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest="command", required=True)
+    for name in ("prepare", "start", "status", "fetch", "_supervise"):
+        command = commands.add_parser(name)
+        command.add_argument("--job-root", type=Path, required=True)
+        if name == "prepare":
+            command.add_argument("--manifest", type=Path, required=True)
+            command.add_argument("--payload", type=Path, required=True)
+        elif name == "start":
+            command.add_argument("--handshake-timeout", type=float, default=10)
+        elif name == "fetch":
+            command.add_argument("--destination", type=Path, required=True)
+        elif name == "_supervise":
+            command.add_argument("--launch-token", required=True)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "_supervise":
+            return _supervise(args.job_root, args.launch_token)
+        if args.command == "prepare":
+            result = prepare_job(args.job_root, args.manifest, args.payload)
+        elif args.command == "start":
+            result = start_job(args.job_root, args.handshake_timeout)
+        elif args.command == "status":
+            result = job_status(args.job_root)
+        else:
+            result = fetch_job(args.job_root, args.destination)
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+        return 3 if args.command == "start" and not result.get("start_acknowledged") else 0
+    except (JobError, OSError) as exc:
+        print(json.dumps({"status": "BLOCKED", "error": str(exc), "error_type": type(exc).__name__}), file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
