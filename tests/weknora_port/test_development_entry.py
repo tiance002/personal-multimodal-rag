@@ -39,6 +39,7 @@ def test_graph_is_independent_explicit_startup_opt_in(tmp_path):
     cfg=settings(tmp_path);env=development_environment(cfg)
     assert cfg.graph_enabled is False
     assert DevelopmentSettings.from_environment(env).graph_enabled is False
+    env['WEKNORA_PORT_RERANK_TOP1_FLOORLESS']='false'
     env['WEKNORA_PORT_GRAPH_ENABLED']='true'
     assert DevelopmentSettings.from_environment(env).graph_enabled is True
     assert DevelopmentSettings.from_environment(env).source_evidence_mode=='off'

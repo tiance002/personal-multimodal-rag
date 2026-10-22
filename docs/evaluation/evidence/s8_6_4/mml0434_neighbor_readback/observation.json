@@ -1,0 +1,78 @@
+{
+  "schema": "s864-mml0434-current-neighbor-observation/v1",
+  "status": "CURRENT_SOURCE_READBACK_VERIFIED",
+  "readback_command_exit_code": 0,
+  "scope_correction": "Initial blocked.json records a parent task-parameter typo; corrected KB independently matches frozen case, anchor and saved PG scope. This was not a current data/security defect.",
+  "checks": {
+    "exact_chunk_ids": true,
+    "index_continuity": true,
+    "reciprocal_previous": true,
+    "reciprocal_next": true,
+    "same_tenant": true,
+    "same_knowledge_base": true,
+    "same_document": true,
+    "same_current_frozen_version": true,
+    "all_current_enabled_ready": true,
+    "original_offsets_match_raw_text": true,
+    "anchor_under_original350": true,
+    "all_three_fit_original850": true,
+    "next_contains_exact_dataset_text": true
+  },
+  "lengths": {
+    "previous": 35,
+    "anchor": 133,
+    "next": 69,
+    "anchor_plus_next_with_two_newlines": 204,
+    "all_three_with_two_newline_separators": 241,
+    "all_three_raw_offset_span": 241
+  },
+  "source_rows_summary": [
+    {
+      "id": "fa5675e3-e769-4f3a-8cd0-267b3d35a386",
+      "chunk_index": 56,
+      "canonical_raw_text_chars": 35,
+      "source_content_empty": true,
+      "canonical_raw_text_sha256": "869e0b90cae3c75d3c775a3359ab50ee92c1635b326540547f93724a6c7d244a",
+      "page_number": 32,
+      "start_at": 9040,
+      "end_at": 9075
+    },
+    {
+      "id": "10ff171b-a054-4cbc-9ab4-4c52b8c3022f",
+      "chunk_index": 57,
+      "canonical_raw_text_chars": 133,
+      "source_content_empty": true,
+      "canonical_raw_text_sha256": "f7505a779fcf9b5275857b66f729fc7a323f1c46e46e6e6be0b63c49e8d8e004",
+      "page_number": 33,
+      "start_at": 9077,
+      "end_at": 9210
+    },
+    {
+      "id": "084c5bee-f7be-4718-9c0b-510e61cb401a",
+      "chunk_index": 58,
+      "canonical_raw_text_chars": 69,
+      "source_content_empty": true,
+      "canonical_raw_text_sha256": "26168d91b1fcb55bf200d260c8f151d94f0c8c1eafc8dabf413ea53079654819",
+      "page_number": 34,
+      "start_at": 9212,
+      "end_at": 9281
+    }
+  ],
+  "answer_source_exact_text": "Kaggle's Cat vs Dog dataset (25k dog/cat pictures)",
+  "finding": "The immediate valid current next chunk contains the dataset text. Its absence from the saved30-source replay fixture is a snapshot coverage gap, not proof of absence from current persisted raw source. The three directly verified blocks fit original350/850 neighbor rules without truncation.",
+  "not_verified": [
+    "No retrieval pipeline was run for this readback.",
+    "No actual final Provider input or new generated answer was observed.",
+    "No real model answer accuracy claim is made."
+  ],
+  "metadata_correction": {
+    "raw_stdout_sql_select_count": 6,
+    "actual_select_statements_in_preserved_executed_payload": 4,
+    "additional_read_only_show_statements": 1,
+    "explanation": "The readback payload hardcoded6 erroneously in its metadata counter. Raw stdout is preserved unchanged; actual payload contains4 SELECT statements plus SHOW, BEGIN and ROLLBACK."
+  },
+  "provider_calls": 0,
+  "database_writes": 0,
+  "application_imports": 0,
+  "transaction_ended": "ROLLBACK"
+}

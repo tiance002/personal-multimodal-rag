@@ -195,7 +195,7 @@ def state_snapshot(state):
     """Private, finite trace of the actual states, never a public SSE payload."""
     value = {name: getattr(state, name, None) for name in (
         'query', 'rewrite_query', 'query_type', 'intent', 'needs_retrieval',
-        'retrieval_strategy_mode', 'source_evidence_mode', 'enable_expansion',
+        'retrieval_strategy_mode', 'source_evidence_mode', 'enable_expansion', 'rerank_top1_floorless',
         'query_trace', 'strategy_trace', 'strategy_coverage', 'bridge_trace',
         'evidence_trace', 'strategy_units_used')}
     value['plan'] = _row(getattr(state, 'strategy_plan', None))
@@ -267,6 +267,7 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
             require(base.pipeline_state.rerank_threshold == .3
                 and base.pipeline_state.rerank_top_k == 30 and base.pipeline_state.embedding_top_k == 30
                 and not base.pipeline_state.rerank_context_enabled
+                and base.pipeline_state.rerank_top1_floorless is True
                 and len(base.pipeline_state.targets) == 1, 'S861_PREFLIGHT_RETRIEVAL_CONFIGURATION_CHANGED')
             require(base.pipeline_state.query_understand_model_id == approved_batch['qu_model_id'],
                     'S861_PREFLIGHT_QU_BINDING_CHANGED')
@@ -417,6 +418,7 @@ def profile_manifest(*, bounded_query_profile=False):
         'approved_fresh_context_required': True,
         'resolved_custom_system_prompt': 'preserved before same suffix; per-run actual wire hash authoritative',
         'citations_enabled': True, 'enable_expansion_both_arms': False,
+        'rerank_top1_floorless': True,
         'router_policy_unchanged': asdict(RouterPolicy(mode='DYNAMIC')),
         'production_defaults_unchanged': {'strategy': ConversationSettings().retrieval_strategy_mode,
             'bridge': ConversationSettings().bridge_rescue_mode,

@@ -47,7 +47,7 @@ class ConversationSettings:
     retrieval_strategy_mode: str = field(default='off', kw_only=True)
     source_evidence_mode: str = 'off'
     rerank_context_enabled: bool = False
-    rerank_top1_floorless: bool = False  # S8 isolated opt-in; no public session override.
+    rerank_top1_floorless: bool = True  # Owner-approved server default; explicit false remains available.
     bridge_rescue_mode: str = 'off'  # Server-only experiment, no saved-session override.
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .7, "max_completion_tokens": 0})

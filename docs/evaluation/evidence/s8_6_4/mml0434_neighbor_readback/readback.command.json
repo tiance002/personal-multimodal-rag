@@ -1,0 +1,27 @@
+{
+  "schema": "s864-readonly-neighbor-command/v1",
+  "command": [
+    "existing-pinned-ssh",
+    "-T",
+    "BatchMode=yes",
+    "StrictHostKeyChecking=yes",
+    "IdentitiesOnly=yes",
+    "<existing-key-file>",
+    "<verified-private-target>",
+    "python3 -"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 1.727,
+  "ssh_helper_sha256": "8d6c5cc5572eaa9d034269aa2e8ab03a66aff359851743cfbc617425798bbce3",
+  "fixture_sha256": "58b2b066f78531eb70f9d444b7541b4c94523dce560aebececed8007f7dadf12",
+  "remote_payload_sha256": "b0602443680397030ec1be48877b93e94e2aad9e5afb4e6838220a86f3caf3c1",
+  "stdout_sha256": "7f8a23b8d6d648d70b4bde09aee588ae1a51055793b23a915332675f98a38268",
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "EMPTY"
+  },
+  "provider_calls": 0,
+  "database_writes": 0,
+  "parent_scope_correction": "Initial KB parameter typo corrected to independently agreeing frozen case/anchor/saved-PG scope; blocked.json preserved."
+}

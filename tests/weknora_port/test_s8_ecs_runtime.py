@@ -24,11 +24,27 @@ def base_env(tmp_path):
             "WEKNORA_PORT_REDIS_PREFIX": "weknora-python-s8:runtime"}
 
 
+@pytest.mark.parametrize('configured,expected',[(None,'true'),('true','true'),('false','false')])
+def test_owner_top1_default_and_explicit_server_override(tmp_path,configured,expected):
+    environment=base_env(tmp_path)
+    if configured is not None:environment['WEKNORA_PORT_RERANK_TOP1_FLOORLESS']=configured
+    actual=runtime_environment(environment)
+    assert actual['WEKNORA_PORT_RERANK_TOP1_FLOORLESS']==expected
+    assert actual['WEKNORA_PORT_GRAPH_ENABLED']=='false'
+    assert actual['WEKNORA_PORT_CLOUD_ALLOWED']=='false'
+
+
+@pytest.mark.parametrize('value',['','1','yes','not-a-boolean'])
+def test_owner_top1_environment_rejects_nonboolean_values(tmp_path,value):
+    with pytest.raises(RuntimeConfigurationError,match='RERANK_TOP1_SETTING_INVALID'):
+        runtime_environment({**base_env(tmp_path),'WEKNORA_PORT_RERANK_TOP1_FLOORLESS':value})
+
+
 def test_runtime_defaults_closed_and_original_strategy_without_secret_logging(tmp_path):
     env = runtime_environment(base_env(tmp_path))
     assert env["WEKNORA_PORT_CLOUD_ALLOWED"] == "false"
     assert env["WEKNORA_PORT_GRAPH_ENABLED"] == "false"
-    assert env["WEKNORA_PORT_RERANK_TOP1_FLOORLESS"] == "false"
+    assert env["WEKNORA_PORT_RERANK_TOP1_FLOORLESS"] == "true"
     assert env["WEKNORA_PORT_ROUTER_MODE"] == "DYNAMIC"
     assert "synthetic%40password%3Aonly" in env["WEKNORA_PORT_DATABASE_URL"]
 
@@ -36,8 +52,7 @@ def test_runtime_defaults_closed_and_original_strategy_without_secret_logging(tm
 @pytest.mark.parametrize("key,value", [("WEKNORA_PORT_DATABASE_SYSTEM_ID", "0"),
                                      ("WEKNORA_PORT_REDIS_RUN_ID", "0" * 40),
                                      ("WEKNORA_PORT_DATABASE_NAME", "old_database"),
-                                     ("WEKNORA_PORT_GRAPH_ENABLED", "true"),
-                                     ("WEKNORA_PORT_RERANK_TOP1_FLOORLESS", "true")])
+                                     ("WEKNORA_PORT_GRAPH_ENABLED", "true")])
 def test_observed_new_resources_and_no_nightly_experiment_override(tmp_path, key, value):
     env = base_env(tmp_path)
     env[key] = value

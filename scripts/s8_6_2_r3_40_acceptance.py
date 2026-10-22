@@ -68,7 +68,7 @@ def profile_manifest():
         'query_input_bound': dict(prior.PROFILE_QUERY_BOUND), 'generation': 'existing P5 DYNAMIC',
         'scope': 'one frozen whole KB per case; no document Gold filter',
         'source_evidence_mode': 'bounded_source_v1', 'retrieval_strategy_mode': 'query_structure_v1',
-        'query_expansion': False, 'citations_enabled': True, 'graph': False,
+        'query_expansion': False, 'citations_enabled': True, 'graph': False, 'rerank_top1_floorless': True,
         'authority_mode': OWNER_TOKEN_MODE, 'owner_max_total_tokens': OWNER_TOKEN_CAP,
         'unlimited_provider_calls': True, 'operational_child_max_calls': 12,
         'operational_child_max_tokens': 100000,
@@ -199,7 +199,7 @@ def install_case_profile(runtime, case, batch, expires_at, evidence_directory=No
         result = await composed(turn)
         state = result.pipeline_state
         require(state.source_evidence_mode == 'bounded_source_v1' and not state.enable_expansion
-            and not state.graph_enabled and not state.rerank_top1_floorless and state.bridge_rescue_mode == 'off',
+            and not state.graph_enabled and state.rerank_top1_floorless is True and state.bridge_rescue_mode == 'off',
             'S840_SAVED_PRODUCTION_BOUNDARIES_CHANGED')
         require([t.knowledge_base_id for t in state.targets] == [case['knowledge_base_id']]
             and all(t.target_type == 'knowledge_base' and not t.knowledge_ids

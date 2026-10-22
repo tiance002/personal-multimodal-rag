@@ -156,7 +156,7 @@ def guarded_runtime(mode='query_structure_v1'):
     state = PipelineState(query=profile.QUESTIONS['compare'], rewrite_query=profile.QUESTIONS['compare'],
         targets=[SearchTarget(profile.KB_IDS[0])], retrieval_strategy_mode=mode,
         source_evidence_mode='bounded_source_v1', query_understand_model_id='approved-qu',
-        rerank_threshold=.3, rerank_top_k=30, embedding_top_k=30, rerank_context_enabled=False,
+        rerank_threshold=.3, rerank_top_k=30, embedding_top_k=30, rerank_context_enabled=False, rerank_top1_floorless=True,
         language='English')
     base = TurnConfiguration(state, {'options': ChatOptions(max_completion_tokens=2048,
         temperature=.7, thinking=False), 'system_prompt': DEFAULT_SYSTEM_PROMPT})

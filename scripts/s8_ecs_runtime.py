@@ -54,9 +54,11 @@ def runtime_environment(environment=None):
     require(env.get("WEKNORA_PORT_DATABASE_SYSTEM_ID") not in (None, "", "0"), "S8_OBSERVED_POSTGRES_ID_REQUIRED")
     require(env.get("WEKNORA_PORT_REDIS_RUN_ID") not in (None, "", "0" * 40), "S8_OBSERVED_REDIS_ID_REQUIRED")
     require(env.get("WEKNORA_PORT_REDIS_PREFIX", "").startswith("weknora-python-s8:"), "S8_REDIS_NAMESPACE_REQUIRED")
-    for key in ("WEKNORA_PORT_GRAPH_ENABLED", "WEKNORA_PORT_RERANK_TOP1_FLOORLESS"):
-        require(env.get(key, "false").lower() == "false", "S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF")
-        env[key] = "false"
+    require(env.get("WEKNORA_PORT_GRAPH_ENABLED", "false").lower() == "false", "S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF")
+    env["WEKNORA_PORT_GRAPH_ENABLED"] = "false"
+    top1 = env.get("WEKNORA_PORT_RERANK_TOP1_FLOORLESS", "true")
+    require(isinstance(top1, str) and top1.lower() in ("true", "false"), "RERANK_TOP1_SETTING_INVALID")
+    env["WEKNORA_PORT_RERANK_TOP1_FLOORLESS"] = top1.lower()
     password = secret_file(env.get("S8_DB_PASSWORD_FILE", "/run/secrets/database_password"))
     host = env.get("S8_DB_HOST", "db")
     require(bool(re.fullmatch(r"[a-zA-Z0-9_.-]+", host)), "S8_DATABASE_HOST_INVALID")

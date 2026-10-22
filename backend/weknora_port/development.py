@@ -33,7 +33,7 @@ class DevelopmentSettings:
     rerank_context_enabled:bool=False
     evidence_dir:Path|None=None
     graph_enabled:bool=False
-    rerank_top1_floorless:bool=False
+    rerank_top1_floorless:bool=True
 
     def __post_init__(self):
         if type(self.graph_enabled) is not bool:
@@ -89,7 +89,7 @@ class DevelopmentSettings:
             query_understand_model_id=env.get('WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID',''),
             rerank_context_enabled=env.get('WEKNORA_PORT_RERANK_CONTEXT_ENABLED','false').lower()=='true',
             graph_enabled=env.get('WEKNORA_PORT_GRAPH_ENABLED','false').lower()=='true',
-            rerank_top1_floorless=env.get('WEKNORA_PORT_RERANK_TOP1_FLOORLESS','false').lower()=='true',
+            rerank_top1_floorless=env.get('WEKNORA_PORT_RERANK_TOP1_FLOORLESS','true').lower()=='true',
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))

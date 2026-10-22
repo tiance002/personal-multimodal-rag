@@ -12,3 +12,7 @@ backend/weknora_port/conversation_assets/*.yaml text eol=lf
 
 # Frozen S8.6.3 evidence keeps original log bytes, including whitespace.
 /docs/evaluation/evidence/s8_6_3/** -text -whitespace
+
+# Frozen S8.6.4 evidence and fixture preserve exact hashed bytes.
+/docs/evaluation/evidence/s8_6_4/** -text -whitespace
+/tests/fixtures/s8_6_4/** -text -whitespace

@@ -296,6 +296,6 @@ def test_formal_session_source_evidence_roundtrip_to_actual_configuration(monkey
     configuration = asyncio.run(runtime._configuration(turn))
     assert configuration.pipeline_state.source_evidence_mode == expected
     assert configuration.pipeline_state.graph_enabled is False
-    assert configuration.pipeline_state.rerank_top1_floorless is False
+    assert configuration.pipeline_state.rerank_top1_floorless is True
     assert configuration.pipeline_state.chat_model_id == 'cheap-id'
     assert runtime.conversation.source_evidence_mode == startup
