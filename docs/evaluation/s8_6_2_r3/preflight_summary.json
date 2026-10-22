@@ -1,0 +1,78 @@
+{
+  "schema": "s862r3-reservation-dryrun/v4",
+  "status": "DRY_RUN_COMPLETE",
+  "profile_sha256": "495447f94ab92f1e2ca770cc2cad851d4eaa40bad326e8b483d2c4d4279a8f2b",
+  "implementation_sha256_LF": "bc352093c8f9e3c20cf3527c57f1813bca0569b9518904547ff0b76d4a630127",
+  "inventory_sha256": "29755cc285a6bfec4901d2ecc7e783e0dc49aae783f7362291b2a50618d606a5",
+  "effective_query_input_contract": {
+    "version": "effective-query/v1",
+    "unicode_characters": 256,
+    "utf8_bytes": 1024
+  },
+  "derived_query_bounds": {
+    "initial_characters": 256,
+    "initial_utf8_bytes": 1024,
+    "child_characters": 288,
+    "child_utf8_bytes": 1056,
+    "child_derivation": "disjoint exact object/dimension spans plus longest enabled Registry template literal",
+    "Q1_characters": 192,
+    "Q1_utf8_bytes_upper": 768,
+    "json_string_bytes_per_character_upper": 6,
+    "nested_json": "actual extraction_payload then json.dumps then ProviderModel request renderer"
+  },
+  "output_caps": {
+    "QU_off": 150,
+    "QU_on": 256,
+    "extract": 256,
+    "final_each_role": 2048
+  },
+  "requested_batches": {
+    "compare": {
+      "kind": "http",
+      "submissions": [
+        "compare:query_structure_v1"
+      ],
+      "max_calls": 9,
+      "reservation_tokens_upper": 65261,
+      "fits_existing_ledger": true
+    }
+  },
+  "requested_full_calls": 9,
+  "recommended_reservation_upper": 65261,
+  "fallback_included": true,
+  "automatic_threshold_retry_calls": 0,
+  "query_expansion": false,
+  "all_searchable_rows_matched": 11,
+  "physical_embedding_groups": 1,
+  "memory_calls": 0,
+  "source_revision": "751c6b26d461e90e76d1c6c708977db9dd831eed",
+  "image_id": "sha256:9ef7691a9cb5667713d4e675e96055010165520984ef8ee1de6dd44532e5df50",
+  "budget_file_sha256": "297b292e19fe67b58efc2e133a4c336d23096dd867f6d70e0caada84d34d3e8c",
+  "prompt_fingerprints": {
+    "acceptance_module_sha256_LF": "bc352093c8f9e3c20cf3527c57f1813bca0569b9518904547ff0b76d4a630127",
+    "classification_guidance_sha256": "a47e4f74e1042c579028f08233a4032ce1cb2ecef2711a3bbc8456450c3fe962",
+    "default_original_system_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+    "default_profile_system_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+    "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+    "qu_empty_history_actual_system_sha256": "a3d246f8766829274ca758359f9c11232bc18f1f7eefaf0f41f7cc3ec49a6213",
+    "qu_request_body_sha256_by_record": {
+      "compare:query_structure_v1:QU": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4",
+      "dependent:query_structure_v1:QU": "7b54cb30749eb095b184756e0a6b6ede7141e2514aa5b32b476495058c62775d",
+      "parallel:query_structure_v1:QU": "5b62623ed9881f4c39ddcf1d85626bf3fdaa0cd1bedbfb635dadab572b1b534a",
+      "qu-only:dimension-negative:query_structure_v1:QU": "b4c6352679f5a50bbed0c1e722686303ccf095e945f9a54ca6ad4bc4cb29d4e4",
+      "qu-only:numeric-model:query_structure_v1:QU": "c5b42cb9b1e2091bdca1166146a72a6a0478921d59103189bdafcbca0b4e7ce1",
+      "qu-only:parallel:query_structure_v1:QU": "5b62623ed9881f4c39ddcf1d85626bf3fdaa0cd1bedbfb635dadab572b1b534a",
+      "qu-only:relational-negative:query_structure_v1:QU": "6678ee03c36c985f64e0fd3e663e535cf2174f4102483623d6e244acfdf39787",
+      "qu-only:three-object:query_structure_v1:QU": "05a11fed54837126904be91ada033fa04c068541929f20d0eb24da8e214329ac",
+      "qu-only:two-object:query_structure_v1:QU": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4"
+    },
+    "qu_v2_guard_sha256": "299121a4142dbe5979cfa64098b107a06a90e23d8812b03b39c2e2ef057d06d3",
+    "qu_v2_system_template_sha256": "18ae87853d81b2e60a64b8496bf9207a89c4f8327e357394bac7d97cd9a487e6",
+    "qu_v2_user_template_sha256": "558b51fd0b5946c104092641ce59447f7d40ef49386d3bfce5a2925f38fee7ed",
+    "query_module_sha256_LF": "3981bf13ea138e111ebe949af4deea1853a7c8f38f9a960d0b38770b598c5558",
+    "recovery_helper_name": "_exact_terminal_period_recovery"
+  },
+  "authorization": "NONE_NEW_OWNER_APPROVAL_REQUIRED",
+  "actual_provider_calls": 0,
+  "actual_tokens": 0
+}

@@ -1,0 +1,72 @@
+{
+  "status": "ZERO_PROVIDER_READY_COMPLETED",
+  "image_id": "sha256:9ef7691a9cb5667713d4e675e96055010165520984ef8ee1de6dd44532e5df50",
+  "source_revision": "751c6b26d461e90e76d1c6c708977db9dd831eed",
+  "profile_sha256": "495447f94ab92f1e2ca770cc2cad851d4eaa40bad326e8b483d2c4d4279a8f2b",
+  "ready": {
+    "attempts": 2,
+    "http_status": 200,
+    "missing_auth_status": 401,
+    "ready": {
+      "cloud_allowed": false,
+      "database": "weknora_s8",
+      "graph_enabled": false,
+      "implementation": "weknora-python-port",
+      "model_requests_at_startup": 0,
+      "models": {
+        "cheap": {
+          "model": "Qwen/Qwen3.5-4B",
+          "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+          "provider": "siliconflow"
+        },
+        "embedding": {
+          "model": "BAAI/bge-m3",
+          "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+          "provider": "siliconflow"
+        },
+        "expensive": {
+          "model": "deepseek-flash",
+          "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+          "provider": "deepseek"
+        },
+        "rerank": {
+          "model": "BAAI/bge-reranker-v2-m3",
+          "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+          "provider": "siliconflow"
+        }
+      },
+      "postgres_system_id": "7698420805889187877",
+      "redis_prefix": "weknora-python-s8:s861:s862r3-20261022t015644z-e3f8d7c3:",
+      "redis_run_id": "268d42dec48542084b1478eea849ecfb7d3f9b83",
+      "rerank_top1_floorless": false,
+      "status": "ready",
+      "storage_root": "/var/lib/eviroute/storage",
+      "subject_sha256": "00f2fd3dad2b741924376adab7fd29c12a93bc7a1fe4e8e1f0f97cacd418fa83",
+      "tenant_id": 332,
+      "worker_in_api": false
+    },
+    "status": "AUTHENTICATED_ZERO_PROVIDER_READY"
+  },
+  "formal_check": {
+    "exit_code": 0,
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "actual_query_module_sha256_LF": "3981bf13ea138e111ebe949af4deea1853a7c8f38f9a960d0b38770b598c5558",
+  "stopped": {
+    "OOMKilled": false,
+    "exit_code": 143,
+    "restarts": 0,
+    "running": false
+  },
+  "provider_calls": 0,
+  "QA_submissions": 0,
+  "SessionCreate": 0,
+  "provider_ledger_unchanged": true,
+  "old_UNKNOWN_unchanged": true,
+  "source_and_indexes_unchanged": true,
+  "all_table_counts_unchanged": true,
+  "production_identity_unchanged": true,
+  "config_hashes_unchanged": true,
+  "real_HTTP_QA": "NOT_RUN"
+}

@@ -1,0 +1,109 @@
+{
+  "schema": "s862r3-owner-authorization-proposal/v1",
+  "goal": "S8.6.2-R3",
+  "owner_approved": false,
+  "state": "AWAITING_FRESH_OWNER_APPROVAL_NOT_ACTIVE",
+  "source_revision": "751c6b26d461e90e76d1c6c708977db9dd831eed",
+  "image_id": "sha256:9ef7691a9cb5667713d4e675e96055010165520984ef8ee1de6dd44532e5df50",
+  "profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+  "profile_sha256": "495447f94ab92f1e2ca770cc2cad851d4eaa40bad326e8b483d2c4d4279a8f2b",
+  "budget_preflight_sha256": "297b292e19fe67b58efc2e133a4c336d23096dd867f6d70e0caada84d34d3e8c",
+  "source_manifest_sha256": "b3e9ff83c56ced2314134b7d145fc59ffbf12ed12eb83a4477dc6f841e4702da",
+  "prompt_fingerprints": {
+    "acceptance_module_sha256_LF": "bc352093c8f9e3c20cf3527c57f1813bca0569b9518904547ff0b76d4a630127",
+    "classification_guidance_sha256": "a47e4f74e1042c579028f08233a4032ce1cb2ecef2711a3bbc8456450c3fe962",
+    "default_original_system_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+    "default_profile_system_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+    "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+    "qu_empty_history_actual_system_sha256": "a3d246f8766829274ca758359f9c11232bc18f1f7eefaf0f41f7cc3ec49a6213",
+    "qu_request_body_sha256_by_record": {
+      "compare:query_structure_v1:QU": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4",
+      "dependent:query_structure_v1:QU": "7b54cb30749eb095b184756e0a6b6ede7141e2514aa5b32b476495058c62775d",
+      "parallel:query_structure_v1:QU": "5b62623ed9881f4c39ddcf1d85626bf3fdaa0cd1bedbfb635dadab572b1b534a",
+      "qu-only:dimension-negative:query_structure_v1:QU": "b4c6352679f5a50bbed0c1e722686303ccf095e945f9a54ca6ad4bc4cb29d4e4",
+      "qu-only:numeric-model:query_structure_v1:QU": "c5b42cb9b1e2091bdca1166146a72a6a0478921d59103189bdafcbca0b4e7ce1",
+      "qu-only:parallel:query_structure_v1:QU": "5b62623ed9881f4c39ddcf1d85626bf3fdaa0cd1bedbfb635dadab572b1b534a",
+      "qu-only:relational-negative:query_structure_v1:QU": "6678ee03c36c985f64e0fd3e663e535cf2174f4102483623d6e244acfdf39787",
+      "qu-only:three-object:query_structure_v1:QU": "05a11fed54837126904be91ada033fa04c068541929f20d0eb24da8e214329ac",
+      "qu-only:two-object:query_structure_v1:QU": "518c9e0791597f1f7e74fc655228864062faf65ad06d89856871071113c26ec4"
+    },
+    "qu_v2_guard_sha256": "299121a4142dbe5979cfa64098b107a06a90e23d8812b03b39c2e2ef057d06d3",
+    "qu_v2_system_template_sha256": "18ae87853d81b2e60a64b8496bf9207a89c4f8327e357394bac7d97cd9a487e6",
+    "qu_v2_user_template_sha256": "558b51fd0b5946c104092641ce59447f7d40ef49386d3bfce5a2925f38fee7ed",
+    "query_module_sha256_LF": "3981bf13ea138e111ebe949af4deea1853a7c8f38f9a960d0b38770b598c5558",
+    "recovery_helper_name": "_exact_terminal_period_recovery"
+  },
+  "initial_only": true,
+  "max_http_submissions": 1,
+  "max_provider_attempts": 9,
+  "max_total_tokens": 65261,
+  "reservation_semantics": "Conservative complete request-tree ceiling, not actual usage or a cost estimate.",
+  "question": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+  "client_request_id": "s861-f644e1376f9f4ccfa0d65f19",
+  "server_run_id": "ALLOCATED_BY_NORMAL_HTTP_ADMISSION_NOT_FORCED_TO_CLIENT_ID",
+  "new_session": true,
+  "knowledge_base_ids": [
+    "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+  ],
+  "document_ids": [
+    "a973df4a-0b4b-43f7-ad17-55265aac1556",
+    "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+    "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+    "3fdf4942-1265-4e9e-959d-27772f57e5dd"
+  ],
+  "retrieval_strategy_mode": "query_structure_v1",
+  "source_evidence_mode": "bounded_source_v1",
+  "citations_enabled": true,
+  "router_mode": "DYNAMIC",
+  "graph_enabled": false,
+  "bridge_rescue_default": "off",
+  "internal_query_expansion": false,
+  "models": {
+    "cheap": {
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "provider": "siliconflow"
+    },
+    "embedding": {
+      "model": "BAAI/bge-m3",
+      "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+      "provider": "siliconflow"
+    },
+    "expensive": {
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "provider": "deepseek"
+    },
+    "rerank": {
+      "model": "BAAI/bge-reranker-v2-m3",
+      "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+      "provider": "siliconflow"
+    }
+  },
+  "query_understanding_output_cap": 256,
+  "final_each_role_output_cap": 2048,
+  "effective_query_input_contract": {
+    "version": "effective-query/v1",
+    "unicode_characters": 256,
+    "utf8_bytes": 1024
+  },
+  "new_execution_file": "/opt/rag-s8/state/executions/s861-s862r3-e3f8d7c3-compare/execution.json",
+  "new_ledger_status": "NOT_CREATED_BEFORE_OWNER_APPROVAL",
+  "old_four_ledgers": "CLOSED_NEVER_REOPEN",
+  "expires_hours_after_approval": 6,
+  "qa_transport": "existing scripts.s8_6_1_api_acceptance api + collect; normal FastAPI endpoints",
+  "egress": "Fixed q0, validated derived queries and necessary originals only within the fixed one-KB/four-document scope to SiliconFlow and existing P5 DeepSeek binding.",
+  "stop_on": [
+    "first HTTP failure",
+    "UNKNOWN or unconfirmed send",
+    "incomplete output",
+    "permission denial",
+    "profile or budget mismatch",
+    "answer or evidence gate fails"
+  ],
+  "automatic_retry": false,
+  "subsequent_parallel_frost": "NOT_AUTHORIZED_BY_THIS_PROPOSAL",
+  "old_500000_token_authorization_reused": false,
+  "actual_calls_at_proposal": 0,
+  "actual_tokens_at_proposal": 0
+}

@@ -1,0 +1,240 @@
+{
+  "status": "OFFLINE_REPLAY_PASS",
+  "fixture_sha256": "d73a03cd62bd46ee4b5e470d0e760901e3017163f315a28c83ef3045c6cc4944",
+  "source_query_sha256_LF": "3981bf13ea138e111ebe949af4deea1853a7c8f38f9a960d0b38770b598c5558",
+  "historical_source_sha256": "df341b516aac6fdaf740603fdfe02f90c16c248a333dfa03277af32337c446fe",
+  "new_provider_calls": 0,
+  "new_actual_tokens": 0,
+  "samples": [
+    {
+      "case": "two-object",
+      "historical_request_id": "s861-f669ae5030a540de9a79ceca/query_rewrite",
+      "q0": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+      "effective_query": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+      "query_type": "SIMPLE_COMPARE",
+      "raw_response_sha256": "85c46abac108e020ee10ef15ed80ecf044a8d5eb2372c3f8ac116d921b13ae2b",
+      "trace": [
+        {
+          "stage": "query_understand",
+          "decision": "RECOVERED",
+          "reason": "EXACT_ASCII_TERMINAL_PERIOD_RESTORED",
+          "q0_sha256": "bd1a51b1714439fd32e625a2db619c8149c831b312448a186851ae8f844ab685",
+          "rewrite_sha256": "bd1a51b1714439fd32e625a2db619c8149c831b312448a186851ae8f844ab685",
+          "history_rounds": 0,
+          "contract": "qu_v2",
+          "query_type": "SIMPLE_COMPARE",
+          "raw_response_sha256": "85c46abac108e020ee10ef15ed80ecf044a8d5eb2372c3f8ac116d921b13ae2b",
+          "raw_response_hash_scope": "chat_response.content_utf8"
+        }
+      ],
+      "plan": {
+        "q0": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+        "effective_query": "Compare Leyden jar and Franklin bells in terms of operating principles and uses.",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "RULE_COMPARE",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "What is known about Leyden jar regarding operating principles and uses?",
+            "covers": [
+              "Leyden jar",
+              "operating principles and uses"
+            ],
+            "depends_on": [],
+            "object_span": [
+              8,
+              18
+            ],
+            "dimension_span": [
+              50,
+              79
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "What is known about Franklin bells regarding operating principles and uses?",
+            "covers": [
+              "Franklin bells",
+              "operating principles and uses"
+            ],
+            "depends_on": [],
+            "object_span": [
+              23,
+              37
+            ],
+            "dimension_span": [
+              50,
+              79
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_COMPARE_RULE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      }
+    },
+    {
+      "case": "three-object",
+      "historical_request_id": "s861-95700e191c1142dfa0d50d71/query_rewrite",
+      "q0": "Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency.",
+      "effective_query": "Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency.",
+      "query_type": "SIMPLE_COMPARE",
+      "raw_response_sha256": "577cd88a46c8a3574b5d5dec9d7ba4b97ad3d7f3cf723440a00a63bac0e00b89",
+      "trace": [
+        {
+          "stage": "query_understand",
+          "decision": "RECOVERED",
+          "reason": "EXACT_ASCII_TERMINAL_PERIOD_RESTORED",
+          "q0_sha256": "b8e8b727718f88173de409afb61f89f5562fdc65aa60117d561590f059e378f4",
+          "rewrite_sha256": "b8e8b727718f88173de409afb61f89f5562fdc65aa60117d561590f059e378f4",
+          "history_rounds": 0,
+          "contract": "qu_v2",
+          "query_type": "SIMPLE_COMPARE",
+          "raw_response_sha256": "577cd88a46c8a3574b5d5dec9d7ba4b97ad3d7f3cf723440a00a63bac0e00b89",
+          "raw_response_hash_scope": "chat_response.content_utf8"
+        }
+      ],
+      "plan": {
+        "q0": "Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency.",
+        "effective_query": "Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency.",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "RULE_COMPARE",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "What is known about PostgreSQL regarding persistence and concurrency?",
+            "covers": [
+              "PostgreSQL",
+              "persistence and concurrency"
+            ],
+            "depends_on": [],
+            "object_span": [
+              8,
+              18
+            ],
+            "dimension_span": [
+              50,
+              77
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "What is known about Redis regarding persistence and concurrency?",
+            "covers": [
+              "Redis",
+              "persistence and concurrency"
+            ],
+            "depends_on": [],
+            "object_span": [
+              20,
+              25
+            ],
+            "dimension_span": [
+              50,
+              77
+            ]
+          },
+          {
+            "id": "sq-3",
+            "query_text": "What is known about SQLite regarding persistence and concurrency?",
+            "covers": [
+              "SQLite",
+              "persistence and concurrency"
+            ],
+            "depends_on": [],
+            "object_span": [
+              31,
+              37
+            ],
+            "dimension_span": [
+              50,
+              77
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_COMPARE_RULE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      }
+    },
+    {
+      "case": "numeric-model",
+      "historical_request_id": "s861-11e525027fcd4a2791a3ab44/query_rewrite",
+      "q0": "Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements.",
+      "effective_query": "Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements.",
+      "query_type": "SIMPLE_COMPARE",
+      "raw_response_sha256": "0b84269ff50ac557190e6736000cceedbff815d003ef49891a89c7fa9b7a4c0a",
+      "trace": [
+        {
+          "stage": "query_understand",
+          "decision": "RECOVERED",
+          "reason": "EXACT_ASCII_TERMINAL_PERIOD_RESTORED",
+          "q0_sha256": "d1ccbc1d468cd5ea54d4449405e48c52aa717b22536b73364583fcef260650d7",
+          "rewrite_sha256": "d1ccbc1d468cd5ea54d4449405e48c52aa717b22536b73364583fcef260650d7",
+          "history_rounds": 0,
+          "contract": "qu_v2",
+          "query_type": "SIMPLE_COMPARE",
+          "raw_response_sha256": "0b84269ff50ac557190e6736000cceedbff815d003ef49891a89c7fa9b7a4c0a",
+          "raw_response_hash_scope": "chat_response.content_utf8"
+        }
+      ],
+      "plan": {
+        "q0": "Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements.",
+        "effective_query": "Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements.",
+        "query_type": "SIMPLE_COMPARE",
+        "strategy": "RULE_COMPARE",
+        "subqueries": [
+          {
+            "id": "sq-1",
+            "query_text": "What is known about Qwen3.5-4B regarding deployment requirements?",
+            "covers": [
+              "Qwen3.5-4B",
+              "deployment requirements"
+            ],
+            "depends_on": [],
+            "object_span": [
+              8,
+              18
+            ],
+            "dimension_span": [
+              44,
+              67
+            ]
+          },
+          {
+            "id": "sq-2",
+            "query_text": "What is known about Qwen3-8B regarding deployment requirements?",
+            "covers": [
+              "Qwen3-8B",
+              "deployment requirements"
+            ],
+            "depends_on": [],
+            "object_span": [
+              23,
+              31
+            ],
+            "dimension_span": [
+              44,
+              67
+            ]
+          }
+        ],
+        "constraints": [],
+        "reason": "CLOSED_COMPARE_RULE",
+        "rule_id": "COMPARE_SHARED",
+        "rule_version": "2",
+        "rule_status": "MATCHED",
+        "reject_reason": "",
+        "rule_full_match": true
+      }
+    }
+  ]
+}
