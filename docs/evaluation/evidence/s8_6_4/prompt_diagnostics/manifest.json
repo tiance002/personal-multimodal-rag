@@ -1,0 +1,369 @@
+{
+  "schema": "s8.6.4-prompt-diagnostics/v1",
+  "status": "OFFLINE_PREPARED_NEW_AUTHORIZATION_REQUIRED",
+  "new_provider_calls": 0,
+  "new_input_tokens": 0,
+  "new_output_tokens": 0,
+  "model_quality": "NOT_RUN",
+  "database_calls": 0,
+  "historical_ids": "PROVENANCE_ONLY; never reuse IDs, grants or CLOSED allocations",
+  "generation_candidate_scope": "TEST_ONLY; production generation configuration unchanged",
+  "candidate_suffix_sha256": "880eb88b7156e4601325ada12ee469072f0548ed87d8d3c0ea7d077a462d1386",
+  "source_analysis_sha256": "6f34218a9a1e335afdf351d20392f960e0e04b40807edb70b312c146f4c488a3",
+  "execution": "Pure loaders/renderers only. Future authorized calls use existing Registry/SendGate/LocalExecution; no retries or new send system.",
+  "images": [
+    {
+      "case_id": "row-0958",
+      "source_request": {
+        "file": "docs/evaluation/evidence/p27-live-20261017/worker-evidence/provider-requests/90bfe30323b833e92677102f62be852a63d7a84abfe213359fbf420925b20f98.json",
+        "file_sha256": "4638a6bdfdb39c2658a3e2de3547aaffcd3b128eff7f5409a5982f660485484a"
+      },
+      "historical_response": {
+        "file": "docs/evaluation/evidence/p27-live-20261017/worker-evidence/deepseek-responses/bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7.json",
+        "file_sha256": "18431d111434868806f44db21a5f850408e349dd5a566d2bf8f61c0ee545e2bf"
+      },
+      "source_pdf_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+      "physical_page": 9,
+      "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "candidate_prompt": {
+        "file": "image_prompts/row-0958.json",
+        "file_sha256": "82274f1954a17ad6b71fe2415a185c3145dd7f704914ecbf4feb5bde41e1f9c1",
+        "body_sha256": "7f5a371640d51602fdb3231452de6b93373eed0787e981e87cee441c144e7a5f"
+      },
+      "old_prompt_sha256": "57dfc36bb1311e85cf752ea2656ea56737424bc5651976e951bea9565c9747da",
+      "candidate_prompt_sha256": "4cebb0fb92995112b9ec7e1acdd223ec39c657f7ee574ef2c623e60fb3324210",
+      "old_body_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "candidate_body_sha256": "fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089",
+      "historical_usage": {
+        "status": "HISTORICAL_ONLY",
+        "calls": 1,
+        "prompt_tokens": 1018,
+        "completion_tokens": 840,
+        "total_tokens": 1858,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 744
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1018
+      },
+      "historical_model": "deepseek-flash",
+      "historical_finish_reason": "stop",
+      "new_quality": "NOT_RUN",
+      "input_isolation": "No question or Gold added; only caption text changes"
+    },
+    {
+      "case_id": "row-0684",
+      "source_request": {
+        "file": "docs/evaluation/evidence/p27-live-20261017/worker-evidence/provider-requests/96587b5ffbd8ba8ae65605b0262ad252b863a2cab1b9e4edc8c9a1fdbde4a617.json",
+        "file_sha256": "e4142f006c40d7601c965bb27e929b631e81e2d2ba273e3b0d89a7e4a24ca3a5"
+      },
+      "historical_response": {
+        "file": "docs/evaluation/evidence/p27-live-20261017/worker-evidence/deepseek-responses/4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a.json",
+        "file_sha256": "8a1b2ad2b75092c7414ed09b1e65547a2d2385a983ee0bb7f21c3f9f001a710a"
+      },
+      "source_pdf_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+      "physical_page": 10,
+      "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "candidate_prompt": {
+        "file": "image_prompts/row-0684.json",
+        "file_sha256": "82274f1954a17ad6b71fe2415a185c3145dd7f704914ecbf4feb5bde41e1f9c1",
+        "body_sha256": "7f5a371640d51602fdb3231452de6b93373eed0787e981e87cee441c144e7a5f"
+      },
+      "old_prompt_sha256": "57dfc36bb1311e85cf752ea2656ea56737424bc5651976e951bea9565c9747da",
+      "candidate_prompt_sha256": "4cebb0fb92995112b9ec7e1acdd223ec39c657f7ee574ef2c623e60fb3324210",
+      "old_body_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "candidate_body_sha256": "f09c46f3fd7bdc8825447ce7e6e4eb5aa68e46ba52f309ef2e4f7390b23fc49c",
+      "historical_usage": {
+        "status": "HISTORICAL_ONLY",
+        "calls": 1,
+        "prompt_tokens": 1032,
+        "completion_tokens": 1161,
+        "total_tokens": 2193,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1013
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1032
+      },
+      "historical_model": "deepseek-flash",
+      "historical_finish_reason": "stop",
+      "new_quality": "NOT_RUN",
+      "input_isolation": "No question or Gold added; only caption text changes"
+    }
+  ],
+  "generation": [
+    {
+      "case_id": "miracl-zh-5721594#0",
+      "layer": "D",
+      "secondary_layers": [],
+      "final_input_sufficient": "YES",
+      "diagnosis": "完整中文公司清单已送达；英文别名未经绑定，430/600 冲突未说明。核心清单部分正确。",
+      "target_chunk_id": "276bb106-7489-48b2-bc35-449b6b1d4630",
+      "historical_request_artifact": {
+        "bytes": 8173,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\11-miracl-zh-5721594-0\\evidence\\34d55edc948744d2b60a5e979fc40ed2.request.json",
+        "sha256": "bbd2086bb7a2f7551bfb540d529fb61b415faefeea67e0a1274828dda788e96b"
+      },
+      "old": {
+        "file": "generation_requests/01-old.json",
+        "file_sha256": "6afebb2205b4fc0a92f7c87d7356c6ea288046ba690eac4961f966874b9788c7",
+        "body_sha256": "b9f3b0bced00e789a6c553f285f072663d525dcf895f870ffc802b3c442adf8b"
+      },
+      "candidate": {
+        "file": "generation_requests/01-candidate.json",
+        "file_sha256": "073f54db5c8eaa4ec20e8652f7cde250aa6fbe476d073bec7b679ed2ce7b0a7a",
+        "body_sha256": "f1d7211ee601ac705b2b3bd7fd0a0dd3c2b82b543764647dae6bcddba9c901bd"
+      },
+      "fixed_user_messages_sha256": "54b7d448f1f362b7e5733a02466ab376773544c2ba5b635347d1a1716a24285c",
+      "context_statistics": {
+        "system_characters": 3108,
+        "user_characters": 2301,
+        "context_characters": 2128,
+        "chunks": 4,
+        "source_characters": 1107,
+        "exact_duplicate_content_occurrences": 0,
+        "source_order_sha256": [
+          "b31ed92c5af631b788066e637cdba459a1f05988ff57cd9cb26a7365fba35a0d",
+          "eb5240c19a32a740570521477e856b19bcaef6df6b4f20eb03f7388f893b9fc6",
+          "a84403305494ad167bb93ea17967286c91bd8afed6d7ce13fc64b66e949151ce",
+          "d089fcdf21c7a39c647801d925a4b0166da81edb11007635f3b7fa828d19e6ab"
+        ],
+        "token_counts": "NOT_MEASURED; characters are not tokens",
+        "causal_conclusion": "NOT_ESTABLISHED; short contexts also contain misreads"
+      },
+      "locale": "HISTORICAL_ENGLISH_FIXED; language changes require a separate comparison",
+      "candidate_quality": "NOT_RUN",
+      "necessary_source_presence": {
+        "authorized_original": "OBSERVED_SCOPED_SEARCH_ORIGINAL",
+        "target_role": "NECESSARY_ORIGINAL_OR_BEST_AVAILABLE_SOURCE",
+        "search": true,
+        "rerank": true,
+        "merge_before_source_projection": "NOT_INDEPENDENTLY_SAVED; candidate count and later trace only",
+        "source_projection_body": true,
+        "context_body": true,
+        "actual_provider_body": true
+      }
+    },
+    {
+      "case_id": "miracl-zh-692002#0",
+      "layer": "C",
+      "secondary_layers": [
+        "D"
+      ],
+      "final_input_sufficient": "NO",
+      "diagnosis": "明确美国经济学家的罗默原文 0.1455925 < 0.3 丢失；现有芝大原文名字仍被生成为 George Stiglitz，是伴随实体错误。",
+      "target_chunk_id": "4ddc4528-85d8-4aa9-936d-45edb5d1c41e",
+      "historical_request_artifact": {
+        "bytes": 4943,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\12-miracl-zh-692002-0\\evidence\\44206619383d4d208314fda8d26a1504.request.json",
+        "sha256": "f306d2704a76504f6eb17b704afdbb54b3122367871d6d02e121374d3244bb5e"
+      },
+      "old": {
+        "file": "generation_requests/02-old.json",
+        "file_sha256": "09814f68476e460d0b8371d54b16cb02ec8e9e7789ccb9aacea0534bc3e899b7",
+        "body_sha256": "8e52661ced667c879cd9313cebd6346d73c9086c599521b26f9e9b916d92e0cb"
+      },
+      "candidate": {
+        "file": "generation_requests/02-candidate.json",
+        "file_sha256": "a5c28152df03c31d61cc3bec13e270e13a9eefadc8951245beb2800fb0573341",
+        "body_sha256": "595f5aac57f1ac289d658f05ce622a12f81bda29a7fe3a9b0d3afc0cd4dbecf3"
+      },
+      "fixed_user_messages_sha256": "7a39e1bd4f4c594e60a4a70b1ea190858e142169d1d716029ddb9d6555bfbbbe",
+      "context_statistics": {
+        "system_characters": 3108,
+        "user_characters": 646,
+        "context_characters": 474,
+        "chunks": 1,
+        "source_characters": 181,
+        "exact_duplicate_content_occurrences": 0,
+        "source_order_sha256": [
+          "5028866316aae6e496b566ccd8ae5d43dbff2a0b947991f79485f0bd4c5726d1"
+        ],
+        "token_counts": "NOT_MEASURED; characters are not tokens",
+        "causal_conclusion": "NOT_ESTABLISHED; short contexts also contain misreads"
+      },
+      "locale": "HISTORICAL_ENGLISH_FIXED; language changes require a separate comparison",
+      "candidate_quality": "NOT_RUN",
+      "necessary_source_presence": {
+        "authorized_original": "OBSERVED_SCOPED_SEARCH_ORIGINAL",
+        "target_role": "NECESSARY_ORIGINAL_OR_BEST_AVAILABLE_SOURCE",
+        "search": true,
+        "rerank": false,
+        "merge_before_source_projection": "NOT_INDEPENDENTLY_SAVED; candidate count and later trace only",
+        "source_projection_body": false,
+        "context_body": false,
+        "actual_provider_body": false
+      }
+    },
+    {
+      "case_id": "miracl-zh-704170#0",
+      "layer": "D",
+      "secondary_layers": [],
+      "final_input_sufficient": "YES",
+      "diagnosis": "共同原文已送达；双键被改成 triple bond，醇盐被称 alcohols。源文 sp 混合表述本身不规范，保留原样。",
+      "target_chunk_id": "31ef880a-0230-4788-89b4-933049c5c660",
+      "historical_request_artifact": {
+        "bytes": 6047,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\13-miracl-zh-704170-0\\evidence\\db3ca4ca86434b2d8b582521833e9fa3.request.json",
+        "sha256": "f44fb910331767770637156c2e13c4ce7ef57f8ecbbf3e60c0ee0a5e7ce0d8d9"
+      },
+      "old": {
+        "file": "generation_requests/03-old.json",
+        "file_sha256": "ee08d7f0953a753d42a8ed4e5d6fa26e31b152a3eb2f501e9c84c4794c5cf107",
+        "body_sha256": "71406c6cfff586ffe1aa5092d28638bb25b962957c9fe15c697c5e984a655570"
+      },
+      "candidate": {
+        "file": "generation_requests/03-candidate.json",
+        "file_sha256": "e960e2224f96dc931c360197585084d599fa59d380a6273f4bcefe26ad0c2e10",
+        "body_sha256": "81731e8fd107105f11890cff6c430137324b2183a1abb3135314981aa99baffa"
+      },
+      "fixed_user_messages_sha256": "584327fa4ff311651a63f2b02c9345d7327d5e4d1d324f0eafa815db803e2ebd",
+      "context_statistics": {
+        "system_characters": 3108,
+        "user_characters": 1325,
+        "context_characters": 1153,
+        "chunks": 3,
+        "source_characters": 388,
+        "exact_duplicate_content_occurrences": 0,
+        "source_order_sha256": [
+          "f1cff16b0cffdcf855642ceae606f43eb43d8a3b6bc1da348183996cf94d430e",
+          "a93382232a5756601d6327676ada53f699221617e492eb9e2366b8ee4bfa10de",
+          "6bbcadc9288a137bb8a2ac60103299223fcafcfd4a4e9a4a3010991c3c7cfd50"
+        ],
+        "token_counts": "NOT_MEASURED; characters are not tokens",
+        "causal_conclusion": "NOT_ESTABLISHED; short contexts also contain misreads"
+      },
+      "locale": "HISTORICAL_ENGLISH_FIXED; language changes require a separate comparison",
+      "candidate_quality": "NOT_RUN",
+      "necessary_source_presence": {
+        "authorized_original": "OBSERVED_SCOPED_SEARCH_ORIGINAL",
+        "target_role": "NECESSARY_ORIGINAL_OR_BEST_AVAILABLE_SOURCE",
+        "search": true,
+        "rerank": true,
+        "merge_before_source_projection": "NOT_INDEPENDENTLY_SAVED; candidate count and later trace only",
+        "source_projection_body": true,
+        "context_body": true,
+        "actual_provider_body": true
+      }
+    },
+    {
+      "case_id": "miracl-zh-91294#0",
+      "layer": "D",
+      "secondary_layers": [],
+      "final_input_sufficient": "YES",
+      "diagnosis": "必要星座名称和方位完整送达，回答擅改摩羯座为 Aquarius，混同蛇夫座与巨蛇座。",
+      "target_chunk_id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+      "historical_request_artifact": {
+        "bytes": 5676,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\16-miracl-zh-91294-0\\evidence\\ae3b07bed1244066a2de11056966b13d.request.json",
+        "sha256": "649a91333b82584edb34019a53f7e1875232fcd99b9a5a90f320dd3db5b462fa"
+      },
+      "old": {
+        "file": "generation_requests/04-old.json",
+        "file_sha256": "0fb2fe926c93ce21ff0492f0fc60ed6657b2af25b2bcc0a75ae9fc5e7e7f53fc",
+        "body_sha256": "0e916200fbad365a0f2a3b4287a55ae03a723a85056983515c17f111c734d272"
+      },
+      "candidate": {
+        "file": "generation_requests/04-candidate.json",
+        "file_sha256": "0499bbd86cdeaa39c77ef00662fefb59350015f77f9ac40d2dd4cd898e470a4c",
+        "body_sha256": "ad2f33d8f746d3cf53ddaacad880f1ade5a5856c22ccba17d8b64938cfb4fbea"
+      },
+      "fixed_user_messages_sha256": "ed3d1eec214c1730d24f8290f8ada5d3513c031edb854148ab2ea2925800f251",
+      "context_statistics": {
+        "system_characters": 3108,
+        "user_characters": 1201,
+        "context_characters": 1029,
+        "chunks": 3,
+        "source_characters": 264,
+        "exact_duplicate_content_occurrences": 0,
+        "source_order_sha256": [
+          "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+          "7bc18f224af264aea24053776301c4fd0c7f971885f06737e775558b35d8462a",
+          "8a85b43463a2992c71020119f11039b040fddc07f58e1239000bd016a7738624"
+        ],
+        "token_counts": "NOT_MEASURED; characters are not tokens",
+        "causal_conclusion": "NOT_ESTABLISHED; short contexts also contain misreads"
+      },
+      "locale": "HISTORICAL_ENGLISH_FIXED; language changes require a separate comparison",
+      "candidate_quality": "NOT_RUN",
+      "necessary_source_presence": {
+        "authorized_original": "OBSERVED_SCOPED_SEARCH_ORIGINAL",
+        "target_role": "NECESSARY_ORIGINAL_OR_BEST_AVAILABLE_SOURCE",
+        "search": true,
+        "rerank": true,
+        "merge_before_source_projection": "NOT_INDEPENDENTLY_SAVED; candidate count and later trace only",
+        "source_projection_body": true,
+        "context_body": true,
+        "actual_provider_body": true
+      }
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+      "layer": "D",
+      "secondary_layers": [],
+      "final_input_sufficient": "YES",
+      "diagnosis": "2005 条件及培训 2.2万人原文送达，答案把人数改成 sessions；76,000 转移就业人数另有来源。",
+      "target_chunk_id": "39aa8800-a6cd-48a6-8ec6-95ce8eb8a7d1",
+      "historical_request_artifact": {
+        "bytes": 25057,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\22-longbench-zh-multifieldqa_zh-51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed\\evidence\\a8f6c62edf6a459ba5765e5e1c64d0b3.request.json",
+        "sha256": "2963ae6dea5e849765b5d392cc70bef97f0980cb36916e9902856150ce4dddd9"
+      },
+      "old": {
+        "file": "generation_requests/05-old.json",
+        "file_sha256": "141dc405c636763b9422e079623c9c7598d191c5e571f2baea62153f703244d6",
+        "body_sha256": "c4d76f228f54ac558df9a7037caf2e7f69e5c88659e1787c063869466f6a541b"
+      },
+      "candidate": {
+        "file": "generation_requests/05-candidate.json",
+        "file_sha256": "bae63c120d08405d394e5619b820293617a14dc1bd87061a97e216a9eaa739b5",
+        "body_sha256": "3f31b4b28ad17c04f384b0d0da80dbe9738e15a60e5385bab7586a5a8f7aedf8"
+      },
+      "fixed_user_messages_sha256": "86f513250bd80dc64eec4ef837e648fff4f0f4d6d19c5f839702225ca910610c",
+      "context_statistics": {
+        "system_characters": 3108,
+        "user_characters": 9449,
+        "context_characters": 9267,
+        "chunks": 14,
+        "source_characters": 6673,
+        "exact_duplicate_content_occurrences": 3,
+        "source_order_sha256": [
+          "4cd424bad167ea610a4435675637a23ffa5b6c78e1a94f6fc9459c20e145c412",
+          "3d410ce9033a58f7af2758b7aceacb18c58ea9a2ef15743a359a6b489c3e88ce",
+          "5a0169e42ac973f769dcd1783cdb05beede24cb15d071ee105863378589aec4b",
+          "4cd424bad167ea610a4435675637a23ffa5b6c78e1a94f6fc9459c20e145c412",
+          "50673df62c73420886a15853e9fffab4c372598a582e4aba0e42d4d467e8cda9",
+          "5a0169e42ac973f769dcd1783cdb05beede24cb15d071ee105863378589aec4b",
+          "49b7aa7e8487b2c27f875b902dbb5bd60a53e9f24f22036c791ea4f83e25b691",
+          "fcd3c9f404d3e7549a5ab13770b6b4a4289897a56556a0f685cdb4faff4e003a",
+          "cadad026bde19c15381aaecfc16aa065f14fc33c23404e5df89836b33cf3ae59",
+          "cadad026bde19c15381aaecfc16aa065f14fc33c23404e5df89836b33cf3ae59",
+          "04127dfc25b19d8b9d7e1656698ed419aeddfbc4e52cb170eb0cf57f0e3af521",
+          "586bd6af3b304626ef670a52c64612cb88ce41d23736f9fb92b50b6e53fff59c",
+          "dcf448d8680726680ac9b217ba6580740e72736d65bffa21a4a22f1613d7a26f",
+          "8e6eaa69d4582b06213b46a577a0b1967031cd3ba3fdc7b99820afab2e992931"
+        ],
+        "token_counts": "NOT_MEASURED; characters are not tokens",
+        "causal_conclusion": "NOT_ESTABLISHED; short contexts also contain misreads"
+      },
+      "locale": "HISTORICAL_ENGLISH_FIXED; language changes require a separate comparison",
+      "candidate_quality": "NOT_RUN",
+      "necessary_source_presence": {
+        "authorized_original": "OBSERVED_SCOPED_SEARCH_ORIGINAL",
+        "target_role": "NECESSARY_ORIGINAL_OR_BEST_AVAILABLE_SOURCE",
+        "search": true,
+        "rerank": true,
+        "merge_before_source_projection": "NOT_INDEPENDENTLY_SAVED; candidate count and later trace only",
+        "source_projection_body": true,
+        "context_body": true,
+        "actual_provider_body": true
+      }
+    }
+  ]
+}

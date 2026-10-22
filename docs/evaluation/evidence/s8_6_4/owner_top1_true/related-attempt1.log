@@ -1,0 +1,27 @@
+..........................................................F.F........... [ 23%]
+........................................................................ [ 47%]
+........................................................................ [ 71%]
+........................................................................ [ 95%]
+..............                                                           [100%]
+================================== FAILURES ===================================
+___ test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried ___
+tests\weknora_port\test_conversation_configuration.py:61: in test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried
+    asyncio.run(understand_query(state,CTX,registry));assert registry.lookups==['missing','baseline'] and state.intent=='greeting'
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert (['missing', 'baseline'] == ['missing', 'baseline']
+E     
+E     Use -v to get more diff and 'kb_search' == 'greeting'
+E     
+E     - greeting
+E     + kb_search)
+__________________ test_exact_go_configuration_function_rows __________________
+tests\weknora_port\test_conversation_configuration.py:116: in test_exact_go_configuration_function_rows
+    assert actual==expected,(kind,value,actual,expected)
+E   AssertionError: ('intent', 'LOCAL', '', 'LOCAL')
+E   assert '' == 'LOCAL'
+E     
+E     - LOCAL
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_conversation_configuration.py::test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried
+FAILED tests/weknora_port/test_conversation_configuration.py::test_exact_go_configuration_function_rows
+2 failed, 300 passed in 11.97s

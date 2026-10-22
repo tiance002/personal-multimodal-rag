@@ -1,0 +1,16 @@
+....FF                                                                   [100%]
+================================== FAILURES ===================================
+_ test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[False] _
+tests\weknora_port\test_s862r3_http_preflight.py:207: in test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer
+    assert not failures and not service.background_errors, (failures,chain_errors,service.background_errors)
+E   AssertionError: (['ORDINARY_CHAIN_FAILED'], [('TypeError', "test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer.<locals>.SourceRepository.get_chunks() got an unexpected keyword argument 'current'")], {})
+E   assert (not ['ORDINARY_CHAIN_FAILED'])
+_ test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[True] _
+tests\weknora_port\test_s862r3_http_preflight.py:207: in test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer
+    assert not failures and not service.background_errors, (failures,chain_errors,service.background_errors)
+E   AssertionError: (['ORDINARY_CHAIN_FAILED'], [('TypeError', "test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer.<locals>.SourceRepository.get_chunks() got an unexpected keyword argument 'current'")], {})
+E   assert (not ['ORDINARY_CHAIN_FAILED'])
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s862r3_http_preflight.py::test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[False]
+FAILED tests/weknora_port/test_s862r3_http_preflight.py::test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[True]
+2 failed, 4 passed in 3.68s

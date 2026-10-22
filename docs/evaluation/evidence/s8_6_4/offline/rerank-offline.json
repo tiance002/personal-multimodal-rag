@@ -1,0 +1,37 @@
+{
+  "schema": "s864-rerank-offline/v1",
+  "worktree": "C:/Users/22088/.codex/worktrees/s8-6-adaptive-retrieval/RAG quention",
+  "baseline": "3c081b657c9c768d4d1b81310e4dc59c711f195d",
+  "files": [
+    "backend/weknora_port/retrieval/rerank.py",
+    "tests/weknora_port/test_s864_rerank.py"
+  ],
+  "runs": [
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s864_rerank.py",
+      "phase": "RED",
+      "exit_code": 1,
+      "output": "12 failed, 7 passed in 0.96s",
+      "log": "E:/RAG quention/var/reports/s8-6-4/rerank-red.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s864_rerank.py",
+      "phase": "GREEN",
+      "exit_code": 0,
+      "output": "19 passed in 0.48s",
+      "log": "E:/RAG quention/var/reports/s8-6-4/rerank-green.log"
+    },
+    {
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_rerank_model_passage.py tests/weknora_port/test_pipeline.py -k 'rerank and not top_one_floor'",
+      "phase": "RELATED",
+      "exit_code": 0,
+      "output": "14 passed, 60 deselected in 0.75s",
+      "log": "E:/RAG quention/var/reports/s8-6-4/rerank-related.log"
+    }
+  ],
+  "real_provider_calls": 0,
+  "database": "NOT RUN",
+  "ECS": "NOT RUN",
+  "commit": "NOT CREATED",
+  "pending": "Parent owns stale test_pipeline.py top_one_floor expectation update. No semantic accuracy claim from fallback."
+}

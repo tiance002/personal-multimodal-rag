@@ -1,0 +1,271 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_______ test_large_selected_source_is_not_removed_by_source_unit_window _______
+
+    def test_large_selected_source_is_not_removed_by_source_unit_window():
+        async def run():
+            original = raw('long', 'Original fact. ' * 2000)
+            repo = Repo([original]); state = await project([deepcopy(original)], repo)
+            assert state.merge_results[0].content == original.content and repo.windows == 0
+            finalized = await into_chat_message(state)
+            request = GenerationRequest('r','s','m',state.query,finalized,
+                evidence=tuple(Evidence.from_result(r) for r in state.merge_results),citations_enabled=True)
+            assert escape_text(original.content) in prepare_generation(request).messages[-1].content
+>       asyncio.run(run())
+
+tests\weknora_port\test_s864_source_convergence.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_source_convergence.py:46: in run
+    repo = Repo([original]); state = await project([deepcopy(original)], repo)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_source_convergence.py:39: in project
+    await fn(state, CTX, repo)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[], rerank_results=[], merge_results=[SearchResult...={}, strategy_units_used=0, strategy_queries_seen=set(), strategy_rerank_scores={}, strategy_rerank_accepted_ids=set())
+context = CallContext(request_id='offline', scope=TrustedScope(owner_id='owner', knowledge_base_ids=('kb',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <test_s864_source_convergence.Repo object at 0x0000025F517BA3C0>
+
+    async def expand_source_evidence(state, context, repository):
+        if not state.needs_retrieval or state.source_evidence_mode == 'off':
+            return
+        if state.source_evidence_mode != MODE:
+            raise ValueError('SOURCE_EVIDENCE_MODE_INVALID')
+        # Retain every admitted original. Summaries remain locator candidates in
+        # Search/Rerank/Merge, but are projected out of this source-only handoff.
+        selected = list(state.merge_results)
+        seen = {r.id for r in selected}
+        # A sub-chunk ID records ancestry, not proof that its entire quote survived
+        # parent replacement, overlap handling or historical slicing.
+        domains, added, source_cache = {}, 0, {}
+        for anchor in selected:
+            if anchor.chunk_type not in ('text', 'summary'):
+                continue
+            version = anchor.metadata.get('source_version')
+            domain = _domain(anchor)
+            if not version or domain not in domains and len(domains) >= MAX_GROUPS:
+                continue
+            domains.setdefault(domain, []).append(anchor)
+        anchors = [anchor for group in domains.values() for anchor in
+                   sorted(group, key=lambda r: (r.chunk_type != 'summary', -r.chunk_index, r.id))[:3]]
+        expanded_domains = set()
+        for anchor in anchors:
+            version = anchor.metadata['source_version']
+            domain = _domain(anchor)
+            if domain in expanded_domains:
+                continue
+            if anchor.chunk_type == 'summary' and any(
+                    row.chunk_type == 'text' and row.content and _domain(row) == domain and
+                    row.chunk_metadata.get('source_version') == version
+                    for row in selected):
+                # The admitted original is already independently identified. Use
+                # its bounded window instead of filling the rest of a Summary's
+                # document, which adds noise without validating the paraphrase.
+                state.evidence_trace.append({'stage': 'source_unit', 'anchor': anchor.id,
+                    'decision': 'UNCHANGED', 'reason': 'SUMMARY_SOURCE_ALREADY_SELECTED',
+                    'added_ids': [], 'added_chars': 0})
+                continue
+            rows = list(await repository.get_source_unit(anchor, context))
+            validate_results(rows, state.targets, context)
+            for row in rows:
+                _validate_source(row, domain)
+                source_cache[row.id] = row
+            new = [r for r in rows if r.id not in seen and r.content]
+            reason = 'SUMMARY_SHORT_SOURCE' if anchor.chunk_type == 'summary' else 'PRECEDING_SOURCE_WINDOW'
+            count = sum(len(r.content) for r in new)
+            if len(rows) > UNIT_CHUNKS or sum(len(r.content) for r in rows) > UNIT_CHARS:
+>               raise SourceEvidenceBudgetError('SOURCE_UNIT_BUDGET_EXCEEDED')
+E               backend.weknora_port.retrieval.source_evidence.SourceEvidenceBudgetError: SOURCE_UNIT_BUDGET_EXCEEDED
+
+backend\weknora_port\retrieval\source_evidence.py:169: SourceEvidenceBudgetError
+_____ test_all_selected_composite_members_survive_without_six_chunk_limit _____
+
+    def test_all_selected_composite_members_survive_without_six_chunk_limit():
+        async def run():
+            originals = [raw(str(i), f'Original {i} ' * 40, chunk_index=i) for i in range(7)]
+            composite = deepcopy(originals[0]); composite.content = '\n'.join(r.content for r in originals)
+            composite.end_at = len(composite.content); composite.sub_chunk_ids = [r.id for r in originals[1:]]
+            state = await project([composite], Repo(originals))
+            assert [r.id for r in state.merge_results] == [r.id for r in originals]
+            assert all(r.content == originals[int(r.id)].content for r in state.merge_results)
+>       asyncio.run(run())
+
+tests\weknora_port\test_s864_source_convergence.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_source_convergence.py:60: in run
+    state = await project([composite], Repo(originals))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_source_convergence.py:39: in project
+    await fn(state, CTX, repo)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[], rerank_results=[], merge_results=[SearchResult...={}, strategy_units_used=0, strategy_queries_seen=set(), strategy_rerank_scores={}, strategy_rerank_accepted_ids=set())
+context = CallContext(request_id='offline', scope=TrustedScope(owner_id='owner', knowledge_base_ids=('kb',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <test_s864_source_convergence.Repo object at 0x0000025F51935090>
+
+    async def expand_source_evidence(state, context, repository):
+        if not state.needs_retrieval or state.source_evidence_mode == 'off':
+            return
+        if state.source_evidence_mode != MODE:
+            raise ValueError('SOURCE_EVIDENCE_MODE_INVALID')
+        # Retain every admitted original. Summaries remain locator candidates in
+        # Search/Rerank/Merge, but are projected out of this source-only handoff.
+        selected = list(state.merge_results)
+        seen = {r.id for r in selected}
+        # A sub-chunk ID records ancestry, not proof that its entire quote survived
+        # parent replacement, overlap handling or historical slicing.
+        domains, added, source_cache = {}, 0, {}
+        for anchor in selected:
+            if anchor.chunk_type not in ('text', 'summary'):
+                continue
+            version = anchor.metadata.get('source_version')
+            domain = _domain(anchor)
+            if not version or domain not in domains and len(domains) >= MAX_GROUPS:
+                continue
+            domains.setdefault(domain, []).append(anchor)
+        anchors = [anchor for group in domains.values() for anchor in
+                   sorted(group, key=lambda r: (r.chunk_type != 'summary', -r.chunk_index, r.id))[:3]]
+        expanded_domains = set()
+        for anchor in anchors:
+            version = anchor.metadata['source_version']
+            domain = _domain(anchor)
+            if domain in expanded_domains:
+                continue
+            if anchor.chunk_type == 'summary' and any(
+                    row.chunk_type == 'text' and row.content and _domain(row) == domain and
+                    row.chunk_metadata.get('source_version') == version
+                    for row in selected):
+                # The admitted original is already independently identified. Use
+                # its bounded window instead of filling the rest of a Summary's
+                # document, which adds noise without validating the paraphrase.
+                state.evidence_trace.append({'stage': 'source_unit', 'anchor': anchor.id,
+                    'decision': 'UNCHANGED', 'reason': 'SUMMARY_SOURCE_ALREADY_SELECTED',
+                    'added_ids': [], 'added_chars': 0})
+                continue
+            rows = list(await repository.get_source_unit(anchor, context))
+            validate_results(rows, state.targets, context)
+            for row in rows:
+                _validate_source(row, domain)
+                source_cache[row.id] = row
+            new = [r for r in rows if r.id not in seen and r.content]
+            reason = 'SUMMARY_SHORT_SOURCE' if anchor.chunk_type == 'summary' else 'PRECEDING_SOURCE_WINDOW'
+            count = sum(len(r.content) for r in new)
+            if len(rows) > UNIT_CHUNKS or sum(len(r.content) for r in rows) > UNIT_CHARS:
+>               raise SourceEvidenceBudgetError('SOURCE_UNIT_BUDGET_EXCEEDED')
+E               backend.weknora_port.retrieval.source_evidence.SourceEvidenceBudgetError: SOURCE_UNIT_BUDGET_EXCEEDED
+
+backend\weknora_port\retrieval\source_evidence.py:169: SourceEvidenceBudgetError
+_____ test_missing_selected_source_does_not_erase_other_verified_sources ______
+
+    def test_missing_selected_source_does_not_erase_other_verified_sources():
+        async def run():
+            good, missing = raw('good','Verified source'), raw('missing','No longer available')
+            state = await project([good, missing], Repo([good]))
+            assert [r.id for r in state.merge_results] == ['good']
+            assert any(t.get('anchor') == 'missing' and t.get('decision') == 'INSUFFICIENT_SOURCE'
+                       for t in state.evidence_trace)
+>       asyncio.run(run())
+
+tests\weknora_port\test_s864_source_convergence.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_source_convergence.py:69: in run
+    state = await project([good, missing], Repo([good]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_source_convergence.py:39: in project
+    await fn(state, CTX, repo)
+backend\weknora_port\retrieval\source_evidence.py:193: in expand_source_evidence
+    originals = await _project_selected(originals, state, context, repository, source_cache)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+selected = [SearchResult(id='good', content='Verified source', score=0.8, knowledge_id='doc', knowledge_base_id='kb', chunk_type=...ritten=False, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='')]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[], rerank_results=[], merge_results=[SearchResult...={}, strategy_units_used=0, strategy_queries_seen=set(), strategy_rerank_scores={}, strategy_rerank_accepted_ids=set())
+context = CallContext(request_id='offline', scope=TrustedScope(owner_id='owner', knowledge_base_ids=('kb',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <test_s864_source_convergence.Repo object at 0x0000025F51937110>
+cache = {'good': SearchResult(id='good', content='Verified source', score=0.8, knowledge_id='doc', knowledge_base_id='kb', chu...ritten=False, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='')}
+
+    async def _project_selected(selected, state, context, repository, cache):
+        """Mandatory identity check, independent of optional neighborhood coverage.
+    
+        Only admitted TopK entries and their bounded ancestry are read. Previously
+        verified source-unit rows are reused within this invocation, never globally.
+        """
+        candidates = [r for r in selected if r.chunk_type in ('text', 'parent_text')]
+        ids = tuple(dict.fromkeys(i for r in candidates if len(_selected_ids(r)) <= UNIT_CHUNKS
+                                 for i in _selected_ids(r) if i not in cache))
+        if ids:
+            loaded = dict(await repository.get_chunks(ids, context, current=True))
+            if set(loaded) != set(ids) or any(key != row.id for key, row in loaded.items()):
+>               raise ValueError('SOURCE_BODY_NOT_PRESERVED')
+E               ValueError: SOURCE_BODY_NOT_PRESERVED
+
+backend\weknora_port\retrieval\source_evidence.py:86: ValueError
+___________________ test_no_neighbor_means_no_rewrite_flag ____________________
+
+    def test_no_neighbor_means_no_rewrite_flag():
+        async def run():
+            original = raw('short', 'A short unchanged original.')
+            row = deepcopy(original)
+            state = PipelineState(targets=(SearchTarget('kb'),), source_evidence_mode='bounded_source_v1')
+            await expand_neighbors([row], state, CTX, Repo([original]))
+            assert row.content == original.content and not row.content_rewritten
+>       asyncio.run(run())
+
+tests\weknora_port\test_s864_source_convergence.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        original = raw('short', 'A short unchanged original.')
+        row = deepcopy(original)
+        state = PipelineState(targets=(SearchTarget('kb'),), source_evidence_mode='bounded_source_v1')
+        await expand_neighbors([row], state, CTX, Repo([original]))
+>       assert row.content == original.content and not row.content_rewritten
+E       AssertionError: assert ('A short unchanged original.' == 'A short unchanged original.'
+E         
+E           A short unchanged original. and not True)
+E        +  where True = SearchResult(id='short', content='A short unchanged original.', score=0.8, knowledge_id='doc', knowledge_base_id='kb',...ewritten=True, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='').content_rewritten
+
+tests\weknora_port\test_s864_source_convergence.py:82: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s864_source_convergence.py::test_large_selected_source_is_not_removed_by_source_unit_window
+FAILED tests/weknora_port/test_s864_source_convergence.py::test_all_selected_composite_members_survive_without_six_chunk_limit
+FAILED tests/weknora_port/test_s864_source_convergence.py::test_missing_selected_source_does_not_erase_other_verified_sources
+FAILED tests/weknora_port/test_s864_source_convergence.py::test_no_neighbor_means_no_rewrite_flag
+4 failed in 0.92s

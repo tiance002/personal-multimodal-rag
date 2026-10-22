@@ -1,0 +1,201 @@
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........................................................................ [ 40%]
+........................................................................ [ 50%]
+........................................................................ [ 60%]
+........................................................................ [ 70%]
+...................................................F.................... [ 80%]
+.......................................FFFFF......F..........FF......... [ 90%]
+......................FF...........................................      [100%]
+================================== FAILURES ===================================
+_ test_approved_guard_rejects_unbudgeted_prompt_and_attachment_inputs[language-Chinese] _
+tests\weknora_port\test_s861_preflight.py:217: in test_approved_guard_rejects_unbudgeted_prompt_and_attachment_inputs
+    with pytest.raises(ValueError, match='S861_'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'S861_'
+E     Actual message: 'S864_PROFILE_LANGUAGE_MISMATCH'
+_ test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream[True-stop] _
+tests\weknora_port\test_s862r_preflight.py:179: in test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r_preflight.py:178: in exercise
+    await pipeline.run(cfg.pipeline_state, CallContext(turn.run_id, TrustedScope('owner', ('kb',))))
+backend\weknora_port\retrieval\pipeline.py:198: in run
+    await self._progress("understand", "completed", rewrite_reason=query_audit.get('reason',''),
+scripts\s8_6_1_api_acceptance.py:379: in checked_progress
+    enforce_completed_query(turn)
+scripts\s8_6_1_api_acceptance.py:319: in enforce_completed_query
+    language = profile_language_guard(state.language, turn.request.content,
+                                                      ^^^^^^^^^^^^
+E   AttributeError: 'types.SimpleNamespace' object has no attribute 'request'
+_ test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream[False-length] _
+tests\weknora_port\test_s862r_preflight.py:179: in test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r_preflight.py:178: in exercise
+    await pipeline.run(cfg.pipeline_state, CallContext(turn.run_id, TrustedScope('owner', ('kb',))))
+backend\weknora_port\retrieval\pipeline.py:198: in run
+    await self._progress("understand", "completed", rewrite_reason=query_audit.get('reason',''),
+scripts\s8_6_1_api_acceptance.py:379: in checked_progress
+    enforce_completed_query(turn)
+scripts\s8_6_1_api_acceptance.py:319: in enforce_completed_query
+    language = profile_language_guard(state.language, turn.request.content,
+                                                      ^^^^^^^^^^^^
+E   AttributeError: 'types.SimpleNamespace' object has no attribute 'request'
+_ test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream[False-] _
+tests\weknora_port\test_s862r_preflight.py:179: in test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r_preflight.py:178: in exercise
+    await pipeline.run(cfg.pipeline_state, CallContext(turn.run_id, TrustedScope('owner', ('kb',))))
+backend\weknora_port\retrieval\pipeline.py:198: in run
+    await self._progress("understand", "completed", rewrite_reason=query_audit.get('reason',''),
+scripts\s8_6_1_api_acceptance.py:379: in checked_progress
+    enforce_completed_query(turn)
+scripts\s8_6_1_api_acceptance.py:319: in enforce_completed_query
+    language = profile_language_guard(state.language, turn.request.content,
+                                                      ^^^^^^^^^^^^
+E   AttributeError: 'types.SimpleNamespace' object has no attribute 'request'
+_ test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests\weknora_port\test_s862r_preflight.py:208: in test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval
+    result = asyncio.run(exercise())
+             ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r_preflight.py:206: in exercise
+    await pipeline.run(cfg.pipeline_state, CallContext(turn.run_id, TrustedScope('owner', ('kb',))))
+backend\weknora_port\retrieval\pipeline.py:198: in run
+    await self._progress("understand", "completed", rewrite_reason=query_audit.get('reason',''),
+scripts\s8_6_1_api_acceptance.py:379: in checked_progress
+    enforce_completed_query(turn)
+scripts\s8_6_1_api_acceptance.py:319: in enforce_completed_query
+    language = profile_language_guard(state.language, turn.request.content,
+                                                      ^^^^^^^^^^^^
+E   AttributeError: 'types.SimpleNamespace' object has no attribute 'request'
+_ test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval[\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c] _
+tests\weknora_port\test_s862r_preflight.py:208: in test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval
+    result = asyncio.run(exercise())
+             ^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r_preflight.py:206: in exercise
+    await pipeline.run(cfg.pipeline_state, CallContext(turn.run_id, TrustedScope('owner', ('kb',))))
+backend\weknora_port\retrieval\pipeline.py:198: in run
+    await self._progress("understand", "completed", rewrite_reason=query_audit.get('reason',''),
+scripts\s8_6_1_api_acceptance.py:379: in checked_progress
+    enforce_completed_query(turn)
+scripts\s8_6_1_api_acceptance.py:319: in enforce_completed_query
+    language = profile_language_guard(state.language, turn.request.content,
+                                                      ^^^^^^^^^^^^
+E   AttributeError: 'types.SimpleNamespace' object has no attribute 'request'
+_ test_six_qu_runner_uses_normal_function_one_call_each_and_stops_incomplete[stop] _
+tests\weknora_port\test_s862r_preflight.py:326: in test_six_qu_runner_uses_normal_function_one_call_each_and_stops_incomplete
+    result = asyncio.run(profile.collect_qu_only(target, env, settings_factory=settings_factory))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_1_api_acceptance.py:1000: in collect_qu_only
+    _budget_state_guard(state, spec['question'], spec.get('answer_language'))
+scripts\s8_6_1_api_acceptance.py:131: in _budget_state_guard
+    profile_language_guard(state.language, q0, explicit_override)
+scripts\s8_6_1_api_acceptance.py:117: in profile_language_guard
+    require(actual_language == expected_language, 'S864_PROFILE_LANGUAGE_MISMATCH')
+scripts\s8_6_1_api_acceptance.py:81: in require
+    raise ValueError(code)
+E   ValueError: S864_PROFILE_LANGUAGE_MISMATCH
+_ test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[False] _
+tests\weknora_port\test_s862r3_http_preflight.py:201: in test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer
+    assert not failures and not service.background_errors
+E   AssertionError: assert (not ['ORDINARY_CHAIN_FAILED'])
+_ test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[True] _
+tests\weknora_port\test_s862r3_http_preflight.py:201: in test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer
+    assert not failures and not service.background_errors
+E   AssertionError: assert (not ['ORDINARY_CHAIN_FAILED'])
+_ test_actual_gate_global_cap_checked_before_unchanged_child_reserve[7900-True] _
+tests\weknora_port\test_s862r3_40_acceptance.py:247: in test_actual_gate_global_cap_checked_before_unchanged_child_reserve
+    execution = adapter.execution_module.LocalExecution(path)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\execution.py:165: in __init__
+    raise ValueError('EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED')
+E   ValueError: EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED
+_ test_actual_gate_global_cap_checked_before_unchanged_child_reserve[7901-False] _
+tests\weknora_port\test_s862r3_40_acceptance.py:247: in test_actual_gate_global_cap_checked_before_unchanged_child_reserve
+    execution = adapter.execution_module.LocalExecution(path)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\execution.py:165: in __init__
+    raise ValueError('EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED')
+E   ValueError: EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED
+============================== warnings summary ===============================
+tests/weknora_port/test_documents.py::test_legacy_page_selection_does_not_filter_full_pdf_image_processing
+tests/weknora_port/test_documents.py::test_legacy_page_selection_does_not_filter_full_pdf_image_processing
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/weknora_port/test_documents.py::test_legacy_page_selection_does_not_filter_full_pdf_image_processing
+tests/weknora_port/test_documents.py::test_legacy_page_selection_does_not_filter_full_pdf_image_processing
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+tests/weknora_port/test_documents.py::test_legacy_page_selection_does_not_filter_full_pdf_image_processing
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s861_preflight.py::test_approved_guard_rejects_unbudgeted_prompt_and_attachment_inputs[language-Chinese]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream[True-stop]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream[False-length]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_downstream[False-]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval[\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c]
+FAILED tests/weknora_port/test_s862r_preflight.py::test_six_qu_runner_uses_normal_function_one_call_each_and_stops_incomplete[stop]
+FAILED tests/weknora_port/test_s862r3_http_preflight.py::test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[False]
+FAILED tests/weknora_port/test_s862r3_http_preflight.py::test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer[True]
+FAILED tests/weknora_port/test_s862r3_40_acceptance.py::test_actual_gate_global_cap_checked_before_unchanged_child_reserve[7900-True]
+FAILED tests/weknora_port/test_s862r3_40_acceptance.py::test_actual_gate_global_cap_checked_before_unchanged_child_reserve[7901-False]
+11 failed, 704 passed, 5 warnings in 25.44s
+<sys>:0: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

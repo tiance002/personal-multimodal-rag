@@ -1,0 +1,9 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_caption_prioritizes_faithful_extraction_before_summary _________
+tests\weknora_port\test_image_multimodal.py:34: in test_caption_prioritizes_faithful_extraction_before_summary
+    assert 'faithful information preservation' in prompt
+E   AssertionError: assert 'faithful information preservation' in 'Provide a brief and concise description of the main content of the image in Chinese (Simplified).'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_image_multimodal.py::test_caption_prioritizes_faithful_extraction_before_summary
+1 failed, 3 deselected in 1.34s

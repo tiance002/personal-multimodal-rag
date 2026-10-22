@@ -1,0 +1,29 @@
+{
+  "command_argv": [
+    "E:/RAG quention/.venv/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "--tb=short",
+    "tests/weknora_port/test_s864_top1_default.py",
+    "tests/weknora_port/test_s8_ecs_runtime.py",
+    "tests/weknora_port/test_development_entry.py",
+    "tests/weknora_port/test_conversation_configuration.py",
+    "tests/weknora_port/test_s86_qu_configuration.py",
+    "tests/weknora_port/test_s861_preflight.py",
+    "tests/weknora_port/test_s861_api_acceptance.py",
+    "tests/weknora_port/test_s862r_preflight.py",
+    "tests/weknora_port/test_s862r3_http_preflight.py",
+    "tests/weknora_port/test_s862r3_40_acceptance.py",
+    "tests/weknora_port/test_s864_request_language.py",
+    "-k",
+    "not test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried and not test_exact_go_configuration_function_rows",
+    "--basetemp",
+    "E:\\RAG quention\\var\\reports\\s8-6-4\\top1-default\\pytest-final"
+  ],
+  "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+  "exit_code": 0,
+  "elapsed_seconds": 14.242,
+  "log": "affected-green.log",
+  "log_sha256": "d2abbe4d8409ef374f1592722b2f76ecfb795d692a9233fd40d80c2315144468"
+}

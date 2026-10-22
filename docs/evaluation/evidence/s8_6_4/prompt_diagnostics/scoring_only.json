@@ -1,0 +1,270 @@
+{
+  "schema": "s8.6.4-prompt-scoring-only/v1",
+  "warning": "OFFLINE REVIEW ONLY; not loaded by request renderers",
+  "images": [
+    {
+      "case_id": "row-0958",
+      "historical_caption": "这张图片是一张关于物理学中**波的特性**的教育图解，主要介绍和解释了波的三种基本现象：**反射（Reflection）**、**折射（Refraction）**和**衍射（Diffraction）**。\n\n图中结合了文字定义和直观的示意图，说明了波在不同介质交界处的反弹与弯曲，以及波穿过缝隙时的扩散规律（如反射定律、波速变化导致折射、缝隙与波长的关系对衍射的影响等）。",
+      "historical_assessment": "Original target image visibly labels shiny object or mirror; OCR corrupts it and Caption only summarizes wave phenomena. No final model call occurred.",
+      "quality_dimensions": [
+        "readable_text_accuracy",
+        "category_value_association",
+        "omissions",
+        "fabrication"
+      ],
+      "candidate_assessment": "NOT_RUN"
+    },
+    {
+      "case_id": "row-0684",
+      "historical_caption": "这张图片是**皮尤研究中心（Pew Research Center）**一份关于**2016年美国大选后选民态度**的调查报告页面。\n\n主要内容概括如下：\n*   **左侧文本**：列出了几项重要调查发现，包括选民对特朗普执政后**种族关系**的悲观预期、对**计票准确性**的信心变化、对**女性总统**的预期，以及认为**新闻媒体对选举影响力过大**的看法。\n*   **右侧图表**：是一个条形图，展示了不同群体（所有选民、男女、特朗普和克林顿支持者）对“**有生之年国家是否会选出女总统**”的预测。数据显示，绝大多数选民（约80%）对此持肯定态度。",
+      "historical_assessment": "Original chart visibly shows men81%, women78%. OCR garbles bars and Caption says about80% without exact group values. Cheap receives the real derived content but invents both groups79% from overall79% prose.",
+      "quality_dimensions": [
+        "readable_text_accuracy",
+        "category_value_association",
+        "omissions",
+        "fabrication"
+      ],
+      "candidate_assessment": "NOT_RUN"
+    }
+  ],
+  "generation": [
+    {
+      "case_id": "miracl-zh-5721594#0",
+      "historical_answer": "Japan has numerous animation production companies. According to the retrieved source, there are **430 animation companies** in the Japanese industry. Among them, larger-scale companies include:\n\n*   MADHOUSE\n*   Studio Ghibli (吉卜力工作室)\n*   GAINAX\n*   Toei Animation (東映動畫)\n*   Kyoto Animation (京都動畫)\n*   TMS Entertainment (TMS娛樂)\n*   Sunrise (日昇動畫)\n*   Studio Deen (新銳動畫)\n*   Production I.G\n*   Bones (BONES)\n*   OLM (OLM)\n*   Tsutaya (創通)\n*   Japan Animation (日本動畫)\n\nMost of these major companies are located in Tokyo and Kyoto prefectures.\n\n<kb doc=\"b8c9d08ed13ec249b4fcc090\" chunk_id=\"276bb106-7489-48b2-bc35-449b6b1d4630\" kb_id=\"214b8b2f-84f9-4d75-ab79-eccbdcd50ec2\" />",
+      "historical_review": {
+        "final_conclusion_quote": "*   Studio Deen (新銳動畫)",
+        "reason": "The answer supplies the source list of thirteen Chinese/company labels and many directly supported examples, but the requested company identities are not fully established in its English output: Studio Deen is paired with 新銳動畫 and Tsutaya with 創通 without any actual source English-name binding. Preserve those Chinese labels as supported partial content rather than treating the unbound English aliases as verified. The industry total is explicitly contradictory across two delivered originals (430 versus 600), which the answer does not disclose. No external company facts were used.",
+        "reference_or_source_basis": [
+          {
+            "audit_artifact_sha256": "f16c12381f09d12d47cf3605692bfe033dea7cdf37865b5d2bbfcd16ddada25d",
+            "chunk_id": "276bb106-7489-48b2-bc35-449b6b1d4630",
+            "chunk_text_sha256": "eb5240c19a32a740570521477e856b19bcaef6df6b4f20eb03f7388f893b9fc6",
+            "document_id": "ec59f5cd-29b1-4e57-bc8d-9902c5684a29",
+            "final_wire_sha256": "b9f3b0bced00e789a6c553f285f072663d525dcf895f870ffc802b3c442adf8b",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "日本動畫業有430家動畫公司，其中規模較大的動畫公司包括MADHOUSE、吉卜力工作室、GAINAX、東映動畫、京都動畫、TMS娛樂、日昇動畫、新銳動畫、Production I.G、BONES、OLM、創通、日本動畫等，主要位於日本的東京都與京都府。",
+            "quote_end": 134,
+            "quote_start": 8,
+            "source_file_sha256": "eb5240c19a32a740570521477e856b19bcaef6df6b4f20eb03f7388f893b9fc6",
+            "source_version": "c3c0ea34-1ba8-4460-b8dd-7c08684e96ee",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          },
+          {
+            "audit_artifact_sha256": "f16c12381f09d12d47cf3605692bfe033dea7cdf37865b5d2bbfcd16ddada25d",
+            "chunk_id": "d5f699df-f3ab-493d-a494-3f8635153cc9",
+            "chunk_text_sha256": "a84403305494ad167bb93ea17967286c91bd8afed6d7ce13fc64b66e949151ce",
+            "document_id": "a7b29a45-6957-432c-8cf0-de9ddead63a3",
+            "final_wire_sha256": "b9f3b0bced00e789a6c553f285f072663d525dcf895f870ffc802b3c442adf8b",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "亦是在日本的600家動畫製作公司大型規模的公司之一",
+            "quote_end": 70,
+            "quote_start": 45,
+            "source_file_sha256": "a84403305494ad167bb93ea17967286c91bd8afed6d7ce13fc64b66e949151ce",
+            "source_version": "b5bd29c5-693f-48b6-9324-eb0c8662ede2",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          }
+        ]
+      },
+      "candidate_assessment": "NOT_RUN"
+    },
+    {
+      "case_id": "miracl-zh-692002#0",
+      "historical_answer": "Based on the provided reference materials, information regarding specific American economics experts is limited to **George Stiglitz**, who is described as a Nobel Prize-winning economist from the **University of Chicago** who also taught an MBA course and was the first商学院 (business school) professor to receive the Nobel Economic Prize.\n\nThe document does not provide a comprehensive list of American economics experts or specify the nationalities of the other 32 Nobel laureates listed (such as Milton Friedman, Ronald Coase, or Eugene Fama), who are also associated with the Chicago School and the University of Chicago.\n\n<kb doc=\"e86fa4bb21efcfb2bf027beb\" chunk_id=\"43c6d4c8-3234-4071-848a-1fc0510fda58\" kb_id=\"214b8b2f-84f9-4d75-ab79-eccbdcd50ec2\" />",
+      "historical_review": {
+        "final_conclusion_quote": "**George Stiglitz**",
+        "reason": "The only asserted main expert is named George Stiglitz and assigned the source biography, while the actual original repeatedly identifies 乔治·斯蒂格勒 (George Stigler). The supplied final Context does not establish US nationality for this asserted entity. Search had retrieved an original explicitly stating 保罗·迈克尔·罗默 ... 美国经济学家; that document was absent from the final provider Context and cannot be claimed as generator-visible evidence. Other mentioned names are hedged as nationality-unknown rather than a resolved list. This is a wrong resolved entity, not a correctness pass for an abstention.",
+        "reference_or_source_basis": [
+          {
+            "audit_artifact_sha256": "68448babd7b6b234fa2c3d1fa590780468fe843c3fc41da45ae146c4449398e7",
+            "chunk_id": "43c6d4c8-3234-4071-848a-1fc0510fda58",
+            "chunk_text_sha256": "5028866316aae6e496b566ccd8ae5d43dbff2a0b947991f79485f0bd4c5726d1",
+            "document_id": "68c6a478-5f15-4284-871b-40f7e23e0389",
+            "final_wire_sha256": "8e52661ced667c879cd9313cebd6346d73c9086c599521b26f9e9b916d92e0cb",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "其中，1982年，该校的经济学家同时也教授MBA课程的乔治·斯蒂格勒荣获诺贝尔经济奖，是全球商学院教授获此殊荣的第一人。",
+            "quote_end": 181,
+            "quote_start": 121,
+            "source_file_sha256": "5028866316aae6e496b566ccd8ae5d43dbff2a0b947991f79485f0bd4c5726d1",
+            "source_version": "f87d2efb-8a26-4c04-b5eb-3ccde90fd4b9",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          },
+          {
+            "audit_artifact_sha256": "68448babd7b6b234fa2c3d1fa590780468fe843c3fc41da45ae146c4449398e7",
+            "chunk_id": "4ddc4528-85d8-4aa9-936d-45edb5d1c41e",
+            "chunk_text_sha256": "ec5f5de86b43d7df5798ac24cc2103909009402019b8ca36531d8974d9847e00",
+            "document_id": "128f550f-c0e0-4c25-8ef9-ad4d04a2b87b",
+            "final_wire_sha256": "8e52661ced667c879cd9313cebd6346d73c9086c599521b26f9e9b916d92e0cb",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "保罗·迈克尔·罗默（，），美国经济学家，纽约大学教授。",
+            "quote_end": 36,
+            "quote_start": 9,
+            "source_file_sha256": "ec5f5de86b43d7df5798ac24cc2103909009402019b8ca36531d8974d9847e00",
+            "source_version": "b5a638da-0148-48e3-8a8d-71ce104ee127",
+            "stage": "RETRIEVED_ORIGINAL_DROPPED_BEFORE_GENERATION"
+          }
+        ]
+      },
+      "candidate_assessment": "NOT_RUN"
+    },
+    {
+      "case_id": "miracl-zh-704170#0",
+      "historical_answer": "Alcohol compounds are characterized by the presence of a hydroxyl group (-OH). The nature of the compound depends on the carbon atom to which this group is attached: if the -OH is bonded to a saturated carbon, it is an alcohol; if bonded to a benzene ring, it is classified as a phenol due to different chemical properties; and if bonded to a carbon atom in a triple bond, it is an enol, which typically cannot exist stably because it tautomerizes into an aldehyde or ketone. Additionally, the oxygen atom in alcohol compounds possesses lone pairs of electrons. This allows them to exhibit weak basicity when reacting with strong acids like sulfuric acid. Like water, the hydroxyl group in alcohols can display both acidic and basic properties (with a pK value between 16-19), making them less acidic than water but reactive enough to form alcohols (alkoxides, with the general formula ROM) when reacting with stronger bases like sodium hydride or active metals like sodium.\n\n<kb doc=\"4c2413e779510f2b2b6d5e2e\" chunk_id=\"31ef880a-0230-4788-89b4-933049c5c660\" kb_id=\"214b8b2f-84f9-4d75-ab79-eccbdcd50ec2\" />\n<kb doc=\"a8159f4c332df8f40796bc50\" chunk_id=\"8115c731-0638-420d-b08f-8ab56f25c88a\" kb_id=\"214b8b2f-84f9-4d75-ab79-eccbdcd50ec2\" />\n<kb doc=\"e7b184dd68c40a453750f70f\" chunk_id=\"0e00b4ff-d3cc-4742-991f-3e3d6061203d\" kb_id=\"214b8b2f-84f9-4d75-ab79-eccbdcd50ec2\" />",
+      "historical_review": {
+        "final_conclusion_quote": "if bonded to a carbon atom in a triple bond, it is an enol",
+        "reason": "The answer correctly supplies hydroxyl on saturated carbon, acid/base behaviour, lone pairs and pK 16-19 from the three actual originals. However a requested structural characteristic is changed from source 双键 (double bond) to triple bond, and the strong-base product is called alcohols even though the source says 醇盐 and the same English sentence parenthetically says alkoxides. These unresolved errors prevent a fully correct answer; retain partial correct characteristics. The source itself contains the malformed phrase sp混合的双键; this review preserves that text and only flags the answer changing the explicit double-bond word.",
+        "reference_or_source_basis": [
+          {
+            "audit_artifact_sha256": "7d29adaa9b93b50d1302d5f6d553b3a1416d944cde1f414f75a9f263511e44a1",
+            "chunk_id": "31ef880a-0230-4788-89b4-933049c5c660",
+            "chunk_text_sha256": "f1cff16b0cffdcf855642ceae606f43eb43d8a3b6bc1da348183996cf94d430e",
+            "document_id": "5c09f3ef-a9df-4667-adcc-a3ad6bd9a8be",
+            "final_wire_sha256": "71406c6cfff586ffe1aa5092d28638bb25b962957c9fe15c697c5e984a655570",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "羥基官能團（-OH）被綁定到一個飽和碳原子，就叫醇",
+            "quote_end": 99,
+            "quote_start": 74,
+            "source_file_sha256": "f1cff16b0cffdcf855642ceae606f43eb43d8a3b6bc1da348183996cf94d430e",
+            "source_version": "d5ab004a-4cf3-442d-a4af-d72a64662668",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          },
+          {
+            "audit_artifact_sha256": "7d29adaa9b93b50d1302d5f6d553b3a1416d944cde1f414f75a9f263511e44a1",
+            "chunk_id": "31ef880a-0230-4788-89b4-933049c5c660",
+            "chunk_text_sha256": "f1cff16b0cffdcf855642ceae606f43eb43d8a3b6bc1da348183996cf94d430e",
+            "document_id": "5c09f3ef-a9df-4667-adcc-a3ad6bd9a8be",
+            "final_wire_sha256": "71406c6cfff586ffe1aa5092d28638bb25b962957c9fe15c697c5e984a655570",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "羥基與sp混合的双键碳原子相連，属烯醇类",
+            "quote_end": 181,
+            "quote_start": 161,
+            "source_file_sha256": "f1cff16b0cffdcf855642ceae606f43eb43d8a3b6bc1da348183996cf94d430e",
+            "source_version": "d5ab004a-4cf3-442d-a4af-d72a64662668",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          },
+          {
+            "audit_artifact_sha256": "7d29adaa9b93b50d1302d5f6d553b3a1416d944cde1f414f75a9f263511e44a1",
+            "chunk_id": "8115c731-0638-420d-b08f-8ab56f25c88a",
+            "chunk_text_sha256": "a93382232a5756601d6327676ada53f699221617e492eb9e2366b8ee4bfa10de",
+            "document_id": "11ee49e6-8701-4b3e-bdfb-fd7ee7532509",
+            "final_wire_sha256": "71406c6cfff586ffe1aa5092d28638bb25b962957c9fe15c697c5e984a655570",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "与强酸性物质下，如硫酸反应中可表现出一定的弱碱性",
+            "quote_end": 54,
+            "quote_start": 30,
+            "source_file_sha256": "a93382232a5756601d6327676ada53f699221617e492eb9e2366b8ee4bfa10de",
+            "source_version": "4ab5becd-88c3-4b23-89f7-697b7ed7f972",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          },
+          {
+            "audit_artifact_sha256": "7d29adaa9b93b50d1302d5f6d553b3a1416d944cde1f414f75a9f263511e44a1",
+            "chunk_id": "0e00b4ff-d3cc-4742-991f-3e3d6061203d",
+            "chunk_text_sha256": "6bbcadc9288a137bb8a2ac60103299223fcafcfd4a4e9a4a3010991c3c7cfd50",
+            "document_id": "b39b0632-b0a9-4070-bc9e-2ff51e35f1b4",
+            "final_wire_sha256": "71406c6cfff586ffe1aa5092d28638bb25b962957c9fe15c697c5e984a655570",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "生成的盐称为醇盐，具有通式：ROM。",
+            "quote_end": 104,
+            "quote_start": 86,
+            "source_file_sha256": "6bbcadc9288a137bb8a2ac60103299223fcafcfd4a4e9a4a3010991c3c7cfd50",
+            "source_version": "31297a22-4bdf-437d-9484-e4c8c0d3a005",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          }
+        ]
+      },
+      "candidate_assessment": "NOT_RUN"
+    },
+    {
+      "case_id": "miracl-zh-91294#0",
+      "historical_answer": "Based on the provided reference materials, Sagittarius (人马座) is bordered by the following neighboring constellations:\n\n*   **Scorpio**: Located to the west (西接天蝎座).\n*   **Aquarius**: Located to the east (東連摩羯座). *Note: The text contains a typo, stating \"Aquarius\" (摩羯座) instead of the correct \"Aquarius\" (寶瓶座) for the constellation east of Sagittarius.*\n*   **Ophiuchus**: Located to the north (北面是蛇夫座).\n*   **Scutum**: Located to the north (盾牌座).\n*   **Ophiuchus**: The text also mentions \"巨蛇座\" (Ophiuchus) as being to the north.\n*   **Telescopium**: Located to the south (望远镜座).\n*   **Microscopium**: Located to the south (显微镜座).\n*   **Corona Australis**: Located to the south (南冕座).\n\nThe materials indicate that Sagittarius is one of the largest and most prominent constellations in the summer night sky.",
+      "historical_review": {
+        "final_conclusion_quote": "*   **Aquarius**: Located to the east (東連摩羯座).",
+        "reason": "The resolved list invents a correction of source 摩羯座 to Aquarius/寶瓶座 even though actual original explicitly says 東連摩羯座, and collapses distinct source labels 蛇夫座 and 巨蛇座 into duplicate Ophiuchus entries. Several other neighbors are directly supported, but required neighbor identities are wrong/unresolved. The purported source typo is not in the source. This conclusion follows from actual displayed labels and the answer internal contradiction, without external astronomical assertions.",
+        "reference_or_source_basis": [
+          {
+            "audit_artifact_sha256": "01aa9be7f3b7c042dffcbed42de93a81075fdcada793663a89cf45fa0239d6d6",
+            "chunk_id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "chunk_text_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+            "document_id": "541b3a8a-70a0-48dc-b31a-19ee96df3b94",
+            "final_wire_sha256": "0e916200fbad365a0f2a3b4287a55ae03a723a85056983515c17f111c734d272",
+            "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+            "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+            "quote": "它西接天蝎座、東連摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边则是一系列小型星座，如望远镜座、显微镜座、南冕座等。",
+            "quote_end": 84,
+            "quote_start": 28,
+            "source_file_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+            "source_version": "73301c48-abc1-4f05-9a30-24dccb10f41e",
+            "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+          }
+        ]
+      },
+      "candidate_assessment": "NOT_RUN"
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+      "historical_answer": "In 2005, the city conducted **22,000** rural labor force training sessions, resulting in the transfer of employment for **76,000** people.\n\n<kb doc=\"43521b2a65fdd1e7f7e1f002\" chunk_id=\"f87c98e3-bd85-4ae0-82f8-61c3c8b40056\" kb_id=\"76770fba-17c3-4704-8663-10aa669476ce\" />",
+      "historical_review": {
+        "final_conclusion_quote": "the city conducted **22,000** rural labor force training sessions",
+        "reason": "Question asks how many people were trained. Native answer 2.2万人 means 22,000 people, and the exact original/readback says 组织开展农村劳动力技能培训2.2万人. The answer changes people into training sessions, a material unit error; the correct numeral alone is insufficient. Additional employment transfer 76,000 people is supported separately.",
+        "reference_or_source_basis": [
+          {
+            "kind": "FROZEN_NATIVE_REFERENCE_NOT_OFFICIAL_JUDGE",
+            "native_reference_answers": [
+              "2.2万人。"
+            ],
+            "native_reference_answers_sha256": "946e0ea1d9a039642c8bc05ee582a64bae016af7802302eaf228ddf8de1848a4"
+          },
+          {
+            "corpus_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\corpus.jsonl",
+            "exact_quote": "组织开展农村劳动力技能培训2.2万人，转移就业7.6万人",
+            "kind": "IMMUTABLE_NATIVE_ORIGINAL_OFFLINE",
+            "original_binding": [
+              {
+                "document_id": "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916",
+                "file_hash": "4698602b9e77c4d8957e001391b4f04bb82106bdbfb7490c3991c3b67eaf2d57",
+                "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+                "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+                "source_version": "7c0165f6-d93d-4cda-a27a-3699e3f94ce9"
+              }
+            ],
+            "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+            "source_text_sha256": "cd9996cbdd93079432f0fe6df198c7b34bcbce874bbdb8b7d6242fee284a9881"
+          },
+          {
+            "native_source_quote_delivered": true,
+            "request_artifact": {
+              "bytes": 25057,
+              "path": "E:\\RAG40-closed\\20261022t045038z-6e81bfc3\\files\\batches\\22-longbench-zh-multifieldqa_zh-51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed\\evidence\\a8f6c62edf6a459ba5765e5e1c64d0b3.request.json",
+              "sha256": "2963ae6dea5e849765b5d392cc70bef97f0980cb36916e9902856150ce4dddd9"
+            },
+            "request_id": "073f8bcd-9ec4-4f38-bc59-3bf26e0828da/answer/1/cheap",
+            "retrieval_candidate_counts": [
+              {
+                "retrieval": 30
+              },
+              {
+                "rerank": 10
+              },
+              {
+                "merge": 8
+              },
+              {
+                "source_unit": 14
+              }
+            ],
+            "source_data_present": true,
+            "wire_sha256": "c4d76f228f54ac558df9a7037caf2e7f69e5c88659e1787c063869466f6a541b"
+          }
+        ]
+      },
+      "candidate_assessment": "NOT_RUN"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+F..F.FF                                                                  [100%]
+================================== FAILURES ===================================
+_______ test_effective_server_defaults_true_and_explicit_false_survives _______
+tests\weknora_port\test_s864_top1_default.py:24: in test_effective_server_defaults_true_and_explicit_false_survives
+    assert ConversationSettings().rerank_top1_floorless is True
+E   AssertionError: assert False is True
+E    +  where False = ConversationSettings(max_rounds=5, embedding_top_k=30, vector_threshold=0.2, keyword_threshold=0.3, rerank_top_k=30, r...ocale='', rewrite_prompt_system=None, rewrite_prompt_user=None, query_understand_model_id='', intent_system_prompts={}).rerank_top1_floorless
+E    +    where ConversationSettings(max_rounds=5, embedding_top_k=30, vector_threshold=0.2, keyword_threshold=0.3, rerank_top_k=30, r...ocale='', rewrite_prompt_system=None, rewrite_prompt_user=None, query_understand_model_id='', intent_system_prompts={}) = ConversationSettings()
+_____ test_profile_fingerprints_and_state_snapshot_record_effective_true ______
+tests\weknora_port\test_s864_top1_default.py:47: in test_profile_fingerprints_and_state_snapshot_record_effective_true
+    assert prior.profile_manifest()['rerank_top1_floorless'] is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'rerank_top1_floorless'
+_ test_approved_profile_validates_top1_policy_instead_of_rewriting_it[False] __
+tests\weknora_port\test_s864_top1_default.py:60: in test_approved_profile_validates_top1_policy_instead_of_rewriting_it
+    with pytest.raises(ValueError,match='S861_PREFLIGHT_RETRIEVAL_CONFIGURATION_CHANGED'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+_ test_graph_requires_explicit_false_override_and_bridge_conflict_stays_closed _
+tests\weknora_port\test_s864_top1_default.py:68: in test_graph_requires_explicit_false_override_and_bridge_conflict_stays_closed
+    with pytest.raises(DevelopmentConfigurationError,match='GRAPH_TOP1_EXPERIMENT_CONFLICT'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE DevelopmentConfigurationError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s864_top1_default.py::test_effective_server_defaults_true_and_explicit_false_survives
+FAILED tests/weknora_port/test_s864_top1_default.py::test_profile_fingerprints_and_state_snapshot_record_effective_true
+FAILED tests/weknora_port/test_s864_top1_default.py::test_approved_profile_validates_top1_policy_instead_of_rewriting_it[False]
+FAILED tests/weknora_port/test_s864_top1_default.py::test_graph_requires_explicit_false_override_and_bridge_conflict_stays_closed
+4 failed, 3 passed in 1.87s

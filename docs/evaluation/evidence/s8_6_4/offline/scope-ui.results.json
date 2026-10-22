@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "mock_api": true,
+  "patches": [
+    {
+      "document_scope": [
+        "doc-a"
+      ]
+    },
+    {
+      "document_scope": [
+        "doc-b"
+      ]
+    },
+    {
+      "document_scope": []
+    }
+  ],
+  "post_document_scopes": [
+    [
+      "doc-a"
+    ],
+    [
+      "doc-b"
+    ]
+  ],
+  "reload_preserved_selection": true,
+  "reload_preserved_clear": true,
+  "page_errors": [],
+  "actual_provider_calls": 0
+}

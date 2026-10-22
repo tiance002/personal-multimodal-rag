@@ -1,0 +1,18 @@
+{
+  "schema": "s864-http-preflight-fixture/v1",
+  "file": "tests/weknora_port/test_s862r3_http_preflight.py",
+  "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s862r3_http_preflight.py --basetemp 'E:/RAG quention/var/reports/s8-6-4/pytest-scope'",
+  "red_exit": 1,
+  "red": "2 failed, 4 passed",
+  "red_log": "http-preflight-red.log",
+  "diagnostic_log": "http-preflight-diagnostic.log",
+  "cause": "TypeError: SourceRepository.get_chunks() got an unexpected keyword argument 'current'",
+  "green_exit": 0,
+  "green": "6 passed in 3.29s",
+  "green_log": "http-preflight-green.log",
+  "diff_check_exit": 0,
+  "actual_provider_calls": 0,
+  "real_database": "NOT RUN",
+  "ECS": "NOT RUN",
+  "production_changes": "NONE"
+}

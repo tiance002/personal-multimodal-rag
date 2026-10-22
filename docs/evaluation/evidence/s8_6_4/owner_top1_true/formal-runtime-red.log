@@ -1,0 +1,54 @@
+FF.FFFF                                                                  [100%]
+================================== FAILURES ===================================
+_______ test_owner_top1_default_and_explicit_server_override[None-true] _______
+tests\weknora_port\test_s8_ecs_runtime.py:32: in test_owner_top1_default_and_explicit_server_override
+    assert actual['WEKNORA_PORT_RERANK_TOP1_FLOORLESS']==expected
+E   AssertionError: assert 'false' == 'true'
+E     
+E     - true
+E     + false
+_______ test_owner_top1_default_and_explicit_server_override[true-true] _______
+tests\weknora_port\test_s8_ecs_runtime.py:31: in test_owner_top1_default_and_explicit_server_override
+    actual=runtime_environment(environment)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\s8_ecs_runtime.py:58: in runtime_environment
+    require(env.get(key, "false").lower() == "false", "S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF")
+scripts\s8_ecs_runtime.py:29: in require
+    raise RuntimeConfigurationError(code)
+E   scripts.s8_ecs_runtime.RuntimeConfigurationError: S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF
+___________ test_owner_top1_environment_rejects_nonboolean_values[] ___________
+tests\weknora_port\test_s8_ecs_runtime.py:39: in test_owner_top1_environment_rejects_nonboolean_values
+    with pytest.raises(RuntimeConfigurationError,match='RERANK_TOP1_SETTING_INVALID'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'RERANK_TOP1_SETTING_INVALID'
+E     Actual message: 'S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF'
+__________ test_owner_top1_environment_rejects_nonboolean_values[1] ___________
+tests\weknora_port\test_s8_ecs_runtime.py:39: in test_owner_top1_environment_rejects_nonboolean_values
+    with pytest.raises(RuntimeConfigurationError,match='RERANK_TOP1_SETTING_INVALID'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'RERANK_TOP1_SETTING_INVALID'
+E     Actual message: 'S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF'
+_________ test_owner_top1_environment_rejects_nonboolean_values[yes] __________
+tests\weknora_port\test_s8_ecs_runtime.py:39: in test_owner_top1_environment_rejects_nonboolean_values
+    with pytest.raises(RuntimeConfigurationError,match='RERANK_TOP1_SETTING_INVALID'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'RERANK_TOP1_SETTING_INVALID'
+E     Actual message: 'S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF'
+____ test_owner_top1_environment_rejects_nonboolean_values[not-a-boolean] _____
+tests\weknora_port\test_s8_ecs_runtime.py:39: in test_owner_top1_environment_rejects_nonboolean_values
+    with pytest.raises(RuntimeConfigurationError,match='RERANK_TOP1_SETTING_INVALID'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'RERANK_TOP1_SETTING_INVALID'
+E     Actual message: 'S8_OVERNIGHT_EXPERIMENTS_MUST_BE_OFF'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s8_ecs_runtime.py::test_owner_top1_default_and_explicit_server_override[None-true]
+FAILED tests/weknora_port/test_s8_ecs_runtime.py::test_owner_top1_default_and_explicit_server_override[true-true]
+FAILED tests/weknora_port/test_s8_ecs_runtime.py::test_owner_top1_environment_rejects_nonboolean_values[]
+FAILED tests/weknora_port/test_s8_ecs_runtime.py::test_owner_top1_environment_rejects_nonboolean_values[1]
+FAILED tests/weknora_port/test_s8_ecs_runtime.py::test_owner_top1_environment_rejects_nonboolean_values[yes]
+FAILED tests/weknora_port/test_s8_ecs_runtime.py::test_owner_top1_environment_rejects_nonboolean_values[not-a-boolean]
+6 failed, 1 passed, 11 deselected in 1.18s

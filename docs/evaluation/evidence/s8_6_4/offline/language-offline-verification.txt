@@ -1,0 +1,8 @@
+COMMAND: python -m pytest -q tests/weknora_port/test_s864_request_language.py
+...............                                                          [100%]
+15 passed in 1.12s
+EXIT: 0
+
+COMMAND: git diff --check -- scripts/s8_6_1_api_acceptance.py scripts/s8_6_2_r3_40_acceptance.py scripts/s8_6_4_language.py tests/weknora_port/test_s864_request_language.py
+warning: in the working copy of 'scripts/s8_6_2_r3_40_acceptance.py', LF will be replaced by CRLF the next time Git touches it
+EXIT: 0

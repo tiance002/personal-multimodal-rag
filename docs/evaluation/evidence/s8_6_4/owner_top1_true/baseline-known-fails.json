@@ -1,0 +1,62 @@
+{
+  "status": "BASELINE_KNOWN_FAIL_REPRODUCED",
+  "current_log": "related-attempt1.log",
+  "current_exit_code": 1,
+  "current_result": "2 failed, 300 passed in 11.97s",
+  "nodes": [
+    "test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried",
+    "test_exact_go_configuration_function_rows"
+  ],
+  "matching_expectations": [
+    "greeting expected, kb_search actual",
+    "LOCAL expected, empty string actual"
+  ],
+  "historical_baseline": "08ebd90b1c39965d1974de0717c5c6a66f36869a",
+  "historical_full_worktree_log": "E:\\RAG quention\\var\\reports\\s8-6\\root\\full-baseline-preexisting.stdout.txt",
+  "historical_exit_code": 1,
+  "historical_log_sha256": "2e37b47943d8f06893f612ce55a46d81be023819ad6b0f7f63ec3ebee8216230",
+  "references": [
+    {
+      "path": "docs/evaluation/S8_6_OFFLINE_IMPLEMENTATION.md",
+      "lines": [
+        90,
+        94,
+        95,
+        97,
+        139
+      ]
+    },
+    {
+      "path": "docs/evaluation/S8_6_OFFLINE_IMPLEMENTATION.results.json",
+      "pointer": "/preexisting_failures"
+    },
+    {
+      "path": "docs/evaluation/S8_6_1_API_ACCEPTANCE.md",
+      "line": 63
+    },
+    {
+      "path": "docs/evaluation/S8_6_1_API_ACCEPTANCE.results.json",
+      "pointer": "/tests/known_preexisting_failures"
+    }
+  ],
+  "query_intent_files_unchanged": [
+    {
+      "path": "backend/weknora_port/retrieval/query.py",
+      "sha256_LF": "3981bf13ea138e111ebe949af4deea1853a7c8f38f9a960d0b38770b598c5558",
+      "equal_to_HEAD": true
+    },
+    {
+      "path": "backend/weknora_port/conversation_configuration.py",
+      "sha256_LF": "055b8184a2b528214037cb60c74d854efcb59812c581c379fcb284f8cf9a743f",
+      "equal_to_HEAD": true
+    },
+    {
+      "path": "backend/weknora_port/conversation_assets/intent_prompts.yaml",
+      "sha256_LF": "d58947231b8e3b588ee01c79011a08b68f9f2f61469608fb596d21d5d0ae4b37",
+      "equal_to_HEAD": true
+    }
+  ],
+  "failing_test_function_AST_equal_to_HEAD": true,
+  "historical_exact_shell_argv": "EXACT_SHELL_ARGV_NOT_CAPTURED; preserved existing report limitation, no reconstruction",
+  "no_new_baseline_worktree_or_rerun": true
+}

@@ -1,0 +1,71 @@
+.......................F................................................ [ 39%]
+..................................F..................................... [ 78%]
+.......................................                                  [100%]
+================================== FAILURES ===================================
+___________ test_invalid_authorized_readback_fails_closed[change2] ____________
+
+change = {'knowledge_id': 'other'}
+
+    @pytest.mark.parametrize('change',[
+        {'tenant_id':2},{'knowledge_base_id':'other'},{'knowledge_id':'other'}])
+    def test_invalid_authorized_readback_fails_closed(change):
+        async def run():
+            source=row('raw','Actual source');selected=result(source);source.update(change)
+            with pytest.raises(PermissionError):
+                await project_source_evidence(state([selected]),CTX,repository([source]))
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_evidence.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_source_evidence.py:116: in run
+    await project_source_evidence(state([selected]),CTX,repository([source]))
+backend\weknora_port\retrieval\source_evidence.py:86: in project_source_evidence
+    rows = await _materialize_selected(hit, loaded.get(hit.id), state, context, repository, cache=loaded)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\source_evidence.py:44: in _materialize_selected
+    _validate_source(row, _domain(hit), ('text', 'parent_text'))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+row = SearchResult(id='raw', content='Actual source', score=0, knowledge_id='other', knowledge_base_id='kb', chunk_type='tex...written=False, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='')
+domain = ('kb', 'doc', 'v'), kinds = ('text', 'parent_text')
+
+    def _validate_source(row, domain, kinds=('text',)):
+        if (not domain[2] or _domain(row) != domain or not row.id or
+                row.chunk_metadata.get('source_version') != domain[2] or not row.is_enabled or
+                row.chunk_type not in kinds or row.content_revision or row.content_rewritten):
+>           raise RetrievalScopeError()
+E           backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+
+backend\weknora_port\retrieval\source_evidence.py:20: RetrievalScopeError
+______ test_parent_image_ocr_preserves_recognized_text_and_scopes_images ______
+
+    def test_parent_image_ocr_preserves_recognized_text_and_scopes_images():
+        base=row('text','![hit](u) ![sibling](v)',parent_chunk_id='parent',image_info='[{"url":"u","ocr_text":"recognized text"}]')
+        parent=row('parent','before ![hit](u) ![sibling](v) after',chunk_type='parent_text')
+        hit=row('image','recognized text',chunk_type='image_ocr',parent_chunk_id='text')
+        repo=Repo(chunks={'text':base,'parent':parent});s=state()
+        out=run(resolve_parents([hit],s,CTX,repo))[0]
+        assert 'recognized text' in out.content and '![hit](u)' in out.content and '![sibling]' not in out.content
+>       assert '"ocr_text": ""' in out.image_info and out.content_rewritten and out.sub_chunk_ids==['image']
+E       assert ('"ocr_text": ""' in '[{"url": "u", "original_url": "", "start_pos": 0, "end_pos": 0, "caption": "", "ocr_text": ""}]' and True and ['text', 'parent', 'image'] == ['image']
+E        +  where '[{"url": "u", "original_url": "", "start_pos": 0, "end_pos": 0, "caption": "", "ocr_text": ""}]' = SearchResult(id='image', content='before ![hit](u)  after\n\n![hit](u)\n\nrecognized text', score=0.8, knowledge_id='d...ewritten=True, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='').image_info
+E        +  and   True = SearchResult(id='image', content='before ![hit](u)  after\n\n![hit](u)\n\nrecognized text', score=0.8, knowledge_id='d...ewritten=True, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='').content_rewritten
+E         
+E         At index 0 diff: 'text' != 'image'
+E         Left contains 2 more items, first extra item: 'parent'
+E         Use -v to get more diff)
+
+tests\weknora_port\test_pipeline.py:198: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_source_evidence.py::test_invalid_authorized_readback_fails_closed[change2]
+FAILED tests/weknora_port/test_pipeline.py::test_parent_image_ocr_preserves_recognized_text_and_scopes_images
+2 failed, 181 passed in 2.70s

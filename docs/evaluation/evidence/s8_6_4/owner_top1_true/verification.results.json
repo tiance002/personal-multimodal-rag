@@ -1,0 +1,141 @@
+{
+  "schema": "s864-owner-top1-default-change/v1",
+  "owner_request": "Set trusted server rerank_top1_floorless=true; retain explicit false and all Graph/bridge guards.",
+  "head_before_parent_commit": "8b75820866176a02e97618c08d4d627e6ba6a8e1",
+  "source_files": [
+    {
+      "path": "backend/weknora_port/runtime.py",
+      "sha256_LF": "07be47df5eb1e5a973b8e93354690cd5361948eb90c29856e19dfd2bdef83188"
+    },
+    {
+      "path": "backend/weknora_port/development.py",
+      "sha256_LF": "37a78306f4ba5739cf7ef27cabfbb0c757c35f444e74aad86d2355b765c5a9f3"
+    },
+    {
+      "path": "scripts/s8_ecs_runtime.py",
+      "sha256_LF": "963b7b5732416f81a218d05d6eaa1ad95a16e380e9de7d77ea5ca4c1c44556e1"
+    },
+    {
+      "path": "scripts/s8_6_1_api_acceptance.py",
+      "sha256_LF": "4ac14136dbf3263a48ab7d35f710fbaf6427eddb3d61be063a5154a886e465b2"
+    },
+    {
+      "path": "scripts/s8_6_2_r3_40_acceptance.py",
+      "sha256_LF": "8055b0867a63545f9097da98692087b40a5b45c96ff4330db5a5daa21106b178"
+    },
+    {
+      "path": "tests/weknora_port/test_s864_top1_default.py",
+      "sha256_LF": "ed113c2de9ae5be54df33fb23e1f79ff9529af581f30ba6b387d1d11ae369110"
+    },
+    {
+      "path": "tests/weknora_port/test_s8_ecs_runtime.py",
+      "sha256_LF": "855445227a60f35488707dff51b93cfa39048008b9d7c630167aca03c9e5b8f0"
+    },
+    {
+      "path": "tests/weknora_port/test_development_entry.py",
+      "sha256_LF": "31a1e23fc991ef14deba224b8c7e9c87d98cb64d9922d7bf16dceb9f92abdfef"
+    },
+    {
+      "path": "tests/weknora_port/test_conversation_configuration.py",
+      "sha256_LF": "61d46487f64742eb95ffa670e2543aa08730130bd9c3c9a92a44bfbf8ee0f6d3"
+    },
+    {
+      "path": "tests/weknora_port/test_s861_preflight.py",
+      "sha256_LF": "f719b2477bb62fac10e7c9c5267bf504c9e2fa488dd69ab82ebee22e9973e928"
+    },
+    {
+      "path": "tests/weknora_port/test_s8_experiment_arms.py",
+      "sha256_LF": "6dc2d6ba5716b228bf84525172da38257ba879a3908927b24f809c375e774ba9"
+    }
+  ],
+  "server_default": true,
+  "neutral_pipeline_state_default": false,
+  "profile_fingerprints": {
+    "s861": {
+      "sha256": "02595ee51021b7c43d86091fa477a72e1e84e7128cedfed3eb765eb333e33be8",
+      "rerank_top1_floorless": true
+    },
+    "s861_bounded": {
+      "sha256": "6dbd3b9d95162be7d892afe46e2ac9900f81d16b32195fc6a4049910283bb2df",
+      "rerank_top1_floorless": true
+    },
+    "s840": {
+      "sha256": "6402fa6a171d868da549ee14f328efe4ce42de3f8bf51b2a645421334d1fbdf1",
+      "rerank_top1_floorless": true
+    }
+  },
+  "runs": [
+    {
+      "phase": "RED",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s864_top1_default.py --basetemp 'E:/RAG quention/var/reports/s8-6-4/top1-default/pytest'",
+      "exit_code": 1,
+      "output": "4 failed, 3 passed in 1.87s",
+      "log": "red.log"
+    },
+    {
+      "phase": "FORMAL_RUNTIME_RED",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s8_ecs_runtime.py -k owner_top1 --basetemp 'E:/RAG quention/var/reports/s8-6-4/top1-default/pytest-ecs'",
+      "exit_code": 1,
+      "output": "6 failed, 1 passed, 11 deselected in 1.18s",
+      "log": "formal-runtime-red.log"
+    },
+    {
+      "phase": "FIRST_GREEN",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s864_top1_default.py tests/weknora_port/test_s8_ecs_runtime.py --basetemp 'E:/RAG quention/var/reports/s8-6-4/top1-default/pytest'",
+      "exit_code": 0,
+      "output": "24 passed in 2.65s",
+      "log": "first-green.log"
+    },
+    {
+      "phase": "FLAG_GUARDS_GREEN",
+      "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s8_experiment_arms.py -k 'owner_startup_top1 or d_rejected or b_selects_actual_max or malformed_results' --basetemp 'E:/RAG quention/var/reports/s8-6-4/top1-default/pytest-arms'",
+      "exit_code": 0,
+      "output": "25 passed, 6 deselected in 1.89s",
+      "log": "flag-guards-green.log"
+    }
+  ],
+  "final_affected_run": {
+    "command_argv": [
+      "E:/RAG quention/.venv/Scripts/python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "tests/weknora_port/test_s864_top1_default.py",
+      "tests/weknora_port/test_s8_ecs_runtime.py",
+      "tests/weknora_port/test_development_entry.py",
+      "tests/weknora_port/test_conversation_configuration.py",
+      "tests/weknora_port/test_s86_qu_configuration.py",
+      "tests/weknora_port/test_s861_preflight.py",
+      "tests/weknora_port/test_s861_api_acceptance.py",
+      "tests/weknora_port/test_s862r_preflight.py",
+      "tests/weknora_port/test_s862r3_http_preflight.py",
+      "tests/weknora_port/test_s862r3_40_acceptance.py",
+      "tests/weknora_port/test_s864_request_language.py",
+      "-k",
+      "not test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried and not test_exact_go_configuration_function_rows",
+      "--basetemp",
+      "E:\\RAG quention\\var\\reports\\s8-6-4\\top1-default\\pytest-final"
+    ],
+    "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+    "exit_code": 0,
+    "elapsed_seconds": 14.242,
+    "log": "affected-green.log",
+    "log_sha256": "d2abbe4d8409ef374f1592722b2f76ecfb795d692a9233fd40d80c2315144468"
+  },
+  "final_affected_result": "300 passed, 2 deselected in 11.18s",
+  "baseline_failures": "BASELINE_KNOWN_FAIL_REPRODUCED; see baseline-known-fails.json and retained related-attempt1.log (2 failed, 300 passed).",
+  "diff_check_exit": 0,
+  "actual_provider_calls": 0,
+  "actual_database_operations": 0,
+  "ECS_operations": 0,
+  "deployment": "NOT RUN",
+  "commit": "NOT CREATED",
+  "authorization": "No Provider grant created or reused; profile/source authorization proposal must be refrozen by parent.",
+  "limits": [
+    "Historical ingestion-specific false requirements unchanged.",
+    "Remote runtime.env/container configuration unchanged; explicit false remains an opt-out.",
+    "No global threshold, P5, RRF, model registry or model prompt changes.",
+    "Protected known intent failures kept unchanged and explicitly excluded from the final affected PASS."
+  ]
+}

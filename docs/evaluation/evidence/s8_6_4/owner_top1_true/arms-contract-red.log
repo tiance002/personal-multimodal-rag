@@ -1,0 +1,27 @@
+....FF.......................FF                                          [100%]
+================================== FAILURES ===================================
+__________ test_only_b_floorless_changes_legal_empty_filter[0-False] __________
+tests\weknora_port\test_s8_experiment_arms.py:51: in test_only_b_floorless_changes_legal_empty_filter
+    with pytest.raises(SearchNothing):run(rerank(s,CTX,Registry(m)))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE SearchNothing
+________ test_only_b_floorless_changes_legal_empty_filter[0.149-False] ________
+tests\weknora_port\test_s8_experiment_arms.py:51: in test_only_b_floorless_changes_legal_empty_filter
+    with pytest.raises(SearchNothing):run(rerank(s,CTX,Registry(m)))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE SearchNothing
+_____________ test_empty_and_cancelled_are_never_fabricated_top1 ______________
+tests\weknora_port\test_s8_experiment_arms.py:80: in test_empty_and_cancelled_are_never_fabricated_top1
+    with pytest.raises(SearchNothing):run(rerank(s,CTX,Registry(Model([[]]))))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE SearchNothing
+_______ test_normal_valid_a_matches_saved_s7_function_without_provider ________
+tests\weknora_port\test_s8_experiment_arms.py:103: in test_normal_valid_a_matches_saved_s7_function_without_provider
+    assert outputs[0]==outputs[1]
+E   AssertionError: assert 'SearchNothing' == []
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s8_experiment_arms.py::test_only_b_floorless_changes_legal_empty_filter[0-False]
+FAILED tests/weknora_port/test_s8_experiment_arms.py::test_only_b_floorless_changes_legal_empty_filter[0.149-False]
+FAILED tests/weknora_port/test_s8_experiment_arms.py::test_empty_and_cancelled_are_never_fabricated_top1
+FAILED tests/weknora_port/test_s8_experiment_arms.py::test_normal_valid_a_matches_saved_s7_function_without_provider
+4 failed, 27 passed in 2.67s

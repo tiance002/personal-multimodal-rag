@@ -1,0 +1,58 @@
+{
+  "schema": "s864-scope-offline/v1",
+  "baseline": "3c081b657c9c768d4d1b81310e4dc59c711f195d",
+  "backend": {
+    "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s864_document_scope.py tests/weknora_port/test_turn_storage.py tests/weknora_port/test_service.py tests/weknora_port/test_http_api.py tests/weknora_port/test_s85_ambiguity_clarification.py",
+    "exit_code": 0,
+    "result": "110 passed in 3.43s",
+    "log": "scope-final.log"
+  },
+  "related": {
+    "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_s86_qu_configuration.py tests/weknora_port/test_service_task_cleanup.py tests/weknora_port/test_document_assets.py tests/weknora_port/test_documents.py",
+    "exit_code": 0,
+    "result": "82 passed, 5 warnings in 3.44s",
+    "log": "scope-configuration-documents.log"
+  },
+  "frontend_build": {
+    "command": "npm.cmd run build",
+    "cwd": "frontend",
+    "exit_code": 0,
+    "result": "tsc --noEmit and Vite build, 274 modules",
+    "log": "scope-frontend-build.log"
+  },
+  "ui": {
+    "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' 'C:/Users/22088/.agents/skills/webapp-testing/scripts/with_server.py' --server 'npm.cmd run dev -- --host 127.0.0.1 --port 5196 --strictPort' --port 5196 -- 'E:/RAG quention/.venv/Scripts/python.exe' tests/weknora-port/s864_scope_ui.py",
+    "cwd": "frontend",
+    "environment": {
+      "VITE_WEKNORA_API_BASE": "/api/v1"
+    },
+    "exit_code": 0,
+    "log": "scope-ui.log",
+    "results": "scope-ui.results.json",
+    "mock_api": true,
+    "page_errors": 0
+  },
+  "adapter_ui": {
+    "command": "npm.cmd test -- --grep 'composer scope picker defaults closed'",
+    "exit_code": 0,
+    "result": "1 passed (5.1s)",
+    "log": "scope-adapter-ui.log"
+  },
+  "red": {
+    "exit_code": 1,
+    "result": "13 failed, 1 passed",
+    "log": "scope-red.log",
+    "limitation": "Storage/HTTP route added before RED; runtime/product feature integration was RED."
+  },
+  "exact_title_limit": "Only unique literal casefold/trim persisted title or filename bypasses clarification; no fuzzy match, no implicit persisted scope lock.",
+  "provider_calls": 0,
+  "real_database": "NOT RUN",
+  "ECS": "NOT RUN",
+  "commit": "NOT CREATED",
+  "diff_check_exit": 0,
+  "cleanup_rejection": {
+    "action": "Remove-Item -LiteralPath 'C:/Users/22088/.codex/worktrees/s8-6-adaptive-retrieval/RAG quention/frontend/frontend/node_modules' -Force",
+    "reason": "blocked by policy",
+    "status": "LEFT UNTOUCHED; ignored redundant junction to existing dependency directory"
+  }
+}

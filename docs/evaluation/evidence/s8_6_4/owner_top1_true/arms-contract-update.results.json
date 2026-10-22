@@ -1,0 +1,29 @@
+{
+  "schema": "s864-experiment-arm-contract-update/v1",
+  "changed_file": "tests/weknora_port/test_s8_experiment_arms.py",
+  "production_changes": false,
+  "historical_oracle_git_object": "b9268e2d6707f73c48b5624a96e39879d02ce12c:backend/weknora_port/retrieval/rerank.py",
+  "historical_oracle_sha256": "b9fe3dc9a3489c484a9a94ffab69c79ae76e47887cb76285623c6d2e90fc8ee2",
+  "historical_oracle_unchanged": true,
+  "intentional_divergence": "Owner S8.6.4 P0 preserves existing Search when valid Rerank pool is empty/all low, so Merge can execute existing Search fallback. Accepted-case outputs remain equal to immutable S7 function.",
+  "preserved_refusals": [
+    "CallCancelled still raises",
+    "Search with no candidates still raises SearchNothing without model call",
+    "Malformed provider responses still fail closed under both policies"
+  ],
+  "red": {
+    "metadata": "arms-contract-red.run.json",
+    "exit_code": 1,
+    "result": "4 failed, 27 passed in 2.67s"
+  },
+  "green": {
+    "metadata": "arms-contract-green.run.json",
+    "exit_code": 0,
+    "result": "31 passed in 2.10s"
+  },
+  "unrelated_two_known_QU_failures": "Separate issue; no QU tests or assertions changed here.",
+  "provider_calls": 0,
+  "database_operations": 0,
+  "ECS_operations": 0,
+  "commit": "NOT CREATED"
+}

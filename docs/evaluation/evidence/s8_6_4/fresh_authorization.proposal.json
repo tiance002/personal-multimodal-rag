@@ -1,0 +1,130 @@
+{
+  "schema": "s864-fresh-authorization-proposal/v1",
+  "status": "PENDING_OWNER_AUTHORIZATION_NOT_A_GRANT",
+  "source_commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+  "phase_commits": [
+    {
+      "commit": "528b19f7e5b76a3e8a9d05ee533dcb3d2dea69be",
+      "scope": "P0 source windows, Merge/provenance, Search fallback"
+    },
+    {
+      "commit": "b9654bf09e922deff83f51ea13760d01b8f1a92c",
+      "scope": "P1 locale, authorized document scope/clarification"
+    },
+    {
+      "commit": "8b75820866176a02e97618c08d4d627e6ba6a8e1",
+      "scope": "VLM extraction prompt and fixed-input diagnostics"
+    },
+    {
+      "commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+      "scope": "Owner explicitly enables server Top1; formal environment/profile wiring; real neighbor readback + offline delivery tests"
+    }
+  ],
+  "http_base_profile_sha256": "6dbd3b9d95162be7d892afe46e2ac9900f81d16b32195fc6a4049910283bb2df",
+  "http_composition_profile_sha256": "6402fa6a171d868da549ee14f328efe4ce42de3f8bf51b2a645421334d1fbdf1",
+  "image": "NOT_BUILT; build isolated image from this source, record image identity before any send",
+  "entrypoints": [
+    "scripts/ecs_acceptance_job.py",
+    "scripts/ecs_acceptance_http_payload.py",
+    "scripts/s8_6_2_r3_40_acceptance.py"
+  ],
+  "composition_limit": "Old profile names/40-case cohort retained as reusable composition identity; not a new executable grant or permission to run all40. Select approved cases only with fresh ledger binding.",
+  "http_cases": [
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+      "knowledge_base_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "scope_origin": "unchanged original ECS40 KB input; no Gold document filter",
+      "accept_language": "en-US"
+    },
+    {
+      "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "q0": "辐射避难所怎么刷箱子",
+      "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+      "knowledge_base_scope": [
+        "76770fba-17c3-4704-8663-10aa669476ce"
+      ],
+      "document_scope": [],
+      "scope_origin": "unchanged original ECS40 KB input; no Gold document filter",
+      "accept_language": "zh-CN"
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+      "knowledge_base_scope": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "document_scope": [],
+      "scope_origin": "unchanged original ECS40 Hotpot KB; eith typo retained",
+      "accept_language": "en-US"
+    }
+  ],
+  "vlm": {
+    "cases": [
+      "row-0684",
+      "row-0958"
+    ],
+    "prompts": [
+      "old",
+      "candidate"
+    ],
+    "calls": 4,
+    "model": "deepseek-flash",
+    "max_output_tokens_each": 5000,
+    "same_image_model_options": true,
+    "manifest": "docs/evaluation/evidence/s8_6_4/prompt_diagnostics/manifest.json",
+    "manifest_sha256": "31ea705d6a017e33ade2247433101f599f66d6330efe23600af80f6c60192231"
+  },
+  "provider_models": [
+    "SiliconFlow Qwen/Qwen3.5-4B",
+    "SiliconFlow BAAI/bge-m3",
+    "SiliconFlow BAAI/bge-reranker-v2-m3",
+    "DeepSeek deepseek-flash (existing P5 if selected and fixed VLM)"
+  ],
+  "requested_total_token_cap": 500000,
+  "bounds": {
+    "HTTP_submissions": 3,
+    "existing_HTTP_child_max_attempts": 12,
+    "existing_HTTP_child_max_tokens": 100000,
+    "HTTP_operational_attempts_max": 36,
+    "VLM_attempts": 4,
+    "total_operational_attempts_max": 40,
+    "elapsed_minutes_max": 40
+  },
+  "budget_status": "PROPOSED_CEILING, not actual usage or a new numerical request-body preflight. Existing reservation/hard-input gates mandatory; no child limit raise.",
+  "configuration": {
+    "retrieval_strategy_mode": "query_structure_v1",
+    "source_evidence_mode": "bounded_source_v1 (provenance only)",
+    "prompt": "unchanged Prompt B",
+    "citations_enabled": true,
+    "P5": "unchanged DYNAMIC",
+    "query_expansion": false,
+    "graph": false,
+    "rerank_top1_floorless": true
+  },
+  "transport": "fixed q0/controlled derived queries/current authorized originals; two frozen original images + extraction prompts only; no Gold/scoring text",
+  "fresh_identity": "new sessions/client IDs/server UUIDs/ledgers; old UNKNOWN/CLOSED grants untouched",
+  "stop": [
+    "UNKNOWN, unclear send, permission/scope/version failure: preserve and stop, no retry",
+    "incomplete output/contract error: retain real settlement and stop",
+    "reservation/hard bound failure: no raised limit or resend",
+    "40 minutes/cap reached: stop new sends and retain results"
+  ],
+  "excluded": [
+    "production replacement",
+    "ingest/reindex",
+    "all40 rerun",
+    "fixed-generation candidate real comparison",
+    "extra document-scope real model questions (offline product verification delivered)"
+  ],
+  "new_provider_calls": 0,
+  "old_grant_reused": false,
+  "isolated_startup_environment": {
+    "WEKNORA_PORT_RERANK_TOP1_FLOORLESS": "true"
+  }
+}

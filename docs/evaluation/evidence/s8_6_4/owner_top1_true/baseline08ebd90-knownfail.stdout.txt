@@ -1,0 +1,77 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___ test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried ___
+
+    def test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried():
+        import asyncio
+        from types import SimpleNamespace
+        from backend.weknora_port.retrieval.pipeline import PipelineState
+        from backend.weknora_port.retrieval.query import understand_query
+        from tests.weknora_port.test_pipeline import CTX,Model
+        class Registry:
+            def __init__(self):self.lookups=[];self.model=Model(['{"rewrite_query":"q0","intent":"greeting"}'])
+            async def chat(self,id,context):
+                self.lookups.append(id)
+                if id=='missing':raise RuntimeError('deleted model')
+                return self.model
+        registry=Registry();state=PipelineState(query='q0',chat_model_id='baseline',query_understand_model_id='missing')
+>       asyncio.run(understand_query(state,CTX,registry));assert registry.lookups==['missing','baseline'] and state.intent=='greeting'
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert (['missing', 'baseline'] == ['missing', 'baseline']
+E         
+E         Use -v to get more diff and 'kb_search' == 'greeting'
+E         
+E         - greeting
+E         + kb_search)
+
+tests\weknora_port\test_conversation_configuration.py:61: AssertionError
+__________________ test_exact_go_configuration_function_rows __________________
+
+    def test_exact_go_configuration_function_rows():
+        import json,asyncio
+        from pathlib import Path
+        from backend.weknora_port.conversation_configuration import resolve_startup_templates,resolved_chat_options,resolve_language
+        from backend.weknora_port.retrieval.pipeline import PipelineState
+        from backend.weknora_port.retrieval.query import understand_query
+        from tests.weknora_port.test_pipeline import CTX,Model
+        fixture=json.loads((Path(__file__).parent/'fixtures/configuration_go_oracle.json').read_text())
+        assert fixture['exit_code']==0 and len(fixture['rows'])==20
+        templates={'system_prompt':[{'id':'same','content':'SYSTEM FIRST'},{'id':'sys','content':'FINAL {{language}}'}],
+            'rewrite':[{'id':'same','content':'SHOULD NOT WIN'},{'id':'rw','content':'REWRITE {{language}} {{conversation}}','user':'USER {{query}}'}],
+            'context_template':[{'id':'ctx','content':'CONTEXT {{query}}'}],
+            'intent_prompts':[{'id':'greeting','content':'GLOBAL {{language}}'},{'id':'','content':'skip'},{'id':'empty','content':''}]}
+        for row in fixture['rows']:
+            kind,value,expected=row['kind'],row['input'],row['output']
+            if kind=='startup':
+                result=resolve_startup_templates({'rewrite_prompt_id':value,'rewrite_prompt_system':'SAVED','rewrite_prompt_user':'USER SAVED','summary':{'prompt_id':'sys','context_template_id':'ctx'}},templates)
+                actual={'system':result['rewrite_prompt_system'],'user':result['rewrite_prompt_user'],'prompt':result['summary']['prompt'],'context':result['summary']['context_template'],'intents':result['intent_system_prompts']}
+            elif kind=='reasoning':
+                result=resolved_chat_options({'thinking':True,'reasoning_effort':'low'},value);actual={'thinking':result.thinking,'effort':result.reasoning_effort}
+            elif kind=='locale':actual=resolve_language('',value)
+            else:
+                class Registry:
+                    def __init__(self):self.calls=[];self.model=Model(['{"rewrite_query":"q0","intent":"greeting"}'])
+                    async def chat(self,id,context):
+                        self.calls.append(id)
+                        if id=='missing':raise RuntimeError('deleted')
+                        return self.model
+                registry=Registry();state=PipelineState(query='q0',chat_model_id='baseline',query_understand_model_id=value if kind=='model' else '')
+                if kind=='intent':state.intent_system_prompts={'greeting':value};state.global_intent_system_prompts={'greeting':'GLOBAL'}
+                elif kind=='prompts':
+                    from types import SimpleNamespace
+                    state.language='Korean';state.rewrite_system_prompt='SESSION {{language}} {{conversation}}';state.rewrite_user_prompt='SESSION {{query}}';state.memory_background=' BACKGROUND';state.history=[SimpleNamespace(query='old',answer='answer')]
+                asyncio.run(understand_query(state,CTX,registry))
+                if kind=='intent':actual=state.system_prompt_override
+                elif kind=='model':actual={'id':registry.calls[-1],'images':False,'calls':registry.calls}
+                else:actual={'system':registry.model.calls[0][0][0].content,'user':registry.model.calls[0][0][1].content}
+>           assert actual==expected,(kind,value,actual,expected)
+E           AssertionError: ('intent', 'LOCAL', '', 'LOCAL')
+E           assert '' == 'LOCAL'
+E             
+E             - LOCAL
+
+tests\weknora_port\test_conversation_configuration.py:116: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_conversation_configuration.py::test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried
+FAILED tests/weknora_port/test_conversation_configuration.py::test_exact_go_configuration_function_rows
+2 failed in 1.32s

@@ -1,0 +1,69 @@
+{
+  "schema": "s862r3-ecs40-profile/v1",
+  "profile": "s8.6.2-r3-ecs40-prompt-b/v2",
+  "goal": "S8.6.2-R3-ECS40",
+  "composition_profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+  "composition_profile_sha256": "366645e606361ffbefc9508c2b092a7a255749838385d798742eea8adb6ae249",
+  "composition_implementation_sha256_LF": "eb1842a5901a482c0df0a56891588b1dc04894670e9c34fa73007c6fab87b11c",
+  "adapter_implementation_sha256_LF": "53ce437913d7ce0ab4ad576860260ca9bf4d95a02f764ec253e17cfa3b812137",
+  "input_identity_sha256": "18ecc8ba164dcfad8fe69136c9300eb5f1f9ebdce963efce20c7f2dd592770ef",
+  "original_cohort_sha256": "0e2f124015d9589dbe41497d7378362bdc0d009a295905a62809180fe4f4e746",
+  "protected_case_ids": [
+    "hotpotqa-5ae3992d5542994393b9e722",
+    "scifact-339"
+  ],
+  "denominator": 40,
+  "eligible_submissions": 38,
+  "answer_language_policy": {
+    "version": "s8.6.4-request-language/v1",
+    "precedence": [
+      "explicit_answer_language",
+      "explicit_q0_answer_directive",
+      "q0_script_default"
+    ],
+    "explicit_locale_tags": [
+      "de-DE",
+      "en-GB",
+      "en-US",
+      "es-ES",
+      "fr-FR",
+      "ja-JP",
+      "ko-KR",
+      "pt-BR",
+      "ru-RU",
+      "zh-CN",
+      "zh-HK",
+      "zh-TW"
+    ],
+    "default": {
+      "contains_han": "zh-CN",
+      "otherwise": "en-US"
+    },
+    "explicit_directive_support": "fixed common English/Chinese answer directives listed by implementation",
+    "unsupported_explicit_locale": "S864_UNSUPPORTED_EXPLICIT_LANGUAGE"
+  },
+  "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+  "query_input_bound": {
+    "version": "effective-query/v1",
+    "unicode_characters": 256,
+    "utf8_bytes": 1024
+  },
+  "generation": "existing P5 DYNAMIC",
+  "scope": "one frozen whole KB per case; no document Gold filter",
+  "source_evidence_mode": "bounded_source_v1",
+  "retrieval_strategy_mode": "query_structure_v1",
+  "query_expansion": false,
+  "citations_enabled": true,
+  "graph": false,
+  "authority_mode": "OWNER_TOKEN_CAP_V1",
+  "owner_max_total_tokens": 500000,
+  "unlimited_provider_calls": true,
+  "operational_child_max_calls": 12,
+  "operational_child_max_tokens": 100000,
+  "shared_owner_cap_over_child_ledgers": true,
+  "numerical_budget_preflight": "NOT_USED_OWNER_WAIVER",
+  "retry": false,
+  "new_session_per_case": true,
+  "worker_started": false,
+  "actual_provider_calls": 0
+}

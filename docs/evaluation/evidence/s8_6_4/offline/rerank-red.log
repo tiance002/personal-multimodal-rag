@@ -1,0 +1,166 @@
+FFFFFFFFFFF..F.....                                                      [100%]
+================================== FAILURES ===================================
+__________ test_search_empty_is_distinct_and_never_looks_up_a_model ___________
+tests\weknora_port\test_s864_rerank.py:21: in test_search_empty_is_distinct_and_never_looks_up_a_model
+    with pytest.raises(SearchNothing):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE SearchNothing
+___ test_all_below_keeps_search_scores_and_raw_rerank_for_merge[off-False] ____
+tests\weknora_port\test_s864_rerank.py:46: in test_all_below_keeps_search_scores_and_raw_rerank_for_merge
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:35: in run
+    await rerank(s, CTX, Registry(model))
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+____ test_all_below_keeps_search_scores_and_raw_rerank_for_merge[off-True] ____
+tests\weknora_port\test_s864_rerank.py:46: in test_all_below_keeps_search_scores_and_raw_rerank_for_merge
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:35: in run
+    await rerank(s, CTX, Registry(model))
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+_ test_all_below_keeps_search_scores_and_raw_rerank_for_merge[bounded_source_v1-False] _
+tests\weknora_port\test_s864_rerank.py:46: in test_all_below_keeps_search_scores_and_raw_rerank_for_merge
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:35: in run
+    await rerank(s, CTX, Registry(model))
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+_ test_all_below_keeps_search_scores_and_raw_rerank_for_merge[bounded_source_v1-True] _
+tests\weknora_port\test_s864_rerank.py:46: in test_all_below_keeps_search_scores_and_raw_rerank_for_merge
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:35: in run
+    await rerank(s, CTX, Registry(model))
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+______ test_high_score_remains_normal_rerank_with_original_search_score _______
+tests\weknora_port\test_s864_rerank.py:53: in test_high_score_remains_normal_rerank_with_original_search_score
+    assert decision(s)['reason'] == 'RERANK_ACCEPTED'
+           ^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:15: in decision
+    return next(item for item in reversed(s.evidence_trace) if item.get('reason'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+___ test_unrelated_low_score_can_continue_but_is_not_marked_rerank_accepted ___
+tests\weknora_port\test_s864_rerank.py:64: in test_unrelated_low_score_can_continue_but_is_not_marked_rerank_accepted
+    asyncio.run(rerank(s, CTX, Registry(Model([[RerankResult(0, .001)]]))))
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+__________ test_model_error_remains_distinct_from_low_scores[False] ___________
+tests\weknora_port\test_s864_rerank.py:83: in test_model_error_remains_distinct_from_low_scores
+    assert decision(s)['reason'] == 'RERANK_MODEL_ERROR'
+           ^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:15: in decision
+    return next(item for item in reversed(s.evidence_trace) if item.get('reason'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+___________ test_model_error_remains_distinct_from_low_scores[True] ___________
+tests\weknora_port\test_s864_rerank.py:83: in test_model_error_remains_distinct_from_low_scores
+    assert decision(s)['reason'] == 'RERANK_MODEL_ERROR'
+           ^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:15: in decision
+    return next(item for item in reversed(s.evidence_trace) if item.get('reason'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+____________ test_model_lookup_failure_retains_its_error_contract _____________
+tests\weknora_port\test_s864_rerank.py:93: in test_model_lookup_failure_retains_its_error_contract
+    assert decision(s)['reason'] == 'RERANK_MODEL_ERROR'
+           ^^^^^^^^^^^
+tests\weknora_port\test_s864_rerank.py:15: in decision
+    return next(item for item in reversed(s.evidence_trace) if item.get('reason'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+___ test_existing_floor_and_threshold_semantics_are_preserved[0.149-False] ____
+tests\weknora_port\test_s864_rerank.py:100: in test_existing_floor_and_threshold_semantics_are_preserved
+    asyncio.run(rerank(s, CTX, Registry(Model([[RerankResult(0, score)]]))))
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+_________ test_existing_high_threshold_retry_remains_two_calls[0.01] __________
+tests\weknora_port\test_s864_rerank.py:111: in test_existing_high_threshold_retry_remains_two_calls
+    asyncio.run(rerank(s, CTX, Registry(model)))
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\rerank.py:242: in rerank
+    raise SearchNothing()
+E   backend.weknora_port.retrieval.search.SearchNothing: SEARCH_NOTHING
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s864_rerank.py::test_search_empty_is_distinct_and_never_looks_up_a_model
+FAILED tests/weknora_port/test_s864_rerank.py::test_all_below_keeps_search_scores_and_raw_rerank_for_merge[off-False]
+FAILED tests/weknora_port/test_s864_rerank.py::test_all_below_keeps_search_scores_and_raw_rerank_for_merge[off-True]
+FAILED tests/weknora_port/test_s864_rerank.py::test_all_below_keeps_search_scores_and_raw_rerank_for_merge[bounded_source_v1-False]
+FAILED tests/weknora_port/test_s864_rerank.py::test_all_below_keeps_search_scores_and_raw_rerank_for_merge[bounded_source_v1-True]
+FAILED tests/weknora_port/test_s864_rerank.py::test_high_score_remains_normal_rerank_with_original_search_score
+FAILED tests/weknora_port/test_s864_rerank.py::test_unrelated_low_score_can_continue_but_is_not_marked_rerank_accepted
+FAILED tests/weknora_port/test_s864_rerank.py::test_model_error_remains_distinct_from_low_scores[False]
+FAILED tests/weknora_port/test_s864_rerank.py::test_model_error_remains_distinct_from_low_scores[True]
+FAILED tests/weknora_port/test_s864_rerank.py::test_model_lookup_failure_retains_its_error_contract
+FAILED tests/weknora_port/test_s864_rerank.py::test_existing_floor_and_threshold_semantics_are_preserved[0.149-False]
+FAILED tests/weknora_port/test_s864_rerank.py::test_existing_high_threshold_retry_remains_two_calls[0.01]
+12 failed, 7 passed in 0.96s

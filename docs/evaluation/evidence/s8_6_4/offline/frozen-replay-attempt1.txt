@@ -1,0 +1,348 @@
+FFFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[scifact_621] _
+
+case = {'case_id': 'scifact-621', 'case_key': 'scifact_621', 'category': 'source_budget', 'q0': 'Individuals with Alzheimers who participate in six months of physical activity improve cognitive function for up to 18 months.', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+>       record = asyncio.run(replay(case))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s864_frozen_replay.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_4_replay.py:74: in replay
+    round_result = await RetrievalPipeline(Repository(), Registry()).retrieve_once(state, context)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\pipeline.py:143: in retrieve_once
+    await merge(state, context, self.repository, self.segmenter)
+backend\weknora_port\retrieval\merge.py:429: in merge
+    results = await resolve_parents(results, state, context, repository)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+results = [SearchResult(id='9c56759d-e0a2-41f3-8d7b-745c4aa52b26', content='CONTEXT Many observational studies have shown that p... balance, albeit only in participants with non-Alzheimer's dementia.", seq=1, knowledge_channel='', context_header='')]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[SearchResult(id='9c56759d-e0a2-41f3-8d7b-745c4aa5...e5d78363-eba8-4637-8ac1-127337a4439f', '83028b90-72be-4354-b00b-5521e3cab168', 'e568e674-5234-5329-aaee-6d01e74b643c'})
+context = CallContext(request_id='offline-replay', scope=TrustedScope(owner_id='p8-real-3de2eca0bea340babcde75ce60c9a366', knowl...ce-ba73-c1dad6eea8d7',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <scripts.s8_6_4_replay.replay.<locals>.Repository object at 0x00000190550F0440>
+
+    async def resolve_parents(results, state, context, repository):
+        parents = await _chunks(repository, [r.parent_chunk_id for r in results], state, context)
+        if not parents:
+            return results
+        parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
+        child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
+        scoped = await collect_image_info(child_ids, state, context, repository,
+            source_chunks={**parents, **{r.id: r for r in results}})
+        for r in results:
+            parent = parents.get(r.parent_chunk_id)
+            if not parent or not parent.content:
+                continue
+            if (parent.knowledge_id, parent.knowledge_base_id) != (r.knowledge_id, r.knowledge_base_id):
+                raise RetrievalScopeError()
+            if (getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                    (not parent.metadata.get('source_version') or
+                     parent.metadata.get('source_version') != r.metadata.get('source_version') or
+                     parent.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+>               raise RetrievalScopeError()
+E               backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+
+backend\weknora_port\retrieval\merge.py:243: RetrievalScopeError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_alt_ast_11b3b7] _
+
+case = {'case_id': 'longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828', 'case_key': 'longbench_alt_ast_11b3b7', 'category': 'source_budget', 'q0': '谷丙转氨酶和谷草转氨酶偏高的原因', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+>       record = asyncio.run(replay(case))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s864_frozen_replay.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_4_replay.py:74: in replay
+    round_result = await RetrievalPipeline(Repository(), Registry()).retrieve_once(state, context)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\pipeline.py:143: in retrieve_once
+    await merge(state, context, self.repository, self.segmenter)
+backend\weknora_port\retrieval\merge.py:429: in merge
+    results = await resolve_parents(results, state, context, repository)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+results = [SearchResult(id='ea8fea64-5aca-41aa-bec8-92392ecdb870', content='# dureader 11b3b7afb73f5bf65a51b3083e885a60825b17421...心,单纯的转氨酶升高对健康是没有大影响的.而且服用以上药物后定会很快痊愈的. 热心网友 | 2013-11-25 14:26', seq=13, knowledge_channel='', context_header=''), ...]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[SearchResult(id='ea8fea64-5aca-41aa-bec8-92392ecd...45974136-185d-4c90-90f8-31983aebf27c', 'e5ec8fa8-ed38-4ea2-9ff6-22da77a5a6fa', 'be66f052-9317-4030-b2e3-6a16ecd2c281'})
+context = CallContext(request_id='offline-replay', scope=TrustedScope(owner_id='p8-real-3de2eca0bea340babcde75ce60c9a366', knowl...04-8663-10aa669476ce',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <scripts.s8_6_4_replay.replay.<locals>.Repository object at 0x000001905368BE00>
+
+    async def resolve_parents(results, state, context, repository):
+        parents = await _chunks(repository, [r.parent_chunk_id for r in results], state, context)
+        if not parents:
+            return results
+        parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
+        child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
+        scoped = await collect_image_info(child_ids, state, context, repository,
+            source_chunks={**parents, **{r.id: r for r in results}})
+        for r in results:
+            parent = parents.get(r.parent_chunk_id)
+            if not parent or not parent.content:
+                continue
+            if (parent.knowledge_id, parent.knowledge_base_id) != (r.knowledge_id, r.knowledge_base_id):
+                raise RetrievalScopeError()
+            if (getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                    (not parent.metadata.get('source_version') or
+                     parent.metadata.get('source_version') != r.metadata.get('source_version') or
+                     parent.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+>               raise RetrievalScopeError()
+E               backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+
+backend\weknora_port\retrieval\merge.py:243: RetrievalScopeError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_fallout_5726f5] _
+
+case = {'case_id': 'longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7', 'case_key': 'longbench_fallout_5726f5', 'category': 'source_budget', 'q0': '辐射避难所怎么刷箱子', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+>       record = asyncio.run(replay(case))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s864_frozen_replay.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_4_replay.py:74: in replay
+    round_result = await RetrievalPipeline(Repository(), Registry()).retrieve_once(state, context)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\pipeline.py:143: in retrieve_once
+    await merge(state, context, self.repository, self.segmenter)
+backend\weknora_port\retrieval\merge.py:429: in merge
+    results = await resolve_parents(results, state, context, repository)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+results = [SearchResult(id='57d67ff3-557a-4377-90c9-c8d84ec77bac', content='(关于装备武器类的任务记得不要做噢) 步骤阅读 4 收集资源类任务可以做,如收集水、食物这些任务难度不高...一个小人),还有50食物的得到25瓶盖(也要做掉不能放弃)。 然后循环好了,刷个20多个就可以开心的玩了(前提是开出好东西)。', seq=4, knowledge_channel='', context_header=''), ...]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[SearchResult(id='57d67ff3-557a-4377-90c9-c8d84ec7...57d67ff3-557a-4377-90c9-c8d84ec77bac', 'e3c877c7-3e0c-43dc-964b-97fecee6c241', 'bfc88cc8-3fde-483a-aef3-cb647bc635c6'})
+context = CallContext(request_id='offline-replay', scope=TrustedScope(owner_id='p8-real-3de2eca0bea340babcde75ce60c9a366', knowl...04-8663-10aa669476ce',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <scripts.s8_6_4_replay.replay.<locals>.Repository object at 0x00000190550F16A0>
+
+    async def resolve_parents(results, state, context, repository):
+        parents = await _chunks(repository, [r.parent_chunk_id for r in results], state, context)
+        if not parents:
+            return results
+        parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
+        child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
+        scoped = await collect_image_info(child_ids, state, context, repository,
+            source_chunks={**parents, **{r.id: r for r in results}})
+        for r in results:
+            parent = parents.get(r.parent_chunk_id)
+            if not parent or not parent.content:
+                continue
+            if (parent.knowledge_id, parent.knowledge_base_id) != (r.knowledge_id, r.knowledge_base_id):
+                raise RetrievalScopeError()
+            if (getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                    (not parent.metadata.get('source_version') or
+                     parent.metadata.get('source_version') != r.metadata.get('source_version') or
+                     parent.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+>               raise RetrievalScopeError()
+E               backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+
+backend\weknora_port\retrieval\merge.py:243: RetrievalScopeError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_holiday_6770736] _
+
+case = {'case_id': 'longbench-zh-dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40', 'case_key': 'longbench_holiday_6770736', 'category': 'source_budget', 'q0': '美国的节日', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+>       record = asyncio.run(replay(case))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s864_frozen_replay.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_4_replay.py:74: in replay
+    round_result = await RetrievalPipeline(Repository(), Registry()).retrieve_once(state, context)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\pipeline.py:143: in retrieve_once
+    await merge(state, context, self.repository, self.segmenter)
+backend\weknora_port\retrieval\merge.py:429: in merge
+    results = await resolve_parents(results, state, context, repository)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+results = [SearchResult(id='a813d164-42cc-5c47-95ee-605ed0f0572c', content='# Summary\n介绍美国主要节日及其日期、起源与庆祝方式。\n\n本文介绍美国主要节日的日期、起源...美国宣布独立,使7月4日成为美国的国庆节。在这一天,往往有大规模的烟火表演、音乐会和游行,还有花样翻新的吃西瓜、吃热狗大赛。', seq=19, knowledge_channel='', context_header=''), ...]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[SearchResult(id='a813d164-42cc-5c47-95ee-605ed0f0...f34b8ad6-5bbb-4e77-b3e5-ef0acf9a1cbe', '0da75300-83db-4978-a1fa-0539980d57a5', 'ca0f809c-6380-41b1-89a6-5646c36c2a82'})
+context = CallContext(request_id='offline-replay', scope=TrustedScope(owner_id='p8-real-3de2eca0bea340babcde75ce60c9a366', knowl...04-8663-10aa669476ce',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <scripts.s8_6_4_replay.replay.<locals>.Repository object at 0x0000019054D3FA10>
+
+    async def resolve_parents(results, state, context, repository):
+        parents = await _chunks(repository, [r.parent_chunk_id for r in results], state, context)
+        if not parents:
+            return results
+        parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
+        child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
+        scoped = await collect_image_info(child_ids, state, context, repository,
+            source_chunks={**parents, **{r.id: r for r in results}})
+        for r in results:
+            parent = parents.get(r.parent_chunk_id)
+            if not parent or not parent.content:
+                continue
+            if (parent.knowledge_id, parent.knowledge_base_id) != (r.knowledge_id, r.knowledge_base_id):
+                raise RetrievalScopeError()
+            if (getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                    (not parent.metadata.get('source_version') or
+                     parent.metadata.get('source_version') != r.metadata.get('source_version') or
+                     parent.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+>               raise RetrievalScopeError()
+E               backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+
+backend\weknora_port\retrieval\merge.py:243: RetrievalScopeError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_utc_conversion_q0_selected] _
+
+case = {'case_id': 'longbench-zh-dureader:9938c97e6ccf006c5fc66ea3294b9835e1584d95713576a9', 'case_key': 'longbench_utc_conversion_q0_selected', 'category': 'source_budget', 'q0': 'utc时间转换北京时间', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+>       record = asyncio.run(replay(case))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s864_frozen_replay.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+scripts\s8_6_4_replay.py:74: in replay
+    round_result = await RetrievalPipeline(Repository(), Registry()).retrieve_once(state, context)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\pipeline.py:143: in retrieve_once
+    await merge(state, context, self.repository, self.segmenter)
+backend\weknora_port\retrieval\merge.py:429: in merge
+    results = await resolve_parents(results, state, context, repository)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+results = [SearchResult(id='1bd91c30-4486-4ccc-81f2-b2ed4d6aa87d', content='# dureader 9938c97e6ccf006c5fc66ea3294b9835e1584d957...规定的起始和结束日期执行。 曾经(1986至2006年期间),美国夏季始于每年4月的第1个周日,止于每年10月的最后一个周日。', seq=5, knowledge_channel='', context_header=''), ...]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[SearchResult(id='1bd91c30-4486-4ccc-81f2-b2ed4d6a...f05e6078-51a5-4a4f-a09a-136b52597489', 'c6d98863-091a-4b74-b8a7-78e74147bdf1', '98dedd6c-5647-4e74-a396-297ee9ba09d2'})
+context = CallContext(request_id='offline-replay', scope=TrustedScope(owner_id='p8-real-3de2eca0bea340babcde75ce60c9a366', knowl...04-8663-10aa669476ce',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <scripts.s8_6_4_replay.replay.<locals>.Repository object at 0x0000019054D3FE00>
+
+    async def resolve_parents(results, state, context, repository):
+        parents = await _chunks(repository, [r.parent_chunk_id for r in results], state, context)
+        if not parents:
+            return results
+        parents.update(await _chunks(repository, [r.parent_chunk_id for r in parents.values()], state, context))
+        child_ids = [r.id if r.chunk_type == 'text' else r.parent_chunk_id for r in results if r.parent_chunk_id and (r.chunk_type in ('image_ocr', 'image_caption') or (r.chunk_type == 'text' and r.parent_chunk_id in parents and (parents[r.parent_chunk_id].chunk_type == 'parent_text')))]
+        scoped = await collect_image_info(child_ids, state, context, repository,
+            source_chunks={**parents, **{r.id: r for r in results}})
+        for r in results:
+            parent = parents.get(r.parent_chunk_id)
+            if not parent or not parent.content:
+                continue
+            if (parent.knowledge_id, parent.knowledge_base_id) != (r.knowledge_id, r.knowledge_base_id):
+                raise RetrievalScopeError()
+            if (getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                    (not parent.metadata.get('source_version') or
+                     parent.metadata.get('source_version') != r.metadata.get('source_version') or
+                     parent.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+>               raise RetrievalScopeError()
+E               backend.weknora_port.retrieval.search.RetrievalScopeError: RETRIEVAL_SCOPE_REJECTED
+
+backend\weknora_port\retrieval\merge.py:243: RetrievalScopeError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[mml_0434] _
+
+case = {'case_id': 'mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434', 'case_key': 'mml_0434...tegory': 'rerank_low', 'q0': "Which dataset was introduced in the 'coding time' section of the PPT for training?", ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+        record = asyncio.run(replay(case))
+        assert record['selected_sources'] and record['source_unit_calls'] == record['new_provider_calls'] == 0
+        assert all(t.get('reason') != 'SOURCE_UNIT_BUDGET_EXCEEDED' for t in record['evidence_trace'])
+        if case['category'] == 'rerank_low':
+            assert not record['rerank_selected_ids']
+>           assert any(t.get('reason') == 'RERANK_ALL_BELOW_THRESHOLD_SEARCH_FALLBACK'
+                       for t in record['decisions'])
+E           assert False
+E            +  where False = any(<generator object test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window.<locals>.<genexpr> at 0x00000190537C4380>)
+
+tests\weknora_port\test_s864_frozen_replay.py:19: AssertionError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[mml_0431] _
+
+case = {'case_id': 'mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0431', 'case_key': 'mml_0431...'rerank_low', 'q0': 'How many layers does the neural network mentioned in the PPT for distinguishing faces have?', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+        record = asyncio.run(replay(case))
+        assert record['selected_sources'] and record['source_unit_calls'] == record['new_provider_calls'] == 0
+        assert all(t.get('reason') != 'SOURCE_UNIT_BUDGET_EXCEEDED' for t in record['evidence_trace'])
+        if case['category'] == 'rerank_low':
+            assert not record['rerank_selected_ids']
+>           assert any(t.get('reason') == 'RERANK_ALL_BELOW_THRESHOLD_SEARCH_FALLBACK'
+                       for t in record['decisions'])
+E           assert False
+E            +  where False = any(<generator object test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window.<locals>.<genexpr> at 0x0000019057A2C040>)
+
+tests\weknora_port\test_s864_frozen_replay.py:19: AssertionError
+_ test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[scifact_1304] _
+
+case = {'case_id': 'scifact-1304', 'case_key': 'scifact_1304', 'category': 'rerank_low', 'q0': 'Tirasemtiv targets cardiac muscle.', ...}
+
+    @pytest.mark.parametrize('case',CASES,ids=lambda c:c['case_key'])
+    def test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window(case):
+        record = asyncio.run(replay(case))
+        assert record['selected_sources'] and record['source_unit_calls'] == record['new_provider_calls'] == 0
+        assert all(t.get('reason') != 'SOURCE_UNIT_BUDGET_EXCEEDED' for t in record['evidence_trace'])
+        if case['category'] == 'rerank_low':
+            assert not record['rerank_selected_ids']
+>           assert any(t.get('reason') == 'RERANK_ALL_BELOW_THRESHOLD_SEARCH_FALLBACK'
+                       for t in record['decisions'])
+E           assert False
+E            +  where False = any(<generator object test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window.<locals>.<genexpr> at 0x0000019057A2DB10>)
+
+tests\weknora_port\test_s864_frozen_replay.py:19: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[scifact_621]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_alt_ast_11b3b7]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_fallout_5726f5]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_holiday_6770736]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[longbench_utc_conversion_q0_selected]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[mml_0434]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[mml_0431]
+FAILED tests/weknora_port/test_s864_frozen_replay.py::test_saved_bge_and_search_replay_keeps_exact_originals_without_source_window[scifact_1304]
+8 failed in 1.77s

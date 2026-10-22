@@ -1,0 +1,129 @@
+{
+  "profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+  "baseline": "0c496c230add039283c80635d4e7d4776a4e373b",
+  "test_only": true,
+  "question_inputs": {
+    "compare": "Compare Leyden jar and Franklin bells in terms of operating principles and uses."
+  },
+  "modes": [
+    "query_structure_v1"
+  ],
+  "session_fields": {
+    "source_evidence_mode": "bounded_source_v1"
+  },
+  "knowledge_base_ids": [
+    "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+  ],
+  "document_ids": [
+    "a973df4a-0b4b-43f7-ad17-55265aac1556",
+    "9d440f3c-021d-4c9b-adc5-6e7084fc8886",
+    "4846280b-37b3-4fbf-97c9-e4d798b9009c",
+    "3fdf4942-1265-4e9e-959d-27772f57e5dd"
+  ],
+  "answer_language_policy": {
+    "version": "s8.6.4-request-language/v1",
+    "precedence": [
+      "explicit_answer_language",
+      "explicit_q0_answer_directive",
+      "q0_script_default"
+    ],
+    "explicit_locale_tags": [
+      "de-DE",
+      "en-GB",
+      "en-US",
+      "es-ES",
+      "fr-FR",
+      "ja-JP",
+      "ko-KR",
+      "pt-BR",
+      "ru-RU",
+      "zh-CN",
+      "zh-HK",
+      "zh-TW"
+    ],
+    "default": {
+      "contains_han": "zh-CN",
+      "otherwise": "en-US"
+    },
+    "explicit_directive_support": "fixed common English/Chinese answer directives listed by implementation",
+    "unsupported_explicit_locale": "S864_UNSUPPORTED_EXPLICIT_LANGUAGE"
+  },
+  "accept_language_by_case": {
+    "compare": "en-US"
+  },
+  "reasoning_effort": "off",
+  "prompt_b_suffix": "When the supplied evidence contains sufficient information, perform the necessary verifiable calculation or logical inference instead of refusing solely because the result is not stated verbatim.\nDistinguish derived conclusions from directly stated facts. Do not invent missing inputs, entities, dates, locations, or relationships. If the evidence does not support a required relation, explicitly state the uncertainty.",
+  "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+  "default_original_system_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+  "default_profile_system_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+  "approved_budget_template_sha256": {
+    "rewrite_system_prompt": "1a7520b2d41de3af2c96898754facb5413f813443e337dc0a822f469ad78f8bc",
+    "rewrite_user_prompt": "7940c8dd9e1fa182357debf747be3e728cf4817d587fbad5077989d6e764393e",
+    "context_template": "d9780ecc6d5acccc09afe530d89f7423f4db8e6ed6c2f617cc454a898598e813"
+  },
+  "approved_fresh_context_required": true,
+  "resolved_custom_system_prompt": "preserved before same suffix; per-run actual wire hash authoritative",
+  "citations_enabled": true,
+  "enable_expansion_both_arms": false,
+  "rerank_top1_floorless": true,
+  "router_policy_unchanged": {
+    "mode": "DYNAMIC",
+    "threshold": "0.35",
+    "quality_escalation": true,
+    "truncated_escalation": true,
+    "abstention_escalation": false,
+    "provider_fallback": false
+  },
+  "production_defaults_unchanged": {
+    "strategy": "off",
+    "bridge": "off",
+    "expansion": true
+  },
+  "evaluations": {
+    "primary": "final_answer_correct",
+    "separate": [
+      "evidence_support",
+      "presentation_consistency",
+      "citation_ownership",
+      "new_recall_gain"
+    ],
+    "no_automatic_gold_substring_score": true,
+    "internal_final_answer_supported_is_not_answer_correctness": true
+  },
+  "new_actual_provider_calls": 0,
+  "authorization": "NONE",
+  "goal": "S8.6.2-R3",
+  "candidate_inputs_not_authorized": {
+    "dependent": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+    "parallel": "分别介绍Leyden jar和Franklin bells的工作原理与用途"
+  },
+  "qu_only_inputs": {},
+  "effective_query_input_contract": {
+    "version": "effective-query/v1",
+    "unicode_characters": 256,
+    "utf8_bytes": 1024
+  },
+  "query_implementation_sha256_LF": "3981bf13ea138e111ebe949af4deea1853a7c8f38f9a960d0b38770b598c5558",
+  "qu_prompt_sha256s": {
+    "_QU_V2_SYSTEM": "18ae87853d81b2e60a64b8496bf9207a89c4f8327e357394bac7d97cd9a487e6",
+    "_QU_V2_USER": "558b51fd0b5946c104092641ce59447f7d40ef49386d3bfce5a2925f38fee7ed",
+    "_REWRITE_GUARD_V2": "299121a4142dbe5979cfa64098b107a06a90e23d8812b03b39c2e2ef057d06d3"
+  },
+  "execution_scope": "one initial compare HTTP submission; other cases require a later explicit authorization",
+  "raw_qu_response_capture": "private normal Registry delegate; no response replacement",
+  "input_guard_stage": "understand/completed; before planning, Embedding, Search and Rerank",
+  "input_bound_failure": "PROFILE_INPUT_BOUND_EXCEEDED",
+  "enabled_rules": [
+    {
+      "rule_id": "COMPARE_SHARED",
+      "rule_version": "2",
+      "query_type": "SIMPLE_COMPARE"
+    },
+    {
+      "rule_id": "PARALLEL_ATTRIBUTE",
+      "rule_version": "2",
+      "query_type": "SIMPLE_PARALLEL"
+    }
+  ],
+  "classification_guidance_sha256": "a47e4f74e1042c579028f08233a4032ce1cb2ecef2711a3bbc8456450c3fe962"
+}

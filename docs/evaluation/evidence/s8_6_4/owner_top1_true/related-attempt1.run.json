@@ -1,0 +1,29 @@
+{
+  "command_argv": [
+    "E:/RAG quention/.venv/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "--tb=short",
+    "tests/weknora_port/test_s864_top1_default.py",
+    "tests/weknora_port/test_s8_ecs_runtime.py",
+    "tests/weknora_port/test_development_entry.py",
+    "tests/weknora_port/test_conversation_configuration.py",
+    "tests/weknora_port/test_s86_qu_configuration.py",
+    "tests/weknora_port/test_s861_preflight.py",
+    "tests/weknora_port/test_s861_api_acceptance.py",
+    "tests/weknora_port/test_s862r_preflight.py",
+    "tests/weknora_port/test_s862r3_http_preflight.py",
+    "tests/weknora_port/test_s862r3_40_acceptance.py",
+    "tests/weknora_port/test_s864_request_language.py",
+    "--basetemp",
+    "E:/RAG quention/var/reports/s8-6-4/top1-default/pytest-related"
+  ],
+  "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+  "exit_code": 1,
+  "log": "related-attempt1.log",
+  "log_sha256": "c5d17a08e2ab6cfea24f96a39cbb3e59d9d590eb9122d92d2865678b5345260f",
+  "result": "2 failed, 300 passed in 11.97s",
+  "command_record_source": "Actual earlier tool invocation from this session, recorded after failure; no test rerun.",
+  "classification": "BASELINE_KNOWN_FAIL_REPRODUCED; matching original full08ebd90 evidence in baseline-known-fails.json"
+}

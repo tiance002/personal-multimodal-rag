@@ -1,0 +1,293 @@
+FFFF.FFFFFFFFF                                                           [100%]
+================================== FAILURES ===================================
+__ test_patch_select_switch_clear_and_strict_current_resource_authorization ___
+tests\weknora_port\test_s864_document_scope.py:94: in test_patch_select_switch_clear_and_strict_current_resource_authorization
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:78: in run
+    response = await client.patch('/api/v1/sessions/session/document-scope', json={'document_scope': docs})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1933: in patch
+    return await self.request(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\httpx\_transports\asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+E:\RAG quention\.venv\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\middleware\base.py:197: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\http_api.py:313: in same_origin_writes
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\starlette\middleware\base.py:173: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+E:\RAG quention\.venv\Lib\site-packages\starlette\middleware\base.py:149: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+E:\RAG quention\.venv\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+E:\RAG quention\.venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+E:\RAG quention\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\fastapi\routing.py:2734: in app
+    await route.handle(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\fastapi\routing.py:1281: in handle
+    await super().handle(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\routing.py:282: in handle
+    await self.app(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\fastapi\routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+E:\RAG quention\.venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+E:\RAG quention\.venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+E:\RAG quention\.venv\Lib\site-packages\fastapi\routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+E:\RAG quention\.venv\Lib\site-packages\fastapi\routing.py:706: in app
+    raw_response = await run_endpoint_function(
+E:\RAG quention\.venv\Lib\site-packages\fastapi\routing.py:352: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\http_api.py:609: in update_session_document_scope
+    return json_data(request, await runtime.update_session_document_scope(
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute 'update_session_document_scope'
+_ test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot[original_docs0-new_docs0] _
+tests\weknora_port\test_s864_document_scope.py:118: in test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:105: in run
+    await app.update_session_document_scope(PRINCIPAL, 'session', new_docs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute 'update_session_document_scope'
+_ test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot[original_docs1-new_docs1] _
+tests\weknora_port\test_s864_document_scope.py:118: in test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:105: in run
+    await app.update_session_document_scope(PRINCIPAL, 'session', new_docs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute 'update_session_document_scope'
+_ test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot[original_docs2-new_docs2] _
+tests\weknora_port\test_s864_document_scope.py:118: in test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:105: in run
+    await app.update_session_document_scope(PRINCIPAL, 'session', new_docs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute 'update_session_document_scope'
+_ test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[\u8fd9\u4efd\u6280\u672f\u89c4\u8303\u7684\u5b9e\u65bd\u65e5\u671f\u662f\u4ec0\u4e48\uff1f] _
+tests\weknora_port\test_s864_document_scope.py:165: in test_real_authorized_title_clarification_precedes_history_memory_and_retrieval
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:151: in run
+    service.document_clarifier = app._document_scope_clarification
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[\u8fd9\u4e2aPPT\u4ecb\u7ecd\u4e86\u4ec0\u4e48\uff1f] _
+tests\weknora_port\test_s864_document_scope.py:165: in test_real_authorized_title_clarification_precedes_history_memory_and_retrieval
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:151: in run
+    service.document_clarifier = app._document_scope_clarification
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[\u4e0a\u8ff0\u62a5\u544a\u7684\u7ed3\u8bba\u662f\u4ec0\u4e48\uff1f] _
+tests\weknora_port\test_s864_document_scope.py:165: in test_real_authorized_title_clarification_precedes_history_memory_and_retrieval
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:151: in run
+    service.document_clarifier = app._document_scope_clarification
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[What is the effective date of this specification?] _
+tests\weknora_port\test_s864_document_scope.py:165: in test_real_authorized_title_clarification_precedes_history_memory_and_retrieval
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:151: in run
+    service.document_clarifier = app._document_scope_clarification
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[What is a classifier?-docs0] _
+tests\weknora_port\test_s864_document_scope.py:177: in test_normal_questions_and_explicit_scopes_are_not_forced_to_choose
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:176: in run
+    assert await app._document_scope_clarification(turn, 'Chinese') is None
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[\u8fd9\u4e9b\u6280\u672f\u89c4\u8303\u6709\u54ea\u4e9b\u5dee\u5f02\uff1f-docs1] _
+tests\weknora_port\test_s864_document_scope.py:177: in test_normal_questions_and_explicit_scopes_are_not_forced_to_choose
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:176: in run
+    assert await app._document_scope_clarification(turn, 'Chinese') is None
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[Compare this document and that document.-docs2] _
+tests\weknora_port\test_s864_document_scope.py:177: in test_normal_questions_and_explicit_scopes_are_not_forced_to_choose
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:176: in run
+    assert await app._document_scope_clarification(turn, 'Chinese') is None
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[\u8fd9\u4efd\u89c4\u8303\u7684\u5b9e\u65bd\u65e5\u671f\u662f\u4ec0\u4e48\uff1f-docs3] _
+tests\weknora_port\test_s864_document_scope.py:177: in test_normal_questions_and_explicit_scopes_are_not_forced_to_choose
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:176: in run
+    assert await app._document_scope_clarification(turn, 'Chinese') is None
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+_ test_clarification_catalog_never_uses_other_kbs_or_expands_explicit_document_set _
+tests\weknora_port\test_s864_document_scope.py:190: in test_clarification_catalog_never_uses_other_kbs_or_expands_explicit_document_set
+    asyncio.run(run())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s864_document_scope.py:186: in run
+    answer = await app._document_scope_clarification(turn, 'Chinese')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ApplicationRuntime' object has no attribute '_document_scope_clarification'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s864_document_scope.py::test_patch_select_switch_clear_and_strict_current_resource_authorization
+FAILED tests/weknora_port/test_s864_document_scope.py::test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot[original_docs0-new_docs0]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot[original_docs1-new_docs1]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_selection_changes_only_future_turns_and_old_post_get_retain_snapshot[original_docs2-new_docs2]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[\u8fd9\u4efd\u6280\u672f\u89c4\u8303\u7684\u5b9e\u65bd\u65e5\u671f\u662f\u4ec0\u4e48\uff1f]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[\u8fd9\u4e2aPPT\u4ecb\u7ecd\u4e86\u4ec0\u4e48\uff1f]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[\u4e0a\u8ff0\u62a5\u544a\u7684\u7ed3\u8bba\u662f\u4ec0\u4e48\uff1f]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_real_authorized_title_clarification_precedes_history_memory_and_retrieval[What is the effective date of this specification?]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[What is a classifier?-docs0]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[\u8fd9\u4e9b\u6280\u672f\u89c4\u8303\u6709\u54ea\u4e9b\u5dee\u5f02\uff1f-docs1]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[Compare this document and that document.-docs2]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_normal_questions_and_explicit_scopes_are_not_forced_to_choose[\u8fd9\u4efd\u89c4\u8303\u7684\u5b9e\u65bd\u65e5\u671f\u662f\u4ec0\u4e48\uff1f-docs3]
+FAILED tests/weknora_port/test_s864_document_scope.py::test_clarification_catalog_never_uses_other_kbs_or_expands_explicit_document_set
+13 failed, 1 passed in 2.13s

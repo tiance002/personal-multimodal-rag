@@ -1,0 +1,11 @@
+# MML0434 current-source neighbor replay
+
+Status: `OFFLINE_PASS_REAL_NOT_RUN`. This evidence runs the saved 30-row Search/BGE input through the real local Rerank, Merge, source projection, Context, and generation-preparation code. It does not call live retrieval, a provider, generation, the database, or ECS.
+
+The raw readback in `../mml0434_neighbor_readback/current-source.stdout.json` contains exactly the three current-version originals used by this replay. The script validates the owner hash, tenant, knowledge base, anchor document, current source version, row scope, offsets, and reciprocal neighbor links. It provides those originals only through the mocked `get_chunks` method; it does not append them to Search results or the BGE input list.
+
+With `rerank_top1_floorless=false`, the unchanged historical `.3` threshold leaves Rerank empty and the existing Search fallback runs. With the flag enabled, production Rerank chooses only the Coding time anchor. The frozen scores remain Search `0.013155858226280761` and raw BGE `0.022454602643847466`; existing post-Rerank fusion yields selected score `0.1174195190541927`. No manual score or threshold adjustment is applied. Existing Merge then reads its saved previous, anchor, and next chunks and retains the original 350/850 behavior.
+
+The floorless prepared context delivers the anchor (133 characters, offsets 9077–9210), previous chunk `fa5675e3-e769-4f3a-8cd0-267b3d35a386` (35 characters, offsets 9040–9075), and next chunk `084c5bee-f7be-4718-9c0b-510e61cb401a` (69 characters, offsets 9212–9281), all at source version `10bce0ac-2fa8-46c1-8fc4-067d575d7370`. The next chunk contains `Kaggle's Cat vs Dog dataset (25k dog/cat pictures)` and that complete 69-character chunk appears in the prepared prompt. Prompt citation handles are tied to original IDs, offsets and version by `verification.json`; offsets and version are identity metadata in the sidecar, not literal prompt fields.
+
+Commands, exit codes, immutable input hashes, prompt hashes, prepared handle-to-source mapping, and both output records are in `verification.json`, `fallback.json`, and `floorless.json`. The focused invalid-readback and replay tests passed: 4 passed, 8 deselected. This is original-delivery/engineering evidence only; no generated answer or semantic-support claim was tested.

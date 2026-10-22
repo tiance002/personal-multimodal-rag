@@ -1,0 +1,33 @@
+{
+  "schema": "s864-baseline-protection/v1",
+  "baseline": "3c081b657c9c768d4d1b81310e4dc59c711f195d",
+  "source_commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+  "scope": "Git-tracked artifacts only; no live DB/ECS inspection",
+  "groups": {
+    "historical_evaluations": {
+      "status": "PASS",
+      "tracked_files": 476,
+      "changed_paths": []
+    },
+    "provider_send_gate": {
+      "status": "PASS",
+      "tracked_files": 24,
+      "changed_paths": []
+    },
+    "query_rules_router": {
+      "status": "PASS",
+      "tracked_files": 3,
+      "changed_paths": []
+    },
+    "schema_indexes": {
+      "status": "PASS",
+      "tracked_files": 25,
+      "changed_paths": []
+    },
+    "background_runner": {
+      "status": "PASS",
+      "tracked_files": 2,
+      "changed_paths": []
+    }
+  }
+}

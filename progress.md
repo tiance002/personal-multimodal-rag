@@ -642,3 +642,10 @@ HTTP驱动适配348557b：直接运行冻结ECS端既有驱动，消费实际逐
 ## 2026-10-22 S8.6.3 引用身份修复与 ECS40 失败分层
 
 基线d5b6850，主修复922b5c3及当前来源保护c13eecd。3条真实历史引用由Merge extend扩大正文却保留anchor ID，已分离可选source窗口与强制身份物化；恢复各原始Chunk/offset/version，当前文档启用与解析完成保护复用既有readback，off及预算不变。RED9failed2passed，额外文档状态反例RED3failed；最终12个受影响模块270passed、exit0，冻结两题完整Context及Pieter来源送达为离线验证，未冒充新真实HTTP。18题仍分别10FAIL/5PARTIAL/3UNVERIFIED，主层C7/D4/F3/A3/A或B未决1；2个D错误+2个正确控制的固定历史请求已校验Gold隔离及双模型离线renderer。新增真实Provider/Token/UNKNOWN/DB/ECS均0，旧收据和Gold保留；真实模型对照与修复版HTTP NOT_RUN。报告docs/evaluation/S8_6_3_SOURCE_IDENTITY_AND_FAILURE_LAYERS.md/.results.json；本地提交收尾，无Push/部署/Tag。
+
+
+## 2026-10-22 S8.6.4 检索链路收敛 — OFFLINE COMPLETE / REAL NOT RUN
+
+先收尾S8.6.3（3c081b6）；依Owner后续S8.6.4优先规则，删除额外Source Unit/2048/6/4096/3组/16000人工限制及整轮清空，保留350/850、父子/连续Merge、TopK、current原文ID/offset/version。528b19f修复空Rerank回退及4处Merge边界，b9654bf接线逐题语言和授权Session文档选择/切换/清空/澄清与在途范围冻结，VLM阶段8b75820接入精确提取Caption及固定2图/5文本对照包。生产生成Prompt/P5/阈值/RRF/模型/Schema/索引不变。最终33受影响模块715passed/5既有SWIG警告/exit0，保留所有RED和11failed/704passed中间失败，不重跑旧922。前端build0和Mock API浏览器doc-a→doc-b→清空/刷新持久化PASS；不是ECS验收。5预算+3低分保存边界原文送达，3历史引用继续通过；初始MML0434保存池漏邻块；后续限定ECS只读回查找到同版本69字符next句，Top1=true与false fallback生产下游回放均送达。指定旧S8.2 UUID完整快照仍BLOCKED_MISSING，新答案NOT_RUN。新版真实HTTP/VLM/生成候选质量NOT_RUN，新增Provider/Token/UNKNOWN/DB写入/ECS构建部署均0，另一次只读三块回查。S8_6_4_RETRIEVAL_CONVERGENCE.md/.results.json及55文件归档已准备；一次新授权提案后停止，无Push/部署/Tag或Owner验收声明。
+
+Owner追加Top1：最终源码a25af498ab3d2eb5614185f73d678a172e300d52，正常服务/defaultenv/formal启动/profile实际true，显式false保留，Graph/bridge/权限护栏不变。裸PipelineState中性false仅隔离用，正常配置实际传true。已证明评分第一Codingtime原BGE0.0224546按Top1保留，邻接3原块241字符入最终946字符消息，必要句绑定独立ChunkID/offset/version。最新六模块RED4/92→GREEN96passed0；配置/profile300passed/2deselected0，旧08ebd90两个intent失败另有2failed/300passed原样复现，断言不改不计PASS。715为追加指令前8b758阶段，所有数量有交集不相加。新组合profile6402fa6a...；一次50万Token/最多40次操作提案尚待Owner授权，真实生成/两图效果NOT_RUN，无自动Push/部署/Tag。
