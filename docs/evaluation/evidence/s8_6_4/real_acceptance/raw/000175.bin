@@ -1,0 +1,7 @@
+import os,sys
+from pathlib import Path
+sys.path.insert(0,'/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629/app')
+from scripts.ecs_acceptance_http_payload import run_payload
+os.environ['S864_CONFIGURATION_FILE']='/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/configuration.json'
+os.environ['S864_CONFIGURATION_SHA256']='71d7bcc16cd0fcc9d1655f9d57db958e9bfa3d9d9b207dcebc4b0c608d02206f'
+raise SystemExit(run_payload(Path('/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/exact3_http_controller.py'),'72a197c1564451461b0fee96248d3432893dbef9ddfc2f0965eff4e7468dd13f',Path('/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/batch-summary.json'),[Path('/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-1/execution.json'),Path('/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-2/execution.json'),Path('/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-3/execution.json'),Path('/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/vision/execution.json'),Path('/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-summary.json'),Path('/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/batch-window/window.json'),Path('/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/vision-output/results.json')]))

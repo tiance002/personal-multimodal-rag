@@ -1,0 +1,31 @@
+{
+  "schema": "s864-new-owner-approval-evidence/v1",
+  "goal": "S8.6.4",
+  "recorded_at_utc": "2026-10-22T10:55:26.431308+00:00",
+  "source_commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+  "profile_sha256": "6402fa6a171d868da549ee14f328efe4ce42de3f8bf51b2a645421334d1fbdf1",
+  "proposal_sha256": "9abe3edf977058d5ec8a56626f2686bd70c7d40f429263e28a193cef6677c64d",
+  "owner_response": "批准本次新范围并执行",
+  "question_verbatim": "依 S8.6.4 第十六节要求的新授权，是否批准报告第10节的这一轮隔离 ECS 验收？源码 a25af498ab3d2eb5614185f73d678a172e300d52，profile 6402fa6a171d868da549ee14f328efe4ce42de3f8bf51b2a645421334d1fbdf1：构建独立临时镜像并记录身份；MML0434、辐射避难所、Pieter 各新 Session、单次正式 HTTP，Top1=true、原 Prompt B/P5 DYNAMIC/原 KB 范围；MML0684、MML0958 冻结原图各做旧/新 Caption，共4次。向现有 SiliconFlow Qwen3.5-4B、bge-m3、bge-reranker 和 DeepSeek deepseek-flash 发送固定问题及必要原文/原图。新总额度500,000 Token；HTTP保留每题12次/100,000 Token子限额，整批操作最多40次、40分钟。权限、UNKNOWN、发送不明或输出不完整即停止，不重试；不替换生产、不重建索引、不复用旧授权。本次申请来自该 Goal 的明确授权要求，当前已完成全部离线工作。",
+  "question_item_id": "[\"request_user_input_async\",\"call_4aa8c437620e434da6a87b8489a8cad6\",0]",
+  "owner_approved": true,
+  "max_total_tokens": 500000,
+  "max_total_attempts": 40,
+  "HTTP_child_max_attempts": 12,
+  "HTTP_child_max_tokens": 100000,
+  "max_runtime_seconds": 2400,
+  "allowed_http_case_ids": [
+    "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+    "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+    "hotpotqa-5a729fe55542991f9a20c53b"
+  ],
+  "allowed_vlm_case_ids": [
+    "row-0684",
+    "row-0958"
+  ],
+  "vision_comparison_attempts_max": 4,
+  "automatic_retries": false,
+  "old_grants_reused": false,
+  "production_update_authorized": false,
+  "ingestion_index_update_authorized": false
+}

@@ -1,0 +1,249 @@
+{
+  "schema": "s8.6.4.http-quality-review/v1",
+  "review_status": "AGENT_REVIEW_COMPLETE_NOT_OWNER_APPROVAL",
+  "reviewed_at_utc": "2026-10-22",
+  "source_commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "export_id": "s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export",
+  "export_root": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output",
+  "rubric": {
+    "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\review\\scoring-rubric.json",
+    "sha256": "11f10d9133635727197267e64ac905efc77978d6431a9f41a6d6f004950dcff1",
+    "bytes": 26407
+  },
+  "method": "Read-only manual review of exported raw answers, actual final generation requests, context passages, frames, source projections, and current-source readback records. No model judge used.",
+  "overall_note": "Runtime settlement totals (16 settled calls / 40,977 tokens as reported by execution accounting) are operational facts, not answer-quality scores. Rule activation is not inferred from correct answers or compact stage counts.",
+  "cases": [
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "final_answer_correct": {
+        "status": "PASS",
+        "basis": "Official native typed answer is “Cat vs Dog dataset”; response identifies Kaggle’s Cat vs Dog dataset."
+      },
+      "question_coverage": {
+        "status": "PASS",
+        "basis": "Connects the dataset to the PPT’s “coding time” section and training context."
+      },
+      "evidence_support": {
+        "status": "PASS",
+        "basis": "Actual final generation user message contains both delivered source passages: the “Coding time!” slide chunk and the next source chunk exact text “Kaggle's Cat vs Dog dataset (25k dog/cat pictures)”. The answer’s 25k detail is supported by that delivered neighbor."
+      },
+      "citation_identity_readback": {
+        "status": "PASS_WITH_DISPLAY_ALIAS_NOTE",
+        "basis": "Answer cites chunk 084c5bee-f7be-4718-9c0b-510e61cb401a and 10ff171b-a054-4cbc-9ab4-4c52b8c3022f in the requested KB. Both have successful HTTP 200 current-source readbacks; chunk IDs map to the scoped source document UUID/version. The doc attribute is a filename-stem display alias, not the returned document UUID."
+      },
+      "unsupported_extras": {
+        "status": "NONE_MATERIAL",
+        "basis": "No material unsupported factual claim identified."
+      },
+      "presentation": {
+        "status": "PASS",
+        "basis": "Concise answer with the identifying fact, source quotation, and section connection."
+      },
+      "raw_answer": {
+        "chars": 632,
+        "sha256": "c571912c388b67094f088c22a98aaf3ff9c7521a1a38fa6a746732461234fbdf",
+        "quote": "The dataset introduced in the 'coding time' section of the PPT is **Kaggle's Cat vs Dog dataset**."
+      },
+      "final_model_input": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\evidence\\1844969a92b64c2ea916b7eb33f745ff.request.json",
+        "sha256": "f8e271c6d0dd03be2e63b78ff89edf2a3fbb63cac936d57a166cf8e2c4276131",
+        "request_id": "7e4c61d1-314d-4e1c-9ab2-7c78eb4db6dd/answer/1/cheap",
+        "model": "Qwen/Qwen3.5-4B",
+        "user_message_chars": 1337,
+        "user_message_sha256": "dc34b4a5b81d7578679603f978e262d67d27262cab9ab5f24acb354129ae7669",
+        "delivered_quotes": [
+          "Coding time!",
+          "Kaggle's Cat vs Dog dataset (25k dog/cat pictures)"
+        ]
+      },
+      "retrieval_path": {
+        "retrieved_candidates": 30,
+        "rerank_candidates": 1,
+        "merge_candidates": 1,
+        "source_projection_candidates": 4,
+        "final_context_evidence": 4,
+        "interpretation": "Observed pipeline counts only; no closed-rule activation inferred from the answer."
+      },
+      "evidence_files": [
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-1\\history.json",
+          "sha256": "4d3c659a18b376b83931de4b2dc4af16066df5bc957002a078dd70b8eafb703a",
+          "bytes": 1807928
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-1\\frames.json",
+          "sha256": "2ba8b793ca3bcf655ddbbed904bb49e478a4647ca8c1654af9e8f4c40dbde630",
+          "bytes": 3640968
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-1\\sources.json",
+          "sha256": "5377bd97bbc38e32ba63868aa859ba97fdd4b8698e4b22e313992c642355dca8",
+          "bytes": 18757
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-1\\input.json",
+          "sha256": "ed596ad9328819e94a2ef5be6f24686e41694805a9d5eeea2f75859f15022b06",
+          "bytes": 788
+        }
+      ]
+    },
+    {
+      "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "q0": "辐射避难所怎么刷箱子",
+      "final_answer_correct": {
+        "status": "NOT_OFFICIAL_GOLD; SOURCE_BASED_MANUAL=PASS_WITH_CAVEATS",
+        "basis": "The frozen local artifact explicitly says no official answer string was located. Manual comparison to the frozen native reference answers supports the main task-reset and task-loop mechanisms, including early task sequencing and deleting/replacing tasks. This is not an official benchmark accuracy result."
+      },
+      "question_coverage": {
+        "status": "PASS",
+        "basis": "Provides actionable approaches to farming lunchboxes: time-shift/task refresh, task recycling, and a separate box-opening RNG technique."
+      },
+      "evidence_support": {
+        "status": "PASS_WITH_CAVEATS",
+        "basis": "Actual final generation user message carries 11 selected evidence items and includes the task-loop/early-achievement sequence, time rollback/new shelter/task refresh, and box-opening save/reload/RNG source text. Source material also supports the house expansion/no-upgrade advice. A few evaluative phrases exceed the source wording."
+      },
+      "citation_identity_readback": {
+        "status": "FAIL_NO_ANSWER_CITATIONS",
+        "basis": "Answer has no citation tags or source attribution handles; exported sources.json is empty (3 bytes, []). This is distinct from the fact that source passages were present in the model context."
+      },
+      "unsupported_extras": {
+        "status": "MINOR_UNSUPPORTED_OR_OVERSTATED",
+        "basis": "The superlatives “最常用”, “最通用且高效” and the claim that time changes are “非破坏性” are not established by the cited source content. The time-change advice does include a later warning about possible game anomalies, and the house advice is supported by delivered source text."
+      },
+      "presentation": {
+        "status": "PARTIAL",
+        "basis": "Chinese answer is organized and detailed, but is longer than needed and mixes the core farming methods with RNG opening advice and caveats; no citations make verification difficult."
+      },
+      "raw_answer": {
+        "chars": 1369,
+        "sha256": "81e97495dced8a8dee492b1475b84245ce0ea11d0fdfeb3c17360fb16c4dee94",
+        "quote": "在《辐射避难所》中刷箱子主要有两种核心方法：**利用时间修改重置任务**（最常用）和**利用任务循环机制**。"
+      },
+      "official_gold_status": "NOT_LOCATED_IN_LOCAL_FROZEN_GOLD_SIDECAR; do not report official benchmark accuracy.",
+      "final_model_input": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\evidence\\3be006cb08864442ae4dc2c745874bd8.request.json",
+        "sha256": "8a37d6a2287e44f0468b76901d337c95ad229ee0f9644a703517873bb723f44f",
+        "request_id": "0af2feba-8794-4a34-a83c-907ab2a2a4f5/answer/1/cheap",
+        "model": "Qwen/Qwen3.5-4B",
+        "user_message_chars": 7266,
+        "user_message_sha256": "f9c4c9920d44e8da6d1591fa427bf525feab1b9d1750324afa9b99057a8d2efd",
+        "context_selected_evidence": 11,
+        "example_delivered_text": [
+          "开局建好水电餐，宿舍……不要完成2个正确分配这任务。",
+          "把时间自动设置功能关了，然后把时间往回调七八个月……任务奖励箱子。",
+          "箱子乱数系统……存档……触发打怪等环节，再存档去开。",
+          "所有房子可以扩大但不要升级……"
+        ]
+      },
+      "retrieval_path": {
+        "retrieved_candidates": 30,
+        "rerank_candidates": 11,
+        "merge_candidates": 3,
+        "source_projection_candidates": 11,
+        "final_context_evidence": 11,
+        "interpretation": "Observed pipeline counts only; no closed-rule activation inferred from answer correctness."
+      },
+      "evidence_files": [
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-2\\history.json",
+          "sha256": "7e6c95dfa99ac1c7c83ebed6ce1ada39009578a2c153a2e85a642a83e17b9fad",
+          "bytes": 5014
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-2\\frames.json",
+          "sha256": "7249e8db0008124f7096431a942137cc7251e6cb00a880bbf82479e09cb0721a",
+          "bytes": 186941
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-2\\sources.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-2\\input.json",
+          "sha256": "84cdaa2dacbde476d01e41f79d94ae14fbe8b2b7f82aebe2c921877243d4dbd5",
+          "bytes": 725
+        }
+      ]
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "qid": "5a729fe55542991f9a20c53b",
+      "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "final_answer_correct": {
+        "status": "PASS",
+        "basis": "Official native answer is “Pieter van Musschenbroek”; answer names the same person."
+      },
+      "question_coverage": {
+        "status": "PASS",
+        "basis": "Explicitly states the person is credited with both the Leyden jar and the tribometer."
+      },
+      "evidence_support": {
+        "status": "PASS",
+        "basis": "Final model context includes the source passage crediting van Musschenbroek with the Leyden jar (1746) and the tribometer passage “It was invented by the 18th century Dutch scientist Musschenbroek”."
+      },
+      "citation_identity_readback": {
+        "status": "PASS",
+        "basis": "Citations identify both supporting chunk IDs; successful HTTP 200 readbacks resolve them to current document UUIDs and versions within the scoped KB. The extra Leyden jar definition citation also read back successfully."
+      },
+      "unsupported_extras": {
+        "status": "NONE_MATERIAL",
+        "basis": "The supporting detail that a Leyden jar stores static electricity is present in delivered context; no material unsupported extra identified."
+      },
+      "presentation": {
+        "status": "PASS",
+        "basis": "Direct, readable answer with citations attached to the two key facts."
+      },
+      "raw_answer": {
+        "chars": 980,
+        "sha256": "b8234c657bea8be089d8e1d99d6fc1fe9c0c6b47e57e6f3544068bf1f9238878",
+        "quote": "The man credited with inventing both the Leyden jar and the tribometer is **Pieter van Musschenbroek**."
+      },
+      "final_model_input": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\evidence\\b27772061c124be88486962dee463ea9.request.json",
+        "sha256": "317cbe4c4865ba093401c8ed557ef66a490d4bcea8e0448cdc63e3d8a07c6397",
+        "request_id": "9b564ed6-41cc-401e-a642-cae8e7941a09/answer/1/cheap",
+        "model": "Qwen/Qwen3.5-4B",
+        "user_message_chars": 3884,
+        "user_message_sha256": "65c77ee8dfb43f265da2e9ec838fb6ae00b32842db8583b96e1ce4ba39074a9f",
+        "delivered_quotes": [
+          "Pieter van Musschenbroek ... credited with the invention ... the Leyden jar.",
+          "It was invented by the 18th century Dutch scientist Musschenbroek"
+        ]
+      },
+      "retrieval_path": {
+        "retrieved_candidates": 30,
+        "rerank_candidates": 8,
+        "merge_candidates": 8,
+        "source_projection_candidates": 5,
+        "final_context_evidence": 5,
+        "interpretation": "Observed pipeline counts only; no closed-rule activation inferred from answer correctness."
+      },
+      "evidence_files": [
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-3\\history.json",
+          "sha256": "8f7e09e16f1ca4dd072b6a79517f18a668b480b86bab18e9073ce24e3af5a1b4",
+          "bytes": 11947
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-3\\frames.json",
+          "sha256": "f398c8697b5510f3543a8cd78ca48a3e14e634307bda80acc01f96b87c983434",
+          "bytes": 62004
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-3\\sources.json",
+          "sha256": "e3ff39e95e21857dec4c2138f19ae18c1ee14171f42b5c45d89d626a3c784122",
+          "bytes": 3667
+        },
+        {
+          "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\case-3\\input.json",
+          "sha256": "1ec2af405c35119d0fbc5ea09a96c99ef1ec66dd8b8264cf0fef4299cfad067f",
+          "bytes": 733
+        }
+      ]
+    }
+  ]
+}

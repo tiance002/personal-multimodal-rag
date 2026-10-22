@@ -1,0 +1,188 @@
+"""Single-use task-specific three-case Docker/HTTP orchestration artifact.
+
+Invoked exactly once by unchanged ecs_acceptance_http_payload/run_payload.
+No Provider implementation, no retries, no environment/credential snapshots.
+"""
+import hashlib,json,os,shutil,subprocess,sys,time
+from datetime import datetime,timezone,timedelta
+from pathlib import Path
+_DIAG_OUTPUT=None
+
+def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path): return json.loads(Path(path).read_text(encoding='utf8'))
+def write(path,obj):
+ p=Path(path);p.parent.mkdir(parents=True,exist_ok=True)
+ with p.open('x',encoding='utf8') as f:json.dump(obj,f,ensure_ascii=False,indent=2);f.write('\n')
+def require(ok,code):
+ if not ok:raise ValueError(code)
+def call(args,timeout=60):
+ r=subprocess.run(args,capture_output=True,timeout=timeout)
+ if r.returncode:
+  if _DIAG_OUTPUT is not None:
+   (_DIAG_OUTPUT/'docker-failure.stdout').write_bytes(r.stdout)
+   (_DIAG_OUTPUT/'docker-failure.stderr').write_bytes(r.stderr)
+   write(_DIAG_OUTPUT/'docker-failure.command.json',{'command':['docker',args[1],'<arguments withheld: no environment dump>'],
+       'exit_code':r.returncode,'no_retry':True})
+  raise ValueError('S864_DOCKER_OPERATION_FAILED_'+args[1])
+ return r.stdout
+
+def main():
+ global _DIAG_OUTPUT
+ configuration=Path(os.environ['S864_CONFIGURATION_FILE'])
+ require(sha(configuration)==os.environ['S864_CONFIGURATION_SHA256'],'S864_CONFIGURATION_CHANGED')
+ cfg=read(configuration);grant=read(cfg['grant_file']);output=Path(os.environ['ECS_ACCEPTANCE_OUTPUT_DIR']);_DIAG_OUTPUT=output
+ require(sha(cfg['grant_file'])==cfg['grant_sha256'] and sha(__file__)==grant['controller_sha256'],'S864_FROZEN_DRIVER_CHANGED')
+ require(len(grant['cases'])==3 and len(grant['batches'])==4
+     and grant['batches'][grant['vision_batch_id']]['kind']=='vision','S864_THREE_HTTP_AND_SHARED_VISION_ONLY')
+ before=read(cfg['before_file'])
+ current=[]
+ for service in ('api','worker'):
+  found=call(['docker','ps','--filter','label=com.docker.compose.project=rag-s8','--filter','label=com.docker.compose.service='+service,'--format','{{.ID}}']).decode().split()
+  require(len(found)==1,'S864_PRODUCTION_SERVICE_NOT_UNIQUE')
+  current.append(json.loads(call(['docker','inspect',found[0]]))[0])
+ require([x['Id'] for x in current]==[x['id'] for x in before['production']]
+     and [x['Image'] for x in current]==[x['image_id'] for x in before['production']],'S864_PRODUCTION_IDENTITIES_CHANGED')
+ base_env=dict(x.split('=',1) for x in current[0]['Config']['Env'] if '=' in x)
+ require(base_env['WEKNORA_PORT_CLOUD_ALLOWED']=='false' and base_env.get('WEKNORA_PORT_GRAPH_ENABLED','false')=='false','S864_PRODUCTION_BOUNDARIES_CHANGED')
+ image=json.loads(call(['docker','image','inspect',cfg['image_id']]))[0]
+ require(image['Id']==cfg['image_id'] and image['Config']['Labels']['org.opencontainers.image.revision']==cfg['source_revision'],'S864_FINAL_IMAGE_IDENTITY')
+ began=time.monotonic();completed=0;results=[]
+ started=datetime.now(timezone.utc)
+ window=cfg.get('batch_window_seed') or {'started_at':started.isoformat(),
+     'deadline_at':(started+timedelta(seconds=2400)).isoformat(),
+     'max_runtime_seconds':2400,'single_shared_http_and_vision_window':True}
+ original_start=datetime.fromisoformat(window['started_at']).timestamp()
+ original_deadline=datetime.fromisoformat(window['deadline_at']).timestamp()
+ require(original_deadline-original_start==2400 and time.time()<original_deadline,'S864_SHARED_BATCH_WINDOW_EXHAUSTED')
+ began=time.monotonic()-(time.time()-original_start)
+ write(cfg['batch_window_file'],window)
+ # All paths below are an explicit approved transport allowlist. review/ and
+ # vlm-preparation/ are never enumerated, opened, mounted or uploaded.
+ readonly=[configuration,Path(cfg['grant_file']),Path(cfg['owner_file']),Path(cfg['proposal_file']),
+     Path(cfg['image_proof_file']),Path(cfg['glue_file']),Path(cfg['before_file'])]
+ if cfg.get('supplement_file'):readonly.append(Path(cfg['supplement_file']))
+ require(len(set(map(str,readonly)))==len(readonly),'S864_DUPLICATE_MOUNTS')
+ for index,case in enumerate(grant['cases'],1):
+  require(time.monotonic()-began<grant['max_runtime_seconds'],'S864_BATCH_RUNTIME_EXHAUSTED_NO_NEXT_SUBMISSION')
+  batch=grant['batches'][case['case_id']]
+  statuses=[read(b['execution_file']) for b in grant['batches'].values()]
+  require(all(d['status']=='OPEN' and all(e['status']=='SETTLED' for e in d['entries']) for d in statuses),'S864_UNKNOWN_UNSETTLED_STOP')
+  require(not read(batch['execution_file'])['entries'],'S864_SELECTED_CASE_NOT_FRESH')
+  env={k:v for k,v in base_env.items() if not k.startswith(('S840_','S861_','S864_'))}
+  env.update({'WEKNORA_PORT_CLOUD_ALLOWED':'true','WEKNORA_PORT_GRAPH_ENABLED':'false',
+      'WEKNORA_PORT_RERANK_TOP1_FLOORLESS':'true','WEKNORA_PORT_ROUTER_MODE':'DYNAMIC',
+      'WEKNORA_PORT_EXECUTION_FILE':batch['execution_file'],'WEKNORA_PORT_EXECUTION_ROOT':'/opt/rag-s8/state/executions',
+      'WEKNORA_PORT_REDIS_PREFIX':batch['redis_prefix'],'WEKNORA_PORT_QUERY_UNDERSTAND_MODEL_ID':batch['qu_model_id'],
+      'WEKNORA_PORT_SOURCE_EVIDENCE_MODE':'bounded_source_v1','S8_COMPONENT':'api',
+      'S8_LOG_DIR':batch['log_directory'],'S864_CONFIGURATION_FILE':str(configuration),
+      'S864_CONFIGURATION_SHA256':os.environ['S864_CONFIGURATION_SHA256'],'S864_OWNER_FILE':cfg['owner_file'],
+      'S864_SOURCE_REVISION':cfg['source_revision'],'S864_IMAGE_ID':cfg['image_id'],'S864_CASE_ID':case['case_id']})
+  env.pop('WEKNORA_PORT_EVIDENCE_DIR',None)
+  name=cfg['container_prefix']+'-'+str(index)
+  args=['docker','run','--detach','--name',name,'--network',before['network'],'--entrypoint','python']
+  for mount in before['readonly_mounts']:
+   args+=['--mount','type=bind,source='+mount['source']+',target='+mount['destination']+',readonly']
+  for p in readonly:args+=['--mount','type=bind,source='+str(p)+',target='+str(p)+',readonly']
+  for p in (cfg['execution_batch_root'],cfg['owner_state_directory'],batch['log_directory'],batch['http_output_parent']):
+   args+=['--mount','type=bind,source='+p+',target='+p]
+  for key,value in sorted(env.items()):args+=['--env',key+'='+value]
+  args += [cfg['image_id'],'-B',cfg['glue_file'],'api']
+  container_id=call(args,60).decode().strip()
+  write(output/(str(index)+'-container.json'),{'id':container_id,'name':name,'image_id':cfg['image_id'],'source_revision':cfg['source_revision'],'worker_started':False})
+  ready=False
+  for attempt in range(45):
+   r=subprocess.run(['docker','exec',name,'python','-B',cfg['glue_file'],'ready'],capture_output=True,timeout=12)
+   if r.returncode==0:
+    write(output/(str(index)+'-ready.json'),json.loads(r.stdout));ready=True;break
+   inspected=json.loads(call(['docker','inspect',name]))[0]
+   if not inspected['State']['Running']:break
+   time.sleep(1)
+  require(ready,'S864_CANDIDATE_NOT_READY_NO_PROVIDER_SEND')
+  # Exactly one normal HTTP POST lives in the collector. No transient retry.
+  r=subprocess.run(['docker','exec',name,'python','-B',cfg['glue_file'],'collector'],capture_output=True,
+      timeout=max(1,grant['max_runtime_seconds']-(time.monotonic()-began)))
+  (output/(str(index)+'-collector.stdout')).write_bytes(r.stdout)
+  (output/(str(index)+'-collector.stderr')).write_bytes(r.stderr)
+  write(output/(str(index)+'-collector.command.json'),{'command':['docker','exec',name,'python','-B',cfg['glue_file'],'collector'],'exit_code':r.returncode,'automatic_retry':False})
+  # Preserve failed/UNKNOWN receipts before interpreting exit status.
+  for source,destination in ((Path(batch['http_output_directory']),output/('case-'+str(index))),
+      (Path(batch['execution_file']).parent,output/('execution-'+str(index)))):
+   if source.exists():shutil.copytree(source,destination,ignore=shutil.ignore_patterns('*.lock'))
+  require(r.returncode==0,'S864_HTTP_COLLECTOR_STOP_NO_RETRY')
+  result=read(Path(batch['http_output_directory'])/'results.json')
+  require(result['status']=='HTTP_COMPLETED_REVIEW_REQUIRED','S864_HTTP_OUTPUT_INCOMPLETE')
+  ledger=read(batch['execution_file']);require(ledger['status']=='OPEN' and all(e['status']=='SETTLED' for e in ledger['entries']),'S864_LEDGER_STOP')
+  completed+=1;results.append(result)
+  # Stop only this isolated, fully settled API to release the unchanged Owner
+  # process lock before the next approved case. Never stop a failed/UNKNOWN API.
+  call(['docker','stop','--time','30',name],45)
+  print(json.dumps({'case_id':case['case_id'],'completed_submissions':completed,'status':'HTTP_COMPLETED_REVIEW_REQUIRED'}),flush=True)
+ totals={'attempts':0,'settled':0,'unknown':0,'unsettled':0,'actual_tokens':0}
+ for case in grant['cases']:
+  batch=grant['batches'][case['case_id']]
+  data=read(batch['execution_file'])
+  for e in data['entries']:
+   totals['attempts']+=1;totals['settled']+=int(e['status']=='SETTLED');totals['unknown']+=int(e['status']=='UNKNOWN')
+   totals['unsettled']+=int(e['status']!='SETTLED')
+   if e['status']=='SETTLED':
+    require(isinstance(e.get('usage'),dict) and type(e['usage'].get('total_tokens')) is int,'S864_USAGE_MUST_BE_REPORTED')
+    totals['actual_tokens']+=e['usage']['total_tokens']
+ require(totals['attempts']<=36 and totals['unknown']==totals['unsettled']==0,'S864_FINAL_LEDGER_STOP')
+ write(cfg['summary_file'],{'status':'ALL_ELIGIBLE_HTTP_COMPLETED_REVIEW_REQUIRED','completed_submissions':completed,
+     'totals':totals,'results':results,'source_revision':cfg['source_revision'],'image_id':cfg['image_id'],
+     'profile_sha256':cfg['profile_sha256'],'owner_approval_sha256':grant['owner_approval_sha256'],
+     'actual_answer_quality':'NOT_REVIEWED','no_retry':True})
+ # The already-approved frozen VLM phase advances autonomously exactly once.
+ require(time.monotonic()-began<2400,'S864_BATCH_RUNTIME_EXHAUSTED_BEFORE_VISION')
+ vision=grant['batches'][grant['vision_batch_id']]
+ env.update({'WEKNORA_PORT_EXECUTION_FILE':vision['execution_file'],
+     'WEKNORA_PORT_REDIS_PREFIX':vision['redis_prefix'],'S8_LOG_DIR':vision['log_directory']})
+ name=cfg['container_prefix']+'-vision'
+ args=['docker','run','--name',name,'--network',before['network'],'--entrypoint','python']
+ for mount in before['readonly_mounts']:
+  args+=['--mount','type=bind,source='+mount['source']+',target='+mount['destination']+',readonly']
+ image_manifest=read(cfg['vision_inputs_file'])
+ inputs=[Path(cfg['vision_inputs_file']).parent/row['file'] for row in image_manifest['calls']]
+ for path in [*readonly,Path(cfg['vision_glue_file']),Path(cfg['vision_inputs_file']),*inputs,Path(cfg['batch_window_file']),Path(cfg['summary_file'])]:
+  args+=['--mount','type=bind,source='+str(path)+',target='+str(path)+',readonly']
+ for path in (cfg['execution_batch_root'],cfg['owner_state_directory'],vision['log_directory'],cfg['vision_output_directory']):
+  args+=['--mount','type=bind,source='+path+',target='+path]
+ for key,value in sorted(env.items()):args+=['--env',key+'='+value]
+ args += [cfg['image_id'],'-B',cfg['vision_glue_file'],'--execute','--configuration',str(configuration),
+     '--configuration-sha256',os.environ['S864_CONFIGURATION_SHA256']]
+ r=subprocess.run(args,capture_output=True,timeout=max(1,2400-(time.monotonic()-began)))
+ (output/'vision.stdout').write_bytes(r.stdout);(output/'vision.stderr').write_bytes(r.stderr)
+ write(output/'vision.command.json',{'command':['docker','run','<exact approved mounts/env>',cfg['image_id'],
+     'python','-B',cfg['vision_glue_file'],'--execute'],'exit_code':r.returncode,'no_retry':True})
+ for source,destination in ((Path(cfg['vision_output_directory']),output/'vision'),
+     (Path(vision['execution_file']).parent,output/'execution-vision')):
+  if source.exists():shutil.copytree(source,destination,ignore=shutil.ignore_patterns('*.lock'))
+ require(r.returncode==0,'S864_VISION_PHASE_STOP_NO_RETRY')
+ result=read(Path(cfg['vision_output_directory'])/'results.json')
+ require(result['status']=='FOUR_VISION_COMPLETED_REVIEW_REQUIRED' and result['completed_calls']==4,'S864_VISION_INCOMPLETE')
+ totals={'attempts':0,'settled':0,'unknown':0,'unsettled':0,'actual_tokens':0}
+ for batch in grant['batches'].values():
+  data=read(batch['execution_file'])
+  for row in data['entries']:
+   totals['attempts']+=1;totals['settled']+=int(row['status']=='SETTLED')
+   totals['unknown']+=int(row['status']=='UNKNOWN');totals['unsettled']+=int(row['status']!='SETTLED')
+   usage=row.get('usage')
+   require(row['status']=='SETTLED' and isinstance(usage,dict) and type(usage.get('total_tokens')) is int,'S864_FINAL_USAGE_UNKNOWN')
+   totals['actual_tokens']+=usage['total_tokens']
+ require(totals['attempts']<=40 and totals['unknown']==totals['unsettled']==0,'S864_FINAL_SHARED_ATTEMPT_OR_UNKNOWN_STOP')
+ write(cfg['batch_summary_file'],{'status':'ALL_ELIGIBLE_HTTP_COMPLETED_REVIEW_REQUIRED','completed_submissions':3,
+     'vision_completed_calls':4,'batch_complete':True,'totals':totals,'actual_answer_quality':'NOT_REVIEWED',
+     'source_revision':cfg['source_revision'],'image_id':cfg['image_id'],'profile_sha256':cfg['profile_sha256'],
+     'accounting_mode':'reported_usage_only_v1','token_estimation':'DISABLED','no_retry':True})
+
+if __name__=='__main__':
+ try:main()
+ except BaseException as exc:
+  # Failed sends keep their exact ledgers and running API for read-only audit;
+  # no cleanup, automatic second execution, next case or failed-ledger rewrite.
+  if _DIAG_OUTPUT is not None:
+   import traceback
+   (_DIAG_OUTPUT/'controller.traceback').write_text(''.join(traceback.format_tb(exc.__traceback__))+'\n'+type(exc).__name__,encoding='utf8')
+  print(json.dumps({'status':'STOP_NO_RETRY','error_type':type(exc).__name__,
+      'code':str(exc) if isinstance(exc,ValueError) else 'READ_PRIVATE_RECEIPTS','provider_retry':False}),flush=True)
+  raise SystemExit(1)

@@ -1,5 +1,7 @@
 # S8.6.4 检索链路收敛、语言与范围修正、多模态精确提取
 
+> 最终续执行状态（2026-10-22）：`IMPLEMENTED_REAL_RUNTIME_PASS_QUALITY_PARTIAL`。最新源码 `f96446742d1f32d7fa13635e43159b08fc3e2e0a`；正式隔离 HTTP 三题与四次 Caption 均真实完成，16 次 Provider 全部结算，实际 40,977 Token，0 UNKNOWN。答案、证据与 Caption 质量单列于第 12 节。以下第 1–11 节保留文档提交 `ed219dc` 的离线阶段记录，其中“等待授权/未构建/调用为0”仅为当时快照。
+
 日期：2026-10-22。当前状态：`OFFLINE_IMPLEMENTED_KNOWN_BASELINE_FAILURES_REAL_NOT_RUN`。本报告是代理工程复核记录，不代表 Owner 验收。最终源码为 `a25af498ab3d2eb5614185f73d678a172e300d52`。Owner 追加 Top1 指令前，33 模块 715 passed/5 warnings；追加后配置/profile 300 passed/2 项旧基线失败单列，最终六模块联检 96 passed；通过命令均退出 0。真实服务和模型质量尚未验收，不能据本报告建立 Tag。
 
 本轮删除额外 Source Unit 来源窗口及其超限清空机制，保留原有 Merge 和 TopK，补上 Rerank 全低分时的 Search 回退，并保留已在 S8.6.3 完成的引用身份修复。新增语言请求策略、会话文档范围更新与歧义澄清，接入精确提取优先的 VLM Caption Prompt，准备固定图片和固定文本的 Prompt 对照材料。
@@ -219,3 +221,117 @@ RED 记录原样保留。VLM 首次新模块尚未建立时的 collection error 
 当前 base profile SHA `6dbd3b9d95162be7d892afe46e2ac9900f81d16b32195fc6a4049910283bb2df`，组合 SHA `6402fa6a171d868da549ee14f328efe4ce42de3f8bf51b2a645421334d1fbdf1`。追加指令前 profile 原字节保留在 `before_owner_top1_true/`，不是覆盖历史授权。新提案仅绑定最终源码/新指纹，旧授权不复用。
 
 此后没有生产源码修改；最终文档提交 SHA 由 Git 交付记录给出。新增 Provider/Token/UNKNOWN 仍为0，ECS仅一次限定只读来源核查，未构建/部署。
+
+
+<!-- S864_REAL_CONTINUATION -->
+## 12. Owner 批准后的最终真实验收与结算
+
+### 12.1 修复、版本与执行合同
+
+Owner 批准固定三道 HTTP / 两图各新旧一次后，追加要求：`LocalExecution` 支持 `vision`，本轮不再估算或预留请求 Token，只记录真实用量与 UNKNOWN 保护。源码提交 **`f96446742d1f32d7fa13635e43159b08fc3e2e0a`** 修改 `execution.py` 的 vision 观察/精确请求绑定及结算分支，两个验收辅助脚本接入新模式，另有针对性测试；没有修改 P5、QU、生成 Prompt、RRF、阈值、Schema、索引或生产模型绑定。
+
+服务端新账本显式使用 `reported_usage_only_v1`：不写 `reserved_tokens/held_tokens`，只用 Provider 有效报告结算；缺失/无效用量或发送结果不明时停止并保留 UNKNOWN、已知计数及原始响应，不补零、不重试。达到实际用量停止阈值时先完整结算再停止后续调用。旧账本默认仍走原合同，不能通过改模式释放旧 UNKNOWN。请求/图片格式、大小、来源、模型身份和输出上限仍有效；本次 vision 支持已批准的 DeepSeek `deepseek-flash` 内联 JPEG/PNG，未声称所有 Provider 的视觉能力已覆盖。
+
+旧 base64 字节预留虚高属于估值错误，不能称实际消耗；本轮四次图像调用的真实用量为 **11,076**，不是 100,000。取消预留后，不能宣称下一次已发送请求有预留保证的总量上限。
+
+| 定向离线执行 | 真实结果 | 证据 |
+|---|---|---|
+| vision-only 初步回归 | exit 0，52 passed | [计量归档](evidence/s8_6_4/reported_usage_mode/manifest.json) |
+| vision / execution / output 合同最终集 | exit 0，164 passed / 1 skipped；跳过项仅 Windows 无法执行的原生 POSIX resolve/flock | 同上，`vision-reported-final-clean2.*` |
+| 新旧计量辅助模块 | exit 0，49 passed | 同上，`accounting-helper/final-v2.*` |
+| 正式 runtime / profile / Prompt 接线集成 | exit 0，35 passed | 同上，`accounting-integration/final.*` |
+
+各阶段存在重叠，不能相加。准确 argv、退出码与 RED/中间失败原样归档；E: 合成账本 WinError 5、测试临时目录/替身问题均保留，未给生产账本添加重试或放宽路径规则。没有重跑历史 922 项。
+
+最终镜像 **`sha256:99faa35360c8b4f73d7fc207f040a9f6a8f69b6f6dd8b1b3c8bf43e1eeafe78f`**；组合 profile **`92ee355f837b10890313f076b4cda9a724c55142551e5b457c954e7c922e14c7`**。原批准 SHA `d74f40e1...` 与追加指令补充记录 SHA `97af48e8...` 均保留原字节。固定原图按实际源 PDF SHA 匹配当前启用副本，原 P27 ID 仅为历史身份；未借用不可用旧 KB 或把不同版本混为一谈。
+
+### 12.2 正式 HTTP 及后台独立运行
+
+首个任务在 SessionCreate 被 `403 ORIGIN_NOT_ALLOWED` 拒绝：私有客户端沿用开发端口 5173 的 Origin，尚未提交问题，四账本为空、0 Provider、0 UNKNOWN。失败任务、原始 403 和账本保留。只将客户端 Origin 修正为实际 API 的 `http://127.0.0.1:8000`；实际同源中间件定向验证 exit 0，正确同源放行、其他 Origin 仍拒绝。服务端权限与 allowlist 没有放宽。
+
+修正任务 **`s864-final-20261022t112810z-2bdb4629-originfix-235e37-job`** 使用新客户端 ID/Session/四账本，于 `11:49:53.992978Z` 启动，`11:51:28.029289Z` 返回 **SUCCEEDED / exit 0**，`runtime_complete=true / result_valid=true / artifact_integrity=MATCH`。沿用首次 `11:42:00.781661Z–12:22:00.781661Z` 总窗口，未重开 40 分钟。既有后台运行器自行推进 3HTTP→4vision，期间无需本机 SSH，日志和结果持续写入 ECS 持久目录。
+
+准确启动命令：
+
+```text
+/usr/bin/python3.12 /opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629/app/scripts/ecs_acceptance_job.py start --job-root /opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37-job
+```
+
+启动命令 exit 0、任务 exit 0；启动收据、控制文件 SHA 和完整原始结果在 [真实证据入口](evidence/s8_6_4/real_acceptance/README.md)。每题一次正常 Session/Message 提交、SSE、持久历史及 replay；客户端 request_id 与服务端 run UUID 独立，replay 没有新增 Provider 调用。
+
+```mermaid
+flowchart LR
+    A[新 Session / 正常 Message POST] --> B[一次 QU及原问题保护]
+    B --> C[一次查询 Embedding / Hybrid]
+    C --> D[BGE Rerank / 原 Merge邻接]
+    D --> E[真实来源投影 / 最终 Context]
+    E --> F[一次 Cheap最终生成]
+    F --> G[SSE / PG完成 / 历史回放]
+    G --> H[原文回读及真实用量对账]
+```
+
+三题均最终走 **PLAIN / 单检索单元**。MML0434、中文题 QU 返回 UNKNOWN、改写接受且与 q0 完全一致。Pieter 原始 QU 建议 DEPENDENT，但把 `eith` 改为 `with`，触发 `REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION`，有效问题保留原字 `eith`、有效类型回退 UNKNOWN。实际 Embedding 和 Rerank 使用同一保留的 q0。没有由答对推断规则或 DEPENDENT 分支已激活，也没有新桥接调用；原 Expansion/Graph 关闭，P5 DYNAMIC 保留。本批每题各一次 QU、Embedding、Rerank、最终生成，均由 Cheap 生成，未触发 Expensive 生成。
+
+### 12.3 答案、证据和引用分开评价
+
+以下是代理依据冻结样本及实际模型输入的复核，不是 Owner 签字或未见集准确率。详细逐句依据见 [HTTP quality review](evidence/s8_6_4/real_acceptance/http-quality-review.json)。
+
+| 问题 | 实际最终结论 | 原文送达 / 引用 | 判定 |
+|---|---|---|---|
+| MML0434 Coding time | Kaggle's Cat vs Dog dataset | 实际 BGE 第一名是 Coding time，分数 **0.02217947132885456 < 0.3**；Top1=true 保留，Merge 邻接送达 `Kaggle's Cat vs Dog dataset (25k dog/cat pictures)`。答案引用 next `084c5bee...` 及 anchor `10ff171b...`，均成功回读当前原文 | 答案、证据、引用 PASS |
+| 辐射避难所怎么刷箱子 | 中文回答时间/任务重置和任务循环等步骤 | 最终输入真实包含 11 项证据，核心步骤有依据；回答没有引用标签，`sources.json=[]`。还存在“最常用/最通用且高效/非破坏性”等超出来源的措辞 | 语种修复 PASS；核心内容为来源人工复核支持，但引用 FAIL、呈现/额外措辞 PARTIAL；本地没有官方答案字符串，**不报官方准确率** |
+| Pieter | Pieter van Musschenbroek 同时获两项发明归属 | 两项发明归属原文实际进入生成输入，相关引用以及附加 Leyden jar 定义引用均回读成功 | 答案、证据、引用 PASS |
+
+Pieter 此处验证的是两项发明归属，不是新的桥接关系算法。引用中的 `doc` 为显示别名，真正身份按 chunk/KB/current document UUID/version 核验。中文题没有引用，因此不能把其空来源列表的接口检查当作“引用通过”。
+
+| 样例 | Search候选 | Rerank保留 | Merge候选 | 最终来源项 |
+|---|---:|---:|---:|---:|
+| MML0434 | 30 | 1 | 1 | 4 |
+| 中文题 | 30 | 11 | 3 | 11 |
+| Pieter | 30 | 8 | 8 | 5 |
+
+MML0434 此次真实请求已直接证明 Top1→邻接→完整数据集原文→正确答案；不把它倒填成指定旧 S8.2 UUID 的因果证据。指定旧记录的完整快照仍未找到。
+
+### 12.4 两张原图的新旧 Caption
+
+原图像素、模型、5000 输出上限、temperature 和既有参数均保持固定；只替换 Caption Prompt。请求哈希、原始图像字节、native 响应、finish_reason=stop 及结算一致。只做提取对照，没有重新入库、替换 Chunk 或再跑两题完整 RAG。模型输出保持派生内容身份。
+
+| 原图 | 旧 Prompt 本次输出 | 新 Prompt 本次输出 | 质量边界 |
+|---|---|---|---|
+| 0958 | 遗漏反射面两个例子 | 正确提取 **shiny object or mirror** | 关键字段 PASS；加入未标明推断的“水波/光线”等细化，完整 Caption 保真度 **PARTIAL** |
+| 0684 | 只有总体 79% 等概述，遗漏男女值 | **Men 81% / Women 78%**，全部十个 Yes/No 值及类别对应正确 | 审查的可读内容 PASS；非全量图表准确率 |
+
+旧 0958 已正确说明反射定律、旧 0684 已正确说明总体 79%，这些不是新增收益。评审者看过历史说明，明确为非盲代理复核。详见 [image quality review](evidence/s8_6_4/real_acceptance/image-quality-review.json)。
+
+| 调用 | 输入 Token | 输出 Token | 真实总 Token |
+|---|---:|---:|---:|
+| 0958 old | 1,018 | 808 | 1,826 |
+| 0958 candidate | 1,236 | 1,859 | 3,095 |
+| 0684 old | 1,032 | 1,026 | 2,058 |
+| 0684 candidate | 1,250 | 2,847 | 4,097 |
+| **四次合计** | **4,536** | **6,540** | **11,076** |
+
+### 12.5 真实总用量、PG和关闭
+
+| 操作 | Provider次数 | 输入 | 输出 | 真实总 Token |
+|---|---:|---:|---:|---:|
+| Qwen QU+最终生成 | 6 | 11,431 | 1,135 | 12,566 |
+| bge-m3 查询 Embedding | 3 | 56 | 0 | 56 |
+| BGE Rerank | 3 | 17,279 | 0 | 17,279 |
+| DeepSeek vision | 4 | 4,536 | 6,540 | 11,076 |
+| **总计** | **16** | **33,302** | **7,675** | **40,977** |
+
+16 条全部 SETTLED，**UNKNOWN=0 / unsettled=0**，本轮 `held_tokens=null`（没有预留），不估算费用。PG `(request_id, capability)` 两侧唯一键集合恰为 16 条，outcome=RESPONSE_RECEIVED、finished、wire SHA 和真实用量全部与新账本一致；3 个完成 Turn 的 q0/授权范围一致。详见 [post-run proof](evidence/s8_6_4/real_acceptance/post-run-summary.json)。
+
+只有本批成功的四个新账本及新 grant 关闭，entries/用量/限额/其他字段不变；关闭前后原字节和哈希均留存。原失败四个空账本在失败归档后保持原字节，已捕获历史 UNKNOWN 指纹不变。七个诊断/准备容器均停止并保留，没有删除。正式 API/Worker ID、旧镜像、重启计数、compose/runtime 文件哈希不变；当前来源/版本/文件哈希/启用状态及已捕获索引指纹不变。详见 [closure receipt](evidence/s8_6_4/real_acceptance/closure-receipt.json)。
+
+### 12.6 证据规模、限制和停止状态
+
+完整真实导出 **219 文件**，archive SHA **`442d172f2067f4acea1bb155281e68c32ee814921e2a36b814a0fad0d6a64a7e`**。其中约 421MB 是输出文件，主要为重复的完整调试 profile/stages 快照；这不代表模型收到了 421MB 或消耗对应 Token。原件在 ECS 持久目录及本机完整保存，不设置额外文件大小失败条件、不截断原始证据。Git 证据包保存必要 wire/响应、SSE/历史/来源、账本、关闭证明、精简实际 Trace 与全量原始哈希清单；重复大快照仅在清单中指向完整保存位置。压缩项保留 raw/stored 哈希，可解压逐字重建。
+
+最终判定：**代码/定向离线通过；真实正式 API、后台独立运行和结算通过；本批业务质量为 PARTIAL**，不能由退出码或历史715/922项推出生产可用。未解决项为中文引用与过度措辞、0958 Caption 物理介质推断、旧 S8.2 指定快照缺档案及两个已单列旧 QU 意图基线失败。完整大规模评测、额外范围选择真实题、固定生成 Prompt 对照、40题重跑、生产更新均 **NOT RUN**。
+
+本轮已收尾并停止所有远端操作。未 Push、打 Tag、更新正式 API/Worker、改 P5、重做 Embedding/索引或扩展新算法；后续最小改进可针对引用完整性和 Caption 无来源细化分别评估，不在本轮追加发送或修改真实结果。
+
+
+证据包最终核对：223 文件、8,973,320 字节；manifest SHA `08ad1ec8fe4afa065df00758c726af4660f4ae997ab3e6b5ee6733e4cd117085`。212 条 raw/gzip 记录的 stored/raw 哈希均重新验证，12 条 gzip 全部解压后逐字节哈希一致；66 个重复完整快照有原路径/哈希清单、原件仍保留。打包曾误落 E: 旧根目录，已逐文件验证并复制至正确 C: worktree；清理该新生成重复目录的 `Remove-Item` 被自动审批以 `blocked by policy` 拒绝，重复副本保留，未采用其他方式删除。未覆盖旧工作树源码或用户修改；此前冗余 node_modules junction 清理被拒绝的情况仍按第 9 节保留。

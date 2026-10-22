@@ -1,0 +1,2982 @@
+{
+  "schema": "s864-derived-actual-trace/v1",
+  "warning": "Derived projection; immutable raw paths+hashes retained. No Provider calls.",
+  "cases": [
+    {
+      "case": 1,
+      "profile_events": [
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00001.profile.json",
+          "sha256": "9d8834f655e389a254c94f279c54846ed8592b2ab5eefb1378b6a6c480be64b0",
+          "stage": "configuration",
+          "status": "resolved",
+          "fields": {
+            "profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+            "system_prompt_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+            "original_system_prompt_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+            "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+            "citations_enabled": true,
+            "options": {
+              "temperature": 0.7,
+              "top_p": 0,
+              "seed": 0,
+              "max_tokens": 0,
+              "max_completion_tokens": 2048,
+              "frequency_penalty": 0,
+              "presence_penalty": 0,
+              "thinking": false,
+              "reasoning_effort": "off",
+              "thinking_budget_tokens": 0,
+              "tools": [],
+              "tool_choice": "",
+              "parallel_tool_calls": null,
+              "format": "",
+              "prompt_cache_key": "",
+              "cache_retention": "",
+              "send_temperature": false
+            },
+            "policy": {
+              "mode": "DYNAMIC",
+              "threshold": "0.35",
+              "quality_escalation": true,
+              "truncated_escalation": true,
+              "abstention_escalation": false,
+              "provider_fallback": false
+            },
+            "models": {
+              "chat_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+              "query_understand_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+              "rerank_model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+              "bridge_cheap_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e"
+            },
+            "fallback_prompt_B": "normal fallback may replace system prompt; inspect actual wire"
+          },
+          "state": {
+            "query": "",
+            "rewrite_query": "",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00002.profile.json",
+          "sha256": "4929c108d36394aeac13508329c55e222cc53e9a0d9f2bf270535eb276726914",
+          "stage": "understand",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00003.profile.json",
+          "sha256": "23d554bad48f684f20db756f75452756789a96c32672fb87cb841e36c9c92055",
+          "stage": "query_understanding_wire",
+          "status": "checked",
+          "fields": {
+            "body_sha256": "a95314f784dc8c66d3037790a771d296dd38d3598e03c0f1967e5cf1b09474a6",
+            "wire_bytes": 5694,
+            "expected_body_sha256": "a95314f784dc8c66d3037790a771d296dd38d3598e03c0f1967e5cf1b09474a6"
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00004.profile.json",
+          "sha256": "d5188c60ac461359307b9d1ffe0f5fd9a40b6ce05e50736428f2e112b8d6df88",
+          "stage": "query_understanding_raw",
+          "status": "returned",
+          "fields": {
+            "content": "{\"rewrite_query\":\"Which dataset was introduced in the 'coding time' section of the PPT for training?\", \"intent\": \"kb_search\", \"image_description\": \"\", \"query_type\": \"UNKNOWN\"}",
+            "finish_reason": "stop",
+            "usage": {
+              "prompt_tokens": 1184,
+              "completion_tokens": 41,
+              "total_tokens": 1225,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 1184,
+              "cache_reported": true,
+              "cache_status": "miss",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 1184,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 41,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 1225,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": 0,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": 1184,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": 0,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":41,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1184,\"prompt_tokens\":1184,\"total_tokens\":1225}",
+                "raw_sha256": "0c7cff9044bac46537783a5c40894a92540a9c5d98ed1d67a59ed2bbba55f24a",
+                "derived_total": 1225,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "request_id": "7e4c61d1-314d-4e1c-9ab2-7c78eb4db6dd/query_rewrite"
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00005.profile.json",
+          "sha256": "f72347e1bd57d62ba8a0cda1b6917f77a9ef9c94ac5b287e0e2a3326251c61fe",
+          "stage": "understand",
+          "status": "completed",
+          "fields": {
+            "rewrite_reason": "",
+            "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+            "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00006.profile.json",
+          "sha256": "b1e9ba75778080c98af3b6a745aebe3136f416b13bae0bba89e11cb226c1237f",
+          "stage": "profile_language",
+          "status": "validated",
+          "fields": {
+            "expected_locale": "en-US",
+            "expected_language": "English",
+            "actual_language": "English",
+            "matched": true
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00007.profile.json",
+          "sha256": "5dbde6ad8886e67ba744b869c8eca6759fdb3f9d4fb5025b1d55aa458cdfe7d4",
+          "stage": "profile_input",
+          "status": "validated",
+          "fields": {
+            "input_contract": {
+              "version": "effective-query/v1",
+              "unicode_characters": 256,
+              "utf8_bytes": 1024
+            },
+            "observed": {
+              "unicode_characters": 82,
+              "utf8_bytes": 82,
+              "valid": true
+            }
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00008.profile.json",
+          "sha256": "01b45ae1ed66e686dd73ba15216205bbc39fb7c21e18d50cd5a9f17b646f0d19",
+          "stage": "retrieval",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00009.profile.json",
+          "sha256": "6328f9f209fce2e488f26545b13e420b54dcf98ff6d0cde817d27c05a7795932",
+          "stage": "retrieval",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 30
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00010.profile.json",
+          "sha256": "3330d7c580552d7c1847f53f19f70e9332e211e02208cc3f5a4a06ae279f6510",
+          "stage": "rerank",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00011.profile.json",
+          "sha256": "2cda8c3cac03fbd70b8429ee1594726ba2dc2af96e58e4c452762560a67004ca",
+          "stage": "rerank",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 1
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00012.profile.json",
+          "sha256": "34ae31da4cc219e876af3c6812f931366169adc7ed9bb028d9c5822154731cd4",
+          "stage": "merge",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00013.profile.json",
+          "sha256": "cb6cb7b2399765bab3f3156b959b882e7dacee40eb7f3cad30dc549d0f94a4d8",
+          "stage": "merge",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 1
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00014.profile.json",
+          "sha256": "c7a24a07ac23c2c0fedbb32f703ac27ee954e5fce832f4bcdb60c964846550ba",
+          "stage": "source_projection",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\strategy-audit\\acb626eb7682b517891b9a00a69bba5ac4ebd9d2bd7605816bfbb9c0871a280e.00015.profile.json",
+          "sha256": "1c4d67cb604bd3f93aca81fe80c6325ff2c602534c931a27cf0c5e9a8e789703",
+          "stage": "source_projection",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 4
+          },
+          "state": {
+            "query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "rewrite_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "rewrite_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+                "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "effective_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+                  "covers": [
+                    "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        }
+      ],
+      "requests": [
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\evidence\\1844969a92b64c2ea916b7eb33f745ff.request.json",
+          "sha256": "f8e271c6d0dd03be2e63b78ff89edf2a3fbb63cac936d57a166cf8e2c4276131",
+          "request_id": "7e4c61d1-314d-4e1c-9ab2-7c78eb4db6dd/answer/1/cheap",
+          "model": "Qwen/Qwen3.5-4B",
+          "capability": "chat",
+          "effective_retrieval_query": null,
+          "reported_models": [
+            "Qwen/Qwen3.5-4B"
+          ],
+          "wire_sha256": "d60b800985f742f6aecf2ce0a8f4625a8298dd428dfc4b57b2f02ced7844608d",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\evidence\\1a05d65c72e447ea85eeaf104f4b4bb3.request.json",
+          "sha256": "9d011920103df501be94be3ef533ec72edbebca2166d21f12451d5c00f74f01f",
+          "request_id": "7e4c61d1-314d-4e1c-9ab2-7c78eb4db6dd/strategy/sq-1/rerank",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "effective_retrieval_query": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+          "reported_models": [],
+          "wire_sha256": "0a71ad54caf869f12223ebfa82f0176d5fc110e828f73eb95fd28efe3c2071ef",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\evidence\\ce7d85ce0c294a6a8d39abf900f05a40.request.json",
+          "sha256": "46311a261ad08f165981c7bb5286b12907767903e378f8e86f60220f83ca2f79",
+          "request_id": "7e4c61d1-314d-4e1c-9ab2-7c78eb4db6dd/strategy/sq-1/query-embedding-7f1d720d-9561-446f-a8cc-6a562c339d23-59f31ac3ae6922a8",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "effective_retrieval_query": [
+            "Which dataset was introduced in the 'coding time' section of the PPT for training?"
+          ],
+          "reported_models": [
+            "BAAI/bge-m3"
+          ],
+          "wire_sha256": "9957b0d0e67ead0880def4abb22e49c0e00d1d21f3c2ab1e594e73d24f823d0b",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-1\\evidence\\f929265728454cb5910af3cc70eb7123.request.json",
+          "sha256": "cef28b3fcb85bb21ac06aa889b5696bd236ceaf453c0a50e0a4c72eca8aa86ef",
+          "request_id": "7e4c61d1-314d-4e1c-9ab2-7c78eb4db6dd/query_rewrite",
+          "model": "Qwen/Qwen3.5-4B",
+          "capability": "chat",
+          "effective_retrieval_query": null,
+          "reported_models": [
+            "Qwen/Qwen3.5-4B"
+          ],
+          "wire_sha256": "a95314f784dc8c66d3037790a771d296dd38d3598e03c0f1967e5cf1b09474a6",
+          "matches_settled_ledger_wire": true
+        }
+      ]
+    },
+    {
+      "case": 2,
+      "profile_events": [
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00001.profile.json",
+          "sha256": "2a87850fd2f6df4aa6d2a8dc19a8f4134b7932816b0a06a9f13ee1f031848d39",
+          "stage": "configuration",
+          "status": "resolved",
+          "fields": {
+            "profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+            "system_prompt_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+            "original_system_prompt_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+            "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+            "citations_enabled": true,
+            "options": {
+              "temperature": 0.7,
+              "top_p": 0,
+              "seed": 0,
+              "max_tokens": 0,
+              "max_completion_tokens": 2048,
+              "frequency_penalty": 0,
+              "presence_penalty": 0,
+              "thinking": false,
+              "reasoning_effort": "off",
+              "thinking_budget_tokens": 0,
+              "tools": [],
+              "tool_choice": "",
+              "parallel_tool_calls": null,
+              "format": "",
+              "prompt_cache_key": "",
+              "cache_retention": "",
+              "send_temperature": false
+            },
+            "policy": {
+              "mode": "DYNAMIC",
+              "threshold": "0.35",
+              "quality_escalation": true,
+              "truncated_escalation": true,
+              "abstention_escalation": false,
+              "provider_fallback": false
+            },
+            "models": {
+              "chat_model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+              "query_understand_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+              "rerank_model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+              "bridge_cheap_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e"
+            },
+            "fallback_prompt_B": "normal fallback may replace system prompt; inspect actual wire"
+          },
+          "state": {
+            "query": "",
+            "rewrite_query": "",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00002.profile.json",
+          "sha256": "588d87ece493064e1a6b2a4e0c2c7bebf8ae9564b94d3b97edeaf75787b2f010",
+          "stage": "understand",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00003.profile.json",
+          "sha256": "000b04572b8f9351c6467e5346304c00c508509f9ac5642e5b0bb55899f2bdcb",
+          "stage": "query_understanding_wire",
+          "status": "checked",
+          "fields": {
+            "body_sha256": "0a903eecc94615017a4735bdf78bf97e31109ce22c65d3e2763251e021c1a37e",
+            "wire_bytes": 5642,
+            "expected_body_sha256": "0a903eecc94615017a4735bdf78bf97e31109ce22c65d3e2763251e021c1a37e"
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00004.profile.json",
+          "sha256": "63a81a6f9b612d4e7e7d7599c25971ac696eadc81933bb2141399fab85ebf04c",
+          "stage": "query_understanding_raw",
+          "status": "returned",
+          "fields": {
+            "content": "{\"rewrite_query\":\"辐射避难所怎么刷箱子\",\"intent\":\"kb_search\",\"image_description\":\"\",\"query_type\":\"UNKNOWN\"}",
+            "finish_reason": "stop",
+            "usage": {
+              "prompt_tokens": 1172,
+              "completion_tokens": 24,
+              "total_tokens": 1196,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 1172,
+              "cache_reported": true,
+              "cache_status": "miss",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 1172,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 24,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 1196,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": 0,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": 1172,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": 0,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":24,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1172,\"prompt_tokens\":1172,\"total_tokens\":1196}",
+                "raw_sha256": "2dbe1915129cc8bc2a21b9b3dec952b5566ff81b26920b1fb21ebb03c4ccea81",
+                "derived_total": 1196,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "request_id": "0af2feba-8794-4a34-a83c-907ab2a2a4f5/query_rewrite"
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00005.profile.json",
+          "sha256": "9f2eebc92e5ce0718c705723d570ef02d04eb53ebd198919f3bb135bdaf3742e",
+          "stage": "understand",
+          "status": "completed",
+          "fields": {
+            "rewrite_reason": "",
+            "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+            "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00006.profile.json",
+          "sha256": "b083823ecc39df3cddef0153f91212c5a6a7ee88f7c75a74bef46dcb2dfecd31",
+          "stage": "profile_language",
+          "status": "validated",
+          "fields": {
+            "expected_locale": "zh-CN",
+            "expected_language": "Chinese (Simplified)",
+            "actual_language": "Chinese (Simplified)",
+            "matched": true
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00007.profile.json",
+          "sha256": "e33686eff17a6b093d6f5afa688ffcab87f19e022434fc019883801aa4c9d4e2",
+          "stage": "profile_input",
+          "status": "validated",
+          "fields": {
+            "input_contract": {
+              "version": "effective-query/v1",
+              "unicode_characters": 256,
+              "utf8_bytes": 1024
+            },
+            "observed": {
+              "unicode_characters": 10,
+              "utf8_bytes": 30,
+              "valid": true
+            }
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00008.profile.json",
+          "sha256": "cebf13ac10080ebfa35fec287d48b009ecd92bae9179c2039a30bd11a8ad66d2",
+          "stage": "retrieval",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00009.profile.json",
+          "sha256": "d60c16df324d99258d9cc522cf486343c18322ea1218e42d4c78de762ff5e1fb",
+          "stage": "retrieval",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 30
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00010.profile.json",
+          "sha256": "75bbde5c5840be18e6d2f9e67b0f5dce3c45e5e9b104a9edf605bb1457ce75df",
+          "stage": "rerank",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00011.profile.json",
+          "sha256": "9131bbbedb187771c6f4143a58a4adc1e7f7de20600b11c57f4fa497386dbe62",
+          "stage": "rerank",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 11
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00012.profile.json",
+          "sha256": "3cc009157fa2f97eb3ecf6c938593917029272a37ab2ed646337b84afe0e4d87",
+          "stage": "merge",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00013.profile.json",
+          "sha256": "437ba83efc5af84862e865947992f83c8b00a068bd06362cd48dcd1a962bfc6b",
+          "stage": "merge",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 3
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00014.profile.json",
+          "sha256": "835e940afc43fde438614fcf50d161489bf9ce0e5d2eb91c0b6366b5d94f05b7",
+          "stage": "source_projection",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\strategy-audit\\282606e451e798dc6338a5cc54d0a9acc7a16d1db0174a28fae38dc6359145f4.00015.profile.json",
+          "sha256": "cc09af92bb094d9ddf7ebf1b59fa5564ae44fe78569fa75bffa4e7a062732a0b",
+          "stage": "source_projection",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 11
+          },
+          "state": {
+            "query": "辐射避难所怎么刷箱子",
+            "rewrite_query": "辐射避难所怎么刷箱子",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "ACCEPTED",
+                "reason": "",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "rewrite_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+                "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "辐射避难所怎么刷箱子",
+              "effective_query": "辐射避难所怎么刷箱子",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "辐射避难所怎么刷箱子",
+                  "covers": [
+                    "辐射避难所怎么刷箱子"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        }
+      ],
+      "requests": [
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\evidence\\37d85a02a7ef4d199b6167e7c2162d6c.request.json",
+          "sha256": "b79db41f699c3342e3265dbf64439689c6b495868fb38bf1a15ff17231a69ffb",
+          "request_id": "0af2feba-8794-4a34-a83c-907ab2a2a4f5/strategy/sq-1/rerank",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "effective_retrieval_query": "辐射避难所怎么刷箱子",
+          "reported_models": [],
+          "wire_sha256": "5f7dd9f246b27a211183f689d1d6a2badbb4b1e1c828800938c5a05806e09443",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\evidence\\3be006cb08864442ae4dc2c745874bd8.request.json",
+          "sha256": "8a37d6a2287e44f0468b76901d337c95ad229ee0f9644a703517873bb723f44f",
+          "request_id": "0af2feba-8794-4a34-a83c-907ab2a2a4f5/answer/1/cheap",
+          "model": "Qwen/Qwen3.5-4B",
+          "capability": "chat",
+          "effective_retrieval_query": null,
+          "reported_models": [
+            "Qwen/Qwen3.5-4B"
+          ],
+          "wire_sha256": "36be15031923405b6be8086d3d8d262c2ba2470ca7e07367ee7fe6ca47c0ee5b",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\evidence\\94d070cb8bd3482d936a10c9d2cca4d8.request.json",
+          "sha256": "3d4779217c4cc888775f18d5274e6e2cbc94ddeac698570e24c3165af0063baf",
+          "request_id": "0af2feba-8794-4a34-a83c-907ab2a2a4f5/query_rewrite",
+          "model": "Qwen/Qwen3.5-4B",
+          "capability": "chat",
+          "effective_retrieval_query": null,
+          "reported_models": [
+            "Qwen/Qwen3.5-4B"
+          ],
+          "wire_sha256": "0a903eecc94615017a4735bdf78bf97e31109ce22c65d3e2763251e021c1a37e",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-2\\evidence\\acb44dc741cc44198970b0922608eab5.request.json",
+          "sha256": "452c5b389127079437488785e847dbe4e1db6a5afba6131722a1d9d81ae18250",
+          "request_id": "0af2feba-8794-4a34-a83c-907ab2a2a4f5/strategy/sq-1/query-embedding-76770fba-17c3-4704-8663-10aa669476ce-2f334f60ada791e7",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "effective_retrieval_query": [
+            "辐射避难所怎么刷箱子"
+          ],
+          "reported_models": [
+            "BAAI/bge-m3"
+          ],
+          "wire_sha256": "a9555eeb1619e2963fef32e6b9b1099b9dcaad6f22ab605d070c797d915ad27b",
+          "matches_settled_ledger_wire": true
+        }
+      ]
+    },
+    {
+      "case": 3,
+      "profile_events": [
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00001.profile.json",
+          "sha256": "4918cda19e695f16e3d289d8c9ae17a8ddf80d4864c8c3eaf71e9c7b3834b955",
+          "stage": "configuration",
+          "status": "resolved",
+          "fields": {
+            "profile": "s8.6.2-r3-formal-api-prompt-b/v3",
+            "system_prompt_sha256": "fbea5b6a2fd2147bd67e853ee38c25913d04f3e690f6dc914edccfe8968faf8e",
+            "original_system_prompt_sha256": "2cecc76ad80fc780f20fd1b3dd9aece260e08b98531c58c3203af5a54391479a",
+            "prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+            "citations_enabled": true,
+            "options": {
+              "temperature": 0.7,
+              "top_p": 0,
+              "seed": 0,
+              "max_tokens": 0,
+              "max_completion_tokens": 2048,
+              "frequency_penalty": 0,
+              "presence_penalty": 0,
+              "thinking": false,
+              "reasoning_effort": "off",
+              "thinking_budget_tokens": 0,
+              "tools": [],
+              "tool_choice": "",
+              "parallel_tool_calls": null,
+              "format": "",
+              "prompt_cache_key": "",
+              "cache_retention": "",
+              "send_temperature": false
+            },
+            "policy": {
+              "mode": "DYNAMIC",
+              "threshold": "0.35",
+              "quality_escalation": true,
+              "truncated_escalation": true,
+              "abstention_escalation": false,
+              "provider_fallback": false
+            },
+            "models": {
+              "chat_model_id": "mdl64475036cd602543893b07c17cee2b6bdd12fac97a2a867cdf9dc8a705799",
+              "query_understand_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+              "rerank_model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+              "bridge_cheap_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e"
+            },
+            "fallback_prompt_B": "normal fallback may replace system prompt; inspect actual wire"
+          },
+          "state": {
+            "query": "",
+            "rewrite_query": "",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00002.profile.json",
+          "sha256": "8c3d2688d2ac66d730cbd3692824a5379a782cbcb3d9613f33b3823540aacc58",
+          "stage": "understand",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00003.profile.json",
+          "sha256": "75a63e41b7d99bc09afc28d987ff625978db90b6ca788f3e5f514edcdc8a17df",
+          "stage": "query_understanding_wire",
+          "status": "checked",
+          "fields": {
+            "body_sha256": "54c8d3d61d4e7eab847eecd8df2902f4fcc941b897ce7c79216d989b66535a35",
+            "wire_bytes": 5687,
+            "expected_body_sha256": "54c8d3d61d4e7eab847eecd8df2902f4fcc941b897ce7c79216d989b66535a35"
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00004.profile.json",
+          "sha256": "59e83e5f9dba6e82a0bcf9aeec157513f3e3e65723f184017b597b6f54177c9f",
+          "stage": "query_understanding_raw",
+          "status": "returned",
+          "fields": {
+            "content": "{\"rewrite_query\":\"What man is credited with inventing both the Leyden jar and the Tribometer?\",\"intent\":\"kb_search\",\"image_description\":\"\",\"query_type\":\"DEPENDENT\"}",
+            "finish_reason": "stop",
+            "usage": {
+              "prompt_tokens": 1184,
+              "completion_tokens": 36,
+              "total_tokens": 1220,
+              "status": "REPORTED",
+              "cached_tokens": 0,
+              "cache_read_tokens": 0,
+              "cache_write_tokens": 0,
+              "cache_miss_tokens": 1184,
+              "cache_reported": true,
+              "cache_status": "miss",
+              "provider_usage_facts": {
+                "semantics": "openai-input-inclusive/v1",
+                "fields": [
+                  [
+                    "input",
+                    {
+                      "value": 1184,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_tokens"
+                    }
+                  ],
+                  [
+                    "output",
+                    {
+                      "value": 36,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens"
+                    }
+                  ],
+                  [
+                    "total",
+                    {
+                      "value": 1220,
+                      "present": true,
+                      "valid": true,
+                      "path": "total_tokens"
+                    }
+                  ],
+                  [
+                    "cache_read",
+                    {
+                      "value": 0,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_cache_hit_tokens"
+                    }
+                  ],
+                  [
+                    "cache_write",
+                    {
+                      "value": null,
+                      "present": false,
+                      "valid": false,
+                      "path": "cache_creation_input_tokens"
+                    }
+                  ],
+                  [
+                    "cache_miss",
+                    {
+                      "value": 1184,
+                      "present": true,
+                      "valid": true,
+                      "path": "prompt_cache_miss_tokens"
+                    }
+                  ],
+                  [
+                    "reasoning",
+                    {
+                      "value": 0,
+                      "present": true,
+                      "valid": true,
+                      "path": "completion_tokens_details.reasoning_tokens"
+                    }
+                  ]
+                ],
+                "numeric_raw": "{\"completion_tokens\":36,\"completion_tokens_details.reasoning_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_cache_miss_tokens\":1184,\"prompt_tokens\":1184,\"total_tokens\":1220}",
+                "raw_sha256": "d03658196ced7ee5ff4517d2cc22a3c97efa94d5d0018b0210f832e03a16a523",
+                "derived_total": 1220,
+                "simulated": false,
+                "observed_lower_bound": 0,
+                "prior_numeric_raw": []
+              }
+            },
+            "request_id": "9b564ed6-41cc-401e-a642-cae8e7941a09/query_rewrite"
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00005.profile.json",
+          "sha256": "869ac38f9e6202edd4597893995752cf43f113fb51c6e30b6e29ba0bf1653fac",
+          "stage": "understand",
+          "status": "completed",
+          "fields": {
+            "rewrite_reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+            "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+            "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00006.profile.json",
+          "sha256": "58975b5f7ec8c7b2c501e47c18cd306179baa3b532389a4037c07cb524e1d610",
+          "stage": "profile_language",
+          "status": "validated",
+          "fields": {
+            "expected_locale": "en-US",
+            "expected_language": "English",
+            "actual_language": "English",
+            "matched": true
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00007.profile.json",
+          "sha256": "8d81e7f8998a78394b982b2bb1ca01fb26e1b912364d8616856289edca1c6a07",
+          "stage": "profile_input",
+          "status": "validated",
+          "fields": {
+            "input_contract": {
+              "version": "effective-query/v1",
+              "unicode_characters": 256,
+              "utf8_bytes": 1024
+            },
+            "observed": {
+              "unicode_characters": 75,
+              "utf8_bytes": 75,
+              "valid": true
+            }
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [],
+            "strategy_units_used": 0,
+            "plan": null
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00008.profile.json",
+          "sha256": "765735ed0549d197acd3d09500d1f37f0b931ca2263591a5147acb6a2bf0e16b",
+          "stage": "retrieval",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00009.profile.json",
+          "sha256": "b72cd7041388296410e89391b0a250673b42ba54391f57084b08b3182ab18305",
+          "stage": "retrieval",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 30
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00010.profile.json",
+          "sha256": "6918628d78b2322e7eb4daa9f623294553de25fdcae3cf12f6c54e1823fd5d5c",
+          "stage": "rerank",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00011.profile.json",
+          "sha256": "10fb57a35cca35d43078741b47e6967c4a3afd9b35fd9e8690ed535a71f29c4d",
+          "stage": "rerank",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 8
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00012.profile.json",
+          "sha256": "edcfd307e318238cff33375ba380450e2272bb624e73589585fdbb98b4172c74",
+          "stage": "merge",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00013.profile.json",
+          "sha256": "bd0e92b8bdf647580844347998da5aa40e35ff82a82c544f00e3a30921bf06fb",
+          "stage": "merge",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 8
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00014.profile.json",
+          "sha256": "7a9ab63bf1501419ada920ca207450b0095826c85f138e23dd1d68f38c4bebe0",
+          "stage": "source_projection",
+          "status": "started",
+          "fields": {},
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\strategy-audit\\a44d0c86d8b119c8092a2efa6f796a8ceae88036feecf98cbdd8d575b3c34950.00015.profile.json",
+          "sha256": "a5b7c202982a05293f7a455bc1c97aed40cda0c808e514ff904a3017c109444c",
+          "stage": "source_projection",
+          "status": "completed",
+          "fields": {
+            "candidate_count": 5
+          },
+          "state": {
+            "query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "rewrite_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+            "query_type": "UNKNOWN",
+            "intent": "kb_search",
+            "needs_retrieval": true,
+            "enable_expansion": false,
+            "rerank_top1_floorless": true,
+            "query_trace": [
+              {
+                "stage": "query_understand",
+                "decision": "FALLBACK",
+                "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "rewrite_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "history_rounds": 0,
+                "contract": "qu_v2",
+                "query_type": "UNKNOWN"
+              }
+            ],
+            "strategy_trace": [
+              {
+                "stage": "strategy_rule",
+                "rule_id": "",
+                "rule_version": "",
+                "rule_status": "NOT_EVALUATED",
+                "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+                "subquery_count": 0,
+                "retrieval_units_planned": 1,
+                "full_match": false,
+                "object_spans": [],
+                "dimension_span": null,
+                "effective_query_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+                "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc"
+              }
+            ],
+            "strategy_units_used": 0,
+            "plan": {
+              "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "effective_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+              "query_type": "UNKNOWN",
+              "strategy": "PLAIN",
+              "subqueries": [
+                {
+                  "id": "sq-1",
+                  "query_text": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+                  "covers": [
+                    "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+                  ],
+                  "depends_on": [],
+                  "object_span": null,
+                  "dimension_span": null
+                }
+              ],
+              "constraints": [],
+              "reason": "SINGLE_QUERY",
+              "rule_id": "",
+              "rule_version": "",
+              "rule_status": "NOT_EVALUATED",
+              "reject_reason": "QUERY_TYPE_NOT_RULE_ELIGIBLE",
+              "rule_full_match": false
+            }
+          },
+          "accepted_rerank": []
+        }
+      ],
+      "requests": [
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\evidence\\5002467dc85140fab8f21566d339078f.request.json",
+          "sha256": "f90aa19f1fc5c1dbd8824c482a2ace302ff6cf63bb1c85c57a292cef8c8d3595",
+          "request_id": "9b564ed6-41cc-401e-a642-cae8e7941a09/strategy/sq-1/query-embedding-96a9eebd-ffb2-4bc6-9bea-3ed015845479-2c7a2c651b630ba7",
+          "model": "BAAI/bge-m3",
+          "capability": "embedding",
+          "effective_retrieval_query": [
+            "What man is credited eith inventing both the Leyden jar and the Tribometer?"
+          ],
+          "reported_models": [
+            "BAAI/bge-m3"
+          ],
+          "wire_sha256": "d533117893f3593864ac9c731b43f174e099dcf64c5762420a6aa3c37f12092d",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\evidence\\8a8a78870ce04f8baceb1cd92c18f375.request.json",
+          "sha256": "7aac2f4f49dc51458c5d19f834d596da877c06169abe838ead013d61a9fadfd9",
+          "request_id": "9b564ed6-41cc-401e-a642-cae8e7941a09/query_rewrite",
+          "model": "Qwen/Qwen3.5-4B",
+          "capability": "chat",
+          "effective_retrieval_query": null,
+          "reported_models": [
+            "Qwen/Qwen3.5-4B"
+          ],
+          "wire_sha256": "54c8d3d61d4e7eab847eecd8df2902f4fcc941b897ce7c79216d989b66535a35",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\evidence\\b27772061c124be88486962dee463ea9.request.json",
+          "sha256": "317cbe4c4865ba093401c8ed557ef66a490d4bcea8e0448cdc63e3d8a07c6397",
+          "request_id": "9b564ed6-41cc-401e-a642-cae8e7941a09/answer/1/cheap",
+          "model": "Qwen/Qwen3.5-4B",
+          "capability": "chat",
+          "effective_retrieval_query": null,
+          "reported_models": [
+            "Qwen/Qwen3.5-4B"
+          ],
+          "wire_sha256": "9f36f785816261d646f11fa464c1a0baff93a59a3038e196bcea3288790977f0",
+          "matches_settled_ledger_wire": true
+        },
+        {
+          "file": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-3\\evidence\\cab8949b454c4b2c9ea4de6f4d79db46.request.json",
+          "sha256": "d22a0a724c37be4201b68a0b67b81bb356d074872b9e7f64cf67812a44e3553c",
+          "request_id": "9b564ed6-41cc-401e-a642-cae8e7941a09/strategy/sq-1/rerank",
+          "model": "BAAI/bge-reranker-v2-m3",
+          "capability": "rerank",
+          "effective_retrieval_query": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+          "reported_models": [],
+          "wire_sha256": "dad95b6ece38f082bd42db749f1b94938f1c6fd95a3ad307a50db31904c441be",
+          "matches_settled_ledger_wire": true
+        }
+      ]
+    }
+  ],
+  "local_projection_validation": {
+    "status": "PASS",
+    "matched_request_bodies": 12,
+    "provider_calls": 0,
+    "previous_local_attempt": {
+      "exit_code": 1,
+      "error": "FileNotFoundError: helper walked one directory above output; fixed private audit path only; no raw or runtime modification"
+    }
+  },
+  "vision_reported_identity": [
+    {
+      "request_id": "s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate",
+      "requested_model": "deepseek-flash",
+      "reported_model": "deepseek-flash",
+      "finish_reason": "stop"
+    },
+    {
+      "request_id": "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+      "requested_model": "deepseek-flash",
+      "reported_model": "deepseek-flash",
+      "finish_reason": "stop"
+    },
+    {
+      "request_id": "s864-vlm-37f71ae598da43628e597c2b/row-0958/old",
+      "requested_model": "deepseek-flash",
+      "reported_model": "deepseek-flash",
+      "finish_reason": "stop"
+    },
+    {
+      "request_id": "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+      "requested_model": "deepseek-flash",
+      "reported_model": "deepseek-flash",
+      "finish_reason": "stop"
+    }
+  ],
+  "qu_outcomes": [
+    {
+      "case": 1,
+      "raw_query_type": "UNKNOWN",
+      "effective_query_type": "UNKNOWN",
+      "rewrite_decision": "ACCEPTED"
+    },
+    {
+      "case": 2,
+      "raw_query_type": "UNKNOWN",
+      "effective_query_type": "UNKNOWN",
+      "rewrite_decision": "ACCEPTED"
+    },
+    {
+      "case": 3,
+      "raw_query_type": "DEPENDENT",
+      "raw_rewrite_changed_eith_to_with": true,
+      "effective_query_type": "UNKNOWN",
+      "rewrite_decision": "FALLBACK",
+      "reason": "REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION",
+      "effective_question_preserved": "eith"
+    }
+  ],
+  "mml0434_rerank": {
+    "raw_best_index": 3,
+    "raw_best_relevance_score": 0.02217947132885456,
+    "threshold": 0.3,
+    "floorless_enabled": true,
+    "best_document_starts_with": "Coding time!",
+    "source_anchor": "10ff171b-a054-4cbc-9ab4-4c52b8c3022f",
+    "next_source": "084c5bee-f7be-4718-9c0b-510e61cb401a",
+    "final_exact_text": "Kaggle's Cat vs Dog dataset (25k dog/cat pictures)",
+    "final_request_file_sha256": "f8e271c6d0dd03be2e63b78ff89edf2a3fbb63cac936d57a166cf8e2c4276131"
+  }
+}

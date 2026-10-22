@@ -1,0 +1,41 @@
+{
+  "status": "CANDIDATE_READY",
+  "identity": {
+    "implementation": "weknora-python-port",
+    "status": "ready",
+    "tenant_id": 332,
+    "subject_sha256": "00f2fd3dad2b741924376adab7fd29c12a93bc7a1fe4e8e1f0f97cacd418fa83",
+    "database": "weknora_s8",
+    "postgres_system_id": "7698420805889187877",
+    "redis_run_id": "268d42dec48542084b1478eea849ecfb7d3f9b83",
+    "redis_prefix": "weknora-python-s8:s864:s864-final-20261022t112810z-2bdb4629-originfix-235e37:http-2",
+    "storage_root": "/var/lib/eviroute/storage",
+    "models": {
+      "embedding": {
+        "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-m3"
+      },
+      "rerank": {
+        "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "provider": "siliconflow",
+        "model": "BAAI/bge-reranker-v2-m3"
+      },
+      "cheap": {
+        "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B"
+      },
+      "expensive": {
+        "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+        "provider": "deepseek",
+        "model": "deepseek-flash"
+      }
+    },
+    "cloud_allowed": true,
+    "graph_enabled": false,
+    "rerank_top1_floorless": true,
+    "worker_in_api": false,
+    "model_requests_at_startup": 0
+  }
+}

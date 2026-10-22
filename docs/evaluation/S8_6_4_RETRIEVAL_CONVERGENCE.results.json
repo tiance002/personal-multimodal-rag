@@ -1,13 +1,13 @@
 {
   "schema": "s8.6.4-retrieval-convergence-results/v1",
   "date": "2026-10-22",
-  "status": "OFFLINE_IMPLEMENTED_KNOWN_BASELINE_FAILURES_REAL_NOT_RUN",
+  "status": "IMPLEMENTED_REAL_RUNTIME_PASS_QUALITY_PARTIAL",
   "owner_acceptance": "NOT_GRANTED",
   "production_readiness": "NOT_CLAIMED",
   "baseline": "3c081b657c9c768d4d1b81310e4dc59c711f195d",
   "prior_s863": "COMPLETE_OFFLINE; S8.6.4 overrides overlapping source-window contracts",
   "branch": "codex/s8-6-adaptive-retrieval-20261021",
-  "source_commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+  "source_commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
   "phase_commits": [
     {
       "commit": "528b19f7e5b76a3e8a9d05ee533dcb3d2dea69be",
@@ -24,6 +24,10 @@
     {
       "commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
       "scope": "Owner explicitly enables server Top1; formal environment/profile wiring; real neighbor readback + offline delivery tests"
+    },
+    {
+      "commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+      "scope": "Owner-directed vision support and reported_usage_only_v1; legacy ledgers unchanged"
     }
   ],
   "worktree": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
@@ -600,63 +604,297 @@
     "historical_usage_not_current_usage": true
   },
   "real_execution": {
-    "status": "NOT_RUN",
-    "provider_attempts": 0,
-    "settlements": 0,
+    "status": "SUCCEEDED_AND_CLOSED_QUALITY_PARTIAL",
+    "provider_attempts": 16,
+    "settlements": 16,
     "UNKNOWN": 0,
-    "input_tokens": 0,
-    "output_tokens": 0,
-    "total_tokens": 0,
-    "held_tokens": 0,
-    "real_database_writes": 0,
-    "ECS_operations": {
-      "read_only_source_readback": 1,
-      "build": 0,
-      "deploy": 0,
-      "model_tests": 0
-    },
-    "image": "NOT_BUILT",
-    "production_API_Worker_updated": false
-  },
-  "protection": {
-    "manifest": "docs/evaluation/evidence/s8_6_4/baseline_protection.results.json",
-    "sha256": "3d069c79e0c2260c8eaab3f556c2964ca7663ebcd8288e3ec9e325a0fb443274",
-    "groups": {
-      "historical_evaluations": {
-        "status": "PASS",
-        "tracked_files": 476,
-        "changed_paths": []
+    "input_tokens": 33302,
+    "output_tokens": 7675,
+    "total_tokens": 40977,
+    "held_tokens": null,
+    "accounting_mode": "reported_usage_only_v1",
+    "image": "sha256:99faa35360c8b4f73d7fc207f040a9f6a8f69b6f6dd8b1b3c8bf43e1eeafe78f",
+    "source_commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+    "profile_sha256": "92ee355f837b10890313f076b4cda9a724c55142551e5b457c954e7c922e14c7",
+    "production_API_Worker_updated": false,
+    "ingestion_or_index_updated": false,
+    "automatic_retry": false,
+    "started_at_utc": "2026-10-22T11:49:53.992978Z",
+    "job_id": "s864-final-20261022t112810z-2bdb4629-originfix-235e37-job",
+    "persistent_output": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37-job/output",
+    "supervisor_pid": 2715237,
+    "payload_pid": 2715238,
+    "last_confirmed_empty_ledgers": "Before detached dispatch; 4 OPEN ledgers, 0 entries",
+    "metrics_status": "RECONCILED_NATIVE_PROVIDER_PG_AND_FOUR_CHILD_LEDGERS",
+    "pre_admission_failed_jobs": [
+      {
+        "job_id": "s864-final-20261022t112810z-2bdb4629-job",
+        "exit_code": 1,
+        "finished_at_utc": "2026-10-22T11:42:04.641453Z",
+        "stage": "HTTP_SESSION_CREATE_BEFORE_QUESTION_POST",
+        "http_status": 403,
+        "code": "ORIGIN_NOT_ALLOWED",
+        "cause": "Private collector copied dev Origin http://127.0.0.1:5173 instead of actual candidate API same-origin http://127.0.0.1:8000",
+        "all_four_ledgers_entries": 0,
+        "provider_attempts": 0,
+        "UNKNOWN": 0,
+        "server_guard_or_permissions_modified": false,
+        "old_job_and_ledgers_preserved": true
+      }
+    ],
+    "deadline_at_utc": "2026-10-22T12:22:00.781661Z",
+    "configuration_sha256": "71d7bcc16cd0fcc9d1655f9d57db958e9bfa3d9d9b207dcebc4b0c608d02206f",
+    "grant_sha256": "7c660558bc80dc744e9397e59f1321d1fc3293f136c886628356cfb584d3f4dc",
+    "finished_at_utc": "2026-10-22T11:51:28.029289Z",
+    "unsettled": 0,
+    "http_provider_attempts": 12,
+    "http_reported_tokens": 29901,
+    "vision_provider_attempts": 4,
+    "vision_reported_tokens": 11076,
+    "runtime_complete": true,
+    "result_valid": true,
+    "artifact_integrity": "MATCH",
+    "ledgers_final_status": "CLOSED",
+    "grant_final_status": "CLOSED",
+    "per_request_token_estimation": false,
+    "per_request_token_reservation": false,
+    "formal_http_submissions": 3,
+    "vision_calls": 4,
+    "source_or_index_writes": 0,
+    "db_write_scope": "Only normal new session/message/provider-receipt lifecycle; source/index unchanged",
+    "raw_archive_sha256": "442d172f2067f4acea1bb155281e68c32ee814921e2a36b814a0fad0d6a64a7e",
+    "raw_archive_files": 219,
+    "usage_by_operation": {
+      "siliconflow/Qwen/Qwen3.5-4B/chat": {
+        "calls": 6,
+        "prompt_tokens": 11431,
+        "completion_tokens": 1135,
+        "total_tokens": 12566
       },
-      "provider_send_gate": {
-        "status": "PASS",
-        "tracked_files": 24,
-        "changed_paths": []
+      "siliconflow/BAAI/bge-m3/embedding": {
+        "calls": 3,
+        "prompt_tokens": 56,
+        "completion_tokens": 0,
+        "total_tokens": 56
       },
-      "query_rules_router": {
-        "status": "PASS",
-        "tracked_files": 3,
-        "changed_paths": []
+      "siliconflow/BAAI/bge-reranker-v2-m3/rerank": {
+        "calls": 3,
+        "prompt_tokens": 17279,
+        "completion_tokens": 0,
+        "total_tokens": 17279
       },
-      "schema_indexes": {
-        "status": "PASS",
-        "tracked_files": 25,
-        "changed_paths": []
-      },
-      "background_runner": {
-        "status": "PASS",
-        "tracked_files": 2,
-        "changed_paths": []
+      "deepseek/deepseek-flash/vision": {
+        "calls": 4,
+        "prompt_tokens": 4536,
+        "completion_tokens": 6540,
+        "total_tokens": 11076
       }
     },
-    "live_old_UNKNOWN_recount": "NOT_RUN; no DB/ECS operations",
-    "push_deploy_tag": false,
-    "note": "Only trusted Top1 option defaults/startup validation changed per latestOwner request; other protected groups remain unchanged."
+    "post_run_checks": {
+      "pg_unique_request_id_capability_equal_16": true,
+      "pg_outcome_usage_wire_exactly_match_child_ledgers": true,
+      "three_completed_turns_q0_scope_exact": true,
+      "captured_source_fingerprints_unchanged": true,
+      "historical_unknown_fingerprint_unchanged": true,
+      "current_vision_copy_version_hash_state_unchanged": true,
+      "current_all4_kb_cloud_allowed": true,
+      "production_ids_images_restart_counts_unchanged": true,
+      "production_compose_runtime_files_unchanged": true
+    },
+    "http_cases": [
+      {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+        "answer_correct": {
+          "status": "PASS",
+          "basis": "Official native typed answer is “Cat vs Dog dataset”; response identifies Kaggle’s Cat vs Dog dataset."
+        },
+        "evidence_support": {
+          "status": "PASS",
+          "basis": "Actual final generation user message contains both delivered source passages: the “Coding time!” slide chunk and the next source chunk exact text “Kaggle's Cat vs Dog dataset (25k dog/cat pictures)”. The answer’s 25k detail is supported by that delivered neighbor."
+        },
+        "citation": {
+          "status": "PASS_WITH_DISPLAY_ALIAS_NOTE",
+          "basis": "Answer cites chunk 084c5bee-f7be-4718-9c0b-510e61cb401a and 10ff171b-a054-4cbc-9ab4-4c52b8c3022f in the requested KB. Both have successful HTTP 200 current-source readbacks; chunk IDs map to the scoped source document UUID/version. The doc attribute is a filename-stem display alias, not the returned document UUID."
+        },
+        "presentation": {
+          "status": "PASS",
+          "basis": "Concise answer with the identifying fact, source quotation, and section connection."
+        },
+        "retrieval_path": {
+          "retrieved_candidates": 30,
+          "rerank_candidates": 1,
+          "merge_candidates": 1,
+          "source_projection_candidates": 4,
+          "final_context_evidence": 4,
+          "interpretation": "Observed pipeline counts only; no closed-rule activation inferred from the answer."
+        },
+        "final_model_input_sha256": "f8e271c6d0dd03be2e63b78ff89edf2a3fbb63cac936d57a166cf8e2c4276131"
+      },
+      {
+        "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+        "q0": "辐射避难所怎么刷箱子",
+        "answer_correct": {
+          "status": "NOT_OFFICIAL_GOLD; SOURCE_BASED_MANUAL=PASS_WITH_CAVEATS",
+          "basis": "The frozen local artifact explicitly says no official answer string was located. Manual comparison to the frozen native reference answers supports the main task-reset and task-loop mechanisms, including early task sequencing and deleting/replacing tasks. This is not an official benchmark accuracy result."
+        },
+        "evidence_support": {
+          "status": "PASS_WITH_CAVEATS",
+          "basis": "Actual final generation user message carries 11 selected evidence items and includes the task-loop/early-achievement sequence, time rollback/new shelter/task refresh, and box-opening save/reload/RNG source text. Source material also supports the house expansion/no-upgrade advice. A few evaluative phrases exceed the source wording."
+        },
+        "citation": {
+          "status": "FAIL_NO_ANSWER_CITATIONS",
+          "basis": "Answer has no citation tags or source attribution handles; exported sources.json is empty (3 bytes, []). This is distinct from the fact that source passages were present in the model context."
+        },
+        "presentation": {
+          "status": "PARTIAL",
+          "basis": "Chinese answer is organized and detailed, but is longer than needed and mixes the core farming methods with RNG opening advice and caveats; no citations make verification difficult."
+        },
+        "retrieval_path": {
+          "retrieved_candidates": 30,
+          "rerank_candidates": 11,
+          "merge_candidates": 3,
+          "source_projection_candidates": 11,
+          "final_context_evidence": 11,
+          "interpretation": "Observed pipeline counts only; no closed-rule activation inferred from answer correctness."
+        },
+        "final_model_input_sha256": "8a37d6a2287e44f0468b76901d337c95ad229ee0f9644a703517873bb723f44f"
+      },
+      {
+        "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+        "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+        "answer_correct": {
+          "status": "PASS",
+          "basis": "Official native answer is “Pieter van Musschenbroek”; answer names the same person."
+        },
+        "evidence_support": {
+          "status": "PASS",
+          "basis": "Final model context includes the source passage crediting van Musschenbroek with the Leyden jar (1746) and the tribometer passage “It was invented by the 18th century Dutch scientist Musschenbroek”."
+        },
+        "citation": {
+          "status": "PASS",
+          "basis": "Citations identify both supporting chunk IDs; successful HTTP 200 readbacks resolve them to current document UUIDs and versions within the scoped KB. The extra Leyden jar definition citation also read back successfully."
+        },
+        "presentation": {
+          "status": "PASS",
+          "basis": "Direct, readable answer with citations attached to the two key facts."
+        },
+        "retrieval_path": {
+          "retrieved_candidates": 30,
+          "rerank_candidates": 8,
+          "merge_candidates": 8,
+          "source_projection_candidates": 5,
+          "final_context_evidence": 5,
+          "interpretation": "Observed pipeline counts only; no closed-rule activation inferred from answer correctness."
+        },
+        "final_model_input_sha256": "317cbe4c4865ba093401c8ed557ef66a490d4bcea8e0448cdc63e3d8a07c6397"
+      }
+    ],
+    "http_quality_review": "evidence/s8_6_4/real_acceptance/http-quality-review.json",
+    "image_quality_review": "evidence/s8_6_4/real_acceptance/image-quality-review.json",
+    "actual_query_trace": "evidence/s8_6_4/real_acceptance/actual-query-and-model-trace.json",
+    "post_run_proof": "evidence/s8_6_4/real_acceptance/post-run-summary.json",
+    "closure_proof": "evidence/s8_6_4/real_acceptance/closure-receipt.json",
+    "image_verdicts": [
+      {
+        "case_id": "row-0958",
+        "old_critical_extraction": "FAIL_OMISSION",
+        "candidate_critical_extraction": "PASS_SHINY_OBJECT_OR_MIRROR",
+        "candidate_whole_caption": "PARTIAL_UNMARKED_WATER_WAVE_LIGHT_RAY_INTERPRETATION"
+      },
+      {
+        "case_id": "row-0684",
+        "old_critical_extraction": "FAIL_GENDER_VALUES_OMITTED",
+        "candidate_critical_extraction": "PASS_MEN81_WOMEN78_ALL10_VALUES",
+        "candidate_whole_caption": "PASS_WITHIN_REVIEWED_VISIBLE_CONTENT"
+      }
+    ],
+    "image_usage": [
+      {
+        "case": "0958",
+        "prompt": "old",
+        "input": 1018,
+        "output": 808,
+        "total": 1826
+      },
+      {
+        "case": "0958",
+        "prompt": "candidate",
+        "input": 1236,
+        "output": 1859,
+        "total": 3095
+      },
+      {
+        "case": "0684",
+        "prompt": "old",
+        "input": 1032,
+        "output": 1026,
+        "total": 2058
+      },
+      {
+        "case": "0684",
+        "prompt": "candidate",
+        "input": 1250,
+        "output": 2847,
+        "total": 4097
+      }
+    ],
+    "qu_and_strategy": {
+      "cases_1_2": "rawUNKNOWN accepted, q0 unchanged",
+      "case_3": "rawDEPENDENT changed eith to with; REWRITE_NOT_LITERAL_REFERENCE_SUBSTITUTION fallback kept original q0/eith, effectiveUNKNOWN",
+      "all_final_plans": "PLAIN / one subquery; query Embedding and Rerank inputs equal effective original q0",
+      "rule_or_dependent_branch_activation": "NOT_TRIGGERED; not inferred from correct answers",
+      "QU_per_http": 1,
+      "final_generation_per_http": 1,
+      "Expensive_generation_calls": 0
+    },
+    "mml0434": {
+      "answer": "Kaggle Cat vs Dog dataset",
+      "best_bge_relevance_score": 0.02217947132885456,
+      "threshold": 0.3,
+      "floorless": true,
+      "best_document": "Coding time!",
+      "next_chunk": "084c5bee-f7be-4718-9c0b-510e61cb401a",
+      "exact_text_delivered": "Kaggle's Cat vs Dog dataset (25k dog/cat pictures)",
+      "final_source_items": 4,
+      "verdict": "REAL_ANSWER_AND_CURRENT_READBACK_PASS"
+    },
+    "closure": {
+      "status": "SUCCESSFUL_FOUR_LEDGERS_AND_GRANT_CLOSED",
+      "closed_at_utc": "2026-10-22T12:03:12.278712+00:00",
+      "four_ledger_entries_and_usage_unchanged": true,
+      "old_failed_ledgers_unchanged": true,
+      "diagnostic_containers_stopped_preserved": 7,
+      "remote_operations_frozen": true,
+      "grant_closed_sha256": "34b9e09648ac29fcdd395df587cab7a1e3c34d9547d1c73fd52ba0c1ad22b0d1"
+    },
+    "evidence_package": {
+      "manifest": "evidence/s8_6_4/real_acceptance/manifest.json",
+      "manifest_sha256": "08ad1ec8fe4afa065df00758c726af4660f4ae997ab3e6b5ee6733e4cd117085",
+      "files": 223,
+      "bytes": 8973320,
+      "raw_or_gzip_records_verified": 212,
+      "gzip_reconstructed_verified": 12,
+      "external_complete_profile_stage_files": 66,
+      "missing_required_files": 0
+    }
+  },
+  "protection": {
+    "previous_manifest": "evidence/s8_6_4/baseline_protection.results.json",
+    "previous_manifest_applies_to": "a25af49 offline stage, not an assertion that execution.py stayed unchanged after f964467",
+    "authorized_delta": "LocalExecution vision/actual-only accounting +2 acceptance helpers +targeted tests",
+    "P5_query_rules_schema_indexes_background_runner_changed": false,
+    "captured_historical_UNKNOWN_fingerprint_unchanged": true,
+    "captured_source_fingerprints_unchanged": true,
+    "production_API_Worker_changed": false,
+    "isolated_temp_API_was_started": true,
+    "automatic_push_or_tag": false
   },
   "unresolved": [
     {
       "id": "MML0434_REQUIRED_TEXT",
-      "status": "RESOLVED_CURRENT_SOURCE_AND_OFFLINE_DELIVERY",
-      "detail": "Current same-version next original contains full dataset sentence; trueTop1 and falseSearchfallback both deliver it to prepared final message. New actual model answer NOT_RUN."
+      "status": "RESOLVED_CURRENT_SOURCE_OFFLINE_AND_REAL_HTTP",
+      "detail": "Current trueTop1 preserves Codingtime, neighbor exact dataset sentence delivered, actual correct answer and cited-source readbacks pass."
     },
     {
       "id": "S8_2_MML0434_RUN",
@@ -666,18 +904,32 @@
     },
     {
       "id": "REAL_QUALITY",
-      "status": "NOT_RUN"
+      "status": "PARTIAL",
+      "detail": "3 HTTP runtime pass; MML0434/Pieter correct with sources; Fallout core source-based manual pass but citations absent and extras overstated. Two image critical extractions pass,0958 whole-caption partial. No general accuracy claim."
     },
     {
       "id": "FULL_REGRESSION",
       "status": "NOT_RUN"
+    },
+    {
+      "id": "FALLOUT_CITATIONS_AND_EXTRAS",
+      "status": "OPEN_QUALITY_LIMIT",
+      "detail": "No inline citation and sources.json empty; unsupported superlatives/non-destructive characterization. Official answer string absent locally; source-based review only."
+    },
+    {
+      "id": "VLM0958_UNMARKED_PHYSICAL_SPECIFICITY",
+      "status": "OPEN_QUALITY_LIMIT",
+      "detail": "Critical reflecting examples exact; unmarked water-wave/light-ray specificity not established by pixels."
+    },
+    {
+      "id": "DIAGNOSTIC_STATE_DUPLICATION",
+      "status": "RECORDED_NOT_FIXED_THIS_SCOPE",
+      "detail": "Raw output about421MB due repeated complete profile snapshots; all retained, necessary wire/receipt evidence and full raw hashes archived. This is not actual model Token usage."
     }
   ],
   "next_step": {
-    "status": "AWAIT_FRESH_OWNER_AUTHORIZATION",
-    "proposal": "docs/evaluation/evidence/s8_6_4/fresh_authorization.proposal.json",
-    "not_a_grant": true,
-    "old_grants_reused": false
+    "status": "STOP_THIS_GOAL_COMPLETE",
+    "action": "Deliver local commits/report and stop; no more Provider/PG/ECS, Push, deployment, full40 rerun or Prompt changes. Candidate future work: citation completeness and caption specificity under separate agreed scope."
   },
   "cleanup_rejection": {
     "action": "Remove-Item -LiteralPath 'C:/Users/22088/.codex/worktrees/s8-6-adaptive-retrieval/RAG quention/frontend/frontend/node_modules' -Force",
@@ -776,5 +1028,108 @@
     "standalone_source_identity": true,
     "false_option_Search_fallback_also_delivers_sentence": true,
     "new_provider_calls": 0
+  },
+  "offline_snapshot_at_ed219dc": {
+    "status": "OFFLINE_IMPLEMENTED_KNOWN_BASELINE_FAILURES_REAL_NOT_RUN",
+    "source_commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+    "real_execution": {
+      "status": "NOT_RUN",
+      "provider_attempts": 0,
+      "settlements": 0,
+      "UNKNOWN": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "held_tokens": 0,
+      "real_database_writes": 0,
+      "ECS_operations": {
+        "read_only_source_readback": 1,
+        "build": 0,
+        "deploy": 0,
+        "model_tests": 0
+      },
+      "image": "NOT_BUILT",
+      "production_API_Worker_updated": false
+    },
+    "next_step": {
+      "status": "AWAIT_FRESH_OWNER_AUTHORIZATION",
+      "proposal": "docs/evaluation/evidence/s8_6_4/fresh_authorization.proposal.json",
+      "not_a_grant": true,
+      "old_grants_reused": false
+    }
+  },
+  "runtime_authorization": {
+    "status": "APPROVED_WITH_EXPLICIT_OWNER_SUPPLEMENT",
+    "original_approval_sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+    "supplement_sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+    "scope": "3 formal HTTP fresh sessions + 4 exact frozen image calls",
+    "per_request_token_estimation_and_reservation": false,
+    "accounting_mode": "reported_usage_only_v1"
+  },
+  "accounting_offline": {
+    "vision_preliminary": {
+      "passed": 52,
+      "exit_code": 0
+    },
+    "execution_vision_output_final": {
+      "passed": 164,
+      "skipped": 1,
+      "exit_code": 0,
+      "skip": "Native POSIX resolve/flock cannot run on Windows"
+    },
+    "owner_helper": {
+      "passed": 49,
+      "exit_code": 0
+    },
+    "formal_runtime_profile_integration": {
+      "passed": 35,
+      "exit_code": 0
+    },
+    "counts_overlap": true,
+    "evidence_manifest": "evidence/s8_6_4/reported_usage_mode/manifest.json",
+    "evidence_manifest_sha256": "cfcc82df0d5dc7fcdd67716da1bef7faa53295f04943e84e1b0aa286ebfdebff",
+    "actual_usage_limit_semantics": "Known actual totals stop subsequent sends; no estimate/reservation, no next-request total guarantee; real overshoot is preserved as SETTLED before stop.",
+    "unknown_usage_semantics": "Keep any valid reported counters even on UNKNOWN; missing counters are not fabricated as zero; stop/no retry."
+  },
+  "real_quality_verdict": "PARTIAL; MML0434/Pieter supported, Fallout citation missing, image0958 specificity unsupported",
+  "protection_snapshot_before_authorized_execution_change": {
+    "manifest": "docs/evaluation/evidence/s8_6_4/baseline_protection.results.json",
+    "sha256": "3d069c79e0c2260c8eaab3f556c2964ca7663ebcd8288e3ec9e325a0fb443274",
+    "groups": {
+      "historical_evaluations": {
+        "status": "PASS",
+        "tracked_files": 476,
+        "changed_paths": []
+      },
+      "provider_send_gate": {
+        "status": "PASS",
+        "tracked_files": 24,
+        "changed_paths": []
+      },
+      "query_rules_router": {
+        "status": "PASS",
+        "tracked_files": 3,
+        "changed_paths": []
+      },
+      "schema_indexes": {
+        "status": "PASS",
+        "tracked_files": 25,
+        "changed_paths": []
+      },
+      "background_runner": {
+        "status": "PASS",
+        "tracked_files": 2,
+        "changed_paths": []
+      }
+    },
+    "live_old_UNKNOWN_recount": "NOT_RUN; no DB/ECS operations",
+    "push_deploy_tag": false,
+    "note": "Only trusted Top1 option defaults/startup validation changed per latestOwner request; other protected groups remain unchanged."
+  },
+  "packaging_cleanup_rejection": {
+    "action": "Remove newly generated duplicate evidence directory E:/RAG quention/docs/evaluation/evidence/s8_6_4/real_acceptance after byte-identical copy to correct C: worktree",
+    "review_result": "blocked by policy",
+    "result": "Duplicate left intact; no alternate deletion mechanism used; no source/runtime effect",
+    "correct_worktree_package_verified": true
   }
 }

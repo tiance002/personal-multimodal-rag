@@ -1,0 +1,17 @@
+{
+  "schema": "s864-owner-accounting-steering/v1",
+  "recorded_at_utc": "2026-10-22T11:18:55.4472322Z",
+  "goal": "S8.6.4",
+  "instructions": [
+    "你改一下让`LocalExecution` 支持 `vision` ， 同时我认为你的预算有问题，处理两张图怎么可能要10万token",
+    "这轮先不用预算请求的token数，先只记录真实用量结算和 UNKNOWN 保护"
+  ],
+  "scope": "Same approved three HTTP questions and two frozen images old/new (four vision calls)",
+  "accounting_mode": "reported_usage_only_v1",
+  "request_token_estimation_and_reservation": false,
+  "retain_reported_usage_settlement": true,
+  "retain_unknown_stop_no_retry": true,
+  "old_ledgers_immutable": true,
+  "original_approval_sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+  "final_source_and_profile_binding": "PENDING_FINAL_LOCAL_COMMIT"
+}

@@ -1,0 +1,359 @@
+"""Task-specific S864 exact-three HTTP composition; artifact, never production code.
+
+Uses unchanged formal create_application, assemble, R3 install_case_profile,
+install_owner_cap and original collector assertions. No Gold/old answer input.
+"""
+from __future__ import annotations
+import asyncio, hashlib, json, os, subprocess, sys, time
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlsplit
+
+# Candidate source only; never the host's checkout or a different image.
+SOURCE_ROOT = Path('/opt/s861/app')
+if SOURCE_ROOT.is_dir(): sys.path.insert(0, str(SOURCE_ROOT))
+from scripts import s8_6_1_api_acceptance as prior
+from scripts import s8_6_2_r3_40_acceptance as s840
+from scripts.s8_ecs_runtime import api_token
+from scripts.s8_6_4_language import expected_profile_language
+require, digest, write_new = prior.require, prior.digest, prior.write_new
+profile_request_headers = s840.profile_request_headers
+profile_manifest = s840.profile_manifest
+OWNER_SHA = 'd74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f'
+PROPOSAL_SHA = '9abe3edf977058d5ec8a56626f2686bd70c7d40f429263e28a193cef6677c64d'
+EXACT = (
+ ('mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434', "Which dataset was introduced in the 'coding time' section of the PPT for training?", '7f1d720d-9561-446f-a8cc-6a562c339d23', 'en-US'),
+ ('longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7', '辐射避难所怎么刷箱子', '76770fba-17c3-4704-8663-10aa669476ce', 'zh-CN'),
+ ('hotpotqa-5a729fe55542991f9a20c53b', 'What man is credited eith inventing both the Leyden jar and the Tribometer?', '96a9eebd-ffb2-4bc6-9bea-3ed015845479', 'en-US'),
+)
+
+def read(path): return json.loads(Path(path).read_text(encoding='utf8'))
+def file_sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def identity_cases():
+ return [{'case_id': a, 'question': b, 'knowledge_base_id': c, 'document_scope': [], 'answer_language': d} for a,b,c,d in EXACT]
+
+def approved_exact(environment):
+ """Closed task artifact validator; no original38-case grant function is called."""
+ env = environment
+ cfg = read(env['S864_CONFIGURATION_FILE'])
+ require(file_sha(env['S864_CONFIGURATION_FILE']) == env['S864_CONFIGURATION_SHA256'], 'S864_FROZEN_CONFIGURATION_CHANGED')
+ grant = read(cfg['grant_file'])
+ require(file_sha(cfg['grant_file']) == cfg['grant_sha256'], 'S864_FRESH_GRANT_CHANGED')
+ require(grant['schema'] == 's864-exact3-owner-grant/v1', 'S864_GRANT_SCHEMA')
+ require(file_sha(cfg['owner_file']) == OWNER_SHA == grant['owner_approval_sha256'], 'S864_NEW_OWNER_BINDING')
+ owner = read(cfg['owner_file'])
+ require(owner['owner_approved'] is True, 'S864_OWNER_NOT_APPROVED')
+ require(file_sha(cfg['proposal_file']) == PROPOSAL_SHA == grant['proposal_sha256'], 'S864_PROPOSAL_BINDING')
+ proposal = read(cfg['proposal_file'])
+ projected = [(c['case_id'], c['q0'], c['knowledge_base_scope'], c['document_scope'], c['accept_language']) for c in proposal['http_cases']]
+ require(projected == [(a,b,[c],[],d) for a,b,c,d in EXACT], 'S864_EXACT_THREE_ORIGINAL_INPUTS')
+ require(grant['cases'] == identity_cases(), 'S864_ONLY_THREE_HTTP_BINDINGS')
+ http_keys = {a for a,_,_,_ in EXACT}
+ vision_key = grant['vision_batch_id']
+ require(set(grant['batches']) == http_keys | {vision_key} and vision_key not in http_keys,
+     'S864_EXACT_THREE_HTTP_PLUS_ONE_VISION_LEDGER')
+ require(all(grant['batches'][key]['kind'] == 'http' for key in http_keys)
+     and grant['batches'][vision_key]['kind'] == 'vision', 'S864_NO_ADDITIONAL_HTTP_AUTHORITY')
+ require(grant['accounting_mode'] == 'reported_usage_only_v1' and grant['owner_max_total_attempts'] == 40,
+     'S864_EXPLICIT_REPORTED_USAGE_OWNER_MODE')
+ proof = read(cfg['image_proof_file'])
+ require(grant['source_revision'] == cfg['source_revision'] == proof['source_revision']
+     and grant['image_id'] == cfg['image_id'] == proof['image_id']
+     and grant['profile_sha256'] == cfg['profile_sha256'] == proof['profile_sha256']
+     == digest(s840.profile_manifest()), 'S864_FROZEN_SOURCE_IMAGE_PROFILE')
+ if grant['source_revision'] != proposal['source_commit']:
+  require(file_sha(cfg['supplement_file']) == cfg['supplement_sha256'] == grant['supplement_sha256'], 'S864_SUPPLEMENT_IDENTITY')
+  supplement = read(cfg['supplement_file'])
+  require(supplement['owner_approved'] is True and supplement['original_owner_approval_sha256'] == OWNER_SHA
+      and supplement['approved_source_commit'] == grant['source_revision']
+      and supplement['profile_sha256'] == grant['profile_sha256']
+      and supplement['scope_and_caps_unchanged'] is True
+      and supplement['accounting_mode'] == grant['accounting_mode'], 'S864_SUPPLEMENT_SOURCE_BINDING')
+ require(file_sha(__file__) == grant['glue_sha256'], 'S864_FROZEN_GLUE_CHANGED')
+ expiry = datetime.fromisoformat(grant['expires_at'].replace('Z','+00:00'))
+ require(expiry.tzinfo is not None and expiry > datetime.now(timezone.utc), 'S864_OWNER_EXPIRED')
+ require(grant['owner_max_total_tokens'] == 500000 and grant['http_max_attempts'] == 36
+     and grant['http_max_total_tokens'] == 300000 and grant['max_runtime_seconds'] == 2400, 'S864_CAPS_CHANGED')
+ require(env['S864_SOURCE_REVISION'] == grant['source_revision'] and env['S864_IMAGE_ID'] == grant['image_id'], 'S864_CONTAINER_IMAGE_BINDING')
+ require(env['WEKNORA_PORT_RERANK_TOP1_FLOORLESS'] == 'true'
+     and env['WEKNORA_PORT_GRAPH_ENABLED'] == 'false'
+     and env['WEKNORA_PORT_CLOUD_ALLOWED'] == 'true'
+     and env['WEKNORA_PORT_ROUTER_MODE'] == 'DYNAMIC', 'S864_EFFECTIVE_RUNTIME_BOUNDARIES')
+ case = next((c for c in grant['cases'] if c['case_id'] == env['S864_CASE_ID']), None)
+ require(case is not None, 'S864_CASE_NOT_APPROVED')
+ inventory = read(cfg['before_file'])['inventory']
+ model_fields = ('provider','model','model_id','capability')
+ expected_models = [{key:value[key] for key in model_fields} for value in inventory['models'].values()]
+ require(sorted(grant['allowed_models'],key=lambda m:m['model_id']) == sorted(expected_models,key=lambda m:m['model_id']),
+     'S864_CURRENT_ARCHIVED_HTTP_MODEL_BINDINGS')
+ expected_ids = {role:value['model_id'] for role,value in inventory['models'].items()}
+ require(all(grant['batches'][key]['model_ids'] == expected_ids
+     and grant['batches'][key]['qu_model_id'] == expected_ids['cheap'] for key in http_keys),
+     'S864_CURRENT_MODEL_ROLE_IDS')
+ selected = grant['batches'][case['case_id']]
+ require(env['WEKNORA_PORT_EXECUTION_FILE'] == selected['execution_file'], 'S864_CHILD_BINDING')
+ require(env['WEKNORA_PORT_REDIS_PREFIX'] == selected['redis_prefix'], 'S864_FRESH_REDIS_PREFIX')
+ for current in grant['cases']:
+  batch = grant['batches'][current['case_id']]
+  ledger = read(batch['execution_file'])
+  s840.execution_module._validate_ledger(ledger)
+  require(batch['kind'] == 'http' and ledger.get('accounting_mode') == grant['accounting_mode']
+      and ledger['status'] in ('OPEN','CLOSED') and ledger['max_calls'] == 12 and ledger['max_tokens'] == 100000
+      and ledger['allowed_kbs'] == [current['knowledge_base_id']]
+      and ledger['tenant_id'] == 332 and hashlib.sha256(ledger['subject_id'].encode()).hexdigest()
+        == '00f2fd3dad2b741924376adab7fd29c12a93bc7a1fe4e8e1f0f97cacd418fa83'
+      and ledger['allowed_request_prefixes'] == ['*']
+      and ledger['allowed_models'] == grant['allowed_models'] and ledger['capture_evidence'] is True,
+      'S864_NORMAL_CHILD_SCOPE_MODEL_CAPS')
+  require(all(e['status'] == 'SETTLED' for e in ledger['entries']), 'S864_UNKNOWN_INFLIGHT_STOP')
+ vision = grant['batches'][vision_key]
+ vision_ledger = read(vision['execution_file'])
+ s840.execution_module._validate_ledger(vision_ledger)
+ require(vision_ledger.get('accounting_mode') == grant['accounting_mode'] and vision_ledger['max_calls'] == 4
+     and vision_ledger['allowed_kbs'] == vision['knowledge_base_scope']
+     and vision_ledger['allowed_request_prefixes'] == vision['request_ids']
+     and vision_ledger['allowed_models'] == vision['allowed_models']
+     and vision_ledger['tenant_id'] == 332
+     and hashlib.sha256(vision_ledger['subject_id'].encode()).hexdigest() == inventory['owner_sha256']
+     and vision_ledger['status'] in ('OPEN','CLOSED')
+     and all(e['status'] == 'SETTLED' for e in vision_ledger['entries']), 'S864_FROZEN_VISION_LEDGER_BINDING')
+ return grant, case, cfg
+
+async def query_body(runtime, case, batch):
+ """Unsent actual QU renderer + real configured model body builder."""
+ from types import SimpleNamespace
+ from backend.weknora_port.models.provider import ProviderModel
+ from backend.weknora_port.models.types import CallContext, TrustedScope
+ from backend.weknora_port.retrieval.pipeline import PipelineState
+ from backend.weknora_port.retrieval.query import understand_query
+ role = await runtime.models.resolve(batch['model_ids']['cheap'])
+ config = runtime.catalogue.resolve(role, batch['model_ids']['cheap'])
+ built = []
+ class Capture:
+  async def chat(self, messages, options, context):
+   built.append(ProviderModel(config, None).build_request_body(messages, options))
+   return SimpleNamespace(content=json.dumps({'rewrite_query': case['question'], 'intent':'kb_search',
+       'image_description':'', 'query_type':'UNKNOWN'}), finish_reason='stop')
+ class Registry:
+  async def chat(self, *args): return Capture()
+ context = CallContext(batch['request_id'], TrustedScope(runtime.principal.subject_id, (case['knowledge_base_id'],), ()))
+ state = PipelineState(query=case['question'], rewrite_query=case['question'],
+     language=expected_profile_language(case['question'],case['answer_language'])[1],
+     chat_model_id=config.model_id, query_understand_model_id=config.model_id,
+     retrieval_strategy_mode='query_structure_v1', source_evidence_mode='bounded_source_v1', enable_expansion=False)
+ prior._budget_state_guard(state, case['question'], case['answer_language'])
+ await understand_query(state, context, Registry())
+ require(len(built) == 1, 'S864_ONE_UNSENT_QU_RENDER_REQUIRED')
+ return {'body_sha256':digest(built[0]), 'wire_bytes':len(prior.canonical(built[0])), 'request_body':built[0], 'sent':False}
+
+def create_application():
+ from backend.weknora_port.development import assemble
+ from scripts.s8_ecs_runtime import create_application as formal_application
+ env = dict(os.environ)
+ grant, case, cfg = approved_exact(env)
+ batch = grant['batches'][case['case_id']]
+ require(not read(batch['execution_file'])['entries'], 'S864_CASE_ALREADY_SENT_NO_RETRY')
+ prior.claim_batch(batch['execution_file'], 'api', grant['profile_sha256'])
+ expiry = datetime.fromisoformat(grant['expires_at'].replace('Z','+00:00'))
+ @asynccontextmanager
+ async def factory(settings, **kwargs):
+  with s840.owner_process_lock(grant['owner_lock_file']):
+   async with assemble(settings, **kwargs) as runtime:
+    require(runtime.cloud_allowed and not runtime.graph_enabled and runtime.conversation.rerank_top1_floorless
+       and runtime.conversation.bridge_rescue_mode == 'off', 'S864_RUNTIME_DEFAULTS')
+    actual = await query_body(runtime, case, batch)
+    require(actual['body_sha256'] == batch['qu_request_sha256s'][batch['request_id']], 'S864_EXACT_QU_PREFLIGHT_CHANGED')
+    s840.install_owner_cap(runtime, grant, batch['execution_file'])
+    s840.install_case_profile(runtime, case, batch, expiry, batch['audit_directory'])
+    write_new(Path(batch['audit_directory'])/'s864-profile.json', {'source_revision':grant['source_revision'],
+       'image_id':grant['image_id'], 'profile_sha256':grant['profile_sha256'], 'case':case,
+       'owner_approval_sha256':OWNER_SHA, 'supplement_sha256':grant.get('supplement_sha256'),
+       'glue_sha256':grant['glue_sha256'], 'normal_formal_application':True, 'unsent_QU_preflight':actual})
+    yield runtime
+ return formal_application(env, assemble_factory=factory)
+
+
+async def collect_exact_http(base_url, output, environment=None, *, transport=None):
+    """One original frozen question through HTTP. Every failure is terminal."""
+    import httpx
+    from scripts.s8_ecs_runtime import api_token
+    environment = dict(os.environ if environment is None else environment)
+    grant, case, _ = approved_exact(environment)
+    batch = grant['batches'][case['case_id']]
+    prior.claim_batch(batch['execution_file'], 'collector', digest(profile_manifest()))
+    parsed = urlsplit(base_url)
+    require(parsed.scheme == 'http' and parsed.hostname == '127.0.0.1' and parsed.path in ('', '/')
+        and not parsed.query and not parsed.fragment and not parsed.username and not parsed.password,
+        'S840_LOOPBACK_HTTP_REQUIRED')
+    target = Path(output)
+    target.mkdir(parents=True, exist_ok=False)
+    write_new(target / 'input.json', {'case': case, 'request_id': batch['request_id'],
+        'profile_sha256': grant['profile_sha256'], 'source_revision': grant['source_revision'],
+        'image_id': grant['image_id'], 'authorization_file_sha256': digest(Path(environment['S864_OWNER_FILE']).read_bytes()),
+        'query_type_injected': False, 'gold_sent': False})
+    headers = {'Authorization': 'Bearer ' + api_token(environment),
+        'Origin': base_url.rstrip('/')}
+    result = None
+    try:
+        async with httpx.AsyncClient(base_url=base_url.rstrip('/'), headers=headers,
+                timeout=httpx.Timeout(300, connect=10), transport=transport) as client:
+            require(prior.ledger_status(batch['execution_file'])['unsettled'] == 0, 'S840_UNSETTLED_BEFORE_POST')
+            session_body = {'title': 'ECS40 ' + case['case_id'][:100],
+                'knowledge_base_scope': [case['knowledge_base_id']], 'document_scope': [],
+                'source_evidence_mode': 'bounded_source_v1', 'retrieval_strategy_mode': 'query_structure_v1'}
+            session = await client.post('/api/v1/sessions', json=session_body)
+            write_new(target / 'session.json', {'status': session.status_code, 'body': session.json()})
+            require(session.status_code == 200, 'S840_SESSION_CREATE_FAILED')
+            sid = session.json()['data']['id']
+            body = {'content': case['question'], 'request_id': batch['request_id'], 'mode': 'quick',
+                'knowledge_base_scope': [case['knowledge_base_id']], 'document_scope': [], 'reasoning_effort': 'off'}
+            write_new(target / 'submit-claim.json', {'status': 'SUBMITTING_NO_RETRY', 'session_id': sid,
+                'request_id': batch['request_id'], 'body': body})
+            began, first_answer = time.monotonic(), None
+            blocks = []
+            with (target / 'response.sse').open('xb') as raw:
+                request_headers = profile_request_headers(case['question'], headers,
+                    case.get('answer_language'))
+                async with client.stream('POST', f'/api/v1/sessions/{sid}/messages', json=body,
+                                         headers=request_headers) as response:
+                    status_code = response.status_code
+                    async for chunk in response.aiter_bytes():
+                        raw.write(chunk); raw.flush(); blocks.append(chunk)
+                        if first_answer is None:
+                            text = b''.join(blocks).decode('utf8', errors='replace')
+                            if '\n\n' in text:
+                                complete = text.rsplit('\n\n', 1)[0] + '\n\n'
+                                if any(f.get('response_type') == 'answer' and f.get('content')
+                                        for f in prior.parse_sse(complete)):
+                                    first_answer = time.monotonic() - began
+            frames = prior.parse_sse(b''.join(blocks).decode('utf8'))
+            ledger = prior.ledger_status(batch['execution_file'])
+            write_new(target / 'frames.json', frames)
+            write_new(target / 'ledger.json', ledger)
+            require(status_code == 200 and frames and frames[-1].get('response_type') == 'complete',
+                    'S840_MISSING_SSE_COMPLETION')
+            terminal = frames[-1].get('data', {})
+            require(not any(f.get('response_type') == 'error' for f in frames)
+                and terminal.get('status') not in ('failed', 'error', 'cancelled'), 'S840_FAILED_TURN_STOP')
+            require(terminal.get('finish_reason') in ('stop', 'end_turn', 'completed')
+                and terminal.get('truncated') is False, 'S840_INCOMPLETE_OUTPUT_STOP')
+            require(ledger['status'] == 'OPEN' and ledger['unsettled'] == 0, 'S840_UNKNOWN_OR_LEDGER_STOP')
+            history = await client.get(f'/api/v1/sessions/{sid}/messages')
+            write_new(target / 'history.json', {'status': history.status_code, 'body': history.json()})
+            require(history.status_code == 200, 'S840_HISTORY_READ_FAILED')
+            assistants = [r for r in history.json()['data'] if r.get('role') == 'assistant']
+            users = [r for r in history.json()['data'] if r.get('role') == 'user']
+            require(len(assistants) == 1 and assistants[0].get('is_completed') is True
+                and assistants[0].get('turn_status') == 'completed', 'S840_HISTORY_STATUS_MISMATCH')
+            assistant = assistants[0]
+            run_id = frames[0].get('id')
+            require(run_id and run_id != batch['request_id'] and all(f.get('id') == run_id for f in frames),
+                    'S840_CLIENT_SERVER_IDENTITY_MISMATCH')
+            queries = [f.get('data', {}) for f in frames if f.get('response_type') == 'agent_query']
+            require(len(queries) == 1 and queries[0].get('request_id') == run_id
+                and queries[0].get('query') == case['question'] and queries[0].get('session_id') == sid
+                and queries[0].get('assistant_message_id') == assistant['id']
+                and assistant.get('request_id') == run_id, 'S840_HISTORY_RUN_BINDING_MISMATCH')
+            require(len(users) == 1 and users[0].get('content') == case['question'], 'S840_HISTORY_Q0_MISMATCH')
+            replay = await client.get(f'/api/v1/sessions/continue-stream/{sid}', params={'message_id': assistant['id']})
+            replay_frames = prior.parse_sse(replay.text) if replay.status_code == 200 else []
+            write_new(target / 'replay.json', {'status': replay.status_code, 'frames': replay_frames})
+            require(replay.status_code == 200 and replay_frames and prior.ledger_status(batch['execution_file']) == ledger
+                and all(f.get('id') == run_id for f in replay_frames)
+                and replay_frames[-1].get('response_type') == 'complete'
+                and replay_frames[-1].get('data') == terminal, 'S840_REPLAY_NEW_SEND_OR_STATE_CHANGE')
+            require([f.get('data') for f in replay_frames if f.get('response_type') == 'agent_query'] == queries,
+                    'S840_REPLAY_RUN_BINDING_MISMATCH')
+            answer = lambda values: ''.join(f.get('content', '') for f in values if f.get('response_type') == 'answer')
+            require(answer(frames) == answer(replay_frames) == assistant.get('content') and bool(answer(frames).strip()),
+                    'S840_ANSWER_HISTORY_MISMATCH')
+            references = [f.get('knowledge_references') for f in frames if f.get('response_type') == 'references']
+            require(references == [f.get('knowledge_references') for f in replay_frames if f.get('response_type') == 'references']
+                and ((references[-1] or []) == (assistant.get('knowledge_references') or []) if references
+                     else not assistant.get('knowledge_references')), 'S840_REFERENCE_PERSISTENCE_MISMATCH')
+            sources = []
+            for reference in assistant.get('knowledge_references') or []:
+                chunk_id = reference.get('chunk_id') or reference.get('id')
+                require(isinstance(chunk_id, str) and chunk_id, 'S840_CITATION_ID_MISSING')
+                source = await client.get('/api/v1/chunks/' + chunk_id)
+                sources.append({'chunk_id': chunk_id, 'status': source.status_code, 'body': source.json()})
+                require(source.status_code == 200, 'S840_CITATION_READBACK_FAILED')
+                payload = source.json().get('data', {})
+                require(payload.get('knowledge_base_id') == case['knowledge_base_id'], 'S840_CITATION_SCOPE_MISMATCH')
+            write_new(target / 'sources.json', sources)
+            result = {'status': 'HTTP_COMPLETED_REVIEW_REQUIRED', 'case_id': case['case_id'],
+                'session_id': sid, 'client_request_id': batch['request_id'], 'server_run_id': run_id,
+                'assistant_message_id': assistant['id'], 'first_answer_seconds': first_answer,
+                'whole_seconds': time.monotonic() - began, 'ledger': ledger,
+                'final_answer_correct': 'NOT_REVIEWED', 'evidence_support': 'NOT_REVIEWED',
+                'actual_rule_activation': 'REQUIRES_STRATEGY_AUDIT_REVIEW',
+                'original_evidence_delivery': 'REQUIRES_ACTUAL_PROVIDER_WIRE_REVIEW',
+                'PG_reconciliation': 'REQUIRES_READ_ONLY_PG_REVIEW',
+                'citation_ownership': 'SAME_KB_READBACK; current version and original asset proof reviewed separately'}
+    except BaseException as exc:
+        write_new(target / 'results.json', {'status': 'STOP_NO_RETRY', 'case_id': case['case_id'],
+            'error_type': type(exc).__name__, 'error': str(exc), 'send_state': 'READ_RAW_RECEIPTS_NO_RESEND',
+            'ledger': prior.ledger_status(batch['execution_file'])})
+        raise
+    write_new(target / 'results.json', result)
+    return result
+
+
+async def preflight():
+ from scripts.s8_ecs_runtime import settings_and_factory
+ env = dict(os.environ)
+ require(env['WEKNORA_PORT_CLOUD_ALLOWED'] == 'false' and not env.get('WEKNORA_PORT_EXECUTION_FILE'), 'S864_PREFLIGHT_MUST_NOT_HAVE_AUTHORITY')
+ cfg = read(env['S864_CONFIGURATION_FILE'])
+ require(cfg['cases'] == identity_cases(), 'S864_PREFLIGHT_EXACT_INPUTS')
+ settings, factory, box = settings_and_factory(env)
+ async with factory(settings) as runtime:
+  values = {}
+  for case in cfg['cases']:
+   batch = {'request_id':'s864-unsent-preflight', 'model_ids':cfg['model_ids']}
+   values[case['case_id']] = await query_body(runtime,case,batch)
+  vision = None
+  if cfg.get('vision_inputs_file'):
+   import importlib.util
+   from backend.weknora_port.models.provider import ProviderModel
+   from backend.weknora_port.models.types import Message,ChatOptions
+   spec=importlib.util.spec_from_file_location('frozen_vision',cfg['vision_glue_file'])
+   module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+   role=await runtime.models.resolve(cfg['model_ids']['expensive'])
+   config=runtime.catalogue.resolve(role,cfg['model_ids']['expensive'])
+   require(config.supports_vision and config.provider=='deepseek' and config.model=='deepseek-flash', 'S864_ARCHIVED_VISION_CONFIGURATION_REQUIRED')
+   bodies=[]
+   for record,body in module.load_inputs(cfg['vision_inputs_file'],cfg['vision_inputs_sha256']):
+    image=body['messages'][0]['content'][0]['image_url']['url']
+    messages=(Message('user',body['messages'][0]['content'][1]['text'],images=(image,)),)
+    built=ProviderModel(config,None).build_request_body(messages,ChatOptions(max_tokens=5000,temperature=0.10000000149011612))
+    require(built==body,'S864_UNSENT_VISION_BODY_CHANGED')
+    bodies.append({'case_id':record['case_id'],'prompt_kind':record['prompt_kind'],'body_sha256':digest(built),'sent':False})
+   vision={'model_id':config.model_id,'provider':config.provider,'model':config.model,'supports_vision':config.supports_vision,'bodies':bodies}
+  print(json.dumps({'status':'UNSENT_EXACT3_QU_AND4_VISION_RENDERED','records':values,'vision':vision,'runtime_identity':box['identity'],'provider_calls':0},ensure_ascii=False))
+
+async def ready():
+ import httpx
+ async with httpx.AsyncClient(headers={'Authorization':'Bearer '+api_token(os.environ)},timeout=5) as c:
+  r = await c.get('http://127.0.0.1:8000/readyz')
+  if r.status_code != 200: raise SystemExit(3)
+  d = r.json()
+  require(d['tenant_id'] == 332 and d['subject_sha256'] == '00f2fd3dad2b741924376adab7fd29c12a93bc7a1fe4e8e1f0f97cacd418fa83'
+      and d['cloud_allowed'] is True and d['graph_enabled'] is False and d['rerank_top1_floorless'] is True
+      and d['worker_in_api'] is False and d['model_requests_at_startup'] == 0, 'S864_READINESS_IDENTITY')
+  print(json.dumps({'status':'CANDIDATE_READY','identity':d}))
+
+async def collect():
+ grant, case, cfg = approved_exact(dict(os.environ))
+ batch = grant['batches'][case['case_id']]
+ require(not read(batch['execution_file'])['entries'], 'S864_NO_RETRY_LEDGER_MUST_BE_FRESH')
+ await collect_exact_http('http://127.0.0.1:8000', batch['http_output_directory'])
+
+if __name__ == '__main__':
+ mode = sys.argv[1] if len(sys.argv) == 2 else ''
+ require(mode in ('api','collector','preflight','ready'), 'S864_FIXED_COMPONENT_REQUIRED')
+ if mode == 'api':
+  import uvicorn
+  uvicorn.run(create_application(), host='0.0.0.0', port=8000, workers=1, access_log=False)
+ else:
+  asyncio.run({'collector':collect,'preflight':preflight,'ready':ready}[mode]())

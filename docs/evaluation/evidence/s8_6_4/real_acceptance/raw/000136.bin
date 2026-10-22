@@ -1,0 +1,449 @@
+{
+  "status": "OPEN",
+  "entries": [
+    {
+      "id": "d66fc4a2011c7df218ec2ebc24f62c7d80b43ffc616354c8939ef1e380a9aca7",
+      "request_id": "s864-vlm-37f71ae598da43628e597c2b/row-0958/old",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "capability": "vision",
+      "wire_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "wire_bytes": 304741,
+      "output_budget": 5000,
+      "status": "SETTLED",
+      "usage": {
+        "prompt_tokens": 1018,
+        "completion_tokens": 808,
+        "total_tokens": 1826,
+        "status": "REPORTED",
+        "cached_tokens": 768,
+        "cache_read_tokens": 768,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 250,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1018,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 808,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 1826,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 768,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 250,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 707,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":808,\"completion_tokens_details.reasoning_tokens\":707,\"prompt_cache_hit_tokens\":768,\"prompt_cache_miss_tokens\":250,\"prompt_tokens\":1018,\"total_tokens\":1826}",
+          "raw_sha256": "abb3b29ce4e6e90083e422816320df96f32725ce15994df3bf2238f00f339420",
+          "derived_total": 1826,
+          "simulated": false,
+          "observed_lower_bound": 1826,
+          "prior_numeric_raw": []
+        }
+      },
+      "image_count": 1,
+      "decoded_image_bytes": 228312,
+      "process_identity": {
+        "pid": 1,
+        "creation_token": "39d8368d-c88b-4209-a46f-a1c8977c59bb:269608583"
+      },
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "id": "02b3407b9d57dd721ce380ef5584332b413f0e4ce1fb7f5240f36053654b0d58",
+      "request_id": "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "capability": "vision",
+      "wire_sha256": "fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089",
+      "wire_bytes": 306009,
+      "output_budget": 5000,
+      "status": "SETTLED",
+      "usage": {
+        "prompt_tokens": 1236,
+        "completion_tokens": 1859,
+        "total_tokens": 3095,
+        "status": "REPORTED",
+        "cached_tokens": 896,
+        "cache_read_tokens": 896,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 340,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1236,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 1859,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 3095,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 896,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 340,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 1378,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":1859,\"completion_tokens_details.reasoning_tokens\":1378,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":340,\"prompt_tokens\":1236,\"total_tokens\":3095}",
+          "raw_sha256": "12d59051e235edf3d4742323a9c13f87ca58d67c650d7e6a5f8e4705b9e57c46",
+          "derived_total": 3095,
+          "simulated": false,
+          "observed_lower_bound": 3095,
+          "prior_numeric_raw": []
+        }
+      },
+      "image_count": 1,
+      "decoded_image_bytes": 228312,
+      "process_identity": {
+        "pid": 1,
+        "creation_token": "39d8368d-c88b-4209-a46f-a1c8977c59bb:269608583"
+      },
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "id": "4263c37092896561bbfc2bf7fa0bee668e434d266d8316750ba0859af755e928",
+      "request_id": "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "capability": "vision",
+      "wire_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "wire_bytes": 410465,
+      "output_budget": 5000,
+      "status": "SETTLED",
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 1026,
+        "total_tokens": 2058,
+        "status": "REPORTED",
+        "cached_tokens": 896,
+        "cache_read_tokens": 896,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 136,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1032,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 1026,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 2058,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 896,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 136,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 866,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":1026,\"completion_tokens_details.reasoning_tokens\":866,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":136,\"prompt_tokens\":1032,\"total_tokens\":2058}",
+          "raw_sha256": "7db2e58633170e6cb0c38f2ba3d53922b630cd4893e34506a572febb737155d7",
+          "derived_total": 2058,
+          "simulated": false,
+          "observed_lower_bound": 2058,
+          "prior_numeric_raw": []
+        }
+      },
+      "image_count": 1,
+      "decoded_image_bytes": 307605,
+      "process_identity": {
+        "pid": 1,
+        "creation_token": "39d8368d-c88b-4209-a46f-a1c8977c59bb:269608583"
+      },
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "id": "5141366b286dd3b97de9c16600107d2114802f58a905c385d3a34294d8201e00",
+      "request_id": "s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "capability": "vision",
+      "wire_sha256": "f09c46f3fd7bdc8825447ce7e6e4eb5aa68e46ba52f309ef2e4f7390b23fc49c",
+      "wire_bytes": 411733,
+      "output_budget": 5000,
+      "status": "SETTLED",
+      "usage": {
+        "prompt_tokens": 1250,
+        "completion_tokens": 2847,
+        "total_tokens": 4097,
+        "status": "REPORTED",
+        "cached_tokens": 768,
+        "cache_read_tokens": 768,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 482,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1250,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 2847,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 4097,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 768,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 482,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 2373,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":2847,\"completion_tokens_details.reasoning_tokens\":2373,\"prompt_cache_hit_tokens\":768,\"prompt_cache_miss_tokens\":482,\"prompt_tokens\":1250,\"total_tokens\":4097}",
+          "raw_sha256": "21d93962662cb40b9d7a0e8acde52a8dcfc91fd3f4a12c8e0e2ddd3063a476da",
+          "derived_total": 4097,
+          "simulated": false,
+          "observed_lower_bound": 4097,
+          "prior_numeric_raw": []
+        }
+      },
+      "image_count": 1,
+      "decoded_image_bytes": 307605,
+      "process_identity": {
+        "pid": 1,
+        "creation_token": "39d8368d-c88b-4209-a46f-a1c8977c59bb:269608583"
+      },
+      "outcome": "RESPONSE_RECEIVED"
+    }
+  ],
+  "accounting_mode": "reported_usage_only_v1",
+  "max_calls": 4,
+  "max_tokens": 100000,
+  "tenant_id": 332,
+  "subject_id": "p8-real-3de2eca0bea340babcde75ce60c9a366",
+  "allowed_kbs": [
+    "7f1d720d-9561-446f-a8cc-6a562c339d23",
+    "fd444069-cc1a-42d0-9617-e95fa90b6941"
+  ],
+  "allowed_request_prefixes": [
+    "s864-vlm-37f71ae598da43628e597c2b/row-0958/old",
+    "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+    "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+    "s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate"
+  ],
+  "allowed_models": [
+    {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "capability": "vision"
+    }
+  ],
+  "capture_evidence": true
+}

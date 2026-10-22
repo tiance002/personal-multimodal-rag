@@ -1,0 +1,248 @@
+....................................F....FF.                             [100%]
+================================== FAILURES ===================================
+_______ test_reported_owner_occupancy_counts_only_actual_usage_not_wire _______
+
+authorization = ({'S840_AUTHORIZATION_FILE': 'E:\\RAG quention\\var\\reports\\s8-6-4\\pytest-scope-accounting-green-v1\\test_reported_...6', 'native_cases_sha256': 'c6e24d716019dba44ee0c7f321ab55d472f59cd499656d27772d66b8dca26b4c', 'denominator': 40, ...})
+
+    def test_reported_owner_occupancy_counts_only_actual_usage_not_wire(authorization):
+        env, grant = reported_grant(authorization, total=490000)
+>       assert adapter.owner_occupancy(grant, env['WEKNORA_PORT_EXECUTION_FILE']) == 490000
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s862r3_40_acceptance.py:404: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\s8_6_2_r3_40_acceptance.py:255: in owner_occupancy
+    execution_module._validate_ledger(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'status': 'OPEN', 'entries': [{'id': 'b8dcb838332eb334f34b708b3e29a3dcda1166b6f77314c138b3701159abd812', 'request_id'..., 'model_id': 'cheap-model', 'provider': 'mock-offline', ...}], 'tenant_id': 332, 'subject_id': 'offline-subject', ...}
+
+    def _validate_ledger(data):
+        try:
+            _require(isinstance(data, dict) and data['status'] in ('OPEN', 'STOP', 'CLOSED'))
+            mode = data.get('accounting_mode', RESERVATION_MODE)
+            _require(mode in (RESERVATION_MODE, REPORTED_USAGE_ONLY))
+            _require(type(data['max_calls']) is int and 0 < data['max_calls'] <= 12)
+            _require(type(data['max_tokens']) is int and 0 < data['max_tokens'] <= 100000)
+            _require(str(data['tenant_id']) and isinstance(data['subject_id'], str) and data['subject_id'])
+            for field in ('allowed_kbs', 'allowed_request_prefixes'):
+                values = data[field]
+                _require(isinstance(values, list) and values and all(isinstance(v, str) and v for v in values))
+                _require(len(values) == len(set(values)))
+            models = data['allowed_models']
+            _require(isinstance(models, list) and models)
+            model_fields = {'provider', 'model', 'model_id', 'capability'}
+            permitted_fields = (model_fields,) if data['status'] == 'OPEN' else (model_fields, model_fields - {'model_id'})
+            _require(all(isinstance(m, dict) and set(m) in permitted_fields
+                and all(isinstance(v, str) and v for v in m.values()) for m in models))
+            _require(len({json.dumps(m, sort_keys=True) for m in models}) == len(models))
+            _require(type(data.get('capture_evidence', False)) is bool)
+            entries = data['entries']
+            _require(isinstance(entries, list) and len(entries) <= data['max_calls'])
+            seen = set()
+            for row in entries:
+                _require(isinstance(row, dict))
+                identity = hashlib.sha256(json.dumps([row['request_id'], row['capability']]).encode()).hexdigest()
+                _require(row['id'] == identity and identity not in seen)
+                seen.add(identity)
+                _require(isinstance(row['request_id'], str) and bool(row['request_id'])
+                    and any(p == '*' or row['request_id'].startswith(p) for p in data['allowed_request_prefixes']))
+                row_model = {k: row[k] for k in ('provider', 'model', 'capability')}
+                if 'model_id' in row: row_model['model_id'] = row['model_id']
+                _require(row_model in models)
+                _require(isinstance(row['wire_sha256'], str) and len(row['wire_sha256']) == 64)
+                int(row['wire_sha256'], 16)
+                if mode == REPORTED_USAGE_ONLY:
+                    _require(not any(k in row for k in ('reserved_tokens', 'held_tokens', 'input_bound_recipe', 'input_tokens_upper_bound')))
+                    _require(type(row['wire_bytes']) is int and row['wire_bytes'] > 0)
+                    _require(row.get('usage') is None or _reported_usage_valid(row['usage']))
+                    _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
+                        'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
+                    if row['status'] == 'SETTLED':
+                        _require(row.get('outcome') == 'RESPONSE_RECEIVED' and _reported_usage_valid(row.get('usage')))
+                    elif row['status'] != 'INFLIGHT':
+                        _require(data['status'] != 'OPEN')
+                    continue
+                reserved, held = row['reserved_tokens'], row['held_tokens']
+                _require(type(reserved) is int and reserved >= 1024 and type(held) is int and 0 <= held <= reserved)
+                if 'input_bound_recipe' in row:
+                    _require(row['capability'] == 'vision' and row['input_bound_recipe'] == VISION_INPUT_RECIPE)
+                    _require(all(type(row[k]) is int and row[k] > 0 for k in ('input_tokens_upper_bound',
+                        'output_tokens_upper_bound', 'text_wire_bytes', 'image_count', 'decoded_image_bytes', 'wire_bytes')))
+                    _require(reserved == row['input_tokens_upper_bound'] + row['output_tokens_upper_bound'] + 1024)
+                _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
+                    'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
+                if row.get('usage') is not None: _require(_usage_valid(row['usage'], reserved))
+                if row['status'] == 'SETTLED':
+                    _require(row.get('outcome') == 'RESPONSE_RECEIVED' and _usage_valid(row.get('usage'), reserved))
+                    _require(held == row['usage']['total_tokens'])
+                else:
+                    _require(held == reserved)
+                    if row['status'] != 'INFLIGHT': _require(data['status'] != 'OPEN')
+            if mode == REPORTED_USAGE_ONLY:
+                known = sum(row['usage']['total_tokens'] for row in entries if row.get('usage') is not None)
+                _require(known < data['max_tokens'] or data['status'] != 'OPEN')
+            else:
+                _require(sum(row['held_tokens'] for row in entries) <= data['max_tokens'])
+        except (KeyError, TypeError, ValueError):
+>           raise ProviderError('LOCAL_EXECUTION_INVALID') from None
+E           backend.weknora_port.models.types.ProviderError: LOCAL_EXECUTION_INVALID
+
+backend\weknora_port\execution.py:266: ProviderError
+_ test_reported_owner_gate_checks_known_actual_without_request_estimator[490000-True] _
+
+authorization = ({'S840_AUTHORIZATION_FILE': 'E:\\RAG quention\\var\\reports\\s8-6-4\\pytest-scope-accounting-green-v1\\test_reported_...6', 'native_cases_sha256': 'c6e24d716019dba44ee0c7f321ab55d472f59cd499656d27772d66b8dca26b4c', 'denominator': 40, ...})
+settled = 490000, allowed = True
+
+    @pytest.mark.parametrize('settled,allowed', [(490000, True), (500000, False)])
+    def test_reported_owner_gate_checks_known_actual_without_request_estimator(authorization, settled, allowed):
+        env, grant = reported_grant(authorization, total=settled)
+        path = Path(env['WEKNORA_PORT_EXECUTION_FILE'])
+        execution = SimpleNamespace(path=path)
+        admissions = []
+        async def authorize(call): admissions.append(call.context.request_id)
+        gate = SimpleNamespace(_local_execution=execution, authorize=authorize)
+        async def make(config, key, current_gate): return SimpleNamespace()
+        runtime = SimpleNamespace(_make_model=make, execution=execution)
+        adapter.install_owner_cap(runtime, grant, path)
+        # Deliberately no wire_bytes, output_budget or _OUTPUT_BOUND: this mode must
+        # not derive a token reservation from any request-size estimate.
+        call = SimpleNamespace(context=SimpleNamespace(request_id='actual-only-next'))
+        async def exercise():
+            await runtime._make_model(None, None, gate)
+            await gate.authorize(call)
+        if allowed:
+>           asyncio.run(exercise()); assert admissions == ['actual-only-next']
+            ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\weknora_port\test_s862r3_40_acceptance.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_s862r3_40_acceptance.py:449: in exercise
+    await gate.authorize(call)
+scripts\s8_6_2_r3_40_acceptance.py:292: in bounded_authorize
+    held = owner_occupancy(grant, execution_file)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\s8_6_2_r3_40_acceptance.py:255: in owner_occupancy
+    execution_module._validate_ledger(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'status': 'OPEN', 'entries': [{'id': 'b8dcb838332eb334f34b708b3e29a3dcda1166b6f77314c138b3701159abd812', 'request_id'..., 'model_id': 'cheap-model', 'provider': 'mock-offline', ...}], 'tenant_id': 332, 'subject_id': 'offline-subject', ...}
+
+    def _validate_ledger(data):
+        try:
+            _require(isinstance(data, dict) and data['status'] in ('OPEN', 'STOP', 'CLOSED'))
+            mode = data.get('accounting_mode', RESERVATION_MODE)
+            _require(mode in (RESERVATION_MODE, REPORTED_USAGE_ONLY))
+            _require(type(data['max_calls']) is int and 0 < data['max_calls'] <= 12)
+            _require(type(data['max_tokens']) is int and 0 < data['max_tokens'] <= 100000)
+            _require(str(data['tenant_id']) and isinstance(data['subject_id'], str) and data['subject_id'])
+            for field in ('allowed_kbs', 'allowed_request_prefixes'):
+                values = data[field]
+                _require(isinstance(values, list) and values and all(isinstance(v, str) and v for v in values))
+                _require(len(values) == len(set(values)))
+            models = data['allowed_models']
+            _require(isinstance(models, list) and models)
+            model_fields = {'provider', 'model', 'model_id', 'capability'}
+            permitted_fields = (model_fields,) if data['status'] == 'OPEN' else (model_fields, model_fields - {'model_id'})
+            _require(all(isinstance(m, dict) and set(m) in permitted_fields
+                and all(isinstance(v, str) and v for v in m.values()) for m in models))
+            _require(len({json.dumps(m, sort_keys=True) for m in models}) == len(models))
+            _require(type(data.get('capture_evidence', False)) is bool)
+            entries = data['entries']
+            _require(isinstance(entries, list) and len(entries) <= data['max_calls'])
+            seen = set()
+            for row in entries:
+                _require(isinstance(row, dict))
+                identity = hashlib.sha256(json.dumps([row['request_id'], row['capability']]).encode()).hexdigest()
+                _require(row['id'] == identity and identity not in seen)
+                seen.add(identity)
+                _require(isinstance(row['request_id'], str) and bool(row['request_id'])
+                    and any(p == '*' or row['request_id'].startswith(p) for p in data['allowed_request_prefixes']))
+                row_model = {k: row[k] for k in ('provider', 'model', 'capability')}
+                if 'model_id' in row: row_model['model_id'] = row['model_id']
+                _require(row_model in models)
+                _require(isinstance(row['wire_sha256'], str) and len(row['wire_sha256']) == 64)
+                int(row['wire_sha256'], 16)
+                if mode == REPORTED_USAGE_ONLY:
+                    _require(not any(k in row for k in ('reserved_tokens', 'held_tokens', 'input_bound_recipe', 'input_tokens_upper_bound')))
+                    _require(type(row['wire_bytes']) is int and row['wire_bytes'] > 0)
+                    _require(row.get('usage') is None or _reported_usage_valid(row['usage']))
+                    _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
+                        'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
+                    if row['status'] == 'SETTLED':
+                        _require(row.get('outcome') == 'RESPONSE_RECEIVED' and _reported_usage_valid(row.get('usage')))
+                    elif row['status'] != 'INFLIGHT':
+                        _require(data['status'] != 'OPEN')
+                    continue
+                reserved, held = row['reserved_tokens'], row['held_tokens']
+                _require(type(reserved) is int and reserved >= 1024 and type(held) is int and 0 <= held <= reserved)
+                if 'input_bound_recipe' in row:
+                    _require(row['capability'] == 'vision' and row['input_bound_recipe'] == VISION_INPUT_RECIPE)
+                    _require(all(type(row[k]) is int and row[k] > 0 for k in ('input_tokens_upper_bound',
+                        'output_tokens_upper_bound', 'text_wire_bytes', 'image_count', 'decoded_image_bytes', 'wire_bytes')))
+                    _require(reserved == row['input_tokens_upper_bound'] + row['output_tokens_upper_bound'] + 1024)
+                _require(row['status'] in ('INFLIGHT', 'SETTLED', 'UNKNOWN', 'LOCAL_ADMISSION_FAILED_STOP',
+                    'LOCAL_SETTLEMENT_FAILED_STOP', 'LOCAL_SETTLEMENT_UNCONFIRMED_STOP'))
+                if row.get('usage') is not None: _require(_usage_valid(row['usage'], reserved))
+                if row['status'] == 'SETTLED':
+                    _require(row.get('outcome') == 'RESPONSE_RECEIVED' and _usage_valid(row.get('usage'), reserved))
+                    _require(held == row['usage']['total_tokens'])
+                else:
+                    _require(held == reserved)
+                    if row['status'] != 'INFLIGHT': _require(data['status'] != 'OPEN')
+            if mode == REPORTED_USAGE_ONLY:
+                known = sum(row['usage']['total_tokens'] for row in entries if row.get('usage') is not None)
+                _require(known < data['max_tokens'] or data['status'] != 'OPEN')
+            else:
+                _require(sum(row['held_tokens'] for row in entries) <= data['max_tokens'])
+        except (KeyError, TypeError, ValueError):
+>           raise ProviderError('LOCAL_EXECUTION_INVALID') from None
+E           backend.weknora_port.models.types.ProviderError: LOCAL_EXECUTION_INVALID
+
+backend\weknora_port\execution.py:266: ProviderError
+_ test_reported_owner_gate_checks_known_actual_without_request_estimator[500000-False] _
+
+authorization = ({'S840_AUTHORIZATION_FILE': 'E:\\RAG quention\\var\\reports\\s8-6-4\\pytest-scope-accounting-green-v1\\test_reported_...6', 'native_cases_sha256': 'c6e24d716019dba44ee0c7f321ab55d472f59cd499656d27772d66b8dca26b4c', 'denominator': 40, ...})
+settled = 500000, allowed = False
+
+    @pytest.mark.parametrize('settled,allowed', [(490000, True), (500000, False)])
+    def test_reported_owner_gate_checks_known_actual_without_request_estimator(authorization, settled, allowed):
+        env, grant = reported_grant(authorization, total=settled)
+        path = Path(env['WEKNORA_PORT_EXECUTION_FILE'])
+        execution = SimpleNamespace(path=path)
+        admissions = []
+        async def authorize(call): admissions.append(call.context.request_id)
+        gate = SimpleNamespace(_local_execution=execution, authorize=authorize)
+        async def make(config, key, current_gate): return SimpleNamespace()
+        runtime = SimpleNamespace(_make_model=make, execution=execution)
+        adapter.install_owner_cap(runtime, grant, path)
+        # Deliberately no wire_bytes, output_budget or _OUTPUT_BOUND: this mode must
+        # not derive a token reservation from any request-size estimate.
+        call = SimpleNamespace(context=SimpleNamespace(request_id='actual-only-next'))
+        async def exercise():
+            await runtime._make_model(None, None, gate)
+            await gate.authorize(call)
+        if allowed:
+            asyncio.run(exercise()); assert admissions == ['actual-only-next']
+        else:
+>           with pytest.raises(Exception, match='MODEL_SEND_AUTHORIZATION_FAILED'): asyncio.run(exercise())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'MODEL_SEND_AUTHORIZATION_FAILED'
+E             Actual message: 'LOCAL_EXECUTION_INVALID'
+
+tests\weknora_port\test_s862r3_40_acceptance.py:453: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_s862r3_40_acceptance.py::test_reported_owner_occupancy_counts_only_actual_usage_not_wire
+FAILED tests/weknora_port/test_s862r3_40_acceptance.py::test_reported_owner_gate_checks_known_actual_without_request_estimator[490000-True]
+FAILED tests/weknora_port/test_s862r3_40_acceptance.py::test_reported_owner_gate_checks_known_actual_without_request_estimator[500000-False]
+3 failed, 41 passed in 5.79s

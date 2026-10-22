@@ -1,0 +1,234 @@
+{
+  "schema": "s864-exact3-owner-grant/v1",
+  "owner_approved": true,
+  "created_at_utc": "2026-10-22T11:49:22.480153+00:00",
+  "expires_at": "2026-10-22T13:49:22.480153+00:00",
+  "owner_approval_sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+  "supplement_sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+  "proposal_sha256": "9abe3edf977058d5ec8a56626f2686bd70c7d40f429263e28a193cef6677c64d",
+  "source_revision": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "image_id": "sha256:99faa35360c8b4f73d7fc207f040a9f6a8f69b6f6dd8b1b3c8bf43e1eeafe78f",
+  "profile_sha256": "92ee355f837b10890313f076b4cda9a724c55142551e5b457c954e7c922e14c7",
+  "glue_sha256": "d726003cd076cc6a67c226117a4cd1b5b21b6e2b1614027a24abd736db8b947e",
+  "controller_sha256": "72a197c1564451461b0fee96248d3432893dbef9ddfc2f0965eff4e7468dd13f",
+  "vision_glue_sha256": "f3877027446bedee82871a7160a92aec46b484fb4bce9d456fbb417973a7a59c",
+  "vision_inputs_sha256": "a38985e9aa62baf628fdb69bc9a3d9fd85c9dc6257a614883d8e799561105ed4",
+  "owner_max_total_tokens": 500000,
+  "owner_max_total_attempts": 40,
+  "http_max_attempts": 36,
+  "http_max_total_tokens": 300000,
+  "max_runtime_seconds": 2400,
+  "accounting_mode": "reported_usage_only_v1",
+  "token_estimation": "DISABLED",
+  "retry": false,
+  "owner_lock_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/owner-state/owner-token.lock",
+  "allowed_models": [
+    {
+      "provider": "siliconflow",
+      "model": "Qwen/Qwen3.5-4B",
+      "model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "capability": "chat"
+    },
+    {
+      "provider": "siliconflow",
+      "model": "BAAI/bge-reranker-v2-m3",
+      "model_id": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+      "capability": "rerank"
+    },
+    {
+      "provider": "siliconflow",
+      "model": "BAAI/bge-m3",
+      "model_id": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+      "capability": "embedding"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "capability": "chat"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "question": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "knowledge_base_id": "7f1d720d-9561-446f-a8cc-6a562c339d23",
+      "document_scope": [],
+      "answer_language": "en-US"
+    },
+    {
+      "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "question": "辐射避难所怎么刷箱子",
+      "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+      "document_scope": [],
+      "answer_language": "zh-CN"
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "question": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "knowledge_base_id": "96a9eebd-ffb2-4bc6-9bea-3ed015845479",
+      "document_scope": [],
+      "answer_language": "en-US"
+    }
+  ],
+  "batches": {
+    "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434": {
+      "kind": "http",
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "request_id": "s864-e2d0a2cc8b054e69b2b63d69",
+      "execution_file": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-1/execution.json",
+      "redis_prefix": "weknora-python-s8:s864:s864-final-20261022t112810z-2bdb4629-originfix-235e37:http-1",
+      "max_calls": 12,
+      "max_tokens": 100000,
+      "model_ids": {
+        "cheap": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "rerank": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "embedding": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "expensive": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749"
+      },
+      "qu_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "qu_request_sha256s": {
+        "s864-e2d0a2cc8b054e69b2b63d69": "a95314f784dc8c66d3037790a771d296dd38d3598e03c0f1967e5cf1b09474a6"
+      },
+      "audit_directory": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-1/strategy-audit",
+      "log_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/logs/http-1",
+      "http_output_parent": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-1",
+      "http_output_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-1/output"
+    },
+    "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7": {
+      "kind": "http",
+      "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "request_id": "s864-ead7f50d52d1473c98000752",
+      "execution_file": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-2/execution.json",
+      "redis_prefix": "weknora-python-s8:s864:s864-final-20261022t112810z-2bdb4629-originfix-235e37:http-2",
+      "max_calls": 12,
+      "max_tokens": 100000,
+      "model_ids": {
+        "cheap": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "rerank": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "embedding": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "expensive": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749"
+      },
+      "qu_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "qu_request_sha256s": {
+        "s864-ead7f50d52d1473c98000752": "0a903eecc94615017a4735bdf78bf97e31109ce22c65d3e2763251e021c1a37e"
+      },
+      "audit_directory": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-2/strategy-audit",
+      "log_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/logs/http-2",
+      "http_output_parent": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-2",
+      "http_output_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-2/output"
+    },
+    "hotpotqa-5a729fe55542991f9a20c53b": {
+      "kind": "http",
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "request_id": "s864-0ad70e052b0e4469be2f839b",
+      "execution_file": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-3/execution.json",
+      "redis_prefix": "weknora-python-s8:s864:s864-final-20261022t112810z-2bdb4629-originfix-235e37:http-3",
+      "max_calls": 12,
+      "max_tokens": 100000,
+      "model_ids": {
+        "cheap": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+        "rerank": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+        "embedding": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+        "expensive": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749"
+      },
+      "qu_model_id": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+      "qu_request_sha256s": {
+        "s864-0ad70e052b0e4469be2f839b": "54c8d3d61d4e7eab847eecd8df2902f4fcc941b897ce7c79216d989b66535a35"
+      },
+      "audit_directory": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-3/strategy-audit",
+      "log_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/logs/http-3",
+      "http_output_parent": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-3",
+      "http_output_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-3/output"
+    },
+    "exact-four-frozen-vision": {
+      "kind": "vision",
+      "execution_file": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/vision/execution.json",
+      "max_calls": 4,
+      "max_tokens": 100000,
+      "knowledge_base_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23",
+        "fd444069-cc1a-42d0-9617-e95fa90b6941"
+      ],
+      "document_scope": [
+        "45a64de0-73c0-442c-af9a-dcdc171d83a0",
+        "6c9e87eb-29c2-4df0-80a5-940a77a23791"
+      ],
+      "request_ids": [
+        "s864-vlm-37f71ae598da43628e597c2b/row-0958/old",
+        "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+        "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+        "s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate"
+      ],
+      "allowed_models": [
+        {
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+          "capability": "vision"
+        }
+      ],
+      "frozen_request_packages": [
+        {
+          "case_id": "row-0958",
+          "prompt_kind": "old",
+          "body_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+          "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+          "source_pdf_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "knowledge_base_scope": [
+            "7f1d720d-9561-446f-a8cc-6a562c339d23"
+          ],
+          "document_scope": [
+            "45a64de0-73c0-442c-af9a-dcdc171d83a0"
+          ],
+          "current_source_version": "69cebfcf-1a97-4af8-aadf-03700ee163fe"
+        },
+        {
+          "case_id": "row-0958",
+          "prompt_kind": "candidate",
+          "body_sha256": "fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089",
+          "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+          "source_pdf_sha256": "43be9592854c7da10bf011335faec017b726ff2e23bb4ccae7e8fe88d7801f22",
+          "knowledge_base_scope": [
+            "7f1d720d-9561-446f-a8cc-6a562c339d23"
+          ],
+          "document_scope": [
+            "45a64de0-73c0-442c-af9a-dcdc171d83a0"
+          ],
+          "current_source_version": "69cebfcf-1a97-4af8-aadf-03700ee163fe"
+        },
+        {
+          "case_id": "row-0684",
+          "prompt_kind": "old",
+          "body_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+          "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+          "source_pdf_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "knowledge_base_scope": [
+            "fd444069-cc1a-42d0-9617-e95fa90b6941"
+          ],
+          "document_scope": [
+            "6c9e87eb-29c2-4df0-80a5-940a77a23791"
+          ],
+          "current_source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+        },
+        {
+          "case_id": "row-0684",
+          "prompt_kind": "candidate",
+          "body_sha256": "f09c46f3fd7bdc8825447ce7e6e4eb5aa68e46ba52f309ef2e4f7390b23fc49c",
+          "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+          "source_pdf_sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+          "knowledge_base_scope": [
+            "fd444069-cc1a-42d0-9617-e95fa90b6941"
+          ],
+          "document_scope": [
+            "6c9e87eb-29c2-4df0-80a5-940a77a23791"
+          ],
+          "current_source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+        }
+      ],
+      "redis_prefix": "weknora-python-s8:s864:s864-final-20261022t112810z-2bdb4629-originfix-235e37:vision",
+      "log_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/logs/vision"
+    }
+  },
+  "vision_batch_id": "exact-four-frozen-vision"
+}

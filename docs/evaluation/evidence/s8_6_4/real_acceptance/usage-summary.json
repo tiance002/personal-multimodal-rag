@@ -1,0 +1,49 @@
+{
+  "schema": "s8.6.4.real_acceptance.usage_summary/v1",
+  "source_delivery_manifest": {
+    "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\delivery.manifest.json",
+    "sha256": "ad6de8a2905c1e24260b96e2d9258882ac2b79ed5e956edb8fbb57c788d604ca"
+  },
+  "source_revision": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "accounting_mode": "reported_usage_only_v1",
+  "token_estimation": "DISABLED",
+  "provider_attempts": 16,
+  "settled": 16,
+  "unknown": 0,
+  "unsettled": 0,
+  "completed_http_submissions": 3,
+  "completed_vision_calls": 4,
+  "usage_totals": {
+    "prompt_tokens": 33302,
+    "completion_tokens": 7675,
+    "total_tokens": 40977
+  },
+  "usage_breakdown": {
+    "siliconflow/Qwen/Qwen3.5-4B/chat": {
+      "calls": 6,
+      "prompt_tokens": 11431,
+      "completion_tokens": 1135,
+      "total_tokens": 12566
+    },
+    "siliconflow/BAAI/bge-m3/embedding": {
+      "calls": 3,
+      "prompt_tokens": 56,
+      "completion_tokens": 0,
+      "total_tokens": 56
+    },
+    "siliconflow/BAAI/bge-reranker-v2-m3/rerank": {
+      "calls": 3,
+      "prompt_tokens": 17279,
+      "completion_tokens": 0,
+      "total_tokens": 17279
+    },
+    "deepseek/deepseek-flash/vision": {
+      "calls": 4,
+      "prompt_tokens": 4536,
+      "completion_tokens": 6540,
+      "total_tokens": 11076
+    }
+  },
+  "actual_queries_and_model_trace": "See actual-query-and-model-trace.json; all12 HTTP bodies were matched to SETTLED ledger records per latest trace.",
+  "quality_interpretation": "Operational usage only; not an answer-quality verdict."
+}

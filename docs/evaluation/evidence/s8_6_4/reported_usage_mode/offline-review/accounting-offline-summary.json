@@ -1,0 +1,322 @@
+{
+  "schema": "s864-offline-accounting-addendum/v1",
+  "prepared_at": "2026-10-22",
+  "source_commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "scope": "offline accounting/vision change review only",
+  "status": "OFFLINE_EVIDENCE_READY_REAL_ACCEPTANCE_PENDING",
+  "owner_authorization": {
+    "original_approval_sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+    "original_approved_scope": [
+      "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "hotpotqa-5a729fe55542991f9a20c53b"
+    ],
+    "vlm_cases": [
+      "row-0684",
+      "row-0958"
+    ],
+    "max_total_tokens": 500000,
+    "max_total_attempts": 40,
+    "runtime_seconds": 2400,
+    "initial_profile_sha256": "6402fa6a171d868da549ee14f328efe4ce42de3f8bf51b2a645421334d1fbdf1",
+    "supplemental_approval_sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+    "supplemental_recorded_at_utc": "2026-10-22T11:22:42.9038901Z",
+    "supplemental_approved_source_commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+    "accounting_mode": "reported_usage_only_v1",
+    "accounting_waiver": "For fresh ledgers only: no per-request input Token estimate, reservation or held Tokens; valid Provider-reported usage settled as received. Actual usage at/exceeding existing limits stops future sends after preserving full real settlement. No future-cost guarantee from reservation.",
+    "unknown_policy": "Missing/invalid usage, unclear send/outcome or UNKNOWN stops future sends; preserve all known counters and raw receipts; no automatic retry",
+    "scope_and_caps_unchanged": true,
+    "old_ledgers_and_unknown_unchanged": true,
+    "production_update_authorized": false,
+    "ingestion_index_update_authorized": false,
+    "automatic_retries": false
+  },
+  "accounting_explanation": {
+    "legacy_base64_reservation": "旧 reservation path 曾把整个 JSON wire byte 数作为保守 token 输入上界；当 inline 图片以 base64 携带时，这会把编码后的字节长度当成 token 成本代理，造成 reservation 虚高。它不是实际 Provider token 使用量。旧 ledgers/旧 UNKNOWN 仍按原契约读写，不做重算或重置。",
+    "vision_bound_fix": "LocalExecution 对独立 vision 请求保留 HTTPS/provider/model/API/body 限定、JPEG/PNG base64 解码与格式/单帧/维度/单图和总字节/wire 限制、真实 wire hash 与输出上界约束。legacy reservation 模式的输入估算先将已验证 image data URL 从文本代理中置空并按每图固定代理量计入，不把 base64 数据长度直接当 token。",
+    "new_round_owner_waiver": "仅 fresh ledgers 使用 reported_usage_only_v1：不估算每请求输入 token、不做 token reservation、不写 held_tokens；只在 Provider 明确返回结构完整的 prompt/completion/total token usage 后按真实报告结算。真实 usage 达到或超过现有封顶时，先保留整笔真实结算并停止后续 sends。",
+    "unknown_and_limits": "usage 缺失/格式不合法、send outcome 不清楚或 UNKNOWN 时停止，不自动重试；known usage 不可伪装成零。每请求输出/body/model guard 保留；实际 usage 结算不提供最后一请求不会超出总上限的预留保证，可能先发生真实超额，随后据真实结算停止。"
+  },
+  "offline_results": {
+    "provider_calls": 0,
+    "db_writes": 0,
+    "real_acceptance_status": "PENDING_NOT_RUN_NO_NEW_ANSWERS",
+    "commands": [
+      {
+        "label": "vision-only preliminary",
+        "scope": "test_execution_vision.py only",
+        "command_recorded_verbatim": "python -m pytest tests/weknora_port/test_execution_vision.py -q --tb=short -p no:cacheprovider --basetemp E:/RAG quention/var/reports/s8-6-4/vision-reported-green1-tmp",
+        "exit_code": 0,
+        "result": "....................................................                     [100%]\n52 passed in 4.00s",
+        "provider_calls": 0,
+        "note": "preliminary, not the combined final suite"
+      },
+      {
+        "label": "vision/execution final combined suite",
+        "scope": "test_execution_vision.py + test_execution_fence.py + test_execution_linux_paths.py + test_output_budget_contract.py",
+        "command_recorded_verbatim": "New-Item -ItemType Directory -Path 'D:/RAG-s864-vision-offline-20261022-0cab81' -Force; WEKNORA_EXECUTION_TEST_ROOT='D:/RAG-s864-vision-offline-20261022-0cab81/fixtures' python -m pytest tests/weknora_port/test_execution_vision.py tests/weknora_port/test_execution_fence.py tests/weknora_port/test_execution_linux_paths.py tests/weknora_port/test_output_budget_contract.py -q --tb=short -p no:cacheprovider --basetemp 'D:/RAG-s864-vision-offline-20261022-0cab81/pytest-tmp-clean2'",
+        "exit_code": 0,
+        "result": "........................................................................ [ 43%]\n.....................................................................s.. [ 87%]\n.....................                                                    [100%]\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\weknora_port\\test_execution_linux_paths.py:31: Real POSIX resolve/flock must be tested on Linux; lexical guards above run on Windows\n164 passed, 1 skipped in 14.41s",
+        "provider_calls": 0,
+        "note": "164 passed, 1 skipped; POSIX resolve/flock test skipped on Windows by its test contract"
+      },
+      {
+        "label": "owner helper final",
+        "command_argv": [
+          "E:/RAG quention/.venv/Scripts/python.exe",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/weknora_port/test_s862r3_40_acceptance.py",
+          "--basetemp",
+          "E:/RAG quention/var/reports/s8-6-4/pytest-scope-accounting-final-v2"
+        ],
+        "cwd": "C:/Users/22088/.codex/worktrees/s8-6-adaptive-retrieval/RAG quention",
+        "exit_code": 0,
+        "elapsed_seconds": 8.162976503372192,
+        "result": "49 passed in 5.35s",
+        "provider_calls": 0,
+        "run_metadata": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\final-v2.run.json",
+        "raw_log": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\final-v2.log"
+      },
+      {
+        "label": "offline integration final",
+        "command_argv": [
+          "-X",
+          "utf8",
+          "-B",
+          "-m",
+          "pytest",
+          "tests/weknora_port/test_s861_api_acceptance.py",
+          "tests/weknora_port/test_s8_ecs_runtime.py",
+          "tests/weknora_port/test_s864_prompt_diagnostics.py",
+          "-q",
+          "--tb=short",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp",
+          "D:/RAG-s864-vision-offline-20261022-0cab81/integration-tmp"
+        ],
+        "executable": "E:/RAG quention/.venv/Scripts/python.exe",
+        "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+        "started_at_utc": "2026-10-22T11:21:54.0397647Z",
+        "finished_at_utc": "2026-10-22T11:22:01.7456633Z",
+        "exit_code": 0,
+        "result": "35 passed in 3.32s",
+        "provider_calls": 0,
+        "run_metadata": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-integration\\final.run.json",
+        "raw_log": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-integration\\final.log"
+      }
+    ],
+    "counting_note": "这些受影响集、helper、integration 有测试重叠，不可相加作为唯一总测试数。52 是早期 vision-only preliminary；164+1 skip 是其后合并 final；49 helper 与35 integration 是独立后的关联组，仍不能与前两者相加成 distinct count。",
+    "database_write_status": "Profile records db_writes=0 and transaction_end=ROLLBACK during the recorded read-only readiness inventory; this is separate from model acceptance calls."
+  },
+  "preserved_failures": [
+    {
+      "artifact": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\prepare-local-first-failure.json",
+      "exit_code": 1,
+      "cause": "本地证明子进程使用 Windows locale 编码导致 UTF-8 解码失败；显式 -X utf8 后继续。未发生远端操作或 Provider send。"
+    },
+    {
+      "artifact": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\prepare-local-second-failure.json",
+      "exit_code": 1,
+      "cause": "本地 profile identity 检查因独立 private artifact 未加入已验证 repo sys.path 而 ModuleNotFoundError: scripts；修复本地导入路径后继续。未发生远端操作或 Provider send。"
+    },
+    {
+      "artifacts": [
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final.command.txt",
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final.output.txt"
+      ],
+      "exit_code": 1,
+      "cause": "Windows PermissionError [WinError 5] during os.replace of a temporary execution ledger while using E: pytest temp root. Preserve as historical failure; later retry uses isolated D: temp root."
+    },
+    {
+      "artifacts": [
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean.command.txt",
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean.output.txt"
+      ],
+      "exit_code": 1,
+      "cause": "D: isolated temp root had not been created before pytest startup (WinError 3 / 129 fixture setup errors); the log is retained. The next retry explicitly created the D: root and passed."
+    },
+    {
+      "artifacts": [
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\red.run.json",
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\red.log",
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\green-v1.run.json",
+        "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\green-v1.log"
+      ],
+      "cause": "Expected early red and intermediate failing helper revisions retained for traceability; final helper command reached 49 passed."
+    }
+  ],
+  "archive_artifacts": [
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\owner_approval.json",
+      "bytes": 2171,
+      "sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\owner_supplement_vision_fix.json",
+      "bytes": 1896,
+      "sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\reported_only_profile.json",
+      "bytes": 2512,
+      "sha256": "8a6fa3774e8008cdf470d85b6d498a35ef1996b73fcb0a50f1435bc90090d148",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\ready-v2.json",
+      "bytes": 646,
+      "sha256": "890322d5a1eb81070ce2cdfda632ed31cd33b6ec3a7cfa1058dcc666ba85dc9d",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-green-attempt1.command.txt",
+      "bytes": 169,
+      "sha256": "d18b8767319fb7bf7729541f1123010fb7ced5278e02781705a2131f9c8b4ed2",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-green-attempt1.exitcode.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-green-attempt1.output.txt",
+      "bytes": 101,
+      "sha256": "e32d249a17215126e73d8790c65601f2bd6570f0b4418a54d9225816f6056cde",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean2.command.txt",
+      "bytes": 482,
+      "sha256": "4777fa1d37925c4f53ff2dbfc0c0c590c798c6cef4d9f936339d83ca7846600e",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean2.exitcode.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean2.output.txt",
+      "bytes": 509,
+      "sha256": "ded7eee546fd6ed5c093dc6e85305a15d0c2405820fc3f6b9c6a0a590267ba2f",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\final-v2.run.json",
+      "bytes": 427,
+      "sha256": "3ae52257aabc0aeed9d4ff1ca04c4738086a576a1b1b18f57dfdf96422b0fd01",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\final-v2.log",
+      "bytes": 101,
+      "sha256": "be3b8872d1d6aa4007825e16f6a9f0006c9d31cc3a7dde925d85d55c86de4dbc",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-integration\\final.run.json",
+      "bytes": 706,
+      "sha256": "3b7e2d60ab4a8d7a3919345b0d3428cdc10b1063d1e57ac866c7ea61122103e6",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-integration\\final.log",
+      "bytes": 101,
+      "sha256": "2585aadb4f53ad8f7ea2d1ef058a658e25cea0ac2874a827341ca9ebce8785d1",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final.command.txt",
+      "bytes": 396,
+      "sha256": "8746abb3498d48f3e3d13470a3416907f40231ac34abb5db9106ffffdc73416a",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final.exitcode.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final.output.txt",
+      "bytes": 2132,
+      "sha256": "80e9cb4f1a6342613964f0f1401833db7b215e4fa839d3e38244567d7e35e2c2",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean.command.txt",
+      "bytes": 387,
+      "sha256": "eacba4c622bc9ec64118e6a00b65dcb8686dbd5b8d1cd46147cf7f4ae9eca75d",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean.exitcode.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\vision-reported-final-clean.output.txt",
+      "bytes": 62936,
+      "sha256": "42536b08b2baaecfa948c6e227b3a01a416ddd5ab45c73ec6748387242851605",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\prepare-local-first-failure.json",
+      "bytes": 337,
+      "sha256": "10c1230f48b79c0c94b4c3be5767974ed22c30d80fd174a442ec85f1c712939c",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\prepare-local-second-failure.json",
+      "bytes": 332,
+      "sha256": "d69e1b488cee09c1ff0fa1caf429ca9af51ed271826c6b2335a3adeb9eaf2678",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\red.run.json",
+      "bytes": 475,
+      "sha256": "b3a160f1c93cc1e97c725f9cc2c5aabe8658a3966fb5685eba2109c1c620bfd5",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\red.log",
+      "bytes": 30533,
+      "sha256": "185a13b3ce39833a42e93025c60b1fa46b488d9f9ab44e5f6f3434466e1c56cd",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\green-v1.run.json",
+      "bytes": 427,
+      "sha256": "4abd5a0305eba8950a3da4f8a7d00de3e1cb44374cd41f1c4be36070a807ad21",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\green-v1.log",
+      "bytes": 17732,
+      "sha256": "2d59386e675e50786e77180b548cccfb4a44ec650dce853ce6b51c72b556f0d8",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\final.run.json",
+      "bytes": 424,
+      "sha256": "f06cfb78ef45f5eab173d5fbe0474f3ff7fee969f357a363232fe07f79857f40",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    },
+    {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\accounting-helper\\final.log",
+      "bytes": 101,
+      "sha256": "22b6084c9a8013a09ea8a7bb8d11701c0b36f7ffc2d27a6bc6315561a76d8e4d",
+      "role": "captured_evidence_preserve_byte_for_byte"
+    }
+  ],
+  "future_real_results": "PENDING; do not state these offline tests imply any of the authorized real HTTP/VLM calls ran or passed."
+}

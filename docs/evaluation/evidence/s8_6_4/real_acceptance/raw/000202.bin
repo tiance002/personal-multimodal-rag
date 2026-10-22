@@ -1,0 +1,45 @@
+# S8.6.4 HTTP quality review
+
+**Status:** agent review complete; this is not Owner approval.
+
+**Scope:** read-only manual review of the three exported HTTP cases against `scoring-rubric.json`. Compared raw final answers, actual final model request bodies, selected evidence in the final context, answer citations, and saved current-source readbacks. No model judge was used.
+
+**Export:** `s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export`  
+**Source commit:** `f96446742d1f32d7fa13635e43159b08fc3e2e0a`  
+**Rubric SHA-256:** `11f10d9133635727197267e64ac905efc77978d6431a9f41a6d6f004950dcff1`
+
+## Results
+
+| Case | Final answer correctness | Coverage | Evidence support | Citation identity/readback | Unsupported extras | Presentation |
+|---|---|---|---|---|---|---|
+| MMLongBench-Doc row 0434 | PASS | PASS | PASS | PASS (display alias note) | None material | PASS |
+| LongBench-ZH DuReader | No official Gold result; manual source-based assessment PASS with caveats | PASS | PASS with caveats | FAIL: no answer citations | Minor unsupported/overstated phrases | PARTIAL |
+| HotpotQA 5a729fe55542991f9a20c53b | PASS | PASS | PASS | PASS | None material | PASS |
+
+### MMLongBench-Doc row 0434
+
+The answer identifies **Kaggle’s Cat vs Dog dataset** and connects it to the “coding time” section. The actual final-generation request user message is 1,337 characters (SHA-256 `dc34b4a5b81d7578679603f978e262d67d27262cab9ab5f24acb354129ae7669`). It contains the actual “Coding time!” evidence and the next source chunk’s exact sentence: **“Kaggle's Cat vs Dog dataset (25k dog/cat pictures)”**. Thus the 25k detail was delivered to the final model input and appears in the answer.
+
+The answer cites chunk IDs `084c5bee-f7be-4718-9c0b-510e61cb401a` and `10ff171b-a054-4cbc-9ab4-4c52b8c3022f`. Both saved readbacks returned HTTP 200 in the same KB and resolved to current document/version identities. The answer’s `doc` attribute is a filename-stem display alias; the chunk IDs and KB ID match the readback records.
+
+Observed path counts: 30 retrieval candidates → 1 rerank → 1 merge → 4 projected sources → 4 context evidence items. These counts do not establish any particular strategy rule activation.
+
+### LongBench-ZH DuReader
+
+The answer is a Chinese, structured response on task refresh and task-loop methods. The final model input contains 11 selected evidence items, including native text on the water/equipment task loop, time rollback with a new shelter and task refresh, and save/reload steps that change box-opening RNG. The source also supports the house expansion/no-upgrade advice. I therefore assess the core instructions as substantially source-supported.
+
+The frozen local Gold sidecar says the official answer string was not located. This is a manual semantic comparison with frozen native reference answers, **not an official benchmark accuracy result**. The answer has no citation tags, and its exported `sources.json` is empty; this is a citation failure even though the evidence was present in the generation context. “Most common,” “most general and efficient,” and “non-destructive” are not established by the delivered sources as phrased. The answer is well structured but overlong and mixes the main farming mechanics with extra advice and caveats.
+
+Observed path counts: 30 retrieval candidates → 11 rerank → 3 merge → 11 projected sources → 11 context evidence items. No answer-correctness or strategy activation is inferred from those counts.
+
+### HotpotQA
+
+The answer names **Pieter van Musschenbroek** as the person credited with both inventions. It cites the Leyden-jar and tribometer facts. Saved HTTP 200 readbacks resolve the cited chunk IDs to current documents/versions in the scoped KB; the additional jar-definition citation also resolves. The final generation context contains both supporting passages.
+
+Observed path counts: 30 retrieval candidates → 8 rerank → 8 merge → 5 projected sources → 5 context evidence items.
+
+## Evidence and limits
+
+Per-case raw answer SHA-256, actual final request path/hash, request ID, final user-message hash/length, compact stage counts, and evidence-file hashes are recorded in the adjacent JSON. Source readbacks and selected final-context evidence were reviewed; this is an offline agent quality review, not an Owner sign-off.
+
+The reported runtime figure of 16 settled calls / 40,977 tokens is an execution-accounting total, not a quality score. No strategy-rule activation is claimed based only on the returned answer or stage counts.

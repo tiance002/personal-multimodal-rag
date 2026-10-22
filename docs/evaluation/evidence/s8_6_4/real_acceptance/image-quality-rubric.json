@@ -1,0 +1,165 @@
+{
+  "schema": "s864-visible-image-quality-rubric/v1",
+  "status": "OFFLINE_ORIGINAL_IMAGE_REVIEWED_FUTURE_CAPTIONS_NOT_REVIEWED",
+  "reviewer": "AGENT_MANUAL_VISUAL_REVIEW_NOT_OWNER",
+  "input_method": "Exact data URL bytes decoded from the frozen old request bodies; tools.view_image(detail=original) used on both originals.",
+  "image_transformations": "NONE; no crop, resize, enhancement, recompression or annotation",
+  "provider_calls": 0,
+  "scoring_input_isolation": "This private rubric must never be mounted or loaded by the image request driver. It contains review expectations only.",
+  "independence_limit": "Reviewer knows historical case descriptions. This is not a blinded study. The observations below were checked against the displayed original pixels, without reading any future Caption output or scoring file during this task.",
+  "comparison_rules": {
+    "unit_of_comparison": "Same image, same model and fixed options; compare old and candidate output separately against this pre-output rubric.",
+    "per_item_status": ["EXACT", "PARTIAL", "MISSING", "WRONG", "UNCERTAIN"],
+    "dimensions": [
+      "visible text and label preservation",
+      "category-value association",
+      "numerical values and percentage units",
+      "explicit or visually observable relationships",
+      "material omissions",
+      "invented or externally supplied claims",
+      "legibility and uncertainty handling"
+    ],
+    "required_review_record": "For each critical item quote the actual Caption phrase, assign a status, and identify the supporting image region. Record unsupported claims separately, rather than treating a successful call as a factual PASS.",
+    "translation": "Chinese explanatory prose is allowed. Evaluate original label retention separately from semantic identity; a translated or paraphrased category may preserve meaning while failing verbatim label preservation.",
+    "unsupported_information": "External scientific, political or demographic knowledge is not image evidence. A readable source phrase may itself be imprecise; do not silently correct it and attribute the correction to the image.",
+    "usage": "Only future raw Provider usage and settled receipts establish actual Tokens. Image dimensions, file bytes and rubric detail are not actual Token counts.",
+    "conclusion_limit": "Two source images can establish case-specific changes only; no claim of general chart/OCR accuracy or dataset-wide improvement."
+  },
+  "cases": [
+    {
+      "case_id": "row-0958",
+      "image_file": "images/row-0958.jpg",
+      "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "source_request_body_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "bytes": 228312,
+      "image_kind": "Educational wave-phenomena diagram with text panels and schematic drawings",
+      "critical_visible_items": [
+        {
+          "id": "reflecting-surface-examples",
+          "region": "Bottom-left reflection drawing, label directly below the horizontal reflecting surface",
+          "visible_text": "Reflecting surface, e.g. shiny object or mirror",
+          "explicit_examples": ["shiny object", "mirror"],
+          "required_association": "Both noun phrases are examples of the reflecting surface. They are not labels for refraction or diffraction.",
+          "failure_examples": [
+            "Only naming a general reflecting surface or reflection phenomenon",
+            "Replacing shiny object with an invented different example",
+            "Adding water as a visible example; the label does not say water",
+            "Omitting either readable example"
+          ],
+          "legibility": "Small, slightly blurred JPEG text, but both examples and the connecting 'or' are readable at original resolution."
+        },
+        {
+          "id": "reflection-law",
+          "region": "Lower central text panel",
+          "visible_text": "Law of Reflection: Angle of incidence = Angle of Reflection",
+          "required_association": "The equality relates the two named angles; no numerical angle magnitudes are given."
+        }
+      ],
+      "other_readable_labels_and_text": [
+        {"region": "Center title", "text": "P1c: Reflection, Refraction, Diffraction"},
+        {"region": "Upper-left panel", "text": "REFRACTION: Bends the wave when entering/leaving a substance to another"},
+        {"region": "Left-middle panel", "text": "REFLECTION: Bounces the wave back towards where it came from"},
+        {"region": "Upper-right panel", "text": "DIFFRACTION: Spreads the wave out when going through a gap or barrier"},
+        {"region": "Top-center refraction drawing", "labels": ["Fast", "Slow", "Fast"]},
+        {"region": "Upper middle-right text panel", "text": "They slow down because the substance would be a different density to another substance."},
+        {"region": "Lower central strip", "text": "All wave can be reflected and refracted"},
+        {"region": "Lower-right panel", "text": "Maximum diffraction occurs when: the gap is equal to the wave."},
+        {"region": "Lower-right panel", "text": "Minimum diffraction occurs when: the gap is smaller or larger than the wave."}
+      ],
+      "observable_diagram_relationships": [
+        {
+          "region": "Bottom-left reflection drawing",
+          "observation": "Two green ray segments meet at the horizontal surface. The left arrow points toward the surface and the right arrow away. A dashed vertical pink line passes through the meeting point; adjacent angle labels are i and r with a small degree-like mark.",
+          "limit": "Do not infer numerical incidence/reflection angles or a material type beyond the printed examples."
+        },
+        {
+          "region": "Top-center refraction drawing",
+          "observation": "Wavefront lines pass through an outlined tilted rectangular region. Outer regions are labeled Fast and the interior is labeled Slow.",
+          "limit": "No refractive index, speed value or wavelength number is printed."
+        },
+        {
+          "region": "Right-middle diffraction drawing",
+          "observation": "Straight wavefronts approach a gap in a horizontal barrier from below. Curved wavefronts and three outward arrows spread above the gap.",
+          "limit": "The arrows do not establish measured directions or angle magnitudes."
+        }
+      ],
+      "source_wording_limits": [
+        "The source says 'wave' in its gap-size statements. Replacing this with wavelength may be a scientific interpretation, but it is not verbatim extraction.",
+        "The displayed maximum/minimum statements are recorded as image text; this review does not endorse or externally correct their scientific completeness.",
+        "The central numbered heading P1c is an identifier, not a measured physical quantity."
+      ],
+      "legibility_limits": "The image is readable overall. The smallest surface-example label is visibly softer than the large panel headings. Uncertain punctuation or angle superscripts should be marked uncertain rather than expanded into invented numerical values.",
+      "case_specific_success": "A candidate that retains both readable surface examples with their correct association improves this specific omission only if it does not replace them or invent other visible examples. General wave summaries alone do not satisfy the critical extraction item.",
+      "caption_assessment": "NOT_RUN"
+    },
+    {
+      "case_id": "row-0684",
+      "image_file": "images/row-0684.jpg",
+      "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "source_request_body_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "bytes": 307605,
+      "image_kind": "Pew Research Center report page with prose and a horizontal grouped-category bar chart",
+      "critical_visible_items": [
+        {
+          "id": "chart-question-and-unit",
+          "region": "Lower-right chart heading and subtitle",
+          "visible_title": "Will the country elect a female president in your lifetime?",
+          "visible_unit_text": "% of voters who say ...",
+          "legend": ["No", "Yes"],
+          "required_association": "The percentages describe expectations of a female president within respondents' lifetimes; they are not male/female population shares, candidate vote shares or race-relation percentages."
+        },
+        {
+          "id": "gender-category-values",
+          "region": "Men and Women rows of the lower-right chart",
+          "visible_values": [
+            {"category": "Men", "No_percent": 16, "Yes_percent": 81},
+            {"category": "Women", "No_percent": 18, "Yes_percent": 78}
+          ],
+          "required_association": "81 belongs to Men/Yes; 78 belongs to Women/Yes. Preserve separate values rather than replacing them with an approximate overall percentage.",
+          "optional_derived_comparison": "The displayed Yes value is larger for Men; the difference is 3 percentage points. This is a derivation from the chart, not a separately printed claim.",
+          "failure_examples": [
+            "Only stating about 80% without the separate gender values",
+            "Assigning the overall 79% to both genders",
+            "Swapping Men and Women values",
+            "Using No values as the affirmative percentages",
+            "Calling the 3 percentage-point difference 3 percent without clarifying the distinction"
+          ]
+        }
+      ],
+      "complete_readable_chart_data": [
+        {"category": "All voters", "No_percent": 17, "Yes_percent": 79},
+        {"category": "Men", "No_percent": 16, "Yes_percent": 81},
+        {"category": "Women", "No_percent": 18, "Yes_percent": 78},
+        {"category": "Trump voters", "No_percent": 17, "Yes_percent": 78},
+        {"category": "Clinton voters", "No_percent": 17, "Yes_percent": 81}
+      ],
+      "visible_chart_notes": [
+        "Note: Don't know responses not shown. Q46bb.",
+        "Source: Voter callback survey conducted Nov. 10-14, 2016.",
+        "PEW RESEARCH CENTER"
+      ],
+      "chart_relationships": [
+        "A lighter gold segment corresponds to No; a darker gold segment corresponds to Yes.",
+        "Printed percentages are attached to named category rows. Both 81 and 78 occur more than once, so category association matters.",
+        "The bars do not imply that the two shown responses sum to 100; the explicit note says Don't know responses are omitted.",
+        "The neighboring prose says no significant differences among the groups. This does not erase the readable 81/78 values or establish a statistical test result."
+      ],
+      "other_visible_page_information": [
+        {"region": "Header", "text": "8; PEW RESEARCH CENTER; Other important findings"},
+        {"region": "Top prose block", "topic": "Impact of Trump's election on race relations", "visible_values": ["46% worse", "25% improve", "26% no difference", "84% of Clinton voters expect worsening", "half of Trump supporters expect improvement", "38% of Trump supporters expect no difference"]},
+        {"region": "Middle-left prose block", "topic": "Confidence in accurate vote counting", "visible_values": ["Trump supporters: 38% in August", "Trump supporters: 75% after victory", "Clinton supporters: 67% after election"]},
+        {"region": "Lower-left/bottom prose", "topic": "Press influence", "visible_values": ["57% too much", "27% right amount", "13% too little", "62% of Trump voters too much", "50% of Clinton voters too much"]},
+        {"region": "Footer", "text": "www.pewresearch.org"}
+      ],
+      "source_wording_limits": [
+        "The original image prints page number 8. The archived PDF physical page mapping is different metadata and should not be called the printed page number.",
+        "Do not mix race-relation, vote-count-confidence or press-influence percentages into the female-president chart.",
+        "No sample size, margin of error or p-value is printed in this visible chart. Do not invent them.",
+        "Do not silently fill in omitted Don't know percentages or replace the chart with contemporary political facts."
+      ],
+      "legibility_limits": "Chart category names, both legend labels and all ten displayed chart numbers are readable at original resolution. The gray source/Don't know note is smaller and lighter but readable. This human review does not prove the Provider's internal image scaling or visual recognition quality.",
+      "case_specific_success": "A candidate that records Men/Yes=81% and Women/Yes=78% with the correct chart question and units repairs this specific numeric omission. Full-chart extraction and absence of invented associations are evaluated separately; a completed call alone is insufficient.",
+      "caption_assessment": "NOT_RUN"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "status": "POST_RUN_ALL_CAPTURED_GUARDS_PASS",
+  "checks": {
+    "pg_unique_request_id_capability_equal_16": true,
+    "pg_outcome_usage_wire_exactly_match_child_ledgers": true,
+    "three_completed_turns_q0_scope_exact": true,
+    "captured_source_fingerprints_unchanged": true,
+    "historical_unknown_fingerprint_unchanged": true,
+    "current_vision_copy_version_hash_state_unchanged": true,
+    "current_all4_kb_cloud_allowed": true,
+    "production_ids_images_restart_counts_unchanged": true,
+    "production_compose_runtime_files_unchanged": true
+  },
+  "usage_totals": {
+    "prompt_tokens": 33302,
+    "completion_tokens": 7675,
+    "total_tokens": 40977
+  },
+  "usage_breakdown": {
+    "siliconflow/Qwen/Qwen3.5-4B/chat": {
+      "calls": 6,
+      "prompt_tokens": 11431,
+      "completion_tokens": 1135,
+      "total_tokens": 12566
+    },
+    "siliconflow/BAAI/bge-m3/embedding": {
+      "calls": 3,
+      "prompt_tokens": 56,
+      "completion_tokens": 0,
+      "total_tokens": 56
+    },
+    "siliconflow/BAAI/bge-reranker-v2-m3/rerank": {
+      "calls": 3,
+      "prompt_tokens": 17279,
+      "completion_tokens": 0,
+      "total_tokens": 17279
+    },
+    "deepseek/deepseek-flash/vision": {
+      "calls": 4,
+      "prompt_tokens": 4536,
+      "completion_tokens": 6540,
+      "total_tokens": 11076
+    }
+  },
+  "readback_generated_provider_calls": 0,
+  "database_writes": 0
+}

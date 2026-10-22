@@ -1,0 +1,182 @@
+{
+  "case_id": "row-0958",
+  "prompt_kind": "candidate",
+  "request_id": "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+  "body_sha256": "fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089",
+  "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+  "content": "以下是从图像中提取的文本和图表信息：\n\n**中心标题**\n*   **P1c: Reflection, Refraction, Diffraction**\n\n---\n\n**折射 (REFRACTION)**\n*   **定义文本**：REFRACTION: Bends the wave when entering/leaving a substance to another\n*   **解释文本**：They slow down because the substance would be a different density to another substance.\n*   **图示**：展示了波在两种介质交界处的传播路径。图中标记了三个文本标签：左上角为“**Fast**”，中间倾斜的矩形区域为“**Slow**”，右下方为“**Fast**”。图示表明波从快速介质进入慢速介质时发生了偏折。\n\n---\n\n**反射 (REFLECTION)**\n*   **定义文本**：REFLECTION: Bounces the wave back towards where it came from\n*   **通则文本**：All wave can be reflected and refracted\n*   **反射定律文本**：Law of Reflection: Angle of incidence = Angle of Reflection\n*   **图示**：左下角的反射示意图。\n    *   左上角标签：**Reflection**\n    *   图中标注了入射角符号：“**\\(i^o\\)**”和反射角符号：“**\\(r^o\\)**”\n    *   底部标签：**Reflecting surface, e.g. shiny object or mirror**\n    *   图示内容：显示一条带有箭头的实线（入射光线）射向带有斜线阴影的表面，一条虚线作为法线，另一条带有箭头的实线（反射光线）从表面弹开。\n\n---\n\n**衍射 (DIFFRACTION)**\n*   **定义文本**：DIFFRACTION: Spreads the wave out when going through a gap or barrier\n*   **规则文本**：\n    *   Maximum diffraction occurs when: the gap is equal to the wave.\n    *   Minimum diffraction occurs when: the gap is smaller or larger than the wave.\n*   **图示**：右侧中间的衍射示意图。显示了水波从下方直线向上穿过中间有缺口的灰色屏障，通过缺口后波前呈半圆形向外扩散。图中包含三个黑色箭头，分别指示向上、左上和右上的传播方向，以及一个从下方指向上方穿过缺口的直箭头。",
+  "finish_reason": "stop",
+  "usage": {
+    "prompt_tokens": 1236,
+    "completion_tokens": 1859,
+    "total_tokens": 3095,
+    "status": "REPORTED",
+    "cached_tokens": 896,
+    "cache_read_tokens": 896,
+    "cache_write_tokens": 0,
+    "cache_miss_tokens": 340,
+    "cache_reported": true,
+    "cache_status": "hit",
+    "provider_usage_facts": {
+      "semantics": "openai-input-inclusive/v1",
+      "fields": [
+        [
+          "input",
+          {
+            "value": 1236,
+            "present": true,
+            "valid": true,
+            "path": "prompt_tokens"
+          }
+        ],
+        [
+          "output",
+          {
+            "value": 1859,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens"
+          }
+        ],
+        [
+          "total",
+          {
+            "value": 3095,
+            "present": true,
+            "valid": true,
+            "path": "total_tokens"
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "value": 896,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_hit_tokens"
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "cache_creation_input_tokens"
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "value": 340,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_miss_tokens"
+          }
+        ],
+        [
+          "reasoning",
+          {
+            "value": 1378,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens_details.reasoning_tokens"
+          }
+        ]
+      ],
+      "numeric_raw": "{\"completion_tokens\":1859,\"completion_tokens_details.reasoning_tokens\":1378,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":340,\"prompt_tokens\":1236,\"total_tokens\":3095}",
+      "raw_sha256": "12d59051e235edf3d4742323a9c13f87ca58d67c650d7e6a5f8e4705b9e57c46",
+      "derived_total": 3095,
+      "simulated": false,
+      "observed_lower_bound": 0,
+      "prior_numeric_raw": []
+    }
+  },
+  "settled_ledger_usage": {
+    "prompt_tokens": 1236,
+    "completion_tokens": 1859,
+    "total_tokens": 3095,
+    "status": "REPORTED",
+    "cached_tokens": 896,
+    "cache_read_tokens": 896,
+    "cache_write_tokens": 0,
+    "cache_miss_tokens": 340,
+    "cache_reported": true,
+    "cache_status": "hit",
+    "provider_usage_facts": {
+      "semantics": "openai-input-inclusive/v1",
+      "fields": [
+        [
+          "input",
+          {
+            "value": 1236,
+            "present": true,
+            "valid": true,
+            "path": "prompt_tokens"
+          }
+        ],
+        [
+          "output",
+          {
+            "value": 1859,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens"
+          }
+        ],
+        [
+          "total",
+          {
+            "value": 3095,
+            "present": true,
+            "valid": true,
+            "path": "total_tokens"
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "value": 896,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_hit_tokens"
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "cache_creation_input_tokens"
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "value": 340,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_miss_tokens"
+          }
+        ],
+        [
+          "reasoning",
+          {
+            "value": 1378,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens_details.reasoning_tokens"
+          }
+        ]
+      ],
+      "numeric_raw": "{\"completion_tokens\":1859,\"completion_tokens_details.reasoning_tokens\":1378,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":340,\"prompt_tokens\":1236,\"total_tokens\":3095}",
+      "raw_sha256": "12d59051e235edf3d4742323a9c13f87ca58d67c650d7e6a5f8e4705b9e57c46",
+      "derived_total": 3095,
+      "simulated": false,
+      "observed_lower_bound": 3095,
+      "prior_numeric_raw": []
+    }
+  },
+  "status": "RECEIVED_REVIEW_REQUIRED"
+}

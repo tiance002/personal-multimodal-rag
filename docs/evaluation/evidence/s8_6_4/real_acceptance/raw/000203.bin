@@ -1,0 +1,587 @@
+{
+  "schema": "s864-actual-image-caption-review/v1",
+  "created_at_utc": "2026-10-22T12:01:04.509275+00:00",
+  "reviewer": "AGENT_MANUAL_REVIEW_NOT_OWNER",
+  "blind": false,
+  "status": "REVIEW_COMPLETE_WITH_LOCAL_FAITHFULNESS_LIMIT",
+  "scope": "Four actual image captions only; no full RAG question rerun or downstream answer/citation acceptance is claimed.",
+  "review_method": "Compare each actual caption independently with the original-pixel rubric frozen before these outputs. Local evidence hashes, request image bytes, raw native responses and settled usage are reconciled.",
+  "rubric": {
+    "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\review\\image-quality-rubric.json",
+    "sha256": "cdc7e48e29fea180194b7ac9b5abad922dc91b0c5a3e2bde1cc0f6919409490b",
+    "bytes": 12859
+  },
+  "rubric_independence_limit": "Reviewer knows historical case descriptions. This is not a blinded study. The observations below were checked against the displayed original pixels, without reading any future Caption output or scoring file during this task.",
+  "execution_ledger": {
+    "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\execution.json",
+    "sha256": "6cfc03bd96c7ed048722abff7d1d9257ce0161f94faf61b425c5ed36b00553f5",
+    "bytes": 13987
+  },
+  "ledger_accounting_mode": "reported_usage_only_v1",
+  "ledger_status": "OPEN",
+  "new_provider_calls_during_review": 0,
+  "tests_run_during_review": 0,
+  "source_or_prompt_edits_during_review": 0,
+  "actual_usage_total": {
+    "prompt_tokens": 4536,
+    "completion_tokens": 6540,
+    "total_tokens": 11076
+  },
+  "actual_usage_interpretation": "Completion counters include provider-reported reasoning; do not add reasoning_tokens again. Wire/image bytes are not token counts. These are new-round actual raw usage counters, not historical estimates.",
+  "settled_calls": 4,
+  "unknown_calls": 0,
+  "pair_comparisons": [
+    {
+      "case_id": "row-0958",
+      "fixed_condition_checks": {
+        "same_image_sha": true,
+        "same_provider_model_identity": true,
+        "same_fixed_options": true,
+        "same_scope": true,
+        "fresh_distinct_request_ids": true,
+        "different_prompt_text": true
+      },
+      "old_critical_verdict": "FAIL_OMISSION",
+      "candidate_critical_verdict": "PASS",
+      "actual_total_token_delta": 1269,
+      "whole_caption_limit": "PARTIAL_UNMARKED_PHYSICAL_SPECIFICITY"
+    },
+    {
+      "case_id": "row-0684",
+      "fixed_condition_checks": {
+        "same_image_sha": true,
+        "same_provider_model_identity": true,
+        "same_fixed_options": true,
+        "same_scope": true,
+        "fresh_distinct_request_ids": true,
+        "different_prompt_text": true
+      },
+      "old_critical_verdict": "FAIL_OMISSION",
+      "candidate_critical_verdict": "PASS",
+      "actual_total_token_delta": 2039,
+      "whole_caption_limit": "PASS_WITHIN_REVIEWED_VISIBLE_CONTENT"
+    }
+  ],
+  "reviews": [
+    {
+      "case_id": "row-0958",
+      "prompt_kind": "old",
+      "request_id": "s864-vlm-37f71ae598da43628e597c2b/row-0958/old",
+      "result": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\vision\\01-result.json",
+        "sha256": "2f5e7682ea998c4437a03fc455fc6efd1e9253862cdc15371872e73ec6855da0",
+        "bytes": 5255
+      },
+      "raw_request": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7e9ae9d30a164e2eb5304b2785345e0a.request.json",
+        "sha256": "10bb17b4cd927a9193bf21eadbe5c432a17bbc5435a1e891be938b5564a0fe28",
+        "bytes": 305230
+      },
+      "raw_response_body": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7e9ae9d30a164e2eb5304b2785345e0a.response.body",
+        "sha256": "031b869fb04ba2ae49dc4a739362f45d7b349e1614391b1fbe1819ca2d46e5fe",
+        "bytes": 4157
+      },
+      "raw_response_metadata": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7e9ae9d30a164e2eb5304b2785345e0a.response.json",
+        "sha256": "8d443710e186e36a1ea9594c6e0aef1f1d4877895a8b7e249890edda0ecfacb3",
+        "bytes": 62
+      },
+      "timing": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7e9ae9d30a164e2eb5304b2785345e0a.timing.json",
+        "sha256": "c5722e66bf71689aa858b89ce6e175f0872c17bbb367168672e2e0d7c0c959c6",
+        "bytes": 304
+      },
+      "canonical_request_body_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "wire_bytes": 304741,
+      "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "decoded_image_bytes": 228312,
+      "original_review_image": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\review\\images\\row-0958.jpg",
+        "sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+        "bytes": 228312
+      },
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "fixed_options": {
+        "model": "deepseek-flash",
+        "temperature": 0.10000000149011612,
+        "max_tokens": 5000
+      },
+      "request_prompt_text": [
+        "Provide a brief and concise description of the main content of the image in Chinese (Simplified)."
+      ],
+      "request_prompt_text_sha256": [
+        "57dfc36bb1311e85cf752ea2656ea56737424bc5651976e951bea9565c9747da"
+      ],
+      "finish_reason": "stop",
+      "ledger_status": "SETTLED",
+      "caption": "这张图片是一张关于物理波现象的图解，主要介绍了波的三种基本特性：\n\n1. **反射 (Reflection)**：波撞击表面后弹回，入射角等于反射角。\n2. **折射 (Refraction)**：波进入不同密度的介质时发生弯曲并改变速度。\n3. **衍射 (Diffraction)**：波穿过缝隙或障碍物时发生向外扩散的现象。\n\n图中通过文字定义、规律说明和直观的示意图，清晰地解释了这三种物理现象。",
+      "caption_utf8_sha256": "ac5a12fb3033535128d6d83787cfcd6bdbe35663945e0dc42b08fe04f9865061",
+      "raw_native_usage": {
+        "prompt_tokens": 1018,
+        "completion_tokens": 808,
+        "total_tokens": 1826,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 707
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 250
+      },
+      "settled_usage_counters": {
+        "prompt_tokens": 1018,
+        "completion_tokens": 808,
+        "total_tokens": 1826
+      },
+      "provider_numeric_usage_raw_sha256": "abb3b29ce4e6e90083e422816320df96f32725ce15994df3bf2238f00f339420",
+      "evidence_checks": {
+        "canonical_request_matches_result_hash": true,
+        "canonical_request_matches_ledger_hash_and_bytes": true,
+        "decoded_image_matches_result_and_pre_output_rubric": true,
+        "decoded_image_byte_equal_original_review_file": true,
+        "caption_equals_raw_provider_content": true,
+        "raw_finish_reason_stop": true,
+        "response_complete_http200": true,
+        "usage_counters_equal_raw_result_and_settled_ledger": true,
+        "usage_nonnegative_and_consistent": true,
+        "settled_actual_reported_not_simulated": true,
+        "no_reservation_or_held_fields": true,
+        "same_provider_model_matches_ledger": true
+      },
+      "critical_extraction_verdict": "FAIL_OMISSION",
+      "whole_caption_faithfulness": "PARTIAL_MATERIAL_OMISSIONS",
+      "items": [
+        {
+          "rubric_item_id": "reflecting-surface-examples",
+          "status": "MISSING",
+          "caption_quote": "1. **反射 (Reflection)**：波撞击表面后弹回，入射角等于反射角。",
+          "reason": "Neither shiny object nor mirror is named. General reflection description does not preserve the readable examples.",
+          "image_region": "Bottom-left surface label"
+        },
+        {
+          "rubric_item_id": "reflection-law",
+          "status": "EXACT",
+          "caption_quote": "1. **反射 (Reflection)**：波撞击表面后弹回，入射角等于反射角。",
+          "reason": "Equality is preserved semantically in Chinese; original English label is not transcribed. This was already successful under the old prompt.",
+          "image_region": "Lower central law panel"
+        }
+      ],
+      "other_observations": [
+        "The three wave topics and qualitative definitions are retained as a summary.",
+        "Fast/Slow/Fast, the gap-size statements, source title and most small labels are omitted."
+      ],
+      "unsupported_claims": [],
+      "scope_note": "Failure is missing required extraction, not a wrong surface example."
+    },
+    {
+      "case_id": "row-0958",
+      "prompt_kind": "candidate",
+      "request_id": "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+      "result": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\vision\\02-result.json",
+        "sha256": "1040eb6045098339f54863ebfcb92fe9f8e04296449d2579ea3ba6902e2e5a0b",
+        "bytes": 6829
+      },
+      "raw_request": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\8a962716d093432c90ac356d9c22678f.request.json",
+        "sha256": "a1e9252c25174092430c68f259e891b87e0dc878925aadde4359f5db271db7c1",
+        "bytes": 306504
+      },
+      "raw_response_body": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\8a962716d093432c90ac356d9c22678f.response.body",
+        "sha256": "00242a5cb9026f17e6934ffd20968512b58ee337d598151862cce05e2b7acc1f",
+        "bytes": 8561
+      },
+      "raw_response_metadata": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\8a962716d093432c90ac356d9c22678f.response.json",
+        "sha256": "8d443710e186e36a1ea9594c6e0aef1f1d4877895a8b7e249890edda0ecfacb3",
+        "bytes": 62
+      },
+      "timing": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\8a962716d093432c90ac356d9c22678f.timing.json",
+        "sha256": "5b7979cd2d187fdd04e11898b611e88e847c0a463410e8355952b5655f5fbbad",
+        "bytes": 304
+      },
+      "canonical_request_body_sha256": "fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089",
+      "wire_bytes": 306009,
+      "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "decoded_image_bytes": 228312,
+      "original_review_image": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\review\\images\\row-0958.jpg",
+        "sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+        "bytes": 228312
+      },
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "fixed_options": {
+        "model": "deepseek-flash",
+        "temperature": 0.10000000149011612,
+        "max_tokens": 5000
+      },
+      "request_prompt_text": [
+        "You are extracting image information for a document knowledge retrieval system. Your priority is faithful information preservation.\n\n1. Preserve readable text as written, including names, technical terms, identifiers, numbers, dates, percentages, units, symbols and labels.\n2. For charts and tables, extract visible titles, axis names and units, legend labels, categories and their corresponding values, and table rows and columns. Keep each value associated with its correct category. Never replace readable separate values with an approximate average or vague summary.\n3. For diagrams, preserve visible text labels and explicit relationships, connections, arrows and layer counts before briefly describing non-text visual content.\n4. For photographs or illustrations without relevant text or quantitative data, provide a concise factual description. Omit empty sections and tables.\n5. Do not invent missing text, labels, values, units or relationships. Mark unclear information as unreadable or uncertain. Never fill missing image data from a user question or expected answer.\n6. Write concise Markdown in Chinese (Simplified), preserving original labels, proper names, dataset names and technical identifiers without translation unless explicitly requested. Record useful observable information before any brief visual summary; avoid general explanations."
+      ],
+      "request_prompt_text_sha256": [
+        "4cebb0fb92995112b9ec7e1acdd223ec39c657f7ee574ef2c623e60fb3324210"
+      ],
+      "finish_reason": "stop",
+      "ledger_status": "SETTLED",
+      "caption": "以下是从图像中提取的文本和图表信息：\n\n**中心标题**\n*   **P1c: Reflection, Refraction, Diffraction**\n\n---\n\n**折射 (REFRACTION)**\n*   **定义文本**：REFRACTION: Bends the wave when entering/leaving a substance to another\n*   **解释文本**：They slow down because the substance would be a different density to another substance.\n*   **图示**：展示了波在两种介质交界处的传播路径。图中标记了三个文本标签：左上角为“**Fast**”，中间倾斜的矩形区域为“**Slow**”，右下方为“**Fast**”。图示表明波从快速介质进入慢速介质时发生了偏折。\n\n---\n\n**反射 (REFLECTION)**\n*   **定义文本**：REFLECTION: Bounces the wave back towards where it came from\n*   **通则文本**：All wave can be reflected and refracted\n*   **反射定律文本**：Law of Reflection: Angle of incidence = Angle of Reflection\n*   **图示**：左下角的反射示意图。\n    *   左上角标签：**Reflection**\n    *   图中标注了入射角符号：“**\\(i^o\\)**”和反射角符号：“**\\(r^o\\)**”\n    *   底部标签：**Reflecting surface, e.g. shiny object or mirror**\n    *   图示内容：显示一条带有箭头的实线（入射光线）射向带有斜线阴影的表面，一条虚线作为法线，另一条带有箭头的实线（反射光线）从表面弹开。\n\n---\n\n**衍射 (DIFFRACTION)**\n*   **定义文本**：DIFFRACTION: Spreads the wave out when going through a gap or barrier\n*   **规则文本**：\n    *   Maximum diffraction occurs when: the gap is equal to the wave.\n    *   Minimum diffraction occurs when: the gap is smaller or larger than the wave.\n*   **图示**：右侧中间的衍射示意图。显示了水波从下方直线向上穿过中间有缺口的灰色屏障，通过缺口后波前呈半圆形向外扩散。图中包含三个黑色箭头，分别指示向上、左上和右上的传播方向，以及一个从下方指向上方穿过缺口的直箭头。",
+      "caption_utf8_sha256": "844ee92569f9b077dab148a6a74fac6e90265902f95f20d3b6ee52a13e136e94",
+      "raw_native_usage": {
+        "prompt_tokens": 1236,
+        "completion_tokens": 1859,
+        "total_tokens": 3095,
+        "prompt_tokens_details": {
+          "cached_tokens": 896
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1378
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 340
+      },
+      "settled_usage_counters": {
+        "prompt_tokens": 1236,
+        "completion_tokens": 1859,
+        "total_tokens": 3095
+      },
+      "provider_numeric_usage_raw_sha256": "12d59051e235edf3d4742323a9c13f87ca58d67c650d7e6a5f8e4705b9e57c46",
+      "evidence_checks": {
+        "canonical_request_matches_result_hash": true,
+        "canonical_request_matches_ledger_hash_and_bytes": true,
+        "decoded_image_matches_result_and_pre_output_rubric": true,
+        "decoded_image_byte_equal_original_review_file": true,
+        "caption_equals_raw_provider_content": true,
+        "raw_finish_reason_stop": true,
+        "response_complete_http200": true,
+        "usage_counters_equal_raw_result_and_settled_ledger": true,
+        "usage_nonnegative_and_consistent": true,
+        "settled_actual_reported_not_simulated": true,
+        "no_reservation_or_held_fields": true,
+        "same_provider_model_matches_ledger": true
+      },
+      "critical_extraction_verdict": "PASS",
+      "whole_caption_faithfulness": "PARTIAL_UNMARKED_PHYSICAL_SPECIFICITY",
+      "items": [
+        {
+          "rubric_item_id": "reflecting-surface-examples",
+          "status": "EXACT",
+          "caption_quote": "*   底部标签：**Reflecting surface, e.g. shiny object or mirror**",
+          "reason": "Both shiny object and mirror appear verbatim, joined by or, as examples of the reflecting surface.",
+          "image_region": "Bottom-left surface label"
+        },
+        {
+          "rubric_item_id": "reflection-law",
+          "status": "EXACT",
+          "caption_quote": "*   **反射定律文本**：Law of Reflection: Angle of incidence = Angle of Reflection",
+          "reason": "Named-angle equality is transcribed exactly without an invented numeric angle.",
+          "image_region": "Lower central law panel"
+        }
+      ],
+      "other_observations": [
+        "Central title, all three definition panels, Fast/Slow/Fast, general reflection/refraction statement and both gap-size statements are retained.",
+        "The source word wave is retained in the gap-size statements; no silent wavelength correction.",
+        "The ray directions, dashed normal and straight-to-curved wavefront relationship agree with the visible schematic.",
+        "Angle labels i/r with a small degree-like mark are rendered as i^o/r^o; the pre-output rubric considers the superscript uncertain. No numerical angle is invented."
+      ],
+      "unsupported_claims": [
+        {
+          "caption_quote": "*   **图示**：右侧中间的衍射示意图。显示了水波从下方直线向上穿过中间有缺口的灰色屏障，通过缺口后波前呈半圆形向外扩散。图中包含三个黑色箭头，分别指示向上、左上和右上的传播方向，以及一个从下方指向上方穿过缺口的直箭头。",
+          "status": "UNSUPPORTED_SPECIFICITY",
+          "finding": "The diffraction diagram is labeled as generic wave behavior; water is not printed or otherwise uniquely established by these schematic wavefronts. Treat water waves as an unmarked interpretation, not extracted image fact.",
+          "severity": "LOCAL_FAITHFULNESS_LIMIT",
+          "not_the_critical_failure": "Water is not substituted for the reflecting-surface examples; those examples are exact."
+        },
+        {
+          "caption_quote": "*   图示内容：显示一条带有箭头的实线（入射光线）射向带有斜线阴影的表面，一条虚线作为法线，另一条带有箭头的实线（反射光线）从表面弹开。",
+          "status": "UNSUPPORTED_SPECIFICITY",
+          "finding": "The schematic supports incoming/outgoing rays but the general wave image does not uniquely identify them as light rays. Optical terminology is an interpretation rather than a printed type label.",
+          "severity": "LOCAL_FAITHFULNESS_LIMIT"
+        }
+      ],
+      "scope_note": "Critical-example extraction passes. The entire Caption must not be called fully faithful or hallucination-free."
+    },
+    {
+      "case_id": "row-0684",
+      "prompt_kind": "old",
+      "request_id": "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+      "result": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\vision\\03-result.json",
+        "sha256": "09dc3c023de2bb8ff306f0f31f410c19b8b8f2ff07e5371411d3919f06e6be3a",
+        "bytes": 5564
+      },
+      "raw_request": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7de55bbeddc94cd69ff6d5b4f09fbd04.request.json",
+        "sha256": "1d803d8812cdcf964c4c00829e5411b2bbba0d4fe1cadca0622f3781c4b5c6a4",
+        "bytes": 410954
+      },
+      "raw_response_body": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7de55bbeddc94cd69ff6d5b4f09fbd04.response.body",
+        "sha256": "c7a62e00b2d6faef12eec89bffb744d56fa7c1ae60e4b0fc4c930caa288fee6c",
+        "bytes": 5210
+      },
+      "raw_response_metadata": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7de55bbeddc94cd69ff6d5b4f09fbd04.response.json",
+        "sha256": "8d443710e186e36a1ea9594c6e0aef1f1d4877895a8b7e249890edda0ecfacb3",
+        "bytes": 62
+      },
+      "timing": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\7de55bbeddc94cd69ff6d5b4f09fbd04.timing.json",
+        "sha256": "49e32f470beac4add121ac2599b96f7df125f5aeb5910d1de9a602585c029b04",
+        "bytes": 304
+      },
+      "canonical_request_body_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "wire_bytes": 410465,
+      "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "decoded_image_bytes": 307605,
+      "original_review_image": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\review\\images\\row-0684.jpg",
+        "sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+        "bytes": 307605
+      },
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "fixed_options": {
+        "model": "deepseek-flash",
+        "temperature": 0.10000000149011612,
+        "max_tokens": 5000
+      },
+      "request_prompt_text": [
+        "Provide a brief and concise description of the main content of the image in Chinese (Simplified)."
+      ],
+      "request_prompt_text_sha256": [
+        "57dfc36bb1311e85cf752ea2656ea56737424bc5651976e951bea9565c9747da"
+      ],
+      "finish_reason": "stop",
+      "ledger_status": "SETTLED",
+      "caption": "这张图片是皮尤研究中心（Pew Research Center）一份选举调查报告的页面，主要总结了2016年美国大选后的几项重要民调发现。\n\n主要内容包括：\n1. **种族关系**：近半数选民对特朗普当选后的种族关系走向持悲观态度。\n2. **计票信心**：胜选后，大多数特朗普支持者对其选票被准确统计的信心大幅提升。\n3. **女性总统**：绝大多数选民（79%）预期在有生之年会看到美国选出女性总统（右侧附有相关的条形图数据）。\n4. **媒体影响**：多数选民（57%）认为媒体对大选结果的影响力过大。\n\n整体而言，该页面呈现了选民对特朗普执政影响、选举制度信任度、女性领导人以及媒体作用的看法。",
+      "caption_utf8_sha256": "a3e90b3c45c03ad6d20c94a1839574c7247ff5aa263524e593044e8ff33a7048",
+      "raw_native_usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 1026,
+        "total_tokens": 2058,
+        "prompt_tokens_details": {
+          "cached_tokens": 896
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 866
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 136
+      },
+      "settled_usage_counters": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 1026,
+        "total_tokens": 2058
+      },
+      "provider_numeric_usage_raw_sha256": "7db2e58633170e6cb0c38f2ba3d53922b630cd4893e34506a572febb737155d7",
+      "evidence_checks": {
+        "canonical_request_matches_result_hash": true,
+        "canonical_request_matches_ledger_hash_and_bytes": true,
+        "decoded_image_matches_result_and_pre_output_rubric": true,
+        "decoded_image_byte_equal_original_review_file": true,
+        "caption_equals_raw_provider_content": true,
+        "raw_finish_reason_stop": true,
+        "response_complete_http200": true,
+        "usage_counters_equal_raw_result_and_settled_ledger": true,
+        "usage_nonnegative_and_consistent": true,
+        "settled_actual_reported_not_simulated": true,
+        "no_reservation_or_held_fields": true,
+        "same_provider_model_matches_ledger": true
+      },
+      "critical_extraction_verdict": "FAIL_OMISSION",
+      "whole_caption_faithfulness": "PARTIAL_MATERIAL_OMISSIONS",
+      "items": [
+        {
+          "rubric_item_id": "chart-question-and-unit",
+          "status": "EXACT",
+          "caption_quote": "3. **女性总统**：绝大多数选民（79%）预期在有生之年会看到美国选出女性总统（右侧附有相关的条形图数据）。",
+          "reason": "The chart question is preserved semantically and overall All voters/Yes=79% is correct. Original title, legend and full unit subtitle are not transcribed.",
+          "image_region": "Lower-right chart and matching female-president paragraph"
+        },
+        {
+          "rubric_item_id": "gender-category-values",
+          "status": "MISSING",
+          "caption_quote": "3. **女性总统**：绝大多数选民（79%）预期在有生之年会看到美国选出女性总统（右侧附有相关的条形图数据）。",
+          "reason": "Neither Men/Yes=81% nor Women/Yes=78% appears. The correct overall 79% cannot replace both category-specific values.",
+          "image_region": "Men and Women chart rows"
+        }
+      ],
+      "other_observations": [
+        "The overall79% and press57% have correct subject associations; these are old-prompt successes, not candidate-only gains.",
+        "All ten individual chart values, No/Yes legend, omitted-response note and source date are absent."
+      ],
+      "unsupported_claims": [],
+      "scope_note": "Do not describe old79% as assigning79% to both genders; it only states the overall figure."
+    },
+    {
+      "case_id": "row-0684",
+      "prompt_kind": "candidate",
+      "request_id": "s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate",
+      "result": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\vision\\04-result.json",
+        "sha256": "12bf57c3545e37640e35410b07a437c989e48007acca64f13f5285930cbfbac9",
+        "bytes": 6852
+      },
+      "raw_request": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\5a95db4a1e534a74b2ba5d7f6beb1f88.request.json",
+        "sha256": "31bf6f8c544d28541f2806c740a6723cc494d12352e9473449e530f8d908bd76",
+        "bytes": 412228
+      },
+      "raw_response_body": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\5a95db4a1e534a74b2ba5d7f6beb1f88.response.body",
+        "sha256": "e331de5ecff5ce32281a8898e2ec9e0312e0392e75040eac8c77962773487574",
+        "bytes": 12649
+      },
+      "raw_response_metadata": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\5a95db4a1e534a74b2ba5d7f6beb1f88.response.json",
+        "sha256": "8d443710e186e36a1ea9594c6e0aef1f1d4877895a8b7e249890edda0ecfacb3",
+        "bytes": 62
+      },
+      "timing": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output\\execution-vision\\evidence\\5a95db4a1e534a74b2ba5d7f6beb1f88.timing.json",
+        "sha256": "34516ecb4833126353fe1c885a110638f7f8f26e36fa65c85c68f07d25f99b1b",
+        "bytes": 303
+      },
+      "canonical_request_body_sha256": "f09c46f3fd7bdc8825447ce7e6e4eb5aa68e46ba52f309ef2e4f7390b23fc49c",
+      "wire_bytes": 411733,
+      "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "decoded_image_bytes": 307605,
+      "original_review_image": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\review\\images\\row-0684.jpg",
+        "sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+        "bytes": 307605
+      },
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "model_id": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749",
+      "fixed_options": {
+        "model": "deepseek-flash",
+        "temperature": 0.10000000149011612,
+        "max_tokens": 5000
+      },
+      "request_prompt_text": [
+        "You are extracting image information for a document knowledge retrieval system. Your priority is faithful information preservation.\n\n1. Preserve readable text as written, including names, technical terms, identifiers, numbers, dates, percentages, units, symbols and labels.\n2. For charts and tables, extract visible titles, axis names and units, legend labels, categories and their corresponding values, and table rows and columns. Keep each value associated with its correct category. Never replace readable separate values with an approximate average or vague summary.\n3. For diagrams, preserve visible text labels and explicit relationships, connections, arrows and layer counts before briefly describing non-text visual content.\n4. For photographs or illustrations without relevant text or quantitative data, provide a concise factual description. Omit empty sections and tables.\n5. Do not invent missing text, labels, values, units or relationships. Mark unclear information as unreadable or uncertain. Never fill missing image data from a user question or expected answer.\n6. Write concise Markdown in Chinese (Simplified), preserving original labels, proper names, dataset names and technical identifiers without translation unless explicitly requested. Record useful observable information before any brief visual summary; avoid general explanations."
+      ],
+      "request_prompt_text_sha256": [
+        "4cebb0fb92995112b9ec7e1acdd223ec39c657f7ee574ef2c623e60fb3324210"
+      ],
+      "finish_reason": "stop",
+      "ledger_status": "SETTLED",
+      "caption": "8\nPEW RESEARCH CENTER\n\nOther important findings\n\n**Voters pessimistic on how Trump will impact race relations.** Nearly half of voters (46%) say Trump’s election will lead to worse race relations, while only about half as many (25%) expect race relations to improve; 26% say his election won’t make a difference. Among Clinton voters, 84% expect race relations to worsen under Trump. Among Trump supporters, half expect improvement, while 38% say his election won’t make a difference.\n\n**Post-victory, most Trump backers confident in an accurate vote count.** In August, just 38% of registered voters who supported Trump were very confident that their vote would be counted accurately. But in the aftermath of Trump’s victory, 75% expressed confidence that their votes were counted accurately. The views of Clinton supporters showed no change: After the election 67% were confident that their votes were counted accurately.\n\n**Most expect woman president, eventually.** Following Clinton’s defeat, a sizable majority of voters (79%) still expect there will be a female president “in their lifetime.” There are no significant differences in these opinions among men and women, or Clinton supporters and Trump backers.\n\n**Voters say press has too much influence.** Voters grade the press very negatively, and most (57%) say it had too much influence on the outcome of the election. Just 27% say the press had the right amount of influence on the election, while 13% say it had too little influence. About six-in-ten Trump voters (62%) say the press had too much influence, as do 50% of Clinton voters.\n\n**图表：Will the country elect a female president in your lifetime?**\n*% of voters who say ...*\n\n| 类别 | No | Yes |\n| :--- | :--- | :--- |\n| All voters | 17 | 79 |\n| Men | 16 | 81 |\n| Women | 18 | 78 |\n| Trump voters | 17 | 78 |\n| Clinton voters | 17 | 81 |\n\nNote: Don’t know responses not shown. Q46bb.\nSource: Voter callback survey conducted Nov. 10-14, 2016.\nPEW RESEARCH CENTER\n\nwww.pewresearch.org",
+      "caption_utf8_sha256": "a36f009ff77fb80b65f8763d409bbe7b6b3aa33d6b8aa40bd6e1bdbc0574ea90",
+      "raw_native_usage": {
+        "prompt_tokens": 1250,
+        "completion_tokens": 2847,
+        "total_tokens": 4097,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2373
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 482
+      },
+      "settled_usage_counters": {
+        "prompt_tokens": 1250,
+        "completion_tokens": 2847,
+        "total_tokens": 4097
+      },
+      "provider_numeric_usage_raw_sha256": "21d93962662cb40b9d7a0e8acde52a8dcfc91fd3f4a12c8e0e2ddd3063a476da",
+      "evidence_checks": {
+        "canonical_request_matches_result_hash": true,
+        "canonical_request_matches_ledger_hash_and_bytes": true,
+        "decoded_image_matches_result_and_pre_output_rubric": true,
+        "decoded_image_byte_equal_original_review_file": true,
+        "caption_equals_raw_provider_content": true,
+        "raw_finish_reason_stop": true,
+        "response_complete_http200": true,
+        "usage_counters_equal_raw_result_and_settled_ledger": true,
+        "usage_nonnegative_and_consistent": true,
+        "settled_actual_reported_not_simulated": true,
+        "no_reservation_or_held_fields": true,
+        "same_provider_model_matches_ledger": true
+      },
+      "critical_extraction_verdict": "PASS",
+      "whole_caption_faithfulness": "PASS_WITHIN_REVIEWED_VISIBLE_CONTENT",
+      "items": [
+        {
+          "rubric_item_id": "chart-question-and-unit",
+          "status": "EXACT",
+          "caption_quote": "**图表：Will the country elect a female president in your lifetime?**\n*% of voters who say ...*",
+          "reason": "Original chart question, percentage unit subtitle and No/Yes table headers are retained. The subtitle gives the unit for every numeric table cell.",
+          "image_region": "Lower-right chart heading/subtitle/legend"
+        },
+        {
+          "rubric_item_id": "gender-category-values",
+          "status": "EXACT",
+          "caption_quote": "| Men | 16 | 81 |\n| Women | 18 | 78 |",
+          "reason": "Men: No16%,Yes81%; Women: No18%,Yes78%. Neither category nor answer column is swapped.",
+          "image_region": "Men and Women chart rows"
+        }
+      ],
+      "complete_chart_review": [
+        {
+          "category": "All voters",
+          "No_percent": 17,
+          "Yes_percent": 79,
+          "status": "EXACT",
+          "caption_quote": "| All voters | 17 | 79 |"
+        },
+        {
+          "category": "Men",
+          "No_percent": 16,
+          "Yes_percent": 81,
+          "status": "EXACT",
+          "caption_quote": "| Men | 16 | 81 |"
+        },
+        {
+          "category": "Women",
+          "No_percent": 18,
+          "Yes_percent": 78,
+          "status": "EXACT",
+          "caption_quote": "| Women | 18 | 78 |"
+        },
+        {
+          "category": "Trump voters",
+          "No_percent": 17,
+          "Yes_percent": 78,
+          "status": "EXACT",
+          "caption_quote": "| Trump voters | 17 | 78 |"
+        },
+        {
+          "category": "Clinton voters",
+          "No_percent": 17,
+          "Yes_percent": 81,
+          "status": "EXACT",
+          "caption_quote": "| Clinton voters | 17 | 81 |"
+        }
+      ],
+      "other_observations": [
+        "All ten chart values retain their correct category/answer-column association.",
+        "The omitted Dont know note and Nov.10-14,2016 source date are retained; no missing-response percentages are invented.",
+        "Page8, organization/title/footer and the other prose percentages agree with the reviewed original.",
+        "The source phrase no significant differences is transcribed while separate81/78 chart values remain intact; no p-value or sample size is added.",
+        "Most of the answer is original English transcription. Original-label retention is required by this rubric; this alone is not a factual extraction error. No additional Chinese explanation is needed to recover the data.",
+        "No statistical-significance interpretation or new3-percentage-point computation is attributed to the image."
+      ],
+      "unsupported_claims": [],
+      "scope_note": "No factual mismatch detected within the visible items reviewed. This is an agent judgment on one image, not a general OCR guarantee."
+    }
+  ],
+  "conclusions": [
+    "Candidate recovers both case-specific critical omissions, on these two actual fixed images.",
+    "Old reflection-law correctness and old overall79% correctness already existed; they are retained successes, not evidence of new gain.",
+    "Candidate0958 critical extraction passes, but unmarked water/light specificity prevents a whole-caption fully-faithful verdict.",
+    "Candidate0684 has exact requested gender percentages and full chart category/column associations; no factual mismatch was detected in reviewed visible content.",
+    "This is nonblind agent review, not Owner signoff, full RAG evaluation, downstream answer correctness, general chart/OCR performance or a statistical quality study."
+  ]
+}

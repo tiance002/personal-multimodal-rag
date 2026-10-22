@@ -1,0 +1,221 @@
+"""Task artifact: exact four image calls through ordinary Registry/SendGate.
+
+Default command only validates image inputs offline. --execute additionally
+requires Root's frozen configuration and completed three-HTTP phase. No
+alternative transport, credential reader, retries, grants or ledger creation.
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+from contextlib import asynccontextmanager
+from dataclasses import asdict
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+import time
+
+SOURCE_ROOT = Path('/opt/s861/app')
+if SOURCE_ROOT.is_dir(): sys.path.insert(0, str(SOURCE_ROOT))
+SOURCE = 'f96446742d1f32d7fa13635e43159b08fc3e2e0a'
+OWNER_SHA = 'd74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f'
+SUPPLEMENT_SHA = '97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971'
+EXACT = (('row-0958','old'),('row-0958','candidate'),('row-0684','old'),('row-0684','candidate'))
+
+
+def require(ok, code):
+    if not ok: raise ValueError(code)
+
+
+def canonical(value):
+    return json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode('utf8')
+
+
+def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path): return json.loads(Path(path).read_text(encoding='utf8'))
+
+
+def write_new(path, value):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    with path.open('x',encoding='utf8') as stream:
+        json.dump(value,stream,ensure_ascii=False,indent=2,default=str);stream.write('\n')
+
+
+def load_inputs(path, expected_sha=None):
+    import base64
+    path=Path(path)
+    if expected_sha: require(sha(path)==expected_sha,'S864_IMAGE_MANIFEST_CHANGED')
+    manifest=read(path)
+    require(manifest['schema']=='s864-fixed-images-only/v1'
+        and [(r['case_id'],r['prompt_kind']) for r in manifest['calls']]==list(EXACT), 'S864_EXACT_FOUR_IMAGES_ONLY')
+    require(manifest['no_question_gold_scoring_or_generation_metadata'] is True, 'S864_INPUT_ISOLATION_REQUIRED')
+    result=[]
+    for row in manifest['calls']:
+        file=(path.parent/row['file']).resolve()
+        require(file.parent==path.parent.resolve() and file.name.endswith('.json'), 'S864_INPUT_PATH_INVALID')
+        require(sha(file)==row['file_sha256'],'S864_IMAGE_FILE_CHANGED')
+        body=read(file)
+        require(hashlib.sha256(canonical(body)).hexdigest()==row['body_sha256'], 'S864_IMAGE_BODY_CHANGED')
+        require(body['model']=='deepseek-flash' and body['max_tokens']==5000
+            and body['temperature']==0.10000000149011612 and len(body['messages'])==1
+            and body['messages'][0]['role']=='user' and set(body)=={'model','messages','max_tokens','temperature'},
+            'S864_FROZEN_MODEL_OPTIONS_CHANGED')
+        parts=body['messages'][0]['content']
+        require(len(parts)==2 and parts[0]['type']=='image_url' and parts[1]['type']=='text'
+            and parts[0]['image_url']['detail']=='auto','S864_IMAGE_PARTS_CHANGED')
+        raw=base64.b64decode(parts[0]['image_url']['url'].split(',',1)[1],validate=True)
+        require(hashlib.sha256(raw).hexdigest()==row['image_sha256'],'S864_IMAGE_BYTES_CHANGED')
+        result.append((row,body))
+    return result
+
+
+def validate_configuration(path, expected_sha):
+    require(sha(path)==expected_sha,'S864_CONFIGURATION_CHANGED')
+    cfg=read(path);grant=read(cfg['grant_file'])
+    require(sha(cfg['grant_file'])==cfg['grant_sha256'],'S864_FRESH_GRANT_CHANGED')
+    require(sha(cfg['owner_file'])==OWNER_SHA==grant['owner_approval_sha256'],'S864_OWNER_IDENTITY_CHANGED')
+    require(sha(cfg['supplement_file'])==SUPPLEMENT_SHA==grant['supplement_sha256'],'S864_SUPPLEMENT_CHANGED')
+    supplement=read(cfg['supplement_file'])
+    require(supplement['owner_approved'] is True and supplement['approved_source_commit']==SOURCE
+        and supplement['accounting_mode']=='reported_usage_only_v1','S864_SUPPLEMENT_SOURCE_MODE')
+    proof=read(cfg['image_proof_file'])
+    require(cfg['source_revision']==SOURCE==grant['source_revision']==proof['source_revision']
+        and cfg['image_id']==grant['image_id']==proof['image_id']
+        and cfg['profile_sha256']==grant['profile_sha256']==proof['profile_sha256'], 'S864_SOURCE_IMAGE_PROFILE_CHANGED')
+    require(os.environ.get('S864_SOURCE_REVISION')==SOURCE and os.environ.get('S864_IMAGE_ID')==cfg['image_id'],
+        'S864_RUNNING_IMAGE_IDENTITY_REQUIRED')
+    require(sha(__file__)==grant['vision_glue_sha256'],'S864_VISION_DRIVER_CHANGED')
+    require(grant['owner_max_total_tokens']==500000 and grant['owner_max_total_attempts']==40
+        and grant['max_runtime_seconds']==2400 and grant['accounting_mode']=='reported_usage_only_v1', 'S864_CAPS_CHANGED')
+    batch=grant['batches'][grant['vision_batch_id']]
+    require(batch['kind']=='vision' and batch['max_calls']==4 and len(batch['request_ids'])==4
+        and len(set(batch['request_ids']))==4 and len(batch['frozen_request_packages'])==4,'S864_VISION_FOUR_CALL_BINDING')
+    require(cfg['vision_inputs_sha256']==grant['vision_inputs_sha256'], 'S864_IMAGE_MANIFEST_BINDING')
+    inputs=load_inputs(cfg['vision_inputs_file'],cfg['vision_inputs_sha256'])
+    for (row,_),approved in zip(inputs,batch['frozen_request_packages']):
+        require(all(row[key]==approved[key] for key in ('case_id','prompt_kind','body_sha256','image_sha256','source_pdf_sha256')),
+            'S864_VISION_CASE_BINDING_CHANGED')
+        require(approved['knowledge_base_scope'] and len(approved['document_scope'])==1,
+            'S864_CURRENT_IMAGE_ORIGIN_SCOPE_REQUIRED')
+    require(os.environ.get('WEKNORA_PORT_EXECUTION_FILE')==batch['execution_file'], 'S864_VISION_EXECUTION_BINDING')
+    return cfg,grant,batch,inputs
+
+
+def check_prior_http(cfg,grant):
+    from backend.weknora_port.execution import _validate_ledger
+    summary=read(cfg['summary_file'])
+    require(summary['status']=='ALL_ELIGIBLE_HTTP_COMPLETED_REVIEW_REQUIRED'
+        and summary['completed_submissions']==3 and summary['totals']['unknown']==summary['totals']['unsettled']==0
+        and summary['source_revision']==SOURCE and summary['image_id']==cfg['image_id']
+        and summary['profile_sha256']==cfg['profile_sha256'],'S864_THREE_HTTP_COMPLETION_REQUIRED')
+    http=[b for b in grant['batches'].values() if b['kind']=='http']
+    require(len(http)==3 and len(grant['batches'])==4,'S864_SHARED_FOUR_LEDGER_GROUP_REQUIRED')
+    for batch in http:
+        ledger=read(batch['execution_file']);_validate_ledger(ledger)
+        require(ledger['accounting_mode']=='reported_usage_only_v1' and ledger['status'] in ('OPEN','CLOSED')
+            and ledger['entries'] and all(r['status']=='SETTLED' for r in ledger['entries']), 'S864_HTTP_UNKNOWN_UNSETTLED_STOP')
+
+
+async def execute(path,expected_sha):
+    from scripts import s8_6_2_r3_40_acceptance as s840
+    from scripts.s8_ecs_runtime import settings_and_factory
+    from backend.weknora_port.development import assemble
+    from backend.weknora_port.execution import REPORTED_USAGE_ONLY, _validate_ledger, _reported_usage_valid
+    from backend.weknora_port.models.types import CallContext, TrustedScope, Message, ChatOptions
+    cfg,grant,batch,inputs=validate_configuration(path,expected_sha)
+    output=Path(cfg['vision_output_directory'])
+    with s840.owner_process_lock(grant['owner_lock_file']):
+        check_prior_http(cfg,grant)
+        ledger=read(batch['execution_file']);_validate_ledger(ledger)
+        require(ledger['status']=='OPEN' and ledger['entries']==[] and ledger['accounting_mode']==REPORTED_USAGE_ONLY
+            and ledger['max_calls']==4 and ledger['capture_evidence'] is True,'S864_FRESH_VISION_LEDGER_REQUIRED')
+        require(ledger['allowed_models']==batch['allowed_models'] and len(batch['allowed_models'])==1
+            and batch['allowed_models'][0]['capability']=='vision','S864_VISION_ARCHIVED_MODEL_BINDING')
+        require(set(ledger['allowed_kbs'])==set(batch['knowledge_base_scope']),'S864_VISION_ORIGIN_KBS_CHANGED')
+        window=read(cfg['batch_window_file'])
+        started=datetime.fromisoformat(window['started_at'].replace('Z','+00:00'))
+        deadline=datetime.fromisoformat(window['deadline_at'].replace('Z','+00:00'))
+        require(deadline.timestamp()-started.timestamp()==2400,'S864_SHARED_WINDOW_CHANGED')
+        expires=datetime.fromisoformat(grant['expires_at'].replace('Z','+00:00'))
+        require(started.tzinfo is not None and expires.tzinfo is not None,'S864_ABSOLUTE_BATCH_TIME_REQUIRED')
+        absolute_deadline=min(deadline.timestamp(),expires.timestamp())
+        require(time.time()<absolute_deadline,'S864_BATCH_TIME_EXHAUSTED')
+        write_new(output/'claimed.json',{'status':'CLAIMED_SINGLE_ATTEMPT','request_ids':batch['request_ids'],
+            'source_revision':SOURCE,'profile_sha256':cfg['profile_sha256'],'no_retry':True})
+        @asynccontextmanager
+        async def wrapped(settings,**kwargs):
+            async with assemble(settings,**kwargs) as runtime:
+                require(runtime.execution.accounting_mode==REPORTED_USAGE_ONLY
+                    and runtime.execution.path.resolve()==Path(batch['execution_file']).resolve(), 'S864_NORMAL_EXECUTION_REQUIRED')
+                s840.install_owner_cap(runtime,grant,batch['execution_file'])
+                yield runtime
+        settings,factory,_=settings_and_factory(os.environ,assemble_factory=wrapped)
+        completed=[]
+        try:
+            async with factory(settings) as runtime:
+                require(runtime.principal.subject_id==ledger['subject_id']
+                    and runtime.principal.tenant_id==ledger['tenant_id'],'S864_VISION_PRINCIPAL_CHANGED')
+                registry=runtime.registry_for_context()
+                try:
+                    model_id=batch['allowed_models'][0]['model_id']
+                    for index,((record,body),approved,request_id) in enumerate(zip(inputs,batch['frozen_request_packages'],batch['request_ids'])):
+                        remaining=absolute_deadline-time.time()
+                        require(remaining>0,'S864_BATCH_TIME_EXHAUSTED_NO_NEXT_SEND')
+                        context=CallContext(request_id,TrustedScope(runtime.principal.subject_id,
+                            tuple(approved['knowledge_base_scope']),tuple(approved['document_scope'])),
+                            deadline=asyncio.get_running_loop().time()+remaining,deadline_kind='run')
+                        require(context.session_id=='','S864_FROZEN_NO_CACHE_KEY')
+                        model=await registry.get(model_id,context)
+                        require(model.config.provider=='deepseek' and model.config.model=='deepseek-flash'
+                            and model.config.supports_vision,'S864_VISION_MODEL_CHANGED')
+                        image=body['messages'][0]['content'][0]['image_url']['url']
+                        messages=(Message('user',body['messages'][0]['content'][1]['text'],images=(image,)),)
+                        options=ChatOptions(max_tokens=5000,temperature=0.10000000149011612)
+                        require(model.build_request_body(messages,options)==body,'S864_EXACT_PROVIDER_INPUT_CHANGED')
+                        # No transport implementation here: this is the ordinary
+                        # model, already wrapped by LocalExecution and Owner cap.
+                        response=await model.vision(messages,options,context)
+                        current=read(batch['execution_file'])
+                        rows=[r for r in current['entries'] if r['request_id']==request_id]
+                        require(len(rows)==1 and rows[0]['status']=='SETTLED'
+                            and _reported_usage_valid(rows[0].get('usage')),'S864_VISION_USAGE_UNKNOWN_STOP')
+                        result={'case_id':record['case_id'],'prompt_kind':record['prompt_kind'],'request_id':request_id,
+                            'body_sha256':record['body_sha256'],'image_sha256':record['image_sha256'],
+                            'content':response.content,'finish_reason':response.finish_reason,'usage':asdict(response.usage),
+                            'settled_ledger_usage':rows[0]['usage'],'status':'RECEIVED_REVIEW_REQUIRED'}
+                        write_new(output/f'{index+1:02d}-result.json',result)
+                        require(bool(response.content.strip()) and response.finish_reason=='stop','S864_VISION_INCOMPLETE_STOP_NO_RETRY')
+                        require(current['status']=='OPEN','S864_VISION_LEDGER_STOP_NO_NEXT_SEND')
+                        completed.append(result)
+                finally: await registry.close()
+            write_new(output/'results.json',{'status':'FOUR_VISION_COMPLETED_REVIEW_REQUIRED','completed_calls':4,
+                'actual_tokens':sum(r['settled_ledger_usage']['total_tokens'] for r in completed),
+                'results':completed,'quality':'NOT_REVIEWED','input_token_estimation':'DISABLED','no_retry':True})
+        except BaseException as error:
+            stop=Path(grant['owner_lock_file']).with_name('owner-stop.json')
+            if not stop.exists():write_new(stop,{'status':'S864_VISION_STOP_NO_RETRY','error_type':type(error).__name__,
+                'code':getattr(error,'code',str(error) if isinstance(error,ValueError) else 'READ_PRIVATE_RECEIPTS'),
+                'completed_calls':len(completed),'ledger_rewritten':False,'retry':False})
+            raise
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--inputs',type=Path)
+    parser.add_argument('--execute',action='store_true')
+    parser.add_argument('--configuration',type=Path)
+    parser.add_argument('--configuration-sha256')
+    args=parser.parse_args()
+    if not args.execute:
+        require(args.inputs is not None,'S864_INPUTS_PATH_REQUIRED')
+        rows=load_inputs(args.inputs)
+        print(json.dumps({'status':'OFFLINE_INPUTS_VALIDATED','calls':len(rows),'provider_calls':0,'token_estimation':'DISABLED'}))
+        return
+    require(args.configuration is not None and args.configuration_sha256,'S864_FROZEN_CONFIGURATION_REQUIRED')
+    asyncio.run(execute(args.configuration,args.configuration_sha256))
+
+
+if __name__=='__main__':main()

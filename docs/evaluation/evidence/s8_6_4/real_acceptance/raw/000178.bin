@@ -1,0 +1,45 @@
+{
+  "status": "EXACT_SEVEN_BATCH_PREPARED_NOT_STARTED",
+  "runner": {
+    "control_sha256": {
+      "manifest.json": "d033906f8dc48dedbbf304da6c04f9caae3e206915c920f3e911f30afd2b1115",
+      "payload.py": "63c5ef267826d24705d87961c518b1647a53a3254bfba2cd25f7555286ad64d6",
+      "runner.py": "fe62949ec8eb0be4ae59009f48cfbb41a19e989d1576865edfd1548aeea69219"
+    },
+    "job_id": "s864-final-20261022t112810z-2bdb4629-originfix-235e37-job",
+    "job_root": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37-job",
+    "status": "PREPARED"
+  },
+  "configuration_sha256": "71d7bcc16cd0fcc9d1655f9d57db958e9bfa3d9d9b207dcebc4b0c608d02206f",
+  "grant_sha256": "7c660558bc80dc744e9397e59f1321d1fc3293f136c886628356cfb584d3f4dc",
+  "ledgers": {
+    "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-1/execution.json": {
+      "sha256": "37044579706ad2c56292bf862aa12fb848d9b33e38c7aa2f49273e293888aa15",
+      "entries": 0,
+      "status": "OPEN"
+    },
+    "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-2/execution.json": {
+      "sha256": "e2e8c3aca99a7c925daa23e4e60a2318f14eaeabe324d296f31c3853392ae218",
+      "entries": 0,
+      "status": "OPEN"
+    },
+    "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-3/execution.json": {
+      "sha256": "79a29f7ca68a0d387b604b212ced449dd3c9600e933b567b3bbf0a5282758acb",
+      "entries": 0,
+      "status": "OPEN"
+    },
+    "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37/vision/execution.json": {
+      "sha256": "f15b854c360e7c244304da451209179846b5824d1f4a584b3bae172a7948f0d9",
+      "entries": 0,
+      "status": "OPEN"
+    }
+  },
+  "provider_calls": 0,
+  "dispatch": [
+    "/usr/bin/python3.12",
+    "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629/app/scripts/ecs_acceptance_job.py",
+    "start",
+    "--job-root",
+    "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37-job"
+  ]
+}

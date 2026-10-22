@@ -1,0 +1,103 @@
+# S8.6.4 actual fixed-image Caption review
+
+## Scope and method
+
+Nonblind agent review against the original-pixel rubric frozen before these outputs. This is **caption extraction only**. It does not establish that a full RAG question was rerun, a downstream answer passed, or the Owner accepted the milestone. No new Provider calls, tests, source edits or Prompt edits were made during this review.
+
+Rubric SHA256: `cdc7e48e29fea180194b7ac9b5abad922dc91b0c5a3e2bde1cc0f6919409490b`. Raw inputs, native response bodies, saved captions and SETTLED ledger counters were reconciled locally. All recorded evidence checks passed. Every old/candidate pair has the same exact image bytes, provider/model identity, fixed options and scope; request IDs are fresh and distinct.
+
+## Independent grades
+
+| Image | Prompt | Critical extraction | Whole Caption |
+|---|---|---|---|
+| row-0958 | old | FAIL_OMISSION | PARTIAL_MATERIAL_OMISSIONS |
+| row-0958 | candidate | PASS | PARTIAL_UNMARKED_PHYSICAL_SPECIFICITY |
+| row-0684 | old | FAIL_OMISSION | PARTIAL_MATERIAL_OMISSIONS |
+| row-0684 | candidate | PASS | PASS_WITHIN_REVIEWED_VISIBLE_CONTENT |
+
+### row-0958: reflection surface examples
+
+Old Caption gives a correct high-level reflection summary, including the angle equality, but omits both surface examples. Candidate preserves the exact readable label:
+
+> *   底部标签：**Reflecting surface, e.g. shiny object or mirror**
+
+Candidate also preserves the original law, Fast/Slow/Fast and the diffraction gap statements. The reflection law already succeeded under the old prompt and is not a new gain.
+
+Candidate has a local faithfulness limitation. It calls the schematic diffraction waves `水波` (water waves) and the reflection ray segments `光线` (light rays), without marking these as interpretations. The original image establishes generic wave/ray relationships, not these unique physical types. This does **not** replace the correctly extracted surface examples with water; it is a separate unsupported-specificity finding. The degree-like superscript on i/r is also uncertain at source resolution; no numeric angle was invented. Therefore critical extraction is PASS, while strict whole-caption faithfulness is PARTIAL.
+
+### row-0684: category-specific percentages
+
+Old Caption correctly reports All voters/Yes=79%, but does not report the two gender-specific values. It does not incorrectly assign79% to both genders; its failure is omission. Candidate preserves the title, percentage unit and this table:
+
+| Category | No (%) | Yes (%) |
+|---|---:|---:|
+| All voters | 17 | 79 |
+| Men | 16 | 81 |
+| Women | 18 | 78 |
+| Trump voters | 17 | 78 |
+| Clinton voters | 17 | 81 |
+
+All ten values and their category/answer-column associations agree with the original. Candidate retains the omitted-response note and survey date, and does not invent sample sizes, p-values or unshown response percentages. The surrounding original prose is transcribed in English; retaining original text is consistent with this extraction rubric. No factual mismatch was detected in the reviewed visible content.
+
+## Actual raw Provider usage
+
+| Image | Prompt | Input | Completion | Total |
+|---|---|---:|---:|---:|
+| row-0958 | old | 1018 | 808 | 1826 |
+| row-0958 | candidate | 1236 | 1859 | 3095 |
+| row-0684 | old | 1032 | 1026 | 2058 |
+| row-0684 | candidate | 1250 | 2847 | 4097 |
+| **Total** | **4 SETTLED,0 UNKNOWN** | **4536** | **6540** | **11076** |
+
+These are actual new-round native usage counters, confirmed against the settled ledger. Completion includes reported reasoning usage; reasoning is not added again. Image or base64 wire bytes are not token counts. Old-prompt calls use3884 total Tokens and candidate calls use7192; the respective per-image increases are1269 and2039. No monetary cost is inferred.
+
+## Evidence and reproducibility
+
+The companion JSON contains exact full captions, selected quotes, per-item grades, native usage objects, complete request prompt text, canonical request hashes, image hashes and SHA256/path references for every result/raw request/raw response/HTTP metadata/timing file. It does not copy base64 image payloads.
+
+Ledger: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\execution.json`
+
+Ledger file SHA256: `6cfc03bd96c7ed048722abff7d1d9257ce0161f94faf61b425c5ed36b00553f5`. Ledger top-level status is OPEN; all four entries are SETTLED, so OPEN is not an unfinished call.
+
+| Caption | Request body SHA256 | Result file SHA256 |
+|---|---|---|
+| row-0958/old | `bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7` | `2f5e7682ea998c4437a03fc455fc6efd1e9253862cdc15371872e73ec6855da0` |
+| row-0958/candidate | `fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089` | `1040eb6045098339f54863ebfcb92fe9f8e04296449d2579ea3ba6902e2e5a0b` |
+| row-0684/old | `4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a` | `09dc3c023de2bb8ff306f0f31f410c19b8b8f2ff07e5371411d3919f06e6be3a` |
+| row-0684/candidate | `f09c46f3fd7bdc8825447ce7e6e4eb5aa68e46ba52f309ef2e4f7390b23fc49c` | `12bf57c3545e37640e35410b07a437c989e48007acca64f13f5285930cbfbac9` |
+
+### row-0958/old raw paths
+
+- Result: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\vision\01-result.json`
+- Request: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\7e9ae9d30a164e2eb5304b2785345e0a.request.json`
+- Native response: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\7e9ae9d30a164e2eb5304b2785345e0a.response.body`
+- Request ID: `s864-vlm-37f71ae598da43628e597c2b/row-0958/old`
+- Image SHA256: `58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9`
+
+### row-0958/candidate raw paths
+
+- Result: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\vision\02-result.json`
+- Request: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\8a962716d093432c90ac356d9c22678f.request.json`
+- Native response: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\8a962716d093432c90ac356d9c22678f.response.body`
+- Request ID: `s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate`
+- Image SHA256: `58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9`
+
+### row-0684/old raw paths
+
+- Result: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\vision\03-result.json`
+- Request: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\7de55bbeddc94cd69ff6d5b4f09fbd04.request.json`
+- Native response: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\7de55bbeddc94cd69ff6d5b4f09fbd04.response.body`
+- Request ID: `s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old`
+- Image SHA256: `2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2`
+
+### row-0684/candidate raw paths
+
+- Result: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\vision\04-result.json`
+- Request: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\5a95db4a1e534a74b2ba5d7f6beb1f88.request.json`
+- Native response: `E:\RAG quention\var\reports\s8-6-4\real-acceptance\final-export\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\output\execution-vision\evidence\5a95db4a1e534a74b2ba5d7f6beb1f88.response.body`
+- Request ID: `s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate`
+- Image SHA256: `2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2`
+
+## Limits
+
+Two fixed images demonstrate two case-specific extraction recoveries. They do not establish general chart/OCR accuracy, a dataset-wide gain, downstream Generation Prompt quality or production full-RAG success. This review was performed by an agent aware of the historical cases; it is not blind or Owner signoff. Candidate0958 remains PARTIAL for whole-caption faithfulness. No source or Prompt change is proposed or applied by this review.

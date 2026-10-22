@@ -1,0 +1,7 @@
+{
+  "command": "python prepare_image.py",
+  "exit_code": 1,
+  "phase": "local zero-send profile proof decoding",
+  "error": "UnicodeDecodeError: subprocess stdout used Windows locale encoding; UTF-8 proof decoding failed.",
+  "resolution": "Explicit -X utf8 for proof subprocess; no remote operation or Provider send occurred."
+}

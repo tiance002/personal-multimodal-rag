@@ -1,0 +1,738 @@
+{
+  "status": "FOUR_VISION_COMPLETED_REVIEW_REQUIRED",
+  "completed_calls": 4,
+  "actual_tokens": 11076,
+  "results": [
+    {
+      "case_id": "row-0958",
+      "prompt_kind": "old",
+      "request_id": "s864-vlm-37f71ae598da43628e597c2b/row-0958/old",
+      "body_sha256": "bcb95a424cebf4980ab54c24991f73871acc1ab957c28f4428433dac1da3dce7",
+      "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "content": "这张图片是一张关于物理波现象的图解，主要介绍了波的三种基本特性：\n\n1. **反射 (Reflection)**：波撞击表面后弹回，入射角等于反射角。\n2. **折射 (Refraction)**：波进入不同密度的介质时发生弯曲并改变速度。\n3. **衍射 (Diffraction)**：波穿过缝隙或障碍物时发生向外扩散的现象。\n\n图中通过文字定义、规律说明和直观的示意图，清晰地解释了这三种物理现象。",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1018,
+        "completion_tokens": 808,
+        "total_tokens": 1826,
+        "status": "REPORTED",
+        "cached_tokens": 768,
+        "cache_read_tokens": 768,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 250,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1018,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 808,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 1826,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 768,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 250,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 707,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":808,\"completion_tokens_details.reasoning_tokens\":707,\"prompt_cache_hit_tokens\":768,\"prompt_cache_miss_tokens\":250,\"prompt_tokens\":1018,\"total_tokens\":1826}",
+          "raw_sha256": "abb3b29ce4e6e90083e422816320df96f32725ce15994df3bf2238f00f339420",
+          "derived_total": 1826,
+          "simulated": false,
+          "observed_lower_bound": 0,
+          "prior_numeric_raw": []
+        }
+      },
+      "settled_ledger_usage": {
+        "prompt_tokens": 1018,
+        "completion_tokens": 808,
+        "total_tokens": 1826,
+        "status": "REPORTED",
+        "cached_tokens": 768,
+        "cache_read_tokens": 768,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 250,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1018,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 808,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 1826,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 768,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 250,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 707,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":808,\"completion_tokens_details.reasoning_tokens\":707,\"prompt_cache_hit_tokens\":768,\"prompt_cache_miss_tokens\":250,\"prompt_tokens\":1018,\"total_tokens\":1826}",
+          "raw_sha256": "abb3b29ce4e6e90083e422816320df96f32725ce15994df3bf2238f00f339420",
+          "derived_total": 1826,
+          "simulated": false,
+          "observed_lower_bound": 1826,
+          "prior_numeric_raw": []
+        }
+      },
+      "status": "RECEIVED_REVIEW_REQUIRED"
+    },
+    {
+      "case_id": "row-0958",
+      "prompt_kind": "candidate",
+      "request_id": "s864-vlm-a006f799ca2a4fa1b73d3eec/row-0958/candidate",
+      "body_sha256": "fb67cad7911f6ff2afee229c96d0f311f3100654aaca9a0794189d6961374089",
+      "image_sha256": "58e2d7521ffa57e1a937993b39ce4a79204b7d0143cc2ea22c7eb905dc95fea9",
+      "content": "以下是从图像中提取的文本和图表信息：\n\n**中心标题**\n*   **P1c: Reflection, Refraction, Diffraction**\n\n---\n\n**折射 (REFRACTION)**\n*   **定义文本**：REFRACTION: Bends the wave when entering/leaving a substance to another\n*   **解释文本**：They slow down because the substance would be a different density to another substance.\n*   **图示**：展示了波在两种介质交界处的传播路径。图中标记了三个文本标签：左上角为“**Fast**”，中间倾斜的矩形区域为“**Slow**”，右下方为“**Fast**”。图示表明波从快速介质进入慢速介质时发生了偏折。\n\n---\n\n**反射 (REFLECTION)**\n*   **定义文本**：REFLECTION: Bounces the wave back towards where it came from\n*   **通则文本**：All wave can be reflected and refracted\n*   **反射定律文本**：Law of Reflection: Angle of incidence = Angle of Reflection\n*   **图示**：左下角的反射示意图。\n    *   左上角标签：**Reflection**\n    *   图中标注了入射角符号：“**\\(i^o\\)**”和反射角符号：“**\\(r^o\\)**”\n    *   底部标签：**Reflecting surface, e.g. shiny object or mirror**\n    *   图示内容：显示一条带有箭头的实线（入射光线）射向带有斜线阴影的表面，一条虚线作为法线，另一条带有箭头的实线（反射光线）从表面弹开。\n\n---\n\n**衍射 (DIFFRACTION)**\n*   **定义文本**：DIFFRACTION: Spreads the wave out when going through a gap or barrier\n*   **规则文本**：\n    *   Maximum diffraction occurs when: the gap is equal to the wave.\n    *   Minimum diffraction occurs when: the gap is smaller or larger than the wave.\n*   **图示**：右侧中间的衍射示意图。显示了水波从下方直线向上穿过中间有缺口的灰色屏障，通过缺口后波前呈半圆形向外扩散。图中包含三个黑色箭头，分别指示向上、左上和右上的传播方向，以及一个从下方指向上方穿过缺口的直箭头。",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1236,
+        "completion_tokens": 1859,
+        "total_tokens": 3095,
+        "status": "REPORTED",
+        "cached_tokens": 896,
+        "cache_read_tokens": 896,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 340,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1236,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 1859,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 3095,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 896,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 340,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 1378,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":1859,\"completion_tokens_details.reasoning_tokens\":1378,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":340,\"prompt_tokens\":1236,\"total_tokens\":3095}",
+          "raw_sha256": "12d59051e235edf3d4742323a9c13f87ca58d67c650d7e6a5f8e4705b9e57c46",
+          "derived_total": 3095,
+          "simulated": false,
+          "observed_lower_bound": 0,
+          "prior_numeric_raw": []
+        }
+      },
+      "settled_ledger_usage": {
+        "prompt_tokens": 1236,
+        "completion_tokens": 1859,
+        "total_tokens": 3095,
+        "status": "REPORTED",
+        "cached_tokens": 896,
+        "cache_read_tokens": 896,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 340,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1236,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 1859,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 3095,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 896,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 340,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 1378,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":1859,\"completion_tokens_details.reasoning_tokens\":1378,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":340,\"prompt_tokens\":1236,\"total_tokens\":3095}",
+          "raw_sha256": "12d59051e235edf3d4742323a9c13f87ca58d67c650d7e6a5f8e4705b9e57c46",
+          "derived_total": 3095,
+          "simulated": false,
+          "observed_lower_bound": 3095,
+          "prior_numeric_raw": []
+        }
+      },
+      "status": "RECEIVED_REVIEW_REQUIRED"
+    },
+    {
+      "case_id": "row-0684",
+      "prompt_kind": "old",
+      "request_id": "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+      "body_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+      "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "content": "这张图片是皮尤研究中心（Pew Research Center）一份选举调查报告的页面，主要总结了2016年美国大选后的几项重要民调发现。\n\n主要内容包括：\n1. **种族关系**：近半数选民对特朗普当选后的种族关系走向持悲观态度。\n2. **计票信心**：胜选后，大多数特朗普支持者对其选票被准确统计的信心大幅提升。\n3. **女性总统**：绝大多数选民（79%）预期在有生之年会看到美国选出女性总统（右侧附有相关的条形图数据）。\n4. **媒体影响**：多数选民（57%）认为媒体对大选结果的影响力过大。\n\n整体而言，该页面呈现了选民对特朗普执政影响、选举制度信任度、女性领导人以及媒体作用的看法。",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 1026,
+        "total_tokens": 2058,
+        "status": "REPORTED",
+        "cached_tokens": 896,
+        "cache_read_tokens": 896,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 136,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1032,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 1026,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 2058,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 896,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 136,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 866,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":1026,\"completion_tokens_details.reasoning_tokens\":866,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":136,\"prompt_tokens\":1032,\"total_tokens\":2058}",
+          "raw_sha256": "7db2e58633170e6cb0c38f2ba3d53922b630cd4893e34506a572febb737155d7",
+          "derived_total": 2058,
+          "simulated": false,
+          "observed_lower_bound": 0,
+          "prior_numeric_raw": []
+        }
+      },
+      "settled_ledger_usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 1026,
+        "total_tokens": 2058,
+        "status": "REPORTED",
+        "cached_tokens": 896,
+        "cache_read_tokens": 896,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 136,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1032,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 1026,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 2058,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 896,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 136,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 866,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":1026,\"completion_tokens_details.reasoning_tokens\":866,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":136,\"prompt_tokens\":1032,\"total_tokens\":2058}",
+          "raw_sha256": "7db2e58633170e6cb0c38f2ba3d53922b630cd4893e34506a572febb737155d7",
+          "derived_total": 2058,
+          "simulated": false,
+          "observed_lower_bound": 2058,
+          "prior_numeric_raw": []
+        }
+      },
+      "status": "RECEIVED_REVIEW_REQUIRED"
+    },
+    {
+      "case_id": "row-0684",
+      "prompt_kind": "candidate",
+      "request_id": "s864-vlm-6f50a4f028314a9687b554d1/row-0684/candidate",
+      "body_sha256": "f09c46f3fd7bdc8825447ce7e6e4eb5aa68e46ba52f309ef2e4f7390b23fc49c",
+      "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+      "content": "8\nPEW RESEARCH CENTER\n\nOther important findings\n\n**Voters pessimistic on how Trump will impact race relations.** Nearly half of voters (46%) say Trump’s election will lead to worse race relations, while only about half as many (25%) expect race relations to improve; 26% say his election won’t make a difference. Among Clinton voters, 84% expect race relations to worsen under Trump. Among Trump supporters, half expect improvement, while 38% say his election won’t make a difference.\n\n**Post-victory, most Trump backers confident in an accurate vote count.** In August, just 38% of registered voters who supported Trump were very confident that their vote would be counted accurately. But in the aftermath of Trump’s victory, 75% expressed confidence that their votes were counted accurately. The views of Clinton supporters showed no change: After the election 67% were confident that their votes were counted accurately.\n\n**Most expect woman president, eventually.** Following Clinton’s defeat, a sizable majority of voters (79%) still expect there will be a female president “in their lifetime.” There are no significant differences in these opinions among men and women, or Clinton supporters and Trump backers.\n\n**Voters say press has too much influence.** Voters grade the press very negatively, and most (57%) say it had too much influence on the outcome of the election. Just 27% say the press had the right amount of influence on the election, while 13% say it had too little influence. About six-in-ten Trump voters (62%) say the press had too much influence, as do 50% of Clinton voters.\n\n**图表：Will the country elect a female president in your lifetime?**\n*% of voters who say ...*\n\n| 类别 | No | Yes |\n| :--- | :--- | :--- |\n| All voters | 17 | 79 |\n| Men | 16 | 81 |\n| Women | 18 | 78 |\n| Trump voters | 17 | 78 |\n| Clinton voters | 17 | 81 |\n\nNote: Don’t know responses not shown. Q46bb.\nSource: Voter callback survey conducted Nov. 10-14, 2016.\nPEW RESEARCH CENTER\n\nwww.pewresearch.org",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1250,
+        "completion_tokens": 2847,
+        "total_tokens": 4097,
+        "status": "REPORTED",
+        "cached_tokens": 768,
+        "cache_read_tokens": 768,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 482,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1250,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 2847,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 4097,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 768,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 482,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 2373,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":2847,\"completion_tokens_details.reasoning_tokens\":2373,\"prompt_cache_hit_tokens\":768,\"prompt_cache_miss_tokens\":482,\"prompt_tokens\":1250,\"total_tokens\":4097}",
+          "raw_sha256": "21d93962662cb40b9d7a0e8acde52a8dcfc91fd3f4a12c8e0e2ddd3063a476da",
+          "derived_total": 4097,
+          "simulated": false,
+          "observed_lower_bound": 0,
+          "prior_numeric_raw": []
+        }
+      },
+      "settled_ledger_usage": {
+        "prompt_tokens": 1250,
+        "completion_tokens": 2847,
+        "total_tokens": 4097,
+        "status": "REPORTED",
+        "cached_tokens": 768,
+        "cache_read_tokens": 768,
+        "cache_write_tokens": 0,
+        "cache_miss_tokens": 482,
+        "cache_reported": true,
+        "cache_status": "hit",
+        "provider_usage_facts": {
+          "semantics": "openai-input-inclusive/v1",
+          "fields": [
+            [
+              "input",
+              {
+                "value": 1250,
+                "present": true,
+                "valid": true,
+                "path": "prompt_tokens"
+              }
+            ],
+            [
+              "output",
+              {
+                "value": 2847,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens"
+              }
+            ],
+            [
+              "total",
+              {
+                "value": 4097,
+                "present": true,
+                "valid": true,
+                "path": "total_tokens"
+              }
+            ],
+            [
+              "cache_read",
+              {
+                "value": 768,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_hit_tokens"
+              }
+            ],
+            [
+              "cache_write",
+              {
+                "value": null,
+                "present": false,
+                "valid": false,
+                "path": "cache_creation_input_tokens"
+              }
+            ],
+            [
+              "cache_miss",
+              {
+                "value": 482,
+                "present": true,
+                "valid": true,
+                "path": "prompt_cache_miss_tokens"
+              }
+            ],
+            [
+              "reasoning",
+              {
+                "value": 2373,
+                "present": true,
+                "valid": true,
+                "path": "completion_tokens_details.reasoning_tokens"
+              }
+            ]
+          ],
+          "numeric_raw": "{\"completion_tokens\":2847,\"completion_tokens_details.reasoning_tokens\":2373,\"prompt_cache_hit_tokens\":768,\"prompt_cache_miss_tokens\":482,\"prompt_tokens\":1250,\"total_tokens\":4097}",
+          "raw_sha256": "21d93962662cb40b9d7a0e8acde52a8dcfc91fd3f4a12c8e0e2ddd3063a476da",
+          "derived_total": 4097,
+          "simulated": false,
+          "observed_lower_bound": 4097,
+          "prior_numeric_raw": []
+        }
+      },
+      "status": "RECEIVED_REVIEW_REQUIRED"
+    }
+  ],
+  "quality": "NOT_REVIEWED",
+  "input_token_estimation": "DISABLED",
+  "no_retry": true
+}

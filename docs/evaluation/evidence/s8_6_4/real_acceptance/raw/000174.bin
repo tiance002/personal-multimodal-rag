@@ -1,0 +1,25 @@
+{
+  "schema": "s864-owner-supplement/v1",
+  "goal": "S8.6.4",
+  "recorded_at_utc": "2026-10-22T11:22:42.9038901Z",
+  "owner_approved": true,
+  "original_owner_approval_sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+  "steering_evidence_sha256": "f87d7e45c40a7f93ce73f358cfc9c3e4874a8c1cb82314dedf75bffc567b0dcb",
+  "owner_instructions_verbatim": [
+    "你改一下让`LocalExecution` 支持 `vision` ， 同时我认为你的预算有问题，处理两张图怎么可能要10万token",
+    "这轮先不用预算请求的token数，先只记录真实用量结算和 UNKNOWN 保护"
+  ],
+  "approved_source_commit": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "profile_sha256": "92ee355f837b10890313f076b4cda9a724c55142551e5b457c954e7c922e14c7",
+  "profile_file_sha256": "8a6fa3774e8008cdf470d85b6d498a35ef1996b73fcb0a50f1435bc90090d148",
+  "accounting_mode": "reported_usage_only_v1",
+  "scope_and_caps_unchanged": true,
+  "unchanged_scope": "Exact approved three fresh-Session HTTP cases and four old/new frozen image calls; same models, KB/document scope, Prompt B, P5 DYNAMIC, Top1=true; 40 attempts, 2400 seconds, actual usage stop limits unchanged",
+  "changed_accounting": "For fresh ledgers only: no per-request input Token estimate, reservation or held Tokens; valid Provider-reported usage settled as received. Actual usage at/exceeding existing limits stops future sends after preserving full real settlement. No future-cost guarantee from reservation.",
+  "unknown_policy": "Missing/invalid usage, unclear send/outcome or UNKNOWN stops future sends; preserve all known counters and raw receipts; no automatic retry",
+  "model_output_and_wire_guards_retained": true,
+  "old_ledgers_and_unknown_unchanged": true,
+  "production_update_authorized": false,
+  "ingestion_index_update_authorized": false,
+  "automatic_retries": false
+}

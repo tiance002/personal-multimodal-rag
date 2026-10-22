@@ -1,0 +1,182 @@
+{
+  "case_id": "row-0684",
+  "prompt_kind": "old",
+  "request_id": "s864-vlm-f53c17a6e386451bab3e15b2/row-0684/old",
+  "body_sha256": "4ead36b0df0c031425618386f3f48efd60f062f2c768415ff24d295f44bb662a",
+  "image_sha256": "2647fbabb967e083ca98308bf643cfb3f875107694c83e4485a69e8ae3d1a0a2",
+  "content": "这张图片是皮尤研究中心（Pew Research Center）一份选举调查报告的页面，主要总结了2016年美国大选后的几项重要民调发现。\n\n主要内容包括：\n1. **种族关系**：近半数选民对特朗普当选后的种族关系走向持悲观态度。\n2. **计票信心**：胜选后，大多数特朗普支持者对其选票被准确统计的信心大幅提升。\n3. **女性总统**：绝大多数选民（79%）预期在有生之年会看到美国选出女性总统（右侧附有相关的条形图数据）。\n4. **媒体影响**：多数选民（57%）认为媒体对大选结果的影响力过大。\n\n整体而言，该页面呈现了选民对特朗普执政影响、选举制度信任度、女性领导人以及媒体作用的看法。",
+  "finish_reason": "stop",
+  "usage": {
+    "prompt_tokens": 1032,
+    "completion_tokens": 1026,
+    "total_tokens": 2058,
+    "status": "REPORTED",
+    "cached_tokens": 896,
+    "cache_read_tokens": 896,
+    "cache_write_tokens": 0,
+    "cache_miss_tokens": 136,
+    "cache_reported": true,
+    "cache_status": "hit",
+    "provider_usage_facts": {
+      "semantics": "openai-input-inclusive/v1",
+      "fields": [
+        [
+          "input",
+          {
+            "value": 1032,
+            "present": true,
+            "valid": true,
+            "path": "prompt_tokens"
+          }
+        ],
+        [
+          "output",
+          {
+            "value": 1026,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens"
+          }
+        ],
+        [
+          "total",
+          {
+            "value": 2058,
+            "present": true,
+            "valid": true,
+            "path": "total_tokens"
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "value": 896,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_hit_tokens"
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "cache_creation_input_tokens"
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "value": 136,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_miss_tokens"
+          }
+        ],
+        [
+          "reasoning",
+          {
+            "value": 866,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens_details.reasoning_tokens"
+          }
+        ]
+      ],
+      "numeric_raw": "{\"completion_tokens\":1026,\"completion_tokens_details.reasoning_tokens\":866,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":136,\"prompt_tokens\":1032,\"total_tokens\":2058}",
+      "raw_sha256": "7db2e58633170e6cb0c38f2ba3d53922b630cd4893e34506a572febb737155d7",
+      "derived_total": 2058,
+      "simulated": false,
+      "observed_lower_bound": 0,
+      "prior_numeric_raw": []
+    }
+  },
+  "settled_ledger_usage": {
+    "prompt_tokens": 1032,
+    "completion_tokens": 1026,
+    "total_tokens": 2058,
+    "status": "REPORTED",
+    "cached_tokens": 896,
+    "cache_read_tokens": 896,
+    "cache_write_tokens": 0,
+    "cache_miss_tokens": 136,
+    "cache_reported": true,
+    "cache_status": "hit",
+    "provider_usage_facts": {
+      "semantics": "openai-input-inclusive/v1",
+      "fields": [
+        [
+          "input",
+          {
+            "value": 1032,
+            "present": true,
+            "valid": true,
+            "path": "prompt_tokens"
+          }
+        ],
+        [
+          "output",
+          {
+            "value": 1026,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens"
+          }
+        ],
+        [
+          "total",
+          {
+            "value": 2058,
+            "present": true,
+            "valid": true,
+            "path": "total_tokens"
+          }
+        ],
+        [
+          "cache_read",
+          {
+            "value": 896,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_hit_tokens"
+          }
+        ],
+        [
+          "cache_write",
+          {
+            "value": null,
+            "present": false,
+            "valid": false,
+            "path": "cache_creation_input_tokens"
+          }
+        ],
+        [
+          "cache_miss",
+          {
+            "value": 136,
+            "present": true,
+            "valid": true,
+            "path": "prompt_cache_miss_tokens"
+          }
+        ],
+        [
+          "reasoning",
+          {
+            "value": 866,
+            "present": true,
+            "valid": true,
+            "path": "completion_tokens_details.reasoning_tokens"
+          }
+        ]
+      ],
+      "numeric_raw": "{\"completion_tokens\":1026,\"completion_tokens_details.reasoning_tokens\":866,\"prompt_cache_hit_tokens\":896,\"prompt_cache_miss_tokens\":136,\"prompt_tokens\":1032,\"total_tokens\":2058}",
+      "raw_sha256": "7db2e58633170e6cb0c38f2ba3d53922b630cd4893e34506a572febb737155d7",
+      "derived_total": 2058,
+      "simulated": false,
+      "observed_lower_bound": 2058,
+      "prior_numeric_raw": []
+    }
+  },
+  "status": "RECEIVED_REVIEW_REQUIRED"
+}

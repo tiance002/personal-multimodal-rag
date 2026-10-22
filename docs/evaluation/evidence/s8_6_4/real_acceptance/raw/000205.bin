@@ -1,0 +1,347 @@
+{
+  "schema": "s8-6-4-private-real-acceptance-scoring-rubric/v1",
+  "language": "zh-CN",
+  "purpose": "SCORING_ONLY_NEVER_MODEL_INPUT",
+  "status": "RUBRIC_READY_NOT_SCORED",
+  "prepared_at_utc": "2026-10-22",
+  "authorization_status": "PENDING_OWNER_AUTHORIZATION_NOT_A_GRANT",
+  "source_commit": "a25af498ab3d2eb5614185f73d678a172e300d52",
+  "case_count": 3,
+  "approved_case_ids": [
+    "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+    "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+    "hotpotqa-5a729fe55542991f9a20c53b"
+  ],
+  "scoring_policy": {
+    "scores_or_outcomes_recorded": false,
+    "actual_pass_claims": false,
+    "evaluate_project_final_answer_correct_separately_from": [
+      "question_coverage",
+      "evidence_support",
+      "citation_identity",
+      "unsupported_extras",
+      "presentation"
+    ],
+    "actual_raw_answer_required": true,
+    "evidence_support_requires_actual_final_generation_context": true,
+    "citation_identity_requires_verified_current_identity_and_readback": true,
+    "keep_historical_operator_diagnosis_separate_from_owner_recollection": true,
+    "excluded_cases": "不包含既有两个旧 UNKNOWN 案例；不得复用其 grant 或推断状态。"
+  },
+  "inputs": {
+    "proposal": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\docs\\evaluation\\evidence\\s8_6_4\\fresh_authorization.proposal.json",
+      "sha256": "9abe3edf977058d5ec8a56626f2686bd70c7d40f429263e28a193cef6677c64d"
+    },
+    "input": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\tests\\weknora_port\\fixtures\\s862r3_40_input.json",
+      "sha256": "f78f7ec42fd0aa87d14f56101462ea5ef2277f1eb77e3df99d974245ee651861"
+    },
+    "source_review": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\docs\\evaluation\\S8_6_3_SOURCE_IDENTITY_AND_FAILURE_LAYERS.results.json",
+      "sha256": "6f34218a9a1e335afdf351d20392f960e0e04b40807edb70b312c146f4c488a3"
+    },
+    "ecs40": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\docs\\evaluation\\S8_6_2_R3_ECS40_ACCEPTANCE.results.json",
+      "sha256": "9c287498414ce79e832a2113148adf6e79fdfb94f5bcbf2470da37216f9ddd13"
+    },
+    "gold": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\docs\\evaluation\\evidence\\s8-1-ecs-20261020\\ground-truth.scoring-only.json",
+      "sha256": "3b3c4b4c6f0c8eafe42509ca1252fda09ddf5c69d64330f1807dffd38c8c4874"
+    },
+    "criteria": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\docs\\evaluation\\evidence\\s8-1-ecs-20261020\\fact-criteria.scoring-only.json",
+      "sha256": "8dbfc2e60a22c1c0bcbdf160c07c2e69407bd6012e9d5cd329c8929ade0bc78d"
+    },
+    "readback": {
+      "path": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention\\docs\\evaluation\\evidence\\s8_6_4\\mml0434_neighbor_readback\\current-source.stdout.json",
+      "sha256": "7f8a23b8d6d648d70b4bde09aee588ae1a51055793b23a915332675f98a38268"
+    }
+  },
+  "cases": [
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "qid": "mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+      "dataset": "mmlongbench-doc",
+      "dataset_version": "MMLongBench-Doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86",
+      "q0": "Which dataset was introduced in the 'coding time' section of the PPT for training?",
+      "q0_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+      "knowledge_base_scope": [
+        "7f1d720d-9561-446f-a8cc-6a562c339d23"
+      ],
+      "document_scope": [],
+      "accept_language": "en-US",
+      "frozen_gold": {
+        "dataset_version": "MMLongBench-Doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86",
+        "qrels_kind": "SOURCE_DERIVED_OFFICIAL_DOCUMENT_IDENTITY",
+        "qrels": {
+          "catvsdogdlpycon15se-150512122612-lva1-app6891_95.pdf": 1
+        },
+        "answers": [
+          "Cat vs Dog dataset"
+        ],
+        "evaluation_metadata": {
+          "answer_format": "Str",
+          "evidence_pages": [
+            34
+          ],
+          "evidence_sources": "['Pure-text (Plain-text)']",
+          "gold_source": "OFFICIAL_NATIVE_TYPED_ANSWER",
+          "official_gpt_normalization": "NOT_RUN",
+          "original_row_index": 434,
+          "page_index_convention": "UNKNOWN",
+          "parsing_gold": "NOT_AVAILABLE"
+        }
+      },
+      "historical_s8_6_3": {
+        "verdict": "FAIL",
+        "first_failure": "SEARCH_TARGET_ABSENT",
+        "reason": "原 PDF coding time 页明确 Cat vs Dog，但该文字不在保存的 30 个候选或最终输入；最终 Expensive 仍无正文。"
+      },
+      "historical_original_ecs40": {
+        "final_answer_correct": "FAIL",
+        "answer_sha256": "fbf261cb2d0528418195680eedfa0f9d46640d9fd74142ad7f714e32e6ba9571",
+        "answer": "I can't answer this from the available evidence. The knowledge base search didn't return readable content from the two listed PDFs (the document catalog only shows titles and file types, not their contents), so I have no source text describing a \"coding time\" section or the dataset it introduces.\n\nIf you can share the relevant slides or text (or confirm the exact document), I can identify the dataset for you."
+      },
+      "scoring_dimensions": {
+        "project_final_answer_correct": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "依冻结的原生答案或原生问答评测契约判断；不得从检索命中、历史回答或资料回读推定本轮回答正确。"
+        },
+        "question_coverage": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "逐项判断 q0 请求的全部关系/限定是否被直接回答；部分命中不能记为完全正确。"
+        },
+        "evidence_support": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "只核对本轮实际最终生成上下文中的原文证据及其是否支持回答；检索阶段命中、摘要或离线只读资料不等于本轮已提供证据。"
+        },
+        "citation_identity": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "逐条核对新回答引用的 KB、document、chunk/source identity、version 与本轮实际可回读原文；缺少引用或身份无法验证时单独记录，不能以答案正确替代。"
+        },
+        "unsupported_extras": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "记录无证据断言、与原文冲突的细节、杜撰身份/页码/版本以及不必要的建议；与核心答案分开判定。"
+        },
+        "presentation": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "记录语言、清晰度、可读性、是否准确表达不确定性；表达质量不覆盖事实或证据失败。"
+        }
+      },
+      "scoring_notes": {
+        "expected_answer_exact": "Cat vs Dog dataset",
+        "expected_answer_sha256": "bf18dbf5e705442287d0a9201e44dc12037116f3e2a8171dd54d8e5e5ec305f7",
+        "official_gpt_normalization": "NOT_RUN",
+        "page_index_convention": "UNKNOWN",
+        "required_fact": "必须把 Cat vs Dog dataset 与 PPT 的 coding time section / training 联系起来；仅泛称某数据集不算覆盖。",
+        "reviewer_only_source_example": "Kaggle's Cat vs Dog dataset (25k dog/cat pictures)",
+        "source_example_status": "离线原文对照示例，仅供事后评分，不得作为新请求输入或生成模型材料。",
+        "operator_diagnosis": {
+          "historical_source_review": "此前实际最终生成输入没有可读源文本或图像；旧冻结搜索快照也未保存邻居正文。",
+          "later_readback": "后续只读同范围当前源回读发现下一块原文，已在独立离线准备中验证；这不是新一轮模型证据或回答。",
+          "owner_historical_recollection": "负责人另行回忆曾有启用 Top1 的回答答对；尚未绑定可核验的 S8.2 run UUID / 原始回答证据，因此只记录为负责人历史回忆，不作为本轮 Gold、评分或 PASS 证据。"
+        }
+      }
+    },
+    {
+      "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "qid": "dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+      "dataset": "longbench-zh",
+      "dataset_version": "LongBench-ZH-HF-5e628be450b7e67fb7ae6e201bd6d8f7056f7672-SEED20260928-V1",
+      "q0": "辐射避难所怎么刷箱子",
+      "q0_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+      "knowledge_base_scope": [
+        "76770fba-17c3-4704-8663-10aa669476ce"
+      ],
+      "document_scope": [],
+      "accept_language": "zh-CN",
+      "frozen_gold": {
+        "gold_kind": "FROZEN_NATIVE_REFERENCE_NOT_OFFICIAL_JUDGE",
+        "answers": [
+          "1.开局建好水电餐，宿舍。拉5S进电，加速，第一个到手。失败的话再试一次，还失败?重来吧，非洲人别玩了，实在不想重来就把人分配错，高s去水厂什么的，然后加速吧。总之不要完成2个正确分配这任务。2.把探索废土任务X了，任务左上有个小叉，这时候加速任务又出来了，加速。3.这时候会有升级和50水任务，如果差一个，完成正确分配2人，就会出来，这阶段完成50水和升级前，别完成50食物任务。4.拿到4盒子，这时候有3任务，穿武器和卖武器，还有50食物，先开箱子完成穿，卖的任务，最后完成50食物，会出现穿装备送以箱子任务，完成就5箱子了。",
+          "1、把时间自动设置功能关了，然后把时间往回调七八个月应该够用了。2、时间往回调后，进入游戏重新建号。3、进入游戏，看任务信息，新手任务都很容易完成而且比较多任务会奖励箱子，如成功启动一次极速模式奖励一个箱子简单。4、利用调时间重置任务这个功能，把不想做的任务删掉就会重新刷一个任务出来，不断的刷收集水这样的任务箱子就源源不断出来了。",
+          "开局随便做任务，可以领取3个箱子。当出现“出售一个武器或装备”之后，其他的任务尽量别做，否则容易无法触发下面的循环。放弃掉“出售一个武器或装备”，出现就放弃。放弃以后会刷出来3个任务，2个可以得到箱子（一个是收集50水，一个是升级一个小人），还有50食物的得到25瓶盖（也要做掉不能放弃）。然后循环好了，刷个20多个就可以开心的玩了。"
+        ],
+        "answers_sha256": "d2d56cd0fd2d3f07aa19398bd23202f79190c4da527027fe6c989035acf7f90f",
+        "source_identity": {}
+      },
+      "historical_s8_6_3": {
+        "verdict": "FAIL",
+        "first_failure": "SOURCE_UNIT_BUDGET",
+        "reason": "任务循环/删任务原文已召回且分数高，旧 source unit 超预算导致最终无正文；参数知识答成清房间取战利品。"
+      },
+      "historical_original_ecs40": {
+        "final_answer_correct": "FAIL",
+        "answer_sha256": "cfae57f78ddcc255b982dca08280840f8d05130f6611d4bf76b0a1af5b0d5e62",
+        "answer": "Radiation Shelter is a mobile game where you can \"farm\" or \"brute\" boxes by systematically clearing rooms and collecting items. Since the specific game files or detailed mechanic guides were not found in the current knowledge base, I will provide the answer based on general knowledge of the game:\n\nIn **Radiation Shelter**, you can farm boxes by:\n\n1. **Clearing Rooms**: Visit locations like the **Wasteland**, **Base**, or specific rooms in the game where boxes are located.\n2. **Looting**: Interact with boxes you find in these locations to collect items.\n3. **Revisiting**: Return to these areas repeatedly to find more boxes.\n\nSince the specific mechanics or updates might vary, it's recommended to check the latest in-game tips or community guides for the most accurate information."
+      },
+      "scoring_dimensions": {
+        "project_final_answer_correct": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "依冻结的原生答案或原生问答评测契约判断；不得从检索命中、历史回答或资料回读推定本轮回答正确。"
+        },
+        "question_coverage": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "逐项判断 q0 请求的全部关系/限定是否被直接回答；部分命中不能记为完全正确。"
+        },
+        "evidence_support": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "只核对本轮实际最终生成上下文中的原文证据及其是否支持回答；检索阶段命中、摘要或离线只读资料不等于本轮已提供证据。"
+        },
+        "citation_identity": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "逐条核对新回答引用的 KB、document、chunk/source identity、version 与本轮实际可回读原文；缺少引用或身份无法验证时单独记录，不能以答案正确替代。"
+        },
+        "unsupported_extras": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "记录无证据断言、与原文冲突的细节、杜撰身份/页码/版本以及不必要的建议；与核心答案分开判定。"
+        },
+        "presentation": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "记录语言、清晰度、可读性、是否准确表达不确定性；表达质量不覆盖事实或证据失败。"
+        }
+      },
+      "scoring_notes": {
+        "official_answer_string": "NOT_LOCATED_IN_LOCAL_FROZEN_GOLD_SIDECAR; DO NOT FABRICATE",
+        "native_reference_answers": [
+          "1.开局建好水电餐，宿舍。拉5S进电，加速，第一个到手。失败的话再试一次，还失败?重来吧，非洲人别玩了，实在不想重来就把人分配错，高s去水厂什么的，然后加速吧。总之不要完成2个正确分配这任务。2.把探索废土任务X了，任务左上有个小叉，这时候加速任务又出来了，加速。3.这时候会有升级和50水任务，如果差一个，完成正确分配2人，就会出来，这阶段完成50水和升级前，别完成50食物任务。4.拿到4盒子，这时候有3任务，穿武器和卖武器，还有50食物，先开箱子完成穿，卖的任务，最后完成50食物，会出现穿装备送以箱子任务，完成就5箱子了。",
+          "1、把时间自动设置功能关了，然后把时间往回调七八个月应该够用了。2、时间往回调后，进入游戏重新建号。3、进入游戏，看任务信息，新手任务都很容易完成而且比较多任务会奖励箱子，如成功启动一次极速模式奖励一个箱子简单。4、利用调时间重置任务这个功能，把不想做的任务删掉就会重新刷一个任务出来，不断的刷收集水这样的任务箱子就源源不断出来了。",
+          "开局随便做任务，可以领取3个箱子。当出现“出售一个武器或装备”之后，其他的任务尽量别做，否则容易无法触发下面的循环。放弃掉“出售一个武器或装备”，出现就放弃。放弃以后会刷出来3个任务，2个可以得到箱子（一个是收集50水，一个是升级一个小人），还有50食物的得到25瓶盖（也要做掉不能放弃）。然后循环好了，刷个20多个就可以开心的玩了。"
+        ],
+        "native_reference_answers_sha256": "d2d56cd0fd2d3f07aa19398bd23202f79190c4da527027fe6c989035acf7f90f",
+        "source_text_sha256": null,
+        "answer_comparison": "按冻结原生参考策略的语义评估是否回答 Fallout Shelter 刷箱子方法；不可要求逐字匹配，也不可将每个可选技巧当作强制项。",
+        "unsupported_answer_pattern": "泛称清房、搜刮、重复探索而未给出冻结原生任务/成就循环机制，应判不支持。",
+        "operator_diagnosis": "The proposed clear-rooms/loot/revisit procedure does not supply any frozen valid Fallout Shelter lunchbox-farming method. Native alternatives describe early achievement/task sequencing or deleting/repeating water/food/equipment tasks, with optional device-time changes. No such mechanism is answered."
+      }
+    },
+    {
+      "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+      "qid": "5a729fe55542991f9a20c53b",
+      "dataset": "hotpotqa",
+      "dataset_version": "HotpotQA-1908d6afbbead072334abe2965f91bd2709910ab",
+      "q0": "What man is credited eith inventing both the Leyden jar and the Tribometer?",
+      "q0_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+      "knowledge_base_scope": [
+        "96a9eebd-ffb2-4bc6-9bea-3ed015845479"
+      ],
+      "document_scope": [],
+      "accept_language": "en-US",
+      "frozen_gold": {
+        "dataset_version": "HotpotQA-1908d6afbbead072334abe2965f91bd2709910ab",
+        "qrels_kind": "SOURCE_DERIVED_SUPPORTING_FACT_DOCUMENT_PROJECTION",
+        "qrels": {
+          "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825": 1,
+          "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc": 1
+        },
+        "answers": [
+          "Pieter van Musschenbroek"
+        ],
+        "evaluation_metadata": {
+          "answer_scorer": "hotpot_answer_normalization_em_token_f1",
+          "gold_source": "OFFICIAL_NATIVE_ANSWER_AND_SUPPORTING_FACTS",
+          "original_split": "validation_distractor",
+          "supporting_facts": [
+            {
+              "document_id": "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+              "sentence_index_zero_based": 1,
+              "title": "Tribometer"
+            },
+            {
+              "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+              "sentence_index_zero_based": 0,
+              "title": "Pieter van Musschenbroek"
+            },
+            {
+              "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+              "sentence_index_zero_based": 2,
+              "title": "Pieter van Musschenbroek"
+            }
+          ]
+        }
+      },
+      "historical_s8_6_3": {
+        "verdict": "PARTIAL",
+        "first_failure": "SOURCE_PROJECTION",
+        "reason": "Tribometer 0.6711833 >= 0.3，通过 Rerank；短原文在 expand_neighbors 即使无邻居仍标记 rewritten，第四文档未进入扩展组，最终 UNMATERIALIZED_SELECTED_PROJECTION。"
+      },
+      "historical_original_ecs40": {
+        "final_answer_correct": "PARTIAL",
+        "answer_sha256": "7416f361ba6554e02feae806c3558ba731b10c8074a7f56afedb74e0a4a8b58e",
+        "answer": "Based on the provided reference materials, **Pieter van Musschenbroek** is credited with inventing the **Leyden jar** in 1746.\n\nThe documents do not contain any information regarding the invention of a \"Tribometer,\" nor do they mention any individual who invented both devices. Therefore, it is impossible to confirm from the available sources who invented both the Leyden jar and the Tribometer.\n\n*   **Source for Leyden Jar:**\n    *   <kb doc=\"e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc\" chunk_id=\"c7df42db-cc48-4c54-beb1-75adcba4dd4b\" kb_id=\"96a9eebd-ffb2-4bc6-9bea-3ed015845479\" /> states: \"He is credited with the invention of the first capacitor in 1746: the Leyden jar.\"\n    *   <kb doc=\"1c5fa1db320d59cba389daa592d258d7cd237eca31134a4f70efd152d7d06f4f\" chunk_id=\"e8a751ff-032c-4c8c-bb31-4eddc73b3a86\" kb_id=\"96a9eebd-ffb2-4bc6-9bea-3ed015845479\" /> defines: \"A Leyden jar, or Leiden jar, is a device that 'stores' static electricity...\"\n*   **Uncertainty regarding Tribometer:**\n    *   The provided text mentions Franklin's electrostatic machine and the Leyden jar, but makes no mention of a \"Tribometer\" or its inventor."
+      },
+      "scoring_dimensions": {
+        "project_final_answer_correct": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "依冻结的原生答案或原生问答评测契约判断；不得从检索命中、历史回答或资料回读推定本轮回答正确。"
+        },
+        "question_coverage": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "逐项判断 q0 请求的全部关系/限定是否被直接回答；部分命中不能记为完全正确。"
+        },
+        "evidence_support": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "只核对本轮实际最终生成上下文中的原文证据及其是否支持回答；检索阶段命中、摘要或离线只读资料不等于本轮已提供证据。"
+        },
+        "citation_identity": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "逐条核对新回答引用的 KB、document、chunk/source identity、version 与本轮实际可回读原文；缺少引用或身份无法验证时单独记录，不能以答案正确替代。"
+        },
+        "unsupported_extras": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "记录无证据断言、与原文冲突的细节、杜撰身份/页码/版本以及不必要的建议；与核心答案分开判定。"
+        },
+        "presentation": {
+          "status": "PENDING_RAW_ANSWER",
+          "method": "记录语言、清晰度、可读性、是否准确表达不确定性；表达质量不覆盖事实或证据失败。"
+        }
+      },
+      "scoring_notes": {
+        "official_answer": "Pieter van Musschenbroek",
+        "official_answer_scorer": "hotpot_answer_normalization_em_token_f1",
+        "required_facts": [
+          "Tribometer invention attribution to Pieter van Musschenbroek.",
+          "Same person credited for Leyden jar, preserving whether the source says 1745/1746."
+        ],
+        "supporting_sentences": [
+          {
+            "document_id": "hotpotqa-context:613eaeec55c95427baf40b1483c3fd9f897530584be4d85da0033278ba4b5825",
+            "sentence_index_zero_based": 1,
+            "title": "Tribometer",
+            "text": " It was invented by the 18th century Dutch scientist Musschenbroek",
+            "verified_original_sha256": "29baf81935dc55110ab75f4711c4502f91e9beda98a4ff12c35b4d728c10fd16",
+            "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+            "archive_member": "objects/29baf81935dc55110ab75f4711c4502f91e9beda98a4ff12c35b4d728c10fd16",
+            "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+            "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+          },
+          {
+            "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+            "sentence_index_zero_based": 0,
+            "title": "Pieter van Musschenbroek",
+            "text": "Pieter van Musschenbroek (14 March 1692 – 19 September 1761) was a Dutch scientist.",
+            "verified_original_sha256": "45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+            "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+            "archive_member": "objects/45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+            "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+            "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+          },
+          {
+            "document_id": "hotpotqa-context:e253bc4313c2daff90303f2865b6be0072dae2a515fefe1b8444172edeba21dc",
+            "sentence_index_zero_based": 2,
+            "title": "Pieter van Musschenbroek",
+            "text": " He is credited with the invention of the first capacitor in 1746: the Leyden jar.",
+            "verified_original_sha256": "45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+            "archive_path": "D:\\RAG-v6-final-ingestion-pack-r1\\attempt3-ocr-layout\\hotpotqa.zip",
+            "archive_member": "objects/45135461e62ee002e847981def562b57678361eaf0438ded47e5bddece948047",
+            "source_sentences_file": "E:\\RAG quention\\var\\reports\\v6-cohort-report-specials-r1\\attempt1\\verification-1\\inputs\\hotpotqa-sources.json",
+            "source_sentences_file_sha256": "9b7a12ba3ba381bf2a96f49fb09a8f1f8f664037c2d9326a607ca95757e40653"
+          }
+        ],
+        "question_coverage": "必须回答同一人同时与 Leyden jar 和 Tribometer 的发明归属相关；只提到一个装置即使人物正确也不足以判完全正确。",
+        "operator_diagnosis": "The answer correctly names Pieter van Musschenbroek for the Leyden jar, matching the frozen native person name only in this partial relation. However the final resolved answer explicitly says: \"Therefore, it is impossible to confirm from the available sources who invented both the Leyden jar and the Tribometer.\" Thus it does not answer the required BOTH-device relation; a correct-name occurrence is not a full correctness pass. The final provider input indeed lacks the Tribometer original, making its narrow uncertainty statement honest. Actual search had retrieved immutable original chunk 41295870-5f65-458c-b045-85280c1184a3 stating Musschenbroek invented the Tribometer, but it was dropped before generation. The model-generated search summary is excluded from original evidence. Review of the search original explains the missing joint relation without pretending it was delivered to the generator."
+      }
+    }
+  ]
+}

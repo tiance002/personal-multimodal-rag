@@ -1,0 +1,34 @@
+......................................................................F. [ 43%]
+....................................................................s... [ 87%]
+....................                                                     [100%]
+================================== FAILURES ===================================
+_____________________ test_scope_before_original[closed] ______________________
+tests\weknora_port\test_execution_fence.py:118: in test_scope_before_original
+    with pytest.raises(ProviderError): run(gate.authorize(c))
+                                       ^^^^^^^^^^^^^^^^^^^^^^
+tests\weknora_port\test_execution_fence.py:47: in run
+    def run(coro): return asyncio.run(coro)
+                          ^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+backend\weknora_port\execution.py:446: in authorize
+    self._reserve(gate, call)
+backend\weknora_port\execution.py:346: in _reserve
+    with self._ledger() as data:
+         ^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\contextlib.py:148: in __exit__
+    next(self.gen)
+backend\weknora_port\execution.py:333: in _ledger
+    os.replace(tmp, self.path)
+E   PermissionError: [WinError 5] �ܾ����ʡ�: 'E:\\RAG quention\\var\\reports\\s8-6-4\\execution-fixtures\\tmp6ueszaml\\owner.json.c5e5d3b722af48889b683ff85806f8d4.tmp' -> 'E:\\RAG quention\\var\\reports\\s8-6-4\\execution-fixtures\\tmp6ueszaml\\owner.json'
+=========================== short test summary info ===========================
+SKIPPED [1] tests\weknora_port\test_execution_linux_paths.py:31: Real POSIX resolve/flock must be tested on Linux; lexical guards above run on Windows
+FAILED tests/weknora_port/test_execution_fence.py::test_scope_before_original[closed]
+1 failed, 162 passed, 1 skipped in 11.72s

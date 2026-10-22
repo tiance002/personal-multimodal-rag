@@ -1,0 +1,20 @@
+{
+  "command": [
+    "existing-pinned-ssh",
+    "<private-target>",
+    "python3 -"
+  ],
+  "remote_command": [
+    "/usr/bin/python3.12",
+    "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629/app/scripts/ecs_acceptance_job.py",
+    "fetch",
+    "--job-root",
+    "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37-job",
+    "--destination",
+    "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 5.557500839233398,
+  "payload_sha256": "0f52afe9be5529dcd2b5a9467631ed360c252c2ba760fe40a21124f17434830c",
+  "provider_calls": "READ_ONLY_EXPORT"
+}

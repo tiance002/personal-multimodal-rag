@@ -1,0 +1,164 @@
+{
+  "schema": "s864-execution-delivery/v1",
+  "status": "EXECUTION_AND_CAPTURED_GUARDS_PASS_QUALITY_REVIEW_SEPARATE",
+  "source_revision": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "image_id": "sha256:99faa35360c8b4f73d7fc207f040a9f6a8f69b6f6dd8b1b3c8bf43e1eeafe78f",
+  "profile_sha256": "92ee355f837b10890313f076b4cda9a724c55142551e5b457c954e7c922e14c7",
+  "owner_approval_sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+  "supplement_sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+  "grant_sha256": "7c660558bc80dc744e9397e59f1321d1fc3293f136c886628356cfb584d3f4dc",
+  "accounting_mode": "reported_usage_only_v1",
+  "token_estimation": "DISABLED",
+  "completed_http_submissions": 3,
+  "completed_vision_calls": 4,
+  "provider_attempts": 16,
+  "settled": 16,
+  "unknown": 0,
+  "unsettled": 0,
+  "usage_totals": {
+    "prompt_tokens": 33302,
+    "completion_tokens": 7675,
+    "total_tokens": 40977
+  },
+  "usage_breakdown": {
+    "siliconflow/Qwen/Qwen3.5-4B/chat": {
+      "calls": 6,
+      "prompt_tokens": 11431,
+      "completion_tokens": 1135,
+      "total_tokens": 12566
+    },
+    "siliconflow/BAAI/bge-m3/embedding": {
+      "calls": 3,
+      "prompt_tokens": 56,
+      "completion_tokens": 0,
+      "total_tokens": 56
+    },
+    "siliconflow/BAAI/bge-reranker-v2-m3/rerank": {
+      "calls": 3,
+      "prompt_tokens": 17279,
+      "completion_tokens": 0,
+      "total_tokens": 17279
+    },
+    "deepseek/deepseek-flash/vision": {
+      "calls": 4,
+      "prompt_tokens": 4536,
+      "completion_tokens": 6540,
+      "total_tokens": 11076
+    }
+  },
+  "original_shared_window": {
+    "started_at": "2026-10-22T11:42:00.781661+00:00",
+    "deadline_at": "2026-10-22T12:22:00.781661+00:00",
+    "max_runtime_seconds": 2400,
+    "single_shared_http_and_vision_window": true
+  },
+  "guard_checks": {
+    "pg_unique_request_id_capability_equal_16": true,
+    "pg_outcome_usage_wire_exactly_match_child_ledgers": true,
+    "three_completed_turns_q0_scope_exact": true,
+    "captured_source_fingerprints_unchanged": true,
+    "historical_unknown_fingerprint_unchanged": true,
+    "current_vision_copy_version_hash_state_unchanged": true,
+    "current_all4_kb_cloud_allowed": true,
+    "production_ids_images_restart_counts_unchanged": true,
+    "production_compose_runtime_files_unchanged": true
+  },
+  "local_raw_output_root": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\output",
+  "raw_archive": {
+    "path": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export.tar",
+    "sha256": "442d172f2067f4acea1bb155281e68c32ee814921e2a36b814a0fad0d6a64a7e",
+    "bytes": 421529600,
+    "manifest": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\final-export\\s864-final-20261022t112810z-2bdb4629-originfix-235e37-job-export\\export-manifest.json",
+    "files": 219,
+    "all_files_stable": true
+  },
+  "first_failure": {
+    "stage": "SessionCreate403_ORIGIN_NOT_ALLOWED",
+    "question_posts": 0,
+    "provider_attempts": 0,
+    "raw_archive": "E:\\RAG quention\\var\\reports\\s8-6-4\\real-acceptance\\first-failure-export.tar",
+    "preserved": true
+  },
+  "evidence_files": {
+    "owner_approval.json": {
+      "sha256": "d74f40e1cf310350291bd7531911f3c8f5868838953719c1156facdd2929ea4f",
+      "bytes": 2171
+    },
+    "owner_supplement_vision_fix.json": {
+      "sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+      "bytes": 1896
+    },
+    "dispatch.command.json": {
+      "sha256": "2c67b4bc6b28e8bc606dbff4aad7ca8f138304d1535d6b682ef3759e7cd69287",
+      "bytes": 758
+    },
+    "dispatch-corrected.command.json": {
+      "sha256": "13fad2fe074b15646e273a37551e17abc4d9891f3f233ce01048f342b091b32f",
+      "bytes": 776
+    },
+    "final-export.command.json": {
+      "sha256": "d7eaa28c02f70dfb362409eb47a7a60d958e07b31da4020015de825fc8d10ba2",
+      "bytes": 686
+    },
+    "final-export-ready.json": {
+      "sha256": "90f7c6e238d9caa67fa6a7fa5f0457fb0ef6b40b593365cef8420b07240a1004",
+      "bytes": 613
+    },
+    "final-packet-corrected/grant.json": {
+      "sha256": "7c660558bc80dc744e9397e59f1321d1fc3293f136c886628356cfb584d3f4dc",
+      "bytes": 12273
+    },
+    "final-packet-corrected/configuration.json": {
+      "sha256": "71d7bcc16cd0fcc9d1655f9d57db958e9bfa3d9d9b207dcebc4b0c608d02206f",
+      "bytes": 3271
+    },
+    "final-packet-corrected/ready.json": {
+      "sha256": "19eaf580b63893e85901fa7defc333a01265e9c2e27dcbfc762112b7e2cffc79",
+      "bytes": 2099
+    },
+    "post-run/pg-production-source.command.json": {
+      "sha256": "9ae9a22d14b9ce55ad2e7644f12f5b9dd0b9e2ded45bda5f4d24b3c7e31083ca",
+      "bytes": 468
+    },
+    "post-run/pg-production-source.stdout": {
+      "sha256": "4f0c9269f8fee37a1fec2d392cfe4d13f2a2a10d72db4760c42b4b5130a57e50",
+      "bytes": 234208
+    },
+    "post-run/summary.json": {
+      "sha256": "7fa72e2279539589a1b8a59dc8a2a3ac8457fafdf50bd027121389c6b3d7d85c",
+      "bytes": 1440
+    },
+    "first-failure-summary.json": {
+      "sha256": "16a5be4e37a48d97cfa948c3fde2f9a544576594dd7dce871020c2454181a5f6",
+      "bytes": 504
+    },
+    "glue-validation/origin-middleware.log": {
+      "sha256": "87976b9c88662ff64de5afbb25c853abea9b2962070955a916276ba875416f99",
+      "bytes": 182
+    },
+    "glue-validation/origin-middleware.run.json": {
+      "sha256": "11e97410acaea443355be791f0563f259722fbc49f9807d6bca22393748dbea9",
+      "bytes": 277
+    },
+    "accounting-helper/red.log": {
+      "sha256": "185a13b3ce39833a42e93025c60b1fa46b488d9f9ab44e5f6f3434466e1c56cd",
+      "bytes": 30533
+    },
+    "accounting-helper/red.run.json": {
+      "sha256": "b3a160f1c93cc1e97c725f9cc2c5aabe8658a3966fb5685eba2109c1c620bfd5",
+      "bytes": 475
+    },
+    "accounting-helper/final-v2.log": {
+      "sha256": "be3b8872d1d6aa4007825e16f6a9f0006c9d31cc3a7dde925d85d55c86de4dbc",
+      "bytes": 101
+    },
+    "accounting-helper/final-v2.run.json": {
+      "sha256": "3ae52257aabc0aeed9d4ff1ca04c4738086a576a1b1b18f57dfdf96422b0fd01",
+      "bytes": 427
+    }
+  },
+  "answer_caption_quality": "ROOT_INDEPENDENT_GRADING",
+  "new_provider_calls_after_terminal": 0,
+  "production_changes": 0,
+  "commits_by_this_agent": 0
+}

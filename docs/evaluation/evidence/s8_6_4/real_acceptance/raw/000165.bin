@@ -1,0 +1,38 @@
+{
+  "schema": "s864-exact-seven-private-configuration/v1",
+  "source_revision": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+  "profile_sha256": "92ee355f837b10890313f076b4cda9a724c55142551e5b457c954e7c922e14c7",
+  "image_id": "sha256:99faa35360c8b4f73d7fc207f040a9f6a8f69b6f6dd8b1b3c8bf43e1eeafe78f",
+  "grant_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/grant.json",
+  "grant_sha256": "7c660558bc80dc744e9397e59f1321d1fc3293f136c886628356cfb584d3f4dc",
+  "owner_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/owner_approval.json",
+  "supplement_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/owner_supplement_vision_fix.json",
+  "supplement_sha256": "97af48e8958d0cf0e2ffbbb2f350f8e9d12187d1dbc94a0c20d18824f920c971",
+  "proposal_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/proposal.json",
+  "image_proof_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/image-proof.json",
+  "before_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/before.json",
+  "glue_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/exact3_http_glue.py",
+  "controller_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/exact3_http_controller.py",
+  "vision_glue_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/exact_four_vision_driver.py",
+  "vision_inputs_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/inputs/images-only-manifest.json",
+  "vision_inputs_sha256": "a38985e9aa62baf628fdb69bc9a3d9fd85c9dc6257a614883d8e799561105ed4",
+  "execution_batch_root": "/opt/rag-s8/state/executions/s864-final-20261022t112810z-2bdb4629-originfix-235e37",
+  "owner_state_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/owner-state",
+  "container_prefix": "s864-final-20261022t112810z-2bdb4629-originfix-235e37",
+  "summary_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/http-summary.json",
+  "batch_summary_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/batch-summary.json",
+  "batch_window_file": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/batch-window/window.json",
+  "batch_window_seed": {
+    "started_at": "2026-10-22T11:42:00.781661+00:00",
+    "deadline_at": "2026-10-22T12:22:00.781661+00:00",
+    "max_runtime_seconds": 2400,
+    "single_shared_http_and_vision_window": true
+  },
+  "vision_output_directory": "/opt/rag-s8/diagnostics/s864-final-20261022t112810z-2bdb4629-originfix-235e37/vision-output",
+  "model_ids": {
+    "cheap": "mdlf5350f8b80d8971c14ddaa8524f8a039d414e85c35a657e4271228473b25e",
+    "rerank": "mdl3076be3c32a0a17f8e9cf5deef89452a9f8886163b0aebd8aa4d1130958e3",
+    "embedding": "mdlebb9931ff609b45a70a6c29c6712caa66c6b657ce4d1f802ee114bed2e779",
+    "expensive": "mdlfc056bbbf8448d15f3d4f3cd954756be9a34bb7f104e137cde38dc360b749"
+  }
+}
