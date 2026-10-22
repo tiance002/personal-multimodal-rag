@@ -79,3 +79,37 @@ S8.3-R两地508文件和包版本相同但Image ID不同，未观察到因此发
 ## 已完成的模拟入档（不计真实事故）
 
 `SIM-COMMAND-EXIT-001`：模拟中间源码检查exit1/`SOURCE_HASH_MISMATCH`被末条`git status`exit0掩盖。合成修复是逐条立即保存退出码并传播失败，夹具中的匹配/不匹配分支为exit0/exit1；没有实际部署或业务发送。完整填写的事件、证据与回退判断保存在 [模拟事件产物](../../../../docs/deployment/ecs-skill/evidence/behavior-v1.json)。既有“命令exit＋语义status”规则已覆盖，实际只补本案例和测试，不新增主流程。该条目是模拟验证，不是新增真实故障或实战修复PASS。
+
+## S8.6.2-R3后续真实事件（2026-10-22）
+
+证据入口：[ECS40真实HTTP测评](../../../../docs/evaluation/S8_6_2_R3_ECS40_ACCEPTANCE.md)及同名results.json；私有原件`E:/RAG quention/var/reports/s8-6-2-r3/followup40/`。只补已发生事件，主Skill规则未改。
+
+### ECS-008 不支持的NanoCPUs（REAL / VERIFIED）
+
+- **阶段/现象**：零发送初始化`docker run --cpus 2`退出125，原文`NanoCPUs can not be set, as your kernel does not support CPU CFS scheduler or the cgroup is not mounted`；Provider0，尚无grant/子账本。
+- **修复/证据**：仅移除不支持的启动参数，保留1GiB内存限制；严格核对原错误、空命名空间及相同PG基线后保存原stop，零发送恢复exit0。新镜像、源码、依赖及模型绑定不变，最终38题完成。
+- **识别→动作**：核对实际内核能力与精确错误；不要把Docker启动拒绝当Provider失败，也不要为资源参数重发已提交问答。
+
+### ECS-009 只读对账进程缺运行环境前缀（REAL / VERIFIED）
+
+- **阶段/现象**：首题HTTP正常完成、4调用SETTLED/10,755Tokens；对账子进程在连接PG前报`RuntimeConfigurationError`，因为`runtime_environment()`要求Redis前缀，辅助容器未提供。
+- **修复/证据**：补独立只读诊断前缀；只读回查原request_id，PG/Local/wire键集合、usage及原始终止帧一致，关闭原账本且条目不变。保存原FAIL/STOP，仅续37个未提交案例。
+- **识别→动作**：区分诊断环境装配失败和已发生模型调用；禁止用新POST修复结果收集器。
+
+### ECS-010 保留容器触发历史枚举上限（REAL / VERIFIED）
+
+- **阶段/现象**：26份账本已CLOSED、105调用/276,649Tokens结算后，只读检查的`docker ps -a --filter name=s862r`结果超过100，脚本预条件拒绝；并非新UNKNOWN或源数据变化。
+- **修复/证据**：枚举限定到本次不可变package前缀，保留100上限及所有旧容器；核对26份闭合证书、12个空子账本和当前来源/旧UNKNOWN后保存原stop，仅发送剩12题。最终158调用/364,593Tokens全部结算。
+- **识别→动作**：历史容器数量不代表活跃执行；来源保护继续核对实际正式API/Worker、PG、索引及原始来源指纹，不删除容器凑检查通过。
+
+### ECS-011 证据导出的路径与重复元数据体积（REAL / VERIFIED）
+
+- **阶段/现象**：SSH gzip传输成功但Windows279字符路径读取失败；后续MML审计单文件约54MB、重复Go-map `parser_metadata`令原始记录达1,094,806,489字节，触发只读导出32MiB/512MiB护栏。
+- **修复/证据**：使用Windows扩展路径，原归档离线恢复；仅诊断快照上限改为128MiB/3GiB，保留文件数上限与逐文件SHA校验。3307原文件完整保存；分析投影对重复parser_metadata先完整哈希，再按唯一哈希保留一次原文，不裁剪知识原文/实际Provider请求。
+- **等级/边界**：最终原始gzip129,799,439字节、SHA256`5f06ca3479bf4d3dad5548183ce8fcbf5a20af10056bfae4d8735e5e35cb93a6`；导出和投影均零Provider、零远端源数据修改。资源峰值NOT_RECORDED。
+
+### ECS-012 在正式API共享cgroup内整库导出（REAL / PARTIAL）
+
+- **阶段/现象**：已取消的旧预算预检通过正式API的`docker exec`整库导出，出现OOM事件1792640739和空stdout；API原容器仍运行、重启0、随后鉴权健康检查exit0，OOM标志变化已记录。
+- **证据等级**：共享1GiB cgroup和Docker OOM事件已证实；未记录内存峰值及具体分配，不能声称所有内存根因已完整定位，也不能声称从未OOM。
+- **后继**：后续元数据检查改用独立只读容器；Owner取消数值预检后停止整库导出，失败材料保留。38题实际问答的诊断容器终止检查无新增OOM。未删除/重建正式服务、数据库或旧UNKNOWN。
