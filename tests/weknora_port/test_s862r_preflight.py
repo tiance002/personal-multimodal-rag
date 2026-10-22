@@ -2,6 +2,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
+from dataclasses import replace
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -13,7 +14,8 @@ from backend.weknora_port.models.provider import ProviderModel
 from backend.weknora_port.models.request import build_embedding_body
 from backend.weknora_port.models.types import CallContext, TrustedScope
 from backend.weknora_port.retrieval.pipeline import RetrievalPipeline
-from backend.weknora_port.service import TurnConfiguration
+from backend.weknora_port.service import TurnConfiguration, AcceptedTurn, OrdinaryTurnRequest
+from backend.weknora_port.conversation.types import MemoryContext
 from test_s86_pipeline_integration import Repo, Registry, Models, state
 from test_s861_preflight import INVENTORY, ORIGINALS, authorization_files, write_json, guarded_runtime
 
@@ -57,6 +59,91 @@ def test_bounded_profile_accepts_ordinary_expensive_baseline_with_explicit_cheap
     current = asyncio.run(runtime.ordinary.configuration(turn))
     assert current.pipeline_state.chat_model_id == 'ordinary-expensive'
     assert current.pipeline_state.query_understand_model_id == current.pipeline_state.bridge_cheap_model_id == 'approved-qu'
+
+
+def accepted_client_fixture():
+    runtime, base, old, approved, resolutions = guarded_runtime()
+    client_id = approved['turns'][0]['request_id']
+    request = OrdinaryTurnRequest('offline-session', old.request.content, old.run_id,
+        knowledge_base_scope=profile.KB_IDS, document_scope=profile.DOCUMENT_IDS, reasoning_effort='off',
+        accept_language='en-US')
+    turn = AcceptedTurn(old.run_id, request.session_id, 'user-message', 'assistant-message',
+        replace(old.context, session_id=request.session_id), MemoryContext(332, old.context.scope.owner_id),
+        request, is_new=True, replay_only=False, client_request_id=client_id)
+    return runtime, base, turn, approved, resolutions
+
+
+def test_accepted_client_identity_authorizes_original_client_and_preserves_server_run():
+    runtime, base, turn, approved, resolutions = accepted_client_fixture()
+    context, request = turn.context, turn.request
+    profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+    result = asyncio.run(runtime.ordinary.configuration(turn))
+    assert resolutions == [turn] and result.pipeline_state.query == turn.request.content
+    assert turn.context is context and turn.request is request
+    assert turn.client_request_id == approved['turns'][0]['request_id']
+    assert turn.request.request_id == turn.context.request_id == turn.run_id != turn.client_request_id
+
+
+@pytest.mark.parametrize('client', ['', None, 's861-unknown-client'])
+def test_accepted_client_identity_missing_unknown_denied_without_nested_request_fallback(client):
+    runtime, base, turn, approved, resolutions = accepted_client_fixture()
+    # An adversarial/incomplete AcceptedTurn cannot gain admission from a
+    # nested request_id that happens to equal an approved HTTP client ID.
+    turn = replace(turn, client_request_id=client,
+        request=replace(turn.request, request_id=approved['turns'][0]['request_id']))
+    profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+    with pytest.raises(ValueError, match='S861_APPROVED_TURN_REQUIRED'):
+        asyncio.run(runtime.ordinary.configuration(turn))
+    assert resolutions == []
+
+
+def test_accepted_client_identity_cannot_rebind_to_second_server_run():
+    runtime, base, turn, approved, resolutions = accepted_client_fixture()
+    profile.install_profile(runtime, approved_batch=approved, expires_at=datetime.now(timezone.utc)+timedelta(hours=1))
+    asyncio.run(runtime.ordinary.configuration(turn))
+    other_id = '11111111-1111-4111-8111-111111111111'
+    other = replace(turn, run_id=other_id, request=replace(turn.request, request_id=other_id),
+        context=replace(turn.context, request_id=other_id))
+    with pytest.raises(ValueError, match='S861_CLIENT_REQUEST_ALREADY_BOUND'):
+        asyncio.run(runtime.ordinary.configuration(other))
+    assert resolutions == [turn]
+
+
+def test_accepted_client_identity_qu_body_lookup_uses_client_but_model_context_uses_server_run(bounded_report, tmp_path):
+    from backend.weknora_port.retrieval.query import understand_query
+    runtime, base, turn, approved, _ = accepted_client_fixture()
+    approved.update(model_ids=bounded_report['model_ids'], qu_model_id=bounded_report['model_ids']['cheap'],
+        qu_request_sha256s={turn.client_request_id: bounded_report['records']['compare:query_structure_v1:QU']['body_sha256']})
+    base.pipeline_state.chat_model_id = bounded_report['model_ids']['expensive']
+    base.pipeline_state.query_understand_model_id = base.pipeline_state.bridge_cheap_model_id = approved['qu_model_id']
+    base.pipeline_state.rerank_model_id = bounded_report['model_ids']['rerank']
+    seen = []
+    class Model:
+        config = real_config('cheap')
+        def build_request_body(self, messages, options):
+            return ProviderModel(self.config, None).build_request_body(messages, options)
+        async def chat(self, messages, options, context):
+            seen.append(context.request_id)
+            return SimpleNamespace(content=json.dumps({'rewrite_query': turn.request.content,
+                'query_type':'SIMPLE_COMPARE','intent':'kb_search','image_description':''}), finish_reason='stop')
+    async def factory(active_turn, progress):
+        return RetrievalPipeline(Repo(), Registry(Model()), on_progress=progress)
+    runtime.ordinary.pipeline_factory = factory
+    profile.install_profile(runtime, tmp_path, approved_batch=approved,
+        expires_at=datetime.now(timezone.utc)+timedelta(hours=1), bounded_query_profile=True)
+    async def exercise():
+        cfg = await runtime.ordinary.configuration(turn)
+        pipeline = await runtime.ordinary.pipeline_factory(turn, None)
+        await understand_query(cfg.pipeline_state, turn.context, pipeline.registry)
+        await pipeline._progress('understand', 'completed')
+        return cfg.pipeline_state
+    current = asyncio.run(exercise())
+    assert seen == [turn.run_id + '/query_rewrite']
+    assert current.rewrite_query == turn.request.content and current.query_type == 'SIMPLE_COMPARE'
+    records = [json.loads(path.read_text(encoding='utf8')) for path in tmp_path.glob('*.profile.json')]
+    wire = next(row for row in records if row['stage']=='query_understanding_wire')
+    assert wire['fields']['body_sha256'] == approved['qu_request_sha256s'][turn.client_request_id]
+    assert runtime._s862r_raw_qu_outputs[turn.run_id]['request_id'] == seen[0]
 
 
 @pytest.mark.parametrize('overflow,finish', [(True, 'stop'), (False, 'length'), (False, '')])

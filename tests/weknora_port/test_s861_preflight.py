@@ -165,11 +165,12 @@ def guarded_runtime(mode='query_structure_v1'):
         calls.append(turn)
         return base
     runtime = SimpleNamespace(ordinary=SimpleNamespace(configuration=configuration))
-    turn = SimpleNamespace(run_id=str(uuid.uuid4()), request=SimpleNamespace(
-        request_id='s861-offline-bound', content=profile.QUESTIONS['compare']),
+    turn = SimpleNamespace(run_id=str(uuid.uuid4()), client_request_id='s861-offline-bound', request=SimpleNamespace(
+        request_id='', content=profile.QUESTIONS['compare']),
         context=CallContext(str(uuid.uuid4()), TrustedScope('approved-user', profile.KB_IDS, profile.DOCUMENT_IDS)))
     turn.context = replace(turn.context, request_id=turn.run_id)
-    approved = {'qu_model_id': 'approved-qu', 'turns': [{'request_id': turn.request.request_id,
+    turn.request.request_id = turn.run_id
+    approved = {'qu_model_id': 'approved-qu', 'turns': [{'request_id': turn.client_request_id,
         'question': turn.request.content, 'mode': mode}]}
     return runtime, base, turn, approved, calls
 
@@ -184,7 +185,8 @@ def test_guard_preserves_normal_server_uuid_and_exact_approved_configuration():
     initial_context = turn.context
     install_guard(runtime, approved)
     result = asyncio.run(runtime.ordinary.configuration(turn))
-    assert uuid.UUID(turn.run_id) and turn.run_id != turn.request.request_id
+    assert uuid.UUID(turn.run_id) and turn.run_id != turn.client_request_id
+    assert turn.request.request_id == turn.run_id
     assert turn.context is initial_context and turn.context.request_id == turn.run_id
     assert calls == [turn]
     assert result.pipeline_state.query == turn.request.content
@@ -299,7 +301,7 @@ def test_approved_fresh_empty_context_forwards_normal_factory_and_progress():
 def test_guard_rejects_turn_or_resolved_contract_drift(mutation, code, before_resolution):
     runtime, base, turn, approved, calls = guarded_runtime()
     if mutation == 'question': turn.request.content += ' extra question'
-    elif mutation == 'client': turn.request.request_id = 's861-unapproved'
+    elif mutation == 'client': turn.client_request_id = 's861-unapproved'
     elif mutation == 'kb': turn.context = replace(turn.context, scope=TrustedScope('approved-user', ('other-kb',), profile.DOCUMENT_IDS))
     elif mutation == 'document': turn.context = replace(turn.context, scope=TrustedScope('approved-user', profile.KB_IDS, ()))
     elif mutation == 'mode': base.pipeline_state.retrieval_strategy_mode = 'off'

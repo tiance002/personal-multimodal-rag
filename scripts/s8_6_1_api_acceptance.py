@@ -128,6 +128,14 @@ def _require_query_bound(state):
     return effective
 
 
+def _accepted_client_request_id(turn):
+    # Storage binds request.request_id to the server run UUID. Only this
+    # separately retained admission field identifies the original HTTP client.
+    client_id = getattr(turn, 'client_request_id', None)
+    require(isinstance(client_id, str) and bool(client_id), 'S861_APPROVED_TURN_REQUIRED')
+    return client_id
+
+
 class _ObservedQueryRegistry:
     """Delegate the real registry/model; retain raw QU return privately only."""
     def __init__(self, registry, observe, before=None):
@@ -205,7 +213,7 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
     async def configuration(turn):
         if approved_batch is not None:
             require(expires_at is not None and expires_at > datetime.now(timezone.utc), 'S861_AUTH_EXPIRED')
-            client_id = turn.request.request_id
+            client_id = _accepted_client_request_id(turn)
             allowed = [row for row in approved_batch['turns'] if row['request_id'] == client_id]
             require(len(allowed) == 1 and allowed[0]['question'] == turn.request.content,
                     'S861_APPROVED_TURN_REQUIRED')
@@ -313,7 +321,7 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
                     def check_qu_body(model, messages, options, context):
                         if approved_batch is None:
                             return
-                        expected = approved_batch.get('qu_request_sha256s', {}).get(turn.request.request_id)
+                        expected = approved_batch.get('qu_request_sha256s', {}).get(_accepted_client_request_id(turn))
                         if expected is None:
                             raise ValueError('S862R_EXACT_QU_PREFLIGHT_REQUIRED')
                         body = model.build_request_body(messages, options)
