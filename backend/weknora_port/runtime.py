@@ -348,7 +348,7 @@ class ApplicationRuntime:
         self.ordinary = BoundOrdinaryService(
             self, self.turns, store, self.history, OrdinaryMemoryLoader(self.memory, self.memory_models.origin_knowledge_bases),
             configuration=self._configuration, pipeline_factory=self._pipeline,
-            generation_factory=self._generation)
+            generation_factory=self._generation, document_clarifier=self._document_scope_clarification)
 
     async def _make_model(self,config,key,gate):
         from .models.local_ollama import local_connection_config
@@ -463,6 +463,51 @@ class ApplicationRuntime:
             "SELECT id,title,knowledge_base_scope,document_scope FROM sessions WHERE "
             "tenant_id=%s AND subject_id=%s AND deleted_at IS NULL ORDER BY created_at,id",
             (principal.tenant_id, principal.subject_id))
+
+    async def update_session_document_scope(self, principal, session_id, document_ids):
+        self._owner(principal)
+        return await self.turns.update_document_scope(session_id,document_ids,principal)
+
+    async def _document_scope_clarification(self, turn, language):
+        import re
+        query=turn.request.content
+        # Only singular document references require an identity. Ordinary
+        # questions may legitimately retrieve evidence from several documents.
+        reference=re.search(r'(?:这|那)(?:一)?(?:份|个|篇|本)\s*(?:技术)?(?:文档|文件|规范|标准|报告|课件|PPT)|(?:上述|该)\s*(?:技术)?(?:文档|文件|规范|标准|报告|课件|PPT)|\b(?:this|that|above)\s+(?:(?:technical|current)\s+)?(?:document|file|specification|standard|report|presentation|PPT)\b',query,re.I)
+        documents=turn.context.scope.document_ids
+        if not reference or len(documents)==1:return None
+        if len(documents)>1 and re.search(r'比较|对比|差异|\bcompar(?:e|ing|ison)\b|\bdifferences?\b',query,re.I):
+            return None
+        async with self.leases.lease() as guard:
+            await self.turns._session(guard,turn.session_id,self.principal)
+            await self.turns._resources(guard,turn.context.scope.knowledge_base_ids,documents)
+            rows=await (await guard.connection.execute(
+                "SELECT id,knowledge_base_id,title,file_name FROM knowledges WHERE tenant_id=%s "
+                "AND knowledge_base_id=ANY(%s) AND deleted_at IS NULL AND enable_status='enabled' "
+                "AND (%s::boolean OR id=ANY(%s)) ORDER BY knowledge_base_id,title,id",
+                (self.principal.tenant_id,list(turn.context.scope.knowledge_base_ids),not bool(documents),list(documents)))).fetchall()
+        if len(rows)<=1:return None
+        # A unique literal persisted title or filename establishes identity for
+        # this question. It never changes the session's explicit ID selection.
+        literal=query.strip().casefold()
+        named={row['id'] for row in rows if any(value and value.strip() and value.strip().casefold() in literal
+            for value in (row.get('title'),row.get('file_name')))}
+        if len(named)==1:return None
+        # Persist the real catalog in the ordinary answer, so choices also
+        # survive history reload. Selection itself uses the authorized PATCH.
+        english=language.startswith('English')
+        heading=('There are multiple documents in the selected scope. Which document do you mean?'
+                 if english else '当前知识库中有多份文档，你想查询哪一份？')
+        choices=[]
+        for row in rows:
+            title=row.get('title') or row.get('file_name') or row['id']
+            title=re.sub(r'[\r\n]+',' ',title)
+            filename=re.sub(r'[\r\n]+',' ',row.get('file_name') or '')
+            if filename and filename!=title:title+=f' / {filename}'
+            choices.append(f"- {title}（Document ID: {row['id']}）")
+        instruction=('Select the document in Retrieval scope and apply the selection, then send your question again.'
+                     if english else '请在“检索范围”中选择对应资料并点击“应用文档范围”，再发送问题。')
+        return heading+'\n\n'+'\n'.join(choices)+'\n\n'+instruction
 
     async def list_messages(self, principal, session_id):
         self._owner(principal)

@@ -75,6 +75,30 @@ class PostgresTurnRepository:
         await self._resources(guard,kbs,docs)
         return ScopeSnapshot(request.content,kbs,docs)
 
+    async def update_document_scope(self,session_id,document_ids,principal):
+        self._owner(principal)
+        docs=tuple(sorted(set(document_ids)))
+        async with self.leases.lease() as guard:
+            async with guard.connection.transaction():
+                session=await self._session(guard,session_id,principal)
+                kbs=_tuple(session['knowledge_base_scope'])
+                if not kbs and session.get('knowledge_base_id'):kbs=(session['knowledge_base_id'],)
+                await self._resources(guard,kbs,docs)
+                await guard.connection.execute('UPDATE sessions SET document_scope=%s::jsonb,updated_at=now() WHERE id=%s AND tenant_id=%s AND subject_id=%s AND deleted_at IS NULL',
+                    (_json(docs),session_id,*self._owner(principal)))
+                return {'id':session_id,'title':session.get('title') or '',
+                        'knowledge_base_scope':list(kbs),'document_scope':list(docs)}
+
+    async def _validate_snapshot(self,guard,row,session):
+        # The session selection is a preference for NEW requests. A claimed
+        # turn keeps its immutable scope, while current resource access remains
+        # mandatory for continuation, stop and idempotent request replay.
+        ceiling=_tuple(session['knowledge_base_scope'])
+        if not ceiling and session.get('knowledge_base_id'):ceiling=(session['knowledge_base_id'],)
+        kbs,docs=_tuple(row['knowledge_base_scope']),_tuple(row['document_scope'])
+        if not set(kbs).issubset(ceiling):raise ProviderError('TURN_SESSION_SCOPE_CHANGED')
+        await self._resources(guard,kbs,docs)
+
     @staticmethod
     def _request_configuration(request, *, include_order=True):
         value={name:getattr(request,name) for name in ('summary_model_id','reasoning_effort','accept_language') if getattr(request,name)}
@@ -113,16 +137,21 @@ class PostgresTurnRepository:
             guard.require_verified();conn=guard.connection
             async with conn.transaction():
                 session=await self._session(guard,request.session_id,principal)
-                snapshot=await self._resolve(guard,request,session);payload=self._payload(request,snapshot)
                 rows=await self._rows(guard,'SELECT * FROM port_turns WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND client_request_id=%s FOR UPDATE',(*self._owner(principal),request.session_id,request.request_id))
                 if rows:
                     row=rows[0]
+                    await self._validate_snapshot(guard,row,session)
+                    snapshot=ScopeSnapshot(request.content,
+                        tuple(sorted(set(request.knowledge_base_scope or _tuple(row['knowledge_base_scope'])))),
+                        tuple(sorted(set(request.document_scope or _tuple(row['document_scope'])))))
+                    payload=self._payload(request,snapshot)
                     if row['payload_sha256']!=payload:
                         # v1 history did not capture order; preserve equivalent replay, never resend.
                         if row.get('request_configuration') or self._request_configuration(request,include_order=False) or row['payload_sha256']!=self._payload(request,snapshot,include_order=False):
                             raise ProviderError('TURN_REQUEST_PAYLOAD_CONFLICT')
                     await self._messages(guard,row)
                     return self._accepted(row)
+                snapshot=await self._resolve(guard,request,session);payload=self._payload(request,snapshot)
                 # Recover source-existing messages without starting their run again.
                 old=await self._rows(guard,"SELECT id,role,content,knowledge_base_scope,document_scope FROM messages WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND request_id=%s AND deleted_at IS NULL",(*self._owner(principal),request.session_id,request.request_id))
                 new=not old
@@ -155,9 +184,7 @@ class PostgresTurnRepository:
             async with guard.connection.transaction():
                 session=await self._session(guard,session_id,principal)
                 row=await self._row(guard,session_id,assistant_message_id)
-                snapshot=await self._resolve(guard,self._accepted(row).request,session)
-                if snapshot.knowledge_base_ids!=_tuple(row['knowledge_base_scope']) or snapshot.document_ids!=_tuple(row['document_scope']):
-                    raise ProviderError('TURN_SESSION_SCOPE_CHANGED')
+                await self._validate_snapshot(guard,row,session)
                 await self._messages(guard,row)
                 return self._accepted(row)
 

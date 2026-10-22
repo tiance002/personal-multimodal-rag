@@ -15,9 +15,15 @@ import inspect
 import json
 import os
 from pathlib import Path
+import sys
 import time
 from urllib.parse import urlsplit
 import uuid
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from scripts.s8_6_4_language import expected_profile_language, message_headers as _language_headers, policy_manifest
 
 PROMPT_B_SUFFIX = (
     'When the supplied evidence contains sufficient information, perform the necessary verifiable calculation or logical inference instead of refusing solely because the result is not stated verbatim.\n'
@@ -99,16 +105,35 @@ def _row(row):
     return asdict(row) if is_dataclass(row) else row
 
 
-def _budget_state_guard(state):
+def profile_request_headers(q0, base=None, explicit_override=None):
+    headers = _language_headers(base or {}, q0, explicit_override)
+    expected, _ = expected_profile_language(q0, explicit_override)
+    require(headers.get('Accept-Language') == expected, 'S864_REQUEST_LANGUAGE_HEADER_MISMATCH')
+    return headers
+
+
+def profile_language_guard(actual_language, q0, explicit_override=None):
+    locale, expected_language = expected_profile_language(q0, explicit_override)
+    require(actual_language == expected_language, 'S864_PROFILE_LANGUAGE_MISMATCH')
+    return {'expected_locale': locale, 'expected_language': expected_language,
+        'actual_language': actual_language, 'matched': True}
+
+
+def _request_language_override(turn):
+    request = turn.request
+    return getattr(request, 'answer_language', None) or getattr(request, 'accept_language', None)
+
+
+def _budget_state_guard(state, q0, explicit_override=None):
     from backend.weknora_port.retrieval.pipeline import PipelineState
     defaults = PipelineState()
     require(all(getattr(state, name) == getattr(defaults, name) for name in
         ('rewrite_system_prompt', 'rewrite_user_prompt', 'context_template'))
-        and state.language == 'English'
         and not any(getattr(state, name) for name in
             ('attachment_prompt', 'images', 'quoted_context', 'system_prompt_override',
              'intent_system_prompts', 'global_intent_system_prompts')),
         'S861_PREFLIGHT_PROMPT_CONFIGURATION_CHANGED')
+    profile_language_guard(state.language, q0, explicit_override)
     require(not state.history and not state.memory_background, 'S861_PREFLIGHT_FRESH_CONTEXT_REQUIRED')
 
 
@@ -258,7 +283,8 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
                 require(base.fallback.get('prompt') in ('', expected_fallback)
                     and base.fallback.get('options') == chat,
                     'S861_PREFLIGHT_FALLBACK_CONFIGURATION_CHANGED')
-            _budget_state_guard(base.pipeline_state)
+            _budget_state_guard(base.pipeline_state, turn.request.content,
+                _request_language_override(turn))
             if bounded_query_profile:
                 ids = approved_batch.get('model_ids', {})
                 require(base.pipeline_state.bridge_cheap_model_id == ids.get('cheap')
@@ -284,7 +310,8 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
     def observe_progress(turn, progress):
         async def observed(stage, status, **fields):
             if approved_batch is not None and stage == 'understand' and status == 'started':
-                _budget_state_guard(states[turn.run_id])
+                _budget_state_guard(states[turn.run_id], turn.request.content,
+                    _request_language_override(turn))
             save(turn.run_id, stage, status, fields)
             if progress is not None:
                 output = progress(stage, status, **fields)
@@ -294,6 +321,9 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
 
     def enforce_completed_query(turn):
         state = states[turn.run_id]
+        language = profile_language_guard(state.language, turn.request.content,
+            _request_language_override(turn))
+        save(turn.run_id, 'profile_language', 'validated', language)
         if not bounded_query_profile:
             return
         raw = qu_outputs.get(turn.run_id)
@@ -319,7 +349,8 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
         def wrap(factory, factory_name):
             async def composed(turn, progress, **kwargs):
                 if approved_batch is not None:
-                    _budget_state_guard(states[turn.run_id])
+                    _budget_state_guard(states[turn.run_id], turn.request.content,
+                    _request_language_override(turn))
                 if factory_name == 'generation_factory':
                     enforce_completed_query(turn)
                 result = factory(turn, observe_progress(turn, progress), **kwargs)
@@ -372,7 +403,11 @@ def profile_manifest(*, bounded_query_profile=False):
         'question_inputs': QUESTIONS, 'modes': list(MODES),
         'session_fields': {'source_evidence_mode': 'bounded_source_v1'},
         'knowledge_base_ids': list(KB_IDS), 'document_ids': list(DOCUMENT_IDS),
-        'accept_language': 'en-US', 'reasoning_effort': 'off',
+        'answer_language_policy': policy_manifest(),
+        'accept_language_by_case': {case: expected_profile_language(q)[0]
+            for case, q in ({'compare': BOUNDED_QUESTIONS['compare']}
+                if bounded_query_profile else QUESTIONS).items()},
+        'reasoning_effort': 'off',
         'prompt_b_suffix': PROMPT_B_SUFFIX,
         'prompt_b_suffix_sha256': digest(PROMPT_B_SUFFIX.encode()),
         'default_original_system_sha256': digest(original.encode()),
@@ -689,14 +724,16 @@ async def dry_run_inventory(inventory_path, source_path, *, bounded_query_profil
             capture = QueryCapture(case, mode)
             class Registry:
                 async def chat(self, *args): return capture
-            state = PipelineState(query=q0, rewrite_query=q0, language='English',
+            state = PipelineState(query=q0, rewrite_query=q0,
+                language=expected_profile_language(q0)[1],
                 chat_model_id=configs['cheap'].model_id, query_understand_model_id=configs['cheap'].model_id,
                 retrieval_strategy_mode=mode, source_evidence_mode='bounded_source_v1')
             await understand_query(state, ctx, Registry())
     if bounded_query_profile:
         for case, q0 in QU_ONLY_QUESTIONS.items():
             capture = QueryCapture('qu-only:' + case, 'query_structure_v1', q0)
-            state = PipelineState(query=q0, rewrite_query=q0, language='English',
+            state = PipelineState(query=q0, rewrite_query=q0,
+                language=expected_profile_language(q0)[1],
                 chat_model_id=configs['cheap'].model_id, query_understand_model_id=configs['cheap'].model_id,
                 retrieval_strategy_mode='query_structure_v1', source_evidence_mode='bounded_source_v1')
             await understand_query(state, ctx, Registry())
@@ -963,11 +1000,12 @@ async def collect_qu_only(output, environment=None, *, settings_factory=None):
                 context = CallContext(spec['request_id'], TrustedScope(runtime.principal.subject_id,
                     KB_IDS, DOCUMENT_IDS), session_id=session['id'])
                 state = PipelineState(query=spec['question'], rewrite_query=spec['question'],
-                    language='English', chat_model_id=batch['model_ids']['cheap'],
+                    language=expected_profile_language(spec['question'],
+                        spec.get('answer_language'))[1], chat_model_id=batch['model_ids']['cheap'],
                     query_understand_model_id=batch['model_ids']['cheap'],
                     retrieval_strategy_mode='query_structure_v1', source_evidence_mode='bounded_source_v1',
                     enable_expansion=False)
-                _budget_state_guard(state)
+                _budget_state_guard(state, spec['question'], spec.get('answer_language'))
                 require(query_input_bound(state.query)['valid'], 'PROFILE_INPUT_BOUND_EXCEEDED')
                 raw = []
                 prefix = f'{number:02d}-{spec["case"]}'
@@ -1042,7 +1080,7 @@ async def collect_http(base_url, batch_id, output, environment=None):
         'profile_sha256': digest(profile_manifest(bounded_query_profile=bounded)), 'authorization_file_sha256':
         digest(Path(environment['S861_AUTHORIZATION_FILE']).read_bytes())})
     headers = {'Authorization': 'Bearer ' + api_token(environment),
-        'Origin': 'http://127.0.0.1:5173', 'Accept-Language': 'en-US'}
+        'Origin': 'http://127.0.0.1:5173'}
     results = []
     async with httpx.AsyncClient(base_url=base_url.rstrip('/'), headers=headers,
                                  timeout=httpx.Timeout(300.0, connect=10.0)) as client:
@@ -1066,7 +1104,10 @@ async def collect_http(base_url, batch_id, output, environment=None):
             blocks = []
             # Preserve response bytes incrementally even on timeout/disconnect.
             with (target / (prefix + '.sse')).open('xb') as raw:
-                async with client.stream('POST', f'/api/v1/sessions/{sid}/messages', json=body) as response:
+                request_headers = profile_request_headers(spec['question'], headers,
+                    spec.get('answer_language'))
+                async with client.stream('POST', f'/api/v1/sessions/{sid}/messages', json=body,
+                                         headers=request_headers) as response:
                     status_code = response.status_code
                     async for chunk in response.aiter_bytes():
                         raw.write(chunk); raw.flush(); blocks.append(chunk)

@@ -80,7 +80,7 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
     runtime, stored, sql_trace = assembled_runtime(monkeypatch,
         ConversationSettings(query_understand_model_id=ids['cheap']))
     qu_calls, embedding_query_inputs, reranks, search_calls, active, peak = [], [], [], [], [0], [0]
-    sources = {}
+    sources, source_reads = {}, []
     class QueryProvider:
         config = configs['cheap']
         def build_request_body(self, messages, options):
@@ -127,11 +127,15 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
                 sources[row.id]=row
                 return [deepcopy(row)]
             finally: active[0]-=1
-        async def get_chunks(self, identifiers, context):
+        async def get_chunks(self, identifiers, context, *, current=False):
+            source_reads.append((tuple(identifiers),current))
+            assert all(sources[key].knowledge_base_id in context.scope.knowledge_base_ids
+                and sources[key].knowledge_id in context.scope.document_ids for key in identifiers)
             return {key:deepcopy(sources[key]) for key in identifiers}
         async def get_chunk_children(self,*args): return []
         async def get_faq_answers(self,*args): return {}
-        async def get_source_unit(self, anchor, context): return [deepcopy(sources[anchor.id])]
+        async def get_source_unit(self, anchor, context):
+            raise AssertionError('Removed Source Unit window must not run')
     source_repository = SourceRepository()
     answer = ('A Leyden jar stores charge using separated conductors and glass <ref id="c1"/>. '
         'Franklin bells indicate electrostatic charge using a moving clapper <ref id="c2"/>.')
@@ -173,6 +177,12 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
     service=RuntimeService(TurnStorage(),store,SimpleNamespace(load=history),SimpleNamespace(load=memory),
         configuration=runtime._configuration,pipeline_factory=pipeline_factory,generation_factory=generation_factory,
         poll_seconds=.001)
+    chain_errors=[]
+    publish_error=service.publish_error
+    async def record_chain_error(turn,error):
+        chain_errors.append((type(error).__name__,str(error)))
+        await publish_error(turn,error)
+    service.publish_error=record_chain_error
     runtime.ordinary=service
     client_id='s861-r3-offline-'+('period' if recovered_terminal_period else 'json')
     approved={'qu_model_id':ids['cheap'],'model_ids':ids,'turns':[{'request_id':client_id,
@@ -198,7 +208,7 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
             replay=await client.get('/api/v1/sessions/continue-stream/'+sid,params={'message_id':'assistant-msg'})
             return profile.parse_sse(result.text),profile.parse_sse(replay.text)
     frames,replayed=asyncio.run(exercise())
-    assert not failures and not service.background_errors
+    assert not failures and not service.background_errors, (failures,chain_errors,service.background_errors)
     turn=accepted_rows[0]
     assert isinstance(turn,AcceptedTurn) and turn.client_request_id==client_id
     assert turn.request.request_id==turn.context.request_id==turn.run_id!=client_id
@@ -213,6 +223,7 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
     assert peak[0]==1 and len(cheap.calls)+len(expensive.calls)==len(committed.calls)==1
     messages=(cheap.calls or expensive.calls)[0][0]
     assert all(row.content in messages[-1].content for row in sources.values())
+    assert any(current for _,current in source_reads), 'Final sources require current-version readback'
     assert profile.PROMPT_B_SUFFIX in messages[0].content
     actual=runtime._s861_profile_states[turn.run_id]
     assert actual.strategy_plan.strategy=='RULE_COMPARE' and actual.query==actual.rewrite_query==q0

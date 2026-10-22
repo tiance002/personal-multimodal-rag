@@ -136,6 +136,9 @@ export const portApi = {
   createSession: (kbIds: string[], documentIds: string[], title = "新对话") => mutate<SessionRow>("/sessions", {
     method: "POST", body: JSON.stringify({ knowledge_base_scope: kbIds, document_scope: documentIds, title }),
   }),
+  updateDocumentScope: (sessionId: string, documentIds: string[]) => mutate<SessionRow>(`/sessions/${encodeURIComponent(sessionId)}/document-scope`, {
+    method: "PATCH", body: JSON.stringify({ document_scope: documentIds }),
+  }),
   messages: (sessionId: string, signal?: AbortSignal) => jsonRequest<MessageRow[]>(`/sessions/${encodeURIComponent(sessionId)}/messages`, { signal }),
   source: (chunkId: string) => jsonRequest<SourceChunk>(`/chunks/${encodeURIComponent(chunkId)}`),
 };

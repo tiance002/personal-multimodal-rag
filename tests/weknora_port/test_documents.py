@@ -51,7 +51,7 @@ class MemoryConnection:
             kb_id, tenant = params
             row = self.kbs.get(kb_id)
             return Cursor([row] if row and row["tenant_id"] == tenant else [])
-        if query.startswith("SELECT id,knowledge_base_id,file_name,parse_status,error_message,created_at FROM knowledges"):
+        if query.startswith("SELECT id,knowledge_base_id,file_name,title,parse_status,error_message,created_at FROM knowledges"):
             tenant, kb_id = params
             return Cursor([d for d in self.docs.values() if d["tenant_id"] == tenant and
                            d["knowledge_base_id"] == kb_id and d.get("deleted_at") is None])
@@ -242,6 +242,10 @@ def test_text_and_markdown_uploads_persist_immutable_source_chunks_and_complete_
             (row["status"], row["error_code"]) for row in (text, markdown))
         docs = await service.list_documents(PRINCIPAL, kb["id"])
         assert [row["filename"] for row in docs] == ["guide.txt", "notes.md"]
+        stored_text=factory.connection.docs[text['id']]
+        stored_text['file_name']=''
+        assert (await service.list_documents(PRINCIPAL,kb['id']))[0]['filename']==stored_text['title']
+        stored_text['file_name']='guide.txt'
         assert (await service.list_knowledge_bases(PRINCIPAL))[0]["document_count"] == 2
 
         for item, raw in ((text, b"first paragraph\n\nsecond paragraph"),

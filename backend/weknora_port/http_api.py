@@ -108,6 +108,10 @@ class StopSessionRequest(ApiModel):
     message_id: str = Field(min_length=1,max_length=36)
 
 
+class SessionDocumentScopeWrite(ApiModel):
+    document_scope: list[str]
+
+
 class ModelRoleWrite(ApiModel):
     source: str | None = None
     role: str
@@ -167,6 +171,7 @@ class RuntimeService(Protocol):
                                          roles: list[dict[str, Any]]) -> Mapping[str, Any]: ...
     async def list_sessions(self, principal: Any) -> Sequence[Mapping[str, Any]]: ...
     async def create_session(self, principal: Any, request: SessionCreate) -> Mapping[str, Any]: ...
+    async def update_session_document_scope(self, principal: Any, session_id: str, document_ids: list[str]) -> Mapping[str, Any]: ...
     async def list_messages(self, principal: Any, session_id: str) -> Sequence[Mapping[str, Any]]: ...
     async def accept_turn(self, request: OrdinaryTurnRequest, trusted_principal: Any) -> AcceptedTurn: ...
     async def validate_run(self, session_id: str, assistant_message_id: str, trusted_principal: Any) -> AcceptedTurn: ...
@@ -294,7 +299,7 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     app.state.allowed_origins = normalized_allowed
     if normalized_allowed:
         app.add_middleware(CORSMiddleware, allow_origins=sorted(normalized_allowed),
-                           allow_credentials=True, allow_methods=["GET", "POST", "PUT", "DELETE"],
+                           allow_credentials=True, allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
                            allow_headers=["Accept", "Content-Type", "X-Request-ID"])
 
     @app.middleware("http")
@@ -598,6 +603,11 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     @app.post("/api/v1/sessions")
     async def create_session(body: SessionCreate, request: Request):
         return json_data(request, await runtime.create_session(await principal(request), body))
+
+    @app.patch("/api/v1/sessions/{session_id}/document-scope")
+    async def update_session_document_scope(session_id: str, body: SessionDocumentScopeWrite, request: Request):
+        return json_data(request, await runtime.update_session_document_scope(
+            await principal(request), session_id, body.document_scope))
 
     @app.get("/api/v1/sessions/{session_id}/messages")
     async def messages(session_id: str, request: Request):

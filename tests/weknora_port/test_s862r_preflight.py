@@ -156,6 +156,7 @@ def test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_dow
             return SimpleNamespace(content=json.dumps({'rewrite_query': rewritten, 'intent': 'kb_search',
                 'image_description': '', 'query_type': 'SIMPLE_COMPARE'}), finish_reason=finish)
     current, repo, model, embeddings, generation = state(query=q0), Repo(), Query(), [], []
+    current.language = profile.expected_profile_language(q0)[1]
     async def configuration(turn):
         return TurnConfiguration(current, {})
     async def pipeline_factory(turn, progress):
@@ -166,7 +167,8 @@ def test_actual_pipeline_completed_guard_propagates_and_preserves_raw_before_dow
         generation.append(turn); return object()
     runtime = SimpleNamespace(ordinary=SimpleNamespace(configuration=configuration,
         pipeline_factory=pipeline_factory, generation_factory=generation_factory))
-    turn = SimpleNamespace(run_id='offline-run')
+    turn = SimpleNamespace(run_id='offline-run',
+        request=SimpleNamespace(content=q0, accept_language='en-US'))
     profile.install_profile(runtime, tmp_path, bounded_query_profile=True)
     expected = 'PROFILE_INPUT_BOUND_EXCEEDED' if overflow else 'S862R_INCOMPLETE_QU_OUTPUT_STOP'
     active = []
@@ -194,13 +196,16 @@ def test_actual_pipeline_accepts_legal_boundary_and_keeps_one_plain_retrieval(tm
             self.qu.append(context.request_id)
             return SimpleNamespace(content=json.dumps({'rewrite_query': question, 'intent': 'kb_search',
                 'image_description': '', 'query_type': 'UNKNOWN'}), finish_reason='stop')
+    locale, language = profile.expected_profile_language(question)
     current, repo, model = state(query=question), Repo(), Query()
+    current.language = language
     async def configuration(turn): return TurnConfiguration(current, {})
     async def factory(turn, progress): return RetrievalPipeline(repo, Registry(model), on_progress=progress)
     runtime = SimpleNamespace(ordinary=SimpleNamespace(configuration=configuration, pipeline_factory=factory))
     profile.install_profile(runtime, tmp_path, bounded_query_profile=True)
     async def exercise():
-        turn = SimpleNamespace(run_id='boundary')
+        turn = SimpleNamespace(run_id='boundary',
+            request=SimpleNamespace(content=question, accept_language=locale))
         cfg = await runtime.ordinary.configuration(turn)
         pipeline = await runtime.ordinary.pipeline_factory(turn, None)
         await pipeline.run(cfg.pipeline_state, CallContext(turn.run_id, TrustedScope('owner', ('kb',))))

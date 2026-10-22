@@ -214,7 +214,8 @@ def test_approved_guard_rejects_unbudgeted_prompt_and_attachment_inputs(field, v
     if field == 'system_prompt': base.generation_options[field] = value
     else: setattr(base.pipeline_state, field, value)
     install_guard(runtime, approved)
-    with pytest.raises(ValueError, match='S861_'):
+    error_prefix = 'S864_' if field == 'language' else 'S861_'
+    with pytest.raises(ValueError, match=error_prefix):
         asyncio.run(runtime.ordinary.configuration(turn))
     assert calls == [turn]
 

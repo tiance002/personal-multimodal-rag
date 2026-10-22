@@ -249,7 +249,7 @@ class DocumentLifecycleService:
                              knowledge_base_id: str) -> list[dict[str, Any]]:
         await self._kb(principal, knowledge_base_id)
         rows = await self._rows(
-            "SELECT id,knowledge_base_id,file_name,parse_status,error_message,created_at "
+            "SELECT id,knowledge_base_id,file_name,title,parse_status,error_message,created_at "
             "FROM knowledges WHERE tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL "
             "ORDER BY created_at,id", (principal.tenant_id, knowledge_base_id))
         return [{"id": row["id"], "knowledge_base_id": row["knowledge_base_id"],

@@ -203,6 +203,7 @@ export function WeKnoraPythonApp() {
   const [messages, setMessages] = useState<ChatLine[]>([]);
   const [selectedBases, setSelectedBases] = useState<string[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
+  const [scopeSaving, setScopeSaving] = useState(false);
   const [scopeOpen, setScopeOpen] = useState(false);
   const scopeControl = useRef<HTMLDivElement | null>(null);
   const [config, setConfig] = useState<ModelConfiguration>(EMPTY_CONFIG);
@@ -266,8 +267,9 @@ export function WeKnoraPythonApp() {
     };
   }, [scopeOpen]);
 
-  const documentScopeLocked = Boolean(activeSession);
-  const canSubmit = !busy && !loading && !runtimeError && selectedBases.length > 0 && query.trim().length > 0;
+  const knowledgeBaseScopeLocked = Boolean(activeSession);
+  const documentScopeDirty = Boolean(activeSession) && JSON.stringify([...selectedDocuments].sort()) !== JSON.stringify([...(activeSession?.document_scope ?? [])].sort());
+  const canSubmit = !busy && !scopeSaving && !documentScopeDirty && !loading && !runtimeError && selectedBases.length > 0 && query.trim().length > 0;
 
   const documentKnowledgeBaseIds = page === "library"
     ? (uploadKbId ? [uploadKbId] : [])
@@ -299,6 +301,7 @@ export function WeKnoraPythonApp() {
   }, [documentKnowledgeBaseIds.join("\u0000"), page, documentRefresh]);
 
   const openSession = async (session: SessionRow) => {
+    if (scopeSaving) return;
     setScopeOpen(false);
     setActiveSession(session);
     setSelectedBases(session.knowledge_base_scope);
@@ -320,6 +323,7 @@ export function WeKnoraPythonApp() {
   };
 
   const newSession = () => {
+    if (scopeSaving) return;
     setScopeOpen(false);
     activeAbort.current?.abort();
     activeAbort.current = null;
@@ -338,6 +342,20 @@ export function WeKnoraPythonApp() {
   };
   const toggleDocument = (id: string) => setSelectedDocuments(current => current.includes(id)
     ? current.filter(value => value !== id) : [...current, id]);
+
+  const applyDocumentScope = async (documentIds: string[]) => {
+    if (!activeSession || busy || scopeSaving) return;
+    setScopeSaving(true);
+    try {
+      const saved = await portApi.updateDocumentScope(activeSession.id, documentIds);
+      setActiveSession(saved);
+      setSelectedDocuments(saved.document_scope);
+      setSessions(current => current.map(session => session.id === saved.id ? saved : session));
+      setScopeOpen(false);
+      setNotice(saved.document_scope.length ? "已锁定所选文档；后续问题使用此范围" : "已取消文档限定；后续问题检索当前知识库");
+    } catch (error) { setNotice(`文档范围未保存：${errorText(error)}`); }
+    finally { setScopeSaving(false); }
+  };
 
   const updateMessage = (messageId: string, update: (message: ChatLine) => ChatLine) => {
     setMessages(current => current.map(message => message.id === messageId ? update(message) : message));
@@ -590,14 +608,15 @@ export function WeKnoraPythonApp() {
                 <div className="wp-scope-control" ref={scopeControl}>
                   <button type="button" className="wp-scope-trigger" aria-label="选择知识库和文件" aria-haspopup="dialog" aria-expanded={scopeOpen} aria-controls="wp-scope-picker" onClick={() => setScopeOpen(current => !current)}>选择资料</button>
                   {scopeOpen && <div className="wp-scope-card" id="wp-scope-picker" role="dialog" aria-label="选择知识库和文件">
-          <div className="wp-scope-heading"><div><strong>检索范围</strong><small>{documentScopeLocked ? "会话使用已保存的知识库范围；新范围请新建会话" : "先选择一个或多个知识库，再限定文档"}</small></div><span>{selectedBases.length} 个知识库 · {selectedDocuments.length} 个资料</span><button type="button" className="wp-scope-close" onClick={() => setScopeOpen(false)}>完成选择</button></div>
+          <div className="wp-scope-heading"><div><strong>检索范围</strong><small>{knowledgeBaseScopeLocked ? "知识库范围已保存；文档范围可切换或取消，应用后用于后续问题" : "先选择一个或多个知识库，再限定文档"}</small></div><span>{selectedBases.length} 个知识库 · {selectedDocuments.length} 个资料</span><button type="button" className="wp-scope-close" disabled={scopeSaving} onClick={() => setScopeOpen(false)}>完成选择</button></div>
           <div className="wp-scope-grid">
-            <div className="wp-scope-column"><label>知识库</label>{bases.map(base => <label key={base.id} className="wp-check-row"><input type="checkbox" checked={selectedBases.includes(base.id)} disabled={documentScopeLocked || busy} onChange={() => toggleBase(base.id)} /><span><strong>{base.name}</strong><small>{base.document_count} 份资料 · {base.cloud_allowed ? "允许外发" : "仅本地（该库内容不外发）"}</small></span></label>)}{!bases.length && <p className="wp-empty-small">尚无知识库，请到资料库创建</p>}</div>
-            <div className="wp-scope-column"><label>资料文件</label>{visibleDocuments.map(doc => <label key={doc.id} className="wp-check-row"><input type="checkbox" checked={selectedDocuments.includes(doc.id)} disabled={documentScopeLocked || busy || !selectedBases.includes(doc.knowledge_base_id)} onChange={() => toggleDocument(doc.id)} /><span><strong>{doc.filename}</strong><small>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</small></span></label>)}{selectedBases.length > 0 && visibleDocuments.length === 0 && <p className="wp-empty-small">所选知识库暂无资料</p>}</div>
+            <div className="wp-scope-column"><label>知识库</label>{bases.map(base => <label key={base.id} className="wp-check-row"><input type="checkbox" checked={selectedBases.includes(base.id)} disabled={knowledgeBaseScopeLocked || busy || scopeSaving} onChange={() => toggleBase(base.id)} /><span><strong>{base.name}</strong><small>{base.document_count} 份资料 · {base.cloud_allowed ? "允许外发" : "仅本地（该库内容不外发）"}</small></span></label>)}{!bases.length && <p className="wp-empty-small">尚无知识库，请到资料库创建</p>}</div>
+            <div className="wp-scope-column"><label>资料文件</label>{visibleDocuments.map(doc => <label key={doc.id} className="wp-check-row"><input type="checkbox" checked={selectedDocuments.includes(doc.id)} disabled={busy || scopeSaving || !selectedBases.includes(doc.knowledge_base_id)} onChange={() => toggleDocument(doc.id)} /><span><strong>{doc.filename}</strong><small>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</small></span></label>)}{selectedBases.length > 0 && visibleDocuments.length === 0 && <p className="wp-empty-small">所选知识库暂无资料</p>}</div>
           </div>
+          {activeSession && <div className="wp-scope-heading"><button type="button" disabled={busy || scopeSaving || !documentScopeDirty} onClick={() => void applyDocumentScope(selectedDocuments)}>{scopeSaving ? "正在保存…" : "应用文档范围"}</button><button type="button" disabled={busy || scopeSaving || (!selectedDocuments.length && !activeSession.document_scope.length)} onClick={() => void applyDocumentScope([])}>取消文档限定</button><small>{documentScopeDirty ? "文档选择尚未应用，保存后可继续提问" : "后续追问继承已保存的文档范围"}</small></div>}
         </div>}
                 </div>
-                <span className="wp-composer-scope" title={selectedNames.join("、")}>{selectedNames.length ? `${selectedNames.join("、")}${selectedDocuments.length ? ` · ${selectedDocuments.length} 个文件` : " · 全部文件"}` : "未选择知识库"}</span>
+                <span className="wp-composer-scope" title={selectedNames.join("、")}>{selectedNames.length ? `${selectedNames.join("、")}${selectedDocuments.length ? ` · ${selectedDocuments.length} 个文件` : " · 全部文件"}${documentScopeDirty ? " · 待应用" : ""}` : "未选择知识库"}</span>
               </div>
               {busy ? <><button type="button" className="wp-stop" onClick={() => void stopGeneration()}>停止生成</button><button type="button" onClick={stopReading}>停止读取</button></> : <span className="wp-composer-hint">Enter 发送 · Shift+Enter 换行</span>}
               <button type="submit" disabled={!canSubmit}>发送 ↗</button>

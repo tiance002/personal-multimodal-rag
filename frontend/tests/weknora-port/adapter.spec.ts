@@ -681,7 +681,7 @@ test("default cloud_allowed false is described as keeping KB contents local", as
 });
 
 
-test("composer scope picker defaults closed, filters multiple KBs and keeps saved session locked", async ({ page }) => {
+test("composer scope picker defaults closed, filters multiple KBs and keeps saved KB scope locked", async ({ page }) => {
   await installCatalogRoutes(page);
   await page.route("**/api/v1/knowledge-bases", route => route.fulfill({ json: envelope([
     { id: "kb-1", name: "课程资料", cloud_allowed: false, document_count: 1 },
@@ -734,8 +734,11 @@ test("composer scope picker defaults closed, filters multiple KBs and keeps save
   expect(messageBody?.knowledge_base_scope).toEqual(["kb-2", "kb-1"]);
   expect(messageBody?.document_scope).toEqual(["doc-1", "doc-2"]);
   await trigger.click();
-  await expect(dialog.getByText("会话使用已保存的知识库范围；新范围请新建会话")).toBeVisible();
-  for (const checkbox of await dialog.getByRole("checkbox").all()) await expect(checkbox).toBeDisabled();
+  await expect(dialog.getByText("知识库范围已保存；文档范围可切换或取消，应用后用于后续问题")).toBeVisible();
+  await expect(dialog.getByRole("checkbox", { name: /课程资料/ })).toBeDisabled();
+  await expect(dialog.getByRole("checkbox", { name: /图片资料/ })).toBeDisabled();
+  await expect(dialog.getByRole("checkbox", { name: /教材 第三章/ })).toBeEnabled();
+  await expect(dialog.getByRole("checkbox", { name: /产品图/ })).toBeEnabled();
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(trigger).toBeFocused();

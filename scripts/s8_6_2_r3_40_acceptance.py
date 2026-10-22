@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from scripts import s8_6_1_api_acceptance as prior
+from scripts.s8_6_4_language import expected_profile_language, message_headers as _language_headers, policy_manifest
 from backend.weknora_port import execution as execution_module
 from backend.weknora_port.models.types import ProviderError
 
@@ -46,6 +47,13 @@ def case_scope(case):
     return {'knowledge_base_ids': [case['knowledge_base_id']], 'document_ids': []}
 
 
+def profile_request_headers(q0, base=None, explicit_override=None):
+    headers = _language_headers(base or {}, q0, explicit_override)
+    expected, _ = expected_profile_language(q0, explicit_override)
+    require(headers.get('Accept-Language') == expected, 'S864_REQUEST_LANGUAGE_HEADER_MISMATCH')
+    return headers
+
+
 def profile_manifest():
     return {'schema': 's862r3-ecs40-profile/v1', 'profile': PROFILE_ID, 'goal': GOAL,
         'composition_profile': prior.BOUNDED_PROFILE_ID,
@@ -55,6 +63,7 @@ def profile_manifest():
         'input_identity_sha256': ORIGINAL_INPUT_IDENTITY_SHA256,
         'original_cohort_sha256': ORIGINAL_COHORT_SHA256,
         'protected_case_ids': sorted(PROTECTED), 'denominator': 40, 'eligible_submissions': 38,
+        'answer_language_policy': policy_manifest(),
         'prompt_b_suffix_sha256': digest(prior.PROMPT_B_SUFFIX.encode()),
         'query_input_bound': dict(prior.PROFILE_QUERY_BOUND), 'generation': 'existing P5 DYNAMIC',
         'scope': 'one frozen whole KB per case; no document Gold filter',
@@ -313,7 +322,10 @@ def create_application(environment=None, *, assemble_factory=None):
                 install_case_profile(runtime, case, batch, expiry, audit)
                 write_new(audit / 'ecs40-profile.json', {'profile': profile_manifest(), 'case_id': case['case_id'],
                     'scope': case_scope(case), 'source_revision': grant['source_revision'], 'image_id': grant['image_id'],
-                    'composition_trace_profile': prior.BOUNDED_PROFILE_ID})
+                    'composition_trace_profile': prior.BOUNDED_PROFILE_ID,
+                    'answer_language': {'q0': case['question'],
+                        'expected': expected_profile_language(case['question'])[0],
+                        'source': 'q0_explicit_directive_or_script_default'}})
                 yield runtime
     return formal_application(environment, assemble_factory=factory)
 
@@ -337,7 +349,7 @@ async def collect_http(base_url, output, environment=None, *, transport=None):
         'image_id': grant['image_id'], 'authorization_file_sha256': digest(Path(environment['S840_AUTHORIZATION_FILE']).read_bytes()),
         'query_type_injected': False, 'gold_sent': False})
     headers = {'Authorization': 'Bearer ' + api_token(environment),
-        'Origin': 'http://127.0.0.1:5173', 'Accept-Language': 'en-US'}
+        'Origin': 'http://127.0.0.1:5173'}
     result = None
     try:
         async with httpx.AsyncClient(base_url=base_url.rstrip('/'), headers=headers,
@@ -357,7 +369,10 @@ async def collect_http(base_url, output, environment=None, *, transport=None):
             began, first_answer = time.monotonic(), None
             blocks = []
             with (target / 'response.sse').open('xb') as raw:
-                async with client.stream('POST', f'/api/v1/sessions/{sid}/messages', json=body) as response:
+                request_headers = profile_request_headers(case['question'], headers,
+                    case.get('answer_language'))
+                async with client.stream('POST', f'/api/v1/sessions/{sid}/messages', json=body,
+                                         headers=request_headers) as response:
                     status_code = response.status_code
                     async for chunk in response.aiter_bytes():
                         raw.write(chunk); raw.flush(); blocks.append(chunk)

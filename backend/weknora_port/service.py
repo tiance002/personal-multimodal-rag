@@ -124,10 +124,11 @@ async def _resolve(value):
 
 class RuntimeService:
     def __init__(self, repository, store, history_service, memory_loader, *,
-                 configuration, pipeline_factory, generation_factory, poll_seconds=.1):
+                 configuration, pipeline_factory, generation_factory, poll_seconds=.1, document_clarifier=None):
         self.repository,self.store=repository,store
         self.history_service,self.memory_loader=history_service,memory_loader
         self.configuration=configuration
+        self.document_clarifier=document_clarifier
         self.pipeline_factory,self.generation_factory=pipeline_factory,generation_factory
         self.poll_seconds=poll_seconds
         self._tasks: dict[tuple[str,str,str], asyncio.Task] = {}
@@ -304,6 +305,20 @@ class RuntimeService:
         # q0 and identities are server admission values, not mutable config.
         state.query=turn.request.content
         state.user_message_id=turn.user_message_id
+        if self.document_clarifier is not None:
+            clarification=await _resolve(self.document_clarifier(turn,state.language))
+            check_context(turn.context)
+            if clarification is not None:
+                from .retrieval.context import FinalizedContext
+                options=dict(config.generation_options)
+                options.update(is_fallback=True,fixed_fallback=clarification,fallback_response=clarification)
+                options.setdefault('language',state.language)
+                state.query_trace.append({'stage':'clarification','decision':'FIXED_CLARIFICATION',
+                                          'reason':'DOCUMENT_SCOPE_AMBIGUOUS','facts_admitted':0})
+                await progress('clarification','completed',reason='DOCUMENT_SCOPE_AMBIGUOUS')
+                request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,
+                    turn.request.content,FinalizedContext(turn.request.content,'',()),**options)
+                return PreparedOrdinaryTurn(request,turn.context)
         await progress('history','started')
         rounds=tuple(h for h in await self.history_service.load(turn.memory_context,turn.session_id,state.max_rounds,
                      exclude_request_id=turn.run_id) if getattr(h,'request_id',None) != turn.run_id)
