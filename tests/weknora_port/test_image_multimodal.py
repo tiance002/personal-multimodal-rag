@@ -10,7 +10,12 @@ def test_pinned_go_image_functions_same_fixture():
     for row in value['rows']:
         if row['kind']=='ocr':actual=sanitize_ocr(value['cases'][row['index']])
         elif row['kind']=='ocr_prompt':actual=PROMPTS['vlmOCRScannedPDFPrompt' if row['source']=='scanned_pdf' else 'vlmOCRPrompt']
-        elif row['kind']=='caption':actual=caption_prompt('Chinese (Simplified)',' CAPTION ONLY ')
+        elif row['kind']=='caption':
+            # S8.6.4 Owner-approved extraction-first divergence. Keep the Go
+            # oracle unchanged as evidence of the former source behavior.
+            assert row['output'].startswith('Provide a brief and concise description')
+            assert caption_prompt('Chinese (Simplified)',' CAPTION ONLY ')!=row['output']
+            continue
         else:actual=enrich_summary_images('body ![alt](image.png)',value['infos'],row['full'])
         assert actual==row['output']
 
@@ -27,3 +32,11 @@ def test_sparse_inline_tags_preserve_source_markdown_utf8_threshold():
     ocr=[row for row in value['rows'] if row['kind']=='ocr']
     assert len(ocr)==4
     for row in ocr:assert sanitize_ocr(value['cases'][row['index']])==row['output']
+
+
+def test_caption_prioritizes_faithful_extraction_before_summary():
+    prompt=caption_prompt('Chinese (Simplified)')
+    assert 'faithful information preservation' in prompt
+    assert 'categories and their corresponding values' in prompt
+    assert 'Chinese (Simplified)' in prompt
+    assert 'preserving original labels' in prompt

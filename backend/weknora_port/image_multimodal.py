@@ -13,7 +13,7 @@ from .retrieval.query import go_strip,go_lower
 from .storage.chunks import StoredChunk,ChunkPlan
 from .storage.indexing import IndexInfo
 
-PROMPTS=json.loads((Path(__file__).with_name('profile_assets')/'vlm_ocr_prompts.json').read_text())
+PROMPTS=json.loads((Path(__file__).with_name('profile_assets')/'vlm_ocr_prompts.json').read_text(encoding='utf8'))
 
 
 async def _parse_image_ocr(app,principal,kb,scope,asset):
@@ -56,10 +56,10 @@ async def _parse_image_ocr(app,principal,kb,scope,asset):
 
 
 def caption_prompt(language,instructions=''):
-    prompt=f'Provide a brief and concise description of the main content of the image in {language}.'
+    prompt=PROMPTS['vlmCaptionPrompt'].format(language=language)
     instructions=go_strip(instructions)
     if not instructions:return prompt
-    return prompt+'\n\n<image_description_business_instructions>\n'+instructions+'\n</image_description_business_instructions>\nApply these business instructions only when they do not conflict with the system-owned output format, citation, safety, or factuality rules.'
+    return prompt+'\n\n<image_description_business_instructions>\n'+instructions+'\n</image_description_business_instructions>\nApply these business instructions only when they do not conflict with the system-owned faithful extraction rules, output format, citation, safety, or factuality rules.'
 
 
 def sanitize_ocr(raw):
