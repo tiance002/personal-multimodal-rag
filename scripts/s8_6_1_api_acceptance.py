@@ -24,6 +24,8 @@ PROMPT_B_SUFFIX = (
     'Distinguish derived conclusions from directly stated facts. Do not invent missing inputs, entities, dates, locations, or relationships. If the evidence does not support a required relation, explicitly state the uncertainty.'
 )
 PROFILE_ID = 's8.6.1-formal-api-prompt-b/v1'
+BOUNDED_PROFILE_ID = 's8.6.2-r-formal-api-prompt-b/v2'
+PROFILE_QUERY_BOUND = {'version': 'effective-query/v1', 'unicode_characters': 256, 'utf8_bytes': 1024}
 BASELINE = '0c496c230add039283c80635d4e7d4776a4e373b'
 KB_IDS = ('96a9eebd-ffb2-4bc6-9bea-3ed015845479',)
 DOCUMENT_IDS = (
@@ -35,6 +37,18 @@ DOCUMENT_IDS = (
 QUESTIONS = {
     'compare': 'Compare Leyden jar and Franklin bells in terms of operating principles and uses.',
     'dependent': 'Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?',
+}
+BOUNDED_QUESTIONS = {
+    **QUESTIONS,
+    'parallel': '分别介绍Leyden jar和Franklin bells的工作原理与用途',
+}
+QU_ONLY_QUESTIONS = {
+    'two-object': QUESTIONS['compare'],
+    'three-object': 'Compare PostgreSQL, Redis, and SQLite in terms of persistence and concurrency.',
+    'parallel': BOUNDED_QUESTIONS['parallel'],
+    'numeric-model': 'Compare Qwen3.5-4B and Qwen3-8B in terms of deployment requirements.',
+    'relational-negative': '分别介绍A和B之间的通信方式',
+    'dimension-negative': '比较PostgreSQL和Redis的区别',
 }
 MODES = ('off', 'query_structure_v1')
 
@@ -96,6 +110,52 @@ def _budget_state_guard(state):
     require(not state.history and not state.memory_background, 'S861_PREFLIGHT_FRESH_CONTEXT_REQUIRED')
 
 
+def query_input_bound(value):
+    """This acceptance profile's input contract; never truncate production text."""
+    try:
+        size = len(value.encode('utf8')) if isinstance(value, str) else None
+    except UnicodeError:
+        size = None
+    return {'unicode_characters': len(value) if isinstance(value, str) else None,
+        'utf8_bytes': size, 'valid': isinstance(value, str) and bool(value)
+            and size is not None and len(value) <= PROFILE_QUERY_BOUND['unicode_characters']
+            and size <= PROFILE_QUERY_BOUND['utf8_bytes']}
+
+
+def _require_query_bound(state):
+    effective = state.rewrite_query or state.query
+    require(query_input_bound(effective)['valid'], 'PROFILE_INPUT_BOUND_EXCEEDED')
+    return effective
+
+
+class _ObservedQueryRegistry:
+    """Delegate the real registry/model; retain raw QU return privately only."""
+    def __init__(self, registry, observe, before=None):
+        self.registry, self.observe, self.before = registry, observe, before
+
+    def __getattr__(self, name):
+        return getattr(self.registry, name)
+
+    async def chat(self, *args, **kwargs):
+        model = await self.registry.chat(*args, **kwargs)
+        observe, before = self.observe, self.before
+        class ObservedModel:
+            def __getattr__(self, name):
+                return getattr(model, name)
+            async def chat(self, messages, options, context):
+                if before is not None and context.request_id.endswith('/query_rewrite'):
+                    before(model, messages, options, context)
+                response = await model.chat(messages, options, context)
+                # No synthetic response, retry or replacement of ProviderModel.
+                if context.request_id.endswith('/query_rewrite'):
+                    observe({'content': getattr(response, 'content', None),
+                        'finish_reason': getattr(response, 'finish_reason', ''),
+                        'usage': _row(getattr(response, 'usage', None)),
+                        'request_id': context.request_id})
+                return response
+        return ObservedModel()
+
+
 def state_snapshot(state):
     """Private, finite trace of the actual states, never a public SSE payload."""
     value = {name: getattr(state, name, None) for name in (
@@ -122,12 +182,14 @@ def state_snapshot(state):
     return value
 
 
-def install_profile(runtime, evidence_directory=None, *, approved_batch=None, expires_at=None):
+def install_profile(runtime, evidence_directory=None, *, approved_batch=None, expires_at=None,
+                    bounded_query_profile=False):
     """Compose existing server dependencies; no class/Adapter monkeypatch."""
     require(not getattr(runtime, '_s861_profile_installed', False), 'S861_PROFILE_ALREADY_INSTALLED')
     ordinary = runtime.ordinary
     original_configuration = ordinary.configuration
-    states, sequence, admitted_clients = {}, [0], {}
+    states, sequence, admitted_clients, qu_outputs = {}, [0], {}, {}
+    profile_id = BOUNDED_PROFILE_ID if bounded_query_profile else PROFILE_ID
     directory = Path(evidence_directory) if evidence_directory is not None else None
 
     def save(run_id, stage, status, fields=None):
@@ -135,7 +197,7 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
             return
         sequence[0] += 1
         name = digest(run_id.encode()) + f'.{sequence[0]:05d}.profile.json'
-        write_new(directory / name, {'profile': PROFILE_ID, 'run_id': run_id,
+        write_new(directory / name, {'profile': profile_id, 'run_id': run_id,
             'stage': stage, 'status': status, 'fields': fields or {},
             'state': state_snapshot(states[run_id]),
             'proof_boundary': 'actual server state; Provider send/completion proven separately by existing receipts'})
@@ -151,6 +213,8 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
                     and set(turn.context.scope.document_ids) == set(DOCUMENT_IDS), 'S861_APPROVED_SCOPE_REQUIRED')
             previous_run = admitted_clients.setdefault(client_id, turn.run_id)
             require(previous_run == turn.run_id, 'S861_CLIENT_REQUEST_ALREADY_BOUND')
+            if bounded_query_profile:
+                require(query_input_bound(turn.request.content)['valid'], 'PROFILE_INPUT_BOUND_EXCEEDED')
         base = await original_configuration(turn)
         if approved_batch is not None:
             require(base.pipeline_state.retrieval_strategy_mode == allowed[0]['mode'],
@@ -175,11 +239,16 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
                     and base.fallback.get('options') == chat,
                     'S861_PREFLIGHT_FALLBACK_CONFIGURATION_CHANGED')
             _budget_state_guard(base.pipeline_state)
+            if bounded_query_profile:
+                ids = approved_batch.get('model_ids', {})
+                require(base.pipeline_state.bridge_cheap_model_id == ids.get('cheap')
+                    and base.pipeline_state.rerank_model_id == ids.get('rerank'),
+                    'S862R_PREFLIGHT_MODEL_BINDINGS_CHANGED')
         result = compose_configuration(base)
         states[turn.run_id] = result.pipeline_state
         options = result.generation_options
         save(turn.run_id, 'configuration', 'resolved', {
-            'profile': PROFILE_ID,
+            'profile': profile_id,
             'system_prompt_sha256': digest(options['system_prompt'].encode()),
             'original_system_prompt_sha256': digest(base.generation_options.get('system_prompt', '').encode()),
             'prompt_b_suffix_sha256': digest(PROMPT_B_SUFFIX.encode()),
@@ -203,32 +272,83 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
                     await output
         return observed
 
+    def enforce_completed_query(turn):
+        state = states[turn.run_id]
+        if not bounded_query_profile:
+            return
+        raw = qu_outputs.get(turn.run_id)
+        if raw is None or raw.get('finish_reason') not in ('stop', 'end_turn', 'completed'):
+            save(turn.run_id, 'profile_input', 'S862R_INCOMPLETE_QU_OUTPUT_STOP', {
+                'raw_QU_response': raw, 'resent': False})
+            raise ValueError('S862R_INCOMPLETE_QU_OUTPUT_STOP')
+        bound = query_input_bound(state.rewrite_query or state.query)
+        if not bound['valid']:
+            save(turn.run_id, 'profile_input', 'PROFILE_INPUT_BOUND_EXCEEDED', {
+                'input_contract': PROFILE_QUERY_BOUND, 'observed': bound,
+                'raw_QU_response': qu_outputs.get(turn.run_id),
+                'semantic_failure': False, 'truncated': False, 'resent': False})
+            raise ValueError('PROFILE_INPUT_BOUND_EXCEEDED')
+        save(turn.run_id, 'profile_input', 'validated', {
+            'input_contract': PROFILE_QUERY_BOUND, 'observed': bound})
+
     ordinary.configuration = configuration
     for name in ('pipeline_factory', 'generation_factory'):
         original = getattr(ordinary, name, None)
         if not callable(original):
             continue
-        def wrap(factory):
+        def wrap(factory, factory_name):
             async def composed(turn, progress, **kwargs):
                 if approved_batch is not None:
                     _budget_state_guard(states[turn.run_id])
+                if factory_name == 'generation_factory':
+                    enforce_completed_query(turn)
                 result = factory(turn, observe_progress(turn, progress), **kwargs)
-                return await result if inspect.isawaitable(result) else result
+                result = await result if inspect.isawaitable(result) else result
+                if bounded_query_profile and factory_name == 'pipeline_factory':
+                    require(callable(getattr(result, '_progress', None)) and hasattr(result, 'registry'),
+                            'S862R_PROFILE_PIPELINE_SEAM_REQUIRED')
+                    def observe_qu(value):
+                        qu_outputs[turn.run_id] = value
+                        save(turn.run_id, 'query_understanding_raw', 'returned', value)
+                    def check_qu_body(model, messages, options, context):
+                        if approved_batch is None:
+                            return
+                        expected = approved_batch.get('qu_request_sha256s', {}).get(turn.request.request_id)
+                        if expected is None:
+                            raise ValueError('S862R_EXACT_QU_PREFLIGHT_REQUIRED')
+                        body = model.build_request_body(messages, options)
+                        actual = digest(body)
+                        save(turn.run_id, 'query_understanding_wire', 'checked', {
+                            'body_sha256': actual, 'wire_bytes': len(canonical(body)),
+                            'expected_body_sha256': expected})
+                        require(actual == expected, 'S862R_ACTUAL_QU_REQUEST_DIFFERS_FROM_PREFLIGHT')
+                    result.registry = _ObservedQueryRegistry(result.registry, observe_qu, check_qu_body)
+                    ordinary_progress = result._progress
+                    async def checked_progress(stage, status, **fields):
+                        await ordinary_progress(stage, status, **fields)
+                        # RetrievalPipeline intentionally suppresses ordinary
+                        # observer exceptions. This instance-level check runs
+                        # OUTSIDE that suppression and before planning/Search.
+                        if stage == 'understand' and status == 'completed':
+                            enforce_completed_query(turn)
+                    result._progress = checked_progress
+                return result
             return composed
-        setattr(ordinary, name, wrap(original))
+        setattr(ordinary, name, wrap(original, name))
     runtime._s861_profile_installed = True
     runtime._s861_profile_states = states
+    runtime._s862r_raw_qu_outputs = qu_outputs
     return runtime
 
 
-def profile_manifest():
+def profile_manifest(*, bounded_query_profile=False):
     from backend.weknora_port.runtime import ConversationSettings
     from backend.weknora_port.generation.context import DEFAULT_SYSTEM_PROMPT
     from backend.weknora_port.generation import RouterPolicy
     from backend.weknora_port.retrieval.pipeline import PipelineState
     defaults = PipelineState()
     original = DEFAULT_SYSTEM_PROMPT
-    return {'profile': PROFILE_ID, 'baseline': BASELINE, 'test_only': True,
+    manifest = {'profile': PROFILE_ID, 'baseline': BASELINE, 'test_only': True,
         'question_inputs': QUESTIONS, 'modes': list(MODES),
         'session_fields': {'source_evidence_mode': 'bounded_source_v1'},
         'knowledge_base_ids': list(KB_IDS), 'document_ids': list(DOCUMENT_IDS),
@@ -251,6 +371,18 @@ def profile_manifest():
             'no_automatic_gold_substring_score': True,
             'internal_final_answer_supported_is_not_answer_correctness': True},
         'new_actual_provider_calls': 0, 'authorization': 'NONE'}
+    if bounded_query_profile:
+        from backend.weknora_port.retrieval.rule_registry import RULES, render_classification_guidance
+        manifest.update(profile=BOUNDED_PROFILE_ID, goal='S8.6.2-R',
+            question_inputs=BOUNDED_QUESTIONS, modes=['query_structure_v1'],
+            qu_only_inputs=QU_ONLY_QUESTIONS, effective_query_input_contract=dict(PROFILE_QUERY_BOUND),
+            raw_qu_response_capture='private normal Registry delegate; no response replacement',
+            input_guard_stage='understand/completed; before planning, Embedding, Search and Rerank',
+            input_bound_failure='PROFILE_INPUT_BOUND_EXCEEDED',
+            enabled_rules=[{'rule_id': rule.rule_id, 'rule_version': rule.rule_version,
+                            'query_type': rule.query_type} for rule in RULES],
+            classification_guidance_sha256=digest(render_classification_guidance().encode('utf8')))
+    return manifest
 
 
 def _approved(environment):
@@ -258,9 +390,11 @@ def _approved(environment):
     path = environment.get('S861_AUTHORIZATION_FILE', '')
     require(path, 'S861_FRESH_OWNER_AUTHORIZATION_REQUIRED')
     value = json.loads(Path(path).read_text(encoding='utf8'))
-    require(value.get('goal') == 'S8.6.1' and value.get('owner_approved') is True,
+    bounded = environment.get('S861_BOUNDED_QUERY_PROFILE', 'false').lower() == 'true'
+    require(value.get('goal') == ('S8.6.2-R' if bounded else 'S8.6.1') and value.get('owner_approved') is True,
             'S861_FRESH_OWNER_AUTHORIZATION_REQUIRED')
-    require(value.get('profile_sha256') == digest(profile_manifest()), 'S861_AUTH_PROFILE_MISMATCH')
+    require(value.get('profile_sha256') == digest(profile_manifest(bounded_query_profile=bounded)),
+            'S861_AUTH_PROFILE_MISMATCH')
     require(value.get('source_revision') == environment.get('S861_SOURCE_REVISION')
             and len(value.get('source_revision', '')) == 40, 'S861_AUTH_SOURCE_MISMATCH')
     require(value.get('image_id') == environment.get('S861_IMAGE_ID')
@@ -269,6 +403,11 @@ def _approved(environment):
     require(expiry.tzinfo is not None and expiry > datetime.now(timezone.utc), 'S861_AUTH_EXPIRED')
     batch = environment.get('S861_BATCH_ID')
     scope = value.get('batches', {}).get(batch, {})
+    if bounded:
+        require(scope.get('kind') in ('http', 'qu_only'), 'S862R_APPROVED_BATCH_KIND_REQUIRED')
+        require(type(value.get('max_total_tokens')) is int and 0 < value['max_total_tokens'] <= 500000
+            and sum(row.get('max_tokens', 500001) for row in value['batches'].values()) <= value['max_total_tokens'],
+            'S862R_AGGREGATE_RESERVATION_LIMIT')
     require(type(scope.get('max_calls')) is int and 0 < scope['max_calls'] <= 12,
             'S861_AUTH_BATCH_CALL_LIMIT')
     require(type(scope.get('max_tokens')) is int and 0 < scope['max_tokens'] <= 100000,
@@ -284,7 +423,8 @@ def _approved(environment):
     require(ledger.get('allowed_models') == scope.get('allowed_models')
             and bool(scope.get('allowed_models')), 'S861_AUTH_MODEL_SCOPE_MISMATCH')
     request_ids = [turn.get('request_id', '') for turn in scope.get('turns', [])]
-    require(0 < len(request_ids) <= 2 and len(set(request_ids)) == len(request_ids)
+    turn_limit = 6 if bounded and scope.get('kind') == 'qu_only' else 1 if bounded else 2
+    require(0 < len(request_ids) <= turn_limit and len(set(request_ids)) == len(request_ids)
             and all(isinstance(v, str) and v.startswith('s861-') and len(v) <= 36 for v in request_ids)
             and ledger.get('allowed_request_prefixes') == ['*'],
             'S861_AUTH_REQUEST_SCOPE_MISMATCH')
@@ -295,11 +435,26 @@ def _approved(environment):
     budget_bytes = Path(budget_path).read_bytes()
     require(digest(budget_bytes) == value.get('budget_preflight_sha256'), 'S861_BUDGET_PREFLIGHT_HASH_MISMATCH')
     budget = json.loads(budget_bytes)
-    require(budget.get('schema') == 's861-reservation-dryrun/v2'
-        and budget.get('profile_sha256') == digest(profile_manifest())
+    require(budget.get('schema') == ('s862r-reservation-dryrun/v3' if bounded else 's861-reservation-dryrun/v2')
+        and budget.get('profile_sha256') == digest(profile_manifest(bounded_query_profile=bounded))
         and budget.get('implementation_sha256_LF') == digest(Path(__file__).read_bytes().replace(b'\r\n', b'\n')),
         'S861_BUDGET_PREFLIGHT_IMPLEMENTATION_MISMATCH')
-    rows = [budget.get('submission_bounds', {}).get(turn.get('case', '') + ':' + turn.get('mode', ''), {})
+    if bounded:
+        require(scope.get('model_ids') == budget.get('model_ids'), 'S862R_BUDGET_MODEL_BINDINGS_MISMATCH')
+        inputs = QU_ONLY_QUESTIONS if scope['kind'] == 'qu_only' else BOUNDED_QUESTIONS
+        require(all(turn.get('question') == inputs.get(turn.get('case'))
+                    and turn.get('mode') == 'query_structure_v1' for turn in scope.get('turns', [])),
+                'S861_FROZEN_INPUT_MISMATCH')
+        if scope['kind'] == 'qu_only':
+            require([turn['case'] for turn in scope['turns']] == list(QU_ONLY_QUESTIONS),
+                    'S862R_QU_FIXED_ORDER_REQUIRED')
+        expected_requests = {turn['request_id']: budget['records'][
+            ('qu-only:' if scope['kind'] == 'qu_only' else '') + turn['case'] + ':query_structure_v1:QU']['body_sha256']
+            for turn in scope['turns']}
+        require(scope.get('qu_request_sha256s') == expected_requests, 'S862R_EXACT_QU_PREFLIGHT_REQUIRED')
+    row_key = lambda turn: ('qu-only:' + turn.get('case', '') if bounded and scope.get('kind') == 'qu_only'
+        else turn.get('case', '') + ':' + turn.get('mode', ''))
+    rows = [budget.get('submission_bounds', {}).get(row_key(turn), {})
             for turn in scope['turns']]
     require(all(row.get('max_calls', 0) > 0 and row.get('reservation_tokens_upper', 0) > 0 for row in rows)
         and sum(row['max_calls'] for row in rows) <= scope['max_calls']
@@ -312,7 +467,7 @@ def claim_batch(execution_file, component, profile_sha256):
     # Persistent one-use marker in this NEW batch directory, never an old ledger.
     # UUID Provider run IDs remain allocated by normal HTTP admission. The
     # approved '*' ledger is narrowed by the server's exact turn/scope binding.
-    require(component in ('api', 'collector'), 'S861_CLAIM_COMPONENT_INVALID')
+    require(component in ('api', 'collector', 'qu-only'), 'S861_CLAIM_COMPONENT_INVALID')
     path = Path(execution_file).parent / ('.s861-' + component + '-claim.json')
     write_new(path, {'component': component, 'profile_sha256': profile_sha256,
         'pid': os.getpid(), 'created_at_utc': datetime.now(timezone.utc).isoformat(),
@@ -330,13 +485,15 @@ def create_application(environment=None, *, assemble_factory=None):
     require(environment.get('WEKNORA_PORT_GRAPH_ENABLED', 'false').lower() == 'false', 'S861_GRAPH_DISABLED_REQUIRED')
     require(environment.get('WEKNORA_PORT_ROUTER_MODE', 'DYNAMIC') == 'DYNAMIC', 'S861_ORIGINAL_P5_REQUIRED')
     approval = None
+    bounded = environment.get('S861_BOUNDED_QUERY_PROFILE', 'false').lower() == 'true'
     if environment.get('WEKNORA_PORT_CLOUD_ALLOWED', 'false').lower() == 'true':
         approval = _approved(environment)
         batch = approval['batches'][environment['S861_BATCH_ID']]
+        require(batch.get('kind', 'http') == 'http', 'S862R_HTTP_BATCH_REQUIRED')
         audit = Path(environment.get('S861_AUDIT_DIR', ''))
         require(audit.is_absolute() and audit.parent.resolve() == Path(batch['execution_file']).parent.resolve()
                 and audit.name == 'strategy-audit' and not audit.exists(), 'S861_FRESH_DURABLE_AUDIT_DIR_REQUIRED')
-        claim_batch(batch['execution_file'], 'api', digest(profile_manifest()))
+        claim_batch(batch['execution_file'], 'api', digest(profile_manifest(bounded_query_profile=bounded)))
 
     @asynccontextmanager
     async def factory(settings, **kwargs):
@@ -345,7 +502,8 @@ def create_application(environment=None, *, assemble_factory=None):
                     'S861_ORIGINAL_EXPERIMENT_DEFAULTS_REQUIRED')
             install_profile(runtime, environment.get('S861_AUDIT_DIR'),
                 approved_batch=approval['batches'][environment['S861_BATCH_ID']] if approval else None,
-                expires_at=datetime.fromisoformat(approval['expires_at'].replace('Z', '+00:00')) if approval else None)
+                expires_at=datetime.fromisoformat(approval['expires_at'].replace('Z', '+00:00')) if approval else None,
+                bounded_query_profile=bounded)
             yield runtime
 
     return formal_application(environment, assemble_factory=factory)
@@ -375,7 +533,7 @@ def ledger_status(path):
         'entries': entries, 'max_calls': value['max_calls'], 'max_tokens': value['max_tokens']}
 
 
-async def dry_run_inventory(inventory_path, source_path):
+async def dry_run_inventory(inventory_path, source_path, *, bounded_query_profile=False):
     """Latest body builders + current bindings and hash-matched originals.
 
     Reservation bounds are not actual model usage or expected billed Tokens.
@@ -397,8 +555,22 @@ async def dry_run_inventory(inventory_path, source_path):
     from backend.weknora_port.retrieval.rerank import enriched_passage
     from backend.weknora_port.retrieval.context import into_chat_message, FinalizedContext, render_placeholders
     from backend.weknora_port.conversation_configuration import source_prompt_templates
-    from backend.weknora_port.retrieval.bridge_rescue import SYSTEM, CONTRACT_VERSION, sentence_spans
+    from backend.weknora_port.retrieval.bridge_rescue import (SYSTEM, CONTRACT_VERSION, sentence_spans,
+        INPUT_CHARS, FactWindow, extraction_payload)
     from backend.weknora_port.generation import GenerationRequest, Evidence, prepare_generation
+    questions = BOUNDED_QUESTIONS if bounded_query_profile else QUESTIONS
+    modes = ('query_structure_v1',) if bounded_query_profile else MODES
+    query_chars = PROFILE_QUERY_BOUND['unicode_characters'] if bounded_query_profile else 2048
+    child_chars = 2080
+    child_literal_bytes = 32
+    if bounded_query_profile:
+        from backend.weknora_port.retrieval.rule_registry import RULES
+        literals = [template.format(object='', dimension='')
+                    for rule in RULES for _, template in rule.templates]
+        child_chars = query_chars + max(map(len, literals))
+        child_literal_bytes = max(len(text.encode('utf8')) for text in literals)
+        require(all(query_input_bound(q)['valid'] for q in (*questions.values(), *QU_ONLY_QUESTIONS.values())),
+                'S862R_FROZEN_Q0_INPUT_BOUND_EXCEEDED')
     inventory = json.loads(Path(inventory_path).read_text(encoding='utf8'))
     require(inventory['status'] == 'READ_ONLY_INVENTORY' and inventory['transaction_read_only'],
             'S861_CURRENT_READONLY_INVENTORY_REQUIRED')
@@ -458,7 +630,7 @@ async def dry_run_inventory(inventory_path, source_path):
     rerank = configs['rerank'].reranking
     require(len(split_batches(passages, max_items=rerank.max_documents,
         max_item_chars=rerank.max_document_chars, max_total_chars=rerank.max_request_chars,
-        fixed_chars=2080)) == 1, 'S861_RECOMPUTE_RERANK_BATCHES')
+        fixed_chars=child_chars)) == 1, 'S861_RECOMPUTE_RERANK_BATCHES')
     final_options = resolved_chat_options(dict(normal.summary), 'off')
     ctx = CallContext('s861-dry-run', TrustedScope('dry-run-scope-only', KB_IDS, DOCUMENT_IDS))
     records = {}
@@ -471,16 +643,21 @@ async def dry_run_inventory(inventory_path, source_path):
             'reserved_tokens_upper': wire + contract.output_upper + 1024,
             'body_sha256': digest(body), 'extra_wire_bytes_upper': extra_bytes,
             'meaning': meaning, 'contract': asdict(contract), 'sent': False}
+        if bounded_query_profile:
+            records[name]['request_body'] = body
+            records[name]['wire_sha256'] = digest(canonical(body))
+            records[name]['wire_bytes'] = len(canonical(body))
         return records[name]['reserved_tokens_upper']
     class QueryCapture:
-        def __init__(self, case, mode): self.case, self.mode = case, mode
+        def __init__(self, case, mode, q0=None):
+            self.case, self.mode, self.q0 = case, mode, q0 or questions[case]
         async def chat(self, messages, options, context):
             body = ProviderModel(configs['cheap'], None).build_request_body(messages, options)
             record(self.case + ':' + self.mode + ':QU', 'cheap', body)
-            return SimpleNamespace(content=json.dumps({'rewrite_query': QUESTIONS[self.case],
+            return SimpleNamespace(content=json.dumps({'rewrite_query': self.q0,
                 'intent': 'kb_search', 'image_description': '', 'query_type': 'UNKNOWN'}), finish_reason='stop')
-    for case, q0 in QUESTIONS.items():
-        for mode in MODES:
+    for case, q0 in questions.items():
+        for mode in modes:
             capture = QueryCapture(case, mode)
             class Registry:
                 async def chat(self, *args): return capture
@@ -488,10 +665,17 @@ async def dry_run_inventory(inventory_path, source_path):
                 chat_model_id=configs['cheap'].model_id, query_understand_model_id=configs['cheap'].model_id,
                 retrieval_strategy_mode=mode, source_evidence_mode='bounded_source_v1')
             await understand_query(state, ctx, Registry())
+    if bounded_query_profile:
+        for case, q0 in QU_ONLY_QUESTIONS.items():
+            capture = QueryCapture('qu-only:' + case, 'query_structure_v1', q0)
+            state = PipelineState(query=q0, rewrite_query=q0, language='English',
+                chat_model_id=configs['cheap'].model_id, query_understand_model_id=configs['cheap'].model_id,
+                retrieval_strategy_mode='query_structure_v1', source_evidence_mode='bounded_source_v1')
+            await understand_query(state, ctx, Registry())
     # validate_rewrite allows <=2048 characters; a child template adds <=32.
     # JSON string encoding is at most6 bytes/Unicode character. These unsent
     # envelopes are never registered as chunks, evidence, or actual query input.
-    for label, chars in (('initial', 2048), ('compare-child', 2080), ('Q1', 192)):
+    for label, chars in (('initial', query_chars), ('compare-child', child_chars), ('Q1', 192)):
         envelope = '\x1c' * chars
         record('embedding:' + label, 'embedding', build_embedding_body(configs['embedding'], (envelope,), 'query'),
                'embedding', meaning='JSON_LENGTH_ENVELOPE_NOT_ACTUAL_QUERY')
@@ -500,9 +684,23 @@ async def dry_run_inventory(inventory_path, source_path):
     pool = sorted((row.content for row in originals), key=lambda value: len(canonical(value)), reverse=True)[:8]
     record('old-pool', 'rerank', build_rerank_body(configs['rerank'], '\x1c' * 192, pool),
            'rerank', meaning='ALL_POSSIBLE_ORIGINAL_POOL_STRINGS_AND_Q1_ENVELOPE')
-    sentence_payload = {'contract_version': CONTRACT_VERSION, 'question': '\x1c' * 2048,
+    sentence_payload = {'contract_version': CONTRACT_VERSION, 'question': '\x1c' * query_chars,
         'sentences': [{'sentence_id': 's-' + '0' * 24, 'text': row.content[a:b], 'role': 'preceding'}
             for row in originals for a, b in sentence_spans(row.content)]}
+    if bounded_query_profile:
+        # Obtain IDs/text through the production renderer, one original
+        # sentence at a time. The union is an UNSENT length superset, not an
+        # admissible2400-character extraction window or new source evidence.
+        sentences = {}
+        for row in originals:
+            for start, end in sentence_spans(row.content):
+                if end - start > INPUT_CHARS:
+                    continue  # such a sentence cannot enter a real payload
+                window = FactWindow(row.id, start, end, row.content[start:end], 'preceding')
+                payload = extraction_payload('\x1c' * query_chars, (window,), {row.id: row})
+                for item in payload['sentences']:
+                    sentences[item['sentence_id']] = item
+        sentence_payload['sentences'] = list(sentences.values())
     extract_body = ProviderModel(configs['cheap'], None).build_request_body(
         (Message('system', SYSTEM), Message('user', json.dumps(sentence_payload, ensure_ascii=False))),
         ChatOptions(temperature=0, thinking=False, max_tokens=256, format='json', send_temperature=True))
@@ -518,8 +716,8 @@ async def dry_run_inventory(inventory_path, source_path):
                     'final_answer_supported': supported, 'target_attribute': attribute}
                 qualifier_lengths.append(len(canonical(bridge_context_attributes(copy))) - 2)
     qualifier_upper = len(originals) * max(qualifier_lengths)
-    for case, q0 in QUESTIONS.items():
-        state = PipelineState(query=q0, rewrite_query='\x1c' * 2048, merge_results=deepcopy(originals), language='English',
+    for case, q0 in questions.items():
+        state = PipelineState(query=q0, rewrite_query='\x1c' * query_chars, merge_results=deepcopy(originals), language='English',
             source_evidence_mode='bounded_source_v1')
         finalized = await into_chat_message(state, ctx, record_bridge=False)
         from backend.weknora_port.generation.context import DEFAULT_SYSTEM_PROMPT
@@ -536,10 +734,10 @@ async def dry_run_inventory(inventory_path, source_path):
     listing = 'Document catalog metadata only (titles and file types; contents not read):\n' + ''.join(
         '- ' + json.dumps({'title': row['title'] or row['file_name'], 'file_type': row['file_type'] or ''},
                          ensure_ascii=False) + '\n' for row in inventory['documents'])
-    fallback_query = '\x1c' * 2048
+    fallback_query = '\x1c' * query_chars
     fallback_prompt = render_placeholders(fallback_template,
         {'query': fallback_query, 'language': 'English', 'kb_documents': listing})
-    for case, q0 in QUESTIONS.items():
+    for case, q0 in questions.items():
         fallback = prepare_generation(GenerationRequest('dry-run', 'dry-run', 'dry-run', q0=q0,
             finalized=FinalizedContext(fallback_query, '', (), fallback_prompt), evidence=(),
             options=final_options, language='English', citations_enabled=True, is_fallback=True,
@@ -550,8 +748,8 @@ async def dry_run_inventory(inventory_path, source_path):
                 meaning='NORMAL_NO_SOURCE_FALLBACK_WITH_CURRENT_CATALOG_AND_QUERY_ENVELOPE')
     costs = lambda names: sum(records[name]['reserved_tokens_upper'] for name in names)
     bounds = {}
-    for case in QUESTIONS:
-        for mode in MODES:
+    for case in questions:
+        for mode in modes:
             names = [case + ':' + mode + ':QU']
             if case == 'compare' and mode != 'off':
                 names += ['embedding:compare-child', 'rerank:compare-child'] * 2
@@ -567,26 +765,26 @@ async def dry_run_inventory(inventory_path, source_path):
             bounds[case + ':' + mode] = {'max_calls': len(names), 'reservation_tokens_upper': costs(names),
                 'physical_call_records': names, 'actual_usage': 'NOT_RUN', 'final_generation_reserve_included': True}
     batches = {}
-    for case in QUESTIONS:
-        children = [bounds[case + ':' + mode] for mode in MODES]
+    for case in questions:
+        children = [bounds[case + ':' + mode] for mode in modes]
         count = sum(row['max_calls'] for row in children)
         tokens = sum(row['reservation_tokens_upper'] for row in children)
         batches[case] = {'submissions': [case + ':' + mode for mode in MODES], 'max_calls': count,
             'reservation_tokens_upper': tokens, 'fits_existing_ledger': count <= 12 and tokens <= 100000}
-    candidates = {case: {'submissions': [case + ':' + MODES[1]], **bounds[case + ':' + MODES[1]]}
-        for case in QUESTIONS}
+    candidates = {case: {'submissions': [case + ':query_structure_v1'], **bounds[case + ':query_structure_v1']}
+        for case in questions}
     reduced = {}
     # Retain an off/on pair only when its complete worst path fits this ledger.
-    for case in QUESTIONS:
+    for case in questions:
         candidates[case]['fits_existing_ledger'] = (candidates[case]['max_calls'] <= 12
             and candidates[case]['reservation_tokens_upper'] <= 100000)
         if batches[case]['fits_existing_ledger']:
             reduced[case] = batches[case]
         elif candidates[case]['fits_existing_ledger']:
             reduced[case] = candidates[case]
-    return {'schema': 's861-reservation-dryrun/v2',
+    report = {'schema': 's861-reservation-dryrun/v2',
         'status': 'DRY_RUN_COMPLETE_SCOPE_REDUCED' if reduced else 'BLOCKED_RESERVATION_BUDGET',
-        'profile_sha256': digest(profile_manifest()),
+        'profile_sha256': digest(profile_manifest(bounded_query_profile=bounded_query_profile)),
         'implementation_sha256_LF': digest(Path(__file__).read_bytes().replace(b'\r\n', b'\n')),
         'inventory_sha256': digest(Path(inventory_path).read_bytes()),
         'frozen_source_sha256': digest(Path(source_path).read_bytes()),
@@ -605,6 +803,174 @@ async def dry_run_inventory(inventory_path, source_path):
         'metric': 'wire_bytes + verified_output_upper +1024 per physical call; conservative reservation, never actual Token usage',
         'classification_quality': 'NOT_RUN; synthetic UNKNOWN used only to capture exact QU request',
         'new_actual_provider_calls': 0, 'actual_tokens': 0, 'authorization': 'NONE'}
+    if bounded_query_profile:
+        return _bounded_dryrun_report(report, configs, query_chars, child_chars, child_literal_bytes)
+    return report
+
+
+def _bounded_dryrun_report(report, configs, query_chars, child_chars, child_literal_bytes):
+    """Small candidate tree over the existing renderer and ledger formula."""
+    from backend.weknora_port.retrieval.rule_registry import RULES, render_classification_guidance
+    records, bounds, batches = report['records'], {}, {}
+    costs = lambda names: sum(records[name]['reserved_tokens_upper'] for name in names)
+    for case in BOUNDED_QUESTIONS:
+        qu = [case + ':query_structure_v1:QU']
+        final = [max((case + ':' + kind + ':' + role for kind in ('final', 'fallback')),
+                     key=lambda name: records[name]['reserved_tokens_upper'])
+                 for role in ('cheap', 'expensive')]
+        paths = {
+            'plain': qu + ['embedding:initial', 'rerank:initial'] + final,
+            'simple-family-max3': qu + ['embedding:compare-child', 'rerank:compare-child'] * 3 + final,
+            'dependent-max1-new-search': qu + ['embedding:initial', 'rerank:initial',
+                'extract', 'old-pool', 'embedding:Q1', 'rerank:Q1'] + final,
+        }
+        largest = max(paths, key=lambda name: costs(paths[name]))
+        upper = costs(paths[largest]); count = max(map(len, paths.values()))
+        bounds[case + ':query_structure_v1'] = {
+            'max_calls': count, 'reservation_tokens_upper': upper,
+            'physical_call_records': paths[largest], 'maximum_reservation_path': largest,
+            'request_paths': {name: {'max_calls': len(names), 'reservation_tokens_upper': costs(names),
+                'physical_call_records': names} for name, names in paths.items()},
+            'actual_usage': 'NOT_RUN', 'final_generation_reserve_included': True,
+            'query_type_is_not_injected': True,
+        }
+        batches[case] = {'kind': 'http', 'submissions': [case + ':query_structure_v1'],
+            'max_calls': count, 'reservation_tokens_upper': upper,
+            'fits_existing_ledger': count <= 12 and upper <= 100000}
+    qu_names = ['qu-only:' + case + ':query_structure_v1:QU' for case in QU_ONLY_QUESTIONS]
+    for case, name in zip(QU_ONLY_QUESTIONS, qu_names):
+        bounds['qu-only:' + case] = {'max_calls': 1,
+            'reservation_tokens_upper': costs([name]), 'physical_call_records': [name],
+            'actual_usage': 'NOT_RUN', 'final_generation_reserve_included': False}
+    batches['qu-only'] = {'kind': 'qu_only', 'submissions': ['qu-only:' + case for case in QU_ONLY_QUESTIONS],
+        'max_calls': len(qu_names), 'reservation_tokens_upper': costs(qu_names),
+        'fits_existing_ledger': len(qu_names) <= 12 and costs(qu_names) <= 100000}
+    recommended = {case: row for case, row in batches.items() if row['fits_existing_ledger']}
+    complete = len(recommended) == len(batches)
+    report.update(schema='s862r-reservation-dryrun/v3',
+        status='DRY_RUN_COMPLETE' if complete else 'BLOCKED_RESERVATION_BUDGET',
+        profile=BOUNDED_PROFILE_ID, submission_bounds=bounds, requested_batches=batches,
+        recommended_batches_not_authorized=recommended,
+        candidate_scopes_not_authorized=batches,
+        requested_full_calls=sum(row['max_calls'] for row in batches.values()),
+        recommended_max_calls=sum(row['max_calls'] for row in recommended.values()),
+        recommended_reservation_upper=sum(row['reservation_tokens_upper'] for row in recommended.values()),
+        budget_block_reason='' if complete else 'At least one proposed isolated batch exceeds12calls or100000 reservedTokens; do not send it.',
+        effective_query_input_contract=dict(PROFILE_QUERY_BOUND),
+        derived_query_bounds={'initial_characters': query_chars,
+            'initial_utf8_bytes': PROFILE_QUERY_BOUND['utf8_bytes'],
+            'child_characters': child_chars,
+            'child_utf8_bytes': PROFILE_QUERY_BOUND['utf8_bytes'] + child_literal_bytes,
+            'child_derivation': 'disjoint exact object/dimension spans plus longest enabled Registry template literal',
+            'Q1_characters': 192, 'Q1_utf8_bytes_upper': 192 * 4,
+            'json_string_bytes_per_character_upper': 6,
+            'nested_json': 'actual extraction_payload then json.dumps then ProviderModel request renderer'},
+        registry_templates=[{'rule_id': rule.rule_id, 'rule_version': rule.rule_version,
+            'templates': list(rule.templates)} for rule in RULES],
+        classification_guidance_sha256=digest(render_classification_guidance().encode('utf8')),
+        source_runtime_validation='frozen read-only inventory; revalidate same hashes,bindings and scope at current isolated startup',
+        image_identity='NOT_BUILT_FOR_CURRENT_SOURCE',
+        no_scope_reduction_assumes_two_objects=True,
+        classification_quality='NOT_RUN; synthetic UNKNOWN captures exact normal understand_query request only')
+    report['output_caps'].update(QU_on=256, extract=256, final_each_role=2048)
+    report['model_ids'] = {role: config.model_id for role, config in configs.items()}
+    return report
+
+
+async def collect_qu_only(output, environment=None, *, settings_factory=None):
+    """Six normal understand_query calls, no retrieval or final generation.
+
+    Runtime construction, Registry, ProviderModel, SendGate and LocalExecution
+    are the existing formal runtime. This is a QU diagnostic, not HTTP QA.
+    """
+    from scripts.s8_ecs_runtime import settings_and_factory
+    from backend.weknora_port.http_api import SessionCreate
+    from backend.weknora_port.models.types import CallContext, TrustedScope
+    from backend.weknora_port.retrieval.pipeline import PipelineState
+    from backend.weknora_port.retrieval.query import understand_query
+    from backend.weknora_port.retrieval.strategy import plan_query, plan_rule_trace
+    environment = dict(os.environ if environment is None else environment)
+    require(environment.get('S861_BOUNDED_QUERY_PROFILE', '').lower() == 'true'
+        and environment.get('WEKNORA_PORT_CLOUD_ALLOWED', '').lower() == 'true',
+        'S862R_EXPLICIT_QU_EXECUTION_REQUIRED')
+    approval = _approved(environment)
+    batch = approval['batches'][environment['S861_BATCH_ID']]
+    require(batch.get('kind') == 'qu_only', 'S862R_QU_ONLY_BATCH_REQUIRED')
+    claim_batch(batch['execution_file'], 'qu-only', digest(profile_manifest(bounded_query_profile=True)))
+    target = Path(output); target.mkdir(parents=True, exist_ok=False)
+    write_new(target / 'input.json', {'profile_sha256': approval['profile_sha256'],
+        'source_revision': approval['source_revision'], 'image_id': approval['image_id'],
+        'authorization_file_sha256': digest(Path(environment['S861_AUTHORIZATION_FILE']).read_bytes()),
+        'turns': batch['turns'], 'query_type_injected': False, 'retrieval_calls': 0,
+        'final_generation_calls': 0})
+    settings, factory, _ = (settings_factory or settings_and_factory)(environment)
+    results = []
+    try:
+        async with factory(settings) as runtime:
+            require(runtime.cloud_allowed and not runtime.graph_enabled,
+                    'S862R_FORMAL_QU_RUNTIME_REQUIRED')
+            for number, spec in enumerate(batch['turns'], 1):
+                require(datetime.fromisoformat(approval['expires_at'].replace('Z', '+00:00'))
+                        > datetime.now(timezone.utc), 'S861_AUTH_EXPIRED')
+                before = ledger_status(batch['execution_file'])
+                require(before['unsettled'] == 0 and before['status'] == 'OPEN', 'S861_UNKNOWN_OR_LEDGER_STOP')
+                session = await runtime.create_session(runtime.principal, SessionCreate(
+                    title='S8.6.2-R QU-only ' + spec['case'], knowledge_base_scope=list(KB_IDS),
+                    document_scope=list(DOCUMENT_IDS), source_evidence_mode='bounded_source_v1',
+                    retrieval_strategy_mode='query_structure_v1'))
+                context = CallContext(spec['request_id'], TrustedScope(runtime.principal.subject_id,
+                    KB_IDS, DOCUMENT_IDS), session_id=session['id'])
+                state = PipelineState(query=spec['question'], rewrite_query=spec['question'],
+                    language='English', chat_model_id=batch['model_ids']['cheap'],
+                    query_understand_model_id=batch['model_ids']['cheap'],
+                    retrieval_strategy_mode='query_structure_v1', source_evidence_mode='bounded_source_v1',
+                    enable_expansion=False)
+                _budget_state_guard(state)
+                require(query_input_bound(state.query)['valid'], 'PROFILE_INPUT_BOUND_EXCEEDED')
+                raw = []
+                prefix = f'{number:02d}-{spec["case"]}'
+                def observe(value):
+                    raw.append(value)
+                    write_new(target / (prefix + '.raw-qu.json'), value)
+                def before_send(model, messages, options, active_context):
+                    body = model.build_request_body(messages, options)
+                    actual = digest(body)
+                    write_new(target / (prefix + '.actual-request.json'), {'request_id': active_context.request_id,
+                        'body': body, 'body_sha256': actual, 'wire_bytes': len(canonical(body))})
+                    require(actual == batch['qu_request_sha256s'][spec['request_id']],
+                            'S862R_ACTUAL_QU_REQUEST_DIFFERS_FROM_PREFLIGHT')
+                registry = runtime.registry_for_context()
+                try:
+                    await understand_query(state, context, _ObservedQueryRegistry(registry, observe, before_send))
+                finally:
+                    await registry.close()
+                after = ledger_status(batch['execution_file'])
+                write_new(target / (prefix + '.state-ledger.json'), {'state': state_snapshot(state), 'ledger': after})
+                require(len(raw) == 1 and raw[0]['finish_reason'] in ('stop', 'end_turn', 'completed'),
+                        'S862R_INCOMPLETE_QU_OUTPUT_STOP')
+                if not query_input_bound(state.rewrite_query or state.query)['valid']:
+                    write_new(target / (prefix + '.bound-failure.json'), {
+                        'status': 'PROFILE_INPUT_BOUND_EXCEEDED', 'state': state_snapshot(state),
+                        'raw_QU_response': raw[0], 'truncated': False, 'resent': False})
+                    raise ValueError('PROFILE_INPUT_BOUND_EXCEEDED')
+                require(after['attempts'] == before['attempts'] + 1 and after['unsettled'] == 0
+                        and after['status'] == 'OPEN', 'S862R_QU_ATTEMPT_OR_SETTLEMENT_MISMATCH')
+                plan = plan_query(state.query, state.rewrite_query or state.query, state.query_type)
+                item = {'case': spec['case'], 'q0': state.query, 'effective_query': state.rewrite_query,
+                    'actual_query_type': state.query_type, 'session_id': session['id'],
+                    'request_id': context.request_id, 'plan': asdict(plan), 'rule_trace': plan_rule_trace(plan),
+                    'query_trace': state.query_trace, 'ledger': after, 'raw_QU_response': raw[0],
+                    'retrieval_calls': 0, 'final_generation_calls': 0,
+                    'classification_correct': 'NOT_REVIEWED', 'semantic_failure_inferred': False}
+                results.append(item); write_new(target / (prefix + '.result.json'), item)
+    except BaseException as error:
+        write_new(target / 'failure.json', {'status': 'STOPPED', 'error_type': type(error).__name__,
+            'error_code': str(error) if isinstance(error, ValueError) else 'S862R_QU_EXECUTION_STOP',
+            'completed_cases': len(results), 'ledger': ledger_status(batch['execution_file']), 'retry': False})
+        raise
+    write_new(target / 'results.json', {'status': 'QU_COMPLETED_REVIEW_REQUIRED', 'results': results,
+        'retrieval_calls': 0, 'final_generation_calls': 0, 'classification_quality': 'REQUIRES_REVIEW'})
+    return results
 
 
 async def collect_http(base_url, batch_id, output, environment=None):
@@ -613,14 +979,17 @@ async def collect_http(base_url, batch_id, output, environment=None):
     from scripts.s8_ecs_runtime import api_token
     environment = dict(os.environ if environment is None else environment)
     approval = _approved(environment)
+    bounded = environment.get('S861_BOUNDED_QUERY_PROFILE', 'false').lower() == 'true'
     require(batch_id == environment.get('S861_BATCH_ID'), 'S861_BATCH_MISMATCH')
     batch = approval['batches'][batch_id]
+    require(batch.get('kind', 'http') == 'http', 'S862R_HTTP_BATCH_REQUIRED')
     turns = batch.get('turns', [])
     require(0 < len(turns) <= 2, 'S861_FROZEN_BATCH_REQUIRED')
     for turn in turns:
-        require(turn.get('question') == QUESTIONS.get(turn.get('case'))
-                and turn.get('mode') in MODES, 'S861_FROZEN_INPUT_MISMATCH')
-    claim_batch(batch['execution_file'], 'collector', digest(profile_manifest()))
+        inputs = BOUNDED_QUESTIONS if bounded else QUESTIONS
+        require(turn.get('question') == inputs.get(turn.get('case'))
+                and turn.get('mode') in (('query_structure_v1',) if bounded else MODES), 'S861_FROZEN_INPUT_MISMATCH')
+    claim_batch(batch['execution_file'], 'collector', digest(profile_manifest(bounded_query_profile=bounded)))
     parsed = urlsplit(base_url)
     require(parsed.scheme == 'http' and parsed.hostname == '127.0.0.1'
         and parsed.path in ('', '/') and not parsed.query and not parsed.fragment
@@ -628,7 +997,7 @@ async def collect_http(base_url, batch_id, output, environment=None):
     target = Path(output)
     target.mkdir(parents=True, exist_ok=False)
     write_new(target / 'input.json', {'batch': batch_id, 'turns': turns,
-        'profile_sha256': digest(profile_manifest()), 'authorization_file_sha256':
+        'profile_sha256': digest(profile_manifest(bounded_query_profile=bounded)), 'authorization_file_sha256':
         digest(Path(environment['S861_AUTHORIZATION_FILE']).read_bytes())})
     headers = {'Authorization': 'Bearer ' + api_token(environment),
         'Origin': 'http://127.0.0.1:5173', 'Accept-Language': 'en-US'}
@@ -747,6 +1116,7 @@ def main(argv=None):
     commands = parser.add_subparsers(dest='command', required=True)
     plan = commands.add_parser('profile')
     plan.add_argument('--output')
+    plan.add_argument('--bounded-query-profile', action='store_true')
     api = commands.add_parser('api')
     api.add_argument('--port', type=int, default=8000)
     collect = commands.add_parser('collect')
@@ -757,12 +1127,15 @@ def main(argv=None):
     dry.add_argument('--inventory', required=True)
     dry.add_argument('--sources', required=True)
     dry.add_argument('--output', required=True)
+    dry.add_argument('--bounded-query-profile', action='store_true')
+    qu = commands.add_parser('qu-only')
+    qu.add_argument('--output', required=True)
     args = parser.parse_args(argv)
     if args.command == 'profile':
-        value = profile_manifest()
+        value = profile_manifest(bounded_query_profile=args.bounded_query_profile)
         if args.output:
             write_new(args.output, value)
-        print(json.dumps({'profile': PROFILE_ID, 'sha256': digest(value),
+        print(json.dumps({'profile': value['profile'], 'sha256': digest(value),
             'prompt_b_suffix_sha256': value['prompt_b_suffix_sha256'], 'new_actual_provider_calls': 0}))
         return 0
     if args.command == 'collect':
@@ -771,10 +1144,15 @@ def main(argv=None):
         return 0
     if args.command == 'dry-run':
         import asyncio
-        value = asyncio.run(dry_run_inventory(args.inventory, args.sources))
+        value = asyncio.run(dry_run_inventory(args.inventory, args.sources,
+            bounded_query_profile=args.bounded_query_profile))
         write_new(args.output, value)
         print(json.dumps({key: value[key] for key in ('status', 'requested_full_calls',
             'recommended_max_calls', 'recommended_reservation_upper', 'new_actual_provider_calls')}))
+        return 0
+    if args.command == 'qu-only':
+        import asyncio
+        asyncio.run(collect_qu_only(args.output))
         return 0
     import uvicorn
     uvicorn.run(create_application(), host='0.0.0.0', port=args.port,
