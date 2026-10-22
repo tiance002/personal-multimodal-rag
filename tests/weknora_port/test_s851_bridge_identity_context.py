@@ -17,7 +17,7 @@ from backend.weknora_port.retrieval.bridge_rescue import rescue_bridge
 from backend.weknora_port.retrieval.context import into_chat_message
 from backend.weknora_port.retrieval.types import SearchResult, context_results
 from backend.weknora_port.retrieval.search import RetrievalScopeError
-from backend.weknora_port.retrieval.source_evidence import SourceEvidenceBudgetError
+from backend.weknora_port.retrieval.types import ContextBudgetError
 from backend.weknora_port.generation.context import Evidence, prepare_generation
 from backend.weknora_port.generation.types import GenerationRequest
 from test_bridge_rescue import Models, Repository
@@ -126,7 +126,7 @@ def test_identity_context_budget_rejection_keeps_first_and_second_hop_unchanged(
         if limit==2000:
             # The unchanged base generation encoding is itself >2000; do not
             # claim a usable answer merely because the optional anchor rolled back.
-            with pytest.raises(SourceEvidenceBudgetError):
+            with pytest.raises(ContextBudgetError):
                 await render(state,context)
         else:
             _,prepared = await render(state,context)
@@ -156,7 +156,7 @@ def test_citation_handles_are_included_in_identity_admission_budget():
         request = GenerationRequest('budget','session','answer',wide.query,limited,
             evidence=tuple(Evidence.from_result(row) for row in context_results(wide)))
         prepare_generation(replace(request,citations_enabled=False))
-        with pytest.raises(SourceEvidenceBudgetError):
+        with pytest.raises(ContextBudgetError):
             prepare_generation(replace(request,citations_enabled=True))
         state,context,repository,models = scenario(limit=2875)
         await rescue_bridge(state,context,repository,models)

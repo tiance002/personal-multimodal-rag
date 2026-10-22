@@ -171,7 +171,7 @@ def test_actual_final_generation_delivery_observer_and_embedding_queries():
         assert all(entry['delivery']=='DELIVERED' and entry['semantic_support']=='NOT_CHECKED' for entry in s.strategy_coverage.values())
     asyncio.run(run())
 
-def test_final_context_budget_cannot_leave_free_generation_with_no_sources():
+def test_large_header_does_not_erase_originals_under_artificial_source_limit():
     async def run():
         class LargeHeader(Repo):
             async def hybrid_search(self,*args,**kwargs):
@@ -179,8 +179,7 @@ def test_final_context_budget_cannot_leave_free_generation_with_no_sources():
                 for r in rows:r.knowledge_title='Large source header '*1200;self.sources[r.id]=deepcopy(r)
                 return rows
         s=state(enable_rewrite=False);models=Models()
-        with pytest.raises(SearchNothing):
-            await RetrievalPipeline(LargeHeader(),Registry(models)).run(s,CTX)
-        assert not s.merge_results
-        assert all(e['delivery']=='BUDGET_OMITTED' for e in s.strategy_coverage.values())
+        final=await RetrievalPipeline(LargeHeader(),Registry(models)).run(s,CTX)
+        assert s.merge_results and final.result_ids
+        assert all(e['delivery']!='BUDGET_OMITTED' for e in s.strategy_coverage.values())
     asyncio.run(run())

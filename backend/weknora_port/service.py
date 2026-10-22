@@ -421,10 +421,10 @@ class RuntimeService:
             evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,**options)
         if getattr(state, 'rescue_evidence', ()):
             from .generation.context import prepare_generation
-            from .retrieval.source_evidence import SourceEvidenceBudgetError
+            from .retrieval.types import ContextBudgetError
             try:
                 prepare_generation(request)
-            except SourceEvidenceBudgetError:
+            except ContextBudgetError:
                 # The final source encoder can be larger than retrieval markup.
                 # Preserve every normal source and drop only the optional addition.
                 from .retrieval.context import into_chat_message

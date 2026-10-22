@@ -4,6 +4,10 @@ from copy import deepcopy
 from typing import Any
 
 
+class ContextBudgetError(ValueError):
+    """Existing graph/bridge encoder budget; never a Source Unit size limit."""
+
+
 @dataclass
 class SearchResult:
     id: str

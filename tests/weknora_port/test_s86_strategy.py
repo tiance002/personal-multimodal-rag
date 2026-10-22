@@ -249,13 +249,13 @@ def test_local_budget_stop_preserves_prior_source_and_unknown_propagates():
     asyncio.run(run())
 
 
-def test_source_budget_result_continues_good_branch():
+def test_real_call_budget_result_continues_good_branch():
     async def run():
         state,ctx=setup_state()
         calls=[]
         async def retrieve(sub,child):
             calls.append(child.request_id)
-            if len(calls)==1: return RoundResult(sub,'BUDGET_OMITTED','SOURCE_UNIT_BUDGET_EXCEEDED')
+            if len(calls)==1: return RoundResult(sub,'BUDGET_OMITTED','LOCAL_EXECUTION_LIMIT_DENIED')
             sub.merge_results=[source('kept','raw second branch')]
             return RoundResult(sub)
         result=await execute_plan(state,ctx,plan_query(state.query,state.query,'SIMPLE_COMPARE'),retrieve)
@@ -332,6 +332,6 @@ def test_actual_prepared_messages_required_for_delivery_and_budget_trim():
         state.merge_results[0].metadata['strategy_subquery_ids']=['sq-1']
         state.merge_results[1].metadata['strategy_subquery_ids']=['sq-2']
         await fit_context_budget(state,ctx)
-        assert len(state.merge_results)==1
-        assert state.strategy_coverage['sq-2']['delivery']=='BUDGET_OMITTED'
+        assert len(state.merge_results)==2  # No artificial 16000-character source limit.
+        assert not any(t.get('reason')=='FINAL_CONTEXT_BUDGET' for t in state.strategy_trace)
     asyncio.run(run())

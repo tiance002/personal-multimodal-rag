@@ -243,7 +243,7 @@ async def admit_identity_context(state, context, repository, data, chain, proof)
     from copy import copy, deepcopy
     from .bridge_rescue import _check, _read_originals, _trace
     from .context import into_chat_message
-    from .source_evidence import SourceEvidenceBudgetError
+    from .types import ContextBudgetError
     from .types import context_results
     from ..generation.context import Evidence, prepare_generation
     from ..generation.types import GenerationRequest
@@ -288,7 +288,7 @@ async def admit_identity_context(state, context, repository, data, chain, proof)
             'identity-context-preview',state.query,finalized,
             evidence=tuple(Evidence.from_result(row) for row in context_results(trial)),
             language=state.language,citations_enabled=True))
-    except SourceEvidenceBudgetError:
+    except ContextBudgetError:
         _trace(state,'IDENTITY_CONTEXT_SKIPPED',reason='IDENTITY_CONTEXT_BUDGET_EXCEEDED',
                source_ids=[row.id for row in additions],final_context_identity_supported=False)
         return

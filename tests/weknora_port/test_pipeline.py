@@ -154,7 +154,8 @@ def test_rerank_top_one_floor(score,accepted):
     s=state(rerank_model_id='rerank');s.search_results=[row()];m=Model([[RerankResult(0,score)]])
     if accepted:run(rerank(s,CTX,Registry(m)));assert s.rerank_results
     else:
-        with pytest.raises(SearchNothing):run(rerank(s,CTX,Registry(m)))
+        run(rerank(s,CTX,Registry(m)));assert not s.rerank_results and s.search_results
+        assert s.evidence_trace[-1]['reason']=='RERANK_ALL_BELOW_THRESHOLD_SEARCH_FALLBACK'
 
 def test_rerank_retry_restores_threshold_and_override_floor():
     s=state(rerank_model_id='r',rerank_threshold=.8);s.search_results=[row()]

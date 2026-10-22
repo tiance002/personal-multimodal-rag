@@ -79,8 +79,9 @@ def sequential(results, *, preserve_sources=False):
                 last.end_at = cur.end_at
             elif mode == 'join':
                 last.content = join_content(last.content, cur.content)
-            if cur.id not in last.sub_chunk_ids:
-                last.sub_chunk_ids.append(cur.id)
+            for member in (cur.id, *cur.sub_chunk_ids):
+                if member not in last.sub_chunk_ids:
+                    last.sub_chunk_ids.append(member)
             merge_images(last, cur)
             last.score = max(last.score, cur.score)
             index = max(index, cur.chunk_index)
@@ -91,7 +92,9 @@ async def _chunks(repository, ids, state, context):
     if not ids:
         return {}
     try:
-        chunks = await repository.get_chunks(ids, context)
+        chunks = (await repository.get_chunks(ids, context, current=True)
+                  if getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1'
+                  else await repository.get_chunks(ids, context))
         if not isinstance(chunks, dict):
             chunks = {r.id: r for r in chunks}
         if not set(chunks) <= set(ids):
@@ -232,15 +235,33 @@ async def resolve_parents(results, state, context, repository):
         parent = parents.get(r.parent_chunk_id)
         if not parent or not parent.content:
             continue
+        if not ((r.chunk_type == 'text' and parent.chunk_type == 'parent_text') or
+                (r.chunk_type in ('image_ocr', 'image_caption') and parent.chunk_type == 'text')):
+            continue
+        if (parent.knowledge_id, parent.knowledge_base_id) != (r.knowledge_id, r.knowledge_base_id):
+            raise RetrievalScopeError()
+        if (getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                (not parent.metadata.get('source_version') or
+                 parent.metadata.get('source_version') != r.metadata.get('source_version') or
+                 parent.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+            raise RetrievalScopeError()
         if r.chunk_type == 'text' and parent.chunk_type == 'parent_text':
             r.image_info = scoped.get(r.id, '')
-            r.content = join_content(prune_images(parent.content, r.image_info), r.content)
+            parent_body = (parent.content if getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1'
+                           else prune_images(parent.content, r.image_info))
+            r.content = join_content(parent_body, r.content)
         elif r.chunk_type in ('image_ocr', 'image_caption') and parent.chunk_type == 'text':
             recognized = r.content
             hit = r.image_info
             source = parents.get(parent.parent_chunk_id)
             if source is None or source.chunk_type != 'parent_text' or (not source.content):
                 source = parent
+            if ((source.knowledge_base_id, source.knowledge_id) != (r.knowledge_base_id, r.knowledge_id) or
+                    getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                    (not source.metadata.get('source_version') or
+                     source.metadata.get('source_version') != r.metadata.get('source_version') or
+                     source.chunk_metadata.get('source_version') != r.chunk_metadata.get('source_version'))):
+                raise RetrievalScopeError()
             r.chunk_index = parent.chunk_index
             r.image_info = scoped.get(parent.id, '')
             if not r.image_info and hit:
@@ -249,7 +270,10 @@ async def resolve_parents(results, state, context, repository):
                 urls.update((go_strip(m[2]) for m in HTML_IMAGE.finditer(parent.content)))
                 infos = [i for i in image_infos(hit) if i.get('url') in urls or i.get('original_url') in urls]
                 r.image_info = json.dumps(infos, ensure_ascii=False) if infos else ''
-            r.content = join_content(prune_images(source.content, r.image_info), prune_images(parent.content, r.image_info))
+            if getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1':
+                r.content = join_content(source.content, parent.content)
+            else:
+                r.content = join_content(prune_images(source.content, r.image_info), prune_images(parent.content, r.image_info))
             r.content = join_content(r.content, recognized)
             infos = image_infos(r.image_info)
             field = 'ocr_text' if r.chunk_type == 'image_ocr' else 'caption'
@@ -261,6 +285,11 @@ async def resolve_parents(results, state, context, repository):
         else:
             continue
         r.content_rewritten = True
+        if getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1':
+            if parent.id not in r.sub_chunk_ids:
+                r.sub_chunk_ids.append(parent.id)
+            if r.chunk_type in ('image_ocr', 'image_caption') and source.id not in r.sub_chunk_ids:
+                r.sub_chunk_ids.append(source.id)
         if r.id not in r.sub_chunk_ids:
             r.sub_chunk_ids.append(r.id)
     return results
@@ -334,7 +363,13 @@ async def expand_neighbors(results, state, context, repository):
         base = cache.get(r.id)
         if base is None or not base.content or base.chunk_type != 'text':
             continue
+        if ((base.knowledge_base_id, base.knowledge_id) != (r.knowledge_base_id, r.knowledge_id) or
+                getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                (not base.metadata.get('source_version') or
+                 base.metadata.get('source_version') != r.metadata.get('source_version'))):
+            raise RetrievalScopeError()
         before = after = ''
+        selected_body = r.content  # Includes earlier selected members/parent context.
         prev = base.pre_chunk_id
         next = base.next_chunk_id
         seen = {base.id}
@@ -351,12 +386,17 @@ async def expand_neighbors(results, state, context, repository):
                     else:
                         next = ''
                     continue
+                if (c.knowledge_base_id != base.knowledge_base_id or
+                        getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1' and
+                        (c.metadata.get('source_version') != base.metadata.get('source_version') or
+                         c.chunk_metadata.get('source_version') != base.chunk_metadata.get('source_version'))):
+                    raise RetrievalScopeError()
                 seen.add(cursor)
                 # A neighbor is optional context. Never sacrifice the selected
                 # source body or split a formula/table merely to fill a window.
                 candidate_before = join_content(c.content, before) if side == 'prev' else before
                 candidate_after = join_content(after, c.content) if side == 'next' else after
-                if len(join_content(join_content(candidate_before, base.content), candidate_after)) > 850:
+                if len(join_content(join_content(candidate_before, selected_body), candidate_after)) > 850:
                     if side == 'prev':
                         prev = ''
                     else:
@@ -369,13 +409,13 @@ async def expand_neighbors(results, state, context, repository):
                 else:
                     after = join_content(after, c.content)
                     next = c.next_chunk_id
-                if len(join_content(join_content(before, base.content), after)) >= 350 and len(added) > 2:
+                if len(join_content(join_content(before, selected_body), after)) >= 350 and len(added) > 2:
                     break
-            merged = join_content(join_content(before, base.content), after)
+            merged = join_content(join_content(before, selected_body), after)
             if len(merged) >= 350:
                 break
-        if base.content:
-            r.content = join_content(join_content(before, base.content), after)
+        if added:
+            r.content = join_content(join_content(before, selected_body), after)
             r.content_rewritten = True
             r.sub_chunk_ids.extend((i for i in added if i not in r.sub_chunk_ids))
 
@@ -390,6 +430,8 @@ async def merge(state, context, repository, segmenter=None):
     if not state.needs_retrieval:
         return
     results = deepcopy(state.rerank_results or sorted(state.search_results, key=lambda r: r.score, reverse=True))
+    if not state.rerank_results and state.rerank_top_k > 0:
+        results = results[:state.rerank_top_k]
     preserve_sources = getattr(state, 'source_evidence_mode', 'off') == 'bounded_source_v1'
     if preserve_sources:
         # Validate before content/identity dedup can hide an invalid candidate.

@@ -10,7 +10,7 @@ from backend.weknora_port.models.types import CallContext, TrustedScope
 from backend.weknora_port.retrieval.pipeline import PipelineState
 from backend.weknora_port.retrieval.search import SearchTarget, RetrievalScopeError
 from backend.weknora_port.retrieval.types import SearchResult
-from backend.weknora_port.retrieval.source_evidence import expand_source_evidence, MODE, CONTEXT_CHARS
+from backend.weknora_port.retrieval.source_evidence import project_source_evidence, MODE
 from backend.weknora_port.retrieval.context import into_chat_message
 from backend.weknora_port.storage.knowledge import ScopedKnowledgeRepository
 from backend.weknora_port.generation.context import Evidence, prepare_generation
@@ -84,172 +84,86 @@ def summary_case():
 @pytest.mark.parametrize('field,value',[
     ('knowledge_enable_status','disabled'), ('knowledge_parse_status','processing'),
     ('knowledge_parse_status','failed')])
-def test_selected_outside_optional_groups_rejects_document_that_became_unavailable(field, value):
+def test_unavailable_document_excludes_only_its_selected_source(field, value):
     async def run():
         originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
         selected = [result(r) for r in originals]
-        # Recall was valid; the document becomes unavailable before the final
-        # authoritative readback, outside the three optional expansion groups.
         originals[-1][field] = value
-        s = state(selected)
-        with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
-            await expand_source_evidence(s, CTX, repository(originals))
-    asyncio.run(run())
-
-
-def test_summary_recovers_intact_real_body_with_independent_identity_and_score():
-    async def run():
-        source,hint=summary_case(); s=state([result(hint)])
-        await expand_source_evidence(s,CTX,repository([source,hint]))
-        assert [r.id for r in s.merge_results]==['raw']
-        recovered=s.merge_results[0]
-        assert recovered.content==source['content'] and recovered.score==0
-        assert recovered.start_at==0 and recovered.end_at==len(source['content'])
-        assert recovered.metadata['source_anchor_score']==.9
-        final=await into_chat_message(s)
-        req=GenerationRequest('r','s','m',s.query,final,tuple(Evidence.from_result(r) for r in s.merge_results))
-        actual=prepare_generation(req)
-        assert 'evidence_kind="source_text"' in actual.messages[-1].content
-        assert 'evidence_kind="generated_summary"' not in actual.messages[-1].content
-        assert '\\begin{bmatrix}' in actual.messages[-1].content
-        assert '&amp; -3' in actual.messages[-1].content
-    asyncio.run(run())
-
-
-def test_preceding_window_keeps_real_ids_and_reciprocal_locators_not_guessed_titles():
-    async def run():
-        a=row('a','Report period: 2011',0,next_chunk_id='b')
-        b=row('b','Annual activities',1,pre_chunk_id='a',next_chunk_id='c')
-        c=row('c','The training programme served 800 people.',2,pre_chunk_id='b')
-        s=state([result(c)]); await expand_source_evidence(s,CTX,repository([a,b,c]))
-        assert {r.id for r in s.merge_results}=={'a','b','c'}
-        assert all(r.content==next(x['content'] for x in [a,b,c] if x['id']==r.id) for r in s.merge_results)
-        assert s.evidence_trace[-1]['reason']=='PRECEDING_SOURCE_WINDOW'
-    asyncio.run(run())
-
-
-@pytest.mark.parametrize('change',[
-    {'tenant_id':2},{'knowledge_base_id':'other'},{'knowledge_id':'other'},
-    {'metadata':{'source_version':'old'}},{'is_enabled':False},{'deleted_at':'2026-01-01'},
-    {'knowledge_parse_status':'processing'},{'knowledge_enable_status':'disabled'}])
-def test_invalid_current_source_does_not_enter_context(change):
-    async def run():
-        source,hint=summary_case(); source.update(change)
-        s=state([result(hint)])
-        try: await expand_source_evidence(s,CTX,repository([source,hint]))
-        except PermissionError: pass
-        assert [r.id for r in s.merge_results]==['hint']
+        s = state(selected); await project_source_evidence(s, CTX, repository(originals))
+        assert [r.id for r in s.merge_results] == [f'source-{i}' for i in range(3)]
+        assert any(t.get('omitted_ids') == ['source-3'] for t in s.evidence_trace)
     asyncio.run(run())
 
 
 @pytest.mark.parametrize('metadata', [{},{'origin':'model_generated_summary'},
-    {'origin':'literal','upstream_parent_link':True},
-    {'origin':'model_generated_summary','upstream_parent_link':True,'source_version':'old'}])
-def test_forged_or_missing_summary_link_is_not_a_source_unit(metadata):
+    {'origin':'model_generated_summary','upstream_parent_link':True}])
+def test_summary_never_triggers_extra_source_window(metadata):
     async def run():
-        source,hint=summary_case(); hint['metadata']=metadata
-        s=state([result(hint)]); await expand_source_evidence(s,CTX,repository([source,hint]))
-        assert len(s.merge_results)==0
+        source,hint=summary_case();hint['metadata']=metadata
+        repo=repository([source,hint]);s=state([result(hint)])
+        await project_source_evidence(s,CTX,repo)
+        assert s.merge_results == [] and repo.retriever.connection.calls == []
+        assert s.evidence_trace[-1]['reason']=='SUMMARY_LOCATOR_ONLY'
     asyncio.run(run())
 
 
-def test_long_document_is_not_truncated_into_a_fake_complete_short_source():
+@pytest.mark.parametrize('change',[
+    {'tenant_id':2},{'knowledge_base_id':'other'},{'knowledge_id':'other'}])
+def test_invalid_authorized_readback_fails_closed(change):
     async def run():
-        source,hint=summary_case(); source['content']='x'*2049
-        s=state([result(hint)]); await expand_source_evidence(s,CTX,repository([source,hint]))
-        assert [r.id for r in s.merge_results]==[]
+        source=row('raw','Actual source');selected=result(source);source.update(change)
+        with pytest.raises((PermissionError, RetrievalScopeError)):
+            await project_source_evidence(state([selected]),CTX,repository([source]))
     asyncio.run(run())
 
 
-def test_disabled_source_member_prevents_fake_complete_short_document():
+@pytest.mark.parametrize('start,end',[(100,99),(-1,3),(0,999)])
+def test_invalid_offsets_never_become_source_proof(start,end):
     async def run():
-        source,hint=summary_case(); disabled=row('disabled','Unreleased source',1,is_enabled=False)
-        s=state([result(hint)]);await expand_source_evidence(s,CTX,repository([source,hint,disabled]))
-        assert [r.id for r in s.merge_results]==[]
-    asyncio.run(run())
-
-
-@pytest.mark.parametrize('start,end', [(100,99),(-1,3),(0,999)])
-def test_invalid_offsets_are_not_promoted_to_valid_source_proof(start,end):
-    async def run():
-        source,hint=summary_case();source.update(start_at=start,end_at=end)
+        source=row('raw','Actual source');selected=result(source);source.update(start_at=start,end_at=end)
         with pytest.raises(PermissionError,match='LOCATOR'):
-            await expand_source_evidence(state([result(hint)]),CTX,repository([source,hint]))
+            await project_source_evidence(state([selected]),CTX,repository([source]))
     asyncio.run(run())
 
 
-def test_unrelated_later_neighbor_is_not_loaded_and_duplicate_anchors_do_not_duplicate_source():
+def test_identity_projection_reads_only_selected_and_recorded_members():
     async def run():
-        source,hint=summary_case()
-        s=state([result(source), result(hint)])
-        await expand_source_evidence(s,CTX,repository([source,hint,row('later','Unrelated next chapter',8)]))
-        assert [r.id for r in s.merge_results]==['raw']
+        a=row('a','Earlier source',0,next_chunk_id='b')
+        b=row('b','Selected source',1,pre_chunk_id='a',next_chunk_id='c')
+        c=row('c','Later source',2,pre_chunk_id='b')
+        repo=repository([a,b,c]);s=state([result(b)])
+        await project_source_evidence(s,CTX,repo)
+        assert [r.id for r in s.merge_results]==['b']
+        assert len(repo.retriever.connection.calls)==1
+        assert 'SELECT id FROM chunks' not in repo.retriever.connection.calls[0][0]
     asyncio.run(run())
 
 
-def test_broken_locator_fails_closed():
+def test_member_identifier_without_its_quote_is_not_delivery_proof():
     async def run():
-        a=row('a','Prior',0,next_chunk_id='wrong')
-        b=row('b','Selected',1,pre_chunk_id='a')
-        s=state([result(b)])
-        with pytest.raises(PermissionError,match='LOCATOR'):
-            await expand_source_evidence(s,CTX,repository([a,b]))
+        a=row('a','Earlier source',0);b=row('b','Selected source',1)
+        selected=result(b);selected.sub_chunk_ids=['a'];s=state([selected])
+        await project_source_evidence(s,CTX,repository([a,b]))
+        assert [r.id for r in s.merge_results]==['b']
+        assert s.evidence_trace[-1]['omitted_ids']==['a']
     asyncio.run(run())
 
 
-@pytest.mark.parametrize('order', [('a','c'),('c','a'),('hint','a','c')])
-def test_empty_or_already_present_anchor_does_not_suppress_later_source_window(order):
+def test_unverifiable_projection_does_not_discard_other_original():
     async def run():
-        rows=[row('a','Source introduction',0,next_chunk_id='b'),
-              row('b','Source period and original intermediate text',1,pre_chunk_id='a',next_chunk_id='c'),
-              row('c','Source fact',2,pre_chunk_id='b'),
-              row('oversize','x'*2049,3),
-              row('hint','Whole-document summary',4,'summary',parent_chunk_id='a',
-                  metadata={'origin':'model_generated_summary','upstream_parent_link':True})]
-        by_id={r['id']:r for r in rows}
-        s=state([result(by_id[id]) for id in order])
-        await expand_source_evidence(s,CTX,repository(rows))
-        assert {r.id for r in s.merge_results}>={'a','b','c'}
-        assert len([r for r in s.merge_results if r.id=='b'])==1
+        a=row('a','Original first');b=row('b','Original second')
+        selected=result(a);selected.content='Lost body'
+        s=state([selected,result(b)]);await project_source_evidence(s,CTX,repository([a,b]))
+        assert [r.id for r in s.merge_results]==['b']
     asyncio.run(run())
 
 
-def test_subchunk_identifier_without_full_quote_is_not_a_coverage_proof():
+def test_off_noop_and_invalid_mode_rejected():
     async def run():
-        a=row('a','The original source period is 2011.',0,next_chunk_id='b')
-        b=row('b','Intermediate source',1,pre_chunk_id='a',next_chunk_id='c')
-        c=row('c','The source count is 800.',2,pre_chunk_id='b')
-        selected=result(c);selected.sub_chunk_ids=['a']
-        s=state([selected]);await expand_source_evidence(s,CTX,repository([a,b,c]))
-        assert any(r.id=='a' and r.content==a['content'] for r in s.merge_results)
-    asyncio.run(run())
-
-
-def test_same_identifier_with_lost_body_is_not_reported_as_complete():
-    async def run():
-        source,hint=summary_case();hit=result(source);hit.content='Only a partial old projection'
-        with pytest.raises(ValueError,match='SOURCE_BODY_NOT_PRESERVED'):
-            await expand_source_evidence(state([hit,result(hint)]),CTX,repository([source,hint]))
-    asyncio.run(run())
-
-
-def test_context_budget_refuses_intact_oversize_source_instead_of_slicing_formula():
-    async def run():
-        s=state([result(row('huge', r'\begin{bmatrix}'+'x'*CONTEXT_CHARS+r'\end{bmatrix}'))])
-        with pytest.raises(ValueError,match='BUDGET'):
-            await into_chat_message(s)
-    asyncio.run(run())
-
-
-def test_off_is_a_true_noop_and_unknown_mode_is_rejected():
-    async def run():
-        source,hint=summary_case(); s=state([result(hint)])
-        s.source_evidence_mode='off'
-        await expand_source_evidence(s,CTX,None)
-        assert len(s.merge_results)==1
+        source,hint=summary_case();s=state([result(hint)]);s.source_evidence_mode='off'
+        await project_source_evidence(s,CTX,None);assert len(s.merge_results)==1
         s.source_evidence_mode='guessed'
-        with pytest.raises(ValueError,match='MODE'):
-            await expand_source_evidence(s,CTX,None)
+        with pytest.raises(ValueError,match='MODE'):await project_source_evidence(s,CTX,None)
     asyncio.run(run())
 
 

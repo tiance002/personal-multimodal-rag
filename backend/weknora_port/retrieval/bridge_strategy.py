@@ -20,7 +20,8 @@ from .bridge_rescue import (ADDED_CHARS, CANDIDATES, CONTRACT_VERSION,
     _literal_prefix_search_clues, _phrase_positions, _read_originals,
     _require_known_usage, _trace, prepare_verified_bridge, sentence_spans)
 from .search import RetrievalScopeError, validate_results, validate_targets
-from .source_evidence import SourceEvidenceBudgetError, _domain, _validate_source
+from .source_evidence import _domain, _validate_source
+from .types import ContextBudgetError
 
 
 class BridgeStatus(str, Enum):
@@ -358,11 +359,11 @@ async def _admit(plan, assessment, state, context, repository):
             details['identity_proof'] = asdict(current_identity)
     try:
         if state.rerank_top_k > 0 and len(context_results(trial)) > state.rerank_top_k:
-            raise SourceEvidenceBudgetError('BRIDGE_GLOBAL_TOPK_BUDGET_EXCEEDED')
+            raise ContextBudgetError('BRIDGE_GLOBAL_TOPK_BUDGET_EXCEEDED')
         finalized = await into_chat_message(trial, context, record_bridge=False)
         bridge_limit=state.bridge_context_char_limit
         if len(finalized.rendered_contexts)>bridge_limit:
-            raise SourceEvidenceBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
+            raise ContextBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
         finalized=replace(finalized,context_char_limit=min(finalized.context_char_limit or bridge_limit,bridge_limit))
         prepared = prepare_generation(GenerationRequest(context.request_id,
             context.session_id or 'bridge-context-preview','bridge-context-preview',
@@ -373,8 +374,8 @@ async def _admit(plan, assessment, state, context, repository):
         wire = '\n'.join(message['content'] for message in json.loads(prepared.full_prompt))
         if not all(source.id in finalized.result_ids and escape_text(source.content) in wire
                    for source in assessment.evidence):
-            raise SourceEvidenceBudgetError('BRIDGE_SOURCE_NOT_IN_GENERATION_MESSAGES')
-    except SourceEvidenceBudgetError as error:
+            raise ContextBudgetError('BRIDGE_SOURCE_NOT_IN_GENERATION_MESSAGES')
+    except ContextBudgetError as error:
         _trace(state,'STRATEGY_BRIDGE_BUDGET_OMITTED',reason=str(error),
                source_ids=[row.id for row in assessment.evidence],q1=plan.q1)
         return replace(assessment,reason=str(error),delivered=False,final_answer_supported=False,budget_omitted=True)

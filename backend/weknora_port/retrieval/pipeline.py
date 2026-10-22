@@ -105,7 +105,6 @@ class RetrievalPipeline:
         import asyncio
         from ..models.types import CallCancelled, RunDeadlineExceeded
         from .search import SearchNothing, SearchError
-        from .source_evidence import SourceEvidenceBudgetError
         from .strategy_executor import RoundResult
         def check_context():
             if context.cancelled and context.cancelled.is_set():
@@ -138,7 +137,7 @@ class RetrievalPipeline:
             check_context()
             await self._progress("merge", "started")
             if ordinary_empty:
-                # A graph rescue must not resurrect all threshold-rejected Search rows.
+                # Only an actually empty Search bypasses ordinary Merge.
                 state.merge_results = []
             else:
                 await merge(state, context, self.repository, self.segmenter)
@@ -148,10 +147,10 @@ class RetrievalPipeline:
                 filter_top_k(state)
             check_context()
             if state.source_evidence_mode != 'off' and not ordinary_empty:
-                from .source_evidence import expand_source_evidence
-                await self._progress('source_unit', 'started')
-                await expand_source_evidence(state, context, self.repository)
-                await self._progress('source_unit', 'completed', candidate_count=len(state.merge_results))
+                from .source_evidence import project_source_evidence
+                await self._progress('source_projection', 'started')
+                await project_source_evidence(state, context, self.repository)
+                await self._progress('source_projection', 'completed', candidate_count=len(state.merge_results))
                 check_context()
                 if not state.merge_results:
                     if not empty_allowed:
@@ -161,11 +160,6 @@ class RetrievalPipeline:
                 raise
             state.merge_results = []
             return RoundResult(state, status='EMPTY', reason='SEARCH_NOTHING')
-        except SourceEvidenceBudgetError:
-            if not getattr(state, '_strategy_serial', False):
-                raise
-            state.merge_results = []
-            return RoundResult(state, status='BUDGET_OMITTED', reason='SOURCE_UNIT_BUDGET_EXCEEDED')
         except SearchError as error:
             from .search import RetrievalScopeError
             if isinstance(error, RetrievalScopeError) or not getattr(state, '_strategy_serial', False):
@@ -284,14 +278,14 @@ class RetrievalPipeline:
         if state.bridge_rescue_mode != 'off' and not ordinary_empty:
             from copy import copy
             from .bridge_rescue import rescue_bridge
-            from .source_evidence import SourceEvidenceBudgetError
+            from .types import ContextBudgetError
             await self._progress('bridge', 'started')
             await rescue_bridge(state, context, self.repository, self.registry)
             check_context()
             if state.rescue_evidence:
                 try:
                     await into_chat_message(copy(state), context, record_bridge=False)
-                except SourceEvidenceBudgetError:
+                except ContextBudgetError:
                     state.rescue_evidence = []
                     state.bridge_trace.append({'decision': 'SKIPPED', 'reason': 'BRIDGE_CONTEXT_BUDGET_EXCEEDED'})
             await self._progress('bridge', 'completed', added_chunks=len(state.rescue_evidence))

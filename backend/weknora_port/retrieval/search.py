@@ -49,9 +49,6 @@ class RetrievalRepository(Protocol):
     async def get_faq_answers(self, ids: Sequence[str], context: CallContext) -> Mapping[str, object]:
         ...
 
-    async def get_source_unit(self, anchor: SearchResult, context: CallContext) -> Sequence[SearchResult]:
-        ...
-
 class SearchError(Exception):
     pass
 

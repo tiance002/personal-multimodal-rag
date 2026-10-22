@@ -18,6 +18,7 @@ class FinalizedContext:
     system_prompt_override: str = ''
     images: tuple[str, ...] = ()
     context_char_limit: int = 0
+    classify_sources: bool = False
 
 def render_placeholders(template, values, now=None):
     now = now or datetime.now()
@@ -133,23 +134,19 @@ async def into_chat_message(state, context=None, *, persist_sink=None, now=None,
             except Exception:
                 pass
     limit = 0
-    if getattr(state, 'source_evidence_mode', 'off') != 'off':
-        from .source_evidence import CONTEXT_CHARS, SourceEvidenceBudgetError
-        limit = CONTEXT_CHARS
-        if len(state.rendered_contexts) > limit:
-            raise SourceEvidenceBudgetError('SOURCE_CONTEXT_BUDGET_EXCEEDED')
     if getattr(state, 'graph_context_char_limit', 0):
-        from .source_evidence import SourceEvidenceBudgetError
+        from .types import ContextBudgetError
         limit = state.graph_context_char_limit
         if len(state.rendered_contexts) > limit:
-            raise SourceEvidenceBudgetError('GRAPH_CONTEXT_BUDGET_EXCEEDED')
+            raise ContextBudgetError('GRAPH_CONTEXT_BUDGET_EXCEEDED')
     if getattr(state, 'rescue_evidence', ()):
-        from .source_evidence import SourceEvidenceBudgetError
+        from .types import ContextBudgetError
         bridge_limit = state.bridge_context_char_limit
         if len(state.rendered_contexts) > bridge_limit:
-            raise SourceEvidenceBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
+            raise ContextBudgetError('BRIDGE_CONTEXT_BUDGET_EXCEEDED')
         limit = min(limit or bridge_limit, bridge_limit)
-    result = FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in context_results(state))), state.system_prompt_override, tuple(state.images), limit)
+    result = FinalizedContext(state.user_content, state.rendered_contexts, tuple((r.id for r in context_results(state))), state.system_prompt_override, tuple(state.images), limit,
+        getattr(state, 'source_evidence_mode', 'off') != 'off')
     normal_hints = [r for r in context_results(state) if r is not None and
                     (r.metadata or {}).get('bridge_normal_qualification')]
     if record_bridge and (getattr(state, 'rescue_evidence', ()) or normal_hints):

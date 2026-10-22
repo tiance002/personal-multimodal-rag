@@ -12,7 +12,7 @@ from typing import Any
 
 from ..models.types import CallCancelled, RunDeadlineExceeded, ProviderError
 from .search import SearchNothing, RetrievalScopeError, validate_results
-from .source_evidence import CONTEXT_CHARS, SourceEvidenceBudgetError
+from .types import ContextBudgetError
 from .strategy import QueryPlan
 
 MAX_RETRIEVAL_UNITS = 3
@@ -154,7 +154,7 @@ async def execute_plan(state, context, plan, retrieve_once):
             delivery='PENDING' if rows else 'NO_EVIDENCE', reason=result.reason)
         queues.append((subquery.id, list(rows)))
     # Do not compare independent Rerank scores or apply a second q0 threshold.
-    selected, by_id, chars = [], {}, 0
+    selected, by_id = [], {}
     top_k = max(0, state.rerank_top_k)
     while any(queue for _, queue in queues):
         for sub_id, queue in queues:
@@ -165,13 +165,12 @@ async def execute_plan(state, context, plan, retrieve_once):
                 labels = target.metadata['strategy_subquery_ids']
                 if sub_id not in labels: labels.append(sub_id)
                 continue
-            if (top_k > 0 and len(selected) >= top_k) or chars + len(row.content) > CONTEXT_CHARS:
+            if top_k > 0 and len(selected) >= top_k:
                 continue
             copied = deepcopy(row)
             copied.metadata['strategy_subquery_ids'] = [sub_id]
             by_id[row.id] = copied
             selected.append(copied)
-            chars += len(copied.content)
     for sub_id, entry in coverage.items():
         chosen = [row.id for row in selected if sub_id in row.metadata['strategy_subquery_ids']]
         entry['selected_ids'] = chosen
@@ -238,7 +237,7 @@ async def fit_context_budget(state, context, *, prepare_preview=None):
                 prepared = prepare_preview(preview, finalized)
                 if hasattr(prepared, '__await__'): await prepared
             break
-        except SourceEvidenceBudgetError:
+        except ContextBudgetError:
             if not state.merge_results: raise
             removed = state.merge_results.pop()
             state.strategy_trace.append({'stage':'strategy_context', 'decision':'BUDGET_OMITTED',

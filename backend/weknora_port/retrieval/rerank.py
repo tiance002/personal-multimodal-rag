@@ -127,13 +127,20 @@ async def rerank(state, context, registry, segmenter=None):
         raise ValueError('RERANK_TOP1_SETTING_INVALID')
     if floorless and getattr(state, 'graph_enabled', False):
         raise ValueError('GRAPH_TOP1_EXPERIMENT_CONFLICT')
-    if not state.needs_retrieval or not state.search_results or (not state.rerank_model_id):
+    if not state.needs_retrieval:
+        return
+    if not any(r is not None for r in state.search_results):
+        state.evidence_trace.append({'stage': 'rerank', 'reason': 'SEARCH_EMPTY'})
+        raise SearchNothing()
+    if not state.rerank_model_id:
         return
     try:
         model = await registry.rerank(state.rerank_model_id, context)
     except (CallCancelled, RunDeadlineExceeded):
         raise
     except Exception as exc:
+        state.evidence_trace.append({'stage': 'rerank', 'reason': 'RERANK_MODEL_ERROR',
+            'operation': 'model_lookup'})
         raise_if_send_denied(exc)
         if getattr(state, '_strategy_serial', False) and (isinstance(exc, PermissionError) or getattr(exc, 'sent', False)):
             raise
@@ -165,11 +172,9 @@ async def rerank(state, context, registry, segmenter=None):
         except TypeError:
             raise InvalidRerankResponse('RERANK_RESPONSE_INVALID') from None
         _validate_raw_results(raw, len(candidates))
-        if getattr(state, '_strategy_serial', False):
-            state.strategy_rerank_scores = {candidates[r.index].id:r.score for r in raw}
-        if getattr(state, 'source_evidence_mode', 'off') != 'off' or getattr(state, 'bridge_rescue_mode', 'off') != 'off':
-            state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
-                'response': [{'index': r.index, 'score': r.score} for r in raw]})
+        state.strategy_rerank_scores = {candidates[r.index].id:r.score for r in raw}
+        state.evidence_trace.append({'stage': 'rerank_raw', 'input_ids': [r.id for r in candidates],
+            'response': [{'index': r.index, 'score': r.score} for r in raw]})
         return raw
 
     def filtered(raw, threshold):
@@ -189,6 +194,8 @@ async def rerank(state, context, registry, segmenter=None):
     except InvalidRerankResponse:
         raise
     except Exception as exc:
+        state.evidence_trace.append({'stage': 'rerank', 'reason': 'RERANK_MODEL_ERROR',
+            'operation': 'rerank'})
         raise_if_send_denied(exc)
         if getattr(state, '_strategy_serial', False):
             if isinstance(exc, PermissionError) or getattr(exc, 'sent', False):
@@ -206,6 +213,8 @@ async def rerank(state, context, registry, segmenter=None):
         except InvalidRerankResponse:
             raise
         except Exception as exc:
+            state.evidence_trace.append({'stage': 'rerank', 'reason': 'RERANK_MODEL_ERROR',
+                'operation': 'threshold_retry'})
             raise_if_send_denied(exc)
             if getattr(state, '_strategy_serial', False):
                 if isinstance(exc, PermissionError) or getattr(exc, 'sent', False):
@@ -214,8 +223,7 @@ async def rerank(state, context, registry, segmenter=None):
                 raise SearchError('RERANK_FAILED') from None
             state.search_results = candidates
             return
-    if getattr(state, '_strategy_serial', False):
-        state.strategy_rerank_accepted_ids = {candidates[r.index].id for r in selected}
+    state.strategy_rerank_accepted_ids = {candidates[r.index].id for r in selected}
     accepted = []
     texts = []
     from copy import deepcopy
@@ -235,8 +243,9 @@ async def rerank(state, context, registry, segmenter=None):
         accepted.append(r)
         texts.append(passages[rr.index])
     state.rerank_results = mmr(accepted, texts, min(len(accepted), max(1, state.rerank_top_k)), segmenter)
-    if getattr(state, 'source_evidence_mode', 'off') != 'off' or getattr(state, 'bridge_rescue_mode', 'off') != 'off':
-        state.evidence_trace.append({'stage': 'rerank_filter_mmr', 'threshold': state.rerank_threshold,
-            'accepted_ids': [r.id for r in accepted], 'mmr_ids': [r.id for r in state.rerank_results]})
-    if not state.rerank_results:
-        raise SearchNothing()
+    state.evidence_trace.append({'stage': 'rerank_filter_mmr', 'threshold': state.rerank_threshold,
+        'reason': 'RERANK_ACCEPTED' if state.rerank_results else 'RERANK_ALL_BELOW_THRESHOLD_SEARCH_FALLBACK',
+        'accepted_ids': [r.id for r in accepted], 'mmr_ids': [r.id for r in state.rerank_results],
+        'search_scores': [{'id': r.id, 'score': r.score} for r in state.search_results if r is not None]})
+    # An empty rerank pool is distinct from empty Search. Merge's existing
+    # fallback sorts the original Search results, preserving their scores.

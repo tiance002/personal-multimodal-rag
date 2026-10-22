@@ -11,7 +11,7 @@ from backend.weknora_port.retrieval.types import SearchResult
 from backend.weknora_port.retrieval.pipeline import PipelineState
 from backend.weknora_port.retrieval.search import SearchTarget, RetrievalScopeError
 from backend.weknora_port.retrieval.merge import sequential, expand_neighbors
-from backend.weknora_port.retrieval.source_evidence import expand_source_evidence, MODE
+from backend.weknora_port.retrieval.source_evidence import project_source_evidence, MODE
 from backend.weknora_port.retrieval.context import into_chat_message
 from backend.weknora_port.generation.context import Evidence, prepare_generation, escape_text
 from backend.weknora_port.generation.types import GenerationRequest
@@ -56,7 +56,7 @@ def test_frozen_extend_replays_to_exact_independent_sources(case, tmp_path, monk
         assert hit.end_at - hit.start_at == len(hit.content)
         assert hit.content != case['source_http']['text']
         assert originals[0].content == case['source_http']['text']
-        await expand_source_evidence(state, ctx, repo)
+        await project_source_evidence(state, ctx, repo)
         assert {r.id for r in state.merge_results} == {r.id for r in originals}
         assert len(repo.reads) == 1
         for row in state.merge_results:
@@ -126,7 +126,7 @@ def test_selected_composite_outside_optional_groups_is_still_checked():
             row = deepcopy(originals[0]); row.id = f'front-{i}'; row.knowledge_id = f'doc-{i}'
             front.append(row); repo.rows[row.id] = deepcopy(row)
         state.merge_results = front + [hit]
-        await expand_source_evidence(state, ctx, repo)
+        await project_source_evidence(state, ctx, repo)
         assert {r.id for r in originals} <= {r.id for r in state.merge_results}
         assert len(repo.reads) == 1
     asyncio.run(run())
@@ -145,14 +145,14 @@ def test_frozen_pieter_original_survives_no_neighbor_rewrite_outside_optional_gr
         repo = Readback([original])
         selected = deepcopy(original)
         await expand_neighbors([selected], state, ctx, repo)
-        assert selected.content == original.content and selected.content_rewritten
+        assert selected.content == original.content and not selected.content_rewritten
         assert not selected.sub_chunk_ids
         front = []
         for i in range(3):
             row = deepcopy(original); row.id = f'front-{i}'; row.knowledge_id = f'doc-{i}'
             front.append(row); repo.rows[row.id] = deepcopy(row)
         state.merge_results = front + [selected]
-        await expand_source_evidence(state, ctx, repo)
+        await project_source_evidence(state, ctx, repo)
         restored = next(r for r in state.merge_results if r.id == original.id)
         assert (restored.content, restored.start_at, restored.end_at) == (
             original.content, original.start_at, original.end_at)
@@ -172,17 +172,19 @@ def test_materialized_ancestry_cannot_cross_source_domain(field, value):
         row = repo.rows[originals[1].id]
         if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
         else: setattr(row, field, value)
-        with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+        with pytest.raises(RetrievalScopeError): await project_source_evidence(state, ctx, repo)
     asyncio.run(run())
 
 
-def test_single_source_is_exact_and_optional_readback_is_reused():
+def test_single_source_is_exact_after_one_authoritative_readback():
     async def run():
         originals, _, ctx, state, repo = setup_case(FROZEN[0])
         state.merge_results = [deepcopy(originals[0])]; repo.windows = [originals[0].id]
-        await expand_source_evidence(state, ctx, repo)
-        assert state.merge_results == [originals[0]]
-        assert repo.reads == []
+        await project_source_evidence(state, ctx, repo)
+        assert len(state.merge_results)==1
+        restored=state.merge_results[0]
+        assert (restored.id,restored.content,restored.start_at,restored.end_at,restored.score)==(originals[0].id,originals[0].content,originals[0].start_at,originals[0].end_at,originals[0].score)
+        assert repo.reads == [(originals[0].id,)]
     asyncio.run(run())
 
 
@@ -192,27 +194,26 @@ def test_missing_version_cannot_pass_by_matching_two_missing_values():
         hit = deepcopy(originals[0]); hit.metadata = {}; hit.chunk_metadata = {}
         repo.rows[hit.id] = deepcopy(hit); state.merge_results = [hit]
         with pytest.raises(RetrievalScopeError):
-            await expand_source_evidence(state, ctx, repo)
+            await project_source_evidence(state, ctx, repo)
     asyncio.run(run())
 
 
-def test_materialization_budget_reports_omission_without_losing_other_source():
+def test_missing_recorded_members_reports_omission_without_losing_known_sources():
     async def run():
         originals, hit, ctx, state, repo = setup_case(FROZEN[0])
         hit.sub_chunk_ids = [f'extra-{i}' for i in range(6)]
         other = deepcopy(originals[0]); other.id = 'safe'; repo.rows[other.id] = deepcopy(other)
         state.merge_results.append(other)
-        await expand_source_evidence(state, ctx, repo)
-        assert [r.id for r in state.merge_results] == ['safe']
-        assert any(t.get('reason') == 'SOURCE_UNIT_BUDGET_EXCEEDED' and
-            t.get('decision') == 'INSUFFICIENT_SOURCE' for t in state.evidence_trace)
+        await project_source_evidence(state, ctx, repo)
+        assert [r.id for r in state.merge_results] == [hit.id,'safe']
+        assert any(t.get('omitted_ids') == hit.sub_chunk_ids for t in state.evidence_trace)
     asyncio.run(run())
 
 
 def test_off_keeps_legacy_composite_without_any_readback():
     async def run():
         _, hit, ctx, state, repo = setup_case(FROZEN[0]); state.source_evidence_mode = 'off'
-        await expand_source_evidence(state, ctx, repo)
+        await project_source_evidence(state, ctx, repo)
         assert state.merge_results == [hit] and repo.reads == []
     asyncio.run(run())
 
@@ -229,7 +230,7 @@ def test_complete_frozen_context_preserves_all_selected_originals_within_existin
         state = PipelineState(query=case['q0'], targets=(SearchTarget(kb),),
             merge_results=selected, source_evidence_mode=MODE)
         required = {id for r in selected for id in (r.id, *r.sub_chunk_ids)}
-        await expand_source_evidence(state, ctx, repo)
+        await project_source_evidence(state, ctx, repo)
         assert {r.id for r in state.merge_results} == required
         final = await into_chat_message(state)
         req = GenerationRequest('offline', 's', 'm', case['q0'], final,

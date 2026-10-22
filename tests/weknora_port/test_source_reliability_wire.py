@@ -12,7 +12,7 @@ from backend.weknora_port.generation.context import Evidence, prepare_generation
 from backend.weknora_port.generation.types import GenerationRequest
 from backend.weknora_port.models import provider_config, ChatOptions
 from backend.weknora_port.retrieval.context import into_chat_message
-from backend.weknora_port.retrieval.source_evidence import expand_source_evidence, ADDED_CHARS
+from backend.weknora_port.retrieval.source_evidence import project_source_evidence
 from backend.weknora_port.retrieval.search import RetrievalScopeError
 
 
@@ -27,8 +27,8 @@ def pair():
 def test_summary_is_a_locator_and_current_original_reaches_actual_adapter_wire():
     async def run():
         source, hint = pair()
-        s = state([result(hint)])
-        await expand_source_evidence(s, CTX, repository([source, hint]))
+        s = state([result(hint),result(source)])
+        await project_source_evidence(s, CTX, repository([source, hint]))
         assert [r.id for r in s.merge_results] == ['original']
         final = await into_chat_message(s)
         request = GenerationRequest('r', 'session', 'answer', s.query, final,
@@ -53,7 +53,7 @@ def test_summary_is_a_locator_and_current_original_reaches_actual_adapter_wire()
         assert dict(prepared.registry.snapshot().chunks)['c1'][0] == 'original'
         assert s.merge_results[0].chunk_metadata['source_version'] == 'v'
         assert (s.merge_results[0].start_at, s.merge_results[0].end_at) == (0, len(source['content']))
-        assert any(t.get('decision') == 'SOURCE_AVAILABLE' for t in s.evidence_trace)
+        assert any(t.get('reason') == 'EXACT_PERSISTED_QUOTES' for t in s.evidence_trace)
     asyncio.run(run())
 
 
@@ -67,7 +67,7 @@ def test_unavailable_original_does_not_leave_summary_facts_in_generation(missing
         rows = [hint] if missing == 'missing' else [source, hint]
         s = state([result(hint)])
         try:
-            await expand_source_evidence(s, CTX, repository(rows))
+            await project_source_evidence(s, CTX, repository(rows))
         except PermissionError:
             return  # A proven invalid parent identity fails closed before generation.
         assert s.merge_results == []
@@ -92,13 +92,13 @@ def test_expansion_revalidates_injected_repository_rows(change):
         forged = result(source)
         for key, value in change.items(): setattr(forged, key, value)
         class Repo:
-            async def get_source_unit(self, *args): return [forged]
+            async def get_chunks(self, *args, **kwargs): return {'original':forged}
         with pytest.raises((RetrievalScopeError, PermissionError, ValueError)):
-            await expand_source_evidence(state([result(hint)]), CTX, Repo())
+            await project_source_evidence(state([result(source)]), CTX, Repo())
     asyncio.run(run())
 
 
-def test_budget_exhaustion_keeps_existing_originals_but_does_not_admit_summary_guess():
+def test_all_selected_originals_survive_without_added_window_budget():
     async def run():
         sources, hints = [], []
         for i in range(3):
@@ -107,12 +107,11 @@ def test_budget_exhaustion_keeps_existing_originals_but_does_not_admit_summary_g
                        knowledge_id=f'doc{i}', parent_chunk_id=source['id'],
                        metadata={'origin':'model_generated_summary', 'upstream_parent_link':True})
             sources.append(source); hints.append(hint)
-        s = state([result(h) for h in hints])
-        await expand_source_evidence(s, CTX, repository(sources+hints))
-        assert len(s.merge_results) == 2
+        s = state([result(h) for h in hints]+[result(r) for r in sources])
+        await project_source_evidence(s, CTX, repository(sources+hints))
+        assert len(s.merge_results) == 3
         assert all(r.chunk_type == 'text' for r in s.merge_results)
-        assert sum(len(r.content) for r in s.merge_results) <= ADDED_CHARS
-        assert any(t.get('decision') == 'BUDGET' for t in s.evidence_trace)
+        assert sum(len(r.content) for r in s.merge_results) == 4500
         assert any(t.get('decision') == 'INSUFFICIENT_SOURCE' for t in s.evidence_trace)
     asyncio.run(run())
 
@@ -121,7 +120,7 @@ def test_default_off_preserves_existing_summary_behavior_without_reading_reposit
     async def run():
         _, hint = pair(); s = state([result(hint)]); s.source_evidence_mode = 'off'
         before = deepcopy(s.merge_results)
-        await expand_source_evidence(s, CTX, None)
+        await project_source_evidence(s, CTX, None)
         assert s.merge_results == before and s.evidence_trace == []
     asyncio.run(run())
 
@@ -154,15 +153,14 @@ def test_existing_original_avoids_unnecessary_summary_whole_document_load():
     async def run():
         source, hint = pair(); calls = []
         class Repo:
-            async def get_source_unit(self, anchor, context):
-                calls.append(anchor.id)
-                assert anchor.chunk_type == 'text'
-                return [result(source)]
+            async def get_chunks(self, ids, context, *, current=False):
+                calls.append(tuple(ids)); assert current
+                return {'original':result(source)}
         s = state([result(hint), result(source)])
-        await expand_source_evidence(s, CTX, Repo())
-        assert calls == ['original']
+        await project_source_evidence(s, CTX, Repo())
+        assert calls == [('original',)]
         assert [r.id for r in s.merge_results] == ['original']
-        assert any(t.get('reason') == 'SUMMARY_SOURCE_ALREADY_SELECTED' for t in s.evidence_trace)
+        assert any(t.get('reason') == 'SUMMARY_LOCATOR_ONLY' for t in s.evidence_trace)
     asyncio.run(run())
 
 
@@ -172,7 +170,7 @@ def test_selected_rewritten_superset_is_rematerialized_as_exact_current_source()
         hit = result(source); hit.content += ' Unverified appended assertion.'
         hit.end_at = 999; hit.content_rewritten = True
         s = state([hit, result(hint)])
-        await expand_source_evidence(s, CTX, repository([source, hint]))
+        await project_source_evidence(s, CTX, repository([source, hint]))
         raw = next(r for r in s.merge_results if r.id == source['id'])
         assert raw.content == source['content']
         assert raw.end_at == len(source['content']) and not raw.content_rewritten
@@ -188,7 +186,7 @@ def test_merged_projection_becomes_separate_source_rows_with_exact_offsets():
         a = row('a', 'First original statement.', 0, next_chunk_id='b')
         b = row('b', 'Second original statement.', 1, pre_chunk_id='a')
         hit = result(a); hit.content += '\n\n' + b['content']; hit.sub_chunk_ids = ['b']
-        s = state([hit]); await expand_source_evidence(s, CTX, repository([a, b]))
+        s = state([hit]); await project_source_evidence(s, CTX, repository([a, b]))
         assert {r.id for r in s.merge_results} == {'a', 'b'}
         for r in s.merge_results:
             expected = a if r.id == 'a' else b
@@ -212,7 +210,7 @@ def test_materialized_subchunk_requires_exact_identity_version_and_locator(chang
             async def get_source_unit(self, *args): return [result(source)]
             async def get_chunks(self, *args, **kwargs): return {'extra':forged}
         with pytest.raises((PermissionError, ValueError, RetrievalScopeError)):
-            await expand_source_evidence(state([hit]), CTX, Repo())
+            await project_source_evidence(state([hit]), CTX, Repo())
     asyncio.run(run())
 
 
@@ -224,7 +222,7 @@ def test_selected_original_cannot_borrow_current_source_identity(change):
         source, _ = pair(); hit = result(source)
         for key, value in change.items(): setattr(hit, key, value)
         with pytest.raises((PermissionError, RetrievalScopeError)):
-            await expand_source_evidence(state([hit]), CTX, repository([source]))
+            await project_source_evidence(state([hit]), CTX, repository([source]))
     asyncio.run(run())
 
 
@@ -238,9 +236,9 @@ def test_window_exclusion_cannot_make_unverified_suffix_a_quote():
             async def get_source_unit(self, anchor, context):
                 return [r for r in originals[:3] if r.id == anchor.id]
             async def get_chunks(self, ids, context, *, current=False):
-                assert current and tuple(ids) == ('raw3',)
-                return {source.id: source}
-        s = state(originals); await expand_source_evidence(s, CTX, Repo())
+                assert current and tuple(ids) == ('raw0','raw1','raw2','raw3')
+                return {r.id:r for r in [*originals[:3],source]}
+        s = state(originals); await project_source_evidence(s, CTX, Repo())
         assert [r.id for r in s.merge_results] == ['raw0', 'raw1', 'raw2', 'raw3']
         assert s.merge_results[-1].content == source.content
         assert s.merge_results[-1].end_at == source.end_at
