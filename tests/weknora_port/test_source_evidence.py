@@ -81,6 +81,22 @@ def summary_case():
     return source,hint
 
 
+@pytest.mark.parametrize('field,value',[
+    ('knowledge_enable_status','disabled'), ('knowledge_parse_status','processing'),
+    ('knowledge_parse_status','failed')])
+def test_selected_outside_optional_groups_rejects_document_that_became_unavailable(field, value):
+    async def run():
+        originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+        selected = [result(r) for r in originals]
+        # Recall was valid; the document becomes unavailable before the final
+        # authoritative readback, outside the three optional expansion groups.
+        originals[-1][field] = value
+        s = state(selected)
+        with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+            await expand_source_evidence(s, CTX, repository(originals))
+    asyncio.run(run())
+
+
 def test_summary_recovers_intact_real_body_with_independent_identity_and_score():
     async def run():
         source,hint=summary_case(); s=state([result(hint)])

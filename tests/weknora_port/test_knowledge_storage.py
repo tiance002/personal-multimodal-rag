@@ -127,3 +127,78 @@ def test_primary_hydration_excludes_stale_index_bodies_but_parent_loader_does_no
         assert await repo._read_chunks(['chunk'],context,searchable=True)=={}
         assert (await repo.get_chunks(['chunk'],context))['chunk'].content=='original source'
     asyncio.run(exercise())
+
+
+@pytest.mark.parametrize('change', [
+    {'is_enabled': False},
+    {'knowledge_enable_status': 'disabled'},
+    {'knowledge_parse_status': 'processing'},
+    {'knowledge_parse_status': 'failed'},
+    {'deleted_at': '2026-10-22'},
+    {'metadata': {'source_version': 'old'}},
+    {'knowledge_metadata': {'source_version': 'new'}},
+    {'knowledge_metadata': {}},
+])
+def test_opt_in_current_source_read_rejects_unavailable_rows(change):
+    async def exercise():
+        row = fixture_row()
+        row.update(is_enabled=True, content_revision=0, deleted_at=None,
+            metadata={'source_version': 'v1'}, knowledge_metadata={'source_version': 'v1'},
+            knowledge_enable_status='enabled', knowledge_parse_status='completed')
+        row.update(change)
+        # The scripted driver deliberately returns an ineligible row despite SQL
+        # predicates, exercising the adapter's existing defensive current filter.
+        conn = SourceConnection([row])
+        retriever = PostgresRetriever(conn, IsolationPolicy('new', frozenset({'old'})))
+        await retriever.verify_identity()
+        repo = ScopedKnowledgeRepository(retriever, tenant)
+        context = CallContext('r', TrustedScope('owner', ('kb',), ('doc',)))
+        assert await repo.get_chunks(['chunk'], context, current=True) == {}
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize('kind', ['text', 'parent_text'])
+def test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter(kind):
+    async def exercise():
+        row = fixture_row()
+        row.update(chunk_type=kind, is_enabled=True, content_revision=0, deleted_at=None,
+            metadata={'source_version': 'v1'}, knowledge_metadata={'source_version': 'v1'},
+            knowledge_enable_status='enabled', knowledge_parse_status='completed')
+        conn = SourceConnection([row])
+        retriever = PostgresRetriever(conn, IsolationPolicy('new', frozenset({'old'})))
+        await retriever.verify_identity()
+        repo = ScopedKnowledgeRepository(retriever, tenant)
+        context = CallContext('r', TrustedScope('owner', ('kb',), ('doc',)))
+        rows = await repo.get_chunks(['chunk'], context, current=True)
+        assert rows['chunk'].chunk_type == kind
+        assert rows['chunk'].content == 'original source'
+        sql, params = conn.calls[-1]
+        assert "k.enable_status='enabled'" in sql and "k.parse_status='completed'" in sql
+        assert "c.metadata->>'source_version'=k.metadata->>'source_version'" in sql
+        assert all(f'{prefix}.deleted_at IS NULL' in sql for prefix in ('c', 'k', 'kb'))
+        assert 'c.is_enabled = TRUE' in sql and 'c.chunk_type IN' not in sql
+        assert params == [1, 1, 1, 'chunk', 'kb', 'doc']
+    asyncio.run(exercise())
+
+
+def test_default_source_read_preserves_noncurrent_loader_semantics():
+    async def exercise():
+        row = fixture_row()
+        row.update(is_enabled=False, knowledge_enable_status='disabled',
+            knowledge_parse_status='processing', metadata={'source_version': 'old'},
+            knowledge_metadata={'source_version': 'new'})
+        conn = SourceConnection([row])
+        retriever = PostgresRetriever(conn, IsolationPolicy('new', frozenset({'old'})))
+        await retriever.verify_identity()
+        repo = ScopedKnowledgeRepository(retriever, tenant)
+        context = CallContext('r', TrustedScope('owner', ('kb',), ('doc',)))
+        default = await repo.get_chunks(['chunk'], context)
+        explicit = await repo.get_chunks(['chunk'], context, current=False)
+        assert default == explicit
+        assert default['chunk'].content == 'original source'
+        assert default['chunk'].content_revision == 1 and not default['chunk'].is_enabled
+        for sql, _ in conn.calls[-2:]:
+            assert 'c.is_enabled = TRUE' not in sql
+            assert "k.enable_status='enabled'" not in sql
+            assert "k.parse_status='completed'" not in sql
+    asyncio.run(exercise())

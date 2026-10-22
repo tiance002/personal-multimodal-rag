@@ -28,7 +28,7 @@ class Repo:
             self.sources[r.id]=r
             return [deepcopy(r)]
         finally:self.active-=1
-    async def get_chunks(self,ids,context):return {i:deepcopy(self.sources[i]) for i in ids if i in self.sources}
+    async def get_chunks(self,ids,context,*,current=False):return {i:deepcopy(self.sources[i]) for i in ids if i in self.sources}
     async def get_chunk_children(self,ids,context):return []
     async def get_faq_answers(self,ids,context):return {}
     async def get_source_unit(self,anchor,context):return [deepcopy(self.sources[anchor.id])]

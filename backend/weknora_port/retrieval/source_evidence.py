@@ -23,7 +23,7 @@ def _domain(row):
 
 
 def _validate_source(row, domain, kinds=('text',)):
-    if (_domain(row) != domain or not row.id or
+    if (not domain[2] or _domain(row) != domain or not row.id or
             row.chunk_metadata.get('source_version') != domain[2] or not row.is_enabled or
             row.chunk_type not in kinds or row.content_revision or row.content_rewritten):
         raise RetrievalScopeError()
@@ -44,7 +44,7 @@ async def _materialize_selected(hit, source, state, context, repository, *, cach
         raise SourceEvidenceBudgetError('SOURCE_UNIT_BUDGET_EXCEEDED')
     extra = tuple(i for i in ids if i != source.id)
     loaded = ({i: cache[i] for i in extra if i in cache} if cache is not None else
-              dict(await repository.get_chunks(extra, context)) if extra else {})
+              dict(await repository.get_chunks(extra, context, current=True)) if extra else {})
     if set(loaded) != set(extra) or any(key != row.id for key, row in loaded.items()):
         raise ValueError('SOURCE_BODY_NOT_PRESERVED')
     loaded[source.id] = source
@@ -81,7 +81,7 @@ async def _project_selected(selected, state, context, repository, cache):
     ids = tuple(dict.fromkeys(i for r in candidates if len(_selected_ids(r)) <= UNIT_CHUNKS
                              for i in _selected_ids(r) if i not in cache))
     if ids:
-        loaded = dict(await repository.get_chunks(ids, context))
+        loaded = dict(await repository.get_chunks(ids, context, current=True))
         if set(loaded) != set(ids) or any(key != row.id for key, row in loaded.items()):
             raise ValueError('SOURCE_BODY_NOT_PRESERVED')
         validate_results(list(loaded.values()), state.targets, context)
@@ -100,7 +100,8 @@ async def _project_selected(selected, state, context, repository, cache):
                 raise RetrievalScopeError()
             if source.content not in hit.content:
                 raise ValueError('SOURCE_BODY_NOT_PRESERVED')
-            exact = (hit.content == source.content and hit.start_at == source.start_at and
+            exact = (hit.chunk_type == source.chunk_type and hit.chunk_index == source.chunk_index and
+                     hit.content == source.content and hit.start_at == source.start_at and
                      hit.end_at == source.end_at and not hit.content_rewritten and not hit.content_revision)
             # Ancestry alone is not proof that those independent quotes were delivered.
             rows = ([hit] if exact and not hit.sub_chunk_ids else

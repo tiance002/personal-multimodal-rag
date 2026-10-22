@@ -10,7 +10,7 @@ from backend.weknora_port.models.types import CallContext, TrustedScope
 from backend.weknora_port.retrieval.types import SearchResult
 from backend.weknora_port.retrieval.pipeline import PipelineState
 from backend.weknora_port.retrieval.search import SearchTarget, RetrievalScopeError
-from backend.weknora_port.retrieval.merge import sequential
+from backend.weknora_port.retrieval.merge import sequential, expand_neighbors
 from backend.weknora_port.retrieval.source_evidence import expand_source_evidence, MODE
 from backend.weknora_port.retrieval.context import into_chat_message
 from backend.weknora_port.generation.context import Evidence, prepare_generation, escape_text
@@ -26,7 +26,7 @@ class Readback:
         self.windows = windows
         self.reads = []
 
-    async def get_chunks(self, ids, context):
+    async def get_chunks(self, ids, context, *, current=False):
         self.reads.append(tuple(ids))
         return {id: deepcopy(self.rows[id]) for id in ids if id in self.rows}
 
@@ -132,6 +132,38 @@ def test_selected_composite_outside_optional_groups_is_still_checked():
     asyncio.run(run())
 
 
+def test_frozen_pieter_original_survives_no_neighbor_rewrite_outside_optional_groups():
+    async def run():
+        frozen = json.loads((Path(__file__).parents[1] /
+            'fixtures/s8_6_3/pieter_tribometer.json').read_text(encoding='utf8'))
+        original = SearchResult(**frozen['source'])
+        assert len(original.content) == 234 and not original.pre_chunk_id and not original.next_chunk_id
+        assert frozen['historical_trace'][0]['reason'] == 'UNMATERIALIZED_SELECTED_PROJECTION'
+        ctx = CallContext('offline', TrustedScope('owner', (original.knowledge_base_id,)))
+        state = PipelineState(query=frozen['q0'], targets=(SearchTarget(original.knowledge_base_id),),
+            source_evidence_mode=MODE)
+        repo = Readback([original])
+        selected = deepcopy(original)
+        await expand_neighbors([selected], state, ctx, repo)
+        assert selected.content == original.content and selected.content_rewritten
+        assert not selected.sub_chunk_ids
+        front = []
+        for i in range(3):
+            row = deepcopy(original); row.id = f'front-{i}'; row.knowledge_id = f'doc-{i}'
+            front.append(row); repo.rows[row.id] = deepcopy(row)
+        state.merge_results = front + [selected]
+        await expand_source_evidence(state, ctx, repo)
+        restored = next(r for r in state.merge_results if r.id == original.id)
+        assert (restored.content, restored.start_at, restored.end_at) == (
+            original.content, original.start_at, original.end_at)
+        assert not restored.content_rewritten
+        final = await into_chat_message(state)
+        req = GenerationRequest('offline', 's', 'm', frozen['q0'], final,
+            tuple(Evidence.from_result(r) for r in state.merge_results), citations_enabled=True)
+        assert escape_text(original.content) in prepare_generation(req).messages[-1].content
+    asyncio.run(run())
+
+
 @pytest.mark.parametrize('field,value', [('knowledge_base_id','other-kb'),
     ('knowledge_id','other-doc'), ('version','old'), ('is_enabled',False)])
 def test_materialized_ancestry_cannot_cross_source_domain(field, value):
@@ -151,6 +183,16 @@ def test_single_source_is_exact_and_optional_readback_is_reused():
         await expand_source_evidence(state, ctx, repo)
         assert state.merge_results == [originals[0]]
         assert repo.reads == []
+    asyncio.run(run())
+
+
+def test_missing_version_cannot_pass_by_matching_two_missing_values():
+    async def run():
+        originals, _, ctx, state, repo = setup_case(FROZEN[0])
+        hit = deepcopy(originals[0]); hit.metadata = {}; hit.chunk_metadata = {}
+        repo.rows[hit.id] = deepcopy(hit); state.merge_results = [hit]
+        with pytest.raises(RetrievalScopeError):
+            await expand_source_evidence(state, ctx, repo)
     asyncio.run(run())
 
 

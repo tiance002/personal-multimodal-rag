@@ -81,8 +81,9 @@ class ScopedKnowledgeRepository:
             raise PermissionError("TRUSTED_PRINCIPAL_UNAVAILABLE")
         return tenant
 
-    async def get_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
-        return await self._read_chunks(ids,context)
+    async def get_chunks(self, ids: Sequence[str], context: CallContext, *,
+                         current: bool = False) -> Mapping[str, SearchResult]:
+        return await self._read_chunks(ids,context,current=current)
 
     async def get_current_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
         """Read current enabled/index-eligible source rows without widening scope."""

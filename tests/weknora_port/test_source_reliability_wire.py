@@ -210,7 +210,7 @@ def test_materialized_subchunk_requires_exact_identity_version_and_locator(chang
         for key, value in change.items(): setattr(forged, key, value)
         class Repo:
             async def get_source_unit(self, *args): return [result(source)]
-            async def get_chunks(self, *args): return {'extra':forged}
+            async def get_chunks(self, *args, **kwargs): return {'extra':forged}
         with pytest.raises((PermissionError, ValueError, RetrievalScopeError)):
             await expand_source_evidence(state([hit]), CTX, Repo())
     asyncio.run(run())
@@ -228,15 +228,22 @@ def test_selected_original_cannot_borrow_current_source_identity(change):
     asyncio.run(run())
 
 
-def test_unmaterialized_projection_outside_group_budget_is_not_a_quote():
+def test_window_exclusion_cannot_make_unverified_suffix_a_quote():
     async def run():
         originals = [result(row(f'raw{i}', f'Original source {i}', knowledge_id=f'doc{i}')) for i in range(4)]
+        source = deepcopy(originals[-1])
         originals[-1].content += ' expanded without exact locator'
         originals[-1].content_rewritten = True
         class Repo:
             async def get_source_unit(self, anchor, context):
                 return [r for r in originals[:3] if r.id == anchor.id]
+            async def get_chunks(self, ids, context, *, current=False):
+                assert current and tuple(ids) == ('raw3',)
+                return {source.id: source}
         s = state(originals); await expand_source_evidence(s, CTX, Repo())
-        assert [r.id for r in s.merge_results] == ['raw0', 'raw1', 'raw2']
-        assert s.evidence_trace[-1]['reason'] == 'UNMATERIALIZED_SELECTED_PROJECTION'
+        assert [r.id for r in s.merge_results] == ['raw0', 'raw1', 'raw2', 'raw3']
+        assert s.merge_results[-1].content == source.content
+        assert s.merge_results[-1].end_at == source.end_at
+        assert not s.merge_results[-1].content_rewritten
+        assert s.evidence_trace[-1]['reason'] == 'EXACT_PERSISTED_QUOTES'
     asyncio.run(run())

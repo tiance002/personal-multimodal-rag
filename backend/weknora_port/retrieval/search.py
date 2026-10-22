@@ -36,7 +36,8 @@ class RetrievalRepository(Protocol):
     async def hybrid_search(self, targets: Sequence[SearchTarget], params: SearchParams, context: CallContext, query_embedding: Sequence[float] | None=None) -> Sequence[SearchResult]:
         ...
 
-    async def get_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
+    async def get_chunks(self, ids: Sequence[str], context: CallContext, *,
+                         current: bool = False) -> Mapping[str, SearchResult]:
         ...
 
     async def get_current_chunks(self, ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
