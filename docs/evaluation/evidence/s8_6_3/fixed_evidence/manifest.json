@@ -1,0 +1,124 @@
+{
+  "schema": "s8.6.3-fixed-evidence/v1",
+  "status": "OFFLINE_ONLY_NEW_AUTHORIZATION_REQUIRED",
+  "snapshot_sha256": "79ecc4f19dd1d08b415270387be8df7003627d8005c14e906c21fc90665943a7",
+  "reviewer": "AGENT_NOT_OWNER",
+  "requested_pair": {
+    "cheap": "Qwen/Qwen3.5-4B",
+    "expensive": "deepseek-flash",
+    "max_output_tokens_each": 2048,
+    "thinking": false,
+    "model_token_counts_need_not_match": true
+  },
+  "execution": "Use load_inputs/render_pair with existing Registry, SendGate and LocalExecution in an authorized job; no historical IDs or grants accepted here.",
+  "cases": [
+    {
+      "case_id": "miracl-zh-91294#0",
+      "role": "D_FAILURE",
+      "request_file": "requests/01.json",
+      "body_sha256": "0e916200fbad365a0f2a3b4287a55ae03a723a85056983515c17f111c734d272",
+      "messages_sha256": "0a62052a2444a46969cf909d76e550da3fa24eebad12743861bfe8ba136598fe",
+      "system_sha256": "85392c0a6a1289d0db8d8f35d82ca07b5a2531a7663e225ea28f0ce389f404a0",
+      "user_sha256": "ed3d1eec214c1730d24f8290f8ada5d3513c031edb854148ab2ea2925800f251",
+      "parameters": {
+        "enable_thinking": false,
+        "max_tokens": 2048,
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7
+      },
+      "historical_request_id": "dd4b2499-19f2-4e93-a6ae-a5d44b1521c9/answer/1/cheap",
+      "historical_request_artifact": {
+        "bytes": 5676,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\16-miracl-zh-91294-0\\evidence\\ae3b07bed1244066a2de11056966b13d.request.json",
+        "sha256": "649a91333b82584edb34019a53f7e1875232fcd99b9a5a90f320dd3db5b462fa"
+      },
+      "gold_injection_check": "PASS_EXACT_FROZEN_BODY_EQUALITY; scoring metadata read only after request copy",
+      "citation_identity_limit": ""
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+      "role": "D_FAILURE",
+      "request_file": "requests/02.json",
+      "body_sha256": "c4d76f228f54ac558df9a7037caf2e7f69e5c88659e1787c063869466f6a541b",
+      "messages_sha256": "08bd54eb0a646665b03653299cf0931303792e52a9c4b43cab5aaf4ca150b5ed",
+      "system_sha256": "85392c0a6a1289d0db8d8f35d82ca07b5a2531a7663e225ea28f0ce389f404a0",
+      "user_sha256": "86f513250bd80dc64eec4ef837e648fff4f0f4d6d19c5f839702225ca910610c",
+      "parameters": {
+        "enable_thinking": false,
+        "max_tokens": 2048,
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7
+      },
+      "historical_request_id": "073f8bcd-9ec4-4f38-bc59-3bf26e0828da/answer/1/cheap",
+      "historical_request_artifact": {
+        "bytes": 25057,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\22-longbench-zh-multifieldqa_zh-51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed\\evidence\\a8f6c62edf6a459ba5765e5e1c64d0b3.request.json",
+        "sha256": "2963ae6dea5e849765b5d392cc70bef97f0980cb36916e9902856150ce4dddd9"
+      },
+      "gold_injection_check": "PASS_EXACT_FROZEN_BODY_EQUALITY; scoring metadata read only after request copy",
+      "citation_identity_limit": ""
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "role": "CORRECT_CONTROL",
+      "request_file": "requests/03.json",
+      "body_sha256": "f8715782588531ea5b8bda82ca543db9e1e9ce106eab5f76fece6f54e5de4598",
+      "messages_sha256": "966d567665e8d26b241e793e0daf86712bb929c6ae12e25b604655ee768ac6c6",
+      "system_sha256": "85392c0a6a1289d0db8d8f35d82ca07b5a2531a7663e225ea28f0ce389f404a0",
+      "user_sha256": "24fc3e7c328cd4bbb1f08d2954ebca9cb22854cd028ca9cb3e2304d24e291604",
+      "parameters": {
+        "enable_thinking": false,
+        "max_tokens": 2048,
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7
+      },
+      "historical_request_id": "8578ee00-4c15-4345-909d-2e0d7ab097e1/answer/1/cheap",
+      "historical_request_artifact": {
+        "bytes": 25356,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\21-longbench-zh-multifieldqa_zh-1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc\\evidence\\5c8743d49e5a48b389b74bd290a9a167.request.json",
+        "sha256": "daabf24c1ab7f9bed97eaaac8c777e6d91a718d45c978fccfae39fbd9b010cc6"
+      },
+      "gold_injection_check": "PASS_EXACT_FROZEN_BODY_EQUALITY; scoring metadata read only after request copy",
+      "citation_identity_limit": "Control keeps historical original wire including old composite identity; not fresh repaired HTTP proof"
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "role": "CORRECT_CONTROL",
+      "request_file": "requests/04.json",
+      "body_sha256": "a3c1e04519ab63a45a96753b09d09b418843dddc2057f6f403186eac5a3b557a",
+      "messages_sha256": "67b1e70e064af4e41389d5190140e35dd3904c39876873e6a2b0d9077100cada",
+      "system_sha256": "85392c0a6a1289d0db8d8f35d82ca07b5a2531a7663e225ea28f0ce389f404a0",
+      "user_sha256": "f1ba88714fe6ebcd91f5b832e0da69eed3ee5de9885de88c1c85570fe670cb76",
+      "parameters": {
+        "enable_thinking": false,
+        "max_tokens": 2048,
+        "model": "Qwen/Qwen3.5-4B",
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "temperature": 0.7
+      },
+      "historical_request_id": "2c74a2d1-32d3-49a6-8379-c0fe72753eb3/answer/1/cheap",
+      "historical_request_artifact": {
+        "bytes": 16406,
+        "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\34-mmlongbench-doc-mmlongbench-doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86-row-0687\\evidence\\9356a038432d48169990007b4e86d127.request.json",
+        "sha256": "01c24c0d2c94033e627eedbb500db5ba9e3c2175b18caba51f2d8dd50ca871cd"
+      },
+      "gold_injection_check": "PASS_EXACT_FROZEN_BODY_EQUALITY; scoring metadata read only after request copy",
+      "citation_identity_limit": "Control keeps historical original wire including old composite identity; not fresh repaired HTTP proof"
+    }
+  ]
+}

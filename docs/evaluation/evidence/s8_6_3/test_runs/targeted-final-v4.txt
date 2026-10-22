@@ -1,0 +1,63 @@
+........................................................................ [ 26%]
+........................................................................ [ 53%]
+........................................................................ [ 80%]
+.....................................................F                   [100%]
+================================== FAILURES ===================================
+_____ test_unmaterialized_projection_outside_group_budget_is_not_a_quote ______
+
+    def test_unmaterialized_projection_outside_group_budget_is_not_a_quote():
+        async def run():
+            originals = [result(row(f'raw{i}', f'Original source {i}', knowledge_id=f'doc{i}')) for i in range(4)]
+            originals[-1].content += ' expanded without exact locator'
+            originals[-1].content_rewritten = True
+            class Repo:
+                async def get_source_unit(self, anchor, context):
+                    return [r for r in originals[:3] if r.id == anchor.id]
+            s = state(originals); await expand_source_evidence(s, CTX, Repo())
+            assert [r.id for r in s.merge_results] == ['raw0', 'raw1', 'raw2']
+            assert s.evidence_trace[-1]['reason'] == 'UNMATERIALIZED_SELECTED_PROJECTION'
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_reliability_wire.py:242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_source_reliability_wire.py:239: in run
+    s = state(originals); await expand_source_evidence(s, CTX, Repo())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\weknora_port\retrieval\source_evidence.py:193: in expand_source_evidence
+    originals = await _project_selected(originals, state, context, repository, source_cache)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+selected = [SearchResult(id='raw0', content='Original source 0', score=0.9, knowledge_id='doc0', knowledge_base_id='kb', chunk_ty...written=True, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='')]
+state = PipelineState(needs_retrieval=True, rerank_top_k=30, search_results=[], rerank_results=[], merge_results=[SearchResult...={}, strategy_units_used=0, strategy_queries_seen=set(), strategy_rerank_scores={}, strategy_rerank_accepted_ids=set())
+context = CallContext(request_id='r', scope=TrustedScope(owner_id='owner', knowledge_base_ids=('kb',), document_ids=()), deadline=None, session_id='', deadline_kind='model', required_origin_kbs=())
+repository = <test_source_reliability_wire.test_unmaterialized_projection_outside_group_budget_is_not_a_quote.<locals>.run.<locals>.Repo object at 0x000001D0910F3770>
+cache = {'raw0': SearchResult(id='raw0', content='Original source 0', score=0.9, knowledge_id='doc0', knowledge_base_id='kb', ...ritten=False, content_revision=0, is_enabled=True, matched_content='', seq=0, knowledge_channel='', context_header='')}
+
+    async def _project_selected(selected, state, context, repository, cache):
+        """Mandatory identity check, independent of optional neighborhood coverage.
+    
+        Only admitted TopK entries and their bounded ancestry are read. Previously
+        verified source-unit rows are reused within this invocation, never globally.
+        """
+        candidates = [r for r in selected if r.chunk_type in ('text', 'parent_text')]
+        ids = tuple(dict.fromkeys(i for r in candidates if len(_selected_ids(r)) <= UNIT_CHUNKS
+                                 for i in _selected_ids(r) if i not in cache))
+        if ids:
+>           loaded = dict(await repository.get_chunks(ids, context, current=True))
+                                ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Repo' object has no attribute 'get_chunks'
+
+backend\weknora_port\retrieval\source_evidence.py:84: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_source_reliability_wire.py::test_unmaterialized_projection_outside_group_budget_is_not_a_quote
+1 failed, 269 passed in 10.50s

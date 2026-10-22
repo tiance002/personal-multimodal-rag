@@ -1,0 +1,35 @@
+[
+  {
+    "command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "scripts.s8_6_3_offline_evidence",
+      "--snapshot",
+      "E:/RAG quention/var/reports/s8-6-2-r3/followup40/actual40-final-extracted.json",
+      "--output",
+      "docs/evaluation/S8_6_3_SOURCE_IDENTITY_AND_FAILURE_LAYERS.results.json"
+    ],
+    "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+    "exit_code": 0,
+    "log": "offline-evidence.txt",
+    "log_sha256": "4353e9b5bf7ef1ef0581ba7e7006fb0033c744aef929790aa9b99dacfb5d8c02"
+  },
+  {
+    "command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "scripts.s8_6_3_fixed_evidence",
+      "docs/evaluation/evidence/s8_6_3/fixed_evidence"
+    ],
+    "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+    "exit_code": 0,
+    "log": "fixed-evidence-render.txt",
+    "log_sha256": "2c3731ec32faade6dfd06b2064d13012d8dc1c7432bf1da68ee3ef42a0e3b7fa"
+  }
+]

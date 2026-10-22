@@ -637,3 +637,8 @@ Owner exact9/65261 granted; latest751c source/image9ef actualECS temporaryHTTP o
 后台runner/probe源码decafab7；独立目录、一次启动、日志/检查点/最终结果持久化，启动SSH不再维持任务进程。按Owner意见移除任意文件/归档大小数量上限及启动器重复授权/账本预检，主机资源参数按实况，逐题不重复整库/模块/历史容器扫描；原正式API/Registry/SendGate/LocalExecution保护继续生效。定向本地41passed/4平台skip exit0；ECS零Provider实测启动SSH约1.2秒exit0后继续4步/约40秒，最终SUCCEEDED，重新连接取回13文件哈希/稳定性一致，重复启动exit2且原控制字节不变。新增Provider/Token/问答0，无物理关机实测，不承诺ECS重启自动续发。机器证据docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.results.json，操作说明同目录ECS_ACCEPTANCE_BACKGROUND_JOBS.md；既有ECS40不重跑，真实HTTP后台批次NOT_RUN。
 
 HTTP驱动适配348557b：直接运行冻结ECS端既有驱动，消费实际逐题进度和明确summary，原HTTP/Registry/SendGate/LocalExecution负责发送；适配器不复制检索/Provider路径。审查修复旧summary复用及检查点失败提前退出，单次claim、drain/wait、原收据只读快照通过。最终两个受影响文件65passed/5平台skip exit0（包含前述41项，不叠加），假驱动离线验证，新增真实HTTP/Provider/Token0。当前全部实测已结束，仅本地提交，不Push/生产部署/重跑40题。
+
+
+## 2026-10-22 S8.6.3 引用身份修复与 ECS40 失败分层
+
+基线d5b6850，主修复922b5c3及当前来源保护c13eecd。3条真实历史引用由Merge extend扩大正文却保留anchor ID，已分离可选source窗口与强制身份物化；恢复各原始Chunk/offset/version，当前文档启用与解析完成保护复用既有readback，off及预算不变。RED9failed2passed，额外文档状态反例RED3failed；最终12个受影响模块270passed、exit0，冻结两题完整Context及Pieter来源送达为离线验证，未冒充新真实HTTP。18题仍分别10FAIL/5PARTIAL/3UNVERIFIED，主层C7/D4/F3/A3/A或B未决1；2个D错误+2个正确控制的固定历史请求已校验Gold隔离及双模型离线renderer。新增真实Provider/Token/UNKNOWN/DB/ECS均0，旧收据和Gold保留；真实模型对照与修复版HTTP NOT_RUN。报告docs/evaluation/S8_6_3_SOURCE_IDENTITY_AND_FAILURE_LAYERS.md/.results.json；本地提交收尾，无Push/部署/Tag。

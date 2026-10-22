@@ -1,0 +1,769 @@
+[
+  {
+    "case_id": "miracl-zh-91294#0",
+    "historical_answer": "Based on the provided reference materials, Sagittarius (人马座) is bordered by the following neighboring constellations:\n\n*   **Scorpio**: Located to the west (西接天蝎座).\n*   **Aquarius**: Located to the east (東連摩羯座). *Note: The text contains a typo, stating \"Aquarius\" (摩羯座) instead of the correct \"Aquarius\" (寶瓶座) for the constellation east of Sagittarius.*\n*   **Ophiuchus**: Located to the north (北面是蛇夫座).\n*   **Scutum**: Located to the north (盾牌座).\n*   **Ophiuchus**: The text also mentions \"巨蛇座\" (Ophiuchus) as being to the north.\n*   **Telescopium**: Located to the south (望远镜座).\n*   **Microscopium**: Located to the south (显微镜座).\n*   **Corona Australis**: Located to the south (南冕座).\n\nThe materials indicate that Sagittarius is one of the largest and most prominent constellations in the summer night sky.",
+    "historical_verdict": "FAIL",
+    "review": {
+      "final_conclusion_quote": "*   **Aquarius**: Located to the east (東連摩羯座).",
+      "reason": "The resolved list invents a correction of source 摩羯座 to Aquarius/寶瓶座 even though actual original explicitly says 東連摩羯座, and collapses distinct source labels 蛇夫座 and 巨蛇座 into duplicate Ophiuchus entries. Several other neighbors are directly supported, but required neighbor identities are wrong/unresolved. The purported source typo is not in the source. This conclusion follows from actual displayed labels and the answer internal contradiction, without external astronomical assertions.",
+      "reference_or_source_basis": [
+        {
+          "audit_artifact_sha256": "01aa9be7f3b7c042dffcbed42de93a81075fdcada793663a89cf45fa0239d6d6",
+          "chunk_id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+          "chunk_text_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+          "document_id": "541b3a8a-70a0-48dc-b31a-19ee96df3b94",
+          "final_wire_sha256": "0e916200fbad365a0f2a3b4287a55ae03a723a85056983515c17f111c734d272",
+          "kind": "ACTUAL_ORIGINAL_SOURCE_QUOTE",
+          "knowledge_base_id": "214b8b2f-84f9-4d75-ab79-eccbdcd50ec2",
+          "quote": "它西接天蝎座、東連摩羯座，北面是蛇夫座、盾牌座和巨蛇座，南边则是一系列小型星座，如望远镜座、显微镜座、南冕座等。",
+          "quote_end": 84,
+          "quote_start": 28,
+          "source_file_sha256": "f59e42e6916ab57d0b2e15cd6b61e4169552442724cc052ffaab35ba534e4b8c",
+          "source_version": "73301c48-abc1-4f05-9a30-24dccb10f41e",
+          "stage": "DELIVERED_IN_ACTUAL_FINAL_PROVIDER_CONTEXT"
+        }
+      ]
+    },
+    "secondary": {
+      "citation_identity_readback": {
+        "denominator": 0,
+        "note": "Zero parsed citations means no citation identity/readback claim, even where final provider Context supports the answer.",
+        "readbacks": [],
+        "scope_version_text_matches": null,
+        "status": "UNVERIFIED"
+      },
+      "citation_semantic_attribution": {
+        "claim_to_source_mappings": [],
+        "note": "Missing parsed citations; supporting Context is not a clickable citation.",
+        "status": "UNVERIFIED"
+      },
+      "evidence_support": {
+        "claims": [
+          {
+            "answer_quote": "*   **Aquarius**: Located to the east (東連摩羯座).",
+            "assessment": "The resolved list invents a correction of source 摩羯座 to Aquarius/寶瓶座 even though actual original explicitly says 東連摩羯座, and collapses distinct source labels 蛇夫座 and 巨蛇座 into duplicate Ophiuchus entries. Several other neighbors are directly supported, but required neighbor identities are wrong/unresolved. The purported source typo is not in the source. This conclusion follows from actual displayed labels and the answer internal contradiction, without external astronomical assertions.",
+            "source_chunk_ids": [
+              "3f6a7679-4adf-4f93-9c2f-5d1bfd649478"
+            ]
+          },
+          {
+            "answer_quote": "The text contains a typo",
+            "reason": "Actual source never says Aquarius or 寶瓶座; it directly states 摩羯座.",
+            "status": "FABRICATED_SOURCE_CORRECTION"
+          },
+          {
+            "answer_quote": "*   **Ophiuchus**: The text also mentions \"巨蛇座\" (Ophiuchus)",
+            "reason": "The source lists 蛇夫座 and 巨蛇座 separately; answer duplicates one English entity.",
+            "status": "COLLAPSED_DISTINCT_SOURCE_ENTITIES"
+          }
+        ],
+        "delivery_audit": {
+          "delivered_original_chunk_ids": [
+            "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+            "2b590199-2b8e-4957-8071-79c2b0fc7004",
+            "ea91d536-c1a6-47a3-8b7d-3ca69f379807"
+          ],
+          "material_dropped_originals": []
+        },
+        "status": "PARTIAL"
+      },
+      "execution_integrity": {
+        "basis": "Actual SSE stop/nontruncated terminal equals replay, with exact PG/local closed receipts reconciliation. Semantic correctness is assessed separately.",
+        "normal_finish": true,
+        "normalized_history_turn_status": "completed",
+        "note": "Raw PG messages.turn_status is pending, while HTTP normalized history is completed; preserve this observed storage/API difference. Answer/reference persistence and server turn completion were reconciled.",
+        "pg_sse_history_match": true,
+        "raw_pg_turn_status": "pending",
+        "replay_added_sends": 0,
+        "status": "PASS"
+      },
+      "presentation_consistency": {
+        "citation_placement": "NO_PARSED_REFERENCES",
+        "status": "FAIL",
+        "unresolved_contradictions": [
+          "Invented source-typo explanation leaves east-neighbor identity contradictory.",
+          "Duplicate Ophiuchus hides the distinct 巨蛇座 source item.",
+          "No parsed clickable citations."
+        ]
+      },
+      "supplementary_fact_accuracy": {
+        "status": "FAIL",
+        "unsupported_or_wrong_claims": [
+          {
+            "answer_quote": "The text contains a typo",
+            "reason": "Actual source never says Aquarius or 寶瓶座; it directly states 摩羯座.",
+            "status": "FABRICATED_SOURCE_CORRECTION"
+          },
+          {
+            "answer_quote": "*   **Ophiuchus**: The text also mentions \"巨蛇座\" (Ophiuchus)",
+            "reason": "The source lists 蛇夫座 and 巨蛇座 separately; answer duplicates one English entity.",
+            "status": "COLLAPSED_DISTINCT_SOURCE_ENTITIES"
+          }
+        ]
+      }
+    },
+    "scoring_only": true
+  },
+  {
+    "case_id": "longbench-zh-multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+    "historical_answer": "In 2005, the city conducted **22,000** rural labor force training sessions, resulting in the transfer of employment for **76,000** people.\n\n<kb doc=\"43521b2a65fdd1e7f7e1f002\" chunk_id=\"f87c98e3-bd85-4ae0-82f8-61c3c8b40056\" kb_id=\"76770fba-17c3-4704-8663-10aa669476ce\" />",
+    "historical_verdict": "FAIL",
+    "review": {
+      "final_conclusion_quote": "the city conducted **22,000** rural labor force training sessions",
+      "reason": "Question asks how many people were trained. Native answer 2.2万人 means 22,000 people, and the exact original/readback says 组织开展农村劳动力技能培训2.2万人. The answer changes people into training sessions, a material unit error; the correct numeral alone is insufficient. Additional employment transfer 76,000 people is supported separately.",
+      "reference_or_source_basis": [
+        {
+          "kind": "FROZEN_NATIVE_REFERENCE_NOT_OFFICIAL_JUDGE",
+          "native_reference_answers": [
+            "2.2万人。"
+          ],
+          "native_reference_answers_sha256": "946e0ea1d9a039642c8bc05ee582a64bae016af7802302eaf228ddf8de1848a4"
+        },
+        {
+          "corpus_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\corpus.jsonl",
+          "exact_quote": "组织开展农村劳动力技能培训2.2万人，转移就业7.6万人",
+          "kind": "IMMUTABLE_NATIVE_ORIGINAL_OFFLINE",
+          "original_binding": [
+            {
+              "document_id": "5f5b5bf4-ac88-4d84-94e8-37c8cd1f9916",
+              "file_hash": "4698602b9e77c4d8957e001391b4f04bb82106bdbfb7490c3991c3b67eaf2d57",
+              "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+              "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+              "source_version": "7c0165f6-d93d-4cda-a27a-3699e3f94ce9"
+            }
+          ],
+          "source_id": "multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+          "source_text_sha256": "cd9996cbdd93079432f0fe6df198c7b34bcbce874bbdb8b7d6242fee284a9881"
+        },
+        {
+          "native_source_quote_delivered": true,
+          "request_artifact": {
+            "bytes": 25057,
+            "path": "E:\\RAG40-closed\\20261022t045038z-6e81bfc3\\files\\batches\\22-longbench-zh-multifieldqa_zh-51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed\\evidence\\a8f6c62edf6a459ba5765e5e1c64d0b3.request.json",
+            "sha256": "2963ae6dea5e849765b5d392cc70bef97f0980cb36916e9902856150ce4dddd9"
+          },
+          "request_id": "073f8bcd-9ec4-4f38-bc59-3bf26e0828da/answer/1/cheap",
+          "retrieval_candidate_counts": [
+            {
+              "retrieval": 30
+            },
+            {
+              "rerank": 10
+            },
+            {
+              "merge": 8
+            },
+            {
+              "source_unit": 14
+            }
+          ],
+          "source_data_present": true,
+          "wire_sha256": "c4d76f228f54ac558df9a7037caf2e7f69e5c88659e1787c063869466f6a541b"
+        }
+      ]
+    },
+    "secondary": {
+      "citation_identity_readback": {
+        "denominator": 1,
+        "readbacks": [
+          {
+            "chunk_id": "f87c98e3-bd85-4ae0-82f8-61c3c8b40056",
+            "document_id": "3de62352-dcd6-47c1-b81d-eac7b40f59b1",
+            "http_status": 200,
+            "matches": {
+              "document": true,
+              "offsets": true,
+              "scope": true,
+              "text": true,
+              "version": true
+            },
+            "native_source_quote_in_readback": true,
+            "persisted_offsets": [
+              693,
+              1106
+            ],
+            "persisted_text_sha256": "4cd424bad167ea610a4435675637a23ffa5b6c78e1a94f6fc9459c20e145c412",
+            "returned_offsets": [
+              693,
+              1106
+            ],
+            "returned_text_sha256": "4cd424bad167ea610a4435675637a23ffa5b6c78e1a94f6fc9459c20e145c412",
+            "source_version": "444774ae-785f-4a10-b744-ee52daf3eb81"
+          }
+        ],
+        "scope_version_text_matches": {
+          "denominator": 1,
+          "exact_matches": 1
+        },
+        "status": "PASS"
+      },
+      "citation_semantic_attribution": {
+        "claim_to_source_mappings": [
+          {
+            "chunk_id": "f87c98e3-bd85-4ae0-82f8-61c3c8b40056",
+            "claim": "22,000 training sessions",
+            "source_quote": "组织开展农村劳动力技能培训2.2万人，转移就业7.6万人",
+            "status": "UNSUPPORTED_UNIT"
+          },
+          {
+            "chunk_id": "f87c98e3-bd85-4ae0-82f8-61c3c8b40056",
+            "claim": "76,000 people employment transfer",
+            "source_quote": "转移就业7.6万人",
+            "status": "SUPPORTED"
+          }
+        ],
+        "status": "PARTIAL"
+      },
+      "evidence_support": {
+        "claims": [
+          {
+            "claim_quote": "the city conducted **22,000** rural labor force training sessions",
+            "reason": "Question asks how many people were trained. Native answer 2.2万人 means 22,000 people, and the exact original/readback says 组织开展农村劳动力技能培训2.2万人. The answer changes people into training sessions, a material unit error; the correct numeral alone is insufficient. Additional employment transfer 76,000 people is supported separately.",
+            "source_delivery": {
+              "native_source_quote_delivered": true,
+              "request_artifact": {
+                "bytes": 25057,
+                "path": "E:\\RAG40-closed\\20261022t045038z-6e81bfc3\\files\\batches\\22-longbench-zh-multifieldqa_zh-51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed\\evidence\\a8f6c62edf6a459ba5765e5e1c64d0b3.request.json",
+                "sha256": "2963ae6dea5e849765b5d392cc70bef97f0980cb36916e9902856150ce4dddd9"
+              },
+              "request_id": "073f8bcd-9ec4-4f38-bc59-3bf26e0828da/answer/1/cheap",
+              "retrieval_candidate_counts": [
+                {
+                  "retrieval": 30
+                },
+                {
+                  "rerank": 10
+                },
+                {
+                  "merge": 8
+                },
+                {
+                  "source_unit": 14
+                }
+              ],
+              "source_data_present": true,
+              "wire_sha256": "c4d76f228f54ac558df9a7037caf2e7f69e5c88659e1787c063869466f6a541b"
+            },
+            "status": "PARTIAL"
+          }
+        ],
+        "status": "PARTIAL"
+      },
+      "execution_integrity": {
+        "evidence": {
+          "exact_keysets": true,
+          "frame_checks": {
+            "replay_answer_match": true,
+            "replay_normal_stop": true,
+            "sse_answer_match": true,
+            "sse_normal_stop": true
+          },
+          "http_normalized_turn_status": "completed",
+          "raw_messages_turn_status": "pending",
+          "reconciliation_status": "PG_LOCAL_EXACT_RECONCILIATION_PASS",
+          "scope_note": "Local preserved export reviewed; no fresh DB/network access. Raw PG turn_status is pending while HTTP normalization/history completed; preserve this distinction.",
+          "wire_hashes_recomputed": true
+        },
+        "normal_finish": true,
+        "pg_sse_history_match": true,
+        "replay_added_sends": 0,
+        "status": "PASS"
+      },
+      "presentation_consistency": {
+        "citation_placement": "One citation immediately follows the claim. Handle readback is exact, but it supports 22,000 people rather than the stated 22,000 sessions.",
+        "status": "PASS",
+        "unresolved_contradictions": []
+      },
+      "supplementary_fact_accuracy": {
+        "status": "PASS",
+        "unsupported_or_wrong_claims": []
+      }
+    },
+    "scoring_only": true
+  },
+  {
+    "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+    "historical_answer": "In the production of Digital Surface Models (DSM) based on stereoscopic satellite imagery, the resolution of the satellite imagery at the nadir point should be better than **5m**.\n\n*Source: <kb doc=\"9f4e5cc4241bbe8944376d75\" chunk_id=\"1400dc3d-f641-4193-8218-0483ab6b528e\" kb_id=\"76770fba-17c3-4704-8663-10aa669476ce\" /> / <kb doc=\"6375aca51735a5ba906eeede\" chunk_id=\"072ced3a-cc3d-4260-ae9f-f73b49fd3a0b\" kb_id=\"76770fba-17c3-4704-8663-10aa669476ce\" /> / <kb doc=\"6375aca51735a5ba906eeede\" chunk_id=\"2ed4fe57-7bb6-4f82-a32a-c22da34db099\" kb_id=\"76770fba-17c3-4704-8663-10aa669476ce\" /> (Section 6.1.1, item a)*",
+    "historical_verdict": "PASS",
+    "review": {
+      "final_conclusion_quote": "the resolution of the satellite imagery at the nadir point should be better than **5m**.",
+      "reason": "The final answer preserves the native strict better-than condition and 5m unit. Exact original clause 6.1.1(a) was delivered in the expanded final generation context. Citation readback identity/content defects are secondary and do not alter this correct resolved answer.",
+      "reference_or_source_basis": [
+        {
+          "kind": "FROZEN_NATIVE_REFERENCE_NOT_OFFICIAL_JUDGE",
+          "native_reference_answers": [
+            "分辨率优于5m。"
+          ],
+          "native_reference_answers_sha256": "8b848260da12f945fe4b765724bcfbe2bbc24a580b1f5a8d289bed38e8e82f32"
+        },
+        {
+          "corpus_path": "D:\\RAG-Public-Bench\\prepared\\adapters\\longbench-zh\\corpus.jsonl",
+          "exact_quote": "影像星下点的分辨率应优于 5m",
+          "kind": "IMMUTABLE_NATIVE_ORIGINAL_OFFLINE",
+          "original_binding": [
+            {
+              "document_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+              "file_hash": "5063c351d4e58b7f139f64637b70fa68fd3b0110fa47b67285002cb962216d21",
+              "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+              "source_id": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+              "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+            }
+          ],
+          "source_id": "multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+          "source_text_sha256": "ebc79f60ff3330a739b1248200e4eeb981b360dd46dae1f8706096c6022831f1"
+        },
+        {
+          "native_source_quote_delivered": true,
+          "request_artifact": {
+            "bytes": 25356,
+            "path": "E:\\RAG40-closed\\20261022t045038z-6e81bfc3\\files\\batches\\21-longbench-zh-multifieldqa_zh-1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc\\evidence\\5c8743d49e5a48b389b74bd290a9a167.request.json",
+            "sha256": "daabf24c1ab7f9bed97eaaac8c777e6d91a718d45c978fccfae39fbd9b010cc6"
+          },
+          "request_id": "8578ee00-4c15-4345-909d-2e0d7ab097e1/answer/1/cheap",
+          "retrieval_candidate_counts": [
+            {
+              "retrieval": 30
+            },
+            {
+              "rerank": 12
+            },
+            {
+              "merge": 7
+            },
+            {
+              "source_unit": 12
+            }
+          ],
+          "source_data_present": true,
+          "wire_sha256": "f8715782588531ea5b8bda82ca543db9e1e9ce106eab5f76fece6f54e5de4598"
+        }
+      ]
+    },
+    "secondary": {
+      "citation_identity_readback": {
+        "denominator": 3,
+        "readbacks": [
+          {
+            "chunk_id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+            "document_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+            "http_status": 200,
+            "matches": {
+              "document": true,
+              "offsets": false,
+              "scope": true,
+              "text": false,
+              "version": true
+            },
+            "native_source_quote_in_readback": false,
+            "persisted_offsets": [
+              5759,
+              6959
+            ],
+            "persisted_text_sha256": "7f2176a9ced22aa0cb3dd2525b8d1b9f884869681b5b9079ad3a1f11971a7797",
+            "returned_offsets": [
+              5759,
+              6238
+            ],
+            "returned_text_sha256": "8cfaeb854d2480b8a2c8602f57f8fa037956bb098b41e31aca7f43c002b0fbc1",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          {
+            "chunk_id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+            "document_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+            "http_status": 200,
+            "matches": {
+              "document": true,
+              "offsets": false,
+              "scope": true,
+              "text": false,
+              "version": true
+            },
+            "native_source_quote_in_readback": false,
+            "persisted_offsets": [
+              6162,
+              6959
+            ],
+            "persisted_text_sha256": "c60b3272254e8422118ca19d8a298404e9023b64226a19e494ca1217bfbfd8c2",
+            "returned_offsets": [
+              6162,
+              6569
+            ],
+            "returned_text_sha256": "ac79846f486af3de39d0c283a4ccbaa376c81022830553fb28882ac981e8e601",
+            "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+          },
+          {
+            "chunk_id": "2ed4fe57-7bb6-4f82-a32a-c22da34db099",
+            "document_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+            "http_status": 200,
+            "matches": {
+              "document": true,
+              "offsets": true,
+              "scope": true,
+              "text": true,
+              "version": true
+            },
+            "native_source_quote_in_readback": false,
+            "persisted_offsets": [
+              8170,
+              8660
+            ],
+            "persisted_text_sha256": "622a155ba21619552d8e13f10bfc8d1eefe1eee9edeaa183c636877642541a90",
+            "returned_offsets": [
+              8170,
+              8660
+            ],
+            "returned_text_sha256": "622a155ba21619552d8e13f10bfc8d1eefe1eee9edeaa183c636877642541a90",
+            "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+          }
+        ],
+        "scope_version_text_matches": {
+          "denominator": 3,
+          "exact_matches": 1
+        },
+        "status": "PARTIAL"
+      },
+      "citation_semantic_attribution": {
+        "claim_to_source_mappings": [
+          {
+            "chunk_id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+            "claim": "resolution better than 5m",
+            "final_generation_support": true,
+            "readback_support": false,
+            "reason": "5m clause absent from returned chunk; expanded context support cannot be credited as same returned chunk."
+          },
+          {
+            "chunk_id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+            "claim": "resolution better than 5m",
+            "final_generation_support": true,
+            "readback_support": false,
+            "reason": "5m clause absent from returned chunk; expanded context support cannot be credited as same returned chunk."
+          },
+          {
+            "chunk_id": "2ed4fe57-7bb6-4f82-a32a-c22da34db099",
+            "claim": "resolution better than 5m",
+            "final_generation_support": false,
+            "readback_support": false,
+            "reason": "5m clause absent from returned chunk; expanded context support cannot be credited as same returned chunk."
+          }
+        ],
+        "status": "FAIL"
+      },
+      "evidence_support": {
+        "claims": [
+          {
+            "claim_quote": "the resolution of the satellite imagery at the nadir point should be better than **5m**.",
+            "reason": "The final answer preserves the native strict better-than condition and 5m unit. Exact original clause 6.1.1(a) was delivered in the expanded final generation context. Citation readback identity/content defects are secondary and do not alter this correct resolved answer.",
+            "source_delivery": {
+              "native_source_quote_delivered": true,
+              "request_artifact": {
+                "bytes": 25356,
+                "path": "E:\\RAG40-closed\\20261022t045038z-6e81bfc3\\files\\batches\\21-longbench-zh-multifieldqa_zh-1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc\\evidence\\5c8743d49e5a48b389b74bd290a9a167.request.json",
+                "sha256": "daabf24c1ab7f9bed97eaaac8c777e6d91a718d45c978fccfae39fbd9b010cc6"
+              },
+              "request_id": "8578ee00-4c15-4345-909d-2e0d7ab097e1/answer/1/cheap",
+              "retrieval_candidate_counts": [
+                {
+                  "retrieval": 30
+                },
+                {
+                  "rerank": 12
+                },
+                {
+                  "merge": 7
+                },
+                {
+                  "source_unit": 12
+                }
+              ],
+              "source_data_present": true,
+              "wire_sha256": "f8715782588531ea5b8bda82ca543db9e1e9ce106eab5f76fece6f54e5de4598"
+            },
+            "status": "SUPPORTED"
+          }
+        ],
+        "status": "SUPPORTED"
+      },
+      "execution_integrity": {
+        "evidence": {
+          "exact_keysets": true,
+          "frame_checks": {
+            "replay_answer_match": true,
+            "replay_normal_stop": true,
+            "sse_answer_match": true,
+            "sse_normal_stop": true
+          },
+          "http_normalized_turn_status": "completed",
+          "raw_messages_turn_status": "pending",
+          "reconciliation_status": "PG_LOCAL_EXACT_RECONCILIATION_PASS",
+          "scope_note": "Local preserved export reviewed; no fresh DB/network access. Raw PG turn_status is pending while HTTP normalization/history completed; preserve this distinction.",
+          "wire_hashes_recomputed": true
+        },
+        "normal_finish": true,
+        "pg_sse_history_match": true,
+        "replay_added_sends": 0,
+        "status": "PASS"
+      },
+      "presentation_consistency": {
+        "citation_placement": "Three citation handles grouped after the answer. Two carry expanded generation spans but HTTP readback lacks the 5m clause; the third is an unrelated section 9.1 span.",
+        "status": "PARTIAL",
+        "unresolved_contradictions": []
+      },
+      "supplementary_fact_accuracy": {
+        "status": "PASS",
+        "unsupported_or_wrong_claims": []
+      }
+    },
+    "scoring_only": true
+  },
+  {
+    "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+    "historical_answer": "Based on the provided source data, Clinton has a higher median campaign grade than Trump.\n\n*   **Trump's average grade:** The data states that \"Trump receives a C- grade on average\" (c1) and the chart summary lists his average grade as **C** (c2).\n*   **Clinton's average grade:** The data states that \"Clinton’s average grade is a C\" (c1) and the chart summary lists her average grade as **C** (c2).\n\n**Uncertainty regarding \"median\" vs. \"average\":**\nThe source materials explicitly provide **average** grades (C for both candidates) rather than **median** grades.\n*   For Trump, the grade distribution is: 30% A or B, 19% C, 15% D, 35% F. The cumulative percentage for C is 49%, and for D is 64%. Therefore, the median grade (the 50th percentile) falls within the **D** category.\n*   For Clinton, the grade distribution is: 43% A or B, 20% C, 16% D, 21% F. The cumulative percentage for C is 63%, and for D is 79%. Therefore, the median grade falls within the **C** category.\n\n**Conclusion:**\nWhile the text explicitly states the *average* grade is a C for both, a logical inference from the provided grade distributions indicates that Clinton's *median* grade (C) is higher than Trump's *median* grade (D).\n\n<kb doc=\"11-21-16-Updated-Post-Election-Release\" chunk_id=\"834f3910-246d-4c81-8285-87afb311005b\" kb_id=\"fd444069-cc1a-42d0-9617-e95fa90b6941\" />\n<kb doc=\"11-21-16-Updated-Post-Election-Release\" chunk_id=\"d843edfe-a0f4-4d7a-9a80-c4a16a7e2297\" kb_id=\"fd444069-cc1a-42d0-9617-e95fa90b6941\" />",
+    "historical_verdict": "PASS",
+    "review": {
+      "final_conclusion_quote": "Clinton's *median* grade (C) is higher than Trump's *median* grade (D).",
+      "reason": "The resolved conclusion exactly selects Clinton, matching native Str Gold. Delivered original distributions are Trump A/B30,C19,D15,F35 and Clinton A/B43,C20,D16,F21; the median categories are D and C respectively. Both subjects and comparison direction are correct. The answer explicitly distinguishes its median calculation from averages.",
+      "reference_or_source_basis": [
+        {
+          "answer_format": "Str",
+          "evidence_page_metrics": "NOT_RUN_PAGE_INDEX_CONVENTION_UNKNOWN",
+          "kind": "FROZEN_NATIVE_TYPED_REFERENCE_PROJECT_DIAGNOSTIC",
+          "native_reference_answers": [
+            "Clinton"
+          ],
+          "native_reference_answers_sha256": "d495e6fdc2b17cf8bb56747c4ea92ce22b075fb460785f486717d235fee72292",
+          "official_gpt_normalization": "NOT_RUN",
+          "scoring_only_metadata": {
+            "answer_format": "Str",
+            "evidence_pages": [
+              28,
+              29
+            ],
+            "evidence_sources": "['Chart']",
+            "gold_source": "OFFICIAL_NATIVE_TYPED_ANSWER",
+            "official_gpt_normalization": "NOT_RUN",
+            "original_row_index": 687,
+            "page_index_convention": "UNKNOWN",
+            "parsing_gold": "NOT_AVAILABLE"
+          },
+          "typed_reference_interpretation": "Clinton"
+        },
+        {
+          "kind": "ORIGINAL_PDF_HASH_VERIFIED_OFFLINE",
+          "native_page_index_convention": "UNKNOWN",
+          "original_binding": [
+            {
+              "document_id": "35c37b2d-3ce7-49ab-98fe-de6d3e6974f9",
+              "file_hash": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+              "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+              "source_id": "11-21-16-Updated-Post-Election-Release.pdf",
+              "source_version": "8358d755-b476-4986-bcce-fe3c979531a0"
+            }
+          ],
+          "page_metric_conversion_performed": false,
+          "reviewed_physical_pages": [
+            {
+              "physical_pdf_page_one_based": 28,
+              "rendered_png_sha256": "71164ccfb552ed686d4f3f13fdf8e93bce160ef33ad26d65b5c28d486643fb05",
+              "review_kind": "REVIEWER_ORIGINAL_VISUAL_INSPECTION_SEPARATE_FROM_PROVIDER_INPUT"
+            }
+          ],
+          "reviewer_observation": "Original chart and text show Trump30/19/15/35, Clinton43/20/16/21. Trump averageC- in prose, roundedC in summary elsewhere; median inference remains valid.",
+          "source_manifest": {
+            "bytes": 5924004,
+            "doc_id": "11-21-16-Updated-Post-Election-Release.pdf",
+            "path": "D:\\RAG-v6-special-subsets-r1\\download-verification-attempt1\\source-files\\object-00.pdf",
+            "sha256": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+            "source_kind": "FULL_PDF_ALL_PAGES"
+          }
+        },
+        {
+          "direct_image_payloads": 0,
+          "message_contents_all_strings": true,
+          "original_image_delivery_to_provider": "NOT_OBSERVED",
+          "request_artifact": {
+            "bytes": 16406,
+            "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\34-mmlongbench-doc-mmlongbench-doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86-row-0687\\evidence\\9356a038432d48169990007b4e86d127.request.json",
+            "sha256": "01c24c0d2c94033e627eedbb500db5ba9e3c2175b18caba51f2d8dd50ca871cd"
+          },
+          "request_id": "2c74a2d1-32d3-49a6-8379-c0fe72753eb3/answer/1/cheap",
+          "retrieval_candidate_counts": [
+            {
+              "retrieval": 30
+            },
+            {
+              "rerank": 18
+            },
+            {
+              "merge": 13
+            },
+            {
+              "source_unit": 15
+            }
+          ],
+          "source_data_present": true,
+          "wire_sha256": "a3c1e04519ab63a45a96753b09d09b418843dddc2057f6f403186eac5a3b557a"
+        }
+      ]
+    },
+    "secondary": {
+      "citation_identity_readback": {
+        "denominator": 2,
+        "readbacks": [
+          {
+            "chunk_id": "834f3910-246d-4c81-8285-87afb311005b",
+            "document_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+            "http_status": 200,
+            "matches": {
+              "document": true,
+              "offsets": false,
+              "scope": true,
+              "text": false,
+              "version": true
+            },
+            "persisted_offsets": [
+              41292,
+              42602
+            ],
+            "persisted_text_sha256": "a4425d707bb6789f75d3330ae2f445467c8e4206d458cf9606d60e0cc9fb1d50",
+            "readback_page_number_raw": null,
+            "returned_offsets": [
+              41292,
+              41788
+            ],
+            "returned_text_sha256": "3bc994cbf928866480eb7b11f4182bfdc5c7165ce1c416e565bb60f4299dc800",
+            "source_file_hash": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+            "source_file_hash_matches_original": true,
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          {
+            "chunk_id": "d843edfe-a0f4-4d7a-9a80-c4a16a7e2297",
+            "document_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+            "http_status": 200,
+            "matches": {
+              "document": true,
+              "offsets": true,
+              "scope": true,
+              "text": true,
+              "version": true
+            },
+            "persisted_offsets": [
+              10311,
+              10818
+            ],
+            "persisted_text_sha256": "d0ed1fa0acabce7f177752bb918b3105321f46aed04ae87080c168a71c23da28",
+            "readback_page_number_raw": null,
+            "returned_offsets": [
+              10311,
+              10818
+            ],
+            "returned_text_sha256": "d0ed1fa0acabce7f177752bb918b3105321f46aed04ae87080c168a71c23da28",
+            "source_file_hash": "8f49f93f1665fd5ff604e66ffed9649d8b18ce7f114ab43463aeac46cd3d00cb",
+            "source_file_hash_matches_original": true,
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          }
+        ],
+        "scope_version_text_matches": {
+          "denominator": 2,
+          "exact_matches": 1
+        },
+        "status": "PARTIAL"
+      },
+      "citation_semantic_attribution": {
+        "claim_to_source_mappings": [
+          {
+            "chunk_id": "834f3910-246d-4c81-8285-87afb311005b",
+            "claim": "Clinton medianC > Trump medianD",
+            "final_input_status": "SUPPORTED_BY_FULL_DISTRIBUTIONS",
+            "readback_status": "PARTIAL",
+            "reason": "Readback ends before D/F and Clinton percentages; cited expanded reference contains complete values."
+          },
+          {
+            "chunk_id": "d843edfe-a0f4-4d7a-9a80-c4a16a7e2297",
+            "claim": "rounded averageC for both",
+            "reason": "Does not itself establish median; detailed prose gives TrumpC-.",
+            "status": "SUPPORTED_ROUNDED_SUMMARY"
+          }
+        ],
+        "status": "PARTIAL"
+      },
+      "evidence_support": {
+        "claims": [
+          {
+            "claim_quote": "Clinton's *median* grade (C) is higher than Trump's *median* grade (D).",
+            "reason": "The resolved conclusion exactly selects Clinton, matching native Str Gold. Delivered original distributions are Trump A/B30,C19,D15,F35 and Clinton A/B43,C20,D16,F21; the median categories are D and C respectively. Both subjects and comparison direction are correct. The answer explicitly distinguishes its median calculation from averages.",
+            "source_delivery": {
+              "direct_image_payloads": 0,
+              "message_contents_all_strings": true,
+              "original_image_delivery_to_provider": "NOT_OBSERVED",
+              "request_artifact": {
+                "bytes": 16406,
+                "path": "\\\\?\\E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\image-preparation\\s862r3-ecs40-20261022t042851z-b8eda35b\\runtime40-snapshot-20261022t050343z-5ee0f773\\files\\batches\\34-mmlongbench-doc-mmlongbench-doc-2ff6aa9237fc777b6627dc57a486e9225ac5fb86-row-0687\\evidence\\9356a038432d48169990007b4e86d127.request.json",
+                "sha256": "01c24c0d2c94033e627eedbb500db5ba9e3c2175b18caba51f2d8dd50ca871cd"
+              },
+              "request_id": "2c74a2d1-32d3-49a6-8379-c0fe72753eb3/answer/1/cheap",
+              "retrieval_candidate_counts": [
+                {
+                  "retrieval": 30
+                },
+                {
+                  "rerank": 18
+                },
+                {
+                  "merge": 13
+                },
+                {
+                  "source_unit": 15
+                }
+              ],
+              "source_data_present": true,
+              "wire_sha256": "a3c1e04519ab63a45a96753b09d09b418843dddc2057f6f403186eac5a3b557a"
+            },
+            "status": "SUPPORTED"
+          }
+        ],
+        "status": "SUPPORTED"
+      },
+      "execution_integrity": {
+        "evidence": {
+          "exact_keysets": true,
+          "frame_checks": {
+            "replay_answer_match": true,
+            "replay_normal_stop": true,
+            "sse_answer_match": true,
+            "sse_normal_stop": true
+          },
+          "http_normalized_turn_status": "completed",
+          "raw_messages_turn_status": "pending",
+          "reconciliation_status": "PG_LOCAL_EXACT_RECONCILIATION_PASS",
+          "scope_note": "Local preserved export only; no fresh DB/network/Provider access. Raw pending and HTTP-normalized completed retained separately.",
+          "wire_hashes_recomputed": true
+        },
+        "normal_finish": true,
+        "pg_sse_history_match": true,
+        "replay_added_sends": 0,
+        "status": "PASS"
+      },
+      "presentation_consistency": {
+        "citation_placement": "Two citations at end. Expanded first reference contains the full distributions, but its HTTP handle returns only the initial text ending before D/F/Clinton figures.",
+        "status": "PARTIAL",
+        "unresolved_contradictions": [
+          {
+            "reason": "Delivered c1 explicitly says TrumpC- while c2 summary rounds it toC. Initial answer bullets acknowledge the discrepancy, but the final average-equality wording overstates a uniform source claim. This does not invalidate the resolved median comparison.",
+            "topic": "rounded average vs detailed average"
+          }
+        ]
+      },
+      "supplementary_fact_accuracy": {
+        "status": "PARTIAL",
+        "unsupported_or_wrong_claims": [
+          {
+            "quote": "While the text explicitly states the *average* grade is a C for both",
+            "reason": "Delivered c1 explicitly says TrumpC- while c2 summary rounds it toC. Initial answer bullets acknowledge the discrepancy, but the final average-equality wording overstates a uniform source claim. This does not invalidate the resolved median comparison.",
+            "status": "PARTIAL"
+          }
+        ]
+      }
+    },
+    "scoring_only": true
+  }
+]

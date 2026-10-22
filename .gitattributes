@@ -9,3 +9,6 @@
 # Preserve fixed tokenizer resource bytes for manifest verification on Windows.
 backend/weknora_port/retrieval/tokenizer_assets/*.utf8 -text
 backend/weknora_port/conversation_assets/*.yaml text eol=lf
+
+# Frozen S8.6.3 evidence keeps original log bytes, including whitespace.
+/docs/evaluation/evidence/s8_6_3/** -text -whitespace

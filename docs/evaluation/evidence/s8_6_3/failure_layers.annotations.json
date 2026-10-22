@@ -1,0 +1,259 @@
+[
+  {
+    "case_id": "scifact-1304",
+    "main_layer": "C",
+    "secondary_layers": [
+      "E"
+    ],
+    "first_failure": "RERANK_THRESHOLD",
+    "target_chunk_id": "d5d05a0b-eaa7-4368-8006-e8e5159bc039",
+    "final_input_sufficient": "NO",
+    "reason": "目标 fast-skeletal 原文在 Search，BGE 0.000371902 < 0.3 后无正文；最终 cardiac/inhibitor 为 fallback 补充错误。",
+    "next_minimal_action": "先检查原始短断言与 Rerank 输入的匹配；不调整全局阈值。",
+    "missing_proof": "别名与机制关系仅沿冻结来源复核，qrels 不是真假标签。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "scifact-1351",
+    "main_layer": "F",
+    "secondary_layers": [],
+    "first_failure": "NO_TRUTH",
+    "target_chunk_id": "242ea540-5ec0-40af-982b-f002180ce6d3",
+    "final_input_sufficient": "NO",
+    "reason": "已送达原文研究正常/缺失 dynein，不足以判定上调条件；保持 UNVERIFIED。",
+    "next_minimal_action": "补齐可判定的上调实验来源后再评价。",
+    "missing_proof": "没有该条件的官方 QA 真值；不是 Cheap 失败。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "UNVERIFIED"
+  },
+  {
+    "case_id": "scifact-247",
+    "main_layer": "F",
+    "secondary_layers": [],
+    "first_failure": "NO_TRUTH",
+    "target_chunk_id": "fa490391-ac34-4c22-952e-e528d8d5bda2",
+    "final_input_sufficient": "NO",
+    "reason": "已送达 TG2 结构/胰岛素原文，没有化学损伤对活性的方向性结论。",
+    "next_minimal_action": "保留拒答与 UNVERIFIED，先核对目标证据。",
+    "missing_proof": "qrels 只能证明相关性，不能决定该断言真假。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "UNVERIFIED"
+  },
+  {
+    "case_id": "scifact-621",
+    "main_layer": "F",
+    "secondary_layers": [
+      "C",
+      "E"
+    ],
+    "first_failure": "SOURCE_UNIT_BUDGET",
+    "target_chunk_id": "9c56759d-e0a2-41f3-8d7b-745c4aa52b26",
+    "final_input_sufficient": "NO",
+    "reason": "目标试验 2395 字原文通过 Rerank(0.9987992)，source unit 超 2048 导致整个旧轮次遗漏；试验人群无痴呆，也不能据此判定阿尔茨海默症人群。",
+    "next_minimal_action": "分别处理原文预算可见性与人群真值，不能将无证据拒答计模型失败。",
+    "missing_proof": "未取得阿尔茨海默症条件的可用真值。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "UNVERIFIED"
+  },
+  {
+    "case_id": "miracl-zh-5721594#0",
+    "main_layer": "D",
+    "secondary_layers": [],
+    "first_failure": "GENERATION",
+    "target_chunk_id": "276bb106-7489-48b2-bc35-449b6b1d4630",
+    "final_input_sufficient": "YES",
+    "reason": "完整中文公司清单已送达；英文别名未经绑定，430/600 冲突未说明。核心清单部分正确。",
+    "next_minimal_action": "固定原消息比较翻译实体与矛盾表达。",
+    "missing_proof": "只做来源复核，不借外部公司知识补 Gold。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "PARTIAL"
+  },
+  {
+    "case_id": "miracl-zh-692002#0",
+    "main_layer": "C",
+    "secondary_layers": [
+      "D"
+    ],
+    "first_failure": "RERANK_THRESHOLD",
+    "target_chunk_id": "4ddc4528-85d8-4aa9-936d-45edb5d1c41e",
+    "final_input_sufficient": "NO",
+    "reason": "明确美国经济学家的罗默原文 0.1455925 < 0.3 丢失；现有芝大原文名字仍被生成为 George Stiglitz，是伴随实体错误。",
+    "next_minimal_action": "先记录罗默排序输入及丢失，再独立比较实体翻译。",
+    "missing_proof": "现有输入不足以完整建立国籍；不把本题硬归 D 对照。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "miracl-zh-704170#0",
+    "main_layer": "D",
+    "secondary_layers": [],
+    "first_failure": "GENERATION",
+    "target_chunk_id": "31ef880a-0230-4788-89b4-933049c5c660",
+    "final_input_sufficient": "YES",
+    "reason": "共同原文已送达；双键被改成 triple bond，醇盐被称 alcohols。源文 sp 混合表述本身不规范，保留原样。",
+    "next_minimal_action": "固定消息复核关键术语，不修改原文。",
+    "missing_proof": "来源质量限制单列；不拿改写修正作为新来源。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "PARTIAL"
+  },
+  {
+    "case_id": "miracl-zh-91294#0",
+    "main_layer": "D",
+    "secondary_layers": [],
+    "first_failure": "GENERATION",
+    "target_chunk_id": "3f6a7679-4adf-4f93-9c2f-5d1bfd649478",
+    "final_input_sufficient": "YES",
+    "reason": "必要星座名称和方位完整送达，回答擅改摩羯座为 Aquarius，混同蛇夫座与巨蛇座。",
+    "next_minimal_action": "选作同证据模型对照；按最终关系和名称评价。",
+    "missing_proof": "后续真实成对验证尚未执行。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "longbench-zh-dureader:11b3b7afb73f5bf65a51b3083e885a60825b17421c58a828",
+    "main_layer": "C",
+    "secondary_layers": [
+      "E"
+    ],
+    "first_failure": "SOURCE_UNIT_BUDGET",
+    "target_chunk_id": "be66f052-9317-4030-b2e3-6a16ecd2c281",
+    "final_input_sufficient": "NO",
+    "reason": "病因原文通过检索与 Rerank，旧 source unit 超预算令整轮清空；最终 metadata fallback 缺多项病因。",
+    "next_minimal_action": "复用本轮身份物化后，离线检查分块预算遗漏；不声称答案已改善。",
+    "missing_proof": "旧中间 Merge 完整快照未独立保存，确切触发超限的锚点未知。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "PARTIAL"
+  },
+  {
+    "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+    "main_layer": "C",
+    "secondary_layers": [
+      "E"
+    ],
+    "first_failure": "SOURCE_UNIT_BUDGET",
+    "target_chunk_id": "57d67ff3-557a-4377-90c9-c8d84ec77bac",
+    "final_input_sufficient": "NO",
+    "reason": "任务循环/删任务原文已召回且分数高，旧 source unit 超预算导致最终无正文；参数知识答成清房间取战利品。",
+    "next_minimal_action": "先回放预算投影，保留玩法来源，不能盲目升级。",
+    "missing_proof": "旧超预算的具体锚点未记录，不补造。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "longbench-zh-dureader:6770736a958b78c4c1b1a0057b34a709bdd869f307f3dc40",
+    "main_layer": "C",
+    "secondary_layers": [
+      "E"
+    ],
+    "first_failure": "SOURCE_UNIT_BUDGET",
+    "target_chunk_id": "6f0e75a5-b74d-4c0a-ab0b-3c0505c6b386",
+    "final_input_sufficient": "NO",
+    "reason": "完整节日资料已进入 Search/Rerank；旧 source unit 超预算后 fallback 只列部分节日。",
+    "next_minimal_action": "检查每个预算遗漏源的单位；不把常识补充冒充文档引用。",
+    "missing_proof": "具体超限锚点缺保存快照；项目要求清单来自冻结参考。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "PARTIAL"
+  },
+  {
+    "case_id": "longbench-zh-multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+    "main_layer": "D",
+    "secondary_layers": [],
+    "first_failure": "GENERATION",
+    "target_chunk_id": "39aa8800-a6cd-48a6-8ec6-95ce8eb8a7d1",
+    "final_input_sufficient": "YES",
+    "reason": "2005 条件及培训 2.2万人原文送达，答案把人数改成 sessions；76,000 转移就业人数另有来源。",
+    "next_minimal_action": "选作固定消息单位对照，核对人数而非数字子串。",
+    "missing_proof": "新模型对照未执行。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "longbench-zh-multifieldqa_zh:bcedff0a6829ca68f2c33247af3bea6f5fa81c8d2d940fa2",
+    "main_layer": "C",
+    "secondary_layers": [],
+    "first_failure": "RERANK_THRESHOLD",
+    "target_chunk_id": "6d02e5b9-e416-42ec-b512-f9cd37b5c50b",
+    "final_input_sufficient": "NO",
+    "reason": "目标 HJ1134—2020 的 2020-08-27 原文在 Search，分数 0.1046835 < 0.3；最终输入为其他规范日期。",
+    "next_minimal_action": "先补记录无历史“这份”指代与 document_scope 的匹配；不将其他文件正确日期当本题通过。",
+    "missing_proof": "问题未自带规范名，宽 KB 范围存在歧义，是伴随条件。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+    "main_layer": "C",
+    "secondary_layers": [],
+    "first_failure": "SOURCE_PROJECTION",
+    "target_chunk_id": "41295870-5f65-458c-b045-85280c1184a3",
+    "final_input_sufficient": "NO",
+    "reason": "Tribometer 0.6711833 >= 0.3，通过 Rerank；短原文在 expand_neighbors 即使无邻居仍标记 rewritten，第四文档未进入扩展组，最终 UNMATERIALIZED_SELECTED_PROJECTION。",
+    "next_minimal_action": "本轮强制来源身份投影可处理该标志；先离线证明原文送达，真实答案仍未重测。",
+    "missing_proof": "原 q0 eith→with 被字面保护拒绝；仅出现 Pieter 名字不等于回答 BOTH 关系。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "PARTIAL"
+  },
+  {
+    "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0684",
+    "main_layer": "A",
+    "secondary_layers": [],
+    "first_failure": "TEXT_ONLY_MODALITY",
+    "target_chunk_id": "126d0c0a-98a7-4934-9eef-766ef8df4dc7",
+    "target_role": "RELATED_ONLY_OVERALL_79_NOT_REQUIRED_GENDER_COMPARISON",
+    "final_input_sufficient": "NO",
+    "reason": "需要图表男女 81/78 对比；实际消息仅文本、无图，已送整体 79 不能解决性别比较。",
+    "next_minimal_action": "先检查现有解析图表对应可用输入，不先调路由。",
+    "missing_proof": "全量落库解析文本未保存，不能证明所有索引都缺 81/78；审查者 PDF 视觉不等于模型见图。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0431",
+    "main_layer": "A",
+    "secondary_layers": [
+      "C",
+      "E"
+    ],
+    "first_failure": "TEXT_ONLY_MODALITY",
+    "target_chunk_id": "",
+    "final_input_sufficient": "NO",
+    "reason": "5 层答案依赖图示结构；最终 metadata-only 无图无正文，所有现有候选被 Rerank 淘汰。",
+    "next_minimal_action": "先核对原图结构能否形成可用证据。",
+    "missing_proof": "源图 reviewer 观察独立；尚无全量解析文本/图像输入覆盖证明。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+    "main_layer": "UNRESOLVED_A_OR_B",
+    "secondary_layers": [
+      "C",
+      "E"
+    ],
+    "first_failure": "SEARCH_TARGET_ABSENT",
+    "target_chunk_id": "",
+    "final_input_sufficient": "NO",
+    "reason": "原 PDF coding time 页明确 Cat vs Dog，但该文字不在保存的 30 个候选或最终输入；最终 Expensive 仍无正文。",
+    "next_minimal_action": "先只读核对已存解析结果是否含该句，再区分解析遗漏 A 或 Search 漏召回 B。",
+    "missing_proof": "未保存完整授权文档解析文本，不能把 PDF 存在等同于已可检索的文本存在。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  },
+  {
+    "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0430",
+    "main_layer": "A",
+    "secondary_layers": [
+      "C",
+      "E"
+    ],
+    "first_failure": "TEXT_ONLY_MODALITY",
+    "target_chunk_id": "",
+    "final_input_sufficient": "NO",
+    "reason": "全 PPT 图像计数题，最终 metadata-only 且无图；冻结整数 0 保留，拒答不是该题正确。",
+    "next_minimal_action": "先取得现有全页图像输入的可用性证据，暂不作模型能力对照。",
+    "missing_proof": "未对 68 页逐图独立计数；0 来自冻结 typed Gold，不伪称视觉重验。",
+    "reviewer": "AGENT_OFFLINE_REVIEW_NOT_OWNER",
+    "historical_verdict": "FAIL"
+  }
+]

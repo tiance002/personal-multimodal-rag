@@ -1,0 +1,139 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_ test_selected_outside_optional_groups_rejects_document_that_became_unavailable[knowledge_enable_status-disabled] _
+
+field = 'knowledge_enable_status', value = 'disabled'
+
+    @pytest.mark.parametrize('field,value',[
+        ('knowledge_enable_status','disabled'), ('knowledge_parse_status','processing'),
+        ('knowledge_parse_status','failed')])
+    def test_selected_outside_optional_groups_rejects_document_that_became_unavailable(field, value):
+        async def run():
+            originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+            selected = [result(r) for r in originals]
+            # Recall was valid; the document becomes unavailable before the final
+            # authoritative readback, outside the three optional expansion groups.
+            originals[-1][field] = value
+            s = state(selected)
+            with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+                await expand_source_evidence(s, CTX, repository(originals))
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_evidence.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+        selected = [result(r) for r in originals]
+        # Recall was valid; the document becomes unavailable before the final
+        # authoritative readback, outside the three optional expansion groups.
+        originals[-1][field] = value
+        s = state(selected)
+>       with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\weknora_port\test_source_evidence.py:95: Failed
+_ test_selected_outside_optional_groups_rejects_document_that_became_unavailable[knowledge_parse_status-processing] _
+
+field = 'knowledge_parse_status', value = 'processing'
+
+    @pytest.mark.parametrize('field,value',[
+        ('knowledge_enable_status','disabled'), ('knowledge_parse_status','processing'),
+        ('knowledge_parse_status','failed')])
+    def test_selected_outside_optional_groups_rejects_document_that_became_unavailable(field, value):
+        async def run():
+            originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+            selected = [result(r) for r in originals]
+            # Recall was valid; the document becomes unavailable before the final
+            # authoritative readback, outside the three optional expansion groups.
+            originals[-1][field] = value
+            s = state(selected)
+            with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+                await expand_source_evidence(s, CTX, repository(originals))
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_evidence.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+        selected = [result(r) for r in originals]
+        # Recall was valid; the document becomes unavailable before the final
+        # authoritative readback, outside the three optional expansion groups.
+        originals[-1][field] = value
+        s = state(selected)
+>       with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\weknora_port\test_source_evidence.py:95: Failed
+_ test_selected_outside_optional_groups_rejects_document_that_became_unavailable[knowledge_parse_status-failed] _
+
+field = 'knowledge_parse_status', value = 'failed'
+
+    @pytest.mark.parametrize('field,value',[
+        ('knowledge_enable_status','disabled'), ('knowledge_parse_status','processing'),
+        ('knowledge_parse_status','failed')])
+    def test_selected_outside_optional_groups_rejects_document_that_became_unavailable(field, value):
+        async def run():
+            originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+            selected = [result(r) for r in originals]
+            # Recall was valid; the document becomes unavailable before the final
+            # authoritative readback, outside the three optional expansion groups.
+            originals[-1][field] = value
+            s = state(selected)
+            with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+                await expand_source_evidence(s, CTX, repository(originals))
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_evidence.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals = [row(f'source-{i}', f'Original body {i}', knowledge_id=f'doc-{i}') for i in range(4)]
+        selected = [result(r) for r in originals]
+        # Recall was valid; the document becomes unavailable before the final
+        # authoritative readback, outside the three optional expansion groups.
+        originals[-1][field] = value
+        s = state(selected)
+>       with pytest.raises(ValueError, match='SOURCE_BODY_NOT_PRESERVED'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\weknora_port\test_source_evidence.py:95: Failed
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_source_evidence.py::test_selected_outside_optional_groups_rejects_document_that_became_unavailable[knowledge_enable_status-disabled]
+FAILED tests/weknora_port/test_source_evidence.py::test_selected_outside_optional_groups_rejects_document_that_became_unavailable[knowledge_parse_status-processing]
+FAILED tests/weknora_port/test_source_evidence.py::test_selected_outside_optional_groups_rejects_document_that_became_unavailable[knowledge_parse_status-failed]
+3 failed, 34 deselected in 0.88s

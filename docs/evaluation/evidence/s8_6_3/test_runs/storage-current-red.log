@@ -1,0 +1,191 @@
+.........FFFFFFFFFFF                                                     [100%]
+================================== FAILURES ===================================
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change0] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change1] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change2] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change3] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change4] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change5] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change6] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+______ test_opt_in_current_source_read_rejects_unavailable_rows[change7] ______
+tests\weknora_port\test_knowledge_storage.py:157: in test_opt_in_current_source_read_rejects_unavailable_rows
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:156: in exercise
+    assert await repo.get_chunks(['chunk'], context, current=True) == {}
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+_ test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter[text] _
+tests\weknora_port\test_knowledge_storage.py:181: in test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:172: in exercise
+    rows = await repo.get_chunks(['chunk'], context, current=True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+_ test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter[parent_text] _
+tests\weknora_port\test_knowledge_storage.py:181: in test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:172: in exercise
+    rows = await repo.get_chunks(['chunk'], context, current=True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+_______ test_default_source_read_preserves_noncurrent_loader_semantics ________
+tests\weknora_port\test_knowledge_storage.py:204: in test_default_source_read_preserves_noncurrent_loader_semantics
+    asyncio.run(exercise())
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\weknora_port\test_knowledge_storage.py:196: in exercise
+    explicit = await repo.get_chunks(['chunk'], context, current=False)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: ScopedKnowledgeRepository.get_chunks() got an unexpected keyword argument 'current'
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change0]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change1]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change2]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change3]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change4]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change5]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change6]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_rejects_unavailable_rows[change7]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter[text]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_opt_in_current_source_read_keeps_valid_text_and_parent_without_search_filter[parent_text]
+FAILED tests/weknora_port/test_knowledge_storage.py::test_default_source_read_preserves_noncurrent_loader_semantics
+11 failed, 9 passed in 1.65s

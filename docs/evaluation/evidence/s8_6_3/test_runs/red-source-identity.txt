@@ -1,0 +1,471 @@
+FFFFFFFF.F.                                                              [100%]
+================================== FAILURES ===================================
+_ test_frozen_extend_replays_to_exact_independent_sources[1400dc3d-f641-4193-8218-0483ab6b528e] _
+
+case = {'case_id': 'longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc', 'q0': '在基于立体卫星影像的DSM生产作业中...e'], 'owner_id': 'p8-real-3de2eca0bea340babcde75ce60c9a366'}, 'anchor_id': '1400dc3d-f641-4193-8218-0483ab6b528e', ...}
+
+    @pytest.mark.parametrize('case', FROZEN, ids=lambda c: c['anchor_id'])
+    def test_frozen_extend_replays_to_exact_independent_sources(case):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(case)
+            merged = sequential(deepcopy(originals), preserve_sources=True)
+            assert len(merged) == 1
+            assert (merged[0].id, merged[0].content, merged[0].start_at, merged[0].end_at) == (
+                hit.id, hit.content, hit.start_at, hit.end_at)
+            assert hit.end_at - hit.start_at == len(hit.content)
+            assert hit.content != case['source_http']['text']
+            assert originals[0].content == case['source_http']['text']
+            await expand_source_evidence(state, ctx, repo)
+            assert {r.id for r in state.merge_results} == {r.id for r in originals}
+            assert len(repo.reads) == 1
+            for row in state.merge_results:
+                source = repo.rows[row.id]
+                assert (row.content, row.start_at, row.end_at) == (source.content, source.start_at, source.end_at)
+                assert not row.sub_chunk_ids
+            assert next(r for r in state.merge_results if r.id == hit.id).score == hit.score
+            assert all(r.score == 0 for r in state.merge_results if r.id != hit.id)
+    
+            finalized = await into_chat_message(state)
+            req = GenerationRequest('offline', 'session', 'message', state.query, finalized,
+                tuple(Evidence.from_result(r) for r in state.merge_results), citations_enabled=True)
+            prepared = prepare_generation(req)
+            wire = '\n'.join(m.content for m in prepared.messages)
+            for row in originals: assert escape_text(row.content) in wire
+            # Exercise the real Registry and reference serialization used by SSE/PG.
+            for handle, _ in prepared.registry.snapshot().chunks:
+                prepared.registry.render_citations('[[cite:' + handle + ']]')
+            refs = GenerationCoordinator._references(req, prepared.registry)
+            assert len(refs) == len(originals)
+            persisted = json.loads(json.dumps(refs))
+            for ref in persisted:
+                raw = repo.rows[ref['id']]
+                assert (ref['content'], ref['start_at'], ref['end_at']) == (raw.content, raw.start_at, raw.end_at)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(case)
+        merged = sequential(deepcopy(originals), preserve_sources=True)
+        assert len(merged) == 1
+        assert (merged[0].id, merged[0].content, merged[0].start_at, merged[0].end_at) == (
+            hit.id, hit.content, hit.start_at, hit.end_at)
+        assert hit.end_at - hit.start_at == len(hit.content)
+        assert hit.content != case['source_http']['text']
+        assert originals[0].content == case['source_http']['text']
+        await expand_source_evidence(state, ctx, repo)
+>       assert {r.id for r in state.merge_results} == {r.id for r in originals}
+E       AssertionError: assert {'1400dc3d-f6...0483ab6b528e'} == {'1400dc3d-f6...99accee1113c'}
+E         
+E         Extra items in the right set:
+E         'b34c30a1-c2ba-48cd-93de-dd0c1a805c9e'
+E         'ef2c43d4-0495-4eb1-8071-99accee1113c'
+E         Use -v to get more diff
+
+tests\weknora_port\test_source_identity.py:60: AssertionError
+_ test_frozen_extend_replays_to_exact_independent_sources[072ced3a-cc3d-4260-ae9f-f73b49fd3a0b] _
+
+case = {'case_id': 'longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc', 'q0': '在基于立体卫星影像的DSM生产作业中...e'], 'owner_id': 'p8-real-3de2eca0bea340babcde75ce60c9a366'}, 'anchor_id': '072ced3a-cc3d-4260-ae9f-f73b49fd3a0b', ...}
+
+    @pytest.mark.parametrize('case', FROZEN, ids=lambda c: c['anchor_id'])
+    def test_frozen_extend_replays_to_exact_independent_sources(case):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(case)
+            merged = sequential(deepcopy(originals), preserve_sources=True)
+            assert len(merged) == 1
+            assert (merged[0].id, merged[0].content, merged[0].start_at, merged[0].end_at) == (
+                hit.id, hit.content, hit.start_at, hit.end_at)
+            assert hit.end_at - hit.start_at == len(hit.content)
+            assert hit.content != case['source_http']['text']
+            assert originals[0].content == case['source_http']['text']
+            await expand_source_evidence(state, ctx, repo)
+            assert {r.id for r in state.merge_results} == {r.id for r in originals}
+            assert len(repo.reads) == 1
+            for row in state.merge_results:
+                source = repo.rows[row.id]
+                assert (row.content, row.start_at, row.end_at) == (source.content, source.start_at, source.end_at)
+                assert not row.sub_chunk_ids
+            assert next(r for r in state.merge_results if r.id == hit.id).score == hit.score
+            assert all(r.score == 0 for r in state.merge_results if r.id != hit.id)
+    
+            finalized = await into_chat_message(state)
+            req = GenerationRequest('offline', 'session', 'message', state.query, finalized,
+                tuple(Evidence.from_result(r) for r in state.merge_results), citations_enabled=True)
+            prepared = prepare_generation(req)
+            wire = '\n'.join(m.content for m in prepared.messages)
+            for row in originals: assert escape_text(row.content) in wire
+            # Exercise the real Registry and reference serialization used by SSE/PG.
+            for handle, _ in prepared.registry.snapshot().chunks:
+                prepared.registry.render_citations('[[cite:' + handle + ']]')
+            refs = GenerationCoordinator._references(req, prepared.registry)
+            assert len(refs) == len(originals)
+            persisted = json.loads(json.dumps(refs))
+            for ref in persisted:
+                raw = repo.rows[ref['id']]
+                assert (ref['content'], ref['start_at'], ref['end_at']) == (raw.content, raw.start_at, raw.end_at)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(case)
+        merged = sequential(deepcopy(originals), preserve_sources=True)
+        assert len(merged) == 1
+        assert (merged[0].id, merged[0].content, merged[0].start_at, merged[0].end_at) == (
+            hit.id, hit.content, hit.start_at, hit.end_at)
+        assert hit.end_at - hit.start_at == len(hit.content)
+        assert hit.content != case['source_http']['text']
+        assert originals[0].content == case['source_http']['text']
+        await expand_source_evidence(state, ctx, repo)
+>       assert {r.id for r in state.merge_results} == {r.id for r in originals}
+E       AssertionError: assert {'072ced3a-cc...f73b49fd3a0b'} == {'072ced3a-cc...55e61c4f83d0'}
+E         
+E         Extra items in the right set:
+E         'dc93c378-76df-4565-9d21-55e61c4f83d0'
+E         Use -v to get more diff
+
+tests\weknora_port\test_source_identity.py:60: AssertionError
+_ test_frozen_extend_replays_to_exact_independent_sources[834f3910-246d-4c81-8285-87afb311005b] _
+
+case = {'case_id': 'mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687', 'q0': 'Who has a high...1'], 'owner_id': 'p8-real-3de2eca0bea340babcde75ce60c9a366'}, 'anchor_id': '834f3910-246d-4c81-8285-87afb311005b', ...}
+
+    @pytest.mark.parametrize('case', FROZEN, ids=lambda c: c['anchor_id'])
+    def test_frozen_extend_replays_to_exact_independent_sources(case):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(case)
+            merged = sequential(deepcopy(originals), preserve_sources=True)
+            assert len(merged) == 1
+            assert (merged[0].id, merged[0].content, merged[0].start_at, merged[0].end_at) == (
+                hit.id, hit.content, hit.start_at, hit.end_at)
+            assert hit.end_at - hit.start_at == len(hit.content)
+            assert hit.content != case['source_http']['text']
+            assert originals[0].content == case['source_http']['text']
+            await expand_source_evidence(state, ctx, repo)
+            assert {r.id for r in state.merge_results} == {r.id for r in originals}
+            assert len(repo.reads) == 1
+            for row in state.merge_results:
+                source = repo.rows[row.id]
+                assert (row.content, row.start_at, row.end_at) == (source.content, source.start_at, source.end_at)
+                assert not row.sub_chunk_ids
+            assert next(r for r in state.merge_results if r.id == hit.id).score == hit.score
+            assert all(r.score == 0 for r in state.merge_results if r.id != hit.id)
+    
+            finalized = await into_chat_message(state)
+            req = GenerationRequest('offline', 'session', 'message', state.query, finalized,
+                tuple(Evidence.from_result(r) for r in state.merge_results), citations_enabled=True)
+            prepared = prepare_generation(req)
+            wire = '\n'.join(m.content for m in prepared.messages)
+            for row in originals: assert escape_text(row.content) in wire
+            # Exercise the real Registry and reference serialization used by SSE/PG.
+            for handle, _ in prepared.registry.snapshot().chunks:
+                prepared.registry.render_citations('[[cite:' + handle + ']]')
+            refs = GenerationCoordinator._references(req, prepared.registry)
+            assert len(refs) == len(originals)
+            persisted = json.loads(json.dumps(refs))
+            for ref in persisted:
+                raw = repo.rows[ref['id']]
+                assert (ref['content'], ref['start_at'], ref['end_at']) == (raw.content, raw.start_at, raw.end_at)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(case)
+        merged = sequential(deepcopy(originals), preserve_sources=True)
+        assert len(merged) == 1
+        assert (merged[0].id, merged[0].content, merged[0].start_at, merged[0].end_at) == (
+            hit.id, hit.content, hit.start_at, hit.end_at)
+        assert hit.end_at - hit.start_at == len(hit.content)
+        assert hit.content != case['source_http']['text']
+        assert originals[0].content == case['source_http']['text']
+        await expand_source_evidence(state, ctx, repo)
+>       assert {r.id for r in state.merge_results} == {r.id for r in originals}
+E       AssertionError: assert {'834f3910-24...87afb311005b'} == {'834f3910-24...53faa3a3e793'}
+E         
+E         Extra items in the right set:
+E         'c090bae1-733d-42a8-a110-9b37df7377cb'
+E         'f96f9f89-1b47-4a04-872a-53faa3a3e793'
+E         Use -v to get more diff
+
+tests\weknora_port\test_source_identity.py:60: AssertionError
+______ test_selected_composite_outside_optional_groups_is_still_checked _______
+
+    def test_selected_composite_outside_optional_groups_is_still_checked():
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+            front = []
+            for i in range(3):
+                row = deepcopy(originals[0]); row.id = f'front-{i}'; row.knowledge_id = f'doc-{i}'
+                front.append(row); repo.rows[row.id] = deepcopy(row)
+            state.merge_results = front + [hit]
+            await expand_source_evidence(state, ctx, repo)
+            assert {r.id for r in originals} <= {r.id for r in state.merge_results}
+            assert len(repo.reads) == 1
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+        front = []
+        for i in range(3):
+            row = deepcopy(originals[0]); row.id = f'front-{i}'; row.knowledge_id = f'doc-{i}'
+            front.append(row); repo.rows[row.id] = deepcopy(row)
+        state.merge_results = front + [hit]
+        await expand_source_evidence(state, ctx, repo)
+>       assert {r.id for r in originals} <= {r.id for r in state.merge_results}
+E       AssertionError: assert {'1400dc3d-f6...99accee1113c'} <= {'1400dc3d-f6...1', 'front-2'}
+E         
+E         Extra items in the left set:
+E         'b34c30a1-c2ba-48cd-93de-dd0c1a805c9e'
+E         'ef2c43d4-0495-4eb1-8071-99accee1113c'
+
+tests\weknora_port\test_source_identity.py:96: AssertionError
+_ test_materialized_ancestry_cannot_cross_source_domain[knowledge_base_id-other-kb] _
+
+field = 'knowledge_base_id', value = 'other-kb'
+
+    @pytest.mark.parametrize('field,value', [('knowledge_base_id','other-kb'),
+        ('knowledge_id','other-doc'), ('version','old'), ('is_enabled',False)])
+    def test_materialized_ancestry_cannot_cross_source_domain(field, value):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+            row = repo.rows[originals[1].id]
+            if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+            else: setattr(row, field, value)
+            with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+        row = repo.rows[originals[1].id]
+        if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+        else: setattr(row, field, value)
+>       with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RetrievalScopeError
+
+tests\weknora_port\test_source_identity.py:109: Failed
+_ test_materialized_ancestry_cannot_cross_source_domain[knowledge_id-other-doc] _
+
+field = 'knowledge_id', value = 'other-doc'
+
+    @pytest.mark.parametrize('field,value', [('knowledge_base_id','other-kb'),
+        ('knowledge_id','other-doc'), ('version','old'), ('is_enabled',False)])
+    def test_materialized_ancestry_cannot_cross_source_domain(field, value):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+            row = repo.rows[originals[1].id]
+            if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+            else: setattr(row, field, value)
+            with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+        row = repo.rows[originals[1].id]
+        if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+        else: setattr(row, field, value)
+>       with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RetrievalScopeError
+
+tests\weknora_port\test_source_identity.py:109: Failed
+_____ test_materialized_ancestry_cannot_cross_source_domain[version-old] ______
+
+field = 'version', value = 'old'
+
+    @pytest.mark.parametrize('field,value', [('knowledge_base_id','other-kb'),
+        ('knowledge_id','other-doc'), ('version','old'), ('is_enabled',False)])
+    def test_materialized_ancestry_cannot_cross_source_domain(field, value):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+            row = repo.rows[originals[1].id]
+            if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+            else: setattr(row, field, value)
+            with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+        row = repo.rows[originals[1].id]
+        if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+        else: setattr(row, field, value)
+>       with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RetrievalScopeError
+
+tests\weknora_port\test_source_identity.py:109: Failed
+___ test_materialized_ancestry_cannot_cross_source_domain[is_enabled-False] ___
+
+field = 'is_enabled', value = False
+
+    @pytest.mark.parametrize('field,value', [('knowledge_base_id','other-kb'),
+        ('knowledge_id','other-doc'), ('version','old'), ('is_enabled',False)])
+    def test_materialized_ancestry_cannot_cross_source_domain(field, value):
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+            row = repo.rows[originals[1].id]
+            if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+            else: setattr(row, field, value)
+            with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+        row = repo.rows[originals[1].id]
+        if field == 'version': row.metadata['source_version'] = row.chunk_metadata['source_version'] = value
+        else: setattr(row, field, value)
+>       with pytest.raises(RetrievalScopeError): await expand_source_evidence(state, ctx, repo)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RetrievalScopeError
+
+tests\weknora_port\test_source_identity.py:109: Failed
+__ test_materialization_budget_reports_omission_without_losing_other_source ___
+
+    def test_materialization_budget_reports_omission_without_losing_other_source():
+        async def run():
+            originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+            hit.sub_chunk_ids = [f'extra-{i}' for i in range(6)]
+            other = deepcopy(originals[0]); other.id = 'safe'; repo.rows[other.id] = deepcopy(other)
+            state.merge_results.append(other)
+            await expand_source_evidence(state, ctx, repo)
+            assert [r.id for r in state.merge_results] == ['safe']
+            assert any(t.get('reason') == 'SOURCE_UNIT_BUDGET_EXCEEDED' and
+                t.get('decision') == 'INSUFFICIENT_SOURCE' for t in state.evidence_trace)
+>       asyncio.run(run())
+
+tests\weknora_port\test_source_identity.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\Drivers\python\Lib\asyncio\runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\Drivers\python\Lib\asyncio\base_events.py:721: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        originals, hit, ctx, state, repo = setup_case(FROZEN[0])
+        hit.sub_chunk_ids = [f'extra-{i}' for i in range(6)]
+        other = deepcopy(originals[0]); other.id = 'safe'; repo.rows[other.id] = deepcopy(other)
+        state.merge_results.append(other)
+        await expand_source_evidence(state, ctx, repo)
+>       assert [r.id for r in state.merge_results] == ['safe']
+E       AssertionError: assert ['1400dc3d-f6...528e', 'safe'] == ['safe']
+E         
+E         At index 0 diff: '1400dc3d-f641-4193-8218-0483ab6b528e' != 'safe'
+E         Left contains one more item: 'safe'
+E         Use -v to get more diff
+
+tests\weknora_port\test_source_identity.py:130: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/weknora_port/test_source_identity.py::test_frozen_extend_replays_to_exact_independent_sources[1400dc3d-f641-4193-8218-0483ab6b528e]
+FAILED tests/weknora_port/test_source_identity.py::test_frozen_extend_replays_to_exact_independent_sources[072ced3a-cc3d-4260-ae9f-f73b49fd3a0b]
+FAILED tests/weknora_port/test_source_identity.py::test_frozen_extend_replays_to_exact_independent_sources[834f3910-246d-4c81-8285-87afb311005b]
+FAILED tests/weknora_port/test_source_identity.py::test_selected_composite_outside_optional_groups_is_still_checked
+FAILED tests/weknora_port/test_source_identity.py::test_materialized_ancestry_cannot_cross_source_domain[knowledge_base_id-other-kb]
+FAILED tests/weknora_port/test_source_identity.py::test_materialized_ancestry_cannot_cross_source_domain[knowledge_id-other-doc]
+FAILED tests/weknora_port/test_source_identity.py::test_materialized_ancestry_cannot_cross_source_domain[version-old]
+FAILED tests/weknora_port/test_source_identity.py::test_materialized_ancestry_cannot_cross_source_domain[is_enabled-False]
+FAILED tests/weknora_port/test_source_identity.py::test_materialization_budget_reports_omission_without_losing_other_source
+9 failed, 2 passed in 1.00s

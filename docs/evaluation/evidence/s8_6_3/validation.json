@@ -1,0 +1,215 @@
+{
+  "kind": "OFFLINE_PYTEST_AND_FROZEN_REPLAY",
+  "new_real_http": "NOT_RUN",
+  "red": {
+    "command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/weknora_port/test_source_identity.py",
+      "-q"
+    ],
+    "exit_code": 1,
+    "result": "9 failed, 2 passed",
+    "exit_provenance": "Observed earlier tool result; preserved pytest stdout does not embed exit code",
+    "published_log": "test_runs/red-source-identity.txt"
+  },
+  "final": {
+    "command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/weknora_port/test_source_identity.py",
+      "tests/weknora_port/test_source_evidence.py",
+      "tests/weknora_port/test_merge_source_retention.py",
+      "tests/weknora_port/test_bounded_source_dedup.py",
+      "tests/weknora_port/test_s86_strategy.py",
+      "tests/weknora_port/test_s86_bridge_strategy.py",
+      "tests/weknora_port/test_s86_pipeline_integration.py",
+      "tests/weknora_port/test_generation_wire.py",
+      "tests/weknora_port/test_history_storage.py",
+      "tests/weknora_port/test_s863_fixed_evidence.py",
+      "tests/weknora_port/test_knowledge_storage.py",
+      "tests/weknora_port/test_source_reliability_wire.py",
+      "-q"
+    ],
+    "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+    "exit_code": 0,
+    "log": "E:\\RAG quention\\var\\reports\\s8-6-3\\targeted-final-v5.txt",
+    "log_sha256": "907a38a44c60149059a16d1dcfaaefbf24aa30fd5e7fe754772f8dae79445384",
+    "summary": "270 passed in 8.78s",
+    "published_log": "test_runs/targeted-final-v5.txt"
+  },
+  "log_inventory": [
+    {
+      "path": "test_runs/red-source-identity.txt",
+      "sha256": "a1fdb8fa2eeee638901bebb21fae20f34ca425cd5c80afe012b93097852b3424"
+    },
+    {
+      "path": "test_runs/green-source-identity-attempt1.txt",
+      "sha256": "739e28c8d91416656d5bd6511d2178bcd660401918c0c3b472cce2ea5aab937e"
+    },
+    {
+      "path": "test_runs/green-source-related-attempt1.txt",
+      "sha256": "edabd734f2061abad475be3a6dace3cf4e12fa36293ea7a2111868787ba41796"
+    },
+    {
+      "path": "test_runs/green-end-to-end-attempt1.txt",
+      "sha256": "420e5865cbaaa7cdbc7feaaa09f1b073cd4483c5422cabd414d56594de29000e"
+    },
+    {
+      "path": "test_runs/green-complete-context.txt",
+      "sha256": "ec7ebaa94c218fe5f854c2bd898da8b5d480d32426b0cf5b779391f75c65fc71"
+    },
+    {
+      "path": "test_runs/green-version-guard.txt",
+      "sha256": "6edf021c9e3709d11815cdf4c7919cd96c78b09eb6ca30f5907f642144210d73"
+    },
+    {
+      "path": "test_runs/targeted-final.txt",
+      "sha256": "068937a98341e25254b93020dea8eb7c62a48816298bd77d723200123e8a6399"
+    },
+    {
+      "path": "test_runs/targeted-final-v2.txt",
+      "sha256": "595a13608c3165d7778d7912906a6bc95f698060795fb82f4ce464d943a471a1"
+    },
+    {
+      "path": "test_runs/targeted-final-v3.txt",
+      "sha256": "a4f2722e775257832dd7b37a314a86a0b1feb64af7a28e3f36a4252aa0dd7d14"
+    },
+    {
+      "path": "test_runs/targeted-final-v3.run.json",
+      "sha256": "ace3e0f2cc352b87ff9d47d580efc85b2dcf9fb8855f73283a7822e6cf9327db"
+    },
+    {
+      "path": "test_runs/targeted-final-v4.txt",
+      "sha256": "66dca499a13db64a0ae87fa50edfd55793483c342ffa804ac1da3f8b94397aca"
+    },
+    {
+      "path": "test_runs/targeted-final-v4.run.json",
+      "sha256": "6d4c9855b3b0ee62279b1284b69720f6cc17f9f39fc05783fbe85d0aeb7c81bb"
+    },
+    {
+      "path": "test_runs/targeted-final-v5.txt",
+      "sha256": "907a38a44c60149059a16d1dcfaaefbf24aa30fd5e7fe754772f8dae79445384"
+    },
+    {
+      "path": "test_runs/targeted-final-v5.run.json",
+      "sha256": "b2085816da4ce9250720d052c348ec3bb98f9e9bdc025103cb440feeb10a8b7f"
+    },
+    {
+      "path": "test_runs/document-current-red.txt",
+      "sha256": "cd3dc4518deb54dbaed20e370d21fce9aa1737cfeadbed516e7383fec4efac08"
+    },
+    {
+      "path": "test_runs/storage-current-red.command.txt",
+      "sha256": "8dcd8345ab6bd9240775187954d7cd1e860902cb74569c34d4a33e3023b54d30"
+    },
+    {
+      "path": "test_runs/storage-current-red.log",
+      "sha256": "7a023cfb3b28eefdf53b49e22d1a188f2877eecadb7050bc75402d1357a6cc2b"
+    },
+    {
+      "path": "test_runs/storage-current-red.exit.txt",
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "test_runs/storage-current-green.command.txt",
+      "sha256": "8dcd8345ab6bd9240775187954d7cd1e860902cb74569c34d4a33e3023b54d30"
+    },
+    {
+      "path": "test_runs/storage-current-green.log",
+      "sha256": "33c8329e47d319196b0daacfc916874d72785305a119a470d4bbfc92dd530b7e"
+    },
+    {
+      "path": "test_runs/storage-current-green.exit.txt",
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    }
+  ],
+  "scope": "Real production functions with mocks/scripted DB rows; no new Provider or live PG/Redis/HTTP source reads",
+  "passed_assertions": [
+    "Three exact historical composite identities become independent originals",
+    "Two full frozen Contexts retain selected original bodies inside existing budgets",
+    "Pieter short original no-neighbor rewrite survives fourth optional document exclusion",
+    "Prepared model message, SourceRegistry, SSE references, scripted PG/history and HTTP source-reader agree",
+    "Cross KB/document/version/disabled source rejected; absent version rejected",
+    "Off path unchanged; optional-source cache reused; bounded omission explicit",
+    "Four exact fixed-evidence model pair requests and scoring isolation",
+    "Current readback rejects disabled/reparsing documents outside optional groups; valid parent_text and default loader semantics preserved"
+  ],
+  "earlier_checkpoint": {
+    "command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/weknora_port/test_source_identity.py",
+      "tests/weknora_port/test_source_evidence.py",
+      "tests/weknora_port/test_merge_source_retention.py",
+      "tests/weknora_port/test_bounded_source_dedup.py",
+      "tests/weknora_port/test_s86_strategy.py",
+      "tests/weknora_port/test_s86_bridge_strategy.py",
+      "tests/weknora_port/test_s86_pipeline_integration.py",
+      "tests/weknora_port/test_generation_wire.py",
+      "tests/weknora_port/test_history_storage.py",
+      "tests/weknora_port/test_s863_fixed_evidence.py",
+      "-q"
+    ],
+    "cwd": "C:\\Users\\22088\\.codex\\worktrees\\s8-6-adaptive-retrieval\\RAG quention",
+    "exit_code": 0,
+    "log": "E:\\RAG quention\\var\\reports\\s8-6-3\\targeted-final-v3.txt",
+    "log_sha256": "a4f2722e775257832dd7b37a314a86a0b1feb64af7a28e3f36a4252aa0dd7d14",
+    "summary": "219 passed in 10.66s",
+    "published_log": "test_runs/targeted-final-v3.txt"
+  },
+  "current_document_regression": {
+    "command_argv": [
+      "E:\\RAG quention\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/weknora_port/test_source_evidence.py",
+      "-k",
+      "became_unavailable",
+      "-q"
+    ],
+    "red_exit_code": 1,
+    "red_result": "3 failed, 34 deselected",
+    "published_log": "test_runs/document-current-red.txt",
+    "green_included_in": "targeted-final-v5"
+  },
+  "current_source_storage": {
+    "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -m pytest -q --tb=short tests/weknora_port/test_knowledge_storage.py",
+    "red_exit_code": 1,
+    "red_result": "11 failed, 9 passed",
+    "green_exit_code": 0,
+    "green_result": "20 passed",
+    "logs": [
+      "test_runs/storage-current-red.log",
+      "test_runs/storage-current-green.log"
+    ]
+  },
+  "intermediate_failures": [
+    {
+      "published_log": "test_runs/green-source-identity-attempt1.txt",
+      "result": "3 failed, 42 passed",
+      "reason": "Test harness used nonexistent SourceRegistry.render_citations; corrected to actual expand_text; failure kept."
+    },
+    {
+      "published_log": "test_runs/targeted-final-v4.txt",
+      "exit_code": 1,
+      "result": "1 failed, 269 passed",
+      "reason": "Legacy window-exclusion test did not implement mandatory readback and expected source omission. Updated stub and expectation to require exact original retention and rejection of unverified suffix; historical Gold unchanged."
+    }
+  ]
+}
