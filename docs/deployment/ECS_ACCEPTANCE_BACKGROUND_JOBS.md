@@ -45,6 +45,25 @@ payload执行现有正式HTTP测评路径，原始执行账本继续保存在原
 
 payload应逐题原子保存`output/checkpoint.json`，stdout/stderr自动写入文件。任务结束时，在`finally`中把本轮选定的收据、SSE、原文回读和运行结果的**只读快照**保存到output；原始账本保持原位，不为后台执行重命名、重置或覆盖。
 
+### 现有正式HTTP驱动适配
+
+`scripts/ecs_acceptance_http_payload.py`负责这层接线：把已经准备好的、具有当前有效任务范围的ECS端Python测评驱动直接交给同一解释器运行。驱动继续调用既有正式HTTP测评脚本，管理串行问答和原账本；适配器只转存stdout、把逐题JSON进度写成检查点、校验原驱动的最终summary，并复制明确选定的收据文件。
+
+将它作为`prepare --payload`的文件，在manifest的`args`中提供：
+
+```json
+[
+  "--driver", "/opt/rag-s8/diagnostics/current-task/run-http.py",
+  "--driver-sha256", "64位当前驱动文件哈希",
+  "--summary", "/opt/rag-s8/diagnostics/current-task/new-records/summary.json",
+  "--receipt", "/opt/rag-s8/state/executions/current-task/case/execution.json"
+]
+```
+
+以上是接线模板，不能直接运行占位路径或历史任务驱动。`summary`须属于新的任务输出，启动前不能已存在。适配器不重新实现HTTP或Provider，不生成授权，不增加模型调用；状态不明或失败后不重新启动。检查点写入异常时仍等待已启动驱动结束，避免辅助工具退出后模型请求还在运行；最终标为未完整完成并保留已有证据。
+
+原驱动须写入状态`ALL_ELIGIBLE_HTTP_COMPLETED_REVIEW_REQUIRED`、`completed_submissions`和完整`totals`（至少attempts、settled、unknown、unsettled）。只有驱动exit 0、attempts=settled、unknown=unsettled=0且选定收据快照稳定，适配器才写`runtime_complete=true`。这不代表答案质量通过。现有HTTP脚本/原始账本保持原位，不把历史ECS40驱动重新执行一遍。
+
 最终必须写入`output/result.json`，例如：
 
 ```json
@@ -102,4 +121,40 @@ python3 /path/to/ecs_acceptance_job.py fetch --job-root /opt/rag-s8/diagnostics/
 
 `scripts/ecs_acceptance_job_probe.py`只记录检查点、日志和最终JSON；不导入RAG应用、不连接PG/Redis、不发送网络请求。manifest须为`kind=zero_provider_probe`，结果须明确`provider_calls=0`。
 
-本地定向测试和ECS断开启动连接后的真实进程验证将分开记录于同目录的`ECS_ACCEPTANCE_BACKGROUND_JOBS.results.json`；本地mock不作为真实SSH断开证明，零调用探针不作为新一轮问答验收。
+### 2026-10-22 实际验证
+
+实现及实测版本：`decafab7f62cbb55fa6ee45b102255b8c70bbc6f`。
+
+| 检查 | 实际结果 |
+|---|---|
+| 本地受影响测试 | `41 passed, 4 skipped in 6.28s`，exit 0；3项因Windows符号链接权限跳过，1项需Linux |
+| 启动SSH退出 | exit 0，约1.2秒返回，`start_acknowledged=true`、RUNNING |
+| SSH退出后的ECS进度 | 持久检查点从1继续到4，约40秒后明确完成，`runtime_complete=true` |
+| 新连接读取 | SUCCEEDED，exit 0；读取时后台进程已经正常退出 |
+| 下载和校验 | 13个导出文件的字节数、SHA及复制稳定性全部吻合 |
+| 重复启动 | runner exit 2，`job already claimed; no retry/resume/re-send is permitted`；5个控制文件原字节不变 |
+| Provider/Token/新问答 | 0 / 0 / 0；未重跑ECS40 |
+
+定向命令（工作目录为本轮合法工作树）：
+
+```powershell
+& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_ecs_acceptance_job.py -q --tb=short -p no:cacheprovider
+```
+
+ECS真实任务目录：`/opt/rag-s8/diagnostics/detached-probe-20261022t054617z-f3c636e6-job`。服务器检查点时间为05:47:10、20、30、40 UTC，最终05:47:50 UTC完成；新连接在05:48:01 UTC读取成功。启动SSH已退出且后续进度继续落盘，这是本次断连验证依据；没有实际关闭本机，也未记录运行中的FD检查。
+
+完整机器结果见 [ECS_ACCEPTANCE_BACKGROUND_JOBS.results.json](ECS_ACCEPTANCE_BACKGROUND_JOBS.results.json)。本地mock与真实ECS证据分别保存；零调用探针证明进程脱离启动连接及结果持久化，新一轮真实HTTP批次的后台执行为`NOT_RUN`。
+
+### HTTP驱动适配的离线验证
+
+适配源码提交：`348557b3bfa82633ad130c92fbee01bdcade53c7`。最终只运行两个受影响测试文件：
+
+```powershell
+& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_ecs_acceptance_job.py tests/weknora_port/test_ecs_acceptance_http_payload.py -q --tb=short -p no:cacheprovider
+```
+
+exit 0，`65 passed, 5 skipped in 9.79s`。包括前述41项runner测试及24项适配测试；5项跳过分别为4项Windows符号链接权限与1项Linux专属测试，不能与旧测试次数相加。
+
+适配测试使用冻结的两题假驱动，验证Unicode日志、逐题检查点、单次执行、完整summary/结算计数、旧summary不被复用、只读收据以及检查点失败后等待原驱动结束。没有运行真实HTTP批次或Provider。最初1个测试误预期`FileNotFoundError`，实际安全文件检查返回`PayloadError`；仅修正异常断言，缺summary仍不能报完整成功。
+
+代码审查定位并修复了两处适配问题：历史完整summary可能被误用；辅助日志/检查点异常可能提前退出。两项定向回归均已通过，未因此重发既有测评题目。

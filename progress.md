@@ -627,3 +627,13 @@ Baseline22dcb59; queryfix9c2aa9c, source751c6b26. ExactASCIIterminalperiod-only 
 ## 2026-10-22 S8.6.2-R3 approved actual HTTP outcome
 
 Owner exact9/65261 granted; latest751c source/image9ef actualECS temporaryHTTP onecompare completed. ActualQUpreciseperiodrecovery→RULE_COMPARE2serialchildren; trueEmbedding/Rerankwires2each, originaldelivery/readback2/2, stop+usage+DONE, SSE30=replay30/PG/historyconsistent. Sixsettledcalls5105input+336output=5441Tokens,0newUNKNOWN/0unsettledheld, PGLocalkeysets/usage/wireexact6/6, ledgerCLOSEDentriesunchanged. Corefinalanswercorrect1/1; overallqualityPARTIAL, unsupportedextraexpressions andfooterrefplacement remain, noprompt/P5fixorretry. ProductionAPI/Workerunchanged. LatestOwnercancelledlocalrealQAandsupplementary3gate; nowECS40preflight, original40sourcesGoldreadonlyverifyPASS,2legacyUNKNOWNNOT_RUN, no40sendyet. Report docs/evaluation/S8_6_2_R3_QU_HTTP_ACCEPTANCE.md/.results.json.
+
+## 2026-10-22 S8.6.2-R3 ECS40 实测收尾
+
+运行源码5585f41；独立ECS临时API镜像b7c89d3，生产API/Worker仍为80e2f2d/29ecf2f。本轮40题中38题真实HTTP执行，2题因旧UNKNOWN保护NOT_RUN；158次Provider全结算，实际356966输入+7627输出=364593Tokens，新增UNKNOWN/未结算/恢复新增发送均0。38子账本CLOSED，Owner任务COMPLETED_NO_FURTHER_SENDS。Agent来源/Gold复核20PASS、5PARTIAL、10FAIL、3UNVERIFIED；不属于官方混合数据集准确率或Owner验收。严格项目复核20/38；引用逐字回读38/41，3处文本/end不一致保留，质量门FAIL，不能宣称生产可用。Frost最终Franconia,NewHampshire正确，RELATED_ONLY及EVENT_VENUE_UNVERIFIED保持；40题未触发比较/并列规则，不宣称规则真实准确率。历史失败、旧UNKNOWN、原始账本/Gold保留，不重跑本地40题。报告提交98105df：docs/evaluation/S8_6_2_R3_ECS40_ACCEPTANCE.md/.results.json。
+
+## 2026-10-22 ECS测评脱离本机与测试环境简化
+
+后台runner/probe源码decafab7；独立目录、一次启动、日志/检查点/最终结果持久化，启动SSH不再维持任务进程。按Owner意见移除任意文件/归档大小数量上限及启动器重复授权/账本预检，主机资源参数按实况，逐题不重复整库/模块/历史容器扫描；原正式API/Registry/SendGate/LocalExecution保护继续生效。定向本地41passed/4平台skip exit0；ECS零Provider实测启动SSH约1.2秒exit0后继续4步/约40秒，最终SUCCEEDED，重新连接取回13文件哈希/稳定性一致，重复启动exit2且原控制字节不变。新增Provider/Token/问答0，无物理关机实测，不承诺ECS重启自动续发。机器证据docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.results.json，操作说明同目录ECS_ACCEPTANCE_BACKGROUND_JOBS.md；既有ECS40不重跑，真实HTTP后台批次NOT_RUN。
+
+HTTP驱动适配348557b：直接运行冻结ECS端既有驱动，消费实际逐题进度和明确summary，原HTTP/Registry/SendGate/LocalExecution负责发送；适配器不复制检索/Provider路径。审查修复旧summary复用及检查点失败提前退出，单次claim、drain/wait、原收据只读快照通过。最终两个受影响文件65passed/5平台skip exit0（包含前述41项，不叠加），假驱动离线验证，新增真实HTTP/Provider/Token0。当前全部实测已结束，仅本地提交，不Push/生产部署/重跑40题。

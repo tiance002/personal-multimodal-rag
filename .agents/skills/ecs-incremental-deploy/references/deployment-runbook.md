@@ -108,3 +108,11 @@ config --quiet仅证明语法。比较完整有效配置时将结果保存到权
 记录目标/旧版本与镜像、实际SHA/配置差异、受影响服务、每条实际命令/exit/语义status、来源/索引/账本/UNKNOWN保护、rollback `AVAILABLE/NOT_TRIGGERED/EXECUTED_VERIFIED`。计数一致仅证明相应计数，不冒称全库逐字节未变。
 
 验收按改动选最小路径：普通代码更新先零云鉴权/来源回读/索引及合同；真实问答只在当前有效模型许可下走正常FastAPI→检索→Context→LLM→SSE→PG→历史，不注入Gold、不重发UNKNOWN。没有新云许可就`REAL_QA_NOT_RUN`，可报告应用部署证据，但不能宣称全链路真实问答通过。
+
+## 临时ECS测评：简化操作与脱离本机
+
+2026-10-22 Owner收敛测试环境边界：独立临时服务和目录；启动确认后脱离本机；日志、结果持久化；保存必要源码/镜像/会话/调用身份；不自动重试状态不明的Provider发送。按当前任务已批准范围执行，不新增重复授权或数值预算复核；正常Registry/SendGate/LocalExecution仍执行原权限、Scope、已批准用量及UNKNOWN合同。
+
+源码与镜像启动时核对一次，不逐题重复整库指纹、模块导入或历史容器枚举。Docker资源参数适配主机能力；诊断文件不设任意大小/数量上限，Windows使用短路径或扩展路径。原始收据保存单份，逐题摘要记录必要ID、查询、引用、终态和真实Token。
+
+后台入口及操作说明：[ECS_ACCEPTANCE_BACKGROUND_JOBS.md](../../../../docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md)。已真实验证启动SSH退出后ECS继续40秒并落盘、重新连接取回13文件且哈希一致、重复启动被拒绝；本次0Provider/0Token，不代表重跑问答。原ECS40质量失败及历史UNKNOWN保持原记录。ECS重启或发送未知时不自动续发。

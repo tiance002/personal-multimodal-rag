@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-22T06:05:34.663855+00:00",
+  "goal": "ECS acceptance independent of local SSH; simplify test operations",
+  "status": "DETACHED_ZERO_PROVIDER_PROBE_PASS",
+  "scope": {
+    "new_provider_attempts": 0,
+    "new_settled_calls": 0,
+    "new_unknown": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "actual_total_tokens": 0,
+    "new_qa_submissions": 0,
+    "old_ecs40_resubmitted": false,
+    "production_api_worker_updated": false,
+    "database_or_indexes_changed": false,
+    "physical_local_pc_shutdown": "NOT_RUN",
+    "live_fd_inspection": "NOT_RECORDED_PROBE_ALREADY_FINISHED_AT_OBSERVATION",
+    "new_real_http_batch_via_detached_runner": "NOT_RUN",
+    "ecs_reboot_automatic_resume": "NOT_IMPLEMENTED_NO_AUTOMATIC_RESEND"
+  },
+  "verified_code": {
+    "source_revision": "decafab7f62cbb55fa6ee45b102255b8c70bbc6f",
+    "branch": "codex/s8-6-adaptive-retrieval-20261021",
+    "runner_sha256": "0cb4e15d465c18f340d8e2df4cfef29ad85fd9a39fbf95f1b7acc4409032ac19",
+    "probe_payload_sha256": "d27b38d00384eaf04fd9447585ac065e94a6d5f380cee9c4816f4fd89d8ec2b4",
+    "profile_sha256": "182d1fa24da37a3bb59075d22f8dd4e46a0478cb3d8afdc3167cfb3980f62d05",
+    "manifest_sha256": "9ad2de649b50acbcbfc7f729b465b3756fb0e7287bb69c859bf753aff5d9741f",
+    "image_reference": "sha256:b7c89d3ec3a44f3275c968a063391d4b15341a7ee5d5a19d656551fb4de82f63",
+    "image_reference_role": "IDENTITY_ONLY_NO_DOCKER_OR_API_STARTED_BY_PROBE",
+    "interpreter": "/usr/bin/python3.12",
+    "interpreter_version": "Python 3.12.3"
+  },
+  "local_tests": {
+    "status": "PASS_WITH_PLATFORM_SKIPS",
+    "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_ecs_acceptance_job.py -q --tb=short -p no:cacheprovider",
+    "exit_code": 0,
+    "passed": 41,
+    "skipped": 4,
+    "seconds": 6.28,
+    "skip_reasons": {
+      "windows_symlink_privilege_1314": 3,
+      "linux_only_process_test": 1
+    },
+    "log": {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-simplified-tests.txt",
+      "bytes": 1527,
+      "sha256": "a35ec2a9153a30f8c794ff1f601e005d808cc148a8670e70aeda428c3284e93f"
+    },
+    "interpretation": "Local tests are not substituted for the real ECS disconnect probe."
+  },
+  "real_ecs_zero_provider_probe": {
+    "status": "PASS",
+    "packet_root": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6",
+    "job_root": "/opt/rag-s8/diagnostics/detached-probe-20261022t054617z-f3c636e6-job",
+    "launch_ssh": {
+      "exit_code": 0,
+      "provider_calls": 0,
+      "seconds": 1.197698500007391
+    },
+    "start": {
+      "boot_id": "39d8368d-c88b-4209-a46f-a1c8977c59bb",
+      "checkpoint": {
+        "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+        "pid": 2579286,
+        "provider_calls": 0,
+        "session_id": 2579286,
+        "step": 1,
+        "steps": 4,
+        "updated_at": "2026-10-22T05:47:10.252975+00:00"
+      },
+      "cli_exit_code": 0,
+      "cli_stderr": "",
+      "heartbeat_at": "2026-10-22T05:47:10.227238+00:00",
+      "job_id": "detached-probe-20261022t054617z-f3c636e6-job",
+      "job_root": "/opt/rag-s8/diagnostics/detached-probe-20261022t054617z-f3c636e6-job",
+      "launch_completed": true,
+      "local_ssh_process_completed": true,
+      "payload": {
+        "boot_id": "39d8368d-c88b-4209-a46f-a1c8977c59bb",
+        "pid": 2579286,
+        "start_ticks": 267425821
+      },
+      "schema_version": 1,
+      "start_acknowledged": true,
+      "started_at": "2026-10-22T05:47:10.227099+00:00",
+      "status": "RUNNING",
+      "supervisor": {
+        "boot_id": "39d8368d-c88b-4209-a46f-a1c8977c59bb",
+        "pid": 2579285,
+        "start_ticks": 267425817
+      },
+      "updated_at": "2026-10-22T05:47:10.227234+00:00"
+    },
+    "progress": [
+      {
+        "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+        "pid": 2579286,
+        "provider_calls": 0,
+        "session_id": 2579286,
+        "step": 1,
+        "steps": 4,
+        "updated_at": "2026-10-22T05:47:10.252975+00:00"
+      },
+      {
+        "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+        "pid": 2579286,
+        "provider_calls": 0,
+        "session_id": 2579286,
+        "step": 2,
+        "steps": 4,
+        "updated_at": "2026-10-22T05:47:20.258500+00:00"
+      },
+      {
+        "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+        "pid": 2579286,
+        "provider_calls": 0,
+        "session_id": 2579286,
+        "step": 3,
+        "steps": 4,
+        "updated_at": "2026-10-22T05:47:30.263897+00:00"
+      },
+      {
+        "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+        "pid": 2579286,
+        "provider_calls": 0,
+        "session_id": 2579286,
+        "step": 4,
+        "steps": 4,
+        "updated_at": "2026-10-22T05:47:40.269172+00:00"
+      }
+    ],
+    "new_connection_observation": {
+      "checkpoint": {
+        "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+        "pid": 2579286,
+        "provider_calls": 0,
+        "session_id": 2579286,
+        "step": 4,
+        "steps": 4,
+        "updated_at": "2026-10-22T05:47:40.269172+00:00"
+      },
+      "job_status": {
+        "acceptance_verdict": "NOT_EVALUATED",
+        "artifact_integrity": "MATCH",
+        "boot_id": "39d8368d-c88b-4209-a46f-a1c8977c59bb",
+        "checkpoint": {
+          "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+          "pid": 2579286,
+          "provider_calls": 0,
+          "session_id": 2579286,
+          "step": 4,
+          "steps": 4,
+          "updated_at": "2026-10-22T05:47:40.269172+00:00"
+        },
+        "exit_code": 0,
+        "finished_at": "2026-10-22T05:47:50.385322+00:00",
+        "heartbeat_at": "2026-10-22T05:47:50.385333+00:00",
+        "job_id": "detached-probe-20261022t054617z-f3c636e6-job",
+        "job_root": "/opt/rag-s8/diagnostics/detached-probe-20261022t054617z-f3c636e6-job",
+        "launch_completed": true,
+        "observed_at": "2026-10-22T05:48:01.490961+00:00",
+        "payload": {
+          "boot_id": "39d8368d-c88b-4209-a46f-a1c8977c59bb",
+          "pid": 2579286,
+          "start_ticks": 267425821
+        },
+        "quality_review_required": true,
+        "read_only": true,
+        "reason": "payload_exit_and_explicit_completion_receipt",
+        "result_valid": true,
+        "runtime_complete": true,
+        "schema_version": 1,
+        "started_at": "2026-10-22T05:47:10.227099+00:00",
+        "started_claim_exists": true,
+        "status": "SUCCEEDED",
+        "supervisor": {
+          "boot_id": "39d8368d-c88b-4209-a46f-a1c8977c59bb",
+          "pid": 2579285,
+          "start_ticks": 267425817
+        },
+        "updated_at": "2026-10-22T05:47:50.385331+00:00"
+      },
+      "observed_at_ns": 1792648081492911002,
+      "observer_pid": 2579689,
+      "observer_sid": 2579689,
+      "payload_process": {
+        "pid": 2579286,
+        "status": "NOT_ALIVE_AT_OBSERVATION"
+      },
+      "progress_advanced_since_start": true,
+      "provider_calls": 0,
+      "qa_acceptance": "NOT_RUN",
+      "status": "SUCCEEDED",
+      "supervisor_process": {
+        "pid": 2579285,
+        "status": "NOT_ALIVE_AT_OBSERVATION"
+      }
+    },
+    "result": {
+      "finished_at": "2026-10-22T05:47:50.274619+00:00",
+      "kind": "ZERO_PROVIDER_PERSISTENCE_PROBE",
+      "provider_calls": 0,
+      "qa_acceptance": "NOT_RUN",
+      "runtime_complete": true,
+      "steps_completed": 4,
+      "unknown": 0,
+      "unsettled": 0
+    },
+    "terminal_export": {
+      "local_root": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\verified-export-d846d839",
+      "files_verified": 13,
+      "all_files_stable": true,
+      "files": {
+        "control/manifest.json": {
+          "bytes": 709,
+          "sha256": "9ad2de649b50acbcbfc7f729b465b3756fb0e7287bb69c859bf753aff5d9741f",
+          "stable_during_copy": true
+        },
+        "control/payload.py": {
+          "bytes": 2800,
+          "sha256": "d27b38d00384eaf04fd9447585ac065e94a6d5f380cee9c4816f4fd89d8ec2b4",
+          "stable_during_copy": true
+        },
+        "control/prepared.json": {
+          "bytes": 509,
+          "sha256": "f949f233829039c5a5fe796f9d51b29b3926e16945b62b328e5f06dce644a023",
+          "stable_during_copy": true
+        },
+        "control/runner.py": {
+          "bytes": 25625,
+          "sha256": "0cb4e15d465c18f340d8e2df4cfef29ad85fd9a39fbf95f1b7acc4409032ac19",
+          "stable_during_copy": true
+        },
+        "control/started.json": {
+          "bytes": 265,
+          "sha256": "7718809e6c88cb29be74c4e4a430c8fc362ba24d23adb503ea4613c896bf381d",
+          "stable_during_copy": true
+        },
+        "output/artifacts.json": {
+          "bytes": 1849,
+          "sha256": "f8f282282ee1be47e6af7def4edeba7889bbc470268ee95db9be9d726180f5b6",
+          "stable_during_copy": true
+        },
+        "output/checkpoint.json": {
+          "bytes": 177,
+          "sha256": "fb841b4c1d93720b1ae75b6d33afc94c6bfa879f8b1ba3af2757929539055795",
+          "stable_during_copy": true
+        },
+        "output/progress.jsonl": {
+          "bytes": 708,
+          "sha256": "d946e9e6f5c433b14bc8e68a717a7a1cc4a54174d565252ccdd5ddb57293c8ce",
+          "stable_during_copy": true
+        },
+        "output/result.json": {
+          "bytes": 222,
+          "sha256": "a04edde7dcc3761cb34e4e1077f8c5254d7aa7d76407cd7ada743d98c8a00f0d",
+          "stable_during_copy": true
+        },
+        "output/state.json": {
+          "bytes": 860,
+          "sha256": "a2998ef874b09fc9640d401fe09fdd31bfd2614da0f6fb376947180b8f90aa68",
+          "stable_during_copy": true
+        },
+        "output/stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stable_during_copy": true
+        },
+        "output/stdout.log": {
+          "bytes": 708,
+          "sha256": "d946e9e6f5c433b14bc8e68a717a7a1cc4a54174d565252ccdd5ddb57293c8ce",
+          "stable_during_copy": true
+        },
+        "output/supervisor.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stable_during_copy": true
+        }
+      },
+      "archive": {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\terminal-export-a4f41fa2.tar.gz",
+        "bytes": 11468,
+        "sha256": "62b37d50d5690cda9c9fcda8cbc44078b54448dadcb4bb1755e37c7ef44a57a7"
+      },
+      "status": "TERMINAL_EXPORT_CLIENT_VERIFIED"
+    },
+    "repeat_start": {
+      "control_hashes_after": {
+        "manifest.json": "9ad2de649b50acbcbfc7f729b465b3756fb0e7287bb69c859bf753aff5d9741f",
+        "payload-started.json": "35928581e4380a2bbf5a04304b8335340497ac66fa36bdcb9f559da0a402df69",
+        "payload.py": "d27b38d00384eaf04fd9447585ac065e94a6d5f380cee9c4816f4fd89d8ec2b4",
+        "runner.py": "0cb4e15d465c18f340d8e2df4cfef29ad85fd9a39fbf95f1b7acc4409032ac19",
+        "started.json": "7718809e6c88cb29be74c4e4a430c8fc362ba24d23adb503ea4613c896bf381d"
+      },
+      "control_hashes_before": {
+        "manifest.json": "9ad2de649b50acbcbfc7f729b465b3756fb0e7287bb69c859bf753aff5d9741f",
+        "payload-started.json": "35928581e4380a2bbf5a04304b8335340497ac66fa36bdcb9f559da0a402df69",
+        "payload.py": "d27b38d00384eaf04fd9447585ac065e94a6d5f380cee9c4816f4fd89d8ec2b4",
+        "runner.py": "0cb4e15d465c18f340d8e2df4cfef29ad85fd9a39fbf95f1b7acc4409032ac19",
+        "started.json": "7718809e6c88cb29be74c4e4a430c8fc362ba24d23adb503ea4613c896bf381d"
+      },
+      "provider_calls": 0,
+      "qa_acceptance": "NOT_RUN",
+      "repeat_start": {
+        "exit_code": 2,
+        "stderr": "{\"status\": \"BLOCKED\", \"error\": \"job already claimed; no retry/resume/re-send is permitted\", \"error_type\": \"JobError\"}\n",
+        "stdout": ""
+      },
+      "status": "NEGATIVE_GUARDS_REJECTED"
+    },
+    "timing_interpretation": "Launch SSH process returned exit0 in about 1.2 seconds; subsequent server checkpoints and explicit completion persisted over about 40 seconds. Separate observer connected after completion. Client/server clock skew exists; no cross-host latency claim.",
+    "commands": [
+      {
+        "operation": "freeze",
+        "exit_code": 0,
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' freeze --revision decafab7f62cbb55fa6ee45b102255b8c70bbc6f"
+      },
+      {
+        "operation": "transfer",
+        "exit_code": 0,
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' transfer --packet 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached-probe-20261022t054617z-f3c636e6'"
+      },
+      {
+        "operation": "prepare",
+        "exit_code": 0,
+        "status": "PREPARED",
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' prepare --packet 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached-probe-20261022t054617z-f3c636e6'"
+      },
+      {
+        "operation": "start",
+        "exit_code": 0,
+        "status": "RUNNING",
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' start --packet 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached-probe-20261022t054617z-f3c636e6'"
+      },
+      {
+        "operation": "observe_new_ssh",
+        "exit_code": 0,
+        "status": "SUCCEEDED",
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' observe --packet 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached-probe-20261022t054617z-f3c636e6'"
+      },
+      {
+        "operation": "fetch_and_verify",
+        "exit_code": 0,
+        "status": "TERMINAL_EXPORT_CLIENT_VERIFIED",
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' fetch --packet 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached-probe-20261022t054617z-f3c636e6'"
+      },
+      {
+        "operation": "repeat_start_negative_check",
+        "helper_exit_code": 0,
+        "runner_exit_code": 2,
+        "status": "NEGATIVE_GUARDS_REJECTED",
+        "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached_probe_operator.py' negative --packet 'E:/RAG quention/var/reports/s8-6-2-r3/followup40/detached-probe-20261022t054617z-f3c636e6'"
+      }
+    ],
+    "evidence_receipts": [
+      {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\start-result.json",
+        "bytes": 1054,
+        "sha256": "03f2eeb79e7ed3ecef14468be6c746d5bb8bbf8728e4add02f1dff83ea15c0e9"
+      },
+      {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\start-343bf002a3.command.json",
+        "bytes": 401,
+        "sha256": "62dcc99d1730e22c77788ea7f0c330ae66f5e493c31f3e47e76bc9019291ea7a"
+      },
+      {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\observation-567f42d7.json",
+        "bytes": 2097,
+        "sha256": "56fdfbcf3e80faf4fd79028c5f67eba60840e67caa1b514e7d61e74f01383c7d"
+      },
+      {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\fetch-result.json",
+        "bytes": 296,
+        "sha256": "be1acd4961120be7341f5031a9b3ddc840ea6235deb4b646c29b1638728835dc"
+      },
+      {
+        "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-probe-20261022t054617z-f3c636e6\\negative-b09e55535c.stdout",
+        "bytes": 1182,
+        "sha256": "428b2286c1ae8fc7ab3b1ebdf3ca3345da1488b11c58c52196510b897c90bb5f"
+      }
+    ]
+  },
+  "simplifications": {
+    "kept": [
+      "isolated temporary service and directory",
+      "detached execution after acknowledged start",
+      "durable logs, checkpoints and final output",
+      "necessary source/image/session/call identities",
+      "no automatic retry of unknown Provider sends"
+    ],
+    "removed_from_launcher": [
+      "arbitrary JSON/file/archive byte or file-count limits",
+      "duplicate grant-policy parsing and ledger scans",
+      "new numerical budget preflight"
+    ],
+    "test_runbook_changes": [
+      "one startup source/image identity check, no repeated per-question whole-corpus or module scans",
+      "host-compatible Docker resource settings",
+      "short or extended Windows paths rather than unsupported path assumptions",
+      "one raw receipt copy and compact per-case summaries"
+    ],
+    "unchanged_authority": "Existing formal HTTP, Registry, SendGate, LocalExecution, permission/Scope checks, approved limits and P5 remain authoritative."
+  },
+  "previous_real_http_batch": {
+    "report": "docs/evaluation/S8_6_2_R3_ECS40_ACCEPTANCE.md",
+    "status": "COMPLETED_NO_FURTHER_SENDS_QUALITY_GATE_FAIL",
+    "actual_submissions": 38,
+    "legacy_unknown_protected_not_run": 2,
+    "provider_attempts": 158,
+    "settled": 158,
+    "new_unknown": 0,
+    "input_tokens": 356966,
+    "output_tokens": 7627,
+    "actual_total_tokens": 364593,
+    "agent_review": {
+      "PASS": 20,
+      "PARTIAL": 5,
+      "FAIL": 10,
+      "UNVERIFIED": 3
+    },
+    "provenance": "Separate completed foreground batch; never presented as a detached batch or official combined dataset score."
+  },
+  "http_payload_adapter": {
+    "status": "IMPLEMENTED_OFFLINE_CONTRACT_PASS",
+    "source_revision": "348557b3bfa82633ad130c92fbee01bdcade53c7",
+    "files": {
+      "scripts/ecs_acceptance_http_payload.py": {
+        "git_blob_sha256": "a25504ec23eb22509b87341574597261fb61aa6b904398f81fe32937b864a36e",
+        "tested_worktree_sha256": "a25504ec23eb22509b87341574597261fb61aa6b904398f81fe32937b864a36e"
+      },
+      "tests/weknora_port/test_ecs_acceptance_http_payload.py": {
+        "git_blob_sha256": "9b7111dae873ee1e6a638a8774a7ab0656daf59d36af7ab2763eb53d24413200",
+        "tested_worktree_sha256": "9b7111dae873ee1e6a638a8774a7ab0656daf59d36af7ab2763eb53d24413200"
+      }
+    },
+    "integration": "Runs exactly one frozen ECS-side Python HTTP driver with the current interpreter; existing driver retains formal HTTP, Registry, SendGate, LocalExecution, serial execution and original ledgers.",
+    "offline_fixture": "Two-case frozen fake driver; no HTTP server or Provider used by these adapter tests.",
+    "real_background_http_batch": "NOT_RUN",
+    "tested_guards": [
+      "fresh summary required before driver launch; historical summary untouched",
+      "exclusive per-output claim prevents a second driver execution",
+      "driver hash verified before and after execution",
+      "Unicode stdout tee and per-case checkpoint projection",
+      "explicit complete summary, attempts=settled and unknown=unsettled=0",
+      "original summary actual_tokens/held_tokens copied without estimation",
+      "observation errors drain stdout and wait for the same driver before incomplete finalization",
+      "selected read-only stable receipt snapshots; no secret or symlink export"
+    ],
+    "review_fixes": [
+      "preexisting complete summary could have been reused; rejected before launch",
+      "checkpoint/log observation error could finalize before driver exit; now drain/wait and retain incomplete status"
+    ],
+    "test_development_failure": "One initial test expected FileNotFoundError while the regular-file guard correctly raised PayloadError; assertion corrected, missing-summary behavior remained incomplete."
+  },
+  "final_targeted_tests": {
+    "status": "PASS_WITH_PLATFORM_SKIPS",
+    "command": "& 'E:/RAG quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_ecs_acceptance_job.py tests/weknora_port/test_ecs_acceptance_http_payload.py -q --tb=short -p no:cacheprovider",
+    "exit_code": 0,
+    "passed": 65,
+    "skipped": 5,
+    "seconds": 9.79,
+    "skip_reasons": {
+      "windows_symlink_privilege_1314": 4,
+      "linux_only_process_test": 1
+    },
+    "log": {
+      "path": "E:\\RAG quention\\var\\reports\\s8-6-2-r3\\followup40\\detached-final-targeted-tests.txt",
+      "bytes": 1926,
+      "sha256": "75a55131c4b0ec8706da87d2a3bfbcbfc0a8118c8a171f969e2285c8687a7265"
+    },
+    "counts_overlap": "Includes earlier 41 runner tests and 24 adapter tests; do not sum the earlier saved run again.",
+    "provider_attempts": 0,
+    "actual_total_tokens": 0
+  }
+}
