@@ -193,7 +193,7 @@ def state_snapshot(state):
 
 
 def install_profile(runtime, evidence_directory=None, *, approved_batch=None, expires_at=None,
-                    bounded_query_profile=False):
+                    bounded_query_profile=False, approved_scope=None):
     """Compose existing server dependencies; no class/Adapter monkeypatch."""
     require(not getattr(runtime, '_s861_profile_installed', False), 'S861_PROFILE_ALREADY_INSTALLED')
     ordinary = runtime.ordinary
@@ -201,6 +201,16 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
     states, sequence, admitted_clients, qu_outputs = {}, [0], {}, {}
     profile_id = BOUNDED_PROFILE_ID if bounded_query_profile else PROFILE_ID
     directory = Path(evidence_directory) if evidence_directory is not None else None
+    expected_kbs, expected_docs = KB_IDS, DOCUMENT_IDS
+    if approved_scope is not None:
+        require(isinstance(approved_scope, dict)
+            and set(approved_scope) == {'knowledge_base_ids', 'document_ids'}
+            and isinstance(approved_scope['knowledge_base_ids'], (list, tuple))
+            and len(approved_scope['knowledge_base_ids']) == 1
+            and isinstance(approved_scope['knowledge_base_ids'][0], str)
+            and bool(approved_scope['knowledge_base_ids'][0])
+            and approved_scope['document_ids'] in ([], ()), 'S861_CLOSED_CASE_SCOPE_REQUIRED')
+        expected_kbs, expected_docs = tuple(approved_scope['knowledge_base_ids']), ()
 
     def save(run_id, stage, status, fields=None):
         if directory is None or run_id not in states:
@@ -219,8 +229,8 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
             allowed = [row for row in approved_batch['turns'] if row['request_id'] == client_id]
             require(len(allowed) == 1 and allowed[0]['question'] == turn.request.content,
                     'S861_APPROVED_TURN_REQUIRED')
-            require(set(turn.context.scope.knowledge_base_ids) == set(KB_IDS)
-                    and set(turn.context.scope.document_ids) == set(DOCUMENT_IDS), 'S861_APPROVED_SCOPE_REQUIRED')
+            require(set(turn.context.scope.knowledge_base_ids) == set(expected_kbs)
+                    and set(turn.context.scope.document_ids) == set(expected_docs), 'S861_APPROVED_SCOPE_REQUIRED')
             previous_run = admitted_clients.setdefault(client_id, turn.run_id)
             require(previous_run == turn.run_id, 'S861_CLIENT_REQUEST_ALREADY_BOUND')
             if bounded_query_profile:
