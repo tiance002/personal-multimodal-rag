@@ -1,0 +1,557 @@
+{
+  "schema": "s8.6.3-citation-fixture/v1",
+  "origin": "Frozen ECS40; Search/Rerank original bodies, historical Context and HTTP readback; no new HTTP",
+  "cases": [
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "q0": "在基于立体卫星影像的DSM生产作业中，影像星下点的分辨率应该满足什么要求？",
+      "scope": {
+        "document_ids": [],
+        "knowledge_base_ids": [
+          "76770fba-17c3-4704-8663-10aa669476ce"
+        ],
+        "owner_id": "p8-real-3de2eca0bea340babcde75ce60c9a366"
+      },
+      "anchor_id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+      "selected": {
+        "id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+        "content": "标准图号：1 位字符，南北半球均为“W”。产品标识符：3 位字符，数字表面模型数据为“DSM”。分隔符：1 位字符，采用“.”符号。扩展名：3 位字符，表示数据文件和元数据文件扩展名。命名示例：NWDSM.img。4.2.8 元数据数字表面模型元数据文件样本参见附录 A。4.2.9 辅助数据辅助数据由 DSM 成果数据的空洞范围矢量边界、分幅结合表等信息组成。4.3 生产技术方法3X X XX X XXXX XXXX XXX XX . XXX南北半球标识符“N”或“S”1:100万地形图图幅行号（字符码）1:100万地形图图幅列号（数字码）比例尺代码图幅行号（数字码）图幅列号（数字码）格网大小产品标识符分隔符扩展名X X XXX . XXX南北半球标识符“N”或“S”标准图号“W”分隔符扩展名DSM产品标识符\nCH/T XXXXX-202X本文件的数字表面模型的生产采用光学立体卫星影像测量方法。根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。选择影像 的要求如下：a） 影像星下点的分辨率应优于 5m；b） 测区内影像连续分布，能够构建连续覆盖的区域网；c） 同一分区内优先选择同轨或相近时相的影像，异轨之间的重叠度不小于 15%；d） 不同分区之间至少有半景的影像重叠；e） 卫星影像成像质量清晰，重要地物特征不得被云、云影、雪、阴影遮挡，光学影像的云、雪覆 盖应在 20%以下；f） 优先选择成像时间新的影像，以保证成果的现势性。6.1.2 控制资料4准备工作技术设计卫星影像预处理区域网平差DSM数据生成相关文件制作成果整理与提交\n CH/T XXXXX-202X成果生产需要收集以下可选的控制资料：a）已有的外业像控点；b）相关比例尺正射影像和地形图；c）其他满足精度要求的控制点资料。6.1.3 其他资料基础地理信息数据，主要包括测区相关比例尺的数字正射影像、数字线划图、数字表面模型、数字 高程模型及相关成果。",
+        "score": 0.7010289576994277,
+        "knowledge_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "chunk_type": "text",
+        "chunk_index": 9,
+        "start_at": 5759,
+        "end_at": 6959,
+        "parent_chunk_id": "",
+        "pre_chunk_id": "6488cb75-c9c5-46ad-aeb5-aadb13d4a86d",
+        "next_chunk_id": "ef2c43d4-0495-4eb1-8071-99accee1113c",
+        "match_type": "embedding",
+        "metadata": {
+          "base_score": "0.0109",
+          "model_score": "0.4096",
+          "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+        },
+        "knowledge_title": "9f4e5cc4241bbe8944376d75",
+        "knowledge_filename": "9f4e5cc4241bbe8944376d75.md",
+        "chunk_metadata": {
+          "parsed_source_id": "92fda6c7-bde7-4974-a637-b035be5db2a2:child:9",
+          "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+        },
+        "sub_chunk_ids": [
+          "ef2c43d4-0495-4eb1-8071-99accee1113c",
+          "b34c30a1-c2ba-48cd-93de-dd0c1a805c9e"
+        ],
+        "content_rewritten": false,
+        "content_revision": 0,
+        "is_enabled": true
+      },
+      "reranked_originals": [
+        {
+          "id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+          "content": "标准图号：1 位字符，南北半球均为“W”。产品标识符：3 位字符，数字表面模型数据为“DSM”。分隔符：1 位字符，采用“.”符号。扩展名：3 位字符，表示数据文件和元数据文件扩展名。命名示例：NWDSM.img。4.2.8 元数据数字表面模型元数据文件样本参见附录 A。4.2.9 辅助数据辅助数据由 DSM 成果数据的空洞范围矢量边界、分幅结合表等信息组成。4.3 生产技术方法3X X XX X XXXX XXXX XXX XX . XXX南北半球标识符“N”或“S”1:100万地形图图幅行号（字符码）1:100万地形图图幅列号（数字码）比例尺代码图幅行号（数字码）图幅列号（数字码）格网大小产品标识符分隔符扩展名X X XXX . XXX南北半球标识符“N”或“S”标准图号“W”分隔符扩展名DSM产品标识符\nCH/T XXXXX-202X本文件的数字表面模型的生产采用光学立体卫星影像测量方法。根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。",
+          "score": 0.34902945291565124,
+          "knowledge_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+          "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+          "chunk_type": "text",
+          "chunk_index": 9,
+          "start_at": 5759,
+          "end_at": 6238,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "6488cb75-c9c5-46ad-aeb5-aadb13d4a86d",
+          "next_chunk_id": "ef2c43d4-0495-4eb1-8071-99accee1113c",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0109",
+            "model_score": "0.4096",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          "knowledge_title": "9f4e5cc4241bbe8944376d75",
+          "knowledge_filename": "9f4e5cc4241bbe8944376d75.md",
+          "chunk_metadata": {
+            "parsed_source_id": "92fda6c7-bde7-4974-a637-b035be5db2a2:child:9",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        },
+        {
+          "id": "ef2c43d4-0495-4eb1-8071-99accee1113c",
+          "content": "根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。",
+          "score": 0.656758744091284,
+          "knowledge_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+          "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+          "chunk_type": "text",
+          "chunk_index": 10,
+          "start_at": 6162,
+          "end_at": 6569,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+          "next_chunk_id": "b34c30a1-c2ba-48cd-93de-dd0c1a805c9e",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0159",
+            "model_score": "0.9200",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          "knowledge_title": "9f4e5cc4241bbe8944376d75",
+          "knowledge_filename": "9f4e5cc4241bbe8944376d75.md",
+          "chunk_metadata": {
+            "parsed_source_id": "92fda6c7-bde7-4974-a637-b035be5db2a2:child:10",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        },
+        {
+          "id": "b34c30a1-c2ba-48cd-93de-dd0c1a805c9e",
+          "content": "选择影像 的要求如下：a） 影像星下点的分辨率应优于 5m；b） 测区内影像连续分布，能够构建连续覆盖的区域网；c） 同一分区内优先选择同轨或相近时相的影像，异轨之间的重叠度不小于 15%；d） 不同分区之间至少有半景的影像重叠；e） 卫星影像成像质量清晰，重要地物特征不得被云、云影、雪、阴影遮挡，光学影像的云、雪覆 盖应在 20%以下；f） 优先选择成像时间新的影像，以保证成果的现势性。6.1.2 控制资料4准备工作技术设计卫星影像预处理区域网平差DSM数据生成相关文件制作成果整理与提交\n CH/T XXXXX-202X成果生产需要收集以下可选的控制资料：a）已有的外业像控点；b）相关比例尺正射影像和地形图；c）其他满足精度要求的控制点资料。6.1.3 其他资料基础地理信息数据，主要包括测区相关比例尺的数字正射影像、数字线划图、数字表面模型、数字 高程模型及相关成果。",
+          "score": 0.7010289576994277,
+          "knowledge_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+          "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+          "chunk_type": "text",
+          "chunk_index": 11,
+          "start_at": 6569,
+          "end_at": 6959,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "ef2c43d4-0495-4eb1-8071-99accee1113c",
+          "next_chunk_id": "adaad679-bf09-4163-863d-890e5dd5f834",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0159",
+            "model_score": "0.9938",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          "knowledge_title": "9f4e5cc4241bbe8944376d75",
+          "knowledge_filename": "9f4e5cc4241bbe8944376d75.md",
+          "chunk_metadata": {
+            "parsed_source_id": "92fda6c7-bde7-4974-a637-b035be5db2a2:child:11",
+            "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        }
+      ],
+      "source_http": {
+        "chunk_id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+        "chunk_index": 9,
+        "chunk_type": "text",
+        "document_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+        "end": 6238,
+        "filename": "9f4e5cc4241bbe8944376d75.md",
+        "image_info": [],
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "page_number": null,
+        "source_url": "/api/v1/knowledge-bases/76770fba-17c3-4704-8663-10aa669476ce/documents/92fda6c7-bde7-4974-a637-b035be5db2a2/source",
+        "source_version": "f4a475b5-5737-4513-9135-8fed67e481ca",
+        "start": 5759,
+        "text": "标准图号：1 位字符，南北半球均为“W”。产品标识符：3 位字符，数字表面模型数据为“DSM”。分隔符：1 位字符，采用“.”符号。扩展名：3 位字符，表示数据文件和元数据文件扩展名。命名示例：NWDSM.img。4.2.8 元数据数字表面模型元数据文件样本参见附录 A。4.2.9 辅助数据辅助数据由 DSM 成果数据的空洞范围矢量边界、分幅结合表等信息组成。4.3 生产技术方法3X X XX X XXXX XXXX XXX XX . XXX南北半球标识符“N”或“S”1:100万地形图图幅行号（字符码）1:100万地形图图幅列号（数字码）比例尺代码图幅行号（数字码）图幅列号（数字码）格网大小产品标识符分隔符扩展名X X XXX . XXX南北半球标识符“N”或“S”标准图号“W”分隔符扩展名DSM产品标识符\nCH/T XXXXX-202X本文件的数字表面模型的生产采用光学立体卫星影像测量方法。根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。"
+      },
+      "historical_reference": {
+        "id": "1400dc3d-f641-4193-8218-0483ab6b528e",
+        "content": "标准图号：1 位字符，南北半球均为“W”。产品标识符：3 位字符，数字表面模型数据为“DSM”。分隔符：1 位字符，采用“.”符号。扩展名：3 位字符，表示数据文件和元数据文件扩展名。命名示例：NWDSM.img。4.2.8 元数据数字表面模型元数据文件样本参见附录 A。4.2.9 辅助数据辅助数据由 DSM 成果数据的空洞范围矢量边界、分幅结合表等信息组成。4.3 生产技术方法3X X XX X XXXX XXXX XXX XX . XXX南北半球标识符“N”或“S”1:100万地形图图幅行号（字符码）1:100万地形图图幅列号（数字码）比例尺代码图幅行号（数字码）图幅列号（数字码）格网大小产品标识符分隔符扩展名X X XXX . XXX南北半球标识符“N”或“S”标准图号“W”分隔符扩展名DSM产品标识符\nCH/T XXXXX-202X本文件的数字表面模型的生产采用光学立体卫星影像测量方法。根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。选择影像 的要求如下：a） 影像星下点的分辨率应优于 5m；b） 测区内影像连续分布，能够构建连续覆盖的区域网；c） 同一分区内优先选择同轨或相近时相的影像，异轨之间的重叠度不小于 15%；d） 不同分区之间至少有半景的影像重叠；e） 卫星影像成像质量清晰，重要地物特征不得被云、云影、雪、阴影遮挡，光学影像的云、雪覆 盖应在 20%以下；f） 优先选择成像时间新的影像，以保证成果的现势性。6.1.2 控制资料4准备工作技术设计卫星影像预处理区域网平差DSM数据生成相关文件制作成果整理与提交\n CH/T XXXXX-202X成果生产需要收集以下可选的控制资料：a）已有的外业像控点；b）相关比例尺正射影像和地形图；c）其他满足精度要求的控制点资料。6.1.3 其他资料基础地理信息数据，主要包括测区相关比例尺的数字正射影像、数字线划图、数字表面模型、数字 高程模型及相关成果。",
+        "start_at": 5759,
+        "end_at": 6959,
+        "knowledge_id": "92fda6c7-bde7-4974-a637-b035be5db2a2",
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce"
+      },
+      "optional_windows": [
+        {
+          "added_chars": 866,
+          "added_ids": [
+            "a387af76-10ae-43b6-a169-92cab6e99576",
+            "ad3307c5-02dd-4102-bb1d-0a5229ce6125"
+          ],
+          "anchor": "2fdf0608-dced-4fad-aff8-2e0110f650c8",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        },
+        {
+          "added_chars": 0,
+          "added_ids": [],
+          "anchor": "72adf8ba-6ecb-5c23-b8fb-cb9748f441f3",
+          "decision": "UNCHANGED",
+          "reason": "SUMMARY_SOURCE_ALREADY_SELECTED",
+          "stage": "source_unit"
+        },
+        {
+          "added_chars": 866,
+          "added_ids": [
+            "5994dea4-d7cd-45ff-9800-f642120594ea",
+            "dc0afecd-6017-462b-873a-4b0c7f203698"
+          ],
+          "anchor": "697c44eb-de76-40e5-9368-a2f408faf14b",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        },
+        {
+          "added_chars": 866,
+          "added_ids": [
+            "05b78a4e-1a95-4608-ae53-aae458135a6f",
+            "8c5734c1-db66-4ccd-92d6-5843998d0e69"
+          ],
+          "anchor": "2ed4fe57-7bb6-4f82-a32a-c22da34db099",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        }
+      ],
+      "source_artifact_sha256": "79ecc4f19dd1d08b415270387be8df7003627d8005c14e906c21fc90665943a7"
+    },
+    {
+      "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+      "q0": "在基于立体卫星影像的DSM生产作业中，影像星下点的分辨率应该满足什么要求？",
+      "scope": {
+        "document_ids": [],
+        "knowledge_base_ids": [
+          "76770fba-17c3-4704-8663-10aa669476ce"
+        ],
+        "owner_id": "p8-real-3de2eca0bea340babcde75ce60c9a366"
+      },
+      "anchor_id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+      "selected": {
+        "id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+        "content": "根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。选择影像 的要求如下：a） 影像星下点的分辨率应优于 5m；b） 测区内影像连续分布，能够构建连续覆盖的区域网；c） 同一分区内优先选择同轨或相近时相的影像，异轨之间的重叠度不小于 15%；d） 不同分区之间至少有半景的影像重叠；e） 卫星影像成像质量清晰，重要地物特征不得被云、云影、雪、阴影遮挡，光学影像的云、雪覆 盖应在 20%以下；f） 优先选择成像时间新的影像，以保证成果的现势性。6.1.2 控制资料4准备工作技术设计卫星影像预处理区域网平差DSM数据生成相关文件制作成果整理与提交\n CH/T XXXXX-202X成果生产需要收集以下可选的控制资料：a）已有的外业像控点；b）相关比例尺正射影像和地形图；c）其他满足精度要求的控制点资料。6.1.3 其他资料基础地理信息数据，主要包括测区相关比例尺的数字正射影像、数字线划图、数字表面模型、数字 高程模型及相关成果。",
+        "score": 0.7009391553484978,
+        "knowledge_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "chunk_type": "text",
+        "chunk_index": 10,
+        "start_at": 6162,
+        "end_at": 6959,
+        "parent_chunk_id": "",
+        "pre_chunk_id": "d345c84a-a631-4d76-869a-bd2db2ce450e",
+        "next_chunk_id": "dc93c378-76df-4565-9d21-55e61c4f83d0",
+        "match_type": "embedding",
+        "metadata": {
+          "base_score": "0.0154",
+          "model_score": "0.9208",
+          "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+        },
+        "knowledge_title": "6375aca51735a5ba906eeede",
+        "knowledge_filename": "6375aca51735a5ba906eeede.md",
+        "chunk_metadata": {
+          "parsed_source_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e:child:10",
+          "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+        },
+        "sub_chunk_ids": [
+          "dc93c378-76df-4565-9d21-55e61c4f83d0"
+        ],
+        "content_rewritten": false,
+        "content_revision": 0,
+        "is_enabled": true
+      },
+      "reranked_originals": [
+        {
+          "id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+          "content": "根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。",
+          "score": 0.6570666254960097,
+          "knowledge_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+          "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+          "chunk_type": "text",
+          "chunk_index": 10,
+          "start_at": 6162,
+          "end_at": 6569,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "d345c84a-a631-4d76-869a-bd2db2ce450e",
+          "next_chunk_id": "dc93c378-76df-4565-9d21-55e61c4f83d0",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0154",
+            "model_score": "0.9208",
+            "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+          },
+          "knowledge_title": "6375aca51735a5ba906eeede",
+          "knowledge_filename": "6375aca51735a5ba906eeede.md",
+          "chunk_metadata": {
+            "parsed_source_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e:child:10",
+            "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        },
+        {
+          "id": "dc93c378-76df-4565-9d21-55e61c4f83d0",
+          "content": "选择影像 的要求如下：a） 影像星下点的分辨率应优于 5m；b） 测区内影像连续分布，能够构建连续覆盖的区域网；c） 同一分区内优先选择同轨或相近时相的影像，异轨之间的重叠度不小于 15%；d） 不同分区之间至少有半景的影像重叠；e） 卫星影像成像质量清晰，重要地物特征不得被云、云影、雪、阴影遮挡，光学影像的云、雪覆 盖应在 20%以下；f） 优先选择成像时间新的影像，以保证成果的现势性。6.1.2 控制资料4准备工作技术设计卫星影像预处理区域网平差DSM数据生成相关文件制作成果整理与提交\n CH/T XXXXX-202X成果生产需要收集以下可选的控制资料：a）已有的外业像控点；b）相关比例尺正射影像和地形图；c）其他满足精度要求的控制点资料。6.1.3 其他资料基础地理信息数据，主要包括测区相关比例尺的数字正射影像、数字线划图、数字表面模型、数字 高程模型及相关成果。",
+          "score": 0.7009391553484978,
+          "knowledge_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+          "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+          "chunk_type": "text",
+          "chunk_index": 11,
+          "start_at": 6569,
+          "end_at": 6959,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+          "next_chunk_id": "d5f70731-b333-4e00-95a3-6506f3322ef4",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0156",
+            "model_score": "0.9938",
+            "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+          },
+          "knowledge_title": "6375aca51735a5ba906eeede",
+          "knowledge_filename": "6375aca51735a5ba906eeede.md",
+          "chunk_metadata": {
+            "parsed_source_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e:child:11",
+            "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        }
+      ],
+      "source_http": {
+        "chunk_id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+        "chunk_index": 10,
+        "chunk_type": "text",
+        "document_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+        "end": 6569,
+        "filename": "6375aca51735a5ba906eeede.md",
+        "image_info": [],
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce",
+        "page_number": null,
+        "source_url": "/api/v1/knowledge-bases/76770fba-17c3-4704-8663-10aa669476ce/documents/3db7e66a-71a1-4e98-af06-eff6eef8ad1e/source",
+        "source_version": "230d83b5-7a2f-41a5-8260-52a923ad9a12",
+        "start": 6162,
+        "text": "根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。"
+      },
+      "historical_reference": {
+        "id": "072ced3a-cc3d-4260-ae9f-f73b49fd3a0b",
+        "content": "根据项目要求以及作业区具体情况，拟定技术路线、技术方法和质量控制措施，编写项目设计书。 项目设计书的编写要求及内容按照 CH/T 1004 的规定执行。在满足成图精度前提下，可采用本标准未列入的新技术和新方法，但应经过实验验证并提供实验报 告，在技术设计中做出明确规定。5 作业流程收集具备立体测图能力的卫星影像数据和相关资料，开展影像预处理和区域网平差，通过立体匹配 生成 DSM 点云或格网数据，对提取过程中产生的伪地形进行编辑处理（如飞点/跳点剔除、空洞插值填 充、噪声平滑滤波、非正常/非自然降高区域抬升），对水域进行置平处理，然后经图幅接边、拼接裁 切、制作元数据、质量检查，最后输出 DSM 分幅成果。生产作业流程见图 3。图 3 基于立体卫星影像的 DSM 生产作业流程6 准备工作6.1 资料收集6.1.1 卫星影像资料满足生产数字表面模型的卫星影像数据主要包括具有立体测图能力的光学卫星影像数据。选择影像 的要求如下：a） 影像星下点的分辨率应优于 5m；b） 测区内影像连续分布，能够构建连续覆盖的区域网；c） 同一分区内优先选择同轨或相近时相的影像，异轨之间的重叠度不小于 15%；d） 不同分区之间至少有半景的影像重叠；e） 卫星影像成像质量清晰，重要地物特征不得被云、云影、雪、阴影遮挡，光学影像的云、雪覆 盖应在 20%以下；f） 优先选择成像时间新的影像，以保证成果的现势性。6.1.2 控制资料4准备工作技术设计卫星影像预处理区域网平差DSM数据生成相关文件制作成果整理与提交\n CH/T XXXXX-202X成果生产需要收集以下可选的控制资料：a）已有的外业像控点；b）相关比例尺正射影像和地形图；c）其他满足精度要求的控制点资料。6.1.3 其他资料基础地理信息数据，主要包括测区相关比例尺的数字正射影像、数字线划图、数字表面模型、数字 高程模型及相关成果。",
+        "start_at": 6162,
+        "end_at": 6959,
+        "knowledge_id": "3db7e66a-71a1-4e98-af06-eff6eef8ad1e",
+        "knowledge_base_id": "76770fba-17c3-4704-8663-10aa669476ce"
+      },
+      "optional_windows": [
+        {
+          "added_chars": 866,
+          "added_ids": [
+            "a387af76-10ae-43b6-a169-92cab6e99576",
+            "ad3307c5-02dd-4102-bb1d-0a5229ce6125"
+          ],
+          "anchor": "2fdf0608-dced-4fad-aff8-2e0110f650c8",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        },
+        {
+          "added_chars": 0,
+          "added_ids": [],
+          "anchor": "72adf8ba-6ecb-5c23-b8fb-cb9748f441f3",
+          "decision": "UNCHANGED",
+          "reason": "SUMMARY_SOURCE_ALREADY_SELECTED",
+          "stage": "source_unit"
+        },
+        {
+          "added_chars": 866,
+          "added_ids": [
+            "5994dea4-d7cd-45ff-9800-f642120594ea",
+            "dc0afecd-6017-462b-873a-4b0c7f203698"
+          ],
+          "anchor": "697c44eb-de76-40e5-9368-a2f408faf14b",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        },
+        {
+          "added_chars": 866,
+          "added_ids": [
+            "05b78a4e-1a95-4608-ae53-aae458135a6f",
+            "8c5734c1-db66-4ccd-92d6-5843998d0e69"
+          ],
+          "anchor": "2ed4fe57-7bb6-4f82-a32a-c22da34db099",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        }
+      ],
+      "source_artifact_sha256": "79ecc4f19dd1d08b415270387be8df7003627d8005c14e906c21fc90665943a7"
+    },
+    {
+      "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+      "q0": "Who has a higher median campaign grade? Trump or Clinton?",
+      "scope": {
+        "document_ids": [],
+        "knowledge_base_ids": [
+          "fd444069-cc1a-42d0-9617-e95fa90b6941"
+        ],
+        "owner_id": "p8-real-3de2eca0bea340babcde75ce60c9a366"
+      },
+      "anchor_id": "834f3910-246d-4c81-8285-87afb311005b",
+      "selected": {
+        "id": "834f3910-246d-4c81-8285-87afb311005b",
+        "content": "www.pewresearch.org\nTrump\nClinton\nRep Party\nDem Party\nPress\nPollsters\nVoters\nA or B C D F\n3. Voters’ evaluations of the campaign\nWhen voters are asked to grade the candidates, parties and press on how they conducted \nthemselves during the \npresidential campaign, they \naward the lowest grades for \nnearly all involved since the \nquadrennial post-election \nsurveys began in 1988.\nJust 30% of voters give \nDonald Trump a grade of A or \nB, 19% give him C, while half \ngrade his conduct at either D \n(15%) or F (35%). Trump \nreceives a C- grade on \naverage.\nHillary Clinton’s grades are \nbetter than Trump’s, which \nmarks the first time a losing \ncandidate has received more \npositive grades than the \nwinner. Clinton receives an A \nor B from 43% of voters; 20% \naward Clinton a C, while \nnearly four-in-ten give Clinton a D (16%) or F (21%). Clinton’s average grade is a C. \nFew voters give high ratings to the political parties. Only about a quarter overall give the \nRepublican Party (22%) and Democratic Party (26%) an A or B; roughly three-in-ten give each of \nthe parties an F (30% for the Republican Party, 28% for the Democratic Party). On average, the \nGOP receives a D+, while the Democratic Party gets a C-.\nThe press and pollsters also are viewed negatively for their performance during the campaign. \n",
+        "score": 0.6848614502120631,
+        "knowledge_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+        "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+        "chunk_type": "text",
+        "chunk_index": 95,
+        "start_at": 41292,
+        "end_at": 42602,
+        "parent_chunk_id": "",
+        "pre_chunk_id": "f03a2c78-a1ec-4c15-ae52-99bccc2d3479",
+        "next_chunk_id": "f96f9f89-1b47-4a04-872a-53faa3a3e793",
+        "match_type": "embedding",
+        "metadata": {
+          "base_score": "0.0160",
+          "model_score": "0.7516",
+          "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+        },
+        "knowledge_title": "11-21-16-Updated-Post-Election-Release",
+        "knowledge_filename": "11-21-16-Updated-Post-Election-Release.pdf",
+        "chunk_metadata": {
+          "parsed_source_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791:child:95",
+          "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+        },
+        "sub_chunk_ids": [
+          "f96f9f89-1b47-4a04-872a-53faa3a3e793",
+          "c090bae1-733d-42a8-a110-9b37df7377cb"
+        ],
+        "content_rewritten": false,
+        "content_revision": 0,
+        "is_enabled": true
+      },
+      "reranked_originals": [
+        {
+          "id": "834f3910-246d-4c81-8285-87afb311005b",
+          "content": "www.pewresearch.org\nTrump\nClinton\nRep Party\nDem Party\nPress\nPollsters\nVoters\nA or B C D F\n3. Voters’ evaluations of the campaign\nWhen voters are asked to grade the candidates, parties and press on how they conducted \nthemselves during the \npresidential campaign, they \naward the lowest grades for \nnearly all involved since the \nquadrennial post-election \nsurveys began in 1988.\nJust 30% of voters give \nDonald Trump a grade of A or \nB, 19% give him C, while half \ngrade his conduct at either D \n",
+          "score": 0.5557665063644367,
+          "knowledge_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+          "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+          "chunk_type": "text",
+          "chunk_index": 95,
+          "start_at": 41292,
+          "end_at": 41788,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "f03a2c78-a1ec-4c15-ae52-99bccc2d3479",
+          "next_chunk_id": "f96f9f89-1b47-4a04-872a-53faa3a3e793",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0160",
+            "model_score": "0.7516",
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          "knowledge_title": "11-21-16-Updated-Post-Election-Release",
+          "knowledge_filename": "11-21-16-Updated-Post-Election-Release.pdf",
+          "chunk_metadata": {
+            "parsed_source_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791:child:95",
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        },
+        {
+          "id": "f96f9f89-1b47-4a04-872a-53faa3a3e793",
+          "content": "B, 19% give him C, while half \ngrade his conduct at either D \n(15%) or F (35%). Trump \nreceives a C- grade on \naverage.\nHillary Clinton’s grades are \nbetter than Trump’s, which \nmarks the first time a losing \ncandidate has received more \npositive grades than the \nwinner. Clinton receives an A \nor B from 43% of voters; 20% \naward Clinton a C, while \nnearly four-in-ten give Clinton a D (16%) or F (21%). Clinton’s average grade is a C. \n",
+          "score": 0.6848614502120631,
+          "knowledge_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+          "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+          "chunk_type": "text",
+          "chunk_index": 96,
+          "start_at": 41726,
+          "end_at": 42164,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "834f3910-246d-4c81-8285-87afb311005b",
+          "next_chunk_id": "c090bae1-733d-42a8-a110-9b37df7377cb",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0162",
+            "model_score": "0.9667",
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          "knowledge_title": "11-21-16-Updated-Post-Election-Release",
+          "knowledge_filename": "11-21-16-Updated-Post-Election-Release.pdf",
+          "chunk_metadata": {
+            "parsed_source_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791:child:96",
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        },
+        {
+          "id": "c090bae1-733d-42a8-a110-9b37df7377cb",
+          "content": "Clinton’s average grade is a C. \nFew voters give high ratings to the political parties. Only about a quarter overall give the \nRepublican Party (22%) and Democratic Party (26%) an A or B; roughly three-in-ten give each of \nthe parties an F (30% for the Republican Party, 28% for the Democratic Party). On average, the \nGOP receives a D+, while the Democratic Party gets a C-.\nThe press and pollsters also are viewed negatively for their performance during the campaign. \n",
+          "score": 0.49999820471262346,
+          "knowledge_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+          "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+          "chunk_type": "text",
+          "chunk_index": 97,
+          "start_at": 42131,
+          "end_at": 42602,
+          "parent_chunk_id": "",
+          "pre_chunk_id": "f96f9f89-1b47-4a04-872a-53faa3a3e793",
+          "next_chunk_id": "79f47a5f-31c9-4328-aee9-5927b0665e29",
+          "match_type": "embedding",
+          "metadata": {
+            "base_score": "0.0142",
+            "model_score": "0.6595",
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          "knowledge_title": "11-21-16-Updated-Post-Election-Release",
+          "knowledge_filename": "11-21-16-Updated-Post-Election-Release.pdf",
+          "chunk_metadata": {
+            "parsed_source_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791:child:97",
+            "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb"
+          },
+          "sub_chunk_ids": [],
+          "content_rewritten": false,
+          "content_revision": 0,
+          "is_enabled": true
+        }
+      ],
+      "source_http": {
+        "chunk_id": "834f3910-246d-4c81-8285-87afb311005b",
+        "chunk_index": 95,
+        "chunk_type": "text",
+        "document_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+        "end": 41788,
+        "filename": "11-21-16-Updated-Post-Election-Release.pdf",
+        "image_info": [],
+        "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941",
+        "page_number": null,
+        "source_url": "/api/v1/knowledge-bases/fd444069-cc1a-42d0-9617-e95fa90b6941/documents/6c9e87eb-29c2-4df0-80a5-940a77a23791/source",
+        "source_version": "1c0ae50f-188f-4081-93b2-8c4a920cbccb",
+        "start": 41292,
+        "text": "www.pewresearch.org\nTrump\nClinton\nRep Party\nDem Party\nPress\nPollsters\nVoters\nA or B C D F\n3. Voters’ evaluations of the campaign\nWhen voters are asked to grade the candidates, parties and press on how they conducted \nthemselves during the \npresidential campaign, they \naward the lowest grades for \nnearly all involved since the \nquadrennial post-election \nsurveys began in 1988.\nJust 30% of voters give \nDonald Trump a grade of A or \nB, 19% give him C, while half \ngrade his conduct at either D \n"
+      },
+      "historical_reference": {
+        "id": "834f3910-246d-4c81-8285-87afb311005b",
+        "content": "www.pewresearch.org\nTrump\nClinton\nRep Party\nDem Party\nPress\nPollsters\nVoters\nA or B C D F\n3. Voters’ evaluations of the campaign\nWhen voters are asked to grade the candidates, parties and press on how they conducted \nthemselves during the \npresidential campaign, they \naward the lowest grades for \nnearly all involved since the \nquadrennial post-election \nsurveys began in 1988.\nJust 30% of voters give \nDonald Trump a grade of A or \nB, 19% give him C, while half \ngrade his conduct at either D \n(15%) or F (35%). Trump \nreceives a C- grade on \naverage.\nHillary Clinton’s grades are \nbetter than Trump’s, which \nmarks the first time a losing \ncandidate has received more \npositive grades than the \nwinner. Clinton receives an A \nor B from 43% of voters; 20% \naward Clinton a C, while \nnearly four-in-ten give Clinton a D (16%) or F (21%). Clinton’s average grade is a C. \nFew voters give high ratings to the political parties. Only about a quarter overall give the \nRepublican Party (22%) and Democratic Party (26%) an A or B; roughly three-in-ten give each of \nthe parties an F (30% for the Republican Party, 28% for the Democratic Party). On average, the \nGOP receives a D+, while the Democratic Party gets a C-.\nThe press and pollsters also are viewed negatively for their performance during the campaign. \n",
+        "start_at": 41292,
+        "end_at": 42602,
+        "knowledge_id": "6c9e87eb-29c2-4df0-80a5-940a77a23791",
+        "knowledge_base_id": "fd444069-cc1a-42d0-9617-e95fa90b6941"
+      },
+      "optional_windows": [
+        {
+          "added_chars": 995,
+          "added_ids": [
+            "f474c944-bfe4-4ad9-96c4-030fdc3148a6",
+            "53a9311b-21c5-4662-8a89-9e3f802a57a3"
+          ],
+          "anchor": "b740c99d-2816-448b-9464-1d932464882a",
+          "decision": "EXPANDED",
+          "reason": "PRECEDING_SOURCE_WINDOW",
+          "stage": "source_unit"
+        }
+      ],
+      "source_artifact_sha256": "79ecc4f19dd1d08b415270387be8df7003627d8005c14e906c21fc90665943a7"
+    }
+  ]
+}

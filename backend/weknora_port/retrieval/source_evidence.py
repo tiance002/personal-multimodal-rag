@@ -32,14 +32,19 @@ def _validate_source(row, domain, kinds=('text',)):
         raise PermissionError('SOURCE_UNIT_LOCATOR_MISMATCH')
 
 
-async def _materialize_selected(hit, source, state, context, repository):
-    """Turn an admitted composite into bounded, individually readable quotes."""
-    ids = tuple(dict.fromkeys(i for i in (hit.id, *hit.sub_chunk_ids,
+def _selected_ids(hit):
+    return tuple(dict.fromkeys(i for i in (hit.id, *hit.sub_chunk_ids,
         hit.parent_chunk_id if hit.content_rewritten else '') if i))
+
+
+async def _materialize_selected(hit, source, state, context, repository, *, cache=None):
+    """Turn an admitted composite into bounded, individually readable quotes."""
+    ids = _selected_ids(hit)
     if len(ids) > UNIT_CHUNKS:
         raise SourceEvidenceBudgetError('SOURCE_UNIT_BUDGET_EXCEEDED')
     extra = tuple(i for i in ids if i != source.id)
-    loaded = dict(await repository.get_chunks(extra, context)) if extra else {}
+    loaded = ({i: cache[i] for i in extra if i in cache} if cache is not None else
+              dict(await repository.get_chunks(extra, context)) if extra else {})
     if set(loaded) != set(extra) or any(key != row.id for key, row in loaded.items()):
         raise ValueError('SOURCE_BODY_NOT_PRESERVED')
     loaded[source.id] = source
@@ -66,6 +71,52 @@ async def _materialize_selected(hit, source, state, context, repository):
     return restored
 
 
+async def _project_selected(selected, state, context, repository, cache):
+    """Mandatory identity check, independent of optional neighborhood coverage.
+
+    Only admitted TopK entries and their bounded ancestry are read. Previously
+    verified source-unit rows are reused within this invocation, never globally.
+    """
+    candidates = [r for r in selected if r.chunk_type in ('text', 'parent_text')]
+    ids = tuple(dict.fromkeys(i for r in candidates if len(_selected_ids(r)) <= UNIT_CHUNKS
+                             for i in _selected_ids(r) if i not in cache))
+    if ids:
+        loaded = dict(await repository.get_chunks(ids, context))
+        if set(loaded) != set(ids) or any(key != row.id for key, row in loaded.items()):
+            raise ValueError('SOURCE_BODY_NOT_PRESERVED')
+        validate_results(list(loaded.values()), state.targets, context)
+        cache.update(loaded)
+    restored, seen = [], set()
+    for hit in selected:
+        if hit.chunk_type not in ('text', 'parent_text'):
+            restored.append(hit)
+            continue
+        try:
+            if len(_selected_ids(hit)) > UNIT_CHUNKS:
+                raise SourceEvidenceBudgetError('SOURCE_UNIT_BUDGET_EXCEEDED')
+            source = cache[hit.id]
+            _validate_source(source, _domain(hit), ('text', 'parent_text'))
+            if (hit.chunk_metadata.get('source_version') != _domain(source)[2] or not hit.is_enabled):
+                raise RetrievalScopeError()
+            if source.content not in hit.content:
+                raise ValueError('SOURCE_BODY_NOT_PRESERVED')
+            exact = (hit.content == source.content and hit.start_at == source.start_at and
+                     hit.end_at == source.end_at and not hit.content_rewritten and not hit.content_revision)
+            # Ancestry alone is not proof that those independent quotes were delivered.
+            rows = ([hit] if exact and not hit.sub_chunk_ids else
+                    await _materialize_selected(hit, source, state, context, repository, cache=cache))
+        except SourceEvidenceBudgetError as error:
+            state.evidence_trace.append({'stage':'source_projection', 'anchor':hit.id,
+                'decision':'INSUFFICIENT_SOURCE', 'reason':str(error),
+                'omitted_ids':list(_selected_ids(hit)), 'source_ids':[]})
+            continue
+        for row in rows:
+            if row.id not in seen:
+                restored.append(row)
+                seen.add(row.id)
+    return restored
+
+
 async def expand_source_evidence(state, context, repository):
     if not state.needs_retrieval or state.source_evidence_mode == 'off':
         return
@@ -77,7 +128,7 @@ async def expand_source_evidence(state, context, repository):
     seen = {r.id for r in selected}
     # A sub-chunk ID records ancestry, not proof that its entire quote survived
     # parent replacement, overlap handling or historical slicing.
-    domains, added = {}, 0
+    domains, added, source_cache = {}, 0, {}
     for anchor in selected:
         if anchor.chunk_type not in ('text', 'summary'):
             continue
@@ -109,21 +160,7 @@ async def expand_source_evidence(state, context, repository):
         validate_results(rows, state.targets, context)
         for row in rows:
             _validate_source(row, domain)
-        for row in rows:
-            if row.id not in seen:
-                continue
-            hit = next(r for r in selected if r.id == row.id)
-            if _domain(hit) != domain or row.content not in hit.content:
-                raise ValueError('SOURCE_BODY_NOT_PRESERVED')
-            if (hit.content != row.content or hit.start_at != row.start_at or
-                    hit.end_at != row.end_at or hit.content_rewritten or hit.content_revision):
-                # Merge/Parent may expand content without changing the anchor's
-                # offsets. A substring is not proof for that entire composite.
-                restored = await _materialize_selected(hit, row, state, context, repository)
-                existing = {r.id for r in selected if r is not hit}
-                selected = [r for r in selected if r is not hit]
-                selected.extend(r for r in restored if r.id not in existing)
-                seen = {r.id for r in selected}
+            source_cache[row.id] = row
         new = [r for r in rows if r.id not in seen and r.content]
         reason = 'SUMMARY_SHORT_SOURCE' if anchor.chunk_type == 'summary' else 'PRECEDING_SOURCE_WINDOW'
         count = sum(len(r.content) for r in new)
@@ -152,28 +189,7 @@ async def expand_source_evidence(state, context, repository):
     # not verify every summary claim (e.g. mistranslation or reversed causality).
     # Keep the independently identified originals, not the conflicting paraphrase.
     originals = [r for r in selected if r.chunk_type not in ('summary', 'table_summary')]
-    # Every retained original still needs consistent provenance, including
-    # rows beyond the optional expansion groups. Unmaterialized composite
-    # offsets are never a proof just because no further lookup was budgeted.
-    verified = []
-    for row in originals:
-        if row.chunk_type in ('text', 'parent_text'):
-            version = row.metadata.get('source_version')
-            if (not version or row.chunk_metadata.get('source_version') != version or
-                    not row.is_enabled):
-                raise RetrievalScopeError()
-            if (row.content_rewritten or row.content_revision or
-                    type(row.start_at) is not int or type(row.end_at) is not int or
-                    row.start_at < 0 or row.end_at - row.start_at != len(row.content)):
-                # Optional expansion is bounded to a few source groups. A
-                # composite outside that budget cannot borrow a quote locator;
-                # preserve the insufficiency instead of discarding valid hits.
-                state.evidence_trace.append({'stage':'source_projection', 'anchor':row.id,
-                    'decision':'INSUFFICIENT_SOURCE', 'reason':'UNMATERIALIZED_SELECTED_PROJECTION',
-                    'source_ids':[]})
-                continue
-        verified.append(row)
-    originals = verified
+    originals = await _project_selected(originals, state, context, repository, source_cache)
     for hint in selected:
         if hint.chunk_type not in ('summary', 'table_summary'):
             continue
