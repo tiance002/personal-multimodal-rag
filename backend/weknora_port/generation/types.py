@@ -39,8 +39,12 @@ class GenerationRequest:
     understanding: ValidatedRewrite | None = field(default=None, repr=False)
     rendered_at: datetime | None = field(default=None,repr=False)
     on_context_prepared: Any = field(default=None, repr=False, compare=False, kw_only=True)
+    # Server-owned SearchNothing reason; never inferred from refusal wording.
+    evidence_insufficient: bool = field(default=False, kw_only=True)
 
     def __post_init__(self):
+        if type(self.evidence_insufficient) is not bool:
+            raise GenerationError('GENERATION_EVIDENCE_INSUFFICIENT_INVALID')
         if self.rendered_at is not None and not isinstance(self.rendered_at,datetime):
             raise GenerationError('GENERATION_RENDER_TIME_INVALID')
         if not all((isinstance(x, str) and x for x in (self.run_id, self.session_id, self.message_id, self.q0))):
@@ -63,6 +67,16 @@ class RoleBinding:
     model: Any = field(repr=False, compare=False)
 
 @dataclass(frozen=True)
+class CitationQuality:
+    """Observed source-handle quality, never a semantic support verdict."""
+    status: str = 'NOT_ASSESSED'
+    valid_handle_count: int = 0
+    invalid_handle_count: int = 0
+    usable_evidence_count: int = 0
+    assessment_complete: bool = False
+    semantic_support: str = 'NOT_ASSESSED'
+
+@dataclass(frozen=True)
 class AttemptRecord:
     attempt_id: str
     ordinal: int
@@ -82,6 +96,7 @@ class AttemptRecord:
     cost_status: str = 'UNKNOWN'
     error_code: str | None = None
     invalid_handle_count: int = 0
+    citation_quality: CitationQuality = field(default_factory=CitationQuality)
 
 @dataclass(frozen=True)
 class GenerationResult:
@@ -98,6 +113,7 @@ class GenerationResult:
     upgraded: bool
     prompt_sha256: str
     context_sha256: str
+    citation_quality: CitationQuality | None = None
 
 class AttemptLifecycle(Protocol):
 

@@ -1,0 +1,163 @@
+{
+  "schema": "ecs-fixed-capacity-strategy/v1",
+  "recorded_at_utc": "2026-10-22T16:18:47.630327+00:00",
+  "user_timezone": "Asia/Shanghai",
+  "baseline_commit": "419f5d19bf578701e91ab41d07f48776d8081ec7",
+  "owner_decisions": {
+    "disk_upgrade_available": false,
+    "use_available_cpu_memory": true,
+    "automatic_oos_cleanup": "DEFERRED",
+    "manual_unused_artifact_cleanup": "AUTHORIZED_AND_COMPLETED"
+  },
+  "fixed_host": {
+    "cpu_cores_observed": 2,
+    "memory_gib_approx": 3.5,
+    "root_disk_gib_approx": 40,
+    "disk_iops_throughput_latency": "NOT_RECORDED",
+    "samples_are_peaks": false
+  },
+  "strategy": {
+    "heavy_io_overlap": false,
+    "independent_cpu_parallelism": "Use actual 2 cores when workload memory fits; no additional CPU quota",
+    "question_execution": "Existing serial HTTP contract",
+    "single_batch_per_host": "OPERATOR_ENFORCED_NOT_GLOBAL_LOCK",
+    "provider_and_claim_durability": "UNCHANGED",
+    "idle_heartbeat_seconds": 15,
+    "child_poll_seconds": 1,
+    "terminal_state_persistence": "IMMEDIATE_AFTER_CHILD_OBSERVATION",
+    "automatic_unknown_retry": false,
+    "automatic_historical_asset_prune": false
+  },
+  "source_sha256": {
+    "scripts/ecs_acceptance_job.py": "2098f2970a0e7948aee508ae81b9d067b1ac510ba3787c02872aeaa348fc9862",
+    "tests/weknora_port/test_ecs_acceptance_job.py": "d2d2413a9e7854fc8097dc49221c5ee51a1d147ea8e659f91d61dd34045e345b"
+  },
+  "offline_checks": [
+    {
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -m pytest -q tests/weknora_port/test_ecs_acceptance_job.py --tb=short",
+      "exit_code": 0,
+      "passed": 45,
+      "skipped": 4,
+      "duration_seconds": 9.06,
+      "skip_reasons": {
+        "windows_symlink_privilege": 3,
+        "linux_real_detached_probe": 1
+      },
+      "evidence_type": "SIMULATED_CLOCK_AND_LOCAL_DURABLE_WRITES"
+    },
+    {
+      "command": "git diff --check -- scripts/ecs_acceptance_job.py tests/weknora_port/test_ecs_acceptance_job.py docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "exit_code": 0,
+      "result": "PASS"
+    }
+  ],
+  "manual_cleanup": {
+    "status": "CLEANED_SERVICES_UNCHANGED",
+    "targets": [
+      {
+        "path": "[PRIVATE_PATH_SHA256:67740682b99b1122b9d6b35a10bc228fd0fb4216f89bc9694240685323086d74]",
+        "kind": "file",
+        "bytes": 561974230,
+        "sha256": "be1a5d5066ea5a473863a6dc59eba325fb7d1ce4a6af9f7602b43cff768840ac",
+        "reason": "loaded image transfer archive"
+      },
+      {
+        "path": "[PRIVATE_PATH_SHA256:82d10a00f271e97a7d1e8f2da6a2a0fbf202eb8d997f4855eb46e2e1dfe50ea5]",
+        "kind": "file",
+        "bytes": 144187321,
+        "sha256": "3c8e3589e45e25a4225fe7f1c70ed2509c2412e3121190f03b9b8cfe0bbd465c",
+        "reason": "loaded image transfer archive"
+      },
+      {
+        "path": "[PRIVATE_PATH_SHA256:77abc04f457c2878664158749c515c46776cde71e3747798b67f57b24aea30a7]",
+        "kind": "directory",
+        "bytes": 421102721,
+        "reason": "duplicate stable export; original219files fresh hash-verified"
+      },
+      {
+        "path": "[PRIVATE_PATH_SHA256:9920a1cc3f0af6344376647ad2f19cb532b957ffa226d5b8903b705022b010e7]",
+        "kind": "file",
+        "bytes": 421529600,
+        "sha256": "442d172f2067f4acea1bb155281e68c32ee814921e2a36b814a0fad0d6a64a7e",
+        "reason": "duplicate export transport archive"
+      }
+    ],
+    "deleted": [
+      "[PRIVATE_PATH_SHA256:67740682b99b1122b9d6b35a10bc228fd0fb4216f89bc9694240685323086d74]",
+      "[PRIVATE_PATH_SHA256:82d10a00f271e97a7d1e8f2da6a2a0fbf202eb8d997f4855eb46e2e1dfe50ea5]",
+      "[PRIVATE_PATH_SHA256:9920a1cc3f0af6344376647ad2f19cb532b957ffa226d5b8903b705022b010e7]",
+      "[PRIVATE_PATH_SHA256:77abc04f457c2878664158749c515c46776cde71e3747798b67f57b24aea30a7]"
+    ],
+    "original_evidence_root": {
+      "publication_redacted": true,
+      "sha256": "b00e0746520ac8ca942b6d4c10e219d1aa2d0f7329b1d2f5a89363ad0cc9aff0"
+    },
+    "original_files_sha256_verified": 219,
+    "original_evidence_retained": true,
+    "all_targets_absent": true,
+    "disk_before": {
+      "total_bytes": 41882943488,
+      "used_bytes": 18975862784,
+      "available_bytes": 20971343872
+    },
+    "disk_after": {
+      "total_bytes": 41882943488,
+      "used_bytes": 17426456576,
+      "available_bytes": 22520750080
+    },
+    "released_bytes_observed": 1549406208
+  },
+  "cleanup_audit": {
+    "ecs_path": {
+      "publication_redacted": true,
+      "sha256": "58b515bd09537aa04b435b81e5b453524a3d2648b137a7b0abd9649edea5e3e9"
+    },
+    "local_path": {
+      "publication_redacted": true,
+      "sha256": "1cf31887b45ec4edf5355a48a7e4f4055b43cd9b1e9e4debf339fabb1fc73e72"
+    },
+    "sha256": "54ea921c9ed2b7698fcb211948a6cb4e61e9e018baf33f69dc12bdf68134d36f",
+    "transfer_hash_verified": true
+  },
+  "ecs_after_cleanup": {
+    "runtime_check_command": "docker exec rag-s8-api-1 python -B -m scripts.s8_ecs_runtime check",
+    "runtime_check_exit_code": 0,
+    "services_ids_images_start_times_restarts_unchanged": true,
+    "api_db_redis_healthy": true,
+    "worker_running": true,
+    "restarts_all_zero": true,
+    "root_df_used_percent": 44,
+    "pg_system_id": {
+      "publication_redacted": true,
+      "sha256": "25afc69548d4c6b9e306151cb048c27e61dc44632fc580aeb325f884307b6685"
+    },
+    "pg_turns": 303,
+    "provider_response_received": 13224,
+    "historical_unknown": 3,
+    "redis_loading": 0,
+    "redis_aof_enabled": 1,
+    "redis_aof_last_write_status": "ok"
+  },
+  "provider": {
+    "new_attempts": 0,
+    "new_actual_tokens": 0,
+    "new_unknown": 0
+  },
+  "not_run": [
+    "NEW_RUNNER_ON_ECS",
+    "REAL_DISK_LOAD_BENCHMARK",
+    "NEW_REAL_QA",
+    "GLOBAL_CROSS_JOB_MUTEX",
+    "AUTOMATIC_REDIS_IDENTITY_SYNC",
+    "OOS_AUTOMATIC_CLEANUP"
+  ],
+  "production_application_update": false,
+  "database_or_index_mutation": false,
+  "push_or_tag": false,
+  "publication": {
+    "status": "SANITIZED_DERIVATIVE",
+    "original_sha256": "e91fb0261f8b23a36a70513f2e60fc784e6d74ff7000be45265436bfc7b05f62",
+    "raw_evidence": "PRIVATE_RETAINED_NOT_SHIPPED",
+    "new_provider_calls_during_publication": 0
+  }
+}

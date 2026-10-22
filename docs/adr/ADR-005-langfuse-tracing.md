@@ -61,3 +61,26 @@ credentials.
   client, callback, and masking APIs were import/signature checked.
 - App-path verification and a real Langfuse trace are tracked in the task
   report; they must not be reported as passing unless actually executed.
+
+## 2026-10-22 S8.6.5 formal-chain addendum
+
+The S8 `backend/weknora_port` runtime is separate from the historical Quick/
+Smart assembly above. Its optional adapter uses the same pinned SDK 4.15.6,
+without importing the old application. S8 telemetry requires both
+`RAG_LANGFUSE_ENABLED=true` and independent
+`RAG_LANGFUSE_EGRESS_ENABLED=true`, plus verified current KB/origin consent.
+It neither reads `RAG_CLOUD_ENABLED` as telemetry authorization nor enables
+`WEKNORA_PORT_CLOUD_ALLOWED`. Root, stage and actual SendGate observations use
+explicit trace ancestry; session identifiers are hashed. Provider counters
+remain absent/UNKNOWN when unreported and costs remain UNPRICED.
+
+S8 content capture defaults off. The optional content path currently captures
+only a redacted root question and successfully persisted answer; Provider
+prompts, source documents, images and raw transport payloads are not exported.
+Environment/secret-file injection is supported, and credentials are not image
+assets. Runtime exit flushes/shuts down off the event loop. SDK/export errors
+are diagnostic failures and do not authorize retries or fail normal answers.
+
+S8.6.5 evidence distinguishes zero-LLM Cloud readback, offline mock/in-memory
+tests, and fresh real-Provider HTTP acceptance. The latter requires new Owner
+authorization and cannot be replaced by a synthetic trace or historical import.

@@ -371,7 +371,7 @@ def test_fetch_rejects_any_symlink_without_following_it(job):
     assert not (job.tmp / 'fetched').exists()
 
 
-def supervise_offline(job, monkeypatch, result, *, close_grant=False):
+def supervise_offline(job, monkeypatch, result, *, close_grant=False, process=None):
     """Exercise supervisor I/O locally with only the payload process mocked."""
     grant = None
     if close_grant:
@@ -395,12 +395,67 @@ def supervise_offline(job, monkeypatch, result, *, close_grant=False):
         if close_grant:
             write_json(job.tmp / 'ledger.json', {'status': 'CLOSED', 'entries': []})
             write_json(job.tmp / 'owner-stop.json', {'status': 'CLOSED'})
-        return SimpleNamespace(pid=424242, poll=lambda: 0, wait=lambda: 0)
+        return process if process is not None else SimpleNamespace(pid=424242, poll=lambda: 0, wait=lambda: 0)
 
     monkeypatch.setattr(jobs.subprocess, 'Popen', popen)
     code = jobs._supervise(job.root, 'offline-claim')
     state = json.loads((job.root / 'output/state.json').read_text(encoding='utf-8'))
     return code, state, calls
+
+
+@pytest.mark.parametrize(('finish_after', 'exit_code', 'terminal_status'), [
+    (3, 0, 'SUCCEEDED'),
+    (3, 1, 'FAILED'),
+    (31, 0, 'SUCCEEDED'),
+    (31, 1, 'FAILED'),
+])
+def test_supervisor_throttles_idle_heartbeat_but_saves_terminal_artifacts_immediately(
+        job, monkeypatch, finish_after, exit_code, terminal_status):
+    # A nonzero monotonic origin ensures the interval starts at the handshake.
+    clock = SimpleNamespace(now=200.0)
+    writes, polls, sleeps = [], [], []
+    atomic_json = jobs._atomic_json
+
+    def record_write(path, value):
+        atomic_json(path, value)
+        writes.append((clock.now - 200, path.name, dict(value)))
+
+    def sleep(seconds):
+        assert seconds == 1
+        sleeps.append(seconds)
+        clock.now += seconds
+
+    def poll():
+        elapsed = clock.now - 200
+        polls.append(elapsed)
+        return exit_code if elapsed >= finish_after else None
+
+    monkeypatch.setattr(jobs.time, 'monotonic', lambda: clock.now)
+    monkeypatch.setattr(jobs.time, 'sleep', sleep)
+    monkeypatch.setattr(jobs, '_atomic_json', record_write)
+    process = SimpleNamespace(pid=424242, poll=poll, wait=lambda: exit_code)
+    code, state, calls = supervise_offline(job, monkeypatch, {
+        'runtime_complete': True, 'provider_calls': 0}, process=process)
+
+    assert jobs.HEARTBEAT_INTERVAL_SECONDS == 15
+    assert len(calls) == 1
+    assert polls == list(range(finish_after + 1))
+    assert sleeps == [1] * finish_after
+    state_writes = [(at, value['status']) for at, name, value in writes if name == 'state.json']
+    expected_heartbeats = [(at, 'RUNNING') for at in range(15, finish_after, 15)]
+    assert state_writes == [
+        (0, 'PREPARED'), (0, 'STARTING'), (0, 'RUNNING'),
+        *expected_heartbeats, (finish_after, terminal_status)]
+    assert code == (0 if exit_code == 0 else 1)
+    assert state['status'] == terminal_status and state['exit_code'] == exit_code
+    assert state['launch_completed'] is True
+    artifact_writes = [(at, value) for at, name, value in writes if name == 'artifacts.json']
+    assert len(artifact_writes) == 1
+    assert artifact_writes[0][0] == finish_after
+    assert artifact_writes[0][1]['status'] == terminal_status
+    assert 'output/state.json' in artifact_writes[0][1]['files']
+    assert 'output/result.json' in artifact_writes[0][1]['files']
+    assert json.loads((job.root / 'output/artifacts.json').read_text(encoding='utf-8')) == artifact_writes[0][1]
 
 
 @pytest.mark.parametrize('result', [None, {}, {'runtime_complete': False},

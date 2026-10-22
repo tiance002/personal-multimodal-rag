@@ -242,3 +242,46 @@ def test_two_literal_matches_or_nonliteral_name_still_require_selection(query):
             context=SimpleNamespace(scope=SimpleNamespace(knowledge_base_ids=('kb',),document_ids=())))
         assert await app._document_scope_clarification(turn,'Chinese') is not None
     asyncio.run(run())
+
+
+@pytest.mark.parametrize('title,question', [
+    ('A', 'What is the effective date of this specification?'),
+    ('B', 'What is above this document?'),
+    ('date', 'What is the date of this document?'),
+    ('report', 'What does this report describe?'),
+    ('实施', '这份规范的实施日期是什么？'),
+    ('文档', '这份文档写了什么？'),
+    ('规范', '这份规范的要求是什么？'),
+    ('HJ 1134', '这份规范 XHJ 1134 的实施日期？'),
+])
+def test_ordinary_words_and_partial_names_do_not_establish_document_identity(title, question):
+    async def run():
+        app, db = application()
+        db.catalog[0].update(title=title, file_name='first.pdf')
+        turn = SimpleNamespace(session_id='session', request=SimpleNamespace(content=question),
+            context=SimpleNamespace(scope=SimpleNamespace(knowledge_base_ids=('kb',), document_ids=())))
+        assert await app._document_scope_clarification(turn, 'Chinese') is not None
+        assert db.session['document_scope'] == []
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('title,question', [
+    ('A', 'What is the date of this document "A"?'),
+    ('B', 'What does this document B describe?'),
+    ('B', 'What does this Document B describe?'),
+    ('date', 'What does this document named date describe?'),
+    ('规范', '这份文档《规范》的实施日期？'),
+    ('实施', '这份文档名为实施，内容是什么？'),
+    ('无人机检查', '这份文档 无人机检查 的主要内容？'),
+    ('Project design', 'What does this document Project design describe?'),
+])
+def test_explicit_short_or_generic_document_names_preserve_identity_and_frozen_scope(title, question):
+    async def run():
+        app, db = application()
+        db.catalog[0].update(title=title, file_name='first.pdf')
+        turn = SimpleNamespace(session_id='session', request=SimpleNamespace(content=question),
+            context=SimpleNamespace(scope=SimpleNamespace(knowledge_base_ids=('kb',), document_ids=())))
+        assert await app._document_scope_clarification(turn, 'Chinese') is None
+        assert db.session['document_scope'] == [] and turn.context.scope.document_ids == ()
+        assert not any(sql.startswith('UPDATE') for sql, _ in db.calls)
+    asyncio.run(run())

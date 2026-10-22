@@ -5,6 +5,7 @@ from dataclasses import dataclass,field
 from pathlib import Path
 from urllib.parse import urlsplit
 import os,re,json,uuid
+from .observability import ObservabilitySettings, LangfuseObservability
 
 PROHIBITED=frozenset({'7691227493754040358','7689510505384681511','7696038373595934758'})
 class DevelopmentConfigurationError(RuntimeError):pass
@@ -34,6 +35,7 @@ class DevelopmentSettings:
     evidence_dir:Path|None=None
     graph_enabled:bool=False
     rerank_top1_floorless:bool=True
+    observability:ObservabilitySettings=field(default_factory=ObservabilitySettings)
 
     def __post_init__(self):
         if type(self.graph_enabled) is not bool:
@@ -90,6 +92,7 @@ class DevelopmentSettings:
             rerank_context_enabled=env.get('WEKNORA_PORT_RERANK_CONTEXT_ENABLED','false').lower()=='true',
             graph_enabled=env.get('WEKNORA_PORT_GRAPH_ENABLED','false').lower()=='true',
             rerank_top1_floorless=env.get('WEKNORA_PORT_RERANK_TOP1_FLOORLESS','true').lower()=='true',
+            observability=ObservabilitySettings.from_environment(env),
             mineru_settings=MinerUSettings.from_environment(env),
             mineru_extensions=tuple(v.strip().lower() for v in
                 env.get('WEKNORA_PORT_MINERU_EXTENSIONS','.pdf,.png,.jpg,.jpeg,.bmp,.webp,.tif,.tiff').split(',') if v.strip()))
@@ -187,7 +190,9 @@ async def assemble(settings,*,model_factory=None,permissions=None,costs=None,pri
                 rerank_context_enabled=settings.rerank_context_enabled,
                 rerank_top1_floorless=settings.rerank_top1_floorless,
                 query_understand_model_id=settings.query_understand_model_id),policy=RouterPolicy(mode=settings.router_mode),tokenizer_asset=settings.tokenizer,
-            permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
+            permissions=permissions,costs=costs,cloud_allowed=settings.cloud_allowed,
+            observability=LangfuseObservability(settings.observability),
+            memory_enqueuer=RedisMemoryExtractionQueue(redis,settings.redis_prefix+':memory',principal,autostart_on_enqueue=False),local_service=HTTPLocalService(settings.local_url,allow_pull=False) if settings.local_url else None)
         runtime.authority_config_sha=None
         runtime.graph_enabled=settings.graph_enabled
         if settings.execution_file is not None:

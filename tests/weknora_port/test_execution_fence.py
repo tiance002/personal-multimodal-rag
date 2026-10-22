@@ -307,6 +307,31 @@ def test_original_settlement_must_explicitly_succeed(ledger, result):
     assert data(ledger)['entries'][0]['held_tokens'] == 1174
 
 
+@pytest.mark.parametrize('mode', [None, 'reported_usage_only_v1'])
+@pytest.mark.parametrize('error_type', [RuntimeError, asyncio.CancelledError])
+def test_settlement_exception_preserves_observed_usage_and_outcome_without_resend(ledger, mode, error_type):
+    if mode: change(ledger, accounting_mode=mode)
+    gate = Gate()
+    async def finish(*args, **kwargs): raise error_type('synthetic settlement failure')
+    gate.finish = finish
+    LocalExecution(ledger).install_gate(gate)
+    run(gate.authorize(call()))
+    expected = asyncio.CancelledError if error_type is asyncio.CancelledError else ProviderError
+    with pytest.raises(expected):
+        run(gate.finish(call(), outcome='RESPONSE_RECEIVED', usage=TokenUsage(10, 5, 15, 'REPORTED')))
+    snapshot = data(ledger)
+    row = snapshot['entries'][0]
+    assert row['usage']['total_tokens'] == 15
+    assert row['outcome'] == 'RESPONSE_RECEIVED'
+    assert row['status'] == 'LOCAL_SETTLEMENT_FAILED_STOP' and snapshot['status'] == 'STOP'
+    if not mode: assert row['held_tokens'] == row['reserved_tokens'] == 1174
+    LocalExecution(ledger)  # Persisted failure evidence remains a valid stopped ledger.
+    for identity in ('run/1', 'run/2'):
+        with pytest.raises(ProviderError, match='LOCAL_EXECUTION_UNKNOWN_STOP'):
+            run(gate.authorize(call(identity)))
+    assert gate.calls == 1 and data(ledger) == snapshot
+
+
 @pytest.mark.parametrize('usage', [TokenUsage(10, 6, 15, 'REPORTED'), TokenUsage(16, None, 15, 'REPORTED'),
     TokenUsage(10, 5, 15, 'REPORTED', cached_tokens=-1)])
 def test_inconsistent_reported_usage_retains_all_occupancy(ledger, usage):

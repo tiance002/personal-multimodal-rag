@@ -10,7 +10,7 @@ from ..streaming.events import StreamEvent
 from ..streaming.replay import FinalCommit, finalize_turn
 from .context import prepare_generation
 from .router import decide
-from .types import GenerationError, GenerationResult, AttemptRecord, ClosedLifecycle, TokenEstimate
+from .types import GenerationError, GenerationResult, AttemptRecord, ClosedLifecycle, TokenEstimate, CitationQuality
 EMPTY_TRUNCATED_FALLBACK = "Sorry, this answer hit the model's per-response output limit before any text was produced. Try narrowing the question, or raise max_completion_tokens."
 
 
@@ -44,6 +44,41 @@ def public_attempt(record):
     result['endpoint']=endpoint.scheme+'://'+(endpoint.hostname or '')+((':'+str(endpoint.port)) if endpoint.port else '')
     result['endpoint_sha256']=hashlib.sha256(record.endpoint.encode()).hexdigest()
     return result
+
+def public_citation_quality(record):
+    """Content-free mapping shared by complete events, replay and tracing."""
+    return asdict(record.citation_quality)
+
+
+def observe_citation_quality(request, registry, text, *, complete):
+    """Observe decoded answer handles without inferring correctness/refusal.
+
+    Nonempty delivered content is usable for citation observation only. It does
+    not prove the source answers the question. Empty content cannot establish a
+    missing-citation defect; a reasonable refusal remains an offline judgment.
+    This result is deliberately separate from upgrade-eligible objectives.
+    """
+    usable = sum(bool(e.content.strip()) for e in request.evidence)
+    valid, invalid = len(registry.used_handles), registry.invalid_count
+    assessed = complete and bool(text.strip())
+    if not request.citations_enabled:
+        status = 'NOT_REQUIRED'
+    elif invalid:
+        status = 'INVALID'
+    elif request.evidence_insufficient:
+        status = 'EVIDENCE_INSUFFICIENT'
+    elif request.is_fallback:
+        status = 'NOT_REQUIRED'
+    elif not assessed:
+        status = 'NOT_ASSESSED'
+    elif valid:
+        status = 'VALID'
+    elif usable:
+        status = 'MISSING'
+    else:
+        status = 'EVIDENCE_INSUFFICIENT'
+    return CitationQuality(status, valid, invalid, usable, assessed)
+
 
 def check_context(context):
     if context.cancelled and context.cancelled.is_set():
@@ -276,19 +311,22 @@ class GenerationCoordinator:
                 setattr(failure, 'cleanup_error_code', 'CANCELLED_STREAM_FLUSH_UNAVAILABLE')
         text = ''.join(answer)
         thought = ''.join(thinking)
+        citation_quality = observe_citation_quality(request, registry, text,
+            complete=failure is None and not is_length(finish))
         objectives = tuple((name for name, present in (('TRUNCATED', is_length(finish)), ('EMPTY', not text.strip()), ('INVALID_HANDLES', registry.invalid_count > 0)) if present))
         if failure is not None:
             code = failure.code if isinstance(failure, ProviderError) else 'GENERATION_CANCELLED' if isinstance(failure, asyncio.CancelledError) else 'PROVIDER_STREAM_FAILED'
             status = 'CANCELLED' if isinstance(failure, (CallCancelled, asyncio.CancelledError)) else 'FAILED'
-            record = replace(record, status=status, model_reported=reported, finish_reason=finish, usage=usage, objective=objectives, error_code=code, invalid_handle_count=registry.invalid_count)
+            record = replace(record, status=status, model_reported=reported, finish_reason=finish, usage=usage, objective=objectives, error_code=code, invalid_handle_count=registry.invalid_count, citation_quality=citation_quality)
         else:
             status = 'TRUNCATED' if is_length(finish) else 'COMPLETED'
-            record = replace(record, status=status, model_reported=reported, finish_reason=finish, usage=usage, objective=objectives, invalid_handle_count=registry.invalid_count)
+            record = replace(record, status=status, model_reported=reported, finish_reason=finish, usage=usage, objective=objectives, invalid_handle_count=registry.invalid_count, citation_quality=citation_quality)
         try:
             await self.lifecycle.finish_attempt(record, attempt_context)
         except Exception:
             raise GenerationError('GENERATION_ATTEMPT_FINALIZE_FAILED', sent=True) from None
-        await self._progress('generation', record.status.lower(), attempt_id=attempt_id, role=role)
+        await self._progress('generation', record.status.lower(), attempt_id=attempt_id, role=role,
+                             citation_quality=public_citation_quality(record))
         if failure is not None:
             partial=(text,thought,(),tuple(error_events)) if request.is_fallback and fallback_output_failure(failure) else None
             return (record, partial, failure)
@@ -343,9 +381,14 @@ class GenerationCoordinator:
                 check_context(context)
         # Fixed output causes no new provider attempt; retain existing attempt usage.
         usage=accumulate_usage([a.usage for a in attempts]) if attempts else TokenUsage()
+        citation_quality = CitationQuality(status='EVIDENCE_INSUFFICIENT'
+            if request.citations_enabled and request.evidence_insufficient else 'NOT_REQUIRED', assessment_complete=True)
         await finalize_turn(self.store,CheckedCommitter(),FinalCommit(request.session_id,request.message_id,
-            request.run_id,text,[],usage_dict(usage)),complete_data={'is_fallback':True,'attempts':[public_attempt(a) for a in attempts],'router':route})
-        return GenerationResult(text,'',(),'fixed','',tuple(attempts),route,usage,'',False,len(attempts)>1,'','')
+            request.run_id,text,[],usage_dict(usage),quality={
+                'citation_quality':asdict(citation_quality),
+                'generation_issues':[]}),complete_data={'is_fallback':True,'attempts':[public_attempt(a) for a in attempts],'router':route,
+                'citation_quality':asdict(citation_quality)})
+        return GenerationResult(text,'',(),'fixed','',tuple(attempts),route,usage,'',False,len(attempts)>1,'','',citation_quality)
 
     async def run(self, request, context):
         check_context(context)
@@ -402,10 +445,13 @@ class GenerationCoordinator:
             raise GenerationError('GENERATION_NO_SELECTED_ATTEMPT')
         answer, thinking, references, error_events = selected
         total_usage = accumulate_usage([record.usage for record in attempts])
-        result = GenerationResult(answer, thinking, references, record.role, record.attempt_id, tuple(attempts), route, total_usage, record.finish_reason, is_length(record.finish_reason), len(attempts) > 1, prepared.prompt_sha256, prepared.context_sha256)
+        result = GenerationResult(answer, thinking, references, record.role, record.attempt_id, tuple(attempts), route, total_usage, record.finish_reason, is_length(record.finish_reason), len(attempts) > 1, prepared.prompt_sha256, prepared.context_sha256, record.citation_quality)
         check_context(context)
         metadata = {'is_fallback':request.is_fallback, 'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
         metadata['generation_issues'] = list(record.objective)
+        metadata['citation_quality'] = public_citation_quality(record)
+        if record.citation_quality.status == 'MISSING':
+            metadata['generation_issues'].append('MISSING_CITATIONS')
         buffered = record.role == 'cheap' and request.policy.mode == 'DYNAMIC'
         if buffered:
             for notice in error_events:
@@ -428,5 +474,6 @@ class GenerationCoordinator:
                 except Exception:
                     raise GenerationError('GENERATION_FINAL_COMMIT_FAILED',sent=True) from None
                 check_context(context)
-        await finalize_turn(self.store, CheckedCommitter(), FinalCommit(request.session_id, request.message_id, request.run_id, answer, list(references), usage_dict(total_usage)), complete_data={**metadata, 'attempts': [public_attempt(a) for a in attempts], 'router': route})
+        await finalize_turn(self.store, CheckedCommitter(), FinalCommit(request.session_id, request.message_id, request.run_id, answer, list(references), usage_dict(total_usage),quality={
+            'citation_quality':metadata['citation_quality'],'generation_issues':metadata['generation_issues']}), complete_data={**metadata, 'attempts': [public_attempt(a) for a in attempts], 'router': route})
         return result

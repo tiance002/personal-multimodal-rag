@@ -12,8 +12,8 @@ from tests.weknora_port.test_generation import CTX, event, request, setup
 @pytest.mark.parametrize(('text', 'finish', 'issues'), [
     ('unfinished answer', 'length', ['TRUNCATED']),
     ('', 'stop', ['EMPTY']),
-    ('complete answer', 'stop', []),
-    ('EOF source semantics retained', '', []),
+    ('complete answer', 'stop', ['MISSING_CITATIONS']),
+    ('EOF source semantics retained', '', ['MISSING_CITATIONS']),
 ])
 def test_complete_exposes_only_final_attempt_issues_without_changing_persistence(text, finish, issues):
     co, cheap, expensive, store, commit, life = setup(

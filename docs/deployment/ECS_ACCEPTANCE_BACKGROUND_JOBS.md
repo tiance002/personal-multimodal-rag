@@ -101,7 +101,7 @@ python3 /path/to/ecs_acceptance_job.py fetch --job-root /opt/rag-s8/diagnostics/
 ## 自动落盘与故障边界
 
 - Supervisor和payload各自`start_new_session=True`，stdin为`/dev/null`，stdout/stderr接本机磁盘文件，关闭其他继承FD；不依赖SSH终端或本地Codex在线。
-- 状态每秒原子替换并fsync，包含heartbeat、PID、boot_id和start_ticks。单次启动claim和payload claim不可复用；进程锁防并发重复执行。
+- 子进程每秒轮询，空闲RUNNING心跳每15秒原子替换并fsync，包含heartbeat、PID、boot_id和start_ticks；启动和终态立即持久化。单次启动claim和payload claim不可复用；进程锁防同一job重复执行，不提供跨job的主机级互斥。
 - `output/artifacts.json`记录输出/控制文件哈希；不设任意文件大小、文件数量或归档体积上限。大文件采用流式复制/哈希。
 - 不导出外部配置、环境变量快照、密钥/凭据文件或符号链接。任务自行选定的收据快照仅保存在output中。
 - ECS重启、进程身份失效、发送结果未知时，状态为`INTERRUPTED_UNCONFIRMED`。原收据和UNKNOWN保留，后续只读对账；不自动重新执行模型调用。
@@ -110,6 +110,8 @@ python3 /path/to/ecs_acceptance_job.py fetch --job-root /opt/rag-s8/diagnostics/
 ## 测试环境简化原则
 
 后续ECS测评保持五条边界：独立临时服务和目录；脱离本机运行；日志与结果持久化；记录必要的源码/镜像/会话/调用结果；状态不明的Provider调用不自动重试。
+
+2026-10-23起按Owner决定，将现有3.5GiB内存与云盘性能作为固定边界。后续采用[固定配置ECS执行策略](ECS_FIXED_CAPACITY_STRATEGY.md)：同一主机一次一个批次、逐题串行、每批复用一个临时API，构建/导入/大导出与评测错峰；结果完成后一次稳定导出核对，不反复扫描终态全部产物。现有的任务锁尚未强制不同job之间互斥，执行代理必须确认主机没有其他活跃批次。
 
 - 启动时核对一次实际源码与镜像身份；逐题不重复模块导入检查、整库指纹扫描或历史诊断容器枚举。结束时汇总必要状态。
 - Docker资源参数使用实际主机支持的设置；不强加CPU调度参数，不为验证临时API重建整个Compose环境。

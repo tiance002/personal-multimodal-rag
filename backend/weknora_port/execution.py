@@ -455,7 +455,7 @@ class LocalExecution:
         async def finish(call, *, outcome, usage):
             try: accepted = await original_finish(call, outcome=outcome, usage=usage)
             except BaseException as error:
-                self._finish(call, failure='LOCAL_SETTLEMENT_FAILED_STOP')
+                self._finish(call, usage, failure='LOCAL_SETTLEMENT_FAILED_STOP', outcome=outcome)
                 if isinstance(error, Exception): raise ProviderError('LOCAL_EXECUTION_SETTLEMENT_FAILED') from None
                 raise
             if accepted is not True:

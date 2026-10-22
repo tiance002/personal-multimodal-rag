@@ -22,6 +22,9 @@ import uuid
 DIAGNOSTICS_ROOT = Path("/opt/rag-s8/diagnostics")
 WORKSPACE_ROOT = Path("/opt/rag-s8")
 SCHEMA_VERSION = 1
+# Persist idle RUNNING heartbeats every 15 seconds; keep child polling at 1 second.
+# Initial handshake and terminal state writes remain immediately durable.
+HEARTBEAT_INTERVAL_SECONDS = 15
 TERMINAL_STATES = {"SUCCEEDED", "FAILED", "INCOMPLETE_UNCONFIRMED", "INTERRUPTED_UNCONFIRMED"}
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 _JOB_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,119}$")
@@ -400,9 +403,12 @@ def _supervise(root: Path, launch_token: str) -> int:
                 )
                 state = _state(root, state, status="RUNNING", launch_completed=True,
                                started_at=_utc(), payload=process_identity(process.pid))
+                last_heartbeat = time.monotonic()
                 while process.poll() is None:
                     time.sleep(1)
-                    state = _state(root, state, status="RUNNING")
+                    if time.monotonic() - last_heartbeat >= HEARTBEAT_INTERVAL_SECONDS:
+                        state = _state(root, state, status="RUNNING")
+                        last_heartbeat = time.monotonic()
                 returncode = process.wait()
                 os.fsync(stdout.fileno())
                 os.fsync(stderr.fileno())

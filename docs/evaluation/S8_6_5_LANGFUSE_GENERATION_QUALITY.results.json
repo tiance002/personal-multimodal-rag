@@ -1,0 +1,657 @@
+{
+  "schema": "s8-6-5-final-results/v1",
+  "report": "docs/evaluation/S8_6_5_LANGFUSE_GENERATION_QUALITY.md",
+  "status": "BLOCKED_NOT_ACCEPTED",
+  "acceptance": {
+    "implementation": "IMPLEMENTED_OFFLINE_NOT_DEPLOYED",
+    "offline_validation": "PASS_WITH_SKIPS",
+    "cloud_synthetic": "PASS_SYNTHETIC_ONLY",
+    "real_rag_http": "NOT_RUN",
+    "production_deployment": "NOT_DEPLOYED",
+    "production_ready": false
+  },
+  "version": {
+    "baseline_commit": "db917c8a535b13b96ffd9ffbda18669025d5b3b3",
+    "visible_head_before_pending_patch": "7510b7a2b41485a7f2602cd16f344c5d4b078e4f",
+    "final_source_commit": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+    "target_branch": "codex/s8-6-adaptive-retrieval-20261021",
+    "current_observability_file_sha256": "fa5b837c75a92bd2adb20dcd9c16b410375a02882ea1f23c16c486fdfc94a565"
+  },
+  "root_cause": {
+    "old_backend_adapter": "backend/app/bootstrap.py constructs backend/app/adapters/langfuse_tracing.py; this is the legacy backend.app application path.",
+    "s8_baseline_build": "At baseline db917c8, deploy/s8/Dockerfile.api copied backend/weknora_port but not backend/app; deploy/s8/requirements.txt lacked Langfuse although pyproject.toml pinned langfuse==4.15.6.",
+    "actual_ecs": {
+      "api_container": "26ac840c2f71",
+      "worker_container": "85ab3bd0793a",
+      "image_id": {
+        "publication_redacted": true,
+        "sha256": "5cf41314bd2bcdcb91aa51df538be45a0bd9c946722f88bd0701520a11a9e3d6"
+      },
+      "revision": "29ecf2f5d3037eed99a4de783546dee272a761bd",
+      "sdk_version": null,
+      "legacy_adapter_present": false,
+      "langfuse_environment_allowlist": {},
+      "model_cloud_enabled": false
+    },
+    "conclusion": "The live S8 API/Worker do not contain the S8.6.5 tracing implementation, Langfuse SDK, or Langfuse runtime configuration. Local Cloud credentials and synthetic traces cannot establish live RAG tracing."
+  },
+  "synthetic_cloud_probes": [
+    {
+      "name": "standalone_zero_llm_probe",
+      "trace_id": {
+        "publication_redacted": true,
+        "sha256": "e9a1417bc58e2deb90b8c3bbf8b750c646ef8fd101738781792a487fbcbf2d1d"
+      },
+      "status": "PASS_READBACK",
+      "endpoint_host": "us.cloud.langfuse.com",
+      "environment": "s865-diagnostic",
+      "project_id": {
+        "publication_redacted": true,
+        "sha256": "a225b716c4d2727571a58b836ac0fd8b755b27e3de917db69be5ae28b0e82ef1"
+      },
+      "auth_check_on_recovery": true,
+      "original_attempt_auth_check": "NOT_RUN",
+      "original_attempt_stdout": "LOST_NO_LOCAL_RECEIPT",
+      "readback_http_status": 200,
+      "readback_cli_exit_code": 0,
+      "observations": 1,
+      "input_null": true,
+      "output_null": true,
+      "provider_calls": 0,
+      "llm_generations": 0,
+      "recovery_resend": false
+    },
+    {
+      "name": "current_adapter_zero_llm_probe",
+      "trace_id": {
+        "publication_redacted": true,
+        "sha256": "032747684e3238197e105252684653b1dcdd33667617ba3f1bf451886b080534"
+      },
+      "status": "PASS_READBACK",
+      "endpoint_host": "us.cloud.langfuse.com",
+      "environment": "s865-diagnostic",
+      "project_id": {
+        "publication_redacted": true,
+        "sha256": "a225b716c4d2727571a58b836ac0fd8b755b27e3de917db69be5ae28b0e82ef1"
+      },
+      "sdk_version": "4.15.6",
+      "auth_check": true,
+      "readback_http_status": 200,
+      "readback_cli_exit_code": "NOT_RECORDED_IN_RECEIPT",
+      "readback_attempts": 2,
+      "observations": [
+        {
+          "name": "weknora.ordinary-turn",
+          "type": "SPAN",
+          "input_null": true,
+          "output_null": true,
+          "parent_context_present": true
+        },
+        {
+          "name": "weknora.context",
+          "type": "SPAN",
+          "input_null": true,
+          "output_null": true,
+          "parent_context_present": true
+        }
+      ],
+      "native_session_correlation_readback": true,
+      "provider_calls": 0,
+      "llm_generations": 0,
+      "adapter_source_sha256": "4dda226fce31dfcfe4c6e34e07b58557d88e296feb6dc7c805dfb40425859d65",
+      "raw_cloud_response_included": false
+    }
+  ],
+  "generation_comparison": {
+    "status": "NOT_RUN_BLOCKED_CURRENT_SOURCE_PREFLIGHT",
+    "fixed_questions": 10,
+    "arms": [
+      "A_Cheap_CurrentPromptB",
+      "B_Cheap_CandidatePrompt",
+      "C_Expensive_CandidatePrompt"
+    ],
+    "prepared_wire_bodies": 30,
+    "manifest_sha256": "0489aecbe70e1dca093dd5e7461a17cf6580e927edc936418f1c80633fa5b143",
+    "wire_manifest_sha256": "9f7b364d4291e38ff15a82611bb23b20ca1a6e45a4f3733ee9826211b7cc3664",
+    "planning_tokens_upper_bound": 583988,
+    "planning_bound_is_actual_usage_or_reservation": false,
+    "source_preflight": {
+      "status": "BLOCKED",
+      "blocked_cases": 10,
+      "ssh_banner_timeouts": 3,
+      "ssh_exit_code_each": 255,
+      "database_query_executed": false,
+      "source_version_membership": "BLOCKED",
+      "permissions": "BLOCKED",
+      "cloud_consent": "BLOCKED",
+      "plaintext_matches_frozen": "BLOCKED"
+    },
+    "models_from_safe_pg_snapshot": {
+      "tenant_id": {
+        "publication_redacted": true,
+        "sha256": "7104741a92e73eb6c5d69cd04cf0afbe50a8796a010d8fa25daaf79e5e173bf3"
+      },
+      "database": "weknora_s8",
+      "config_revision": 3,
+      "cheap": {
+        "provider": "siliconflow",
+        "model": "Qwen/Qwen3.5-4B",
+        "model_id": {
+          "publication_redacted": true,
+          "sha256": "92515adff135ee9f5316eef457af5a17dee6694d1dd63bbe189a13d0f79cf35d"
+        }
+      },
+      "expensive": {
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "model_id": {
+          "publication_redacted": true,
+          "sha256": "336d8e4a64f6aff3fce053bd4e866f2a3be9e94c9dd162e4a09601f8cbcba0cf"
+        }
+      }
+    },
+    "metrics": {
+      "core_answer_correctness": null,
+      "necessary_condition_completeness": null,
+      "unsupported_content_rate": null,
+      "citation_validity": null,
+      "actual_tokens": null,
+      "actual_cost": null,
+      "end_to_end_latency_ms": null,
+      "generation_latency_ms": null,
+      "reason": "No real ABC or HTTP generation executed."
+    },
+    "per_case": [
+      {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0434",
+        "question_sha256": "59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "longbench-zh-dureader:5726f5fc6feedda99cafb275a27a8fd67483185b6fb8efa7",
+        "question_sha256": "2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "hotpotqa-5a729fe55542991f9a20c53b",
+        "question_sha256": "2c7a2c651b630ba769debb728c227d0e4b1fb22e08b6c4e38459dc7353d5bebc",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "miracl-zh-5721594#0",
+        "question_sha256": "bb3ecc5a59808b782ffb6f4cbae386370645508e4197e9bd39fe5c4d88dc91db",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "miracl-zh-692002#0",
+        "question_sha256": "43b96ffe8df179f930179f215b3ae1a367bd98afdad5e85a6de7bbc6cfef8134",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "miracl-zh-704170#0",
+        "question_sha256": "750728051623b43d80d01dcacb28e4c77087ef31c45b116351ac52f4b839bfe5",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "miracl-zh-91294#0",
+        "question_sha256": "fb30e87889b75390b289054f90e476160ed81d75eaa7457011b2b90b342e6481",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "longbench-zh-multifieldqa_zh:51abd2060651563dfb6982a9e5380c6dfdf7c4917056feed",
+        "question_sha256": "9740bcae56e8e7a4dcedf6e6d4b18e01ff503fb8530099215011197180f22c0b",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "longbench-zh-multifieldqa_zh:1a6c19fed6361cbfbfd0df3fb7ca1e01f2a2ffa0da9903bc",
+        "question_sha256": "31cc30e14b96363d0776e20aa867ec8873b025bf45b777ba273210a238bab1d7",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      },
+      {
+        "case_id": "mmlongbench-doc-mmlongbench-doc:2ff6aa9237fc777b6627dc57a486e9225ac5fb86:row-0687",
+        "question_sha256": "77c455d06bfb30a28b3de7fd6fb7f31dcb831fe5527f64264ac205a3c12af380",
+        "arms": {
+          "A": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "B": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          },
+          "C": {
+            "status": "NOT_RUN",
+            "answer": null,
+            "final_answer_correct": null,
+            "tokens": null,
+            "latency_ms": null,
+            "citation_quality": null,
+            "cost": null
+          }
+        }
+      }
+    ]
+  },
+  "provider_accounting": {
+    "new_paid_provider_calls": 0,
+    "actual_usage": null,
+    "actual_cost": null,
+    "unknown_outcomes_created": 0
+  },
+  "tests": [
+    {
+      "name": "probe_compile",
+      "command": "python -B -m py_compile scripts/s8_6_5_langfuse_probe.py",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "name": "probe_guard_tests",
+      "command": "& '[PRIVATE_PATH_SHA256:93f304207981d108266931677a715357031dc85c3b39ddc5dd2052bd6b530794] quention\\.venv\\Scripts\\python.exe' -m pytest -q tests/test_s8_6_5_langfuse_probe.py",
+      "exit_code": 0,
+      "result": "4 passed"
+    },
+    {
+      "name": "generation_comparison_offline",
+      "command_evidence": "docs/evaluation/evidence/s8_6_5/offline/generation-quality/compare-final4.command.txt",
+      "exit_code": 0,
+      "result": "23 passed; rendered package reproducible"
+    },
+    {
+      "name": "http_grant_profile",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_s865_http_profile.py -q -p no:cacheprovider --tb=short",
+      "exit_code": 0,
+      "result": "4 passed"
+    },
+    {
+      "name": "asgi_http_preflight",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_s862r3_http_preflight.py -k actual_asgi -q -p no:cacheprovider --tb=short",
+      "exit_code": 0,
+      "result": "2 passed, 4 deselected"
+    },
+    {
+      "name": "full_offline_integration",
+      "command": "NOT_RECORDED_WITH_RESULT_LOG",
+      "exit_code": 0,
+      "result": "473 passed, 1 skipped; see evidence/s8_6_5/offline/integration-final.log",
+      "skip_reason": "Explicit isolated PostgreSQL DSN not supplied."
+    },
+    {
+      "name": "p1_settlement_exception_red",
+      "command_evidence": "docs/evaluation/evidence/s8_6_5/offline/execution-scope/red-execution-valid.txt",
+      "exit_code": 1,
+      "result": "Expected RED: 4 failed before fix"
+    },
+    {
+      "name": "p1_settlement_focus_green",
+      "command_evidence": "docs/evaluation/evidence/s8_6_5/offline/execution-scope/green-focused.txt",
+      "exit_code": 0,
+      "result": "5 passed"
+    },
+    {
+      "name": "related_execution_document_scope",
+      "command_evidence": "docs/evaluation/evidence/s8_6_5/offline/execution-scope/green-final.txt",
+      "exit_code": 1,
+      "result": "171 passed, 1 failed; unrelated Windows ledger os.replace WinError 5; fixture-only failure rerun passed"
+    },
+    {
+      "name": "known_empty_evidence_red",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest -q tests/weknora_port/test_s865_empty_evidence_reason.py tests/weknora_port/test_s865_generation_quality.py --tb=short -p no:cacheprovider",
+      "exit_code": 1,
+      "result": "7 failed, 14 passed; expected RED before fix",
+      "evidence": "docs/evaluation/evidence/s8_6_5/final_addendum/known_empty/known-empty-red.log"
+    },
+    {
+      "name": "known_empty_evidence_focused_green",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest -q tests/weknora_port/test_s865_empty_evidence_reason.py tests/weknora_port/test_s865_generation_quality.py --tb=short -p no:cacheprovider",
+      "exit_code": 0,
+      "result": "21 passed",
+      "evidence": "docs/evaluation/evidence/s8_6_5/final_addendum/known_empty/known-empty-green.log"
+    },
+    {
+      "name": "known_empty_evidence_related_regression",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest -q tests/weknora_port/test_s865_empty_evidence_reason.py tests/weknora_port/test_s865_generation_quality.py tests/weknora_port/test_s851_history_transform_ambiguity.py tests/weknora_port/test_s864_document_scope.py tests/weknora_port/test_service.py tests/weknora_port/test_generation.py tests/weknora_port/test_s865_quality_persistence.py tests/weknora_port/test_generation_visibility.py tests/weknora_port/test_history_storage.py --tb=short -p no:cacheprovider",
+      "exit_code": 0,
+      "result": "196 passed",
+      "evidence": "docs/evaluation/evidence/s8_6_5/final_addendum/known_empty/known-empty-related.log"
+    },
+    {
+      "name": "tracing_zero_attempt_red",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_s865_observability.py -k zero_attempt -q -p no:cacheprovider --tb=short",
+      "exit_code": 1,
+      "result": "1 failed, 26 deselected; citation_status projection gap",
+      "evidence": "docs/evaluation/evidence/s8_6_5/final_addendum/root_runs/logs/zero-attempt-red.log",
+      "command_provenance": "ROOT_REPORTED_COMMAND_NOT_EMBEDDED_IN_LOG"
+    },
+    {
+      "name": "tracing_final_quality_green",
+      "command": "& '[PRIVATE_PATH_SHA256:3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f] quention/.venv/Scripts/python.exe' -X utf8 -B -m pytest tests/weknora_port/test_s865_observability.py tests/weknora_port/test_s865_empty_evidence_reason.py tests/weknora_port/test_s865_generation_quality.py tests/weknora_port/test_s865_quality_persistence.py -q -p no:cacheprovider --tb=short",
+      "exit_code": 0,
+      "result": "52 passed",
+      "evidence": "docs/evaluation/evidence/s8_6_5/final_addendum/root_runs/logs/final-quality-green.log",
+      "command_provenance": "ROOT_REPORTED_COMMAND_NOT_EMBEDDED_IN_LOG"
+    }
+  ],
+  "conditional_future_authorization_plan": {
+    "status": "PROPOSED_NOT_AUTHORIZED",
+    "generation_calls_max": 30,
+    "normal_http_questions_max": 2,
+    "model_attempts_max_proposed": 54,
+    "actual_reported_token_cap_proposed": 800000,
+    "http_request_tree_upper_bound": "NOT_CLOSED",
+    "safe_to_execute_now": false,
+    "conditions": [
+      "Refresh current authorized source/version/permission/cloud-consent/plaintext proof for all 10 fixed contexts and bind stable source identity to a fresh grant.",
+      "Close the maximum HTTP request-tree token and attempt bound; 583988 is generation planning only and is not actual usage, reservation, or sufficient proof for the combined cap.",
+      "Build and verify an isolated S8.6.5 image within this Goal's allowed isolation scope after SSH recovers; submit one complete fresh Provider authorization request only after source/image and HTTP bounds are frozen.",
+      "Use no old grants, ledgers, or UNKNOWN allocations; retain STOP behavior on any unknown outcome."
+    ],
+    "source_commit": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+    "image_id": null,
+    "image_status": "NOT_BUILT_SSH_UNAVAILABLE",
+    "http_profile_sha256": "c300f8ba6ed7e109541e8bf18d7196e0a923959acb02f24811f12ab273dc7b54",
+    "proposed_http_questions": [
+      "[PRIVATE_QUESTION_SHA256:59f31ac3ae6922a85653447d4c1df05e7e33eb953b14cda0a440dca5412c245f]",
+      "[PRIVATE_QUESTION_SHA256:2f334f60ada791e7dcafcc97feeab33ec5cc3254e7c4af9605b40ace145c5eb2]"
+    ],
+    "no_automatic_provider_retries": true,
+    "account_mode": "reported_usage_only_v1",
+    "authorization_request_submitted": false,
+    "authorization_request_block_reason": "Current source proof, image identity, and HTTP request-tree upper bound cannot be frozen while SSH is unavailable; no premature paid-send approval requested.",
+    "model_data_scope": "Fixed ten historical question/context pairs and original scopes only; two HTTP questions use their existing server-authorized KB/document scopes; metadata-only Langfuse."
+  },
+  "runtime": {
+    "ecs_revision": "29ecf2f5d3037eed99a4de783546dee272a761bd",
+    "ecs_image": "sha256:80e2f2d84bf67d7d22117d98676049aa9cd3101e69b20f780d5fd9eeaf931a36",
+    "image_built_for_s865": false,
+    "deployed_for_s865": false
+  },
+  "evidence": {
+    "offline_archive_manifest": "docs/evaluation/evidence/s8_6_5/offline/manifest.json",
+    "offline_archive_manifest_sha256": "9a42453bc786ccb03c19a49e61550b980ff859bdae2b3309a7a9fa7d5083ea2d",
+    "fixed_generation_manifest": "docs/evaluation/evidence/s8_6_5/fixed_generation/manifest.json",
+    "current_source_preflight": "docs/evaluation/evidence/s8_6_5/fixed_generation/current_source_preflight.json",
+    "current_source_preflight_status": "BLOCKED_CURRENT_AUTHORIZED_READBACK_UNAVAILABLE",
+    "safe_model_snapshot": "docs/evaluation/evidence/s8_6_5/observability/ecs_model_configuration_safe.json",
+    "safe_ecs_snapshot": "docs/evaluation/evidence/s8_6_5/observability/ecs_current_runtime_summary.json",
+    "final_addendum_manifest": "docs/evaluation/evidence/s8_6_5/final_addendum/manifest.json",
+    "final_addendum_manifest_sha256": "7cd58445267ec8132f82e4004448a435e51bf33fc3a7d349b492aa315843ba04"
+  },
+  "pricing": {
+    "status": "UNPRICED",
+    "actual_bill": null,
+    "reason": "No new Provider sends. Current official SiliconFlow page does not expose a verified applicable Qwen3.5-4B rate; cache mix and real response model are unknown. No whole-batch monetary estimate claimed.",
+    "official_sources": [
+      "http[PRIVATE_PATH_SHA256:9e5dce7fbef86e9859caa2e187b77bc99925e8a0197b404f76ac15ef6b4c343f]",
+      "http[PRIVATE_PATH_SHA256:09063ccc3eb4b5e81273c1c2bfa850303789fbc2818a881ad4481dcd910d433b]"
+    ]
+  },
+  "publication": {
+    "status": "SANITIZED_DERIVATIVE",
+    "original_sha256": "0fbb6c3f8d41a6c9a0bcc66e84040f139bbaf83d728695bf960feedc78368f96",
+    "raw_evidence": "PRIVATE_RETAINED_NOT_SHIPPED",
+    "new_provider_calls_during_publication": 0
+  }
+}

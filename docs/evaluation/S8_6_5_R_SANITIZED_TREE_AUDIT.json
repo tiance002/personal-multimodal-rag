@@ -1,0 +1,1296 @@
+{
+  "schema": "s865r-sanitized-publication-audit/v2",
+  "status": "PASS",
+  "audit_date": "2026-10-23",
+  "public_parent": "db917c8a535b13b96ffd9ffbda18669025d5b3b3",
+  "original_private_head": "46be011ae242c0691e6864eeeef88d0cde81d6dc",
+  "scope": {
+    "changed_paths": 46,
+    "scanned_path_versions": 46,
+    "unique_new_reachable_blobs": 46,
+    "git_rev_list_new_reachable_blobs": 46,
+    "unique_scanned_blobs": 46,
+    "original_raw_evidence_excluded": 159,
+    "report_hash_inventory_exclusions": [
+      "docs/evaluation/S8_6_5_R_SANITIZED_TREE_AUDIT.json",
+      "docs/evaluation/S8_6_5_R_SANITIZED_TREE_AUDIT.md"
+    ],
+    "inherited_public_content_scanned": true,
+    "existing_public_ancestor_history": "UNCHANGED_OUTSIDE_REDACTION_SCOPE"
+  },
+  "checks": {
+    "raw_fixed_question_patterns": 10,
+    "raw_context_patterns": 57,
+    "raw_context_excerpt_patterns": 380,
+    "full_request_patterns": 10,
+    "blockers": 0,
+    "backend_deploy_source": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+    "backend_deploy_exact_blob_files": 214,
+    "backend_deploy_mismatches": [],
+    "backend_deploy_extra_files": [],
+    "ops_heartbeat_46be_exact": true,
+    "comparison_changed_functions": [
+      "prepare",
+      "dry_run",
+      "main"
+    ],
+    "comparison_execution_functions_unchanged": true,
+    "excluded_paths_present": [],
+    "excluded_new_blob_matches": [],
+    "original_raw_branch_head_preserved": true,
+    "single_clean_successor_ancestry": true,
+    "carried_verification_blobs_unchanged": true,
+    "reachable_blob_set_matches_proposed_tree": true
+  },
+  "carried_unit_verification": {
+    "command": "python -m pytest tests/weknora_port/test_s865_generation_compare.py -q",
+    "exit_code": 0,
+    "passed": 19,
+    "kind": "SYNTHETIC_OFFLINE_CONTRACT",
+    "log_sha256": "e21ed1e99b461136a37cf15ae62d507f104d77606e74c94894bbbeabae9d8ba2",
+    "rerun": "NOT_RUN_UNCHANGED_TEST_AND_SCRIPT_BLOBS",
+    "real_provider_http_pg_ecs": "NOT_RUN"
+  },
+  "safe_findings": [
+    {
+      "path": "backend/weknora_port/development.py",
+      "line": 26,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "backend/weknora_port/development.py",
+      "line": 85,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "backend/weknora_port/execution.py",
+      "line": 19,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3a05b27e1a3f326863a4eff5e210016574d8b713a345e4c168b930cd720951c1",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 35,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 72,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 83,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 93,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 105,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 14,
+      "category": "absolute_path_candidate",
+      "match_sha256": "c4b01e1032658e1c455d736fc3a6372ad1d023ace1a84facf93ceaef72478dc9",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 16,
+      "category": "absolute_path_candidate",
+      "match_sha256": "aeae858ad3ed09c3fe6458a6bc2c082de4bf4dc0f1f8614011d3801e85996fa5",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 17,
+      "category": "absolute_path_candidate",
+      "match_sha256": "fa1b91fad1c83a105f137bd9213b405cc32ec6acd391f3b0416989dba0980601",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 49,
+      "category": "absolute_path_candidate",
+      "match_sha256": "bd5ce0409e4f8444eb24fcec6a287efa6e7d51acd19c29362c534567ab48715b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 50,
+      "category": "absolute_path_candidate",
+      "match_sha256": "774425e489c657fb20fa20a3acd61f68793672ed189fa8959b019dd0fdaeab35",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 51,
+      "category": "absolute_path_candidate",
+      "match_sha256": "81caf5fc399f0e08433ce084ca8733da57611be8708d2e85f6318b1142d7f10c",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 52,
+      "category": "absolute_path_candidate",
+      "match_sha256": "5514c05c569834482395d828afccd8a3a80360834b8805640f18ca0ab0f15230",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 117,
+      "category": "absolute_path_candidate",
+      "match_sha256": "7ed6d391cf3cac40d13a62b8d48a1dd0320e1e325089a56cda36203ab85c767a",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 118,
+      "category": "absolute_path_candidate",
+      "match_sha256": "b6d3dd07932282e2fa0fccc9f23158b906e71bc7439f4c2d245c28c6186f313c",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 119,
+      "category": "absolute_path_candidate",
+      "match_sha256": "c03fd790e09679dfd22a08b4446c9b67f23f1a31cc5eb9d9de09f018f129ad5b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 120,
+      "category": "absolute_path_candidate",
+      "match_sha256": "ed8036821c6344416e982e8ab688909973fbd9881851a3b98474dd4f7b3a9d08",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "line": 121,
+      "category": "absolute_path_candidate",
+      "match_sha256": "83a88ed3f2bca03ec2301f8e107ffd97843235fb99b1f9bdd9d34c85643ea3f6",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 15,
+      "category": "absolute_path_candidate",
+      "match_sha256": "532f153dcbf19e73a9cec1812f6cfa38bda059ab61be5caff03a7fc9e29e500d",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 28,
+      "category": "absolute_path_candidate",
+      "match_sha256": "9b983afe735272b96dc2a5c627d8695c5a78cf421715015cec19817be7cf9122",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 31,
+      "category": "absolute_path_candidate",
+      "match_sha256": "10d5b4f5e25d15f4fb615b5ec03c0519fcef8c80fbafa86864abe49d70a3ca83",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 56,
+      "category": "absolute_path_candidate",
+      "match_sha256": "36fd80c9924c72a7045bc12a7a3fa9c26ac11a2f8f406ac6bbf0776d5ee42121",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 58,
+      "category": "absolute_path_candidate",
+      "match_sha256": "09caaccab89386516f1253b02d77bca9246488dce86d5a7dba9b5dda46af24af",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 59,
+      "category": "absolute_path_candidate",
+      "match_sha256": "6b1fbd88a2d9885bf421154ce48adfc66ec2f8e416a9d7d41d873341cfff4289",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 86,
+      "category": "absolute_path_candidate",
+      "match_sha256": "efd5d67b4a7f4bc338fed833e588d5d019deda6791e3ec6a54dd6f06adaa960b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 87,
+      "category": "absolute_path_candidate",
+      "match_sha256": "efd5d67b4a7f4bc338fed833e588d5d019deda6791e3ec6a54dd6f06adaa960b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 95,
+      "category": "absolute_path_candidate",
+      "match_sha256": "efd5d67b4a7f4bc338fed833e588d5d019deda6791e3ec6a54dd6f06adaa960b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 96,
+      "category": "absolute_path_candidate",
+      "match_sha256": "efd5d67b4a7f4bc338fed833e588d5d019deda6791e3ec6a54dd6f06adaa960b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 96,
+      "category": "absolute_path_candidate",
+      "match_sha256": "bd8e7a07639a7c93908fd08dc84d03fa0b28a8613158b30dde3b70aab9980706",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 143,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 146,
+      "category": "absolute_path_candidate",
+      "match_sha256": "150c04cbdea9f22f3140c69357b9cd07ce513b33a663fcad6b9a7d5ff7245eed",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "line": 155,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 64,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 65,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 66,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 87,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 88,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 89,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 245,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 246,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 246,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 261,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 274,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 276,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 312,
+      "category": "ipv4",
+      "match_sha256": "12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "status": "LOOPBACK_UNSPECIFIED_OR_RFC5737_DOCUMENTATION",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 69,
+      "category": "absolute_path_candidate",
+      "match_sha256": "836fafb1e6d8c94222b39c75a5701f27577e033dc8c423224715d81966dd0977",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 87,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 88,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 89,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 138,
+      "category": "absolute_path_candidate",
+      "match_sha256": "836fafb1e6d8c94222b39c75a5701f27577e033dc8c423224715d81966dd0977",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 258,
+      "category": "absolute_path_candidate",
+      "match_sha256": "b352e308716fc37fbad4cab5f6b826df93cacb7b2985153b3b20d0274aa95c00",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 259,
+      "category": "absolute_path_candidate",
+      "match_sha256": "5410180754c3fd2ce46ec77a11299387fbe7a66139b9cb412d4569d53d500d30",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 260,
+      "category": "absolute_path_candidate",
+      "match_sha256": "206c8c49566c76112a80760951ddfc5c2c3e51e5c022ca36a0d9a45623250de9",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 268,
+      "category": "absolute_path_candidate",
+      "match_sha256": "93f304207981d108266931677a715357031dc85c3b39ddc5dd2052bd6b530794",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 287,
+      "category": "absolute_path_candidate",
+      "match_sha256": "8dd8e261871dd0e0d24a9ab10d40ec7488fe36f2f63ee96099e14b07b86873be",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 460,
+      "category": "absolute_path_candidate",
+      "match_sha256": "f6d904413d18e0acfcc69ba75512cbfa5ce32319a439c13a33b6cc2975ec1b54",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 467,
+      "category": "absolute_path_candidate",
+      "match_sha256": "50fca7038eee9c3698d50b20b0375dea75ef492c2e3d90b7a74057b9c39d553b",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 472,
+      "category": "absolute_path_candidate",
+      "match_sha256": "c55f678ea22d44f8734cb2dcce59418d91872d9ea66af654120a423e85150abe",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 472,
+      "category": "absolute_path_candidate",
+      "match_sha256": "418579ddb6b5c6759e8c21f412bd225032f8023319a6ce9b1ad9711e9418bb40",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 478,
+      "category": "absolute_path_candidate",
+      "match_sha256": "b10711273566c5db9ffad0bce6251930e6f4498179987fb58f8813c842cb5a06",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 482,
+      "category": "absolute_path_candidate",
+      "match_sha256": "46e0a21b8c08755683034e76b134a49c93e2c7283ab998ece4899eeb74529379",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 489,
+      "category": "absolute_path_candidate",
+      "match_sha256": "102ab60ee965c1c61283093870080d4559087d5d0b2cc8d8dafabfb949c2a44f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 507,
+      "category": "absolute_path_candidate",
+      "match_sha256": "49ff9019b0c07ca3fd01f7a1c5dd98e86ee88bb98e5a5ecfc0cca46177651894",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 564,
+      "category": "absolute_path_candidate",
+      "match_sha256": "af98009bb3fb40305a77c129da0f9caf94b740c09f65548418e8c39cabcfdc02",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 569,
+      "category": "absolute_path_candidate",
+      "match_sha256": "57ef70de356e885009c9139f8b9e4e3afa64987bea4f56624864e08e131a6a24",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "progress.md",
+      "line": 584,
+      "category": "absolute_path_candidate",
+      "match_sha256": "3f0e777b6d25154298a426e2041aad9353abd4b8a5f216668b1d30102d2ac42f",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "scripts/ecs_acceptance_job.py",
+      "line": 22,
+      "category": "absolute_path_candidate",
+      "match_sha256": "4ebada9b83f18a0152ff6a2c40370d8d05a2817ae95ef0da6a356e664129f75a",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "scripts/ecs_acceptance_job.py",
+      "line": 23,
+      "category": "absolute_path_candidate",
+      "match_sha256": "8d035e1d72651e5d7c26e5e339d200f9683fdf0f387fbb9e68c56bcd7d091044",
+      "status": "INHERITED_PUBLIC_PATH",
+      "inherited_from_public_baseline": true
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "line": 22,
+      "category": "credential_material",
+      "match_sha256": "310f116fad3b48501ec5ea4e8a880bf974eb943000e27070da2d718d3e6e25e9",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "line": 81,
+      "category": "credential_material",
+      "match_sha256": "310f116fad3b48501ec5ea4e8a880bf974eb943000e27070da2d718d3e6e25e9",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "line": 114,
+      "category": "credential_material",
+      "match_sha256": "310f116fad3b48501ec5ea4e8a880bf974eb943000e27070da2d718d3e6e25e9",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "line": 116,
+      "category": "credential_material",
+      "match_sha256": "310f116fad3b48501ec5ea4e8a880bf974eb943000e27070da2d718d3e6e25e9",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "line": 139,
+      "category": "credential_material",
+      "match_sha256": "310f116fad3b48501ec5ea4e8a880bf974eb943000e27070da2d718d3e6e25e9",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 31,
+      "category": "credential_material",
+      "match_sha256": "f672887d3597caa5d54cb4be6bea6d4d0d993b557253fe8ebe9e61b20e68568a",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 34,
+      "category": "credential_material",
+      "match_sha256": "f672887d3597caa5d54cb4be6bea6d4d0d993b557253fe8ebe9e61b20e68568a",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 44,
+      "category": "credential_material",
+      "match_sha256": "f672887d3597caa5d54cb4be6bea6d4d0d993b557253fe8ebe9e61b20e68568a",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 124,
+      "category": "credential_material",
+      "match_sha256": "6d2f851c88cf94eb94514b16d6bd7c1ceb15f1447cede75cc38258a79958b38e",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 143,
+      "category": "credential_material",
+      "match_sha256": "f672887d3597caa5d54cb4be6bea6d4d0d993b557253fe8ebe9e61b20e68568a",
+      "status": "SYNTHETIC_REDACTION_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 54,
+      "category": "credential_assignment",
+      "match_sha256": "dfe7ed3dca6c04829b439d6eef708640eb84e7618700f5663f089926b1fb99fe",
+      "status": "SYNTHETIC_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "line": 431,
+      "category": "credential_assignment",
+      "match_sha256": "de98858e30e441360c33c06443d00e766ff71bc61023965db78eb81aad0d62ae",
+      "status": "SYNTHETIC_TEST_LITERAL",
+      "inherited_from_public_baseline": false
+    }
+  ],
+  "blockers": [],
+  "inventory": [
+    {
+      "path": ".gitattributes",
+      "git_blob": "ec34aaf7bccdede1af9541eff2b8771c70bdaf1a",
+      "sha256": "29bf8f8081208771af3c02e150c23c03129590627de9b75c1233e57a21e71c1b",
+      "bytes": 1185
+    },
+    {
+      "path": "backend/weknora_port/development.py",
+      "git_blob": "77cde8791b1377817e27ce83b5bfe917248e8b5a",
+      "sha256": "d71fff2cb34d57cf927cb9fb016dd5bfbf3bbb309b64f416812e05e76315dbb3",
+      "bytes": 13501
+    },
+    {
+      "path": "backend/weknora_port/execution.py",
+      "git_blob": "a1ac93f04d9dd72c79cf2f94f6cf2ba4b63c9286",
+      "sha256": "e00ceddf4cd5a6bee18bc3af2df62a3b48f8206fe7e948ead3ca0198cc2e2134",
+      "bytes": 33688
+    },
+    {
+      "path": "backend/weknora_port/generation/assets/s865_candidate_v1.json",
+      "git_blob": "e8a521894d9a4f6dacb8f303611b41f5a9f4d1d8",
+      "sha256": "c96cb6edd96ccabf3bab685274e16460bf240a48b91b68842ac3624bbf588ba2",
+      "bytes": 1347
+    },
+    {
+      "path": "backend/weknora_port/generation/coordinator.py",
+      "git_blob": "cdeed3b60c3938c9dea05c11376840c1f2de4da8",
+      "sha256": "1aee246ad6b58b957a49e566f649b564524df1475ac2a9d92eb20b6a57b75037",
+      "bytes": 29188
+    },
+    {
+      "path": "backend/weknora_port/generation/prompt_candidate.py",
+      "git_blob": "6d1c9cd44248570f8352302325ddf1e92a200f2e",
+      "sha256": "568a68c6d5597869ca3d30dde555a76d5f327d7836a3d433547c4f977b884e53",
+      "bytes": 2380
+    },
+    {
+      "path": "backend/weknora_port/generation/types.py",
+      "git_blob": "3eb9bbc5f64ce415b781ac09b65abf27005a0679",
+      "sha256": "19d64e338df95f9fd4e35968e2cf219f7867aa996b20ad97b7f02ef92d984eef",
+      "bytes": 5666
+    },
+    {
+      "path": "backend/weknora_port/models/transport.py",
+      "git_blob": "6d452e968e3a7bcb61a681443e99e6d12a50a2f2",
+      "sha256": "f3a7cdb42bc8a3dfa06ef029698b918fa5ede65a5b4a7c3a68c43238fb34477b",
+      "bytes": 20492
+    },
+    {
+      "path": "backend/weknora_port/observability.py",
+      "git_blob": "44f7077a39f89e85ccb0dd79b03b5a9926fa54d6",
+      "sha256": "fa5b837c75a92bd2adb20dcd9c16b410375a02882ea1f23c16c486fdfc94a565",
+      "bytes": 21511
+    },
+    {
+      "path": "backend/weknora_port/runtime.py",
+      "git_blob": "467f35f8ab15f186c709246ca654493753c079ab",
+      "sha256": "be0387fb9584c0b5562c12c5bdc15847004b7215eb2fa3526f34b8880852d241",
+      "bytes": 61922
+    },
+    {
+      "path": "backend/weknora_port/service.py",
+      "git_blob": "4c15a51cec9071fe4541efdeb8a191419a5758b6",
+      "sha256": "1bed74fc4722f807840aa92b25a25e5d7b657b968e893c71f6d30ded45a8ddf3",
+      "bytes": 29856
+    },
+    {
+      "path": "backend/weknora_port/storage/history.py",
+      "git_blob": "b765f82f32246a7a992daa9a5e50bef18072f7c6",
+      "sha256": "8ea4de832c07056ac9c45e956c9395ff1a56c628c955908d03a52ae7acbed895",
+      "bytes": 8414
+    },
+    {
+      "path": "backend/weknora_port/streaming/replay.py",
+      "git_blob": "637090684c97ec4145f6418bbe587946bbb1fbb6",
+      "sha256": "541b35152328b45d3c498d8af281c0f6b9220a80b3430651c91a0fb3770de6ef",
+      "bytes": 5224
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "git_blob": "9095e3f98c51718643b0f6c7d2b46a04f6d129e5",
+      "sha256": "cf440f76b7fd2ab87714342d64877692609faa5e2306bcad2f5bfcad02406b93",
+      "bytes": 5360
+    },
+    {
+      "path": "deploy/s8/langfuse.env.example",
+      "git_blob": "972fe58a05105a35077dcdac106da1b03ee38b51",
+      "sha256": "41925665748860af71d7122f0535693c73236b7554fe883848f3cff5108c3493",
+      "bytes": 557
+    },
+    {
+      "path": "deploy/s8/requirements.txt",
+      "git_blob": "13d1b6dc7c685c61859fe6b6156b6bd93df259d4",
+      "sha256": "78018171941293f35b5e31a0a112478434610648748856f769cc0e146d611100",
+      "bytes": 454
+    },
+    {
+      "path": "docs/adr/ADR-005-langfuse-tracing.md",
+      "git_blob": "619a382f4f3ef615d0d67a9c57c003b415f7bb4c",
+      "sha256": "5c5f34102a824cbafb6bfcc2e3ab47db67e1967a70e9ed60d4db0f8ba9a19fa8",
+      "bytes": 4443
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "git_blob": "6f8b3b4013f71f301be7bf6c4e9019bf145e678e",
+      "sha256": "ade8339c6b1240ae5f06fb48cfbc0a9c3b2141c8c594937f6a883ce071ca7024",
+      "bytes": 11976
+    },
+    {
+      "path": "docs/deployment/ECS_FIXED_CAPACITY_STRATEGY.md",
+      "git_blob": "206eab6e64fb657b7589dcca30c76d6dd455e69f",
+      "sha256": "2d87c0838012175ebe95b10561d9f668265beb86146ac7bf7eacde00deccd3d1",
+      "bytes": 9671
+    },
+    {
+      "path": "docs/deployment/ECS_FIXED_CAPACITY_STRATEGY.results.json",
+      "git_blob": "914421a65c6e5ef4a09ee107cec763ee11f32f1c",
+      "sha256": "629ded61e1bc2131f57a3fcfbcba23ce10fd43160286d7587738935df1c88bcd",
+      "bytes": 6203
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_LANGFUSE_GENERATION_QUALITY.md",
+      "git_blob": "bded48709c831b37a0107bc5f11de2d4afc7eed5",
+      "sha256": "b4f638da9d4a6164a3979984ca53aa2ebeab12844bd940522d83628db5dfa00d",
+      "bytes": 21171
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_LANGFUSE_GENERATION_QUALITY.results.json",
+      "git_blob": "bdf105386a1638fb70aaaeaf6a1d1afa0af47dcc",
+      "sha256": "22af917f923028e66c3b49c764c3d48d95fcb01df571a5d7adfe2c6b940ccd06",
+      "bytes": 25860
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PRIVATE_EVIDENCE_HASHMANIFEST.json",
+      "git_blob": "0dd00c72a4c8c2c6d109f9a8459118a0e10262c7",
+      "sha256": "dcaa4887f840e0ceceec206e7ece9fb7b63b29cb599302176f4557fab2a93787",
+      "bytes": 43447
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PUBLICATION_AUDIT.json",
+      "git_blob": "064047e9dfa399d4945ddb031156ac680248601a",
+      "sha256": "c2803b9c6cc3b3aebad768cba9158e5765089b69e53c7abe027e93035ca01aff",
+      "bytes": 129272
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PUBLICATION_AUDIT.md",
+      "git_blob": "574b2f39223ed0e14bf4dfc778f2289d09a57a68",
+      "sha256": "26ed198c295838c5975790cbf06a5f21c22968732b41bcce583b87e5ff7d6289",
+      "bytes": 4115
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PUBLICATION_README.md",
+      "git_blob": "fe6964a670d69655b3c45a720ef4a30dcabd1ffd",
+      "sha256": "ee531f0a6e8efbad8b15d78d5b3f987c2d9076b6f3594971c8afbfb373f9165f",
+      "bytes": 1958
+    },
+    {
+      "path": "progress.md",
+      "git_blob": "53efdeebb0fa17458571a5441197eba685646d8a",
+      "sha256": "6593ec781fdacde233353baa2b28dc0844a6587428a751847cd97939528600d9",
+      "bytes": 122431
+    },
+    {
+      "path": "scripts/ecs_acceptance_job.py",
+      "git_blob": "d2f10d545e97378d5c886e13cb034e8315259409",
+      "sha256": "2098f2970a0e7948aee508ae81b9d067b1ac510ba3787c02872aeaa348fc9862",
+      "bytes": 26015
+    },
+    {
+      "path": "scripts/s8_6_5_generation_compare.py",
+      "git_blob": "e0d237f5ec73def2edfc950a3eae2deb026ac895",
+      "sha256": "d472e6e7b00bf72bb8e6e257d64317c3c64fdd7d6d8fe005db2e917aac43859d",
+      "bytes": 35065
+    },
+    {
+      "path": "scripts/s8_6_5_http_acceptance.py",
+      "git_blob": "816b6b32043a43c1a7c3bd82341536905ec42a4a",
+      "sha256": "a526f51590afe6e1a211d71cc9a2e141659abbacc337742cdb139128c6d4f592",
+      "bytes": 7225
+    },
+    {
+      "path": "scripts/s8_6_5_langfuse_probe.py",
+      "git_blob": "bd24c4f588aaff80c2670da52e6806777db3b8ce",
+      "sha256": "ac6d25599297c914f445fe88c58c630996061573fdae97f244c4a3cf04e0e676",
+      "bytes": 7842
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "git_blob": "ee9be3bda35c8bb982e9849b0791dc7823945496",
+      "sha256": "6668f2eb5df92f247bd9713aa4ae637ef4a99aaa364b6814fad6888d0ff6344d",
+      "bytes": 5446
+    },
+    {
+      "path": "tests/weknora_port/test_ecs_acceptance_job.py",
+      "git_blob": "d62a1d9e3b1f13277206ee0b90d9f61c76771afd",
+      "sha256": "d2d2413a9e7854fc8097dc49221c5ee51a1d147ea8e659f91d61dd34045e345b",
+      "bytes": 26956
+    },
+    {
+      "path": "tests/weknora_port/test_execution_fence.py",
+      "git_blob": "3a0dd47ac303594745e9448a64bbb0aebd25b01a",
+      "sha256": "fcb0cd22dc5a5845f1ecec661ea8a7e96312d81629ec4d637a1d76617cc64237",
+      "bytes": 27031
+    },
+    {
+      "path": "tests/weknora_port/test_generation_visibility.py",
+      "git_blob": "9c376cc2876c454d44cdbbc0973d7472c3fdf19f",
+      "sha256": "784055eb8bd8903ceb127248b997863e7aff6bf36722baa43ecfa235b8f66e6e",
+      "bytes": 3378
+    },
+    {
+      "path": "tests/weknora_port/test_s851_history_transform_ambiguity.py",
+      "git_blob": "48bfcc9fdb8cca964d7ca8866fd1bdf386afe8ad",
+      "sha256": "f635db07a180811c91cf01477f7edc278664a23f2895228f06051216269ef279",
+      "bytes": 5908
+    },
+    {
+      "path": "tests/weknora_port/test_s864_document_scope.py",
+      "git_blob": "a2d443c603bc9fea256154167d362d7c7763c5a6",
+      "sha256": "f7a7690cf8a51421cfd78a3b4c8035514ad5be14d0b317cb151e95f716510469",
+      "bytes": 16943
+    },
+    {
+      "path": "tests/weknora_port/test_s865_empty_evidence_reason.py",
+      "git_blob": "f3c72755d593b7c45883c13abb15f13b255997c5",
+      "sha256": "58ae51c8fed7103fece0f8b228085069ce0fb42d5c4f3122f46369d3f3fd6cf1",
+      "bytes": 3679
+    },
+    {
+      "path": "tests/weknora_port/test_s865_generation_compare.py",
+      "git_blob": "0af21ae6e3f5e59b7498a5697c098537c21020f2",
+      "sha256": "d51a72b93ab74ea075d53c6a982f542fc8e85d9e4783c01cc7003510d596f5d2",
+      "bytes": 16349
+    },
+    {
+      "path": "tests/weknora_port/test_s865_generation_quality.py",
+      "git_blob": "290963c56ce35f921612954f69ae2e2916881e13",
+      "sha256": "8340881e2600617b20b8cbdf19b169c6a1434963852be6766c97fdc9f3b58dc4",
+      "bytes": 7840
+    },
+    {
+      "path": "tests/weknora_port/test_s865_http_profile.py",
+      "git_blob": "ec582ad8c3cb318ce2fb9b5a7ed6364a6881780a",
+      "sha256": "aad2e8d77704019dda6282c9e918e0a0ed7280804fcc4a243d369469daecf793",
+      "bytes": 3491
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "git_blob": "dd4d38132885f35738c5a7c3b9f65a86990a6336",
+      "sha256": "526a43065c4b15860df276200f1331e0faf94b5432fd98e435c064bb30a63b33",
+      "bytes": 24604
+    },
+    {
+      "path": "tests/weknora_port/test_s865_prompt_candidate.py",
+      "git_blob": "70d91efb3a94fe57ccb14eecf4662130a60a1797",
+      "sha256": "2f0b86b17eef085a649167f22c816157cda570f9e8d45305b6f74a2e8487aaee",
+      "bytes": 3068
+    },
+    {
+      "path": "tests/weknora_port/test_s865_quality_persistence.py",
+      "git_blob": "2053e926d12f72e9d7bc7ce734148dc1df3bbcf2",
+      "sha256": "21c9cb26dd76b084f566322a70240e3ac5ac954eb0a012f7b45d7e9524261252",
+      "bytes": 3665
+    }
+  ],
+  "source_mapping": [
+    {
+      "path": ".gitattributes",
+      "published_git_blob": "ec34aaf7bccdede1af9541eff2b8771c70bdaf1a",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "ec34aaf7bccdede1af9541eff2b8771c70bdaf1a",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/development.py",
+      "published_git_blob": "77cde8791b1377817e27ce83b5bfe917248e8b5a",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "77cde8791b1377817e27ce83b5bfe917248e8b5a",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/execution.py",
+      "published_git_blob": "a1ac93f04d9dd72c79cf2f94f6cf2ba4b63c9286",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "a1ac93f04d9dd72c79cf2f94f6cf2ba4b63c9286",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/generation/assets/s865_candidate_v1.json",
+      "published_git_blob": "e8a521894d9a4f6dacb8f303611b41f5a9f4d1d8",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "e8a521894d9a4f6dacb8f303611b41f5a9f4d1d8",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/generation/coordinator.py",
+      "published_git_blob": "cdeed3b60c3938c9dea05c11376840c1f2de4da8",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "cdeed3b60c3938c9dea05c11376840c1f2de4da8",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/generation/prompt_candidate.py",
+      "published_git_blob": "6d1c9cd44248570f8352302325ddf1e92a200f2e",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "6d1c9cd44248570f8352302325ddf1e92a200f2e",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/generation/types.py",
+      "published_git_blob": "3eb9bbc5f64ce415b781ac09b65abf27005a0679",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "3eb9bbc5f64ce415b781ac09b65abf27005a0679",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/models/transport.py",
+      "published_git_blob": "6d452e968e3a7bcb61a681443e99e6d12a50a2f2",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "6d452e968e3a7bcb61a681443e99e6d12a50a2f2",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/observability.py",
+      "published_git_blob": "44f7077a39f89e85ccb0dd79b03b5a9926fa54d6",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "44f7077a39f89e85ccb0dd79b03b5a9926fa54d6",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/runtime.py",
+      "published_git_blob": "467f35f8ab15f186c709246ca654493753c079ab",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "467f35f8ab15f186c709246ca654493753c079ab",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/service.py",
+      "published_git_blob": "4c15a51cec9071fe4541efdeb8a191419a5758b6",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "4c15a51cec9071fe4541efdeb8a191419a5758b6",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/storage/history.py",
+      "published_git_blob": "b765f82f32246a7a992daa9a5e50bef18072f7c6",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "b765f82f32246a7a992daa9a5e50bef18072f7c6",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "backend/weknora_port/streaming/replay.py",
+      "published_git_blob": "637090684c97ec4145f6418bbe587946bbb1fbb6",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "637090684c97ec4145f6418bbe587946bbb1fbb6",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "deploy/s8/compose.yml",
+      "published_git_blob": "9095e3f98c51718643b0f6c7d2b46a04f6d129e5",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "9095e3f98c51718643b0f6c7d2b46a04f6d129e5",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "deploy/s8/langfuse.env.example",
+      "published_git_blob": "972fe58a05105a35077dcdac106da1b03ee38b51",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "972fe58a05105a35077dcdac106da1b03ee38b51",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "deploy/s8/requirements.txt",
+      "published_git_blob": "13d1b6dc7c685c61859fe6b6156b6bd93df259d4",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "13d1b6dc7c685c61859fe6b6156b6bd93df259d4",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "docs/adr/ADR-005-langfuse-tracing.md",
+      "published_git_blob": "619a382f4f3ef615d0d67a9c57c003b415f7bb4c",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "619a382f4f3ef615d0d67a9c57c003b415f7bb4c",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "docs/deployment/ECS_ACCEPTANCE_BACKGROUND_JOBS.md",
+      "published_git_blob": "6f8b3b4013f71f301be7bf6c4e9019bf145e678e",
+      "source_ref": "46be011ae242c0691e6864eeeef88d0cde81d6dc",
+      "source_git_blob": "6f8b3b4013f71f301be7bf6c4e9019bf145e678e",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "docs/deployment/ECS_FIXED_CAPACITY_STRATEGY.md",
+      "published_git_blob": "206eab6e64fb657b7589dcca30c76d6dd455e69f",
+      "source_ref": null,
+      "source_git_blob": "ef133d6c08a0c1e836f8f8818a46c5cfff00ab54",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/deployment/ECS_FIXED_CAPACITY_STRATEGY.results.json",
+      "published_git_blob": "914421a65c6e5ef4a09ee107cec763ee11f32f1c",
+      "source_ref": null,
+      "source_git_blob": "2f9c782ebff6f91926f98b116ff4aaf8a9e274c1",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_LANGFUSE_GENERATION_QUALITY.md",
+      "published_git_blob": "bded48709c831b37a0107bc5f11de2d4afc7eed5",
+      "source_ref": null,
+      "source_git_blob": "05a8f1a6385008103143deb5c7558283807be5dd",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_LANGFUSE_GENERATION_QUALITY.results.json",
+      "published_git_blob": "bdf105386a1638fb70aaaeaf6a1d1afa0af47dcc",
+      "source_ref": null,
+      "source_git_blob": "91bedd75bf1d0e15924b12f996c3e5f2c1a7756d",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PRIVATE_EVIDENCE_HASHMANIFEST.json",
+      "published_git_blob": "0dd00c72a4c8c2c6d109f9a8459118a0e10262c7",
+      "source_ref": null,
+      "source_git_blob": null,
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PUBLICATION_AUDIT.json",
+      "published_git_blob": "064047e9dfa399d4945ddb031156ac680248601a",
+      "source_ref": null,
+      "source_git_blob": null,
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PUBLICATION_AUDIT.md",
+      "published_git_blob": "574b2f39223ed0e14bf4dfc778f2289d09a57a68",
+      "source_ref": null,
+      "source_git_blob": null,
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "docs/evaluation/S8_6_5_R_PUBLICATION_README.md",
+      "published_git_blob": "fe6964a670d69655b3c45a720ef4a30dcabd1ffd",
+      "source_ref": null,
+      "source_git_blob": null,
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "progress.md",
+      "published_git_blob": "53efdeebb0fa17458571a5441197eba685646d8a",
+      "source_ref": null,
+      "source_git_blob": "12bb5bfca87fa4bc966a5cf4adf7199745549d59",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "scripts/ecs_acceptance_job.py",
+      "published_git_blob": "d2f10d545e97378d5c886e13cb034e8315259409",
+      "source_ref": "46be011ae242c0691e6864eeeef88d0cde81d6dc",
+      "source_git_blob": "d2f10d545e97378d5c886e13cb034e8315259409",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "scripts/s8_6_5_generation_compare.py",
+      "published_git_blob": "e0d237f5ec73def2edfc950a3eae2deb026ac895",
+      "source_ref": null,
+      "source_git_blob": "67ba00ca8740cbf4925703aa1968779b76e1f647",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "scripts/s8_6_5_http_acceptance.py",
+      "published_git_blob": "816b6b32043a43c1a7c3bd82341536905ec42a4a",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "816b6b32043a43c1a7c3bd82341536905ec42a4a",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "scripts/s8_6_5_langfuse_probe.py",
+      "published_git_blob": "bd24c4f588aaff80c2670da52e6806777db3b8ce",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "bd24c4f588aaff80c2670da52e6806777db3b8ce",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/test_s8_6_5_langfuse_probe.py",
+      "published_git_blob": "ee9be3bda35c8bb982e9849b0791dc7823945496",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "ee9be3bda35c8bb982e9849b0791dc7823945496",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_ecs_acceptance_job.py",
+      "published_git_blob": "d62a1d9e3b1f13277206ee0b90d9f61c76771afd",
+      "source_ref": "46be011ae242c0691e6864eeeef88d0cde81d6dc",
+      "source_git_blob": "d62a1d9e3b1f13277206ee0b90d9f61c76771afd",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_execution_fence.py",
+      "published_git_blob": "3a0dd47ac303594745e9448a64bbb0aebd25b01a",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "3a0dd47ac303594745e9448a64bbb0aebd25b01a",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_generation_visibility.py",
+      "published_git_blob": "9c376cc2876c454d44cdbbc0973d7472c3fdf19f",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "9c376cc2876c454d44cdbbc0973d7472c3fdf19f",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s851_history_transform_ambiguity.py",
+      "published_git_blob": "48bfcc9fdb8cca964d7ca8866fd1bdf386afe8ad",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "48bfcc9fdb8cca964d7ca8866fd1bdf386afe8ad",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s864_document_scope.py",
+      "published_git_blob": "a2d443c603bc9fea256154167d362d7c7763c5a6",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "a2d443c603bc9fea256154167d362d7c7763c5a6",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_empty_evidence_reason.py",
+      "published_git_blob": "f3c72755d593b7c45883c13abb15f13b255997c5",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "f3c72755d593b7c45883c13abb15f13b255997c5",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_generation_compare.py",
+      "published_git_blob": "0af21ae6e3f5e59b7498a5697c098537c21020f2",
+      "source_ref": null,
+      "source_git_blob": "41482f6bd1eafc2915062fd3d3511578f60e94a0",
+      "disposition": "SANITIZED_OR_PUBLICATION_ONLY"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_generation_quality.py",
+      "published_git_blob": "290963c56ce35f921612954f69ae2e2916881e13",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "290963c56ce35f921612954f69ae2e2916881e13",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_http_profile.py",
+      "published_git_blob": "ec582ad8c3cb318ce2fb9b5a7ed6364a6881780a",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "ec582ad8c3cb318ce2fb9b5a7ed6364a6881780a",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_observability.py",
+      "published_git_blob": "dd4d38132885f35738c5a7c3b9f65a86990a6336",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "dd4d38132885f35738c5a7c3b9f65a86990a6336",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_prompt_candidate.py",
+      "published_git_blob": "70d91efb3a94fe57ccb14eecf4662130a60a1797",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "70d91efb3a94fe57ccb14eecf4662130a60a1797",
+      "disposition": "EXACT_SOURCE_BLOB"
+    },
+    {
+      "path": "tests/weknora_port/test_s865_quality_persistence.py",
+      "published_git_blob": "2053e926d12f72e9d7bc7ce734148dc1df3bbcf2",
+      "source_ref": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+      "source_git_blob": "2053e926d12f72e9d7bc7ce734148dc1df3bbcf2",
+      "disposition": "EXACT_SOURCE_BLOB"
+    }
+  ],
+  "limitations": [
+    "Focused static publication sensitivity review, not a full security audit",
+    "No live credential validity checks or provider calls",
+    "Existing public ancestor exposure cannot be removed by this successor",
+    "Final report files are scanned but excluded from their own recursive hash inventory",
+    "Push and Tag are coordinated separately by root"
+  ]
+}

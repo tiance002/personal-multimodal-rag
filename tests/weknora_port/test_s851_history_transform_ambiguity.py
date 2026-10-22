@@ -98,6 +98,7 @@ def test_actual_prepare_turn_retrieves_after_format_then_clarifies_without_model
         accepted = await repo.accept(replace(REQ, content=Q0), 'owner')
         prepared = await service.prepare_turn(accepted)
         assert prepared.request.fixed_fallback
+        assert prepared.request.evidence_insufficient is False
         assert prepared.request.evidence == prepared.request.history == ()
         assert prepared.request.memory_prompt == ''
         assert prepared.request.finalized.result_ids == ()

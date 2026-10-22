@@ -240,6 +240,9 @@ class RuntimeService:
             StreamEvent(accepted.run_id,'complete',data={'status':'cancelled' if isinstance(error,(CallCancelled,asyncio.CancelledError)) else 'failed','error_code':code}))
 
     async def _progress(self, turn, stage, status, **fields):
+        observer = getattr(getattr(self, 'application', None), 'observability', None)
+        if observer is not None:
+            observer._safe('PROGRESS', lambda: observer.stage(turn.run_id, stage, status, fields))
         safe={k:v for k,v in fields.items() if k in ('candidate_count','selected_evidence_count') and type(v) is int and v>=0}
         if stage == 'understand':
             for key in ('q0_sha256', 'rewrite_sha256'):
@@ -301,6 +304,8 @@ class RuntimeService:
         config=await _resolve(self.configuration(turn))
         if not isinstance(config,TurnConfiguration) or not isinstance(config.pipeline_state,PipelineState):
             raise ProviderError('TURN_CONFIGURATION_REQUIRED')
+        if 'evidence_insufficient' in config.generation_options:
+            raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
         state=config.pipeline_state
         # q0 and identities are server admission values, not mutable config.
         state.query=turn.request.content
@@ -365,6 +370,7 @@ class RuntimeService:
         pipeline=await _resolve(self.pipeline_factory(turn,progress))
         from .retrieval.query import requires_ambiguity_clarification
         fallback=None
+        evidence_insufficient=False
         try:
             finalized=await pipeline.run(state,model_context)
         except SearchNothing:
@@ -376,6 +382,7 @@ class RuntimeService:
             else:
                 if config.fallback is None:raise
                 fallback=dict(config.fallback)
+                evidence_insufficient=True
                 query=go_strip(state.rewrite_query) or state.query
                 prompt=fallback['prompt']
                 if fallback['strategy']=='model' and prompt!='':
@@ -405,6 +412,7 @@ class RuntimeService:
                                       'reason':'AMBIGUOUS_REFERENCE','facts_admitted':0})
             history=()
             fallback=None
+            evidence_insufficient=False
             if hasattr(pipeline,'_progress'):
                 await pipeline._progress('context','completed',selected_evidence_count=0)
         check_context(turn.context)
@@ -426,14 +434,14 @@ class RuntimeService:
         options.setdefault('language',state.language)
         options.setdefault('supports_vision',state.chat_model_supports_vision)
         options.setdefault('faq_priority_enabled',state.faq_priority_enabled)
-        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding','on_context_prepared'} & options.keys()
+        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding','on_context_prepared','evidence_insufficient'} & options.keys()
         if forbidden:
             raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
         if getattr(state, 'retrieval_strategy_mode', 'off') == 'query_structure_v1':
             from .retrieval.strategy_executor import record_delivered_coverage
             options['on_context_prepared'] = lambda prepared: record_delivered_coverage(state, prepared)
         request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
-            evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,**options)
+            evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,evidence_insufficient=evidence_insufficient,**options)
         if getattr(state, 'rescue_evidence', ()):
             from .generation.context import prepare_generation
             from .retrieval.types import ContextBudgetError

@@ -1,0 +1,7 @@
+{
+  "version": "s8.6.5-generation-candidate/v1",
+  "status": "OFFLINE_CANDIDATE_NOT_PRODUCTION_DEFAULT",
+  "baseline_prompt_b_suffix": "When the supplied evidence contains sufficient information, perform the necessary verifiable calculation or logical inference instead of refusing solely because the result is not stated verbatim.\nDistinguish derived conclusions from directly stated facts. Do not invent missing inputs, entities, dates, locations, or relationships. If the evidence does not support a required relation, explicitly state the uncertainty.",
+  "baseline_prompt_b_suffix_sha256": "4501caef3b4b0d5b0de09e00e51d1ca9d50332637637e52ffc45ee90e2dc726b",
+  "suffix": "Source fidelity:\nPreserve source conditions, exceptions and required step order; do not broaden a conditional instruction into a general recommendation.\nPreserve entity distinctions, names, numbers, units and category/value associations. Do not substitute an unverified alias or silently repair unclear source wording.\nKeep each claim within the support and scope of its source; omit unsupported rankings, assurances and extra factual claims.\nAttach the supplied source citation to each factual claim or closely related group of claims it supports, using the existing citation protocol. If the sources cannot support the requested answer, state the specific gap."
+}

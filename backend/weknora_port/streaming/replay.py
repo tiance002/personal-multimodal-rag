@@ -29,6 +29,50 @@ class FinalCommit:
     answer: str
     references: Any
     usage: dict[str, Any] | None = None
+    quality: dict[str, Any] | None = None
+
+
+def validate_final_quality(value):
+    """A content-free observation; never a semantic-support or routing verdict."""
+    if (not isinstance(value, dict) or set(value) != {'citation_quality', 'generation_issues'}
+            or not isinstance(value['citation_quality'], dict)):
+        raise ValueError('FINAL_QUALITY_INVALID')
+    citation = value['citation_quality']
+    fields = {'status', 'valid_handle_count', 'invalid_handle_count', 'usable_evidence_count',
+              'assessment_complete', 'semantic_support'}
+    if (set(citation) != fields or citation['status'] not in
+            {'VALID', 'INVALID', 'MISSING', 'EVIDENCE_INSUFFICIENT', 'NOT_REQUIRED', 'NOT_ASSESSED'}
+            or citation['semantic_support'] != 'NOT_ASSESSED'
+            or type(citation['assessment_complete']) is not bool
+            or any(type(citation[k]) is not int or citation[k] < 0 for k in
+                   ('valid_handle_count', 'invalid_handle_count', 'usable_evidence_count'))
+            or not isinstance(value['generation_issues'], list)
+            or any(not isinstance(x,str) or x not in {'EMPTY', 'TRUNCATED', 'INVALID_HANDLES', 'MISSING_CITATIONS'}
+                   for x in value['generation_issues'])):
+        raise ValueError('FINAL_QUALITY_INVALID')
+    return value
+
+
+def project_final_quality(row):
+    """Project only a new, exact-run record; historical absence stays unknown."""
+    if (row.get('role') != 'assistant' or row.get('is_completed') is not True
+            or not isinstance(row.get('request_id'),str) or not row['request_id']
+            or row.get('turn_status') in ('error', 'cancelled')):
+        return row
+    steps = row.get('agent_steps')
+    if not isinstance(steps, list):
+        return row
+    matched = [step for step in steps if isinstance(step, dict)
+               and step.get('type') == 'generation_quality'
+               and step.get('request_id') == row.get('request_id')]
+    if len(matched) != 1:
+        return row
+    try:
+        quality = validate_final_quality({k:v for k,v in matched[0].items()
+                                          if k not in ('type', 'request_id')})
+    except ValueError:
+        return row
+    return {**row, **quality}
 
 
 class FinalCommitter(Protocol):

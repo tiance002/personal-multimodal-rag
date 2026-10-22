@@ -111,6 +111,11 @@ class LeasedSendGate:
     def __init__(self, application):
         self.application = application
 
+    def observe_error(self, call, error):
+        observer = getattr(self.application, 'observability', None)
+        if observer is not None:
+            observer._safe('PROVIDER_ERROR', lambda: observer.provider_error(call, error))
+
     async def authorize(self, call):
         app = self.application
         scope = call.context.scope
@@ -167,10 +172,15 @@ class LeasedSendGate:
                      call.context.session_id, call.provider, call.model, call.model_id, call.wire_sha256))).fetchall()
                 if not claimed:
                     raise ProviderError('MODEL_CALL_ID_REUSE_DENIED')
+        observer = getattr(app, 'observability', None)
+        if observer is not None:
+            observer._safe('PROVIDER_START', lambda: observer.provider_started(call,
+                cloud_consented=bool(rows) and all(row['cloud_allowed'] for row in rows)))
 
     async def finish(self, call, *, outcome, usage):
         from dataclasses import asdict
         app = self.application
+        settled, settlement_error = False, None
         try:
             async with asyncio.timeout(10):
                 async with app.leases.lease() as guard:
@@ -179,16 +189,24 @@ class LeasedSendGate:
                         'WHERE tenant_id=%s AND subject_id=%s AND request_id=%s AND capability=%s AND wire_sha256=%s AND finished_at IS NULL RETURNING request_id',
                         (outcome, json.dumps(asdict(usage)), app.principal.tenant_id,
                          call.context.scope.owner_id, call.context.request_id, call.capability, call.wire_sha256))).fetchall()
-                    return len(rows) == 1
+                    settled = len(rows) == 1
+                    return settled
         except asyncio.CancelledError:
+            settlement_error = 'CANCELLED'
             raise
         except Exception as exc:
+            settlement_error = 'PERSISTENCE_FAILED'
             # Preserve the durable UNKNOWN claim and the successful answer.
             # Ordinary mode preserves the answer; bounded mode requires True.
             import logging
             logging.getLogger(__name__).error('PROVIDER_USAGE_RECORD_FAILED request_id=%s error=%s',
                                              call.context.request_id, type(exc).__name__)
             return False
+        finally:
+            observer = getattr(app, 'observability', None)
+            if observer is not None:
+                observer._safe('PROVIDER_FINISH', lambda: observer.provider_finished(call, outcome=outcome,
+                    usage=usage, settlement_success=settled, settlement_error=settlement_error))
 
 
 class LeasedLifecycle:
@@ -263,15 +281,24 @@ class BoundOrdinaryService(RuntimeService):
     def __init__(self, application, *args, **kwargs):
         self.application = application
         super().__init__(*args, **kwargs)
+        self._bound_active = set()
 
     async def run_turn(self, turn):
+        self._validate(turn)
+        key = self._key(turn)
+        if turn.replay_only or key in self._active or key in self._bound_active:
+            return None
+        self._bound_active.add(key)
+        trace, result, terminal = None, None, None
         try:
+            trace = await self.application._start_turn_trace(turn)
             result = await super().run_turn(turn)
             succeeded=False
             if result is not None:
                 rows=await self.application._rows("SELECT status,error_code FROM port_turns WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND run_id=%s",
                     (self.application.principal.tenant_id,self.application.principal.subject_id,turn.session_id,turn.run_id))
-                succeeded=len(rows)==1 and rows[0]['status']=='completed' and not rows[0]['error_code']
+                terminal = rows[0] if len(rows) == 1 else None
+                succeeded=terminal is not None and terminal['status']=='completed' and not terminal['error_code']
             if succeeded:
                 try:
                     await self.application.record_turn_memory(turn,result)
@@ -279,9 +306,29 @@ class BoundOrdinaryService(RuntimeService):
                     self.application.memory_hook_errors.append(type(exc).__name__)
             return result
         finally:
-            state = self.application._runs.pop(turn.run_id, None)
-            if state is not None:
-                await state["registry"].close()
+            try:
+                observer = getattr(self.application, 'observability', None)
+                if trace is not None and observer is not None:
+                    if terminal is None:
+                        try:
+                            rows = await self.application._rows('SELECT status,error_code FROM port_turns WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND run_id=%s',
+                                (self.application.principal.tenant_id, self.application.principal.subject_id, turn.session_id, turn.run_id))
+                            terminal = rows[0] if len(rows) == 1 else None
+                        except asyncio.CancelledError:
+                            observer._safe('TURN_FINISH', lambda: observer.finish_turn(trace,
+                                status='UNKNOWN', error_code='CANCELLED'))
+                            raise
+                        except Exception:
+                            observer._warn('TURN_STATUS_UNAVAILABLE')
+                    observer._safe('TURN_FINISH', lambda: observer.finish_turn(trace, result=result,
+                        status=terminal['status'] if terminal else 'UNKNOWN', error_code=terminal.get('error_code') if terminal else None))
+            finally:
+                try:
+                    state = self.application._runs.pop(turn.run_id, None)
+                    if state is not None:
+                        await state["registry"].close()
+                finally:
+                    self._bound_active.discard(key)
 
 
 class ApplicationRuntime:
@@ -294,13 +341,15 @@ class ApplicationRuntime:
     """
     def __init__(self, leases, principal, store, documents, *, model_factory,
                  cipher: SecretCipher, conversation=None, policy=None,
-                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None,token_authority=None,cloud_allowed=False):
+                 estimator=None, tokenizer_asset=None, memory_enqueuer=None, permissions=None, costs=None, catalogue=None, local_service=None,token_authority=None,cloud_allowed=False,observability=None):
         self.leases, self.principal = leases, principal
         self.store, self.documents = store, documents
         self.cipher, self.catalogue = cipher, catalogue or SourceCatalogue()
         self.model_factory, self.permissions, self.costs = model_factory, permissions, costs
         self.token_authority=None  # P31: legacy argument never controls production sends
         self.cloud_allowed=cloud_allowed
+        from .observability import LangfuseObservability
+        self.observability = observability if observability is not None else LangfuseObservability()
         self.graph_enabled=False  # Explicit development setting only; never inferred from old graph placeholders.
         self.local_service=local_service
         self.conversation = conversation or ConversationSettings()
@@ -349,6 +398,23 @@ class ApplicationRuntime:
             self, self.turns, store, self.history, OrdinaryMemoryLoader(self.memory, self.memory_models.origin_knowledge_bases),
             configuration=self._configuration, pipeline_factory=self._pipeline,
             generation_factory=self._generation, document_clarifier=self._document_scope_clarification)
+
+    async def _start_turn_trace(self, turn):
+        observer = getattr(self, 'observability', None)
+        if observer is None or not observer.enabled: return None
+        try:
+            async with self.leases.lease() as guard:
+                await self.turns._session(guard, turn.session_id, self.principal)
+                await self.turns._resources(guard, turn.context.scope.knowledge_base_ids, turn.context.scope.document_ids)
+                rows = await (await guard.connection.execute(
+                    'SELECT id,cloud_allowed FROM knowledge_bases WHERE tenant_id=%s AND id=ANY(%s) AND deleted_at IS NULL',
+                    (self.principal.tenant_id, list(turn.context.scope.knowledge_base_ids)))).fetchall()
+            consented = bool(rows) and {r['id'] for r in rows} == set(turn.context.scope.knowledge_base_ids) and all(r['cloud_allowed'] for r in rows)
+            if not consented: observer._warn('TURN_SCOPE_EGRESS_DENIED')
+            return observer.begin_turn(turn, cloud_consented=consented)
+        except Exception:
+            observer._warn('TURN_PERMISSION_UNAVAILABLE')
+            return None
 
     async def _make_model(self,config,key,gate):
         from .models.local_ollama import local_connection_config
@@ -487,10 +553,28 @@ class ApplicationRuntime:
                 "AND (%s::boolean OR id=ANY(%s)) ORDER BY knowledge_base_id,title,id",
                 (self.principal.tenant_id,list(turn.context.scope.knowledge_base_ids),not bool(documents),list(documents)))).fetchall()
         if len(rows)<=1:return None
-        # A unique literal persisted title or filename establishes identity for
-        # this question. It never changes the session's explicit ID selection.
-        literal=query.strip().casefold()
-        named={row['id'] for row in rows if any(value and value.strip() and value.strip().casefold() in literal
+        # A distinctive literal or an explicitly named title establishes
+        # identity. Short labels and ordinary words require a naming marker;
+        # incidental question text must not silently resolve ambiguity.
+        def title_matches(value):
+            if not value or not value.strip():return False
+            name=value.strip()
+            bounded=r'(?<![A-Za-z0-9_])'+re.escape(name)+r'(?![A-Za-z0-9_])'
+            if not re.search(bounded,query,re.I):return False
+            for left,right in (('《','》'),('「','」'),('“','”'),('"','"'),("'","'"),('‘','’')):
+                if re.search(re.escape(left)+r'\s*'+re.escape(name)+r'\s*'+re.escape(right),query,re.I):return True
+            kind=r'(?:文档|文件|规范|标准|报告|课件|PPT|\b(?:document|file|specification|standard|report|presentation)\b)'
+            if re.search(kind+r'\s*(?:名为|名称为|叫做|named\b|called\b|[:：])\s*'+bounded,query,re.I):return True
+            # Direct labels such as "document B" are explicit identities too.
+            # Case matters here: a lower-case ordinary word after "document"
+            # (for example "document date") is not a naming declaration.
+            if name[0].isupper() and re.search(r'(?i:'+kind+r')\s*'+bounded,query):return True
+            if re.fullmatch(r'[\u3400-\u9fff]+',name) and re.search(kind+r'\s+'+bounded,query,re.I):return True
+            # Names with numbers/punctuation and multiword Latin titles can
+            # stand alone. Plain single words/CJK phrases need explicit naming.
+            return bool(re.search(r'[0-9._—-]',name) or
+                        len(re.findall(r'[A-Za-z]+',name))>=2)
+        named={row['id'] for row in rows if any(title_matches(value)
             for value in (row.get('title'),row.get('file_name')))}
         if len(named)==1:return None
         # Persist the real catalog in the ordinary answer, so choices also
@@ -513,7 +597,7 @@ class ApplicationRuntime:
         self._owner(principal)
         async with self.leases.lease() as guard:
             await self.turns._session(guard, session_id, principal)
-            return await (await guard.connection.execute(
+            rows = await (await guard.connection.execute(
                 "SELECT m.id,m.request_id,m.role,m.content,m.created_at,m.knowledge_references,m.agent_steps,m.is_completed,m.turn_status,"
                 "m.turn_error_code,m.knowledge_base_scope,m.document_scope,"
                 "g.finish_reason,COALESCE(g.objective,'[]'::jsonb) AS generation_issues FROM messages m "
@@ -527,6 +611,8 @@ class ApplicationRuntime:
                 "AND a.status IN ('COMPLETED','TRUNCATED') ORDER BY a.ordinal DESC LIMIT 1) g ON true "
                 "WHERE m.tenant_id=%s AND m.subject_id=%s AND m.session_id=%s AND m.deleted_at IS NULL "
                 "ORDER BY m.created_at,m.id", (principal.tenant_id, principal.subject_id, session_id))).fetchall()
+        from .streaming.replay import project_final_quality
+        return [project_final_quality(row) for row in rows]
 
     async def _snapshot(self, guard):
         configuration = PostgresModelRoleStore(
@@ -598,6 +684,12 @@ class ApplicationRuntime:
             context_template=summary.get('context_template', DEFAULT_CONTEXT_TEMPLATE),
             intent_system_prompts=effective['intent_system_prompts'],
             global_intent_system_prompts=effective['global_intent_system_prompts'])
+        observer = getattr(self, 'observability', None)
+        if observer is not None:
+            observer._safe('CONFIGURATION', lambda: observer.annotate(router_mode=self.policy.mode,
+                **{name: getattr(state, name) for name in ('retrieval_strategy_mode', 'source_evidence_mode',
+                    'enable_rewrite', 'enable_expansion', 'rerank_top1_floorless', 'rerank_context_enabled',
+                    'bridge_rescue_mode', 'chat_model_id', 'query_understand_model_id', 'rerank_model_id', 'vlm_model_id')}))
         return TurnConfiguration(state, {"policy": self.policy,
             "system_prompt": summary.get('prompt', DEFAULT_SYSTEM_PROMPT),
             "options": resolved_chat_options(summary, turn.request.reasoning_effort)},
@@ -810,9 +902,13 @@ class ApplicationRuntime:
         if callable(start):await start()
 
     async def stop_background_workers(self):
-        await self.image_tasks.stop()
-        stop=getattr(self.memory_enqueuer,'stop',None)
-        if callable(stop):await stop()
+        try:
+            await self.image_tasks.stop()
+            stop=getattr(self.memory_enqueuer,'stop',None)
+            if callable(stop):await stop()
+        finally:
+            observer = getattr(self, 'observability', None)
+            if observer is not None: await observer.shutdown()
 
     async def drain_background(self):
         await self.ordinary.drain_background()

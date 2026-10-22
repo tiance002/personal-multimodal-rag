@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ..models.types import TrustedScope
-from ..streaming.replay import AssistantRun, FinalCommit
+from ..streaming.replay import AssistantRun, FinalCommit, validate_final_quality
 from .postgres import PostgresRetriever
 
 
@@ -88,28 +88,42 @@ class PostgresHistoryRepository:
         self.repository.require_verified()
         references = json.dumps(commit.references, ensure_ascii=False, allow_nan=False)
         usage = json.dumps(commit.usage, allow_nan=False)
+        quality = validate_final_quality(commit.quality) if commit.quality is not None else None
         async with self.repository.connection.transaction():
             # Serialize with session deletion as well as repeated final callbacks.
             sessions = await self._rows("SELECT id FROM sessions WHERE id=%s AND tenant_id=%s "
                 "AND subject_id=%s AND deleted_at IS NULL FOR UPDATE", (commit.session_id, *self._owner()))
             if len(sessions) != 1:
                 raise LookupError("SESSION_NOT_FOUND")
-            rows = await self._rows("SELECT content,knowledge_references,usage,is_completed FROM messages "
+            quality_columns = ',agent_steps' if quality is not None else ''
+            rows = await self._rows("SELECT content,knowledge_references,usage,is_completed" + quality_columns + " FROM messages "
                 "WHERE session_id=%s AND id=%s AND request_id=%s AND tenant_id=%s AND subject_id=%s "
                 "AND role='assistant' AND deleted_at IS NULL FOR UPDATE",
                 (commit.session_id, commit.message_id, commit.request_id, *self._owner()))
             if len(rows) != 1:
                 raise LookupError("ASSISTANT_MESSAGE_NOT_FOUND")
             previous = rows[0]
+            steps = previous.get('agent_steps') or []
+            quality_step = {'type':'generation_quality', 'request_id':commit.request_id, **quality} if quality is not None else None
             if previous["is_completed"]:
                 if (previous["content"] != commit.answer or previous["knowledge_references"] != json.loads(references)
                         or previous["usage"] != commit.usage):
                     raise ValueError("FINAL_COMMIT_CONFLICT")
+                if quality_step is not None and [s for s in steps if isinstance(s,dict)
+                        and s.get('type')=='generation_quality' and s.get('request_id')==commit.request_id] != [quality_step]:
+                    raise ValueError('FINAL_COMMIT_CONFLICT')
                 return
+            quality_sql, quality_args = '', ()
+            if quality_step is not None:
+                if not isinstance(steps,list) or any(isinstance(s,dict) and s.get('type')=='generation_quality'
+                        and s.get('request_id')==commit.request_id for s in steps):
+                    raise ValueError('FINAL_COMMIT_CONFLICT')
+                quality_sql = 'agent_steps=%s::jsonb,'
+                quality_args = (json.dumps([*steps,quality_step],ensure_ascii=False,allow_nan=False),)
             await self.repository.connection.execute("UPDATE messages SET content=%s,rendered_content=%s,"
-                "knowledge_references=%s::jsonb,usage=%s::jsonb,is_completed=true,updated_at=now() "
+                "knowledge_references=%s::jsonb,usage=%s::jsonb," + quality_sql + "is_completed=true,updated_at=now() "
                 "WHERE id=%s AND session_id=%s AND request_id=%s AND tenant_id=%s AND subject_id=%s",
-                (commit.answer, commit.answer, references, usage, commit.message_id, commit.session_id,
+                (commit.answer, commit.answer, references, usage, *quality_args, commit.message_id, commit.session_id,
                  commit.request_id, *self._owner()))
 
     async def message_origin_scopes(self, session_id: str) -> tuple[tuple[str, ...], ...]:

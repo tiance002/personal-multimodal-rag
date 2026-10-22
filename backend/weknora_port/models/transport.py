@@ -358,6 +358,11 @@ class AsyncHTTPTransport:
             # so a stuck close can never hang the call. Cancellation still
             # propagates; an already-sent request is never flipped to NOT_SENT and
             # a settlement failure never triggers a retry or a model switch.
+            observed_error = sys.exc_info()[1]
+            observe_error = getattr(self.gate, 'observe_error', None)
+            if observed_error is not None and callable(observe_error):
+                try: observe_error(call, observed_error)
+                except Exception: pass  # Optional diagnostics never own settlement.
             settlement_error = None
             try:
                 usage=handle.usage if handle is not None else TokenUsage()

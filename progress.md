@@ -271,7 +271,7 @@
 | 远程备份脚本（strict SSH，经 stdin 传输） | 0 | BACKUP_VERIFIED utc=20260927T143810Z；归档 SHA-256 1e427fc512525ba9669ae32c8f168b1c5511ea08d85e1b9e099aab3f99c9a12d；DB dump SHA-256 76cd48d52800f6a4d5fbea10cf3cbc83b5d088f80967dea6b0809b470d5a47ad |
 | 备份独立复核（重算 SHA-256、读取归档、pg_restore 校验） | 0 | BACKUP_RECHECK_PASS |
 | 远端清理脚本 | 1 | 清理操作已完成；尾部 SSH 端口断言误对整行匹配，未从 ss 提取本地地址列。修正后的完整状态复核退出码 0：CLEANUP_POSTCHECK_PASS，SSH 22 保持监听，80/443/8000 无旧监听 |
-| & '.\scripts\deploy_eval_center.ps1' -HostName '120.55.115.162' -User 'root' -Port 22 -IdentityFile '<运行时提供的私钥路径>' -Apply | 0 | rag-eval is active on 127.0.0.1:8787 |
+| & '.\scripts\deploy_eval_center.ps1' -HostName '[PRIVATE_DEPLOYMENT_IPV4_SHA256:34f63243c66134a7e5cbd385cb10bf5973cde34560947b5bb9ffc0bbcc5bff62]' -User 'root' -Port 22 -IdentityFile '<运行时提供的私钥路径>' -Apply | 0 | rag-eval is active on 127.0.0.1:8787 |
 | 远端 health/dashboard/API、SQLite integrity/schema、systemd restart 复核 | 0 | health {"status":"ok"}；dashboard HTTP 200；API {"experiments":[]}；schema 1；integrity ok；重启后同样正常 |
 | SSH tunnel 到本机 127.0.0.1:18787 health 请求及关闭检查 | 0 | SSH_TUNNEL_PASS local_port=18787 health=ok tunnel_closed=true |
 
@@ -649,3 +649,21 @@ HTTP驱动适配348557b：直接运行冻结ECS端既有驱动，消费实际逐
 先收尾S8.6.3（3c081b6）；依Owner后续S8.6.4优先规则，删除额外Source Unit/2048/6/4096/3组/16000人工限制及整轮清空，保留350/850、父子/连续Merge、TopK、current原文ID/offset/version。528b19f修复空Rerank回退及4处Merge边界，b9654bf接线逐题语言和授权Session文档选择/切换/清空/澄清与在途范围冻结，VLM阶段8b75820接入精确提取Caption及固定2图/5文本对照包。生产生成Prompt/P5/阈值/RRF/模型/Schema/索引不变。最终33受影响模块715passed/5既有SWIG警告/exit0，保留所有RED和11failed/704passed中间失败，不重跑旧922。前端build0和Mock API浏览器doc-a→doc-b→清空/刷新持久化PASS；不是ECS验收。5预算+3低分保存边界原文送达，3历史引用继续通过；初始MML0434保存池漏邻块；后续限定ECS只读回查找到同版本69字符next句，Top1=true与false fallback生产下游回放均送达。指定旧S8.2 UUID完整快照仍BLOCKED_MISSING，新答案NOT_RUN。新版真实HTTP/VLM/生成候选质量NOT_RUN，新增Provider/Token/UNKNOWN/DB写入/ECS构建部署均0，另一次只读三块回查。S8_6_4_RETRIEVAL_CONVERGENCE.md/.results.json及55文件归档已准备；一次新授权提案后停止，无Push/部署/Tag或Owner验收声明。
 
 Owner追加Top1：最终源码a25af498ab3d2eb5614185f73d678a172e300d52，正常服务/defaultenv/formal启动/profile实际true，显式false保留，Graph/bridge/权限护栏不变。裸PipelineState中性false仅隔离用，正常配置实际传true。已证明评分第一Codingtime原BGE0.0224546按Top1保留，邻接3原块241字符入最终946字符消息，必要句绑定独立ChunkID/offset/version。最新六模块RED4/92→GREEN96passed0；配置/profile300passed/2deselected0，旧08ebd90两个intent失败另有2failed/300passed原样复现，断言不改不计PASS。715为追加指令前8b758阶段，所有数量有交集不相加。新组合profile6402fa6a...；一次50万Token/最多40次操作提案尚待Owner授权，真实生成/两图效果NOT_RUN，无自动Push/部署/Tag。
+
+## 2026-10-22 S8.6.5 Langfuse 与生成质量 — OFFLINE PASS / REAL BLOCKED
+
+从已推送的实际基线 db917c8 开始，源码提交 7510b7a、最终局部修复 9163f0916a60c5ae4ee647ea70816a278e3bf070。新 weknora_port 链路接入 SDK4.15.6，独立 telemetry 开关、默认安全元数据、真实 Provider durable claim/settlement、跨任务父子关联、fail-open 和 shutdown flush。只读核验实际运行 ECS API/Worker 仍为 29ecf2f/80e2f2d，SDK/配置未接入；本轮未更新生产。两个零模型 Cloud trace 可按 ID 回读（3faa6260324b80de7de2d71c1b852c80、8d1a34f6b0c15af846fb4379e4756fc8），后者证明新 adapter 的 null-I/O、parent/session 关联，不代表真实 RAG 子调用验收。
+
+已知 Usage 在结算失败时保留，短标题匹配收紧，引用质量保存到现有 final-commit/agent_steps/SSE/history，MISSING 不新增升级；最终 SearchNothing 固定回复的 EVIDENCE_INSUFFICIENT 状态与 Trace 一致，semantic_support 仍 NOT_ASSESSED。真实 RED/GREEN 保留。受影响组合 473passed/1skip（无独立 PGDSN），后续 HTTPprofile4passed、ASGI2passed、最终 no-evidence相关196passed、Trace/quality52passed，均 exit0，数量重叠不相加；另一次 Windows fixture WinError5 失败及聚焦重跑证据保留。SQL/Provider使用 mock 的检查不冒充真实 PG/API 验收。
+
+冻结10道互异历史真实Context、30个ABC wire，规划字节包络583988并非实际Token或预留。当前模型快照Cheap=Qwen/Qwen3.5-4B、Expensive=deepseek-flash。当前来源证明因连续3次 SSH banner timeout 全部BLOCKED，未开始对应只读查询；新隔离镜像未构建，新付费授权未取得。真实ABC/正式HTTP/真实Provider与Cloud账本对账均NOT_RUN，新增Provider/UNKNOWN均0，无索引/数据库写入、生产部署、Push或Tag。S8.6.5整体尚未验收，报告为 docs/evaluation/S8_6_5_LANGFUSE_GENERATION_QUALITY.md/.results.json；后续恢复SSH、核验来源、冻结镜像及一次新授权后继续，不从离线结果推断Cheap/Expensive胜负或调整P5。
+
+
+## 2026-10-23 固定配置 ECS 策略与手动清理
+
+Owner 确认云盘不再升级，并要求充分使用现有 CPU/内存、暂不创建 OOS 自动清理。按当前 2 核/约3.5GiB/40GiB 编写 docs/deployment/ECS_FIXED_CAPACITY_STRATEGY.md/.results.json：高磁盘负载错峰，独立计算可使用两个核心和实际可用内存，保留原正式串行 HTTP、PG事务及权限/UNKNOWN合同。后台 runner 空闲心跳从1秒改为15秒，子进程仍1秒轮询，启动/终态/claim/收据耐久写入不变；定向45passed/4Windows相关skip exit0，Linux新版runner/真实云盘压力测试NOT_RUN。
+
+Owner授权后只清理4项具名重复资产：两个已加载镜像传输包、S8.6.4已完成任务的导出副本目录及tar；先核对219个原始文件SHA，保留原始任务及全部收据/容器/镜像/卷。实际释放1549406208字节，根盘48%→44%（df约21G可用）；四个正式容器ID/镜像/启动时间/restart不变，鉴权runtime check exit0，PG物理ID/303turns、13224已收到Provider记录/旧UNKNOWN3不变，Redis AOF正常。清理审计已取回本机并核对SHA。新增Provider/Token/UNKNOWN0，无应用发布/索引变更/自动清理/Push/Tag；尚无跨job全局互斥或Redis自动身份同步，未伪称已实现。
+
+
+S8.6.5-R 公开整理：原始四个本地提交及全部证据保留；公开后继从 db917c8 构建，排除159份原始证据，真实问题改为哈希。公开合成测试不代表真实历史验收；部署、Provider和正式验收由独立授权控制。
