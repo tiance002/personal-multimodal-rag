@@ -79,14 +79,23 @@ def isolated_state(state, query):
 def _fingerprint(row):
     version = (row.metadata or {}).get('source_version')
     chunk_version = (row.chunk_metadata or {}).get('source_version')
+    derived = row.chunk_type in ('image_ocr', 'image_caption')
     if (not row.id or not row.knowledge_base_id or not row.knowledge_id or not version or
             chunk_version != version or not row.is_enabled or row.content_rewritten or
-            row.content_revision or row.chunk_type not in ('text', 'parent_text', 'faq') or
+            row.content_revision or row.chunk_type not in ('text', 'parent_text', 'faq', 'image_ocr', 'image_caption') or
             not row.content or type(row.start_at) is not int or type(row.end_at) is not int or
-            row.start_at < 0 or row.end_at - row.start_at != len(row.content)):
+            row.start_at < 0 or row.end_at < row.start_at or
+            (not derived and row.end_at - row.start_at != len(row.content)) or
+            (derived and row.metadata.get('source_selection') != 'MATERIALIZED_SELECTED_SOURCE')):
         raise RetrievalScopeError()
-    return (row.knowledge_base_id, row.knowledge_id, version, chunk_version,
+    fingerprint = (row.knowledge_base_id, row.knowledge_id, version, chunk_version,
             row.chunk_type, row.start_at, row.end_at, row.content)
+    # Persisted image derivatives have asset locators, not original text spans.
+    # Projection already reread them with current=True; keep their type and
+    # provenance distinct, including when the same ID appears across rounds.
+    if derived:
+        fingerprint += (row.parent_chunk_id, row.image_info, deepcopy(row.chunk_metadata))
+    return fingerprint
 
 
 def _coverage(plan):
