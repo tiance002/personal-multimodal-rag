@@ -1,0 +1,235 @@
+{
+  "schema": "ecs118-public-diagnostic-summary/v1",
+  "status": "PUBLIC_DRAFT_AGENT_REVIEW_NOT_OWNER_ACCEPTANCE",
+  "frozen_run": {
+    "source_revision": "f96446742d1f32d7fa13635e43159b08fc3e2e0a",
+    "image_digest": "sha256:99faa35360c8b4f73d7fc207f040a9f6a8f69b6f6dd8b1b3c8bf43e1eeafe78f",
+    "configuration_sha256": "87cb919a510b5a14eccf16fe200386670d7cd33d7ad4590cc8b68e0b81ef0921"
+  },
+  "execution": {
+    "questions_attempted": 118,
+    "collector_accepted": 116,
+    "collector_rejected": 2,
+    "provider_calls": 646,
+    "settled": 646,
+    "unknown": 0,
+    "reported_tokens": 1704088,
+    "http_calls": 473,
+    "http_reported_tokens": 1321575,
+    "multimodal_calls": 173,
+    "multimodal_reported_tokens": 382513,
+    "latency_aggregate": {
+      "scope": "HTTP cases only",
+      "recorded_count": 116,
+      "attempted_cases": 118,
+      "missing_elapsed_count": 2,
+      "mean_seconds": 10.99,
+      "p50_seconds": 8.97,
+      "p95_seconds": 24.11,
+      "method": "linear interpolation over sorted actual recorded elapsed times",
+      "missing_policy": "exclude_missing_elapsed_not_zero"
+    }
+  },
+  "gold_answer_review": {
+    "cases": 55,
+    "labels": {
+      "CORRECT": 38,
+      "PARTIAL": 7,
+      "WRONG": 8,
+      "UNVERIFIED": 2
+    },
+    "completed_semantically_labeled_answers": 53,
+    "core_correct_over_completed_labeled_answers": {
+      "numerator": 38,
+      "denominator": 53
+    },
+    "core_correct_over_all_gold_cases": {
+      "numerator": 38,
+      "denominator": 55
+    },
+    "official_scorer": "NOT_RUN",
+    "official_or_production_accuracy_claim": false,
+    "citation_support_all_cases": "UNVERIFIED",
+    "datasets": {
+      "longbench-zh": {
+        "gold": 39,
+        "http_completed": 38,
+        "correct": 26,
+        "partial": 7,
+        "wrong": 5,
+        "unverified": 1
+      },
+      "hotpotqa": {
+        "gold": 8,
+        "http_completed": 8,
+        "correct": 8,
+        "partial": 0,
+        "wrong": 0,
+        "unverified": 0
+      },
+      "mmlongbench-doc": {
+        "gold": 8,
+        "http_completed": 7,
+        "correct": 4,
+        "partial": 0,
+        "wrong": 3,
+        "unverified": 1
+      }
+    }
+  },
+  "qrels_only": {
+    "cases": 63,
+    "qa_accuracy": null,
+    "scifact": {
+      "cases": 40,
+      "search_source_presence": 38,
+      "rerank_source_presence": 30,
+      "context_exact_candidate_text": 30,
+      "first_gap_F4": 2,
+      "first_gap_F5": 8
+    },
+    "miracl_zh": {
+      "cases": 23,
+      "search_source_presence": 23,
+      "rerank_source_presence": 23,
+      "context_exact_candidate_text": 23
+    },
+    "interpretation": "source_identity_coverage_only; factual_sufficiency_and_answer_error_unverified"
+  },
+  "causal_review": {
+    "focused_cases": 16,
+    "confirmed_F8_statement_defects": {
+      "count": 5,
+      "ordinals": [
+        0,
+        2,
+        4,
+        13,
+        34
+      ]
+    },
+    "confirmed_F6_context_insufficiency_upstream_unverified": {
+      "count": 6,
+      "ordinals": [
+        18,
+        33,
+        36,
+        47,
+        50,
+        52
+      ]
+    },
+    "underspecified_referents": {
+      "count": 4,
+      "ordinals": [
+        25,
+        26,
+        27,
+        38
+      ]
+    },
+    "subjective_recommendation_competition": {
+      "count": 1,
+      "ordinals": [
+        10
+      ]
+    },
+    "http099": "completed_fixed_clarification_rejected_by_collector_contract; no_provider_answer_generation",
+    "http112": "cancelled_before_answer_generation; three_settled_pre_generation_calls; exact_cancellation_cause_and_server_terminal_unverified"
+  },
+  "multimodal": {
+    "terminal_artifacts": 173,
+    "complete_responses": 166,
+    "length_incomplete": 7,
+    "blank_final_text": 5,
+    "targeted_visual_reviews": 24,
+    "all_image_accuracy": "UNVERIFIED",
+    "qa_linked_image_cases": 0,
+    "previous_targeted_visual_reviews": 4,
+    "additional_manual_visual_reviews": 20,
+    "root_verified_additional_observations": {
+      "count": 4,
+      "fresh_output_vs_visible_page_mismatches": 2,
+      "page_only_current_text_discrepancies_with_fresh_matching_pixels": 2,
+      "page_only_exact_asset_cause": "UNVERIFIED",
+      "not_qa_accuracy": true
+    },
+    "reviewer_correction_summary": "A prior cross-image pairing and a page-type visual misread were corrected; neither is counted as a product defect.",
+    "other_149_visual_semantics": "UNVERIFIED",
+    "confirmed_existing_text_deviations_count": 2,
+    "fresh_source_fidelity_deviation_count": 1
+  },
+  "projection": {
+    "completed_shards": "001-110 full v3 + 111-118 lossy projected v4",
+    "latency_mean_p50_p95": "COMPLETE_HTTP_CASES_ONLY_116_RECORDED_2_MISSING",
+    "pending_shards": [],
+    "shard_111_identity_note": "Identity bookkeeping was corrected in the aggregate; the historical incorrect mapping is retained for audit; no case rerun.",
+    "projection_limitation": "Projected v4 shards are lossy candidate metadata, not full raw shards; omitted candidate fields are not inferred."
+  },
+  "implementation_and_acceptance": {
+    "production_rag_code_changed": false,
+    "prompt_or_p5_calibration_performed": false,
+    "retrieval_or_rerank_algorithm_changed": false,
+    "owner_acceptance": false,
+    "public_accuracy_claim": false
+  },
+  "publication_boundary": {
+    "private_raw_evidence_included": false,
+    "questions_context_answers_or_source_paragraphs_included": false,
+    "host_or_user_identifiers_included": false,
+    "credentials_or_private_paths_included": false
+  },
+  "dataset_http_accounting": {
+    "longbench-zh": {
+      "cases": 39,
+      "http_provider_attempts": 154,
+      "reported_tokens": 585769,
+      "recorded_elapsed_count": 38,
+      "missing_elapsed_count": 1,
+      "mean_seconds": 13.36,
+      "p50_seconds": 9.66,
+      "p95_seconds": 40.78
+    },
+    "hotpotqa": {
+      "cases": 8,
+      "http_provider_attempts": 36,
+      "reported_tokens": 60796,
+      "recorded_elapsed_count": 8,
+      "missing_elapsed_count": 0,
+      "mean_seconds": 7.89,
+      "p50_seconds": 6.53,
+      "p95_seconds": 13.53
+    },
+    "mmlongbench-doc": {
+      "cases": 8,
+      "http_provider_attempts": 31,
+      "reported_tokens": 47712,
+      "recorded_elapsed_count": 7,
+      "missing_elapsed_count": 1,
+      "mean_seconds": 8.51,
+      "p50_seconds": 8.06,
+      "p95_seconds": 9.86
+    },
+    "scifact": {
+      "cases": 40,
+      "http_provider_attempts": 160,
+      "reported_tokens": 444464,
+      "recorded_elapsed_count": 40,
+      "missing_elapsed_count": 0,
+      "mean_seconds": 10.07,
+      "p50_seconds": 9.04,
+      "p95_seconds": 18.11
+    },
+    "miracl-zh": {
+      "cases": 23,
+      "http_provider_attempts": 92,
+      "reported_tokens": 182834,
+      "recorded_elapsed_count": 23,
+      "missing_elapsed_count": 0,
+      "mean_seconds": 10.48,
+      "p50_seconds": 9.42,
+      "p95_seconds": 18.07
+    }
+  },
+  "dataset_http_accounting_note": "Per-dataset Provider attempts and reported token totals use the verified settled HTTP ledger; latency is per-case recorded elapsed time and excludes missing elapsed samples."
+}

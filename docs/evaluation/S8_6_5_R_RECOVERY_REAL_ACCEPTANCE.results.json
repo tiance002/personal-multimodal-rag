@@ -1,0 +1,135 @@
+{
+  "schema": "s865r-public-http-stop-summary/v1",
+  "status": "FAILED_TURN_TRACE_READBACK_ONLY",
+  "acceptance": "NOT_PASS_REAL_RAG",
+  "approved_freeze": {
+    "source_revision": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+    "image_digest": "sha256:32cddd15cfb45c16f59dd465aed53adf5f0a697699bce501f38c0017a315d3b2",
+    "profile_sha256": "c300f8ba6ed7e109541e8bf18d7196e0a923959acb02f24811f12ab273dc7b54",
+    "approved_document_sha256": "5805f8033c33a9a5e189e6d002df19bdf76f69fa6b5df17ffdc7eb0668292975",
+    "scope_owner_approved": true
+  },
+  "first_http": {
+    "session_submitted_once": true,
+    "stopped_before_provider": true,
+    "provider_attempts": 0,
+    "actual_reported_tokens": 0,
+    "unknown": 0,
+    "result": "ORDINARY_CHAIN_FAILED",
+    "r6_native_checkpoint": {
+      "complete": 0,
+      "attempts": 0,
+      "actual_reported_tokens": 0,
+      "unknown": 0
+    }
+  },
+  "cause": {
+    "stage": "exact_QU_preflight",
+    "required_grant_field": "qu_request_sha256s",
+    "field_missing": true,
+    "provider_delegate_called": false,
+    "classification": "PRE_PROVIDER_AUTHORIZATION_AND_INTEGRITY_GUARD_STOP",
+    "required_map_semantics": "client request UUID -> request body SHA"
+  },
+  "readbacks": {
+    "turn_incomplete_error": true,
+    "generation_records": 0,
+    "metadata_observations": 4,
+    "observation_stages": [
+      "ordinary-turn",
+      "history",
+      "memory",
+      "understand"
+    ],
+    "input_output_present": false,
+    "provider_observations": 0,
+    "source_eligibility_cases": "10/10_READ_ONLY",
+    "source_rows": "83/83_READ_ONLY",
+    "schema": "PASS",
+    "isolated_pg_r6": "PASS_8_OF_8",
+    "acceptance_resource_oom": 0,
+    "acceptance_resource_killed": 0,
+    "temporary_api_stopped": true,
+    "production_changed": false,
+    "acceptance_slice_resource_observation": {
+      "memory_peak_bytes": 384155648,
+      "memory_peak_mib_approx": 366.36,
+      "memory_events": {
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "kill": 0
+      },
+      "cpu_usage_usec": 6193512,
+      "cpu_throttled_usec": 537419,
+      "io_device": "259:0",
+      "io_rbytes": 53051392,
+      "io_wbytes": 647168
+    },
+    "legacy_trace_route": "HTTP_410_SEPARATE_TOOLING_FAILURE_NOT_MODEL_SEND;SUPPORTED_OBSERVATION_API_READBACK_SUCCEEDED"
+  },
+  "remaining": {
+    "second_http": "NOT_RUN",
+    "abc_generations": 30,
+    "abc_status": "NOT_RUN",
+    "p5_calibration": "NOT_RUN",
+    "actual_cost": "UNPRICED_NOT_ZERO",
+    "whole_s865": "NOT_COMPLETE"
+  },
+  "recovery": {
+    "scope": "private_grant_builder_and_exact_wrapper_contract",
+    "production_rag_code_changed": false,
+    "image_changed": false,
+    "focused_red_green_evidence": "PASS_NARROW_GUARD_ONLY_NOT_REAL_RAG",
+    "next_send": "WAIT_FOR_EXPLICIT_RECOVERY_APPROVAL",
+    "automatic_retry": false
+  },
+  "privacy": {
+    "private_paths_or_host_data_included": false,
+    "trace_session_request_ids_included": false,
+    "model_or_tenant_ids_included": false,
+    "questions_context_answers_or_wire_content_included": false
+  },
+  "repair_verification": {
+    "status": "FIXED_NARROW_GUARD_ONLY",
+    "private_acceptance_staging_sha256": "2f2c13fe1a0632b27f4f9a2fdef6b66f125ae117dc9bf0c4e0bfda10dac962ae",
+    "red": {
+      "exit_code": 1,
+      "missing_hash_delegation_count": 0
+    },
+    "green": {
+      "exit_code": 0,
+      "correct_hash_synthetic_fake_delegate_count": 1,
+      "missing_hash_rejected": true,
+      "wrong_hash_rejected": true
+    },
+    "offline_approved_image_qu_render": {
+      "provider_calls": 0,
+      "body_bytes": [
+        5694,
+        5642
+      ],
+      "network": "NONE",
+      "bodies_rendered": 2
+    },
+    "business_source_changed": false,
+    "image_changed": false,
+    "r6_execution_and_grant": "CLOSED",
+    "r6_checkpoint": {
+      "actual_reported_tokens": 0,
+      "attempts": 0,
+      "unknown": 0,
+      "complete": 0
+    },
+    "prior_receipt_backup_retained": true,
+    "prior_ledger_entries_unchanged": 0,
+    "r7": {
+      "grant": "NONE",
+      "authorization_document_sha256": "f642830f737cddbf8ffe274591af7ecaa40249b5202d8296d5a8bb325e39c93b",
+      "execution": "NOT_RUN",
+      "combined_request": "SUBMITTED_ASYNC_PENDING",
+      "next_post": "WAIT_FOR_EXPLICIT_OWNER_REPLY"
+    }
+  },
+  "r6_execution_grant_status": "CLOSED_WITH_ZERO_COMPLETE_ZERO_ATTEMPTS"
+}
