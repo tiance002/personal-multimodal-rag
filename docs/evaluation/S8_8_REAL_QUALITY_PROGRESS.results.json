@@ -1,0 +1,250 @@
+{
+  "schema": "s8-8-real-quality-progress/v3",
+  "as_of_date": "2026-10-24",
+  "status": "PROGRESS_SNAPSHOT_NOT_FINAL_ACCEPTANCE",
+  "scope": {
+    "answer_gold_denominator": 55,
+    "target_core_correct": 50,
+    "root_agent_provisional_core_correct": 40,
+    "current_v2_complete_answers": 53,
+    "current_v2_no_result_cases": 2,
+    "no_result_cases_retained_in_denominator": true,
+    "target_met": false,
+    "owner_approval": false,
+    "ordinal34_root_adjudication": "WRONG",
+    "accuracy_profile": "Fixed-context Prompt v2 Cheap only; separate model/prompt/retrieval variants are excluded.",
+    "adjudication_status": "ROOT_AGENT_PROVISIONAL_NOT_OWNER_APPROVAL",
+    "completed_v2_not_core_correct": 13
+  },
+  "accounting": {
+    "completed_provider_calls": 112,
+    "reported_tokens": 492897,
+    "usage_unknown_calls": 0,
+    "provider_counts": {
+      "siliconflow": 79,
+      "deepseek": 33
+    },
+    "provider_model_counts": {
+      "siliconflow/Qwen/Qwen3.5-4B": 67,
+      "deepseek/deepseek-flash": 33,
+      "siliconflow/BAAI/bge-reranker-v2-m3": 8,
+      "siliconflow/BAAI/bge-m3": 4
+    },
+    "batches": [
+      {
+        "name": "Original S8.8 batch",
+        "calls": 13,
+        "reported_tokens": 40193,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "deepseek-flash": 11
+        },
+        "note": "2 Qwen prompt attempts; 9 image calls including 2 normal-completion controls; 2 DeepSeek Quick/Smart controls; one Qwen answer incomplete."
+      },
+      {
+        "name": "Prompt v1 Expensive follow-up",
+        "calls": 1,
+        "reported_tokens": 5657,
+        "models": {
+          "deepseek-flash": 1
+        },
+        "note": "Separate prompt/profile result."
+      },
+      {
+        "name": "Prompt v2 selected Cheap subset",
+        "calls": 6,
+        "reported_tokens": 28395,
+        "models": {
+          "Qwen/Qwen3.5-4B": 6
+        },
+        "note": "Fixed-context V2 answer subset."
+      },
+      {
+        "name": "Prompt v2 Cheap fixed-context remainder",
+        "calls": 47,
+        "reported_tokens": 188260,
+        "models": {
+          "Qwen/Qwen3.5-4B": 47
+        },
+        "note": "Fixed-context V2 answer remainder."
+      },
+      {
+        "name": "Prompt v2 Expensive follow-ups",
+        "calls": 17,
+        "reported_tokens": 73539,
+        "models": {
+          "deepseek-flash": 17
+        },
+        "note": "Separate model variant; excluded from V2 Cheap score."
+      },
+      {
+        "name": "Prompt v2 matched Expensive pairs",
+        "calls": 2,
+        "reported_tokens": 14512,
+        "models": {
+          "deepseek-flash": 2
+        },
+        "note": "Separate model variant; excluded from V2 Cheap score."
+      },
+      {
+        "name": "BGE rerank baseline/candidate replay",
+        "calls": 4,
+        "reported_tokens": 45618,
+        "models": {
+          "BAAI/bge-reranker-v2-m3": 4
+        },
+        "note": "Retrieval diagnostic, not answer generation; model identity unreported."
+      },
+      {
+        "name": "Prompt v3 Cheap subset",
+        "calls": 4,
+        "reported_tokens": 18350,
+        "models": {
+          "Qwen/Qwen3.5-4B": 4
+        },
+        "note": "Separate prompt version."
+      },
+      {
+        "name": "Prompt v3 Expensive pair",
+        "calls": 1,
+        "reported_tokens": 10989,
+        "models": {
+          "deepseek-flash": 1
+        },
+        "note": "Separate prompt/model variant."
+      },
+      {
+        "name": "HTTP39 diagnostic trace",
+        "calls": 5,
+        "reported_tokens": 8406,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1,
+          "deepseek-flash": 1
+        },
+        "settled": 5,
+        "ledger_lifecycle": "OPEN",
+        "note": "Settled diagnostic, outside fixed V2 cohort."
+      },
+      {
+        "name": "HTTP33 diagnostic trace",
+        "calls": 4,
+        "reported_tokens": 18869,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1
+        },
+        "settled": 4,
+        "ledger_lifecycle": "OPEN",
+        "note": "Settled diagnostic, outside fixed V2 cohort."
+      },
+      {
+        "name": "HTTP36 formal API diagnostic",
+        "calls": 4,
+        "reported_tokens": 19999,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "BAAI/bge-reranker-v2-m3": 1,
+          "BAAI/bge-m3": 1
+        },
+        "settled": 4,
+        "usage_unknown": 0,
+        "ledger_lifecycle": "OPEN",
+        "quality_review": "CORE_PASS_CITATION_PRECISION_FAIL",
+        "source_revision": "b5fc",
+        "execution_image": "sha256:07a9",
+        "archive_file_count": 101,
+        "note": "Formal API diagnostic; outside fixed55 answer accuracy."
+      },
+      {
+        "name": "HTTP24 formal API diagnostic",
+        "calls": 4,
+        "reported_tokens": 20110,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "BAAI/bge-reranker-v2-m3": 1,
+          "BAAI/bge-m3": 1
+        },
+        "settled": 4,
+        "usage_unknown": 0,
+        "ledger_lifecycle": "OPEN",
+        "quality_review": "PENDING_AGENT_REVIEW",
+        "source_revision": "b5fc",
+        "execution_image": "sha256:07a9",
+        "archive_file_count": 101,
+        "note": "Formal API diagnostic; outside fixed55 answer accuracy."
+      }
+    ],
+    "reconciliation": "Previous 104-call snapshot plus settled HTTP36 (4/19,999) and HTTP24 (4/20,110) = 112 calls / 492,897 reported tokens; UNKNOWN 0.",
+    "excluded": "Partial/checkpoint mirrors are not counted as extra sends. HTTP36 and HTTP24 are included in call/token accounting but excluded from fixed55 answer accuracy."
+  },
+  "image_review": {
+    "calls": 9,
+    "normal_stop_nonempty": 9,
+    "normal_completion_controls_included_in_nine": 2,
+    "independent_semantic_review": {
+      "faithful_or_substantially_faithful": 4,
+      "mixed": 2,
+      "unresolved_formula_or_dense_text": 3
+    },
+    "major_transcription_error_count": 1,
+    "major_transcription_error_summary": "One caption rendered visible IMG as IGN.",
+    "completion_is_accuracy": false
+  },
+  "rerank_diagnostic": {
+    "calls": 4,
+    "reported_tokens": 45618,
+    "default_p5_threshold": 0.35,
+    "threshold_changed": false,
+    "url_candidate": "Score 0.272, rank 3, below the unchanged 0.30 retrieval threshold; another candidate scored 0.282 and was also below threshold.",
+    "tourism_candidate": "Score improved from about 0.109 (rank 18) to about 0.971 (rank 1) in offline score replay.",
+    "final_pipeline_context_membership": "HTTP33 actual final context verified by separate review; BGE offline score replay alone does not prove answer correctness.",
+    "answer_quality_claim": false,
+    "model_reported": "UNREPORTED",
+    "retrieval_score_threshold": 0.3
+  },
+  "source_proof": {
+    "captured_generation_inputs_proven": 53,
+    "context_handles": 458,
+    "unique_source_rows": 457,
+    "provider_calls": 0,
+    "database_writes": 0,
+    "separate_current_text_discovery_matches": 197,
+    "historical_versions_for_discovery_matches": "UNKNOWN"
+  },
+  "versions": {
+    "report_worktree_head_short": "b132d9e",
+    "rerank_passage_render_source_revision": "a48f29f61e7c88ceebf4bffaf9f1f1ee6ce636d7",
+    "production_changed": false,
+    "current_report_worktree_head": "b132d9e",
+    "http36_http24_source_revision": "b5fc",
+    "http39_source_revision": "6bd49e7d48e2ee5a52e572b094a0104f5234aff8",
+    "http39_execution_image": "sha256:62bccab7a5052bbbb5056ca0a96a0de7b29daf55380f4cf5e36f773b0a6a3652",
+    "fixed_batches_runtime_source_revision": "01ae7cf05767e211224edfa9c0d5e0a3267f6e82",
+    "fixed_batches_execution_image": "sha256:341647bfd12c76a1cc383d30e94121e2347445f07d46579843369673f73149c6",
+    "http39_source_used_by_batch": {
+      "source_revision": "6bd49e7d48e2ee5a52e572b094a0104f5234aff8",
+      "execution_image": "sha256:62bccab7a5052bbbb5056ca0a96a0de7b29daf55380f4cf5e36f773b0a6a3652",
+      "calls": 5
+    },
+    "http33_36_24_execution_image_digest_prefix": "07a9"
+  },
+  "privacy": "No full questions, Gold records, contexts, case IDs, source IDs, or answer text are included.",
+  "prompt_and_execution_profiles": {
+    "fixed_quality_profile": "Prompt v2 fixed-context Cheap",
+    "separate_profiles": [
+      "Prompt v1 Expensive follow-up",
+      "Prompt v2 Expensive follow-ups",
+      "Prompt v2 Expensive matched pairs",
+      "Prompt v3 Cheap subset",
+      "Prompt v3 Expensive pair",
+      "BGE rerank diagnostic",
+      "HTTP39/HTTP33 diagnostic"
+    ],
+    "default_p5_threshold": 0.35,
+    "http36_quality_review": "CORE_PASS_CITATION_PRECISION_FAIL; outside fixed55 score.",
+    "http24_quality_review": "PENDING_AGENT_REVIEW; no correctness result inferred."
+  }
+}
