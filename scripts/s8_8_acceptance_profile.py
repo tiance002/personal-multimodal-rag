@@ -44,8 +44,9 @@ def validate_approved_generation(turn, configuration, approved):
     return frozen
 
 
-def _compose_resolved(configuration, *, shadow_routing_mode='off'):
+def _compose_resolved(configuration, *, shadow_routing_mode='off', expected_router_mode='DYNAMIC'):
     require=existing.require
+    require(expected_router_mode in ('DYNAMIC','EXPENSIVE_ONLY'), 'S88_APPROVED_ROUTER_MODE_INVALID')
     state=configuration.pipeline_state
     require(state.retrieval_strategy_mode=='query_structure_v1'
             and state.source_evidence_mode=='bounded_source_v1'
@@ -53,7 +54,7 @@ def _compose_resolved(configuration, *, shadow_routing_mode='off'):
             and state.bridge_rescue_mode=='off', 'S88_SAVED_PROFILE_BOUNDARIES_REQUIRED')
     require(shadow_routing_mode in ('off','shadow_structure_v1'), 'S88_SHADOW_ROUTING_MODE_INVALID')
     options=dict(configuration.generation_options)
-    require(options.get('policy')==RouterPolicy(mode='DYNAMIC'), 'S88_ORIGINAL_P5_REQUIRED')
+    require(options.get('policy')==RouterPolicy(mode=expected_router_mode), 'S88_ORIGINAL_P5_REQUIRED')
     require(options.get('citations_enabled') is True
             and options.get('system_prompt','').count(existing.PROMPT_B_SUFFIX)==1,
             'S88_PROMPT_B_PROFILE_REQUIRED')
@@ -61,19 +62,26 @@ def _compose_resolved(configuration, *, shadow_routing_mode='off'):
     return replace(configuration,generation_options=options)
 
 
-def compose_configuration(configuration, *, shadow_routing_mode='off'):
+def compose_configuration(configuration, *, shadow_routing_mode='off', expected_router_mode='DYNAMIC'):
     """Pure offline companion: Prompt B once, original options/policy preserved."""
-    return _compose_resolved(existing.compose_configuration(configuration),shadow_routing_mode=shadow_routing_mode)
+    return _compose_resolved(existing.compose_configuration(configuration),shadow_routing_mode=shadow_routing_mode,
+        expected_router_mode=expected_router_mode)
 
 
-def install_profile(runtime, evidence_directory=None, *, shadow_routing_mode='off', **kwargs):
-    """Retain original request/scope/model/expiry checks before S8.8 composition."""
+def install_profile(runtime, evidence_directory=None, *, shadow_routing_mode='off', expected_router_mode='DYNAMIC', **kwargs):
+    """Validate a declared test policy without changing the configured policy.
+
+    DYNAMIC remains the default. An explicit EXPENSIVE_ONLY expectation supports
+    a fixed-role control; it never turns Smart into an automatic role fallback.
+    """
+    existing.require(expected_router_mode in ('DYNAMIC','EXPENSIVE_ONLY'), 'S88_APPROVED_ROUTER_MODE_INVALID')
     existing.require('generation_contract' not in kwargs, 'S88_GENERATION_CONTRACT_OWNED')
     existing.require(kwargs.get('bounded_query_profile',True) is True, 'S88_BOUNDED_QUERY_PROFILE_REQUIRED')
     kwargs['bounded_query_profile']=True
     existing.install_profile(runtime,evidence_directory,generation_contract=GENERATION_CONTRACT,**kwargs)
     original=runtime.ordinary.configuration
     async def configuration(turn):
-        return _compose_resolved(await original(turn),shadow_routing_mode=shadow_routing_mode)
+        return _compose_resolved(await original(turn),shadow_routing_mode=shadow_routing_mode,
+            expected_router_mode=expected_router_mode)
     runtime.ordinary.configuration=configuration
     return runtime
