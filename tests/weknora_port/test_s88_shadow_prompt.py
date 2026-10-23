@@ -1,4 +1,5 @@
 from dataclasses import replace
+import hashlib
 import json
 from types import SimpleNamespace
 
@@ -114,3 +115,75 @@ def test_frozen_prompt_pair_preserves_all_other_fields():
     assert candidate['messages'][1:] == body['messages'][1:]
     assert {k:v for k,v in candidate.items() if k!='messages'} == {k:v for k,v in body.items() if k!='messages'}
     assert pair['new_request_identity_required'] is True
+
+
+@pytest.mark.parametrize('version,expected_hash,ends_with_newline', [
+    ('s88-source-precision/v2',
+     '08d01e2d146515439aa31ca344599ade04fae042f90c2a5bc02110c6654409ba', False),
+    ('s88-source-precision/v3',
+     '7c4a091438eab40f4c73e814af052185cb6dab29d282828c7d514bec3506e450', True),
+])
+def test_tested_candidate_suffix_matches_frozen_wire(version, expected_hash, ends_with_newline):
+    # Hashes pin the exact UTF-8 suffix in evaluated system messages, including
+    # the marker and final LF, independently of local text-file line endings.
+    from backend.weknora_port.generation.prompt_candidates import (
+        CANDIDATE_SUFFIXES, CANDIDATE_SUFFIX_SHA256)
+    base = 'Synthetic citation protocol.\n'
+    suffix = CANDIDATE_SUFFIXES[version]
+    assert suffix.startswith('System answer precision [' + version + ']:\n')
+    assert suffix.endswith('\n') is ends_with_newline
+    assert hashlib.sha256(suffix.encode()).hexdigest() == expected_hash
+    assert CANDIDATE_SUFFIX_SHA256[version] == expected_hash
+    assert apply_candidate(base, version=version) == base + '\n\n' + suffix
+    manifest = candidate_manifest(base, version=version)
+    assert manifest['version'] == version and manifest['suffix_sha256'] == expected_hash
+    assert manifest['candidate_sha256'] == hashlib.sha256(
+        apply_candidate(base, version=version).encode()).hexdigest()
+    assert manifest['real_quality_status'] == 'DEVELOPMENT_SET_EVALUATED'
+    assert manifest['default_changed'] is False
+
+
+def test_candidate_catalog_is_immutable_and_v1_default_is_unchanged():
+    from backend.weknora_port.generation.prompt_candidates import (
+        CANDIDATE_VERSION, CANDIDATE_RULES, CANDIDATE_SUFFIXES, CANDIDATE_SUFFIX_SHA256)
+    assert CANDIDATE_VERSION == 's88-source-precision/v1'
+    expected_rules = (
+        "Keep procedures from different sources separate when their steps are incompatible; preserve each procedure's conditions and exceptions.\n"
+        'Make the opening conclusion agree with the final explanation. Bind each date to its specific event, such as founding, renaming, or merger.\n'
+        'Distinguish conflicting sources explicitly; do not resolve a conflict by inventing identifiers, aliases, or explanations.\n'
+        'People and cases described in sources are not the current user; do not attribute their experiences to the user.'
+    )
+    assert CANDIDATE_RULES == expected_rules
+    base = 'Synthetic base'
+    expected = base + '\n\nSystem answer precision [s88-source-precision/v1]:\n' + expected_rules
+    assert apply_candidate(base) == expected
+    assert candidate_manifest(base) == {
+        'version': CANDIDATE_VERSION,
+        'base_sha256': hashlib.sha256(base.encode()).hexdigest(),
+        'candidate_sha256': hashlib.sha256(expected.encode()).hexdigest(),
+        'added_utf8_bytes': len(expected.encode()) - len(base.encode()),
+        'real_quality_status': 'PAIRED_EVAL_PENDING_AUTH',
+        'default_changed': False,
+    }
+    assert apply_candidate(base, version='off') == base
+    for catalog in (CANDIDATE_SUFFIXES, CANDIDATE_SUFFIX_SHA256):
+        assert tuple(catalog) == tuple('s88-source-precision/' + v for v in ('v1', 'v2', 'v3'))
+        with pytest.raises(TypeError):
+            catalog[CANDIDATE_VERSION] = 'changed'
+
+
+@pytest.mark.parametrize('first', ['v1', 'v2', 'v3'])
+@pytest.mark.parametrize('second', ['v1', 'v2', 'v3'])
+def test_candidate_versions_cannot_be_stacked(first, second):
+    prompt = apply_candidate('Synthetic base', version='s88-source-precision/' + first)
+    with pytest.raises(ValueError, match='ALREADY_APPLIED'):
+        apply_candidate(prompt, version='s88-source-precision/' + second)
+
+
+def test_explicit_candidate_manifest_off_and_invalid_version():
+    manifest = candidate_manifest('Synthetic base', version='off')
+    assert manifest['version'] == 'off' and manifest['added_utf8_bytes'] == 0
+    assert manifest['base_sha256'] == manifest['candidate_sha256']
+    assert manifest['real_quality_status'] == 'OFF' and not manifest['default_changed']
+    with pytest.raises(ValueError, match='VERSION_INVALID'):
+        candidate_manifest('Synthetic base', version='unknown')
