@@ -1,0 +1,163 @@
+{
+  "evidence": {
+    "closure": "r8-actual/R8_CLOSURE_AND_RESOURCES.json",
+    "cloud": "r8-actual/cloud-final-proof-v2.json",
+    "independent_review": "r8-actual/abc-independent-review.json",
+    "abc_wire_timing": "r8-actual/ABC_WIRE_TIMING_COMPARISON.json"
+  },
+  "overall_s865_quality": "PARTIAL_NOT_ACCEPTED",
+  "cloud": {
+    "no_new_calls_for_correction": true,
+    "external_parent_existence": "UNRESOLVED_OUTSIDE_EXPORT",
+    "proof_sha256": "d57852d46fe41c97f7627dfb4395ed6818d1ed85bc94f9900bf3b82458644fd7",
+    "prompt_tokens": 10708,
+    "observations": 22,
+    "metadata_unexpected_keys": 0,
+    "pg_local_cloud_native_keys_equal": "7_OF_7",
+    "total_tokens": 11897,
+    "status": "LANGFUSE_SCOPE_PASS",
+    "corrected_harness_final_pass": true,
+    "external_sdk_root_parents": 4,
+    "initial_harness_wrong_expectation_preserved": true,
+    "io_fields_explicit_null": "22_OF_22",
+    "internal_parent_links": 18,
+    "completion_tokens": 1189,
+    "provider_calls": 7
+  },
+  "r8_scoped_observability": "PASS_REAL_RAG",
+  "abc": {
+    "arms": {
+      "A": {
+        "output": 294,
+        "total": 1625,
+        "wall_s": 15.88,
+        "input": 1331,
+        "ttfb_s": 3.667,
+        "review": "PARTIAL"
+      },
+      "C": {
+        "input": 1364,
+        "uncertainty": "PARTIAL",
+        "total": 1795,
+        "output": 431,
+        "source_truth": "UNVERIFIED_SOURCE_DEFECT",
+        "ttfb_s": 0.356,
+        "wall_s": 10.941,
+        "core_review": "PASS_SOURCE_BASED_CORE_ONLY"
+      },
+      "B": {
+        "output": 378,
+        "total": 1828,
+        "wall_s": 14.921,
+        "input": 1450,
+        "ttfb_s": 0.501,
+        "review": "PARTIAL"
+      }
+    },
+    "wire_bodies": "3_OF_3_MATCH_R7_FROZEN_ARM_WIRES",
+    "negative_guard_triggered_in_real_run": false,
+    "serial": true,
+    "case_ordinal": 6,
+    "completion_contract": "3_OF_3_STOP_AND_PROVIDER_ANSWER_DONE",
+    "review_method": "small source-only proxy review, not blind/Owner/official scorer",
+    "overall_quality": "NO_ARM_OVERALL_QUALITY_PASS"
+  },
+  "fees": "UNPRICED",
+  "r8_totals": {
+    "http_tokens": 6649,
+    "http_calls": 4,
+    "unknown": 0,
+    "provider_calls": 7,
+    "abc_tokens": 5248,
+    "output_tokens": 1189,
+    "input_tokens": 10708,
+    "settled": 7,
+    "actual_reported_tokens": 11897,
+    "abc_calls": 3
+  },
+  "privacy": {
+    "raw_questions_context_answers_wires": false,
+    "actual_uuids_internal_ids_hosts_private_paths": false
+  },
+  "limitations": [
+    "Scoped PASS_REAL_RAG applies only to this R8 HTTP turn plus three ABC background calls, not global production or full S8.6.5 quality.",
+    "ABC review is source-only proxy review, small sample, not blind, not Owner review, and not official scoring.",
+    "Four SDK root parents are outside the Cloud export; external existence is unresolved.",
+    "R7 stop-contract violation and historical HTTP2 quality failure remain unchanged.",
+    "No Provider invoice; no fee estimate."
+  ],
+  "closure": {
+    "oom": 0,
+    "production_containers_running": 4,
+    "settled_entries_unchanged": true,
+    "status": "CLOSED_NO_ACTIVE_ACCEPTANCE_PROCESSES",
+    "production_unchanged": true,
+    "active_acceptance_processes": 0,
+    "all_grants_closed": true,
+    "proof_sha256": "8baba23e7ae5238fb63bb960dd0fe4dc99b61cc23b50a69e240cb8b47daf8f9b",
+    "memory_events_high": 2,
+    "memory_events_max": 245,
+    "oom_kill": 0
+  },
+  "http": {
+    "client_wall_seconds": 220.624,
+    "first_answer_seconds": 208.607,
+    "status": "PASS_SCOPED_HTTP_RAG_OBSERVABILITY",
+    "output_tokens": 86,
+    "calls": 4,
+    "replay_answer_equal": true,
+    "citation_readback": "PASS",
+    "input_tokens": 6563,
+    "tokens": 6649,
+    "source_based_case_review": "PASS_FOR_THIS_HTTP_CASE",
+    "replay_provider_calls": 0,
+    "sse_history_pg": "PASS"
+  },
+  "owner_acceptance": "NOT_CLAIMED",
+  "schema": "s865r-r8-public-final/v1",
+  "latency": "AUDIT_IO_CONFOUNDED_NOT_PURE_INFERENCE",
+  "historical": {
+    "old_10_case_cohort_changed": false,
+    "r7_http2_quality_failure_resolved": false,
+    "p5_threshold_changed": false,
+    "r7_post_stop_calls": 13,
+    "p5_calibration_evidence": "NONE",
+    "r7_audit_status": "AUDIT_FAIL_STOP_MISSING_FINISH_CONTRACT"
+  },
+  "freeze": {
+    "profile_sha256": "c300f8ba6ed7e109541e8bf18d7196e0a923959acb02f24811f12ab273dc7b54",
+    "production_source_image_config_changed": false,
+    "source_revision": "b4c6e4520b0d386a251a5b604553cc015eb7e143",
+    "image_digest": "sha256:80f4d6dbd22eeb8155c5dd9de0835ee8b4852eb984c77308e716c697cab00f01"
+  },
+  "official_scorer": "NOT_CLAIMED",
+  "r8_execution_status": "COMPLETE_AND_CLOSED",
+  "pg": {
+    "read_only": true,
+    "calls": 7,
+    "tokens": 11897,
+    "status": "PASS",
+    "unknown": 0
+  },
+  "cumulative_with_r7": {
+    "remaining_original_cap": 1868689,
+    "provider_calls": 45,
+    "actual_reported_tokens": 131311
+  },
+  "resource_event_delta": {
+    "low": 0,
+    "high": 2,
+    "max": 95,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "next_minimal_recommendation": "Reduce duplicated audit metadata projections while retaining exact Provider wire/source evidence; not implemented in R8.",
+  "validation_reuse": {
+    "offline_observability_30": "REUSED_SAME_SOURCE_NOT_RERUN",
+    "offline_finish_contract_29": "REUSED_SAME_SOURCE_NOT_RERUN",
+    "real_cloud_outage_injection": "NOT_RUN",
+    "nominal_and_replay_no_duplicate_send": "PASS_REAL_HTTP_AND_LEDGER",
+    "private_evidence_refs_not_shipped": true
+  }
+}

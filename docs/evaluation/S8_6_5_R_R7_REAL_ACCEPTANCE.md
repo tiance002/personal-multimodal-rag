@@ -1,5 +1,7 @@
 # S8.6.5-R R7 最终执行与审计摘要
 
+> 后续 R8 使用独立授权、修复镜像与新账本完成了限定范围复核，见 [R8 报告](S8_6_5_R_R8_REAL_ACCEPTANCE.md)。本文 R7 的失败、违例、用量和原始 Cloud 字段缺口均未改为成功。
+
 **执行已结束；审计失败并已关闭：** `AUDIT_FAIL_STOP_MISSING_FINISH_CONTRACT`。本轮 2 个 HTTP 与 10 个 ABC case 共 38 calls、119,414 reported tokens，全部 settled、0 UNKNOWN。由于 ABC6/B 缺少 finish contract 后未及时停止，本轮不能标记为 PASS_REAL_RAG 或 Owner 已接受。
 
 冻结源码 revision `9163f0916a60c5ae4ee647ea70816a278e3bf070`、镜像 `sha256:32cddd15cfb45c16f59dd465aed53adf5f0a697699bce501f38c0017a315d3b2`、profile SHA-256 `c300f8ba6ed7e109541e8bf18d7196e0a923959acb02f24811f12ab273dc7b54`。本次隔离 grant 与 runner 兼容修改没有更改生产业务代码或镜像。
