@@ -1,0 +1,104 @@
+{
+  "workflow": "S8.8 A Quick/Smart and output Token settings",
+  "status": "IMPLEMENTED_OFFLINE_VERIFIED_REAL_PENDING_AUTH",
+  "real_provider_calls": 0,
+  "ecs_writes_by_agent": 0,
+  "commits_by_agent": 0,
+  "checks": [
+    {
+      "command": "$env:PYTHONPATH=(Get-Location).Path; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m pytest tests/weknora_port/test_s88_generation_settings.py tests/weknora_port/test_generation.py tests/weknora_port/test_turn_storage.py tests/weknora_port/test_http_api.py tests/weknora_port/test_image_configuration.py tests/weknora_port/test_s88_reliability.py tests/weknora_port/test_s88_shadow_prompt.py -q --tb=short -p no:cacheprovider",
+      "exit_code": 0,
+      "result": "205 passed",
+      "kind": "synthetic SQL/ASGI and actual request renderer, no network Provider"
+    },
+    {
+      "command": "$env:PYTHONPATH=(Get-Location).Path; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m pytest tests/weknora_port/test_execution_vision.py tests/weknora_port/test_s88_generation_settings.py -q --tb=short -p no:cacheprovider --basetemp 'E:\\RAG quention\\var\\s88-a-bound-fixtures-20261023-2301'",
+      "exit_code": 0,
+      "result": "85 passed",
+      "kind": "offline actual request bounds/accounting mock transport"
+    },
+    {
+      "command": "$env:PLAYWRIGHT_CHROME_PATH='C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'; npx --prefix frontend playwright test --config frontend/playwright.weknora.config.ts frontend/tests/weknora-port/adapter.spec.ts frontend/tests/weknora-port/generation-settings.spec.ts",
+      "exit_code": 0,
+      "result": "27 passed (22.9s)",
+      "kind": "real system Chrome, mocked HTTP"
+    },
+    {
+      "command": "npm --prefix frontend run build",
+      "exit_code": 0,
+      "result": "tsc and Vite PASS; 276 modules"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "$env:PYTHONPATH=(Get-Location).Path; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m pytest tests/weknora_port/test_s88_generation_pg.py -q --tb=short -p no:cacheprovider",
+      "exit_code": null,
+      "result": "NOT RUN standalone; combined earlier skipped due S88_TEST_DSN and S88_TEST_SYSTEM_ID unset",
+      "kind": "root to execute actual PG disposable database"
+    },
+    {
+      "command": "$env:PYTHONPATH=(Get-Location).Path; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m pytest tests/weknora_port/test_s88_generation_settings.py tests/weknora_port/test_execution_vision.py -q --tb=short -p no:cacheprovider --basetemp 'E:\\RAG quention\\var\\s88-a-bound-fixtures-20261023-2305'",
+      "exit_code": 0,
+      "result": "86 passed (including separate context vs reservation image bounds)",
+      "kind": "offline mock transport and real renderer"
+    },
+    {
+      "command": "$env:PYTHONPATH=(Get-Location).Path; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' scripts/s88_image_context_replay.py --media-root 'E:\\RAG quention\\var\\reports\\ecs118-quality-audit-20261023\\media-private' --output docs/evaluation/S8_8_HISTORICAL_IMAGE_CONTEXT_OFFLINE.json",
+      "exit_code": 0,
+      "result": "OFFLINE_PASS seven exact historical images; context input upper2587-2588 + cap5000 fits declared1000000; unchanged reservation188608-3389455",
+      "kind": "read-only historical replay; zero Provider calls"
+    },
+    {
+      "command": "$env:PYTHONPATH=(Get-Location).Path; & 'E:\\RAG quention\\.venv\\Scripts\\python.exe' -m pytest tests/weknora_port/test_s88_generation_settings.py -q --tb=short -p no:cacheprovider",
+      "exit_code": 0,
+      "result": "27 passed; includes actual current Qwen3.5-4B SourceCatalogue Quick+Smart refusal with zero transport opens",
+      "kind": "offline actual configured identity regression"
+    }
+  ],
+  "known_failures": [
+    {
+      "test": "tests/weknora_port/test_conversation_configuration.py::test_dedicated_model_failure_falls_back_once_and_same_id_is_not_retried",
+      "output": "state.intent expected greeting, actual kb_search; lookups correctly ['missing','baseline']",
+      "status": "CONFIRMED_ON_BASE_F3A541_UNCHANGED_EXPECTATION"
+    },
+    {
+      "test": "tests/weknora_port/test_conversation_configuration.py::test_exact_go_configuration_function_rows",
+      "output": "('intent', 'LOCAL', '', 'LOCAL')",
+      "status": "CONFIRMED_ON_BASE_F3A541_UNCHANGED_EXPECTATION"
+    },
+    {
+      "command": "initial execution_vision run using default C: pytest tmp path",
+      "output": "61 fail before call at EXECUTION_ABSOLUTE_D_E_PATH_REQUIRED; 24 pass1 skip",
+      "status": "RESOLVED by permitted unique E: --basetemp; final85 PASS"
+    },
+    {
+      "command": "initial broader adapter run after feature additions",
+      "output": "old ambiguous combobox selectors; expanded image settings shifted upload position",
+      "status": "RESOLVED labels/mocks and collapsible fixed-height drawer; final27 PASS"
+    }
+  ],
+  "limitations": [
+    "Known configured capacities are declared metadata, not live verified model limits.",
+    "Unknown output/context capacity refuses MODEL_GENERATION_CAPACITY_UNKNOWN. Pinned XingChenAGI/Xing4.0-29B has 0/0 unless runtime row supplies supported configuration.",
+    "Explicit image context validation currently accepts only existing documented DeepSeek Flash inline JPEG/PNG recipe; unknown media/provider recipes refuse MODEL_INPUT_BOUND_NOT_APPLICABLE.",
+    "Existing SiliconFlow Smart output cost hard-bound contract may refuse; no budget gate was relaxed.",
+    "No live Provider, production deployment or cutover verification performed by A.",
+    "Actual current Cheap binding siliconflow/Qwen/Qwen3.5-4B resolves context_window=0,max_output_tokens=0,reasoning=False,cataloged=False through SourceCatalogue. Quick and Smart both refuse MODEL_GENERATION_CAPACITY_UNKNOWN before transport. Formal HTTP live acceptance blocked on hosted capability proof.",
+    "Qwen/Qwen3.5-397B-A17B in earlier tests is a pinned offline renderer fixture; those tests establish parameter construction only and do not prove actual current Cheap capability or live catalogue availability.",
+    "Official SiliconFlow family256K context does not establish a hosted Qwen3.5-4B output maximum. Existing historical max_tokens2048/enable_thinkingFalse is a supported past request point, not a model-specific hosted maximum or Smart total bound. No invented ceiling, binding update or guard relaxation made."
+  ],
+  "root_integration_followup": {
+    "real_isolated_pg": {
+      "status": "PASS",
+      "exit_code": 0,
+      "combined_passed": 2,
+      "same_runtime_source": "08a804d",
+      "log": "pg-final-image.log"
+    },
+    "provider_calls": 0,
+    "production_updated": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "workflow": "S8.8-B",
+  "status": "IMPLEMENTED_OFFLINE_PASS",
+  "provider_calls": 0,
+  "provider_tokens": 0,
+  "ecs_writes": 0,
+  "red": {
+    "command": "pytest tests/weknora_port/test_image_processing.py -q",
+    "exit_code": 1,
+    "failed": 2,
+    "passed": 7
+  },
+  "green_image": {
+    "exit_code": 0,
+    "passed": 22
+  },
+  "collector_combination": {
+    "exit_code": 0,
+    "passed": 98,
+    "fixture_note": "unique E: basetemp required by existing execution path guard"
+  },
+  "latest_combination": {
+    "exit_code": 0,
+    "passed": 76
+  },
+  "real_pg": {
+    "status": "NOT_RUN",
+    "local_skipped": 1,
+    "test": "tests/weknora_port/test_s88_image_retry_pg.py"
+  },
+  "real_provider": "NOT_RUN",
+  "production": "NOT_RUN",
+  "migration_required": "017_image_selected_retry",
+  "historical_HTTP112_origin": "UNKNOWN",
+  "counts_overlap": true,
+  "cancel_unknown_review_fix": {
+    "red": {
+      "exit_code": 1,
+      "failed": 5,
+      "passed": 1
+    },
+    "green": {
+      "exit_code": 0,
+      "passed": 6,
+      "deselected": 14
+    },
+    "related_combination": {
+      "exit_code": 0,
+      "passed": 42
+    },
+    "provider_calls": 0
+  },
+  "root_integration_followup": {
+    "real_isolated_pg": {
+      "status": "PASS",
+      "exit_code": 0,
+      "combined_passed": 2,
+      "same_runtime_source": "08a804d",
+      "log": "pg-final-image.log"
+    },
+    "provider_calls": 0,
+    "production_updated": false
+  }
+}
