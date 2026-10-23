@@ -93,6 +93,30 @@ def test_declared_model_capacity_is_checked_without_clamping(change, code):
         ProviderModel(config, None).build_request_body((Message('user','x'*200),), options)
 
 
+@pytest.mark.parametrize('mode',['quick','smart'])
+def test_actual_current_qwen35_4b_source_catalogue_refuses_unknown_capacity_without_send(mode):
+    from contextlib import asynccontextmanager
+    from backend.weknora_port.model_registry import SourceCatalogue
+    from backend.weknora_port.storage.configuration import ConfiguredRole
+    role=ConfiguredRole('cheap','siliconflow','Qwen/Qwen3.5-4B',
+                        'https://api.siliconflow.cn/v1','',{},source='remote')
+    config=SourceCatalogue().resolve(role,'actual-current-cheap')
+    assert config.model=='Qwen/Qwen3.5-4B'
+    assert (config.context_window,config.max_output_tokens,config.reasoning,config.cataloged)==(0,0,False,False)
+    class Transport:
+        opens=0
+        @asynccontextmanager
+        async def open(self,*args,**kwargs):
+            self.opens+=1
+            raise AssertionError('unknown hosted capacity must refuse before any send')
+            yield
+    transport=Transport()
+    options=apply_settings(ChatOptions(),resolve_settings(SUMMARY,{},reasoning_mode=mode,max_output_tokens=2048))
+    with pytest.raises(ProviderError,match='MODEL_GENERATION_CAPACITY_UNKNOWN') as failure:
+        asyncio.run(ProviderModel(config,transport).chat((Message('user','synthetic capacity check'),),options,CTX))
+    assert failure.value.sent is False and transport.opens==0
+
+
 def test_smart_and_quick_refuse_unsupported_wire_without_send():
     config = provider_config('deepseek','deepseek-flash')
     options = apply_settings(ChatOptions(), resolve_settings(SUMMARY, {}, reasoning_mode='smart'))
