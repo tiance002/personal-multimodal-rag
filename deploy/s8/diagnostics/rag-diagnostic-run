@@ -1,0 +1,147 @@
+#!/usr/bin/python3
+"""Root-owned offline diagnostic launcher; no shell evaluation or automatic retry."""
+import datetime
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import uuid
+
+BASE = Path('/opt/rag-s8/diagnostics/common')
+RECEIPTS = BASE / 'receipts'
+SLICE = 'rag-diagnostics.slice'
+CGROOT = Path('/sys/fs/cgroup')
+
+
+def run(argv):
+    return subprocess.check_output(argv, text=True, stderr=subprocess.DEVNULL).strip()
+
+
+def cg(unit):
+    path = run(['systemctl', 'show', unit, '-p', 'ControlGroup', '--value'])
+    if not path.startswith('/') or '..' in path.split('/'):
+        raise RuntimeError('missing or invalid cgroup path')
+    return CGROOT / path.lstrip('/')
+
+
+def verify():
+    if not (CGROOT / 'cgroup.controllers').is_file():
+        raise RuntimeError('cgroup v2 required; refusing unbounded execution')
+    p = cg(SLICE)
+    expected = {'memory.high': '268435456', 'memory.max': '402653184',
+                'memory.swap.max': '0', 'pids.max': '64'}
+    actual = {name: (p / name).read_text().strip() for name in expected}
+    if actual != expected:
+        raise RuntimeError('memory/pids hard limit readback mismatch')
+    quota, period = (p / 'cpu.max').read_text().split()
+    if quota == 'max' or int(quota) * 2 != int(period):
+        raise RuntimeError('CPU quota must equal half of one core')
+    dev = os.stat('/dev/nvme0n1').st_rdev
+    device = f'{os.major(dev)}:{os.minor(dev)}'
+    lines = (p / 'io.max').read_text().splitlines()
+    io = next((dict(v.split('=', 1) for v in line.split()[1:])
+               for line in lines if line.split()[0] == device), {})
+    limits = {'rbps': '4194304', 'wbps': '2097152', 'riops': '128', 'wiops': '64'}
+    if any(io.get(k) != v for k, v in limits.items()):
+        raise RuntimeError('actual block device IO hard limit readback mismatch')
+    return {'slice_cgroup': str(p), **actual, 'cpu.max': f'{quota} {period}',
+            'device': device, 'io.max': io}
+
+
+def save(unit, fields):
+    RECEIPTS.mkdir(mode=0o700, parents=True, exist_ok=True)
+    path = RECEIPTS / (unit + '.json')
+    old = json.loads(path.read_text()) if path.exists() else {}
+    old.update(fields)
+    tmp = path.with_suffix('.tmp')
+    with tmp.open('w') as stream:
+        json.dump(old, stream, indent=2)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    tmp.replace(path)
+
+
+def finish(unit):
+    fields = {'finished_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'service_result': os.environ.get('SERVICE_RESULT', 'UNKNOWN'),
+              'exit_code': os.environ.get('EXIT_CODE', 'UNKNOWN'),
+              'exit_status': os.environ.get('EXIT_STATUS', 'UNKNOWN')}
+    try:
+        p = cg(unit)
+        for name in ('memory.peak', 'memory.events', 'cpu.stat', 'io.stat', 'pids.peak'):
+            fields[name] = (p / name).read_text().strip() if (p / name).exists() else 'NOT_RECORDED'
+        props = ['CPUUsageNSec', 'MemoryPeak', 'IOReadBytes', 'IOWriteBytes', 'ExecMainPID', 'ExecMainStatus', 'Result']
+        fields['systemd'] = dict(line.split('=', 1) for line in
+                                run(['systemctl', 'show', unit] + ['-p' + v for v in props]).splitlines())
+    except Exception as exc:
+        fields['metrics_error'] = type(exc).__name__
+    save(unit, fields)
+
+
+def main(args):
+    os.umask(0o077)
+    if os.geteuid() != 0:
+        raise RuntimeError('root required')
+    if args == ['--verify']:
+        print(json.dumps(verify(), sort_keys=True))
+        return 0
+    if len(args) == 2 and args[0] == '--receipt':
+        if not re.fullmatch(r'rag-diag-[a-f0-9]{32}\.service', args[1]):
+            raise RuntimeError('invalid owned unit')
+        finish(args[1])
+        return 0
+    if len(args) >= 4 and args[0] == '--inside':
+        unit, cwd, command = args[1], args[2], args[3:]
+        with open(BASE / 'active.lock', 'a') as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                save(unit, {'guard_error': 'another owned diagnostic is active'})
+                return 75
+            limits = verify()
+            if cg(SLICE) not in cg(unit).parents:
+                raise RuntimeError('unit is outside guarded slice')
+            save(unit, {'started_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                        'pid': os.getpid(), 'limits': limits,
+                        'command_first3': [Path(command[0]).name] + ['<arg:redacted>'] * min(2, len(command)-1),
+                        'argc': len(command)})
+            stdout_path = RECEIPTS / (unit + '.stdout')
+            stderr_path = RECEIPTS / (unit + '.stderr')
+            with stdout_path.open('x') as stdout, stderr_path.open('x') as stderr:
+                child = subprocess.Popen(command, cwd=cwd, stdin=subprocess.DEVNULL,
+                                         stdout=stdout, stderr=stderr)
+                save(unit, {'child_pid': child.pid, 'stdout_path': str(stdout_path),
+                            'stderr_path': str(stderr_path)})
+                code = child.wait()
+            save(unit, {'child_returncode': code})
+            return code if code >= 0 else 128 - code
+    if len(args) < 2 or args[0] != '--' or not Path(args[1]).is_absolute():
+        raise RuntimeError('usage: rag-diagnostic-run -- /absolute/executable [argv...] (offline only)')
+    verify()
+    unit = 'rag-diag-' + uuid.uuid4().hex + '.service'
+    props = ['Type=exec', 'Restart=no', 'KillMode=control-group', 'RuntimeMaxSec=15min',
+             'TimeoutStopSec=10s', 'Nice=10', 'IOSchedulingClass=idle', 'OOMScoreAdjust=500',
+             'MemoryAccounting=yes', 'CPUAccounting=yes', 'IOAccounting=yes',
+             'StandardOutput=null', 'StandardError=null', 'UMask=0077',
+             'NoNewPrivileges=yes', 'ProtectControlGroups=yes', 'PrivateNetwork=yes',
+             'ExecStopPost=' + str(BASE / 'rag-diagnostic-run') + ' --receipt ' + unit]
+    command = ['systemd-run', '--quiet', '--no-block', '--unit=' + unit, '--slice=' + SLICE]
+    command += ['--property=' + p for p in props]
+    command += ['--', str(BASE / 'rag-diagnostic-run'), '--inside', unit, os.getcwd()] + args[1:]
+    subprocess.run(command, check=True)
+    print(json.dumps({'unit': unit, 'receipt': str(RECEIPTS / (unit + '.json'))}))
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except Exception as exc:
+        # Never stringify exceptions which may embed an argv, path, or secret.
+        detail = str(exc) if type(exc) is RuntimeError else type(exc).__name__
+        print('DIAGNOSTIC_GUARD_REFUSED: ' + detail, file=sys.stderr)
+        sys.exit(78)

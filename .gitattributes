@@ -10,6 +10,9 @@
 backend/weknora_port/retrieval/tokenizer_assets/*.utf8 -text
 backend/weknora_port/conversation_assets/*.yaml text eol=lf
 
+# Linux diagnostic entrypoints are transferred from Windows worktrees.
+deploy/s8/diagnostics/* text eol=lf
+
 # Frozen S8.6.3 evidence keeps original log bytes, including whitespace.
 /docs/evaluation/evidence/s8_6_3/** -text -whitespace
 

@@ -1,0 +1,17 @@
+[Unit]
+Description=Shared hard budget for owned offline RAG diagnostics
+
+[Slice]
+CPUAccounting=yes
+CPUQuota=50%
+MemoryAccounting=yes
+MemoryHigh=256M
+MemoryMax=384M
+MemorySwapMax=0
+TasksAccounting=yes
+TasksMax=64
+IOAccounting=yes
+IOReadBandwidthMax=/dev/nvme0n1 4194304
+IOWriteBandwidthMax=/dev/nvme0n1 2097152
+IOReadIOPSMax=/dev/nvme0n1 128
+IOWriteIOPSMax=/dev/nvme0n1 64

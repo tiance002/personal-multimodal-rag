@@ -1,0 +1,159 @@
+{
+  "schema": "ecs-diagnostic-resource-guard/v1",
+  "recorded_at": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "status": "PASS_GUARD_INSTALLED_REAL_SMOKE_BUSINESS_ACCEPTANCE_PENDING",
+  "scope": {
+    "production_application_changed": false,
+    "production_cutover": false,
+    "provider_calls": 0,
+    "provider_batch_guarded_by_this_unit": false,
+    "offline_diagnostics_only": true,
+    "s865r_semantic_completion_claimed": false,
+    "ecs_118_semantic_completion_claimed": false
+  },
+  "host_observation": {
+    "memory_gib_approx": 3.5,
+    "cpu_cores": 2,
+    "root_disk_gib": 40,
+    "available_disk_gib_approx": 16,
+    "sample_is_peak": false,
+    "previous_boot_oom_log_retained": false,
+    "oom_observed_by_owner": true,
+    "oom_process_root_cause": "UNVERIFIED"
+  },
+  "recovery": {
+    "ssh_recovered_local_time": "08:36 Asia/Shanghai",
+    "postgres_physical_identity_and_data_volume_same": true,
+    "postgres_wal_redo_completed_ready": true,
+    "redis_aof_loading_completed_and_write_ok": true,
+    "redis_run_id_changed_after_reboot": true,
+    "redis_container_identity_verified_same": true,
+    "runtime_environment_backed_up_privately": true,
+    "services_recreated": [
+      "api",
+      "worker"
+    ],
+    "api_worker_image": "same existing 80e2 image",
+    "authenticated_normal_check_exit_code": 0,
+    "production_containers_running": 4,
+    "production_container_restart_count": 0
+  },
+  "guard": {
+    "slice": "rag-diagnostics.slice",
+    "entrypoint": "rag-diagnostic-run",
+    "shared_flock_inside_unit": true,
+    "lock_survives_ssh_disconnect": true,
+    "cpu_quota_readback": "50000/100000",
+    "cpu_quota_fraction_of_one_core": 0.5,
+    "cpu_quota_fraction_of_two_core_host": 0.25,
+    "memory_high_bytes": 268435456,
+    "memory_max_bytes": 402653184,
+    "swap_max_bytes": 0,
+    "tasks_max": 64,
+    "physical_device_read_bytes_per_second": 4194304,
+    "physical_device_write_bytes_per_second": 2097152,
+    "physical_device_read_iops": 128,
+    "physical_device_write_iops": 64,
+    "nice": 10,
+    "io_class": "idle",
+    "oom_score_adjust": 500,
+    "restart": "no",
+    "kill_mode": "control-group",
+    "stop_timeout_seconds": 10,
+    "provider_batches_in_scope": false,
+    "runtime_max_seconds": 900
+  },
+  "smoke_evidence": {
+    "active_unit_properties_and_cgroup_readback": "PASS",
+    "payload_proc_oom_score_adj_readback": 500,
+    "usr_bin_true_exit_code": 0,
+    "systemd_result": "success",
+    "memory_peak_bytes": 7917568,
+    "lock_contention_expected_exit_code": 75,
+    "initial_io_suffix_decimal_interpretation_corrected": true,
+    "initial_exec_stop_post_literal_unit_name_corrected": true,
+    "corrections_retested": true
+  },
+  "offline_report_context": {
+    "original_unbounded_accumulation_risk_items": [
+      118,
+      173
+    ],
+    "derived_report_offline_pass_count": 7,
+    "python_allocation_sample_bytes": 8339801,
+    "is_os_rss": false,
+    "is_ecs_process_peak": false,
+    "case_rows": 100,
+    "media_rows": 100,
+    "extra_payload_bytes_per_row": 2097152,
+    "output_jsonl_bytes": 420350374
+  },
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "install.sh"
+      ],
+      "exit_code": 0,
+      "phase": "final_install_v3"
+    },
+    {
+      "argv": [
+        "/opt/rag-s8/diagnostics/common/rag-diagnostic-run",
+        "--",
+        "/usr/bin/true"
+      ],
+      "launcher_exit_code": 0,
+      "payload_exit_code": 0,
+      "systemd_result": "success"
+    },
+    {
+      "argv": [
+        "/opt/rag-s8/diagnostics/common/rag-diagnostic-run",
+        "--",
+        "/usr/bin/sleep",
+        "6"
+      ],
+      "launcher_exit_code": 0,
+      "payload_exit_code": 0,
+      "second_concurrent_payload_exit_code": 75
+    },
+    {
+      "argv": [
+        "docker",
+        "exec",
+        "rag-s8-api-1",
+        "python",
+        "-B",
+        "-m",
+        "scripts.s8_ecs_runtime",
+        "check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "business_acceptance": "PENDING",
+  "limitations": [
+    "No universal OOM guarantee; only jobs launched through the designated unit receive these controls",
+    "Exact OOM process cause is unverified",
+    "No ECS pressure test for the derived offline report; allocation sample is not RSS",
+    "No provider workload, production cutover, model change, application release, commit, or tag"
+  ],
+  "next_step": "Continue only explicitly authorized, bounded serial business acceptance; preserve separate semantic results and do not infer S8.6.5 or ECS 118-item completion.",
+  "diagnostic_guard_source_files": [
+    "deploy/s8/diagnostics/install.sh",
+    "deploy/s8/diagnostics/rag-diagnostics.slice",
+    "deploy/s8/diagnostics/rag-diagnostic-run"
+  ],
+  "source_files_sha256": {
+    "deploy/s8/diagnostics/install.sh": "f45f75e24c90dffb661907a42968493454b32d656c1981cf739b4b17494736a7",
+    "deploy/s8/diagnostics/rag-diagnostic-run": "02ce3ccca161de61be79b1b1c3d742c834282d77bed1c3c189d28554c9618e2f",
+    "deploy/s8/diagnostics/rag-diagnostics.slice": "fa956fb72a0d0de61d60cbdf168c55b8b1dfa4cc8a0055471604f2f66b5de6a4"
+  },
+  "local_validation": {
+    "bash_syntax_exit_code": 0,
+    "python_ast": "PASS",
+    "evidence": "Real cgroup readbacks and controlled commands recorded separately"
+  }
+}
