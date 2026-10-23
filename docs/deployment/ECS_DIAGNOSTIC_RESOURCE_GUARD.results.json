@@ -62,7 +62,8 @@
     "kill_mode": "control-group",
     "stop_timeout_seconds": 10,
     "provider_batches_in_scope": false,
-    "runtime_max_seconds": 900
+    "runtime_max_seconds": 900,
+    "docker_cli_does_not_automatically_bound_container": true
   },
   "smoke_evidence": {
     "active_unit_properties_and_cgroup_readback": "PASS",
@@ -155,5 +156,60 @@
     "bash_syntax_exit_code": 0,
     "python_ast": "PASS",
     "evidence": "Real cgroup readbacks and controlled commands recorded separately"
+  },
+  "container_probe": {
+    "status": "PASS_REAL_ZERO_PROVIDER",
+    "container_cgroup_under_guarded_slice": true,
+    "container_cpu_max": "50000 100000",
+    "container_memory_max_bytes": 134217728,
+    "container_pids_max": 32,
+    "inherits_shared_memory_cpu_device_io_caps": true,
+    "container_exit_code": 0,
+    "guarded_host_payload_exit_code": 0,
+    "systemd_result": "success",
+    "network": "none",
+    "mounts": 0,
+    "provider_calls": 0,
+    "earlier_failed_probes_retained": 2,
+    "known_docker_local_log_driver_max_file_1_compression_incompatibility_removed": true,
+    "persistent_parent_stdout_stderr": true,
+    "host_unit_peak_bytes": 30240768,
+    "host_unit_peak_includes_separate_container_scope": false
+  },
+  "actual_guarded_report": {
+    "status": "TIMEOUT_PARTIAL_RETAINED_NOT_PASS",
+    "runtime_seconds": 900,
+    "memory_peak_bytes": 296398848,
+    "oom": 0,
+    "oom_kill": 0,
+    "read_bytes": 635568128,
+    "write_bytes": 420618240,
+    "semantic_review_complete": false,
+    "next": "Per-case fresh processes and direct bounded saved HTTP answer views; no cap increase or model rerun."
+  },
+  "latest_host_samples": {
+    "cpu_idle_percent": [
+      96,
+      99
+    ],
+    "sample_is_peak": false,
+    "authenticated_normal_check_exit_code": 0
+  },
+  "bounded_answer_read_smoke": {
+    "cases": 3,
+    "payload_exit_code": 0,
+    "systemd_result": "success",
+    "memory_peak_bytes": 18432000,
+    "semantic_evaluation_complete": false,
+    "provider_calls": 0
+  },
+  "single_case_shard_smoke": {
+    "original_case_index": 66,
+    "payload_exit_code": 0,
+    "systemd_result": "success",
+    "read_errors": 0,
+    "memory_peak_bytes": 39645184,
+    "provider_calls": 0,
+    "semantic_evaluation_complete": false
   }
 }

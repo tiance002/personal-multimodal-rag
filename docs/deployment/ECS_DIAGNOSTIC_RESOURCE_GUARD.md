@@ -41,6 +41,10 @@ docker exec rag-s8-api-1 python -B -m scripts.s8_ecs_runtime check
 
 后续操作入口为上面的 `rag-diagnostic-run -- /absolute/executable ...`。不要用裸 `systemd-run` 或 `python` 启动重型诊断而绕开资源检查和共享锁。
 
+Docker 容器需要额外核对：Docker daemon 创建的容器不一定属于启动 CLI 的 systemd unit。后续临时诊断容器必须分别配置 CPU、内存、进程数上限，并核实实际 cgroup 归属及 I/O 限制；不能把包装器的上限直接当成容器已受限的证据。未验证该归属的重型容器任务暂不启动。
+
+真实零调用容器冒烟已完成：使用 `--cgroup-parent=rag-diagnostics.slice` 后，活跃容器的实际 cgroup 位于该 slice 下，容器自身半核、128 MiB、32 进程限制及共享 slice 的 I/O 限制均已读回，容器和包装器 payload 均退出 0。该容器无网络、无挂载、没有模型调用。最初两个探针失败记录保留；已去掉不兼容的 local log driver 单文件配置，改用外层持久 stdout/stderr 保存短时诊断日志。
+
 ## 3. 结果
 
 - **恢复：PASS（真实 ECS）**。PG 数据身份/卷一致，WAL redo 完成；Redis AOF 加载完成且可写；仅 API/Worker 按原镜像恢复；普通认证检查 exit 0，4 个容器运行且无重启。
@@ -51,10 +55,12 @@ docker exec rag-s8-api-1 python -B -m scripts.s8_ecs_runtime check
 
 ## 4. 风险与遗留
 
+本次实际大报告派生任务因持续内存回收未完成，于 900 秒保护时限停止，状态为 `TIMEOUT`，不是 PASS。unit 内存峰值 296,398,848 字节，未出现 OOM/oom_kill，原始记录及未完成文件保留。后续采用逐题新进程、独立落盘的派生记录，以及已完成 HTTP 答案的有界只读视图；不提高资源上限，也不重发模型调用。首批三题答案视图已真实完成，payload 退出 0、systemd success，unit 内存峰值 18,432,000 字节。该结果只证明读取路径，语义评分仍需逐题审查。另一个完整单题诊断派生进程已完成，原始序号 66，payload 退出 0、systemd success、读取错误 0，unit 内存峰值 39,645,184 字节，证明逐题独立落盘路径可实际执行。
+
 历史启动前内核日志没有保留此前启动周期的 OOM 条目。Owner 观察到 OOM，但具体进程根因**未验证**；本记录不把诊断作业认定为已证实的 OOM 根因。此护栏只限制通过指定 systemd unit 启动的离线作业，不提供整机 OOM 绝对保证，也不约束绕开入口启动的进程。
 
 后续所有 SSH 工作仅执行轻量控制和状态读回；分析经共享包装器运行。源文件、报告及数据集审阅应串行进行；用元数据/路径引用代替整体加载约 387 MB JSONL；只保留一份不可变证据副本，不频繁重算完整哈希。禁止自动重试、自动提升资源上限或将此离线护栏用于 Provider 批次。磁盘 I/O 与跨任务吞吐未做压力测试，仍为 `NOT_RECORDED`。
 
 ## 5. 版本与下一步
 
-护栏安装和冒烟已完成；生产应用镜像未变更，未做生产切换、模型变更或新版本发布。没有本次提交 SHA 或 tag。当前验收状态为 `PASS_GUARD_INSTALLED_REAL_SMOKE_BUSINESS_ACCEPTANCE_PENDING`。后续只在明确授权的任务中继续有限、串行的业务验收，并单独记录其语义结果；不得把本报告当作 S8.6.5 或 ECS 118 项完成证明。
+护栏安装和冒烟已完成；生产应用镜像未变更，未做生产切换、模型变更或新版本发布。未建立 tag；初始护栏代码提交为 `4fa1de01a4f2b0cfe91e0cc584ef9bb9ebfc49ed`，后续证据更新以 Git 历史为准。当前验收状态为 `PASS_GUARD_INSTALLED_REAL_SMOKE_BUSINESS_ACCEPTANCE_PENDING`。后续只在明确授权的任务中继续有限、串行的业务验收，并单独记录其语义结果；不得把本报告当作 S8.6.5 或 ECS 118 项完成证明。
