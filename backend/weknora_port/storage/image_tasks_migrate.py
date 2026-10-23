@@ -20,3 +20,20 @@ async def apply_image_task_schema(identity_guard):
             await conn.execute('INSERT INTO port_schema_migrations(version,sha256) VALUES(%s,%s)',
                                ('010_image_tasks',digest))
     return digest
+
+
+async def apply_image_selected_retry_schema(identity_guard):
+    """Explicit deployment step after 010; never called by request handling."""
+    await identity_guard.verify_identity()
+    version='017_image_selected_retry'
+    sql=(Path(__file__).with_name('migrations')/(version+'.sql')).read_text(encoding='utf-8')
+    digest=hashlib.sha256(sql.encode()).hexdigest()
+    conn=identity_guard.connection
+    async with conn.transaction():
+        await conn.execute('SELECT pg_advisory_xact_lock(20261013,17)')
+        rows=await (await conn.execute('SELECT sha256 FROM port_schema_migrations WHERE version=%s',(version,))).fetchall()
+        if rows and rows[0]['sha256']!=digest:raise ValueError('APPLIED_MIGRATION_CHECKSUM_MISMATCH')
+        if not rows:
+            await conn.execute(sql)
+            await conn.execute('INSERT INTO port_schema_migrations(version,sha256) VALUES(%s,%s)',(version,digest))
+    return digest

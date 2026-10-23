@@ -1,6 +1,6 @@
 import type {
   DocumentRow, KnowledgeBase, MessageRow, ModelConfiguration, PortEnvelope,
-  RuntimeIdentity, SessionRow, SourceChunk,
+  RuntimeIdentity, SessionRow, SourceChunk, GenerationPreferences, GenerationSettings, ImageProcessingSettings, ImageTaskStatus,
 } from "./types";
 
 const configured = import.meta.env.VITE_WEKNORA_API_BASE?.trim().replace(/\/$/, "");
@@ -74,6 +74,12 @@ async function mutate<T>(path: string, init: RequestInit): Promise<T> {
 }
 
 export const portApi = {
+  imageTask: (kbId: string, documentId: string) => jsonRequest<ImageTaskStatus>(`/knowledge-bases/${encodeURIComponent(kbId)}/documents/${encodeURIComponent(documentId)}/image-task`),
+  retryImageCaption: (kbId: string, documentId: string, source_version: string, asset_path: string, asset_sha256: string) => mutate<{ id: string; state: string }>(`/knowledge-bases/${encodeURIComponent(kbId)}/documents/${encodeURIComponent(documentId)}/image-task/retry`, { method: 'POST', body: JSON.stringify({ source_version, asset_path, asset_sha256, kind: 'caption', idempotency_key: crypto.randomUUID() }) }),
+  generationSettings: (sessionId: string) => jsonRequest<GenerationSettings>(`/sessions/${encodeURIComponent(sessionId)}/generation-settings`),
+  saveGenerationSettings: (sessionId: string, value: GenerationPreferences, reset = false) => mutate<GenerationSettings>(`/sessions/${encodeURIComponent(sessionId)}/generation-settings`, { method: 'PUT', body: JSON.stringify({ ...value, reset }) }),
+  imageProcessing: (kbId: string) => jsonRequest<ImageProcessingSettings>(`/knowledge-bases/${encodeURIComponent(kbId)}/image-processing`),
+  saveImageProcessing: (kbId: string, value: GenerationPreferences) => mutate<ImageProcessingSettings>(`/knowledge-bases/${encodeURIComponent(kbId)}/image-processing`, { method: 'PATCH', body: JSON.stringify(value) }),
   runtime: assertPortRuntime,
   knowledgeBases: () => jsonRequest<KnowledgeBase[]>("/knowledge-bases"),
   createKnowledgeBase: (name: string) => mutate<KnowledgeBase>("/knowledge-bases", { method: "POST", body: JSON.stringify({ name }) }),
@@ -133,8 +139,8 @@ export const portApi = {
     await jsonRequest<void>(`/sessions/${encodeURIComponent(sessionId)}/stop`, { method: "POST", body: JSON.stringify({ message_id: messageId }) }, true);
   },
   sessions: () => jsonRequest<SessionRow[]>("/sessions"),
-  createSession: (kbIds: string[], documentIds: string[], title = "新对话") => mutate<SessionRow>("/sessions", {
-    method: "POST", body: JSON.stringify({ knowledge_base_scope: kbIds, document_scope: documentIds, title }),
+  createSession: (kbIds: string[], documentIds: string[], title = "新对话", generation?: GenerationPreferences) => mutate<SessionRow>("/sessions", {
+    method: "POST", body: JSON.stringify({ knowledge_base_scope: kbIds, document_scope: documentIds, title, ...generation }),
   }),
   updateDocumentScope: (sessionId: string, documentIds: string[]) => mutate<SessionRow>(`/sessions/${encodeURIComponent(sessionId)}/document-scope`, {
     method: "PATCH", body: JSON.stringify({ document_scope: documentIds }),

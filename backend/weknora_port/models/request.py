@@ -103,6 +103,8 @@ def apply_thinking(body, config, opts, stream):
     if s.thinking_format in ("", "none"):
         return
     level, requested = opts.reasoning() if opts is not None else ("", False)
+    if opts is not None and opts.reasoning_mode == 'smart' and level == 'auto' and s.thinking_format == 'openai':
+        level = next((name for name in ('medium','low','high','minimal','xhigh','max') if levels.get(name)), level)
     if not requested:
         if not s.thinking_always_send:
             return

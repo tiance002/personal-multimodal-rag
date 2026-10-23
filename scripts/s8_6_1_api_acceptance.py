@@ -61,6 +61,19 @@ QU_ONLY_QUESTIONS = {
 MODES = ('off', 'query_structure_v1')
 
 
+
+def completed_answer_contract(frames):
+    """Fixed server replies have no provider finish; provider replies still must."""
+    if not frames or frames[-1].get('response_type')!='complete':return False
+    terminal=frames[-1].get('data',{})
+    if terminal.get('status') in ('failed','error','cancelled') or any(f.get('response_type')=='error' for f in frames):return False
+    if terminal.get('completion_source')=='server_fixed':
+        return (terminal.get('provider_completion_required') is False
+            and terminal.get('lifecycle_completed') is True
+            and terminal.get('is_fallback') is True and terminal.get('attempts')==[]
+            and bool(''.join(f.get('content','') for f in frames if f.get('response_type')=='answer').strip()))
+    return terminal.get('finish_reason') in ('stop','end_turn','completed') and terminal.get('truncated') is False
+
 def _canonical_default(value):
     if isinstance(value, Decimal):
         return str(value)
@@ -218,8 +231,9 @@ def state_snapshot(state):
 
 
 def install_profile(runtime, evidence_directory=None, *, approved_batch=None, expires_at=None,
-                    bounded_query_profile=False, approved_scope=None):
+                    bounded_query_profile=False, approved_scope=None, generation_contract=None):
     """Compose existing server dependencies; no class/Adapter monkeypatch."""
+    require(generation_contract in (None, 's88-answer-settings/v1'), 'S88_GENERATION_CONTRACT_INVALID')
     require(not getattr(runtime, '_s861_profile_installed', False), 'S861_PROFILE_ALREADY_INSTALLED')
     ordinary = runtime.ordinary
     original_configuration = ordinary.configuration
@@ -272,8 +286,13 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
             require(base.pipeline_state.query_understand_model_id == approved_batch['qu_model_id'],
                     'S861_PREFLIGHT_QU_BINDING_CHANGED')
             chat = base.generation_options['options']
-            require(chat.max_completion_tokens == 2048 and chat.thinking is False
-                    and chat.temperature == .7, 'S861_PREFLIGHT_GENERATION_OPTIONS_CHANGED')
+            if generation_contract == 's88-answer-settings/v1':
+                from scripts.s8_8_acceptance_profile import validate_approved_generation
+                validate_approved_generation(turn, base, allowed[0])
+                require(chat.temperature == .7, 'S861_PREFLIGHT_GENERATION_OPTIONS_CHANGED')
+            else:
+                require(chat.max_completion_tokens == 2048 and chat.thinking is False
+                        and chat.temperature == .7, 'S861_PREFLIGHT_GENERATION_OPTIONS_CHANGED')
             from backend.weknora_port.generation.context import DEFAULT_SYSTEM_PROMPT
             require(base.generation_options.get('system_prompt', DEFAULT_SYSTEM_PROMPT) == DEFAULT_SYSTEM_PROMPT,
                     'S861_PREFLIGHT_PROMPT_CONFIGURATION_CHANGED')
@@ -1149,8 +1168,7 @@ async def collect_http(base_url, batch_id, output, environment=None):
             terminal = frames[-1].get('data', {})
             require(not any(f.get('response_type') == 'error' for f in frames)
                 and terminal.get('status') not in ('failed', 'cancelled'), 'S861_FAILED_TURN_STOP')
-            require(terminal.get('finish_reason') in ('stop', 'end_turn', 'completed')
-                and terminal.get('truncated') is False, 'S861_INCOMPLETE_OUTPUT_STOP')
+            require(completed_answer_contract(frames), 'S861_INCOMPLETE_OUTPUT_STOP')
             require(ledger['status'] == 'OPEN' and ledger['unsettled'] == 0,
                     'S861_UNKNOWN_OR_LEDGER_STOP')
             history = await client.get(f'/api/v1/sessions/{sid}/messages')

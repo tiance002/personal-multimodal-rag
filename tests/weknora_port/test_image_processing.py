@@ -41,8 +41,8 @@ class FakeModel:
         self.calls.append(kind)
         if self.mode==kind+'-uncertain':raise ProviderError('PROVIDER_TRANSPORT_ERROR',sent=True)
         if self.mode==kind+'-failed':raise ProviderError('SYNTHETIC_MODEL_FAILURE')
-        if self.mode==kind+'-empty':return SimpleNamespace(content='  ')
-        return SimpleNamespace(content='Caption text')
+        if self.mode==kind+'-empty':return SimpleNamespace(content='  ',finish_reason='stop')
+        return SimpleNamespace(content='Caption text',finish_reason={'caption-length':'length','caption-missing':'','caption-native':'end_turn'}.get(self.mode,'stop'))
 
 
 def process(mode):
@@ -151,3 +151,18 @@ def test_uncertain_sent_caption_is_not_downgraded_to_partial_success():
     with pytest.raises(ProviderError,match='PROVIDER_TRANSPORT_ERROR') as error:
         process('caption-uncertain')
     assert error.value.sent
+
+
+@pytest.mark.parametrize('mode,code',[('caption-length','IMAGE_CAPTION_TRUNCATED'),('caption-missing','IMAGE_CAPTION_COMPLETION_MISSING')])
+def test_incomplete_caption_retains_text_but_never_becomes_evidence(mode,code):
+    plan,_,_,_=process(mode)
+    assert [c.chunk_type for c in plan.persisted]==['text','image_ocr']
+    info=json.loads(plan.persisted[-1].image_info)[0]
+    assert info['caption']=='Caption text'
+    assert info['caption_status']['error']==code
+    assert info['caption_status']['usage']['completion_tokens'] is None
+
+
+def test_native_end_turn_is_valid_completed_caption():
+    plan,_,_,_=process('caption-native')
+    assert plan.persisted[-1].chunk_type=='image_caption'

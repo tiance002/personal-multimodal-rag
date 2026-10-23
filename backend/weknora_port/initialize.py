@@ -13,7 +13,7 @@ async def initialize(settings):
     from .storage.turns_migrate import apply_turn_schema,apply_turn_configuration_schema
     from .storage.models_migrate import apply_model_schema
     from .storage.document_profile_migrate import apply_document_profile_schema
-    from .storage.image_tasks_migrate import apply_image_task_schema
+    from .storage.image_tasks_migrate import apply_image_task_schema,apply_image_selected_retry_schema
     from .storage.token_migrate import apply_token_schema
     connection=await psycopg.AsyncConnection.connect(settings.database_url,autocommit=True,row_factory=dict_row,connect_timeout=5)
     try:
@@ -23,7 +23,7 @@ async def initialize(settings):
         if row['n']:raise DevelopmentConfigurationError('EMPTY_NEW_DATABASE_REQUIRED_NO_DDL_EXECUTED')
         result={'retrieval':await apply_initial_schema(guard,[]),'history_memory':await apply_history_and_memory_schema(guard)}
         for apply in (apply_configuration_schema,apply_generation_schema,apply_send_gate_schema,apply_turn_schema,
-                      apply_model_schema,apply_document_profile_schema,apply_image_task_schema,apply_turn_configuration_schema,apply_token_schema):
+                      apply_model_schema,apply_document_profile_schema,apply_image_task_schema,apply_image_selected_retry_schema,apply_turn_configuration_schema,apply_token_schema):
             result[apply.__name__]=await apply(guard)
         return result
     finally:await connection.close()

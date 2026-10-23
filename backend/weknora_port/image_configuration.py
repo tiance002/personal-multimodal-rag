@@ -26,12 +26,17 @@ class ImageSelection:
     caption: ImageBinding | None
     caption_error: str = ""
     config_version: int = 1
+    reasoning_mode: str = "quick"
+    max_output_tokens: int = 5000
+    generation_config_version: int = 1
 
     def public(self) -> dict[str, Any]:
         return {"ocr": self.ocr.public(),
                 "caption": self.caption.public() if self.caption else None,
                 "caption_error": self.caption_error,
-                "config_version": self.config_version}
+                "config_version": self.config_version,
+                "reasoning_mode": self.reasoning_mode,"max_output_tokens": self.max_output_tokens,
+                "generation_config_version": self.generation_config_version}
 
 
 def effective_image_config(kb: Mapping[str, Any], override: Mapping[str, Any] | None = None) -> dict[str, Any]:
@@ -43,7 +48,7 @@ def effective_image_config(kb: Mapping[str, Any], override: Mapping[str, Any] | 
         raise DocumentLifecycleError("IMAGE_PAGES_UNSUPPORTED")
     if override:
         for key in ("ocr_adapter", "ocr_model_id", "caption_mode", "caption_model_id",
-                    "description_language", "custom_instructions"):
+                    "description_language", "custom_instructions", "reasoning_mode", "max_output_tokens", "config_version"):
             value = override.get(key)
             if value is not None and value != "":
                 base[key] = value
@@ -83,6 +88,7 @@ async def _vision_binding(model_id: str, source: str, model_store: Any,
 async def resolve_image_selection(kb: Mapping[str, Any], override: Mapping[str, Any] | None,
                                   model_store: Any, catalogue: Any, context: CallContext) -> ImageSelection:
     cfg = effective_image_config(kb, override)
+    generation = image_generation_settings(cfg)
     if override and override.get("ocr_model_id"):
         raise DocumentLifecycleError("IMAGE_OCR_MODEL_RETIRED")
     adapter = cfg.get("ocr_adapter") or "mineru"
@@ -101,10 +107,10 @@ async def resolve_image_selection(kb: Mapping[str, Any], override: Mapping[str, 
         caption = await _vision_binding(explicit,
             "upload" if override and override.get("caption_model_id") else "knowledge_base",
             model_store, catalogue, context)
-        return ImageSelection(ocr, caption)
+        return ImageSelection(ocr, caption, **generation)
     if explicit:
         raise DocumentLifecycleError("IMAGE_CAPTION_MODE_CONFLICT")
-    return ImageSelection(ocr, None, "IMAGE_CAPTION_VISION_MODEL_REQUIRED")
+    return ImageSelection(ocr, None, "IMAGE_CAPTION_VISION_MODEL_REQUIRED", **generation)
 
 
 async def validate_pinned_selection(snapshot: Mapping[str, Any], model_store: Any,
@@ -125,4 +131,15 @@ async def validate_pinned_selection(snapshot: Mapping[str, Any], model_store: An
         caption=await _vision_binding(caption_row.get('model_id',''),caption_row.get('source',''),
                                       model_store,catalogue,context)
     else:raise DocumentLifecycleError('IMAGE_TASK_CONFIG_INVALID')
-    return ImageSelection(ocr,caption,snapshot.get('caption_error',''))
+    return ImageSelection(ocr,caption,snapshot.get('caption_error',''),
+        **image_generation_settings({**snapshot,'config_version':snapshot.get('generation_config_version',1)}))
+
+
+def image_generation_settings(config):
+    mode=config.get('reasoning_mode','quick')
+    maximum=config.get('max_output_tokens',0)
+    version=config.get('config_version',1)
+    if mode not in ('quick','smart'):raise DocumentLifecycleError('IMAGE_REASONING_MODE_INVALID')
+    if type(maximum) is not int or maximum<0:raise DocumentLifecycleError('IMAGE_OUTPUT_TOKENS_INVALID')
+    if type(version) is not int or version<1:raise DocumentLifecycleError('IMAGE_CONFIG_VERSION_INVALID')
+    return {'reasoning_mode':mode,'max_output_tokens':maximum or 5000,'generation_config_version':version}

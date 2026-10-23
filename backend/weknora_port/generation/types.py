@@ -41,6 +41,9 @@ class GenerationRequest:
     on_context_prepared: Any = field(default=None, repr=False, compare=False, kw_only=True)
     # Server-owned SearchNothing reason; never inferred from refusal wording.
     evidence_insufficient: bool = field(default=False, kw_only=True)
+    generation_settings: dict = field(default_factory=dict, kw_only=True)
+    routing_snapshot: dict = field(default_factory=dict, kw_only=True)
+    shadow_routing_mode: str = field(default='off', kw_only=True)
 
     def __post_init__(self):
         if type(self.evidence_insufficient) is not bool:

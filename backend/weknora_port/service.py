@@ -28,6 +28,9 @@ class OrdinaryTurnRequest:
     summary_model_id: str = ''
     reasoning_effort: str = ''
     accept_language: str = ''
+    reasoning_mode: str | None = field(default=None, kw_only=True)
+    max_output_tokens: int | None = field(default=None, kw_only=True)
+    generation_settings: dict = field(default_factory=dict, repr=False, kw_only=True)
 
     def __post_init__(self):
         if not all(isinstance(x,str) and x for x in (self.session_id,self.content,self.request_id)):
@@ -36,6 +39,8 @@ class OrdinaryTurnRequest:
             raise ProviderError('TURN_CONFIGURATION_INVALID')
         if self.mode != 'quick':
             raise ProviderError('ORDINARY_MODE_REQUIRED')
+        from .generation_settings import validate_settings
+        validate_settings(self.reasoning_mode, self.max_output_tokens)
         if not all(isinstance(x,tuple) and all(isinstance(v,str) and v for v in x) for x in (self.knowledge_base_scope,self.document_scope)):
             raise ProviderError('TURN_SCOPE_INVALID')
 
@@ -193,7 +198,21 @@ class RuntimeService:
         code=getattr(error,'code','ORDINARY_CHAIN_FAILED')
         return code if isinstance(code,str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,127}',code) else 'ORDINARY_CHAIN_FAILED'
 
-    async def _publish_cancelled(self, accepted):
+    @staticmethod
+    def cancellation_diagnostics(accepted,events,error):
+        progress=[event.data or {} for event in events if event.type=='progress']
+        stage=progress[-1].get('stage','UNKNOWN') if progress else 'UNKNOWN'
+        stop=next((event for event in reversed(events) if event.type=='stop'),None)
+        deadline=isinstance(error,RunDeadlineExceeded) or getattr(error,'code','')=='MODEL_CALL_TIMEOUT'
+        # An error's sent flag describes only that model call, not earlier settled calls.
+        # Missing send/settlement telemetry is explicitly UNKNOWN, never reported as zero.
+        return {'origin':'user' if stop is not None and (stop.data or {}).get('reason')=='user_requested' else 'deadline' if deadline else 'UNKNOWN',
+                'stage':stage,'deadline_kind':accepted.context.deadline_kind if deadline else None,
+                'failing_call_sent':getattr(error,'sent',None),
+                'generation_request_sent':None,'settled_provider_calls':None,
+                'error_code':RuntimeService._safe_code(error)}
+
+    async def _publish_cancelled(self, accepted, error=None):
         events,_=await self.store.get_events(accepted.session_id,accepted.assistant_message_id,0)
         answer=''.join(event.content for event in events if event.type=='answer')
         thinking=''.join(event.content for event in events if event.type=='thinking')
@@ -206,7 +225,11 @@ class RuntimeService:
                 if not identifier:continue
                 attribute='url' if ref.get('knowledge_source','').lower()=='web_search' else 'chunk_id'
                 if f'{attribute}="{html.escape(identifier,quote=True)}"' in answer:references[identifier]=ref
-        receipt=await self.repository.commit_cancelled(accepted,answer,thinking,list(references.values()))
+        diagnostics=self.cancellation_diagnostics(accepted,events,error or CallCancelled())
+        import inspect
+        supports_diagnostics='cancellation' in inspect.signature(self.repository.commit_cancelled).parameters
+        receipt=await self.repository.commit_cancelled(accepted,answer,thinking,list(references.values()),
+            **({'cancellation':diagnostics} if supports_diagnostics else {}))
         if receipt is not True and receipt is not False:raise ProviderError('TURN_CANCEL_COMMIT_UNVERIFIED')
         status='cancelled';code='MODEL_CALL_CANCELLED'
         if receipt is False:
@@ -216,19 +239,21 @@ class RuntimeService:
         events,_=await self.store.get_events(accepted.session_id,accepted.assistant_message_id,0)
         if not any(event.type=='complete' for event in events):
             await self.store.append_event(accepted.session_id,accepted.assistant_message_id,
-                StreamEvent(accepted.run_id,'complete',data={'status':status,'error_code':code,'lifecycle_completed':True}))
+                StreamEvent(accepted.run_id,'complete',data={'status':status,'error_code':code,'lifecycle_completed':True,'cancellation':diagnostics}))
 
     async def publish_error(self, accepted, error):
         from .models.cloud_errors import public_cloud_error
         self._validate(accepted)
         code=self._safe_code(error)
         if isinstance(error,(CallCancelled,asyncio.CancelledError)):
-            cleanup=asyncio.create_task(self._publish_cancelled(accepted))
+            cleanup=asyncio.create_task(self._publish_cancelled(accepted,error))
             try:await asyncio.wait_for(asyncio.shield(cleanup),5)
             except BaseException:
                 cleanup.cancel();await asyncio.gather(cleanup,return_exceptions=True)
                 raise
             return
+        events,_=await self.store.get_events(accepted.session_id,accepted.assistant_message_id,0)
+        diagnostics=self.cancellation_diagnostics(accepted,events,error)
         receipt=await self.repository.commit_failure(accepted,code)
         if receipt is False:
             return
@@ -237,7 +262,7 @@ class RuntimeService:
         await self.store.append_event(accepted.session_id,accepted.assistant_message_id,
             StreamEvent(accepted.run_id,'error',content=public_cloud_error(code),done=True,data={'error_code':code,'status':'failed'}))
         await self.store.append_event(accepted.session_id,accepted.assistant_message_id,
-            StreamEvent(accepted.run_id,'complete',data={'status':'cancelled' if isinstance(error,(CallCancelled,asyncio.CancelledError)) else 'failed','error_code':code}))
+            StreamEvent(accepted.run_id,'complete',data={'status':'cancelled' if isinstance(error,(CallCancelled,asyncio.CancelledError)) else 'failed','error_code':code,'cancellation':diagnostics}))
 
     async def _progress(self, turn, stage, status, **fields):
         observer = getattr(getattr(self, 'application', None), 'observability', None)
@@ -434,14 +459,16 @@ class RuntimeService:
         options.setdefault('language',state.language)
         options.setdefault('supports_vision',state.chat_model_supports_vision)
         options.setdefault('faq_priority_enabled',state.faq_priority_enabled)
-        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding','on_context_prepared','evidence_insufficient'} & options.keys()
+        forbidden={'run_id','session_id','message_id','q0','finalized','evidence','history','memory_prompt','understanding','on_context_prepared','evidence_insufficient','routing_snapshot'} & options.keys()
         if forbidden:
             raise ProviderError('TURN_GENERATION_IDENTITY_OVERRIDE')
         if getattr(state, 'retrieval_strategy_mode', 'off') == 'query_structure_v1':
             from .retrieval.strategy_executor import record_delivered_coverage
             options['on_context_prepared'] = lambda prepared: record_delivered_coverage(state, prepared)
+        from .generation.shadow import snapshot_from_state
         request=GenerationRequest(turn.run_id,turn.session_id,turn.assistant_message_id,turn.request.content,finalized,
-            evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,evidence_insufficient=evidence_insufficient,**options)
+            evidence=evidence,history=history,memory_prompt='' if fallback is not None or ambiguity_clarification else memory.prompt,understanding=understanding,evidence_insufficient=evidence_insufficient,
+            routing_snapshot=snapshot_from_state(state,evidence),**options)
         if getattr(state, 'rescue_evidence', ()):
             from .generation.context import prepare_generation
             from .retrieval.types import ContextBudgetError

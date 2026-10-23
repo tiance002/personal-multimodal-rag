@@ -671,3 +671,21 @@ def go_fields(text):
     if start is not None:
         words.append(text[start:])
     return words
+
+
+def format_document_clarification(rows,language):
+    """Bounded display only. All scoped documents remain selectable in the UI."""
+    english=language.startswith('English')
+    heading=('There are multiple documents in the selected scope. Which document do you mean?'
+             if english else '当前知识库中有多份文档，你想查询哪一份？')
+    choices=[]
+    for row in rows[:5]:
+        title=re.sub(r'[\r\n\t]+',' ',str(row.get('title') or row.get('file_name') or row['id']))
+        title=title[:117]+'…' if len(title)>120 else title
+        choices.append('- '+title)
+    if len(rows)>5:
+        choices.append(f'… {len(rows)-5} more documents are available in Retrieval scope.' if english
+                       else f'……另有 {len(rows)-5} 份资料，可在“检索范围”中搜索选择。')
+    instruction=('Search and select the document in Retrieval scope, apply the selection, then send your question again.'
+                 if english else '请在“检索范围”中搜索并选择对应资料，点击“应用文档范围”后再发送问题。')
+    return heading+'\n\n'+'\n'.join(choices)+'\n\n'+instruction

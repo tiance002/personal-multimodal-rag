@@ -25,6 +25,8 @@ def _opaque_string(value):
 
 def _level(config,opts):
     level,requested=opts.reasoning() if opts else ("",False)
+    if opts and opts.reasoning_mode == 'smart' and level == 'auto' and config.api == 'openai-responses':
+        level = next((name for name in ('medium','low','high','minimal','xhigh','max') if config.thinking_levels.get(name)), level)
     return (clamp_level(config.thinking_levels,level) if level in LADDER else level),requested
 
 

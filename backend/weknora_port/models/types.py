@@ -116,6 +116,9 @@ class ChatOptions:
     # deterministic temperature on the provider wire. Default calls retain the
     # upstream-compatible behavior that omits zero-valued sampling fields.
     send_temperature: bool = False
+    # Explicit final-answer/VLM product mode. Empty retains legacy internal
+    # calls (QU etc.) and their existing provider contract.
+    reasoning_mode: str = ''
 
     def completion_budget(self) -> int:
         return self.max_completion_tokens if self.max_completion_tokens > 0 else self.max_tokens

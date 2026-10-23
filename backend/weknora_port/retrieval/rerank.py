@@ -38,6 +38,23 @@ def clean_passage(text):
         text = re.sub(pattern, '\\1', text)
     return go_strip(re.sub('\\n{3,}', '\n\n', text))
 
+def filter_image_derivative_status(info):
+    """Exclude incomplete derivatives from evidence; retain status-free legacy.
+
+    Ingestion preserves partial text for document inspection. Neither scoring
+    passages nor answer context may promote that text back into valid evidence.
+    """
+    for text_key, status_key in (('caption', 'caption_status'), ('ocr_text', 'ocr_status')):
+        if status_key not in info:
+            continue
+        status = info[status_key]
+        if isinstance(status, dict) and 'status' not in status:
+            continue  # Older records may contain an empty status object.
+        if not isinstance(status, dict) or status.get('status') != 'completed':
+            info[text_key] = ''
+    return info
+
+
 def image_infos(raw):
     try:
         values = json.loads(raw)
@@ -60,7 +77,7 @@ def image_infos(raw):
                     info[key] = 0
                 if type(info[key]) is not int:
                     return []
-            output.append(info)
+            output.append(filter_image_derivative_status(info))
         return output
     except (ValueError, TypeError):
         return []

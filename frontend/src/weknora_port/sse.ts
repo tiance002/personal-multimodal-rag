@@ -113,6 +113,8 @@ export async function runPortChat(sessionId: string, requestBody: {
   content: string; request_id: string; mode: "quick" | "smart";
   knowledge_base_scope: string[]; document_scope: string[];
   reasoning_effort?: string;
+  reasoning_mode?: 'quick' | 'smart';
+  max_output_tokens?: number;
   accept_language?: string;
 }, callbacks: RunCallbacks): Promise<void> {
   await assertPortRuntime();

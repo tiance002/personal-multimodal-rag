@@ -7,6 +7,8 @@ const roleRows = ["embedding", "rerank", "cheap", "expensive", "vlm"].map(role =
 }));
 
 async function installCatalogRoutes(page: import("@playwright/test").Page, options: { implementation?: string } = {}) {
+  await page.route('**/api/v1/sessions/*/generation-settings', route => route.fulfill({ json: envelope({ saved: {}, effective: { reasoning_mode: 'quick', max_output_tokens: 2048 }, defaults: { reasoning_mode: 'quick', max_output_tokens: 2048 }, session_revision: 0, configuration_version: 'fixture' }) }));
+  await page.route('**/api/v1/knowledge-bases/*/image-processing', route => route.fulfill({ json: envelope({ image_processing_config: {}, effective_generation: { reasoning_mode: 'quick', max_output_tokens: 5000 } }) }));
   await page.route("**/api/v1/runtime", route => route.fulfill({ json: envelope({ implementation: options.implementation ?? "weknora-python-port", api_version: "v1" }) }));
   await page.route("**/api/v1/knowledge-bases", route => route.fulfill({ json: envelope([
     { id: "kb-1", name: "课程资料", cloud_allowed: false, document_count: 1 },
@@ -93,9 +95,9 @@ test("port adapter loads visible scope and five masked model roles without old a
   await expect(page.getByText("课程资料", { exact: true }).first()).toBeVisible();
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("教材 第三章.pdf")).toBeVisible();
-  await expect(page.getByRole("button", { name: /智能推理/ })).toBeDisabled();
+  await expect(page.getByRole("combobox", { name: "回答设置推理模式" })).toHaveValue("quick");
   await page.getByRole("button", { name: "模型设置" }).click();
-  for (const role of ["Embedding", "Rerank", "Quick answer", "Smart answer", "Vision"]) {
+  for (const role of ["Embedding", "Rerank", "Cheap answer", "Expensive answer", "Vision"]) {
     await expect(page.getByText(role, { exact: true })).toBeVisible();
   }
   await expect(page.getByText("API 密钥只写入，不会从服务端读回")).toBeVisible();
@@ -147,7 +149,8 @@ test("POST once and recover by offset-zero GET of the same assistant message wit
   expect(posts).toBe(1);
   expect(gets).toBe(1);
   expect(postBody?.mode).toBe("quick");
-  expect(postBody?.reasoning_effort).toBe("off");
+  expect(postBody?.reasoning_mode).toBe("quick");
+  expect(postBody?.max_output_tokens).toBe(0);
   expect(postBody).not.toHaveProperty("accept_language");
   expect(answerLanguage).toBe("zh-CN");
   expect(postBody?.knowledge_base_scope).toEqual(["kb-1"]);
@@ -190,7 +193,8 @@ test("answer language defaults to Simplified Chinese and persists an explicit se
   await expect(page.getByText("The card reading is 37.", { exact: true })).toBeVisible();
   expect(posts).toBe(1);
   expect(answerLanguage).toBe("en-US");
-  expect(postBody?.reasoning_effort).toBe("off");
+  expect(postBody?.reasoning_mode).toBe("quick");
+  expect(postBody?.max_output_tokens).toBe(0);
   expect(postBody?.knowledge_base_scope).toEqual(["kb-1"]);
   expect(postBody?.content).toBe("卡片中的读数是多少？");
   expect(postBody).not.toHaveProperty("accept_language");
@@ -276,7 +280,7 @@ test("library selection reads its KB scope and upload polling exposes terminal c
   await expect(page.getByRole("link", { name: "查看原文件" })).toHaveAttribute("href", /knowledge-bases\/kb-1\/documents\/doc-1\/source$/);
   await page.getByRole("button", { name: /^图片资料/ }).click();
   await expect(page.getByText("chapter.pdf", { exact: true })).toHaveCount(0);
-  await expect(page.getByRole("combobox")).toHaveValue("kb-2");
+  await expect(page.getByRole("combobox", { name: '上传目标知识库' })).toHaveValue("kb-2");
   await expect(page.getByText("资料文件", { exact: true })).toBeVisible();
   await page.locator('input[type="file"]').setInputFiles({ name: "figure.png", mimeType: "image/png", buffer: Buffer.from("image") });
   await expect(page.getByText("figure.png", { exact: true })).toBeVisible();
@@ -780,7 +784,7 @@ test("library keeps upload and readable filenames in view with 50 KBs and indepe
   const lastBase = kbList.getByRole("button").last();
   await lastBase.click();
   await expect(lastBase).toHaveAttribute("aria-pressed", "true");
-  await expect(library.getByRole("combobox")).toHaveValue("many-kb-50");
+  await expect(library.getByRole("combobox", { name: '上传目标知识库' })).toHaveValue("many-kb-50");
   await expect(docList.locator(".wp-document-row")).toHaveCount(35);
   await expect(heading).toBeInViewport({ ratio: 1 });
   await expect(upload).toBeInViewport({ ratio: 1 });
@@ -811,7 +815,7 @@ test("library keeps upload and readable filenames in view with 50 KBs and indepe
   await expect(heading).toBeInViewport({ ratio: 1 });
   await expect(upload).toBeInViewport({ ratio: 1 });
   expect(Math.abs((await upload.boundingBox())!.y - uploadTop)).toBeLessThanOrEqual(1);
-  await expect(library.getByRole("combobox")).toHaveValue("many-kb-50");
+  await expect(library.getByRole("combobox", { name: "上传目标知识库" })).toHaveValue("many-kb-50");
   await expect(lastBase).toHaveAttribute("aria-pressed", "true");
   const overflow = await page.locator("main").evaluate(element => ({ scroll: element.scrollWidth, client: element.clientWidth }));
   expect(overflow.scroll).toBeLessThanOrEqual(overflow.client + 1);

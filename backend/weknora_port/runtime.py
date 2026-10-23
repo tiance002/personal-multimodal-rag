@@ -49,6 +49,7 @@ class ConversationSettings:
     rerank_context_enabled: bool = False
     rerank_top1_floorless: bool = True  # Owner-approved server default; explicit false remains available.
     bridge_rescue_mode: str = 'off'  # Server-only experiment, no saved-session override.
+    shadow_routing_mode: str = field(default='off', kw_only=True)
     summary: Mapping[str, Any] = field(default_factory=lambda: {
         "temperature": .7, "max_completion_tokens": 0})
 
@@ -70,6 +71,8 @@ class ConversationSettings:
         validate_strategy_mode(self.retrieval_strategy_mode, self.source_evidence_mode)
         if type(self.bridge_rescue_mode) is not str or self.bridge_rescue_mode not in ('off', 'cheap_bridge_v1'):
             raise ValueError('BRIDGE_RESCUE_MODE_INVALID')
+        if self.shadow_routing_mode not in ('off','shadow_structure_v1'):
+            raise ValueError('SHADOW_ROUTING_MODE_INVALID')
 
     @classmethod
     def from_mapping(cls, configuration, *, prompt_templates=None):
@@ -356,7 +359,7 @@ class ApplicationRuntime:
         self.policy = policy or RouterPolicy()
         self.estimator = estimator if estimator is not None else LocalTextTokenEstimator(tokenizer_asset)
         self.models = PostgresModelStore(leases, principal, self.catalogue, cipher=cipher)
-        self.turns = PostgresTurnRepository(leases, principal)
+        self.turns = PostgresTurnRepository(leases, principal, generation_defaults=self.conversation.summary)
         self.memory_repository = LeasedMemoryRepository(leases, principal)
         from .memory_runtime import RuntimeMemoryModels
         from .conversation.management import MemoryManager
@@ -510,6 +513,11 @@ class ApplicationRuntime:
                 if mode is not None:
                     saved["retrieval_strategy_mode"] = mode
                 context_config = {"conversation": saved} if saved else {}
+                generation = {name: getattr(request,name) for name in ('reasoning_mode','max_output_tokens') if getattr(request,name,None) is not None}
+                if generation:
+                    from .generation_settings import validate_settings
+                    validate_settings(generation.get('reasoning_mode'),generation.get('max_output_tokens'))
+                    context_config['generation'] = {**generation,'revision':1}
                 await guard.connection.execute(
                     "INSERT INTO sessions(id,tenant_id,subject_id,title,knowledge_base_scope,"
                     "document_scope,max_rounds,enable_rewrite,embedding_top_k,vector_threshold,"
@@ -533,6 +541,34 @@ class ApplicationRuntime:
     async def update_session_document_scope(self, principal, session_id, document_ids):
         self._owner(principal)
         return await self.turns.update_document_scope(session_id,document_ids,principal)
+
+    async def read_generation_settings(self, principal, session_id):
+        self._owner(principal)
+        from .generation_settings import resolve_settings
+        from .conversation_configuration import resolve_saved_conversation
+        async with self.leases.lease() as guard:
+            session = await self.turns._session(guard, session_id, principal)
+        summary = resolve_saved_conversation(self.conversation, session)['summary']
+        return resolve_settings(summary, session)
+
+    async def update_generation_settings(self, principal, session_id, value):
+        self._owner(principal)
+        from .generation_settings import validate_settings, session_settings
+        validate_settings(value.get('reasoning_mode'), value.get('max_output_tokens'))
+        if set(value) - {'reasoning_mode', 'max_output_tokens', 'reset'}:
+            raise ProviderError('GENERATION_SETTINGS_INVALID')
+        async with self.leases.lease() as guard:
+            async with guard.connection.transaction():
+                session = await self.turns._session(guard, session_id, principal)
+                context = session.get('context_config') or {}
+                if isinstance(context, str): context = json.loads(context)
+                context = dict(context)
+                revision = int(session_settings(session).get('revision', 0)) + 1
+                saved = {} if value.get('reset') else {k: value[k] for k in ('reasoning_mode', 'max_output_tokens') if k in value}
+                context['generation'] = {**saved, 'revision': revision}
+                await guard.connection.execute('UPDATE sessions SET context_config=%s::jsonb,updated_at=now() WHERE id=%s AND tenant_id=%s AND subject_id=%s AND deleted_at IS NULL',
+                    (json.dumps(context), session_id, principal.tenant_id, principal.subject_id))
+        return await self.read_generation_settings(principal, session_id)
 
     async def _document_scope_clarification(self, turn, language):
         import re
@@ -577,21 +613,8 @@ class ApplicationRuntime:
         named={row['id'] for row in rows if any(title_matches(value)
             for value in (row.get('title'),row.get('file_name')))}
         if len(named)==1:return None
-        # Persist the real catalog in the ordinary answer, so choices also
-        # survive history reload. Selection itself uses the authorized PATCH.
-        english=language.startswith('English')
-        heading=('There are multiple documents in the selected scope. Which document do you mean?'
-                 if english else '当前知识库中有多份文档，你想查询哪一份？')
-        choices=[]
-        for row in rows:
-            title=row.get('title') or row.get('file_name') or row['id']
-            title=re.sub(r'[\r\n]+',' ',title)
-            filename=re.sub(r'[\r\n]+',' ',row.get('file_name') or '')
-            if filename and filename!=title:title+=f' / {filename}'
-            choices.append(f"- {title}（Document ID: {row['id']}）")
-        instruction=('Select the document in Retrieval scope and apply the selection, then send your question again.'
-                     if english else '请在“检索范围”中选择对应资料并点击“应用文档范围”，再发送问题。')
-        return heading+'\n\n'+'\n'.join(choices)+'\n\n'+instruction
+        from .retrieval.query import format_document_clarification
+        return format_document_clarification(rows,language)
 
     async def list_messages(self, principal, session_id):
         self._owner(principal)
@@ -600,7 +623,8 @@ class ApplicationRuntime:
             rows = await (await guard.connection.execute(
                 "SELECT m.id,m.request_id,m.role,m.content,m.created_at,m.knowledge_references,m.agent_steps,m.is_completed,m.turn_status,"
                 "m.turn_error_code,m.knowledge_base_scope,m.document_scope,"
-                "g.finish_reason,COALESCE(g.objective,'[]'::jsonb) AS generation_issues FROM messages m "
+                "g.finish_reason,COALESCE(g.objective,'[]'::jsonb) AS generation_issues,"
+                "(SELECT t.request_configuration->'generation_settings' FROM port_turns t WHERE t.tenant_id=m.tenant_id AND t.subject_id=m.subject_id AND t.session_id=m.session_id AND t.run_id=m.request_id LIMIT 1) AS generation_settings FROM messages m "
                 "LEFT JOIN LATERAL (SELECT a.finish_reason,a.objective FROM port_turns t "
                 "JOIN generation_runs r ON r.run_id=t.run_id AND r.tenant_id=t.tenant_id "
                 "AND r.subject_id=t.subject_id AND r.session_id=t.session_id AND r.message_id=t.assistant_message_id "
@@ -630,6 +654,7 @@ class ApplicationRuntime:
         registry = NeutralModelRegistry(
             self.models, factory, owner_id=self.principal.subject_id, catalogue=self.catalogue)
         from .conversation_configuration import resolve_saved_conversation, resolve_language, resolved_chat_options
+        from .generation_settings import resolve_settings, apply_settings
         from .retrieval.pipeline import DEFAULT_REWRITE_SYSTEM, DEFAULT_REWRITE_USER, DEFAULT_CONTEXT_TEMPLATE
         from .generation.context import DEFAULT_SYSTEM_PROMPT
         source = self.conversation
@@ -658,6 +683,10 @@ class ApplicationRuntime:
         self._runs[turn.run_id] = {"registry": registry, "snapshot": snapshot, "chat_id": chat_id}
         baseline = await registry.chat(chat_id, turn.context)
         summary = effective['summary']
+        answer_settings = getattr(turn.request,'generation_settings',{}) or resolve_settings(summary, session,
+            reasoning_mode=getattr(turn.request,'reasoning_mode',None), max_output_tokens=getattr(turn.request,'max_output_tokens',None),
+            reasoning_effort=turn.request.reasoning_effort)
+        answer_options = apply_settings(resolved_chat_options(summary, ''), answer_settings)
         state = PipelineState(
             targets=tuple(SearchTarget(kb, "knowledge" if turn.context.scope.document_ids else "knowledge_base",
                 turn.context.scope.document_ids) for kb in turn.context.scope.knowledge_base_ids),
@@ -692,10 +721,11 @@ class ApplicationRuntime:
                     'bridge_rescue_mode', 'chat_model_id', 'query_understand_model_id', 'rerank_model_id', 'vlm_model_id')}))
         return TurnConfiguration(state, {"policy": self.policy,
             "system_prompt": summary.get('prompt', DEFAULT_SYSTEM_PROMPT),
-            "options": resolved_chat_options(summary, turn.request.reasoning_effort)},
+            "options": answer_options, "generation_settings": answer_settings,
+            "shadow_routing_mode":source.shadow_routing_mode},
             fallback={"strategy":source.fallback_strategy,"response":source.fallback_response,
                 "prompt":self._fallback_prompt(),"documents":lambda:self._fallback_documents(turn),
-                "options":resolved_chat_options(summary, 'off')})
+                "options":answer_options})
 
     def _fallback_prompt(self):
         if self.conversation.fallback_prompt is not None:return self.conversation.fallback_prompt
@@ -944,7 +974,7 @@ class ApplicationRuntime:
         from .image_configuration import effective_image_config,resolve_image_selection
         from .models.types import CallContext,TrustedScope
         kb=await self.documents._kb(principal,knowledge_base_id)
-        allowed={'enable_multimodal','ocr_adapter','ocr_model_id','caption_mode',
+        allowed={'enable_multimodal','ocr_adapter','ocr_model_id','caption_mode','reasoning_mode','max_output_tokens',
                  'caption_model_id','description_language','custom_instructions'}
         if set(value)-allowed or ('enable_multimodal' in value and type(value['enable_multimodal']) is not bool):
             raise ValueError('IMAGE_CONFIG_INVALID')
@@ -952,7 +982,12 @@ class ApplicationRuntime:
             raise ValueError('IMAGE_OCR_ADAPTER_RETIRED')
         if value.get('ocr_model_id'):
             raise ValueError('IMAGE_OCR_MODEL_RETIRED')
+        from .generation_settings import validate_settings
+        validate_settings(value.get('reasoning_mode'),value.get('max_output_tokens'))
         cfg=effective_image_config(kb,value)
+        previous=kb.get('image_processing_config') or {}
+        if isinstance(previous,str):previous=json.loads(previous)
+        cfg['config_version']=int(previous.get('config_version',1))+1
         if cfg.get('ocr_adapter') == 'mineru':
             cfg.pop('ocr_model_id',None)
         elif not cfg.get('ocr_adapter'):
@@ -965,10 +1000,24 @@ class ApplicationRuntime:
             guard.require_verified()
             rows=await (await guard.connection.execute(
                 'UPDATE knowledge_bases SET image_processing_config=%s::jsonb,updated_at=now() '
-                'WHERE id=%s AND tenant_id=%s AND deleted_at IS NULL RETURNING id',
-                (json.dumps(cfg,ensure_ascii=False),knowledge_base_id,principal.tenant_id))).fetchall()
-        if len(rows)!=1:raise LookupError('KNOWLEDGE_BASE_NOT_FOUND')
+                'WHERE id=%s AND tenant_id=%s AND deleted_at IS NULL AND COALESCE(image_processing_config,\'{}\'::jsonb)=%s::jsonb RETURNING id',
+                (json.dumps(cfg,ensure_ascii=False),knowledge_base_id,principal.tenant_id,json.dumps(previous)))).fetchall()
+        if len(rows)!=1:raise ProviderError('IMAGE_CONFIG_CONFLICT')
         return {'id':knowledge_base_id,'image_processing_config':cfg}
+
+    async def read_image_processing(self,principal,knowledge_base_id):
+        self._owner(principal)
+        from .image_configuration import effective_image_config
+        kb=await self.documents._kb(principal,knowledge_base_id)
+        cfg=effective_image_config(kb)
+        return {'id':knowledge_base_id,'image_processing_config':cfg,
+                'effective_generation':{'reasoning_mode':cfg.get('reasoning_mode','quick'),
+                                        'max_output_tokens':cfg.get('max_output_tokens',0) or 5000}}
+
+    async def retry_image_item(self,principal,knowledge_base_id,document_id,value):
+        self._owner(principal)
+        kb=await self.documents._kb(principal,knowledge_base_id)
+        return await self.image_tasks.create_selected_retry(principal,kb,document_id,**value)
 
     async def list_documents(self, principal, knowledge_base_id):
         self._owner(principal)
@@ -978,7 +1027,7 @@ class ApplicationRuntime:
         self._owner(principal)
         await self.documents._kb(principal,knowledge_base_id)
         rows=await self._rows(
-            'SELECT id,state,attempt,max_retry,error_code,outcomes,selected_config '
+            'SELECT id,state,attempt,max_retry,error_code,outcomes,selected_config,source_version '
             'FROM port_image_tasks WHERE tenant_id=%s AND subject_id=%s '
             'AND knowledge_base_id=%s AND knowledge_id=%s ORDER BY created_at DESC LIMIT 1',
             (principal.tenant_id,principal.subject_id,knowledge_base_id,document_id))
@@ -986,7 +1035,8 @@ class ApplicationRuntime:
         row=rows[0]
         return {'id':row['id'],'state':row['state'],'attempt':row['attempt'],
             'max_retry':row['max_retry'],'error_code':row['error_code'],
-            'selection':row['selected_config']['selection'],'outcomes':row['outcomes']}
+            'selection':row['selected_config']['selection'],'outcomes':row['outcomes'],
+            'source_version':row['source_version']}
 
     async def cancel_image_task(self,principal,knowledge_base_id,document_id):
         self._owner(principal)

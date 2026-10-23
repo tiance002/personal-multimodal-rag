@@ -28,9 +28,10 @@ class TurnState:
 
 
 class PostgresTurnRepository:
-    def __init__(self,lease_factory,principal: LocalPrincipal):
+    def __init__(self,lease_factory,principal: LocalPrincipal, *, generation_defaults=None):
         if not isinstance(principal,LocalPrincipal):raise ProviderError('LOCAL_PRINCIPAL_REQUIRED')
         self.leases,self.principal=lease_factory,principal
+        self.generation_defaults = dict(generation_defaults or {})
 
     def _owner(self,principal):
         if not isinstance(principal,LocalPrincipal) or principal!=self.principal:raise ProviderError('TURN_OWNER_MISMATCH')
@@ -102,6 +103,9 @@ class PostgresTurnRepository:
     @staticmethod
     def _request_configuration(request, *, include_order=True):
         value={name:getattr(request,name) for name in ('summary_model_id','reasoning_effort','accept_language') if getattr(request,name)}
+        for name in ('reasoning_mode', 'max_output_tokens'):
+            if getattr(request, name) is not None:
+                value[name] = getattr(request, name)
         ordered=tuple(dict.fromkeys(request.knowledge_base_scope))
         if include_order and len(ordered)>1:
             value['knowledge_base_order']=list(ordered)
@@ -152,6 +156,20 @@ class PostgresTurnRepository:
                     await self._messages(guard,row)
                     return self._accepted(row)
                 snapshot=await self._resolve(guard,request,session);payload=self._payload(request,snapshot)
+                # Freeze resolved answer settings under the same session lock
+                # as admission. Later preference updates affect future turns.
+                from ..generation_settings import resolve_settings
+                summary = dict(getattr(self, 'generation_defaults', {}))
+                parameters = session.get('summary_parameters') or {}
+                if isinstance(parameters, str): parameters = json.loads(parameters)
+                summary.update({k: v for k, v in parameters.items() if v is not None})
+                context = session.get('context_config') or {}
+                if isinstance(context, str): context = json.loads(context)
+                summary.update({k: v for k, v in ((context.get('conversation') or {}).get('summary') or {}).items() if v is not None})
+                frozen_configuration = self._request_configuration(request)
+                frozen_configuration['generation_settings'] = resolve_settings(summary, session,
+                    reasoning_mode=request.reasoning_mode, max_output_tokens=request.max_output_tokens,
+                    reasoning_effort=request.reasoning_effort)
                 # Recover source-existing messages without starting their run again.
                 old=await self._rows(guard,"SELECT id,role,content,knowledge_base_scope,document_scope FROM messages WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND request_id=%s AND deleted_at IS NULL",(*self._owner(principal),request.session_id,request.request_id))
                 new=not old
@@ -162,11 +180,11 @@ class PostgresTurnRepository:
                     if len(users)!=1 or len(answers)!=1 or users[0]['content']!=snapshot.q0 or _tuple(users[0]['knowledge_base_scope'])!=snapshot.knowledge_base_ids or _tuple(users[0]['document_scope'])!=snapshot.document_ids:
                         raise ProviderError('TURN_REQUEST_PAYLOAD_CONFLICT')
                     user_id,assistant_id=users[0]['id'],answers[0]['id']
-                row=dict(tenant_id=principal.tenant_id,subject_id=principal.subject_id,session_id=request.session_id,client_request_id=request.request_id,run_id=run_id,user_message_id=user_id,assistant_message_id=assistant_id,q0=snapshot.q0,knowledge_base_scope=snapshot.knowledge_base_ids,document_scope=snapshot.document_ids,payload_sha256=payload,request_configuration=self._request_configuration(request))
+                row=dict(tenant_id=principal.tenant_id,subject_id=principal.subject_id,session_id=request.session_id,client_request_id=request.request_id,run_id=run_id,user_message_id=user_id,assistant_message_id=assistant_id,q0=snapshot.q0,knowledge_base_scope=snapshot.knowledge_base_ids,document_scope=snapshot.document_ids,payload_sha256=payload,request_configuration=frozen_configuration)
                 if new:
                     for id,role,content in ((user_id,'user',snapshot.q0),(assistant_id,'assistant','')):
                         await conn.execute('INSERT INTO messages(id,request_id,session_id,tenant_id,subject_id,role,content,knowledge_base_scope,document_scope,is_completed,created_at) VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s,clock_timestamp())',(id,run_id,request.session_id,*self._owner(principal),role,content,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids),role=='user'))
-                await conn.execute('INSERT INTO port_turns(tenant_id,subject_id,session_id,client_request_id,run_id,user_message_id,assistant_message_id,q0,payload_sha256,knowledge_base_scope,document_scope,request_configuration) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s::jsonb)',(*self._owner(principal),request.session_id,request.request_id,run_id,user_id,assistant_id,snapshot.q0,payload,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids),_json(self._request_configuration(request))))
+                await conn.execute('INSERT INTO port_turns(tenant_id,subject_id,session_id,client_request_id,run_id,user_message_id,assistant_message_id,q0,payload_sha256,knowledge_base_scope,document_scope,request_configuration) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s::jsonb,%s::jsonb)',(*self._owner(principal),request.session_id,request.request_id,run_id,user_id,assistant_id,snapshot.q0,payload,_json(snapshot.knowledge_base_ids),_json(snapshot.document_ids),_json(frozen_configuration)))
                 return self._accepted(row,new=new)
 
     async def _messages(self,guard,row):
@@ -206,7 +224,7 @@ class PostgresTurnRepository:
                 await guard.connection.execute("UPDATE port_turns SET status='error',error_code=%s,updated_at=now() WHERE tenant_id=%s AND subject_id=%s AND session_id=%s AND run_id=%s",(safe_code,*self._owner(self.principal),accepted.session_id,accepted.run_id))
                 return True
 
-    async def commit_cancelled(self,accepted,answer,thinking,references) -> bool:
+    async def commit_cancelled(self,accepted,answer,thinking,references,*,cancellation=None) -> bool:
         self._accepted_owner(accepted)
         if not isinstance(answer,str) or not isinstance(thinking,str):raise ProviderError('TURN_CANCELLED_CONTENT_INVALID')
         encoded=_json(references)
@@ -233,6 +251,8 @@ class PostgresTurnRepository:
                     steps=list(steps)
                     if not steps:steps=[{'iteration':0,'timestamp':datetime.now(timezone.utc).isoformat(),'tool_calls':[]}]
                     steps[0]={**steps[0],'reasoning_content':thinking}
+                if cancellation is not None:
+                    steps=list(steps)+[{'stage':'cancellation','cancellation':cancellation}]
                 await guard.connection.execute("UPDATE messages SET content=%s,rendered_content=%s,knowledge_references=%s::jsonb,agent_steps=%s::jsonb,is_completed=true,turn_status='cancelled',turn_error_code='MODEL_CALL_CANCELLED',updated_at=now() WHERE id=%s AND request_id=%s AND session_id=%s AND tenant_id=%s AND subject_id=%s AND role='assistant'",
                     (answer,answer,encoded,_json(steps),accepted.assistant_message_id,accepted.run_id,accepted.session_id,*self._owner(self.principal)))
                 # Existing coarse terminal CHECK stays unchanged; error_code/message status distinguish cancel from success.

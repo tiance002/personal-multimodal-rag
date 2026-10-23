@@ -122,6 +122,15 @@ class GenerationCoordinator:
     async def _attempt(self, request, prepared, context, role, ordinal, reason):
         binding = self._binding(role)
         attempt_id = f'{request.run_id}/answer/{ordinal}/{role}'
+        from ..models.generation_capabilities import validate_generation_options
+        options = request.options
+        body = binding.model.build_request_body(prepared.messages, options, stream=True) if options.reasoning_mode and hasattr(binding.model, 'build_request_body') else None
+        mapping = validate_generation_options(binding.model.config, options, body=body, messages=prepared.messages, stream=True)
+        if mapping:
+            self._parameter_mappings[attempt_id] = mapping
+            await self.store.append_event(request.session_id,request.message_id,
+                StreamEvent(attempt_id+'-settings','generation_settings',data={
+                    **request.generation_settings, 'attempt_id':attempt_id,'role':role,'provider_mapping':mapping}))
         envelope = digest({'attempt_id': attempt_id, 'role': role, 'prompt': prepared.prompt_sha256, 'context': prepared.context_sha256, 'options': asdict(request.options), 'provider': binding.provider, 'model': binding.model_requested, 'endpoint': binding.endpoint})
         record = AttemptRecord(attempt_id, ordinal, role, binding.provider, binding.model_requested, binding.endpoint, envelope, prepared.prompt_sha256, prepared.context_sha256, upgrade_reason=reason)
         attempt_context = replace(context, request_id=attempt_id)
@@ -387,7 +396,9 @@ class GenerationCoordinator:
             request.run_id,text,[],usage_dict(usage),quality={
                 'citation_quality':asdict(citation_quality),
                 'generation_issues':[]}),complete_data={'is_fallback':True,'attempts':[public_attempt(a) for a in attempts],'router':route,
-                'citation_quality':asdict(citation_quality)})
+                'citation_quality':asdict(citation_quality), 'completion_source':'server_fixed',
+                'provider_completion_required':False, 'lifecycle_completed':True,
+                'generation_settings':request.generation_settings})
         return GenerationResult(text,'',(),'fixed','',tuple(attempts),route,usage,'',False,len(attempts)>1,'','',citation_quality)
 
     async def run(self, request, context):
@@ -404,6 +415,7 @@ class GenerationCoordinator:
         if request.on_context_prepared is not None:
             request.on_context_prepared(prepared)
         route = None
+        self._parameter_mappings = {}
         role = 'baseline'
         if request.policy.mode != 'OFF':
             estimate = self.estimator.estimate(prepared.messages, request.options) if self.estimator else TokenEstimate()
@@ -413,6 +425,9 @@ class GenerationCoordinator:
             decision = decide(query, prepared.full_prompt, request.policy, estimated_tokens=estimate.tokens, estimator=estimate.estimator, understanding=request.understanding)
             route = decision.public(request.policy)
             role = decision.role
+            from .shadow import enrich_snapshot, shadow_decide
+            route['input_snapshot'] = enrich_snapshot(request.routing_snapshot, prepared, decision.features)
+            route['shadow'] = shadow_decide(route['input_snapshot'], baseline_role=role, mode=request.shadow_routing_mode)
         payload = digest({'request': request.run_id, 'session': request.session_id, 'message': request.message_id, 'q0': request.q0, 'prompt': prepared.prompt_sha256, 'context': prepared.context_sha256, 'options': asdict(request.options), 'mode': request.policy.mode, 'owner': context.scope.owner_id, 'knowledge_bases': context.scope.knowledge_base_ids, 'documents': context.scope.document_ids})
         await self.lifecycle.claim_run(request.run_id, payload, context)
         attempts = []
@@ -449,6 +464,9 @@ class GenerationCoordinator:
         check_context(context)
         metadata = {'is_fallback':request.is_fallback, 'attempt_id': record.attempt_id, 'role': record.role, 'finish_reason': record.finish_reason, 'truncated': result.truncated, 'upgraded': result.upgraded, 'model_requested': record.model_requested, 'model_reported': record.model_reported, 'usage_status': record.usage.status, 'invalid_handle_count': record.invalid_handle_count}
         metadata['generation_issues'] = list(record.objective)
+        metadata.update(completion_source='provider', provider_completion_required=True, lifecycle_completed=True,
+                        generation_settings=request.generation_settings,
+                        provider_parameter_mappings=self._parameter_mappings)
         metadata['citation_quality'] = public_citation_quality(record)
         if record.citation_quality.status == 'MISSING':
             metadata['generation_issues'].append('MISSING_CITATIONS')

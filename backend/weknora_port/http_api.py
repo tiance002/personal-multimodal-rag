@@ -68,6 +68,8 @@ class KnowledgeBaseCreate(ApiModel):
 
 
 class ImageProcessingWrite(ApiModel):
+    reasoning_mode: Literal['quick', 'smart'] = 'quick'
+    max_output_tokens: int = Field(default=0, ge=0, strict=True)
     enable_multimodal: StrictBool = False
     ocr_adapter: str = ''
     ocr_model_id: str = ''
@@ -87,6 +89,8 @@ class VisionModelCreate(ApiModel):
 
 
 class SessionCreate(ApiModel):
+    reasoning_mode: Literal['quick', 'smart'] | None = None
+    max_output_tokens: int | None = Field(default=None, ge=0, strict=True)
     retrieval_strategy_mode: Literal["off", "query_structure_v1"] | None = None
     source_evidence_mode: Literal["off", "bounded_source_v1"] | None = None
     knowledge_base_scope: list[str] = Field(min_length=1)
@@ -95,6 +99,8 @@ class SessionCreate(ApiModel):
 
 
 class MessageCreate(ApiModel):
+    reasoning_mode: Literal['quick', 'smart'] | None = None
+    max_output_tokens: int | None = Field(default=None, ge=0, strict=True)
     summary_model_id: str | None = Field(default='',max_length=64)
     reasoning_effort: str | None = Field(default='',max_length=32)
     content: str = Field(min_length=1, max_length=100_000)
@@ -110,6 +116,20 @@ class StopSessionRequest(ApiModel):
 
 class SessionDocumentScopeWrite(ApiModel):
     document_scope: list[str]
+
+
+class GenerationSettingsWrite(ApiModel):
+    reasoning_mode: Literal['quick', 'smart'] = 'quick'
+    max_output_tokens: int = Field(default=0, ge=0, strict=True)
+    reset: StrictBool = False
+
+
+class ImageRetryWrite(ApiModel):
+    source_version: str = Field(min_length=1, max_length=128)
+    asset_path: str = Field(min_length=1, max_length=2048)
+    asset_sha256: str = Field(pattern=r'^[0-9a-f]{64}$')
+    kind: Literal['caption', 'ocr_text']
+    idempotency_key: str = Field(min_length=1, max_length=128)
 
 
 class ModelRoleWrite(ApiModel):
@@ -521,15 +541,17 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
             overrides=json.loads(raw) if isinstance(raw,str) and raw else None
         except ValueError:
             raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID') from None
-        allowed_strings={'ocr_adapter','ocr_model_id','caption_mode','caption_model_id',
+        allowed_strings={'ocr_adapter','ocr_model_id','caption_mode','caption_model_id','reasoning_mode',
                          'description_language','custom_instructions'}
         if overrides is not None and not isinstance(overrides,dict):
             raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID')
         if overrides is not None:
             if 'image_pages' in overrides:
                 raise HTTPException(status_code=422,detail='IMAGE_PAGES_UNSUPPORTED')
-            invalid=(set(overrides)-allowed_strings or
+            invalid=(set(overrides)-(allowed_strings | {'max_output_tokens'}) or
                 any(not isinstance(value,str) for key,value in overrides.items() if key in allowed_strings))
+            if 'max_output_tokens' in overrides and (type(overrides['max_output_tokens']) is not int or overrides['max_output_tokens'] < 0): invalid=True
+            if overrides.get('reasoning_mode') not in (None, 'quick', 'smart'): invalid=True
             if invalid:
                 raise HTTPException(status_code=422,detail='IMAGE_PROCESS_OVERRIDES_INVALID')
             ocr_adapter=overrides.get('ocr_adapter')
@@ -543,6 +565,10 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     async def update_image_processing(knowledge_base_id: str,body: ImageProcessingWrite,request: Request):
         return json_data(request,await runtime.update_image_processing(await principal(request),
             knowledge_base_id,body.model_dump(exclude_unset=True)))
+
+    @app.get('/api/v1/knowledge-bases/{knowledge_base_id}/image-processing')
+    async def read_image_processing(knowledge_base_id: str, request: Request):
+        return json_data(request, await runtime.read_image_processing(await principal(request), knowledge_base_id))
 
     @app.post('/api/v1/settings/vision-models')
     async def register_vision_model(body: VisionModelCreate,request: Request):
@@ -575,6 +601,11 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
     async def cancel_image_task(knowledge_base_id: str,document_id: str,request: Request):
         return json_data(request,await runtime.cancel_image_task(await principal(request),
             knowledge_base_id,document_id))
+
+    @app.post('/api/v1/knowledge-bases/{knowledge_base_id}/documents/{document_id}/image-task/retry')
+    async def retry_image_item(knowledge_base_id: str, document_id: str, body: ImageRetryWrite, request: Request):
+        return json_data(request, await runtime.retry_image_item(await principal(request),
+            knowledge_base_id, document_id, body.model_dump()))
 
     @app.get("/api/v1/settings/model-configuration")
     async def read_model_configuration(request: Request):
@@ -623,6 +654,15 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
             history.append(item)
         return json_data(request, history)
 
+    @app.get('/api/v1/sessions/{session_id}/generation-settings')
+    async def generation_settings(session_id: str, request: Request):
+        return json_data(request, await runtime.read_generation_settings(await principal(request), session_id))
+
+    @app.put('/api/v1/sessions/{session_id}/generation-settings')
+    async def save_generation_settings(session_id: str, body: GenerationSettingsWrite, request: Request):
+        return json_data(request, await runtime.update_generation_settings(
+            await principal(request), session_id, body.model_dump()))
+
     @app.post("/api/v1/sessions/{session_id}/messages")
     async def create_message(session_id: str, body: MessageCreate, request: Request):
         if body.mode != "quick":
@@ -631,7 +671,8 @@ def create_app(runtime: RuntimeService, *, resolve_principal: PrincipalResolver,
         turn_request = OrdinaryTurnRequest(session_id, body.content, body.request_id, body.mode,
                                            tuple(body.knowledge_base_scope), tuple(body.document_scope),
                                            body.summary_model_id or "", body.reasoning_effort or "",
-                                           request.headers.get("Accept-Language", "")[:256])
+                                           request.headers.get("Accept-Language", "")[:256],
+                                           reasoning_mode=body.reasoning_mode, max_output_tokens=body.max_output_tokens)
         accepted = await runtime.accept_turn(turn_request, who)
         if accepted.session_id != session_id or (getattr(accepted, 'client_request_id', '') or accepted.run_id) != body.request_id:
             raise RuntimeContractError("TURN_IDENTITY_MISMATCH")

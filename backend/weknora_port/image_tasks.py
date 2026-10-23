@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import asyncio
 import json
+import hashlib
+import re
 import logging
 import secrets
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 
 from .documents import DocumentLifecycleError
 from .image_configuration import effective_image_config,resolve_image_selection
@@ -21,6 +23,15 @@ from .storage.configuration import ModelConfigurationError
 from .storage.memory_queue import source_retry_delay
 
 _LOG=logging.getLogger(__name__)
+
+
+def unresolved_image_send(outcomes):
+    """A terminal task label cannot erase an unresolved external dispatch."""
+    if isinstance(outcomes,str):outcomes=json.loads(outcomes)
+    return any(isinstance(value,dict) and isinstance(value.get(kind),dict)
+               and value[kind].get('status')=='sending'
+               for value in (outcomes or {}).values()
+               for kind in ('ocr_text','caption','embedding'))
 
 
 @dataclass(frozen=True)
@@ -37,6 +48,7 @@ class ImageTask:
     claim_token: str
     outcomes: dict
     source_sha256: str = ""
+    retry: dict = field(default_factory=dict)
 
 
 class ImageTaskQueue:
@@ -55,7 +67,7 @@ class ImageTaskQueue:
         selection=await resolve_image_selection(kb,override,self.model_store,self.catalogue,context)
         cfg={key:value for key,value in effective_image_config(kb,override).items() if key in {
             'description_language','custom_instructions','ocr_adapter','ocr_model_id',
-            'caption_mode','caption_model_id'} and value not in (None,'')}
+            'caption_mode','caption_model_id','reasoning_mode','max_output_tokens','config_version'} and value not in (None,'')}
         cfg['enable_multimodal']=True
         snapshot={"selection":selection.public(),"override":cfg,"source_sha256":source_sha256}
         task_id=str(uuid.uuid4())
@@ -64,7 +76,7 @@ class ImageTaskQueue:
             async with guard.connection.transaction():
                 rows=await (await guard.connection.execute(
                     'INSERT INTO port_image_tasks(id,tenant_id,subject_id,knowledge_base_id,knowledge_id,source_version,selected_config) '
-                    'VALUES(%s,%s,%s,%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,knowledge_base_id,knowledge_id,source_version) '
+                    'VALUES(%s,%s,%s,%s,%s,%s,%s::jsonb) ON CONFLICT(tenant_id,knowledge_base_id,knowledge_id,source_version,retry_key) '
                     'DO NOTHING RETURNING id',
                     (task_id,principal.tenant_id,principal.subject_id,kb['id'],document_id,source_version,
                      json.dumps(snapshot,ensure_ascii=False)))).fetchall()
@@ -76,6 +88,47 @@ class ImageTaskQueue:
                     (document_id,principal.tenant_id,kb['id'],source_version))).fetchall()
                 if len(changed)!=1:raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
         return task_id
+
+    async def create_selected_retry(self,principal,kb,document_id,*,source_version,
+                                    asset_path,asset_sha256,kind,idempotency_key,override=None):
+        if principal!=self.principal:raise PermissionError('IMAGE_TASK_OWNER_MISMATCH')
+        if kind not in ('caption','ocr_text'):raise DocumentLifecycleError('IMAGE_RETRY_KIND_INVALID')
+        if not isinstance(idempotency_key,str) or not re.fullmatch(r'[A-Za-z0-9_-]{8,128}',idempotency_key):
+            raise DocumentLifecycleError('IMAGE_RETRY_IDEMPOTENCY_INVALID')
+        asset=await self.documents.read_document_asset(principal,kb['id'],document_id,
+            asset_path=asset_path,source_version=source_version)
+        if hashlib.sha256(asset.content).hexdigest()!=asset_sha256:
+            raise DocumentLifecycleError('IMAGE_ASSET_REPLAY_MISMATCH')
+        context=CallContext(source_version+'/image/retry-config',TrustedScope(principal.subject_id,(kb['id'],),(document_id,)))
+        selection=await resolve_image_selection(kb,override,self.model_store,self.catalogue,context)
+        cfg=effective_image_config(kb,override)
+        retry={'asset_path':asset_path,'asset_sha256':asset_sha256,'kind':kind}
+        snapshot={'selection':selection.public(),'override':cfg,'retry':retry}
+        retry_key=hashlib.sha256(idempotency_key.encode()).hexdigest()
+        snapshot['configuration_sha256']=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        async with self.leases.lease(writable_knowledge_base_ids=frozenset({kb['id']})) as guard:
+            guard.require_verified()
+            async with guard.connection.transaction():
+                # Serialize admission with final switch and source deletion/version changes.
+                current=await (await guard.connection.execute(
+                    "SELECT metadata,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL FOR UPDATE",
+                    (document_id,principal.tenant_id,kb['id']))).fetchall()
+                if len(current)!=1 or current[0]['parse_status']!='completed' or current[0]['metadata'].get('source_version')!=source_version:
+                    raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
+                rows=await (await guard.connection.execute(
+                    'SELECT id,state,retry_key,selected_config,outcomes FROM port_image_tasks WHERE tenant_id=%s AND subject_id=%s AND knowledge_base_id=%s AND knowledge_id=%s AND source_version=%s',
+                    (principal.tenant_id,principal.subject_id,kb['id'],document_id,source_version))).fetchall()
+                previous=next((r for r in rows if r['retry_key']==retry_key),None)
+                if previous:
+                    if previous['selected_config']!=snapshot:raise DocumentLifecycleError('IMAGE_RETRY_IDEMPOTENCY_CONFLICT')
+                    return {'id':previous['id'],'state':previous['state'],'replay':True}
+                if any(r['state'] in ('unknown','pending','processing','retry') or unresolved_image_send(r.get('outcomes')) for r in rows):
+                    raise DocumentLifecycleError('IMAGE_RETRY_ACTIVE_OR_UNKNOWN')
+                task_id=str(uuid.uuid4())
+                await guard.connection.execute(
+                    'INSERT INTO port_image_tasks(id,tenant_id,subject_id,knowledge_base_id,knowledge_id,source_version,retry_key,selected_config) VALUES(%s,%s,%s,%s,%s,%s,%s,%s::jsonb)',
+                    (task_id,principal.tenant_id,principal.subject_id,kb['id'],document_id,source_version,retry_key,json.dumps(snapshot)))
+        return {'id':task_id,'state':'pending','replay':False}
 
     async def _claim(self):
         async with self.leases.lease() as guard:
@@ -90,8 +143,7 @@ class ImageTaskQueue:
                 if not rows:return None
                 row=rows[0]
                 outcomes=row['outcomes'] if isinstance(row['outcomes'],dict) else json.loads(row['outcomes'])
-                if any(value.get(kind,{}).get('status')=='sending' for value in outcomes.values()
-                       for kind in ('ocr_text','caption')):
+                if unresolved_image_send(outcomes):
                     await guard.connection.execute(
                         "UPDATE port_image_tasks SET state='unknown',error_code='IMAGE_REQUEST_OUTCOME_UNKNOWN',"
                         'claim_token=NULL,lease_until=NULL,updated_at=now() WHERE id=%s', (row['id'],))
@@ -129,7 +181,7 @@ class ImageTaskQueue:
                     digest=legacy_scope.get('source_sha256','')
                 return ImageTask(row['id'],row['tenant_id'],row['subject_id'],row['knowledge_base_id'],
                     row['knowledge_id'],row['source_version'],selected['selection'],override,
-                    row['attempt']+1,token,outcomes,digest)
+                    row['attempt']+1,token,outcomes,digest,selected.get('retry',{}))
 
     async def cancel(self,principal,knowledge_base_id,knowledge_id):
         if principal!=self.principal:raise PermissionError('IMAGE_TASK_OWNER_MISMATCH')
@@ -137,24 +189,28 @@ class ImageTaskQueue:
             guard.require_verified()
             async with guard.connection.transaction():
                 rows=await (await guard.connection.execute(
-                    'SELECT id,state,source_version FROM port_image_tasks WHERE tenant_id=%s '
+                    'SELECT id,state,source_version,outcomes FROM port_image_tasks WHERE tenant_id=%s '
                     'AND subject_id=%s AND knowledge_base_id=%s AND knowledge_id=%s '
                     'ORDER BY created_at DESC FOR UPDATE LIMIT 1',
                     (principal.tenant_id,principal.subject_id,knowledge_base_id,knowledge_id))).fetchall()
                 if not rows:raise LookupError('IMAGE_TASK_NOT_FOUND')
                 row=rows[0]
-                if row['state'] not in ('completed','failed','cancelled','orphaned','unknown'):
+                uncertain=unresolved_image_send(row.get('outcomes'))
+                terminal=row['state'] in ('completed','failed','cancelled','orphaned','unknown')
+                target='unknown' if uncertain else row['state'] if terminal else 'cancelled'
+                if uncertain or not terminal:
+                    code='IMAGE_REQUEST_OUTCOME_UNKNOWN' if uncertain else 'IMAGE_TASK_CANCELLED'
                     await guard.connection.execute(
-                        "UPDATE port_image_tasks SET state='cancelled',claim_token=NULL,lease_until=NULL,"
-                        "error_code='IMAGE_TASK_CANCELLED',updated_at=now() WHERE id=%s",(row['id'],))
+                        "UPDATE port_image_tasks SET state=%s,claim_token=NULL,lease_until=NULL,"
+                        "error_code=%s,updated_at=now() WHERE id=%s",(target,code,row['id']))
                     await guard.connection.execute(
-                        "UPDATE knowledges SET parse_status='cancelled',error_message='IMAGE_TASK_CANCELLED',"
+                        "UPDATE knowledges SET parse_status=%s,error_message=%s,"
                         "updated_at=now() WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s "
                         "AND metadata->>'source_version'=%s AND deleted_at IS NULL "
                         "AND parse_status IN ('pending','processing')",
-                        (knowledge_id,principal.tenant_id,knowledge_base_id,row['source_version']))
-                return {'id':row['id'],'state':'cancelled' if row['state'] not in
-                        ('completed','failed','cancelled','orphaned','unknown') else row['state']}
+                        ('failed' if uncertain else 'cancelled',code,knowledge_id,principal.tenant_id,
+                         knowledge_base_id,row['source_version']))
+                return {'id':row['id'],'state':target}
 
     async def _update(self, task, *, state=None, error='', outcomes=None, delay=0):
         async with self.leases.lease(writable_knowledge_base_ids=frozenset({task.knowledge_base_id})) as guard:
@@ -183,7 +239,8 @@ class ImageTaskQueue:
         outcomes[str(index)]={**outcomes.get(str(index),{}),
             'ocr_text':info.get('ocr_status',{}),'caption':info.get('caption_status',{}),
             'ocr_result':info.get('ocr_text',''),'caption_result':info.get('caption',''),
-            'ocr_layout':info.get('ocr_layout',{})}
+            'ocr_layout':info.get('ocr_layout',{}),'asset_path':info.get('url',''),
+            'asset_sha256':info.get('asset_sha256','')}
         await self._update(task,outcomes=outcomes)
         task.outcomes.clear();task.outcomes.update(outcomes)
 

@@ -6,10 +6,12 @@ import { cloudErrorMessage } from "./cloudErrors";
 import { resumePortChat, runPortChat } from "./sse";
 import type {
   DocumentRow, KnowledgeBase, MessageRow, ModelConfiguration, ModelRole,
-  PortRunIdentity, SessionRow, WeKnoraSSEMessage,
+  PortRunIdentity, SessionRow, WeKnoraSSEMessage, GenerationPreferences,
 } from "./types";
 import { KnowledgeBaseConsent } from "./KnowledgeBaseConsent";
 import { MemoryPanel } from "./MemoryPanel";
+import { GenerationControls, ImageGenerationSettings, DEFAULT_GENERATION } from './GenerationControls';
+import { ImageTaskDetails } from './ImageTaskDetails';
 import "./styles.css";
 
 type Segment = { eventId: string; text: string; done: boolean };
@@ -28,8 +30,8 @@ type ChatLine = {
 const ROLE_NAMES: Record<ModelRole, string> = {
   embedding: "Embedding",
   rerank: "Rerank",
-  cheap: "Quick answer",
-  expensive: "Smart answer",
+  cheap: "Cheap answer",
+  expensive: "Expensive answer",
   vlm: "Vision",
 };
 const EMPTY_CONFIG: ModelConfiguration = { revision: "", roles: (Object.keys(ROLE_NAMES) as ModelRole[]).map(role => ({
@@ -209,6 +211,10 @@ export function WeKnoraPythonApp() {
   const [config, setConfig] = useState<ModelConfiguration>(EMPTY_CONFIG);
   const [answerLanguage, setAnswerLanguage] = useState(savedAnswerLanguage);
   const [busy, setBusy] = useState(false);
+  const [generation, setGeneration] = useState<GenerationPreferences>(DEFAULT_GENERATION);
+  const [effectiveGeneration, setEffectiveGeneration] = useState<GenerationPreferences | null>(null);
+  const [generationSaving, setGenerationSaving] = useState(false);
+  const settingsRead = useRef(0);
   const [notice, setNotice] = useState("正在确认 Python 服务身份");
   const [query, setQuery] = useState("");
   const [newKbName, setNewKbName] = useState("");
@@ -269,7 +275,7 @@ export function WeKnoraPythonApp() {
 
   const knowledgeBaseScopeLocked = Boolean(activeSession);
   const documentScopeDirty = Boolean(activeSession) && JSON.stringify([...selectedDocuments].sort()) !== JSON.stringify([...(activeSession?.document_scope ?? [])].sort());
-  const canSubmit = !busy && !scopeSaving && !documentScopeDirty && !loading && !runtimeError && selectedBases.length > 0 && query.trim().length > 0;
+  const canSubmit = !busy && !generationSaving && !scopeSaving && !documentScopeDirty && !loading && !runtimeError && selectedBases.length > 0 && query.trim().length > 0;
 
   const documentKnowledgeBaseIds = page === "library"
     ? (uploadKbId ? [uploadKbId] : [])
@@ -304,6 +310,15 @@ export function WeKnoraPythonApp() {
     if (scopeSaving) return;
     setScopeOpen(false);
     setActiveSession(session);
+    const settingsTicket = ++settingsRead.current;
+    setGeneration(DEFAULT_GENERATION); setEffectiveGeneration(null); setGenerationSaving(true);
+    void portApi.generationSettings(session.id).then(row => {
+      if (settingsTicket !== settingsRead.current) return;
+      setGeneration({ reasoning_mode: row.saved.reasoning_mode ?? row.defaults.reasoning_mode,
+        max_output_tokens: row.saved.max_output_tokens ?? 0 });
+      setEffectiveGeneration(row.effective);
+    }).catch(error => { if (settingsTicket === settingsRead.current) setNotice(`回答设置读取失败：${errorText(error)}`); })
+      .finally(() => { if (settingsTicket === settingsRead.current) setGenerationSaving(false); });
     setSelectedBases(session.knowledge_base_scope);
     setSelectedDocuments(session.document_scope);
     setMessages([]);
@@ -329,6 +344,8 @@ export function WeKnoraPythonApp() {
     activeAbort.current = null;
     activeIdentity.current = null;
     setActiveSession(null);
+    settingsRead.current++;
+    setGeneration(DEFAULT_GENERATION); setEffectiveGeneration(null); setGenerationSaving(false);
     setMessages([]);
     setSelectedBases([]);
     setSelectedDocuments([]);
@@ -362,6 +379,11 @@ export function WeKnoraPythonApp() {
   };
 
   const applyEvent = (messageId: string, event: WeKnoraSSEMessage) => {
+    if (event.response_type === 'generation_settings' && event.data.effective) {
+      const effective = event.data.effective as GenerationPreferences;
+      if (['quick', 'smart'].includes(effective.reasoning_mode) && Number.isSafeInteger(effective.max_output_tokens)) setEffectiveGeneration(effective);
+    }
+
     if (event.response_type === "complete") {
       const hadTerminalError = terminalErrorMessages.current.has(messageId);
       terminalErrorMessages.current.delete(messageId);
@@ -419,7 +441,7 @@ export function WeKnoraPythonApp() {
     setBusy(true);
     try {
       await runPortChat(sessionId, {
-        content, request_id: requestId, mode: "quick", reasoning_effort: "off",
+        content, request_id: requestId, mode: "quick", ...generation,
         accept_language: answerLanguage,
         knowledge_base_scope: selectedBases, document_scope: selectedDocuments,
       }, {
@@ -446,9 +468,24 @@ export function WeKnoraPythonApp() {
     }
   };
 
+  const saveAnswerSettings = async (reset: boolean) => {
+    const next = reset ? DEFAULT_GENERATION : generation;
+    if (!activeSession) { setGeneration(next); setEffectiveGeneration(null); return; }
+    setGenerationSaving(true);
+    try {
+      const row = await portApi.saveGenerationSettings(activeSession.id, next, reset);
+      setGeneration({ reasoning_mode: row.saved.reasoning_mode ?? row.defaults.reasoning_mode,
+        max_output_tokens: row.saved.max_output_tokens ?? 0 });
+      setEffectiveGeneration(row.effective);
+      setNotice('回答设置已保存，仅影响后续请求。');
+    } catch (error) { setNotice(`回答设置保存失败：${errorText(error)}`); }
+    finally { setGenerationSaving(false); }
+  };
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!canSubmit) return;
+    setBusy(true);
     setScopeOpen(false);
     const content = query.trim();
     setQuery("");
@@ -461,7 +498,7 @@ export function WeKnoraPythonApp() {
     setMessages(current => [...current, userLine, assistantLine]);
     try {
       if (!session) {
-        session = await portApi.createSession(selectedBases, selectedDocuments, content.slice(0, 48));
+        session = await portApi.createSession(selectedBases, selectedDocuments, content.slice(0, 48), generation);
         setActiveSession(session);
         setSessions(current => [session!, ...current.filter(row => row.id !== session!.id)]);
       }
@@ -469,6 +506,7 @@ export function WeKnoraPythonApp() {
     } catch (error) {
       updateMessage(assistantLine.id, previous => ({ ...previous, content: errorText(error), status: "failed", error: true }));
       setNotice(errorText(error));
+      setBusy(false);
     }
   };
 
@@ -600,7 +638,15 @@ export function WeKnoraPythonApp() {
           </article>)}
         </div>
         <div className="wp-composer-wrap">
-          <div className="wp-mode-row"><span className="wp-mode-active">快速问答</span><button className="wp-mode-disabled" disabled title="Python 适配器尚未接入智能推理执行">智能推理 <small>暂不可用</small></button></div>
+          <div className="wp-answer-preferences">
+            <GenerationControls value={generation} effective={effectiveGeneration} disabled={busy || generationSaving}
+              onChange={next => { setGeneration(next); setEffectiveGeneration(null); }}/>
+            <div className="wp-generation-actions">
+              <button type="button" disabled={busy || generationSaving || !activeSession} onClick={() => void saveAnswerSettings(false)}>保存本会话设置</button>
+              <button type="button" disabled={busy || generationSaving} onClick={() => void saveAnswerSettings(true)}>恢复默认</button>
+              <small>{activeSession ? '保存后刷新及重新进入会话仍有效；本次发送使用当前设置。' : '首次发送时保存到新会话。'}</small>
+            </div>
+          </div>
           <form className="wp-composer" onSubmit={event => void submit(event)}>
             <textarea value={query} onChange={event => setQuery(event.target.value)} placeholder={selectedBases.length ? "询问当前资料…" : "选择知识库后提问…"} disabled={busy || Boolean(runtimeError)} rows={3} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} />
             <div className="wp-composer-actions">
@@ -637,7 +683,8 @@ export function WeKnoraPythonApp() {
             <h2>资料文件</h2>
             <KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/>
             <div className="wp-upload-row"><select aria-label="上传目标知识库" value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>
-            <div className="wp-library-documents">{visibleDocuments.map(doc => <div className="wp-library-row wp-document-row" key={doc.id}><strong title={doc.filename}>{doc.filename}</strong><span>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</span><a href={portApi.originalDocumentURL(doc.knowledge_base_id, doc.id)} target="_blank" rel="noreferrer">查看原文件</a></div>)}{!visibleDocuments.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div>
+            {uploadKbId && <details className="wp-image-settings-drawer"><summary>图片处理设置</summary><ImageGenerationSettings key={uploadKbId} kbId={uploadKbId} disabled={busy || loading || Boolean(runtimeError)}/></details>}
+            <div className="wp-library-documents">{visibleDocuments.map(doc => <div className="wp-library-row wp-document-row" key={doc.id}><strong title={doc.filename}>{doc.filename}</strong><span>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</span><a href={portApi.originalDocumentURL(doc.knowledge_base_id, doc.id)} target="_blank" rel="noreferrer">查看原文件</a><ImageTaskDetails document={doc} disabled={busy || Boolean(runtimeError)}/></div>)}{!visibleDocuments.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div>
           </div>
         </div>
       </section>}

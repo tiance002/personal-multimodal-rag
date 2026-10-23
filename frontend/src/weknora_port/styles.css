@@ -177,3 +177,20 @@
 .wp-scope-heading>span { white-space:nowrap; }
 @media (max-width:850px) { .wp-scope-card { width:min(540px,calc(100vw - 240px)); } }
 @media (max-width:620px) { .wp-scope-card { width:calc(100vw - 70px); } .wp-scope-heading { flex-wrap:wrap; } .wp-scope-column { max-height:130px; } }
+
+.wp-answer-preferences { margin: 8px 0; border-top: 1px solid var(--wp-border, #e4e7eb); padding-top: 8px; }
+.wp-generation-controls { border: 0; padding: 0; margin: 0; min-width: 0; }
+.wp-generation-controls legend { font-size: 12px; color: #536159; margin-bottom: 5px; }
+.wp-generation-fields { display: flex; gap: 14px; flex-wrap: wrap; }
+.wp-generation-fields label { display: grid; gap: 4px; font-size: 12px; }
+.wp-generation-fields select, .wp-generation-fields input { min-width: 145px; border: 1px solid #ccd5cf; border-radius: 6px; padding: 5px 8px; background: #fff; }
+.wp-generation-controls small, .wp-generation-actions small { color: #657069; font-size: 11px; }
+.wp-generation-controls p { font-size: 12px; margin: 4px 0; }
+.wp-generation-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.wp-generation-actions button, .wp-image-generation button { border: 1px solid #ccd5cf; border-radius: 6px; background: #fff; padding: 5px 8px; font-size: 12px; }
+.wp-image-generation { margin: 16px 0; padding: 12px; border: 1px solid #dde5df; border-radius: 8px; }
+.wp-image-generation p { font-size: 12px; color: #657069; }
+
+.wp-image-settings-drawer { flex:none; margin-top:12px; max-height:250px; overflow:auto; font-size:12px; }
+.wp-image-settings-drawer>summary { cursor:pointer; color:#078a59; }
+.wp-image-task-details { grid-column:1/-1; font-size:12px; }

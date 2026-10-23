@@ -6,7 +6,7 @@ import json
 import re
 from .search import deduplicate, partial_overlap, source_domain, validate_results, RetrievalScopeError
 from .query import simple_tokens, jaccard
-from .rerank import image_infos
+from .rerank import image_infos, filter_image_derivative_status
 from ..models.types import CallCancelled, RunDeadlineExceeded
 IMAGE = re.compile('!\\[([^\\]]*)\\]\\(([^)]+)\\)')
 
@@ -138,11 +138,15 @@ def _parent_image_infos(raw):
                 return []
             info = dict(url='', original_url='', start_pos=0, end_pos=0,
                         caption='', ocr_text='')
+            statuses = {}
             for key, item in value:
                 # Go simple-fold equivalence for these ASCII tags includes long
                 # s, but never expands ligatures as Unicode full casefold does.
                 key = ''.join(chr(ord(c) + 32) if 'A' <= c <= 'Z'
                               else 's' if c == '\u017f' else c for c in key)
+                if key in ('caption_status', 'ocr_status'):
+                    statuses[key] = dict(item) if isinstance(item, _ImageInfoObject) else item
+                    continue
                 if key not in info or item is None:
                     continue
                 if key in ('start_pos', 'end_pos'):
@@ -151,7 +155,11 @@ def _parent_image_infos(raw):
                 elif not isinstance(item, str):
                     return []
                 info[key] = item
-            output.append(info)
+            # Parent aggregation emits only fixed ImageInfo fields. Filter
+            # before dropping completion metadata, or a failed child caption
+            # would reappear downstream as apparently valid legacy text.
+            filtered = filter_image_derivative_status({**info, **statuses})
+            output.append({key: filtered[key] for key in info})
         return output
     except (ValueError, TypeError):
         return []

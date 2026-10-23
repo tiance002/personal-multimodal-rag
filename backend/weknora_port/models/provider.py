@@ -116,8 +116,11 @@ class ProviderModel:
 
     def build_request_body(self, messages, options=None, *, stream=False):
         if self.config.source=='local':
-            return build_ollama_body(self.config, messages, options, stream=stream,
-                                     image_resolver=self.image_resolver)
+            body = build_ollama_body(self.config, messages, options, stream=stream,
+                                    image_resolver=self.image_resolver)
+            from .generation_capabilities import validate_generation_options
+            validate_generation_options(self.config, options, body=body, messages=messages, stream=stream)
+            return body
         if self.config.provider=="weknoracloud" and self.config.model_type=="VLLM":
             # Specialized source VLM wire; ordinary cloud chat flattens images.
             from .request import convert_messages
@@ -138,6 +141,8 @@ class ProviderModel:
             raise ProviderError("MODEL_OUTPUT_BUDGET_INVALID")
         if self.config.max_output_tokens > 0 and budget > self.config.max_output_tokens:
             raise ProviderError("MODEL_OUTPUT_LIMIT_EXCEEDED")
+        from .generation_capabilities import validate_generation_options
+        validate_generation_options(self.config, options, body=body, messages=messages, stream=stream)
         return body
 
     def _affinity(self, options, context):
@@ -301,11 +306,10 @@ class ProviderModel:
         if service is None:
             raise ProviderError("MODEL_LOCAL_SERVICE_UNAVAILABLE")
         effective = local_connection_config(self.config, service.base_url,allow_pull=service.allow_pull)
+        body = self.build_request_body(messages, options, stream=False)
         async with call_lifetime(context, DEFAULT_CHAT_TIMEOUT) as lifetime:
             await self._local_ensure(service,effective,context,lifetime)
             lifetime.phase="admission"
-            body = build_ollama_body(self.config, messages, options, stream=False,
-                                     image_resolver=self.image_resolver)
             async with self.transport.open(effective, "/api/chat", body, context,
                     capability=_capability, stream=False, lifetime=lifetime) as handle:
                 env = decode_json(await handle.response.aread())
@@ -327,11 +331,10 @@ class ProviderModel:
         effective = local_connection_config(self.config, service.base_url,allow_pull=service.allow_pull)
         state = OllamaStreamState(self.config)
         try:
+            body = self.build_request_body(messages, options, stream=True)
             async with call_lifetime(context, DEFAULT_STREAM_TIMEOUT) as lifetime:
                 await self._local_ensure(service,effective,context,lifetime)
                 lifetime.phase="admission"
-                body = build_ollama_body(self.config, messages, options, stream=True,
-                                         image_resolver=self.image_resolver)
                 async with self.transport.open(effective, "/api/chat", body, context,
                         capability="chat", stream=True, lifetime=lifetime) as handle:
                     usage = None

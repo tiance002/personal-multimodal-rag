@@ -1,13 +1,13 @@
 """Bounded source image OCR/caption main-entry binding, independent of P5."""
 from __future__ import annotations
-import asyncio,base64,json,mimetypes,re,uuid
+import asyncio,base64,hashlib,json,mimetypes,re,uuid
 from pathlib import Path
 from .documents import DocumentLifecycleError,_json_object
 from .image_configuration import resolve_image_selection,validate_pinned_selection
 from .ingestion.core import DocumentRequest
 from .document_profile import language_name
 from .conversation_configuration import resolve_language
-from .models.types import CallContext,TrustedScope,Message,ProviderError
+from .models.types import CallContext,TrustedScope,Message,ProviderError,ChatOptions
 from .storage.configuration import ModelConfigurationError
 from .retrieval.query import go_strip,go_lower
 from .storage.chunks import StoredChunk,ChunkPlan
@@ -96,6 +96,8 @@ def enrich_summary_images(content,infos,full):
         values=[]
         for key,tag in [('caption','image_caption'),('ocr_text','image_ocr')]:
             if key=='ocr_text' and not full:continue
+            status=info.get('caption_status' if key=='caption' else 'ocr_status')
+            if isinstance(status,dict) and status.get('status')!='completed':continue
             if info.get(key):values.append(f'<{tag}>{info[key]}</{tag}>')
         return '\n'.join(values)
     for match in list(re.finditer(r'!\[([^\]]*)\]\(([^)]+)\)',content)):
@@ -106,11 +108,36 @@ def enrich_summary_images(content,infos,full):
     return content
 
 
+def caption_completion(response,selection):
+    """Consume adapter-normalized finish semantics; missing facts stay missing."""
+    finish=getattr(response,'finish_reason','') if response is not None else ''
+    content=go_strip(getattr(response,'content','') or '')
+    usage=getattr(response,'usage',None)
+    facts=getattr(usage,'provider_usage_facts',None)
+    reasoning=facts.get('reasoning') if facts is not None else None
+    counts={key:getattr(usage,key,None) for key in ('prompt_tokens','completion_tokens','total_tokens')}
+    counts['reasoning_tokens']=reasoning.value if reasoning is not None and reasoning.present and reasoning.valid else None
+    if finish in ('length','max_tokens','max_output_tokens'):
+        kind,error='truncated','IMAGE_CAPTION_TRUNCATED'
+    elif not finish or finish=='incomplete':
+        kind,error='missing_completion','IMAGE_CAPTION_COMPLETION_MISSING'
+    elif finish not in ('stop','end_turn','stop_sequence','completed'):
+        kind,error='provider_incomplete','IMAGE_CAPTION_PROVIDER_INCOMPLETE'
+    elif not content:
+        kind,error='empty','IMAGE_CAPTION_EMPTY'
+    else:kind,error='completed',''
+    return {'status':'completed' if not error else 'failed','error':error,
+            'completion_kind':kind,'finish_reason':finish,'usage':counts,
+            'max_output_tokens':selection.max_output_tokens,'reasoning_mode':selection.reasoning_mode,
+            'config_version':selection.generation_config_version}
+
+
 class SourceImageProcessor:
     def __init__(self,application):self.app=application
 
     async def process_plan(self,principal,kb,scope,assets,plan,*,override=None,
-                           selection_snapshot=None,on_before=None,on_result=None,prior=None):
+                           selection_snapshot=None,on_before=None,on_result=None,prior=None,
+                           source_states=('processing',),request_identity=None):
         app=self.app;app._owner(principal)
         if scope.tenant_id!=principal.tenant_id or scope.owner_id!=principal.subject_id or scope.knowledge_base_id!=kb['id']:
             raise DocumentLifecycleError('IMAGE_CHUNK_SCOPE_MISMATCH')
@@ -120,7 +147,7 @@ class SourceImageProcessor:
             image_cfg={**image_cfg, **{k:v for k,v in override.items() if v not in (None,'')}}
         rows=await app.documents._rows('SELECT metadata,parse_status FROM knowledges WHERE tenant_id=%s AND knowledge_base_id=%s AND id=%s AND deleted_at IS NULL',
             (principal.tenant_id,kb['id'],scope.knowledge_id))
-        if len(rows)!=1 or rows[0]['parse_status']!='processing' or rows[0]['metadata'].get('source_version')!=scope.source_version:
+        if len(rows)!=1 or rows[0]['parse_status'] not in source_states or rows[0]['metadata'].get('source_version')!=scope.source_version:
             raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
         context=CallContext(scope.source_version+'/image/config',TrustedScope(principal.subject_id,(kb['id'],),(scope.knowledge_id,)))
         selection=(await validate_pinned_selection(selection_snapshot,app.models,app.catalogue,context)
@@ -131,7 +158,7 @@ class SourceImageProcessor:
             for index,asset in enumerate(assets):
                 parent=next((chunk for chunk in plan.persisted if chunk.chunk_type=='text' and asset.path in chunk.content),None)
                 if parent is None:raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
-                context=CallContext(scope.source_version+'/image/'+str(index),TrustedScope(principal.subject_id,(kb['id'],),(scope.knowledge_id,)))
+                context=CallContext((request_identity or scope.source_version)+'/image/'+str(index),TrustedScope(principal.subject_id,(kb['id'],),(scope.knowledge_id,)))
                 image='data:'+asset.media_type+';base64,'+base64.b64encode(asset.data).decode('ascii')
                 ocr_prompt=PROMPTS['vlmOCRScannedPDFPrompt' if asset.source_type=='scanned_pdf' else 'vlmOCRPrompt']
                 results={};states={};layout={}
@@ -164,13 +191,22 @@ class SourceImageProcessor:
                             # model availability are checked again per send.
                             await app.models.resolve(binding.model_id)
                             model=await registry.get(binding.model_id,context)
+                            if on_result is not None:
+                                await on_result(index,{'url':asset.path,'asset_sha256':hashlib.sha256(asset.data).hexdigest(),
+                                    'ocr_text':results.get('ocr_text',''),'ocr_status':states.get('ocr_text',{}),
+                                    'ocr_layout':layout,'caption_status':{'status':'pending'}})
                             if on_before is not None:await on_before(index,kind)
-                            response=await model.vision((Message('user',prompt,images=(image,)),),None,context.child(kind))
+                            options=ChatOptions(max_tokens=selection.max_output_tokens,
+                                thinking=selection.reasoning_mode=='smart',reasoning_mode=selection.reasoning_mode)
+                            response=await model.vision((Message('user',prompt,images=(image,)),),options,context.child(kind))
                             value=response.content if response else ''
                             value=go_strip(value)
+                            results[kind]=value
+                            states[kind]={**caption_completion(response,selection),'binding':binding.public()}
+                            if states[kind]['status']!='completed':continue
                         if not value:raise DocumentLifecycleError('IMAGE_'+('OCR' if kind=='ocr_text' else 'CAPTION')+'_EMPTY')
                         results[kind]=value
-                        states[kind]={'status':'completed','error':'','binding':binding.public()}
+                        states.setdefault(kind,{'status':'completed','error':'','binding':binding.public()})
                     except ProviderError as error:
                         # Source handles ordinary OCR/caption errors independently;
                         # permission/fee/identity denials remain fatal safety boundaries.
@@ -185,17 +221,20 @@ class SourceImageProcessor:
                                       'binding':binding.public()}
                 info={'url':asset.path,'original_url':asset.path,'start_pos':0,'end_pos':0,
                     'page_number':asset.page_number,'source_type':asset.source_type,
+                    'asset_sha256':hashlib.sha256(asset.data).hexdigest(),
                     'caption':results.get('caption',''),'ocr_text':results.get('ocr_text',''),
                     'ocr_layout':layout,'ocr_status':states.get('ocr_text',{}),
                     'caption_status':states.get('caption',{})}
                 if on_result is not None:
                     await on_result(index,info)
                 for field,chunk_type in [('ocr_text','image_ocr'),('caption','image_caption')]:
-                    if not info[field]:continue
+                    if not info[field] or states.get(field,{}).get('status')!='completed':continue
                     identifier=str(uuid.uuid4())
                     chunk=StoredChunk(identifier,scope,info[field],0,0,0,chunk_type,'',parent_chunk_id=parent.id,
                         metadata={'source_version':scope.source_version,'image_source_type':asset.source_type,
-                                  'page_number':asset.page_number,'recommended':True},
+                                  'page_number':asset.page_number,'recommended':True,
+                                  'asset_sha256':hashlib.sha256(asset.data).hexdigest(),
+                                  'image_config_version':selection.generation_config_version},
                         image_info=json.dumps([info],ensure_ascii=False))
                     created.append(chunk);indexed.append(IndexInfo(identifier,0,identifier,scope.knowledge_id,kb['id'],info[field]))
             return ChunkPlan((*plan.persisted,*created),(*plan.indexed,*indexed))

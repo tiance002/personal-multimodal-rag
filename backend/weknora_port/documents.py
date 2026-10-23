@@ -460,7 +460,7 @@ class DocumentLifecycleService:
             (task.knowledge_id,task.tenant_id,task.knowledge_base_id,task.id))
         if (len(rows)!=1 or rows[0]['metadata'].get('source_version')!=task.source_version
                 or task.source_sha256 and rows[0].get('file_hash')!=task.source_sha256
-                or rows[0]['parse_status'] not in ('pending','processing')
+                or rows[0]['parse_status'] not in (('completed',) if getattr(task,'retry',{}) else ('pending','processing'))
                 or rows[0]['state']!='processing' or rows[0]['claim_token']!=task.claim_token):
             raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
 
@@ -510,6 +510,7 @@ class DocumentLifecycleService:
 
     async def process_image_task(self,principal,task,queue):
         await self._assert_current_image_task(principal,task)
+        if getattr(task,'retry',{}):return await self._process_selected_image_retry(principal,task,queue)
         kb=await self._kb(principal,task.knowledge_base_id)
         kb={**kb,'image_processing_config':dict(task.config)}
         source=await self.read_document(principal,task.knowledge_base_id,task.knowledge_id)
@@ -518,7 +519,82 @@ class DocumentLifecycleService:
             task.knowledge_id,task.source_version,metadata,
             process_overrides=task.config,image_task=task,image_queue=queue)
 
+    async def _process_selected_image_retry(self,principal,task,queue):
+        from .storage.chunks import StoredChunk,ChunkPlan
+        from .storage.indexing import sanitize_for_embedding
+        retry=task.retry
+        kb=await self._kb(principal,task.knowledge_base_id)
+        kb={**kb,'image_processing_config':dict(task.config)}
+        strategy=_json_object(kb.get('indexing_strategy'))
+        if not (strategy.get('vector_enabled') or strategy.get('keyword_enabled')):
+            raise DocumentLifecycleError('IMAGE_RETRY_INDEX_DISABLED')
+        source=await self.read_document_asset(principal,task.knowledge_base_id,task.knowledge_id,
+            asset_path=retry['asset_path'],source_version=task.source_version)
+        if hashlib.sha256(source.content).hexdigest()!=retry['asset_sha256']:
+            raise DocumentLifecycleError('IMAGE_ASSET_REPLAY_MISMATCH')
+        rows=await self._rows('SELECT metadata FROM knowledges WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL',
+            (task.knowledge_id,task.tenant_id,task.knowledge_base_id))
+        manifest=next(a for a in rows[0]['metadata']['assets'] if a['logical_path']==retry['asset_path'])
+        assets=(ParsedAsset(retry['asset_path'],source.content,source.media_type,
+            manifest['source_type'],manifest.get('page_number',0)),)
+        scope=DocumentScope(task.tenant_id,task.subject_id,task.knowledge_base_id,task.knowledge_id,task.source_version)
+        chunks=await self._rows("SELECT id,content,chunk_type,metadata,image_info FROM chunks WHERE tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s AND metadata->>'source_version'=%s AND deleted_at IS NULL AND is_enabled=true",
+            (task.tenant_id,task.knowledge_base_id,task.knowledge_id,task.source_version))
+        parent=next((r for r in chunks if r['chunk_type']=='text' and retry['asset_path'] in r['content']),None)
+        if parent is None:raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
+        parent_chunk=StoredChunk(parent['id'],scope,parent['content'],0,0,0,'text','')
+        # Never re-run the successful sibling or the entire document parser.
+        sibling='ocr_text' if retry['kind']=='caption' else 'caption'
+        prior={'0':{sibling:{'status':'unavailable','error':'IMAGE_RETRY_UNSELECTED'},**task.outcomes.get('0',{})}}
+        plan=await self.asset_processor.process_plan(principal,kb,scope,assets,ChunkPlan((parent_chunk,),()),
+            selection_snapshot=task.selection,override=task.config,prior=prior,source_states=('completed',),
+            request_identity=task.id,on_before=lambda i,k:queue.before(task,i,k),on_result=lambda i,info:queue.result(task,i,info))
+        chunk_type='image_caption' if retry['kind']=='caption' else 'image_ocr'
+        derived=tuple(c for c in plan.persisted if c.chunk_type==chunk_type)
+        if len(derived)!=1:
+            status=task.outcomes.get('0',{}).get(retry['kind'],{})
+            return {'status':'failed','error_code':status.get('error') or 'IMAGE_RETRY_NO_COMPLETE_RESULT'}
+        for chunk in derived:chunk.metadata['image_attempt_id']=task.id
+        ids={c.id for c in derived}
+        indexes=tuple(i for i in plan.indexed if i.chunk_id in ids)
+        strategy=_json_object(kb.get('indexing_strategy'))
+        vectors={}
+        if strategy.get('vector_enabled'):
+            if self.embedder_for_kb is None:raise DocumentLifecycleError('EMBEDDING_ADAPTER_REQUIRED')
+            embedder=await _resolve(self.embedder_for_kb(principal,kb))
+            if callable(getattr(embedder,'for_operation',None)):embedder=embedder.for_operation(task.id+'/selected-image-embedding',task.knowledge_id)
+            if embedder is None:raise DocumentLifecycleError('EMBEDDING_ADAPTER_REQUIRED')
+            # One call only; an uncertain embedding outcome must not be retried here.
+            await queue.before(task,0,'embedding')
+            values=await embedder.batch_embed_with_pool([sanitize_for_embedding(i.content) for i in indexes],attempt=0)
+            if len(values)!=len(indexes):raise DocumentLifecycleError('EMBEDDING_BATCH_IDENTITY_MISMATCH')
+            vectors={i.source_id:value for i,value in zip(indexes,values)}
+        old=[]
+        for chunk in chunks:
+            if chunk['chunk_type']!=chunk_type:continue
+            info=json.loads(chunk.get('image_info') or '[]')
+            if any(i.get('url')==retry['asset_path'] for i in info):old.append(chunk['id'])
+        async with self.connection_factory.lease(writable_knowledge_base_ids=frozenset({task.knowledge_base_id})) as guard:
+            async with guard.connection.transaction():
+                await self._lock_current_image_document(guard,principal,task,states=('completed',))
+                context=CallContext(task.id,TrustedScope(task.subject_id,(task.knowledge_base_id,),(task.knowledge_id,)))
+                repository=ScopedKnowledgeRepository(guard,resolve_tenant=lambda owner:self._resolve_tenant(owner,principal))
+                await repository.create_chunks(ChunkPlan(derived,indexes),context)
+                if strategy.get('vector_enabled') or strategy.get('keyword_enabled'):
+                    await guard.batch_save(indexes,vectors)
+                if old:
+                    await guard.connection.execute('UPDATE embeddings SET is_enabled=false WHERE chunk_id=ANY(%s) AND knowledge_id=%s AND knowledge_base_id=%s',(old,task.knowledge_id,task.knowledge_base_id))
+                    await guard.connection.execute('UPDATE chunks SET is_enabled=false WHERE id=ANY(%s) AND tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s',(old,task.tenant_id,task.knowledge_base_id,task.knowledge_id))
+                # Clear the embedding dispatch checkpoint only together with the
+                # successful index switch. A crash before this transaction remains UNKNOWN.
+                await guard.connection.execute("UPDATE port_image_tasks SET state='completed',claim_token=NULL,lease_until=NULL,error_code='',"
+                    "outcomes=CASE WHEN outcomes->'0'->'embedding'->>'status'='sending' THEN "
+                    "jsonb_set(outcomes,'{0,embedding,status}',to_jsonb('completed'::text)) ELSE outcomes END,"
+                    "updated_at=now() WHERE id=%s AND claim_token=%s AND state='processing'",(task.id,task.claim_token))
+        return {'status':'completed','id':task.knowledge_id,'image_attempt_id':task.id}
+
     async def fail_image_task(self,principal,task,code):
+        if getattr(task,'retry',{}):return True  # Preserve the completed document and its old usable evidence.
         try:
             await self._mark(principal,task.knowledge_base_id,task.knowledge_id,'failed',code,
                              {'source_version':task.source_version},image_task=task)

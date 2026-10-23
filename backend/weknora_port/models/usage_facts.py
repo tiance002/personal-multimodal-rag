@@ -77,11 +77,13 @@ def capture_usage(raw, *, semantics='openai-input-inclusive/v1', simulated=None)
              # input/completion/total (that would double count reasoning).
              'reasoning': ('completion_tokens_details.reasoning_tokens',)}
     if semantics=='openai-responses/v1':
-        paths.update(input=('input_tokens',),output=('output_tokens',),cache_read=('input_tokens_details.cached_tokens',))
+        paths.update(input=('input_tokens',),output=('output_tokens',),cache_read=('input_tokens_details.cached_tokens',),
+                     reasoning=('output_tokens_details.reasoning_tokens',))
     elif semantics=='anthropic-messages/v1':
         paths.update(input=('input_tokens',),output=('output_tokens',),cache_read=('cache_read_input_tokens',))
     elif semantics=='google-generative-ai/v1':
-        paths.update(input=('promptTokenCount',),output=('candidatesTokenCount',),total=('totalTokenCount',),cache_read=('cachedContentTokenCount',))
+        paths.update(input=('promptTokenCount',),output=('candidatesTokenCount',),total=('totalTokenCount',),cache_read=('cachedContentTokenCount',),
+                     reasoning=('thoughtsTokenCount',))
     elif semantics=='ollama/v1':
         paths.update(input=('prompt_eval_count',),output=('eval_count',))
     elif semantics=='siliconflow-rerank-tokens/v1':
