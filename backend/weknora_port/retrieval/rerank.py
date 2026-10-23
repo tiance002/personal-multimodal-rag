@@ -1,13 +1,16 @@
 """Threshold retry, top-1 fallback, composite relevance and MMR."""
 from __future__ import annotations
+from dataclasses import replace
 from .query import go_strip, go_fields
 import json
+import hashlib
 import math
 import re
 from .query import simple_tokens, jaccard
 from .search import SearchNothing
 from ..models.types import CallCancelled, RunDeadlineExceeded
 from ..models.cloud_errors import raise_if_send_denied
+from ..models.transport import call_lifetime
 
 
 class InvalidRerankResponse(ValueError):
@@ -27,9 +30,11 @@ def _validate_raw_results(raw, candidate_count):
         seen.add(index)
     return raw
 
-def clean_passage(text):
+def clean_passage(text, *, preserve_urls=False):
     substitutions = [('(?s)```[^\\r\\n]*\\r?\\n(.*?)\\r?\\n?```', '\\1'), ('(?s)\\$\\$(.*?)\\$\\$', '\\1'), ('</?[a-zA-Z][^>]*>', ''), ('\\[(!\\[[^\\]]*\\]\\([^)]*\\))\\]\\([^)]*\\)', '\\1'), ('!\\[[^\\]]*\\]\\((?:[^()]|\\([^()]*\\))*\\)', ''), ('\\[([^\\]]*)\\]\\((?:[^()]|\\([^()]*\\))*\\)', '\\1'), ('https?://[^\\s)\\]>]+', ''), ('(?m)^[ \\t]*\\|[ \\t:|-]+\\|[ \\t]*$', '')]
-    for pattern, replacement in substitutions:
+    for index, (pattern, replacement) in enumerate(substitutions):
+        if preserve_urls and index in (5, 6):
+            continue  # Scoring candidate keeps Markdown targets and literal URLs.
         text = re.sub(pattern, replacement, text)
     text = re.sub('(?m)^[ \\t]*\\|(.+?)\\|[ \\t]*$', lambda m: ', '.join((go_strip(c) for c in m[1].split('|') if go_strip(c))), text)
     for pattern in ('(?m)^#{1,6}\\s+', '(?m)^>\\s?', '(?m)^[\\t ]*(?:[-*+]|\\d+\\.)\\s+'):
@@ -82,8 +87,8 @@ def image_infos(raw):
     except (ValueError, TypeError):
         return []
 
-def enriched_passage(result, *, deduplicate_images=False):
-    base = clean_passage(result.content)
+def enriched_passage(result, *, deduplicate_images=False, preserve_urls=False):
+    base = clean_passage(result.content, preserve_urls=preserve_urls)
     extra = []
     seen = {go_strip(result.content)} if deduplicate_images else set()
     for img in image_infos(result.image_info):
@@ -123,6 +128,39 @@ def model_passage(result, *, passage=None):
     prefixes = [go_strip(result.knowledge_title), go_strip(result.context_header)]
     return '\n\n'.join([p for p in prefixes if p] + [passage])
 
+
+def render_scoring_passage(result, first_source=None):
+    """Pure opt-in renderer; no question/Gold/generated prefix may enter it.
+
+    Prefix proof names an exact <=400 character original source interval. The
+    renderer changes neither the SearchResult nor answer/citation source text.
+    """
+    body = enriched_passage(result, deduplicate_images=True, preserve_urls=True)
+    rendered = model_passage(result, passage=body)
+    if not rendered or result.chunk_type == 'faq' or first_source is None:
+        return rendered, {}
+    source = first_source
+    version = (result.metadata or {}).get('source_version')
+    if (not version or (result.chunk_metadata or {}).get('source_version') != version
+            or (source.knowledge_base_id, source.knowledge_id) != (result.knowledge_base_id, result.knowledge_id)
+            or (source.metadata or {}).get('source_version') != version
+            or (source.chunk_metadata or {}).get('source_version') != version
+            or not source.id or source.chunk_type != 'text' or source.chunk_index != 0
+            or not source.is_enabled or source.content_revision or source.content_rewritten
+            or not isinstance(source.content, str) or not source.content
+            or type(source.start_at) is not int or type(source.end_at) is not int
+            or source.start_at < 0 or source.end_at-source.start_at != len(source.content)
+            or source.id == result.id):
+        return rendered, {}
+    quote = source.content[:400]
+    prefix = clean_passage(quote, preserve_urls=True)
+    if not prefix:
+        return rendered, {}
+    return prefix + '\n\n' + rendered, {
+        'source_chunk_id':source.id, 'source_version':version, 'document_id':source.knowledge_id,
+        'start':source.start_at, 'end':source.start_at+len(quote),
+        'quote_sha256':hashlib.sha256(quote.encode('utf-8')).hexdigest()}
+
 def mmr(candidates, passages, k, segmenter=None):
     tokens = [simple_tokens(text, segmenter) for text in passages]
     chosen = []
@@ -138,7 +176,7 @@ def mmr(candidates, passages, k, segmenter=None):
         remaining.remove(best)
     return [candidates[i] for i in chosen]
 
-async def rerank(state, context, registry, segmenter=None):
+async def rerank(state, context, registry, segmenter=None, *, repository=None):
     floorless = getattr(state, 'rerank_top1_floorless', False)
     if type(floorless) is not bool:
         raise ValueError('RERANK_TOP1_SETTING_INVALID')
@@ -173,9 +211,36 @@ async def rerank(state, context, registry, segmenter=None):
         if go_strip(passage):
             candidates.append(r)
             passages.append(passage)
-            model_passages.append(model_passage(r, passage=passage) if with_context else passage)
+            model_passages.append(passage)
     if not passages:
         return
+
+    if with_context:
+        documents = tuple(dict.fromkeys(r.knowledge_id for r in candidates if r.knowledge_id))
+        first_sources, reason = {}, 'SOURCE_READER_UNAVAILABLE'
+        if len(documents) > 30:
+            reason = 'SOURCE_DOCUMENT_LIMIT'
+        elif documents and callable(getattr(repository, 'get_first_source_chunks', None)):
+            try:
+                # Source I/O shares cancellation/deadline handling, but expiry is
+                # terminal retrieval expiry, never a model retry/upgrade signal.
+                # Without a request deadline this optional read has a 10s bound.
+                async with call_lifetime(replace(context, deadline_kind='run'), 10):
+                    first_sources = await repository.get_first_source_chunks(documents, context)
+                if not isinstance(first_sources, dict) or not set(first_sources) <= set(documents):
+                    raise PermissionError('SOURCE_PREFIX_SCOPE_MISMATCH')
+                reason = 'CURRENT_SOURCE_READBACK'
+            except (PermissionError, CallCancelled, RunDeadlineExceeded):
+                raise
+            except Exception:
+                first_sources, reason = {}, 'SOURCE_READBACK_UNAVAILABLE'
+        proofs = []
+        for index, row in enumerate(candidates):
+            model_passages[index], proof = render_scoring_passage(row, first_sources.get(row.knowledge_id))
+            if proof:
+                proofs.append({'candidate_id':row.id, **proof})
+        state.evidence_trace.append({'stage':'rerank_source_context', 'reason':reason,
+            'document_count':len(documents), 'prefixes':proofs})
 
     invoke_count = 0
     async def invoke():

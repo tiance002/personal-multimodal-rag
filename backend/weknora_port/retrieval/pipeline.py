@@ -126,7 +126,7 @@ class RetrievalPipeline:
             await self._progress("rerank", "started")
             try:
                 if not ordinary_empty:
-                    await rerank(state, context, self.registry, self.segmenter)
+                    await rerank(state, context, self.registry, self.segmenter, repository=self.repository)
             except SearchNothing:
                 if not empty_allowed:
                     raise

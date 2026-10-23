@@ -268,7 +268,7 @@ class LeasedKnowledgeRepository:
         return result.vectors[0]
 
     def __getattr__(self, name):
-        if name not in ("hybrid_search", "get_chunks", "get_current_chunks", "get_chunk_children", "get_faq_answers"):
+        if name not in ("hybrid_search", "get_chunks", "get_current_chunks", "get_first_source_chunks", "get_chunk_children", "get_faq_answers"):
             raise AttributeError(name)
 
         async def invoke(*args, **kwargs):

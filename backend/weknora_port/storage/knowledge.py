@@ -92,6 +92,65 @@ class ScopedKnowledgeRepository:
     async def get_chunk_children(self, parent_ids: Sequence[str], context: CallContext) -> Sequence[SearchResult]:
         return list((await self._read_chunks(parent_ids,context,children=True)).values())
 
+    async def get_first_source_chunks(self, document_ids: Sequence[str], context: CallContext) -> Mapping[str, SearchResult]:
+        """One current original text row per already-recalled document, <=30.
+
+        This is scoped source readback for scoring context, never new recall or
+        a document scan. Ambiguous/stale/unverifiable first rows add no prefix.
+        """
+        ids = tuple(dict.fromkeys(document_ids))
+        if len(ids)>30 or any(not isinstance(id,str) or not id for id in ids):
+            raise ValueError('SOURCE_PREFIX_DOCUMENT_LIMIT')
+        self.retriever.require_verified()
+        tenant = await self._tenant(context)
+        if not ids:
+            return {}
+        scope = context.scope
+        if scope.document_ids and not set(ids)<=set(scope.document_ids):
+            raise PermissionError('SOURCE_PREFIX_SCOPE_MISMATCH')
+        where = ["c.tenant_id = %s", "k.tenant_id = %s", "kb.tenant_id = %s",
+                 "c.deleted_at IS NULL", "k.deleted_at IS NULL", "kb.deleted_at IS NULL",
+                 "c.knowledge_id IN ("+','.join(['%s']*len(ids))+")",
+                 "c.knowledge_base_id IN ("+','.join(['%s']*len(scope.knowledge_base_ids))+")",
+                 "c.chunk_type = 'text'", "c.chunk_index = 0", "c.is_enabled = TRUE",
+                 "k.enable_status='enabled'", "k.parse_status='completed'",
+                 "(c.index_status IS NULL OR c.index_status NOT IN ('processing','failed'))",
+                 "COALESCE(c.content_revision,0)=0",
+                 "c.metadata->>'source_version'=k.metadata->>'source_version'"]
+        values = [tenant,tenant,tenant,*ids,*scope.knowledge_base_ids]
+        if scope.document_ids:
+            where.append("c.knowledge_id IN ("+','.join(['%s']*len(scope.document_ids))+")")
+            values.extend(scope.document_ids)
+        query = ("SELECT c.*,k.metadata AS knowledge_metadata,k.enable_status AS knowledge_enable_status,"
+                 "k.parse_status AS knowledge_parse_status FROM chunks c "
+                 "JOIN knowledges k ON k.id=c.knowledge_id AND k.knowledge_base_id=c.knowledge_base_id "
+                 "JOIN knowledge_bases kb ON kb.id=c.knowledge_base_id WHERE "+' AND '.join(where))
+        rows = await (await self.retriever.connection.execute(query,values)).fetchall()
+        result, seen = {}, set()
+        for row in rows:
+            doc = row['knowledge_id']
+            if (row['tenant_id']!=tenant or doc not in ids or row['knowledge_base_id'] not in scope.knowledge_base_ids
+                    or scope.document_ids and doc not in scope.document_ids):
+                raise PermissionError('SOURCE_PREFIX_SCOPE_MISMATCH')
+            if doc in seen:
+                result.pop(doc,None);continue
+            # Even an invalid first row makes another index-0 row ambiguous.
+            seen.add(doc)
+            metadata = _json_object(row.get('knowledge_metadata'))
+            chunk_metadata = _json_object(row.get('metadata'))
+            content, start, end = row.get('content'),row.get('start_at'),row.get('end_at')
+            if (row.get('deleted_at') is not None or row.get('is_enabled') is not True
+                    or row.get('knowledge_enable_status')!='enabled' or row.get('knowledge_parse_status')!='completed'
+                    or row.get('chunk_type')!='text' or row.get('chunk_index')!=0 or row.get('content_revision')
+                    or row.get('index_status') in ('processing','failed')
+                    or not metadata.get('source_version') or metadata.get('source_version')!=chunk_metadata.get('source_version')
+                    or not isinstance(content,str) or not content or type(start) is not int or type(end) is not int
+                    or start<0 or end-start!=len(content)):
+                continue
+            result[doc] = SearchResult(row['id'],content,0,knowledge_id=doc,knowledge_base_id=row['knowledge_base_id'],
+                chunk_type='text',chunk_index=0,start_at=start,end_at=end,metadata=metadata,chunk_metadata=chunk_metadata)
+        return result
+
     async def _read_chunks(self, ids: Sequence[str], context: CallContext, *,
                            children: bool = False, searchable: bool = False,
                            current: bool = False) -> Mapping[str, SearchResult]:
