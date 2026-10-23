@@ -50,6 +50,61 @@ class DocumentLifecycleError(RuntimeError):
         super().__init__(self.code)
 
 
+def _selected_image_retry_parent(chunks, task, document_metadata, manifest):
+    """Resolve one original parent; only selected Caption uses MinerU proof."""
+    path, digest = task.retry['asset_path'], task.retry['asset_sha256']
+    text = [r for r in chunks if r['chunk_type'] == 'text']
+    literal = [r for r in text if path in r['content']]
+    if literal:
+        if len(literal) != 1:
+            raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_AMBIGUOUS')
+        return literal[0], False
+    if task.retry['kind'] != 'caption':
+        raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
+    from .ingestion.mineru import public_chunk_locators
+    found = []
+    for row in text:
+        metadata = _json_object(row.get('metadata'))
+        locators = metadata.get('source_locators', ())
+        claims = [loc for loc in locators if isinstance(loc, dict) and
+            (loc.get('raw_evidence') or {}).get('asset', {}).get('logical_path') == path]
+        if not claims:
+            continue
+        try:
+            if ((row.get('tenant_id'), row.get('knowledge_base_id'), row.get('knowledge_id')) !=
+                    (task.tenant_id, task.knowledge_base_id, task.knowledge_id) or
+                    row.get('is_enabled') is not True or row.get('content_revision') != 0 or
+                    metadata.get('source_version') != task.source_version or
+                    document_metadata.get('source_version') != task.source_version or
+                    manifest.get('logical_path') != path or manifest.get('sha256') != digest or
+                    manifest.get('source_type') != 'mineru_evidence' or
+                    manifest.get('metadata', {}).get('processing_role') != 'parser_evidence' or
+                    manifest.get('metadata', {}).get('source_sha256') != document_metadata.get('sha256')):
+                raise LookupError('SOURCE_CHUNK_UNAVAILABLE')
+            # Reuse the existing immutable-source validator: stored document
+            # originals, clipped quote/offset, version, middle and asset hashes.
+            public_chunk_locators(metadata, document_metadata, task.knowledge_id,
+                task.source_version, row['start_at'], row['end_at'], row['content'])
+            for loc in claims:
+                proof = loc['raw_evidence']
+                start, end = proof.get('derived_block_start'), proof.get('derived_block_end')
+                location = {k: proof.get(k) for k in ('page_idx', 'block_index', 'block_path', 'bbox')}
+                if (proof.get('asset') != {'logical_path': path, 'sha256': digest} or
+                        type(start) is not int or type(end) is not int or
+                        not start <= loc['start'] < loc['end'] <= end or
+                        manifest.get('page_number') != loc.get('page') or
+                        location not in manifest.get('metadata', {}).get('locations', ())):
+                    raise LookupError('SOURCE_CHUNK_UNAVAILABLE')
+        except (LookupError, KeyError, TypeError, ValueError, AttributeError):
+            raise DocumentLifecycleError('IMAGE_SOURCE_ASSOCIATION_INVALID') from None
+        found.append(row)
+    if len(found) > 1:
+        raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_AMBIGUOUS')
+    if not found:
+        raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
+    return found[0], True
+
+
 @dataclass(frozen=True)
 class KnowledgeBaseSettings:
     """Resolved, server-side settings. IDs come from configured model bindings."""
@@ -532,21 +587,28 @@ class DocumentLifecycleService:
             asset_path=retry['asset_path'],source_version=task.source_version)
         if hashlib.sha256(source.content).hexdigest()!=retry['asset_sha256']:
             raise DocumentLifecycleError('IMAGE_ASSET_REPLAY_MISMATCH')
-        rows=await self._rows('SELECT metadata FROM knowledges WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL',
+        rows=await self._rows('SELECT metadata,file_hash,parse_status FROM knowledges WHERE id=%s AND tenant_id=%s AND knowledge_base_id=%s AND deleted_at IS NULL',
             (task.knowledge_id,task.tenant_id,task.knowledge_base_id))
+        if len(rows)!=1:
+            raise DocumentLifecycleError('IMAGE_SOURCE_VERSION_CHANGED')
         manifest=next(a for a in rows[0]['metadata']['assets'] if a['logical_path']==retry['asset_path'])
         assets=(ParsedAsset(retry['asset_path'],source.content,source.media_type,
             manifest['source_type'],manifest.get('page_number',0)),)
         scope=DocumentScope(task.tenant_id,task.subject_id,task.knowledge_base_id,task.knowledge_id,task.source_version)
-        chunks=await self._rows("SELECT id,content,chunk_type,metadata,image_info FROM chunks WHERE tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s AND metadata->>'source_version'=%s AND deleted_at IS NULL AND is_enabled=true",
+        chunks=await self._rows("SELECT id,tenant_id,knowledge_base_id,knowledge_id,content,chunk_type,chunk_index,start_at,end_at,metadata,image_info,is_enabled,content_revision FROM chunks WHERE tenant_id=%s AND knowledge_base_id=%s AND knowledge_id=%s AND metadata->>'source_version'=%s AND deleted_at IS NULL AND is_enabled=true",
             (task.tenant_id,task.knowledge_base_id,task.knowledge_id,task.source_version))
-        parent=next((r for r in chunks if r['chunk_type']=='text' and retry['asset_path'] in r['content']),None)
-        if parent is None:raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
-        parent_chunk=StoredChunk(parent['id'],scope,parent['content'],0,0,0,'text','')
+        parent,explicit_parent=_selected_image_retry_parent(chunks,task,rows[0]['metadata'],manifest)
+        if explicit_parent and (rows[0]['parse_status']!='completed' or
+                rows[0]['file_hash']!=rows[0]['metadata'].get('sha256') or
+                (principal.tenant_id,principal.subject_id)!=(task.tenant_id,task.subject_id)):
+            raise DocumentLifecycleError('IMAGE_SOURCE_ASSOCIATION_INVALID')
+        parent_chunk=StoredChunk(parent['id'],scope,parent['content'],parent.get('chunk_index',0),
+            parent.get('start_at',0),parent.get('end_at',0),'text','',metadata=dict(parent['metadata']))
         # Never re-run the successful sibling or the entire document parser.
         sibling='ocr_text' if retry['kind']=='caption' else 'caption'
         prior={'0':{sibling:{'status':'unavailable','error':'IMAGE_RETRY_UNSELECTED'},**task.outcomes.get('0',{})}}
         plan=await self.asset_processor.process_plan(principal,kb,scope,assets,ChunkPlan((parent_chunk,),()),
+            **({'source_parent_id':parent['id']} if explicit_parent else {}),
             selection_snapshot=task.selection,override=task.config,prior=prior,source_states=('completed',),
             request_identity=task.id,on_before=lambda i,k:queue.before(task,i,k),on_result=lambda i,info:queue.result(task,i,info))
         chunk_type='image_caption' if retry['kind']=='caption' else 'image_ocr'

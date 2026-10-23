@@ -137,7 +137,7 @@ class SourceImageProcessor:
 
     async def process_plan(self,principal,kb,scope,assets,plan,*,override=None,
                            selection_snapshot=None,on_before=None,on_result=None,prior=None,
-                           source_states=('processing',),request_identity=None):
+                           source_states=('processing',),request_identity=None,source_parent_id=None):
         app=self.app;app._owner(principal)
         if scope.tenant_id!=principal.tenant_id or scope.owner_id!=principal.subject_id or scope.knowledge_base_id!=kb['id']:
             raise DocumentLifecycleError('IMAGE_CHUNK_SCOPE_MISMATCH')
@@ -156,7 +156,17 @@ class SourceImageProcessor:
         registry=app.registry_for_context();created=[];indexed=[]
         try:
             for index,asset in enumerate(assets):
-                parent=next((chunk for chunk in plan.persisted if chunk.chunk_type=='text' and asset.path in chunk.content),None)
+                if source_parent_id is not None:
+                    # Server-only selected retry: documents validates the exact
+                    # current locator before passing this original parent ID.
+                    parents=[chunk for chunk in plan.persisted if chunk.chunk_type=='text' and chunk.id==source_parent_id]
+                    if (len(assets)!=1 or source_states!=('completed',) or not request_identity or
+                            selection_snapshot is None or len(parents)!=1 or parents[0].scope!=scope or
+                            parents[0].metadata.get('source_version')!=scope.source_version):
+                        raise DocumentLifecycleError('IMAGE_SOURCE_ASSOCIATION_INVALID')
+                    parent=parents[0]
+                else:
+                    parent=next((chunk for chunk in plan.persisted if chunk.chunk_type=='text' and asset.path in chunk.content),None)
                 if parent is None:raise DocumentLifecycleError('IMAGE_PARENT_CHUNK_NOT_FOUND')
                 context=CallContext((request_identity or scope.source_version)+'/image/'+str(index),TrustedScope(principal.subject_id,(kb['id'],),(scope.knowledge_id,)))
                 image='data:'+asset.media_type+';base64,'+base64.b64encode(asset.data).decode('ascii')
