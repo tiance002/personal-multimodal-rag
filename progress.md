@@ -671,4 +671,10 @@ S8.6.5-R 公开整理：原始四个本地提交及全部证据保留；公开�
 
 ## 2026-10-24 S8.8 实施与真实质量进展（未完成验收）
 
-代码 b132d9e；前端 Quick/Smart/额度、Caption 终态与选定资产重处理、固定澄清/取消、来源状态及影子路由已实施并完成受影响离线验证。最新隔离正式 HTTP 39/33/36/24 共17次调用，连同固定生成/图片/Rerank诊断，本轮累计112次、492897实际reported Tokens、新增UNKNOWN0；其中原始批次1份缺结束信号回答被拒绝，实际用量保留。HTTP33/36答对必要数值，36仍误引标题块，24没有引用且未证明唯一城市绑定。固定V2 Cheap为53完成+2无结果保留分母，主代理暂定40/55核心正确；新Prompt/模型/证据版本不混算，50/55目标尚未达到。正式生产和P5(.35)/全局Rerank(.3)未改；当前继续原图证据修复与正式Smart控制，范围修正另待Owner确认。详见docs/evaluation/S8_8_IMPLEMENTATION_AND_ACCEPTANCE.md；旧离线阶段单独归档，不再冒充当前零调用状态。
+源码更新至 `1f927e1`；`6b63b19` 修复已验证图片派生证据在串行策略中的交接，实际三行证据离线回放至最终生成准备通过，派生类型保留，定向 65 passed / exit 0。`1f927e1` 仅对验收 profile 的完整元数据做 SHA sidecar 无损去重：实际 60,191,721 字节快照首份降至总计 7,159,099 字节，完整 state 恢复相等；定向 17 passed / 2 deselected / exit 0，两项旧 ASGI 能力 fixture 失败在基线复现并保留。本次文档更新未重跑产品测试。
+
+规范原生回执 v6 对账：135 次调用、543,542 reported Token、UNKNOWN 0；ZIP/解压/检查点副本不重复计数，费用 UNPRICED。包括普通 HTTP Quick/Smart 同配置模型控制（各 4 次，6,551 / 6,606 Token），隔离整库副本正常 Caption+Embedding（2 次 / 1,416），HTTP50 首次生成前失败（3 次 / 7,021，全部结算保留）及修复后 r2b 完成（4 次 / 8,734）。HTTP50 核心层数正确，但 Caption 节点数量错误进入附加说明，整体 PARTIAL；派生引用可回读，不冒充原文或固定 V2 同输入救回。Quick/Smart 控制验证设置持久化、真实思考开关、History/Replay/用量，不证明自动路由质量或 Cheap Smart 能力。
+
+固定 V2 Cheap 仍为 53 完成 + 2 无结果保留分母，主代理复核核心 40/55；同证据 V2 Cheap 加匹配 Expensive 并集 41/55，不是自动路由准确率。新的 Prompt、物理副本和检索输入不混算，至少 50/55 目标尚未达到。HTTP18-r3 已完成（4 次 / 16,854 Token，6.90365 秒），实际 Context 缺目标端点后缀，核心/整体 PARTIAL；规范完成状态与原生/PG 4 条用量一致。HTTP50、HTTP18 两次独立同输入 Expensive 生成分别 1 次 / 1,559、1 次 / 1,904 Token，均完成但无整体改善；它们不是新的 HTTP 全链路验收。原始 response complete=false 属于消费语义 DONE 后未自然到 EOF 的采集标记，不代表业务失败。当前调用结束，范围/输入澄清与最终统一评估待完成。生产及 P5 0.35 / Rerank 0.3 未改，未宣称 Owner 验收或打 Tag。详见 [实施报告](docs/evaluation/S8_8_IMPLEMENTATION_AND_ACCEPTANCE.md) 与 [真实质量报告](docs/evaluation/S8_8_REAL_QUALITY_PROGRESS.md)；旧阶段、失败和 UNKNOWN 历史原样保留。
+
+本批收尾：公开材料检查完成；私有 `S8_8_PRIVATE_EVIDENCE_FINAL_R3_1.zip`（110,444,370 字节，SHA-256 `a081265123619f14d274d0bafb81999530835128a76ffee8ced783e54d726667`）已完成 CRC、全部成员哈希和快照还原检查，仅本地交付。55 个原始目标中保留 53 份已保存最终答案/请求，2 份明确缺失。临时 API/执行器/隔离 Caption 数据库已停止，无在途调用，Volume 与证据保留；生产不变。代码及脱敏报告可交付，至少 50/55 的质量目标仍未完成。

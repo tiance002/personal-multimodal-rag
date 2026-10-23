@@ -1,8 +1,8 @@
 {
-  "schema": "s88-implementation-acceptance-progress/v2",
+  "schema": "s88-implementation-acceptance-progress/v3",
   "status": "IMPLEMENTED_OFFLINE_VERIFIED_REAL_IN_PROGRESS_55_TARGET_NOT_MET",
-  "as_of": "2026-10-24_HTTP24_COMPLETE",
-  "code_revision": "b132d9ef1ed50a2daf474b8cf6f7ea69b51fca7d",
+  "as_of": "2026-10-24_HTTP18_R3_AND_STANDALONE_PAIRS_COMPLETE_SOURCE_1F927E1",
+  "code_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
   "branch": "codex/s8-8-implementation-20261023",
   "offline_baseline": "S8_8_OFFLINE_ACCEPTANCE_01AE7CF.results.json",
   "fixed55": {
@@ -15,15 +15,20 @@
       48
     ],
     "passed": false,
-    "mixed_profiles_pooled": false
+    "mixed_profiles_pooled": false,
+    "v2_cheap_and_matched_expensive_core_correct_provisional": 41,
+    "combined_profile_note": "Same-evidence V2 reviewed union; not observed automatic-router accuracy. Other prompt/context variants excluded."
   },
   "actual_provider": {
-    "calls": 112,
-    "reported_tokens": 492897,
+    "calls": 135,
+    "reported_tokens": 543542,
     "unknown": 0,
     "cost_status": "UNPRICED",
     "includes_diagnostics": true,
-    "incomplete_rejected_response_count": 1
+    "incomplete_rejected_response_count": 1,
+    "unique_request_capability_pairs": 135,
+    "duplicate_request_capability_pairs": 0,
+    "reconciliation": "Canonical native receipt reconciliation v6; ZIP/checkpoint mirrors counted once."
   },
   "formal_http": [
     {
@@ -55,6 +60,40 @@
       "core_correct": true,
       "citation": "MISSING",
       "independent_full_review": "COMPLETE_CORE_GOLD_PASS_CITATION_MISSING_YEAR_CITY_BINDING_UNVERIFIED"
+    },
+    {
+      "ordinal": 50,
+      "profile": "HTTP50clone-r2b; Prompt v3; isolated physical caption clone",
+      "status": "COMPLETE",
+      "calls": 4,
+      "tokens": 8734,
+      "usage_unknown": 0,
+      "all_settled": true,
+      "core_correct": true,
+      "overall_quality": "PARTIAL",
+      "citation": "VALID_CURRENT_DERIVED_IMAGE_CAPTION_HANDLE",
+      "extra_fact_issue": "Inaccurate node counts copied from derived caption; original pixels support the core layer count.",
+      "completion_evidence": "Saved assistant completed; native stop and DONE present.",
+      "included_in_fixed55_score": false,
+      "capture_semantics": "Raw response complete=false records that the iterator did not naturally reach EOF because the consumer stopped on semantic DONE; stop/DONE and canonical turn completion are compatible. It is not a business completion failure."
+    },
+    {
+      "ordinal": 18,
+      "profile": "HTTP18-r3; original question and whole-KB scope; Prompt v3",
+      "status": "COMPLETE",
+      "calls": 4,
+      "tokens": 16854,
+      "usage_unknown": 0,
+      "elapsed_seconds": 6.90365,
+      "core_label": "PARTIAL",
+      "overall_quality": "PARTIAL",
+      "citation": "VALID_CURRENT_HANDLE_ENDPOINT_INCOMPLETE",
+      "finding": "Returned base route is grounded; exact target suffix is absent from actual delivered Context and answer. Source/Gold disagreement remains unresolved.",
+      "formal_completion": "SSE/History and canonical port_turns completed; native ledger and four PG provider records match exactly.",
+      "legacy_raw_message_status": "pending with is_completed=true; existing history projection derives completed, not a failed final commit.",
+      "source_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
+      "execution_image_digest_prefix": "256856",
+      "included_in_fixed55_score": false
     }
   ],
   "production_changed": false,
@@ -63,10 +102,164 @@
   "rerank_threshold": 0.3,
   "private_payloads_published": false,
   "pending": [
-    "selected_source_image_repair",
-    "supported_model_formal_http_smart",
-    "scope_clarification",
-    "final_coherent55_evaluation",
-    "private_package_and_publication"
-  ]
+    "owner_scope_input_clarification",
+    "final_coherent55_evaluation"
+  ],
+  "formal_http_quick_smart_control": {
+    "status": "PASS_FIXED_CONFIGURED_MODEL_ORDINARY_HTTP_QUICK_SMART_PAIR",
+    "ordinal": 39,
+    "mode": "EXPENSIVE_ONLY_OFFLINE_ARM",
+    "calls": 8,
+    "reported_tokens": 13157,
+    "quick": {
+      "calls": 4,
+      "reported_tokens": 6551,
+      "final_reported_tokens": 1600,
+      "reasoning_tokens": null
+    },
+    "smart": {
+      "calls": 4,
+      "reported_tokens": 6606,
+      "final_reported_tokens": 1654,
+      "reasoning_tokens": 35
+    },
+    "same_messages_context_and_model": true,
+    "final_wire_difference": "thinking disabled versus enabled",
+    "max_output_tokens": 2048,
+    "settings_history_replay_verified": true,
+    "both_core_correct": true,
+    "both_citations_current": true,
+    "usage_unknown": 0,
+    "langfuse_provider_observations_each": 4,
+    "langfuse_input_output_null": true,
+    "limitation": "One-question mechanism control; not automatic DYNAMIC escalation, Qwen Smart capacity certification, or comparative quality evidence."
+  },
+  "selected_caption_repair": {
+    "status": "COMPLETE_ON_ISOLATED_PHYSICAL_CLONE",
+    "calls": 2,
+    "reported_tokens": 1416,
+    "usage_unknown": 0,
+    "normal_selected_retry_and_embedding": true,
+    "whole_original_kb_preserved": true,
+    "documents": 4,
+    "original_chunks": 267,
+    "derived_chunks_added": 1,
+    "original_text_unchanged": true,
+    "production_written": false,
+    "quality": "CORE_VISUAL_COUNT_SUPPORTED_EXTRA_NODE_COUNTS_INACCURATE"
+  },
+  "verified_followup_fixes": {
+    "scoped_image_handoff": {
+      "source_revision": "6b63b1984988dee22496790cf1852cff8e5000c4",
+      "change": "Preserve validated current derived image evidence through serial strategy; retain scope/version/materialization guards and original-text span checks.",
+      "synthetic_red": {
+        "failed": 5,
+        "passed": 13,
+        "exit_code": 1
+      },
+      "targeted_green": {
+        "passed": 65,
+        "exit_code": 0
+      },
+      "command": "python -m pytest tests/weknora_port/test_s88_strategy_image_evidence.py tests/weknora_port/test_s86_strategy.py -q",
+      "private_actual_replay": "Frozen fingerprint rejects actual current rows; repaired retrieve_once through execute_plan, context budget, source context and prepare_generation preserves generated_caption classification.",
+      "replay_provider_calls": 0,
+      "replay_database_calls": 0
+    },
+    "profile_snapshot_dedup": {
+      "source_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
+      "format": "metadata-blobs/v1",
+      "change": "Profile-only content-addressed full metadata sidecars; legacy direct snapshots remain unchanged; restore verifies byte length and SHA.",
+      "initial_red": {
+        "failed": 5,
+        "exit_code": 1
+      },
+      "targeted_green": {
+        "passed": 17,
+        "deselected": 2,
+        "exit_code": 0
+      },
+      "command": "python -m pytest tests/weknora_port/test_s88_profile_snapshot_metadata.py tests/weknora_port/test_s862r3_http_preflight.py tests/weknora_port/test_s864_top1_default.py -k 'not actual_asgi_session_message' -q",
+      "excluded_existing_failures": "Two ASGI fixtures also fail with the baseline serializer: MODEL_GENERATION_CAPACITY_UNKNOWN. No assertion or production capacity guard was relaxed.",
+      "actual_profile_replay": {
+        "original_bytes": 60191721,
+        "encoded_profile_bytes": 247357,
+        "full_metadata_blobs": 40,
+        "metadata_blob_bytes": 6911742,
+        "first_snapshot_total_bytes": 7159099,
+        "repeat_new_blob_bytes": 0,
+        "entire_state_roundtrip_equal": true,
+        "provider_calls": 0,
+        "database_calls": 0
+      },
+      "reader_contract": "New metadata consumers must hydrate using restore_state_snapshot; archives must include recursive sidecars. Current HTTP collector reads SSE/usage and does not depend on inline profile metadata.",
+      "no_truncation": true,
+      "provider_wire_unchanged": true,
+      "measurement_scope": "Local actual frozen-profile replay; not ECS throughput measurement."
+    }
+  },
+  "pending_experiments": [],
+  "report_update_validation": "Documentation-only integration; product tests not rerun.",
+  "standalone_same_input_expensive_pairs": [
+    {
+      "ordinal": 50,
+      "execution_kind": "STANDALONE_SAME_INPUT_EXPENSIVE_GENERATION_NOT_NEW_HTTP",
+      "status": "COMPLETE",
+      "calls": 1,
+      "reported_tokens": 1559,
+      "prompt_tokens": 1506,
+      "completion_tokens": 53,
+      "usage_unknown": 0,
+      "finish_reason": "stop",
+      "core_label": "CORRECT",
+      "overall_quality": "PARTIAL",
+      "comparison": "No improvement: repeats inaccurate caption node-count extras despite correct core layer count.",
+      "same_messages_context": true,
+      "source_revision": "6b63b1984988dee22496790cf1852cff8e5000c4",
+      "execution_image_digest_prefix": "a6ac",
+      "included_in_fixed55_score": false
+    },
+    {
+      "ordinal": 18,
+      "execution_kind": "STANDALONE_SAME_INPUT_EXPENSIVE_GENERATION_NOT_NEW_HTTP",
+      "status": "COMPLETE",
+      "calls": 1,
+      "reported_tokens": 1904,
+      "prompt_tokens": 1714,
+      "completion_tokens": 190,
+      "usage_unknown": 0,
+      "finish_reason": "stop",
+      "core_label": "PARTIAL",
+      "overall_quality": "PARTIAL",
+      "comparison": "No improvement: retains base route and states the requested page detail is missing; exact target endpoint remains unresolved.",
+      "same_messages_context": true,
+      "source_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
+      "execution_image_digest_prefix": "256856",
+      "included_in_fixed55_score": false
+    }
+  ],
+  "current_calls_status": "COMPLETE_NO_FURTHER_CURRENT_CALLS",
+  "private_evidence_delivery": {
+    "status": "SEALED_AND_LOCALLY_VERIFIED_PRIVATE_ONLY",
+    "archive_basename": "S8_8_PRIVATE_EVIDENCE_FINAL_R3_1.zip",
+    "sha256": "a081265123619f14d274d0bafb81999530835128a76ffee8ced783e54d726667",
+    "bytes": 110444370,
+    "payload_entries": 3368,
+    "zip_members_including_manifest": 3369,
+    "zip_crc": "PASS",
+    "all_member_size_sha256": "PASS",
+    "alias_restore_and_metadata_hydration": "PASS",
+    "original_target_count": 55,
+    "saved_original_final_answer_and_request_pairs": 53,
+    "original_missing_answer_and_request_count": 2,
+    "published_to_github": false,
+    "excluded": "Credentials, environment files, keys, grant authority, protected database rows, PGDATA and build contexts.",
+    "snapshot_note": "The archive contains the pre-seal report snapshot; its external manifest records the final seal. Public delivery metadata was appended afterwards."
+  },
+  "resource_closeout": {
+    "temporary_services": "STOPPED",
+    "inflight_provider_calls": 0,
+    "clone_data_and_evidence": "PRESERVED",
+    "production_changed": false
+  }
 }

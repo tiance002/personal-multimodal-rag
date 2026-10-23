@@ -1,5 +1,5 @@
 {
-  "schema": "s8-8-real-quality-progress/v3",
+  "schema": "s8-8-real-quality-progress/v4",
   "as_of_date": "2026-10-24",
   "status": "PROGRESS_SNAPSHOT_NOT_FINAL_ACCEPTANCE",
   "scope": {
@@ -14,21 +14,23 @@
     "ordinal34_root_adjudication": "WRONG",
     "accuracy_profile": "Fixed-context Prompt v2 Cheap only; separate model/prompt/retrieval variants are excluded.",
     "adjudication_status": "ROOT_AGENT_PROVISIONAL_NOT_OWNER_APPROVAL",
-    "completed_v2_not_core_correct": 13
+    "completed_v2_not_core_correct": 13,
+    "v2_cheap_and_matched_expensive_core_correct": 41,
+    "combined_score_note": "Same-evidence V2 reviewed union, not automatic routing accuracy; V3 and changed-context HTTP excluded."
   },
   "accounting": {
-    "completed_provider_calls": 112,
-    "reported_tokens": 492897,
+    "completed_provider_calls": 135,
+    "reported_tokens": 543542,
     "usage_unknown_calls": 0,
     "provider_counts": {
-      "siliconflow": 79,
-      "deepseek": 33
+      "siliconflow": 97,
+      "deepseek": 38
     },
     "provider_model_counts": {
-      "siliconflow/Qwen/Qwen3.5-4B": 67,
-      "deepseek/deepseek-flash": 33,
-      "siliconflow/BAAI/bge-reranker-v2-m3": 8,
-      "siliconflow/BAAI/bge-m3": 4
+      "siliconflow/Qwen/Qwen3.5-4B": 74,
+      "deepseek/deepseek-flash": 38,
+      "siliconflow/BAAI/bge-reranker-v2-m3": 13,
+      "siliconflow/BAAI/bge-m3": 10
     },
     "batches": [
       {
@@ -124,7 +126,7 @@
           "deepseek-flash": 1
         },
         "settled": 5,
-        "ledger_lifecycle": "OPEN",
+        "ledger_lifecycle": "CLOSED_PRESERVED",
         "note": "Settled diagnostic, outside fixed V2 cohort."
       },
       {
@@ -137,7 +139,7 @@
           "BAAI/bge-reranker-v2-m3": 1
         },
         "settled": 4,
-        "ledger_lifecycle": "OPEN",
+        "ledger_lifecycle": "CLOSED_PRESERVED",
         "note": "Settled diagnostic, outside fixed V2 cohort."
       },
       {
@@ -151,7 +153,7 @@
         },
         "settled": 4,
         "usage_unknown": 0,
-        "ledger_lifecycle": "OPEN",
+        "ledger_lifecycle": "CLOSED_PRESERVED",
         "quality_review": "CORE_PASS_CITATION_PRECISION_FAIL",
         "source_revision": "b5fc",
         "execution_image": "sha256:07a9",
@@ -169,16 +171,120 @@
         },
         "settled": 4,
         "usage_unknown": 0,
-        "ledger_lifecycle": "OPEN",
-        "quality_review": "PENDING_AGENT_REVIEW",
+        "ledger_lifecycle": "CLOSED_PRESERVED",
+        "quality_review": "CORE_GOLD_PASS_CITATION_MISSING_YEAR_CITY_BINDING_UNVERIFIED",
         "source_revision": "b5fc",
         "execution_image": "sha256:07a9",
         "archive_file_count": 101,
         "note": "Formal API diagnostic; outside fixed55 answer accuracy."
+      },
+      {
+        "name": "HTTP39 Quick ordinary HTTP control",
+        "calls": 4,
+        "reported_tokens": 6551,
+        "models": {
+          "Qwen/Qwen3.5-4B": 1,
+          "deepseek-flash": 1,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1
+        },
+        "settled": 4,
+        "usage_unknown": 0,
+        "note": "Same configured-model Quick/Smart control; outside fixed V2 score."
+      },
+      {
+        "name": "HTTP39 Smart ordinary HTTP control",
+        "calls": 4,
+        "reported_tokens": 6606,
+        "models": {
+          "Qwen/Qwen3.5-4B": 1,
+          "deepseek-flash": 1,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1
+        },
+        "settled": 4,
+        "usage_unknown": 0,
+        "note": "Same configured-model Quick/Smart control; outside fixed V2 score."
+      },
+      {
+        "name": "Selected-caption isolated clone repair",
+        "calls": 2,
+        "reported_tokens": 1416,
+        "models": {
+          "deepseek-flash": 1,
+          "BAAI/bge-m3": 1
+        },
+        "settled": 2,
+        "usage_unknown": 0,
+        "note": "Normal selected-image caption plus embedding; derived evidence, not answer score."
+      },
+      {
+        "name": "HTTP50 clone first attempt",
+        "calls": 3,
+        "reported_tokens": 7021,
+        "models": {
+          "Qwen/Qwen3.5-4B": 1,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1
+        },
+        "settled": 3,
+        "usage_unknown": 0,
+        "note": "RetrievalScopeError before final generation; all incurred usage preserved."
+      },
+      {
+        "name": "HTTP50 clone repaired attempt",
+        "calls": 4,
+        "reported_tokens": 8734,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1
+        },
+        "settled": 4,
+        "usage_unknown": 0,
+        "note": "Completed; core correct, overall PARTIAL due inaccurate derived-caption extras; outside fixed V2 score."
+      },
+      {
+        "name": "HTTP18-r3 formal API diagnostic",
+        "calls": 4,
+        "reported_tokens": 16854,
+        "models": {
+          "Qwen/Qwen3.5-4B": 2,
+          "BAAI/bge-m3": 1,
+          "BAAI/bge-reranker-v2-m3": 1
+        },
+        "settled": 4,
+        "usage_unknown": 0,
+        "note": "Completed; source-grounded base route but exact target endpoint unresolved; core PARTIAL."
+      },
+      {
+        "name": "HTTP50-input standalone Expensive pair",
+        "calls": 1,
+        "reported_tokens": 1559,
+        "models": {
+          "deepseek-flash": 1
+        },
+        "settled": 1,
+        "usage_unknown": 0,
+        "note": "Standalone same-input generation, not a new HTTP pipeline; core correct / overall PARTIAL, no improvement."
+      },
+      {
+        "name": "HTTP18-input standalone Expensive pair",
+        "calls": 1,
+        "reported_tokens": 1904,
+        "models": {
+          "deepseek-flash": 1
+        },
+        "settled": 1,
+        "usage_unknown": 0,
+        "note": "Standalone same-input generation, not a new HTTP pipeline; core/overall PARTIAL, no improvement."
       }
     ],
-    "reconciliation": "Previous 104-call snapshot plus settled HTTP36 (4/19,999) and HTTP24 (4/20,110) = 112 calls / 492,897 reported tokens; UNKNOWN 0.",
-    "excluded": "Partial/checkpoint mirrors are not counted as extra sends. HTTP36 and HTTP24 are included in call/token accounting but excluded from fixed55 answer accuracy."
+    "reconciliation": "Canonical native receipts v6: prior 129 / 523225 + formal HTTP18-r3 4 / 16854 + standalone same-input Expensive pairs 1 / 1559 and 1 / 1904 = 135 / 543542; UNKNOWN 0.",
+    "excluded": "ZIP/extracted/checkpoint mirrors are not extra sends. All three latest experiments are included once in accounting and excluded from fixed55 scores.",
+    "unique_request_capability_pairs": 135,
+    "duplicate_request_capability_pairs": 0,
+    "cost_status": "UNPRICED"
   },
   "image_review": {
     "calls": 9,
@@ -190,8 +296,22 @@
       "unresolved_formula_or_dense_text": 3
     },
     "major_transcription_error_count": 1,
-    "major_transcription_error_summary": "One caption rendered visible IMG as IGN.",
-    "completion_is_accuracy": false
+    "major_transcription_error_summary": "One major visible-text transcription error; raw image text retained privately.",
+    "completion_is_accuracy": false,
+    "selected_caption_clone_repair": {
+      "status": "COMPLETE_ON_ISOLATED_PHYSICAL_CLONE",
+      "calls": 2,
+      "reported_tokens": 1416,
+      "usage_unknown": 0,
+      "normal_selected_retry_and_embedding": true,
+      "whole_original_kb_preserved": true,
+      "documents": 4,
+      "original_chunks": 267,
+      "derived_chunks_added": 1,
+      "original_text_unchanged": true,
+      "production_written": false,
+      "quality": "CORE_VISUAL_COUNT_SUPPORTED_EXTRA_NODE_COUNTS_INACCURATE"
+    }
   },
   "rerank_diagnostic": {
     "calls": 4,
@@ -215,10 +335,10 @@
     "historical_versions_for_discovery_matches": "UNKNOWN"
   },
   "versions": {
-    "report_worktree_head_short": "b132d9e",
+    "report_worktree_head_short": "1f927e1",
     "rerank_passage_render_source_revision": "a48f29f61e7c88ceebf4bffaf9f1f1ee6ce636d7",
     "production_changed": false,
-    "current_report_worktree_head": "b132d9e",
+    "current_report_worktree_head": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
     "http36_http24_source_revision": "b5fc",
     "http39_source_revision": "6bd49e7d48e2ee5a52e572b094a0104f5234aff8",
     "http39_execution_image": "sha256:62bccab7a5052bbbb5056ca0a96a0de7b29daf55380f4cf5e36f773b0a6a3652",
@@ -229,7 +349,9 @@
       "execution_image": "sha256:62bccab7a5052bbbb5056ca0a96a0de7b29daf55380f4cf5e36f773b0a6a3652",
       "calls": 5
     },
-    "http33_36_24_execution_image_digest_prefix": "07a9"
+    "http33_36_24_execution_image_digest_prefix": "07a9",
+    "scoped_image_handoff_source": "6b63b1984988dee22496790cf1852cff8e5000c4",
+    "document_context_source": "dd189962958f5afb4e3e6953ad79b6887ec65988"
   },
   "privacy": "No full questions, Gold records, contexts, case IDs, source IDs, or answer text are included.",
   "prompt_and_execution_profiles": {
@@ -241,10 +363,196 @@
       "Prompt v3 Cheap subset",
       "Prompt v3 Expensive pair",
       "BGE rerank diagnostic",
-      "HTTP39/HTTP33 diagnostic"
+      "HTTP39/HTTP33 diagnostic",
+      "HTTP24/36 diagnostics",
+      "HTTP39 ordinary HTTP Quick/Smart controls",
+      "Selected-caption clone repair and HTTP50 Prompt v3 answer",
+      "HTTP18-r3 diagnostic",
+      "HTTP50/18-input standalone same-input Expensive generation pairs"
     ],
     "default_p5_threshold": 0.35,
     "http36_quality_review": "CORE_PASS_CITATION_PRECISION_FAIL; outside fixed55 score.",
-    "http24_quality_review": "PENDING_AGENT_REVIEW; no correctness result inferred."
+    "http24_quality_review": "CORE_GOLD_PASS_CITATION_MISSING_YEAR_CITY_BINDING_UNVERIFIED; outside fixed55 score."
+  },
+  "as_of": "2026-10-24_HTTP18_R3_AND_STANDALONE_PAIRS_COMPLETE_SOURCE_1F927E1",
+  "formal_http_quick_smart_control": {
+    "status": "PASS_FIXED_CONFIGURED_MODEL_ORDINARY_HTTP_QUICK_SMART_PAIR",
+    "ordinal": 39,
+    "mode": "EXPENSIVE_ONLY_OFFLINE_ARM",
+    "calls": 8,
+    "reported_tokens": 13157,
+    "quick": {
+      "calls": 4,
+      "reported_tokens": 6551,
+      "final_reported_tokens": 1600,
+      "reasoning_tokens": null
+    },
+    "smart": {
+      "calls": 4,
+      "reported_tokens": 6606,
+      "final_reported_tokens": 1654,
+      "reasoning_tokens": 35
+    },
+    "same_messages_context_and_model": true,
+    "final_wire_difference": "thinking disabled versus enabled",
+    "max_output_tokens": 2048,
+    "settings_history_replay_verified": true,
+    "both_core_correct": true,
+    "both_citations_current": true,
+    "usage_unknown": 0,
+    "langfuse_provider_observations_each": 4,
+    "langfuse_input_output_null": true,
+    "limitation": "One-question mechanism control; not automatic DYNAMIC escalation, Qwen Smart capacity certification, or comparative quality evidence."
+  },
+  "http50_clone_review": {
+    "ordinal": 50,
+    "profile": "HTTP50clone-r2b; Prompt v3; isolated physical caption clone",
+    "status": "COMPLETE",
+    "calls": 4,
+    "tokens": 8734,
+    "usage_unknown": 0,
+    "all_settled": true,
+    "core_correct": true,
+    "overall_quality": "PARTIAL",
+    "citation": "VALID_CURRENT_DERIVED_IMAGE_CAPTION_HANDLE",
+    "extra_fact_issue": "Inaccurate node counts copied from derived caption; original pixels support the core layer count.",
+    "completion_evidence": "Saved assistant completed; native stop and DONE present.",
+    "included_in_fixed55_score": false,
+    "capture_semantics": "Raw response complete=false records that the iterator did not naturally reach EOF because the consumer stopped on semantic DONE; stop/DONE and canonical turn completion are compatible. It is not a business completion failure."
+  },
+  "verified_followup_fixes": {
+    "scoped_image_handoff": {
+      "source_revision": "6b63b1984988dee22496790cf1852cff8e5000c4",
+      "change": "Preserve validated current derived image evidence through serial strategy; retain scope/version/materialization guards and original-text span checks.",
+      "synthetic_red": {
+        "failed": 5,
+        "passed": 13,
+        "exit_code": 1
+      },
+      "targeted_green": {
+        "passed": 65,
+        "exit_code": 0
+      },
+      "command": "python -m pytest tests/weknora_port/test_s88_strategy_image_evidence.py tests/weknora_port/test_s86_strategy.py -q",
+      "private_actual_replay": "Frozen fingerprint rejects actual current rows; repaired retrieve_once through execute_plan, context budget, source context and prepare_generation preserves generated_caption classification.",
+      "replay_provider_calls": 0,
+      "replay_database_calls": 0
+    },
+    "profile_snapshot_dedup": {
+      "source_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
+      "format": "metadata-blobs/v1",
+      "change": "Profile-only content-addressed full metadata sidecars; legacy direct snapshots remain unchanged; restore verifies byte length and SHA.",
+      "initial_red": {
+        "failed": 5,
+        "exit_code": 1
+      },
+      "targeted_green": {
+        "passed": 17,
+        "deselected": 2,
+        "exit_code": 0
+      },
+      "command": "python -m pytest tests/weknora_port/test_s88_profile_snapshot_metadata.py tests/weknora_port/test_s862r3_http_preflight.py tests/weknora_port/test_s864_top1_default.py -k 'not actual_asgi_session_message' -q",
+      "excluded_existing_failures": "Two ASGI fixtures also fail with the baseline serializer: MODEL_GENERATION_CAPACITY_UNKNOWN. No assertion or production capacity guard was relaxed.",
+      "actual_profile_replay": {
+        "original_bytes": 60191721,
+        "encoded_profile_bytes": 247357,
+        "full_metadata_blobs": 40,
+        "metadata_blob_bytes": 6911742,
+        "first_snapshot_total_bytes": 7159099,
+        "repeat_new_blob_bytes": 0,
+        "entire_state_roundtrip_equal": true,
+        "provider_calls": 0,
+        "database_calls": 0
+      },
+      "reader_contract": "New metadata consumers must hydrate using restore_state_snapshot; archives must include recursive sidecars. Current HTTP collector reads SSE/usage and does not depend on inline profile metadata.",
+      "no_truncation": true,
+      "provider_wire_unchanged": true,
+      "measurement_scope": "Local actual frozen-profile replay; not ECS throughput measurement."
+    }
+  },
+  "pending_experiments": [],
+  "http18_r3_review": {
+    "ordinal": 18,
+    "profile": "HTTP18-r3; original question and whole-KB scope; Prompt v3",
+    "status": "COMPLETE",
+    "calls": 4,
+    "tokens": 16854,
+    "usage_unknown": 0,
+    "elapsed_seconds": 6.90365,
+    "core_label": "PARTIAL",
+    "overall_quality": "PARTIAL",
+    "citation": "VALID_CURRENT_HANDLE_ENDPOINT_INCOMPLETE",
+    "finding": "Returned base route is grounded; exact target suffix is absent from actual delivered Context and answer. Source/Gold disagreement remains unresolved.",
+    "formal_completion": "SSE/History and canonical port_turns completed; native ledger and four PG provider records match exactly.",
+    "legacy_raw_message_status": "pending with is_completed=true; existing history projection derives completed, not a failed final commit.",
+    "source_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
+    "execution_image_digest_prefix": "256856",
+    "included_in_fixed55_score": false
+  },
+  "standalone_same_input_expensive_pairs": [
+    {
+      "ordinal": 50,
+      "execution_kind": "STANDALONE_SAME_INPUT_EXPENSIVE_GENERATION_NOT_NEW_HTTP",
+      "status": "COMPLETE",
+      "calls": 1,
+      "reported_tokens": 1559,
+      "prompt_tokens": 1506,
+      "completion_tokens": 53,
+      "usage_unknown": 0,
+      "finish_reason": "stop",
+      "core_label": "CORRECT",
+      "overall_quality": "PARTIAL",
+      "comparison": "No improvement: repeats inaccurate caption node-count extras despite correct core layer count.",
+      "same_messages_context": true,
+      "source_revision": "6b63b1984988dee22496790cf1852cff8e5000c4",
+      "execution_image_digest_prefix": "a6ac",
+      "included_in_fixed55_score": false
+    },
+    {
+      "ordinal": 18,
+      "execution_kind": "STANDALONE_SAME_INPUT_EXPENSIVE_GENERATION_NOT_NEW_HTTP",
+      "status": "COMPLETE",
+      "calls": 1,
+      "reported_tokens": 1904,
+      "prompt_tokens": 1714,
+      "completion_tokens": 190,
+      "usage_unknown": 0,
+      "finish_reason": "stop",
+      "core_label": "PARTIAL",
+      "overall_quality": "PARTIAL",
+      "comparison": "No improvement: retains base route and states the requested page detail is missing; exact target endpoint remains unresolved.",
+      "same_messages_context": true,
+      "source_revision": "1f927e1845a0a137242fac58ee409620dc7bf2ec",
+      "execution_image_digest_prefix": "256856",
+      "included_in_fixed55_score": false
+    }
+  ],
+  "current_calls_status": "COMPLETE_NO_FURTHER_CURRENT_CALLS",
+  "pending": [
+    "owner_scope_input_clarification",
+    "final_coherent55_evaluation"
+  ],
+  "private_evidence_delivery": {
+    "status": "SEALED_AND_LOCALLY_VERIFIED_PRIVATE_ONLY",
+    "archive_basename": "S8_8_PRIVATE_EVIDENCE_FINAL_R3_1.zip",
+    "sha256": "a081265123619f14d274d0bafb81999530835128a76ffee8ced783e54d726667",
+    "bytes": 110444370,
+    "payload_entries": 3368,
+    "zip_members_including_manifest": 3369,
+    "zip_crc": "PASS",
+    "all_member_size_sha256": "PASS",
+    "alias_restore_and_metadata_hydration": "PASS",
+    "original_target_count": 55,
+    "saved_original_final_answer_and_request_pairs": 53,
+    "original_missing_answer_and_request_count": 2,
+    "published_to_github": false,
+    "excluded": "Credentials, environment files, keys, grant authority, protected database rows, PGDATA and build contexts.",
+    "snapshot_note": "The archive contains the pre-seal report snapshot; its external manifest records the final seal. Public delivery metadata was appended afterwards."
+  },
+  "resource_closeout": {
+    "temporary_services": "STOPPED",
+    "inflight_provider_calls": 0,
+    "clone_data_and_evidence": "PRESERVED",
+    "production_changed": false
   }
 }
