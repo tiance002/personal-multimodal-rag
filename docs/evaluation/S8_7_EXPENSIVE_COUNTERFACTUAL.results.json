@@ -1,0 +1,66 @@
+{
+  "schema_version": "s8.7-public-redacted-summary-v1",
+  "status": "COMPLETED_DIAGNOSTIC_SAMPLE",
+  "privacy": {
+    "contains_per_case_questions": false,
+    "contains_gold_answers": false,
+    "contains_raw_model_answers": false,
+    "contains_context_or_source_passages": false,
+    "contains_session_request_or_receipt_ids": false,
+    "private_evidence_archive_in_repository": false
+  },
+  "execution": {
+    "new_expensive_generation_calls": 20,
+    "settled_calls": 20,
+    "unknown_calls": 0,
+    "retries": 0,
+    "reported_tokens_total": 80951,
+    "reported_prompt_tokens": 75042,
+    "reported_completion_tokens": 5909,
+    "billing_status": "UNVERIFIED_NO_BILLING_RECEIPT",
+    "cost_estimated": false,
+    "generation_elapsed_seconds_sum": 223.11060610599816,
+    "generation_elapsed_seconds_p50": 3.36868165749911,
+    "generation_elapsed_seconds_p95": 41.17913894019912,
+    "timing_scope": "Native chat_stream call boundary; not end-to-end RAG latency or causal model latency delta",
+    "production_updated": false
+  },
+  "treatment": {
+    "denominator": 14,
+    "outcomes": {
+      "GROUNDED_RESCUE": 3,
+      "PARTIAL_IMPROVEMENT": 0,
+      "NO_IMPROVEMENT": 1,
+      "REGRESSION": 0,
+      "UNSUPPORTED_GOLD_MATCH": 0,
+      "EVIDENCE_LIMITED": 5,
+      "GOLD_OR_SCOPE_AMBIGUOUS": 5,
+      "UNVERIFIED": 0
+    },
+    "grounded_rescue_rate": 0.21428571428571427
+  },
+  "controls": {
+    "denominator": 6,
+    "stable_correct": 6,
+    "core_regressions": 0
+  },
+  "historical_pairs": {
+    "included_in_new_call_count": false,
+    "correct_to_correct": 1,
+    "partial_to_partial": 1,
+    "core_rescues": 0,
+    "regressions": 0
+  },
+  "decisions": {
+    "p5_threshold_changed": false,
+    "p5_calibration_completed": false,
+    "frontend_configuration_implemented": false,
+    "generalized_accuracy_claim": false
+  },
+  "limitations": [
+    "Selected diagnostic sample; not a general accuracy estimate or production lift.",
+    "Five treatment cases were evidence-limited and five had Gold or scope ambiguity.",
+    "Actual billing amount was not available; no cost estimate is reported.",
+    "Private per-case answers, Context, source passages and receipts are excluded from this public artifact."
+  ]
+}
