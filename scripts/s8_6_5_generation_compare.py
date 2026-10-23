@@ -450,7 +450,12 @@ async def run_case(package, case_id, *, app, owner_grant, output):
                     state['arms'][arm]['usage'] = matches[0].get('usage')
                 if (len(matches) != 1 or matches[0]['status'] != 'SETTLED'
                         or matches[0].get('outcome') != 'RESPONSE_RECEIVED'
-                        or not any(e.get('is_final') for e in events)
+                        # Adapter EOF/[DONE] bookkeeping can settle known usage
+                        # without a Provider answer finish. Require its actual
+                        # final answer contract before admitting the next arm.
+                        or not any(e.get('is_final') and e.get('response_type') == 'answer'
+                            and (e.get('data') or {}).get('provider_answer_done') is True
+                            and e.get('finish_reason') in ('stop', 'end_turn', 'completed') for e in events)
                         or any(e.get('response_type') == 'error' for e in events)
                         or any(e.get('finish_reason') in ('length', 'max_tokens', 'max_output_tokens') for e in events)):
                     raise RuntimeError('S865_UNKNOWN_INCOMPLETE_OR_TRUNCATED_STOP_NO_RETRY')

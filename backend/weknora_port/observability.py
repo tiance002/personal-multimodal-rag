@@ -263,7 +263,8 @@ class LangfuseObservability:
             background = self._start('background-provider', trace_id, metadata=metadata)
             if background is None: return
             parent = background.id
-        kind = 'embedding' if call.capability == 'embedding' else 'generation' if call.capability in ('chat', 'vision') else 'span'
+        # SDK 4.15.6 only exports native model/usage for generation-like types.
+        kind = 'embedding' if call.capability == 'embedding' else 'generation' if call.capability in ('chat', 'vision', 'rerank') else 'span'
         span = self._start('provider-' + call.capability, trace_id, parent, as_type=kind,
                            metadata=metadata, model=self._content(call.model))
         if span is None:
