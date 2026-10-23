@@ -85,6 +85,8 @@ def context_results(state):
 
 def bridge_context_attributes(row):
     """Program evidence qualifications shared by both Context encoders."""
+    if (row.metadata or {}).get('source_document_context'):
+        return ' role="document_context" supports="document_identity_only"'
     if (row.metadata or {}).get('bridge_identity'):
         return ' role="bridge_identity" supports="subject_identity"'
     details = (row.metadata or {}).get('bridge_rescue')

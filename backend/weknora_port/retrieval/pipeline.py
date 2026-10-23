@@ -250,6 +250,9 @@ class RetrievalPipeline:
                 state.strategy_trace.append({'stage':'strategy_bridge','status':assessment.status.value,
                     'reason':assessment.reason,'source_validity':assessment.source_validity,
                     'semantic_support':assessment.semantic_support,'new_recall':assessment.new_recall})
+            from .source_context import project_document_context
+            await project_document_context(state, context, self.repository)
+            check_context()
             await self._progress('context', 'started')
             finalized = await into_chat_message(state, context, persist_sink=self.persist_sink)
             await self._progress('context','completed',selected_evidence_count=len(finalized.result_ids))
@@ -289,6 +292,9 @@ class RetrievalPipeline:
                     state.rescue_evidence = []
                     state.bridge_trace.append({'decision': 'SKIPPED', 'reason': 'BRIDGE_CONTEXT_BUDGET_EXCEEDED'})
             await self._progress('bridge', 'completed', added_chunks=len(state.rescue_evidence))
+        from .source_context import project_document_context
+        await project_document_context(state, context, self.repository)
+        check_context()
         await self._progress("context", "started")
         result = await into_chat_message(state, context, persist_sink=self.persist_sink)
         await self._progress("context", "completed", selected_evidence_count=len(result.result_ids))
