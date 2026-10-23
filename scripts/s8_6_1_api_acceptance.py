@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import asynccontextmanager
-from dataclasses import asdict, is_dataclass, replace
+from dataclasses import asdict, fields as dataclass_fields, is_dataclass, replace
 from datetime import datetime, timezone
 from decimal import Decimal
 import hashlib
@@ -114,8 +114,69 @@ def compose_configuration(configuration):
     return replace(configuration, pipeline_state=state, generation_options=options)
 
 
-def _row(row):
-    return asdict(row) if is_dataclass(row) else row
+class SnapshotMetadataStore:
+    """Private, lossless metadata sidecars shared by this profile's snapshots."""
+    def __init__(self, directory):
+        self.directory = Path(directory) / 'snapshot-metadata'
+        self.written = set()
+
+    def reference(self, value):
+        raw = json.dumps(value, ensure_ascii=False, sort_keys=True,
+                         separators=(',', ':'), default=str).encode('utf8')
+        sha = digest(raw)
+        if sha not in self.written:
+            self.directory.mkdir(parents=True, exist_ok=True)
+            path = self.directory / (sha + '.json')
+            try:
+                with path.open('xb') as stream:
+                    stream.write(raw)
+            except FileExistsError:
+                require(digest(path.read_bytes()) == sha, 'SNAPSHOT_METADATA_HASH_MISMATCH')
+            self.written.add(sha)
+        return {'snapshot_metadata_sha256': sha, 'bytes': len(raw),
+                'source_version': value.get('source_version') if isinstance(value, dict) else None}
+
+
+def restore_state_snapshot(value, directory):
+    """Hydrate versioned profile evidence; legacy inline snapshots stay valid."""
+    if 'snapshot_encoding' not in value:
+        return value
+    require(value['snapshot_encoding'] == 'metadata-blobs/v1', 'SNAPSHOT_ENCODING_UNSUPPORTED')
+    cache = {}
+
+    def restore(item):
+        if isinstance(item, list):
+            return [restore(child) for child in item]
+        if not isinstance(item, dict):
+            return item
+        if set(item) == {'snapshot_metadata_sha256', 'bytes', 'source_version'}:
+            sha = item['snapshot_metadata_sha256']
+            require(isinstance(sha, str) and len(sha) == 64 and
+                    all(c in '0123456789abcdef' for c in sha), 'SNAPSHOT_METADATA_REFERENCE_INVALID')
+            if sha not in cache:
+                raw = (Path(directory) / 'snapshot-metadata' / (sha + '.json')).read_bytes()
+                require(len(raw) == item['bytes'] and digest(raw) == sha, 'SNAPSHOT_METADATA_HASH_MISMATCH')
+                cache[sha] = (len(raw), json.loads(raw))
+            size, original = cache[sha]
+            require(size == item['bytes'], 'SNAPSHOT_METADATA_HASH_MISMATCH')
+            require((original.get('source_version') if isinstance(original, dict) else None)
+                    == item['source_version'], 'SNAPSHOT_METADATA_VERSION_MISMATCH')
+            from copy import deepcopy
+            return deepcopy(original)
+        return {key: restore(child) for key, child in item.items()}
+
+    return restore({key: item for key, item in value.items() if key != 'snapshot_encoding'})
+
+
+def _row(row, *, metadata_store=None):
+    if metadata_store is None or not is_dataclass(row):
+        return asdict(row) if is_dataclass(row) else row
+    # Avoid asdict's repeated deep copies of rich metadata before deduplication.
+    value = {field.name: getattr(row, field.name) for field in dataclass_fields(row)}
+    for name in ('metadata', 'chunk_metadata'):
+        if name in value:
+            value[name] = metadata_store.reference(value[name])
+    return value
 
 
 def profile_request_headers(q0, base=None, explicit_override=None):
@@ -204,7 +265,7 @@ class _ObservedQueryRegistry:
         return ObservedModel()
 
 
-def state_snapshot(state):
+def state_snapshot(state, *, metadata_store=None):
     """Private, finite trace of the actual states, never a public SSE payload."""
     value = {name: getattr(state, name, None) for name in (
         'query', 'rewrite_query', 'query_type', 'intent', 'needs_retrieval',
@@ -214,19 +275,21 @@ def state_snapshot(state):
     value['plan'] = _row(getattr(state, 'strategy_plan', None))
     for name in ('search_results', 'rerank_results', 'merge_results',
                  'bridge_identity_evidence', 'rescue_evidence'):
-        value[name] = [_row(row) for row in getattr(state, name, ())]
+        value[name] = [_row(row, metadata_store=metadata_store) for row in getattr(state, name, ())]
     value['rounds'] = [{
         'status': result.status, 'reason': result.reason,
         'query': result.state.query, 'rewrite_query': result.state.rewrite_query,
         'targets': [_row(t) for t in result.state.targets],
-        'search': [_row(row) for row in result.state.search_results],
+        'search': [_row(row, metadata_store=metadata_store) for row in result.state.search_results],
         'rerank_scores': dict(result.state.strategy_rerank_scores),
         'accepted_ids': list(result.state.strategy_rerank_accepted_ids),
-        'originals': [_row(row) for row in result.state.merge_results],
+        'originals': [_row(row, metadata_store=metadata_store) for row in result.state.merge_results],
     } for result in getattr(state, 'strategy_rounds', ())]
     assessment = getattr(state, '_strategy_bridge_assessment', None)
     if assessment is not None:
         value['bridge_assessment'] = asdict(assessment)
+    if metadata_store is not None:
+        value['snapshot_encoding'] = 'metadata-blobs/v1'
     return value
 
 
@@ -240,6 +303,7 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
     states, sequence, admitted_clients, qu_outputs = {}, [0], {}, {}
     profile_id = BOUNDED_PROFILE_ID if bounded_query_profile else PROFILE_ID
     directory = Path(evidence_directory) if evidence_directory is not None else None
+    metadata_store = SnapshotMetadataStore(directory) if directory is not None else None
     expected_kbs, expected_docs = KB_IDS, DOCUMENT_IDS
     if approved_scope is not None:
         require(isinstance(approved_scope, dict)
@@ -258,7 +322,7 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
         name = digest(run_id.encode()) + f'.{sequence[0]:05d}.profile.json'
         write_new(directory / name, {'profile': profile_id, 'run_id': run_id,
             'stage': stage, 'status': status, 'fields': fields or {},
-            'state': state_snapshot(states[run_id]),
+            'state': state_snapshot(states[run_id], metadata_store=metadata_store),
             'proof_boundary': 'actual server state; Provider send/completion proven separately by existing receipts'})
 
     async def configuration(turn):
