@@ -278,9 +278,11 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
         if approved_batch is not None:
             require(base.pipeline_state.retrieval_strategy_mode == allowed[0]['mode'],
                     'S861_SAVED_MODE_MISMATCH')
+            expected_rerank_context = allowed[0].get('rerank_context_enabled', False)
+            require(type(expected_rerank_context) is bool, 'S88_APPROVED_RERANK_CONTEXT_REQUIRED')
             require(base.pipeline_state.rerank_threshold == .3
                 and base.pipeline_state.rerank_top_k == 30 and base.pipeline_state.embedding_top_k == 30
-                and not base.pipeline_state.rerank_context_enabled
+                and base.pipeline_state.rerank_context_enabled is expected_rerank_context
                 and base.pipeline_state.rerank_top1_floorless is True
                 and len(base.pipeline_state.targets) == 1, 'S861_PREFLIGHT_RETRIEVAL_CONFIGURATION_CHANGED')
             require(base.pipeline_state.query_understand_model_id == approved_batch['qu_model_id'],
