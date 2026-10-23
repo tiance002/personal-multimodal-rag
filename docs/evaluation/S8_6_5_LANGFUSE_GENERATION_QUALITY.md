@@ -1,5 +1,7 @@
 # S8.6.5：Langfuse 可观测性与生成质量对照
 
+> 本文为初始 S8.6.5 阶段的历史报告，保留当时未执行项。2026-10-23 的实际 R7 两题 HTTP、固定 Context A/B/C、Cloud / PG 对账与失败边界见 [R7 最终审计报告](S8_6_5_R_R7_REAL_ACCEPTANCE.md)。R7 审计结论为 FAIL，尚未达到 PASS_REAL_RAG；原始历史结果没有被重分类。
+
 **当前状态：部分实现并完成离线验证；合成 Cloud trace 可读回；真实 RAG HTTP 与 A/B/C 质量对照未运行。整体验收为 `BLOCKED / NOT ACCEPTED`。**
 
 本报告依据原始任务 `d403f59a-4d3f-4146-b248-9783d19c42b7/Pasted text.txt`、只读 ECS/PG 快照、Langfuse 合成 trace 读回、冻结输入包和离线测试日志整理。没有真实生成质量结果，也没有生产部署。

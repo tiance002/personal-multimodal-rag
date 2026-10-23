@@ -1,0 +1,736 @@
+{
+  "schema": "s865r-public-r7-final-audited/v2",
+  "execution_status": "ALL_FROZEN_SENDS_FINISHED",
+  "audit_status": "AUDIT_FAIL_STOP_MISSING_FINISH_CONTRACT",
+  "pass_real_rag": false,
+  "owner_acceptance": "NOT_CLAIMED",
+  "freeze": {
+    "source_revision": "9163f0916a60c5ae4ee647ea70816a278e3bf070",
+    "image_digest": "sha256:32cddd15cfb45c16f59dd465aed53adf5f0a697699bce501f38c0017a315d3b2",
+    "profile_sha256": "c300f8ba6ed7e109541e8bf18d7196e0a923959acb02f24811f12ab273dc7b54",
+    "production_source_changed": false,
+    "image_changed": false
+  },
+  "totals": {
+    "calls": 38,
+    "settled": 38,
+    "tokens": 119414,
+    "unknown": 0,
+    "http_calls": 8,
+    "http_tokens": 22980,
+    "abc_calls": 30,
+    "abc_tokens": 96434,
+    "dedupe_key": [
+      "request_id",
+      "capability"
+    ],
+    "input_tokens": 110792,
+    "output_tokens": 8622
+  },
+  "http": {
+    "http1": {
+      "calls": 4,
+      "tokens": 6649,
+      "structure": "PASS",
+      "core_correctness": "PASS",
+      "citation_semantics": "PASS",
+      "citation_count": 1
+    },
+    "http2": {
+      "calls": 4,
+      "tokens": 16331,
+      "structure": "PASS",
+      "core_correctness": "FAIL",
+      "issue": "contradictory claims and no citations",
+      "citation_count": 0
+    }
+  },
+  "abc_review": {
+    "label": "SMALL_FROZEN_DEVSET_AGENT_REVIEW_NOT_OFFICIAL_METRIC",
+    "A": {
+      "cases": 10,
+      "PASS": 6,
+      "PARTIAL": 2,
+      "FAIL": 2
+    },
+    "B": {
+      "cases": 10,
+      "PASS": 5,
+      "PARTIAL": 1,
+      "FAIL": 2,
+      "UNVERIFIED": 1,
+      "NOT_SCORED_INVALID_COMPLETION": 1
+    },
+    "C": {
+      "cases": 10,
+      "PASS": 9,
+      "FAIL": 1,
+      "case10": "NATIVE_TARGET_NOT_ANSWERED"
+    }
+  },
+  "protocol_deviation": {
+    "accepted_calls_before_stop": 24,
+    "accepted_abc_arms_before_stop": 16,
+    "invalid_call_ordinal": 25,
+    "case": 6,
+    "arm": "B",
+    "valid_json_sse_frames": 312,
+    "done_sentinel": 1,
+    "nonempty_finish_reason_count": 0,
+    "adapter_completion_flag": false,
+    "local_guard_missed_stop": true,
+    "post_stop_calls": 13,
+    "post_stop_calls_usage": "OBSERVATIONAL_ONLY",
+    "root_cause": "upstream_missing_finish_signal_plus_local_guard_miss_not_parser_bug"
+  },
+  "reconciliation": {
+    "execution_ledger": {
+      "calls": 38,
+      "settled": 38,
+      "tokens": 119414,
+      "unknown": 0
+    },
+    "native_postgresql": {
+      "calls": 38,
+      "tokens": 119414,
+      "provider_keysets": "38_OF_38_EQUAL",
+      "status": "PASS"
+    },
+    "status": "POSTGRESQL_AND_CLOUD_METADATA_PASS; NATIVE_USAGEDETAILS_FIELD_GAP_RECORDED",
+    "cloud_metadata_reconciliation": {
+      "unique_provider_keys": 38,
+      "matched_keys": 38,
+      "model_wire_outcome_usage_status_settlement": "38_OF_38_EQUAL",
+      "prompt_tokens": 110792,
+      "completion_tokens": 8622,
+      "tokens": 119414,
+      "status": "PASS"
+    },
+    "langfuse_native_usageDetails_gap": {
+      "provider_observations": 38,
+      "usageDetails_populated_calls": 36,
+      "usageDetails_tokens": 105905,
+      "rerank_observations": 2,
+      "rerank_observations_present": true,
+      "rerank_observations_missing_native_usage_and_model": 2,
+      "gap_tokens_in_reconciled_metadata": 13509,
+      "status": "FIELD_COMPLETENESS_GAP_METADATA_RECONCILIATION_PASS"
+    }
+  },
+  "offline_synthetic_checks": {
+    "rerank_generation_shape_checks_passed": 30,
+    "finish_contract_red": {
+      "failed": 6,
+      "passed": 4
+    },
+    "finish_contract_green_passed": 29,
+    "real_calls": 0,
+    "image_changed": false,
+    "source_fix_commit": "b4c6e4520b0d386a251a5b604553cc015eb7e143",
+    "isolated_candidate_image": "sha256:80f4d6dbd22eeb8155c5dd9de0835ee8b4852eb984c77308e716c697cab00f01",
+    "candidate_image_zero_network_checks": "PASS",
+    "patched_real_verification": "NOT_RUN",
+    "exact_commands": {
+      "rerank_red": "python -m pytest tests/weknora_port/test_s865_rerank_native_telemetry.py -q --tb=short",
+      "rerank_red_exit": 1,
+      "rerank_red_failed": 3,
+      "rerank_green": "python -m pytest tests/weknora_port/test_s865_rerank_native_telemetry.py -q --tb=short",
+      "rerank_green_exit": 0,
+      "rerank_green_passed": 3,
+      "rerank_green_seconds": 6.4,
+      "rerank_combined": "python -m pytest tests/weknora_port/test_s865_observability.py tests/weknora_port/test_s865_rerank_native_telemetry.py -q --tb=short",
+      "rerank_combined_exit": 0,
+      "rerank_combined_passed": 30,
+      "rerank_combined_seconds": 8.87,
+      "rerank_combined_includes_three": true,
+      "guard_red": "python -B -m pytest tests/weknora_port/test_s865_fixed_generation_finish_contract.py -q",
+      "guard_red_exit": 1,
+      "guard_red_failed": 6,
+      "guard_red_passed": 4,
+      "guard_green": "python -B -m pytest tests/weknora_port/test_s865_fixed_generation_finish_contract.py tests/weknora_port/test_s865_generation_compare.py -q",
+      "guard_green_exit": 0,
+      "guard_green_passed": 29,
+      "guard_green_seconds": 3.95
+    }
+  },
+  "closure": {
+    "status": "CLOSED_NO_ACTIVE_ACCEPTANCE_PROCESSES",
+    "cgroup_max_event_count": 150,
+    "oom": 0,
+    "oom_kill": 0,
+    "memory_pressure_note": "pressure/reclaim signal; not no pressure",
+    "production_containers_healthy_at_final_sample": 4,
+    "auto_resend": false
+  },
+  "limitations": {
+    "latency_is_audit_io_confounded_client_wall": true,
+    "fees": "UNPRICED",
+    "p5_threshold_changed": false,
+    "p5_calibration_evidence": "NONE",
+    "new_exact_authorization_required_for_future_real_verification": true,
+    "owner_acceptance": "NOT_CLAIMED"
+  },
+  "privacy": {
+    "raw_questions_context_answers_or_wires": false,
+    "request_trace_session_ids": false,
+    "internal_model_ids": false,
+    "tenant_kb_host_or_private_paths": false
+  },
+  "cloud_trace_relationships": {
+    "io_observations": 92,
+    "all_io_inputs_outputs_explicit_null": true,
+    "provider_parent_associations": 38,
+    "provider_parent_associations_verified_same_trace": true,
+    "internal_parent_links": 60,
+    "internal_links_same_trace_acyclic": true,
+    "root_synthetic_remote_parent_ids": 32,
+    "root_synthetic_parent_ids_in_92_inventory": false,
+    "root_trace_exists_queryable": true,
+    "full_ancestry": "NOT_RESOLVED_FOR_ALL_92"
+  },
+  "case10_annotation": {
+    "native_target_status": "NOT_ANSWERED_BY_ANY_ARM",
+    "median_comparison": "UNVERIFIED_ROUNDING_AND_MEDIAN_CONVENTION"
+  },
+  "patched_image_zero_network_check": {
+    "status": "PASS_ISOLATED_IMAGE_ZERO_NETWORK",
+    "source_commit": "b4c6e4520b0d386a251a5b604553cc015eb7e143",
+    "image": "sha256:80f4d6dbd22eeb8155c5dd9de0835ee8b4852eb984c77308e716c697cab00f01",
+    "python": "3.11.16",
+    "sdk": "4.15.6",
+    "imports": "PASS",
+    "frozen_abc_wire_hashes_identical": 30,
+    "qu_render_hashes_identical": 2,
+    "qu_body_bytes": [
+      5694,
+      5642
+    ],
+    "network": "NONE",
+    "database_calls": 0,
+    "provider_calls": 0,
+    "patched_real_verification": "NOT_RUN"
+  },
+  "per_case_arm_reviews": [
+    {
+      "case_ordinal": 1,
+      "arms": {
+        "A": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1125,
+          "output_tokens": 37,
+          "total_tokens": 1162,
+          "transport_elapsed_seconds": 3.484,
+          "time_to_first_byte_seconds": 2.135,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "B": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1244,
+          "output_tokens": 48,
+          "total_tokens": 1292,
+          "transport_elapsed_seconds": 2.168,
+          "time_to_first_byte_seconds": 0.38,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1163,
+          "output_tokens": 32,
+          "total_tokens": 1195,
+          "transport_elapsed_seconds": 1.675,
+          "time_to_first_byte_seconds": 0.153,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        }
+      }
+    },
+    {
+      "case_ordinal": 2,
+      "arms": {
+        "A": {
+          "core": "PARTIAL",
+          "necessary": "FAIL",
+          "support": "FAIL",
+          "citation": "FAIL",
+          "presentation": "PARTIAL",
+          "input_tokens": 4699,
+          "output_tokens": 896,
+          "total_tokens": 5595,
+          "transport_elapsed_seconds": 45.881,
+          "time_to_first_byte_seconds": 1.225,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "B": {
+          "core": "PARTIAL",
+          "necessary": "FAIL",
+          "support": "PARTIAL",
+          "citation": "FAIL",
+          "presentation": "PARTIAL",
+          "input_tokens": 4818,
+          "output_tokens": 694,
+          "total_tokens": 5512,
+          "transport_elapsed_seconds": 26.115,
+          "time_to_first_byte_seconds": 0.75,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 4710,
+          "output_tokens": 1121,
+          "total_tokens": 5831,
+          "transport_elapsed_seconds": 60.36,
+          "time_to_first_byte_seconds": 0.708,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        }
+      }
+    },
+    {
+      "case_ordinal": 3,
+      "arms": {
+        "A": {
+          "core": "PASS",
+          "necessary": "PARTIAL",
+          "support": "PASS",
+          "citation": "PARTIAL",
+          "presentation": "PASS",
+          "input_tokens": 2067,
+          "output_tokens": 86,
+          "total_tokens": 2153,
+          "transport_elapsed_seconds": 4.176,
+          "time_to_first_byte_seconds": 0.882,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "B": {
+          "core": "PASS",
+          "necessary": "PARTIAL",
+          "support": "PASS",
+          "citation": "PARTIAL",
+          "presentation": "FAIL",
+          "input_tokens": 2186,
+          "output_tokens": 173,
+          "total_tokens": 2359,
+          "transport_elapsed_seconds": 7.59,
+          "time_to_first_byte_seconds": 0.428,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1915,
+          "output_tokens": 167,
+          "total_tokens": 2082,
+          "transport_elapsed_seconds": 3.474,
+          "time_to_first_byte_seconds": 0.737,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        }
+      }
+    },
+    {
+      "case_ordinal": 4,
+      "arms": {
+        "A": {
+          "core": "PARTIAL",
+          "necessary": "UNVERIFIED",
+          "support": "UNVERIFIED",
+          "citation": "PARTIAL",
+          "presentation": "PARTIAL",
+          "input_tokens": 1837,
+          "output_tokens": 154,
+          "total_tokens": 1991,
+          "transport_elapsed_seconds": 4.731,
+          "time_to_first_byte_seconds": 0.777,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "B": {
+          "core": "FAIL",
+          "necessary": "FAIL",
+          "support": "FAIL",
+          "citation": "FAIL",
+          "presentation": "FAIL",
+          "input_tokens": 1956,
+          "output_tokens": 367,
+          "total_tokens": 2323,
+          "transport_elapsed_seconds": 12.676,
+          "time_to_first_byte_seconds": 0.432,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1873,
+          "output_tokens": 216,
+          "total_tokens": 2089,
+          "transport_elapsed_seconds": 4.66,
+          "time_to_first_byte_seconds": 0.254,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        }
+      }
+    },
+    {
+      "case_ordinal": 5,
+      "arms": {
+        "A": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PARTIAL",
+          "presentation": "PARTIAL",
+          "input_tokens": 934,
+          "output_tokens": 171,
+          "total_tokens": 1105,
+          "transport_elapsed_seconds": 7.405,
+          "time_to_first_byte_seconds": 0.752,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "B": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "FAIL",
+          "presentation": "PARTIAL",
+          "input_tokens": 1053,
+          "output_tokens": 246,
+          "total_tokens": 1299,
+          "transport_elapsed_seconds": 15.028,
+          "time_to_first_byte_seconds": 5.544,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1007,
+          "output_tokens": 183,
+          "total_tokens": 1190,
+          "transport_elapsed_seconds": 3.913,
+          "time_to_first_byte_seconds": 0.298,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        }
+      }
+    },
+    {
+      "case_ordinal": 6,
+      "arms": {
+        "A": {
+          "core": "PASS",
+          "necessary": "PARTIAL",
+          "support": "PASS",
+          "citation": "FAIL",
+          "presentation": "PARTIAL",
+          "input_tokens": 1331,
+          "output_tokens": 327,
+          "total_tokens": 1658,
+          "transport_elapsed_seconds": 13.419,
+          "time_to_first_byte_seconds": 0.895,
+          "finish_contract": "PASS",
+          "protocol_cohort": "PRE_STOP_ACCEPTED"
+        },
+        "B": {
+          "core": "NOT_SCORED_INVALID_COMPLETION",
+          "necessary": "NOT_SCORED_INVALID_COMPLETION",
+          "support": "NOT_SCORED_INVALID_COMPLETION",
+          "citation": "NOT_SCORED_INVALID_COMPLETION",
+          "presentation": "NOT_SCORED_INVALID_COMPLETION",
+          "input_tokens": 1450,
+          "output_tokens": 311,
+          "total_tokens": 1761,
+          "transport_elapsed_seconds": 27.371,
+          "time_to_first_byte_seconds": 15.03,
+          "finish_contract": "FAIL_MISSING_FINISH_CONTRACT",
+          "protocol_cohort": "INVALID_COMPLETION"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1364,
+          "output_tokens": 385,
+          "total_tokens": 1749,
+          "transport_elapsed_seconds": 9.545,
+          "time_to_first_byte_seconds": 0.421,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        }
+      }
+    },
+    {
+      "case_ordinal": 7,
+      "arms": {
+        "A": {
+          "core": "FAIL",
+          "necessary": "FAIL",
+          "support": "FAIL",
+          "citation": "PARTIAL",
+          "presentation": "PARTIAL",
+          "input_tokens": 1235,
+          "output_tokens": 136,
+          "total_tokens": 1371,
+          "transport_elapsed_seconds": 10.257,
+          "time_to_first_byte_seconds": 4.026,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "B": {
+          "core": "UNVERIFIED",
+          "necessary": "UNVERIFIED",
+          "support": "UNVERIFIED",
+          "citation": "PARTIAL",
+          "presentation": "FAIL",
+          "input_tokens": 1354,
+          "output_tokens": 191,
+          "total_tokens": 1545,
+          "transport_elapsed_seconds": 7.709,
+          "time_to_first_byte_seconds": 0.42,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 1266,
+          "output_tokens": 141,
+          "total_tokens": 1407,
+          "transport_elapsed_seconds": 3.421,
+          "time_to_first_byte_seconds": 0.443,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        }
+      }
+    },
+    {
+      "case_ordinal": 8,
+      "arms": {
+        "A": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "FAIL",
+          "citation": "FAIL",
+          "presentation": "PARTIAL",
+          "input_tokens": 5758,
+          "output_tokens": 390,
+          "total_tokens": 6148,
+          "transport_elapsed_seconds": 21.568,
+          "time_to_first_byte_seconds": 6.18,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "B": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "FAIL",
+          "citation": "PARTIAL",
+          "presentation": "PARTIAL",
+          "input_tokens": 5877,
+          "output_tokens": 200,
+          "total_tokens": 6077,
+          "transport_elapsed_seconds": 11.197,
+          "time_to_first_byte_seconds": 3.442,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PARTIAL",
+          "citation": "PARTIAL",
+          "presentation": "PASS",
+          "input_tokens": 5577,
+          "output_tokens": 49,
+          "total_tokens": 5626,
+          "transport_elapsed_seconds": 2.168,
+          "time_to_first_byte_seconds": 0.756,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        }
+      }
+    },
+    {
+      "case_ordinal": 9,
+      "arms": {
+        "A": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 6110,
+          "output_tokens": 44,
+          "total_tokens": 6154,
+          "transport_elapsed_seconds": 2.88,
+          "time_to_first_byte_seconds": 1.134,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "B": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 6229,
+          "output_tokens": 39,
+          "total_tokens": 6268,
+          "transport_elapsed_seconds": 2.404,
+          "time_to_first_byte_seconds": 0.798,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "C": {
+          "core": "PASS",
+          "necessary": "PASS",
+          "support": "PASS",
+          "citation": "PASS",
+          "presentation": "PASS",
+          "input_tokens": 6073,
+          "output_tokens": 116,
+          "total_tokens": 6189,
+          "transport_elapsed_seconds": 2.914,
+          "time_to_first_byte_seconds": 0.364,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        }
+      }
+    },
+    {
+      "case_ordinal": 10,
+      "arms": {
+        "A": {
+          "core": "FAIL",
+          "necessary": "FAIL",
+          "support": "PARTIAL",
+          "citation": "FAIL",
+          "presentation": "PARTIAL",
+          "input_tokens": 4214,
+          "output_tokens": 128,
+          "total_tokens": 4342,
+          "transport_elapsed_seconds": 4.276,
+          "time_to_first_byte_seconds": 1.036,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "B": {
+          "core": "FAIL",
+          "necessary": "FAIL",
+          "support": "PARTIAL",
+          "citation": "FAIL",
+          "presentation": "FAIL",
+          "input_tokens": 4333,
+          "output_tokens": 343,
+          "total_tokens": 4676,
+          "transport_elapsed_seconds": 15.546,
+          "time_to_first_byte_seconds": 2.292,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        },
+        "C": {
+          "core": "FAIL",
+          "necessary": "FAIL",
+          "support": "PARTIAL",
+          "citation": "PASS",
+          "presentation": "PARTIAL",
+          "input_tokens": 4073,
+          "output_tokens": 212,
+          "total_tokens": 4285,
+          "transport_elapsed_seconds": 4.375,
+          "time_to_first_byte_seconds": 0.265,
+          "finish_contract": "PASS",
+          "protocol_cohort": "POST_MISSED_STOP_OBSERVATIONAL"
+        }
+      }
+    }
+  ],
+  "abc_token_breakdown": {
+    "input_tokens": 88831,
+    "output_tokens": 7603,
+    "total_tokens": 96434
+  },
+  "total_input_tokens": 110792,
+  "total_output_tokens": 8622,
+  "abc_arm_token_breakdown": {
+    "C": {
+      "input": 29021,
+      "total": 31643,
+      "output": 2622
+    },
+    "A": {
+      "input": 29310,
+      "total": 31679,
+      "output": 2369
+    },
+    "B": {
+      "input": 30500,
+      "total": 33112,
+      "output": 2612
+    }
+  },
+  "metadata_only_audit": {
+    "observations_io_null": 92,
+    "metadata_keys": 69,
+    "project_allowlist_keys": 59,
+    "sdk_keys": 10,
+    "unexpected_keys": 0,
+    "hashed_scan_inputs": 78,
+    "raw_window_hits": 20,
+    "classified_identifier_overlaps": 20,
+    "unclassified_hits": 0,
+    "known_human_text_segment_hits": 0,
+    "limitation": "KNOWN_INPUT_WINDOW_HEURISTIC_NOT_ABSOLUTE_CONTENT_ABSENCE"
+  },
+  "minimal_patched_recovery_proposal": {
+    "status": "READY_FOR_OWNER_APPROVAL_NO_SEND",
+    "authorization_document_sha256": "ed411d68ff1d77b03b127fdc2fd26cdeed9b8c779ca86e008958d9ef55bdce6c",
+    "http_submissions": 1,
+    "fixed_case_ordinal": 6,
+    "abc_generations": 3,
+    "provider_admission_ceiling": 15,
+    "prior_plus_proposed_admission_ceiling": 53,
+    "prior_approved_admission_ceiling": 54,
+    "additional_tokens_requested": 0,
+    "remaining_actual_token_stop_cap": 1880586,
+    "new_grant_created": false,
+    "provider_sent": 0
+  }
+}

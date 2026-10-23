@@ -1,5 +1,7 @@
 # S8.6.5-R 首个真实 HTTP 验收结果
 
+> 此文保留 R6 失败及当时 R7 待授权的历史快照。R7 后经独立授权执行，最新实际结果见 [R7 最终审计报告](S8_6_5_R_R7_REAL_ACCEPTANCE.md)；本 R6 失败没有改为成功。
+
 **状态：`FAILED_TURN_TRACE_READBACK_ONLY`，不是 `PASS_REAL_RAG`。** Owner 已批准冻结范围：源码 `9163f0916a60c5ae4ee647ea70816a278e3bf070`、镜像 `sha256:32cddd15cfb45c16f59dd465aed53adf5f0a697699bce501f38c0017a315d3b2`、profile SHA-256 `c300f8ba6ed7e109541e8bf18d7196e0a923959acb02f24811f12ab273dc7b54`，批准文档 SHA-256 `5805f8033c33a9a5e189e6d002df19bdf76f69fa6b5df17ffdc7eb0668292975`。
 
 ## 首个 HTTP case
