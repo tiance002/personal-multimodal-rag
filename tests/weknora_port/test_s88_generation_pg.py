@@ -54,6 +54,11 @@ def test_s88_generation_preferences_and_frozen_turn_real_postgresql():
                 runtime=object.__new__(ApplicationRuntime)
                 runtime.principal=principal;runtime.leases=leases;runtime.conversation=ConversationSettings()
                 runtime.turns=PostgresTurnRepository(leases,principal,generation_defaults=runtime.conversation.summary)
+                # Disposable schema tests PG preferences, with no model tables.
+                async def capabilities(session, maximum):
+                    from backend.weknora_port.models.generation_capabilities import describe_generation_capabilities
+                    return describe_generation_capabilities(None,maximum,error_code='CHAT_MODEL_CONFIGURATION_REQUIRED')
+                runtime._answer_generation_capabilities=capabilities
                 settings=await runtime.update_generation_settings(principal,ids[0],{'reasoning_mode':'smart','max_output_tokens':1600})
                 request=OrdinaryTurnRequest(ids[0],'synthetic source question',str(uuid.uuid4()))
                 first=await runtime.turns.accept(request,principal)

@@ -15,6 +15,7 @@ from scripts import s8_6_1_api_acceptance as profile
 from scripts.s8_ecs_runtime import PrivateApiGuard
 from backend.weknora_port.conversation.types import MemoryContext
 from backend.weknora_port.generation import RoleBinding
+from backend.weknora_port.generation import RouterPolicy
 from backend.weknora_port.http_api import create_app
 from backend.weknora_port.models.provider import ProviderModel
 from backend.weknora_port.models.types import CallContext, TrustedScope, RerankResult, TokenUsage
@@ -71,14 +72,20 @@ def test_r3_initial_grant_cannot_admit_later_or_qu_only_cases(tmp_path, monkeypa
 
 
 @pytest.mark.parametrize('recovered_terminal_period', [False, True])
+@pytest.mark.parametrize('answer_configuration', ['current-unknown-cheap', 'explicit-supported-model'])
 def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_one_answer(
-        monkeypatch, tmp_path, current_budget, recovered_terminal_period):
+        monkeypatch, tmp_path, current_budget, recovered_terminal_period, answer_configuration):
     """Storage/provider mocks are explicit; public HTTP and orchestration run."""
     q0 = profile.BOUNDED_QUESTIONS['compare']
     configs = {role: real_config(role) for role in ('cheap','expensive','embedding','rerank')}
     ids = {role: cfg.model_id for role, cfg in configs.items()}
     runtime, stored, sql_trace = assembled_runtime(monkeypatch,
         ConversationSettings(query_understand_model_id=ids['cheap']))
+    supported_answer = answer_configuration == 'explicit-supported-model'
+    if supported_answer:
+        # Explicit normal model selection with routing OFF is a separate
+        # supported path. It does not certify the frozen hosted Cheap model.
+        runtime.policy = RouterPolicy(mode='OFF')
     qu_calls, embedding_query_inputs, reranks, search_calls, active, peak = [], [], [], [], [0], [0]
     sources, source_reads = {}, []
     class QueryProvider:
@@ -98,14 +105,16 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
             return SimpleNamespace(results=[RerankResult(index,.85) for index in range(len(documents))])
     class Registry:
         def __init__(self,*args,**kwargs): pass
-        async def chat(self,*args): return QueryProvider()
+        async def chat(self,model_id,*args):
+            return SimpleNamespace(config=configs['expensive']) if model_id==ids['expensive'] else QueryProvider()
         async def rerank(self,*args): return RankProvider()
     import backend.weknora_port.runtime as runtime_module
     monkeypatch.setattr(runtime_module,'NeutralModelRegistry', Registry)
     async def snapshot(*args):
         return SimpleNamespace(model_id=lambda role: ids[role], model_ids=tuple(ids.items()))
-    async def rows(*args): return [{'id':profile.KB_IDS[0],'summary_model_id':ids['cheap']}]
-    async def load(*args): return ({'id':ids['cheap'],'type':'KnowledgeQA','source':'remote'},None,None)
+    async def rows(*args): return [{'id':profile.KB_IDS[0],
+        'summary_model_id':ids['expensive'] if supported_answer else ids['cheap']}]
+    async def load(model_id): return ({'id':model_id,'type':'KnowledgeQA','source':'remote'},None,None)
     runtime._snapshot, runtime._rows, runtime.models._load = snapshot, rows, load
     class SourceRepository:
         async def hybrid_search(self, targets, params, context, query_embedding=None):
@@ -208,6 +217,14 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
             replay=await client.get('/api/v1/sessions/continue-stream/'+sid,params={'message_id':'assistant-msg'})
             return profile.parse_sse(result.text),profile.parse_sse(replay.text)
     frames,replayed=asyncio.run(exercise())
+    if not supported_answer:
+        # Keep the actual default failure visible; no fabricated capacity,
+        # weakened guard or automatic Expensive substitution is permitted.
+        assert failures == ['MODEL_GENERATION_CAPACITY_UNKNOWN']
+        assert chain_errors == [('ProviderError','MODEL_GENERATION_CAPACITY_UNKNOWN')]
+        assert not service.background_errors and not cheap.calls and not expensive.calls and not committed.calls
+        assert len(qu_calls)==1 and len(search_calls)==2 and peak[0]==1
+        return
     assert not failures and not service.background_errors, (failures,chain_errors,service.background_errors)
     turn=accepted_rows[0]
     assert isinstance(turn,AcceptedTurn) and turn.client_request_id==client_id
@@ -221,6 +238,8 @@ def test_actual_asgi_session_message_client_run_admission_qu_wire_two_children_o
               'What is known about Franklin bells regarding operating principles and uses?']
     assert [query for query,_ in search_calls]==[query for query,_ in embedding_query_inputs]==[query for query,_ in reranks]==expected
     assert peak[0]==1 and len(cheap.calls)+len(expensive.calls)==len(committed.calls)==1
+    assert not cheap.calls and len(expensive.calls)==1
+    assert runtime._runs[turn.run_id]['chat_id']==ids['expensive']
     messages=(cheap.calls or expensive.calls)[0][0]
     assert all(row.content in messages[-1].content for row in sources.values())
     assert any(current for _,current in source_reads), 'Final sources require current-version readback'

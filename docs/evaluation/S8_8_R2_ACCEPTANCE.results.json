@@ -1,0 +1,316 @@
+{
+  "schema": "s8-8-r2-acceptance/v2",
+  "as_of_date": "2026-10-24",
+  "status": "STOPPED_AFTER_APPROVED_RECOVERY_SECOND_UNKNOWN_TARGET_NOT_MET",
+  "source_revision": "e796932e028e9a972fa902da4b5c5867d108c25b",
+  "execution_image_prefix": "e6fa90",
+  "acceptance": {
+    "fixed_denominator": 55,
+    "http_completed": 51,
+    "agent_review_core": {
+      "correct": 41,
+      "partial": 3,
+      "wrong": 7,
+      "no_result": 4
+    },
+    "agent_review_full_answer": {
+      "fully_correct": 14,
+      "partial": 31,
+      "wrong": 6,
+      "no_result": 4
+    },
+    "target_core_correct": 50,
+    "target_met": false,
+    "review_status": "AGENT_REVIEW_NOT_OWNER_ADJUDICATION",
+    "owner_approval": false,
+    "production_deployment": false,
+    "tag_created": false,
+    "pushed_this_goal": false,
+    "http_attempted": 53,
+    "failed_cases": [
+      51,
+      52
+    ],
+    "failed_count": 2,
+    "not_run_ordinals": [
+      53,
+      54
+    ],
+    "not_run_count": 2
+  },
+  "comparison_boundaries": {
+    "r2_core_correct": "41/55",
+    "historical_fixed_prompt_v2_cheap": "40/55",
+    "historical_same_evidence_v2_cheap_plus_matched_expensive_union": "41/55",
+    "historical_union_is_automatic_router_accuracy": false,
+    "historical_scores_used_as_r2_outcome": false,
+    "r2_numeric_match_with_historical_union_is_coincidental": true
+  },
+  "usage_reconciliation": {
+    "unified_cohort": {
+      "attempts": 213,
+      "settled": 211,
+      "known_reported_tokens": 931628,
+      "usage_unknown_attempts": 2
+    },
+    "browser_quick_smart": {
+      "attempts": 8,
+      "settled": 8,
+      "known_reported_tokens": 19478,
+      "usage_unknown_attempts": 0,
+      "settings_revision_restored": 5,
+      "model_configuration_restored_via": "HTTP",
+      "prior_role_selections_preserved": true,
+      "default_qwen_smart_capability": "UNKNOWN_GUARD_RETAINED"
+    },
+    "isolated_caption_and_embedding": {
+      "attempts": 2,
+      "settled": 2,
+      "known_reported_tokens": 1774,
+      "usage_unknown_attempts": 0,
+      "task_completion": "stop",
+      "count_repair_pass": false,
+      "later_final_answer_repeated_incorrect_node_counts": false,
+      "source_count_evidence_resolved": false
+    },
+    "r2_total": {
+      "attempts": 223,
+      "settled": 221,
+      "known_reported_tokens": 952880,
+      "usage_unknown_attempts": 2
+    }
+  },
+  "input_contract": {
+    "status": "PASS_OFFLINE_55_AND_CURRENT_SOURCE_PERMISSION_PROOF",
+    "denominator": 55,
+    "original_questions_unchanged": 55,
+    "question_changes": 0,
+    "scope_changes": 47,
+    "kb_selection_corrections": [
+      47,
+      48,
+      49
+    ],
+    "hotpot_scope": "FULL_KB",
+    "gold_changed": false,
+    "runtime_scope_status": "PASS_FOR_51_COMPLETED_HTTP_TURNS; 4 NO_RESULT"
+  },
+  "clone_index": {
+    "pre_post_fingerprint_unchanged": true,
+    "private_fingerprint_published": false,
+    "documents": 117,
+    "chunks": 1826,
+    "embeddings": 1826,
+    "production_modified": false,
+    "unchanged_window": "After selected-caption derived switch, throughout unified HTTP cohort"
+  },
+  "source_and_citation_review": {
+    "case_18": {
+      "status": "PASS_SEPARATE_SOURCE_EVIDENCE",
+      "finding": "official original PDF verifies ctl route; printed footer page 21 is separate from URL path ctl/21",
+      "gold_changed": false,
+      "historical_label_changed": false
+    },
+    "case_36": {
+      "status": "FULLWIDTH_NUMERIC_CITATION_CONFIRMED_CORRECT",
+      "ascii_only_check_was_reviewer_error": true,
+      "review_corrected": true,
+      "code_changed": false
+    }
+  },
+  "verification": [
+    {
+      "name": "targeted_integration_selection",
+      "result": "PASS",
+      "exit_code": 0,
+      "summary": "46 passed"
+    },
+    {
+      "name": "offline_input_contract_validation",
+      "result": "PASS_OFFLINE_ONLY",
+      "exit_code": 0,
+      "summary": "55 inputs; 0 question changes; 47 scope changes; three KB corrections; Gold unchanged"
+    },
+    {
+      "name": "unified_r2_http_execution",
+      "result": "STOPPED",
+      "exit_code": null,
+      "summary": "51 HTTP-completed; one failed/unknown attempt; three not run"
+    },
+    {
+      "name": "affected_backend_mock_tests",
+      "result": "PASS",
+      "exit_code": 0,
+      "summary": "144 passed, 1 PostgreSQL skip; mock-backed"
+    },
+    {
+      "name": "frontend_generation_controls_http_fixtures",
+      "result": "PASS",
+      "exit_code": 0,
+      "summary": "13 passed"
+    },
+    {
+      "name": "frontend_adapter_http_fixtures",
+      "result": "PASS",
+      "exit_code": 0,
+      "summary": "25 passed"
+    },
+    {
+      "name": "frontend_build",
+      "result": "PASS",
+      "exit_code": 0,
+      "summary": "tsc --noEmit and Vite"
+    },
+    {
+      "name": "real_isolated_postgresql",
+      "result": "PASS",
+      "exit_code": 0,
+      "summary": "Committed function, unchanged assertions, rollback; not pytest invocation"
+    },
+    {
+      "name": "expanded_backend_including_old_intent_contracts",
+      "result": "FAIL_BASELINE_UNCHANGED",
+      "exit_code": 1,
+      "summary": "188 passed, 2 pre-existing intent failures, 1 skip"
+    }
+  ],
+  "recovery_boundary": {
+    "new_recovery_authorization": true,
+    "new_sends_made": true,
+    "case_51_retry_allowed": false,
+    "case_51_preserved_as_unknown": true,
+    "cases_52_to_54_once": 3,
+    "frozen_eligible_pairs_once": 37,
+    "conditional_pairs_for_new_bad_cheap_outputs_max": 3,
+    "maximum_provider_attempts": 76,
+    "maximum_attempts_source": "OWNER_APPROVED_RECOVERY_SCOPE; stopped after4attempts",
+    "additional_token_budget_request": false,
+    "standing_allowance_is_sending_authorization": false,
+    "native_per_child_caps_preserved": true,
+    "standing_allowance_does_not_override_current_stop": true,
+    "private_request_sha256": "412a6809641f72215c2006a6d168d9063fc4854444fd21ecf28337088606333f",
+    "zero_send_actual_pair_checks": 37,
+    "pair_runtime_preflight": "PASS_ZERO_SEND",
+    "owner_approved_request_sha256": "412a6809641f72215c2006a6d168d9063fc4854444fd21ecf28337088606333f",
+    "actual_provider_attempts": 4,
+    "actual_settled_calls": 3,
+    "actual_reported_tokens": 6792,
+    "new_unknown_attempts": 1,
+    "case_52_retry_allowed": false,
+    "actually_sent_http_ordinals": [
+      52
+    ],
+    "not_run_http_ordinals": [
+      53,
+      54
+    ],
+    "paired_generation_calls": 0,
+    "stop_reapplied": true,
+    "further_recovery_requested": false
+  },
+  "privacy": {
+    "raw_qa_answers_gold_source_or_case_ids_internal_addresses_credentials_private_contexts_included": false,
+    "private_evidence_or_index_fingerprint_included": false
+  },
+  "next_step": "Stopped under the approved UNKNOWN rule; preserve both unresolved calls and deliver evidence. No additional recovery request or model send is made in this run.",
+  "execution_image_id": "sha256:e6fa90f60bc491b029e0b463624fb61891bc40d42f5647690a5d64d9ceab4c8b",
+  "actual_routing": {
+    "mode": "DYNAMIC",
+    "threshold_unchanged": 0.35,
+    "final_cheap": 51,
+    "final_expensive": 0,
+    "expensive_generation_calls": 0,
+    "same_input_expensive_pairs": "NOT_RUN_STOP",
+    "oracle_union": "NOT_RUN_CURRENT_COHORT",
+    "qwen_profile": "EXPLICIT_NONDEFAULT_QUICK_OPERATIONAL_ALLOWANCE_NOT_VENDOR_CAPACITY_CERTIFICATION",
+    "production_default_profile_pass": false
+  },
+  "remaining_core_unmet_ordinals": [
+    2,
+    7,
+    12,
+    13,
+    18,
+    22,
+    29,
+    45,
+    47,
+    48,
+    51,
+    52,
+    53,
+    54
+  ],
+  "stop_events": [
+    {
+      "case": 51,
+      "provider_attempts": 1,
+      "outcome": "UNKNOWN",
+      "response_present": false,
+      "usage_present": false,
+      "retry_made": false,
+      "database_turn_is_completed": false,
+      "sse_status": "failed",
+      "global_stop_applied": true,
+      "cases_52_to_54_sent": false,
+      "upstream_receipt_confirmed": false,
+      "snapshot_scope": "As of first stop, before the subsequently approved recovery"
+    },
+    {
+      "case": 52,
+      "stage": "generation",
+      "error_code": "PROVIDER_HTTP_ERROR",
+      "upstream_status_code": "MISSING_EVIDENCE",
+      "raw_response_receipt": "MISSING_EVIDENCE",
+      "usage_present": false,
+      "retry_made": false,
+      "database_turn_is_completed": false,
+      "sse_status": "failed",
+      "global_stop_applied": true
+    }
+  ],
+  "provider_error_boundary": "Ordinal52 PROVIDER_HTTP_ERROR is the transport non-2xx branch before stream-adapter yield. Numeric upstream status and raw body were not retained. Do not infer specific status, zero billing or stream-parser regression. Host DNS/TLS probe alone is not a model-service test.",
+  "post_run_offline_fix": {
+    "source_revision": "bed0a6675700367f0bfbfd904d440fba4254d863",
+    "module": "backend/weknora_port/ingestion/upstream_pdf_parser.py",
+    "functions": [
+      "_strip_arxiv_and_page_num_lines",
+      "_strip_chart_text_debris"
+    ],
+    "targeted_pytest": {
+      "exit_code": 0,
+      "passed": 18
+    },
+    "unchanged_pdf_guard_bodies": {
+      "execution": "AST harness, not pytest collection",
+      "passed": 2,
+      "exit_code": 0
+    },
+    "legacy_test_collection": {
+      "status": "BLOCKED",
+      "exit_code": 2,
+      "reason": "optional pptx unavailable"
+    },
+    "actual_saved_page_replay": {
+      "standalone_numeric_lines_retained": 11,
+      "standalone_numeric_lines_total": 11,
+      "chart_values_retained": 10,
+      "chart_values_total": 10,
+      "network_attempts": 0,
+      "ocr_calls": 0
+    },
+    "frozen_index_updated": false,
+    "real_quality_revalidated": false,
+    "row_column_binding_verified": false,
+    "real_qa_source_unchanged": "e796932",
+    "score_changed": false
+  },
+  "private_failure_report": {
+    "unique_cases": 41,
+    "completed_with_defects": 37,
+    "failed_no_result": 2,
+    "not_run": 2,
+    "contains_full_question_gold_actual_answer_and_stage_evidence": true,
+    "published": false
+  }
+}

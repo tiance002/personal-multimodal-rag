@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "S88 lane gold fixups",
+  "description": "题号 -> 修订记录。仅用于修正经评审确认存在歧义的金标准标注；原始 gold 由 prep_judge_data.py 保留在 gold_original 字段，可随时回退。",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["gold", "note", "evidence"],
+    "properties": {
+      "gold": {
+        "type": "array",
+        "description": "修订后的金标准要点（评审认定的正确表述）",
+        "items": {"type": "string"},
+        "minItems": 1
+      },
+      "also_accept": {
+        "type": "array",
+        "description": "同样成立、判分时视同正确的等价答案",
+        "items": {"type": "string"}
+      },
+      "note": {
+        "type": "string",
+        "description": "修订理由：原始标注为何有歧义、证据原文如何支持新标注"
+      },
+      "evidence": {
+        "type": "string",
+        "description": "支撑该修订的实测证据，例如两侧模型都给出同一答案、且答案明确写出两种口径"
+      },
+      "decided_by": {"type": "string"},
+      "decided_at": {"type": "string"}
+    },
+    "additionalProperties": false
+  }
+}

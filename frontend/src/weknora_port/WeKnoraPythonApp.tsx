@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { Alert, Button, ConfigProvider, Drawer, Empty, Input, Layout, Modal, Select, Spin, Tag, Tooltip, Upload } from "antd";
+import { BookOutlined, DatabaseOutlined, FileOutlined, InboxOutlined, MenuOutlined, PlusOutlined, SearchOutlined, SendOutlined, StopOutlined } from '@ant-design/icons';
+import { WorkbenchNavigation } from './WorkbenchNavigation';
+import { DocumentPreview } from './DocumentPreview';
+import { SourceReferenceDrawer, sourceReferences } from './SourceReferenceDrawer';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { PortApiError, portApi, resolveMarkdownImageURL } from "./api";
@@ -6,7 +11,7 @@ import { cloudErrorMessage } from "./cloudErrors";
 import { resumePortChat, runPortChat } from "./sse";
 import type {
   DocumentRow, KnowledgeBase, MessageRow, ModelConfiguration, ModelRole,
-  PortRunIdentity, SessionRow, WeKnoraSSEMessage, GenerationPreferences,
+  PortRunIdentity, SessionRow, WeKnoraSSEMessage, GenerationPreferences, GenerationCapabilities, KnowledgeReference,
 } from "./types";
 import { KnowledgeBaseConsent } from "./KnowledgeBaseConsent";
 import { MemoryPanel } from "./MemoryPanel";
@@ -25,6 +30,7 @@ type ChatLine = {
   status?: "running" | "completed" | "truncated" | "empty" | "interrupted" | "failed" | "cancelled" | "unknown";
   error?: boolean;
   identity?: PortRunIdentity;
+  references?: KnowledgeReference[];
 };
 
 const ROLE_NAMES: Record<ModelRole, string> = {
@@ -203,6 +209,7 @@ export function WeKnoraPythonApp() {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [activeSession, setActiveSession] = useState<SessionRow | null>(null);
   const [messages, setMessages] = useState<ChatLine[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [selectedBases, setSelectedBases] = useState<string[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [scopeSaving, setScopeSaving] = useState(false);
@@ -213,11 +220,25 @@ export function WeKnoraPythonApp() {
   const [busy, setBusy] = useState(false);
   const [generation, setGeneration] = useState<GenerationPreferences>(DEFAULT_GENERATION);
   const [effectiveGeneration, setEffectiveGeneration] = useState<GenerationPreferences | null>(null);
+  const [generationCapabilities, setGenerationCapabilities] = useState<GenerationCapabilities | null>(null);
   const [generationSaving, setGenerationSaving] = useState(false);
   const settingsRead = useRef(0);
   const [notice, setNotice] = useState("正在确认 Python 服务身份");
   const [query, setQuery] = useState("");
   const [newKbName, setNewKbName] = useState("");
+  const [navigationOpen, setNavigationOpen] = useState(false);
+  const [createKbOpen, setCreateKbOpen] = useState(false);
+  const [creatingKb, setCreatingKb] = useState(false);
+  const [createKbError, setCreateKbError] = useState("");
+  const [librarySearch, setLibrarySearch] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [sourceReference, setSourceReference] = useState<KnowledgeReference | null>(null);
+  const transcript = useRef<HTMLDivElement>(null);
+  const transcriptPositions = useRef(new Map<string, number>());
+  const followAnswer = useRef(true);
+  const restoringTranscript = useRef(false);
+  const sessionRead = useRef(0);
   const [uploadKbId, setUploadKbId] = useState("");
   const [documentRefresh, setDocumentRefresh] = useState(0);
   const [familiarDocument, setFamiliarDocument] = useState<DocumentRow | null>(null);
@@ -307,45 +328,53 @@ export function WeKnoraPythonApp() {
   }, [documentKnowledgeBaseIds.join("\u0000"), page, documentRefresh]);
 
   const openSession = async (session: SessionRow) => {
-    if (scopeSaving) return;
+    if (scopeSaving || busy) return;
+    const readTicket = ++sessionRead.current;
+    restoringTranscript.current = true;
+    setPage("chat"); setNavigationOpen(false); setSourceReference(null);
     setScopeOpen(false);
     setActiveSession(session);
     const settingsTicket = ++settingsRead.current;
-    setGeneration(DEFAULT_GENERATION); setEffectiveGeneration(null); setGenerationSaving(true);
+    setGeneration(DEFAULT_GENERATION); setEffectiveGeneration(null); setGenerationCapabilities(null); setGenerationSaving(true);
     void portApi.generationSettings(session.id).then(row => {
       if (settingsTicket !== settingsRead.current) return;
       setGeneration({ reasoning_mode: row.saved.reasoning_mode ?? row.defaults.reasoning_mode,
         max_output_tokens: row.saved.max_output_tokens ?? 0 });
       setEffectiveGeneration(row.effective);
+      setGenerationCapabilities(row.capabilities ?? null);
     }).catch(error => { if (settingsTicket === settingsRead.current) setNotice(`回答设置读取失败：${errorText(error)}`); })
       .finally(() => { if (settingsTicket === settingsRead.current) setGenerationSaving(false); });
     setSelectedBases(session.knowledge_base_scope);
     setSelectedDocuments(session.document_scope);
-    setMessages([]);
+    setMessages([]); setHistoryLoading(true);
     setNotice("正在读取会话历史");
     try {
       const history = await portApi.messages(session.id);
+      if (readTicket !== sessionRead.current) return;
       setMessages(history.map(row => {
         const mappedError = row.turn_status === "error" ? cloudErrorMessage(row.turn_error_code) : "";
         return { id: row.id, role: row.role === "user" ? "user" : "assistant", content: mappedError || row.content,
           status: row.role === "user" ? "completed" : row.turn_error_code === "MODEL_CALL_CANCELLED" ? "cancelled" : row.turn_status === "error" ? "failed" : row.is_completed ? generationStatus(row) : "unknown",
           error: row.turn_status === "error",
+          references: row.turn_status === "error" ? [] : sourceReferences(row.knowledge_references, row.knowledge_base_scope ?? session.knowledge_base_scope, row.document_scope),
           progress: (row.agent_steps ?? []).filter(step => step.reasoning_content).map(step => ({ type: "thinking", text: step.reasoning_content ?? "" })),
         };
       }));
       setNotice("已读取保存的会话历史；实时阶段仅显示当前连接收到的事件");
-    } catch (error) { setMessages([assistantBubble(`历史读取失败：${errorText(error)}`)]); }
+    } catch (error) { if (readTicket === sessionRead.current) setMessages([assistantBubble(`历史读取失败：${errorText(error)}`)]); }
+    finally { if (readTicket === sessionRead.current) setHistoryLoading(false); }
   };
 
   const newSession = () => {
-    if (scopeSaving) return;
+    if (scopeSaving || busy) return;
+    sessionRead.current++; restoringTranscript.current = true; setHistoryLoading(false); setNavigationOpen(false); setSourceReference(null);
     setScopeOpen(false);
     activeAbort.current?.abort();
     activeAbort.current = null;
     activeIdentity.current = null;
     setActiveSession(null);
     settingsRead.current++;
-    setGeneration(DEFAULT_GENERATION); setEffectiveGeneration(null); setGenerationSaving(false);
+    setGeneration(DEFAULT_GENERATION); setEffectiveGeneration(null); setGenerationCapabilities(null); setGenerationSaving(false);
     setMessages([]);
     setSelectedBases([]);
     setSelectedDocuments([]);
@@ -401,6 +430,9 @@ export function WeKnoraPythonApp() {
     }
     updateMessage(messageId, previous => {
       const progress = [...(previous.progress ?? [])];
+      if (event.response_type === 'references') {
+        return { ...previous, references: sourceReferences(event.knowledge_references ?? event.data.references, selectedBases, selectedDocuments), progress: [...progress, { type: 'references', text: eventLabel(event) }] };
+      }
       if (event.response_type !== "answer") progress.push({
         type: event.response_type,
         text: eventLabel(event),
@@ -420,7 +452,7 @@ export function WeKnoraPythonApp() {
           return { ...previous, progress, status: "cancelled" };
         }
         if (event.data.status === "failed" || previous.error) {
-          return { ...previous, progress, status: "failed", error: true };
+          return { ...previous, progress, status: "failed", error: true, references: [] };
         }
         const finalContent = typeof event.data.final_content === "string" ? event.data.final_content : answerFromSegments(previous.segments);
         return { ...previous, content: finalContent, progress, status: generationStatus(event.data) };
@@ -429,7 +461,7 @@ export function WeKnoraPythonApp() {
         if (event.data.non_terminal === true && event.data.stage === "chat_completion_stream") {
           return { ...previous, progress: progress.slice(-80) };
         }
-        return { ...previous, content: cloudErrorMessage(event.data.error_code) || event.content || "运行发生错误", progress: progress.slice(-80), error: true };
+        return { ...previous, content: cloudErrorMessage(event.data.error_code) || event.content || "运行发生错误", progress: progress.slice(-80), error: true, references: [] };
       }
       return { ...previous, progress: progress.slice(-80) };
     });
@@ -450,7 +482,7 @@ export function WeKnoraPythonApp() {
           activeIdentity.current = identity;
           updateMessage(line.id, previous => ({ ...previous, identity }));
         },
-        onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], status: "running" })),
+        onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], references: [], status: "running" })),
         onMessage: event => applyEvent(line.id, event),
       });
       if (controller.signal.aborted) updateMessage(line.id, previous => ["completed", "truncated", "empty", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "interrupted" });
@@ -477,6 +509,7 @@ export function WeKnoraPythonApp() {
       setGeneration({ reasoning_mode: row.saved.reasoning_mode ?? row.defaults.reasoning_mode,
         max_output_tokens: row.saved.max_output_tokens ?? 0 });
       setEffectiveGeneration(row.effective);
+      setGenerationCapabilities(row.capabilities ?? null);
       setNotice('回答设置已保存，仅影响后续请求。');
     } catch (error) { setNotice(`回答设置保存失败：${errorText(error)}`); }
     finally { setGenerationSaving(false); }
@@ -487,13 +520,14 @@ export function WeKnoraPythonApp() {
     if (!canSubmit) return;
     setBusy(true);
     setScopeOpen(false);
+    followAnswer.current = true;
     const content = query.trim();
     setQuery("");
     setRuntimeError("");
     const requestId = crypto.randomUUID();
     let session = activeSession;
     const userLine: ChatLine = { id: crypto.randomUUID(), role: "user", content };
-    const assistantLine: ChatLine = { id: crypto.randomUUID(), role: "assistant", content: "", segments: [], progress: [], status: "running" };
+    const assistantLine: ChatLine = { id: crypto.randomUUID(), role: "assistant", content: "", segments: [], progress: [], references: [], status: "running" };
     setNotice("正在提交问题");
     setMessages(current => [...current, userLine, assistantLine]);
     try {
@@ -520,7 +554,7 @@ export function WeKnoraPythonApp() {
       await resumePortChat(line.identity, {
         signal: controller.signal,
         onRunIdentity: () => {},
-        onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], status: "running" })),
+        onReplayStart: () => updateMessage(line.id, previous => ({ ...previous, content: "", segments: [], progress: [], references: [], status: "running" })),
         onMessage: event => applyEvent(line.id, event),
       });
       if (!controller.signal.aborted) updateMessage(line.id, previous => ["completed", "truncated", "empty", "failed", "cancelled"].includes(previous.status ?? "") ? previous : { ...previous, status: "unknown" });
@@ -532,7 +566,8 @@ export function WeKnoraPythonApp() {
   };
 
   const upload = async (file?: File) => {
-    if (!file || !uploadKbId) return;
+    if (!file || !uploadKbId || uploading) return;
+    setUploading(true); setUploadError("");
     const targetKbId = uploadKbId;
     try {
       const row = await portApi.upload(targetKbId, file);
@@ -542,18 +577,21 @@ export function WeKnoraPythonApp() {
       }
       setBases(await portApi.knowledgeBases());
       setNotice(`已提交资料：${row.filename} · ${row.status}`);
-    } catch (error) { setNotice(`上传失败：${errorText(error)}`); }
+    } catch (error) { setUploadError(errorText(error)); setNotice(`上传失败：${errorText(error)}`); }
+    finally { setUploading(false); }
   };
 
   const createKb = async (event: FormEvent) => {
     event.preventDefault();
-    if (!newKbName.trim()) return;
+    if (!newKbName.trim() || creatingKb) return;
+    setCreatingKb(true); setCreateKbError("");
     try {
       const row = await portApi.createKnowledgeBase(newKbName.trim());
       setBases(current => [...current, row]);
-      setNewKbName("");
+      setNewKbName(""); setCreateKbOpen(false); setUploadKbId(row.id);
       setNotice(`已创建知识库：${row.name}`);
-    } catch (error) { setNotice(`创建失败：${errorText(error)}`); }
+    } catch (error) { setCreateKbError(errorText(error)); setNotice(`创建失败：${errorText(error)}`); }
+    finally { setCreatingKb(false); }
   };
 
   const saveConfig = async (event: FormEvent) => {
@@ -592,67 +630,81 @@ export function WeKnoraPythonApp() {
   const visibleDocuments = documents.filter(doc => documentKnowledgeBaseIds.includes(doc.knowledge_base_id));
   const selectedNames = useMemo(() => bases.filter(base => selectedBases.includes(base.id)).map(base => base.name), [bases, selectedBases]);
 
-  return <div className="wp-shell">
-    <aside className="wp-sidebar">
-      <div className="wp-brand"><span className="wp-brand-mark">W</span><span><strong>WeKnora</strong><small>Python adapter</small></span></div>
-      <nav className="wp-nav" aria-label="主导航">
-        <button className={page === "chat" ? "active" : ""} onClick={() => setPage("chat")}>问答</button>
-        <button className={page === "library" ? "active" : ""} onClick={() => setPage("library")}>资料库</button>
-        <button className={page === "models" ? "active" : ""} onClick={() => setPage("models")}>模型设置</button>
-        <button className={page === "memory" ? "active" : ""} onClick={() => setPage("memory")}>长期记忆</button>
-      </nav>
-      <button className="wp-new-chat" onClick={newSession}>＋ 新对话</button>
-      <div className="wp-history-title">历史会话</div>
-      <div className="wp-history-list">
-        {sessions.map(session => <button type="button" title={session.title || "新对话"} key={session.id} className={activeSession?.id === session.id ? "selected" : ""} onClick={() => void openSession(session)}>
-          <strong>{session.title || "新对话"}</strong><small>{session.knowledge_base_scope.length} 个知识库 · {session.updated_at || ""}</small>
-        </button>)}
-        {!sessions.length && <p className="wp-empty-small">还没有会话</p>}
-      </div>
-      <div className="wp-sidebar-footer">本地知识工作台</div>
-    </aside>
+  const historyKey = activeSession?.id ?? 'new';
+  useEffect(() => {
+    const node = transcript.current;
+    if (!node || page !== 'chat' || historyLoading) return;
+    const savedPosition = transcriptPositions.current.get(historyKey);
+    const frame = requestAnimationFrame(() => {
+      node.scrollTop = savedPosition ?? node.scrollHeight;
+      restoringTranscript.current = false;
+      followAnswer.current = node.scrollHeight - node.scrollTop - node.clientHeight < 120;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [historyKey, page, historyLoading]);
+  useEffect(() => {
+    const node = transcript.current;
+    if (node && !historyLoading && !restoringTranscript.current && followAnswer.current) node.scrollTop = node.scrollHeight;
+  }, [messages, historyLoading]);
+  const navigation = <WorkbenchNavigation page={page} sessions={sessions} activeId={activeSession?.id} disabled={busy || scopeSaving}
+    onPage={next => { setPage(next); setNavigationOpen(false); }} onNew={newSession} onSession={session => void openSession(session)} />;
+  const activeLibrary = bases.find(base => base.id === uploadKbId);
+  const matchingBases = bases.filter(base => base.name.toLocaleLowerCase().includes(librarySearch.toLocaleLowerCase()));
+  const matchingDocuments = visibleDocuments.filter(doc => doc.filename.toLocaleLowerCase().includes(librarySearch.toLocaleLowerCase()));
 
-    <main className="wp-main">
-      <header className="wp-topbar"><div><span className="wp-live-dot" />{page === "chat" ? `问答台${selectedNames.length ? ` / ${selectedNames.join("、")}` : ""}` : page === "library" ? "知识库与资料" : page === "memory" ? "长期记忆" : "模型角色"}</div><span className="wp-notice" role="status">{loading ? "正在加载" : notice}</span></header>
-      {runtimeError && <div className="wp-banner" role="alert"><strong>Python API 不可用</strong><span>{runtimeError}</span><button onClick={() => { setLoading(true); setRuntimeError(""); void portApi.runtime().then(() => location.reload()).catch(error => { setRuntimeError(errorText(error)); setLoading(false); }); }}>重新检查</button></div>}
+  return <ConfigProvider theme={{ token: { colorPrimary: '#16834c', colorInfo: '#16834c', colorText: '#20342a', colorTextSecondary: '#66756c', colorBorder: '#dfe7e2', borderRadius: 8, fontFamily: '"Segoe UI", "Microsoft YaHei", sans-serif', fontSize: 14 }, components: { Menu: { itemSelectedBg: '#e8f5ed', itemSelectedColor: '#16834c', itemHeight: 42 }, Button: { defaultShadow: 'none', primaryShadow: 'none' } } }}>
+  <Layout className="wp-shell">
+    <Layout.Sider width={256} className="wp-sidebar" theme="light">{navigation}</Layout.Sider>
+    <Drawer className="wp-mobile-navigation" title="导航与历史会话" placement="left" open={navigationOpen} onClose={() => setNavigationOpen(false)} size={280} destroyOnHidden><div className="wp-sidebar-content">{navigation}</div></Drawer>
+    <Layout.Content className="wp-main">
+      <header className="wp-topbar"><div className="wp-topbar-title"><Button className="wp-mobile-menu" type="text" icon={<MenuOutlined aria-hidden="true" />} aria-label="打开导航" onClick={() => setNavigationOpen(true)} /><span className="wp-live-dot" /><span>{page === "chat" ? activeSession?.title || "新对话" : page === "library" ? "知识库与资料" : page === "memory" ? "长期记忆" : "模型角色"}</span></div><Tooltip title={notice}><span className="wp-notice" role="status">{loading ? "正在加载" : notice}</span></Tooltip></header>
+      {runtimeError && <Alert className="wp-banner" type="error" showIcon title="Python API 不可用" description={runtimeError} action={<Button onClick={() => { setLoading(true); setRuntimeError(""); void portApi.runtime().then(() => location.reload()).catch(error => { setRuntimeError(errorText(error)); setLoading(false); }); }}>重新检查</Button>} />}
+      {loading && <div className="wp-page-loading"><Spin description="正在加载知识工作台" /></div>}
 
       {page === "chat" && <section className="wp-chat-page">
 
 
-        <div className="wp-transcript" aria-live="polite">
-          {messages.length === 0 && <div className="wp-welcome"><span className="wp-welcome-icon">✳</span><h1>从你的资料中寻找答案</h1><p>选择检索范围，快速问答会显示实际检索与回答进度。</p><div className="wp-scope-tags">{selectedNames.map(name => <span key={name}>{name}</span>)}</div></div>}
+        <div className="wp-transcript" ref={transcript} aria-live="polite" onScroll={event => {
+          if (historyLoading || restoringTranscript.current) return;
+          const node = event.currentTarget;
+          transcriptPositions.current.set(historyKey, node.scrollTop);
+          followAnswer.current = node.scrollHeight - node.scrollTop - node.clientHeight < 120;
+        }}>
+          {historyLoading && <div className="wp-drawer-loading"><Spin description="正在读取会话" /></div>}
+          {!historyLoading && messages.length === 0 && <div className="wp-welcome"><span className="wp-welcome-icon"><BookOutlined aria-hidden="true" /></span><h1>从你的资料中寻找答案</h1><p>选择检索范围，快速问答会显示实际检索与回答进度。</p><div className="wp-scope-tags">{selectedNames.map(name => <span key={name}>{name}</span>)}</div></div>}
           {messages.map(message => <article key={message.id} className={`wp-message ${message.role} ${message.error ? "error" : ""}`}>
             <div className="wp-message-label">{message.role === "user" ? "你" : message.error ? "运行提示" : "WeKnora"}</div>
             {message.role === "user" ? <p className="wp-message-content">{message.content}</p> : <>
               {message.progress?.length ? <details className="wp-progress" open={message.status === "running"}><summary>实际执行事件 · {message.progress.length}</summary><ol>{message.progress.map((event, index) => <li key={`${event.eventId ?? event.type}-${index}`}><span>{event.type}</span><p>{event.text}</p></li>)}</ol></details> : null}
               <div className="wp-message-content"><MessageContent content={message.content} /></div>
-              {message.status === "running" && <span className="wp-running"><i />正在接收同一运行的回答</span>}
-              {message.status === "interrupted" && <div className="wp-run-actions"><span>已断开读取，服务端运行未被重发</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>继续读取原回答</button>}</div>}
+              {Boolean(message.references?.length) && <div className="wp-reference-list" aria-label="回答引用"><span>引用来源</span>{message.references!.map((reference, index) => <Tooltip key={reference.chunk_id} title={reference.title || '查看原始片段'}><Button className="wp-citation" size="small" icon={<FileOutlined aria-hidden="true" />} onClick={() => setSourceReference(reference)}>{index + 1}. {reference.title || '来源片段'}</Button></Tooltip>)}</div>}
+              {message.status === "running" && <span className="wp-running"><Spin size="small" />正在接收同一运行的回答</span>}
+              {message.status === "interrupted" && <div className="wp-run-actions"><span>已断开读取，服务端运行未被重发</span>{message.identity && <Button size="small" onClick={() => void resume(message)} disabled={busy}>继续读取原回答</Button>}</div>}
               {message.status === "cancelled" && <p className="wp-run-actions">已停止生成；原始运行已保存取消状态。</p>}
               {message.status === "failed" && <p className="wp-run-actions">生成失败；原始运行的错误已保存。</p>}
               {message.status === "truncated" && <p className="wp-run-actions">输出被截断；已有内容已保存，未重新生成。</p>}
               {message.status === "empty" && <p className="wp-run-actions">模型未返回可用答案；运行终态已保存，未重新生成。</p>}
-              {message.status === "unknown" && <div className="wp-run-actions"><span>尚未收到 complete，结果状态待确认；没有重新生成。</span>{message.identity && <button onClick={() => void resume(message)} disabled={busy}>GET 续读原回答</button>}</div>}
+              {message.status === "unknown" && <div className="wp-run-actions"><span>尚未收到 complete，结果状态待确认；没有重新生成。</span>{message.identity && <Button size="small" onClick={() => void resume(message)} disabled={busy}>GET 续读原回答</Button>}</div>}
               {message.role === "assistant" && message.status === "completed" && <small className="wp-complete">回答已由服务端完成并保存</small>}
             </>}
           </article>)}
         </div>
         <div className="wp-composer-wrap">
           <div className="wp-answer-preferences">
-            <GenerationControls value={generation} effective={effectiveGeneration} disabled={busy || generationSaving}
+            <GenerationControls value={generation} effective={effectiveGeneration} capabilities={generationCapabilities} disabled={busy || generationSaving}
               onChange={next => { setGeneration(next); setEffectiveGeneration(null); }}/>
             <div className="wp-generation-actions">
-              <button type="button" disabled={busy || generationSaving || !activeSession} onClick={() => void saveAnswerSettings(false)}>保存本会话设置</button>
-              <button type="button" disabled={busy || generationSaving} onClick={() => void saveAnswerSettings(true)}>恢复默认</button>
+              <Button size="small" disabled={busy || generationSaving || !activeSession} onClick={() => void saveAnswerSettings(false)}>保存本会话设置</Button>
+              <Button size="small" type="text" disabled={busy || generationSaving} onClick={() => void saveAnswerSettings(true)}>恢复默认</Button>
               <small>{activeSession ? '保存后刷新及重新进入会话仍有效；本次发送使用当前设置。' : '首次发送时保存到新会话。'}</small>
             </div>
           </div>
           <form className="wp-composer" onSubmit={event => void submit(event)}>
-            <textarea value={query} onChange={event => setQuery(event.target.value)} placeholder={selectedBases.length ? "询问当前资料…" : "选择知识库后提问…"} disabled={busy || Boolean(runtimeError)} rows={3} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} />
+            <Input.TextArea aria-label="问题" autoSize={{ minRows: 2, maxRows: 7 }} value={query} onChange={event => setQuery(event.target.value)} placeholder={selectedBases.length ? "询问当前资料…" : "选择知识库后提问…"} disabled={busy || Boolean(runtimeError)} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} />
             <div className="wp-composer-actions">
               <div className="wp-composer-tools">
                 <div className="wp-scope-control" ref={scopeControl}>
-                  <button type="button" className="wp-scope-trigger" aria-label="选择知识库和文件" aria-haspopup="dialog" aria-expanded={scopeOpen} aria-controls="wp-scope-picker" onClick={() => setScopeOpen(current => !current)}>选择资料</button>
+                  <Button className="wp-scope-trigger" aria-label="选择知识库和文件" aria-haspopup="dialog" aria-expanded={scopeOpen} aria-controls="wp-scope-picker" onClick={() => setScopeOpen(current => !current)} icon={<DatabaseOutlined aria-hidden="true" />}>选择资料</Button>
                   {scopeOpen && <div className="wp-scope-card" id="wp-scope-picker" role="dialog" aria-label="选择知识库和文件">
           <div className="wp-scope-heading"><div><strong>检索范围</strong><small>{knowledgeBaseScopeLocked ? "知识库范围已保存；文档范围可切换或取消，应用后用于后续问题" : "先选择一个或多个知识库，再限定文档"}</small></div><span>{selectedBases.length} 个知识库 · {selectedDocuments.length} 个资料</span><button type="button" className="wp-scope-close" disabled={scopeSaving} onClick={() => setScopeOpen(false)}>完成选择</button></div>
           <div className="wp-scope-grid">
@@ -664,27 +716,34 @@ export function WeKnoraPythonApp() {
                 </div>
                 <span className="wp-composer-scope" title={selectedNames.join("、")}>{selectedNames.length ? `${selectedNames.join("、")}${selectedDocuments.length ? ` · ${selectedDocuments.length} 个文件` : " · 全部文件"}${documentScopeDirty ? " · 待应用" : ""}` : "未选择知识库"}</span>
               </div>
-              {busy ? <><button type="button" className="wp-stop" onClick={() => void stopGeneration()}>停止生成</button><button type="button" onClick={stopReading}>停止读取</button></> : <span className="wp-composer-hint">Enter 发送 · Shift+Enter 换行</span>}
-              <button type="submit" disabled={!canSubmit}>发送 ↗</button>
+              {busy ? <><Button danger icon={<StopOutlined aria-hidden="true" />} onClick={() => void stopGeneration()}>停止生成</Button><Button onClick={stopReading}>停止读取</Button></> : <span className="wp-composer-hint">Enter 发送 · Shift+Enter 换行</span>}
+              <Button type="primary" htmlType="submit" icon={<SendOutlined aria-hidden="true" />} disabled={!canSubmit}>发送</Button>
             </div>
           </form>
         </div>
       </section>}
 
       {page === "library" && <section className="wp-page-content wp-library-page">
-        <div className="wp-page-heading"><div><h1>知识库</h1><p>上传和管理资料；问答范围在输入框内选择。</p></div></div>
+        <div className="wp-page-heading"><div><h1><DatabaseOutlined aria-hidden="true" /> 知识库</h1><p>管理资料与处理状态，问答时按知识库和文档限定范围。</p></div><Button type="primary" icon={<PlusOutlined aria-hidden="true" />} disabled={Boolean(runtimeError)} onClick={() => { setCreateKbError(''); setCreateKbOpen(true); }}>新建知识库</Button></div>
+        <div className="wp-library-toolbar"><span>{bases.length} 个知识库</span><Input allowClear prefix={<SearchOutlined aria-hidden="true" />} placeholder="搜索知识库或文件" aria-label="搜索知识库或文件" value={librarySearch} onChange={event => setLibrarySearch(event.target.value)} /></div>
         <div className="wp-library-grid">
-          <div className="wp-panel">
+          <div className="wp-panel wp-library-bases">
             <h2>知识库</h2>
-            <div className="wp-kb-list">{bases.map(base => <button type="button" key={base.id} className="wp-library-row" aria-pressed={uploadKbId === base.id} onClick={() => setUploadKbId(base.id)}><strong title={base.name}>{base.name}</strong><span>{base.document_count} 份 · {base.cloud_allowed ? "允许外发" : "仅本地（该库内容不外发）"}</span></button>)}</div>
-            <form className="wp-inline-form" onSubmit={event => void createKb(event)}><input value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="新知识库名称"/><button disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</button></form>
+            <div className="wp-kb-list">{matchingBases.map(base => <button type="button" key={base.id} className="wp-library-row" aria-pressed={uploadKbId === base.id} onClick={() => { setUploadKbId(base.id); setUploadError(''); }}><span className="wp-kb-icon"><DatabaseOutlined aria-hidden="true" /></span><span className="wp-kb-description"><strong title={base.name}>{base.name}</strong><span>{base.document_count} 份资料 · {base.cloud_allowed ? "允许外发" : "仅本地"}</span></span></button>)}{!matchingBases.length && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={bases.length ? "没有匹配的知识库" : "还没有知识库"} />}</div>
           </div>
-          <div className="wp-panel">
-            <h2>资料文件</h2>
-            <KnowledgeBaseConsent key={uploadKbId} base={bases.find(base => base.id === uploadKbId)} disabled={loading || busy || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/>
-            <div className="wp-upload-row"><select aria-label="上传目标知识库" value={uploadKbId} onChange={event => setUploadKbId(event.target.value)}><option value="">选择目标知识库</option>{bases.map(base => <option key={base.id} value={base.id}>{base.name}</option>)}</select><label className="wp-button">上传资料<input type="file" onChange={event => void upload(event.target.files?.[0])} disabled={!uploadKbId || Boolean(runtimeError)}/></label></div>
-            {uploadKbId && <details className="wp-image-settings-drawer"><summary>图片处理设置</summary><ImageGenerationSettings key={uploadKbId} kbId={uploadKbId} disabled={busy || loading || Boolean(runtimeError)}/></details>}
-            <div className="wp-library-documents">{visibleDocuments.map(doc => <div className="wp-library-row wp-document-row" key={doc.id}><strong title={doc.filename}>{doc.filename}</strong><span>{doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ""}</span><a href={portApi.originalDocumentURL(doc.knowledge_base_id, doc.id)} target="_blank" rel="noreferrer">查看原文件</a><ImageTaskDetails document={doc} disabled={busy || Boolean(runtimeError)}/></div>)}{!visibleDocuments.length && <p className="wp-empty">选择知识库后显示文件名称和状态。</p>}</div>
+          <div className="wp-panel wp-library-files">
+            <div className="wp-panel-heading"><h2>资料文件</h2>{activeLibrary && <Tag color="green">{visibleDocuments.length} 份资料</Tag>}</div>
+            <div className="wp-upload-row"><Select aria-label="上传目标知识库" placeholder="选择目标知识库" value={uploadKbId || undefined} onChange={id => { setUploadKbId(id); setUploadError(''); }} disabled={uploading} options={bases.map(base => ({ value: base.id, label: base.name }))} /></div>
+            {activeLibrary ? <>
+              <KnowledgeBaseConsent key={uploadKbId} base={activeLibrary} disabled={loading || busy || uploading || Boolean(runtimeError)} onUpdated={updated => setBases(current => current.map(base => base.id === updated.id ? updated : base))}/>
+              <Upload.Dragger className="wp-upload-dropzone" disabled={!uploadKbId || uploading || Boolean(runtimeError)} showUploadList={false} multiple={false} beforeUpload={file => { void upload(file); return false; }}>
+                <div className="wp-upload-invitation">{uploading ? <Spin size="small" /> : <InboxOutlined aria-hidden="true" />}<span>{uploading ? '正在上传资料…' : '拖放文件到此处，或点击上传资料'}</span></div><p>上传后自动解析和建立索引，可在下方查看处理状态。</p>
+              </Upload.Dragger>
+              {uploadError && <Alert type="error" title="上传失败" description={uploadError} showIcon closable onClose={() => setUploadError('')} />}
+              {uploadKbId && <details className="wp-image-settings-drawer"><summary>图片处理设置</summary><ImageGenerationSettings key={uploadKbId} kbId={uploadKbId} disabled={busy || loading || Boolean(runtimeError)}/></details>}
+              <div className="wp-document-summary"><span>{visibleDocuments.filter(doc => ['ready', 'completed'].includes(doc.status)).length} 份可检索</span><span>{visibleDocuments.filter(doc => ['pending', 'processing'].includes(doc.status)).length} 份处理中</span>{visibleDocuments.some(doc => doc.status === 'failed' || doc.error_code) && <span className="wp-document-error">{visibleDocuments.filter(doc => doc.status === 'failed' || doc.error_code).length} 份处理失败</span>}</div>
+              <div className="wp-library-documents">{matchingDocuments.map(doc => <div className="wp-library-row wp-document-row" key={doc.id}><FileOutlined className="wp-document-icon" /><div className="wp-document-info"><strong title={doc.filename}>{doc.filename}</strong><span className={doc.status === 'failed' || doc.error_code ? 'wp-document-error' : undefined}>{['pending', 'processing'].includes(doc.status) && <Spin size="small" />} {doc.status === 'ready' ? '可检索' : doc.status === 'pending' ? '等待处理' : doc.status === 'processing' ? '正在处理' : doc.status}{doc.error_code ? ` · 错误码 ${doc.error_code}` : ''}</span></div><Button size="small" onClick={() => setFamiliarDocument(doc)}>预览</Button><a href={portApi.originalDocumentURL(doc.knowledge_base_id, doc.id)} target="_blank" rel="noreferrer">查看原文件</a><ImageTaskDetails document={doc} disabled={busy || Boolean(runtimeError)}/></div>)}{!matchingDocuments.length && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={visibleDocuments.length ? '没有匹配的文件' : '还没有资料，上传后即可开始问答'} />}</div>
+            </> : <div className="wp-library-empty"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={bases.length ? '选择知识库，查看和上传资料' : '创建第一个知识库，开始整理资料'}>{!bases.length && <Button type="primary" icon={<PlusOutlined aria-hidden="true" />} disabled={Boolean(runtimeError)} onClick={() => setCreateKbOpen(true)}>新建知识库</Button>}</Empty></div>}
           </div>
         </div>
       </section>}
@@ -698,10 +757,14 @@ export function WeKnoraPythonApp() {
             setNotice("回答语言已更新，仅保存在此浏览器。");
           } catch { setNotice("回答语言已更新，但浏览器不允许保存；刷新后恢复简体中文。"); }
         }}>{ANSWER_LANGUAGES.map(([locale, label]) => <option key={locale} value={locale}>{label}</option>)}</select><small>即刻生效，无需保存模型设置。回答使用所选语言，不随提问语言切换。</small></label></div></fieldset>
-        {config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Source<select aria-label={`Source ${role.role}`} value={role.source ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, source: event.target.value } : row) }))}><option value="">Choose source / preserve legacy</option><option value="remote">Remote</option><option value="local">Local (calls unavailable)</option></select></label><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.credential_status === "UNAVAILABLE" ? `凭据不可用（${role.credential_error}）；可输入新密钥替换` : role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<button className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</button></form></section>}
+        {config.roles.map((role, index) => <fieldset className="wp-role-card" key={role.role}><legend>{ROLE_NAMES[role.role]}</legend><div className="wp-role-grid"><label>Source<select aria-label={`Source ${role.role}`} value={role.source ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, source: event.target.value } : row) }))}><option value="">Choose source / preserve legacy</option><option value="remote">Remote</option><option value="local">Local (calls unavailable)</option></select></label><label>Provider<input value={role.provider} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, provider: event.target.value } : row) }))}/></label><label>Model<input value={role.model} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, model: event.target.value } : row) }))}/></label><label className="wide">Base URL<input value={role.base_url} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, base_url: event.target.value } : row) }))}/></label><label className="wide">API key <small>{role.credential_status === "UNAVAILABLE" ? `凭据不可用（${role.credential_error}）；可输入新密钥替换` : role.key_configured ? "已配置；留空保留已保存密钥" : "尚未配置"}</small><input type="password" autoComplete="new-password" value={role.api_key ?? ""} onChange={event => setConfig(current => ({ ...current, roles: current.roles.map((row, i) => i === index ? { ...row, api_key: event.target.value } : row) }))} placeholder={role.key_configured ? "留空保留" : "输入密钥"}/></label></div></fieldset>)}{configError && <p className="wp-inline-error" role="alert">{configError}</p>}<Button type="primary" htmlType="submit" className="wp-save" disabled={busy || Boolean(runtimeError)}>保存模型设置</Button></form></section>}
       {page === "memory" && <MemoryPanel disabled={loading || Boolean(runtimeError)} onOpenDocument={openMemoryDocument} />}
-    </main>
-
-    {page === "library" && familiarDocument && <aside className="wp-source-drawer" aria-label="常用文档详情"><button className="wp-close" onClick={() => setFamiliarDocument(null)}>关闭文档</button><strong>{familiarDocument.filename}</strong><p>{familiarDocument.status}</p><a href={portApi.originalDocumentURL(familiarDocument.knowledge_base_id, familiarDocument.id)} target="_blank" rel="noreferrer">打开原始文件</a></aside>}
-  </div>;
+    </Layout.Content>
+    <Modal title="新建知识库" open={createKbOpen} onCancel={() => { if (!creatingKb) setCreateKbOpen(false); }} footer={null} destroyOnHidden>
+      <form className="wp-create-kb-form" onSubmit={event => void createKb(event)}><label htmlFor="wp-kb-name">知识库名称</label><Input id="wp-kb-name" autoFocus value={newKbName} onChange={event => setNewKbName(event.target.value)} placeholder="例如：课程资料" disabled={creatingKb} />{createKbError && <Alert type="error" title={createKbError} showIcon />}<p>新建知识库默认仅在本地处理。外发许可可在资料管理中明确设置。</p><div><Button disabled={creatingKb} onClick={() => setCreateKbOpen(false)}>取消</Button><Button type="primary" htmlType="submit" loading={creatingKb} disabled={!newKbName.trim() || Boolean(runtimeError)}>创建</Button></div></form>
+    </Modal>
+    <DocumentPreview document={page === 'library' ? familiarDocument : null} onClose={() => setFamiliarDocument(null)} />
+    <SourceReferenceDrawer reference={page === 'chat' ? sourceReference : null} onClose={() => setSourceReference(null)} />
+  </Layout>
+  </ConfigProvider>;
 }

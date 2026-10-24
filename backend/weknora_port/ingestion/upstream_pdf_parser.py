@@ -290,22 +290,29 @@ def _strip_chart_text_debris(text: str) -> str:
                 _is_chart_debris_line(lines[j]) or not lines[j].strip()
             ):
                 j += 1
-            if j - i >= 3:
+            # Numeric-only runs may be data; text alone gives no layout proof.
+            has_chart_marker = any(
+                ln.strip() and not re.fullmatch(r"[\d\s.()-]+", ln.strip())
+                for ln in lines[i:j]
+            )
+            if j - i >= 3 and has_chart_marker:
                 i = j
                 continue
+            out.extend(lines[i:j])
+            i = j
+            continue
         out.append(lines[i])
         i += 1
     return "\n".join(out)
 
 
 def _strip_arxiv_and_page_num_lines(text: str) -> str:
+    """Strip arXiv markings, preserving numeric facts without page-position evidence."""
     lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
     kept: list = []
     for ln in lines:
         t = ln.strip()
         if _ARXIV_LINE_RE.match(t):
-            continue
-        if _PAGE_NUM_LINE_RE.match(t):
             continue
         if "arXiv:" in ln:
             ln = re.sub(r"\s*arXiv:\s*\S+\s*(?:\[[^\]]+\])?\s*[^\n]*", "", ln).strip()

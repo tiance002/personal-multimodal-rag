@@ -211,6 +211,11 @@ def runtime(db):
     value.principal=PRINCIPAL;value.leases=Leases(db)
     value.turns=PostgresTurnRepository(value.leases,PRINCIPAL,generation_defaults=SUMMARY)
     value.conversation=ConversationSettings()
+    # This fixture owns preferences/admission only; no model catalogue tables.
+    async def capabilities(session, maximum):
+        from backend.weknora_port.models.generation_capabilities import describe_generation_capabilities
+        return describe_generation_capabilities(None, maximum, error_code='CHAT_MODEL_CONFIGURATION_REQUIRED')
+    value._answer_generation_capabilities=capabilities
     return value
 
 

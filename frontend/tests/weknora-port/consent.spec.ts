@@ -23,7 +23,7 @@ async function mocks(page: import("@playwright/test").Page, fail = false) {
 
 async function openConsent(page: import("@playwright/test").Page) {
   await page.goto("/");
-  await page.getByRole("button", { name: "资料库", exact: true }).click();
+  await page.getByRole("menuitem", { name: "资料库", exact: true }).click();
   await page.getByRole("button", { name: /课程资料/ }).click();
   return page.getByRole("switch", { name: "允许当前知识库使用云端模型" });
 }

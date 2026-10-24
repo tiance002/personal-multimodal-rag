@@ -24,6 +24,13 @@ function frame(event: Record<string, unknown>) {
   return `event: message\ndata: ${JSON.stringify(event)}\n\n`;
 }
 
+async function expectUploadKnowledgeBase(page: import("@playwright/test").Page, id: string, name: string) {
+  const control = page.getByRole("combobox", { name: "上传目标知识库" });
+  await control.click();
+  await expect(page.getByRole("option", { name, exact: true, selected: true })).toHaveText(id);
+  await control.press("Escape");
+}
+
 for (const scenario of [
   { name: "truncated", text: "保留尚未写完的回答", finish_reason: "length", generation_issues: ["TRUNCATED"], label: "输出被截断；已有内容已保存，未重新生成。" },
   { name: "empty", text: "", finish_reason: "stop", generation_issues: ["EMPTY"], label: "模型未返回可用答案；运行终态已保存，未重新生成。" },
@@ -96,7 +103,7 @@ test("port adapter loads visible scope and five masked model roles without old a
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("教材 第三章.pdf")).toBeVisible();
   await expect(page.getByRole("combobox", { name: "回答设置推理模式" })).toHaveValue("quick");
-  await page.getByRole("button", { name: "模型设置" }).click();
+  await page.getByRole("menuitem", { name: "模型设置" }).click();
   for (const role of ["Embedding", "Rerank", "Cheap answer", "Expensive answer", "Vision"]) {
     await expect(page.getByText(role, { exact: true })).toBeVisible();
   }
@@ -176,16 +183,16 @@ test("answer language defaults to Simplified Chinese and persists an explicit se
     });
   });
   await page.goto("/");
-  await page.getByRole("button", { name: "模型设置" }).click();
+  await page.getByRole("menuitem", { name: "模型设置" }).click();
   const language = page.getByRole("combobox", { name: "回答语言", exact: true });
   await expect(language).toHaveValue("zh-CN");
   await expect(language.locator("option")).toHaveText(["简体中文", "繁體中文", "English", "日本語", "한국어"]);
   await language.selectOption("en-US");
   await expect(page.getByText("回答语言已更新，仅保存在此浏览器。", { exact: true })).toBeVisible();
   await page.reload();
-  await page.getByRole("button", { name: "模型设置" }).click();
+  await page.getByRole("menuitem", { name: "模型设置" }).click();
   await expect(language).toHaveValue("en-US");
-  await page.getByRole("button", { name: "问答", exact: true }).click();
+  await page.getByRole("menuitem", { name: "问答", exact: true }).click();
   await page.getByRole("button", { name: "选择知识库和文件", exact: true }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await page.getByPlaceholder("询问当前资料…").fill("卡片中的读数是多少？");
@@ -274,13 +281,13 @@ test("library selection reads its KB scope and upload polling exposes terminal c
   });
 
   await page.goto("/");
-  await page.getByRole("button", { name: "资料库" }).click();
+  await page.getByRole("menuitem", { name: "资料库" }).click();
   await page.getByText("课程资料", { exact: true }).first().click();
   await expect(page.getByText("chapter.pdf", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "查看原文件" })).toHaveAttribute("href", /knowledge-bases\/kb-1\/documents\/doc-1\/source$/);
   await page.getByRole("button", { name: /^图片资料/ }).click();
   await expect(page.getByText("chapter.pdf", { exact: true })).toHaveCount(0);
-  await expect(page.getByRole("combobox", { name: '上传目标知识库' })).toHaveValue("kb-2");
+  await expectUploadKnowledgeBase(page, "kb-2", "图片资料");
   await expect(page.getByText("资料文件", { exact: true })).toBeVisible();
   await page.locator('input[type="file"]').setInputFiles({ name: "figure.png", mimeType: "image/png", buffer: Buffer.from("image") });
   await expect(page.getByText("figure.png", { exact: true })).toBeVisible();
@@ -774,17 +781,17 @@ test("library keeps upload and readable filenames in view with 50 KBs and indepe
   });
 
   await page.goto("/");
-  await page.getByRole("button", { name: "资料库", exact: true }).click();
+  await page.getByRole("menuitem", { name: "资料库", exact: true }).click();
   const library = page.locator("section.wp-library-page");
   const heading = library.getByRole("heading", { name: "知识库", exact: true, level: 1 });
   const kbList = library.locator(".wp-kb-list");
   const docList = library.locator(".wp-library-documents");
-  const upload = library.locator(".wp-upload-row");
+  const upload = library.locator(".wp-upload-dropzone");
   await expect(kbList.getByRole("button")).toHaveCount(50);
   const lastBase = kbList.getByRole("button").last();
   await lastBase.click();
   await expect(lastBase).toHaveAttribute("aria-pressed", "true");
-  await expect(library.getByRole("combobox", { name: '上传目标知识库' })).toHaveValue("many-kb-50");
+  await expectUploadKnowledgeBase(page, "many-kb-50", kbRows[49].name);
   await expect(docList.locator(".wp-document-row")).toHaveCount(35);
   await expect(heading).toBeInViewport({ ratio: 1 });
   await expect(upload).toBeInViewport({ ratio: 1 });
@@ -815,7 +822,7 @@ test("library keeps upload and readable filenames in view with 50 KBs and indepe
   await expect(heading).toBeInViewport({ ratio: 1 });
   await expect(upload).toBeInViewport({ ratio: 1 });
   expect(Math.abs((await upload.boundingBox())!.y - uploadTop)).toBeLessThanOrEqual(1);
-  await expect(library.getByRole("combobox", { name: "上传目标知识库" })).toHaveValue("many-kb-50");
+  await expectUploadKnowledgeBase(page, "many-kb-50", kbRows[49].name);
   await expect(lastBase).toHaveAttribute("aria-pressed", "true");
   const overflow = await page.locator("main").evaluate(element => ({ scroll: element.scrollWidth, client: element.clientWidth }));
   expect(overflow.scroll).toBeLessThanOrEqual(overflow.client + 1);

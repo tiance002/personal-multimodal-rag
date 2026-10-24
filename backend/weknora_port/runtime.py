@@ -19,7 +19,7 @@ from .retrieval.pipeline import PipelineState, RetrievalPipeline
 from .retrieval.search import SearchTarget
 from .service import RuntimeService, TurnConfiguration, OrdinaryMemoryLoader
 from .conversation import OrdinaryHistoryService, MemoryService
-from .storage.configuration import PostgresModelRoleStore, ModelConfigurationError
+from .storage.configuration import ConfiguredRole, PostgresModelRoleStore, ModelConfigurationError
 from .storage.models import PostgresModelStore
 from .storage.turns import PostgresTurnRepository
 from .storage.generation import PostgresGenerationLifecycle
@@ -549,7 +549,65 @@ class ApplicationRuntime:
         async with self.leases.lease() as guard:
             session = await self.turns._session(guard, session_id, principal)
         summary = resolve_saved_conversation(self.conversation, session)['summary']
-        return resolve_settings(summary, session)
+        result = resolve_settings(summary, session)
+        result['capabilities'] = await self._answer_generation_capabilities(
+            session, result['effective']['max_output_tokens'])
+        return result
+
+    async def _answer_generation_capabilities(self, session, maximum):
+        from .models.generation_capabilities import describe_generation_capabilities
+        from .storage.configuration import ModelConfigurationError
+        mode = self.policy.mode
+        if mode == 'OFF':
+            try:
+                scope = session.get('knowledge_base_scope') or ()
+                if isinstance(scope, str): scope = json.loads(scope)
+                scope = tuple(scope) or ((session['knowledge_base_id'],) if session.get('knowledge_base_id') else ())
+                model_id = await self._normal_chat_model_id(session, '', scope)
+                _, _, role = await self.models._load(model_id)
+                config = self.catalogue.resolve(role, model_id)
+                result = describe_generation_capabilities(config, maximum, role=role.role)
+            except (ProviderError, ModelConfigurationError) as error:
+                code = getattr(error, 'code', str(error))
+                if code not in {'CHAT_MODEL_CONFIGURATION_REQUIRED', 'CONFIGURED_CHAT_MODEL_UNAVAILABLE',
+                                'MODEL_NOT_FOUND', 'MODEL_UNAVAILABLE', 'MODEL_ID_INVALID'}:
+                    raise
+                result = describe_generation_capabilities(None, maximum, error_code=code)
+            return {**result, 'routing_mode': mode, 'selection_scope': 'selected-model',
+                    'candidate_models': [result['selected_model']] if result['selected_model'] else []}
+        names = ('cheap', 'expensive') if mode == 'DYNAMIC' else (
+            ('cheap',) if mode == 'CHEAP_ONLY' else ('expensive',))
+        # This read does not persist model snapshots, decrypt credentials or
+        # instantiate a provider. Role identities are prospective until a turn.
+        async with self.leases.lease() as guard:
+            revision, values = await PostgresModelRoleStore(
+                guard, self.principal, self.catalogue, cipher=self.cipher)._stored()
+        candidates = []
+        for name in names:
+            value = values[name]
+            if not all(value.get(key) for key in ('provider', 'model', 'base_url')):
+                candidates.append(describe_generation_capabilities(None, maximum, error_code='MODEL_ROLE_NOT_CONFIGURED'))
+                continue
+            parameters = {key: item for key, item in (value.get('parameters') or {}).items()
+                          if key not in {'api_key', 'app_secret'}}
+            role = ConfiguredRole(**{**value, 'api_key': '', 'parameters': parameters})
+            config = self.catalogue.resolve(role, 'configured-role-' + name)
+            item = describe_generation_capabilities(config, maximum, role=name)
+            item['selected_model']['model_id'] = None
+            candidates.append(item)
+        result = describe_generation_capabilities(None, maximum)
+        states = [item['thinking'] for item in candidates]
+        result['thinking'] = 'unsupported' if 'unsupported' in states else (
+            'unknown' if 'unknown' in states else 'supported')
+        limits = [item['declared_max_output_tokens'] for item in candidates]
+        if all(limit is not None for limit in limits):
+            result['declared_max_output_tokens'] = min(limits)
+            result['capacity_source'] = 'fixed-source-catalog'
+        result['error_code'] = next((item['error_code'] for item in candidates if item['error_code']), '')
+        return {**result, 'routing_mode': mode, 'selection_scope': 'configured-routing-roles',
+                'configuration_revision': revision,
+                'candidate_models': [item['selected_model'] for item in candidates if item['selected_model']],
+                'candidate_capabilities': candidates}
 
     async def update_generation_settings(self, principal, session_id, value):
         self._owner(principal)
@@ -643,6 +701,28 @@ class ApplicationRuntime:
             guard, self.principal, self.catalogue, cipher=self.cipher)
         return await role_snapshot(configuration, self.models)
 
+    async def _normal_chat_model_id(self, session, requested_model_id, ordered):
+        """Share normal scoped selection with read-only capability guidance."""
+        from .model_selection import resolve_chat_model_id
+        context_configuration = session.get('context_config') or {}
+        if isinstance(context_configuration, str): context_configuration = json.loads(context_configuration)
+        profile_id = (context_configuration.get('conversation') or {}).get('model_id', '')
+        allowed = set(ordered)
+        async def get_kb(id):
+            if id not in allowed: raise ProviderError('TURN_KB_SCOPE_DENIED')
+            rows = await self._rows('SELECT id,summary_model_id FROM knowledge_bases WHERE tenant_id=%s AND id=ANY(%s) AND deleted_at IS NULL',
+                (self.principal.tenant_id, [id]))
+            return rows[0] if rows else None
+        async def get_model(id):
+            row, _, _ = await self.models._load(id)
+            return {name: row[name] for name in ('id', 'type', 'source')}
+        async def list_models():
+            # Source repository List has no ORDER BY; do not invent role priority.
+            rows = await self._rows("SELECT id FROM models WHERE tenant_id=%s AND subject_id=%s AND status='active' AND deleted_at IS NULL",
+                (self.principal.tenant_id, self.principal.subject_id))
+            return [await get_model(row['id']) for row in rows]
+        return await resolve_chat_model_id(requested_model_id, profile_id, ordered, get_kb, get_model, list_models)
+
     async def _configuration(self, turn):
         async with self.leases.lease() as guard:
             session = await self.turns._session(guard, turn.session_id, self.principal)
@@ -656,30 +736,13 @@ class ApplicationRuntime:
         from .conversation_configuration import resolve_saved_conversation, resolve_language, resolved_chat_options
         from .generation_settings import resolve_settings, apply_settings
         from .retrieval.pipeline import DEFAULT_REWRITE_SYSTEM, DEFAULT_REWRITE_USER, DEFAULT_CONTEXT_TEMPLATE
-        from .generation.context import DEFAULT_SYSTEM_PROMPT
+        from .generation.context import EN_SYSTEM_PROMPT
         source = self.conversation
         effective = resolve_saved_conversation(source, session)
-        from .model_selection import resolve_chat_model_id
-        context_configuration=session.get('context_config') or {}
-        if isinstance(context_configuration,str):context_configuration=json.loads(context_configuration)
-        profile_id=(context_configuration.get('conversation') or {}).get('model_id','')
         allowed=set(turn.context.scope.knowledge_base_ids)
         ordered=tuple(dict.fromkeys(turn.request.knowledge_base_scope or turn.context.scope.knowledge_base_ids))
         if set(ordered)!=allowed:raise ProviderError('TURN_KB_SCOPE_DENIED')
-        async def get_kb(id):
-            if id not in allowed:raise ProviderError('TURN_KB_SCOPE_DENIED')
-            rows=await self._rows('SELECT id,summary_model_id FROM knowledge_bases WHERE tenant_id=%s AND id=ANY(%s) AND deleted_at IS NULL',
-                (self.principal.tenant_id,[id]))
-            return rows[0] if rows else None
-        async def get_model(id):
-            row,_,_=await self.models._load(id)
-            return {name:row[name] for name in ('id','type','source')}
-        async def list_models():
-            # Source repository List has no ORDER BY; do not invent role priority.
-            rows=await self._rows("SELECT id FROM models WHERE tenant_id=%s AND subject_id=%s AND status='active' AND deleted_at IS NULL",
-                (self.principal.tenant_id,self.principal.subject_id))
-            return [await get_model(row['id']) for row in rows]
-        chat_id=await resolve_chat_model_id(turn.request.summary_model_id,profile_id,ordered,get_kb,get_model,list_models)
+        chat_id=await self._normal_chat_model_id(session, turn.request.summary_model_id, ordered)
         self._runs[turn.run_id] = {"registry": registry, "snapshot": snapshot, "chat_id": chat_id}
         baseline = await registry.chat(chat_id, turn.context)
         summary = effective['summary']
@@ -720,7 +783,7 @@ class ApplicationRuntime:
                     'enable_rewrite', 'enable_expansion', 'rerank_top1_floorless', 'rerank_context_enabled',
                     'bridge_rescue_mode', 'chat_model_id', 'query_understand_model_id', 'rerank_model_id', 'vlm_model_id')}))
         return TurnConfiguration(state, {"policy": self.policy,
-            "system_prompt": summary.get('prompt', DEFAULT_SYSTEM_PROMPT),
+            "system_prompt": summary.get('prompt', EN_SYSTEM_PROMPT),
             "options": answer_options, "generation_settings": answer_settings,
             "shadow_routing_mode":source.shadow_routing_mode},
             fallback={"strategy":source.fallback_strategy,"response":source.fallback_response,
@@ -1008,11 +1071,30 @@ class ApplicationRuntime:
     async def read_image_processing(self,principal,knowledge_base_id):
         self._owner(principal)
         from .image_configuration import effective_image_config
+        from .models.generation_capabilities import describe_generation_capabilities
         kb=await self.documents._kb(principal,knowledge_base_id)
         cfg=effective_image_config(kb)
+        maximum=cfg.get('max_output_tokens',0) or 5000
+        model_id=cfg.get('caption_model_id') or ''
+        config=None
+        role=None
+        error_code='IMAGE_CAPTION_VISION_MODEL_REQUIRED'
+        if model_id:
+            try:
+                _,_,role=await self.models._load(model_id)
+                config=self.catalogue.resolve(role,model_id)
+                error_code=''
+            except (ProviderError,ModelConfigurationError) as error:
+                error_code=getattr(error,'code',str(error))
+                if error_code not in {'MODEL_NOT_FOUND','MODEL_UNAVAILABLE','MODEL_ID_INVALID'}:
+                    raise
+        capabilities=describe_generation_capabilities(config,maximum,role=role.role if role else '',
+            error_code=error_code)
         return {'id':knowledge_base_id,'image_processing_config':cfg,
+                'capabilities':{**capabilities,'selection_scope':'explicit-caption-model',
+                                'routing_mode':'OFF'},
                 'effective_generation':{'reasoning_mode':cfg.get('reasoning_mode','quick'),
-                                        'max_output_tokens':cfg.get('max_output_tokens',0) or 5000}}
+                                        'max_output_tokens':maximum}}
 
     async def retry_image_item(self,principal,knowledge_base_id,document_id,value):
         self._owner(principal)

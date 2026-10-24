@@ -14,6 +14,228 @@ async function install(page: import('@playwright/test').Page) {
   await page.route('**/api/v1/sessions/s88-session/messages', route => route.fulfill({ json: envelope([]) }));
 }
 
+async function selectUploadKnowledgeBase(page: import('@playwright/test').Page, name: string) {
+  await page.getByRole('combobox', { name: '上传目标知识库' }).click();
+  await page.locator('.ant-select-dropdown').getByText(name, { exact: true }).click();
+}
+
+async function openImageSettings(page: import('@playwright/test').Page, knowledgeBase = '设置验证资料') {
+  await page.goto('/');
+  await page.getByRole('menuitem', { name: '资料库', exact: true }).click();
+  await selectUploadKnowledgeBase(page, knowledgeBase);
+  await page.getByText('图片处理设置', { exact: true }).click();
+}
+
+test('image save validation failure allows correction, retry and restoring defaults', async ({ page }) => {
+  await install(page);
+  let saved = { reasoning_mode: 'quick', max_output_tokens: 0 };
+  let patches = 0;
+  await page.route('**/api/v1/knowledge-bases/kb-1/image-processing', route => {
+    if (route.request().method() === 'PATCH') {
+      patches++;
+      const body = route.request().postDataJSON();
+      if (body.max_output_tokens === 999999) return route.fulfill({ status: 422, json: { error: { message: '图片输出额度超出当前配置' } } });
+      saved = body;
+    }
+    return route.fulfill({ json: envelope({ image_processing_config: saved,
+      effective_generation: { ...saved, max_output_tokens: saved.max_output_tokens || 5000 } }) });
+  });
+  await openImageSettings(page);
+  const maximum = page.getByRole('spinbutton', { name: '图片处理最大输出 Token' });
+  const save = page.getByRole('button', { name: '保存图片设置' });
+  const reset = page.getByRole('button', { name: '恢复图片默认' });
+  await expect(maximum).toBeEnabled();
+  await maximum.fill('999999'); await save.click();
+  await expect(page.getByRole('alert')).toContainText('图片输出额度超出当前配置');
+  await expect(save).toBeEnabled(); await expect(reset).toBeEnabled();
+  await maximum.fill('4000'); await save.click();
+  await expect(page.getByRole('region', { name: '图片处理设置', exact: true }).getByRole('status')).toContainText('图片设置已保存');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await maximum.fill('999999'); await save.click();
+  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.getByRole('region', { name: '图片处理设置', exact: true }).getByRole('status')).toHaveCount(0);
+  await reset.click();
+  await expect(maximum).toHaveValue('0');
+  expect(saved).toEqual({ reasoning_mode: 'quick', max_output_tokens: 0 });
+  expect(patches).toBe(4);
+});
+
+test('image load failure is blocked until explicit load retry succeeds', async ({ page }) => {
+  await install(page);
+  let reads = 0;
+  let available = false;
+  await page.route('**/api/v1/knowledge-bases/kb-1/image-processing', route => {
+    reads++;
+    return !available ? route.fulfill({ status: 503, json: { error: { message: '图片设置暂时不可读取' } } })
+      : route.fulfill({ json: envelope({ image_processing_config: { reasoning_mode: 'smart', max_output_tokens: 3000 } }) });
+  });
+  await openImageSettings(page);
+  await expect(page.getByRole('alert')).toContainText('图片设置暂时不可读取');
+  await expect(page.getByRole('button', { name: '保存图片设置' })).toBeDisabled();
+  await expect(page.getByRole('combobox', { name: '图片处理推理模式' })).toBeDisabled();
+  const failedReads = reads; available = true;
+  await page.getByRole('button', { name: '重新读取图片设置' }).click();
+  await expect(page.getByRole('combobox', { name: '图片处理推理模式' })).toHaveValue('smart');
+  await expect(page.getByRole('button', { name: '保存图片设置' })).toBeEnabled();
+  expect(reads).toBe(failedReads + 1);
+});
+
+test('transient image save failure can retry the same unsaved values', async ({ page }) => {
+  await install(page);
+  let patches = 0;
+  await page.route('**/api/v1/knowledge-bases/kb-1/image-processing', route => {
+    if (route.request().method() === 'PATCH' && ++patches === 1) {
+      return route.fulfill({ status: 503, json: { error: { message: '图片设置保存暂时不可用' } } });
+    }
+    return route.fulfill({ json: envelope({ image_processing_config: {},
+      effective_generation: { reasoning_mode: 'quick', max_output_tokens: 3500 } }) });
+  });
+  await openImageSettings(page);
+  const maximum = page.getByRole('spinbutton', { name: '图片处理最大输出 Token' });
+  const save = page.getByRole('button', { name: '保存图片设置' });
+  await expect(maximum).toBeEnabled(); await maximum.fill('3500'); await save.click();
+  await expect(page.getByRole('alert')).toContainText('图片设置保存暂时不可用');
+  await expect(maximum).toHaveValue('3500');
+  await save.click();
+  await expect(page.getByText('当前有效值：Quick · 3500 Token')).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect(patches).toBe(2);
+});
+
+test('image pending save disables concurrent edits, save and reset', async ({ page }) => {
+  await install(page);
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  let patches = 0;
+  await page.route('**/api/v1/knowledge-bases/kb-1/image-processing', async route => {
+    if (route.request().method() === 'PATCH') { patches++; await held; }
+    return route.fulfill({ json: envelope({ image_processing_config: {} }) });
+  });
+  await openImageSettings(page);
+  const save = page.getByRole('button', { name: '保存图片设置' });
+  await expect(save).toBeEnabled(); await save.click();
+  await expect(save).toBeDisabled();
+  await expect(page.getByRole('button', { name: '恢复图片默认' })).toBeDisabled();
+  await expect(page.getByRole('spinbutton', { name: '图片处理最大输出 Token' })).toBeDisabled();
+  release();
+  await expect(save).toBeEnabled(); expect(patches).toBe(1);
+});
+
+test('late image save from another knowledge base cannot replace current settings', async ({ page }) => {
+  await install(page);
+  await page.route('**/api/v1/knowledge-bases', route => route.fulfill({ json: envelope([
+    { id: 'kb-1', name: '旧资料库', cloud_allowed: true, document_count: 1 },
+    { id: 'kb-2', name: '新资料库', cloud_allowed: true, document_count: 0 },
+  ]) }));
+  await page.route('**/api/v1/knowledge-bases/kb-2/documents', route => route.fulfill({ json: envelope([]) }));
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  let patchStarted!: () => void;
+  const started = new Promise<void>(resolve => { patchStarted = resolve; });
+  let oldReads = 0;
+  await page.route('**/api/v1/knowledge-bases/*/image-processing', async route => {
+    const old = route.request().url().includes('/kb-1/');
+    if (old && route.request().method() === 'GET') oldReads++;
+    if (route.request().method() === 'PATCH') { patchStarted(); await held; }
+    return route.fulfill({ json: envelope({ image_processing_config: { reasoning_mode: old ? 'smart' : 'quick', max_output_tokens: old ? 4000 : 2000 } }) });
+  });
+  await openImageSettings(page, '旧资料库');
+  const maximum = page.getByRole('spinbutton', { name: '图片处理最大输出 Token' });
+  await expect(maximum).toHaveValue('4000');
+  await page.getByRole('button', { name: '保存图片设置' }).click(); await started;
+  const priorReads = oldReads;
+  await selectUploadKnowledgeBase(page, '新资料库');
+  await expect(maximum).toHaveValue('2000');
+  // Flush the pending response through the browser before checking the new scope.
+  const finished = page.waitForResponse(response => response.url().includes('/kb-1/image-processing') && response.request().method() === 'PATCH');
+  release(); await finished;
+  await expect(maximum).toHaveValue('2000');
+  await expect(page.getByRole('combobox', { name: '图片处理推理模式' })).toHaveValue('quick');
+  await expect(page.getByText('图片设置已保存，仅用于新的 VLM / Caption 处理尝试。')).toHaveCount(0);
+  expect(oldReads).toBe(priorReads);
+});
+
+test('late image load cannot overwrite a newly selected knowledge base', async ({ page }) => {
+  await install(page);
+  await page.route('**/api/v1/knowledge-bases', route => route.fulfill({ json: envelope([
+    { id: 'kb-1', name: '旧资料库', cloud_allowed: true, document_count: 1 },
+    { id: 'kb-2', name: '新资料库', cloud_allowed: true, document_count: 0 },
+  ]) }));
+  await page.route('**/api/v1/knowledge-bases/kb-2/documents', route => route.fulfill({ json: envelope([]) }));
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  let loadStarted!: () => void;
+  const started = new Promise<void>(resolve => { loadStarted = resolve; });
+  await page.route('**/api/v1/knowledge-bases/*/image-processing', async route => {
+    const old = route.request().url().includes('/kb-1/');
+    if (old) { loadStarted(); await held; }
+    return route.fulfill({ json: envelope({ image_processing_config: { reasoning_mode: old ? 'smart' : 'quick', max_output_tokens: old ? 9000 : 2000 } }) });
+  });
+  await openImageSettings(page, '旧资料库'); await started;
+  await expect(page.getByRole('button', { name: '保存图片设置' })).toBeDisabled();
+  await selectUploadKnowledgeBase(page, '新资料库');
+  const maximum = page.getByRole('spinbutton', { name: '图片处理最大输出 Token' });
+  await expect(maximum).toHaveValue('2000');
+  const finished = page.waitForResponse(response => response.url().includes('/kb-1/image-processing'));
+  release(); await finished;
+  await expect(maximum).toHaveValue('2000');
+  await expect(page.getByRole('button', { name: '保存图片设置' })).toBeEnabled();
+});
+
+for (const thinking of ['unknown', 'unsupported', 'supported'] as const) {
+  test(`answer capability display preserves ${thinking} and distinguishes operating budget from certified maximum`, async ({ page }) => {
+    await install(page);
+    await page.route('**/api/v1/sessions/s88-session/generation-settings', route => route.fulfill({ json: envelope({
+      saved: {}, defaults: { reasoning_mode: 'quick', max_output_tokens: 2048 },
+      effective: { reasoning_mode: 'quick', max_output_tokens: 2048 },
+      capabilities: { thinking, operating_max_output_tokens: 2048, certified_max_output_tokens: null },
+    }) }));
+    await page.goto('/');
+    await page.getByRole('button', { name: /设置持久化会话/ }).click();
+    const controls = page.getByRole('group', { name: '回答设置', exact: true });
+    await expect(controls).toContainText(thinking === 'unknown' ? '思考能力：未知，尚未确认' : thinking === 'unsupported' ? '思考能力：当前模型不支持 Smart' : '思考能力：支持');
+    await expect(controls).toContainText('运行输出额度：2048 Token；已认证模型输出上限：未知');
+    await expect(controls).toContainText('不代表价格档位');
+    const smart = controls.getByRole('option', { name: 'Smart · 开启思考' });
+    await expect(smart).toHaveJSProperty('disabled', thinking === 'unsupported');
+  });
+}
+
+test('dynamic answer routing shows candidate roles and catalog capacity without certification', async ({ page }) => {
+  await install(page);
+  await page.route('**/api/v1/sessions/s88-session/generation-settings', route => route.fulfill({ json: envelope({
+    saved: {}, defaults: { reasoning_mode: 'quick', max_output_tokens: 2048 },
+    effective: { reasoning_mode: 'quick', max_output_tokens: 2048 },
+    capabilities: { thinking: 'supported', operating_max_output_tokens: 2048, certified_max_output_tokens: null,
+      declared_max_output_tokens: 65536, capacity_source: 'fixed-source-catalog', selected_model: null,
+      routing_mode: 'DYNAMIC', selection_scope: 'configured-routing-roles', candidate_models: [
+        { model_id: null, role: 'cheap', provider: 'fixture', model: 'low-cost-model', source: 'cloud' },
+        { model_id: null, role: 'expensive', provider: 'fixture', model: 'high-cost-model', source: 'cloud' },
+      ] },
+  }) }));
+  await page.goto('/'); await page.getByRole('button', { name: /设置持久化会话/ }).click();
+  const controls = page.getByRole('group', { name: '回答设置', exact: true });
+  await expect(controls).toContainText('服务端路由：DYNAMIC；候选模型：cheap · fixture / low-cost-model；expensive · fixture / high-cost-model');
+  await expect(controls).toContainText('目录声明输出上限：65536 Token；此声明不代表当前部署已认证');
+  await expect(controls).toContainText('已认证模型输出上限：未知');
+  await expect(controls).not.toContainText('当前模型：');
+});
+
+test('image capability guidance names the explicit caption model without substituting roles', async ({ page }) => {
+  await install(page);
+  await page.route('**/api/v1/knowledge-bases/kb-1/image-processing', route => route.fulfill({ json: envelope({
+    image_processing_config: {}, effective_generation: { reasoning_mode: 'quick', max_output_tokens: 5000 },
+    capabilities: { thinking: 'unknown', operating_max_output_tokens: 5000, certified_max_output_tokens: null,
+      selected_model: { model_id: 'explicit-caption', role: 'vlm', provider: 'fixture', model: 'selected-caption', source: 'cloud' },
+      selection_scope: 'explicit-caption-model', error_code: 'MODEL_GENERATION_CAPACITY_UNKNOWN' },
+  }) }));
+  await openImageSettings(page);
+  const controls = page.getByRole('group', { name: '图片处理', exact: true });
+  await expect(controls).toContainText('当前模型：fixture / selected-caption（vlm）');
+  await expect(controls).toContainText('当前模型的容量信息尚未确认，请在模型设置中检查配置');
+  await expect(controls).toContainText('思考能力：未知，尚未确认');
+});
+
 test('saved session settings restore after reload, Smart uses ordinary mode and finite explicit cap', async ({ page }) => {
   await install(page);
   let saved = { reasoning_mode: 'quick', max_output_tokens: 0 };
@@ -86,8 +308,8 @@ test('image settings save independently and selected failed Caption starts one e
     return route.fulfill({ json: envelope({ id: 'new-attempt', state: 'pending' }) });
   });
   await page.goto('/');
-  await page.getByRole('button', { name: '资料库', exact: true }).click();
-  await page.getByRole('combobox', { name: '上传目标知识库' }).selectOption('kb-1');
+  await page.getByRole('menuitem', { name: '资料库', exact: true }).click();
+  await selectUploadKnowledgeBase(page, '设置验证资料');
   await page.getByText('图片处理设置', { exact: true }).click();
   await expect(page.getByRole('combobox', { name: '图片处理推理模式' })).toBeEnabled();
   await page.getByRole('combobox', { name: '图片处理推理模式' }).selectOption('smart');
@@ -102,7 +324,7 @@ test('image settings save independently and selected failed Caption starts one e
   expect(posts).toBe(1);
   expect(retried).toMatchObject({ source_version: 'version-1', asset_path: 'assets/selected.png', asset_sha256: 'a'.repeat(64), kind: 'caption' });
   expect(retried?.idempotency_key).toBeTruthy();
-  await page.getByRole('button', { name: '问答', exact: true }).click();
+  await page.getByRole('menuitem', { name: '问答', exact: true }).click();
   await expect(page.getByRole('combobox', { name: '回答设置推理模式' })).toHaveValue('quick');
   await expect(page.getByRole('spinbutton', { name: '回答设置最大输出 Token' })).toHaveValue('0');
 });

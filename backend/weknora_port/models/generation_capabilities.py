@@ -5,6 +5,51 @@ import json
 from .types import ProviderError
 
 
+def describe_generation_capabilities(config, operating_max_output_tokens, *, role='', error_code=''):
+    """Read-only product guidance from the same model contract used by the guard.
+
+    A finite task budget is not a provider maximum. The pinned source catalogue
+    declares capabilities but does not certify a currently hosted deployment.
+    Missing catalogue facts remain unknown, including ``reasoning=False`` on an
+    uncatalogued model. This projection never enables a send or changes roles.
+    """
+    result = {'thinking': 'unknown', 'operating_max_output_tokens': operating_max_output_tokens,
+              'certified_max_output_tokens': None, 'declared_max_output_tokens': None,
+              'capacity_source': 'unknown', 'selected_model': None, 'error_code': error_code}
+    if config is None:
+        return result
+    result['selected_model'] = {'model_id': config.model_id, 'provider': config.provider,
+        'model': config.model, 'source': config.source, 'role': role}
+    if config.cataloged:
+        from .catalog import find_model
+        declared = find_model(config.provider, config.model, config.model_type)
+        if declared and declared.get('max_output_tokens', 0) > 0:
+            result['declared_max_output_tokens'] = declared['max_output_tokens']
+            result['capacity_source'] = 'fixed-source-catalog'
+        result['thinking'] = 'supported' if config.reasoning else 'unsupported'
+        if config.reasoning:
+            from .types import ChatOptions
+            options = ChatOptions(thinking=True, reasoning_effort='auto', reasoning_mode='smart',
+                                  max_completion_tokens=operating_max_output_tokens)
+            if config.source == 'local':
+                from .local_ollama import build_ollama_body
+                body = build_ollama_body(config, (), options)
+            elif config.api == 'openai-completions':
+                from .request import build_chat_body
+                body = build_chat_body(config, (), options)
+            else:
+                from .native_request import build_native_body
+                body = build_native_body(config, (), options)
+            if _thinking_wire(config, body)[1] is not True:
+                result['thinking'] = 'unsupported'
+                result['error_code'] = error_code or 'MODEL_SMART_MODE_UNSUPPORTED'
+    if config.max_output_tokens <= 0 or config.context_window <= 0:
+        result['error_code'] = error_code or 'MODEL_GENERATION_CAPACITY_UNKNOWN'
+    elif operating_max_output_tokens > config.max_output_tokens:
+        result['error_code'] = error_code or 'MODEL_OUTPUT_LIMIT_EXCEEDED'
+    return result
+
+
 def _thinking_wire(config, body):
     if config.source == 'local':
         return ('think', body.get('think'))
@@ -77,6 +122,8 @@ def validate_generation_options(config, options, *, body=None, messages=(), stre
             body = build_native_body(config, messages, options, stream=stream)
     field, enabled = _thinking_wire(config, body)
     if mode == 'smart' and (not config.reasoning or enabled is not True):
+        if not config.cataloged and not config.reasoning:
+            raise ProviderError('MODEL_SMART_MODE_UNKNOWN')
         raise ProviderError('MODEL_SMART_MODE_UNSUPPORTED')
     if mode == 'quick' and enabled is not False:
         if config.reasoning or not config.cataloged:

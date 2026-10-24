@@ -294,7 +294,8 @@ def state_snapshot(state, *, metadata_store=None):
 
 
 def install_profile(runtime, evidence_directory=None, *, approved_batch=None, expires_at=None,
-                    bounded_query_profile=False, approved_scope=None, generation_contract=None):
+                    bounded_query_profile=False, approved_scope=None, generation_contract=None,
+                    approved_scopes=None):
     """Compose existing server dependencies; no class/Adapter monkeypatch."""
     require(generation_contract in (None, 's88-answer-settings/v1'), 'S88_GENERATION_CONTRACT_INVALID')
     require(not getattr(runtime, '_s861_profile_installed', False), 'S861_PROFILE_ALREADY_INSTALLED')
@@ -305,6 +306,25 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
     directory = Path(evidence_directory) if evidence_directory is not None else None
     metadata_store = SnapshotMetadataStore(directory) if directory is not None else None
     expected_kbs, expected_docs = KB_IDS, DOCUMENT_IDS
+    # A corrected task-input cohort may contain different explicitly selected
+    # documents. Bind each scope to its trusted client ID before any QU send;
+    # these are authorization inputs, never inferred from retrieved answers.
+    scopes_by_client = {}
+    if approved_scopes is not None:
+        require(approved_scope is None and approved_batch is not None
+            and isinstance(approved_scopes, dict), 'S88_APPROVED_SCOPES_REQUIRED')
+        client_ids = [row['request_id'] for row in approved_batch['turns']]
+        require(len(client_ids) == len(set(client_ids))
+            and set(approved_scopes) == set(client_ids), 'S88_APPROVED_SCOPES_REQUIRED')
+        for client_id, scope in approved_scopes.items():
+            require(isinstance(scope, dict)
+                and set(scope) == {'knowledge_base_ids', 'document_ids'}, 'S88_APPROVED_SCOPES_REQUIRED')
+            kbs, docs = scope['knowledge_base_ids'], scope['document_ids']
+            require(isinstance(kbs, (list, tuple)) and len(kbs) == 1
+                and isinstance(docs, (list, tuple))
+                and all(isinstance(value, str) and bool(value) for value in (*kbs, *docs))
+                and len(docs) == len(set(docs)), 'S88_APPROVED_SCOPES_REQUIRED')
+            scopes_by_client[client_id] = (tuple(kbs), tuple(docs))
     if approved_scope is not None:
         require(isinstance(approved_scope, dict)
             and set(approved_scope) == {'knowledge_base_ids', 'document_ids'}
@@ -332,8 +352,9 @@ def install_profile(runtime, evidence_directory=None, *, approved_batch=None, ex
             allowed = [row for row in approved_batch['turns'] if row['request_id'] == client_id]
             require(len(allowed) == 1 and allowed[0]['question'] == turn.request.content,
                     'S861_APPROVED_TURN_REQUIRED')
-            require(set(turn.context.scope.knowledge_base_ids) == set(expected_kbs)
-                    and set(turn.context.scope.document_ids) == set(expected_docs), 'S861_APPROVED_SCOPE_REQUIRED')
+            turn_kbs, turn_docs = scopes_by_client.get(client_id, (expected_kbs, expected_docs))
+            require(set(turn.context.scope.knowledge_base_ids) == set(turn_kbs)
+                    and set(turn.context.scope.document_ids) == set(turn_docs), 'S861_APPROVED_SCOPE_REQUIRED')
             previous_run = admitted_clients.setdefault(client_id, turn.run_id)
             require(previous_run == turn.run_id, 'S861_CLIENT_REQUEST_ALREADY_BOUND')
             if bounded_query_profile:
